@@ -7,7 +7,7 @@ settings:
 catalogs:
   default:
     '@gsap/react':
-      specifier: ^2.1.2
+      specifier: 2.1.2
       version: 2.1.2
     '@hookform/resolvers':
       specifier: 3.10.0
@@ -34,7 +34,7 @@ catalogs:
       specifier: 3.6.0
       version: 3.6.0
     gsap:
-      specifier: ^3.14.2
+      specifier: 3.14.2
       version: 3.14.2
     lottie-react:
       specifier: 2.4.1
@@ -128,6 +128,9 @@ importers:
       '@daodao/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@gsap/react':
+        specifier: 'catalog:'
+        version: 2.1.2(gsap@3.14.2)(react@19.2.3)
       '@hookform/resolvers':
         specifier: 'catalog:'
         version: 3.10.0(react-hook-form@7.69.0(react@19.2.3))
@@ -143,6 +146,9 @@ importers:
       date-fns:
         specifier: 'catalog:'
         version: 3.6.0
+      gsap:
+        specifier: 'catalog:'
+        version: 3.14.2
       lottie-react:
         specifier: 'catalog:'
         version: 2.4.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)

@@ -17,6 +17,7 @@ export const menuItems = [
     icon: HomeOutlineSvg,
     label: "我的小島",
     href: "/",
+    isMatch: (pathname: string) => pathname === "/",
   },
   {
     activeIcon: SearchSolidSvg,
@@ -24,6 +25,7 @@ export const menuItems = [
     label: "探索社群",
     href: "/explore",
     hidden: true,
+    isMatch: (pathname: string) => pathname === "/explore",
   },
   {
     activeIcon: MedalSolidSvg,
@@ -31,6 +33,7 @@ export const menuItems = [
     label: "成長地圖",
     href: "/growth-map",
     hidden: true,
+    isMatch: (pathname: string) => pathname === "/growth-map",
   },
   {
     activeIcon: BellSolidSvg,
@@ -38,11 +41,13 @@ export const menuItems = [
     label: "最新通知",
     href: "/notifications",
     hidden: true,
+    isMatch: (pathname: string) => pathname === "/notifications",
   },
   {
     activeIcon: UserSolidSvg,
     icon: UserOutlineSvg,
     label: "個人資料",
-    href: "/profile",
+    href: (identifier: string) => `/users/${identifier}`,
+    isMatch: (pathname: string, identifier: string) => pathname.startsWith(`/users/${identifier}`),
   },
 ];

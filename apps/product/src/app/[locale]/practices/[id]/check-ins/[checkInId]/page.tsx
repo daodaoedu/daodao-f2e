@@ -131,9 +131,8 @@ export default function CheckInDetailPage() {
 
       <PageHeader
         leftAction="back"
-        backLabel="返回"
         title="打卡紀錄"
-        closeTo={`/practices/${practiceId}`}
+        rightActionTo={`/practices/${practiceId}`}
         variant="light"
         disableLightOn="mobile"
       />

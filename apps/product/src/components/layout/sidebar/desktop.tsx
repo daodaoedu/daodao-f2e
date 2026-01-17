@@ -66,7 +66,7 @@ export const DesktopSidebar = () => {
       {/* Menu Items */}
       <ul className={cn("flex flex-col", isCollapsed ? "gap-6 items-center" : "gap-6")}>
         {menuItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = item.isMatch(pathname, '123');
           const Icon = isActive ? item.activeIcon : item.icon;
           return (
             <li
@@ -77,7 +77,7 @@ export const DesktopSidebar = () => {
               )}
             >
               <CustomLink
-                href={item.href}
+                href={typeof item.href === 'function' ? item.href('123') : item.href}
                 className={cn(
                   "flex items-center px-6 py-3 text-text-dark cursor-pointer transition-all duration-300",
                   isCollapsed ? "justify-center" : "gap-2"

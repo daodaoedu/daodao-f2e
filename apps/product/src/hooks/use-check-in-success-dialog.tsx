@@ -13,8 +13,8 @@ import { cn } from "@daodao/ui/lib/utils";
 
 interface UseCheckInSuccessDialogOptions {
   title: string;
-  from: number;
-  to: number;
+  from?: number;
+  to?: number;
 }
 
 interface DelayedSplitTextProps {
@@ -324,20 +324,22 @@ function CheckInSuccessContent({
  */
 export function useCheckInSuccessDialog({
   title,
+  from = 0,
+  to = 100,
 }: UseCheckInSuccessDialogOptions) {
   const { openSuccessDialog: openDialog } = useDialog();
 
   const openSuccessDialog = useCallback(() => {
     return openDialog({
       title: "打卡成功!",
-      message: <CheckInSuccessContent title={title} from={85} to={100} />,
+      message: <CheckInSuccessContent title={title} from={from} to={to} />,
       textAlign: "left",
       buttons: [
         // { label: "分享心得", value: "share", variant: "outline" },
         { label: "完成", value: "complete", variant: "orange" },
       ],
     });
-  }, [openDialog, title]);
+  }, [openDialog, title, from, to]);
 
   return { openSuccessDialog };
 }

@@ -90,7 +90,7 @@ export default function PracticeDetailPage() {
 
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-      <PageHeader leftAction="back" title="主題實踐" closeTo="/" />
+      <PageHeader leftAction="back" title="主題實踐" rightActionTo="/" />
 
       <BackgroundAnimation />
 

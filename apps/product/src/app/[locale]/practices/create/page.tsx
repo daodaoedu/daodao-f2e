@@ -51,7 +51,7 @@ export default function CreatePracticePage() {
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <PageHeader closeTo="/" />
+      <PageHeader rightActionTo="/" />
 
       <main className="relative px-4 max-w-[600px] mx-auto">
         {/* Header */}

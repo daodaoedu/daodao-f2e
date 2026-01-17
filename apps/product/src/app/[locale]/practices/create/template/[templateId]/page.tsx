@@ -86,7 +86,7 @@ export default function TemplateDetailPage() {
       <Deco4Svg className="absolute top-0 right-0" width={270} height={484} />
 
       {/* Top Navigation */}
-      <PageHeader leftAction="back" closeTo="/" variant="light" />
+      <PageHeader leftAction="back" rightActionTo="/" variant="light" />
 
       <main className="relative max-w-[600px] mx-auto pb-8">
         {/* Category Label */}

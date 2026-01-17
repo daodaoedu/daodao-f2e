@@ -163,7 +163,7 @@ export default function CreateManualPracticePage() {
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <PageHeader title={currentStep === 5 ? "預覽" : "建立實踐"} closeTo="/" />
+      <PageHeader title={currentStep === 5 ? "預覽" : "建立實踐"} rightActionTo="/" />
 
       <main className="relative px-5 max-w-[448px] mx-auto pb-20">
         {/* Progress Bar */}

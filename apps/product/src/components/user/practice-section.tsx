@@ -1,0 +1,214 @@
+"use client";
+
+import { ArrowRightOutlineSvg } from "@daodao/assets";
+import { useIsMobile, useScrollVisibility } from "@daodao/shared";
+import { Badge } from "@daodao/ui/components/badge";
+import { Button } from "@daodao/ui/components/button";
+import { Checkbox } from "@daodao/ui/components/checkbox";
+import { CustomLink } from "@daodao/ui/components/custom-link";
+import { cn } from "@daodao/ui/lib/utils";
+import { Flag } from "lucide-react";
+import { useState } from "react";
+import { createPortal } from "react-dom";
+
+type TabType = "practices" | "plans" | "ideas";
+
+interface PracticeItem {
+  id: string;
+  status: "draft" | "in-progress" | "completed";
+  title: string;
+  description: string;
+  tags: string[];
+}
+
+interface PracticeSectionProps {
+  practices?: PracticeItem[];
+}
+
+interface Tab {
+  id: TabType;
+  label: string;
+  disabled?: boolean;
+}
+
+/**
+ * 「主題實踐」區塊組件
+ */
+export function PracticeSection({ practices = [] }: PracticeSectionProps) {
+  const [activeTab, setActiveTab] = useState<TabType>("practices");
+  const [includeCompleted, setIncludeCompleted] = useState(true);
+  const isMobile = useIsMobile();
+  const isScrolled = useScrollVisibility({ threshold: 167 });
+
+  const tabs: Tab[] = [
+    { id: "practices", label: "主題實踐" },
+    { id: "plans", label: "學習計劃", disabled: true },
+    { id: "ideas", label: "想法", disabled: true },
+  ];
+
+  const getStatusBadge = (status: PracticeItem["status"]) => {
+    switch (status) {
+      case "draft":
+        return (
+          <Badge variant="gray" size="sm">
+            草稿
+          </Badge>
+        );
+      case "in-progress":
+        return (
+          <Badge variant="outline-logo" size="sm">
+            進行中
+          </Badge>
+        );
+      case "completed":
+        return (
+          <Badge variant="default" size="sm">
+            已完成
+          </Badge>
+        );
+    }
+  };
+
+  const filteredPractices = includeCompleted
+    ? practices
+    : practices.filter((p) => p.status !== "completed");
+
+  const renderSubNavigation = () => {
+    const content = (
+      <>
+        {tabs.map((tab) => (
+          <Button
+            key={tab.id}
+            variant="ghost"
+            onClick={() => setActiveTab(tab.id)}
+            className="flex gap-2 md:flex-col items-center md:gap-0.5 p-0 h-auto"
+            aria-label={tab.label}
+            animation="none"
+            disabled={tab.disabled}
+          >
+            <div
+              className={cn(
+                "size-10 flex items-center justify-center rounded-full transition-colors",
+                activeTab === tab.id
+                  ? "text-logo-cyan md:bg-logo-cyan md:text-white"
+                  : "bg-white text-bg-dark"
+              )}
+            >
+              <Flag className="size-6" />
+            </div>
+            <div
+              className={cn(
+                "text-sm md:text-xs text-bg-dark whitespace-nowrap leading-normal",
+                activeTab !== tab.id && "opacity-50"
+              )}
+            >
+              {tab.label}
+            </div>
+          </Button>
+        ))}
+      </>
+    );
+
+    if (isMobile) {
+      return createPortal(
+        <div
+          className={cn(
+            "fixed top-0 inset-x-0 z-40 grid grid-cols-3 bg-white border-b border-light-gray px-5 py-2.5 transition-transform",
+            isScrolled ? "translate-y-0" : "-translate-y-full"
+          )}
+        >
+          {content}
+        </div>,
+        document.body
+      );
+    }
+
+    return (
+      <div
+        className={cn(
+          "hidden md:absolute md:top-0 md:right-full md:flex md:flex-col md:gap-4 md:mt-6 md:mr-3"
+        )}
+      >
+        {content}
+      </div>
+    );
+  };
+
+  return (
+    <div className="relative bg-white rounded-2xl p-6">
+      {/* 標題和篩選 */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-medium text-bg-dark">主題實踐</h2>
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="include-completed"
+            checked={includeCompleted}
+            onCheckedChange={(checked) => setIncludeCompleted(checked === true)}
+          />
+          <label
+            htmlFor="include-completed"
+            className="text-sm text-text-dark cursor-pointer select-none"
+          >
+            包含已完成
+          </label>
+        </div>
+      </div>
+
+      {/* 子導航 */}
+      {renderSubNavigation()}
+
+      {/* 實踐列表 */}
+      <div className="space-y-2.5">
+        {filteredPractices.length === 0 ? (
+          <div className="text-center py-8 text-basic-400">
+            {activeTab === "practices" && "尚無主題實踐"}
+            {activeTab === "plans" && "尚無學習計劃"}
+            {activeTab === "ideas" && "尚無想法"}
+          </div>
+        ) : (
+          filteredPractices.map((practice) => (
+            <div
+              key={practice.id}
+              className="flex items-start gap-4 p-4 rounded-lg border-b border-bg-gray hover:shadow-sm transition-shadow bg-white"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  {getStatusBadge(practice.status)}
+                  <div className="flex h-fit flex-wrap gap-2">
+                    {practice.tags.slice(0, 2).map((tag) => (
+                      <Badge key={tag} variant="gray" size="sm">
+                        {tag}
+                      </Badge>
+                    ))}
+                    {practice.tags.length > 2 && (
+                      <span className="text-xs text-basic-400 py-0.5">
+                        +{practice.tags.length - 2}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-medium text-text-dark line-clamp-1 mb-1">
+                      {practice.title}
+                    </h3>
+                    <p className="text-xs text-text-dark line-clamp-1">
+                      {practice.description}
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    <Button variant="ghost" size="icon" asChild>
+                      <CustomLink href={`/practices/${practice.id}`}>
+                        <ArrowRightOutlineSvg className="size-5 text-light-gray" />
+                      </CustomLink>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
