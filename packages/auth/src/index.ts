@@ -3,6 +3,7 @@
 // Export components
 export * from "./components/auth-guard";
 export * from "./components/login-button";
+export * from "./components/login-dialog";
 // Export hooks
 export * from "./hooks/use-auth";
 export * from "./hooks/use-redirect-after-login";

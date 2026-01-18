@@ -3,6 +3,7 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 @source "../../../apps/**/*.{ts,tsx}";
+@source "../../../auth/**/*.{ts,tsx}";
 @source "../../../features/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
 

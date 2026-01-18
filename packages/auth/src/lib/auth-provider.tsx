@@ -7,6 +7,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { AuthContextValue, StoredUser } from "../types";
 import { initiateOAuthLogin } from "./auth-client";
 import { DEFAULT_REDIRECT_URL } from "./auth-constants";
+import { LoginDialog } from "../components/login-dialog";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
@@ -22,6 +23,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<StoredUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [loginDialogRedirectUrl, setLoginDialogRedirectUrl] = useState<string | undefined>();
+  const [loginDialogSource, setLoginDialogSource] = useState<"website" | "app" | undefined>();
   const userInfoStorage = useMemo(() => getStorage<StoredUser>(StorageEnum.UserInfo), []);
   const router = useRouter();
 
@@ -151,14 +155,62 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [userInfoStorage, clearAuthState]);
 
   /**
-   * 登入
-   * 啟動 OAuth 流程
+   * 開啟登入 Dialog
    */
-  const login = useCallback(async (redirectUrl?: string) => {
-    const defaultRedirect = redirectUrl || DEFAULT_REDIRECT_URL;
-    const source = window.location.hostname.includes("app.") ? "app" : "website";
-    initiateOAuthLogin(defaultRedirect, source);
-  }, []);
+  const openLoginDialog = useCallback(
+    (options?: { redirectUrl?: string; source?: "website" | "app" }) => {
+      if (options?.redirectUrl) {
+        setLoginDialogRedirectUrl(options.redirectUrl);
+      } else {
+        setLoginDialogRedirectUrl(undefined);
+      }
+      if (options?.source) {
+        setLoginDialogSource(options.source);
+      } else {
+        setLoginDialogSource(undefined);
+      }
+      setIsLoginDialogOpen(true);
+    },
+    []
+  );
+
+  /**
+   * 需要登入時自動打開 Dialog，如果已登入則執行回調
+   */
+  const requireAuth = useCallback(
+    <T,>(
+      callback: () => T | Promise<T>,
+      options?: { redirectUrl?: string; source?: "website" | "app" }
+    ): T | Promise<T> | void => {
+      if (isAuthenticated) {
+        return callback();
+      }
+      openLoginDialog(options);
+    },
+    [isAuthenticated, openLoginDialog]
+  );
+
+  /**
+   * 登入
+   * 開啟登入 Dialog（不再直接啟動 OAuth 流程）
+   */
+  const login = useCallback(
+    async (redirectUrl?: string) => {
+      openLoginDialog({ redirectUrl });
+    },
+    [openLoginDialog]
+  );
+
+  /**
+   * 處理登入 Dialog 中的 Google 登入
+   */
+  const handleGoogleLogin = useCallback(() => {
+    const redirectUrl = loginDialogRedirectUrl || DEFAULT_REDIRECT_URL;
+    const source =
+      loginDialogSource || (window.location.hostname.includes("app.") ? "app" : "website");
+    setIsLoginDialogOpen(false);
+    initiateOAuthLogin(redirectUrl, source);
+  }, [loginDialogRedirectUrl, loginDialogSource]);
 
   /**
    * 登出
@@ -182,11 +234,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const refreshToken = useCallback(async () => {
     const refreshSuccess = await handleTokenRefresh();
     if (!refreshSuccess) {
-      // Token 刷新失敗，清除狀態並跳轉登入頁
+      // Token 刷新失敗，清除狀態並打開登入 Dialog
       clearAuthState();
-      router.push("/auth/login");
+      openLoginDialog();
     }
-  }, [handleTokenRefresh, clearAuthState, router]);
+  }, [handleTokenRefresh, clearAuthState, openLoginDialog]);
 
   const value: AuthContextValue = useMemo(
     () => ({
@@ -196,11 +248,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       login,
       logout,
       refreshToken,
+      openLoginDialog,
+      requireAuth,
     }),
-    [user, isAuthenticated, isLoading, login, logout, refreshToken]
+    [user, isAuthenticated, isLoading, login, logout, refreshToken, openLoginDialog, requireAuth]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+      <LoginDialog
+        open={isLoginDialogOpen}
+        onOpenChange={setIsLoginDialogOpen}
+        redirectUrl={loginDialogRedirectUrl}
+        source={loginDialogSource}
+        onLogin={handleGoogleLogin}
+      />
+    </AuthContext.Provider>
+  );
 };
 
 /**

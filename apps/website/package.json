@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@daodao/api": "workspace:*",
+    "@daodao/auth": "workspace:*",
     "@daodao/assets": "workspace:*",
     "@daodao/features-quiz": "workspace:*",
     "@daodao/i18n": "workspace:*",

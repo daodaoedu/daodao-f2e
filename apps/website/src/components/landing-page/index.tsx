@@ -15,8 +15,6 @@ import { TypewriterBubble } from "./typewriter-bubble";
 import { VideoSection } from "./video-section";
 
 export function LandingPage() {
-  const isMobile = useIsMobile();
-  console.log(isMobile);
   return (
     <Loader>
       <KeyVision />

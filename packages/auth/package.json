@@ -25,8 +25,11 @@
   },
   "dependencies": {
     "@daodao/api": "workspace:*",
+    "@daodao/assets": "workspace:*",
     "@daodao/config": "workspace:*",
-    "@daodao/shared": "workspace:*"
+    "@daodao/i18n": "workspace:*",
+    "@daodao/shared": "workspace:*",
+    "@daodao/ui": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

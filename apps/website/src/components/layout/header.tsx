@@ -7,6 +7,7 @@ import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
+import { useAuth } from "@daodao/auth";
 import { useEffect } from "react";
 
 type NavItemType = {
@@ -50,6 +51,7 @@ export const Header = () => {
   const { alwaysShow, navItems } = useHeaderConfig();
   const isVisible = useScrollVisibility({ threshold: 200 });
   const t = useTranslations("common");
+  const { openLoginDialog } = useAuth();
 
   useEffect(() => {
     document.documentElement.style.setProperty("scroll-padding-top", "69px");
@@ -98,7 +100,7 @@ export const Header = () => {
           </li>
         ))}
         <li>
-          <Button variant="ctaOrangeSmall">立即加入</Button>
+          <Button variant="ctaOrangeSmall" onClick={() => openLoginDialog({ redirectUrl: "/" })}>立即加入</Button>
         </li>
       </ul>
     </nav>

@@ -1,9 +1,14 @@
 "use client";
 
-import { type Locale, type Messages, NextIntlClientProvider } from "@daodao/i18n";
+import {
+  type Locale,
+  type Messages,
+  NextIntlClientProvider,
+} from "@daodao/i18n";
 import "@daodao/ui/globals.css";
 import { DialogManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
+import { AuthProvider } from "@daodao/auth";
 
 interface GlobalProviderProps {
   head?: React.ReactNode;
@@ -12,7 +17,12 @@ interface GlobalProviderProps {
   messages: Messages;
 }
 
-function GlobalProvider({ head, locale, children, messages }: GlobalProviderProps) {
+function GlobalProvider({
+  head,
+  locale,
+  children,
+  messages,
+}: GlobalProviderProps) {
   return (
     <html
       lang={locale}
@@ -22,9 +32,15 @@ function GlobalProvider({ head, locale, children, messages }: GlobalProviderProp
     >
       {head}
       <body>
-        <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
+        <NextIntlClientProvider
+          messages={messages}
+          locale={locale}
+          timeZone="Asia/Taipei"
+        >
           <NavigationBlockerProvider>
-            <DialogManagerProvider>{children}</DialogManagerProvider>
+            <DialogManagerProvider>
+              <AuthProvider>{children}</AuthProvider>
+            </DialogManagerProvider>
           </NavigationBlockerProvider>
         </NextIntlClientProvider>
       </body>

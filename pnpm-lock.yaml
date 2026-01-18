@@ -207,6 +207,9 @@ importers:
       '@daodao/assets':
         specifier: workspace:*
         version: link:../../packages/assets
+      '@daodao/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@daodao/features-quiz':
         specifier: workspace:*
         version: link:../../packages/features/quiz
@@ -314,12 +317,21 @@ importers:
       '@daodao/api':
         specifier: workspace:*
         version: link:../api
+      '@daodao/assets':
+        specifier: workspace:*
+        version: link:../assets
       '@daodao/config':
         specifier: workspace:*
         version: link:../config
+      '@daodao/i18n':
+        specifier: workspace:*
+        version: link:../i18n
       '@daodao/shared':
         specifier: workspace:*
         version: link:../shared
+      '@daodao/ui':
+        specifier: workspace:*
+        version: link:../ui
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

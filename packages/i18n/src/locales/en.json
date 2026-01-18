@@ -4082,5 +4082,15 @@
     "nelspruit_south_africa": "Nelspruit, South Africa",
     "lupane_zimbabwe": "Lupane, Zimbabwe",
     "charlotte_amalie_u_s_virgin_islands": "Charlotte Amalie, U.S. Virgin Islands"
+  },
+  "auth": {
+    "login_dialog_title": "Welcome back to DaoDao!",
+    "login_dialog_subtitle": "Build your learning island and grow together with community partners",
+    "login_dialog_google_button_text": "Sign up / Sign in with Google",
+    "login_dialog_google_button_label": "Sign in with Google account",
+    "login_dialog_terms_prefix": "By registering, you agree to DaoDao's",
+    "login_dialog_terms_link": "Terms of Service",
+    "login_dialog_terms_and": "and",
+    "login_dialog_privacy_link": "Privacy Policy"
   }
 }

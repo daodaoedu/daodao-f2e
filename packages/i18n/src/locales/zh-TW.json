@@ -4082,5 +4082,15 @@
     "zvecan_kosovo": "茲韋昌, 科索沃",
     "zwedru_liberia": "茲韋德魯, 賴比瑞亞",
     "zwolle_netherlands": "茲沃勒, 荷蘭"
+  },
+  "auth": {
+    "login_dialog_title": "歡迎回來島島阿學!",
+    "login_dialog_subtitle": "建立你的學習小島,與社群夥伴一同成長",
+    "login_dialog_google_button_text": "Google 帳號註冊 / 登入",
+    "login_dialog_google_button_label": "使用 Google 帳號登入",
+    "login_dialog_terms_prefix": "註冊即代表您同意島島阿學的",
+    "login_dialog_terms_link": "服務條款",
+    "login_dialog_terms_and": "與",
+    "login_dialog_privacy_link": "隱私權政策"
   }
 }
