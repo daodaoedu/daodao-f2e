@@ -16,8 +16,11 @@ import {
 
 type TooltipProviderProps = TooltipProviderPrimitiveProps;
 
-function TooltipProvider({ delay = 0, ...props }: TooltipProviderProps) {
-  return <TooltipProviderPrimitive delay={delay} {...props} />;
+function TooltipProvider({ delay, ...props }: TooltipProviderProps) {
+  // 確保 delay 始終是一個明確的值，避免 hydration mismatch
+  // 如果 delay 是 undefined，使用 0 作為默認值，確保服務器端和客戶端一致
+  const delayValue = delay !== undefined ? delay : 0;
+  return <TooltipProviderPrimitive delay={delayValue} {...props} />;
 }
 
 type TooltipProps = TooltipPrimitiveProps & {
@@ -25,9 +28,12 @@ type TooltipProps = TooltipPrimitiveProps & {
   alwaysOpen?: boolean;
 };
 
-function Tooltip({ delay = 0, alwaysOpen, ...props }: TooltipProps) {
+function Tooltip({ delay, alwaysOpen, ...props }: TooltipProps) {
+  // 確保 delay 始終是一個明確的值，避免 hydration mismatch
+  // 如果 delay 是 undefined，使用 0 作為默認值，確保服務器端和客戶端一致
+  const delayValue = delay !== undefined ? delay : 0;
   return (
-    <TooltipProvider delay={delay}>
+    <TooltipProvider delay={delayValue}>
       <TooltipPrimitive alwaysOpen={alwaysOpen} {...props} />
     </TooltipProvider>
   );

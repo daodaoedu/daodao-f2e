@@ -1,8 +1,8 @@
 services:
   website:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: docker/production/Dockerfile
       target: website
       args:
         APP_NAME: website
@@ -16,12 +16,12 @@ services:
     restart: unless-stopped
     # 如果需要環境變數文件，取消下面的註解
     # env_file:
-    #   - .env.production
+    #   - ../../.env.production
 
   product:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: docker/production/Dockerfile
       target: product
       args:
         APP_NAME: product
@@ -35,5 +35,4 @@ services:
     restart: unless-stopped
     # 如果需要環境變數文件，取消下面的註解
     # env_file:
-    #   - .env.production
-
+    #   - ../../.env.production

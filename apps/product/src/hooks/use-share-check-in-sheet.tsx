@@ -47,7 +47,6 @@ export function useShareCheckInSheet({
         <ShareCheckInSheetContent
           taskTitle={taskTitle}
           checkInData={checkInData}
-          onClose={onClose}
         />
       ),
       dismissible: true,

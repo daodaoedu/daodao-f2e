@@ -14,7 +14,11 @@
     "format:check": "biome format .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "docker:build": "pnpm build && docker-compose up -d --build",
+    "docker:dev": "docker-compose -f docker/development/docker-compose.yml up --build",
+    "docker:dev:down": "docker-compose -f docker/development/docker-compose.yml down",
+    "docker:prod": "pnpm build && docker-compose -f docker/production/docker-compose.yml up -d --build",
+    "docker:prod:down": "docker-compose -f docker/production/docker-compose.yml down",
+    "docker:build": "pnpm build && docker-compose -f docker/production/docker-compose.yml up -d --build",
     "clean": "turbo run clean && pnpm dlx rimraf node_modules"
   },
   "devDependencies": {

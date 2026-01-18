@@ -68,9 +68,11 @@ known_hosts
 .gitignore
 
 # Docker
-Dockerfile
+docker/development/Dockerfile
+docker/production/Dockerfile
+docker/development/docker-compose.yml
+docker/production/docker-compose.yml
 .dockerignore
-docker-compose.yml
 
 # Documentation
 README.md

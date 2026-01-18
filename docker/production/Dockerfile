@@ -1,6 +1,10 @@
-# 生產階段 - 預先建置模式
-# 使用方式：在本地執行 `pnpm build` 後，使用此 Dockerfile 打包
-# 構建命令：docker build -f Dockerfile.prod --target website --build-arg APP_NAME=website --build-arg APP_PORT=3000 -t daodao-website .
+# 生產環境 Dockerfile
+# 使用方式：
+#   1. 在本地執行 `pnpm build` 預先建置應用
+#   2. 使用 docker-compose：docker-compose -f docker/production/docker-compose.yml up --build
+#   3. 或單獨構建：docker build -f docker/production/Dockerfile --target website --build-arg APP_NAME=website --build-arg APP_PORT=3000 -t daodao-website .
+#
+# 注意：此 Dockerfile 需要預先執行 `pnpm build`，只複製建置後的輸出檔案
 
 # Build argument 指定要運行的 app
 ARG APP_NAME=website
@@ -34,7 +38,7 @@ COPY --chown=nextjs:nodejs packages/assets/images ./packages/assets/images
 RUN apk add --no-cache nginx
 
 # 複製 Nginx 配置檔
-COPY apps/${APP_NAME}/nginx.conf /etc/nginx/http.d/default.conf
+COPY docker/production/nginx.conf /etc/nginx/http.d/default.conf
 
 # 創建 Nginx 運行時目錄並設置權限
 RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run && \
@@ -86,4 +90,3 @@ EXPOSE ${APP_PORT}
 # 設置工作目錄並啟動應用
 WORKDIR /app/apps/${APP_NAME}
 CMD ["node", "server.js"]
-

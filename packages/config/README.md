@@ -47,7 +47,7 @@ pnpm --filter @daodao/config dev
 import { getEnv, getRequiredEnv } from "@daodao/config";
 
 // 取得環境變數（可選預設值）
-const apiUrl = getEnv("NEXT_PUBLIC_API_URL", "http://localhost:3000/api");
+const apiUrl = getEnv("NEXT_PUBLIC_API_URL", "http://localhost:3001/api");
 
 // 取得必要的環境變數（不存在時會拋出錯誤）
 const requiredUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");

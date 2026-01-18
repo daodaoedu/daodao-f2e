@@ -50,7 +50,13 @@ class UnauthorizedHandler {
    * @returns Response 物件
    */
   wrapFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    const response = await fetch(input, init);
+    // 確保 credentials 被設置，以支援跨域 cookie
+    const fetchInit: RequestInit = {
+      ...init,
+      credentials: "include",
+    };
+
+    const response = await fetch(input, fetchInit);
 
     // 如果不是 401 或沒有處理器，直接返回
     if (response.status !== 401 || !this.onUnauthorized) {
@@ -61,8 +67,8 @@ class UnauthorizedHandler {
     if (this.isRefreshing && this.refreshPromise) {
       const refreshSuccess = await this.refreshPromise;
       if (refreshSuccess) {
-        // 刷新成功，重試原請求
-        return fetch(input, init);
+        // 刷新成功，重試原請求（確保 credentials 被傳遞）
+        return fetch(input, fetchInit);
       }
       // 刷新失敗，返回原始 401 響應
       return response;
@@ -75,8 +81,8 @@ class UnauthorizedHandler {
     try {
       const refreshSuccess = await this.refreshPromise;
       if (refreshSuccess) {
-        // 刷新成功，重試原請求
-        return fetch(input, init);
+        // 刷新成功，重試原請求（確保 credentials 被傳遞）
+        return fetch(input, fetchInit);
       }
       // 刷新失敗，返回原始 401 響應
       return response;

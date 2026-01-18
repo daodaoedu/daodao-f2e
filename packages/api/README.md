@@ -81,7 +81,9 @@ try {
 
 ### 環境變數
 
-- `NEXT_PUBLIC_API_URL`: API 基礎 URL（預設: `http://localhost:3000/api`）
+- `NEXT_PUBLIC_API_URL`: API 基礎 URL（**必填**，例如: `http://localhost:3001/api`）
+  
+  > **注意**：這是後端 API 服務器的 URL，不是前端應用的 URL。必須在 `.env` 文件中設定此環境變數。
 
 #### 在 Monorepo 中使用環境變數
 

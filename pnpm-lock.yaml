@@ -144,7 +144,7 @@ importers:
         specifier: 'catalog:'
         version: 3.6.0
       gsap:
-        specifier: ^3.12.5
+        specifier: 'catalog:'
         version: 3.14.2
       lottie-react:
         specifier: 'catalog:'
