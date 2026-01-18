@@ -24,7 +24,7 @@ export interface TagEditData {
   selectedTags: string[];
 }
 
-const AVAILABLE_TAGS = ["讀唇語", "講唇語", "教學閱讀策略", "諮詢患者改善聽力"];
+const SEARCH_TAGS: string[] = [];
 
 // Zod schema for form validation
 const tagEditFormSchema = z.object({
@@ -76,7 +76,7 @@ export const TagEditSheetContent = ({
   };
 
   const pinListItems: PinListItem[] = React.useMemo(() => {
-    const availableTags = AVAILABLE_TAGS.filter((tag) => !selectedTags.includes(tag));
+    const availableTags = SEARCH_TAGS.filter((tag) => !selectedTags.includes(tag));
     const allTags = [...availableTags, ...selectedTags];
 
     const keywordItem =
@@ -134,7 +134,7 @@ export const TagEditSheetContent = ({
       transformed.forEach((item) => {
         if (item.pinned) {
           pinnedItems.push(item);
-        } else if (AVAILABLE_TAGS.includes(item.name) || (keyword && item.name === keyword)) {
+        } else if (SEARCH_TAGS.includes(item.name) || (keyword && item.name === keyword)) {
           unpinnedItems.push(item);
         }
       });
@@ -163,7 +163,7 @@ export const TagEditSheetContent = ({
 
   return (
     <Form {...form}>
-      <form className="flex-1 flex flex-col">
+      <form className="flex-1 h-full flex flex-col">
         <div className="flex-1 px-4">
           {/* Keyword Input */}
           <FormField
@@ -190,6 +190,7 @@ export const TagEditSheetContent = ({
                 pinned: "已選用標籤",
                 unpinned: "可用標籤",
               }}
+              unpinnedPlaceholder={<div className="text-light-gray bg-very-light-gray border border-bg-gray py-[50px] text-center">無符合標籤</div>}
               onItemToggle={handleToggleTag}
               transformItems={transformItems}
               className="flex flex-col-reverse"

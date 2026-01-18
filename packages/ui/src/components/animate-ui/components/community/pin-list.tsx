@@ -25,6 +25,7 @@ type PinListProps = {
     unpinned?: string;
   };
   transition?: Transition;
+  unpinnedPlaceholder?: React.ReactNode;
   labelMotionProps?: HTMLMotionProps<"p">;
   className?: string;
   labelClassName?: string;
@@ -50,6 +51,7 @@ function PinList({
   pinnedSectionClassName,
   unpinnedSectionClassName,
   zIndexResetDelay = 500,
+  unpinnedPlaceholder,
   onItemToggle,
   transformItems,
   ...props
@@ -166,7 +168,7 @@ function PinList({
 
         <div>
           <AnimatePresence>
-            {unpinned.length > 0 && (
+            {(unpinned.length > 0 || !unpinnedPlaceholder) && (
               <motion.p
                 layout
                 key="all-label"
@@ -177,7 +179,7 @@ function PinList({
               </motion.p>
             )}
           </AnimatePresence>
-          {unpinned.length > 0 && (
+          {unpinned.length > 0 ? (
             <div
               className={cn(
                 "space-y-3 relative",
@@ -201,6 +203,8 @@ function PinList({
                 </motion.div>
               ))}
             </div>
+          ) : (
+            unpinnedPlaceholder
           )}
         </div>
       </LayoutGroup>

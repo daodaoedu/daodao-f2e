@@ -44,7 +44,7 @@ export const BgRadialAnimation = ({ className, variant }: BgRadialAnimationProps
               className={cn(absoluteClassName, "w-[80px] h-[81px]")}
               initial={initial}
               animate={{
-                x: "calc(-50% + 272px)",
+                x: "calc(-50% + 252px)",
                 y: "calc(-50% + 210px)",
                 opacity: 1,
               }}
@@ -72,7 +72,7 @@ export const BgRadialAnimation = ({ className, variant }: BgRadialAnimationProps
               className={cn(absoluteClassName, "w-[98px] h-[120px]")}
               initial={initial}
               animate={{
-                x: "calc(-50% - 300px)",
+                x: "calc(-50% - 280px)",
                 y: "calc(-50% - 46px)",
                 opacity: 1,
               }}
