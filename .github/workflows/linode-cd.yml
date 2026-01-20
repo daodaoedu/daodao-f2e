@@ -57,19 +57,22 @@ jobs:
           fetch-depth: 1
 
       - name: Set up Node.js
-        if: ${{ needs.continuous_integration.result != 'success' }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install pnpm
-        if: ${{ needs.continuous_integration.result != 'success' }}
         uses: pnpm/action-setup@v4
         with:
           run_install: false
 
-      - name: Install dependencies and build (when CI was skipped)
-        if: ${{ needs.continuous_integration.result != 'success' }}
+      - name: Create environment files
+        run: |
+          echo "${{ secrets.ENV_DEV }}" > .env
+          cp .env apps/website/.env
+          cp .env apps/product/.env
+
+      - name: Install dependencies and build
         run: |
           pnpm install --frozen-lockfile
           pnpm run build
@@ -164,19 +167,22 @@ jobs:
           fetch-depth: 1
 
       - name: Set up Node.js
-        if: ${{ needs.continuous_integration.result != 'success' }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install pnpm
-        if: ${{ needs.continuous_integration.result != 'success' }}
         uses: pnpm/action-setup@v4
         with:
           run_install: false
 
-      - name: Install dependencies and build (when CI was skipped)
-        if: ${{ needs.continuous_integration.result != 'success' }}
+      - name: Create environment files
+        run: |
+          echo "${{ secrets.ENV_DEV }}" > .env
+          cp .env apps/website/.env
+          cp .env apps/product/.env
+
+      - name: Install dependencies and build
         run: |
           pnpm install --frozen-lockfile
           pnpm run build
