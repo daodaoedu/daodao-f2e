@@ -1,0 +1,39 @@
+{
+  "name": "@daodao/analytics",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Analytics integrations (Google Analytics, Clarity, PostHog) for DaoDao monorepo",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./components/*": "./src/components/*.tsx",
+    "./lib/*": "./src/lib/*.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "clean": "pnpm dlx rimraf dist node_modules"
+  },
+  "dependencies": {
+    "@daodao/config": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@types/react": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:"
+  }
+}

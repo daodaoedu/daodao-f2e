@@ -1,0 +1,44 @@
+{
+  "name": "@daodao/features-quiz",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Quiz feature module for DaoDao monorepo",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "clean": "pnpm dlx rimraf dist node_modules"
+  },
+  "dependencies": {
+    "@daodao/api": "workspace:*",
+    "@daodao/assets": "workspace:*",
+    "@daodao/i18n": "workspace:*",
+    "@daodao/shared": "workspace:*",
+    "@daodao/ui": "workspace:*",
+    "lucide-react": "catalog:",
+    "recharts": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@daodao/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "react": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
+}

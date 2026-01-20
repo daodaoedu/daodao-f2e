@@ -69,7 +69,7 @@ jobs:
         id: check
         continue-on-error: true
         run: |
-          if ! ERROR_MSG=$(pnpm ts:check 2>&1); then
+          if ! ERROR_MSG=$(pnpm typecheck 2>&1); then
               {
                 echo "check_error<<EOF"
                 echo "$ERROR_MSG"

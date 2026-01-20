@@ -1,0 +1,42 @@
+{
+  "name": "@daodao/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "API client package for DaoDao monorepo (OpenAPI)",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./hooks": "./src/hooks.ts",
+    "./errors": "./src/errors.ts",
+    "./types": "./src/types.ts",
+    "./is-match": "./src/is-match.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "clean": "pnpm dlx rimraf dist node_modules"
+  },
+  "dependencies": {
+    "@daodao/config": "workspace:*",
+    "next": "catalog:",
+    "openapi-fetch": "^0.15.0",
+    "swr-openapi": "^5.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "openapi-typescript": "^7.10.1",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:"
+  }
+}

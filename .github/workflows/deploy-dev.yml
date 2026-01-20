@@ -1,0 +1,146 @@
+name: Deploy to Development
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+    inputs:
+      app_name:
+        description: 'Which app to deploy'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - website
+          - product
+
+env:
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+jobs:
+  deploy-website:
+    name: Deploy Website to Development
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.app_name == 'all' || github.event.inputs.app_name == 'website' || github.event_name == 'push' }}
+    environment: development
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Build and push Website Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/Dockerfile
+          push: true
+          build-args: |
+            APP_NAME=website
+            APP_PORT=3000
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:dev-latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:dev-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy Website to Linode VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.LINODE_HOST }}
+          username: ${{ secrets.LINODE_USER }}
+          key: ${{ secrets.LINODE_SSH_KEY }}
+          script: |
+            cd /path/to/daodao-f2e
+            export DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}
+            export COMMIT_SHA=${{ github.sha }}
+            ./deploy.sh dev website
+
+      - name: Notify Discord
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "${{ job.status == 'success' && '✅' || '❌' }} Development Website Deployment"
+          description: |
+            **App:** Website
+            **Environment:** Development
+            **Commit:** ${{ github.sha }}
+            **Branch:** dev
+            **URL:** https://dev.daodao.so
+          color: ${{ job.status == 'success' && '0x00ff00' || '0xff0000' }}
+
+  deploy-product:
+    name: Deploy Product to Development
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.app_name == 'all' || github.event.inputs.app_name == 'product' || github.event_name == 'push' }}
+    environment: development
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Build and push Product Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/Dockerfile
+          push: true
+          build-args: |
+            APP_NAME=product
+            APP_PORT=3001
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:dev-latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:dev-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy Product to Linode VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.LINODE_HOST }}
+          username: ${{ secrets.LINODE_USER }}
+          key: ${{ secrets.LINODE_SSH_KEY }}
+          script: |
+            cd /path/to/daodao-f2e
+            export DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}
+            export COMMIT_SHA=${{ github.sha }}
+            ./deploy.sh dev product
+
+      - name: Notify Discord
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "${{ job.status == 'success' && '✅' || '❌' }} Development Product Deployment"
+          description: |
+            **App:** Product
+            **Environment:** Development
+            **Commit:** ${{ github.sha }}
+            **Branch:** dev
+            **URL:** https://app-dev.daodao.so
+          color: ${{ job.status == 'success' && '0x00ff00' || '0xff0000' }}

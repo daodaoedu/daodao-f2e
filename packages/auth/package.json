@@ -1,0 +1,46 @@
+{
+  "name": "@daodao/auth",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Authentication & Authorization module for DaoDao monorepo",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./lib/*": "./src/lib/*.ts",
+    "./hooks/*": "./src/hooks/*.ts",
+    "./components/*": "./src/components/*.tsx",
+    "./utils/*": "./src/utils/*.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "clean": "pnpm dlx rimraf dist node_modules"
+  },
+  "dependencies": {
+    "@daodao/api": "workspace:*",
+    "@daodao/assets": "workspace:*",
+    "@daodao/config": "workspace:*",
+    "@daodao/i18n": "workspace:*",
+    "@daodao/shared": "workspace:*",
+    "@daodao/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@types/react": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:"
+  }
+}

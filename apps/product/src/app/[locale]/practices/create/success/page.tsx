@@ -1,0 +1,129 @@
+"use client";
+
+import { ArrowRightOutlineSvg } from "@daodao/assets";
+import featureHappyJson from "@daodao/assets/images/quiz/feature-happy.json";
+import { useRouter } from "@daodao/i18n/navigation";
+import { Button } from "@daodao/ui/components/button";
+import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
+import Lottie from "lottie-react";
+import { motion } from "motion/react";
+import { useCallback, useEffect, useState } from "react";
+import { BackgroundAnimation } from "@/components/layout";
+
+export default function PracticeSuccessPage() {
+  const router = useRouter();
+  const [countdown, setCountdown] = useState(11);
+
+  const handleBackToIsland = useCallback(() => {
+    router.push("/");
+  }, [router]);
+
+  // 倒數計時自動跳轉
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (countdown === 0) {
+      handleBackToIsland();
+    }
+  }, [countdown, handleBackToIsland]);
+
+  const handleStartPractice = () => {
+    // TODO: 導航到實踐詳情頁面
+    // router.push(`/practices/${practiceId}`);
+  };
+
+  return (
+    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+      {/* 背景漸層動畫 */}
+      <BackgroundAnimation />
+
+      {/* Confetti 動畫 */}
+      <ConfettiAnimation />
+
+      <main className="relative max-w-[600px] mx-auto min-h-screen flex flex-col items-center justify-center px-5 py-12">
+        {/* 標題區域 */}
+        <div className="text-center py-4">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-4xl font-medium text-text-dark leading-normal">太棒啦！</h1>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <p className="text-sm text-text-dark">你已成功建立了一項主題實踐</p>
+          </motion.div>
+        </div>
+
+        {/* 角色區域 */}
+        <div className="flex items-center justify-center w-[375px] h-[275px]">
+          <Lottie
+            animationData={featureHappyJson}
+            className="*:w-full *:h-full"
+            loop={true}
+            autoplay={true}
+          />
+        </div>
+
+        {/* 鼓勵文字 */}
+        <motion.div
+          className="text-center py-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
+          <p className="text-sm text-logo-cyan">鼓勵文字鼓勵文字鼓勵文字鼓勵文字</p>
+          <p className="text-sm text-logo-cyan">鼓勵文字鼓勵文字鼓勵文字</p>
+        </motion.div>
+
+        {/* 按鈕區域 */}
+        <motion.div
+          className="flex flex-col items-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.9 }}
+        >
+          <Button onClick={handleStartPractice} variant="ctaOrange" className="inline-flex mb-6">
+            開始主題實踐
+            <ArrowRightOutlineSvg className="size-4.5" />
+          </Button>
+
+          <Button
+            onClick={handleBackToIsland}
+            variant="ghost"
+            className="inline-flex mb-px"
+            animation="none"
+          >
+            回到我的小島
+            <ArrowRightOutlineSvg className="size-4.5" />
+          </Button>
+          {/* 倒數計時提示 */}
+          <motion.p
+            className="text-sm text-light-gray"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 1.1 }}
+          >
+            {countdown} 秒後自動跳轉
+          </motion.p>
+        </motion.div>
+      </main>
+    </div>
+  );
+}
