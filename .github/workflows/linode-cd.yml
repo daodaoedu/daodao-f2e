@@ -32,7 +32,7 @@ on:
 # ===== 全域環境變數 =====
 env:
   NODE_VERSION: 20
-  PNPM_VERSION: 9
+  PNPM_VERSION: 10
   DOCKER_BUILDKIT: 1
 
 jobs:
