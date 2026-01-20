@@ -66,7 +66,6 @@ jobs:
         if: ${{ needs.continuous_integration.result != 'success' }}
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Install dependencies and build (when CI was skipped)
@@ -174,7 +173,6 @@ jobs:
         if: ${{ needs.continuous_integration.result != 'success' }}
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Install dependencies and build (when CI was skipped)
@@ -273,6 +271,23 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.LINODE_INSTANCE_IP }} >> ~/.ssh/known_hosts
 
+      - name: Create environment files on Linode
+        env:
+          LINODE_INSTANCE_IP: ${{ secrets.LINODE_INSTANCE_IP }}
+          ENV_PROD: ${{ secrets.ENV_PROD }}
+          ENV_DEV: ${{ secrets.ENV_DEV }}
+        run: |
+          # 確保目錄存在
+          ssh -o StrictHostKeyChecking=no root@$LINODE_INSTANCE_IP "mkdir -p /root/daodao-f2e"
+
+          # 創建 .env.prod
+          echo "$ENV_PROD" | ssh -o StrictHostKeyChecking=no root@$LINODE_INSTANCE_IP "cat > /root/daodao-f2e/.env.prod && chmod 600 /root/daodao-f2e/.env.prod"
+
+          # 創建 .env.dev
+          echo "$ENV_DEV" | ssh -o StrictHostKeyChecking=no root@$LINODE_INSTANCE_IP "cat > /root/daodao-f2e/.env.dev && chmod 600 /root/daodao-f2e/.env.dev"
+
+          echo "✅ Environment files created on Linode"
+
       - name: Deploy to Linode
         env:
           LINODE_INSTANCE_IP: ${{ secrets.LINODE_INSTANCE_IP }}
@@ -282,27 +297,31 @@ jobs:
           COMMIT_SHA: ${{ github.sha }}
           DEPLOY_WEBSITE: ${{ needs.build-website.result == 'success' }}
           DEPLOY_PRODUCT: ${{ needs.build-product.result == 'success' }}
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          GIT_HUB_USERNAME: ${{ secrets.GIT_HUB_USERNAME }}
+          GIT_HUB_ACCESS_TOKEN: ${{ secrets.GIT_HUB_ACCESS_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ConnectTimeout=10 root@$LINODE_INSTANCE_IP << 'ENDSSH'
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ConnectTimeout=10 root@$LINODE_INSTANCE_IP << ENDSSH
             set -e
             export APP_DIR=/root/daodao-f2e
             export COMPOSE_FILE=docker-compose.yaml
-            export APP_ENV=${{ env.APP_ENV }}
-            export DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}
-            export IMAGE_TAG=${{ env.IMAGE_TAG }}
-            export COMMIT_SHA=${{ env.COMMIT_SHA }}
+            export APP_ENV=${APP_ENV}
+            export DOCKER_HUB_USERNAME=${DOCKER_HUB_USERNAME}
+            export IMAGE_TAG=${IMAGE_TAG}
+            export COMMIT_SHA=${COMMIT_SHA}
 
-            echo "=== Starting deployment for $APP_ENV environment ==="
+            echo "=== Starting deployment for \$APP_ENV environment ==="
 
             # ===== 磁碟空間檢查 =====
             echo "=== Pre-deployment Disk Space Check ==="
-            DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
-            DISK_AVAIL=$(df -BG / | tail -1 | awk '{print $4}' | sed 's/G//')
+            DISK_USAGE=\$(df / | tail -1 | awk '{print \$5}' | sed 's/%//')
+            DISK_AVAIL=\$(df -BG / | tail -1 | awk '{print \$4}' | sed 's/G//')
 
-            echo "Current disk usage: ${DISK_USAGE}%"
-            echo "Available space: ${DISK_AVAIL}GB"
+            echo "Current disk usage: \${DISK_USAGE}%"
+            echo "Available space: \${DISK_AVAIL}GB"
 
-            if [ "$DISK_USAGE" -gt 80 ] || [ "$DISK_AVAIL" -lt 10 ]; then
+            if [ "\$DISK_USAGE" -gt 80 ] || [ "\$DISK_AVAIL" -lt 10 ]; then
               echo "⚠️  Disk space is limited, cleaning up..."
               docker builder prune -a -f || true
               docker image prune -a -f --filter "until=48h" || true
@@ -312,64 +331,66 @@ jobs:
             fi
 
             # ===== 更新代碼 =====
-            if [ -d $APP_DIR/.git ]; then
-              cd $APP_DIR
+            if [ -d \$APP_DIR/.git ]; then
+              cd \$APP_DIR
               echo "Updating existing repository..."
-              git fetch --depth 1 origin ${{ env.BRANCH_NAME }}
+              git fetch --depth 1 origin ${BRANCH_NAME}
               git reset --hard FETCH_HEAD
               git clean -fd
             else
               echo "Cloning repository..."
-              git clone --depth 1 --branch ${{ env.BRANCH_NAME }} \
-                https://${{ secrets.GIT_HUB_USERNAME }}:${{ secrets.GIT_HUB_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git \
-                $APP_DIR
-              cd $APP_DIR
+              git clone --depth 1 --branch ${BRANCH_NAME} \
+                https://${GIT_HUB_USERNAME}:${GIT_HUB_ACCESS_TOKEN}@github.com/${GITHUB_REPOSITORY}.git \
+                \$APP_DIR
+              cd \$APP_DIR
             fi
 
-            # ===== 檢查環境文件 =====
+            # ===== 確認環境文件 =====
             # Feature 分支使用 dev 環境配置
-            if [ "${APP_ENV}" = "feat" ]; then
+            if [ "\${APP_ENV}" = "feat" ]; then
               ENV_FILE=".env.dev"
             else
-              ENV_FILE=".env.${APP_ENV}"
+              ENV_FILE=".env.\${APP_ENV}"
             fi
 
-            if [ ! -f ${ENV_FILE} ]; then
-              echo "❌ Environment file ${ENV_FILE} not found"
+            if [ ! -f \${ENV_FILE} ]; then
+              echo "❌ Environment file \${ENV_FILE} not found"
               exit 1
             fi
 
+            echo "✅ Using environment file: \${ENV_FILE}"
+
             # ===== 部署 Website =====
-            if [ "${{ env.DEPLOY_WEBSITE }}" = "true" ]; then
+            if [ "${DEPLOY_WEBSITE}" = "true" ]; then
               echo "=== Deploying Website ==="
-              SERVICE_NAME="${APP_ENV}_website"
+              SERVICE_NAME="\${APP_ENV}_website"
 
               echo "Pulling Website image..."
-              docker pull ${DOCKER_HUB_USERNAME}/daodao-website:${IMAGE_TAG}-${COMMIT_SHA}
+              docker pull \${DOCKER_HUB_USERNAME}/daodao-website:\${IMAGE_TAG}-\${COMMIT_SHA}
 
               echo "Stopping old Website container..."
-              docker ps -a --filter "name=${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker stop || true
-              docker ps -a --filter "name=${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker rm || true
+              docker ps -a --filter "name=\${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker stop || true
+              docker ps -a --filter "name=\${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker rm || true
 
               echo "Starting new Website container..."
-              DOCKER_HUB_USERNAME=${DOCKER_HUB_USERNAME} IMAGE_TAG=${IMAGE_TAG} COMMIT_SHA=${COMMIT_SHA} \
-                docker compose --env-file ${ENV_FILE} -f $COMPOSE_FILE up -d --wait --wait-timeout 90 ${SERVICE_NAME}
+              DOCKER_HUB_USERNAME=\${DOCKER_HUB_USERNAME} IMAGE_TAG=\${IMAGE_TAG} COMMIT_SHA=\${COMMIT_SHA} \
+                docker compose --env-file \${ENV_FILE} -f \$COMPOSE_FILE up -d --wait --wait-timeout 90 \${SERVICE_NAME}
 
               # 健康檢查
-              NEW_CONTAINER=$(docker ps -q -f name=${SERVICE_NAME} | head -1)
-              if [ -z "$NEW_CONTAINER" ]; then
+              NEW_CONTAINER=\$(docker ps -q -f name=\${SERVICE_NAME} | head -1)
+              if [ -z "\$NEW_CONTAINER" ]; then
                 echo "❌ Website container failed to start"
                 exit 1
               fi
 
               for i in {1..10}; do
-                if docker exec $NEW_CONTAINER wget --quiet --tries=1 --spider http://localhost:3000 2>/dev/null; then
+                if docker exec \$NEW_CONTAINER wget --quiet --tries=1 --spider http://localhost:3000 2>/dev/null; then
                   echo "✅ Website health check passed"
                   break
                 fi
-                if [ $i -eq 10 ]; then
+                if [ \$i -eq 10 ]; then
                   echo "❌ Website health check failed"
-                  docker logs $NEW_CONTAINER --tail=50
+                  docker logs \$NEW_CONTAINER --tail=50
                   exit 1
                 fi
                 sleep 3
@@ -377,36 +398,36 @@ jobs:
             fi
 
             # ===== 部署 Product =====
-            if [ "${{ env.DEPLOY_PRODUCT }}" = "true" ]; then
+            if [ "${DEPLOY_PRODUCT}" = "true" ]; then
               echo "=== Deploying Product ==="
-              SERVICE_NAME="${APP_ENV}_product"
+              SERVICE_NAME="\${APP_ENV}_product"
 
               echo "Pulling Product image..."
-              docker pull ${DOCKER_HUB_USERNAME}/daodao-product:${IMAGE_TAG}-${COMMIT_SHA}
+              docker pull \${DOCKER_HUB_USERNAME}/daodao-product:\${IMAGE_TAG}-\${COMMIT_SHA}
 
               echo "Stopping old Product container..."
-              docker ps -a --filter "name=${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker stop || true
-              docker ps -a --filter "name=${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker rm || true
+              docker ps -a --filter "name=\${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker stop || true
+              docker ps -a --filter "name=\${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker rm || true
 
               echo "Starting new Product container..."
-              DOCKER_HUB_USERNAME=${DOCKER_HUB_USERNAME} IMAGE_TAG=${IMAGE_TAG} COMMIT_SHA=${COMMIT_SHA} \
-                docker compose --env-file ${ENV_FILE} -f $COMPOSE_FILE up -d --wait --wait-timeout 90 ${SERVICE_NAME}
+              DOCKER_HUB_USERNAME=\${DOCKER_HUB_USERNAME} IMAGE_TAG=\${IMAGE_TAG} COMMIT_SHA=\${COMMIT_SHA} \
+                docker compose --env-file \${ENV_FILE} -f \$COMPOSE_FILE up -d --wait --wait-timeout 90 \${SERVICE_NAME}
 
               # 健康檢查
-              NEW_CONTAINER=$(docker ps -q -f name=${SERVICE_NAME} | head -1)
-              if [ -z "$NEW_CONTAINER" ]; then
+              NEW_CONTAINER=\$(docker ps -q -f name=\${SERVICE_NAME} | head -1)
+              if [ -z "\$NEW_CONTAINER" ]; then
                 echo "❌ Product container failed to start"
                 exit 1
               fi
 
               for i in {1..10}; do
-                if docker exec $NEW_CONTAINER wget --quiet --tries=1 --spider http://localhost:3001 2>/dev/null; then
+                if docker exec \$NEW_CONTAINER wget --quiet --tries=1 --spider http://localhost:3001 2>/dev/null; then
                   echo "✅ Product health check passed"
                   break
                 fi
-                if [ $i -eq 10 ]; then
+                if [ \$i -eq 10 ]; then
                   echo "❌ Product health check failed"
-                  docker logs $NEW_CONTAINER --tail=50
+                  docker logs \$NEW_CONTAINER --tail=50
                   exit 1
                 fi
                 sleep 3
