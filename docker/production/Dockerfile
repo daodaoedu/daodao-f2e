@@ -70,7 +70,8 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # 安裝 sharp 所需的系統依賴（根據 Next.js 官方建議）
-RUN apk add --no-cache libc6-compat
+# 安裝 wget 用於健康檢查
+RUN apk add --no-cache libc6-compat wget
 
 # 從本地複製預先建置的 standalone 輸出
 COPY --chown=nextjs:nodejs apps/${APP_NAME}/.next/standalone ./
