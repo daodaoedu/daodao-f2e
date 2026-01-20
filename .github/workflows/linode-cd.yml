@@ -113,6 +113,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          target: website
           push: true
           tags: |
             ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}
@@ -223,6 +224,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          target: product
           push: true
           tags: |
             ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}
