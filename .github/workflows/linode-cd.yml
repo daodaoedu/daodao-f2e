@@ -112,7 +112,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./docker/production/Dockerfile
           target: website
           push: true
           tags: |
@@ -223,7 +223,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./docker/production/Dockerfile
           target: product
           push: true
           tags: |

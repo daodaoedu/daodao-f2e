@@ -46,7 +46,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./docker/production/Dockerfile
           push: true
           build-args: |
             APP_NAME=website
@@ -107,7 +107,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./docker/production/Dockerfile
           push: true
           build-args: |
             APP_NAME=product
