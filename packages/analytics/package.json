@@ -32,8 +32,7 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
-    "@types/react": "catalog:",
-    "next": "catalog:",
-    "react": "catalog:"
+    "next": ">=14.0.0",
+    "react": ">=18.0.0"
   }
 }
