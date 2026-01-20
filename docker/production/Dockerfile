@@ -88,6 +88,6 @@ USER nextjs
 # 暴露端口
 EXPOSE ${APP_PORT}
 
-# 啟動應用（server.js 在 standalone 根目錄）
-WORKDIR /app
+# 設置工作目錄並啟動應用
+WORKDIR /app/apps/${APP_NAME}
 CMD ["node", "server.js"]
