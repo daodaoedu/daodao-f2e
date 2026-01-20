@@ -1,5 +1,7 @@
 "use client";
 
+import { AnalyticsScripts } from "@daodao/analytics";
+import { AuthProvider } from "@daodao/auth";
 import {
   type Locale,
   type Messages,
@@ -8,7 +10,6 @@ import {
 import "@daodao/ui/globals.css";
 import { DialogManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
-import { AuthProvider } from "@daodao/auth";
 
 interface GlobalProviderProps {
   head?: React.ReactNode;
@@ -32,6 +33,7 @@ function GlobalProvider({
     >
       {head}
       <body>
+        <AnalyticsScripts />
         <NextIntlClientProvider
           messages={messages}
           locale={locale}

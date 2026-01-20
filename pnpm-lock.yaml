@@ -107,6 +107,9 @@ importers:
 
   apps/product:
     dependencies:
+      '@daodao/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@daodao/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -201,6 +204,9 @@ importers:
 
   apps/website:
     dependencies:
+      '@daodao/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@daodao/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -256,6 +262,28 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.7)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  packages/analytics:
+    dependencies:
+      '@daodao/config':
+        specifier: workspace:*
+        version: link:../config
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 20.19.27
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.7
+      next:
+        specifier: 'catalog:'
+        version: 15.5.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

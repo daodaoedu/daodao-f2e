@@ -18,6 +18,7 @@
     "clean": "pnpm dlx rimraf .next out node_modules"
   },
   "dependencies": {
+    "@daodao/analytics": "workspace:*",
     "@daodao/api": "workspace:*",
     "@daodao/assets": "workspace:*",
     "@daodao/auth": "workspace:*",
