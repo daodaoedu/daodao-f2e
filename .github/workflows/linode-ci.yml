@@ -102,8 +102,11 @@ jobs:
           wait
 
       # ===== 設定環境變數 =====
-      - name: Create environment file
-        run: echo "${{ secrets.ENV_DEV }}" > .env
+      - name: Create environment files
+        run: |
+          echo "${{ secrets.ENV_DEV }}" > .env
+          cp .env apps/website/.env
+          cp .env apps/product/.env
 
       # ===== 構建驗證 =====
       - name: Build applications
