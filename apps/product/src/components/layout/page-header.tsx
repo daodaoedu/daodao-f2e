@@ -5,7 +5,6 @@ import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
-import type { ReactNode } from "react";
 
 type PageHeaderProps = {
   /** 左側動作：'back' 顯示返回按鈕，null 顯示空佔位符 */

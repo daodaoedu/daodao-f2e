@@ -1,6 +1,7 @@
 import createNextIntlPlugin from "@daodao/i18n/plugin";
 import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
+import path from "node:path";
 
 loadEnvConfig(process.cwd());
 
@@ -8,6 +9,7 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  outputFileTracingRoot: path.join(__dirname, "../../"),
   reactStrictMode: true,
   typedRoutes: true,
   transpilePackages: [

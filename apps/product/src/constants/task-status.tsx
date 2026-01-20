@@ -1,4 +1,4 @@
-import { type BadgeProps } from "@daodao/ui/components/badge";
+import type { BadgeProps } from "@daodao/ui/components/badge";
 import { CalendarCheck, PenLine } from "lucide-react";
 
 export type TaskStatus = "draft" | "not-started" | "in-progress" | "completed";

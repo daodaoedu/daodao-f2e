@@ -10,7 +10,7 @@ import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { cn } from "@daodao/ui/lib/utils";
 import Matter from "matter-js";
 import * as decomp from "poly-decomp-es";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const { Engine, World, Bodies, Vertices, Runner, Body } = Matter;
 Matter.Common.setDecomp(decomp);
@@ -351,6 +351,11 @@ export const CheckInStack = ({ items = defaultItems }: CheckInStackProps) => {
   );
   const count = items.length;
 
+  const getSvgRef = useCallback(
+    (index: number) => svgRefsRef.current[index % svgRefsRef.current.length],
+    []
+  );
+
   // 從實際渲染的 SVG 元素中提取幾何數據
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
@@ -370,7 +375,7 @@ export const CheckInStack = ({ items = defaultItems }: CheckInStackProps) => {
     });
 
     return () => cancelAnimationFrame(frameId);
-  }, [count]);
+  }, [count, getSvgRef]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -535,16 +540,13 @@ export const CheckInStack = ({ items = defaultItems }: CheckInStackProps) => {
       World.clear(engine.world, false);
       Engine.clear(engine);
     };
-  }, [count, svgGeometries]);
+  }, [count, svgGeometries, getSvgRef]);
 
   /**
    * 獲取 SVG 組件配置
    */
   const getSvgConfig = (index: number) =>
     SVG_CONFIGS[index % SVG_CONFIGS.length];
-
-  const getSvgRef = (index: number) =>
-    svgRefsRef.current[index % svgRefsRef.current.length];
 
   /**
    * 處理 SVG ref 的回調
