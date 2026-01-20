@@ -50,7 +50,12 @@ export const trackEvent = (
   label?: string,
   value?: number
 ) => {
-  if (typeof window !== "undefined" && window.gtag) {
+  const config = getAnalyticsConfig();
+  if (
+    typeof window !== "undefined" &&
+    window.gtag &&
+    config.googleAnalytics.enabled
+  ) {
     window.gtag("event", action, {
       event_category: category,
       event_label: label,
@@ -64,6 +69,7 @@ export const trackPageView = (url: string) => {
   if (
     typeof window !== "undefined" &&
     window.gtag &&
+    config.googleAnalytics.enabled &&
     config.googleAnalytics.measurementId
   ) {
     window.gtag("config", config.googleAnalytics.measurementId, {
