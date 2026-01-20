@@ -247,9 +247,10 @@ jobs:
         run: |
           echo "🧪 Verifying Product Docker image..."
 
-          docker run --rm -d --name test-product \
+          docker run -d --name test-product \
             -p 3011:3001 \
             -e NODE_ENV=${{ env.NODE_ENV }} \
+            -e HOSTNAME=0.0.0.0 \
             ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}-${{ github.sha }}
 
           sleep 15
@@ -258,11 +259,12 @@ jobs:
             echo "✅ Product container started successfully"
           else
             echo "❌ Product container failed to start"
-            docker logs test-product
+            docker logs test-product || true
             exit 1
           fi
 
           docker stop test-product || true
+          docker rm test-product || true
 
   # ===== 部署階段 =====
   deploy:
