@@ -46,6 +46,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
+      - HOSTNAME=0.0.0.0
       - APP_NAME=product
     expose:
       - "3001"
@@ -114,6 +115,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
+      - HOSTNAME=0.0.0.0
       - APP_NAME=product
     expose:
       - "3001"
@@ -184,6 +186,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
+      - HOSTNAME=0.0.0.0
       - APP_NAME=product
     expose:
       - "3001"
