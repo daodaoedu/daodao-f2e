@@ -52,12 +52,18 @@ export const Step2 = ({ form }: Step2Props) => {
                   invalid={!!form.formState.errors.startDate}
                   placeholder="選擇日期"
                   onBlur={field.onBlur}
+                  minDate={new Date()}
+                  maxDate={addDays(new Date(), 14)}
+                  onError={(errorMessage) => {
+                    form.setError("startDate", { message: errorMessage });
+                  }}
                   onChange={(calendarDate) => {
                     if (calendarDate && isValid(calendarDate)) {
                       field.onChange(format(calendarDate, "yyyy-MM-dd"));
                     } else {
                       field.onChange("");
                     }
+                    form.clearErrors("startDate");
                   }}
                 />
               </FormControl>

@@ -1,3 +1,4 @@
+import { addDays, format, isAfter, isBefore, isValid, parse, startOfDay } from "date-fns";
 import { z } from "zod";
 
 // Form Options Constants
@@ -37,7 +38,36 @@ export const manualPracticeFormSchema = z.object({
   actionDescription: z.string().min(1, "請輸入實踐行動").max(50, "最多50字").default(""),
 
   // Step 2
-  startDate: z.string().min(1, "請選擇開始時間"),
+  startDate: z
+    .string()
+    .min(1, "請選擇開始時間")
+    .refine(
+      (val) => {
+        if (!val) return false;
+        const date = parse(val, "yyyy-MM-dd", new Date());
+        if (!isValid(date)) return false;
+        const today = startOfDay(new Date());
+        const maxDate = startOfDay(addDays(new Date(), 14));
+        const dateStartOfDay = startOfDay(date);
+        return !isBefore(dateStartOfDay, today) && !isAfter(dateStartOfDay, maxDate);
+      },
+      (val) => {
+        if (!val) return { message: "請選擇開始時間" };
+        const date = parse(val, "yyyy-MM-dd", new Date());
+        if (!isValid(date)) return { message: "請選擇有效的日期" };
+        const today = startOfDay(new Date());
+        const maxDate = startOfDay(addDays(new Date(), 14));
+        const dateStartOfDay = startOfDay(date);
+        if (isBefore(dateStartOfDay, today)) {
+          return { message: "日期不能早於今天" };
+        }
+        if (isAfter(dateStartOfDay, maxDate)) {
+          const maxDateFormatted = format(maxDate, "yyyy/MM/dd");
+          return { message: `日期不能晚於 ${maxDateFormatted}` };
+        }
+        return { message: "日期不在允許的範圍內" };
+      }
+    ),
   durationDays: z.enum(["7", "14", "21", "30"], { required_error: "請選擇想要持續多久" }),
   frequency: z.enum(["2-4", "3-5", "4-7"], { required_error: "請選擇每週實踐頻率" }),
 

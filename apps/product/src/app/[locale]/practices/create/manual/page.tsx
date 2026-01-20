@@ -39,7 +39,7 @@ export default function CreateManualPracticePage() {
   const form = useForm<ManualPracticeFormValues>({
     resolver: zodResolver(manualPracticeFormSchema),
     defaultValues: defaultFormValues as ManualPracticeFormValues,
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
   // 使用共用 Hook 處理暫存邏輯
