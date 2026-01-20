@@ -360,7 +360,7 @@ jobs:
               echo "Updating existing repository..."
               git fetch --depth 1 origin ${BRANCH_NAME}
               git reset --hard FETCH_HEAD
-              git clean -fd
+              git clean -fd -e '.env*'
             else
               # 如果目錄存在但不是 git repo，先清除
               if [ -d \$APP_DIR ]; then
