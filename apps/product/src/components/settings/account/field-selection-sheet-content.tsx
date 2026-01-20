@@ -2,7 +2,6 @@
 
 import { Button } from "@daodao/ui/components/button";
 import { Input } from "@daodao/ui/components/input";
-import { cn } from "@daodao/ui/lib/utils";
 import { Check, Plus, X, ChevronRight } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import type { FieldSelectionData } from "./use-field-selection-sheet";

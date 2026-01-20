@@ -2,7 +2,7 @@
 
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 
 type ArchivedPractice = {
   id: string;
@@ -34,7 +34,7 @@ const practices: ArchivedPractice[] = [
 ];
 
 export const ArchivedContentList = () => {
-  const handleUnarchive = useCallback(async (practiceId: string) => {
+  const handleUnarchive = useCallback(async (_practiceId: string) => {
     // 顯示 toast，帶有復原按鈕
     return new Promise<void>((resolve) => {
       const handleUnarchiveConfirm = () => {

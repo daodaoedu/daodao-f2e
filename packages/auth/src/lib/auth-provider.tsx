@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loginDialogRedirectUrl, setLoginDialogRedirectUrl] = useState<string | undefined>();
   const [loginDialogSource, setLoginDialogSource] = useState<"website" | "app" | undefined>();
   const userInfoStorage = useMemo(() => getStorage<StoredUser>(StorageEnum.UserInfo), []);
-  const router = useRouter();
+  const _router = useRouter();
 
   /**
    * 清除認證狀態
@@ -181,7 +181,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     <T,>(
       callback: () => T | Promise<T>,
       options?: { redirectUrl?: string; source?: "website" | "app" }
-    ): T | Promise<T> | void => {
+    ): T | Promise<T> | undefined => {
       if (isAuthenticated) {
         return callback();
       }
