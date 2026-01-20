@@ -101,6 +101,10 @@ jobs:
 
           wait
 
+      # ===== 設定環境變數 =====
+      - name: Create environment file
+        run: echo "${{ secrets.ENV_DEV }}" > .env
+
       # ===== 構建驗證 =====
       - name: Build applications
         run: |
