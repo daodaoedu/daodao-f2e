@@ -272,6 +272,22 @@ jobs:
     environment: ${{ needs.build-website.outputs.image-tag == 'prod' && 'production' || 'development' }}
     timeout-minutes: 20
     steps:
+      - name: Debug - Check secrets
+        run: |
+          echo "=== Checking Secrets ==="
+          if [ -z "${{ secrets.LINODE_SSH_PRIVATE_KEY }}" ]; then
+            echo "❌ LINODE_SSH_PRIVATE_KEY is EMPTY"
+          else
+            KEY_LENGTH=$(echo "${{ secrets.LINODE_SSH_PRIVATE_KEY }}" | wc -c)
+            echo "✅ LINODE_SSH_PRIVATE_KEY has value (length: $KEY_LENGTH chars)"
+          fi
+
+          if [ -z "${{ secrets.LINODE_INSTANCE_IP }}" ]; then
+            echo "❌ LINODE_INSTANCE_IP is EMPTY"
+          else
+            echo "✅ LINODE_INSTANCE_IP has value: ${{ secrets.LINODE_INSTANCE_IP }}"
+          fi
+
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
@@ -346,6 +362,11 @@ jobs:
               git reset --hard FETCH_HEAD
               git clean -fd
             else
+              # 如果目錄存在但不是 git repo，先清除
+              if [ -d \$APP_DIR ]; then
+                echo "Directory exists but is not a git repo, removing..."
+                rm -rf \$APP_DIR
+              fi
               echo "Cloning repository..."
               git clone --depth 1 --branch ${BRANCH_NAME} \
                 https://${GIT_HUB_USERNAME}:${GIT_HUB_ACCESS_TOKEN}@github.com/${GITHUB_REPOSITORY}.git \
