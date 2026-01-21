@@ -1,5 +1,6 @@
 "use client";
 
+import { AnalyticsScripts } from "@daodao/analytics";
 import { AuthProvider } from "@daodao/auth";
 import { type Locale, type Messages, NextIntlClientProvider } from "@daodao/i18n";
 import { type DeviceInfo, DeviceProvider, detectDeviceClient } from "@daodao/shared";
@@ -33,6 +34,7 @@ function GlobalProvider({
     >
       {head}
       <body>
+        <AnalyticsScripts />
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
           <DeviceProvider initialDevice={initialDevice}>
             <NavigationBlockerProvider>
