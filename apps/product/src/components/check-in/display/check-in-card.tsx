@@ -8,7 +8,7 @@ import { format, isValid } from "date-fns";
 import { useEffect, useRef } from "react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 
-interface CheckInCardProps {
+interface ICheckInCardProps {
   taskTitle: string;
   date: string;
   mood: MoodType | null;
@@ -82,7 +82,7 @@ export const CheckInCard = ({
   titleClassName = "text-white",
   onImageClick,
   showTape = true,
-}: CheckInCardProps) => {
+}: ICheckInCardProps) => {
   const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
   const MoodEmoji = moodOption?.emoji;
 

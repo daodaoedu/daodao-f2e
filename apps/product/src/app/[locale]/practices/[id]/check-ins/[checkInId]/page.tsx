@@ -4,43 +4,13 @@ import { Deco4Svg } from "@daodao/assets";
 import { useParams } from "@daodao/i18n/navigation";
 import { addDays, format, isValid, parse } from "date-fns";
 import { useMemo } from "react";
-import { CheckInButton, type CheckInData as CheckInSheetData } from "@/components/dashboard";
+import {
+  CheckInButton,
+  CheckInDateSelector,
+  CheckInDetail,
+  mockCheckIns,
+} from "@/components/check-in";
 import { PageHeader } from "@/components/layout";
-import { type CheckInData, CheckInDateSelector, CheckInDetail } from "@/components/practice/detail";
-
-// 模擬資料 - 之後替換為實際 API 資料
-const mockCheckIns: Record<string, CheckInData> = {
-  "1": {
-    id: "1",
-    date: "2026.01.01",
-    mood: "neutral",
-    content:
-      "今天我主要練習了…\n我學到的一個新概念是新概念是\nPodcast裡面主持人提到\n過程中發生了一件有趣的事，就是過程中發生了一件有趣的",
-    tags: ["新概念", "有趣"],
-    images: [
-      "https://placehold.co/600x400",
-      "https://placehold.co/600x399",
-      "https://placehold.co/600x398",
-    ],
-    practiceTitle: "學習 Vibe coding",
-  },
-  "3": {
-    id: "3",
-    date: "2026.01.03",
-    mood: "bored",
-    content: "今天我主要練習了學習 Vibe coding 文字文字文字文字文字文字。",
-    tags: ["受啟發"],
-    practiceTitle: "學習 Vibe coding",
-  },
-  "4": {
-    id: "4",
-    date: "2026.01.04",
-    mood: "fine",
-    content: "今天我主要練習了學習 Vibe coding 文字文字文字文字文字文字。",
-    tags: ["新概念"],
-    practiceTitle: "學習 Vibe coding",
-  },
-};
 
 // 模擬 practice 資訊 - 之後替換為實際 API 資料
 const mockPractice = {
@@ -96,7 +66,7 @@ export default function CheckInDetailPage() {
     return <div>找不到打卡記錄</div>;
   }
 
-  const handleCheckInComplete = (data: CheckInSheetData) => {
+  const handleCheckInComplete = (data: unknown) => {
     // TODO: 處理打卡資料
     console.log("打卡資料:", data);
   };

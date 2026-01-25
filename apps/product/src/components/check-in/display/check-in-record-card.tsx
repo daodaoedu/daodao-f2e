@@ -5,32 +5,23 @@ import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
-
-interface MoodStat {
-  mood: MoodType;
-  count: number;
-}
-
-interface ThoughtTag {
-  tag: string;
-  count: number;
-}
+import { MOOD_OPTIONS, MoodType } from "@/constants/mood";
+import type { IMoodStat, IThoughtTag } from "../types";
 
 export const CheckInRecordCard = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // 模擬資料 - 之後替換為實際 API 資料
-  const moodStats: MoodStat[] = [
-    { mood: "happy", count: 3 },
-    { mood: "neutral", count: 2 },
-    { mood: "bored", count: 0 },
-    { mood: "fine", count: 0 },
-    { mood: "frustrated", count: 0 },
-    { mood: "hopeless", count: 1 },
+  const moodStats: IMoodStat[] = [
+    { mood: MoodType.happy, count: 3 },
+    { mood: MoodType.neutral, count: 2 },
+    { mood: MoodType.bored, count: 0 },
+    { mood: MoodType.fine, count: 0 },
+    { mood: MoodType.frustrated, count: 0 },
+    { mood: MoodType.hopeless, count: 1 },
   ];
 
-  const thoughtTags: ThoughtTag[] = [
+  const thoughtTags: IThoughtTag[] = [
     { tag: "有趣", count: 1 },
     { tag: "不太懂", count: 1 },
     { tag: "新概念", count: 2 },

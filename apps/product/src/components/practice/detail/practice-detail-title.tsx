@@ -4,7 +4,7 @@ import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg } from "@daodao/assets";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
-import { getStatusConfig } from "@/constants/task-status";
+import { getStatusConfig, TaskStatus } from "@/constants/task-status";
 
 interface PracticeDetailTitleProps {
   title: string;
@@ -22,7 +22,7 @@ export const PracticeDetailTitle = ({
   hasNext,
 }: PracticeDetailTitleProps) => {
   // TODO: 從 API 取得實踐的 status
-  const status = "in-progress";
+  const status = TaskStatus.inProgress;
   const statusInfo = getStatusConfig(status);
 
   return (

@@ -2,10 +2,10 @@
 
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { useCallback, useRef } from "react";
-import type { CheckInData } from "@/components/dashboard/check-in-sheet";
-import { CheckInSheetContent } from "@/components/dashboard/check-in-sheet";
+import type { CheckInData } from "@/components/check-in";
+import { CheckInSheetContent } from "@/components/check-in";
 
-interface UseCheckInSheetOptions {
+interface IUseCheckInSheetOptions {
   /** 任務標題 */
   taskTitle: string;
   /** 打卡完成回調 */
@@ -29,7 +29,7 @@ interface UseCheckInSheetOptions {
  * openCheckInSheet();
  * ```
  */
-export function useCheckInSheet({ taskTitle, onComplete, onClose }: UseCheckInSheetOptions) {
+export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInSheetOptions) {
   const { open } = useSheetManager();
   const closeRef = useRef<(() => void) | null>(null);
 

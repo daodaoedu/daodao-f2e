@@ -3,11 +3,9 @@
 import { useParams } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Archive, Trash2 } from "lucide-react";
-import { CheckInButton } from "@/components/dashboard";
+import { CheckInButton, CheckInRecordCard, CheckInStack } from "@/components/check-in";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import {
-  CheckInRecordCard,
-  CheckInStack,
   ExecutionDurationCard,
   ExecutionTimingCard,
   type ManualPracticeFormValues,

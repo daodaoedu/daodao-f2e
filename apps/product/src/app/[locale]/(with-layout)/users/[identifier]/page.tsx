@@ -2,7 +2,9 @@
 
 import { SlidersHorizontal } from "lucide-react";
 import { PageHeader } from "@/components/layout";
-import { IslandHeader, PracticeSection, UserInfoCard } from "@/components/user";
+import { PracticeSection } from "@/components/practice";
+import { IslandHeader, UserInfoCard } from "@/components/user";
+import { TaskStatus } from "@/constants/task-status";
 
 /**
  * 個人頁面
@@ -25,14 +27,14 @@ export default function UserProfilePage() {
   const mockPractices = [
     {
       id: "1",
-      status: "draft" as const,
+      status: TaskStatus.draft,
       title: "閱讀原子習慣",
       description: "點精油,跟着 Youtube 教學做",
       tags: ["閱讀", "原子習慣", "心理學"],
     },
     {
       id: "2",
-      status: "in-progress" as const,
+      status: TaskStatus.inProgress,
       title: "閱讀原子習慣",
       description: "點精油,跟着 Youtube 教學做",
       tags: ["閱讀", "原子習慣"],

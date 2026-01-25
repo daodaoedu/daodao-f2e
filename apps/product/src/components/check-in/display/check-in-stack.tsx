@@ -10,26 +10,16 @@ import { cn } from "@daodao/ui/lib/utils";
 import Matter from "matter-js";
 import * as decomp from "poly-decomp-es";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { MOOD_OPTIONS, MoodType, type MoodType as MoodTypeType } from "@/constants/mood";
+import type { IBodyPosition, ICheckInItem, ISvgGeometry } from "../types";
 
 const { Engine, World, Bodies, Vertices, Runner, Body } = Matter;
 Matter.Common.setDecomp(decomp);
 
 /**
- * 從 SVG 元素中提取幾何數據
- */
-interface SvgGeometry {
-  width: number;
-  height: number;
-  path?: string;
-  isCircle?: boolean;
-  radius?: number;
-}
-
-/**
  * 從實際的 SVG DOM 元素中提取幾何數據
  */
-const extractSvgGeometry = (svgElement: SVGSVGElement): SvgGeometry | null => {
+const extractSvgGeometry = (svgElement: SVGSVGElement): ISvgGeometry | null => {
   if (!svgElement) return null;
 
   // 從 SVG 元素的 width/height 屬性或 viewBox 獲取尺寸
@@ -160,13 +150,6 @@ const PHYSICS_CONFIG = {
   timeScale: 3,
 } as const;
 
-interface BodyPosition {
-  id: number;
-  x: number;
-  y: number;
-  angle: number;
-}
-
 /**
  * 創建物理引擎的邊界牆
  */
@@ -227,7 +210,7 @@ const clampAngle = (angle: number): number => {
 /**
  * 從 body 位置提取安全的位置數據
  */
-const extractBodyPosition = (body: Matter.Body): BodyPosition => ({
+const extractBodyPosition = (body: Matter.Body): IBodyPosition => ({
   id: body.id,
   x: Number.isFinite(body.position.x) ? body.position.x : 0,
   y: Number.isFinite(body.position.y) ? body.position.y : 0,
@@ -267,80 +250,73 @@ const createPathBody = (x: number, y: number, pathElement: SVGPathElement): Matt
 
 const MOOD_MAP = Object.fromEntries(
   MOOD_OPTIONS.map((option) => [option.id, option.emoji])
-) as Record<MoodType, React.FC<React.SVGProps<SVGSVGElement>>>;
+) as Record<MoodTypeType, React.FC<React.SVGProps<SVGSVGElement>>>;
 
-interface CheckInItem {
-  id: string;
-  date: string;
-  mood: MoodType;
-  content: string;
-}
-
-const defaultItems: CheckInItem[] = [
+const defaultItems: ICheckInItem[] = [
   {
     id: "1",
     date: "2026.01.01",
-    mood: "happy",
+    mood: MoodType.happy,
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第一次打卡",
   },
   {
     id: "2",
     date: "2026.01.03",
-    mood: "neutral",
+    mood: MoodType.neutral,
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第二次打卡",
   },
   {
     id: "3",
     date: "2026.01.04",
-    mood: "bored",
+    mood: MoodType.bored,
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
   },
   {
     id: "4",
     date: "2026.01.05",
-    mood: "fine",
+    mood: MoodType.fine,
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
   },
   {
     id: "5",
     date: "2026.01.09",
-    mood: "frustrated",
+    mood: MoodType.frustrated,
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
   },
   {
     id: "6",
     date: "2026.01.11",
-    mood: "frustrated",
+    mood: MoodType.frustrated,
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
   },
   {
     id: "7",
     date: "2026.01.13",
-    mood: "frustrated",
+    mood: MoodType.frustrated,
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
   },
 ];
 
-interface CheckInStackProps {
+interface ICheckInStackProps {
   practiceId?: string;
-  items?: CheckInItem[];
+  items?: ICheckInItem[];
 }
 
-export const CheckInStack = ({ practiceId, items = defaultItems }: CheckInStackProps) => {
+export const CheckInStack = ({ practiceId, items = defaultItems }: ICheckInStackProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRefsRef = useRef<(SVGSVGElement | null)[]>([]);
   const bodiesRef = useRef<Matter.Body[]>([]);
-  const [positions, setPositions] = useState<BodyPosition[]>([]);
+  const [positions, setPositions] = useState<IBodyPosition[]>([]);
   const [containerHeight, setContainerHeight] = useState(MIN_CONTAINER_HEIGHT);
   const animationFrameRef = useRef<number | undefined>(undefined);
-  const [svgGeometries, setSvgGeometries] = useState<(SvgGeometry | null)[]>([]);
+  const [svgGeometries, setSvgGeometries] = useState<(ISvgGeometry | null)[]>([]);
   const count = items.length;
 
   /**
@@ -356,7 +332,7 @@ export const CheckInStack = ({ practiceId, items = defaultItems }: CheckInStackP
   // 從實際渲染的 SVG 元素中提取幾何數據
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
-      const geometries: (SvgGeometry | null)[] = [];
+      const geometries: (ISvgGeometry | null)[] = [];
 
       for (let i = 0; i < count; i++) {
         const svgElement = getSvgRef(i);
@@ -544,7 +520,7 @@ export const CheckInStack = ({ practiceId, items = defaultItems }: CheckInStackP
   /**
    * 生成 clip-path CSS 值
    */
-  const getClipPath = (geometry: SvgGeometry | null, index: number): string => {
+  const getClipPath = (geometry: ISvgGeometry | null, index: number): string => {
     if (!geometry) return "";
 
     if (geometry.isCircle && geometry.radius) {
@@ -622,7 +598,7 @@ export const CheckInStack = ({ practiceId, items = defaultItems }: CheckInStackP
         if (!item) return null;
 
         const { mood, date, content } = item;
-        const Emoji = MOOD_MAP[mood];
+        const Emoji = MOOD_MAP[mood] ?? MOOD_OPTIONS[0]?.emoji;
 
         return (
           <Link

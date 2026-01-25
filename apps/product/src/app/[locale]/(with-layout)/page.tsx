@@ -12,6 +12,7 @@ import {
   type InProgressTask,
 } from "@/components/dashboard";
 import { BackgroundAnimation } from "@/components/layout";
+import { TaskStatus } from "@/constants/task-status";
 
 export default function HomePage() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function HomePage() {
       messagesCount: 17,
       isUnreadMessages: true,
       theme: "yellow",
-      status: "draft",
+      status: TaskStatus.draft,
     },
     {
       id: 5,
@@ -54,7 +55,7 @@ export default function HomePage() {
       messagesCount: 2,
       isUnreadMessages: false,
       theme: "blue",
-      status: "in-progress",
+      status: TaskStatus.inProgress,
     },
     {
       id: 6,
@@ -65,7 +66,7 @@ export default function HomePage() {
       messagesCount: 3,
       isUnreadMessages: true,
       theme: "pink",
-      status: "not-started",
+      status: TaskStatus.notStarted,
     },
     {
       id: 7,
@@ -76,7 +77,7 @@ export default function HomePage() {
       messagesCount: 7,
       isUnreadMessages: true,
       theme: "green",
-      status: "in-progress",
+      status: TaskStatus.inProgress,
     },
   ];
 

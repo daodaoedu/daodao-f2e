@@ -3,12 +3,12 @@
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { MOOD_OPTIONS } from "@/constants/mood";
-import type { CheckInData, CheckInDate } from "./types";
+import type { ICheckInDate, ICheckInDisplayData } from "../types";
 
-interface CheckInDateButtonProps {
-  item: CheckInDate;
+interface ICheckInDateButtonProps {
+  item: ICheckInDate;
   index: number;
-  checkIns: Record<string, CheckInData>;
+  checkIns: Record<string, ICheckInDisplayData>;
   activeCheckInId: string;
   onSelect: (checkInId: string) => void;
   className?: string;
@@ -21,7 +21,7 @@ export const CheckInDateButton = ({
   activeCheckInId,
   onSelect,
   className,
-}: CheckInDateButtonProps) => {
+}: ICheckInDateButtonProps) => {
   const hasCheckIn = item.hasCheckIn ?? !!checkIns[item.id];
   const isActive = hasCheckIn && item.id === activeCheckInId;
   const itemCheckIn = checkIns[item.id];

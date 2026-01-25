@@ -9,11 +9,11 @@ import { getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 import { Download, ExternalLink } from "lucide-react";
-import type { CheckInData } from "./check-in-sheet";
+import type { ICheckInFormData } from "../types";
 
-interface ShareCheckInSheetContentProps {
+interface IShareCheckInSheetContentProps {
   taskTitle: string;
-  checkInData: CheckInData & { date: string; images?: string[] };
+  checkInData: ICheckInFormData & { date: string; images?: string[] };
 }
 
 /**
@@ -23,7 +23,7 @@ interface ShareCheckInSheetContentProps {
 export const ShareCheckInSheetContent = ({
   taskTitle,
   checkInData,
-}: ShareCheckInSheetContentProps) => {
+}: IShareCheckInSheetContentProps) => {
   const { description, images } = checkInData;
 
   // 準備分享內容

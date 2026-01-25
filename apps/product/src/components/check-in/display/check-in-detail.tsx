@@ -4,26 +4,18 @@ import { Button } from "@daodao/ui/components/button";
 import { ImageLightbox } from "@daodao/ui/components/image-lightbox";
 import { Share2, Trash2 } from "lucide-react";
 import * as React from "react";
-import type { MoodType } from "@/constants/mood";
 import { DeleteCheckInResult, useDeleteCheckInDialog } from "@/hooks/use-delete-check-in-dialog";
 import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
+import type { ICheckInDisplayData, ICheckInFormData } from "../types";
 import { CheckInCard } from "./check-in-card";
 
-export interface CheckInData {
-  id: string;
-  date: string;
-  mood: MoodType;
-  content: string;
-  tags: string[];
-  images?: string[];
-  practiceTitle: string;
+export type { ICheckInDisplayData as CheckInData };
+
+interface ICheckInDetailProps {
+  checkInData: ICheckInDisplayData;
 }
 
-interface CheckInDetailProps {
-  checkInData: CheckInData;
-}
-
-export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
+export const CheckInDetail = ({ checkInData }: ICheckInDetailProps) => {
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
 
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
@@ -49,7 +41,7 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
       media: [],
       date,
       images,
-    },
+    } as ICheckInFormData & { date: string; images?: string[] },
   });
 
   // 處理圖片點擊，開啟 lightbox

@@ -5,14 +5,14 @@ import { Button } from "@daodao/ui/components/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CheckInDateButton } from "./check-in-date-button";
-import type { CheckInDateSelectorProps } from "./types";
+import type { ICheckInDateSelectorProps } from "./types";
 
 export const DesktopCheckInDateSelector = ({
   checkInDates,
   checkIns,
   practiceId,
   activeCheckInId,
-}: CheckInDateSelectorProps) => {
+}: ICheckInDateSelectorProps) => {
   const router = useRouter();
   const [canScrollUp, setCanScrollUp] = useState(false);
   const [canScrollDown, setCanScrollDown] = useState(false);

@@ -9,12 +9,13 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { TaskStatus, type TaskStatus as TaskStatusType } from "@/constants/task-status";
 
 type TabType = "practices" | "plans" | "ideas";
 
 interface PracticeItem {
   id: string;
-  status: "draft" | "in-progress" | "completed";
+  status: TaskStatusType;
   title: string;
   description: string;
   tags: string[];
@@ -53,19 +54,19 @@ export function PracticeSection({ practices = [] }: PracticeSectionProps) {
 
   const getStatusBadge = (status: PracticeItem["status"]) => {
     switch (status) {
-      case "draft":
+      case TaskStatus.draft:
         return (
           <Badge variant="gray" size="sm">
             草稿
           </Badge>
         );
-      case "in-progress":
+      case TaskStatus.inProgress:
         return (
           <Badge variant="outline-logo" size="sm">
             進行中
           </Badge>
         );
-      case "completed":
+      case TaskStatus.completed:
         return (
           <Badge variant="default" size="sm">
             已完成
@@ -76,7 +77,7 @@ export function PracticeSection({ practices = [] }: PracticeSectionProps) {
 
   const filteredPractices = includeCompleted
     ? practices
-    : practices.filter((p) => p.status !== "completed");
+    : practices.filter((p) => p.status !== TaskStatus.completed);
 
   const renderSubNavigation = () => {
     const content = (

@@ -2,10 +2,10 @@
 
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { useCallback } from "react";
-import type { CheckInData } from "@/components/dashboard/check-in-sheet";
-import { ShareCheckInSheetContent } from "@/components/dashboard/share-check-in-content";
+import type { CheckInData } from "@/components/check-in";
+import { ShareCheckInSheetContent } from "@/components/check-in";
 
-interface UseShareCheckInSheetOptions {
+interface IUseShareCheckInSheetOptions {
   /** 任務標題 */
   taskTitle: string;
   /** 打卡資料 */
@@ -36,7 +36,7 @@ export function useShareCheckInSheet({
   taskTitle,
   checkInData,
   onClose,
-}: UseShareCheckInSheetOptions) {
+}: IUseShareCheckInSheetOptions) {
   const { open } = useSheetManager();
 
   const openShareSheet = useCallback(() => {

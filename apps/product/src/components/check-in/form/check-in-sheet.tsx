@@ -22,16 +22,14 @@ import { CalendarCheck, Check, Plus, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { CheckInStatus, type CheckInStatusType } from "@/constants/check-in-status";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
+import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
 
-export interface CheckInData {
-  mood: MoodType | null;
-  tags: string[];
-  description: string;
-  media: File[];
-}
+export type { ICheckInFormData as CheckInData, ICheckInStatusOptions as CheckInStatusOptions };
+export type { CheckInStatusType as CheckInStatus } from "@/constants/check-in-status";
 
 const AVAILABLE_TAGS = ["練習", "新概念", "實作", "有趣", "創造", "困難", "刻意練習"] as const;
 
@@ -48,29 +46,26 @@ const checkInFormSchema = z.object({
   media: z.array(z.instanceof(File)).default([]),
 });
 
-type CheckInFormValues = {
-  mood: MoodType | null;
-  tags: string[];
-  description: string;
-  media: File[];
-};
+type CheckInFormValuesType = ICheckInFormData;
 
 /**
  * 打卡 Sheet 的內容組件（不包含 Sheet 外層）
  * 可用於 SheetManager 或直接使用 CheckInSheet
  */
+interface ICheckInSheetContentProps {
+  taskTitle: string;
+  onComplete: (data: ICheckInFormData) => void;
+  onClose?: () => void;
+}
+
 export const CheckInSheetContent = ({
   taskTitle,
   onComplete,
   onClose,
-}: {
-  taskTitle: string;
-  onComplete: (data: CheckInData) => void;
-  onClose?: () => void;
-}) => {
+}: ICheckInSheetContentProps) => {
   const [customTagInput, setCustomTagInput] = useState("");
 
-  const form = useForm<CheckInFormValues>({
+  const form = useForm<CheckInFormValuesType>({
     resolver: zodResolver(checkInFormSchema),
     defaultValues: {
       mood: null,
@@ -96,7 +91,7 @@ export const CheckInSheetContent = ({
     };
   }, []);
 
-  const onSubmit = (values: CheckInFormValues) => {
+  const onSubmit = (values: CheckInFormValuesType) => {
     // Zod 驗證已確保 mood 不是 null
     if (values.mood === null) {
       return;
@@ -335,20 +330,6 @@ export const CheckInSheetContent = ({
   );
 };
 
-export type CheckInStatus = "available" | "already-checked-in" | "practice-completed";
-
-export interface CheckInStatusOptions {
-  /**
-   * 實踐狀態
-   * - "active" | "paused" | "completed" | "archived"
-   */
-  practiceStatus?: string;
-  /**
-   * 最後打卡日期 (ISO 格式字串，例如 "2026-01-01")
-   */
-  lastCheckInDate?: string | null;
-}
-
 /**
  * 檢查指定日期是否為今天
  */
@@ -370,7 +351,7 @@ const isDateToday = (dateString: string | null | undefined): boolean => {
 /**
  * 檢查打卡狀態
  */
-const useCheckInStatus = (options: CheckInStatusOptions) => {
+const useCheckInStatus = (options: ICheckInStatusOptions) => {
   const { practiceStatus, lastCheckInDate } = options;
 
   return useMemo(() => {
@@ -381,21 +362,21 @@ const useCheckInStatus = (options: CheckInStatusOptions) => {
     const isTodayCheckedIn = isDateToday(lastCheckInDate);
 
     // 決定最終狀態（優先級：已完成 > 今天已打卡 > 可打卡）
-    const getStatus = (): CheckInStatus => {
-      if (isPracticeCompleted) return "practice-completed";
-      if (isTodayCheckedIn) return "already-checked-in";
-      return "available";
+    const getStatus = (): CheckInStatusType => {
+      if (isPracticeCompleted) return CheckInStatus.practiceCompleted;
+      if (isTodayCheckedIn) return CheckInStatus.alreadyCheckedIn;
+      return CheckInStatus.available;
     };
     const status = getStatus();
 
     // 取得按鈕文字
     const getButtonLabel = (): string => {
       switch (status) {
-        case "practice-completed":
+        case CheckInStatus.practiceCompleted:
           return "實踐已完成";
-        case "already-checked-in":
+        case CheckInStatus.alreadyCheckedIn:
           return "今天已打過卡囉！";
-        case "available":
+        case CheckInStatus.available:
           return "打卡";
         default:
           return "打卡";
@@ -403,7 +384,7 @@ const useCheckInStatus = (options: CheckInStatusOptions) => {
     };
 
     // 是否可以點擊
-    const canCheckIn = status === "available";
+    const canCheckIn = status === CheckInStatus.available;
 
     return {
       status,
@@ -415,8 +396,8 @@ const useCheckInStatus = (options: CheckInStatusOptions) => {
   }, [practiceStatus, lastCheckInDate]);
 };
 
-interface CheckInButtonProps
-  extends CheckInStatusOptions,
+interface ICheckInButtonProps
+  extends ICheckInStatusOptions,
     Omit<ButtonProps, "onClick" | "children"> {
   /**
    * 任務標題（用於顯示在 Sheet 中）
@@ -425,7 +406,7 @@ interface CheckInButtonProps
   /**
    * 打卡完成回調函數
    */
-  onComplete: (data: CheckInData) => void;
+  onComplete: (data: ICheckInFormData) => void;
   /**
    * 是否顯示圖標
    */
@@ -446,14 +427,14 @@ export const CheckInButton = ({
   className,
   showIcon,
   ...props
-}: CheckInButtonProps) => {
+}: ICheckInButtonProps) => {
   const { canCheckIn, getButtonLabel } = useCheckInStatus({
     practiceStatus,
     lastCheckInDate,
   });
 
   // 使用 ref 來保存打卡資料，以便在成功對話框中使用
-  const checkInDataRef = useRef<CheckInData | null>(null);
+  const checkInDataRef = useRef<ICheckInFormData | null>(null);
 
   const { openSuccessDialog } = useCheckInSuccessDialog({
     title: taskTitle,

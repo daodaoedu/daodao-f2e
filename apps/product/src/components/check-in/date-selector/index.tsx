@@ -3,9 +3,11 @@
 import { useIsMobile } from "@daodao/shared";
 import { DesktopCheckInDateSelector } from "./desktop";
 import { MobileCheckInDateSelector } from "./mobile";
-import type { CheckInDateSelectorProps } from "./types";
+import type { ICheckInDateSelectorProps } from "./types";
 
-export const CheckInDateSelector = (props: CheckInDateSelectorProps) => {
+export { mockCheckIns } from "./mock";
+
+export const CheckInDateSelector = (props: ICheckInDateSelectorProps) => {
   const isMobile = useIsMobile();
   if (isMobile) {
     return <MobileCheckInDateSelector {...props} />;

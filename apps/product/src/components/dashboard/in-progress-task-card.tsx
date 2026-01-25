@@ -13,8 +13,8 @@ import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
 import { PenLine } from "lucide-react";
-import { getStatusConfig } from "@/constants/task-status";
-import { CheckInButton } from "./check-in-sheet";
+import { CheckInButton } from "@/components/check-in";
+import { getStatusConfig, TaskStatus } from "@/constants/task-status";
 
 const themesMap = {
   yellow: YellowSvg,
@@ -50,7 +50,7 @@ export const InProgressTaskCard = ({
 }: InProgressTaskCardProps) => {
   const Theme = themesMap[theme as keyof typeof themesMap] ?? YellowSvg;
   const statusInfo = getStatusConfig(status);
-  const isDraft = status === "draft";
+  const isDraft = status === TaskStatus.draft;
 
   return (
     <div className="relative w-[294px]">

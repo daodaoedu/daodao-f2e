@@ -4,14 +4,14 @@ import { useRouter } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { CheckInDateButton } from "./check-in-date-button";
-import type { CheckInDateSelectorProps } from "./types";
+import type { ICheckInDateSelectorProps } from "./types";
 
 export const MobileCheckInDateSelector = ({
   checkInDates,
   checkIns,
   practiceId,
   activeCheckInId,
-}: CheckInDateSelectorProps) => {
+}: ICheckInDateSelectorProps) => {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);

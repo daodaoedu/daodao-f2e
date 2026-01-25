@@ -10,10 +10,12 @@ import {
 import { cn } from "@daodao/ui/lib/utils";
 import { Ellipsis } from "lucide-react";
 import { useState } from "react";
-import type { TaskStatus } from "@/constants/task-status";
+import {
+  FilterStatus,
+  type FilterStatus as FilterStatusType,
+  type TaskStatus,
+} from "@/constants/task-status";
 import { InProgressTaskCard } from "./in-progress-task-card";
-
-export type FilterStatus = "all" | "draft" | "not-started" | "in-progress";
 
 export interface InProgressTask {
   id: number;
@@ -32,10 +34,12 @@ interface InProgressSectionProps {
 }
 
 export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+  const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
 
   const filteredTasks =
-    filterStatus === "all" ? tasks : tasks.filter((task) => task.status === filterStatus);
+    filterStatus === FilterStatus.all
+      ? tasks
+      : tasks.filter((task) => task.status === filterStatus);
 
   return (
     <section className="mb-6">
@@ -47,7 +51,8 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
               variant="ghost"
               size="icon"
               className={cn(
-                filterStatus !== "all" && "bg-light-cyan text-logo-cyan hover:text-logo-cyan"
+                filterStatus !== FilterStatus.all &&
+                  "bg-light-cyan text-logo-cyan hover:text-logo-cyan"
               )}
             >
               <Ellipsis className="size-6" />
@@ -55,26 +60,34 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              onClick={() => setFilterStatus("all")}
-              className={cn(filterStatus === "all" && "bg-accent text-accent-foreground")}
+              onClick={() => setFilterStatus(FilterStatus.all)}
+              className={cn(
+                filterStatus === FilterStatus.all && "bg-accent text-accent-foreground"
+              )}
             >
               全部
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => setFilterStatus("draft")}
-              className={cn(filterStatus === "draft" && "bg-accent text-accent-foreground")}
+              onClick={() => setFilterStatus(FilterStatus.draft)}
+              className={cn(
+                filterStatus === FilterStatus.draft && "bg-accent text-accent-foreground"
+              )}
             >
               草稿
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => setFilterStatus("not-started")}
-              className={cn(filterStatus === "not-started" && "bg-accent text-accent-foreground")}
+              onClick={() => setFilterStatus(FilterStatus.notStarted)}
+              className={cn(
+                filterStatus === FilterStatus.notStarted && "bg-accent text-accent-foreground"
+              )}
             >
               未開始
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => setFilterStatus("in-progress")}
-              className={cn(filterStatus === "in-progress" && "bg-accent text-accent-foreground")}
+              onClick={() => setFilterStatus(FilterStatus.inProgress)}
+              className={cn(
+                filterStatus === FilterStatus.inProgress && "bg-accent text-accent-foreground"
+              )}
             >
               進行中
             </DropdownMenuItem>
