@@ -190,7 +190,11 @@ export const TagEditSheetContent = ({
                 pinned: "已選用標籤",
                 unpinned: "可用標籤",
               }}
-              unpinnedPlaceholder={<div className="text-light-gray bg-very-light-gray border border-bg-gray py-[50px] text-center">無符合標籤</div>}
+              unpinnedPlaceholder={
+                <div className="text-light-gray bg-very-light-gray border border-bg-gray py-[50px] text-center">
+                  無符合標籤
+                </div>
+              }
               onItemToggle={handleToggleTag}
               transformItems={transformItems}
               className="flex flex-col-reverse"

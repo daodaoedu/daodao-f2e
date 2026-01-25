@@ -4,10 +4,10 @@ import { client, unauthorizedHandler } from "@daodao/api";
 import { getStorage, getStorageKey, StorageEnum } from "@daodao/shared";
 import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { LoginDialog } from "../components/login-dialog";
 import type { AuthContextValue, StoredUser } from "../types";
 import { initiateOAuthLogin } from "./auth-client";
 import { DEFAULT_REDIRECT_URL } from "./auth-constants";
-import { LoginDialog } from "../components/login-dialog";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 

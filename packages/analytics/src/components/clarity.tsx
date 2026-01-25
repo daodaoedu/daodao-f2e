@@ -5,10 +5,7 @@ import { getAnalyticsConfig } from "../lib/config";
 
 declare global {
   interface Window {
-    clarity: (
-      command: "set" | "identify" | "consent" | "event",
-      ...args: unknown[]
-    ) => void;
+    clarity: (command: "set" | "identify" | "consent" | "event", ...args: unknown[]) => void;
   }
 }
 

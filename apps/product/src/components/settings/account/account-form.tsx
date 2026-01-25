@@ -8,11 +8,11 @@ import { useForm } from "react-hook-form";
 import { FieldSelectionSection } from "./field-selection-section";
 import { PersonalInfoSection } from "./personal-info-section";
 import {
+  type AccountFormValues,
   AVAILABLE_FIELDS,
+  accountFormSchema,
   EDUCATION_STAGE_OPTIONS,
   ROLE_OPTIONS,
-  accountFormSchema,
-  type AccountFormValues,
 } from "./schema";
 
 export const AccountForm = () => {
@@ -24,12 +24,7 @@ export const AccountForm = () => {
       role: "",
       educationStage: "",
       professionalFields: ["資訊與資訊通信科技(ICT)", "法律", "商業與管理"],
-      explorationFields: [
-        "資訊與電腦科學",
-        "語言",
-        "商管與理財",
-        "社會創新與永續",
-      ],
+      explorationFields: ["資訊與電腦科學", "語言", "商管與理財", "社會創新與永續"],
     },
   });
 
@@ -67,11 +62,7 @@ export const AccountForm = () => {
 
         {/* 儲存按鈕 */}
         <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray">
-          <Button
-            type="submit"
-            variant="orange"
-            className="w-full sm:max-w-[288px]"
-          >
+          <Button type="submit" variant="orange" className="w-full sm:max-w-[288px]">
             儲存
           </Button>
         </footer>

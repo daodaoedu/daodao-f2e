@@ -1,5 +1,6 @@
 "use client";
 
+import { ArtSvg, HealthSvg, LanguageSvg, LifeSvg, TechSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -12,16 +13,9 @@ import {
 } from "@daodao/ui/components/carousel";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronRight } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { BgRadialAnimation } from "@/components/layout/bg-radial-animation";
-import {
-  ArtSvg,
-  HealthSvg,
-  LanguageSvg,
-  LifeSvg,
-  TechSvg,
-} from "@daodao/assets";
 
 // 類別定義
 type CategoryId = "language" | "lifestyle" | "digital" | "art" | "health";
@@ -137,8 +131,7 @@ const practicesByCategory: Record<
 
 export default function CreatePracticePage() {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] =
-    useState<CategoryId>("lifestyle");
+  const [selectedCategory, setSelectedCategory] = useState<CategoryId>("lifestyle");
 
   const handleTemplateSelect = (templateId: string) => {
     router.push(`/practices/create/template/${templateId}`);
@@ -174,11 +167,7 @@ export default function CreatePracticePage() {
       <main className="relative px-4 max-w-[600px] mx-auto pb-8">
         {/* Header */}
         <div className="text-center pt-5 md:pt-12">
-          <Badge
-            size="sm"
-            variant="secondary"
-            className="text-xs md:text-sm text-text-dark mb-3"
-          >
+          <Badge size="sm" variant="secondary" className="text-xs md:text-sm text-text-dark mb-3">
             主題實踐
           </Badge>
           <h1 className="text-2xl md:text-4xl font-semibold text-text-dark mb-3 relative">
@@ -234,9 +223,7 @@ export default function CreatePracticePage() {
                       <button
                         key={practice.id}
                         type="button"
-                        onClick={() =>
-                          handleTemplateSelect(practice.templateId)
-                        }
+                        onClick={() => handleTemplateSelect(practice.templateId)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" || e.key === " ") {
                             e.preventDefault();
@@ -284,10 +271,7 @@ export default function CreatePracticePage() {
 
         {/* Create Manual Practice Button */}
         <div className="flex justify-center mt-8 mb-4">
-          <Button
-            variant="white"
-            onClick={() => router.push("/practices/create/manual")}
-          >
+          <Button variant="white" onClick={() => router.push("/practices/create/manual")}>
             我想自己建立
             <ChevronRight className="size-4" />
           </Button>

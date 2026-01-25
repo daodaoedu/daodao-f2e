@@ -2,8 +2,8 @@
 
 import { Button } from "@daodao/ui/components/button";
 import { Input } from "@daodao/ui/components/input";
-import { Check, Plus, X, ChevronRight } from "lucide-react";
-import { useState, useCallback, useMemo } from "react";
+import { Check, ChevronRight, Plus, X } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import type { FieldSelectionData } from "./use-field-selection-sheet";
 
 interface FieldSelectionSheetContentProps {
@@ -157,12 +157,7 @@ export const FieldSelectionSheetContent = ({
 
       {/* 完成按鈕 */}
       <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6">
-        <Button
-          type="button"
-          variant="orange"
-          className="w-full"
-          onClick={handleSubmit}
-        >
+        <Button type="button" variant="orange" className="w-full" onClick={handleSubmit}>
           <Check className="size-4.5" />
           完成
         </Button>

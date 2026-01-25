@@ -56,8 +56,10 @@ export function KeyVision() {
             </Button>
           </div>
 
-          <div className="col-span-12 flex justify-center md:col-span-8 md:justify-start md:pr-2 lg:col-span-7 lg:pr-24">
-            <LottieHero />
+          <div className="col-span-12 aspect-564/396 w-full md:aspect-498/320 md:col-span-8 md:pr-2 lg:col-span-7 lg:pr-24">
+            <div className="aspect-564/396 w-full md:aspect-498/320" aria-hidden="true">
+              <LottieHero />
+            </div>
           </div>
         </div>
       </div>

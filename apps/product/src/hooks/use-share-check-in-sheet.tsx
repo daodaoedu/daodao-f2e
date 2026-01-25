@@ -43,12 +43,7 @@ export function useShareCheckInSheet({
     open({
       title: "分享",
       description: "分享你的打卡記錄",
-      content: (
-        <ShareCheckInSheetContent
-          taskTitle={taskTitle}
-          checkInData={checkInData}
-        />
-      ),
+      content: <ShareCheckInSheetContent taskTitle={taskTitle} checkInData={checkInData} />,
       dismissible: true,
       closeOnEscape: true,
       showCloseButton: true,

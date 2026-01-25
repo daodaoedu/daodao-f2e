@@ -1,7 +1,7 @@
+import path from "node:path";
 import createNextIntlPlugin from "@daodao/i18n/plugin";
 import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
-import path from "node:path";
 
 loadEnvConfig(process.cwd());
 

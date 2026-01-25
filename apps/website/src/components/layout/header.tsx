@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname } from "@daodao/i18n/navigation";
 import { ANCHOR_IDS, useScrollVisibility } from "@daodao/shared";
@@ -7,7 +8,6 @@ import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
-import { useAuth } from "@daodao/auth";
 import { useEffect } from "react";
 
 type NavItemType = {
@@ -100,7 +100,9 @@ export const Header = () => {
           </li>
         ))}
         <li>
-          <Button variant="ctaOrangeSmall" onClick={() => openLoginDialog({ redirectUrl: "/" })}>立即加入</Button>
+          <Button variant="ctaOrangeSmall" onClick={() => openLoginDialog({ redirectUrl: "/" })}>
+            立即加入
+          </Button>
         </li>
       </ul>
     </nav>

@@ -39,7 +39,7 @@ export const ArchivedContentList = () => {
     return new Promise<void>((resolve) => {
       const handleUnarchiveConfirm = () => {
         // 用戶沒有點擊復原，確認取消封存
-        console.log('unarchive success');
+        console.log("unarchive success");
         resolve();
       };
 
@@ -82,9 +82,7 @@ export const ArchivedContentList = () => {
               <h3 className="text-base font-medium text-text-dark line-clamp-1 mb-1">
                 {practice.title}
               </h3>
-              <p className="text-xs text-text-dark line-clamp-1">
-                {practice.description}
-              </p>
+              <p className="text-xs text-text-dark line-clamp-1">{practice.description}</p>
             </div>
             <div className="shrink-0">
               <Button

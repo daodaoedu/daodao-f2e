@@ -123,11 +123,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           ref={ref}
           value={inputValue}
           placeholder={placeholder}
-          className={cn(
-            "pr-10",
-            className,
-            (invalid || isRangeError) && "border-red"
-          )}
+          className={cn("pr-10", className, (invalid || isRangeError) && "border-red")}
           onChange={(e) => {
             const inputDate = new Date(e.target.value);
             setInputValue(e.target.value);
@@ -184,10 +180,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
                 false
               }
               onSelect={(calendarDate) => {
-                if (
-                  calendarDate &&
-                  isDateInRange(calendarDate, minDate, maxDate)
-                ) {
+                if (calendarDate && isDateInRange(calendarDate, minDate, maxDate)) {
                   handleDateChange(calendarDate);
                   setOpen(false);
                   onBlur?.();

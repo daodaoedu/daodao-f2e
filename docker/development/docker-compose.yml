@@ -35,8 +35,8 @@ services:
     image: nginx:alpine
     container_name: daodao-nginx
     ports:
+      - "80:80"    # HTTP 端口
       - "443:443"  # HTTPS 端口
-      - "3000:3000"  # HTTP 端口（重定向到 /zh-TW）
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./ssl:/etc/nginx/ssl

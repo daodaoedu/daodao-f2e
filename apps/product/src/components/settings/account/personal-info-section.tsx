@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@daodao/ui/components/form";
 import { Input } from "@daodao/ui/components/input";
 import {
   Select,
@@ -8,17 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@daodao/ui/components/select";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@daodao/ui/components/form";
 import { cn } from "@daodao/ui/lib/utils";
+import { format } from "date-fns";
 import { Calendar, Mail } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
-import { format } from "date-fns";
 import type { AccountFormValues } from "./schema";
 
 type SelectOption = {
@@ -45,9 +45,7 @@ export const PersonalInfoSection = ({
         name="email"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block font-medium text-text-dark mb-3">
-              Email
-            </FormLabel>
+            <FormLabel className="block font-medium text-text-dark mb-3">Email</FormLabel>
             <FormControl>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-light-gray" />
@@ -73,9 +71,7 @@ export const PersonalInfoSection = ({
 
           return (
             <FormItem>
-              <FormLabel className="block font-medium text-text-dark mb-3">
-                生日
-              </FormLabel>
+              <FormLabel className="block font-medium text-text-dark mb-3">生日</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-light-gray" />
@@ -100,9 +96,7 @@ export const PersonalInfoSection = ({
         name="role"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block font-medium text-text-dark mb-3">
-              身份
-            </FormLabel>
+            <FormLabel className="block font-medium text-text-dark mb-3">身份</FormLabel>
             <FormControl>
               <Select
                 value={field.value}
@@ -145,9 +139,7 @@ export const PersonalInfoSection = ({
         name="educationStage"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block font-medium text-text-dark mb-3">
-              教育階段
-            </FormLabel>
+            <FormLabel className="block font-medium text-text-dark mb-3">教育階段</FormLabel>
             <FormControl>
               <Select
                 value={field.value}
