@@ -1,36 +1,4 @@
 services:
-  dev:
-    build:
-      context: ../..
-      dockerfile: docker/development/Dockerfile
-    container_name: daodao-dev
-    # 不直接暴露端口到主機，由 nginx 代理
-    expose:
-      - "3000"  # website
-      - "3001"  # product
-    volumes:
-      # 掛載源代碼以實現熱重載
-      - ../..:/app
-      # 使用 named volume 來保護根目錄的 node_modules，避免被本地目錄覆蓋
-      # pnpm workspace 會將大部分依賴安裝到根目錄的 node_modules
-      - node_modules:/app/node_modules
-      # 排除 .next 等構建產物（使用本地構建產物）
-      - /app/apps/*/.next
-      - /app/packages/*/dist
-      - /app/.turbo
-    environment:
-      - NODE_ENV=development
-    # 如果需要環境變數文件，取消下面的註解
-    # env_file:
-    #   - ../../.env.local
-    #   - ../../.env.development
-    stdin_open: true
-    tty: true
-    # 保持容器運行
-    command: pnpm dev
-    networks:
-      - daodao-network
-
   nginx:
     image: nginx:alpine
     container_name: daodao-nginx
@@ -43,14 +11,12 @@ services:
       - ./docker-entrypoint.sh:/docker-entrypoint.sh:ro
     entrypoint: ["/bin/sh", "/docker-entrypoint.sh"]
     command: ["nginx", "-g", "daemon off;"]
-    depends_on:
-      - dev
+    # 使用 extra_hosts 讓容器可以訪問主機服務
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - daodao-network
     restart: unless-stopped
-
-volumes:
-  node_modules:
 
 networks:
   daodao-network:

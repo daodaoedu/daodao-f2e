@@ -41,6 +41,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
+    "swr": "^2.2.5",
     "zod": "catalog:"
   },
   "devDependencies": {

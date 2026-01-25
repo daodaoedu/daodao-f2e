@@ -16,35 +16,81 @@ API 客戶端套件，提供類型安全的 API 調用功能。
 
 ## 使用方式
 
-### 基本使用
+### 方式 1：使用 Domain Services（推薦）
+
+專案提供了統一的 domain-specific API 服務，建議優先使用：
+
+#### Client Functions（Server Components 或直接調用）
 
 ```typescript
-import { client } from "@daodao/api";
+import { getUserByIdentifier, getCurrentUser, updateCurrentUser } from "@daodao/api";
+
+// Server Component
+export default async function UserPage({ params }: { params: { id: string } }) {
+  const response = await getUserByIdentifier(params.id);
+  const userData = response.data?.data;
+  
+  return <div>{userData?.name}</div>;
+}
+
+// 直接調用
+const userResponse = await getCurrentUser();
+const updateResponse = await updateCurrentUser({ name: "New Name" });
+```
+
+#### Hooks（Client Components）
+
+```typescript
+"use client";
+
+import { useUserByIdentifier, useCurrentUser, useUserMutations } from "@daodao/api";
+
+function UserProfile({ identifier }: { identifier: string }) {
+  const { data, error, isLoading } = useUserByIdentifier(identifier);
+  const { updateCurrentUser } = useUserMutations();
+
+  const handleUpdate = async () => {
+    await updateCurrentUser({ name: "New Name" });
+  };
+
+  if (isLoading) return <div>載入中...</div>;
+  if (error) return <div>錯誤: {error.message}</div>;
+
+  return (
+    <div>
+      <h1>{data?.data?.data?.name}</h1>
+      <button onClick={handleUpdate}>更新</button>
+    </div>
+  );
+}
+```
+
+### 方式 2：直接使用 Client 和 Hooks
+
+如果 domain service 沒有提供您需要的功能，可以直接使用底層的 client 和 hooks：
+
+```typescript
+import { client, useQuery, useMutate } from "@daodao/api";
 
 // 直接調用 API
-const { data, error } = await client.GET("/users/{id}", {
+const { data, error } = await client.GET("/api/v1/users/{id}", {
   params: {
     path: { id: "123" },
   },
 });
-```
 
-### 使用 Hooks
-
-```typescript
-import { useApiGet, useApiMutate } from "@daodao/api";
-
+// 使用 Hooks
 function UserProfile({ userId }: { userId: string }) {
-  const { data, error, isLoading } = useApiGet("/users/{id}", {
+  const { data, error, isLoading } = useQuery("/api/v1/users/{id}", {
     params: {
       path: { id: userId },
     },
   });
 
-  const mutate = useApiMutate();
+  const mutate = useMutate();
 
   const handleUpdate = async () => {
-    await mutate.put("/users/{id}", {
+    await mutate.put("/api/v1/users/{id}", {
       params: { path: { id: userId } },
       body: { name: "New Name" },
     });
@@ -53,7 +99,7 @@ function UserProfile({ userId }: { userId: string }) {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-  return <div>{data?.name}</div>;
+  return <div>{data?.data?.name}</div>;
 }
 ```
 
@@ -147,6 +193,11 @@ packages/api/
 │   ├── errors.ts          # 錯誤處理
 │   ├── is-match.ts        # 路由匹配工具
 │   ├── types.ts           # OpenAPI 生成的類型
+│   ├── services/          # Domain-specific API 服務
+│   │   ├── user.ts        # User API client functions
+│   │   ├── user-hooks.ts  # User API React hooks
+│   │   ├── index.ts       # 統一導出
+│   │   └── README.md      # 服務層說明
 │   ├── config/
 │   │   └── auth.ts         # 認證配置
 │   └── index.ts           # 導出入口
@@ -154,6 +205,15 @@ packages/api/
 ├── tsconfig.json
 └── README.md
 ```
+
+## Domain Services
+
+專案提供了統一的 domain-specific API 服務，位於 `src/services/` 目錄：
+
+- **User Service**: `getUserByIdentifier`, `getCurrentUser`, `useUserByIdentifier`, `useCurrentUser` 等
+- 更多 domain services 將陸續添加
+
+詳細說明請參考 [services/README.md](./src/services/README.md)
 
 ## 依賴關係
 

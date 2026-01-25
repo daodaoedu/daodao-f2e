@@ -9,8 +9,9 @@ import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { useState } from "react";
 import { menuItems } from "./constant";
+import type { SidebarProps } from "./type";
 
-export const DesktopSidebar = () => {
+export const DesktopSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -66,7 +67,7 @@ export const DesktopSidebar = () => {
       {/* Menu Items */}
       <ul className={cn("flex flex-col", isCollapsed ? "gap-6 items-center" : "gap-6")}>
         {menuItems.map((item) => {
-          const isActive = item.isMatch(pathname, "123");
+          const isActive = item.isMatch(pathname, identifier);
           const Icon = isActive ? item.activeIcon : item.icon;
           return (
             <li
@@ -77,7 +78,7 @@ export const DesktopSidebar = () => {
               )}
             >
               <CustomLink
-                href={typeof item.href === "function" ? item.href("123") : item.href}
+                href={typeof item.href === "function" ? item.href(identifier) : item.href}
                 className={cn(
                   "flex items-center px-6 py-3 text-text-dark cursor-pointer transition-all duration-300",
                   isCollapsed ? "justify-center" : "gap-2"

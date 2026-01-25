@@ -1,6 +1,7 @@
-"use client";
-
+import { getUserByIdentifier } from "@daodao/api";
 import { SlidersHorizontal } from "lucide-react";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout";
 import { PracticeSection } from "@/components/practice";
 import { IslandHeader, UserInfoCard } from "@/components/user";
@@ -14,13 +15,71 @@ import { TaskStatus } from "@/constants/task-status";
  * - /users/123 (userId)
  * - /users/john-doe (customId)
  */
-export default function UserProfilePage() {
-  const userData = {
-    name: "John Doe",
-    location: "Taiwan",
-    selfIntroduction: "I am a software engineer",
-    photoURL: "https://example.com/photo.jpg",
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/users/[identifier]">): Promise<Metadata> {
+  const { identifier } = await params;
+
+  // 獲取用戶資料以生成 metadata
+  const userResponse = await getUserByIdentifier(identifier);
+
+  // 如果請求失敗或沒有資料，返回預設 metadata
+  if (!userResponse.data || !userResponse.response.ok) {
+    return {
+      title: "用戶個人頁面",
+      description: "查看用戶的個人資訊和實踐記錄",
+    };
+  }
+
+  const userData = userResponse.data?.data ?? userResponse.data;
+  const userName = userData?.name || "未命名用戶";
+  const userDescription = userData?.selfIntroduction || "查看用戶的個人資訊和實踐記錄";
+  const userPhotoURL = userData?.photoURL;
+
+  return {
+    title: `${userName} 的個人頁面`,
+    description: userDescription,
+    openGraph: {
+      title: `${userName} 的個人頁面`,
+      description: userDescription,
+      ...(userPhotoURL && {
+        images: [
+          {
+            url: userPhotoURL,
+            width: 1200,
+            height: 630,
+            alt: `${userName} 的頭像`,
+          },
+        ],
+      }),
+      type: "profile",
+    },
+    twitter: {
+      card: "summary",
+      title: `${userName} 的個人頁面`,
+      description: userDescription,
+      ...(userPhotoURL && {
+        images: [userPhotoURL],
+      }),
+    },
   };
+}
+
+export default async function UserProfilePage({
+  params,
+}: PageProps<"/[locale]/users/[identifier]">) {
+  const { identifier } = await params;
+
+  // 使用 SSR 方式獲取用戶資訊（自動判斷是 ID 還是 customId）
+  const userResponse = await getUserByIdentifier(identifier);
+
+  // 如果請求失敗或沒有資料，顯示 404
+  if (!userResponse.data || !userResponse.response.ok) {
+    notFound();
+  }
+
+  const userData = userResponse.data?.data;
 
   // 模擬資料 - 之後從 API 取得
   const mockLearningType = "我是注重推理的探探島！";
@@ -41,30 +100,9 @@ export default function UserProfilePage() {
     },
   ];
 
-  const handleRetakeQuiz = () => {
-    // TODO: 導航到測驗頁面
-    console.log("重新測驗");
-  };
-
-  const handleViewDetails = () => {
-    // TODO: 顯示詳細說明
-    console.log("觀看詳細說明");
-  };
-
-  // 模擬社群媒體連結 - 之後從 API 取得
-  const mockSocialLinks = [
-    { platform: "line" as const, url: "https://line.me/ti/p/@example" },
-    { platform: "facebook" as const, url: "https://facebook.com/example" },
-    { platform: "instagram" as const, url: "https://instagram.com/example" },
-  ];
-
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-[#B8E8FD]">
-      <IslandHeader
-        learningType={mockLearningType}
-        onRetakeQuiz={handleRetakeQuiz}
-        onViewDetails={handleViewDetails}
-      >
+      <IslandHeader learningType={mockLearningType}>
         <PageHeader
           title="我的小島"
           rightActionTo="/settings"
@@ -80,7 +118,7 @@ export default function UserProfilePage() {
           location={userData.location || undefined}
           selfIntroduction={userData.selfIntroduction || undefined}
           photoURL={userData.photoURL || undefined}
-          socialLinks={mockSocialLinks}
+          socialLinks={userData.contactList || undefined}
         />
 
         {/* 「主題實踐」區塊 */}

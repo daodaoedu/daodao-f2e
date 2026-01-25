@@ -4,6 +4,7 @@
  */
 export interface StoredUser {
   id: string;
+  customId: string | null;
   email: string | null;
   name: string | null;
   photoUrl?: string | null;

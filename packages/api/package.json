@@ -28,6 +28,7 @@
     "@daodao/config": "workspace:*",
     "next": "catalog:",
     "openapi-fetch": "^0.15.0",
+    "swr": "^2.3.8",
     "swr-openapi": "^5.5.0"
   },
   "devDependencies": {

@@ -6,8 +6,9 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { menuItems } from "./constant";
+import type { SidebarProps } from "./type";
 
-export const MobileSidebar = () => {
+export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
 
   return (
@@ -25,12 +26,12 @@ export const MobileSidebar = () => {
         {/* Menu Items */}
         <ul className="flex px-10 py-3 justify-evenly">
           {menuItems.map((item) => {
-            const isActive = item.isMatch(pathname, "123");
+            const isActive = item.isMatch(pathname, identifier);
             const Icon = isActive ? item.activeIcon : item.icon;
             return (
               <li key={item.label} className={cn(item.hidden && "hidden")}>
                 <CustomLink
-                  href={typeof item.href === "function" ? item.href("123") : item.href}
+                  href={typeof item.href === "function" ? item.href(identifier) : item.href}
                   className="flex items-center text-text-dark"
                   aria-label={item.label}
                 >

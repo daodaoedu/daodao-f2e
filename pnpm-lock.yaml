@@ -176,6 +176,9 @@ importers:
       react-hook-form:
         specifier: 'catalog:'
         version: 7.69.0(react@19.2.3)
+      swr:
+        specifier: ^2.2.5
+        version: 2.3.8(react@19.2.3)
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -302,6 +305,9 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.2.3
+      swr:
+        specifier: ^2.3.8
+        version: 2.3.8(react@19.2.3)
       swr-openapi:
         specifier: ^5.5.0
         version: 5.5.0(openapi-fetch@0.15.0)(openapi-typescript@7.10.1(typescript@5.9.3))(react@19.2.3)(swr@2.3.8(react@19.2.3))(typescript@5.9.3)

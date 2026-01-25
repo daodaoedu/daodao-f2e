@@ -14,7 +14,7 @@
     "format:check": "biome format .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "docker:dev": "docker-compose -f docker/development/docker-compose.yml up -d --build",
+    "docker:dev": "docker-compose -f docker/development/docker-compose.yml up -d",
     "docker:dev:down": "docker-compose -f docker/development/docker-compose.yml down",
     "docker:dev:start": "docker-compose -f docker/development/docker-compose.yml start",
     "docker:dev:stop": "docker-compose -f docker/development/docker-compose.yml stop",

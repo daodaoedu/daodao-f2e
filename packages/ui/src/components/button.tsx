@@ -33,7 +33,7 @@ const buttonVariants = cva(
           "border border-solid border-logo-cyan bg-background text-text-dark hover:bg-logo-cyan hover:text-white",
         secondary:
           "border border-solid border-transparent bg-white text-text-dark shadow-[0_4px_0_color-mix(in_srgb,var(--color-logo-cyan)_40%,transparent)]",
-        ghost: "text-text-dark hover:text-logo-cyan",
+        ghost: "text-text-dark hover:text-logo-cyan [&_svg[fill*='url']]:fill-[unset]",
         link: "text-primary underline-offset-4 hover:underline",
         gray: "border-basic-200 bg-basic-200 text-basic-300 shadow-lg hover:border-primary-base hover:bg-primary-base hover:text-white",
         light:
