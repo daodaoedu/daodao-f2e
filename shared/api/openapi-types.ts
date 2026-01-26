@@ -8903,6 +8903,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/login-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 獲取當前用戶的登入歷史
+         * @description 獲取當前用戶的登入歷史記錄，包含裝置和時間資訊
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 限制返回數量 */
+                    limit?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功獲取登入歷史 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LoginHistoryResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/activity-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 獲取當前用戶的活躍統計
+         * @description 獲取當前用戶的活躍狀態統計，包含登入次數、最後活動時間等
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功獲取活躍統計 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UserActivityStatsResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/preferences/available": {
         parameters: {
             query?: never;
@@ -13721,6 +13806,747 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/user-stats/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 獲取總覽儀表板
+         * @description 返回使用者統計的關鍵指標摘要，包括總使用者數、本月新增、增長率、活躍使用者等
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功返回總覽統計 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: {
+                                /** @description 總使用者數 */
+                                totalUsers: number;
+                                /** @description 本月新增使用者數 */
+                                newUsersThisMonth: number;
+                                /** @description 上月新增使用者數 */
+                                newUsersLastMonth: number;
+                                /** @description 增長率（百分比） */
+                                growthRate: number;
+                                /** @description 活躍使用者數（最近30天） */
+                                activeUsers: number;
+                                /** @description 活躍率（百分比） */
+                                activeRate: number;
+                            };
+                            metadata: {
+                                generated_at: string;
+                            };
+                        };
+                    };
+                };
+                /** @description 未授權 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 權限不足（需要管理員權限） */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/user-stats/registrations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 獲取註冊統計
+         * @description 根據不同維度（時間、地區、角色、教育階段）獲取使用者註冊統計資料
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description 統計分組方式（必選） */
+                    groupBy: "day" | "week" | "month" | "year" | "location" | "role" | "education_stage";
+                    /** @description 開始日期（YYYY-MM-DD） */
+                    startDate?: string;
+                    /** @description 結束日期（YYYY-MM-DD） */
+                    endDate?: string;
+                    /** @description 地區 ID 篩選 */
+                    locationId?: string;
+                    /** @description 角色 ID 篩選 */
+                    roleId?: string;
+                    /** @description 教育階段篩選 */
+                    educationStage?: string;
+                    /** @description 分頁限制（最大 1000） */
+                    limit?: string;
+                    /** @description 分頁偏移 */
+                    offset?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功返回註冊統計 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data?: unknown;
+                            metadata?: {
+                                generated_at: string;
+                            };
+                        };
+                    };
+                };
+                /** @description 參數錯誤 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 未授權 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 權限不足 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/user-stats/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 獲取活躍度統計
+         * @description 分析使用者活躍度，可選擇按角色、地區或教育階段分組
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 活躍度時間範圍（天數，最大 365） */
+                    activeWithinDays?: string;
+                    /** @description 統計分組方式 */
+                    groupBy?: "role" | "location" | "education_stage";
+                    /** @description 分頁限制（最大 1000） */
+                    limit?: string;
+                    /** @description 分頁偏移 */
+                    offset?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功返回活躍度統計 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: {
+                                /** @description 活躍使用者數 */
+                                activeUsers: number;
+                                /** @description 非活躍使用者數 */
+                                inactiveUsers: number;
+                                /** @description 總使用者數 */
+                                totalUsers: number;
+                                /** @description 活躍率（百分比） */
+                                activeRate: number;
+                                /** @description 細分統計 */
+                                breakdown?: unknown;
+                            };
+                            metadata: {
+                                activeWithinDays?: number;
+                                generated_at: string;
+                            };
+                        };
+                    };
+                };
+                /** @description 參數錯誤 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 未授權 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 權限不足 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/user-stats/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 匯出統計資料
+         * @description 將統計資料匯出為 CSV 或 Excel 格式
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description 匯出格式（必選） */
+                    format: "csv" | "excel";
+                    /** @description 匯出類型（必選） */
+                    type: "registrations" | "activity" | "full";
+                    /** @description 開始日期（YYYY-MM-DD） */
+                    startDate?: string;
+                    /** @description 結束日期（YYYY-MM-DD） */
+                    endDate?: string;
+                    /** @description 統計分組方式（type=registrations 時必選） */
+                    groupBy?: "day" | "week" | "month" | "year" | "location" | "role" | "education_stage";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功匯出檔案 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/csv": string;
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                    };
+                };
+                /** @description 參數錯誤 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 未授權 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 權限不足 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/user-stats/active-users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 獲取 DAU/WAU/MAU 統計
+         * @description 返回日活躍、週活躍、月活躍用戶統計及趨勢變化
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功返回活躍用戶統計 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: {
+                                /** @description 日活躍用戶數 */
+                                dau: number;
+                                /** @description 週活躍用戶數 */
+                                wau: number;
+                                /** @description 月活躍用戶數 */
+                                mau: number;
+                                /** @description DAU 佔總用戶比例 */
+                                dauRate: number;
+                                /** @description WAU 佔總用戶比例 */
+                                wauRate: number;
+                                /** @description MAU 佔總用戶比例 */
+                                mauRate: number;
+                                /** @description 總用戶數 */
+                                totalUsers: number;
+                                trend?: {
+                                    /** @description DAU 較昨日變化百分比 */
+                                    dauTrend: number;
+                                    /** @description WAU 較上週變化百分比 */
+                                    wauTrend: number;
+                                    /** @description MAU 較上月變化百分比 */
+                                    mauTrend: number;
+                                };
+                            };
+                            metadata: {
+                                generated_at: string;
+                            };
+                        };
+                    };
+                };
+                /** @description 未授權 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 權限不足 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/user-stats/device-analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 獲取裝置分析
+         * @description 分析用戶登入裝置、瀏覽器和作業系統的分佈統計
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 開始日期（YYYY-MM-DD） */
+                    startDate?: string;
+                    /** @description 結束日期（YYYY-MM-DD） */
+                    endDate?: string;
+                    /** @description 如果沒提供日期範圍，預設最近 N 天（最大 365） */
+                    days?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功返回裝置分析 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: {
+                                devices: {
+                                    deviceType: string | null;
+                                    count: number;
+                                    percentage: number;
+                                }[];
+                                browsers: {
+                                    browser: string | null;
+                                    count: number;
+                                    percentage: number;
+                                }[];
+                                operatingSystems: {
+                                    os: string | null;
+                                    count: number;
+                                    percentage: number;
+                                }[];
+                                totalLogins: number;
+                                dateRange: {
+                                    startDate: string;
+                                    endDate: string;
+                                };
+                            };
+                            metadata: {
+                                generated_at: string;
+                            };
+                        };
+                    };
+                };
+                /** @description 參數錯誤 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 未授權 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 權限不足 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/user-stats/retention": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 獲取用戶留存率
+         * @description 分析用戶註冊後的留存情況，支持群組分析
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 分析的群組數量（最近 N 個群組，最大 30） */
+                    cohorts?: string;
+                    /** @description 追蹤天數（最大 90） */
+                    trackDays?: string;
+                    /** @description 群組粒度 */
+                    granularity?: "day" | "week";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功返回留存率統計 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: {
+                                cohorts: {
+                                    cohortDate: string;
+                                    cohortSize: number;
+                                    retentionByDay: {
+                                        day: number;
+                                        retainedUsers: number;
+                                        retentionRate: number;
+                                    }[];
+                                }[];
+                                averageRetention: {
+                                    day1: number;
+                                    day7: number;
+                                    day14: number;
+                                    day30: number;
+                                };
+                            };
+                            metadata: {
+                                generated_at: string;
+                            };
+                        };
+                    };
+                };
+                /** @description 參數錯誤 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 未授權 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 權限不足 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/user-stats/popular-profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 獲取熱門檔案排行
+         * @description 返回被瀏覽次數最多的用戶檔案排行
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 返回數量（最大 100） */
+                    limit?: string;
+                    /** @description 偏移量 */
+                    offset?: string;
+                    /** @description 最低查看次數 */
+                    minViews?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功返回熱門檔案排行 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: {
+                                profiles: {
+                                    userId: number;
+                                    externalId: string;
+                                    nickname: string | null;
+                                    photoUrl: string | null;
+                                    profileViews: number;
+                                    lastActiveAt: string | null;
+                                }[];
+                                totalCount: number;
+                            };
+                            metadata: {
+                                generated_at: string;
+                            };
+                        };
+                    };
+                };
+                /** @description 參數錯誤 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 未授權 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 權限不足 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/user-stats/segmentation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 獲取用戶活躍度分類
+         * @description 將用戶按活躍程度分為高度活躍、活躍、中度活躍、不活躍、休眠五個等級
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功返回用戶活躍度分類 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: {
+                                segments: {
+                                    /** @enum {string} */
+                                    label: "highly_active" | "active" | "moderate" | "inactive" | "dormant";
+                                    displayName: string;
+                                    description: string;
+                                    userCount: number;
+                                    percentage: number;
+                                    criteria: string;
+                                }[];
+                                totalUsers: number;
+                                lastUpdated: string;
+                            };
+                            metadata: {
+                                generated_at: string;
+                            };
+                        };
+                    };
+                };
+                /** @description 未授權 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 權限不足 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/db-info": {
         parameters: {
             query?: never;
@@ -14990,7 +15816,7 @@ export interface components {
              */
             name?: string;
         };
-        /** @description 寄送歡迎信給新用戶的請求資料 */
+        /** @description 寄送歡迎信給新用戶的請求資料。根據 hasCompletedQuiz 決定使用哪個版本：已做測驗版本（簡短，1 個 CTA）或未做測驗版本（詳細，2 個 CTA） */
         WelcomeEmailRequest: {
             /**
              * Format: email
@@ -15009,6 +15835,40 @@ export interface components {
              * @example 新成員
              */
             name: string;
+            /**
+             * @description 是否已完成學習類型測驗（決定使用哪個版本歡迎信）
+             * @example false
+             */
+            hasCompletedQuiz: boolean;
+            /**
+             * Format: uri
+             * @description 主題實踐連結（兩版本共用）
+             * @example https://daoedu.tw/practice
+             */
+            practiceUrl?: string;
+            /**
+             * Format: uri
+             * @description 學習類型測驗連結（僅未做測驗版本使用）
+             * @example https://daoedu.tw/quiz
+             */
+            quizUrl?: string;
+            /**
+             * Format: uri
+             * @description 海星插圖 URL
+             * @example https://daodao.so/images/emails/joyride.png
+             */
+            illustrationUrl?: string;
+            /**
+             * Format: uri
+             * @description 取消訂閱連結
+             * @example https://daoedu.tw/unsubscribe
+             */
+            unsubscribeUrl?: string;
+            /**
+             * @description 用戶 ID（用於記錄到 email_logs）
+             * @example 123
+             */
+            userId?: number;
         };
         /** @description 寄送密碼重設郵件的請求資料 */
         PasswordResetEmailRequest: {
@@ -16709,6 +17569,16 @@ export interface components {
              * @example john.doe.fb
              */
             facebook?: string;
+            /**
+             * @description Threads 帳號
+             * @example @john_doe
+             */
+            threads?: string;
+            /**
+             * @description LinkedIn 個人檔案網址或用戶名
+             * @example john-doe-123456
+             */
+            linkedin?: string;
         };
         /** @description 創建用戶請求 */
         CreateUserRequest: {
@@ -17303,6 +18173,10 @@ export interface components {
                 line: string | null;
                 /** @description Facebook 帳號 */
                 facebook: string | null;
+                /** @description Threads 帳號 */
+                threads: string | null;
+                /** @description LinkedIn 個人檔案網址或用戶名 */
+                linkedin: string | null;
             } | null;
             /**
              * @description 用戶自訂 ID
@@ -17342,6 +18216,60 @@ export interface components {
              * @example friend_referral
              */
             referralSource: ("instagram" | "facebook" | "discord" | "linkedin" | "friend_referral" | "others") | string | unknown;
+            /**
+             * Format: date-time
+             * @description 最後登入時間
+             * @example 2024-01-20T08:30:00.000Z
+             */
+            lastLoginAt: string | null;
+            /**
+             * Format: date-time
+             * @description 最後活動時間（任何操作）
+             * @example 2024-01-20T14:25:00.000Z
+             */
+            lastActiveAt: string | null;
+            /**
+             * @description 總登入次數
+             * @example 42
+             */
+            loginCount: number;
+            /**
+             * @description 個人檔案被查看次數
+             * @example 128
+             */
+            profileViews: number;
+            /** @description 最新測驗結果（如果有的話） */
+            latestQuizResult: {
+                /**
+                 * @description 測驗結果 ID
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 測驗結果類型 (L/C/A/D/O)
+                 * @example A
+                 */
+                resultType: string;
+                /**
+                 * @description 五個維度的分數
+                 * @example {
+                 *       "L": 10,
+                 *       "C": 8,
+                 *       "A": 12,
+                 *       "D": 6,
+                 *       "O": 9
+                 *     }
+                 */
+                scores: {
+                    [key: string]: number;
+                };
+                /**
+                 * Format: date-time
+                 * @description 測驗完成時間
+                 * @example 2024-01-20T14:30:00.000Z
+                 */
+                completedAt: string;
+            } | null;
             /**
              * Format: date-time
              * @description 建立時間
@@ -20791,6 +21719,255 @@ export interface components {
             } & {
                 [key: string]: unknown;
             };
+        };
+        /**
+         * @description 登入歷史回應
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        LoginHistoryResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: components["schemas"]["LoginHistoryRecord"][];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /** @description 登入歷史記錄 */
+        LoginHistoryRecord: {
+            /**
+             * @description 登入記錄 ID
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 裝置類型
+             * @example desktop
+             * @example desktop
+             * @example mobile
+             * @example tablet
+             */
+            deviceType: string | null;
+            /**
+             * @description 作業系統
+             * @example macOS 14.0
+             */
+            os: string | null;
+            /**
+             * @description 瀏覽器
+             * @example Chrome 120
+             */
+            browser: string | null;
+            /**
+             * @description 完整 User-Agent 字串
+             * @example Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
+             */
+            userAgent: string | null;
+            /**
+             * @description IP 地址
+             * @example 192.168.1.1
+             */
+            ipAddress: string | null;
+            /**
+             * Format: date-time
+             * @description 登入時間
+             * @example 2024-01-20T08:30:00.000Z
+             */
+            loginAt: string | null;
+        };
+        /**
+         * @description 用戶活躍統計回應
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        UserActivityStatsResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            data: components["schemas"]["UserActivityStats"];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /** @description The main response data */
+        UserActivityStats: {
+            /**
+             * Format: date-time
+             * @description 最後登入時間
+             * @example 2024-01-20T08:30:00.000Z
+             */
+            lastLoginAt: string | null;
+            /**
+             * Format: date-time
+             * @description 最後活動時間
+             * @example 2024-01-20T14:25:00.000Z
+             */
+            lastActiveAt: string | null;
+            /**
+             * @description 總登入次數
+             * @example 42
+             */
+            loginCount: number;
+            /**
+             * @description 個人檔案被查看次數
+             * @example 128
+             */
+            profileViews: number;
+            /**
+             * @description 最近 30 天登入次數
+             * @example 15
+             */
+            recentLoginCount: number;
         };
     };
     responses: {
