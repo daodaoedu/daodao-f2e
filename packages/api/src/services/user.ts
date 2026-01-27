@@ -13,11 +13,15 @@ import type { paths } from "../types";
 type UserResponse =
   paths["/api/v1/users/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
 type UserListResponse =
-  paths["/api/v1/users/"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/v1/users"]["get"]["responses"]["200"]["content"]["application/json"];
 type CreateUserRequest =
-  paths["/api/v1/users/"]["post"]["requestBody"]["content"]["application/json"];
+  paths["/api/v1/users"]["post"]["requestBody"] extends { content: { "application/json": infer T } }
+    ? T
+    : never;
 type UpdateUserRequest =
-  paths["/api/v1/users/{id}"]["put"]["requestBody"]["content"]["application/json"];
+  paths["/api/v1/users/{id}"]["put"]["requestBody"] extends { content: { "application/json": infer T } }
+    ? T
+    : never;
 
 export interface IGetUsersParams {
   page?: number;
@@ -36,17 +40,15 @@ export interface IGetUsersParams {
  * 獲取用戶列表
  */
 export const getUsers = async (params?: IGetUsersParams) => {
-  return client.GET("/api/v1/users/", {
+  return client.GET("/api/v1/users", {
     params: {
       query: {
-        page: params?.page ? ({ value: params.page } as { [key: string]: unknown }) : null,
-        pageSize: params?.pageSize
-          ? ({ value: params.pageSize } as { [key: string]: unknown })
-          : null,
-        educationStage: params?.educationStage ?? null,
-        roleList: params?.roleList ?? null,
-        location: params?.location ?? null,
-        search: params?.search ?? null,
+        page: params?.page ? String(params.page) : undefined,
+        pageSize: params?.pageSize ? String(params.pageSize) : undefined,
+        educationStage: params?.educationStage ?? undefined,
+        roleList: params?.roleList ?? undefined,
+        location: params?.location ?? undefined,
+        search: params?.search ?? undefined,
       },
     },
   });
@@ -121,7 +123,7 @@ export const updateUser = async (id: string, data: UpdateUserRequest) => {
  * 創建新用戶
  */
 export const createUser = async (data: CreateUserRequest) => {
-  return client.POST("/api/v1/users/", {
+  return client.POST("/api/v1/users", {
     body: data,
   });
 };
@@ -174,7 +176,7 @@ export const getCurrentUserPreferences = async (options?: {
   return client.GET("/api/v1/users/me/preferences", {
     params: {
       query: {
-        category: options?.category ?? null,
+        category: options?.category ?? undefined,
         includeSystem: options?.includeSystem ?? false,
       },
     },
@@ -185,7 +187,11 @@ export const getCurrentUserPreferences = async (options?: {
  * 更新當前用戶的偏好設定
  */
 export const updateCurrentUserPreferences = async (
-  preferences: paths["/api/v1/users/me/preferences"]["put"]["requestBody"]["content"]["application/json"]
+  preferences: paths["/api/v1/users/me/preferences"]["put"]["requestBody"] extends {
+    content: { "application/json": infer T };
+  }
+    ? T
+    : never
 ) => {
   return client.PUT("/api/v1/users/me/preferences", {
     body: preferences,
@@ -197,6 +203,13 @@ export const updateCurrentUserPreferences = async (
  */
 export const getAvailablePreferences = async () => {
   return client.GET("/api/v1/users/preferences/available");
+};
+
+/**
+ * 獲取當前登入用戶的最新測驗結果
+ */
+export const getLatestQuizResult = async () => {
+  return client.GET("/api/v1/quiz/latest");
 };
 
 // ============================================================================

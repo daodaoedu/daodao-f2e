@@ -1,4 +1,4 @@
-import { getUserByIdentifier } from "@daodao/api";
+import { getUserByIdentifier, getLatestQuizResult } from "@daodao/api";
 import { SlidersHorizontal } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -82,6 +82,7 @@ export default async function UserProfilePage({
   const userData = userResponse.data?.data;
 
   // 模擬資料 - 之後從 API 取得
+  // TODO: 從 latestQuizResult 取得實際的學習類型
   const mockLearningType = "我是注重推理的探探島！";
   const mockPractices = [
     {

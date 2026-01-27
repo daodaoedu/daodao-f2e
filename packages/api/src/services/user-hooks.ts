@@ -11,11 +11,19 @@ import type { paths } from "../types";
 import type { IGetUsersParams } from "./user";
 
 type UpdateUserRequest =
-  paths["/api/v1/users/{id}"]["put"]["requestBody"]["content"]["application/json"];
+  paths["/api/v1/users/{id}"]["put"]["requestBody"] extends { content: { "application/json": infer T } }
+    ? T
+    : never;
 type CreateUserRequest =
-  paths["/api/v1/users/"]["post"]["requestBody"]["content"]["application/json"];
+  paths["/api/v1/users"]["post"]["requestBody"] extends { content: { "application/json": infer T } }
+    ? T
+    : never;
 type UpdatePreferencesRequest =
-  paths["/api/v1/users/me/preferences"]["put"]["requestBody"]["content"]["application/json"];
+  paths["/api/v1/users/me/preferences"]["put"]["requestBody"] extends {
+    content: { "application/json": infer T };
+  }
+    ? T
+    : never;
 
 // ============================================================================
 // Query Hooks
@@ -25,17 +33,15 @@ type UpdatePreferencesRequest =
  * 獲取用戶列表的 Hook
  */
 export const useUsers = (params?: IGetUsersParams) => {
-  return useQuery("/api/v1/users/", {
+  return useQuery("/api/v1/users", {
     params: {
       query: {
-        page: params?.page ? ({ value: params.page } as { [key: string]: unknown }) : null,
-        pageSize: params?.pageSize
-          ? ({ value: params.pageSize } as { [key: string]: unknown })
-          : null,
-        educationStage: params?.educationStage ?? null,
-        roleList: params?.roleList ?? null,
-        location: params?.location ?? null,
-        search: params?.search ?? null,
+        page: params?.page ? String(params.page) : undefined,
+        pageSize: params?.pageSize ? String(params.pageSize) : undefined,
+        educationStage: params?.educationStage ?? undefined,
+        roleList: params?.roleList ?? undefined,
+        location: params?.location ?? undefined,
+        search: params?.search ?? undefined,
       },
     },
   });
@@ -113,7 +119,7 @@ export const useCurrentUserPreferences = (options?: {
   return useQuery("/api/v1/users/me/preferences", {
     params: {
       query: {
-        category: options?.category ?? null,
+        category: options?.category ?? undefined,
         includeSystem: options?.includeSystem ?? false,
       },
     },
@@ -161,7 +167,7 @@ export const useUserMutations = () => {
      * 創建新用戶
      */
     createUser: async (data: CreateUserRequest) => {
-      return client.POST("/api/v1/users/", {
+      return client.POST("/api/v1/users", {
         body: data,
       });
     },
