@@ -2245,14 +2245,12 @@ export interface paths {
                     page?: number;
                     /** @description 每頁顯示的練習項目數量 */
                     limit?: number;
-                    /** @description 按練習狀態篩選 (active: 進行中, paused: 已暫停, completed: 已完成, archived: 已歸檔) */
-                    status?: "active" | "paused" | "completed" | "archived";
-                    /** @description 按內容類型篩選練習 (book: 書籍, video: 影片, articles: 文章, podcast: 播客, course: 課程, custom: 自訂) */
-                    contentType?: "book" | "video" | "articles" | "podcast" | "course" | "custom";
+                    /** @description 按練習狀態篩選 (draft: 草稿, not_started: 未開始, active: 進行中, completed: 已完成, archived: 已封存) */
+                    status?: "draft" | "not_started" | "active" | "completed" | "archived";
                     /** @description 搜尋關鍵詞，用於標題或內容搜尋 */
                     search?: string;
-                    /** @description 排序欄位 (createdAt: 按創建時間, updatedAt: 按更新時間, title: 按標題, progress: 按進度) */
-                    sortBy?: "createdAt" | "updatedAt" | "title" | "progress";
+                    /** @description 排序欄位 (createdAt: 按創建時間, updatedAt: 按更新時間, likeCount: 按喜歡數) */
+                    sortBy?: "createdAt" | "updatedAt" | "likeCount";
                     /** @description 排序方向 (asc: 升序, desc: 降序) */
                     sortOrder?: "asc" | "desc";
                     /** @description 開始日期篩選，格式為YYYY-MM-DD */
@@ -2423,8 +2421,7 @@ export interface paths {
                              *       "totalPractices": 12,
                              *       "activePractices": 3,
                              *       "completedPractices": 7,
-                             *       "pausedPractices": 2,
-                             *       "archivedPractices": 0,
+                             *       "archivedPractices": 2,
                              *       "totalCheckIns": 245,
                              *       "currentStreak": 5,
                              *       "maxStreak": 25,
@@ -2473,8 +2470,6 @@ export interface paths {
                                 activePractices: number;
                                 /** @description 已完成實踐數 */
                                 completedPractices: number;
-                                /** @description 暫停的實踐數 */
-                                pausedPractices: number;
                                 /** @description 歸檔的實踐數 */
                                 archivedPractices: number;
                                 /** @description 總簽到次數 */
@@ -11732,7 +11727,7 @@ export interface paths {
                     contentType?: string;
                     tags?: string;
                     userId?: string;
-                    status?: "active" | "paused" | "completed" | "archived" | "all";
+                    status?: "draft" | "not_started" | "active" | "completed" | "archived" | "all";
                     sort?: "createdAt" | "updatedAt" | "likeCount";
                     order?: "asc" | "desc";
                     include?: string;
@@ -11863,7 +11858,125 @@ export interface paths {
             };
             requestBody?: {
                 content: {
-                    "application/json": components["schemas"]["CreatePracticeRequest"];
+                    "application/json": {
+                        /**
+                         * @description 實踐活動標題
+                         * @example 每日閱讀 30 分鐘
+                         * @example 每日閱讀 30 分鐘
+                         * @example 學習 React Hooks
+                         * @example 每天運動 20 分鐘
+                         */
+                        title: string;
+                        /**
+                         * @description 具體的實踐行動描述
+                         * @example 閱讀技術書籍或文章
+                         * @example 閱讀技術書籍或文章
+                         * @example 完成線上課程一個章節
+                         * @example 跑步或健身
+                         */
+                        practiceAction?: string;
+                        /**
+                         * Format: date
+                         * @description 實踐開始日期（不可超過 14 天後）
+                         * @example 2024-01-15
+                         * @example 2024-01-15
+                         * @example 2024-03-01
+                         * @example 2024-06-01
+                         */
+                        startDate?: string;
+                        /**
+                         * @description 實踐持續天數
+                         * @example 14
+                         * @example 7
+                         * @example 14
+                         * @example 21
+                         * @example 30
+                         */
+                        durationDays?: number;
+                        /**
+                         * @description 每週最低打卡天數
+                         * @example 4
+                         * @example 1
+                         * @example 3
+                         * @example 4
+                         * @example 5
+                         */
+                        frequencyMinDays?: number;
+                        /**
+                         * @description 每週最高打卡天數
+                         * @example 7
+                         * @example 5
+                         * @example 6
+                         * @example 7
+                         */
+                        frequencyMaxDays?: number;
+                        /**
+                         * @description 每次實踐時長（分鐘）
+                         * @example 30
+                         * @example 15
+                         * @example 30
+                         * @example 60
+                         * @example 90
+                         */
+                        sessionDurationMinutes?: number;
+                        /**
+                         * @description 偏好實踐時段
+                         * @default []
+                         * @example [
+                         *       "morning",
+                         *       "evening"
+                         *     ]
+                         * @example [
+                         *       "morning"
+                         *     ]
+                         * @example [
+                         *       "afternoon",
+                         *       "evening"
+                         *     ]
+                         * @example [
+                         *       "morning",
+                         *       "night"
+                         *     ]
+                         */
+                        practiceTimePeriods?: ("morning" | "afternoon" | "evening" | "night")[];
+                        /**
+                         * @description 其他補充說明
+                         * @example 希望養成每天閱讀的習慣
+                         */
+                        otherContext?: string;
+                        /**
+                         * @description 相關標籤（最多 3 個）
+                         * @default []
+                         * @example [
+                         *       "閱讀",
+                         *       "學習"
+                         *     ]
+                         * @example [
+                         *       "閱讀",
+                         *       "學習"
+                         *     ]
+                         * @example [
+                         *       "運動",
+                         *       "健康"
+                         *     ]
+                         * @example [
+                         *       "程式",
+                         *       "前端",
+                         *       "React"
+                         *     ]
+                         */
+                        tags?: string[];
+                        /**
+                         * @description 相關學習資源（最多 5 個）
+                         * @example [
+                         *       {
+                         *         "name": "React 官方文檔",
+                         *         "url": "https://react.dev/"
+                         *       }
+                         *     ]
+                         */
+                        resources?: components["schemas"]["PracticeResourceInput"][];
+                    };
                 };
             };
             responses: {
@@ -11966,7 +12079,7 @@ export interface paths {
                     contentType?: string;
                     tags?: string;
                     userId?: string;
-                    status?: "active" | "paused" | "completed" | "archived" | "all";
+                    status?: "draft" | "not_started" | "active" | "completed" | "archived" | "all";
                     sort?: "createdAt" | "updatedAt" | "likeCount";
                     order?: "asc" | "desc";
                     include?: string;
@@ -12193,6 +12306,155 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/practices/user/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得指定用戶的實踐列表
+         * @description 取得指定用戶的實踐活動列表，支援分頁、搜尋和過濾。公開存取。
+         */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number;
+                    limit?: number;
+                    query?: string;
+                    contentType?: string;
+                    tags?: string;
+                    userId?: string;
+                    status?: "draft" | "not_started" | "active" | "completed" | "archived" | "all";
+                    sort?: "createdAt" | "updatedAt" | "likeCount";
+                    order?: "asc" | "desc";
+                    include?: string;
+                };
+                header?: never;
+                path: {
+                    /** @description 用戶外部 UUID */
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功獲取用戶實踐列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description Array of paginated data items */
+                            data: components["schemas"]["PracticeEntity"][];
+                            /**
+                             * @description Pagination information
+                             * @example {
+                             *       "currentPage": 1,
+                             *       "totalPages": 5,
+                             *       "totalItems": 50,
+                             *       "itemsPerPage": 10,
+                             *       "hasNext": true,
+                             *       "hasPrev": false
+                             *     }
+                             * @example {
+                             *       "currentPage": 3,
+                             *       "totalPages": 8,
+                             *       "totalItems": 156,
+                             *       "itemsPerPage": 20,
+                             *       "hasNext": true,
+                             *       "hasPrev": true
+                             *     }
+                             */
+                            pagination: {
+                                /** @description Current page number (1-based) */
+                                currentPage: number;
+                                /** @description Total number of pages */
+                                totalPages: number;
+                                /** @description Total number of items across all pages */
+                                totalItems: number;
+                                /** @description Number of items per page */
+                                itemsPerPage: number;
+                                /** @description Whether there are more pages after current page */
+                                hasNext: boolean;
+                                /** @description Whether there are pages before current page */
+                                hasPrev: boolean;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/practices/{id}": {
         parameters: {
             query?: never;
@@ -12304,22 +12566,27 @@ export interface paths {
                 content: {
                     "application/json": {
                         title?: string;
-                        totalAmount?: number;
-                        startDate?: string;
-                        dailyGoal?: components["schemas"]["DailyGoal"];
                         practiceAction?: string;
+                        startDate?: string;
+                        durationDays?: number;
+                        frequencyMinDays?: number;
+                        frequencyMaxDays?: number;
+                        sessionDurationMinutes?: number;
+                        practiceTimePeriods?: ("morning" | "afternoon" | "evening" | "night")[];
+                        otherContext?: string;
                         tags?: string[];
                         resources?: components["schemas"]["PracticeResourceInput"][];
                         /**
-                         * @description 實踐活動狀態 (active: 進行中, paused: 暫停, completed: 已完成, archived: 已封存)
+                         * @description 實踐活動狀態 (draft: 草稿, not_started: 未開始, active: 進行中, completed: 已完成, archived: 已封存)
+                         * @example not_started
+                         * @example draft
+                         * @example not_started
                          * @example active
-                         * @example active
-                         * @example paused
                          * @example completed
                          * @example archived
                          * @enum {string}
                          */
-                        status?: "active" | "paused" | "completed" | "archived";
+                        status?: "draft" | "not_started" | "active" | "completed" | "archived";
                     };
                 };
             };
@@ -12779,7 +13046,6 @@ export interface paths {
                              *       "totalCheckIns": 45,
                              *       "currentStreak": 5,
                              *       "maxStreak": 12,
-                             *       "averageProgress": 2.3,
                              *       "lastCheckInDate": "2024-01-20"
                              *     }
                              */
@@ -12790,8 +13056,6 @@ export interface paths {
                                 currentStreak: number;
                                 /** @description 最大連續天數 */
                                 maxStreak: number;
-                                /** @description 平均進度 */
-                                averageProgress: number;
                                 /** @description 最後簽到日期 */
                                 lastCheckInDate?: string;
                             };
@@ -13706,6 +13970,210 @@ export interface paths {
                 };
                 401: components["responses"]["UnauthorizedError"];
                 404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/checkin-encouragements/random": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得隨機鼓勵句
+         * @description 取得打卡時顯示的隨機鼓勵句
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功獲取鼓勵句 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            data: components["schemas"]["Encouragement"] & unknown;
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tag-prompts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得引導句列表
+         * @description 取得標籤相關的引導句，用於打卡時顯示
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 使用場景類型 */
+                    usageType?: "checkin" | "practice" | "general";
+                    /** @description 語言 */
+                    locale?: "zh-TW" | "en";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功獲取引導句列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: components["schemas"]["TagPrompt"][];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -15843,13 +16311,13 @@ export interface components {
             /**
              * Format: uri
              * @description 主題實踐連結（兩版本共用）
-             * @example https://daoedu.tw/practice
+             * @example https://daodao.so/practice/create
              */
             practiceUrl?: string;
             /**
              * Format: uri
              * @description 學習類型測驗連結（僅未做測驗版本使用）
-             * @example https://daoedu.tw/quiz
+             * @example https://daodao.so/quiz
              */
             quizUrl?: string;
             /**
@@ -15861,7 +16329,7 @@ export interface components {
             /**
              * Format: uri
              * @description 取消訂閱連結
-             * @example https://daoedu.tw/unsubscribe
+             * @example https://daodao.so/unsubscribe
              */
             unsubscribeUrl?: string;
             /**
@@ -19658,59 +20126,6 @@ export interface components {
             message: string;
         };
         /**
-         * @description 每日學習目標設定
-         * @example {
-         *       "type": "time",
-         *       "timeMinutes": 60
-         *     }
-         * @example {
-         *       "type": "time",
-         *       "timeMinutes": 60
-         *     }
-         * @example {
-         *       "type": "completion",
-         *       "amount": 3,
-         *       "unit": "章"
-         *     }
-         */
-        DailyGoal: {
-            /**
-             * @description 每日目標類型 (time: 時間目標, completion: 完成目標)
-             * @example time
-             * @example time
-             * @example completion
-             * @enum {string}
-             */
-            type: "time" | "completion";
-            /**
-             * @description 每日時間目標（分鐘）
-             * @example 60
-             * @example 30
-             * @example 60
-             * @example 90
-             * @example 120
-             */
-            timeMinutes?: number;
-            /**
-             * @description 每日數量目標
-             * @example 3
-             * @example 1
-             * @example 3
-             * @example 5
-             * @example 10
-             */
-            amount?: number;
-            /**
-             * @description 數量單位
-             * @example 章
-             * @example 章
-             * @example 頁
-             * @example 集
-             * @example 篇
-             */
-            unit?: string;
-        };
-        /**
          * @description 實踐資源輸入資料
          * @example {
          *       "name": "React 官方文檔",
@@ -19767,111 +20182,116 @@ export interface components {
              */
             url?: string;
         };
-        /**
-         * @description 創建實踐活動的請求資料
-         * @example {
-         *       "title": "學習 React Hooks",
-         *       "contentType": "course",
-         *       "totalAmount": 20,
-         *       "startDate": "2024-01-15",
-         *       "dailyGoal": {
-         *         "type": "time",
-         *         "timeMinutes": 60
-         *       },
-         *       "practiceAction": "每天學習 1 小時的 React Hooks 課程並做實作練習",
-         *       "tags": [
-         *         "React",
-         *         "Hooks",
-         *         "前端"
-         *       ],
-         *       "resources": [
-         *         {
-         *           "name": "React 官方文檔",
-         *           "url": "https://react.dev/"
-         *         }
-         *       ]
-         *     }
-         */
         CreatePracticeRequest: {
             /**
              * @description 實踐活動標題
+             * @example 每日閱讀 30 分鐘
+             * @example 每日閱讀 30 分鐘
              * @example 學習 React Hooks
-             * @example 學習 React Hooks
-             * @example 閱讀《深入理解計算機系統》
-             * @example 練習 JavaScript 算法
+             * @example 每天運動 20 分鐘
              */
             title: string;
             /**
-             * @description 內容類型 (book: 書籍, video: 影片, articles: 文章, podcast: 播客, course: 課程, custom: 自定義)
-             * @example book
-             * @example book
-             * @example video
-             * @example articles
-             * @example podcast
-             * @example course
-             * @example custom
-             * @enum {string}
+             * @description 具體的實踐行動描述
+             * @example 閱讀技術書籍或文章
+             * @example 閱讀技術書籍或文章
+             * @example 完成線上課程一個章節
+             * @example 跑步或健身
              */
-            contentType: "book" | "video" | "articles" | "podcast" | "course" | "custom";
-            /**
-             * @description 自定義內容類型（當選擇 custom 時使用）
-             * @example 程式設計練習
-             * @example 程式設計練習
-             * @example 語言學習
-             * @example 技術文檔
-             */
-            customContentType?: string;
-            /**
-             * @description 學習內容的總量（如總頁數、總章節數等）
-             * @example 300
-             * @example 300
-             * @example 12
-             * @example 50
-             * @example 100
-             */
-            totalAmount: number;
+            practiceAction?: string;
             /**
              * Format: date
-             * @description 實踐開始日期
+             * @description 實踐開始日期（不可超過 14 天後）
              * @example 2024-01-15
              * @example 2024-01-15
              * @example 2024-03-01
              * @example 2024-06-01
              */
             startDate?: string;
-            dailyGoal: components["schemas"]["DailyGoal"];
             /**
-             * @description 具體的實踐行動描述
-             * @example 每天閱讀並做筆記
-             * @example 每天閱讀並做筆記
-             * @example 觀看影片並實作練習
-             * @example 完成課後習題
+             * @description 實踐持續天數
+             * @example 14
+             * @example 7
+             * @example 14
+             * @example 21
+             * @example 30
              */
-            practiceAction?: string;
+            durationDays?: number;
             /**
-             * @description 相關標籤（最多3個）
+             * @description 每週最低打卡天數
+             * @example 4
+             * @example 1
+             * @example 3
+             * @example 4
+             * @example 5
+             */
+            frequencyMinDays?: number;
+            /**
+             * @description 每週最高打卡天數
+             * @example 7
+             * @example 5
+             * @example 6
+             * @example 7
+             */
+            frequencyMaxDays?: number;
+            /**
+             * @description 每次實踐時長（分鐘）
+             * @example 30
+             * @example 15
+             * @example 30
+             * @example 60
+             * @example 90
+             */
+            sessionDurationMinutes?: number;
+            /**
+             * @description 偏好實踐時段
              * @default []
              * @example [
-             *       "JavaScript",
-             *       "前端"
+             *       "morning",
+             *       "evening"
              *     ]
              * @example [
-             *       "JavaScript",
-             *       "前端"
+             *       "morning"
              *     ]
              * @example [
-             *       "React",
-             *       "Hooks",
-             *       "實戰"
+             *       "afternoon",
+             *       "evening"
              *     ]
              * @example [
-             *       "算法",
-             *       "資料結構"
+             *       "morning",
+             *       "night"
+             *     ]
+             */
+            practiceTimePeriods: ("morning" | "afternoon" | "evening" | "night")[];
+            /**
+             * @description 其他補充說明
+             * @example 希望養成每天閱讀的習慣
+             */
+            otherContext?: string;
+            /**
+             * @description 相關標籤（最多 3 個）
+             * @default []
+             * @example [
+             *       "閱讀",
+             *       "學習"
+             *     ]
+             * @example [
+             *       "閱讀",
+             *       "學習"
+             *     ]
+             * @example [
+             *       "運動",
+             *       "健康"
+             *     ]
+             * @example [
+             *       "程式",
+             *       "前端",
+             *       "React"
              *     ]
              */
             tags: string[];
             /**
-             * @description 相關學習資源（最多5個）
+             * @description 相關學習資源（最多 5 個）
              * @example [
              *       {
              *         "name": "React 官方文檔",
@@ -19884,86 +20304,41 @@ export interface components {
         /**
          * @description 實踐活動簽到記錄
          * @example {
-         *       "progress": 25,
-         *       "note": "今天學習了 React Hooks 的 useState 和 useEffect",
          *       "mood": "happy",
-         *       "reflectionText": "對 Hooks 的概念有了更清楚的理解",
-         *       "isPublic": true,
-         *       "tags": [
-         *         "React",
-         *         "Hooks",
-         *         "學習"
-         *       ]
+         *       "note": "今天閱讀了第三章，學到了很多新概念",
+         *       "imageUrls": []
          *     }
          */
         CheckInRequest: {
             /**
-             * @description 今日學習進度
-             * @example 25
-             * @example 5
-             * @example 10
-             * @example 25
-             * @example 50
-             * @example 100
+             * @description 學習心情 (give_up: 想放棄, frustrated: 挫折, bored: 無聊, neutral: 普通, good: 不錯, happy: 開心)
+             * @example happy
+             * @example give_up
+             * @example frustrated
+             * @example bored
+             * @example neutral
+             * @example good
+             * @example happy
+             * @enum {string}
              */
-            progress: number;
+            mood?: "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
             /**
-             * @description 學習筆記
-             * @example 今天學習了 React Hooks 的 useState
-             * @example 今天學習了 React Hooks 的 useState
-             * @example 完成了三個章節的練習題
+             * @description 詳細描述（最多300字）
+             * @example 今天閱讀了第三章，學到了很多新概念
+             * @example 今天閱讀了第三章，學到了很多新概念
+             * @example 完成了 30 分鐘的練習
              */
             note?: string;
             /**
-             * @description 學習心情 (awesome: 非常棒, happy: 開心, neutral: 普通, tired: 疲累, frustrated: 挫折)
-             * @example happy
-             * @example awesome
-             * @example happy
-             * @example neutral
-             * @example tired
-             * @example frustrated
-             * @enum {string}
-             */
-            mood?: "awesome" | "happy" | "neutral" | "tired" | "frustrated";
-            /**
-             * @description 學習反思
-             * @example 今天的學習效果很好，對 Hooks 的理解更深入了
-             * @example 今天的學習效果很好，對 Hooks 的理解更深入了
-             * @example 遇到了一些困難，需要多練習
-             */
-            reflectionText?: string;
-            /**
-             * Format: uuid
-             * @description 相關資源ID
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            relatedResourceId?: string;
-            /**
-             * @description 是否公開分享
-             * @default true
-             * @example true
-             * @example true
-             * @example false
-             */
-            isPublic: boolean;
-            /**
-             * @description 簽到標籤（最多5個）
+             * @description 打卡圖片 URL（最多3張）
              * @default []
+             * @example []
+             * @example []
              * @example [
-             *       "React",
-             *       "學習"
-             *     ]
-             * @example [
-             *       "React",
-             *       "學習"
-             *     ]
-             * @example [
-             *       "JavaScript",
-             *       "進步",
-             *       "練習"
+             *       "https://example.com/image1.jpg"
              *     ]
              */
-            tags: string[];
+            imageUrls: string[];
         };
         /**
          * @description 實踐活動統計資訊
@@ -20006,22 +20381,23 @@ export interface components {
          * @description 實踐活動詳細資訊
          * @example {
          *       "id": "123e4567-e89b-12d3-a456-426614174000",
-         *       "title": "學習 React Hooks",
-         *       "contentType": "course",
-         *       "customContentType": null,
-         *       "totalAmount": 20,
-         *       "currentProgress": 8,
+         *       "title": "每日閱讀 30 分鐘",
+         *       "practiceAction": "閱讀技術書籍或文章",
          *       "startDate": "2024-01-15",
-         *       "dailyGoal": {
-         *         "type": "time",
-         *         "timeMinutes": 60
-         *       },
-         *       "practiceAction": "每天學習 1 小時的 React Hooks 課程並做實作練習",
+         *       "endDate": "2024-01-29",
+         *       "durationDays": 14,
+         *       "frequencyMinDays": 4,
+         *       "frequencyMaxDays": 7,
+         *       "frequencyDescription": "每週 4-7 天",
+         *       "sessionDurationMinutes": 30,
+         *       "practiceTimePeriods": [
+         *         "morning",
+         *         "evening"
+         *       ],
          *       "status": "active",
-         *       "hasResources": true,
-         *       "streak": 5,
-         *       "maxStreak": 12,
-         *       "lastCheckInDate": "2024-01-20",
+         *       "hasResources": false,
+         *       "progressPercentage": 50,
+         *       "firstCheckinAt": "2024-01-15T08:30:00.000Z",
          *       "createdAt": "2024-01-15T10:30:00.000Z",
          *       "updatedAt": "2024-01-20T15:45:00.000Z",
          *       "user": {
@@ -20040,9 +20416,8 @@ export interface components {
          *         "selfIntroduction": "熱愛學習的開發者"
          *       },
          *       "tags": [
-         *         "React",
-         *         "Hooks",
-         *         "前端"
+         *         "閱讀",
+         *         "學習"
          *       ],
          *       "stats": {
          *         "likeCount": 25,
@@ -20062,79 +20437,87 @@ export interface components {
             id: string;
             /**
              * @description 實踐活動標題
-             * @example 學習 React Hooks
+             * @example 每日閱讀 30 分鐘
              */
             title: string;
             /**
-             * @description 內容類型 (book: 書籍, video: 影片, articles: 文章, podcast: 播客, course: 課程, custom: 自定義)
-             * @example book
-             * @example book
-             * @example video
-             * @example articles
-             * @example podcast
-             * @example course
-             * @example custom
-             * @enum {string}
+             * @description 實踐行動描述
+             * @example 閱讀技術書籍或文章
              */
-            contentType: "book" | "video" | "articles" | "podcast" | "course" | "custom";
-            /**
-             * @description 自定義內容類型
-             * @example 程式設計練習
-             */
-            customContentType?: string;
-            /**
-             * @description 總學習量
-             * @example 20
-             */
-            totalAmount: number;
-            /**
-             * @description 當前進度
-             * @example 8
-             */
-            currentProgress: number;
+            practiceAction?: string;
             /**
              * Format: date
              * @description 開始日期 (YYYY-MM-DD)
              * @example 2024-01-15
              */
             startDate?: string;
-            dailyGoal: components["schemas"]["DailyGoal"];
             /**
-             * @description 實踐行動描述
-             * @example 每天學習 1 小時的 React Hooks 課程並做實作練習
+             * Format: date
+             * @description 結束日期 (YYYY-MM-DD)
+             * @example 2024-01-29
              */
-            practiceAction?: string;
+            endDate?: string;
             /**
-             * @description 實踐活動狀態 (active: 進行中, paused: 暫停, completed: 已完成, archived: 已封存)
+             * @description 持續天數
+             * @example 14
+             */
+            durationDays?: number;
+            /**
+             * @description 每週最低打卡天數
+             * @example 4
+             */
+            frequencyMinDays?: number;
+            /**
+             * @description 每週最高打卡天數
+             * @example 7
+             */
+            frequencyMaxDays?: number;
+            /**
+             * @description 頻率描述
+             * @example 每週 4-7 天
+             */
+            frequencyDescription?: string;
+            /**
+             * @description 每次實踐時長（分鐘）
+             * @example 30
+             */
+            sessionDurationMinutes?: number;
+            /**
+             * @description 偏好實踐時段
+             * @example [
+             *       "morning",
+             *       "evening"
+             *     ]
+             */
+            practiceTimePeriods: string[];
+            /** @description 其他說明 */
+            otherContext?: string;
+            /**
+             * @description 實踐活動狀態 (draft: 草稿, not_started: 未開始, active: 進行中, completed: 已完成, archived: 已封存)
+             * @example not_started
+             * @example draft
+             * @example not_started
              * @example active
-             * @example active
-             * @example paused
              * @example completed
              * @example archived
              * @enum {string}
              */
-            status: "active" | "paused" | "completed" | "archived";
+            status: "draft" | "not_started" | "active" | "completed" | "archived";
             /**
              * @description 是否有相關資源
              * @example true
              */
             hasResources: boolean;
             /**
-             * @description 當前連續天數
-             * @example 5
+             * @description 進度百分比
+             * @example 50
              */
-            streak: number;
+            progressPercentage: number;
             /**
-             * @description 最大連續天數
-             * @example 12
+             * Format: date-time
+             * @description 首次打卡時間
              */
-            maxStreak: number;
-            /**
-             * Format: date
-             * @description 最後簽到日期
-             * @example 2024-01-20
-             */
-            lastCheckInDate?: string;
+            firstCheckinAt?: string;
             /**
              * Format: date-time
              * @description 創建時間
@@ -20151,9 +20534,8 @@ export interface components {
             /**
              * @description 相關標籤
              * @example [
-             *       "React",
-             *       "Hooks",
-             *       "前端"
+             *       "閱讀",
+             *       "學習"
              *     ]
              */
             tags: string[];
@@ -20165,15 +20547,10 @@ export interface components {
          *       "id": 456,
          *       "practiceId": 123,
          *       "userId": 789,
-         *       "checkInDate": "2024-01-20",
-         *       "progressAmount": 50,
-         *       "unit": "頁",
-         *       "note": "今天學習了 useState 和 useEffect",
+         *       "checkinDate": "2024-01-20",
          *       "mood": "happy",
-         *       "reflectionText": "對 Hooks 的概念有了更清楚的理解",
-         *       "relatedResourceId": "res-123e4567-e89b-12d3-a456-426614174000",
-         *       "streakDay": 5,
-         *       "cumulativeProgress": 8,
+         *       "note": "今天閱讀了第三章",
+         *       "imageUrls": [],
          *       "createdAt": "2024-01-20T15:45:00.000Z",
          *       "updatedAt": "2024-01-20T15:45:00.000Z"
          *     }
@@ -20199,48 +20576,23 @@ export interface components {
              * @description 簽到日期
              * @example 2024-01-20
              */
-            checkInDate: string;
+            checkinDate: string;
             /**
-             * @description 簽到進度數量
-             * @example 50
-             */
-            progressAmount: number;
-            /**
-             * @description 進度單位（頁、章、集等）
-             * @example 頁
-             */
-            unit?: string;
-            /**
-             * @description 簽到筆記
-             * @example 今天學習了 useState 和 useEffect
-             */
-            note?: string;
-            /**
-             * @description 簽到心情
+             * @description 簽到心情 (give_up: 想放棄, frustrated: 挫折, bored: 無聊, neutral: 普通, good: 不錯, happy: 開心)
              * @example happy
              * @enum {string}
              */
-            mood?: "awesome" | "happy" | "neutral" | "tired" | "frustrated";
+            mood?: "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
             /**
-             * @description 學習反思
-             * @example 對 Hooks 的概念有了更清楚的理解
+             * @description 詳細描述
+             * @example 今天閱讀了第三章
              */
-            reflectionText?: string;
+            note?: string;
             /**
-             * @description 相關資源 ID
-             * @example res-123e4567-e89b-12d3-a456-426614174000
+             * @description 打卡圖片 URL（最多3張）
+             * @example []
              */
-            relatedResourceId?: string;
-            /**
-             * @description 連續簽到天數
-             * @example 5
-             */
-            streakDay: number;
-            /**
-             * @description 累積進度
-             * @example 8
-             */
-            cumulativeProgress: number;
+            imageUrls: string[];
             /**
              * Format: date-time
              * @description 創建時間
@@ -20260,7 +20612,6 @@ export interface components {
          *       "totalPractices": 12,
          *       "activePractices": 3,
          *       "completedPractices": 7,
-         *       "pausedPractices": 2,
          *       "totalCheckIns": 245,
          *       "averageStreak": 8.5,
          *       "maxStreak": 25
@@ -20283,11 +20634,6 @@ export interface components {
              */
             completedPractices: number;
             /**
-             * @description 暫停的實踐數
-             * @example 2
-             */
-            pausedPractices: number;
-            /**
              * @description 總簽到次數
              * @example 245
              */
@@ -20302,6 +20648,136 @@ export interface components {
              * @example 25
              */
             maxStreak: number;
+        };
+        /** @description 實踐模板 */
+        PracticeTemplate: {
+            /**
+             * Format: uuid
+             * @description 模板 ID
+             */
+            id: string;
+            /**
+             * @description 模板標題
+             * @example 每日閱讀 30 分鐘
+             */
+            title: string;
+            /** @description 模板描述 */
+            description?: string;
+            /**
+             * @description 模板分類
+             * @example reading
+             */
+            category: string;
+            /**
+             * @description 最低打卡頻率
+             * @example 1
+             */
+            frequencyMinDays: number;
+            /**
+             * @description 最高打卡頻率
+             * @example 3
+             */
+            frequencyMaxDays: number;
+            /**
+             * @description 建議持續天數
+             * @example 30
+             */
+            durationDays: number;
+            /**
+             * @description 建議標籤
+             * @example [
+             *       "閱讀",
+             *       "習慣養成"
+             *     ]
+             */
+            suggestedTags: string[];
+            /**
+             * Format: date-time
+             * @description 建立時間
+             */
+            createdAt: string;
+        };
+        /** @description 打卡鼓勵句 */
+        Encouragement: {
+            /** @description 鼓勵句 ID */
+            id: number;
+            /**
+             * @description 鼓勵句內容
+             * @example 太棒了！你做到了！
+             */
+            message: string;
+            /**
+             * @description 分類
+             * @example general
+             */
+            category?: string;
+        };
+        /** @description 標籤引導句 */
+        TagPrompt: {
+            /** @description 引導句 ID */
+            id: number;
+            /**
+             * @description 標籤名稱
+             * @example 閱讀
+             */
+            tagName: string;
+            /**
+             * @description 引導句內容
+             * @example 今天讀了什麼書？有什麼收穫嗎？
+             */
+            prompt: string;
+            /**
+             * @description 使用場景
+             * @example checkin
+             */
+            usageType: string;
+        };
+        /**
+         * @description 打卡回應（含鼓勵句）
+         * @example {
+         *       "id": 456,
+         *       "practiceId": 123,
+         *       "userId": 789,
+         *       "checkinDate": "2024-01-20",
+         *       "mood": "happy",
+         *       "note": "今天閱讀了第三章",
+         *       "imageUrls": [],
+         *       "createdAt": "2024-01-20T15:45:00.000Z",
+         *       "updatedAt": "2024-01-20T15:45:00.000Z"
+         *     }
+         */
+        CheckInWithEncouragement: components["schemas"]["CheckInEntity"] & {
+            /**
+             * @description 鼓勵句
+             * @example 太棒了！你做到了！
+             */
+            encouragement: string;
+            /**
+             * @description 實踐進度百分比
+             * @example 50
+             */
+            practiceProgressPercentage: number;
+            /**
+             * @description 實踐活動狀態 (draft: 草稿, not_started: 未開始, active: 進行中, completed: 已完成, archived: 已封存)
+             * @example not_started
+             * @example draft
+             * @example not_started
+             * @example active
+             * @example completed
+             * @example archived
+             * @enum {string}
+             */
+            practiceStatus: "draft" | "not_started" | "active" | "completed" | "archived";
+            /**
+             * @description 是否首次打卡
+             * @example false
+             */
+            isFirstCheckIn: boolean;
+            /**
+             * @description 是否達成目標
+             * @example false
+             */
+            hasReachedTarget: boolean;
         };
         /** @description 創建新學習成果的請求資料 */
         CreateOutcomeRequest: {
@@ -21344,52 +21820,80 @@ export interface components {
              */
             title: string;
             /**
-             * @description 內容類型
-             * @example course
-             * @enum {string}
+             * @description 實踐行動描述
+             * @example 每天學習1小時React Hooks課程
              */
-            contentType: "book" | "video" | "articles" | "podcast" | "course" | "custom";
-            /**
-             * @description 自定義內容類型
-             * @example 線上課程
-             */
-            customContentType?: string;
-            /**
-             * @description 總學習量
-             * @example 20
-             */
-            totalAmount: number;
-            /**
-             * @description 當前進度
-             * @example 8
-             */
-            currentProgress: number;
+            practiceAction?: string;
             /**
              * @description 開始日期 (YYYY-MM-DD)
              * @example 2024-01-15
              */
             startDate?: string;
             /**
+             * @description 結束日期 (YYYY-MM-DD)
+             * @example 2024-02-15
+             */
+            endDate?: string;
+            /**
+             * @description 持續天數 (7-90天)
+             * @example 30
+             */
+            durationDays?: number;
+            /**
+             * @description 最小頻率天數
+             * @example 1
+             */
+            frequencyMinDays?: number;
+            /**
+             * @description 最大頻率天數
+             * @example 7
+             */
+            frequencyMaxDays?: number;
+            /**
+             * @description 頻率描述
+             * @example 每週3-5次
+             */
+            frequencyDescription?: string;
+            /**
+             * @description 每次練習時長 (分鐘)
+             * @example 30
+             */
+            sessionDurationMinutes?: number;
+            /**
+             * @description 練習時段
+             * @example [
+             *       "morning",
+             *       "evening"
+             *     ]
+             */
+            practiceTimePeriods: ("morning" | "afternoon" | "evening" | "night")[];
+            /**
+             * @description 其他備註或情境說明
+             * @example 在通勤時間練習
+             */
+            otherContext?: string;
+            /**
              * @description 實踐狀態
              * @example active
              * @enum {string}
              */
-            status: "active" | "paused" | "completed" | "archived";
+            status: "draft" | "not_started" | "active" | "completed" | "archived";
             /**
-             * @description 當前連續天數
-             * @example 5
+             * @description 是否有相關資源
+             * @example true
              */
-            streak: number;
+            hasResources: boolean;
             /**
-             * @description 最大連續天數
-             * @example 12
+             * @description 進度百分比 (0-100)
+             * @example 45
              */
-            maxStreak: number;
+            progressPercentage?: number;
             /**
-             * @description 最後簽到日期 (YYYY-MM-DD)
-             * @example 2024-01-20
+             * Format: date-time
+             * @description 首次打卡時間
+             * @example 2024-01-16T08:30:00.000Z
              */
-            lastCheckInDate?: string;
+            firstCheckinAt?: string;
             /**
              * Format: date-time
              * @description 創建時間
@@ -21402,7 +21906,6 @@ export interface components {
              * @example 2024-01-20T15:45:00.000Z
              */
             updatedAt?: string;
-            dailyGoal: components["schemas"]["DailyGoal"] & unknown;
             /**
              * @description 相關標籤
              * @example [
@@ -21412,16 +21915,6 @@ export interface components {
              *     ]
              */
             tags: string[];
-            /**
-             * @description 實踐行動描述
-             * @example 每天學習1小時React Hooks課程
-             */
-            practiceAction?: string;
-            /**
-             * @description 是否有相關資源
-             * @example true
-             */
-            hasResources: boolean;
         };
         /** @description 更新個人偏好設定的請求資料 */
         UpdatePreferencesRequest: {
