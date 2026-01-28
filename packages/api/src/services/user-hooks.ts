@@ -10,14 +10,16 @@ import { useQuery } from "../hooks";
 import type { paths } from "../types";
 import type { IGetUsersParams } from "./user";
 
-type UpdateUserRequest =
-  paths["/api/v1/users/{id}"]["put"]["requestBody"] extends { content: { "application/json": infer T } }
-    ? T
-    : never;
-type CreateUserRequest =
-  paths["/api/v1/users"]["post"]["requestBody"] extends { content: { "application/json": infer T } }
-    ? T
-    : never;
+type UpdateUserRequest = paths["/api/v1/users/{id}"]["put"]["requestBody"] extends {
+  content: { "application/json": infer T };
+}
+  ? T
+  : never;
+type CreateUserRequest = paths["/api/v1/users"]["post"]["requestBody"] extends {
+  content: { "application/json": infer T };
+}
+  ? T
+  : never;
 type UpdatePreferencesRequest =
   paths["/api/v1/users/me/preferences"]["put"]["requestBody"] extends {
     content: { "application/json": infer T };

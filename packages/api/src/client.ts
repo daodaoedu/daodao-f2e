@@ -6,8 +6,6 @@ import createClient, {
 } from "openapi-fetch";
 import type { paths } from "./types";
 
-export type * from "openapi-fetch";
-
 export const PREFIX = "dao-dao-server-api" as const;
 
 /**

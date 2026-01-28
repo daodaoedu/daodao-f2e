@@ -14,14 +14,16 @@ type UserResponse =
   paths["/api/v1/users/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
 type UserListResponse =
   paths["/api/v1/users"]["get"]["responses"]["200"]["content"]["application/json"];
-type CreateUserRequest =
-  paths["/api/v1/users"]["post"]["requestBody"] extends { content: { "application/json": infer T } }
-    ? T
-    : never;
-type UpdateUserRequest =
-  paths["/api/v1/users/{id}"]["put"]["requestBody"] extends { content: { "application/json": infer T } }
-    ? T
-    : never;
+type CreateUserRequest = paths["/api/v1/users"]["post"]["requestBody"] extends {
+  content: { "application/json": infer T };
+}
+  ? T
+  : never;
+type UpdateUserRequest = paths["/api/v1/users/{id}"]["put"]["requestBody"] extends {
+  content: { "application/json": infer T };
+}
+  ? T
+  : never;
 
 export interface IGetUsersParams {
   page?: number;

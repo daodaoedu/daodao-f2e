@@ -1,35 +1,73 @@
 "use client";
 
 import activeShaper1Json from "@daodao/assets/images/quiz/active-shaper-1.json";
+import communityConnector1Json from "@daodao/assets/images/quiz/community-connector-1.json";
+import deepExplorer1Json from "@daodao/assets/images/quiz/deep-explorer-1.json";
+import liquidIntegrator1Json from "@daodao/assets/images/quiz/liquid-integrator-1.json";
+import orderBuilder1Json from "@daodao/assets/images/quiz/order-builder-1.json";
 import userDesktopBannerPng from "@daodao/assets/images/users/user-desktop-banner.png";
 import userMobileBannerPng from "@daodao/assets/images/users/user-mobile-banner.png";
+import { useAuthContext } from "@daodao/auth";
+import { getEnv } from "@daodao/config";
+import { resultDetailMap, themeMap } from "@daodao/features-quiz";
+import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
+import { cn } from "@daodao/ui/lib/utils";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lottie from "lottie-react";
-import { ChevronRight, RefreshCcw } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { ChevronRight, RefreshCcw, SlidersHorizontal } from "lucide-react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { PageHeader, type PageHeaderProps } from "../layout/page-header";
 
 gsap.registerPlugin(ScrollTrigger);
 
 interface IslandHeaderProps {
-  children: React.ReactNode;
-  learningType: string;
-  onRetakeQuiz?: () => void;
-  onViewDetails?: () => void;
+  resultType: string;
 }
 
+const resultTypeToLottieMap = new Map<string, object>([
+  ["d", deepExplorer1Json],
+  ["o", orderBuilder1Json],
+  ["a", activeShaper1Json],
+  ["l", liquidIntegrator1Json],
+  ["c", communityConnector1Json],
+]);
 /**
  * 「我的小島」標題區組件
  */
-export function IslandHeader({
-  children,
-  learningType,
-  onRetakeQuiz,
-  onViewDetails,
-}: IslandHeaderProps) {
+export function IslandHeader({ resultType }: IslandHeaderProps) {
+  const { isAuthenticated } = useAuthContext();
+  const router = useRouter();
   const headerRef = useRef<HTMLDivElement>(null);
+  const resultDetail = resultDetailMap.get(resultType);
+  const theme = themeMap.get(resultType);
+  const lottieJson = resultTypeToLottieMap.get(resultType);
+  const isEmptyResult = !resultDetail || !theme;
+  const message = isEmptyResult
+    ? "你是哪一種島？快來測驗看看！"
+    : `我是${resultDetail?.tags[0]}的${theme?.title}`;
+
+  const handleGoToQuiz = () => {
+    router.push(`${getEnv("NEXT_PUBLIC_WEBSITE_URL")}/quiz`);
+  };
+
+  const handleGoToQuizDetail = () => {
+    router.push(`${getEnv("NEXT_PUBLIC_WEBSITE_URL")}/quiz/${resultType}`);
+  };
+
+  const pageHeaderProps = useMemo<PageHeaderProps>(() => {
+    if (isAuthenticated) {
+      return {
+        title: "我的小島",
+        rightActionTo: "/settings",
+        rightLabel: "設定",
+        rightActionIcon: <SlidersHorizontal className="size-6" />,
+      };
+    }
+    return { leftAction: "back" };
+  }, [isAuthenticated]);
 
   useLayoutEffect(() => {
     const originalBackgroundColor = document.body.style.backgroundColor;
@@ -80,7 +118,13 @@ export function IslandHeader({
 
   return (
     <>
-      <div className="h-[378px] md:h-[333px] relative -z-20" />
+      <div
+        className={cn(
+          "relative -z-20",
+          isAuthenticated ? "h-[378px] md:h-[389px]" : "h-[92px] md:h-[152px]",
+          !isEmptyResult && "h-[378px] md:h-[333px]"
+        )}
+      />
       <header ref={headerRef} className="fixed top-0 inset-x-0 h-[420px] -z-10">
         <Image
           src={userDesktopBannerPng}
@@ -94,29 +138,78 @@ export function IslandHeader({
           fill
           className="md:hidden object-cover"
         />
-        {children}
-        <div className="absolute left-1/2 top-[92px] md:top-[127px] -translate-x-1/2 w-[149px] h-[140px] md:w-[168px] md:h-[158px]">
-          <Lottie animationData={activeShaper1Json} className="*:w-full *:h-full" />
-          <div className="hidden md:block absolute bottom-[25px] -left-[5px] w-3 h-[11px] rounded-full bg-white/70 border border-light-cyan" />
-          <div className="hidden md:block absolute bottom-[35px] -left-[22px] size-4.5 rounded-full bg-white/70 border border-light-cyan" />
-          <div className="absolute -bottom-[126px] left-1/2 -translate-x-1/2 w-[calc(100vw-40px)] max-w-[600px] md:translate-x-0 md:bottom-[37px] md:-left-[241px] md:w-[219px] rounded-[20px] bg-white/70 py-3 px-4 border border-light-cyan">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-sm text-logo-cyan font-medium">學習類型</p>
-              <Button
-                variant="ghost"
-                className="group text-text-dark text-xs p-0 h-auto"
-                onClick={onRetakeQuiz}
-              >
-                <RefreshCcw className="size-4.5 text-light-gray group-hover:animate-spin-reverse" />
-                重新測驗
-              </Button>
+        <PageHeader {...pageHeaderProps} />
+        {isEmptyResult && (
+          <div className="absolute left-0 right-0 top-[256px] w-[600px] mx-auto overflow-hidden mask-marquee">
+            <div className="animate-marquee flex w-max gap-3 will-change-transform">
+              {/* 第一份內容 */}
+              {Array.from(resultTypeToLottieMap.keys()).map((key) => (
+                <div key={key} className="w-[96px] h-[91px] shrink-0">
+                  <Lottie
+                    animationData={resultTypeToLottieMap.get(key)}
+                    className="*:w-full *:h-full"
+                  />
+                </div>
+              ))}
+              {/* 複製一次以實現無縫循環 */}
+              {Array.from(resultTypeToLottieMap.keys()).map((key) => (
+                <div key={`duplicate-${key}`} className="w-[96px] h-[91px] shrink-0">
+                  <Lottie
+                    animationData={resultTypeToLottieMap.get(key)}
+                    className="*:w-full *:h-full"
+                  />
+                </div>
+              ))}
             </div>
-            <p className="text-text-dark font-medium mb-2">{learningType}</p>
-            <Button variant="orange" className="w-full" onClick={onViewDetails}>
-              觀看詳細說明
-              <ChevronRight className="size-4" />
-            </Button>
           </div>
+        )}
+        <div className="absolute left-1/2 top-[92px] md:top-[127px] -translate-x-1/2 w-[149px] h-[140px] md:w-[168px] md:h-[158px]">
+          {!isEmptyResult && <Lottie animationData={lottieJson} className="*:w-full *:h-full" />}
+          {isAuthenticated && (
+            <>
+              <div
+                className={cn(
+                  "hidden md:block absolute bottom-[25px] -left-[5px] w-3 h-[11px] rounded-full bg-white/70 border border-light-cyan",
+                  isEmptyResult && "left-[34px]"
+                )}
+              />
+              <div
+                className={cn(
+                  "hidden md:block absolute bottom-[35px] -left-[22px] size-4.5 rounded-full bg-white/70 border border-light-cyan",
+                  isEmptyResult && " left-[17px]"
+                )}
+              />
+              <div
+                className={cn(
+                  "absolute -bottom-[126px] left-1/2 -translate-x-1/2 w-[calc(100vw-40px)] max-w-[600px] md:translate-x-0 md:bottom-[37px] md:-left-[241px] md:w-[219px] rounded-[20px] bg-white/70 py-3 px-4 border border-light-cyan",
+                  isEmptyResult && "md:w-[258px]"
+                )}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm text-logo-cyan font-medium">學習類型</p>
+                  {!isEmptyResult && (
+                    <Button
+                      variant="ghost"
+                      className="group text-text-dark text-xs p-0 h-auto"
+                      onClick={handleGoToQuiz}
+                    >
+                      <RefreshCcw className="size-4.5 text-light-gray group-hover:animate-spin-reverse" />
+                      重新測驗
+                    </Button>
+                  )}
+                </div>
+                <p className="text-text-dark font-medium mb-2">{message}</p>
+                <Button
+                  variant="orange"
+                  className="w-full"
+                  onClick={isEmptyResult ? handleGoToQuiz : handleGoToQuizDetail}
+                >
+                  {isEmptyResult ? "立即測驗" : "觀看詳細說明"}
+                  <ChevronRight className="size-4" />
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </header>
     </>

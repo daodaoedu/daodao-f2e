@@ -409,6 +409,9 @@ importers:
       '@daodao/assets':
         specifier: workspace:*
         version: link:../../assets
+      '@daodao/auth':
+        specifier: workspace:*
+        version: link:../../auth
       '@daodao/i18n':
         specifier: workspace:*
         version: link:../../i18n

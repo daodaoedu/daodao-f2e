@@ -8,26 +8,31 @@
 import { client } from "../client";
 import type { paths } from "../types";
 
-type LoginRequest =
-  paths["/api/v1/auth/login"]["post"]["requestBody"] extends { content: { "application/json": infer T } }
-    ? T
-    : never;
-type RegisterRequest =
-  paths["/api/v1/auth/register"]["post"]["requestBody"] extends { content: { "application/json": infer T } }
-    ? T
-    : never;
-type ForgotPasswordRequest =
-  paths["/api/v1/auth/forgot-password"]["post"]["requestBody"] extends { content: { "application/json": infer T } }
-    ? T
-    : never;
-type ResetPasswordRequest =
-  paths["/api/v1/auth/reset-password"]["post"]["requestBody"] extends { content: { "application/json": infer T } }
-    ? T
-    : never;
-type VerifyEmailRequest =
-  paths["/api/v1/auth/verify-email"]["post"]["requestBody"] extends { content: { "application/json": infer T } }
-    ? T
-    : never;
+type LoginRequest = paths["/api/v1/auth/login"]["post"]["requestBody"] extends {
+  content: { "application/json": infer T };
+}
+  ? T
+  : never;
+type RegisterRequest = paths["/api/v1/auth/register"]["post"]["requestBody"] extends {
+  content: { "application/json": infer T };
+}
+  ? T
+  : never;
+type ForgotPasswordRequest = paths["/api/v1/auth/forgot-password"]["post"]["requestBody"] extends {
+  content: { "application/json": infer T };
+}
+  ? T
+  : never;
+type ResetPasswordRequest = paths["/api/v1/auth/reset-password"]["post"]["requestBody"] extends {
+  content: { "application/json": infer T };
+}
+  ? T
+  : never;
+type VerifyEmailRequest = paths["/api/v1/auth/verify-email"]["post"]["requestBody"] extends {
+  content: { "application/json": infer T };
+}
+  ? T
+  : never;
 
 // ============================================================================
 // Mutation Hooks

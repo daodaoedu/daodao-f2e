@@ -1,8 +1,6 @@
-import { getUserByIdentifier, getLatestQuizResult } from "@daodao/api";
-import { SlidersHorizontal } from "lucide-react";
+import { getUserByIdentifier } from "@daodao/api";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { PageHeader } from "@/components/layout";
 import { PracticeSection } from "@/components/practice";
 import { IslandHeader, UserInfoCard } from "@/components/user";
 import { TaskStatus } from "@/constants/task-status";
@@ -80,10 +78,8 @@ export default async function UserProfilePage({
   }
 
   const userData = userResponse.data?.data;
+  const resultType = (userData.latestQuizResult?.resultType ?? "").toLowerCase();
 
-  // 模擬資料 - 之後從 API 取得
-  // TODO: 從 latestQuizResult 取得實際的學習類型
-  const mockLearningType = "我是注重推理的探探島！";
   const mockPractices = [
     {
       id: "1",
@@ -103,14 +99,7 @@ export default async function UserProfilePage({
 
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-[#B8E8FD]">
-      <IslandHeader learningType={mockLearningType}>
-        <PageHeader
-          title="我的小島"
-          rightActionTo="/settings"
-          rightLabel="設定"
-          rightActionIcon={<SlidersHorizontal className="size-6" />}
-        />
-      </IslandHeader>
+      <IslandHeader resultType={resultType} />
 
       <main className="max-w-[640px] mx-auto px-5 pb-[64px]">
         {/* 用戶個人資訊卡片 */}

@@ -5,12 +5,7 @@
   "description": "API client package for DaoDao monorepo (OpenAPI)",
   "main": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./client": "./src/client.ts",
-    "./hooks": "./src/hooks.ts",
-    "./errors": "./src/errors.ts",
-    "./types": "./src/types.ts",
-    "./is-match": "./src/is-match.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "build": "tsc",
