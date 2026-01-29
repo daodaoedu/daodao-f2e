@@ -10,6 +10,7 @@ import {
 import { cn } from "@daodao/ui/lib/utils";
 import { Ellipsis } from "lucide-react";
 import { useState } from "react";
+import type { PracticeTheme } from "@/constants/practice-theme";
 import {
   FilterStatus,
   type FilterStatus as FilterStatusType,
@@ -18,14 +19,15 @@ import {
 import { InProgressTaskCard } from "./in-progress-task-card";
 
 export interface InProgressTask {
-  id: number;
+  id: string;
   label: string;
   title: string;
   description: string;
-  progress: string;
+  checkInCount: number;
+  progress: number;
   messagesCount: number;
   isUnreadMessages: boolean;
-  theme: string;
+  theme: PracticeTheme;
   status: TaskStatus;
 }
 
@@ -107,6 +109,7 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
             label={task.label}
             title={task.title}
             description={task.description}
+            checkInCount={task.checkInCount}
             progress={task.progress}
             messagesCount={task.messagesCount}
             theme={task.theme}

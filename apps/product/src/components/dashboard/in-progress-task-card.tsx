@@ -1,37 +1,25 @@
 "use client";
 
-import {
-  ArrowRightOutlineSvg,
-  BlueSvg,
-  GreenSvg,
-  MessagesSvg,
-  PinkSvg,
-  YellowSvg,
-} from "@daodao/assets";
+import { ArrowRightOutlineSvg, MessagesSvg } from "@daodao/assets";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
 import { PenLine } from "lucide-react";
 import { CheckInButton } from "@/components/check-in";
+import { PracticeTheme, practiceThemeSvgMap } from "@/constants/practice-theme";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
-
-const themesMap = {
-  yellow: YellowSvg,
-  blue: BlueSvg,
-  pink: PinkSvg,
-  green: GreenSvg,
-};
 
 interface InProgressTaskCardProps {
   label: string;
   id: string;
   title: string;
   description: string;
-  progress: string;
+  checkInCount: number;
+  progress: number;
   messagesCount: number;
   isUnreadMessages: boolean;
-  theme: string;
+  theme: PracticeTheme;
   status: string;
   onEdit?: () => void;
 }
@@ -41,6 +29,7 @@ export const InProgressTaskCard = ({
   id,
   title,
   description,
+  checkInCount,
   progress,
   messagesCount,
   isUnreadMessages,
@@ -48,7 +37,7 @@ export const InProgressTaskCard = ({
   status,
   onEdit,
 }: InProgressTaskCardProps) => {
-  const Theme = themesMap[theme as keyof typeof themesMap] ?? YellowSvg;
+  const Theme = practiceThemeSvgMap[theme] ?? practiceThemeSvgMap[PracticeTheme.yellow];
   const statusInfo = getStatusConfig(status);
   const isDraft = status === TaskStatus.draft;
 
@@ -93,7 +82,7 @@ export const InProgressTaskCard = ({
         <div className="flex items-center justify-between">
           <span className="text-xs flex gap-1">
             <span className="text-text-dark">已打卡</span>
-            <span className="text-text-dark font-semibold">{progress}</span>
+            <span className="text-text-dark font-semibold">{checkInCount}</span>
             <span className="text-text-dark">次</span>
           </span>
           {/* TODO: MVP 先不開放 */}
@@ -127,7 +116,7 @@ export const InProgressTaskCard = ({
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 overflow-hidden rounded-b-full">
-        <Progress value={23} />
+        <Progress value={progress} />
       </div>
     </div>
   );

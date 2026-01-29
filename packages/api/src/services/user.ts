@@ -24,7 +24,14 @@ type UpdateUserRequest = paths["/api/v1/users/{id}"]["put"]["requestBody"] exten
 }
   ? T
   : never;
+type UpdatePreferencesRequest =
+  paths["/api/v1/users/me/preferences"]["put"]["requestBody"] extends {
+    content: { "application/json": infer T };
+  }
+    ? T
+    : never;
 
+// API 定義中 query 參數是 string 類型，但使用時需要 number，所以定義一個轉換層
 export interface IGetUsersParams {
   page?: number;
   pageSize?: number;
@@ -188,13 +195,7 @@ export const getCurrentUserPreferences = async (options?: {
 /**
  * 更新當前用戶的偏好設定
  */
-export const updateCurrentUserPreferences = async (
-  preferences: paths["/api/v1/users/me/preferences"]["put"]["requestBody"] extends {
-    content: { "application/json": infer T };
-  }
-    ? T
-    : never
-) => {
+export const updateCurrentUserPreferences = async (preferences: UpdatePreferencesRequest) => {
   return client.PUT("/api/v1/users/me/preferences", {
     body: preferences,
   });
@@ -218,4 +219,10 @@ export const getLatestQuizResult = async () => {
 // Export Types
 // ============================================================================
 
-export type { UserResponse, UserListResponse, CreateUserRequest, UpdateUserRequest };
+export type {
+  UserResponse,
+  UserListResponse,
+  CreateUserRequest,
+  UpdateUserRequest,
+  UpdatePreferencesRequest,
+};

@@ -2,8 +2,8 @@
 
 import { CompletedTaskCard } from "./completed-task-card";
 
-interface CompletedTask {
-  id: number;
+export interface CompletedTask {
+  id: string;
   label: string;
   title: string;
   description: string;

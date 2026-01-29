@@ -44,8 +44,8 @@ export const BgRadialAnimation = ({ className, variant }: BgRadialAnimationProps
               className={cn(absoluteClassName, "w-[80px] h-[81px]")}
               initial={initial}
               animate={{
-                x: "calc(-50% + 252px)",
-                y: "calc(-50% + 210px)",
+                x: isMobile ? "calc(-50% + 158px)" : "calc(-50% + 252px)",
+                y: isMobile ? "calc(-50% + 150px)" : "calc(-50% + 210px)",
                 opacity: 1,
               }}
               transition={{
@@ -72,8 +72,8 @@ export const BgRadialAnimation = ({ className, variant }: BgRadialAnimationProps
               className={cn(absoluteClassName, "w-[98px] h-[120px]")}
               initial={initial}
               animate={{
-                x: "calc(-50% - 280px)",
-                y: "calc(-50% - 46px)",
+                x: isMobile ? "calc(-50% - 180px)" : "calc(-50% - 280px)",
+                y: isMobile ? "calc(-50% - 60px)" : "calc(-50% - 46px)",
                 opacity: 1,
               }}
               transition={{
@@ -98,8 +98,8 @@ export const BgRadialAnimation = ({ className, variant }: BgRadialAnimationProps
               className={cn(absoluteClassName, "w-[108px] h-[122px]")}
               initial={initial}
               animate={{
-                x: "calc(-50% + 280px)",
-                y: "calc(-50% - 78px)",
+                x: isMobile ? "calc(-50% + 180px)" : "calc(-50% + 280px)",
+                y: isMobile ? "calc(-50% - 130px)" : "calc(-50% - 78px)",
                 opacity: 1,
               }}
               transition={{

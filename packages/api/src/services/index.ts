@@ -6,7 +6,9 @@
 // Auth Service
 export * from "./auth";
 export * from "./auth-hooks";
-
+// Practice Service
+export * from "./practice";
+export * from "./practice-hooks";
 // User Service
 export * from "./user";
 export * from "./user-hooks";

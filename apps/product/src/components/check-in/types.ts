@@ -1,5 +1,6 @@
 import type { CheckInStatusType } from "@/constants/check-in-status";
 import type { MoodType } from "@/constants/mood";
+import type { PracticeStatus } from "@/constants/practice-status";
 
 /**
  * 打卡表單資料（用於表單輸入）
@@ -41,7 +42,7 @@ export type { CheckInStatusType };
 export interface ICheckInStatusOptions {
   /**
    * 實踐狀態
-   * - "active" | "paused" | "completed" | "archived"
+   * - {@link PracticeStatus}
    */
   practiceStatus?: string;
   /**
