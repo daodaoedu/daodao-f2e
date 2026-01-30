@@ -16,34 +16,101 @@ export const PracticeTheme = {
 export type PracticeTheme = (typeof PracticeTheme)[keyof typeof PracticeTheme];
 
 /**
+ * 實踐主題配置
+ * 單一來源定義所有主題相關信息（顏色值、SVG 組件）
+ */
+const PRACTICE_THEME_CONFIG = [
+  {
+    name: PracticeTheme.yellow,
+    color: "#FCDD84",
+    svg: YellowSvg,
+  },
+  {
+    name: PracticeTheme.blue,
+    color: "#C3EEFF",
+    svg: BlueSvg,
+  },
+  {
+    name: PracticeTheme.pink,
+    color: "#FFC0C8",
+    svg: PinkSvg,
+  },
+  {
+    name: PracticeTheme.green,
+    color: "#A0E8D0",
+    svg: GreenSvg,
+  },
+] as const;
+
+/**
  * 主題顏色列表（用於循環選擇）
  */
-export const PRACTICE_THEMES: PracticeTheme[] = [
-  PracticeTheme.yellow,
-  PracticeTheme.blue,
-  PracticeTheme.pink,
-  PracticeTheme.green,
-];
+export const PRACTICE_THEMES: PracticeTheme[] = PRACTICE_THEME_CONFIG.map(
+  (config) => config.name
+);
 
 /**
  * 主題顏色對應的 SVG 組件映射
  */
-export const practiceThemeSvgMap = {
-  [PracticeTheme.yellow]: YellowSvg,
-  [PracticeTheme.blue]: BlueSvg,
-  [PracticeTheme.pink]: PinkSvg,
-  [PracticeTheme.green]: GreenSvg,
-} as const;
+export const practiceThemeSvgMap = PRACTICE_THEME_CONFIG.reduce(
+  (acc, config) => {
+    acc[config.name] = config.svg;
+    return acc;
+  },
+  {} as Record<PracticeTheme, typeof PRACTICE_THEME_CONFIG[number]["svg"]>
+);
 
 /**
- * 根據實踐 ID 生成主題顏色
+ * 主題顏色值映射
+ */
+export const practiceThemeColorMap = PRACTICE_THEME_CONFIG.reduce(
+  (acc, config) => {
+    acc[config.name] = config.color;
+    return acc;
+  },
+  {} as Record<PracticeTheme, string>
+);
+
+/**
+ * 顏色值到主題名稱的反向映射
+ */
+const themeColorToThemeMap = new Map<string, PracticeTheme>(
+  PRACTICE_THEME_CONFIG.map((config) => [config.color, config.name])
+);
+
+/**
+ * 根據顏色值取得主題名稱
+ */
+export const getThemeNameFromColor = (color: string): PracticeTheme => {
+  return themeColorToThemeMap.get(color) ?? PracticeTheme.yellow;
+};
+
+/**
+ * 根據實踐 ID 計算主題索引
  * 使用 ID 的 hash 來決定主題，確保相同 ID 總是得到相同的主題
  */
-export const getThemeFromId = (id: string): PracticeTheme => {
+const getThemeIndexFromId = (id: string): number => {
   let hash = 0;
   for (let i = 0; i < id.length; i++) {
     hash = id.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const index = Math.abs(hash) % PRACTICE_THEMES.length;
+  return Math.abs(hash) % PRACTICE_THEMES.length;
+};
+
+/**
+ * 根據實踐 ID 生成主題名稱
+ * 使用 ID 的 hash 來決定主題，確保相同 ID 總是得到相同的主題
+ */
+export const getThemeNameFromId = (id: string): PracticeTheme => {
+  const index = getThemeIndexFromId(id);
   return PRACTICE_THEMES[index] ?? PracticeTheme.yellow;
+};
+
+/**
+ * 根據實踐 ID 生成主題顏色值
+ * 使用 ID 的 hash 和 themeColor 映射來決定主題顏色，確保相同 ID 總是得到相同的主題顏色
+ */
+export const getThemeFromId = (id: string): string => {
+  const theme = getThemeNameFromId(id);
+  return practiceThemeColorMap[theme] ?? practiceThemeColorMap[PracticeTheme.yellow];
 };

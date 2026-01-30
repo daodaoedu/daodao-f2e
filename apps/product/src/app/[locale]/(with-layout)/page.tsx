@@ -66,7 +66,7 @@ export default function HomePage() {
           label: "主題實踐",
           title: practice.title,
           description: practice.practiceAction || "",
-          checkInCount: 0, // TODO: 待 API 補充
+          checkInCount: practice.checkInCount,
           progress: practice.progressPercentage ?? 0,
           messagesCount: 0, // TODO: 需要從其他 API 取得
           isUnreadMessages: false, // TODO: 需要從其他 API 取得

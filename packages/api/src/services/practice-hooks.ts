@@ -6,7 +6,12 @@
  */
 
 import { useQuery } from "../hooks";
-import type { IGetMyPracticesParams, IGetPracticeStatsParams } from "./practice";
+import type {
+  IGetMyPracticesParams,
+  IGetPracticeStatsParams,
+  IGetPracticeTemplatesParams,
+  IGetRandomPracticeTemplatesParams,
+} from "./practice";
 
 // ============================================================================
 // Query Hooks
@@ -41,6 +46,56 @@ export const useMyPracticeStats = (params?: IGetPracticeStatsParams) => {
       query: {
         timeRange: params?.timeRange,
         includeArchived: params?.includeArchived ?? undefined,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取實踐模板列表的 Hook
+ */
+export const usePracticeTemplates = (params?: IGetPracticeTemplatesParams) => {
+  return useQuery("/api/v1/practices/templates", {
+    params: {
+      query: {
+        page: params?.page,
+        limit: params?.limit,
+        category: params?.category,
+        search: params?.search,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取實踐模板分類列表的 Hook
+ */
+export const usePracticeTemplateCategories = () => {
+  return useQuery("/api/v1/practices/templates/categories");
+};
+
+/**
+ * 獲取單一實踐模板詳情的 Hook
+ */
+export const usePracticeTemplateById = (id: string) => {
+  return useQuery("/api/v1/practices/templates/{id}", {
+    params: {
+      path: {
+        id,
+      },
+    },
+  });
+};
+
+/**
+ * 隨機獲取實踐模板的 Hook
+ */
+export const useRandomPracticeTemplates = (params?: IGetRandomPracticeTemplatesParams) => {
+  return useQuery("/api/v1/practices/templates/random", {
+    params: {
+      query: {
+        count: params?.count,
+        category: params?.category,
       },
     },
   });

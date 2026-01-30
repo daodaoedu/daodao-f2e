@@ -1,6 +1,10 @@
 "use client";
 
-import { ArrowRightOutlineSvg, BulbSvg, Deco2Svg } from "@daodao/assets";
+import { ArrowRightOutlineSvg, Deco2Svg } from "@daodao/assets";
+import {
+  useRandomPracticeTemplates,
+  type PracticeTemplateType,
+} from "@daodao/api";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import Stack from "@daodao/ui/components/stack";
@@ -19,27 +23,20 @@ interface IRandomPractice {
   templateId: string;
 }
 
-// 模擬隨機實踐資料 - 之後可以從 API 取得
-const MOCK_RANDOM_PRACTICES: IRandomPractice[] = [
-  {
-    id: "0",
-    title: "自己準備便當",
-    description: "開始為自己做上班的健康午餐便當",
-    templateId: "prepare-lunch-box",
-  },
-  {
-    id: "1",
-    title: "每天學英文 30 分鐘",
-    description: "透過 App 和影片學習，持續 30 天",
-    templateId: "learn-english-30min",
-  },
-  {
-    id: "2",
-    title: "冥想",
-    description: "看 Youtube 教學,每晚睡前練習",
-    templateId: "meditation",
-  },
-];
+// 將 API 的 PracticeTemplate 轉換成 IRandomPractice
+const convertTemplateToRandomPractice = (
+  template: PracticeTemplateType
+): IRandomPractice => {
+  return {
+    id: template.id,
+    title: template.title,
+    description:
+      template.practiceAction ||
+      template.suggestedTags.join("、") ||
+      template.title,
+    templateId: template.id,
+  };
+};
 
 interface IRandomPracticeCardProps {
   practice: IRandomPractice;
@@ -90,9 +87,29 @@ interface IRandomPracticesSectionProps {
 }
 
 export const RandomPracticesSection = ({
-  practices = MOCK_RANDOM_PRACTICES,
+  practices: propPractices,
 }: IRandomPracticesSectionProps) => {
   const router = useRouter();
+
+  // 取得 3 個隨機模板
+  const { data: randomTemplatesData } = useRandomPracticeTemplates({
+    count: 3,
+  });
+
+  // 從 API 取得隨機模板，或使用傳入的 practices
+  const practices = useMemo(() => {
+    // 如果傳入了 practices，直接使用
+    if (propPractices && propPractices.length > 0) {
+      return propPractices;
+    }
+
+    // 否則使用隨機模板 API 的結果
+    if (!randomTemplatesData?.data || randomTemplatesData.data.length === 0) {
+      return [];
+    }
+
+    return randomTemplatesData.data.map(convertTemplateToRandomPractice);
+  }, [propPractices, randomTemplatesData]);
 
   // 為每個實踐分配主題顏色
   const practicesWithTheme = useMemo(() => {

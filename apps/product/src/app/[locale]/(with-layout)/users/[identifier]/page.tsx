@@ -1,6 +1,7 @@
 import { getUserByIdentifier } from "@daodao/api";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { PracticeSection } from "@/components/practice";
 import { IslandHeader, UserInfoCard } from "@/components/user";
 import { TaskStatus } from "@/constants/task-status";
@@ -14,13 +15,16 @@ import { TaskStatus } from "@/constants/task-status";
  * - /users/john-doe (customId)
  */
 
+// 使用 React.cache() 避免在 generateMetadata 和 page 中重複請求
+const getCachedUserByIdentifier = cache(getUserByIdentifier);
+
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/users/[identifier]">): Promise<Metadata> {
   const { identifier } = await params;
 
-  // 獲取用戶資料以生成 metadata
-  const userResponse = await getUserByIdentifier(identifier);
+  // 獲取用戶資料以生成 metadata（使用緩存版本）
+  const userResponse = await getCachedUserByIdentifier(identifier);
 
   // 如果請求失敗或沒有資料，返回預設 metadata
   if (!userResponse.data || !userResponse.response.ok) {
@@ -69,8 +73,8 @@ export default async function UserProfilePage({
 }: PageProps<"/[locale]/users/[identifier]">) {
   const { identifier } = await params;
 
-  // 使用 SSR 方式獲取用戶資訊（自動判斷是 ID 還是 customId）
-  const userResponse = await getUserByIdentifier(identifier);
+  // 使用緩存版本避免重複請求（與 generateMetadata 共享）
+  const userResponse = await getCachedUserByIdentifier(identifier);
 
   // 如果請求失敗或沒有資料，顯示 404
   if (!userResponse.data || !userResponse.response.ok) {

@@ -7,7 +7,11 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
 import { PenLine } from "lucide-react";
 import { CheckInButton } from "@/components/check-in";
-import { PracticeTheme, practiceThemeSvgMap } from "@/constants/practice-theme";
+import {
+  PracticeTheme,
+  practiceThemeSvgMap,
+  getThemeNameFromColor,
+} from "@/constants/practice-theme";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
 
 interface InProgressTaskCardProps {
@@ -19,7 +23,7 @@ interface InProgressTaskCardProps {
   progress: number;
   messagesCount: number;
   isUnreadMessages: boolean;
-  theme: PracticeTheme;
+  theme: string;
   status: string;
   onEdit?: () => void;
 }
@@ -37,7 +41,8 @@ export const InProgressTaskCard = ({
   status,
   onEdit,
 }: InProgressTaskCardProps) => {
-  const Theme = practiceThemeSvgMap[theme] ?? practiceThemeSvgMap[PracticeTheme.yellow];
+  const themeName = getThemeNameFromColor(theme);
+  const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
   const statusInfo = getStatusConfig(status);
   const isDraft = status === TaskStatus.draft;
 

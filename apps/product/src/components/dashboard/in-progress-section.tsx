@@ -10,7 +10,6 @@ import {
 import { cn } from "@daodao/ui/lib/utils";
 import { Ellipsis } from "lucide-react";
 import { useState } from "react";
-import type { PracticeTheme } from "@/constants/practice-theme";
 import {
   FilterStatus,
   type FilterStatus as FilterStatusType,
@@ -27,7 +26,7 @@ export interface InProgressTask {
   progress: number;
   messagesCount: number;
   isUnreadMessages: boolean;
-  theme: PracticeTheme;
+  theme: string;
   status: TaskStatus;
 }
 
