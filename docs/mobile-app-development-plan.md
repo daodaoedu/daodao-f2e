@@ -384,14 +384,15 @@ export type Radius = typeof radius
 #### `apps/mobile/tamagui.config.ts`
 
 ```typescript
-import { createTamagui, createTokens } from 'tamagui'
-import { createInterFont } from '@tamagui/font-inter'
+import { createTamagui, createTokens, createFont } from 'tamagui'
 import { shorthands } from '@tamagui/shorthands'
 import { themes as defaultThemes, tokens as defaultTokens } from '@tamagui/config/v3'
 import { colors, spacing, radius, typography } from '@daodao/design-tokens'
 
 // 字體配置
-const headingFont = createInterFont({
+// 注意：使用 createFont 而非 createInterFont，以確保 Expo 字體正確映射
+const headingFont = createFont({
+  family: 'Inter',
   size: {
     1: typography.fontSizes.xs,
     2: typography.fontSizes.sm,
@@ -407,9 +408,16 @@ const headingFont = createInterFont({
     6: typography.fontWeights.semibold,
     7: typography.fontWeights.bold,
   },
+  // face 映射確保原生平台正確渲染不同字重
+  face: {
+    400: { normal: 'Inter_400' },
+    600: { normal: 'Inter_600' },
+    700: { normal: 'Inter_700' },
+  },
 })
 
-const bodyFont = createInterFont({
+const bodyFont = createFont({
+  family: 'Inter',
   size: {
     1: typography.fontSizes.xs,
     2: typography.fontSizes.sm,
@@ -420,6 +428,11 @@ const bodyFont = createInterFont({
     4: typography.fontWeights.normal,
     5: typography.fontWeights.medium,
     6: typography.fontWeights.semibold,
+  },
+  face: {
+    400: { normal: 'Inter_400' },
+    500: { normal: 'Inter_500' },
+    600: { normal: 'Inter_600' },
   },
 })
 
@@ -608,9 +621,12 @@ SplashScreen.preventAutoHideAsync()
 export default function RootLayout() {
   const colorScheme = useColorScheme()
 
+  // 載入所有需要的字重，名稱需與 tamagui.config.ts 中的 face 映射一致
   const [loaded] = useFonts({
-    Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
-    InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
+    Inter_400: require('@tamagui/font-inter/otf/Inter-Regular.otf'),
+    Inter_500: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
+    Inter_600: require('@tamagui/font-inter/otf/Inter-SemiBold.otf'),
+    Inter_700: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
   })
 
   useEffect(() => {
@@ -979,39 +995,256 @@ export async function requestPermissions() {
 ### 10.2 離線支援
 
 ```typescript
-// apps/mobile/hooks/useOfflineCheckIn.ts
+// apps/mobile/services/offline-checkin.ts
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import NetInfo from '@react-native-community/netinfo'
-import { useEffect } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { client } from '@daodao/api'
 
-const PENDING_CHECKINS_KEY = 'pending_checkins'
+// ============ 型別定義 ============
 
-// 儲存離線打卡
-export async function savePendingCheckIn(checkIn: PendingCheckIn) {
-  const pending = await getPendingCheckIns()
-  pending.push({ ...checkIn, timestamp: Date.now() })
-  await AsyncStorage.setItem(PENDING_CHECKINS_KEY, JSON.stringify(pending))
+/** 離線打卡的狀態 */
+type PendingStatus = 'pending' | 'syncing' | 'failed'
+
+/** 離線打卡資料結構 */
+interface PendingCheckIn {
+  id: string                    // 本地 UUID
+  practiceId: string            // 實踐 ID
+  note?: string                 // 打卡心得
+  timestamp: number             // 建立時間戳
+  status: PendingStatus         // 同步狀態
+  retryCount: number            // 重試次數
+  lastError?: string            // 最後一次錯誤訊息
 }
 
-// 同步離線打卡
+/** 同步結果 */
+interface SyncResult {
+  success: boolean
+  syncedCount: number
+  failedCount: number
+  errors: Array<{ id: string; error: string }>
+}
+
+// ============ 常數 ============
+
+const PENDING_CHECKINS_KEY = 'pending_checkins'
+const MAX_RETRY_COUNT = 3
+
+// ============ 儲存層函式 ============
+
+/** 取得所有待同步的打卡 */
+export async function getPendingCheckIns(): Promise<PendingCheckIn[]> {
+  try {
+    const data = await AsyncStorage.getItem(PENDING_CHECKINS_KEY)
+    return data ? JSON.parse(data) : []
+  } catch (error) {
+    console.error('Failed to get pending check-ins:', error)
+    return []
+  }
+}
+
+/** 儲存待同步打卡列表 */
+async function savePendingCheckIns(checkIns: PendingCheckIn[]): Promise<void> {
+  await AsyncStorage.setItem(PENDING_CHECKINS_KEY, JSON.stringify(checkIns))
+}
+
+/** 新增一筆離線打卡 */
+export async function savePendingCheckIn(
+  practiceId: string,
+  note?: string
+): Promise<PendingCheckIn> {
+  const pending = await getPendingCheckIns()
+  const newCheckIn: PendingCheckIn = {
+    id: `offline_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    practiceId,
+    note,
+    timestamp: Date.now(),
+    status: 'pending',
+    retryCount: 0,
+  }
+  pending.push(newCheckIn)
+  await savePendingCheckIns(pending)
+  return newCheckIn
+}
+
+/** 移除已同步的打卡 */
+async function removePendingCheckIn(id: string): Promise<void> {
+  const pending = await getPendingCheckIns()
+  const filtered = pending.filter((item) => item.id !== id)
+  await savePendingCheckIns(filtered)
+}
+
+/** 更新打卡狀態 */
+async function updatePendingCheckIn(
+  id: string,
+  updates: Partial<PendingCheckIn>
+): Promise<void> {
+  const pending = await getPendingCheckIns()
+  const index = pending.findIndex((item) => item.id === id)
+  if (index !== -1) {
+    pending[index] = { ...pending[index], ...updates }
+    await savePendingCheckIns(pending)
+  }
+}
+
+// ============ 同步邏輯 ============
+
+/** 同步單筆打卡到伺服器 */
+async function syncCheckIn(checkIn: PendingCheckIn): Promise<void> {
+  const response = await client.POST('/practices/{id}/check-ins', {
+    params: { path: { id: checkIn.practiceId } },
+    body: {
+      note: checkIn.note,
+      // 傳送原始時間戳，讓後端知道實際打卡時間
+      createdAt: new Date(checkIn.timestamp).toISOString(),
+    },
+  })
+
+  if (response.error) {
+    throw new Error(response.error.message || 'Sync failed')
+  }
+}
+
+/** 批次同步所有待處理的打卡 */
+export async function syncAllPendingCheckIns(): Promise<SyncResult> {
+  const pending = await getPendingCheckIns()
+  const result: SyncResult = {
+    success: true,
+    syncedCount: 0,
+    failedCount: 0,
+    errors: [],
+  }
+
+  for (const checkIn of pending) {
+    // 跳過已超過重試次數的項目
+    if (checkIn.retryCount >= MAX_RETRY_COUNT) {
+      result.failedCount++
+      result.errors.push({ id: checkIn.id, error: 'Max retry exceeded' })
+      continue
+    }
+
+    try {
+      // 更新狀態為同步中
+      await updatePendingCheckIn(checkIn.id, { status: 'syncing' })
+
+      // 執行同步
+      await syncCheckIn(checkIn)
+
+      // 同步成功，移除項目
+      await removePendingCheckIn(checkIn.id)
+      result.syncedCount++
+    } catch (error) {
+      // 同步失敗，更新重試次數
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      await updatePendingCheckIn(checkIn.id, {
+        status: 'failed',
+        retryCount: checkIn.retryCount + 1,
+        lastError: errorMessage,
+      })
+      result.failedCount++
+      result.errors.push({ id: checkIn.id, error: errorMessage })
+      result.success = false
+    }
+  }
+
+  return result
+}
+
+// ============ React Hooks ============
+
+/** 監聽網路狀態並自動同步 */
 export function useSyncPendingCheckIns() {
+  const [isSyncing, setIsSyncing] = useState(false)
+  const [lastSyncResult, setLastSyncResult] = useState<SyncResult | null>(null)
+
+  const sync = useCallback(async () => {
+    if (isSyncing) return
+
+    setIsSyncing(true)
+    try {
+      const result = await syncAllPendingCheckIns()
+      setLastSyncResult(result)
+    } finally {
+      setIsSyncing(false)
+    }
+  }, [isSyncing])
+
   useEffect(() => {
+    // 網路狀態監聽
     const unsubscribe = NetInfo.addEventListener(async (state) => {
-      if (state.isConnected) {
-        const pending = await getPendingCheckIns()
-        for (const checkIn of pending) {
-          try {
-            await syncCheckIn(checkIn)
-            await removePendingCheckIn(checkIn.id)
-          } catch (error) {
-            console.error('Failed to sync check-in:', error)
-          }
-        }
+      if (state.isConnected && state.isInternetReachable) {
+        await sync()
+      }
+    })
+
+    // 初始同步（如果有網路）
+    NetInfo.fetch().then((state) => {
+      if (state.isConnected && state.isInternetReachable) {
+        sync()
       }
     })
 
     return unsubscribe
+  }, [sync])
+
+  return { isSyncing, lastSyncResult, manualSync: sync }
+}
+
+/** 取得待同步數量 */
+export function usePendingCheckInsCount() {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    const loadCount = async () => {
+      const pending = await getPendingCheckIns()
+      setCount(pending.length)
+    }
+
+    loadCount()
+
+    // 可考慮加入定期更新或事件監聽
+    const interval = setInterval(loadCount, 5000)
+    return () => clearInterval(interval)
   }, [])
+
+  return count
+}
+```
+
+**離線同步 UI 整合範例：**
+
+```typescript
+// apps/mobile/components/SyncStatusBanner.tsx
+import { XStack, Text } from 'tamagui'
+import { Cloud, CloudOff, Loader } from '@tamagui/lucide-icons'
+import { useSyncPendingCheckIns, usePendingCheckInsCount } from '../services/offline-checkin'
+
+export function SyncStatusBanner() {
+  const { isSyncing, lastSyncResult } = useSyncPendingCheckIns()
+  const pendingCount = usePendingCheckInsCount()
+
+  if (pendingCount === 0) return null
+
+  return (
+    <XStack
+      backgroundColor={isSyncing ? '$warning' : '$info'}
+      padding="$2"
+      alignItems="center"
+      justifyContent="center"
+      gap="$2"
+    >
+      {isSyncing ? (
+        <Loader size={16} color="white" />
+      ) : (
+        <CloudOff size={16} color="white" />
+      )}
+      <Text color="white" fontSize="$2">
+        {isSyncing
+          ? '同步中...'
+          : `${pendingCount} 筆打卡待同步`}
+      </Text>
+    </XStack>
+  )
 }
 ```
 
