@@ -1,6 +1,6 @@
 "use client";
 
-import { usePracticeById, usePracticeCheckIns } from "@daodao/api";
+import { useMyPractices, usePracticeById, usePracticeCheckIns } from "@daodao/api";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import {
@@ -40,6 +40,9 @@ export default function PracticeDetailPage() {
   const { data: practiceData, isLoading, error } = usePracticeById(practiceId);
   const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
     limit: 30,
+  });
+  const { data: practicesListData } = useMyPractices({
+    limit: 100, // 取得足夠的實踐列表來判斷前後實踐
   });
   const { openArchiveDialog } = useArchivePracticeDialog();
   const { openDeleteDialog } = useDeletePracticeDialog();
@@ -136,13 +139,42 @@ export default function PracticeDetailPage() {
     }
   };
 
-  // TODO: 取得上一個和下一個實踐的 ID（需要從 API 取得實踐列表）
+  // 計算當前實踐在列表中的位置，並判斷是否有上一個和下一個實踐
+  const { previousPracticeId, nextPracticeId, hasPrevious, hasNext } = useMemo(() => {
+    const practices = practicesListData?.data || [];
+    const currentIndex = practices.findIndex((practice) => String(practice.id) === practiceId);
+
+    if (currentIndex === -1) {
+      return {
+        previousPracticeId: null,
+        nextPracticeId: null,
+        hasPrevious: false,
+        hasNext: false,
+      };
+    }
+
+    const previousPractice = currentIndex > 0 ? practices[currentIndex - 1] : null;
+    const nextPractice =
+      currentIndex < practices.length - 1 ? practices[currentIndex + 1] : null;
+
+    return {
+      previousPracticeId: previousPractice ? String(previousPractice.id) : null,
+      nextPracticeId: nextPractice ? String(nextPractice.id) : null,
+      hasPrevious: previousPractice !== null,
+      hasNext: nextPractice !== null,
+    };
+  }, [practicesListData, practiceId]);
+
   const handlePrevious = () => {
-    // router.push(`/practices/${previousId}`);
+    if (previousPracticeId) {
+      router.push(`/practices/${previousPracticeId}`);
+    }
   };
 
   const handleNext = () => {
-    // router.push(`/practices/${nextId}`);
+    if (nextPracticeId) {
+      router.push(`/practices/${nextPracticeId}`);
+    }
   };
 
   // Loading 狀態
@@ -183,10 +215,11 @@ export default function PracticeDetailPage() {
         {/* Practice Title Section */}
         <PracticeDetailTitle
           title={practice.name}
+          status={practiceData?.data?.status}
           onPrevious={handlePrevious}
           onNext={handleNext}
-          hasPrevious={false} // TODO: 從 API 取得實踐列表來判斷
-          hasNext={false} // TODO: 從 API 取得實踐列表來判斷
+          hasPrevious={hasPrevious}
+          hasNext={hasNext}
         />
 
         <div className="flex items-center justify-between mb-4">

@@ -30,6 +30,7 @@ import {
   parseFrequency,
   PracticeTimePeriodToExecutionTimingMap,
 } from "@/constants/practice-form";
+import { PracticeStatus } from "@/constants/practice-status";
 
 // 將表單資料轉換成 API 請求格式
 const convertFormValuesToApiRequest = (
@@ -86,6 +87,11 @@ export default function EditPracticePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: practiceData, isLoading, error } = usePracticeById(practiceId);
+
+  // 檢查實踐是否已經開始（狀態為 active）
+  const isPracticeStarted = useMemo(() => {
+    return practiceData?.data?.status === PracticeStatus.active;
+  }, [practiceData?.data?.status]);
 
   // 將 API 資料轉換為表單值
   const formValues: ManualPracticeFormValues | null = useMemo(() => {
@@ -255,7 +261,7 @@ export default function EditPracticePage() {
             className="space-y-6"
           >
             <Step1 form={form} />
-            <Step2 form={form} />
+            <Step2 form={form} disabled={isPracticeStarted} />
             <Step3 form={form} />
             <Step4 form={form} />
 

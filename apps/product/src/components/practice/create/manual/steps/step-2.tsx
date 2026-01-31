@@ -17,9 +17,10 @@ import { DURATION_DAYS_OPTIONS, FREQUENCY_OPTIONS, type ManualPracticeFormValues
 
 interface Step2Props {
   form: UseFormReturn<ManualPracticeFormValues>;
+  disabled?: boolean;
 }
 
-export const Step2 = ({ form }: Step2Props) => {
+export const Step2 = ({ form, disabled = false }: Step2Props) => {
   const startDate = form.watch("startDate");
   const durationDays = form.watch("durationDays");
 
@@ -51,6 +52,7 @@ export const Step2 = ({ form }: Step2Props) => {
                   value={date}
                   invalid={!!form.formState.errors.startDate}
                   placeholder="選擇日期"
+                  disabled={disabled}
                   onBlur={field.onBlur}
                   minDate={new Date()}
                   maxDate={addDays(new Date(), 14)}
@@ -58,6 +60,7 @@ export const Step2 = ({ form }: Step2Props) => {
                     form.setError("startDate", { message: errorMessage });
                   }}
                   onChange={(calendarDate) => {
+                    if (disabled) return;
                     if (calendarDate && isValid(calendarDate)) {
                       field.onChange(format(calendarDate, "yyyy-MM-dd"));
                     } else {
@@ -84,8 +87,13 @@ export const Step2 = ({ form }: Step2Props) => {
             <FormControl>
               <RadioGroup
                 value={field.value ?? ""}
-                onValueChange={field.onChange}
+                onValueChange={(value) => {
+                  if (!disabled) {
+                    field.onChange(value);
+                  }
+                }}
                 onBlur={field.onBlur}
+                disabled={disabled}
                 className="grid grid-cols-4 gap-3"
               >
                 {DURATION_DAYS_OPTIONS.map((option) => {
@@ -96,10 +104,13 @@ export const Step2 = ({ form }: Step2Props) => {
                       key={option.value}
                       htmlFor={inputId}
                       className={cn(
-                        "flex items-center justify-center p-4.5 rounded-lg border transition-colors cursor-pointer bg-white text-text-dark",
+                        "flex items-center justify-center p-4.5 rounded-lg border transition-colors bg-white text-text-dark",
+                        disabled
+                          ? "cursor-not-allowed opacity-50"
+                          : "cursor-pointer hover:border-bg-gray",
                         isSelected
                           ? "border-logo-cyan text-logo-cyan"
-                          : "border-transparent hover:border-bg-gray"
+                          : "border-transparent"
                       )}
                     >
                       <RadioGroupItem
@@ -107,6 +118,7 @@ export const Step2 = ({ form }: Step2Props) => {
                         id={inputId}
                         className="sr-only"
                         aria-label={option.label}
+                        disabled={disabled}
                       />
                       <span className="text-base font-medium">{option.label}</span>
                     </label>
@@ -133,8 +145,13 @@ export const Step2 = ({ form }: Step2Props) => {
             <FormControl>
               <RadioGroup
                 value={field.value ?? ""}
-                onValueChange={field.onChange}
+                onValueChange={(value) => {
+                  if (!disabled) {
+                    field.onChange(value);
+                  }
+                }}
                 onBlur={field.onBlur}
+                disabled={disabled}
                 className="grid grid-cols-3 gap-3"
               >
                 {FREQUENCY_OPTIONS.map((option) => {
@@ -145,10 +162,13 @@ export const Step2 = ({ form }: Step2Props) => {
                       key={option.value}
                       htmlFor={inputId}
                       className={cn(
-                        "flex flex-col gap-1 items-center justify-center p-2 rounded-lg border transition-colors cursor-pointer bg-white text-text-dark",
+                        "flex flex-col gap-1 items-center justify-center p-2 rounded-lg border transition-colors bg-white text-text-dark",
+                        disabled
+                          ? "cursor-not-allowed opacity-50"
+                          : "cursor-pointer hover:border-bg-gray",
                         isSelected
                           ? "border-logo-cyan text-logo-cyan"
-                          : "border-transparent hover:border-bg-gray"
+                          : "border-transparent"
                       )}
                     >
                       <RadioGroupItem
@@ -156,6 +176,7 @@ export const Step2 = ({ form }: Step2Props) => {
                         id={inputId}
                         className="sr-only"
                         aria-label={`${option.label} ${option.description}`}
+                        disabled={disabled}
                       />
                       <span
                         className={cn(

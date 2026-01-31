@@ -17,7 +17,6 @@ import {
 import type { CompletedTask } from "@/components/dashboard/completed-section";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeStatus } from "@/constants/practice-status";
-import { getThemeFromId } from "@/constants/practice-theme";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 
 export default function HomePage() {
@@ -53,7 +52,7 @@ export default function HomePage() {
           progress: practice.progressPercentage ?? 0,
           messagesCount: 0, // TODO: 需要從其他 API 取得
           isUnreadMessages: false, // TODO: 需要從其他 API 取得
-          theme: getThemeFromId(practice.id),
+          theme: practice.themeColor || "#FCDD84",
           status: mapPracticeStatusToTaskStatus(practice.status),
           // TODO: 需要從 practice.stats 或打卡記錄 API 獲取最新的打卡日期
           lastCheckInDate: null,

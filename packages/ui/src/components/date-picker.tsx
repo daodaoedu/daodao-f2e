@@ -63,6 +63,7 @@ interface DatePickerProps {
   className?: string;
   minDate?: Date;
   maxDate?: Date;
+  disabled?: boolean;
   onChange?: (date: Date | undefined) => void;
   onBlur?: () => void;
   onError?: (message: string) => void;
@@ -77,6 +78,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
       className,
       minDate,
       maxDate,
+      disabled = false,
       onChange,
       onBlur,
       onError,
@@ -123,8 +125,10 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           ref={ref}
           value={inputValue}
           placeholder={placeholder}
+          disabled={disabled}
           className={cn("pr-10", className, (invalid || isRangeError) && "border-red")}
           onChange={(e) => {
+            if (disabled) return;
             const inputDate = new Date(e.target.value);
             setInputValue(e.target.value);
             if (isValidDate(inputDate)) {
@@ -145,17 +149,19 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           }}
           onBlur={onBlur}
           onKeyDown={(e) => {
+            if (disabled) return;
             if (e.key === "ArrowDown") {
               e.preventDefault();
               setOpen(true);
             }
           }}
         />
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={disabled ? false : open} onOpenChange={disabled ? undefined : setOpen}>
           <PopoverTrigger asChild>
             <Button
               id="date-picker"
               variant="ghost"
+              disabled={disabled}
               className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
             >
               <CalendarIcon className="size-3.5" />
