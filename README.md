@@ -52,6 +52,18 @@ pnpm dev:product    # http://localhost:3001
 
 ### 📱 Mobile 開發 (Expo)
 
+**前置條件：**
+
+```bash
+# 安裝 EAS CLI (用於建置 App)
+npm install -g eas-cli
+
+# 登入 Expo 帳號
+eas login
+```
+
+**開發：**
+
 ```bash
 pnpm dev:mobile     # 啟動 Expo 開發伺服器
 
@@ -62,12 +74,25 @@ pnpm dev:android    # Android 模擬器
 pnpm dev:web        # Web 瀏覽器
 ```
 
-**建置 Mobile App：**
+**建置 Mobile App (使用 EAS Build)：**
 
 ```bash
-pnpm build:dev        # 開發版本
-pnpm build:preview    # 預覽版本
-pnpm build:production # 正式版本
+# 從根目錄執行
+pnpm --filter @daodao/mobile build:dev        # 開發版本
+pnpm --filter @daodao/mobile build:preview    # 預覽版本
+pnpm --filter @daodao/mobile build:production # 正式版本
+
+# 或進入 mobile 目錄執行
+cd apps/mobile
+pnpm build:dev
+pnpm build:preview
+pnpm build:production
+```
+
+**類型檢查：**
+
+```bash
+pnpm --filter @daodao/mobile typecheck
 ```
 
 ### 構建
