@@ -1,12 +1,13 @@
 import * as WebBrowser from 'expo-web-browser'
 import * as AppleAuthentication from 'expo-apple-authentication'
 import Constants from 'expo-constants'
-import { authStorage, type AuthTokens, type StoredUser } from './auth-storage'
+import { type AuthTokens, type StoredUser } from './auth-storage'
 
 // Ensure WebBrowser session is properly closed
 WebBrowser.maybeCompleteAuthSession()
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl ?? 'https://api.daodao.so'
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://api.daodao.so'
+const API_URL = `${API_BASE_URL}/api/v1`
 
 interface OAuthResult {
   tokens: AuthTokens
@@ -52,36 +53,59 @@ export const oauthService = {
       throw new Error('Google 登入失敗')
     }
 
-    // Parse and validate response
+    // Parse URL to get authorization code
     const url = new URL(result.url)
-    const accessToken = url.searchParams.get('access_token')
-    const refreshToken = url.searchParams.get('refresh_token')
-    const userId = url.searchParams.get('user_id')
-    const email = url.searchParams.get('email')
-    const name = url.searchParams.get('name')
-    const avatar = url.searchParams.get('avatar')
+    const code = url.searchParams.get('code')
 
-    // Validate required fields
-    if (!accessToken || !refreshToken || !userId || !email || !name) {
-      throw new Error('登入失敗：回應資料不完整')
+    if (!code) {
+      throw new Error('登入失敗：未取得授權碼')
+    }
+
+    // Exchange code for tokens
+    const response = await fetch(`${API_URL}/auth/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.message || 'Google 登入失敗')
+    }
+
+    const data = await response.json()
+
+    // Validate response structure
+    if (!data.accessToken || !data.refreshToken || !data.user) {
+      throw new Error('登入失敗：伺服器回應格式錯誤')
+    }
+
+    if (!data.user.id || !data.user.email || !data.user.name) {
+      throw new Error('登入失敗：用戶資料不完整')
     }
 
     // Validate token format
-    if (!validateTokenFormat(accessToken)) {
+    if (!validateTokenFormat(data.accessToken)) {
       throw new Error('登入失敗：無效的認證令牌')
     }
 
     // Validate email format
-    if (!validateEmail(email)) {
+    if (!validateEmail(data.user.email)) {
       throw new Error('登入失敗：無效的電子郵件格式')
     }
 
-    const tokens: AuthTokens = { accessToken, refreshToken }
+    const tokens: AuthTokens = {
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+    }
+
     const user: StoredUser = {
-      id: userId,
-      email,
-      name: decodeURIComponent(name),
-      avatar: avatar ? decodeURIComponent(avatar) : undefined,
+      id: data.user.id,
+      email: data.user.email,
+      name: data.user.name,
+      avatar: data.user.avatar,
     }
 
     return { tokens, user }

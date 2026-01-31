@@ -41,8 +41,8 @@ export default function QuizQuestionsScreen() {
     if (isLastQuestion) {
       // Navigate to result with answers
       router.replace({
-        pathname: `/quiz/${quizId}/result`,
-        params: { answers: JSON.stringify(updatedAnswers) },
+        pathname: '/quiz/[quizId]/result',
+        params: { quizId: quizId as string, answers: JSON.stringify(updatedAnswers) },
       })
     } else {
       setCurrentIndex(prev => prev + 1)

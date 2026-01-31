@@ -1,41 +1,55 @@
 import { useState, useCallback } from 'react'
-import { Alert, RefreshControl } from 'react-native'
+import { Alert, RefreshControl, Pressable, StyleSheet } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Button, Spinner } from 'tamagui'
+import { YStack, XStack, Text, ScrollView, Button, Spinner, Card, View } from 'tamagui'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {
   ChevronLeft,
+  ChevronRight,
   Check,
-  Flame,
-  Calendar,
-  MoreVertical,
-  Pencil,
+  X,
+  Tag,
+  Archive,
+  Trash2,
 } from '@tamagui/lucide-icons'
-import { usePractice, useCheckIn } from '@/hooks/usePractices'
+import { usePractice, useCheckIn, useCheckIns } from '@/hooks/usePractices'
 import { ProgressRing, CheckInSheet, CheckInList, ShareCheckInSheet } from '@/components'
 import { colors } from '@/generated/design-tokens'
-import type { CheckIn } from '@/types/practice'
+import type { CheckInData } from '@/components/CheckInSheet'
 
-// Mock check-in data for now
-const mockCheckIns: CheckIn[] = [
-  { id: '1', practiceId: '1', note: '今天學了新的概念，很有收穫！', createdAt: new Date().toISOString() },
-  { id: '2', practiceId: '1', createdAt: new Date(Date.now() - 86400000).toISOString() },
-  { id: '3', practiceId: '1', note: '堅持就是勝利', createdAt: new Date(Date.now() - 86400000 * 2).toISOString() },
-]
+// 狀態標籤配置
+const statusConfig: Record<string, { label: string; backgroundColor: string; textColor: string }> = {
+  draft: { label: '草稿', backgroundColor: 'rgba(255, 255, 255, 0.8)', textColor: '#666666' },
+  'not-started': { label: '未開始', backgroundColor: '#E0F4FF', textColor: '#0088CC' },
+  'in-progress': { label: '進行中', backgroundColor: '#16B9B3', textColor: '#FFFFFF' },
+  active: { label: '進行中', backgroundColor: '#16B9B3', textColor: '#FFFFFF' },
+  completed: { label: '已完成', backgroundColor: '#10B981', textColor: '#FFFFFF' },
+}
+
+// 執行時機標籤
+const timingLabels: Record<string, string> = {
+  holiday: '休假日',
+  commute: '通勤中',
+  beforeSleep: '睡前',
+  morning: '早晨',
+  lunch: '午休',
+  evening: '傍晚',
+}
 
 export default function PracticeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const router = useRouter()
   const { practice, isLoading, mutate } = usePractice(id)
   const { checkIn, isChecking } = useCheckIn()
+  const { checkIns } = useCheckIns(id)
 
   const [showCheckInSheet, setShowCheckInSheet] = useState(false)
   const [showShareSheet, setShowShareSheet] = useState(false)
 
-  const handleCheckIn = useCallback(async (note?: string) => {
+  const handleCheckIn = useCallback(async (data: CheckInData) => {
     if (!id) return { success: false, error: '無效的實踐 ID' }
 
-    const result = await checkIn({ practiceId: id, note })
+    const result = await checkIn({ practiceId: id, note: data.description })
 
     if (result.success) {
       await mutate()
@@ -49,6 +63,20 @@ export default function PracticeDetailScreen() {
   const handleRefresh = useCallback(async () => {
     await mutate()
   }, [mutate])
+
+  const handleArchive = useCallback(() => {
+    Alert.alert('封存實踐', '確定要封存此實踐嗎？', [
+      { text: '取消', style: 'cancel' },
+      { text: '封存', onPress: () => { /* TODO */ } },
+    ])
+  }, [])
+
+  const handleDelete = useCallback(() => {
+    Alert.alert('刪除實踐', '確定要刪除此實踐嗎？此操作無法復原。', [
+      { text: '取消', style: 'cancel' },
+      { text: '刪除', style: 'destructive', onPress: () => { /* TODO */ } },
+    ])
+  }, [])
 
   if (isLoading) {
     return (
@@ -79,7 +107,13 @@ export default function PracticeDetailScreen() {
     ? Math.round((practice.completedDays / practice.targetDays) * 100)
     : 0
 
-  const cardColor = practice.color || colors.primary.base
+  const status = practice.status || 'in-progress'
+  const statusInfo = statusConfig[status] || statusConfig['in-progress']
+
+  // 模擬執行時機數據
+  const executionTiming = ['holiday', 'commute', 'beforeSleep']
+  const frequency = '2-4'
+  const durationMinutes = 40
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
@@ -93,6 +127,7 @@ export default function PracticeDetailScreen() {
             tintColor={colors.primary.base}
           />
         }
+        contentContainerStyle={{ paddingBottom: 100 }}
       >
         {/* Header */}
         <XStack padding="$4" justifyContent="space-between" alignItems="center">
@@ -105,161 +140,186 @@ export default function PracticeDetailScreen() {
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
-
+          <Text fontSize={16} fontWeight="500" color="$color">
+            主題實踐
+          </Text>
           <Button
             size="$4"
             circular
             chromeless
-            accessibilityLabel="更多選項"
+            onPress={() => router.push('/')}
+            accessibilityLabel="關閉"
           >
-            <MoreVertical size={20} color="$color" />
+            <X size={20} color="$color" />
           </Button>
         </XStack>
 
-        <YStack padding="$4" gap="$5">
-          {/* Progress Section */}
-          <YStack alignItems="center" gap="$4">
-            <ProgressRing
-              progress={progress}
-              size={140}
-              strokeWidth={12}
-              color={cardColor}
-              label="完成"
-            />
+        <YStack paddingHorizontal="$5" gap="$4">
+          {/* Title Section with Navigation */}
+          <XStack alignItems="center" gap="$2" height={84}>
+            <Button
+              size="$4"
+              circular
+              backgroundColor="white"
+              opacity={0.5}
+              disabled
+            >
+              <ChevronLeft size={24} color="$color" />
+            </Button>
 
-            <YStack alignItems="center" gap="$1">
-              <Text fontSize={24} fontWeight="700" color="$color">
+            <YStack flex={1} alignItems="center" gap="$2">
+              <XStack
+                backgroundColor={statusInfo.backgroundColor}
+                paddingHorizontal="$2"
+                paddingVertical="$1"
+                borderRadius="$sm"
+              >
+                <Text fontSize={12} color={statusInfo.textColor} fontWeight="500">
+                  {statusInfo.label}
+                </Text>
+              </XStack>
+              <Text
+                fontSize={18}
+                fontWeight="600"
+                color="$color"
+                textAlign="center"
+                numberOfLines={2}
+              >
                 {practice.title}
               </Text>
-              {practice.description && (
-                <Text fontSize={14} color="$color" opacity={0.6} textAlign="center">
-                  {practice.description}
-                </Text>
-              )}
-            </YStack>
-          </YStack>
-
-          {/* Stats Cards */}
-          <XStack gap="$3">
-            <YStack
-              flex={1}
-              backgroundColor={colors.primary.palest}
-              padding="$4"
-              borderRadius="$md"
-              alignItems="center"
-              gap="$1"
-            >
-              <Text fontSize={24} fontWeight="700" color={colors.primary.darker}>
-                {practice.completedDays}
-              </Text>
-              <Text fontSize={12} color={colors.primary.darker} opacity={0.8}>
-                已完成天數
-              </Text>
             </YStack>
 
-            <YStack
-              flex={1}
-              backgroundColor={colors.semantic.warning + '15'}
-              padding="$4"
-              borderRadius="$md"
-              alignItems="center"
-              gap="$1"
+            <Button
+              size="$4"
+              circular
+              backgroundColor="white"
+              opacity={0.5}
+              disabled
             >
-              <XStack alignItems="center" gap="$1">
-                <Flame size={20} color={colors.semantic.warning} />
-                <Text fontSize={24} fontWeight="700" color={colors.semantic.warning}>
-                  {practice.currentStreak}
-                </Text>
-              </XStack>
-              <Text fontSize={12} color={colors.semantic.warning}>
-                連續天數
-              </Text>
-            </YStack>
-
-            <YStack
-              flex={1}
-              backgroundColor={colors.basic[100]}
-              padding="$4"
-              borderRadius="$md"
-              alignItems="center"
-              gap="$1"
-            >
-              <Text fontSize={24} fontWeight="700" color="$color">
-                {practice.targetDays}
-              </Text>
-              <Text fontSize={12} color="$color" opacity={0.6}>
-                目標天數
-              </Text>
-            </YStack>
+              <ChevronRight size={24} color="$color" />
+            </Button>
           </XStack>
 
-          {/* Check-in Button */}
-          {!practice.todayCheckedIn ? (
-            <Button
-              size="$5"
-              backgroundColor={cardColor}
-              pressStyle={{ opacity: 0.8 }}
-              onPress={() => setShowCheckInSheet(true)}
-              disabled={isChecking}
-              accessibilityLabel="打卡"
-            >
-              {isChecking ? (
-                <Spinner color={colors.basic.white} />
-              ) : (
-                <XStack alignItems="center" gap="$2">
-                  <Check size={20} color={colors.basic.white} />
-                  <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                    今日打卡
-                  </Text>
+          {/* Practice Overview Card */}
+          <Card
+            backgroundColor="white"
+            borderRadius={12}
+            padding="$4"
+            shadowColor="rgba(0,0,0,0.1)"
+            shadowOffset={{ width: 0, height: 2 }}
+            shadowOpacity={1}
+            shadowRadius={8}
+          >
+            <XStack>
+              <YStack flex={1} paddingRight="$4">
+                {/* Description */}
+                <Text fontSize={15} fontWeight="500" color="$color" marginBottom="$3">
+                  {practice.description || '每天學習，持續進步'}
+                </Text>
+
+                {/* Frequency */}
+                <XStack marginBottom="$3" paddingBottom="$3" borderBottomWidth={1} borderBottomColor={colors.basic[200]}>
+                  <YStack width={80}>
+                    <Text fontSize={12} color="$color" opacity={0.6}>一週</Text>
+                    <XStack alignItems="baseline" gap={2}>
+                      <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
+                        {frequency}
+                      </Text>
+                      <Text fontSize={12} color="$color">天</Text>
+                    </XStack>
+                  </YStack>
+                  <YStack width={80}>
+                    <Text fontSize={12} color="$color" opacity={0.6}>一次</Text>
+                    <XStack alignItems="baseline" gap={2}>
+                      <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
+                        {durationMinutes}
+                      </Text>
+                      <Text fontSize={12} color="$color">分鐘</Text>
+                    </XStack>
+                  </YStack>
                 </XStack>
-              )}
-            </Button>
-          ) : (
-            <YStack
-              backgroundColor={colors.semantic.success + '15'}
+
+                {/* Tags */}
+                {practice.tags && practice.tags.length > 0 && (
+                  <XStack flexWrap="wrap" gap="$2">
+                    {practice.tags.map(tag => (
+                      <XStack
+                        key={tag}
+                        backgroundColor="#E0F4FF"
+                        paddingHorizontal="$2"
+                        paddingVertical={4}
+                        borderRadius="$sm"
+                        alignItems="center"
+                        gap="$1"
+                      >
+                        <Tag size={14} color={colors.primary.lighter} />
+                        <Text fontSize={12} color="$color">{tag}</Text>
+                      </XStack>
+                    ))}
+                  </XStack>
+                )}
+              </YStack>
+
+              {/* Progress Ring */}
+              <View position="absolute" right={16} top={16}>
+                <ProgressRing
+                  progress={progress}
+                  size={72}
+                  strokeWidth={6}
+                  color={colors.primary.base}
+                />
+              </View>
+            </XStack>
+          </Card>
+
+          {/* Execution Timing & Duration */}
+          <XStack gap="$3">
+            {/* Execution Timing Card */}
+            <Card
+              flex={1}
+              backgroundColor={colors.primary.palest}
+              borderRadius={12}
               padding="$4"
-              borderRadius="$md"
-              alignItems="center"
-              gap="$1"
             >
-              <XStack alignItems="center" gap="$2">
-                <Check size={20} color={colors.semantic.success} />
-                <Text fontSize={16} fontWeight="600" color={colors.semantic.success}>
-                  今日已完成
+              <Text fontSize={12} color={colors.primary.darker} marginBottom="$2">
+                執行時機
+              </Text>
+              <XStack flexWrap="wrap" gap="$1">
+                {executionTiming.map(timing => (
+                  <XStack
+                    key={timing}
+                    backgroundColor="white"
+                    paddingHorizontal="$2"
+                    paddingVertical={4}
+                    borderRadius="$sm"
+                  >
+                    <Text fontSize={12} color={colors.primary.base}>
+                      {timingLabels[timing] || timing}
+                    </Text>
+                  </XStack>
+                ))}
+              </XStack>
+            </Card>
+
+            {/* Duration Card */}
+            <Card
+              flex={1}
+              backgroundColor={colors.primary.palest}
+              borderRadius={12}
+              padding="$4"
+            >
+              <Text fontSize={12} color={colors.primary.darker} marginBottom="$2">
+                剩餘天數
+              </Text>
+              <XStack alignItems="baseline" gap={4}>
+                <Text fontSize={24} fontWeight="600" color={colors.primary.darker}>
+                  {practice.targetDays - practice.completedDays}
+                </Text>
+                <Text fontSize={12} color={colors.primary.darker}>
+                  / {practice.targetDays} 天
                 </Text>
               </XStack>
-            </YStack>
-          )}
-
-          {/* Action Buttons */}
-          <XStack gap="$3">
-            <Button
-              flex={1}
-              size="$4"
-              backgroundColor="transparent"
-              borderWidth={1}
-              borderColor="$borderColor"
-              onPress={() => router.push(`/practices/${id}/calendar`)}
-            >
-              <XStack alignItems="center" gap="$2">
-                <Calendar size={18} color="$color" />
-                <Text color="$color">日曆</Text>
-              </XStack>
-            </Button>
-
-            <Button
-              flex={1}
-              size="$4"
-              backgroundColor="transparent"
-              borderWidth={1}
-              borderColor="$borderColor"
-              onPress={() => router.push(`/practices/${id}/edit`)}
-            >
-              <XStack alignItems="center" gap="$2">
-                <Pencil size={18} color="$color" />
-                <Text color="$color">編輯</Text>
-              </XStack>
-            </Button>
+            </Card>
           </XStack>
 
           {/* Check-in History */}
@@ -267,10 +327,87 @@ export default function PracticeDetailScreen() {
             <Text fontSize={16} fontWeight="600" color="$color">
               打卡紀錄
             </Text>
-            <CheckInList checkIns={mockCheckIns} />
+            <CheckInList checkIns={checkIns || []} />
+          </YStack>
+
+          {/* Action Buttons */}
+          <YStack alignItems="center" gap="$3" marginTop="$4">
+            <Button
+              backgroundColor="white"
+              borderRadius="$md"
+              paddingHorizontal="$6"
+              onPress={handleArchive}
+            >
+              <XStack alignItems="center" gap="$2">
+                <Archive size={18} color="$color" />
+                <Text color="$color">封存實踐</Text>
+              </XStack>
+            </Button>
+
+            <Button
+              backgroundColor="transparent"
+              borderWidth={1}
+              borderColor={colors.primary.base}
+              borderRadius="$md"
+              paddingHorizontal="$6"
+              onPress={handleDelete}
+            >
+              <XStack alignItems="center" gap="$2">
+                <Trash2 size={18} color="$color" />
+                <Text color="$color">刪除實踐</Text>
+              </XStack>
+            </Button>
           </YStack>
         </YStack>
       </ScrollView>
+
+      {/* Fixed Bottom Check-in Button */}
+      <YStack
+        position="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+        padding="$4"
+        backgroundColor="$background"
+        borderTopWidth={1}
+        borderTopColor="$borderColor"
+      >
+        {!practice.todayCheckedIn ? (
+          <Button
+            size="$5"
+            backgroundColor="#FF8C42"
+            borderRadius="$md"
+            pressStyle={{ opacity: 0.8 }}
+            onPress={() => setShowCheckInSheet(true)}
+            disabled={isChecking}
+          >
+            {isChecking ? (
+              <Spinner color="white" />
+            ) : (
+              <XStack alignItems="center" gap="$2">
+                <Check size={18} color="white" />
+                <Text color="white" fontWeight="600" fontSize={16}>
+                  打卡
+                </Text>
+              </XStack>
+            )}
+          </Button>
+        ) : (
+          <Button
+            size="$5"
+            backgroundColor={colors.semantic.success}
+            borderRadius="$md"
+            disabled
+          >
+            <XStack alignItems="center" gap="$2">
+              <Check size={18} color="white" />
+              <Text color="white" fontWeight="600" fontSize={16}>
+                今日已完成
+              </Text>
+            </XStack>
+          </Button>
+        )}
+      </YStack>
 
       {/* Check-in Sheet */}
       <CheckInSheet

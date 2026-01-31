@@ -36,8 +36,15 @@ export function usePractices() {
 
   // 使用 useMemo 避免每次 render 都重新計算
   const { activePractices, completedPractices, todayPending, todayCompleted } = useMemo(() => {
-    const active = practices.filter(p => p.status === 'active')
-    const completed = practices.filter(p => p.status === 'completed')
+    // 進行中的實踐 (包含 draft, not-started, in-progress, active)
+    const activeStatuses = ['draft', 'not-started', 'in-progress', 'active']
+    const active = practices.filter(p => activeStatuses.includes(p.status))
+
+    // 已完成的實踐
+    const completed = practices.filter(p =>
+      p.status === 'completed' || p.isCompleted
+    )
+
     const pending = active.filter(p => !p.todayCheckedIn)
     const done = active.filter(p => p.todayCheckedIn)
 

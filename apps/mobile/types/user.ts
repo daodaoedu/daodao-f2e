@@ -4,6 +4,8 @@ export interface User {
   name: string
   avatar?: string
   bio?: string
+  location?: string
+  learningType?: string
   createdAt: string
   updatedAt: string
 }
@@ -25,7 +27,7 @@ export interface UserProfile extends User {
 }
 
 export interface SocialLink {
-  platform: 'github' | 'twitter' | 'linkedin' | 'website' | 'instagram'
+  platform: 'line' | 'facebook' | 'instagram' | 'threads' | 'linkedin'
   url: string
 }
 

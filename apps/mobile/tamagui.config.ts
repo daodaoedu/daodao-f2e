@@ -82,8 +82,14 @@ const tokens = createTokens({
     mascotAqua: colors.mascot.aqua,
     mascotBrightBlue: colors.mascot.brightBlue,
   },
-  space: spacing,
-  radius: radius,
+  space: {
+    ...spacing,
+    true: spacing[4], // 預設 spacing 為 $4 (16px)
+  },
+  radius: {
+    ...radius,
+    true: radius.md, // 預設 radius 為 md
+  },
 })
 
 // 主題配置

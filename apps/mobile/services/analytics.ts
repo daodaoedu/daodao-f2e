@@ -14,16 +14,26 @@
  *
  * Platform support:
  * - PostHog: iOS, Android, Web
- * - Firebase Analytics: iOS, Android only (requires native configuration)
- * - Clarity: iOS, Android only
+ * - Firebase Analytics: iOS, Android only (requires native configuration, not available in Expo Go)
+ * - Clarity: iOS, Android only (not available in Expo Go)
  *
  * @see https://posthog.com/docs/libraries/react-native
  * @see https://rnfirebase.io/analytics/usage
  * @see https://learn.microsoft.com/en-us/clarity/mobile-sdk/react-native-sdk
  */
 import PostHog from 'posthog-react-native'
-import analytics, { type FirebaseAnalyticsTypes } from '@react-native-firebase/analytics'
-import * as Clarity from '@microsoft/react-native-clarity'
+import Constants from 'expo-constants'
+
+// Firebase and Clarity require native modules - only available in development builds
+// They will be dynamically imported to avoid crashes in Expo Go
+type FirebaseAnalyticsModule = typeof import('@react-native-firebase/analytics')
+type ClarityModule = typeof import('@microsoft/react-native-clarity')
+
+let firebaseAnalytics: FirebaseAnalyticsModule['default'] | null = null
+let Clarity: ClarityModule | null = null
+
+// Check if running in Expo Go (no native modules available)
+const isExpoGo = Constants.appOwnership === 'expo'
 
 // PostHog Configuration
 const POSTHOG_KEY = process.env.EXPO_PUBLIC_POSTHOG_KEY || ''
@@ -113,9 +123,11 @@ class AnalyticsService {
       console.log('[Analytics] PostHog key not configured, skipping')
     }
 
-    // Initialize Microsoft Clarity
-    if (CLARITY_PROJECT_ID) {
+    // Initialize Microsoft Clarity (not available in Expo Go)
+    if (CLARITY_PROJECT_ID && !isExpoGo) {
       try {
+        const clarityModule = await import('@microsoft/react-native-clarity')
+        Clarity = clarityModule
         Clarity.initialize(CLARITY_PROJECT_ID)
         this.clarityInitialized = true
 
@@ -128,26 +140,36 @@ class AnalyticsService {
         }
       }
     } else if (__DEV__) {
-      console.log('[Analytics] Clarity project ID not configured, skipping')
+      if (isExpoGo) {
+        console.log('[Analytics] Clarity not available in Expo Go, skipping')
+      } else {
+        console.log('[Analytics] Clarity project ID not configured, skipping')
+      }
     }
 
-    // Initialize Firebase Analytics
-    try {
-      const firebaseAnalytics = analytics()
-      if (firebaseAnalytics) {
-        await firebaseAnalytics.setAnalyticsCollectionEnabled(true)
-        this.firebaseInitialized = true
+    // Initialize Firebase Analytics (not available in Expo Go)
+    if (!isExpoGo) {
+      try {
+        const firebaseModule = await import('@react-native-firebase/analytics')
+        firebaseAnalytics = firebaseModule.default
+        const analyticsInstance = firebaseAnalytics()
+        if (analyticsInstance) {
+          await analyticsInstance.setAnalyticsCollectionEnabled(true)
+          this.firebaseInitialized = true
 
-        if (__DEV__) {
-          console.log('[Analytics] Firebase Analytics initialized')
+          if (__DEV__) {
+            console.log('[Analytics] Firebase Analytics initialized')
+          }
+        } else if (__DEV__) {
+          console.warn('[Analytics] Firebase Analytics not available')
         }
-      } else if (__DEV__) {
-        console.warn('[Analytics] Firebase Analytics not available')
+      } catch (error) {
+        if (__DEV__) {
+          console.error('[Analytics] Firebase Analytics failed to initialize:', error)
+        }
       }
-    } catch (error) {
-      if (__DEV__) {
-        console.error('[Analytics] Firebase Analytics failed to initialize:', error)
-      }
+    } else if (__DEV__) {
+      console.log('[Analytics] Firebase Analytics not available in Expo Go, skipping')
     }
 
     this.initialized = true
@@ -160,11 +182,11 @@ class AnalyticsService {
   /**
    * Safely get Firebase Analytics instance
    */
-  private getFirebaseAnalytics(): FirebaseAnalyticsTypes.Module | null {
-    if (!this.firebaseInitialized) return null
+  private getFirebaseAnalytics(): ReturnType<NonNullable<typeof firebaseAnalytics>> | null {
+    if (!this.firebaseInitialized || !firebaseAnalytics) return null
 
     try {
-      return analytics()
+      return firebaseAnalytics()
     } catch (error) {
       if (__DEV__) {
         console.error('[Analytics] Failed to get Firebase Analytics instance:', error)
@@ -228,7 +250,7 @@ class AnalyticsService {
       }
 
       // Clarity set custom user ID
-      if (this.clarityInitialized) {
+      if (this.clarityInitialized && Clarity) {
         Clarity.setCustomUserId(user.id)
       }
 
@@ -258,7 +280,7 @@ class AnalyticsService {
       }
 
       // Clarity doesn't have a reset method, but we can clear the custom user ID
-      if (this.clarityInitialized) {
+      if (this.clarityInitialized && Clarity) {
         Clarity.setCustomUserId('')
       }
 
@@ -291,7 +313,7 @@ class AnalyticsService {
       }
 
       // Clarity - explicitly set screen name for better tracking
-      if (this.clarityInitialized) {
+      if (this.clarityInitialized && Clarity) {
         Clarity.setCurrentScreenName(screenName)
       }
 
@@ -420,7 +442,7 @@ class AnalyticsService {
 
   // Clarity specific methods
   setCustomTag(key: string, value: string): void {
-    if (this.clarityInitialized) {
+    if (this.clarityInitialized && Clarity) {
       try {
         Clarity.setCustomTag(key, value)
       } catch (error) {

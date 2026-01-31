@@ -5,6 +5,9 @@
   "description": "DaoDao Frontend Monorepo",
   "scripts": {
     "dev": "turbo run dev",
+    "dev:website": "pnpm --filter @daodao/website dev",
+    "dev:product": "pnpm --filter @daodao/product dev",
+    "dev:mobile": "pnpm --filter @daodao/mobile dev",
     "build": "turbo run build",
     "start": "turbo run start",
     "lint": "turbo run lint",

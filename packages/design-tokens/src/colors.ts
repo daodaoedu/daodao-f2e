@@ -57,6 +57,21 @@ export const colors = {
     gray: '#F3F4F6',
     veryLightGray: '#FAFAFA',
     veryLightBlue: '#F0FDFA',
+    lightCyan: '#B8E8FD', // banner 漸層底色
+  },
+
+  // 文字色彩 - 對應 CSS 變數
+  text: {
+    dark: '#333333', // --text-dark
+    light: '#FFFFFF',
+    muted: '#6B7280', // --light-gray
+  },
+
+  // 邊框色彩
+  border: {
+    light: '#E5E7EB',
+    lightCyan: '#C1ECFF',
+    white: '#FFFFFF',
   },
 
   // Quiz 島嶼主題色

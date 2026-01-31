@@ -1,7 +1,7 @@
-import Constants from 'expo-constants'
 import { authStorage } from './auth-storage'
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl ?? 'https://api.daodao.so'
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://api.daodao.so'
+const API_URL = `${API_BASE_URL}/api/v1`
 const REQUEST_TIMEOUT = 30000 // 30 seconds
 
 interface RefreshTokenResponse {
