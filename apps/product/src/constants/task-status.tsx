@@ -1,4 +1,5 @@
 import type { BadgeProps } from "@daodao/ui/components/badge";
+import { PracticeStatus } from "./practice-status";
 
 /**
  * 任務狀態運行時常數
@@ -63,5 +64,24 @@ const statusConfig: Record<TaskStatus, StatusConfig> = {
  * 取得完整的 status 配置（包含 label, variant, icon, buttonLabel）
  */
 export const getStatusConfig = (status: TaskStatus | string): StatusConfig => {
-  return statusConfig[status as TaskStatus] ?? statusConfig[TaskStatus.draft];
+  return statusConfig[status as TaskStatus];
+};
+
+/**
+ * 將 API 的 PracticeStatus 映射到 TaskStatus
+ */
+export const mapPracticeStatusToTaskStatus = (status: PracticeStatus): TaskStatus => {
+  if (status === PracticeStatus.active) {
+    return TaskStatus.inProgress;
+  }
+  if (status === PracticeStatus.draft) {
+    return TaskStatus.draft;
+  }
+  if (status === PracticeStatus.notStarted) {
+    return TaskStatus.notStarted;
+  }
+  if (status === PracticeStatus.completed) {
+    return TaskStatus.completed;
+  }
+  return TaskStatus.completed;
 };

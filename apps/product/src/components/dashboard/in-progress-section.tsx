@@ -35,6 +35,7 @@ interface InProgressSectionProps {
 }
 
 export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
+  console.log("tasks", tasks);
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
 
   const filteredTasks =
@@ -42,7 +43,7 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
       ? tasks
       : tasks.filter((task) => task.status === filterStatus);
 
-  if (filteredTasks.length === 0) {
+  if (tasks.length === 0) {
     return null;
   }
 

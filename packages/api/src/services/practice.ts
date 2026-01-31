@@ -31,6 +31,10 @@ export type IGetRandomPracticeTemplatesParams = NonNullable<
   paths["/api/v1/practices/templates/random"]["get"]["parameters"]["query"]
 >;
 
+export type IGetPracticeCheckInsParams = NonNullable<
+  paths["/api/v1/practices/{id}/checkins"]["get"]["parameters"]["query"]
+>;
+
 // ============================================================================
 // Client Functions (用於 Server Components 或直接調用)
 // ============================================================================
@@ -119,6 +123,43 @@ export const getRandomPracticeTemplates = async (params?: IGetRandomPracticeTemp
   });
 };
 
+/**
+ * 獲取單一實踐詳情
+ */
+export const getPracticeById = async (id: string) => {
+  return client.GET("/api/v1/practices/{id}", {
+    params: {
+      path: {
+        id,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取實踐的打卡記錄列表
+ */
+export const getPracticeCheckIns = async (
+  id: string,
+  params?: IGetPracticeCheckInsParams
+) => {
+  return client.GET("/api/v1/practices/{id}/checkins", {
+    params: {
+      path: {
+        id,
+      },
+      query: {
+        page: params?.page,
+        limit: params?.limit,
+        startDate: params?.startDate,
+        endDate: params?.endDate,
+        mood: params?.mood,
+        include: params?.include,
+      },
+    },
+  });
+};
+
 // ============================================================================
 // Export Types
 // ============================================================================
@@ -129,7 +170,13 @@ type PracticeTemplatesResponse =
 type PracticeTemplateCategoriesResponse =
   paths["/api/v1/practices/templates/categories"]["get"]["responses"]["200"]["content"]["application/json"];
 
+type PracticeDetailResponse =
+  paths["/api/v1/practices/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
+
+type PracticeCheckInsResponse =
+  paths["/api/v1/practices/{id}/checkins"]["get"]["responses"]["200"]["content"]["application/json"];
+
 // 從回應中提取 PracticeTemplateType 類型（單一模板項目的數據類型）
 export type PracticeTemplateType = NonNullable<PracticeTemplatesResponse["data"]>[number];
 
-export type { PracticeListResponse, PracticeStatsResponse, PracticeTemplatesResponse, PracticeTemplateCategoriesResponse };
+export type { PracticeListResponse, PracticeStatsResponse, PracticeTemplatesResponse, PracticeTemplateCategoriesResponse, PracticeDetailResponse, PracticeCheckInsResponse };

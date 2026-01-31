@@ -5,12 +5,14 @@ import ClippedCircleSvg from "@daodao/assets/images/dashboard/clipped-circle.svg
 import HexagonSvg from "@daodao/assets/images/dashboard/hexagon.svg";
 import SemiCircleSvg from "@daodao/assets/images/dashboard/semi-circle.svg";
 import SpeechBubbleSvg from "@daodao/assets/images/dashboard/speech-bubble.svg";
+import type { PracticeCheckInsResponse } from "@daodao/api";
 import { Link } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
+import { format, isValid, parse } from "date-fns";
 import Matter from "matter-js";
 import * as decomp from "poly-decomp-es";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { MOOD_OPTIONS, MoodType, type MoodType as MoodTypeType } from "@/constants/mood";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { MOOD_OPTIONS, mapApiMoodToMoodType, type MoodType as MoodTypeType } from "@/constants/mood";
 import type { IBodyPosition, ICheckInItem, ISvgGeometry } from "../types";
 
 const { Engine, World, Bodies, Vertices, Runner, Body } = Matter;
@@ -252,64 +254,24 @@ const MOOD_MAP = Object.fromEntries(
   MOOD_OPTIONS.map((option) => [option.id, option.emoji])
 ) as Record<MoodTypeType, React.FC<React.SVGProps<SVGSVGElement>>>;
 
-const defaultItems: ICheckInItem[] = [
-  {
-    id: "1",
-    date: "2026.01.01",
-    mood: MoodType.happy,
-    content:
-      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第一次打卡",
-  },
-  {
-    id: "2",
-    date: "2026.01.03",
-    mood: MoodType.neutral,
-    content:
-      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第二次打卡",
-  },
-  {
-    id: "3",
-    date: "2026.01.04",
-    mood: MoodType.bored,
-    content:
-      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
-  },
-  {
-    id: "4",
-    date: "2026.01.05",
-    mood: MoodType.fine,
-    content:
-      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
-  },
-  {
-    id: "5",
-    date: "2026.01.09",
-    mood: MoodType.frustrated,
-    content:
-      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
-  },
-  {
-    id: "6",
-    date: "2026.01.11",
-    mood: MoodType.frustrated,
-    content:
-      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
-  },
-  {
-    id: "7",
-    date: "2026.01.13",
-    mood: MoodType.frustrated,
-    content:
-      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
-  },
-];
+/**
+ * 將 API 的 checkinDate 格式轉換為顯示格式
+ * 從 "2024-01-20" 轉換為 "2024.01.20"
+ */
+const formatCheckInDate = (checkinDate: string): string => {
+  const date = parse(checkinDate, "yyyy-MM-dd", new Date());
+  if (!isValid(date)) {
+    return checkinDate.replace(/-/g, ".");
+  }
+  return format(date, "yyyy.MM.dd");
+};
 
 interface ICheckInStackProps {
-  practiceId?: string;
-  items?: ICheckInItem[];
+  practiceId: string;
+  checkInsData?: PracticeCheckInsResponse;
 }
 
-export const CheckInStack = ({ practiceId, items = defaultItems }: ICheckInStackProps) => {
+export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRefsRef = useRef<(SVGSVGElement | null)[]>([]);
   const bodiesRef = useRef<Matter.Body[]>([]);
@@ -317,7 +279,37 @@ export const CheckInStack = ({ practiceId, items = defaultItems }: ICheckInStack
   const [containerHeight, setContainerHeight] = useState(MIN_CONTAINER_HEIGHT);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const [svgGeometries, setSvgGeometries] = useState<(ISvgGeometry | null)[]>([]);
+
+  // 將 API 資料轉換為 ICheckInItem[] 格式
+  const items: ICheckInItem[] = useMemo(() => {
+    if (!checkInsData?.data) {
+      return [];
+    }
+
+    return checkInsData.data
+      .map((checkIn) => {
+        const moodType = mapApiMoodToMoodType(checkIn.mood);
+        // 如果沒有心情類型，跳過這個打卡記錄
+        if (!moodType) {
+          return null;
+        }
+
+        return {
+          id: String(checkIn.id),
+          date: formatCheckInDate(checkIn.checkinDate),
+          mood: moodType,
+          content: checkIn.note || "",
+        };
+      })
+      .filter((item): item is ICheckInItem => item !== null);
+  }, [checkInsData]);
+
   const count = items.length;
+
+  // 如果沒有資料（載入完成後），不顯示任何內容
+  if (count === 0) {
+    return null;
+  }
 
   /**
    * 獲取 SVG 組件配置
@@ -598,7 +590,7 @@ export const CheckInStack = ({ practiceId, items = defaultItems }: ICheckInStack
         if (!item) return null;
 
         const { mood, date, content } = item;
-        const Emoji = MOOD_MAP[mood] ?? MOOD_OPTIONS[0]?.emoji;
+        const Emoji = (MOOD_MAP[mood as MoodTypeType] ?? MOOD_OPTIONS[0]?.emoji) as React.FC<React.SVGProps<SVGSVGElement>>;
 
         return (
           <Link

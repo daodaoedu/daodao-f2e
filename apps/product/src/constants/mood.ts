@@ -38,3 +38,31 @@ export const MOOD_OPTIONS: MoodOption[] = [
   { id: MoodType.fine, label: "還不錯", emoji: FineSvg },
   { id: MoodType.happy, label: "開心", emoji: HappySvg },
 ];
+
+/**
+ * API mood 值類型
+ */
+export type ApiMoodType = "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
+
+/**
+ * API mood 值到前端 MoodType 的映射
+ */
+export const ApiMoodToMoodTypeMap: Record<ApiMoodType, MoodType> = {
+  give_up: MoodType.hopeless,
+  frustrated: MoodType.frustrated,
+  bored: MoodType.bored,
+  neutral: MoodType.neutral,
+  good: MoodType.fine,
+  happy: MoodType.happy,
+} as const;
+
+/**
+ * 將 API 的 mood 值映射到前端的 MoodType
+ */
+export const mapApiMoodToMoodType = (apiMood: ApiMoodType | undefined): MoodType | null => {
+  if (!apiMood) {
+    return null;
+  }
+
+  return ApiMoodToMoodTypeMap[apiMood] ?? null;
+};

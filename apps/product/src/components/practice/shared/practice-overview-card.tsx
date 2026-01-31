@@ -12,7 +12,6 @@ interface PracticeOverviewCardProps {
   tags?: ManualPracticeFormValues["tags"];
   // 詳情頁專用屬性
   progress?: number; // 進度值
-  total?: number; // 總數（用於計算進度百分比）
   showProgress?: boolean; // 是否顯示進度條
 }
 
@@ -22,12 +21,8 @@ export const PracticeOverviewCard = ({
   durationMinutes,
   tags,
   progress,
-  total,
   showProgress = false,
 }: PracticeOverviewCardProps) => {
-  const progressPercentage =
-    showProgress && total && total > 0 && progress !== undefined ? (progress / total) * 100 : 0;
-
   return (
     <div className="relative bg-white rounded-lg p-4 mb-4 shadow-sm">
       <div className="flex items-start gap-4">
@@ -72,9 +67,9 @@ export const PracticeOverviewCard = ({
         </div>
 
         {/* Circular Progress - 僅在詳情頁顯示 */}
-        {showProgress && (
+        {showProgress && typeof progress === "number" && (
           <div className="absolute right-4 top-4">
-            <CircularProgress value={progressPercentage} />
+            <CircularProgress value={progress} />
           </div>
         )}
       </div>

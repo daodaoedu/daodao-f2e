@@ -18,24 +18,7 @@ import type { CompletedTask } from "@/components/dashboard/completed-section";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeStatus } from "@/constants/practice-status";
 import { getThemeFromId } from "@/constants/practice-theme";
-import { TaskStatus } from "@/constants/task-status";
-
-/**
- * 將 API 的 status 映射到 TaskStatus
- */
-const mapApiStatusToTaskStatus = (status: PracticeStatus): TaskStatus => {
-  if (status === PracticeStatus.active) {
-    return TaskStatus.inProgress;
-  }
-  if (status === PracticeStatus.draft || status === PracticeStatus.notStarted) {
-    return TaskStatus.draft;
-  }
-  if (status === PracticeStatus.completed) {
-    return TaskStatus.completed;
-  }
-  // archived 狀態不應該出現在進行中或已完成列表
-  return TaskStatus.draft;
-};
+import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 
 export default function HomePage() {
   const router = useRouter();
@@ -71,7 +54,7 @@ export default function HomePage() {
           messagesCount: 0, // TODO: 需要從其他 API 取得
           isUnreadMessages: false, // TODO: 需要從其他 API 取得
           theme: getThemeFromId(practice.id),
-          status: mapApiStatusToTaskStatus(practice.status),
+          status: mapPracticeStatusToTaskStatus(practice.status),
         });
       } else if (practice.status === PracticeStatus.completed) {
         completedTasksData.push({

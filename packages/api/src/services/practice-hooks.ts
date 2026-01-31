@@ -11,6 +11,7 @@ import type {
   IGetPracticeStatsParams,
   IGetPracticeTemplatesParams,
   IGetRandomPracticeTemplatesParams,
+  IGetPracticeCheckInsParams,
 } from "./practice";
 
 // ============================================================================
@@ -96,6 +97,43 @@ export const useRandomPracticeTemplates = (params?: IGetRandomPracticeTemplatesP
       query: {
         count: params?.count,
         category: params?.category,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取單一實踐詳情的 Hook
+ */
+export const usePracticeById = (id: string) => {
+  return useQuery("/api/v1/practices/{id}", {
+    params: {
+      path: {
+        id,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取實踐打卡記錄列表的 Hook
+ */
+export const usePracticeCheckIns = (
+  id: string,
+  params?: IGetPracticeCheckInsParams
+) => {
+  return useQuery("/api/v1/practices/{id}/checkins", {
+    params: {
+      path: {
+        id,
+      },
+      query: {
+        page: params?.page,
+        limit: params?.limit,
+        startDate: params?.startDate,
+        endDate: params?.endDate,
+        mood: params?.mood,
+        include: params?.include,
       },
     },
   });

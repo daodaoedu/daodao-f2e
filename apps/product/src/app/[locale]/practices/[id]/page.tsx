@@ -1,8 +1,10 @@
 "use client";
 
+import { usePracticeById, usePracticeCheckIns } from "@daodao/api";
 import { useParams } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Archive, Trash2 } from "lucide-react";
+import { useMemo } from "react";
 import { CheckInButton, CheckInRecordCard, CheckInStack } from "@/components/check-in";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import {
@@ -13,58 +15,101 @@ import {
   PracticeOverviewCard,
 } from "@/components/practice";
 import {
+  DurationDays,
+  ExecutionTiming,
+  Frequency,
+  PracticeTimePeriodToExecutionTimingMap,
+} from "@/constants/practice-form";
+import {
   ArchivePracticeResult,
   useArchivePracticeDialog,
 } from "@/hooks/use-archive-practice-dialog";
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
 
-const practice: ManualPracticeFormValues & {
-  total: number;
-  currentProgress: number;
-} = {
-  // Step 1
-  name: "學習 Vibe coding",
-  actionDescription: "搭配 Gemini,看 30 天線上教學、實際 做一個專案。",
-  durationMinutes: 40,
-
-  // Step 2
-  startDate: "2026-01-01",
-  durationDays: "7",
-  frequency: "2-4",
-
-  // Step 3
-  executionTiming: ["holiday", "commute", "beforeSleep"],
-  customTiming: "",
-
-  // Step 4
-  tags: ["專案管理", "software", "applications", "產品設計", "AI"],
-  resources: [
-    {
-      id: "1",
-      name: "Hahow",
-      url: "https://hahow.in/",
-    },
-    {
-      id: "2",
-      name: "Hahow",
-    },
-    {
-      id: "3",
-      name: "我來試試看這個特別長的資源名稱",
-      url: "https://example.com/",
-    },
-  ],
-
-  total: 7,
-  currentProgress: 5,
-};
-
 export default function PracticeDetailPage() {
   const params = useParams();
   const practiceId = params.id as string;
 
+  const { data: practiceData, isLoading, error } = usePracticeById(practiceId);
+  const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
+    limit: 30,
+  });
   const { openArchiveDialog } = useArchivePracticeDialog();
   const { openDeleteDialog } = useDeletePracticeDialog();
+
+  // 將 API 資料轉換為頁面需要的格式
+  const practice: (ManualPracticeFormValues & {
+    total: number;
+    currentProgress: number;
+  }) | null = useMemo(() => {
+    if (!practiceData?.data) {
+      return null;
+    }
+
+    const data = practiceData.data;
+
+    // 轉換 durationDays: number -> DurationDays (字串字面量)
+    let durationDays: DurationDays = DurationDays.seven;
+    if (data.durationDays) {
+      const durationDaysNumber = data.durationDays;
+      if (durationDaysNumber === 7) {
+        durationDays = DurationDays.seven;
+      } else if (durationDaysNumber === 14) {
+        durationDays = DurationDays.fourteen;
+      } else if (durationDaysNumber === 21) {
+        durationDays = DurationDays.twentyOne;
+      } else if (durationDaysNumber === 30) {
+        durationDays = DurationDays.thirty;
+      }
+    }
+
+    // 轉換 frequency: frequencyMinDays + frequencyMaxDays -> Frequency
+    const frequencyMin = data.frequencyMinDays ?? 0;
+    const frequencyMax = data.frequencyMaxDays ?? 0;
+    let frequency: Frequency = Frequency.twoToFour;
+    if (frequencyMin > 0 && frequencyMax > 0) {
+      const frequencyStr = `${frequencyMin}-${frequencyMax}` as Frequency;
+      if (
+        frequencyStr === Frequency.twoToFour ||
+        frequencyStr === Frequency.threeToFive ||
+        frequencyStr === Frequency.fourToSeven
+      ) {
+        frequency = frequencyStr;
+      }
+    }
+
+    // 轉換 executionTiming: practiceTimePeriods -> ExecutionTiming[]
+    const executionTiming: ExecutionTiming[] = (data.practiceTimePeriods || [])
+      .map((period: string) => PracticeTimePeriodToExecutionTimingMap[period])
+      .filter((timing): timing is ExecutionTiming => timing !== undefined);
+
+    // 如果沒有有效的 executionTiming，使用預設值
+    const finalExecutionTiming =
+      executionTiming.length > 0 ? executionTiming : [ExecutionTiming.morning];
+
+    return {
+      // Step 1
+      name: data.title,
+      actionDescription: data.practiceAction || "",
+      durationMinutes: data.sessionDurationMinutes ?? 0,
+
+      // Step 2
+      startDate: data.startDate || "",
+      durationDays,
+      frequency,
+
+      // Step 3
+      executionTiming: finalExecutionTiming,
+      customTiming: data.otherContext || "",
+
+      // Step 4
+      tags: data.tags || [],
+      resources: [], // TODO: 需要從 API 取得資源列表
+
+      total: data.durationDays ?? 0,
+      currentProgress: data.progressPercentage ?? 0,
+    };
+  }, [practiceData]);
 
   const handleArchive = async () => {
     const result = await openArchiveDialog(practiceId);
@@ -89,6 +134,34 @@ export default function PracticeDetailPage() {
     // router.push(`/practices/${nextId}`);
   };
 
+  // Loading 狀態
+  if (isLoading) {
+    return (
+      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+        <PageHeader leftAction="back" title="主題實踐" rightActionTo="/" />
+        <BackgroundAnimation />
+        <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
+          <div className="text-center text-text-dark">載入中...</div>
+        </main>
+      </div>
+    );
+  }
+
+  // Error 狀態
+  if (error || !practice) {
+    return (
+      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+        <PageHeader leftAction="back" title="主題實踐" rightActionTo="/" />
+        <BackgroundAnimation />
+        <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
+          <div className="text-center text-text-dark">
+            {error ? "載入失敗，請稍後再試" : "找不到此實踐"}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <PageHeader leftAction="back" title="主題實踐" rightActionTo="/" />
@@ -101,8 +174,8 @@ export default function PracticeDetailPage() {
           title={practice.name}
           onPrevious={handlePrevious}
           onNext={handleNext}
-          hasPrevious={false} // TODO: 從 API 取得
-          hasNext={false} // TODO: 從 API 取得
+          hasPrevious={false} // TODO: 從 API 取得實踐列表來判斷
+          hasNext={false} // TODO: 從 API 取得實踐列表來判斷
         />
 
         {/* Practice Overview Card */}
@@ -112,7 +185,6 @@ export default function PracticeDetailPage() {
           durationMinutes={practice.durationMinutes}
           tags={practice.tags}
           progress={practice.currentProgress}
-          total={practice.total}
           showProgress
         />
 
@@ -125,18 +197,20 @@ export default function PracticeDetailPage() {
           <ExecutionDurationCard
             durationDays={practice.durationDays}
             startDate={practice.startDate}
-            currentProgress={practice.currentProgress}
             showRemaining
           />
         </div>
 
         {/* Check-in Record Card */}
-        <CheckInRecordCard />
+        <CheckInRecordCard
+          checkInsData={checkInsData}
+          isLoading={isLoadingCheckIns}
+        />
       </main>
 
       {/* CheckIn Stack */}
       <div className="max-w-[448px] mx-auto">
-        <CheckInStack practiceId={practiceId} />
+        <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
       </div>
 
       <div className="flex flex-col w-fit gap-4 mx-auto pb-40 pt-6">
