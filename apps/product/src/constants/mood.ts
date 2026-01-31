@@ -1,3 +1,4 @@
+import type { ElementType } from "react";
 import {
   BoredSvg,
   FineSvg,
@@ -12,7 +13,7 @@ export type MoodType = "hopeless" | "frustrated" | "bored" | "neutral" | "fine" 
 export interface MoodOption {
   id: MoodType;
   label: string;
-  emoji: React.FC<React.SVGProps<SVGSVGElement>>;
+  emoji: ElementType;
 }
 
 export const MOOD_OPTIONS: MoodOption[] = [

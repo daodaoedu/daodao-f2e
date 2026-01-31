@@ -236,15 +236,25 @@ function convertSvgToComponent(svgFile: SvgFile): string {
   // Convert attributes in inner content
   svgWithoutTags = convertSvgContent(svgWithoutTags);
 
-  const componentCode = `import type { SVGProps } from "react";
+  const componentCode = `import { forwardRef } from "react";
+import type { SVGProps, Ref } from "react";
 
-export default function ${svgFile.componentName}(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg${svgAttributes} {...props}>
-      ${svgWithoutTags}
-    </svg>
-  );
+interface SvgComponentProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
+  ref?: Ref<SVGSVGElement>;
 }
+
+const ${svgFile.componentName} = forwardRef<SVGSVGElement, Omit<SVGProps<SVGSVGElement>, "ref">>(
+  function ${svgFile.componentName}(props, ref) {
+    return (
+      <svg${svgAttributes} ref={ref} {...props}>
+        ${svgWithoutTags}
+      </svg>
+    );
+  }
+);
+
+export default ${svgFile.componentName};
+export type { SvgComponentProps };
 `;
 
   return componentCode;

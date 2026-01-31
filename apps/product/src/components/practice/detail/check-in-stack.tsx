@@ -267,7 +267,7 @@ const createPathBody = (x: number, y: number, pathElement: SVGPathElement): Matt
 
 const MOOD_MAP = Object.fromEntries(
   MOOD_OPTIONS.map((option) => [option.id, option.emoji])
-) as Record<MoodType, React.FC<React.SVGProps<SVGSVGElement>>>;
+) as Record<MoodType, typeof MOOD_OPTIONS[number]["emoji"]>;
 
 interface CheckInItem {
   id: string;
