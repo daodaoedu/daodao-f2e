@@ -10,6 +10,5 @@ export * from "./hooks/use-redirect-after-login";
 export * from "./hooks/use-require-auth";
 // Export lib
 export * from "./lib/auth-client";
-export * from "./lib/auth-middleware";
 export * from "./lib/auth-provider";
 export type * from "./types";

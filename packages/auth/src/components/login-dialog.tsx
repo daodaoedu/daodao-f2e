@@ -37,6 +37,8 @@ export interface LoginDialogProps {
   className?: string;
   /** 自訂登入處理函數（如果提供，會覆蓋預設行為） */
   onLogin?: () => void;
+  /** 是否允許關閉（預設: true） */
+  dismissible?: boolean;
 }
 
 /**
@@ -61,6 +63,7 @@ export const LoginDialog = ({
   source,
   className,
   onLogin,
+  dismissible = true,
 }: LoginDialogProps) => {
   const t = useTranslations("auth");
   const isMobile = useIsMobile();
@@ -88,14 +91,47 @@ export const LoginDialog = ({
     window.open("/terms/privacy", "_blank");
   };
 
+  // 處理關閉事件（如果不可關閉，則阻止關閉）
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!dismissible && !newOpen) {
+      // 如果不可關閉且嘗試關閉，則不執行任何操作
+      return;
+    }
+    onOpenChange(newOpen);
+  };
+
+  // 阻止點擊外部關閉
+  const handlePointerDownOutside = (e: { preventDefault: () => void }) => {
+    if (!dismissible) {
+      e.preventDefault();
+    }
+  };
+
+  // 阻止 ESC 鍵關閉
+  const handleEscapeKeyDown = (e: { preventDefault: () => void }) => {
+    if (!dismissible) {
+      e.preventDefault();
+    }
+  };
+
+  // 阻止交互外部關閉
+  const handleInteractOutside = (e: { preventDefault: () => void }) => {
+    if (!dismissible) {
+      e.preventDefault();
+    }
+  };
+
   if (isMobile) {
     return (
-      <Sheet open={open} onOpenChange={onOpenChange}>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent
           side="bottom"
           className={`h-auto max-h-[calc(100vh-64px)] overflow-y-auto gap-0 ${className ?? ""}`}
+          onPointerDownOutside={handlePointerDownOutside}
+          onInteractOutside={handleInteractOutside}
+          onEscapeKeyDown={handleEscapeKeyDown}
         >
-          <SheetHeader>
+          <SheetHeader showCloseButton={dismissible}>
             <SheetTitle className="text-3xl font-medium text-bg-dark mb-2 mt-10">
               {t("login_dialog_title")}
             </SheetTitle>
@@ -153,10 +189,14 @@ export const LoginDialog = ({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         className={`w-fit sm:max-w-none overflow-hidden border-none ${className ?? ""}`}
         from="bottom"
+        showCloseButton={dismissible}
+        onPointerDownOutside={handlePointerDownOutside}
+        onInteractOutside={handleInteractOutside}
+        onEscapeKeyDown={handleEscapeKeyDown}
       >
         <div className="flex">
           <div className="w-[372px] pt-16 pb-8 px-8 flex flex-col justify-between">

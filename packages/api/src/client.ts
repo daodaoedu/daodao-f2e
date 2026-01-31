@@ -54,10 +54,17 @@ class UnauthorizedHandler {
       credentials: "include",
     };
 
+    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
     const response = await fetch(input, fetchInit);
 
     // 如果不是 401 或沒有處理器，直接返回
     if (response.status !== 401 || !this.onUnauthorized) {
+      return response;
+    }
+
+    // 如果是 refresh token endpoint 返回 401，直接返回，避免死鎖
+    const isRefreshEndpoint = url.includes("/api/v1/auth/refresh");
+    if (isRefreshEndpoint) {
       return response;
     }
 

@@ -35,7 +35,11 @@ export interface AuthContextValue {
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
   /** 開啟登入 Dialog */
-  openLoginDialog: (options?: { redirectUrl?: string; source?: "website" | "app" }) => void;
+  openLoginDialog: (options?: {
+    redirectUrl?: string;
+    source?: "website" | "app";
+    dismissible?: boolean;
+  }) => void;
   /** 需要登入時自動打開 Dialog，如果已登入則執行回調 */
   requireAuth: <T>(
     callback: () => T | Promise<T>,
