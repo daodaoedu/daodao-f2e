@@ -45,9 +45,7 @@ const PRACTICE_THEME_CONFIG = [
 /**
  * 主題顏色列表（用於循環選擇）
  */
-export const PRACTICE_THEMES: PracticeTheme[] = PRACTICE_THEME_CONFIG.map(
-  (config) => config.name
-);
+export const PRACTICE_THEMES: PracticeTheme[] = PRACTICE_THEME_CONFIG.map((config) => config.name);
 
 /**
  * 主題顏色對應的 SVG 組件映射
@@ -57,7 +55,7 @@ export const practiceThemeSvgMap = PRACTICE_THEME_CONFIG.reduce(
     acc[config.name] = config.svg;
     return acc;
   },
-  {} as Record<PracticeTheme, typeof PRACTICE_THEME_CONFIG[number]["svg"]>
+  {} as Record<PracticeTheme, (typeof PRACTICE_THEME_CONFIG)[number]["svg"]>
 );
 
 /**

@@ -38,11 +38,7 @@ export function useArchivePracticeDialog() {
   const { openInfoDialog } = useDialog();
 
   const openArchiveDialog = useCallback(
-    async (
-      options: {
-        onRestore?: () => void | Promise<void>;
-      }
-    ): Promise<ArchivePracticeResult> => {
+    async (options: { onRestore?: () => void | Promise<void> }): Promise<ArchivePracticeResult> => {
       // 先顯示確認對話框
       const result = await openInfoDialog({
         title: "即將封存這個實踐",

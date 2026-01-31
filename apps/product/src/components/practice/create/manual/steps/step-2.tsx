@@ -108,9 +108,7 @@ export const Step2 = ({ form, disabled = false }: Step2Props) => {
                         disabled
                           ? "cursor-not-allowed opacity-50"
                           : "cursor-pointer hover:border-bg-gray",
-                        isSelected
-                          ? "border-logo-cyan text-logo-cyan"
-                          : "border-transparent"
+                        isSelected ? "border-logo-cyan text-logo-cyan" : "border-transparent"
                       )}
                     >
                       <RadioGroupItem
@@ -166,9 +164,7 @@ export const Step2 = ({ form, disabled = false }: Step2Props) => {
                         disabled
                           ? "cursor-not-allowed opacity-50"
                           : "cursor-pointer hover:border-bg-gray",
-                        isSelected
-                          ? "border-logo-cyan text-logo-cyan"
-                          : "border-transparent"
+                        isSelected ? "border-logo-cyan text-logo-cyan" : "border-transparent"
                       )}
                     >
                       <RadioGroupItem

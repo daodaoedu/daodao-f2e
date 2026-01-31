@@ -46,10 +46,6 @@ export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInS
             // 然後執行 onComplete（會顯示 loading 和成功對話框）
             await onComplete(data);
           }}
-          onClose={() => {
-            closeRef.current?.();
-            onClose?.();
-          }}
         />
       ),
       dismissible: true,

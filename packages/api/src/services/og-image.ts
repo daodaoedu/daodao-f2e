@@ -49,12 +49,12 @@ export interface IExtractOgImageResponse {
 
 /**
  * 從指定網址提取 og:image
- * 
+ *
  * 注意：此函數調用的是 Next.js API Route，因此需要在 Next.js 應用中使用
- * 
+ *
  * @param params - 包含要提取的網址和可選的刷新參數
  * @returns 提取後的圖片資訊
- * 
+ *
  * @example
  * ```typescript
  * // Server Component
@@ -63,9 +63,9 @@ export interface IExtractOgImageResponse {
  *   console.log(result.data.ogImageUrl); // og:image URL
  *   console.log(result.data.cached); // 是否來自快取
  * }
- * 
+ *
  * // Client Component
- * const result = await extractOgImage({ 
+ * const result = await extractOgImage({
  *   url: "https://example.com/article",
  *   refresh: true // 強制刷新快取
  * });
@@ -74,8 +74,7 @@ export interface IExtractOgImageResponse {
 export const extractOgImage = async (
   params: IExtractOgImageParams
 ): Promise<
-  | { success: true; data: IExtractOgImageResponse }
-  | { success: false; error: string }
+  { success: true; data: IExtractOgImageResponse } | { success: false; error: string }
 > => {
   const queryParams = new URLSearchParams({
     url: params.url,

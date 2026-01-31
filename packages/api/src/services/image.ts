@@ -1,7 +1,7 @@
 /**
  * Image API Service
  * 提供圖片上傳與刪除相關的 API 調用函數（用於 Server Components 或直接調用）
- * 
+ *
  * 注意：上傳使用 fetch 而非 client，因為 openapi-fetch 對 multipart/form-data 的類型支持有限
  * 刪除使用 client.DELETE，因為是標準的 JSON API
  */
@@ -134,9 +134,7 @@ export const deleteMultipleImages = async (
     return [];
   }
 
-  const results = await Promise.allSettled(
-    filenames.map((filename) => deleteImage(filename))
-  );
+  const results = await Promise.allSettled(filenames.map((filename) => deleteImage(filename)));
 
   return results.map((result, index): { filename: string; success: boolean; error?: string } => {
     const filename = filenames[index];

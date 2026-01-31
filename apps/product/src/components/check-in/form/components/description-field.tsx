@@ -1,4 +1,3 @@
-import { Textarea } from "@daodao/ui/components/textarea";
 import {
   FormControl,
   FormDescription,
@@ -7,6 +6,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@daodao/ui/components/form";
+import { Textarea } from "@daodao/ui/components/textarea";
 import type { UseFormReturn } from "react-hook-form";
 import type { CheckInFormValuesType } from "../schema";
 
@@ -27,19 +27,14 @@ export const DescriptionField = ({ form }: IDescriptionFieldProps) => {
       render={({ field }) => (
         <FormItem>
           <div className="mb-1.5 flex items-center justify-between gap-2">
-            <FormLabel className="text-sm text-text-dark font-normal">
-              詳細描述
-            </FormLabel>
+            <FormLabel className="text-sm text-text-dark font-normal">詳細描述</FormLabel>
 
             <FormDescription className="text-sm text-light-gray">
               {descriptionLength}/300
             </FormDescription>
           </div>
           <FormControl>
-            <Textarea
-              {...field}
-              placeholder="簡單紀錄今天的發現，或卡關的地方"
-            />
+            <Textarea {...field} placeholder="簡單紀錄今天的發現，或卡關的地方" />
           </FormControl>
           <FormMessage />
         </FormItem>

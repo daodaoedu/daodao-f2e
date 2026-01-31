@@ -1,20 +1,13 @@
 "use client";
 
+import { type PracticeTemplateType, useRandomPracticeTemplates } from "@daodao/api";
 import { ArrowRightOutlineSvg, Deco2Svg } from "@daodao/assets";
-import {
-  useRandomPracticeTemplates,
-  type PracticeTemplateType,
-} from "@daodao/api";
+import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import Stack from "@daodao/ui/components/stack";
-import { useRouter } from "@daodao/i18n/navigation";
 import { useMemo } from "react";
-import {
-  PracticeTheme,
-  PRACTICE_THEMES,
-  practiceThemeSvgMap,
-} from "@/constants/practice-theme";
+import { PRACTICE_THEMES, PracticeTheme, practiceThemeSvgMap } from "@/constants/practice-theme";
 
 interface IRandomPractice {
   id: string;
@@ -24,16 +17,11 @@ interface IRandomPractice {
 }
 
 // 將 API 的 PracticeTemplate 轉換成 IRandomPractice
-const convertTemplateToRandomPractice = (
-  template: PracticeTemplateType
-): IRandomPractice => {
+const convertTemplateToRandomPractice = (template: PracticeTemplateType): IRandomPractice => {
   return {
     id: template.id,
     title: template.title,
-    description:
-      template.practiceAction ||
-      template.suggestedTags.join("、") ||
-      template.title,
+    description: template.practiceAction || template.suggestedTags.join("、") || template.title,
     templateId: template.id,
   };
 };
@@ -44,18 +32,13 @@ interface IRandomPracticeCardProps {
   onAction: () => void;
 }
 
-const RandomPracticeCard = ({
-  practice,
-  theme,
-  onAction,
-}: IRandomPracticeCardProps) => {
-  const ThemeSvg =
-    practiceThemeSvgMap[theme] ?? practiceThemeSvgMap[PracticeTheme.yellow];
+const RandomPracticeCard = ({ practice, theme, onAction }: IRandomPracticeCardProps) => {
+  const ThemeSvg = practiceThemeSvgMap[theme] ?? practiceThemeSvgMap[PracticeTheme.yellow];
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
-      onAction();
-    };
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    onAction();
+  };
 
   return (
     <div className="absolute inset-0 rounded-[12px] overflow-hidden">
@@ -66,12 +49,8 @@ const RandomPracticeCard = ({
             主題實踐
           </Badge>
           <div className="flex flex-col gap-2">
-            <h3 className="text-xl font-medium text-bg-dark line-clamp-2">
-              {practice.title}
-            </h3>
-            <p className="text-xs text-text-dark line-clamp-2">
-              {practice.description}
-            </p>
+            <h3 className="text-xl font-medium text-bg-dark line-clamp-2">{practice.title}</h3>
+            <p className="text-xs text-text-dark line-clamp-2">{practice.description}</p>
           </div>
         </div>
         <Button variant="secondary" className="w-full" onClick={handleClick}>
@@ -159,11 +138,7 @@ export const RandomPracticesSection = ({
             <Stack cards={stackCards} sendToBackOnClick />
           </div>
         </div>
-        <Button
-          variant="default"
-          onClick={handleMoreThemes}
-          className="max-w-60 w-full"
-        >
+        <Button variant="default" onClick={handleMoreThemes} className="max-w-60 w-full">
           更多主題
           <ArrowRightOutlineSvg className="size-4.5" />
         </Button>

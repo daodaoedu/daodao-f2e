@@ -65,10 +65,7 @@ export type DurationDaysNumber = (typeof DurationDaysNumber)[keyof typeof Durati
 /**
  * API 的 practiceTimePeriods 映射到 executionTiming
  */
-export const PracticeTimePeriodToExecutionTimingMap: Record<
-  string,
-  ExecutionTiming
-> = {
+export const PracticeTimePeriodToExecutionTimingMap: Record<string, ExecutionTiming> = {
   morning: ExecutionTiming.morning,
   afternoon: ExecutionTiming.lunchBreak,
   evening: ExecutionTiming.evening,
@@ -88,10 +85,7 @@ export const DURATION_DAYS_NUMBER_OPTIONS: DurationDaysNumber[] = [
 /**
  * 持續天數數字到字串的映射
  */
-export const DurationDaysNumberToStringMap: Record<
-  DurationDaysNumber,
-  DurationDays
-> = {
+export const DurationDaysNumberToStringMap: Record<DurationDaysNumber, DurationDays> = {
   [DurationDaysNumber.seven]: DurationDays.seven,
   [DurationDaysNumber.fourteen]: DurationDays.fourteen,
   [DurationDaysNumber.twentyOne]: DurationDays.twentyOne,
@@ -120,10 +114,7 @@ export const mapExecutionTimingToPracticeTimePeriods = (
 ): ("morning" | "afternoon" | "evening" | "night")[] => {
   return executionTiming
     .map((timing) => ExecutionTimingToPracticeTimePeriodMap[timing])
-    .filter(
-      (period): period is "morning" | "afternoon" | "evening" | "night" =>
-        period !== null
-    );
+    .filter((period): period is "morning" | "afternoon" | "evening" | "night" => period !== null);
 };
 
 /**

@@ -1,6 +1,6 @@
 "use client";
 
-import { createPractice, type CreatePracticeRequestType } from "@daodao/api";
+import { type CreatePracticeRequestType, createPractice } from "@daodao/api";
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { StorageEnum, useFormDraft } from "@daodao/shared";
@@ -20,8 +20,8 @@ import { Step3 } from "@/components/practice/create/manual/steps/step-3";
 import { Step4 } from "@/components/practice/create/manual/steps/step-4";
 import { Step5 } from "@/components/practice/create/manual/steps/step-5";
 import {
-  ExecutionTiming,
-  Frequency,
+  type ExecutionTiming,
+  type Frequency,
   mapExecutionTimingToPracticeTimePeriods,
   parseFrequency,
 } from "@/constants/practice-form";
@@ -178,7 +178,7 @@ export default function CreateManualPracticePage() {
           };
           message?: string;
         };
-        
+
         const error = errorResponse.error || errorResponse;
         let errorMessage = "建立實踐失敗";
         let shouldNavigateToStep: number | null = null;
@@ -189,7 +189,7 @@ export default function CreateManualPracticePage() {
           if ("details" in error && Array.isArray(error.details)) {
             // 處理 details 陣列中的每個錯誤
             const details = error.details;
-            
+
             details.forEach((detail) => {
               if (detail.path && detail.message) {
                 // 將錯誤設置到對應的表單欄位
@@ -260,8 +260,7 @@ export default function CreateManualPracticePage() {
         );
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "建立實踐失敗，請稍後再試";
+      const errorMessage = error instanceof Error ? error.message : "建立實踐失敗，請稍後再試";
       console.error("Failed to create practice:", error);
       toast.error(errorMessage);
       setIsSubmitting(false);

@@ -1,10 +1,11 @@
 "use client";
 
 import {
-  usePracticeTemplates,
-  usePracticeTemplateCategories,
   type PracticeTemplateType,
+  usePracticeTemplateCategories,
+  usePracticeTemplates,
 } from "@daodao/api";
+import { LifeSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -21,7 +22,6 @@ import { useEffect, useMemo, useState } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { BgRadialAnimation } from "@/components/layout/bg-radial-animation";
 import { practiceCategoryMetadataMap } from "@/constants/practice-category";
-import { LifeSvg } from "@daodao/assets";
 
 // 類別定義
 interface Category {
@@ -32,7 +32,7 @@ interface Category {
 
 export default function CreatePracticePage() {
   const router = useRouter();
-  
+
   // 取得分類列表
   const {
     data: categoriesData,
@@ -77,14 +77,18 @@ export default function CreatePracticePage() {
   }, [categories, selectedCategory]);
 
   // 取得實踐模板列表
-  const { data, error, isLoading: isTemplatesLoading } = usePracticeTemplates({
+  const {
+    data,
+    error,
+    isLoading: isTemplatesLoading,
+  } = usePracticeTemplates({
     category: selectedCategory || undefined,
     limit: 16,
   });
 
   // 統一的 loading 狀態：分類或模板任一在載入中
   const isLoading = isCategoriesLoading || isTemplatesLoading;
-  
+
   // 統一的 error 狀態：分類或模板任一發生錯誤
   const hasError = categoriesError || error;
 
@@ -105,10 +109,7 @@ export default function CreatePracticePage() {
     return data.data.map((template: PracticeTemplateType, index: number) => ({
       id: index + 1,
       title: template.title,
-      description:
-        template.practiceAction ||
-        template.suggestedTags.join("、") ||
-        template.title,
+      description: template.practiceAction || template.suggestedTags.join("、") || template.title,
       templateId: template.id,
     }));
   }, [data]);

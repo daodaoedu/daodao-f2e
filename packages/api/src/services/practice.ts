@@ -14,6 +14,14 @@ type PracticeListResponse =
   paths["/api/v1/me/practices"]["get"]["responses"]["200"]["content"]["application/json"];
 type PracticeStatsResponse =
   paths["/api/v1/me/practice-stats"]["get"]["responses"]["200"]["content"]["application/json"];
+type PracticeTemplatesResponse =
+  paths["/api/v1/practices/templates"]["get"]["responses"]["200"]["content"]["application/json"];
+type PracticeTemplateCategoriesResponse =
+  paths["/api/v1/practices/templates/categories"]["get"]["responses"]["200"]["content"]["application/json"];
+type PracticeDetailResponse =
+  paths["/api/v1/practices/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
+type PracticeCheckInsResponse =
+  paths["/api/v1/practices/{id}/checkins"]["get"]["responses"]["200"]["content"]["application/json"];
 
 export type IGetMyPracticesParams = NonNullable<
   paths["/api/v1/me/practices"]["get"]["parameters"]["query"]
@@ -38,6 +46,18 @@ export type IGetPracticeCheckInsParams = NonNullable<
 export type IGetUserPracticesParams = NonNullable<
   paths["/api/v1/practices/user/{userId}"]["get"]["parameters"]["query"]
 >;
+
+// 從回應中提取 PracticeTemplateType 類型（單一模板項目的數據類型）
+export type PracticeTemplateType = NonNullable<PracticeTemplatesResponse["data"]>[number];
+
+export type {
+  PracticeListResponse,
+  PracticeStatsResponse,
+  PracticeTemplatesResponse,
+  PracticeTemplateCategoriesResponse,
+  PracticeDetailResponse,
+  PracticeCheckInsResponse,
+};
 
 // ============================================================================
 // Client Functions (用於 Server Components 或直接調用)
@@ -143,10 +163,7 @@ export const getPracticeById = async (id: string) => {
 /**
  * 獲取實踐的打卡記錄列表
  */
-export const getPracticeCheckIns = async (
-  id: string,
-  params?: IGetPracticeCheckInsParams
-) => {
+export const getPracticeCheckIns = async (id: string, params?: IGetPracticeCheckInsParams) => {
   return client.GET("/api/v1/practices/{id}/checkins", {
     params: {
       path: {
@@ -188,24 +205,3 @@ export const getUserPractices = async (userId: string, params?: IGetUserPractice
     },
   });
 };
-
-// ============================================================================
-// Export Types
-// ============================================================================
-
-type PracticeTemplatesResponse =
-  paths["/api/v1/practices/templates"]["get"]["responses"]["200"]["content"]["application/json"];
-
-type PracticeTemplateCategoriesResponse =
-  paths["/api/v1/practices/templates/categories"]["get"]["responses"]["200"]["content"]["application/json"];
-
-type PracticeDetailResponse =
-  paths["/api/v1/practices/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
-
-type PracticeCheckInsResponse =
-  paths["/api/v1/practices/{id}/checkins"]["get"]["responses"]["200"]["content"]["application/json"];
-
-// 從回應中提取 PracticeTemplateType 類型（單一模板項目的數據類型）
-export type PracticeTemplateType = NonNullable<PracticeTemplatesResponse["data"]>[number];
-
-export type { PracticeListResponse, PracticeStatsResponse, PracticeTemplatesResponse, PracticeTemplateCategoriesResponse, PracticeDetailResponse, PracticeCheckInsResponse };

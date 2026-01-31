@@ -8,9 +8,9 @@ import { Progress } from "@daodao/ui/components/progress";
 import { PenLine } from "lucide-react";
 import { CheckInButton } from "@/components/check-in";
 import {
+  getThemeNameFromColor,
   PracticeTheme,
   practiceThemeSvgMap,
-  getThemeNameFromColor,
 } from "@/constants/practice-theme";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
 

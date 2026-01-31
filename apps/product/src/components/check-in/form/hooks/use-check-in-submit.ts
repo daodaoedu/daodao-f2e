@@ -74,8 +74,7 @@ export const useCheckInSubmit = ({
       toast.dismiss(loadingToast);
 
       // 顯示錯誤提示
-      const errorMessage =
-        error instanceof Error ? error.message : "打卡失敗，請稍後再試";
+      const errorMessage = error instanceof Error ? error.message : "打卡失敗，請稍後再試";
       console.error("打卡失敗:", error);
       toast.error(errorMessage);
       throw error;

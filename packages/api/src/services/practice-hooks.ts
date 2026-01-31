@@ -8,16 +8,16 @@
 import { useRef } from "react";
 import { client } from "../client";
 import { useMutate, useQuery } from "../hooks";
-import { uploadMultipleImages, deleteMultipleImages } from "./image";
+import type { components, paths } from "../types";
+import { deleteMultipleImages, uploadMultipleImages } from "./image";
 import type {
   IGetMyPracticesParams,
+  IGetPracticeCheckInsParams,
   IGetPracticeStatsParams,
   IGetPracticeTemplatesParams,
   IGetRandomPracticeTemplatesParams,
-  IGetPracticeCheckInsParams,
   IGetUserPracticesParams,
 } from "./practice";
-import type { components, paths } from "../types";
 
 // ============================================================================
 // Types
@@ -33,8 +33,8 @@ export type UpdatePracticeRequestType = UpdatePracticeRequestBody extends {
   : UpdatePracticeRequestBody extends undefined
     ? never
     : NonNullable<UpdatePracticeRequestBody>["content"] extends {
-        "application/json": infer T;
-      }
+          "application/json": infer T;
+        }
       ? T
       : never;
 
@@ -142,10 +142,7 @@ export const usePracticeById = (id: string) => {
 /**
  * 獲取實踐打卡記錄列表的 Hook
  */
-export const usePracticeCheckIns = (
-  id: string,
-  params?: IGetPracticeCheckInsParams
-) => {
+export const usePracticeCheckIns = (id: string, params?: IGetPracticeCheckInsParams) => {
   return useQuery("/api/v1/practices/{id}/checkins", {
     params: {
       path: {
@@ -250,10 +247,7 @@ export interface ICheckInFormData {
  * @param data 打卡資料
  * @returns 創建結果
  */
-export const createPracticeCheckIn = async (
-  practiceId: string,
-  data: CreateCheckInRequestType
-) => {
+export const createPracticeCheckIn = async (practiceId: string, data: CreateCheckInRequestType) => {
   return client.POST("/api/v1/practices/{id}/checkins", {
     params: {
       path: {
@@ -277,7 +271,7 @@ export const createPracticeCheckInWithFormData = async (
   // 1. 上傳圖片（如果有）
   let imageUrls: string[] = [];
   let uploadedFilenames: string[] = [];
-  
+
   try {
     if (formData.media && formData.media.length > 0) {
       const uploadResult = await uploadMultipleImages(formData.media);
@@ -296,7 +290,7 @@ export const createPracticeCheckInWithFormData = async (
 
     // 3. 調用 API 創建打卡記錄
     const response = await createPracticeCheckIn(practiceId, checkInRequest);
-    
+
     // 如果創建失敗，清理已上傳的圖片
     if (response.error && uploadedFilenames.length > 0) {
       await deleteMultipleImages(uploadedFilenames).catch((error) => {
@@ -304,7 +298,7 @@ export const createPracticeCheckInWithFormData = async (
         console.error("清理已上傳圖片失敗:", error);
       });
     }
-    
+
     return response;
   } catch (error) {
     // 如果圖片上傳或創建打卡記錄時發生異常，清理已上傳的圖片

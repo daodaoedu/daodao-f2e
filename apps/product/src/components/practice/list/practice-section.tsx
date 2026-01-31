@@ -10,8 +10,12 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { PracticeStatus } from "@/constants/practice-status";
-import { TaskStatus, mapPracticeStatusToTaskStatus, type TaskStatus as TaskStatusType } from "@/constants/task-status";
+import type { PracticeStatus } from "@/constants/practice-status";
+import {
+  mapPracticeStatusToTaskStatus,
+  TaskStatus,
+  type TaskStatus as TaskStatusType,
+} from "@/constants/task-status";
 
 type TabType = "practices" | "plans" | "ideas";
 
@@ -47,7 +51,11 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
   const isMobile = useIsMobile();
   const isScrolled = useScrollVisibility({ threshold: 167 });
 
-  const { data: practicesData, isLoading, error } = useUserPractices(userId, {
+  const {
+    data: practicesData,
+    isLoading,
+    error,
+  } = useUserPractices(userId, {
     limit: 16, // 取得足夠的實踐列表
   });
 

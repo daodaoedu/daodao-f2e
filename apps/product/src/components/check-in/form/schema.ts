@@ -14,10 +14,7 @@ export const checkInFormSchema = z.object({
     }),
   tags: z.array(z.string()).min(1, "請至少選擇一個標籤"),
   description: z.string().min(1, "請輸入描述").max(300, "最多300字"),
-  media: z
-    .array(z.instanceof(File))
-    .max(3, "最多只能上傳3張圖片")
-    .default([]),
+  media: z.array(z.instanceof(File)).max(3, "最多只能上傳3張圖片").default([]),
 });
 
 export type CheckInFormValuesType = ICheckInFormData;

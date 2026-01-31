@@ -5,8 +5,8 @@
  * 提供從網址提取 og:image 的 React Hooks
  */
 
-import useSWR from "swr";
 import { useCallback } from "react";
+import useSWR from "swr";
 import {
   extractOgImage,
   type IExtractOgImageParams,
@@ -20,9 +20,7 @@ import {
 /**
  * SWR fetcher 函數
  */
-const ogImageFetcher = async (
-  key: string
-): Promise<IExtractOgImageResponse> => {
+const ogImageFetcher = async (key: string): Promise<IExtractOgImageResponse> => {
   // key 格式: "og-image:url:https://example.com:refresh:true"
   const parts = key.split(":");
   const urlPart = parts[2];
@@ -52,29 +50,29 @@ const ogImageFetcher = async (
 
 /**
  * Hook 用於提取 og:image（使用 SWR）
- * 
+ *
  * 此 hook 會自動處理快取、去重和重新驗證
- * 
+ *
  * @param url - 要提取 og:image 的網址（如果為 null 或 undefined，則不會發起請求）
  * @param options - 可選配置
  * @param options.refresh - 是否強制刷新快取（預設 false）
  * @param options.revalidateOnFocus - 是否在視窗獲得焦點時重新驗證（預設 false）
  * @param options.revalidateOnReconnect - 是否在重新連線時重新驗證（預設 true）
- * 
+ *
  * @example
  * ```typescript
  * "use client";
- * 
+ *
  * function MyComponent() {
  *   const { data, error, isLoading, mutate } = useExtractOgImage("https://example.com/article");
- * 
+ *
  *   const handleRefresh = () => {
  *     mutate(); // 手動重新驗證
  *   };
- * 
+ *
  *   if (isLoading) return <div>載入中...</div>;
  *   if (error) return <div>錯誤: {error.message}</div>;
- *   
+ *
  *   return (
  *     <div>
  *       <img src={data?.ogImageUrl} alt={data?.title} />
@@ -83,13 +81,13 @@ const ogImageFetcher = async (
  *   );
  * }
  * ```
- * 
+ *
  * @example
  * ```typescript
  * // 條件式獲取
  * function ResourceCard({ url }: { url?: string }) {
  *   const { data, isLoading } = useExtractOgImage(url); // url 為 undefined 時不會發起請求
- *   
+ *
  *   return (
  *     <div>
  *       {isLoading && <div>載入中...</div>}
@@ -112,9 +110,7 @@ export const useExtractOgImage = (
   const revalidateOnReconnect = options?.revalidateOnReconnect ?? true;
 
   // 構建 SWR key
-  const swrKey = url
-    ? `og-image:url:${encodeURIComponent(url)}:refresh:${refresh}`
-    : null;
+  const swrKey = url ? `og-image:url:${encodeURIComponent(url)}:refresh:${refresh}` : null;
 
   const { data, error, isLoading, mutate } = useSWR<IExtractOgImageResponse>(
     swrKey,
@@ -133,11 +129,11 @@ export const useExtractOgImage = (
 
   /**
    * 手動觸發提取（用於需要手動觸發的場景）
-   * 
+   *
    * @example
    * ```typescript
    * const { trigger } = useExtractOgImageTrigger();
-   * 
+   *
    * const handleExtract = async () => {
    *   const result = await trigger({ url: "https://example.com" });
    *   if (result.success) {
@@ -150,8 +146,7 @@ export const useExtractOgImage = (
     async (
       params: IExtractOgImageParams
     ): Promise<
-      | { success: true; data: IExtractOgImageResponse }
-      | { success: false; error: string }
+      { success: true; data: IExtractOgImageResponse } | { success: false; error: string }
     > => {
       try {
         const result = await extractOgImage(params);

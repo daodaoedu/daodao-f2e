@@ -3,11 +3,11 @@
 import { ArrowRightOutlineSvg } from "@daodao/assets";
 import featureHappyJson from "@daodao/assets/images/quiz/feature-happy.json";
 import { useRouter } from "@daodao/i18n/navigation";
-import { useSearchParams } from "next/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
 import Lottie from "lottie-react";
 import { motion } from "motion/react";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { BackgroundAnimation } from "@/components/layout";
 

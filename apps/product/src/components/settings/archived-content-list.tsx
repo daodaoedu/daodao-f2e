@@ -1,10 +1,10 @@
 "use client";
 
+import type { UpdatePracticeRequestType } from "@daodao/api";
+import { updatePractice, useMyPractices, useUnarchivePractice } from "@daodao/api";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
-import { useMyPractices, useUnarchivePractice, updatePractice } from "@daodao/api";
 import { useCallback, useState } from "react";
-import type { UpdatePracticeRequestType } from "@daodao/api";
 
 export const ArchivedContentList = () => {
   const [unarchivingIds, setUnarchivingIds] = useState<Set<string>>(new Set());
@@ -136,9 +136,7 @@ export const ArchivedContentList = () => {
               <h3 className="text-base font-medium text-text-dark line-clamp-1 mb-1">
                 {practice.title}
               </h3>
-              <p className="text-xs text-text-dark line-clamp-1">
-                {practice.practiceAction || ""}
-              </p>
+              <p className="text-xs text-text-dark line-clamp-1">{practice.practiceAction || ""}</p>
             </div>
             <div className="shrink-0">
               <Button

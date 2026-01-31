@@ -11,8 +11,8 @@ import {
   CompletedSection,
   DashboardHeader,
   InProgressSection,
-  RandomPracticesSection,
   type InProgressTask,
+  RandomPracticesSection,
 } from "@/components/dashboard";
 import type { CompletedTask } from "@/components/dashboard/completed-section";
 import { BackgroundAnimation } from "@/components/layout";

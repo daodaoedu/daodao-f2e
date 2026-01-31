@@ -1,6 +1,6 @@
-import { useLocale } from "@daodao/i18n";
 import { getTagPromptsByTags } from "@daodao/api";
-import { UseFormReturn } from "react-hook-form";
+import { useLocale } from "@daodao/i18n";
+import type { UseFormReturn } from "react-hook-form";
 import type { CheckInFormValuesType } from "../schema";
 
 /**
@@ -23,21 +23,14 @@ export const useTagPrompt = (form: UseFormReturn<CheckInFormValuesType>) => {
       });
 
       const promptsData = response.data?.data;
-      if (
-        promptsData &&
-        Array.isArray(promptsData) &&
-        promptsData.length > 0
-      ) {
+      if (promptsData && Array.isArray(promptsData) && promptsData.length > 0) {
         // 使用第一個引導句作為提示
         const promptText = promptsData[0]?.prompt;
         if (promptText) {
           const currentDescription = form.getValues("description");
           if (currentDescription.trim()) {
             // 如果 description 已有內容，則追加該 tag 的引導句
-            form.setValue(
-              "description",
-              `${currentDescription}\n${promptText}`,
-            );
+            form.setValue("description", `${currentDescription}\n${promptText}`);
           } else {
             form.setValue("description", promptText);
           }

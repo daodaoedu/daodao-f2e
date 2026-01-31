@@ -1,21 +1,14 @@
-import { Checkbox } from "@daodao/ui/components/checkbox";
-import { Input } from "@daodao/ui/components/input";
-import { Button } from "@daodao/ui/components/button";
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@daodao/ui/components/form";
-import { cn } from "@daodao/ui/lib/utils";
-import { Plus, X } from "lucide-react";
-import { useState, useMemo } from "react";
 import { useTagPrompts } from "@daodao/api";
 import { useLocale } from "@daodao/i18n";
-import { useTagPrompt } from "../hooks/use-tag-prompt";
+import { Button } from "@daodao/ui/components/button";
+import { Checkbox } from "@daodao/ui/components/checkbox";
+import { FormControl, FormField, FormItem, FormMessage } from "@daodao/ui/components/form";
+import { Input } from "@daodao/ui/components/input";
+import { cn } from "@daodao/ui/lib/utils";
+import { Plus, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
+import { useTagPrompt } from "../hooks/use-tag-prompt";
 import type { CheckInFormValuesType } from "../schema";
 
 interface ITagSelectorProps {
@@ -40,15 +33,13 @@ export const TagSelector = ({ form }: ITagSelectorProps) => {
   // 從引導句列表中提取標籤名稱（限制 8 個）
   const availableTagsFromApi = useMemo(() => {
     if (!tagPromptsData?.data) return [];
-    return tagPromptsData.data
-      .map((item: { tagName: string }) => item.tagName)
-      .slice(0, 8);
+    return tagPromptsData.data.map((item: { tagName: string }) => item.tagName).slice(0, 8);
   }, [tagPromptsData]);
 
   // 合併 API 取得的標籤和使用者自訂的標籤
   const availableTags = useMemo(
     () => Array.from(new Set([...availableTagsFromApi, ...(tags || [])])),
-    [availableTagsFromApi, tags],
+    [availableTagsFromApi, tags]
   );
 
   const handleAddCustomTag = async () => {
@@ -102,18 +93,14 @@ export const TagSelector = ({ form }: ITagSelectorProps) => {
                     const checkboxId = `tag-${tag}`;
                     return (
                       <div key={tag} className="flex items-center">
-                        <Checkbox
-                          id={checkboxId}
-                          checked={isSelected}
-                          className="sr-only"
-                        />
+                        <Checkbox id={checkboxId} checked={isSelected} className="sr-only" />
                         <label
                           htmlFor={checkboxId}
                           className={cn(
                             "px-5 py-1.5 text-sm rounded-full border transition-colors flex items-center gap-1 cursor-pointer",
                             isSelected
                               ? "bg-logo-gray text-white border-logo-gray"
-                              : "bg-white text-gray-700 border-logo-cyan hover:bg-logo-cyan/10",
+                              : "bg-white text-gray-700 border-logo-cyan hover:bg-logo-cyan/10"
                           )}
                           onClick={() => handleToggle(tag)}
                           onKeyDown={(e) => {
@@ -130,9 +117,7 @@ export const TagSelector = ({ form }: ITagSelectorProps) => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 const currentTags = field.value || [];
-                                field.onChange(
-                                  currentTags.filter((t: string) => t !== tag),
-                                );
+                                field.onChange(currentTags.filter((t: string) => t !== tag));
                               }}
                             />
                           )}

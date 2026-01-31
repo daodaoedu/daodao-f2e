@@ -7,11 +7,11 @@
 
 import { useQuery } from "../hooks";
 import type {
+  IGetPopularTagsParams,
+  IGetTagPromptsByTagsParams,
+  IGetTagPromptsParams,
   IGetTagSearchParams,
   IGetTagSuggestParams,
-  IGetPopularTagsParams,
-  IGetTagPromptsParams,
-  IGetTagPromptsByTagsParams,
 } from "./tag";
 
 // ============================================================================

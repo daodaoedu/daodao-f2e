@@ -61,10 +61,12 @@ export default function PracticeDetailPage() {
   };
 
   // 將 API 資料轉換為頁面需要的格式
-  const practice: (ManualPracticeFormValues & {
-    total: number;
-    currentProgress: number;
-  }) | null = useMemo(() => {
+  const practice:
+    | (ManualPracticeFormValues & {
+        total: number;
+        currentProgress: number;
+      })
+    | null = useMemo(() => {
     if (!practiceData?.data) {
       return null;
     }
@@ -190,8 +192,7 @@ export default function PracticeDetailPage() {
     }
 
     const previousPractice = currentIndex > 0 ? practices[currentIndex - 1] : null;
-    const nextPractice =
-      currentIndex < practices.length - 1 ? practices[currentIndex + 1] : null;
+    const nextPractice = currentIndex < practices.length - 1 ? practices[currentIndex + 1] : null;
 
     return {
       previousPracticeId: previousPractice ? String(previousPractice.id) : null,
@@ -297,10 +298,7 @@ export default function PracticeDetailPage() {
         </div>
 
         {/* Check-in Record Card */}
-        <CheckInRecordCard
-          checkInsData={checkInsData}
-          isLoading={isLoadingCheckIns}
-        />
+        <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
       </main>
 
       {/* CheckIn Stack */}

@@ -34,32 +34,29 @@ export enum DeletePracticeResult {
 export function useDeletePracticeDialog() {
   const { openWarningDialog } = useDialog();
 
-  const openDeleteDialog = useCallback(
-    async (): Promise<DeletePracticeResult> => {
-      // 先顯示確認對話框
-      const result = await openWarningDialog({
-        title: "確定刪除這個實踐？",
-        message: "確定要跟這個主題說再見了嗎？一旦刪除，就無法復原囉。",
-        textAlign: "left",
-        buttons: [
-          { label: "確定刪除", value: "confirm", variant: "outline" },
-          { label: "先不要", value: "cancel", variant: "orange" },
-        ],
-      });
+  const openDeleteDialog = useCallback(async (): Promise<DeletePracticeResult> => {
+    // 先顯示確認對話框
+    const result = await openWarningDialog({
+      title: "確定刪除這個實踐？",
+      message: "確定要跟這個主題說再見了嗎？一旦刪除，就無法復原囉。",
+      textAlign: "left",
+      buttons: [
+        { label: "確定刪除", value: "confirm", variant: "outline" },
+        { label: "先不要", value: "cancel", variant: "orange" },
+      ],
+    });
 
-      // 如果用戶取消，直接返回
-      if (result.value !== "confirm") {
-        return DeletePracticeResult.Cancelled;
-      }
+    // 如果用戶取消，直接返回
+    if (result.value !== "confirm") {
+      return DeletePracticeResult.Cancelled;
+    }
 
-      // 用戶確認刪除，立即返回並顯示 toast
-      toast.success("實踐已成功刪除");
+    // 用戶確認刪除，立即返回並顯示 toast
+    toast.success("實踐已成功刪除");
 
-      // 立即返回，讓調用方可以立即執行動作
-      return DeletePracticeResult.Deleted;
-    },
-    [openWarningDialog]
-  );
+    // 立即返回，讓調用方可以立即執行動作
+    return DeletePracticeResult.Deleted;
+  }, [openWarningDialog]);
 
   return { openDeleteDialog };
 }

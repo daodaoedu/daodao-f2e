@@ -82,9 +82,7 @@ export const mapApiMoodToMoodType = (apiMood: ApiMoodType | undefined): MoodType
 /**
  * 將前端的 MoodType 映射到 API 的 mood 值
  */
-export const mapMoodTypeToApiMood = (
-  mood: MoodType | null
-): ApiMoodType | undefined => {
+export const mapMoodTypeToApiMood = (mood: MoodType | null): ApiMoodType | undefined => {
   if (!mood) {
     return undefined;
   }

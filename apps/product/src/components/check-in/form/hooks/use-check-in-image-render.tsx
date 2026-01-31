@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import type { ReactNode } from "react";
-import { CheckInCard } from "../../display/check-in-card";
-import { dataURLtoFile, convertMediaToUrls } from "../utils";
-import { format } from "date-fns";
-import type { ICheckInFormData } from "../../types";
 import type { CapturedImageData } from "@daodao/shared";
+import { format } from "date-fns";
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
+import { CheckInCard } from "../../display/check-in-card";
+import type { ICheckInFormData } from "../../types";
+import { convertMediaToUrls, dataURLtoFile } from "../utils";
 
 interface UseCheckInImageRenderOptions {
   taskTitle: string;
@@ -23,8 +23,7 @@ export const useCheckInImageRender = ({
   // 狀態：是否正在等待渲染圖片
   const [isRendering, setIsRendering] = useState(false);
   // 狀態：保存待提交的表單資料
-  const [pendingFormData, setPendingFormData] =
-    useState<ICheckInFormData | null>(null);
+  const [pendingFormData, setPendingFormData] = useState<ICheckInFormData | null>(null);
   // 狀態：渲染用的圖片 URL 陣列
   const [renderImageUrls, setRenderImageUrls] = useState<string[]>([]);
 
@@ -57,14 +56,11 @@ export const useCheckInImageRender = ({
     if (!pendingFormData) return;
 
     // 將 maskedImageData 轉換為 File
-    const renderedImageFile = dataURLtoFile(
-      maskedImageData.src,
-      "check-in-rendered.jpg",
-    );
+    const renderedImageFile = dataURLtoFile(maskedImageData.src, "check-in-rendered.jpg");
 
     // 過濾掉舊的渲染圖片（如果存在）
     const mediaWithoutRendered = pendingFormData.media.filter(
-      (file) => file.name !== "check-in-rendered.jpg",
+      (file) => file.name !== "check-in-rendered.jpg"
     );
 
     // 將新的渲染圖片插入到第一個位置

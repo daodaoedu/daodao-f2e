@@ -1,9 +1,6 @@
-import { useMemo } from "react";
 import { isSameDay, isValid, parse } from "date-fns";
-import {
-  CheckInStatus,
-  type CheckInStatusType,
-} from "@/constants/check-in-status";
+import { useMemo } from "react";
+import { CheckInStatus, type CheckInStatusType } from "@/constants/check-in-status";
 import type { ICheckInStatusOptions } from "../../types";
 
 /**
@@ -32,8 +29,7 @@ export const useCheckInStatus = (options: ICheckInStatusOptions) => {
 
   return useMemo(() => {
     // 檢查實踐是否已完成
-    const isPracticeCompleted =
-      practiceStatus === "completed" || practiceStatus === "archived";
+    const isPracticeCompleted = practiceStatus === "completed" || practiceStatus === "archived";
 
     // 檢查今天是否已打卡
     const isTodayCheckedIn = isDateToday(lastCheckInDate);

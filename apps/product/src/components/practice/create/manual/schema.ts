@@ -1,12 +1,4 @@
-import {
-  addDays,
-  format,
-  isAfter,
-  isBefore,
-  isValid,
-  parse,
-  startOfDay,
-} from "date-fns";
+import { addDays, format, isAfter, isBefore, isValid, parse, startOfDay } from "date-fns";
 import { z } from "zod";
 import {
   DurationDays,
@@ -64,11 +56,7 @@ export const EXECUTION_TIMING_OPTIONS = [
 export const manualPracticeFormSchema = z.object({
   // Step 1
   name: z.string().min(1, "請輸入名稱"),
-  actionDescription: z
-    .string()
-    .min(1, "請輸入實踐行動")
-    .max(50, "最多50字")
-    .default(""),
+  actionDescription: z.string().min(1, "請輸入實踐行動").max(50, "最多50字").default(""),
 
   // Step 2
   startDate: z
@@ -82,9 +70,7 @@ export const manualPracticeFormSchema = z.object({
         const today = startOfDay(new Date());
         const maxDate = startOfDay(addDays(new Date(), 14));
         const dateStartOfDay = startOfDay(date);
-        return (
-          !isBefore(dateStartOfDay, today) && !isAfter(dateStartOfDay, maxDate)
-        );
+        return !isBefore(dateStartOfDay, today) && !isAfter(dateStartOfDay, maxDate);
       },
       (val) => {
         if (!val) return { message: "請選擇開始時間" };
@@ -101,7 +87,7 @@ export const manualPracticeFormSchema = z.object({
           return { message: `日期不能晚於 ${maxDateFormatted}` };
         }
         return { message: "日期不在允許的範圍內" };
-      },
+      }
     ),
   durationDays: z.nativeEnum(DurationDays, {
     required_error: "請選擇想要持續多久",
@@ -112,16 +98,11 @@ export const manualPracticeFormSchema = z.object({
 
   // Step 3
   durationMinutes: z.number(),
-  executionTiming: z
-    .array(z.nativeEnum(ExecutionTiming))
-    .min(1, "請至少選擇一個執行時機"),
+  executionTiming: z.array(z.nativeEnum(ExecutionTiming)).min(1, "請至少選擇一個執行時機"),
   customTiming: z.string(),
 
   // Step 4
-  tags: z
-    .array(z.string())
-    .max(MAX_PRACTICE_TAGS, `標籤最多 ${MAX_PRACTICE_TAGS} 個`)
-    .optional(),
+  tags: z.array(z.string()).max(MAX_PRACTICE_TAGS, `標籤最多 ${MAX_PRACTICE_TAGS} 個`).optional(),
   resources: z
     .array(
       z.object({
@@ -135,7 +116,7 @@ export const manualPracticeFormSchema = z.object({
           })
           .optional()
           .or(z.literal("")),
-      }),
+      })
     )
     .optional(),
 });

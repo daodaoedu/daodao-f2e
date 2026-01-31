@@ -1,7 +1,7 @@
 /**
  * Next.js API Client
  * 統一管理 Next.js API Routes 的調用
- * 
+ *
  * 此 client 用於調用前端應用內部的 API Routes（/api/*）
  * 與後端 API client 不同，後者用於調用外部後端服務（NEXT_PUBLIC_API_URL）
  */

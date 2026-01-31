@@ -335,7 +335,7 @@ export function useCheckInSuccessDialog({
         ],
       });
     },
-    [openDialog, title, from, to],
+    [openDialog, title, from, to]
   );
 
   return { openSuccessDialog };

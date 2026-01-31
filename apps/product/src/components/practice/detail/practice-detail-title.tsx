@@ -4,8 +4,8 @@ import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg } from "@daodao/assets";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
-import { getStatusConfig, mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 import type { PracticeStatus } from "@/constants/practice-status";
+import { getStatusConfig, mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 
 interface PracticeDetailTitleProps {
   title: string;

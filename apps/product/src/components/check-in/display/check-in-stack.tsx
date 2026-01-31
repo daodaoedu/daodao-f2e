@@ -1,11 +1,11 @@
 "use client";
 
+import type { PracticeCheckInsResponse } from "@daodao/api";
 import CircleSvg from "@daodao/assets/images/dashboard/circle.svg";
 import ClippedCircleSvg from "@daodao/assets/images/dashboard/clipped-circle.svg";
 import HexagonSvg from "@daodao/assets/images/dashboard/hexagon.svg";
 import SemiCircleSvg from "@daodao/assets/images/dashboard/semi-circle.svg";
 import SpeechBubbleSvg from "@daodao/assets/images/dashboard/speech-bubble.svg";
-import type { PracticeCheckInsResponse } from "@daodao/api";
 import { Link } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid, parse } from "date-fns";
@@ -14,8 +14,8 @@ import * as decomp from "poly-decomp-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   MOOD_OPTIONS,
-  mapApiMoodToMoodType,
   type MoodType as MoodTypeType,
+  mapApiMoodToMoodType,
 } from "@/constants/mood";
 import type { IBodyPosition, ICheckInItem, ISvgGeometry } from "../types";
 
@@ -82,10 +82,7 @@ const extractSvgGeometry = (svgElement: SVGSVGElement): ISvgGeometry | null => {
  * @param samples 採樣點數量
  * @returns Matter.js 頂點陣列
  */
-const pathElementToVertices = (
-  pathElement: SVGPathElement,
-  samples: number,
-): Matter.Vector[] => {
+const pathElementToVertices = (pathElement: SVGPathElement, samples: number): Matter.Vector[] => {
   const pathLength = pathElement.getTotalLength();
   const vertices: Matter.Vector[] = [];
 
@@ -108,9 +105,7 @@ const pathElementToVertices = (
 
     if (!current || !next) continue;
 
-    const distance = Math.sqrt(
-      (current.x - next.x) ** 2 + (current.y - next.y) ** 2,
-    );
+    const distance = Math.sqrt((current.x - next.x) ** 2 + (current.y - next.y) ** 2);
 
     // 如果距離太近，跳過這個點
     if (distance > VERTEX_DISTANCE_THRESHOLD) {
@@ -175,7 +170,7 @@ const createWalls = (containerWidth: number, containerHeight: number) => {
     containerHeight - WALL_OFFSET,
     containerWidth,
     WALL_THICKNESS,
-    wallOptions,
+    wallOptions
   );
 
   const leftWall = Bodies.rectangle(
@@ -183,7 +178,7 @@ const createWalls = (containerWidth: number, containerHeight: number) => {
     containerHeight / 2,
     WALL_THICKNESS,
     containerHeight * 2,
-    wallOptions,
+    wallOptions
   );
 
   const rightWall = Bodies.rectangle(
@@ -191,7 +186,7 @@ const createWalls = (containerWidth: number, containerHeight: number) => {
     containerHeight / 2,
     WALL_THICKNESS,
     containerHeight * 2,
-    wallOptions,
+    wallOptions
   );
 
   const topWall = Bodies.rectangle(
@@ -199,7 +194,7 @@ const createWalls = (containerWidth: number, containerHeight: number) => {
     -WALL_OFFSET,
     containerWidth,
     WALL_THICKNESS,
-    wallOptions,
+    wallOptions
   );
 
   return { bottomWall, leftWall, rightWall, topWall };
@@ -231,11 +226,7 @@ const extractBodyPosition = (body: Matter.Body): IBodyPosition => ({
 /**
  * 創建圓形物體
  */
-const createCircleBody = (
-  x: number,
-  y: number,
-  radius: number,
-): Matter.Body => {
+const createCircleBody = (x: number, y: number, radius: number): Matter.Body => {
   return Bodies.circle(x, y, radius, {
     friction: PHYSICS_CONFIG.friction,
     frictionAir: PHYSICS_CONFIG.frictionAir,
@@ -248,11 +239,7 @@ const createCircleBody = (
 /**
  * 從 path 創建多邊形物體
  */
-const createPathBody = (
-  x: number,
-  y: number,
-  pathElement: SVGPathElement,
-): Matter.Body | null => {
+const createPathBody = (x: number, y: number, pathElement: SVGPathElement): Matter.Body | null => {
   const vertices = pathElementToVertices(pathElement, PATH_SAMPLES);
   const sortedVertices = Vertices.clockwiseSort(vertices);
 
@@ -264,13 +251,11 @@ const createPathBody = (
     restitution: PHYSICS_CONFIG.restitution,
   });
 
-  return Array.isArray(bodiesFromVertices)
-    ? bodiesFromVertices[0]
-    : bodiesFromVertices;
+  return Array.isArray(bodiesFromVertices) ? bodiesFromVertices[0] : bodiesFromVertices;
 };
 
 const MOOD_MAP = Object.fromEntries(
-  MOOD_OPTIONS.map((option) => [option.id, option.emoji]),
+  MOOD_OPTIONS.map((option) => [option.id, option.emoji])
 ) as Record<MoodTypeType, React.FC<React.SVGProps<SVGSVGElement>>>;
 
 /**
@@ -290,19 +275,14 @@ interface ICheckInStackProps {
   checkInsData?: PracticeCheckInsResponse;
 }
 
-export const CheckInStack = ({
-  practiceId,
-  checkInsData,
-}: ICheckInStackProps) => {
+export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRefsRef = useRef<(SVGSVGElement | null)[]>([]);
   const bodiesRef = useRef<Matter.Body[]>([]);
   const [positions, setPositions] = useState<IBodyPosition[]>([]);
   const [containerHeight, setContainerHeight] = useState(MIN_CONTAINER_HEIGHT);
   const animationFrameRef = useRef<number | undefined>(undefined);
-  const [svgGeometries, setSvgGeometries] = useState<(ISvgGeometry | null)[]>(
-    [],
-  );
+  const [svgGeometries, setSvgGeometries] = useState<(ISvgGeometry | null)[]>([]);
 
   // 將 API 資料轉換為 ICheckInItem[] 格式
   const items: ICheckInItem[] = useMemo(() => {
@@ -333,14 +313,11 @@ export const CheckInStack = ({
   /**
    * 獲取 SVG 組件配置
    */
-  const getSvgConfig = useCallback(
-    (index: number) => SVG_CONFIGS[index % SVG_CONFIGS.length],
-    [],
-  );
+  const getSvgConfig = useCallback((index: number) => SVG_CONFIGS[index % SVG_CONFIGS.length], []);
 
   const getSvgRef = useCallback(
     (index: number) => svgRefsRef.current[index % svgRefsRef.current.length],
-    [],
+    []
   );
 
   // 從實際渲染的 SVG 元素中提取幾何數據
@@ -375,10 +352,7 @@ export const CheckInStack = ({
     }
 
     // 初始化容器高度
-    const initialHeight = Math.max(
-      MIN_CONTAINER_HEIGHT,
-      count * MIN_CONTAINER_HEIGHT,
-    );
+    const initialHeight = Math.max(MIN_CONTAINER_HEIGHT, count * MIN_CONTAINER_HEIGHT);
     setContainerHeight(initialHeight);
 
     // 創建並配置物理引擎
@@ -392,7 +366,7 @@ export const CheckInStack = ({
     // 創建邊界牆
     const { bottomWall, leftWall, rightWall, topWall } = createWalls(
       CONTAINER_WIDTH,
-      initialHeight,
+      initialHeight
     );
     World.add(engine.world, [bottomWall, leftWall, rightWall, topWall]);
 
@@ -462,9 +436,7 @@ export const CheckInStack = ({
         const currentAngularVelocity = body.angularVelocity ?? 0;
         if (Math.abs(currentAngularVelocity) > MAX_ANGULAR_VELOCITY) {
           const clampedVelocity =
-            currentAngularVelocity > 0
-              ? MAX_ANGULAR_VELOCITY
-              : -MAX_ANGULAR_VELOCITY;
+            currentAngularVelocity > 0 ? MAX_ANGULAR_VELOCITY : -MAX_ANGULAR_VELOCITY;
           Body.setAngularVelocity(body, clampedVelocity);
         }
 
@@ -539,16 +511,12 @@ export const CheckInStack = ({
   /**
    * 生成 clip-path CSS 值
    */
-  const getClipPath = (
-    geometry: ISvgGeometry | null,
-    index: number,
-  ): string => {
+  const getClipPath = (geometry: ISvgGeometry | null, index: number): string => {
     if (!geometry) return "";
 
     if (geometry.isCircle && geometry.radius) {
       // 對於圓形，使用 circle() 函數
-      const radiusPercent =
-        (geometry.radius / Math.max(geometry.width, geometry.height)) * 100;
+      const radiusPercent = (geometry.radius / Math.max(geometry.width, geometry.height)) * 100;
       return `circle(${radiusPercent}% at 50% 50%)`;
     }
 
@@ -626,8 +594,9 @@ export const CheckInStack = ({
         if (!item) return null;
 
         const { mood, date, content } = item;
-        const Emoji = (MOOD_MAP[mood as MoodTypeType] ??
-          MOOD_OPTIONS[0]?.emoji) as React.FC<React.SVGProps<SVGSVGElement>>;
+        const Emoji = (MOOD_MAP[mood as MoodTypeType] ?? MOOD_OPTIONS[0]?.emoji) as React.FC<
+          React.SVGProps<SVGSVGElement>
+        >;
 
         return (
           <Link
@@ -648,16 +617,14 @@ export const CheckInStack = ({
             <div
               className={cn(
                 "absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2",
-                i % 5 === 3 && "pb-11",
+                i % 5 === 3 && "pb-11"
               )}
             >
               <Emoji className="size-6" />
               <div className="text-xs text-bg-dark">
                 #{i + 1} {date}
               </div>
-              <div className="max-w-40 text-bg-dark line-clamp-2">
-                {content}
-              </div>
+              <div className="max-w-40 text-bg-dark line-clamp-2">{content}</div>
             </div>
           </Link>
         );

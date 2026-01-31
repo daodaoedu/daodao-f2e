@@ -15,10 +15,7 @@ export const ExecutionDurationCard = ({
   startDate,
   showRemaining = false,
 }: ExecutionDurationCardProps) => {
-  const days =
-    typeof durationDays === "string"
-      ? Number.parseInt(durationDays, 10)
-      : durationDays;
+  const days = typeof durationDays === "string" ? Number.parseInt(durationDays, 10) : durationDays;
 
   const today = new Date();
   const start =
@@ -27,9 +24,7 @@ export const ExecutionDurationCard = ({
       : null;
   const end = start ? addDays(start, days) : null;
   const remainingDays =
-    showRemaining && end
-      ? Math.min(days, Math.max(0, differenceInDays(end, today)))
-      : days;
+    showRemaining && end ? Math.min(days, Math.max(0, differenceInDays(end, today))) : days;
 
   return (
     <div className="relative bg-white rounded-lg p-4 flex flex-col justify-between min-h-[120px]">
@@ -41,9 +36,7 @@ export const ExecutionDurationCard = ({
         <div>
           <h3 className="text-xs text-text-dark">剩餘</h3>
           <div className="flex items-baseline gap-0.5">
-            <div className="text-lg font-medium text-logo-orange">
-              {remainingDays}
-            </div>
+            <div className="text-lg font-medium text-logo-orange">{remainingDays}</div>
             <div className="text-xs text-text-dark">天</div>
             <div className="text-xs text-text-dark">/ 總共</div>
             <div className="text-xs text-text-dark">{days}</div>
@@ -54,9 +47,7 @@ export const ExecutionDurationCard = ({
         <div>
           <h3 className="text-xs text-text-dark">執行時長</h3>
           <div className="flex items-baseline gap-0.5">
-            <div className="text-lg font-medium text-logo-orange">
-              {durationDays}
-            </div>
+            <div className="text-lg font-medium text-logo-orange">{durationDays}</div>
             <div className="text-xs text-text-dark">天</div>
           </div>
         </div>
@@ -64,17 +55,13 @@ export const ExecutionDurationCard = ({
       {start && (
         <div>
           <div className="text-xs text-text-dark">開始日</div>
-          <div className="text-sm text-logo-cyan">
-            {format(start, "yyyy/MM/dd")}
-          </div>
+          <div className="text-sm text-logo-cyan">{format(start, "yyyy/MM/dd")}</div>
         </div>
       )}
       {end && (
         <div>
           <div className="text-xs text-text-dark">結束日</div>
-          <div className="text-sm text-logo-cyan">
-            {format(end, "yyyy/MM/dd")}
-          </div>
+          <div className="text-sm text-logo-cyan">{format(end, "yyyy/MM/dd")}</div>
         </div>
       )}
     </div>

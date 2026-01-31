@@ -1,18 +1,14 @@
 "use client";
 
-import { Deco4Svg } from "@daodao/assets";
 import { usePracticeById, usePracticeCheckIns } from "@daodao/api";
+import { Deco4Svg } from "@daodao/assets";
 import { useParams } from "@daodao/i18n/navigation";
 import { addDays, format, isValid, parse } from "date-fns";
 import { useMemo } from "react";
-import {
-  CheckInButton,
-  CheckInDateSelector,
-  CheckInDetail,
-} from "@/components/check-in";
+import { CheckInButton, CheckInDateSelector, CheckInDetail } from "@/components/check-in";
 import type { ICheckInDisplayData } from "@/components/check-in/types";
-import { mapApiMoodToMoodType } from "@/constants/mood";
 import { PageHeader } from "@/components/layout";
+import { mapApiMoodToMoodType } from "@/constants/mood";
 
 /**
  * 將 API 的 checkinDate 格式轉換為顯示格式
@@ -63,7 +59,7 @@ export default function CheckInDetailPage() {
 
   // 獲取 practice 資料
   const { data: practiceData, isLoading: isLoadingPractice } = usePracticeById(practiceId);
-  
+
   // 獲取所有 check-ins
   const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
     limit: 30,
@@ -72,7 +68,7 @@ export default function CheckInDetailPage() {
   // 將 API 的 check-ins 轉換為 ICheckInDisplayData 格式
   const checkInsMap = useMemo(() => {
     const map = new Map<string, ICheckInDisplayData>();
-    
+
     if (!checkInsData?.data || !practiceData?.data) {
       return map;
     }
@@ -103,7 +99,7 @@ export default function CheckInDetailPage() {
   // 建立日期到 check-in ID 的映射（用於生成日期列表）
   const checkInDateToIdMap = useMemo(() => {
     const map = new Map<string, string>();
-    
+
     if (!checkInsData?.data) {
       return map;
     }
@@ -118,7 +114,7 @@ export default function CheckInDetailPage() {
   // 建立 check-in ID 到原始日期的映射（用於 lastCheckInDate）
   const checkInIdToDateMap = useMemo(() => {
     const map = new Map<string, string>();
-    
+
     if (!checkInsData?.data) {
       return map;
     }

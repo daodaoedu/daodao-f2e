@@ -1,7 +1,7 @@
 "use client";
 
-import { BookSvg } from "@daodao/assets";
 import { useExtractOgImage } from "@daodao/api";
+import { BookSvg } from "@daodao/assets";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { Link2Icon, X } from "lucide-react";
@@ -100,15 +100,12 @@ const ResourceCardComponent = ({ resource, className, onClick, onRemove }: Resou
   );
 };
 
-export const ResourceCard = React.memo(
-  ResourceCardComponent,
-  (prevProps, nextProps) => {
-    // 只比較 resource 對象，忽略 onRemove 和 onClick 的變化
-    return (
-      prevProps.resource.id === nextProps.resource.id &&
-      prevProps.resource.name === nextProps.resource.name &&
-      prevProps.resource.url === nextProps.resource.url &&
-      prevProps.className === nextProps.className
-    );
-  }
-);
+export const ResourceCard = React.memo(ResourceCardComponent, (prevProps, nextProps) => {
+  // 只比較 resource 對象，忽略 onRemove 和 onClick 的變化
+  return (
+    prevProps.resource.id === nextProps.resource.id &&
+    prevProps.resource.name === nextProps.resource.name &&
+    prevProps.resource.url === nextProps.resource.url &&
+    prevProps.className === nextProps.className
+  );
+});

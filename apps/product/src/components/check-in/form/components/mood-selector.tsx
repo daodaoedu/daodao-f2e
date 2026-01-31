@@ -1,4 +1,3 @@
-import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
 import {
   FormControl,
   FormField,
@@ -6,9 +5,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@daodao/ui/components/form";
+import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
 import { cn } from "@daodao/ui/lib/utils";
-import { MOOD_OPTIONS } from "@/constants/mood";
 import type { UseFormReturn } from "react-hook-form";
+import { MOOD_OPTIONS } from "@/constants/mood";
 import type { CheckInFormValuesType } from "../schema";
 
 interface IMoodSelectorProps {
@@ -44,7 +44,7 @@ export const MoodSelector = ({ form }: IMoodSelectorProps) => {
                     htmlFor={inputId}
                     className={cn(
                       "flex flex-col items-center gap-1 opacity-30 transition-opacity cursor-pointer",
-                      isSelected && "opacity-100",
+                      isSelected && "opacity-100"
                     )}
                   >
                     <RadioGroupItem

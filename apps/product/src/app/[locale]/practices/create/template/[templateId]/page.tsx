@@ -1,13 +1,13 @@
 "use client";
 
-import { ArrowRightOutlineSvg, CompassSvg, Deco4Svg } from "@daodao/assets";
 import {
+  type CreatePracticeRequestType,
   createPractice,
   getRandomPracticeTemplates,
-  usePracticeTemplateById,
-  type CreatePracticeRequestType,
   type PracticeTemplateType,
+  usePracticeTemplateById,
 } from "@daodao/api";
+import { ArrowRightOutlineSvg, CompassSvg, Deco4Svg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -26,20 +26,18 @@ import {
   ResourceCard,
 } from "@/components/practice";
 import {
-  DurationDays,
   DURATION_DAYS_NUMBER_OPTIONS,
+  DurationDays,
   DurationDaysNumberToStringMap,
-  ExecutionTiming,
+  type ExecutionTiming,
   Frequency,
   mapExecutionTimingToPracticeTimePeriods,
-  parseFrequency,
   PracticeTimePeriodToExecutionTimingMap,
+  parseFrequency,
 } from "@/constants/practice-form";
 
 // 將 API 的 practiceTimePeriods 映射到 executionTiming
-const mapPracticeTimePeriodsToExecutionTiming = (
-  periods: string[]
-): ExecutionTiming[] => {
+const mapPracticeTimePeriodsToExecutionTiming = (periods: string[]): ExecutionTiming[] => {
   const mapped = periods
     .map((period) => PracticeTimePeriodToExecutionTimingMap[period])
     .filter((timing): timing is ExecutionTiming => timing !== undefined);
@@ -48,10 +46,7 @@ const mapPracticeTimePeriodsToExecutionTiming = (
 };
 
 // 將 API 的 frequencyMinDays 和 frequencyMaxDays 映射到 frequency
-const mapFrequencyToFormValue = (
-  minDays: number | null,
-  maxDays: number | null
-): Frequency => {
+const mapFrequencyToFormValue = (minDays: number | null, maxDays: number | null): Frequency => {
   if (minDays === null || maxDays === null) {
     return Frequency.threeToFive; // 預設值
   }
@@ -87,9 +82,7 @@ const mapDurationDaysToString = (days: number | null): DurationDays => {
 };
 
 // 將 API 的 PracticeTemplate 轉換成 ManualPracticeFormValues
-const convertTemplateToFormValues = (
-  template: PracticeTemplateType
-): ManualPracticeFormValues => {
+const convertTemplateToFormValues = (template: PracticeTemplateType): ManualPracticeFormValues => {
   // 預設開始日期為今天
   const today = new Date();
   const startDate = format(today, "yyyy-MM-dd");
@@ -355,7 +348,9 @@ export default function TemplateDetailPage() {
 
                 if (response.error) {
                   const errorMessage =
-                    response.error && typeof response.error === "object" && "message" in response.error
+                    response.error &&
+                    typeof response.error === "object" &&
+                    "message" in response.error
                       ? String(response.error.message)
                       : "建立實踐失敗";
                   console.error("Failed to create practice:", errorMessage);

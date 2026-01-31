@@ -114,9 +114,7 @@ export const Step4 = ({ form }: Step4Props) => {
             if (isDuplicate) {
               form.setError("resources", {
                 type: "manual",
-                message: trimmedUrl
-                  ? "此網址的資源已經添加過了"
-                  : "此名稱的資源已經添加過了",
+                message: trimmedUrl ? "此網址的資源已經添加過了" : "此名稱的資源已經添加過了",
               });
               return;
             }

@@ -27,7 +27,10 @@ const resultTypeToLottiePathMap = new Map<string, () => Promise<object>>([
   ["o", () => import("@daodao/assets/images/quiz/order-builder-1.json").then((m) => m.default)],
   ["a", () => import("@daodao/assets/images/quiz/active-shaper-1.json").then((m) => m.default)],
   ["l", () => import("@daodao/assets/images/quiz/liquid-integrator-1.json").then((m) => m.default)],
-  ["c", () => import("@daodao/assets/images/quiz/community-connector-1.json").then((m) => m.default)],
+  [
+    "c",
+    () => import("@daodao/assets/images/quiz/community-connector-1.json").then((m) => m.default),
+  ],
 ]);
 /**
  * 「我的小島」標題區組件
@@ -182,10 +185,7 @@ export function IslandHeader({ resultType }: IslandHeaderProps) {
                 if (!animationData) return null;
                 return (
                   <div key={key} className="w-[96px] h-[91px] shrink-0">
-                    <Lottie
-                      animationData={animationData}
-                      className="*:w-full *:h-full"
-                    />
+                    <Lottie animationData={animationData} className="*:w-full *:h-full" />
                   </div>
                 );
               })}
@@ -195,10 +195,7 @@ export function IslandHeader({ resultType }: IslandHeaderProps) {
                 if (!animationData) return null;
                 return (
                   <div key={`duplicate-${key}`} className="w-[96px] h-[91px] shrink-0">
-                    <Lottie
-                      animationData={animationData}
-                      className="*:w-full *:h-full"
-                    />
+                    <Lottie animationData={animationData} className="*:w-full *:h-full" />
                   </div>
                 );
               })}

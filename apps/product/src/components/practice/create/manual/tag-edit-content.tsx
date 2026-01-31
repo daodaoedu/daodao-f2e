@@ -1,5 +1,6 @@
 "use client";
 
+import { suggestTags } from "@daodao/api";
 import {
   PinList,
   type PinListItem,
@@ -19,7 +20,6 @@ import { Check } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { suggestTags } from "@daodao/api";
 
 export interface TagEditData {
   selectedTags: string[];
@@ -62,7 +62,6 @@ export const TagEditSheetContent = ({
   // Cache for tag suggestions to avoid re-fetching same keywords
   const tagCacheRef = React.useRef<Map<string, string[]>>(new Map());
   const [tagSuggestions, setTagSuggestions] = React.useState<string[]>([]);
-  const [isLoadingSuggestions, setIsLoadingSuggestions] = React.useState(false);
   // Track the current keyword being queried to prevent race conditions
   const currentQueryKeywordRef = React.useRef<string>("");
 
@@ -96,7 +95,6 @@ export const TagEditSheetContent = ({
         return;
       }
 
-      setIsLoadingSuggestions(true);
       try {
         const response = await suggestTags({
           q: trimmedKeyword,
@@ -121,11 +119,6 @@ export const TagEditSheetContent = ({
         // Only update state if keyword still matches
         if (currentQueryKeywordRef.current === trimmedKeyword) {
           setTagSuggestions([]);
-        }
-      } finally {
-        // Only update loading state if keyword still matches
-        if (currentQueryKeywordRef.current === trimmedKeyword) {
-          setIsLoadingSuggestions(false);
         }
       }
     }, 300); // 300ms debounce
@@ -164,9 +157,7 @@ export const TagEditSheetContent = ({
 
   const pinListItems: PinListItem[] = React.useMemo(() => {
     // Filter out already selected tags from available tags
-    const availableTags = availableTagsFromAPI.filter(
-      (tag) => !selectedTags.includes(tag)
-    );
+    const availableTags = availableTagsFromAPI.filter((tag) => !selectedTags.includes(tag));
     const allTags = [...availableTags, ...selectedTags];
 
     // Create keyword item if keyword exists and is not in allTags

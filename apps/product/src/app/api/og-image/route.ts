@@ -3,13 +3,9 @@
  * 從指定網址提取 og:image 並暫存
  */
 
-import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
-import {
-  getCachedOgImage,
-  setCachedOgImage,
-  type IOgImageCacheData,
-} from "@/lib/og-image-cache";
+import { NextResponse } from "next/server";
+import { getCachedOgImage, type IOgImageCacheData, setCachedOgImage } from "@/lib/og-image-cache";
 
 /**
  * 從 HTML 內容中提取 Open Graph 資料
@@ -33,7 +29,7 @@ const extractOgData = (
   let ogImageUrl: string | null = null;
   for (const pattern of imagePatterns) {
     const match = html.match(pattern);
-    if (match && match[1]) {
+    if (match?.[1]) {
       const imageUrl = match[1].trim();
       // 處理相對路徑
       if (imageUrl.startsWith("https://")) {
@@ -62,7 +58,7 @@ const extractOgData = (
   let title: string | undefined;
   for (const pattern of titlePatterns) {
     const match = html.match(pattern);
-    if (match && match[1]) {
+    if (match?.[1]) {
       title = match[1].trim();
       break;
     }
@@ -76,7 +72,7 @@ const extractOgData = (
   let description: string | undefined;
   for (const pattern of descriptionPatterns) {
     const match = html.match(pattern);
-    if (match && match[1]) {
+    if (match?.[1]) {
       description = match[1].trim();
       break;
     }
@@ -161,7 +157,6 @@ const fetchOgImageData = unstable_cache(
     tags: ["og-image"],
   }
 );
-
 
 /**
  * GET /api/og-image

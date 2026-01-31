@@ -1,25 +1,22 @@
 "use client";
 
 import { Button, type ButtonProps } from "@daodao/ui/components/button";
-import { CalendarCheck, Check } from "lucide-react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { Form } from "@daodao/ui/components/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarCheck, Check } from "lucide-react";
+import { useForm } from "react-hook-form";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
-import { checkInFormSchema, type CheckInFormValuesType } from "./schema";
-import { useCheckInImageRender } from "./hooks/use-check-in-image-render";
-import { MoodSelector } from "./components/mood-selector";
-import { TagSelector } from "./components/tag-selector";
+import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
 import { DescriptionField } from "./components/description-field";
 import { MediaUploadField } from "./components/media-upload-field";
+import { MoodSelector } from "./components/mood-selector";
+import { TagSelector } from "./components/tag-selector";
+import { useCheckInImageRender } from "./hooks/use-check-in-image-render";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
 import { useCheckInSubmit } from "./hooks/use-check-in-submit";
-import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
+import { type CheckInFormValuesType, checkInFormSchema } from "./schema";
 
-export type {
-  ICheckInFormData as CheckInData,
-  ICheckInStatusOptions as CheckInStatusOptions,
-};
+export type { ICheckInFormData as CheckInData, ICheckInStatusOptions as CheckInStatusOptions };
 export type { CheckInStatusType as CheckInStatus } from "@/constants/check-in-status";
 
 /**
@@ -29,14 +26,9 @@ export type { CheckInStatusType as CheckInStatus } from "@/constants/check-in-st
 interface ICheckInSheetContentProps {
   taskTitle: string;
   onComplete: (data: ICheckInFormData) => Promise<void> | void;
-  onClose?: () => void;
 }
 
-export const CheckInSheetContent = ({
-  taskTitle,
-  onComplete,
-  onClose,
-}: ICheckInSheetContentProps) => {
+export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetContentProps) => {
   const form = useForm<CheckInFormValuesType>({
     resolver: zodResolver(checkInFormSchema),
     defaultValues: {
@@ -47,14 +39,13 @@ export const CheckInSheetContent = ({
     },
   });
 
-  const { isRendering, startRender, renderCheckInCard } =
-    useCheckInImageRender({
-      taskTitle,
-      onComplete,
-      onReset: () => {
-        form.reset();
-      },
-    });
+  const { isRendering, startRender, renderCheckInCard } = useCheckInImageRender({
+    taskTitle,
+    onComplete,
+    onReset: () => {
+      form.reset();
+    },
+  });
 
   const onSubmit = async (values: CheckInFormValuesType) => {
     // Zod 驗證已確保 mood 不是 null
@@ -87,9 +78,7 @@ export const CheckInSheetContent = ({
 
         {/* Thought Sharing */}
         <div className="mb-8">
-          <h3 className="text-base font-medium mb-3 text-text-dark">
-            想法分享
-          </h3>
+          <h3 className="text-base font-medium mb-3 text-text-dark">想法分享</h3>
           <TagSelector form={form} />
           <DescriptionField form={form} />
         </div>
@@ -102,12 +91,7 @@ export const CheckInSheetContent = ({
 
         {/* Complete Button */}
         <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
-          <Button
-            type="submit"
-            variant="orange"
-            className="w-full"
-            disabled={isRendering}
-          >
+          <Button type="submit" variant="orange" className="w-full" disabled={isRendering}>
             <Check className="size-4.5" />
             {isRendering ? "打卡中..." : "完成打卡"}
           </Button>
@@ -117,9 +101,9 @@ export const CheckInSheetContent = ({
   );
 };
 
-
 interface ICheckInButtonProps
-  extends ICheckInStatusOptions, Omit<ButtonProps, "onClick" | "children"> {
+  extends ICheckInStatusOptions,
+    Omit<ButtonProps, "onClick" | "children"> {
   /**
    * 實踐 ID（用於 API 調用）
    */

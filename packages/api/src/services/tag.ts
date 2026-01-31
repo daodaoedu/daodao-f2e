@@ -125,4 +125,10 @@ type TagPromptsResponse =
 type TagPromptsByTagsResponse =
   paths["/api/v1/tags/prompts"]["get"]["responses"]["200"]["content"]["application/json"];
 
-export type { TagSearchResponse, TagSuggestResponse, PopularTagsResponse, TagPromptsResponse, TagPromptsByTagsResponse };
+export type {
+  TagSearchResponse,
+  TagSuggestResponse,
+  PopularTagsResponse,
+  TagPromptsResponse,
+  TagPromptsByTagsResponse,
+};

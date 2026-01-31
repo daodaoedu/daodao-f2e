@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  updatePractice,
-  usePracticeById,
-  type UpdatePracticeRequestType,
-} from "@daodao/api";
+import { type UpdatePracticeRequestType, updatePractice, usePracticeById } from "@daodao/api";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
@@ -14,10 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import {
-  type ManualPracticeFormValues,
-  manualPracticeFormSchema,
-} from "@/components/practice";
+import { type ManualPracticeFormValues, manualPracticeFormSchema } from "@/components/practice";
 import { Step1 } from "@/components/practice/create/manual/steps/step-1";
 import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";
@@ -27,18 +20,18 @@ import {
   ExecutionTiming,
   Frequency,
   mapExecutionTimingToPracticeTimePeriods,
-  parseFrequency,
   PracticeTimePeriodToExecutionTimingMap,
+  parseFrequency,
 } from "@/constants/practice-form";
 import { PracticeStatus } from "@/constants/practice-status";
 
 // 將表單資料轉換成 API 請求格式
 const convertFormValuesToApiRequest = (
-  values: ManualPracticeFormValues,
+  values: ManualPracticeFormValues
 ): UpdatePracticeRequestType => {
   const frequency = parseFrequency(values.frequency as Frequency);
   const practiceTimePeriods = mapExecutionTimingToPracticeTimePeriods(
-    values.executionTiming as ExecutionTiming[],
+    values.executionTiming as ExecutionTiming[]
   );
 
   const request: Record<string, unknown> = {
@@ -256,10 +249,7 @@ export default function EditPracticePage() {
       <main className="relative px-5 max-w-[448px] mx-auto pb-20">
         {/* Form */}
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-6"
-          >
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             <Step1 form={form} />
             <Step2 form={form} disabled={isPracticeStarted} />
             <Step3 form={form} />
