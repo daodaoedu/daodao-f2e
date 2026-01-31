@@ -1,8 +1,12 @@
+"use client";
+
+import { useAuth } from "@daodao/auth";
 import { ANCHOR_IDS } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 
 export function PlanSection() {
+  const { openLoginDialog } = useAuth();
   return (
     <section
       className="relative mt-[60px] flex flex-col items-center justify-center overflow-x-clip pb-[60px]"
@@ -52,7 +56,12 @@ export function PlanSection() {
                 </li>
               </ul>
 
-              <Button variant="ctaOrange" size="huge" className="mt-6">
+              <Button
+                variant="ctaOrange"
+                size="huge"
+                className="mt-6"
+                onClick={() => openLoginDialog({ redirectUrl: "/" })}
+              >
                 立即免費註冊
               </Button>
               <p className="mt-2 text-center text-[13px]">Beta 期間完全免費 • 無需信用卡</p>

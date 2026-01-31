@@ -14,7 +14,7 @@
   "scripts": {
     "dev": "pnpm generate:env --watch",
     "generate:env": "tsx scripts/generate-env.ts",
-    "build": "tsc && pnpm generate:env",
+    "build": "pnpm generate:env && tsc",
     "clean": "pnpm dlx rimraf generated node_modules dist"
   },
   "dependencies": {},

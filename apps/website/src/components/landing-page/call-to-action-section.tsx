@@ -1,7 +1,12 @@
+"use client";
+
+import { useAuth } from "@daodao/auth";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 
 export function CallToActionSection() {
+  const { openLoginDialog } = useAuth();
+
   return (
     <section className="relative my-20 flex min-h-[366px] flex-col items-center justify-center px-6 overflow-hidden">
       <Image
@@ -17,7 +22,7 @@ export function CallToActionSection() {
         你喜歡的學習生活了嗎？
       </h2>
       <div className="relative z-10">
-        <Button variant="ctaOrange" size="huge">
+        <Button variant="ctaOrange" size="huge" onClick={() => openLoginDialog({ redirectUrl: "/" })}>
           立即加入
         </Button>
       </div>

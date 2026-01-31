@@ -1,9 +1,13 @@
+"use client";
+
+import { useAuth } from "@daodao/auth";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 import { ChevronRight } from "lucide-react";
 import { LottieHero } from "./lottie-hero";
 
 export function KeyVision() {
+  const { openLoginDialog } = useAuth();
   return (
     <div className="relative md:pb-32">
       <Image
@@ -50,7 +54,12 @@ export function KeyVision() {
               </div>
             </h2>
 
-            <Button variant="ctaOrange" size="huge" className="relative z-20 mt-8">
+            <Button
+              variant="ctaOrange"
+              size="huge"
+              className="relative z-20 mt-8"
+              onClick={() => openLoginDialog({ redirectUrl: "/" })}
+            >
               立即加入
               <ChevronRight className="ml-2 size-5" />
             </Button>

@@ -31,8 +31,8 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
-          
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-  check:
+  typecheck:
     name: TypeScript Check
     runs-on: ubuntu-latest
     needs: init
@@ -54,8 +54,8 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
-          
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -66,12 +66,12 @@ jobs:
         run: pnpm install
 
       - name: TypeScript Check
-        id: check
+        id: typecheck
         continue-on-error: true
         run: |
           if ! ERROR_MSG=$(pnpm typecheck 2>&1); then
               {
-                echo "check_error<<EOF"
+                echo "typecheck_error<<EOF"
                 echo "$ERROR_MSG"
                 echo "EOF"
               } >> $GITHUB_OUTPUT
@@ -79,25 +79,25 @@ jobs:
           fi
 
       - name: Send TypeScript Error Notification
-        if: steps.check.outcome == 'failure'
+        if: steps.typecheck.outcome == 'failure'
         uses: ./.github/actions/notification
         with:
           TYPE: failure
           TITLE: "❌ TypeScript Error"
-          DESCRIPTION: "Branch: ${{ env.BRANCH_NAME }}\n\n${{ steps.check.outputs.check_error }}"
+          DESCRIPTION: "Branch: ${{ env.BRANCH_NAME }}\n\n${{ steps.typecheck.outputs.typecheck_error }}"
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: Check on failure
-        if: steps.check.outcome == 'failure'
+        if: steps.typecheck.outcome == 'failure'
         env:
-          CHECK_ERROR: ${{ steps.check.outputs.check_error }}
+          TYPECHECK_ERROR: ${{ steps.typecheck.outputs.typecheck_error }}
         run: |
           echo "❌ TypeScript Error"
-          echo $CHECK_ERROR
+          echo $TYPECHECK_ERROR
           exit 1
 
-  lint:
-    name: ESLint Check
+  quality:
+    name: Code Quality Check
     runs-on: ubuntu-latest
     needs: init
 
@@ -108,8 +108,8 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
-          
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -119,33 +119,33 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: ESLint Check
-        id: lint
+      - name: Code Quality Check
+        id: quality
         continue-on-error: true
         run: |
-          if ! ERROR_MSG=$(pnpm lint 2>&1); then
+          if ! ERROR_MSG=$(pnpm check 2>&1); then
               {
-                echo "lint_error<<EOF"
+                echo "quality_error<<EOF"
                 echo "$ERROR_MSG"
                 echo "EOF"
               } >> $GITHUB_OUTPUT
               exit 1
           fi
 
-      - name: Send ESLint Error Notification
-        if: steps.lint.outcome == 'failure'
+      - name: Send Code Quality Error Notification
+        if: steps.quality.outcome == 'failure'
         uses: ./.github/actions/notification
         with:
           TYPE: failure
-          TITLE: "❌ Lint Failed"
-          DESCRIPTION: "Branch: ${{ env.BRANCH_NAME }}\n\n${{ steps.lint.outputs.lint_error }}"
+          TITLE: "❌ Code Quality Check Failed"
+          DESCRIPTION: "Branch: ${{ env.BRANCH_NAME }}\n\n${{ steps.quality.outputs.quality_error }}"
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: Check on failure
-        if: steps.lint.outcome == 'failure'
+        if: steps.quality.outcome == 'failure'
         env:
-          LINT_ERROR: ${{ steps.lint.outputs.lint_error }}
+          QUALITY_ERROR: ${{ steps.quality.outputs.quality_error }}
         run: |
-          echo "❌ Lint Failed"
-          echo $LINT_ERROR
+          echo "❌ Code Quality Check Failed"
+          echo $QUALITY_ERROR
           exit 1

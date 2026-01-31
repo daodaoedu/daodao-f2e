@@ -26,19 +26,25 @@ ENV PORT=${APP_PORT}
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-# 從本地複製預先建置的靜態導出文件
-COPY --chown=nextjs:nodejs apps/${APP_NAME}/out ./apps/${APP_NAME}/out
-COPY --chown=nextjs:nodejs apps/${APP_NAME}/public ./apps/${APP_NAME}/public
+# 從本地複製預先建置的靜態導出文件（不設置所有權，保持 root）
+COPY apps/${APP_NAME}/out ./apps/${APP_NAME}/out
+COPY apps/${APP_NAME}/public ./apps/${APP_NAME}/public
 
-# 複製 packages 的靜態資源
-COPY --chown=nextjs:nodejs packages/assets/generated ./packages/assets/generated
-COPY --chown=nextjs:nodejs packages/assets/images ./packages/assets/images
+# 複製 packages 的靜態資源（不設置所有權，保持 root）
+COPY packages/assets/generated ./packages/assets/generated
+COPY packages/assets/images ./packages/assets/images
+
+# 設置複製的資源為只讀權限（檔案 644，目錄 755）
+# 保持 root 所有權，確保非 root 用戶沒有寫入權限
+RUN find ./apps/${APP_NAME}/out ./apps/${APP_NAME}/public ./packages/assets/generated ./packages/assets/images -type f -exec chmod 644 {} \; && \
+    find ./apps/${APP_NAME}/out ./apps/${APP_NAME}/public ./packages/assets/generated ./packages/assets/images -type d -exec chmod 755 {} \;
 
 # 安裝 Nginx
 RUN apk add --no-cache nginx
 
-# 複製 Nginx 配置檔
+# 複製 Nginx 配置檔（設置為只讀）
 COPY docker/production/nginx.conf /etc/nginx/http.d/default.conf
+RUN chmod 644 /etc/nginx/http.d/default.conf
 
 # 創建 Nginx 運行時目錄並設置權限
 RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run && \
@@ -73,14 +79,19 @@ RUN addgroup --system --gid 1001 nodejs && \
 # 安裝 wget 用於健康檢查
 RUN apk add --no-cache libc6-compat wget
 
-# 從本地複製預先建置的 standalone 輸出
-COPY --chown=nextjs:nodejs apps/${APP_NAME}/.next/standalone ./
-COPY --chown=nextjs:nodejs apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/.next/static
-COPY --chown=nextjs:nodejs apps/${APP_NAME}/public ./apps/${APP_NAME}/public
+# 從本地複製預先建置的 standalone 輸出（不設置所有權，保持 root）
+COPY apps/${APP_NAME}/.next/standalone ./
+COPY apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/.next/static
+COPY apps/${APP_NAME}/public ./apps/${APP_NAME}/public
 
-# 複製 packages 的靜態資源
-COPY --chown=nextjs:nodejs packages/assets/generated ./packages/assets/generated
-COPY --chown=nextjs:nodejs packages/assets/images ./packages/assets/images
+# 複製 packages 的靜態資源（不設置所有權，保持 root）
+COPY packages/assets/generated ./packages/assets/generated
+COPY packages/assets/images ./packages/assets/images
+
+# 設置複製的資源為只讀權限（檔案 644，目錄 755）
+# 保持 root 所有權，確保非 root 用戶沒有寫入權限
+RUN find ./apps/${APP_NAME}/.next/standalone ./apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/public ./packages/assets/generated ./packages/assets/images -type f -exec chmod 644 {} \; && \
+    find ./apps/${APP_NAME}/.next/standalone ./apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/public ./packages/assets/generated ./packages/assets/images -type d -exec chmod 755 {} \;
 
 # 切換到非 root 用戶
 USER nextjs
