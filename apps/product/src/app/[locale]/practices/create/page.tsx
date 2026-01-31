@@ -79,7 +79,7 @@ export default function CreatePracticePage() {
   // 取得實踐模板列表
   const { data, error, isLoading: isTemplatesLoading } = usePracticeTemplates({
     category: selectedCategory || undefined,
-    limit: 100, // 取得足夠的數量以顯示所有模板
+    limit: 16,
   });
 
   // 統一的 loading 狀態：分類或模板任一在載入中

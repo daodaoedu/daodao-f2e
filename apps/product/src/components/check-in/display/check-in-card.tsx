@@ -2,7 +2,6 @@
 
 import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
 import { type CapturedImageData, captureElementAsImage } from "@daodao/shared";
-import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
 import { useEffect, useRef } from "react";
@@ -18,6 +17,7 @@ interface ICheckInCardProps {
   titleClassName?: string;
   onImageClick?: (index: number) => void;
   showTape?: boolean;
+  onMaskedImageReady?: (maskedImageData: CapturedImageData) => void;
 }
 
 /**
@@ -37,8 +37,16 @@ const applyGradientMask = async (imageData: CapturedImageData): Promise<Captured
         return;
       }
 
-      canvas.width = imageData.width;
-      canvas.height = imageData.height;
+      // 使用高解析度 Canvas 以獲得清晰圖片
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      const targetWidth = imageData.width * devicePixelRatio;
+      const targetHeight = imageData.height * devicePixelRatio;
+
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+
+      // 縮放 context 以保持正確的繪製比例
+      ctx.scale(devicePixelRatio, devicePixelRatio);
 
       // 繪製原始圖片
       ctx.drawImage(img, 0, 0, imageData.width, imageData.height);
@@ -82,6 +90,7 @@ export const CheckInCard = ({
   titleClassName = "text-white",
   onImageClick,
   showTape = true,
+  onMaskedImageReady,
 }: ICheckInCardProps) => {
   const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
   const MoodEmoji = moodOption?.emoji;
@@ -102,22 +111,26 @@ export const CheckInCard = ({
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (!mainRef.current) return;
-      const imageData = await captureElementAsImage(mainRef.current, {
-        width: 350,
-        height: 192,
+      const element = mainRef.current;
+      const actualWidth = element.clientWidth;
+      const actualHeight = element.clientHeight;
+      const imageData = await captureElementAsImage(element, {
+        width: actualWidth,
+        height: actualHeight,
         x: 0,
         y: 0,
       });
       if (imageData) {
         const maskedImageData = await applyGradientMask(imageData);
         checkInImageRef.current = maskedImageData;
+        onMaskedImageReady?.(maskedImageData);
       }
     }, 500);
 
     return () => {
       clearTimeout(timer);
     };
-  }, []);
+  }, [onMaskedImageReady]);
 
   return (
     <div className="max-w-[350px] mx-auto">
@@ -136,6 +149,7 @@ export const CheckInCard = ({
           className="pt-4.5 bg-white max-h-[460px] overflow-y-auto scrollbar-hide px-5"
         >
           <div
+            className="pb-24"
             style={{
               backgroundImage:
                 "linear-gradient(to bottom, transparent 0px, transparent 38px, #99ECFF 38px, #99ECFF 39px)",
@@ -177,23 +191,25 @@ export const CheckInCard = ({
               )}
 
               {/* 圖片區域 */}
-              {images && images.length > 0 && (
+              {images && images.length > 1 && (
                 <div className="relative -mt-14">
-                  {images.map((imageUrl: string, index: number) => {
+                  {images.slice(1, 4).map((imageUrl: string, displayIndex: number) => {
+                    // displayIndex 是顯示時的索引（0, 1, 2）
+                    // 實際的圖片索引是 displayIndex + 1（1, 2, 3）
+                    const actualIndex = displayIndex + 1;
                     const imageElement = (
                       <>
-                        {index === 0 && showTape && (
+                        {displayIndex === 0 && showTape && (
                           <TapeSvg
                             width={70}
                             height={38}
                             className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-6 z-10"
                           />
                         )}
-                        <Image
-                          src={checkInImageRef.current?.src || imageUrl}
-                          alt={`打卡圖片 ${index + 1}`}
-                          fill
-                          className="object-contain bg-white"
+                        <img
+                          src={imageUrl}
+                          alt={`打卡圖片 ${actualIndex + 1}`}
+                          className="absolute inset-0 w-full h-full object-contain bg-white"
                         />
                       </>
                     );
@@ -203,14 +219,14 @@ export const CheckInCard = ({
                         <button
                           type="button"
                           key={imageUrl}
-                          onClick={() => onImageClick(index)}
+                          onClick={() => onImageClick(actualIndex)}
                           className={cn(
                             "relative block aspect-103/67 rounded border w-[206px] cursor-pointer transition-shadow hover:shadow-lg",
-                            index === 0 && "top-16 left-4 -rotate-8 z-2",
-                            index === 1 && "ml-auto right-4 rotate-12 z-1",
-                            index === 2 && "mx-auto bottom-5"
+                            displayIndex === 0 && "top-16 left-4 -rotate-8 z-2",
+                            displayIndex === 1 && "ml-auto right-4 rotate-12 z-1",
+                            displayIndex === 2 && "mx-auto bottom-5"
                           )}
-                          aria-label={`查看圖片 ${index + 1}`}
+                          aria-label={`查看圖片 ${actualIndex + 1}`}
                         >
                           {imageElement}
                         </button>
@@ -222,9 +238,9 @@ export const CheckInCard = ({
                         key={imageUrl}
                         className={cn(
                           "relative block aspect-103/67 rounded border overflow-hidden w-[206px]",
-                          index === 0 && "top-16 left-4 -rotate-8 z-2",
-                          index === 1 && "ml-auto right-4 rotate-12 z-1",
-                          index === 2 && "mx-auto bottom-5"
+                          displayIndex === 0 && "top-16 left-4 -rotate-8 z-2",
+                          displayIndex === 1 && "ml-auto right-4 rotate-12 z-1",
+                          displayIndex === 2 && "mx-auto bottom-5"
                         )}
                       >
                         {imageElement}

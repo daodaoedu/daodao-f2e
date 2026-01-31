@@ -255,8 +255,11 @@ export default function PracticeDetailPage() {
         <CheckInButton
           variant="orange"
           className="w-full sm:max-w-[288px]"
+          practiceId={practiceId}
+          practiceStatus={practiceData?.data?.status}
+          lastCheckInDate={checkInsData?.data?.[0]?.checkinDate || null}
           taskTitle={practice.name}
-          onComplete={() => {}}
+          progressPercentage={practice?.currentProgress ?? 0}
         />
       </footer>
     </div>

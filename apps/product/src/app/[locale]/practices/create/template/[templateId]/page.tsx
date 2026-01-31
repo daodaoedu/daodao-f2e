@@ -2,13 +2,16 @@
 
 import { ArrowRightOutlineSvg, CompassSvg, Deco4Svg } from "@daodao/assets";
 import {
+  createPractice,
   getRandomPracticeTemplates,
   usePracticeTemplateById,
+  type CreatePracticeRequestType,
   type PracticeTemplateType,
 } from "@daodao/api";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
+import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { format } from "date-fns";
 import { Loader, RefreshCcw } from "lucide-react";
@@ -28,6 +31,8 @@ import {
   DurationDaysNumberToStringMap,
   ExecutionTiming,
   Frequency,
+  mapExecutionTimingToPracticeTimePeriods,
+  parseFrequency,
   PracticeTimePeriodToExecutionTimingMap,
 } from "@/constants/practice-form";
 
@@ -110,6 +115,53 @@ const convertTemplateToFormValues = (
   };
 };
 
+// 將表單資料轉換成 API 請求格式
+const convertFormValuesToApiRequest = (
+  values: ManualPracticeFormValues
+): CreatePracticeRequestType => {
+  const frequency = parseFrequency(values.frequency as Frequency);
+  const practiceTimePeriods = mapExecutionTimingToPracticeTimePeriods(
+    values.executionTiming as ExecutionTiming[]
+  );
+
+  const request: Record<string, unknown> = {
+    title: values.name,
+    durationDays: parseInt(values.durationDays, 10),
+    frequencyMinDays: frequency.minDays,
+    frequencyMaxDays: frequency.maxDays,
+    sessionDurationMinutes: values.durationMinutes,
+  };
+
+  if (values.actionDescription) {
+    request.practiceAction = values.actionDescription;
+  }
+
+  if (values.startDate) {
+    request.startDate = values.startDate;
+  }
+
+  if (practiceTimePeriods.length > 0) {
+    request.practiceTimePeriods = practiceTimePeriods;
+  }
+
+  if (values.tags && values.tags.length > 0) {
+    request.tags = values.tags;
+  }
+
+  if (values.resources && values.resources.length > 0) {
+    request.resources = values.resources.map((resource) => ({
+      name: resource.name,
+      url: resource.url || undefined,
+    }));
+  }
+
+  if (values.customTiming) {
+    request.otherContext = values.customTiming;
+  }
+
+  return request as CreatePracticeRequestType;
+};
+
 export default function TemplateDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -128,6 +180,7 @@ export default function TemplateDetailPage() {
 
   const [showActions, setShowActions] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -288,17 +341,64 @@ export default function TemplateDetailPage() {
           )}
         >
           <Button
-            onClick={() => {
-              // TODO: 處理開始實踐的邏輯（提交到 API）
-              // 提交成功後導航到成功頁面
-              router.push(
-                `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}`
-              );
+            onClick={async () => {
+              if (isSubmitting || !template) {
+                return;
+              }
+
+              setIsSubmitting(true);
+
+              try {
+                const apiRequest = convertFormValuesToApiRequest(template);
+
+                const response = await createPractice(apiRequest);
+
+                if (response.error) {
+                  const errorMessage =
+                    response.error && typeof response.error === "object" && "message" in response.error
+                      ? String(response.error.message)
+                      : "建立實踐失敗";
+                  console.error("Failed to create practice:", errorMessage);
+                  toast.error(errorMessage);
+                  setIsSubmitting(false);
+                  return;
+                }
+
+                // 取得新建立的實踐 ID
+                const practiceId = response.data?.data?.id;
+
+                // 提交成功後導航到成功頁面
+                if (practiceId) {
+                  router.push(
+                    `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}&practiceId=${encodeURIComponent(practiceId)}`
+                  );
+                } else {
+                  router.push(
+                    `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}`
+                  );
+                }
+              } catch (error) {
+                const errorMessage =
+                  error instanceof Error ? error.message : "建立實踐失敗，請稍後再試";
+                console.error("Failed to create practice:", error);
+                toast.error(errorMessage);
+                setIsSubmitting(false);
+              }
             }}
+            disabled={isSubmitting}
             className="w-full sm:max-w-[288px]"
           >
-            看起來不錯
-            <ArrowRightOutlineSvg className="size-4.5" />
+            {isSubmitting ? (
+              <>
+                <Loader className="size-4.5 animate-spin" />
+                建立中...
+              </>
+            ) : (
+              <>
+                看起來不錯
+                <ArrowRightOutlineSvg className="size-4.5" />
+              </>
+            )}
           </Button>
         </footer>
       </main>

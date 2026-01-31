@@ -10,6 +10,8 @@ import type {
   IGetTagSearchParams,
   IGetTagSuggestParams,
   IGetPopularTagsParams,
+  IGetTagPromptsParams,
+  IGetTagPromptsByTagsParams,
 } from "./tag";
 
 // ============================================================================
@@ -55,6 +57,35 @@ export const usePopularTags = (params?: IGetPopularTagsParams) => {
         limit: params?.limit,
         entityType: params?.entityType,
         timeRange: params?.timeRange,
+      },
+    },
+  });
+};
+
+/**
+ * 取得引導句列表的 Hook
+ */
+export const useTagPrompts = (params?: IGetTagPromptsParams) => {
+  return useQuery("/api/v1/tag-prompts", {
+    params: {
+      query: {
+        usageType: params?.usageType,
+        locale: params?.locale,
+      },
+    },
+  });
+};
+
+/**
+ * 取得標籤引導句的 Hook（根據標籤名稱）
+ */
+export const useTagPromptsByTags = (params: IGetTagPromptsByTagsParams) => {
+  return useQuery("/api/v1/tags/prompts", {
+    params: {
+      query: {
+        tags: params.tags,
+        usageType: params.usageType,
+        locale: params.locale,
       },
     },
   });

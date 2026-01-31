@@ -12,6 +12,7 @@ import {
   DurationDays,
   ExecutionTiming,
   Frequency,
+  MAX_PRACTICE_TAGS,
 } from "@/constants/practice-form";
 
 // Form Options Constants
@@ -117,7 +118,10 @@ export const manualPracticeFormSchema = z.object({
   customTiming: z.string(),
 
   // Step 4
-  tags: z.array(z.string()).optional(),
+  tags: z
+    .array(z.string())
+    .max(MAX_PRACTICE_TAGS, `標籤最多 ${MAX_PRACTICE_TAGS} 個`)
+    .optional(),
   resources: z
     .array(
       z.object({

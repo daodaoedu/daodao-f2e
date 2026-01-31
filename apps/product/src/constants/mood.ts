@@ -57,6 +57,18 @@ export const ApiMoodToMoodTypeMap: Record<ApiMoodType, MoodType> = {
 } as const;
 
 /**
+ * 前端 MoodType 到 API mood 值的映射
+ */
+export const MoodTypeToApiMoodMap: Record<MoodType, ApiMoodType> = {
+  hopeless: "give_up",
+  frustrated: "frustrated",
+  bored: "bored",
+  neutral: "neutral",
+  fine: "good",
+  happy: "happy",
+} as const;
+
+/**
  * 將 API 的 mood 值映射到前端的 MoodType
  */
 export const mapApiMoodToMoodType = (apiMood: ApiMoodType | undefined): MoodType | null => {
@@ -65,4 +77,17 @@ export const mapApiMoodToMoodType = (apiMood: ApiMoodType | undefined): MoodType
   }
 
   return ApiMoodToMoodTypeMap[apiMood] ?? null;
+};
+
+/**
+ * 將前端的 MoodType 映射到 API 的 mood 值
+ */
+export const mapMoodTypeToApiMood = (
+  mood: MoodType | null
+): ApiMoodType | undefined => {
+  if (!mood) {
+    return undefined;
+  }
+
+  return MoodTypeToApiMoodMap[mood];
 };

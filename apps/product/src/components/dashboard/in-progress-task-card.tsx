@@ -25,6 +25,7 @@ interface InProgressTaskCardProps {
   isUnreadMessages: boolean;
   theme: string;
   status: string;
+  lastCheckInDate?: string | null;
   onEdit?: () => void;
 }
 
@@ -39,6 +40,7 @@ export const InProgressTaskCard = ({
   isUnreadMessages,
   theme,
   status,
+  lastCheckInDate,
   onEdit,
 }: InProgressTaskCardProps) => {
   const themeName = getThemeNameFromColor(theme);
@@ -113,9 +115,12 @@ export const InProgressTaskCard = ({
           <CheckInButton
             variant="secondary"
             className="w-full sm:max-w-[288px]"
+            practiceId={id}
+            practiceStatus={status}
+            lastCheckInDate={lastCheckInDate ?? null}
             taskTitle={title}
             showIcon
-            onComplete={() => {}}
+            progressPercentage={progress}
           />
         )}
       </div>

@@ -18,3 +18,5 @@ export * from "./tag-hooks";
 // OG Image Service
 export * from "./og-image";
 export * from "./og-image-hooks";
+// Image Service
+export * from "./image";

@@ -107,6 +107,95 @@ const response = await client.GET("/api/users/{id}", {
 
 **禁止直接使用 `fetch` 或 `axios`**
 
+#### API 錯誤處理
+
+**所有 API 呼叫都必須檢查 `response.error`，避免在錯誤情況下繼續執行後續邏輯**
+
+使用 `@daodao/api` 的 `client` 或 API 函數時，返回的 response 物件可能包含 `error` 屬性。必須先檢查錯誤，只有在沒有錯誤時才執行成功邏輯（如導航、清除資料等）。
+
+```typescript
+import { createPractice } from "@daodao/api";
+import { toast } from "@daodao/ui/components/sonner";
+
+const response = await createPractice(apiRequest);
+
+// ✅ 正確：先檢查錯誤
+if (response.error) {
+  const errorMessage =
+    response.error && typeof response.error === "object" && "message" in response.error
+      ? String(response.error.message)
+      : "操作失敗";
+  console.error("Failed to create practice:", errorMessage);
+  toast.error(errorMessage);
+  setIsSubmitting(false);
+  return; // 重要：必須 return，避免繼續執行成功邏輯
+}
+
+// 只有在沒有錯誤時才執行成功邏輯
+clearDraft();
+router.push("/success");
+```
+
+**錯誤處理模式：**
+
+1. **檢查 `response.error`**：所有 API 呼叫後必須先檢查 `response.error`
+2. **提取錯誤訊息**：優先使用 `response.error.message`，如果不存在則使用預設錯誤訊息
+3. **顯示錯誤提示**：使用 `toast.error()` 顯示錯誤訊息給用戶
+4. **重置狀態**：錯誤時必須重置 loading/submitting 狀態（如 `setIsSubmitting(false)`）
+5. **早期返回**：檢查到錯誤後必須 `return`，避免繼續執行成功邏輯（如導航、清除資料等）
+6. **記錄錯誤**：使用 `console.error()` 記錄錯誤以便除錯
+
+**處理驗證錯誤的 details 陣列：**
+
+當 API 返回包含 `details` 陣列的驗證錯誤時（例如表單驗證失敗），必須處理每個欄位的錯誤：
+
+```typescript
+if (response.error) {
+  const error = response.error;
+  let errorMessage = "操作失敗";
+
+  if (typeof error === "object" && error !== null) {
+    // 檢查是否有 details 陣列
+    if ("details" in error && Array.isArray(error.details)) {
+      const details = error.details as Array<{ path?: string; message?: string }>;
+
+      // 處理每個欄位錯誤
+      details.forEach((detail) => {
+        if (detail.path && detail.message) {
+          // 將錯誤設置到對應的表單欄位
+          form.setError(detail.path as keyof FormValues, {
+            type: "server",
+            message: detail.message,
+          });
+        }
+      });
+
+      // 使用第一個具體錯誤訊息作為 toast 訊息
+      const firstDetail = details[0];
+      if (firstDetail?.message) {
+        errorMessage = firstDetail.message;
+      }
+    } else if ("message" in error) {
+      // 如果沒有 details，使用頂層 message
+      errorMessage = String(error.message);
+    }
+  }
+
+  toast.error(errorMessage);
+  setIsSubmitting(false);
+  return;
+}
+```
+
+**驗證錯誤處理原則：**
+
+1. **處理 details 陣列**：當 `response.error.details` 存在且為陣列時，必須遍歷處理每個欄位錯誤
+2. **設置表單錯誤**：使用 `form.setError()` 將每個錯誤設置到對應的表單欄位，讓用戶能看到具體的欄位錯誤
+3. **顯示具體錯誤訊息**：優先使用 `details` 中第一個具體錯誤訊息作為 toast 提示，而不是只顯示頂層的通用錯誤訊息
+4. **可選：跳轉到錯誤步驟**：對於多步驟表單，可以根據錯誤欄位自動跳轉到對應的步驟
+
+**禁止：** 忽略 `response.error`、在錯誤情況下繼續執行成功邏輯、只依賴 try-catch 處理 API 錯誤（`openapi-fetch` 不會拋出異常，錯誤在 `response.error` 中）、忽略 `details` 陣列中的欄位錯誤
+
 ### Date Operations
 
 **必須使用 `date-fns` 來處理所有日期相關的操作**

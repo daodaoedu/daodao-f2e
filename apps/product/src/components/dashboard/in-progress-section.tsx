@@ -28,6 +28,7 @@ export interface InProgressTask {
   isUnreadMessages: boolean;
   theme: string;
   status: TaskStatus;
+  lastCheckInDate?: string | null;
 }
 
 interface InProgressSectionProps {
@@ -119,6 +120,7 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
             theme={task.theme}
             isUnreadMessages={task.isUnreadMessages}
             status={task.status}
+            lastCheckInDate={task.lastCheckInDate}
           />
         ))}
       </div>

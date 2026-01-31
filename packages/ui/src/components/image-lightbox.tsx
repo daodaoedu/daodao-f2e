@@ -189,6 +189,7 @@ export const ImageLightbox = ({
                     fill
                     className="object-contain"
                     sizes="90vw"
+                    unoptimized
                   />
                 </div>
               </CarouselItem>

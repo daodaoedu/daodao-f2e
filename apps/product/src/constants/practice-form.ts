@@ -137,3 +137,8 @@ export const parseFrequency = (frequency: Frequency): { minDays: number; maxDays
   const max = maxStr ? Number.parseInt(maxStr, 10) : 5;
   return { minDays: min, maxDays: max };
 };
+
+/**
+ * 實踐標籤最大數量限制
+ */
+export const MAX_PRACTICE_TAGS = 3;

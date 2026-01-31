@@ -35,16 +35,19 @@ const cropImage = async (
           return;
         }
 
-        // Canvas 尺寸使用邏輯像素（CSS 像素）
-        canvas.width = options.width;
-        canvas.height = options.height;
-
         // 將邏輯像素轉換為物理像素
         const pixelRatio = devicePixelRatio;
         const sourceWidth = img.width; // 實際圖片寬度（物理像素）
         const sourceHeight = img.height; // 實際圖片高度（物理像素）
         const targetWidth = options.width * pixelRatio; // 目標寬度（物理像素）
         const targetHeight = options.height * pixelRatio; // 目標高度（物理像素）
+
+        // Canvas 尺寸使用高解析度（物理像素）以獲得清晰圖片
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+
+        // 縮放 context 以保持正確的繪製比例
+        ctx.scale(pixelRatio, pixelRatio);
 
         // 計算裁切起始位置（預設從中心裁切）
         let sourceX = options.x !== undefined ? options.x * pixelRatio : undefined;
@@ -76,7 +79,7 @@ const cropImage = async (
           cropHeight,
           0,
           0,
-          options.width, // 輸出到 canvas 的邏輯尺寸
+          options.width, // 輸出到 canvas 的邏輯尺寸（已通過 scale 調整）
           options.height
         );
 

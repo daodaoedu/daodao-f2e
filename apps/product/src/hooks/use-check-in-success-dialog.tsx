@@ -321,17 +321,22 @@ export function useCheckInSuccessDialog({
 }: UseCheckInSuccessDialogOptions) {
   const { openSuccessDialog: openDialog } = useDialog();
 
-  const openSuccessDialog = useCallback(() => {
-    return openDialog({
-      title: "打卡成功!",
-      message: <CheckInSuccessContent title={title} from={from} to={to} />,
-      textAlign: "left",
-      buttons: [
-        // { label: "分享心得", value: "share", variant: "outline" },
-        { label: "完成", value: "complete", variant: "orange" },
-      ],
-    });
-  }, [openDialog, title, from, to]);
+  const openSuccessDialog = useCallback(
+    (dynamicFrom?: number, dynamicTo?: number) => {
+      const finalFrom = dynamicFrom !== undefined ? dynamicFrom : from;
+      const finalTo = dynamicTo !== undefined ? dynamicTo : to;
+      return openDialog({
+        title: "打卡成功!",
+        message: <CheckInSuccessContent title={title} from={finalFrom} to={finalTo} />,
+        textAlign: "left",
+        buttons: [
+          // { label: "分享心得", value: "share", variant: "outline" },
+          { label: "完成", value: "complete", variant: "orange" },
+        ],
+      });
+    },
+    [openDialog, title, from, to],
+  );
 
   return { openSuccessDialog };
 }

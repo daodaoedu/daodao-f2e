@@ -47,8 +47,9 @@ export interface ICheckInStatusOptions {
   practiceStatus?: string;
   /**
    * 最後打卡日期 (ISO 格式字串，例如 "2026-01-01")
+   * 如果沒有打卡記錄，應傳入 null
    */
-  lastCheckInDate?: string | null;
+  lastCheckInDate: string | null;
 }
 
 /**

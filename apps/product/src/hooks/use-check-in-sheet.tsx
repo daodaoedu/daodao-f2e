@@ -9,7 +9,7 @@ interface IUseCheckInSheetOptions {
   /** 任務標題 */
   taskTitle: string;
   /** 打卡完成回調 */
-  onComplete: (data: CheckInData) => void;
+  onComplete: (data: CheckInData) => Promise<void> | void;
   /** 關閉時的回調 */
   onClose?: () => void;
 }
@@ -40,9 +40,11 @@ export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInS
       content: (
         <CheckInSheetContent
           taskTitle={taskTitle}
-          onComplete={(data) => {
-            onComplete(data);
+          onComplete={async (data) => {
+            // 先關閉 sheet
             closeRef.current?.();
+            // 然後執行 onComplete（會顯示 loading 和成功對話框）
+            await onComplete(data);
           }}
           onClose={() => {
             closeRef.current?.();

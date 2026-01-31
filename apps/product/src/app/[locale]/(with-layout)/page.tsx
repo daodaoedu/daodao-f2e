@@ -25,7 +25,7 @@ export default function HomePage() {
 
   // 取得所有實踐（不傳 status 參數，取得所有狀態）
   const { data: allPracticesData, isLoading } = useMyPractices({
-    limit: 100, // 增加 limit 以確保取得足夠的數據
+    limit: 16,
   });
 
   // 取得統計數據
@@ -55,6 +55,8 @@ export default function HomePage() {
           isUnreadMessages: false, // TODO: 需要從其他 API 取得
           theme: getThemeFromId(practice.id),
           status: mapPracticeStatusToTaskStatus(practice.status),
+          // TODO: 需要從 practice.stats 或打卡記錄 API 獲取最新的打卡日期
+          lastCheckInDate: null,
         });
       } else if (practice.status === PracticeStatus.completed) {
         completedTasksData.push({

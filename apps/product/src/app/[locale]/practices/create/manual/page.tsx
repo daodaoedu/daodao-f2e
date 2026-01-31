@@ -7,6 +7,7 @@ import { StorageEnum, useFormDraft } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { Progress } from "@daodao/ui/components/progress";
+import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -166,18 +167,103 @@ export default function CreateManualPracticePage() {
     try {
       const apiRequest = convertFormValuesToApiRequest(values);
 
-      await createPractice(apiRequest);
+      const response = await createPractice(apiRequest);
+
+      if (response.error) {
+        // response.error 是整個響應物件，實際錯誤在 response.error.error
+        const errorResponse = response.error as {
+          error?: {
+            message?: string;
+            details?: Array<{ path?: string; message?: string }>;
+          };
+          message?: string;
+        };
+        
+        const error = errorResponse.error || errorResponse;
+        let errorMessage = "建立實踐失敗";
+        let shouldNavigateToStep: number | null = null;
+
+        // 處理錯誤訊息
+        if (typeof error === "object" && error !== null) {
+          // 檢查是否有 details 陣列
+          if ("details" in error && Array.isArray(error.details)) {
+            // 處理 details 陣列中的每個錯誤
+            const details = error.details;
+            
+            details.forEach((detail) => {
+              if (detail.path && detail.message) {
+                // 將錯誤設置到對應的表單欄位
+                form.setError(detail.path as keyof ManualPracticeFormValues, {
+                  type: "server",
+                  message: detail.message,
+                });
+
+                // 根據欄位名稱決定要跳轉到哪個步驟
+                if (detail.path === "tags" || detail.path === "resources") {
+                  shouldNavigateToStep = 4;
+                } else if (
+                  detail.path === "durationMinutes" ||
+                  detail.path === "executionTiming" ||
+                  detail.path === "customTiming"
+                ) {
+                  shouldNavigateToStep = 3;
+                } else if (
+                  detail.path === "startDate" ||
+                  detail.path === "durationDays" ||
+                  detail.path === "frequency"
+                ) {
+                  shouldNavigateToStep = 2;
+                } else if (detail.path === "name" || detail.path === "actionDescription") {
+                  shouldNavigateToStep = 1;
+                }
+              }
+            });
+
+            // 使用第一個具體錯誤訊息作為 toast 訊息
+            const firstDetail = details[0];
+            if (firstDetail?.message) {
+              errorMessage = firstDetail.message;
+            }
+          } else if ("message" in error && error.message) {
+            // 如果沒有 details，使用頂層 message
+            errorMessage = String(error.message);
+          }
+        }
+
+        console.error("Failed to create practice:", response.error);
+        toast.error(errorMessage);
+
+        // 如果有需要跳轉的步驟，跳轉到該步驟
+        if (shouldNavigateToStep !== null) {
+          setCurrentStep(shouldNavigateToStep);
+          window.scrollTo(0, 0);
+        }
+
+        setIsSubmitting(false);
+        return;
+      }
 
       // 提交成功後清除暫存資料
       clearDraft();
 
+      // 取得新建立的實踐 ID
+      const practiceId = response.data?.data?.id;
+
       // 提交後導航到成功頁面
-      router.push(
-        `/practices/create/success?practiceName=${encodeURIComponent(values.name || "")}`
-      );
+      if (practiceId) {
+        router.push(
+          `/practices/create/success?practiceName=${encodeURIComponent(values.name || "")}&practiceId=${encodeURIComponent(practiceId)}`
+        );
+      } else {
+        router.push(
+          `/practices/create/success?practiceName=${encodeURIComponent(values.name || "")}`
+        );
+      }
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "建立實踐失敗，請稍後再試";
       console.error("Failed to create practice:", error);
-      // TODO: 顯示錯誤訊息給用戶
+      toast.error(errorMessage);
       setIsSubmitting(false);
     }
   };

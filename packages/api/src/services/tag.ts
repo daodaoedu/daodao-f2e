@@ -22,6 +22,14 @@ export type IGetPopularTagsParams = NonNullable<
   paths["/api/v1/tags/popular"]["get"]["parameters"]["query"]
 >;
 
+export type IGetTagPromptsParams = NonNullable<
+  paths["/api/v1/tag-prompts"]["get"]["parameters"]["query"]
+>;
+
+export type IGetTagPromptsByTagsParams = NonNullable<
+  paths["/api/v1/tags/prompts"]["get"]["parameters"]["query"]
+>;
+
 // ============================================================================
 // Client Functions (用於 Server Components 或直接調用)
 // ============================================================================
@@ -69,6 +77,35 @@ export const getPopularTags = async (params?: IGetPopularTagsParams) => {
   });
 };
 
+/**
+ * 取得引導句列表
+ */
+export const getTagPrompts = async (params?: IGetTagPromptsParams) => {
+  return client.GET("/api/v1/tag-prompts", {
+    params: {
+      query: {
+        usageType: params?.usageType,
+        locale: params?.locale,
+      },
+    },
+  });
+};
+
+/**
+ * 取得標籤引導句（根據標籤名稱）
+ */
+export const getTagPromptsByTags = async (params: IGetTagPromptsByTagsParams) => {
+  return client.GET("/api/v1/tags/prompts", {
+    params: {
+      query: {
+        tags: params.tags,
+        usageType: params.usageType,
+        locale: params.locale,
+      },
+    },
+  });
+};
+
 // ============================================================================
 // Export Types
 // ============================================================================
@@ -82,4 +119,10 @@ type TagSuggestResponse =
 type PopularTagsResponse =
   paths["/api/v1/tags/popular"]["get"]["responses"]["200"]["content"]["application/json"];
 
-export type { TagSearchResponse, TagSuggestResponse, PopularTagsResponse };
+type TagPromptsResponse =
+  paths["/api/v1/tag-prompts"]["get"]["responses"]["200"]["content"]["application/json"];
+
+type TagPromptsByTagsResponse =
+  paths["/api/v1/tags/prompts"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type { TagSearchResponse, TagSuggestResponse, PopularTagsResponse, TagPromptsResponse, TagPromptsByTagsResponse };

@@ -3,6 +3,7 @@
 import { ArrowRightOutlineSvg } from "@daodao/assets";
 import featureHappyJson from "@daodao/assets/images/quiz/feature-happy.json";
 import { useRouter } from "@daodao/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
 import Lottie from "lottie-react";
@@ -12,7 +13,11 @@ import { BackgroundAnimation } from "@/components/layout";
 
 export default function PracticeSuccessPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [countdown, setCountdown] = useState(11);
+
+  // 從 URL query 參數取得 practiceId
+  const practiceId = searchParams.get("practiceId");
 
   const handleBackToIsland = useCallback(() => {
     router.push("/");
@@ -39,10 +44,14 @@ export default function PracticeSuccessPage() {
     }
   }, [countdown, handleBackToIsland]);
 
-  const handleStartPractice = () => {
-    // TODO: 導航到實踐詳情頁面
-    // router.push(`/practices/${practiceId}`);
-  };
+  const handleStartPractice = useCallback(() => {
+    if (practiceId) {
+      router.push(`/practices/${practiceId}`);
+    } else {
+      // 如果沒有 practiceId，導航回首頁
+      handleBackToIsland();
+    }
+  }, [practiceId, router, handleBackToIsland]);
 
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
