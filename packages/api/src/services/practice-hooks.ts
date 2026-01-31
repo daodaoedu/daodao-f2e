@@ -5,6 +5,7 @@
  * 提供實踐相關的 React Hooks（用於 Client Components）
  */
 
+import { client } from "../client";
 import { useQuery } from "../hooks";
 import type {
   IGetMyPracticesParams,
@@ -13,6 +14,20 @@ import type {
   IGetRandomPracticeTemplatesParams,
   IGetPracticeCheckInsParams,
 } from "./practice";
+import type { components, paths } from "../types";
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export type CreatePracticeRequestType = components["schemas"]["CreatePracticeRequest"];
+
+type UpdatePracticeRequestBody = paths["/api/v1/practices/{id}"]["put"]["requestBody"];
+export type UpdatePracticeRequestType = UpdatePracticeRequestBody extends {
+  content: { "application/json": infer T };
+}
+  ? T
+  : never;
 
 // ============================================================================
 // Query Hooks
@@ -143,16 +158,25 @@ export const usePracticeCheckIns = (
 // Mutation Hooks
 // ============================================================================
 
-import { client } from "../client";
-import type { components } from "../types";
-
-export type CreatePracticeRequestType = components["schemas"]["CreatePracticeRequest"];
-
 /**
  * 建立實踐的函數（用於 Client Components）
  */
 export const createPractice = async (data: CreatePracticeRequestType) => {
   return client.POST("/api/v1/practices", {
+    body: data,
+  });
+};
+
+/**
+ * 更新實踐的函數（用於 Client Components）
+ */
+export const updatePractice = async (id: string, data: UpdatePracticeRequestType) => {
+  return client.PUT("/api/v1/practices/{id}", {
+    params: {
+      path: {
+        id,
+      },
+    },
     body: data,
   });
 };

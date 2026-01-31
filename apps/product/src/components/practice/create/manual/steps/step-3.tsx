@@ -44,7 +44,7 @@ export const Step3 = ({ form }: Step3Props) => {
                   }}
                   min={15}
                   max={60}
-                  step={1}
+                  step={15}
                   className="w-full"
                   renderTooltip={(value) => <div>{value}分鐘</div>}
                 />

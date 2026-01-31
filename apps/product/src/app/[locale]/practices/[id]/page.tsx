@@ -1,9 +1,15 @@
 "use client";
 
 import { usePracticeById, usePracticeCheckIns } from "@daodao/api";
-import { useParams } from "@daodao/i18n/navigation";
+import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
-import { Archive, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@daodao/ui/components/dropdown-menu";
+import { Archive, Ellipsis, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { CheckInButton, CheckInRecordCard, CheckInStack } from "@/components/check-in";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
@@ -27,6 +33,7 @@ import {
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
 
 export default function PracticeDetailPage() {
+  const router = useRouter();
   const params = useParams();
   const practiceId = params.id as string;
 
@@ -36,6 +43,10 @@ export default function PracticeDetailPage() {
   });
   const { openArchiveDialog } = useArchivePracticeDialog();
   const { openDeleteDialog } = useDeletePracticeDialog();
+
+  const handleEdit = () => {
+    router.push(`/practices/${practiceId}/edit`);
+  };
 
   // 將 API 資料轉換為頁面需要的格式
   const practice: (ManualPracticeFormValues & {
@@ -178,6 +189,21 @@ export default function PracticeDetailPage() {
           hasNext={false} // TODO: 從 API 取得實踐列表來判斷
         />
 
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-base font-medium text-text-dark">執行方式</p>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Ellipsis className="size-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleEdit} className="text-center">
+                編輯實踐
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         {/* Practice Overview Card */}
         <PracticeOverviewCard
           actionDescription={practice.actionDescription || ""}

@@ -214,3 +214,61 @@ if (isActive) {
 ```
 
 在 JSX 中也要避免使用嵌套三元運算子，優先使用條件渲染或提取成函數。
+
+### API Service Files Structure
+
+**API Service 檔案必須遵循以下結構順序：**
+
+1. **Import 語句**：所有 import 必須放在檔案最頂端
+2. **Type 定義**：類型定義放在 import 之後
+3. **API Hooks/Functions**：實際的 API 函數實作放在最下面
+
+```typescript
+"use client";
+
+/**
+ * API Service 說明
+ */
+
+// ============================================================================
+// Imports
+// ============================================================================
+import { client } from "../client";
+import { useQuery } from "../hooks";
+import type { SomeType } from "./types";
+import type { components, paths } from "../types";
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export type CreateRequestType = components["schemas"]["CreateRequest"];
+export type UpdateRequestType = paths["/api/v1/resource/{id}"]["put"]["requestBody"];
+
+// ============================================================================
+// Query Hooks
+// ============================================================================
+
+export const useResource = (id: string) => {
+  return useQuery("/api/v1/resource/{id}", {
+    params: { path: { id } },
+  });
+};
+
+// ============================================================================
+// Mutation Hooks
+// ============================================================================
+
+export const createResource = async (data: CreateRequestType) => {
+  return client.POST("/api/v1/resource", { body: data });
+};
+
+export const updateResource = async (id: string, data: UpdateRequestType) => {
+  return client.PUT("/api/v1/resource/{id}", {
+    params: { path: { id } },
+    body: data,
+  });
+};
+```
+
+**禁止：** 將 import 語句分散在檔案中間、將 type 定義放在函數實作之後
