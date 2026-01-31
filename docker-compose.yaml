@@ -1,0 +1,222 @@
+services:
+  # ===== 正式環境 - Website =====
+  prod_website:
+    image: ${DOCKER_HUB_USERNAME}/daodao-website:${IMAGE_TAG:-prod}${COMMIT_SHA:+-}${COMMIT_SHA}
+    container_name: prod_website
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - APP_NAME=website
+    # 不暴露端口到宿主機，只在內部網路中訪問
+    # 透過 Nginx 反向代理
+    expose:
+      - "3000"
+    networks:
+      - prod-daodao-network
+    # 健康檢查配置
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    # 資源限制（適配 2GB RAM VPS）
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    # 禁用 Docker 日誌捕獲（節省磁碟空間）
+    logging:
+      driver: "none"
+
+  # ===== 正式環境 - Product =====
+  prod_product:
+    image: ${DOCKER_HUB_USERNAME}/daodao-product:${IMAGE_TAG:-prod}${COMMIT_SHA:+-}${COMMIT_SHA}
+    container_name: prod_product
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - HOSTNAME=0.0.0.0
+      - APP_NAME=product
+    expose:
+      - "3001"
+    networks:
+      - prod-daodao-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    logging:
+      driver: "none"
+
+  # ===== 測試環境 - Website =====
+  dev_website:
+    image: ${DOCKER_HUB_USERNAME}/daodao-website:${IMAGE_TAG:-dev}${COMMIT_SHA:+-}${COMMIT_SHA}
+    container_name: dev_website
+    restart: unless-stopped
+    env_file:
+      - .env.dev
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - APP_NAME=website
+    expose:
+      - "3000"
+    networks:
+      - dev-daodao-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+    # 測試環境保留最小日誌用於調試
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+  # ===== 測試環境 - Product =====
+  dev_product:
+    image: ${DOCKER_HUB_USERNAME}/daodao-product:${IMAGE_TAG:-dev}${COMMIT_SHA:+-}${COMMIT_SHA}
+    container_name: dev_product
+    restart: unless-stopped
+    env_file:
+      - .env.dev
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - HOSTNAME=0.0.0.0
+      - APP_NAME=product
+    expose:
+      - "3001"
+    networks:
+      - dev-daodao-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+  # ===== Feature 分支 - Website =====
+  feat_website:
+    image: ${DOCKER_HUB_USERNAME}/daodao-website:${IMAGE_TAG:-feat}${COMMIT_SHA:+-}${COMMIT_SHA}
+    container_name: feat_website
+    restart: unless-stopped
+    env_file:
+      - .env.dev
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - APP_NAME=website
+    expose:
+      - "3000"
+    networks:
+      - dev-daodao-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+  # ===== Feature 分支 - Product =====
+  feat_product:
+    image: ${DOCKER_HUB_USERNAME}/daodao-product:${IMAGE_TAG:-feat}${COMMIT_SHA:+-}${COMMIT_SHA}
+    container_name: feat_product
+    restart: unless-stopped
+    env_file:
+      - .env.dev
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - HOSTNAME=0.0.0.0
+      - APP_NAME=product
+    expose:
+      - "3001"
+    networks:
+      - dev-daodao-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+# ===== 網路配置 =====
+# 使用外部網路連接到 daodao-server
+# 這些網路由 daodao-server 創建和管理
+networks:
+  prod-daodao-network:
+    external: true
+  dev-daodao-network:
+    external: true

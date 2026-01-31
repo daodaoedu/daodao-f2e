@@ -1,0 +1,207 @@
+/**
+ * Practice API Service
+ * 提供實踐相關的 API 調用函數（用於 Server Components 或直接調用）
+ */
+
+import { client } from "../client";
+import type { paths } from "../types";
+
+// ============================================================================
+// Types
+// ============================================================================
+
+type PracticeListResponse =
+  paths["/api/v1/me/practices"]["get"]["responses"]["200"]["content"]["application/json"];
+type PracticeStatsResponse =
+  paths["/api/v1/me/practice-stats"]["get"]["responses"]["200"]["content"]["application/json"];
+type PracticeTemplatesResponse =
+  paths["/api/v1/practices/templates"]["get"]["responses"]["200"]["content"]["application/json"];
+type PracticeTemplateCategoriesResponse =
+  paths["/api/v1/practices/templates/categories"]["get"]["responses"]["200"]["content"]["application/json"];
+type PracticeDetailResponse =
+  paths["/api/v1/practices/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
+type PracticeCheckInsResponse =
+  paths["/api/v1/practices/{id}/checkins"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type IGetMyPracticesParams = NonNullable<
+  paths["/api/v1/me/practices"]["get"]["parameters"]["query"]
+>;
+
+export type IGetPracticeStatsParams = NonNullable<
+  paths["/api/v1/me/practice-stats"]["get"]["parameters"]["query"]
+>;
+
+export type IGetPracticeTemplatesParams = NonNullable<
+  paths["/api/v1/practices/templates"]["get"]["parameters"]["query"]
+>;
+
+export type IGetRandomPracticeTemplatesParams = NonNullable<
+  paths["/api/v1/practices/templates/random"]["get"]["parameters"]["query"]
+>;
+
+export type IGetPracticeCheckInsParams = NonNullable<
+  paths["/api/v1/practices/{id}/checkins"]["get"]["parameters"]["query"]
+>;
+
+export type IGetUserPracticesParams = NonNullable<
+  paths["/api/v1/practices/user/{userId}"]["get"]["parameters"]["query"]
+>;
+
+// 從回應中提取 PracticeTemplateType 類型（單一模板項目的數據類型）
+export type PracticeTemplateType = NonNullable<PracticeTemplatesResponse["data"]>[number];
+
+export type {
+  PracticeListResponse,
+  PracticeStatsResponse,
+  PracticeTemplatesResponse,
+  PracticeTemplateCategoriesResponse,
+  PracticeDetailResponse,
+  PracticeCheckInsResponse,
+};
+
+// ============================================================================
+// Client Functions (用於 Server Components 或直接調用)
+// ============================================================================
+
+/**
+ * 獲取當前用戶的實踐列表
+ */
+export const getMyPractices = async (params?: IGetMyPracticesParams) => {
+  return client.GET("/api/v1/me/practices", {
+    params: {
+      query: {
+        page: params?.page,
+        limit: params?.limit,
+        status: params?.status,
+        search: params?.search,
+        sortBy: params?.sortBy,
+        sortOrder: params?.sortOrder,
+        dateFrom: params?.dateFrom,
+        dateTo: params?.dateTo,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取當前用戶的實踐統計
+ */
+export const getMyPracticeStats = async (params?: IGetPracticeStatsParams) => {
+  return client.GET("/api/v1/me/practice-stats", {
+    params: {
+      query: {
+        timeRange: params?.timeRange,
+        includeArchived: params?.includeArchived ?? undefined,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取實踐模板列表
+ */
+export const getPracticeTemplates = async (params?: IGetPracticeTemplatesParams) => {
+  return client.GET("/api/v1/practices/templates", {
+    params: {
+      query: {
+        page: params?.page,
+        limit: params?.limit,
+        category: params?.category,
+        search: params?.search,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取實踐模板分類列表
+ */
+export const getPracticeTemplateCategories = async () => {
+  return client.GET("/api/v1/practices/templates/categories");
+};
+
+/**
+ * 獲取單一實踐模板詳情
+ */
+export const getPracticeTemplateById = async (id: string) => {
+  return client.GET("/api/v1/practices/templates/{id}", {
+    params: {
+      path: {
+        id,
+      },
+    },
+  });
+};
+
+/**
+ * 隨機獲取實踐模板
+ */
+export const getRandomPracticeTemplates = async (params?: IGetRandomPracticeTemplatesParams) => {
+  return client.GET("/api/v1/practices/templates/random", {
+    params: {
+      query: {
+        count: params?.count,
+        category: params?.category,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取單一實踐詳情
+ */
+export const getPracticeById = async (id: string) => {
+  return client.GET("/api/v1/practices/{id}", {
+    params: {
+      path: {
+        id,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取實踐的打卡記錄列表
+ */
+export const getPracticeCheckIns = async (id: string, params?: IGetPracticeCheckInsParams) => {
+  return client.GET("/api/v1/practices/{id}/checkins", {
+    params: {
+      path: {
+        id,
+      },
+      query: {
+        page: params?.page,
+        limit: params?.limit,
+        startDate: params?.startDate,
+        endDate: params?.endDate,
+        mood: params?.mood,
+        include: params?.include,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取指定用戶的實踐列表
+ */
+export const getUserPractices = async (userId: string, params?: IGetUserPracticesParams) => {
+  return client.GET("/api/v1/practices/user/{userId}", {
+    params: {
+      path: {
+        userId,
+      },
+      query: {
+        page: params?.page,
+        limit: params?.limit,
+        query: params?.query,
+        contentType: params?.contentType,
+        tags: params?.tags,
+        userId: params?.userId,
+        status: params?.status,
+        sort: params?.sort,
+        order: params?.order,
+        include: params?.include,
+      },
+    },
+  });
+};

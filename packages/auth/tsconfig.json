@@ -1,0 +1,10 @@
+{
+  "extends": "@daodao/config/react.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "jsx": "react-jsx"
+  },
+  "include": ["src", "../config/types/image.d.ts"],
+  "exclude": ["node_modules", "dist", ".turbo"]
+}

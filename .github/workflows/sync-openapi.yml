@@ -39,14 +39,14 @@ jobs:
           gh api repos/daodaoedu/daodao-server/contents/generated/openapi-types.ts \
             --method GET \
             --jq '.content' \
-            -f ref=dev | base64 -d > shared/api/openapi-types.ts
+            -f ref=dev | base64 -d > packages/api/src/types.ts
 
       - name: Check for changes
         id: check_changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add shared/api/openapi-types.ts
+          git add packages/api/src/types.ts
           git diff --cached --quiet || echo "changes=true" >> $GITHUB_OUTPUT
 
       - name: Commit and Push

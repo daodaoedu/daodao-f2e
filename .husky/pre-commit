@@ -1,2 +1,2 @@
 pnpm lint
-pnpm ts:check
+pnpm typecheck
