@@ -152,6 +152,9 @@ importers:
       lottie-react:
         specifier: 'catalog:'
         version: 2.4.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      lru-cache:
+        specifier: ^11.2.5
+        version: 11.2.5
       lucide-react:
         specifier: 'catalog:'
         version: 0.475.0(react@19.2.3)
@@ -3233,6 +3236,10 @@ packages:
 
   lru-cache@11.2.4:
     resolution: {integrity: sha512-B5Y16Jr9LB9dHVkh6ZevG+vAbOsNOYCX+sXvFWFu7B3Iz5mijW3zdbMyhsh8ANd2mSWBYdJgnqi+mL7/LrOPYg==}
+    engines: {node: 20 || >=22}
+
+  lru-cache@11.2.5:
+    resolution: {integrity: sha512-vFrFJkWtJvJnD5hg+hJvVE8Lh/TcMzKnTgCWmtBipwI5yLX/iX+5UB2tfuyODF5E7k9xEzMdYgGqaSb1c0c5Yw==}
     engines: {node: 20 || >=22}
 
   lru-cache@7.18.3:
@@ -6715,6 +6722,8 @@ snapshots:
   lower-case@1.1.4: {}
 
   lru-cache@11.2.4: {}
+
+  lru-cache@11.2.5: {}
 
   lru-cache@7.18.3: {}
 

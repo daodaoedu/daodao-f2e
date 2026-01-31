@@ -42,6 +42,10 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
       ? tasks
       : tasks.filter((task) => task.status === filterStatus);
 
+  if (filteredTasks.length === 0) {
+    return null;
+  }
+
   return (
     <section className="mb-6">
       <div className="max-w-[640px] px-5 mx-auto mb-3 flex items-center justify-between">

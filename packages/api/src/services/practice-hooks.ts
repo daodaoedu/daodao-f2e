@@ -100,3 +100,21 @@ export const useRandomPracticeTemplates = (params?: IGetRandomPracticeTemplatesP
     },
   });
 };
+
+// ============================================================================
+// Mutation Hooks
+// ============================================================================
+
+import { client } from "../client";
+import type { components } from "../types";
+
+export type CreatePracticeRequestType = components["schemas"]["CreatePracticeRequest"];
+
+/**
+ * 建立實踐的函數（用於 Client Components）
+ */
+export const createPractice = async (data: CreatePracticeRequestType) => {
+  return client.POST("/api/v1/practices", {
+    body: data,
+  });
+};

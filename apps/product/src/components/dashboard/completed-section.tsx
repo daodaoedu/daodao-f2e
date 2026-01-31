@@ -17,6 +17,10 @@ interface CompletedSectionProps {
 }
 
 export const CompletedSection = ({ tasks }: CompletedSectionProps) => {
+  if (tasks.length === 0) {
+    return null;
+  }
+
   return (
     <section className="max-w-[640px] pt-4 px-5 mx-auto">
       <h2 className="mb-3 text-[1.125rem] font-medium text-bg-dark">已完成</h2>

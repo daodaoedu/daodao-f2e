@@ -72,9 +72,11 @@ export const Step4 = ({ form }: Step4Props) => {
               return;
             }
 
+            const trimmedName = resourceName.trim();
+            const trimmedUrl = resourceUrl.trim();
+
             // 如果有輸入 URL，驗證 URL 格式和 HTTPS
-            if (resourceUrl.trim()) {
-              const trimmedUrl = resourceUrl.trim();
+            if (trimmedUrl) {
               try {
                 const url = new URL(trimmedUrl);
                 if (url.protocol !== "https:") {
@@ -93,10 +95,36 @@ export const Step4 = ({ form }: Step4Props) => {
               }
             }
 
+            // 檢查是否已存在相同的資源
+            // 如果有 URL：檢查 URL 是否已存在（URL 是唯一標識）
+            // 如果沒有 URL：檢查名稱是否已存在（名稱是唯一標識）
+            const isDuplicate = resources.some((resource) => {
+              if (trimmedUrl) {
+                // 有 URL 時，比較 URL（忽略大小寫和尾部斜線）
+                return (
+                  resource.url &&
+                  resource.url.toLowerCase().replace(/\/$/, "") ===
+                    trimmedUrl.toLowerCase().replace(/\/$/, "")
+                );
+              }
+              // 沒有 URL 時，比較名稱（忽略大小寫和首尾空白）
+              return resource.name.toLowerCase().trim() === trimmedName.toLowerCase();
+            });
+
+            if (isDuplicate) {
+              form.setError("resources", {
+                type: "manual",
+                message: trimmedUrl
+                  ? "此網址的資源已經添加過了"
+                  : "此名稱的資源已經添加過了",
+              });
+              return;
+            }
+
             const newResource = {
               id: Date.now().toString(),
-              name: resourceName.trim(),
-              url: resourceUrl.trim() || undefined,
+              name: trimmedName,
+              url: trimmedUrl || undefined,
             };
 
             field.onChange([...resources, newResource]);
@@ -162,11 +190,7 @@ export const Step4 = ({ form }: Step4Props) => {
                       {resources.map((resource) => (
                         <ResourceCard
                           key={resource.id}
-                          resource={{
-                            id: resource.id,
-                            name: resource.name,
-                            url: resource.url,
-                          }}
+                          resource={resource}
                           onRemove={() => handleRemoveResource(resource.id)}
                         />
                       ))}

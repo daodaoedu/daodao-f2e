@@ -19,12 +19,11 @@ import { Check } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { suggestTags } from "@daodao/api";
 
 export interface TagEditData {
   selectedTags: string[];
 }
-
-const SEARCH_TAGS: string[] = [];
 
 // Zod schema for form validation
 const tagEditFormSchema = z.object({
@@ -60,6 +59,86 @@ export const TagEditSheetContent = ({
   const keyword = form.watch("keyword");
   const selectedTags = form.watch("selectedTags");
 
+  // Cache for tag suggestions to avoid re-fetching same keywords
+  const tagCacheRef = React.useRef<Map<string, string[]>>(new Map());
+  const [tagSuggestions, setTagSuggestions] = React.useState<string[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = React.useState(false);
+  // Track the current keyword being queried to prevent race conditions
+  const currentQueryKeywordRef = React.useRef<string>("");
+
+  // Fetch tag suggestions when keyword exists
+  const trimmedKeyword = keyword.trim();
+  const shouldFetchSuggestions = trimmedKeyword.length > 0;
+
+  // Fetch tag suggestions with debounce and cache check
+  React.useEffect(() => {
+    if (!shouldFetchSuggestions) {
+      setTagSuggestions([]);
+      currentQueryKeywordRef.current = "";
+      return;
+    }
+
+    // Check cache first
+    const cachedTags = tagCacheRef.current.get(trimmedKeyword);
+    if (cachedTags) {
+      setTagSuggestions(cachedTags);
+      currentQueryKeywordRef.current = trimmedKeyword;
+      return;
+    }
+
+    // Update current query keyword
+    currentQueryKeywordRef.current = trimmedKeyword;
+
+    // Debounce API call
+    const timeoutId = setTimeout(async () => {
+      // Double-check if keyword hasn't changed during debounce
+      if (currentQueryKeywordRef.current !== trimmedKeyword) {
+        return;
+      }
+
+      setIsLoadingSuggestions(true);
+      try {
+        const response = await suggestTags({
+          q: trimmedKeyword,
+          limit: "20",
+        });
+
+        // Check if keyword still matches when response arrives (prevent race condition)
+        if (currentQueryKeywordRef.current !== trimmedKeyword) {
+          return;
+        }
+
+        if (response.data?.data && Array.isArray(response.data.data)) {
+          const tagNames = response.data.data.map((tag: { name: string }) => tag.name);
+          // Store in cache
+          tagCacheRef.current.set(trimmedKeyword, tagNames);
+          setTagSuggestions(tagNames);
+        } else {
+          setTagSuggestions([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tag suggestions:", error);
+        // Only update state if keyword still matches
+        if (currentQueryKeywordRef.current === trimmedKeyword) {
+          setTagSuggestions([]);
+        }
+      } finally {
+        // Only update loading state if keyword still matches
+        if (currentQueryKeywordRef.current === trimmedKeyword) {
+          setIsLoadingSuggestions(false);
+        }
+      }
+    }, 300); // 300ms debounce
+
+    return () => {
+      clearTimeout(timeoutId);
+      // If effect is cleaning up, mark that this query is no longer current
+      if (currentQueryKeywordRef.current === trimmedKeyword) {
+        currentQueryKeywordRef.current = "";
+      }
+    };
+  }, [trimmedKeyword, shouldFetchSuggestions]);
+
   // Reset form when initial values change
   React.useEffect(() => {
     form.reset({
@@ -75,16 +154,28 @@ export const TagEditSheetContent = ({
     onClose?.();
   };
 
+  // Get available tags from API or cache
+  const availableTagsFromAPI = React.useMemo(() => {
+    if (trimmedKeyword.length > 0 && shouldFetchSuggestions) {
+      return tagSuggestions;
+    }
+    return [];
+  }, [trimmedKeyword, shouldFetchSuggestions, tagSuggestions]);
+
   const pinListItems: PinListItem[] = React.useMemo(() => {
-    const availableTags = SEARCH_TAGS.filter((tag) => !selectedTags.includes(tag));
+    // Filter out already selected tags from available tags
+    const availableTags = availableTagsFromAPI.filter(
+      (tag) => !selectedTags.includes(tag)
+    );
     const allTags = [...availableTags, ...selectedTags];
 
+    // Create keyword item if keyword exists and is not in allTags
     const keywordItem =
-      keyword && !allTags.includes(keyword)
+      keyword.trim() && !allTags.includes(keyword.trim())
         ? {
-            id: keyword,
-            name: keyword,
-            pinned: selectedTags.includes(keyword),
+            id: keyword.trim(),
+            name: keyword.trim(),
+            pinned: selectedTags.includes(keyword.trim()),
           }
         : null;
 
@@ -105,7 +196,7 @@ export const TagEditSheetContent = ({
     });
 
     return items;
-  }, [selectedTags, keyword]);
+  }, [selectedTags, keyword, availableTagsFromAPI]);
 
   // Transform items to apply custom styles and adjust order
   const transformItems = React.useCallback(
@@ -134,15 +225,18 @@ export const TagEditSheetContent = ({
       transformed.forEach((item) => {
         if (item.pinned) {
           pinnedItems.push(item);
-        } else if (SEARCH_TAGS.includes(item.name) || (keyword && item.name === keyword)) {
+        } else if (
+          availableTagsFromAPI.includes(item.name) ||
+          (keyword.trim() && item.name === keyword.trim())
+        ) {
           unpinnedItems.push(item);
         }
       });
-      unpinnedItems.sort((a) => (a.name === keyword ? -1 : 1));
+      unpinnedItems.sort((a) => (a.name === keyword.trim() ? -1 : 1));
 
       return [...unpinnedItems, ...pinnedItems];
     },
-    [keyword]
+    [keyword, availableTagsFromAPI]
   );
 
   const handleToggleTag = (item: PinListItem) => {

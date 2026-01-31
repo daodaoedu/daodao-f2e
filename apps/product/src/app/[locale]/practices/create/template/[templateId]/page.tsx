@@ -39,8 +39,7 @@ const mapPracticeTimePeriodsToExecutionTiming = (
     .map((period) => PracticeTimePeriodToExecutionTimingMap[period])
     .filter((timing): timing is ExecutionTiming => timing !== undefined);
 
-  // 如果沒有映射到任何值，使用預設值
-  return mapped.length > 0 ? mapped : [ExecutionTiming.evening];
+  return mapped.length > 0 ? mapped : [];
 };
 
 // 將 API 的 frequencyMinDays 和 frequencyMaxDays 映射到 frequency

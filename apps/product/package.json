@@ -33,6 +33,7 @@
     "date-fns": "catalog:",
     "gsap": "catalog:",
     "lottie-react": "catalog:",
+    "lru-cache": "^11.2.5",
     "lucide-react": "catalog:",
     "matter-js": "^0.20.0",
     "motion": "catalog:",

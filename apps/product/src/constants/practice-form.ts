@@ -9,7 +9,6 @@ export const ExecutionTiming = {
   morning: "morning",
   lunchBreak: "lunchBreak",
   commute: "commute",
-  holiday: "holiday",
   evening: "evening",
   beforeSleep: "beforeSleep",
 } as const;
@@ -98,3 +97,43 @@ export const DurationDaysNumberToStringMap: Record<
   [DurationDaysNumber.twentyOne]: DurationDays.twentyOne,
   [DurationDaysNumber.thirty]: DurationDays.thirty,
 } as const;
+
+/**
+ * ExecutionTiming 映射到 API 的 practiceTimePeriods
+ */
+export const ExecutionTimingToPracticeTimePeriodMap: Record<
+  ExecutionTiming,
+  ("morning" | "afternoon" | "evening" | "night") | null
+> = {
+  [ExecutionTiming.morning]: "morning",
+  [ExecutionTiming.lunchBreak]: "afternoon",
+  [ExecutionTiming.commute]: null, // API 不支援，忽略
+  [ExecutionTiming.evening]: "evening",
+  [ExecutionTiming.beforeSleep]: "night",
+} as const;
+
+/**
+ * 將表單的 executionTiming 轉換成 API 的 practiceTimePeriods
+ */
+export const mapExecutionTimingToPracticeTimePeriods = (
+  executionTiming: ExecutionTiming[]
+): ("morning" | "afternoon" | "evening" | "night")[] => {
+  return executionTiming
+    .map((timing) => ExecutionTimingToPracticeTimePeriodMap[timing])
+    .filter(
+      (period): period is "morning" | "afternoon" | "evening" | "night" =>
+        period !== null
+    );
+};
+
+/**
+ * 將表單的 frequency 轉換成 frequencyMinDays 和 frequencyMaxDays
+ */
+export const parseFrequency = (frequency: Frequency): { minDays: number; maxDays: number } => {
+  const parts = frequency.split("-");
+  const minStr = parts[0];
+  const maxStr = parts[1];
+  const min = minStr ? Number.parseInt(minStr, 10) : 3;
+  const max = maxStr ? Number.parseInt(maxStr, 10) : 5;
+  return { minDays: min, maxDays: max };
+};

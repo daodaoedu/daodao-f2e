@@ -4,8 +4,9 @@ API 客戶端套件，提供類型安全的 API 調用功能。
 
 ## 功能
 
-- ✅ 基於 OpenAPI 的類型安全 API 客戶端
-- ✅ 使用 `openapi-fetch` 進行 API 調用
+- ✅ 基於 OpenAPI 的類型安全 API 客戶端（後端 API）
+- ✅ Next.js API Routes 客戶端（前端內部 API）
+- ✅ 使用 `openapi-fetch` 進行後端 API 調用
 - ✅ 使用 `swr` 進行數據獲取與快取
 - ✅ 統一的錯誤處理
 - ✅ 認證配置支援
@@ -65,7 +66,31 @@ function UserProfile({ identifier }: { identifier: string }) {
 }
 ```
 
-### 方式 2：直接使用 Client 和 Hooks
+### 方式 2：Next.js API Routes（前端內部 API）
+
+對於 Next.js API Routes（`/api/*`），使用專門的服務：
+
+```typescript
+import { extractOgImage, useExtractOgImage } from "@daodao/api";
+
+// Server Component
+const result = await extractOgImage({ url: "https://example.com" });
+if (result.success) {
+  console.log(result.data.ogImageUrl);
+}
+
+// Client Component
+function MyComponent() {
+  const { extract, isLoading, data } = useExtractOgImage();
+  
+  const handleExtract = async () => {
+    const result = await extract({ url: "https://example.com" });
+    // ...
+  };
+}
+```
+
+### 方式 3：直接使用 Client 和 Hooks
 
 如果 domain service 沒有提供您需要的功能，可以直接使用底層的 client 和 hooks：
 
@@ -127,9 +152,18 @@ try {
 
 ### 環境變數
 
-- `NEXT_PUBLIC_API_URL`: API 基礎 URL（**必填**，例如: `http://localhost:3001/api`）
+#### 後端 API
+
+- `NEXT_PUBLIC_API_URL`: 後端 API 基礎 URL（**必填**，例如: `http://localhost:3001/api`）
   
   > **注意**：這是後端 API 服務器的 URL，不是前端應用的 URL。必須在 `.env` 文件中設定此環境變數。
+
+#### Next.js API Routes
+
+- `NEXT_PUBLIC_APP_URL`: 前端應用 URL（可選，用於 Server-side 調用 Next.js API Routes）
+- `VERCEL_URL`: Vercel 部署時自動設定的環境變數（可選）
+
+  > **注意**：Next.js API Routes 在 Client-side 使用相對路徑，Server-side 需要完整 URL。
 
 #### 在 Monorepo 中使用環境變數
 

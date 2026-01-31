@@ -1,5 +1,6 @@
 "use client";
 
+import { createPractice, type CreatePracticeRequestType } from "@daodao/api";
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { StorageEnum, useFormDraft } from "@daodao/shared";
@@ -8,7 +9,7 @@ import { Form } from "@daodao/ui/components/form";
 import { Progress } from "@daodao/ui/components/progress";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { type ManualPracticeFormValues, manualPracticeFormSchema } from "@/components/practice";
@@ -17,6 +18,12 @@ import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";
 import { Step4 } from "@/components/practice/create/manual/steps/step-4";
 import { Step5 } from "@/components/practice/create/manual/steps/step-5";
+import {
+  ExecutionTiming,
+  Frequency,
+  mapExecutionTimingToPracticeTimePeriods,
+  parseFrequency,
+} from "@/constants/practice-form";
 import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
 
 const TOTAL_STEPS = 5;
@@ -32,9 +39,58 @@ const defaultFormValues: Partial<ManualPracticeFormValues> = {
   resources: [],
 };
 
+// 將表單資料轉換成 API 請求格式
+const convertFormValuesToApiRequest = (
+  values: ManualPracticeFormValues
+): CreatePracticeRequestType => {
+  const frequency = parseFrequency(values.frequency as Frequency);
+  const practiceTimePeriods = mapExecutionTimingToPracticeTimePeriods(
+    values.executionTiming as ExecutionTiming[]
+  );
+
+  const request: Record<string, unknown> = {
+    title: values.name,
+    durationDays: parseInt(values.durationDays, 10),
+    frequencyMinDays: frequency.minDays,
+    frequencyMaxDays: frequency.maxDays,
+    sessionDurationMinutes: values.durationMinutes,
+  };
+
+  if (values.actionDescription) {
+    request.practiceAction = values.actionDescription;
+  }
+
+  if (values.startDate) {
+    request.startDate = values.startDate;
+  }
+
+  if (practiceTimePeriods.length > 0) {
+    request.practiceTimePeriods = practiceTimePeriods;
+  }
+
+  if (values.tags && values.tags.length > 0) {
+    request.tags = values.tags;
+  }
+
+  if (values.resources && values.resources.length > 0) {
+    request.resources = values.resources.map((resource) => ({
+      name: resource.name,
+      url: resource.url || undefined,
+    }));
+  }
+
+  if (values.customTiming) {
+    request.otherContext = values.customTiming;
+  }
+
+  return request as CreatePracticeRequestType;
+};
+
 export default function CreateManualPracticePage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isRestoreDialogOpenRef = useRef(false);
 
   const form = useForm<ManualPracticeFormValues>({
     resolver: zodResolver(manualPracticeFormSchema),
@@ -101,12 +157,29 @@ export default function CreateManualPracticePage() {
   };
 
   const handleSubmit = async (values: ManualPracticeFormValues) => {
-    // TODO: 提交表單資料到 API
-    console.log("Form submitted:", values);
-    // 提交成功後清除暫存資料
-    clearDraft();
-    // 提交後導航到成功頁面
-    router.push(`/practices/create/success?practiceName=${encodeURIComponent(values.name || "")}`);
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const apiRequest = convertFormValuesToApiRequest(values);
+
+      await createPractice(apiRequest);
+
+      // 提交成功後清除暫存資料
+      clearDraft();
+
+      // 提交後導航到成功頁面
+      router.push(
+        `/practices/create/success?practiceName=${encodeURIComponent(values.name || "")}`
+      );
+    } catch (error) {
+      console.error("Failed to create practice:", error);
+      // TODO: 顯示錯誤訊息給用戶
+      setIsSubmitting(false);
+    }
   };
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -120,13 +193,18 @@ export default function CreateManualPracticePage() {
   const { openRestoreDialog } = useRestoreDraftDialog({ draft });
 
   useEffect(() => {
-    if (showRestoreDialog) {
+    if (showRestoreDialog && !isRestoreDialogOpenRef.current) {
       const handleRestore = async () => {
-        const result = await openRestoreDialog();
-        if (result.value === "restore") {
-          handleRestoreDraft();
-        } else if (result.value === "discard") {
-          clearDraft();
+        isRestoreDialogOpenRef.current = true;
+        try {
+          const result = await openRestoreDialog();
+          if (result.value === "restore") {
+            handleRestoreDraft();
+          } else if (result.value === "discard") {
+            clearDraft();
+          }
+        } finally {
+          isRestoreDialogOpenRef.current = false;
         }
       };
       handleRestore();
@@ -196,7 +274,7 @@ export default function CreateManualPracticePage() {
                 type="button"
                 onClick={handleNext}
                 className="w-full sm:max-w-[288px]"
-                disabled={isCheckingDraft}
+                disabled={isCheckingDraft || isSubmitting}
               >
                 下一步
                 <ArrowRightOutlineSvg className="size-4.5" />
