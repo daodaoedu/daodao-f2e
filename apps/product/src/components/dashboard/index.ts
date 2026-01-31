@@ -7,5 +7,5 @@ export { DashboardHeader } from "./dashboard-header";
 export type { InProgressTask } from "./in-progress-section";
 export { InProgressSection } from "./in-progress-section";
 export { InProgressTaskCard } from "./in-progress-task-card";
-export { RandomPracticesSection } from "./random-practices-section";
+export { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 export { StatCard } from "./stat-card";

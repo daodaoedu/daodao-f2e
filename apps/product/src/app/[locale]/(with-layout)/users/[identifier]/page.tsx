@@ -86,7 +86,7 @@ export default async function UserProfilePage({
 
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-[#B8E8FD]">
-      <IslandHeader resultType={resultType} />
+      <IslandHeader resultType={resultType} userId={userId} />
 
       <main className="max-w-[640px] mx-auto px-5 pb-[64px]">
         {/* 用戶個人資訊卡片 */}

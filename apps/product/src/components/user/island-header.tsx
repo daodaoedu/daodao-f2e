@@ -2,7 +2,7 @@
 
 import userDesktopBannerPng from "@daodao/assets/images/users/user-desktop-banner.png";
 import userMobileBannerPng from "@daodao/assets/images/users/user-mobile-banner.png";
-import { useAuthContext } from "@daodao/auth";
+import { useAuth } from "@daodao/auth";
 import { getEnv } from "@daodao/config";
 import { resultDetailMap, themeMap } from "@daodao/features-quiz";
 import { useRouter } from "@daodao/i18n/navigation";
@@ -20,6 +20,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 interface IslandHeaderProps {
   resultType: string;
+  userId?: string;
 }
 
 const resultTypeToLottiePathMap = new Map<string, () => Promise<object>>([
@@ -35,8 +36,9 @@ const resultTypeToLottiePathMap = new Map<string, () => Promise<object>>([
 /**
  * 「我的小島」標題區組件
  */
-export function IslandHeader({ resultType }: IslandHeaderProps) {
-  const { isAuthenticated } = useAuthContext();
+export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
+  const { user } = useAuth();
+  const isOwnProfile = userId !== undefined && user?.id === userId;
   const router = useRouter();
   const headerRef = useRef<HTMLDivElement>(null);
   const resultDetail = resultDetailMap.get(resultType);
@@ -63,10 +65,10 @@ export function IslandHeader({ resultType }: IslandHeaderProps) {
     }
   }, [resultType, isEmptyResult]);
 
-  // 動態載入所有 lottie 動畫（當沒有結果且已登入時，用於跑馬燈）
+  // 動態載入所有 lottie 動畫（當沒有結果且是自己的個人頁面時，用於跑馬燈）
   const [allLotties, setAllLotties] = useState<Map<string, object>>(new Map());
   useEffect(() => {
-    if (isEmptyResult && isAuthenticated && typeof window !== "undefined") {
+    if (isEmptyResult && isOwnProfile && typeof window !== "undefined") {
       const loadAllLotties = async () => {
         const lottieMap = new Map<string, object>();
         const loadPromises = Array.from(resultTypeToLottiePathMap.entries()).map(
@@ -84,7 +86,7 @@ export function IslandHeader({ resultType }: IslandHeaderProps) {
       };
       loadAllLotties();
     }
-  }, [isEmptyResult, isAuthenticated]);
+  }, [isEmptyResult, isOwnProfile]);
 
   const handleGoToQuiz = () => {
     router.push(`${getEnv("NEXT_PUBLIC_WEBSITE_URL")}/quiz`);
@@ -95,7 +97,7 @@ export function IslandHeader({ resultType }: IslandHeaderProps) {
   };
 
   const pageHeaderProps = useMemo<PageHeaderProps>(() => {
-    if (isAuthenticated) {
+    if (isOwnProfile) {
       return {
         title: "我的小島",
         rightActionTo: "/settings",
@@ -104,7 +106,7 @@ export function IslandHeader({ resultType }: IslandHeaderProps) {
       };
     }
     return { leftAction: "back" };
-  }, [isAuthenticated]);
+  }, [isOwnProfile]);
 
   useLayoutEffect(() => {
     const originalBackgroundColor = document.body.style.backgroundColor;
@@ -158,7 +160,7 @@ export function IslandHeader({ resultType }: IslandHeaderProps) {
       <div
         className={cn(
           "relative -z-20",
-          isAuthenticated ? "h-[378px] md:h-[389px]" : "h-[92px] md:h-[152px]",
+          isOwnProfile ? "h-[378px] md:h-[389px]" : "h-[92px] md:h-[152px]",
           !isEmptyResult && "h-[378px] md:h-[333px]"
         )}
       />
@@ -176,7 +178,7 @@ export function IslandHeader({ resultType }: IslandHeaderProps) {
           className="md:hidden object-cover"
         />
         <PageHeader {...pageHeaderProps} />
-        {isEmptyResult && isAuthenticated && (
+        {isEmptyResult && isOwnProfile && (
           <div className="absolute left-0 right-0 top-[256px] w-[600px] mx-auto overflow-hidden mask-marquee">
             <div className="animate-marquee flex w-max gap-3 will-change-transform">
               {/* 第一份內容 */}
@@ -206,7 +208,7 @@ export function IslandHeader({ resultType }: IslandHeaderProps) {
           {!isEmptyResult && lottieJson && (
             <Lottie animationData={lottieJson} className="*:w-full *:h-full" />
           )}
-          {isAuthenticated && (
+          {isOwnProfile && (
             <>
               <div
                 className={cn(

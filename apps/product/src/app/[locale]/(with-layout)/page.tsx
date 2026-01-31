@@ -12,8 +12,8 @@ import {
   DashboardHeader,
   InProgressSection,
   type InProgressTask,
-  RandomPracticesSection,
 } from "@/components/dashboard";
+import { RandomPracticesSection } from "@/components/practice";
 import type { CompletedTask } from "@/components/dashboard/completed-section";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeStatus } from "@/constants/practice-status";

@@ -63,10 +63,15 @@ const RandomPracticeCard = ({ practice, theme, onAction }: IRandomPracticeCardPr
 
 interface IRandomPracticesSectionProps {
   practices?: IRandomPractice[];
+  /**
+   * 是否使用緊湊模式（移除外層 padding，適用於放在其他容器內）
+   */
+  compact?: boolean;
 }
 
 export const RandomPracticesSection = ({
   practices: propPractices,
+  compact = false,
 }: IRandomPracticesSectionProps) => {
   const router = useRouter();
 
@@ -122,7 +127,7 @@ export const RandomPracticesSection = ({
     ));
 
   return (
-    <section className="mb-6 pt-4 px-4">
+    <section className={compact ? "" : "mb-6 pt-4 px-4"}>
       {/* 標題區域 */}
       <div className="relative max-w-[640px] bg-white rounded-[12px] p-4 mx-auto flex flex-col items-center gap-3">
         <Deco2Svg

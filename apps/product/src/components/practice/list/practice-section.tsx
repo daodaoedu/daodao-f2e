@@ -1,6 +1,7 @@
 "use client";
 
 import { useUserPractices } from "@daodao/api";
+import { useAuth } from "@daodao/auth";
 import { ArrowRightOutlineSvg, ExperimentSvg, FlagSvg, NoteSvg } from "@daodao/assets";
 import { useIsMobile, useScrollVisibility } from "@daodao/shared";
 import { Badge } from "@daodao/ui/components/badge";
@@ -16,6 +17,7 @@ import {
   TaskStatus,
   type TaskStatus as TaskStatusType,
 } from "@/constants/task-status";
+import { RandomPracticesSection } from "../shared/random-practices-section";
 
 type TabType = "practices" | "plans" | "ideas";
 
@@ -50,6 +52,7 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
   const [isMounted, setIsMounted] = useState(false);
   const isMobile = useIsMobile();
   const isScrolled = useScrollVisibility({ threshold: 167 });
+  const { user } = useAuth();
 
   const {
     data: practicesData,
@@ -58,6 +61,11 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
   } = useUserPractices(userId, {
     limit: 16, // 取得足夠的實踐列表
   });
+
+  // 判斷是否為自己的資料
+  const isOwnData = useMemo(() => {
+    return user?.id === userId;
+  }, [user?.id, userId]);
 
   // 將 API 資料轉換為組件需要的格式
   const practices: PracticeItem[] = useMemo(() => {
@@ -216,11 +224,15 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
         ) : error ? (
           <div className="text-center py-8 text-basic-400">載入失敗，請稍後再試</div>
         ) : filteredPractices.length === 0 ? (
-          <div className="text-center py-8 text-basic-400">
-            {activeTab === "practices" && "尚無主題實踐"}
-            {activeTab === "plans" && "尚無學習計劃"}
-            {activeTab === "ideas" && "尚無想法"}
-          </div>
+          isOwnData ? (
+            <RandomPracticesSection compact />
+          ) : (
+            <div className="text-center py-8 text-basic-400">
+              {activeTab === "practices" && "尚無主題實踐"}
+              {activeTab === "plans" && "尚無學習計劃"}
+              {activeTab === "ideas" && "尚無想法"}
+            </div>
+          )
         ) : (
           filteredPractices.map((practice) => (
             <div
