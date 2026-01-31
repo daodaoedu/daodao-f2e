@@ -90,8 +90,9 @@ COPY packages/assets/images ./packages/assets/images
 
 # 設置複製的資源為只讀權限（檔案 644，目錄 755）
 # 保持 root 所有權，確保非 root 用戶沒有寫入權限
-RUN find ./apps/${APP_NAME}/.next/standalone ./apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/public ./packages/assets/generated ./packages/assets/images -type f -exec chmod 644 {} \; && \
-    find ./apps/${APP_NAME}/.next/standalone ./apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/public ./packages/assets/generated ./packages/assets/images -type d -exec chmod 755 {} \;
+# 注意：standalone 內容已複製到根目錄，不需要單獨設置權限
+RUN find ./apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/public ./packages/assets/generated ./packages/assets/images -type f -exec chmod 644 {} \; && \
+    find ./apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/public ./packages/assets/generated ./packages/assets/images -type d -exec chmod 755 {} \;
 
 # 切換到非 root 用戶
 USER nextjs
