@@ -1,6 +1,12 @@
 "use client";
 
-import { useMyPractices, usePracticeById, usePracticeCheckIns } from "@daodao/api";
+import {
+  useArchivePractice,
+  useDeletePractice,
+  useMyPractices,
+  usePracticeById,
+  usePracticeCheckIns,
+} from "@daodao/api";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import {
@@ -9,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@daodao/ui/components/dropdown-menu";
+import { toast } from "@daodao/ui/components/sonner";
 import { Archive, Ellipsis, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { CheckInButton, CheckInRecordCard, CheckInStack } from "@/components/check-in";
@@ -46,6 +53,8 @@ export default function PracticeDetailPage() {
   });
   const { openArchiveDialog } = useArchivePracticeDialog();
   const { openDeleteDialog } = useDeletePracticeDialog();
+  const { archivePractice, restorePractice } = useArchivePractice(practiceId);
+  const { deletePractice: deletePracticeById } = useDeletePractice(practiceId);
 
   const handleEdit = () => {
     router.push(`/practices/${practiceId}/edit`);
@@ -126,16 +135,43 @@ export default function PracticeDetailPage() {
   }, [practiceData]);
 
   const handleArchive = async () => {
-    const result = await openArchiveDialog(practiceId);
+    const result = await openArchiveDialog({
+      onRestore: async () => {
+        try {
+          await restorePractice();
+          toast.success("實踐已成功復原");
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : "復原失敗";
+          console.error("Failed to restore practice:", errorMessage);
+          toast.error(errorMessage);
+        }
+      },
+    });
     if (result === ArchivePracticeResult.Archived) {
-      // TODO: 實作封存功能
+      try {
+        await archivePractice();
+        // 導航到封存頁面
+        router.push("/settings/archived");
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "封存失敗";
+        console.error("Failed to archive practice:", errorMessage);
+        toast.error(errorMessage);
+      }
     }
   };
 
   const handleDelete = async () => {
-    const result = await openDeleteDialog(practiceId);
+    const result = await openDeleteDialog();
     if (result === DeletePracticeResult.Deleted) {
-      // TODO: 實作刪除功能
+      try {
+        await deletePracticeById();
+        // 導航到實踐列表頁面
+        router.push("/");
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "刪除失敗";
+        console.error("Failed to delete practice:", errorMessage);
+        toast.error(errorMessage);
+      }
     }
   };
 

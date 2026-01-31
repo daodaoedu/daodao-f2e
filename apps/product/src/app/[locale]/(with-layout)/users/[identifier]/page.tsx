@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { PracticeSection } from "@/components/practice";
 import { IslandHeader, UserInfoCard } from "@/components/user";
-import { TaskStatus } from "@/constants/task-status";
 
 /**
  * 個人頁面
@@ -83,23 +82,7 @@ export default async function UserProfilePage({
 
   const userData = userResponse.data?.data;
   const resultType = (userData.latestQuizResult?.resultType ?? "").toLowerCase();
-
-  const mockPractices = [
-    {
-      id: "1",
-      status: TaskStatus.draft,
-      title: "閱讀原子習慣",
-      description: "點精油,跟着 Youtube 教學做",
-      tags: ["閱讀", "原子習慣", "心理學"],
-    },
-    {
-      id: "2",
-      status: TaskStatus.inProgress,
-      title: "閱讀原子習慣",
-      description: "點精油,跟着 Youtube 教學做",
-      tags: ["閱讀", "原子習慣"],
-    },
-  ];
+  const userId = userData.id;
 
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-[#B8E8FD]">
@@ -116,7 +99,7 @@ export default async function UserProfilePage({
         />
 
         {/* 「主題實踐」區塊 */}
-        <PracticeSection practices={mockPractices} />
+        <PracticeSection userId={userId} />
       </main>
     </div>
   );

@@ -7,8 +7,6 @@ import { useCallback } from "react";
 export enum DeletePracticeResult {
   /** 實踐已成功刪除 */
   Deleted,
-  /** 用戶點擊了復原按鈕 */
-  Restored,
   /** 用戶在對話框取消了操作 */
   Cancelled,
 }
@@ -37,7 +35,7 @@ export function useDeletePracticeDialog() {
   const { openWarningDialog } = useDialog();
 
   const openDeleteDialog = useCallback(
-    async (practiceId: string): Promise<DeletePracticeResult> => {
+    async (): Promise<DeletePracticeResult> => {
       // 先顯示確認對話框
       const result = await openWarningDialog({
         title: "確定刪除這個實踐？",
@@ -54,26 +52,11 @@ export function useDeletePracticeDialog() {
         return DeletePracticeResult.Cancelled;
       }
 
-      // 用戶確認刪除，顯示 toast 並返回 Promise
-      return new Promise<DeletePracticeResult>((resolve) => {
-        const handleDelete = () => {
-          console.log(practiceId);
-          resolve(DeletePracticeResult.Deleted);
-        };
+      // 用戶確認刪除，立即返回並顯示 toast
+      toast.success("實踐已成功刪除");
 
-        // 顯示 toast，帶有復原按鈕
-        toast.success("實踐已成功刪除", {
-          action: {
-            label: "復原",
-            onClick: () => {
-              // 用戶點擊復原，取消刪除
-              resolve(DeletePracticeResult.Restored);
-            },
-          },
-          onAutoClose: handleDelete,
-          onDismiss: handleDelete,
-        });
-      });
+      // 立即返回，讓調用方可以立即執行動作
+      return DeletePracticeResult.Deleted;
     },
     [openWarningDialog]
   );

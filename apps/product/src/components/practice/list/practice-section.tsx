@@ -1,5 +1,6 @@
 "use client";
 
+import { useUserPractices } from "@daodao/api";
 import { ArrowRightOutlineSvg, ExperimentSvg, FlagSvg, NoteSvg } from "@daodao/assets";
 import { useIsMobile, useScrollVisibility } from "@daodao/shared";
 import { Badge } from "@daodao/ui/components/badge";
@@ -7,9 +8,10 @@ import { Button } from "@daodao/ui/components/button";
 import { Checkbox } from "@daodao/ui/components/checkbox";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { TaskStatus, type TaskStatus as TaskStatusType } from "@/constants/task-status";
+import { PracticeStatus } from "@/constants/practice-status";
+import { TaskStatus, mapPracticeStatusToTaskStatus, type TaskStatus as TaskStatusType } from "@/constants/task-status";
 
 type TabType = "practices" | "plans" | "ideas";
 
@@ -22,7 +24,10 @@ interface PracticeItem {
 }
 
 interface PracticeSectionProps {
-  practices?: PracticeItem[];
+  /**
+   * 用戶 ID，如果提供則獲取該用戶的實踐，否則獲取當前登入用戶的實踐
+   */
+  userId: string;
 }
 
 interface Tab {
@@ -35,12 +40,31 @@ interface Tab {
 /**
  * 「主題實踐」區塊組件
  */
-export function PracticeSection({ practices = [] }: PracticeSectionProps) {
+export function PracticeSection({ userId }: PracticeSectionProps) {
   const [activeTab, setActiveTab] = useState<TabType>("practices");
   const [includeCompleted, setIncludeCompleted] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const isMobile = useIsMobile();
   const isScrolled = useScrollVisibility({ threshold: 167 });
+
+  const { data: practicesData, isLoading, error } = useUserPractices(userId, {
+    limit: 16, // 取得足夠的實踐列表
+  });
+
+  // 將 API 資料轉換為組件需要的格式
+  const practices: PracticeItem[] = useMemo(() => {
+    if (!practicesData?.data) {
+      return [];
+    }
+
+    return practicesData.data.map((practice) => ({
+      id: practice.id,
+      status: mapPracticeStatusToTaskStatus(practice.status as PracticeStatus),
+      title: practice.title,
+      description: practice.practiceAction || "",
+      tags: practice.tags || [],
+    }));
+  }, [practicesData]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -60,6 +84,12 @@ export function PracticeSection({ practices = [] }: PracticeSectionProps) {
             草稿
           </Badge>
         );
+      case TaskStatus.notStarted:
+        return (
+          <Badge variant="gray" size="sm">
+            未開始
+          </Badge>
+        );
       case TaskStatus.inProgress:
         return (
           <Badge variant="outline-logo" size="sm">
@@ -70,6 +100,12 @@ export function PracticeSection({ practices = [] }: PracticeSectionProps) {
         return (
           <Badge variant="default" size="sm">
             已完成
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="gray" size="sm">
+            未知
           </Badge>
         );
     }
@@ -167,7 +203,11 @@ export function PracticeSection({ practices = [] }: PracticeSectionProps) {
 
       {/* 實踐列表 */}
       <div className="space-y-2.5">
-        {filteredPractices.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-8 text-basic-400">載入中...</div>
+        ) : error ? (
+          <div className="text-center py-8 text-basic-400">載入失敗，請稍後再試</div>
+        ) : filteredPractices.length === 0 ? (
           <div className="text-center py-8 text-basic-400">
             {activeTab === "practices" && "尚無主題實踐"}
             {activeTab === "plans" && "尚無學習計劃"}

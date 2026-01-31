@@ -5,6 +5,7 @@
  * 提供實踐相關的 React Hooks（用於 Client Components）
  */
 
+import { useRef } from "react";
 import { client } from "../client";
 import { useMutate, useQuery } from "../hooks";
 import { uploadMultipleImages, deleteMultipleImages } from "./image";
@@ -14,6 +15,7 @@ import type {
   IGetPracticeTemplatesParams,
   IGetRandomPracticeTemplatesParams,
   IGetPracticeCheckInsParams,
+  IGetUserPracticesParams,
 } from "./practice";
 import type { components, paths } from "../types";
 
@@ -28,7 +30,13 @@ export type UpdatePracticeRequestType = UpdatePracticeRequestBody extends {
   content: { "application/json": infer T };
 }
   ? T
-  : never;
+  : UpdatePracticeRequestBody extends undefined
+    ? never
+    : NonNullable<UpdatePracticeRequestBody>["content"] extends {
+        "application/json": infer T;
+      }
+      ? T
+      : never;
 
 // ============================================================================
 // Query Hooks
@@ -155,6 +163,31 @@ export const usePracticeCheckIns = (
   });
 };
 
+/**
+ * 獲取指定用戶實踐列表的 Hook
+ */
+export const useUserPractices = (userId: string, params?: IGetUserPracticesParams) => {
+  return useQuery("/api/v1/practices/user/{userId}", {
+    params: {
+      path: {
+        userId,
+      },
+      query: {
+        page: params?.page,
+        limit: params?.limit,
+        query: params?.query,
+        contentType: params?.contentType,
+        tags: params?.tags,
+        userId: params?.userId,
+        status: params?.status,
+        sort: params?.sort,
+        order: params?.order,
+        include: params?.include,
+      },
+    },
+  });
+};
+
 // ============================================================================
 // Mutation Hooks
 // ============================================================================
@@ -179,6 +212,19 @@ export const updatePractice = async (id: string, data: UpdatePracticeRequestType
       },
     },
     body: data,
+  });
+};
+
+/**
+ * 刪除實踐的函數（用於 Client Components）
+ */
+export const deletePractice = async (id: string) => {
+  return client.DELETE("/api/v1/practices/{id}", {
+    params: {
+      path: {
+        id,
+      },
+    },
   });
 };
 
@@ -273,6 +319,59 @@ export const createPracticeCheckInWithFormData = async (
 };
 
 /**
+ * 刷新實踐相關的 cache（共用函數）
+ * @param mutate mutate 函數
+ * @param practiceId 實踐 ID
+ * @param options 選項
+ * @param options.skipDetail 是否跳過刷新實踐詳情（用於封存等操作，因為封存後可能無法訪問詳情）
+ */
+const refreshPracticeCaches = async (
+  mutate: ReturnType<typeof useMutate>,
+  practiceId: string,
+  options?: { skipDetail?: boolean }
+) => {
+  // 1. 刷新單個實踐詳情的 cache（如果沒有跳過）
+  if (!options?.skipDetail) {
+    try {
+      await mutate([
+        "/api/v1/practices/{id}",
+        {
+          params: {
+            path: {
+              id: practiceId,
+            },
+          },
+        },
+      ] as const);
+    } catch (error) {
+      // 如果刷新實踐詳情失敗（例如實踐已被封存或刪除），忽略錯誤
+      // 繼續刷新其他 cache
+      console.warn("Failed to refresh practice detail cache:", error);
+    }
+  }
+
+  // 2. 刷新實踐列表的 cache（使用 pattern matching 來匹配所有 query 參數組合）
+  await mutate([
+    "/api/v1/me/practices",
+    {
+      params: {
+        query: {},
+      },
+    },
+  ] as const);
+
+  // 3. 刷新實踐統計的 cache（使用 pattern matching 來匹配所有 query 參數組合）
+  await mutate([
+    "/api/v1/me/practice-stats",
+    {
+      params: {
+        query: {},
+      },
+    },
+  ] as const);
+};
+
+/**
  * Hook 用於創建實踐打卡記錄（自動處理 cache 刷新）
  * @param practiceId 實踐 ID
  * @returns 創建打卡記錄的函數和狀態
@@ -292,8 +391,7 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
       throw new Error(errorMessage);
     }
 
-    // 刷新相關的 cache
-    // 1. 刷新打卡列表的 cache
+    // 刷新打卡列表的 cache
     await mutate([
       "/api/v1/practices/{id}/checkins",
       {
@@ -305,8 +403,133 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
       },
     ] as const);
 
-    // 2. 刷新實踐列表的 cache（dashboard 使用）
-    // 使用 pattern matching 來匹配所有 query 參數組合
+    // 刷新實踐相關的 cache
+    await refreshPracticeCaches(mutate, practiceId);
+
+    return response;
+  };
+
+  return { createCheckIn };
+};
+
+/**
+ * Hook 用於封存實踐（自動處理 cache 刷新）
+ * @param practiceId 實踐 ID
+ * @returns 封存實踐的函數
+ */
+export const useArchivePractice = (practiceId: string) => {
+  const mutate = useMutate();
+  const { data: practiceData } = usePracticeById(practiceId);
+
+  // 使用 useRef 保存原始狀態，供復原時使用
+  const originalStatusRef = useRef<string | null>(null);
+
+  const archivePractice = async () => {
+    // 先獲取當前狀態作為原始狀態
+    originalStatusRef.current = practiceData?.data?.status || "active";
+
+    const response = await updatePractice(practiceId, {
+      status: "archived",
+    } as UpdatePracticeRequestType);
+
+    if (response.error) {
+      const errorMessage =
+        response.error && typeof response.error === "object" && "message" in response.error
+          ? String(response.error.message)
+          : "封存失敗";
+      throw new Error(errorMessage);
+    }
+
+    // 刷新相關的 cache（跳過實踐詳情，因為封存後可能無法訪問）
+    await refreshPracticeCaches(mutate, practiceId, { skipDetail: true });
+
+    return response;
+  };
+
+  const restorePractice = async () => {
+    if (!originalStatusRef.current) {
+      throw new Error("無法復原：找不到原始狀態");
+    }
+
+    const response = await updatePractice(practiceId, {
+      status: originalStatusRef.current as
+        | "draft"
+        | "not_started"
+        | "active"
+        | "completed"
+        | "archived",
+    } as UpdatePracticeRequestType);
+
+    if (response.error) {
+      const errorMessage =
+        response.error && typeof response.error === "object" && "message" in response.error
+          ? String(response.error.message)
+          : "復原失敗";
+      throw new Error(errorMessage);
+    }
+
+    // 刷新相關的 cache
+    await refreshPracticeCaches(mutate, practiceId);
+
+    // 清除保存的原始狀態
+    originalStatusRef.current = null;
+
+    return response;
+  };
+
+  return { archivePractice, restorePractice };
+};
+
+/**
+ * Hook 用於取消封存實踐（自動處理 cache 刷新）
+ * 返回一個函數，可以接受 practiceId 作為參數，適用於列表頁面
+ * @returns 取消封存實踐的函數
+ */
+export const useUnarchivePractice = () => {
+  const mutate = useMutate();
+
+  const unarchivePractice = async (practiceId: string) => {
+    const response = await updatePractice(practiceId, {
+      status: "active",
+    } as UpdatePracticeRequestType);
+
+    if (response.error) {
+      const errorMessage =
+        response.error && typeof response.error === "object" && "message" in response.error
+          ? String(response.error.message)
+          : "取消封存失敗";
+      throw new Error(errorMessage);
+    }
+
+    // 刷新相關的 cache
+    await refreshPracticeCaches(mutate, practiceId);
+
+    return response;
+  };
+
+  return { unarchivePractice };
+};
+
+/**
+ * Hook 用於刪除實踐（自動處理 cache 刷新）
+ * @param practiceId 實踐 ID
+ * @returns 刪除實踐的函數
+ */
+export const useDeletePractice = (practiceId: string) => {
+  const mutate = useMutate();
+
+  const deletePracticeById = async () => {
+    const response = await deletePractice(practiceId);
+
+    if (response.error) {
+      const errorMessage =
+        response.error && typeof response.error === "object" && "message" in response.error
+          ? String(response.error.message)
+          : "刪除失敗";
+      throw new Error(errorMessage);
+    }
+
+    // 刷新相關的 cache（不需要刷新單個實踐詳情，因為已經刪除了）
     await mutate([
       "/api/v1/me/practices",
       {
@@ -316,8 +539,6 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
       },
     ] as const);
 
-    // 3. 刷新實踐統計的 cache（dashboard 使用）
-    // 使用 pattern matching 來匹配所有 query 參數組合
     await mutate([
       "/api/v1/me/practice-stats",
       {
@@ -327,20 +548,8 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
       },
     ] as const);
 
-    // 4. 刷新單個實踐詳情的 cache（實踐詳情頁使用）
-    await mutate([
-      "/api/v1/practices/{id}",
-      {
-        params: {
-          path: {
-            id: practiceId,
-          },
-        },
-      },
-    ] as const);
-
     return response;
   };
 
-  return { createCheckIn };
+  return { deletePractice: deletePracticeById };
 };

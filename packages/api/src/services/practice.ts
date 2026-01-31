@@ -35,6 +35,10 @@ export type IGetPracticeCheckInsParams = NonNullable<
   paths["/api/v1/practices/{id}/checkins"]["get"]["parameters"]["query"]
 >;
 
+export type IGetUserPracticesParams = NonNullable<
+  paths["/api/v1/practices/user/{userId}"]["get"]["parameters"]["query"]
+>;
+
 // ============================================================================
 // Client Functions (用於 Server Components 或直接調用)
 // ============================================================================
@@ -154,6 +158,31 @@ export const getPracticeCheckIns = async (
         startDate: params?.startDate,
         endDate: params?.endDate,
         mood: params?.mood,
+        include: params?.include,
+      },
+    },
+  });
+};
+
+/**
+ * 獲取指定用戶的實踐列表
+ */
+export const getUserPractices = async (userId: string, params?: IGetUserPracticesParams) => {
+  return client.GET("/api/v1/practices/user/{userId}", {
+    params: {
+      path: {
+        userId,
+      },
+      query: {
+        page: params?.page,
+        limit: params?.limit,
+        query: params?.query,
+        contentType: params?.contentType,
+        tags: params?.tags,
+        userId: params?.userId,
+        status: params?.status,
+        sort: params?.sort,
+        order: params?.order,
         include: params?.include,
       },
     },

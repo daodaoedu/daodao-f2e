@@ -1,10 +1,5 @@
 "use client";
 
-import activeShaper1Json from "@daodao/assets/images/quiz/active-shaper-1.json";
-import communityConnector1Json from "@daodao/assets/images/quiz/community-connector-1.json";
-import deepExplorer1Json from "@daodao/assets/images/quiz/deep-explorer-1.json";
-import liquidIntegrator1Json from "@daodao/assets/images/quiz/liquid-integrator-1.json";
-import orderBuilder1Json from "@daodao/assets/images/quiz/order-builder-1.json";
 import userDesktopBannerPng from "@daodao/assets/images/users/user-desktop-banner.png";
 import userMobileBannerPng from "@daodao/assets/images/users/user-mobile-banner.png";
 import { useAuthContext } from "@daodao/auth";
@@ -18,7 +13,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lottie from "lottie-react";
 import { ChevronRight, RefreshCcw, SlidersHorizontal } from "lucide-react";
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { PageHeader, type PageHeaderProps } from "../layout/page-header";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -27,12 +22,12 @@ interface IslandHeaderProps {
   resultType: string;
 }
 
-const resultTypeToLottieMap = new Map<string, object>([
-  ["d", deepExplorer1Json],
-  ["o", orderBuilder1Json],
-  ["a", activeShaper1Json],
-  ["l", liquidIntegrator1Json],
-  ["c", communityConnector1Json],
+const resultTypeToLottiePathMap = new Map<string, () => Promise<object>>([
+  ["d", () => import("@daodao/assets/images/quiz/deep-explorer-1.json").then((m) => m.default)],
+  ["o", () => import("@daodao/assets/images/quiz/order-builder-1.json").then((m) => m.default)],
+  ["a", () => import("@daodao/assets/images/quiz/active-shaper-1.json").then((m) => m.default)],
+  ["l", () => import("@daodao/assets/images/quiz/liquid-integrator-1.json").then((m) => m.default)],
+  ["c", () => import("@daodao/assets/images/quiz/community-connector-1.json").then((m) => m.default)],
 ]);
 /**
  * 「我的小島」標題區組件
@@ -43,11 +38,50 @@ export function IslandHeader({ resultType }: IslandHeaderProps) {
   const headerRef = useRef<HTMLDivElement>(null);
   const resultDetail = resultDetailMap.get(resultType);
   const theme = themeMap.get(resultType);
-  const lottieJson = resultTypeToLottieMap.get(resultType);
   const isEmptyResult = !resultDetail || !theme;
   const message = isEmptyResult
     ? "你是哪一種島？快來測驗看看！"
     : `我是${resultDetail?.tags[0]}的${theme?.title}`;
+
+  // 動態載入主要的 lottie 動畫（當有結果時）
+  const [lottieJson, setLottieJson] = useState<object | null>(null);
+  useEffect(() => {
+    if (!isEmptyResult && typeof window !== "undefined") {
+      const loadLottie = resultTypeToLottiePathMap.get(resultType);
+      if (loadLottie) {
+        loadLottie()
+          .then((data) => {
+            setLottieJson(data);
+          })
+          .catch((error) => {
+            console.error("Failed to load Lottie animation:", error);
+          });
+      }
+    }
+  }, [resultType, isEmptyResult]);
+
+  // 動態載入所有 lottie 動畫（當沒有結果且已登入時，用於跑馬燈）
+  const [allLotties, setAllLotties] = useState<Map<string, object>>(new Map());
+  useEffect(() => {
+    if (isEmptyResult && isAuthenticated && typeof window !== "undefined") {
+      const loadAllLotties = async () => {
+        const lottieMap = new Map<string, object>();
+        const loadPromises = Array.from(resultTypeToLottiePathMap.entries()).map(
+          async ([key, loadFn]) => {
+            try {
+              const data = await loadFn();
+              lottieMap.set(key, data);
+            } catch (error) {
+              console.error(`Failed to load Lottie animation for ${key}:`, error);
+            }
+          }
+        );
+        await Promise.all(loadPromises);
+        setAllLotties(lottieMap);
+      };
+      loadAllLotties();
+    }
+  }, [isEmptyResult, isAuthenticated]);
 
   const handleGoToQuiz = () => {
     router.push(`${getEnv("NEXT_PUBLIC_WEBSITE_URL")}/quiz`);
@@ -139,32 +173,42 @@ export function IslandHeader({ resultType }: IslandHeaderProps) {
           className="md:hidden object-cover"
         />
         <PageHeader {...pageHeaderProps} />
-        {isEmptyResult && (
+        {isEmptyResult && isAuthenticated && (
           <div className="absolute left-0 right-0 top-[256px] w-[600px] mx-auto overflow-hidden mask-marquee">
             <div className="animate-marquee flex w-max gap-3 will-change-transform">
               {/* 第一份內容 */}
-              {Array.from(resultTypeToLottieMap.keys()).map((key) => (
-                <div key={key} className="w-[96px] h-[91px] shrink-0">
-                  <Lottie
-                    animationData={resultTypeToLottieMap.get(key)}
-                    className="*:w-full *:h-full"
-                  />
-                </div>
-              ))}
+              {Array.from(resultTypeToLottiePathMap.keys()).map((key) => {
+                const animationData = allLotties.get(key);
+                if (!animationData) return null;
+                return (
+                  <div key={key} className="w-[96px] h-[91px] shrink-0">
+                    <Lottie
+                      animationData={animationData}
+                      className="*:w-full *:h-full"
+                    />
+                  </div>
+                );
+              })}
               {/* 複製一次以實現無縫循環 */}
-              {Array.from(resultTypeToLottieMap.keys()).map((key) => (
-                <div key={`duplicate-${key}`} className="w-[96px] h-[91px] shrink-0">
-                  <Lottie
-                    animationData={resultTypeToLottieMap.get(key)}
-                    className="*:w-full *:h-full"
-                  />
-                </div>
-              ))}
+              {Array.from(resultTypeToLottiePathMap.keys()).map((key) => {
+                const animationData = allLotties.get(key);
+                if (!animationData) return null;
+                return (
+                  <div key={`duplicate-${key}`} className="w-[96px] h-[91px] shrink-0">
+                    <Lottie
+                      animationData={animationData}
+                      className="*:w-full *:h-full"
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
         <div className="absolute left-1/2 top-[92px] md:top-[127px] -translate-x-1/2 w-[149px] h-[140px] md:w-[168px] md:h-[158px]">
-          {!isEmptyResult && <Lottie animationData={lottieJson} className="*:w-full *:h-full" />}
+          {!isEmptyResult && lottieJson && (
+            <Lottie animationData={lottieJson} className="*:w-full *:h-full" />
+          )}
           {isAuthenticated && (
             <>
               <div
