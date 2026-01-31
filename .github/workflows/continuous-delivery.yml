@@ -4,21 +4,25 @@ concurrency:
   group: cd-${{ github.workflow }}-${{ github.head_ref }}
   cancel-in-progress: true
 
+# CD workflow 已暫停
+# on:
+#   push:
+#     branches:
+#       - 'prod'
+#       - 'dev'
+#
+#   pull_request:
+#     branches:
+#       - '**'
+#       - '!prod'
+#     types:
+#       - opened
+#       - synchronize
+#       - reopened
+#
+#   workflow_dispatch:
+
 on:
-  push:
-    branches:
-      - 'prod'
-      - 'dev'
-
-  pull_request:
-    branches:
-      - '**'
-      - '!prod'
-    types:
-      - opened
-      - synchronize
-      - reopened
-
   workflow_dispatch:
 
 env:

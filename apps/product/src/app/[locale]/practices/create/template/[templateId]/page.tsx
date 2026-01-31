@@ -1,73 +1,179 @@
 "use client";
 
+import {
+  type CreatePracticeRequestType,
+  createPractice,
+  getRandomPracticeTemplates,
+  type PracticeTemplateType,
+  usePracticeTemplateById,
+} from "@daodao/api";
 import { ArrowRightOutlineSvg, CompassSvg, Deco4Svg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
+import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
+import { format } from "date-fns";
 import { Loader, RefreshCcw } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout";
 import {
-  DURATION_DAYS_OPTIONS,
   ExecutionDurationCard,
   ExecutionTimingCard,
-  FREQUENCY_OPTIONS,
   type ManualPracticeFormValues,
   PracticeOverviewCard,
   ResourceCard,
 } from "@/components/practice";
+import {
+  DURATION_DAYS_NUMBER_OPTIONS,
+  DurationDays,
+  DurationDaysNumberToStringMap,
+  type ExecutionTiming,
+  Frequency,
+  mapExecutionTimingToPracticeTimePeriods,
+  PracticeTimePeriodToExecutionTimingMap,
+  parseFrequency,
+} from "@/constants/practice-form";
 
-// 模擬數據 - 之後可以從 API 取得
-const templateData: Record<string, ManualPracticeFormValues> = {
-  "learn-vibe-coding": {
+// 將 API 的 practiceTimePeriods 映射到 executionTiming
+const mapPracticeTimePeriodsToExecutionTiming = (periods: string[]): ExecutionTiming[] => {
+  const mapped = periods
+    .map((period) => PracticeTimePeriodToExecutionTimingMap[period])
+    .filter((timing): timing is ExecutionTiming => timing !== undefined);
+
+  return mapped.length > 0 ? mapped : [];
+};
+
+// 將 API 的 frequencyMinDays 和 frequencyMaxDays 映射到 frequency
+const mapFrequencyToFormValue = (minDays: number | null, maxDays: number | null): Frequency => {
+  if (minDays === null || maxDays === null) {
+    return Frequency.threeToFive; // 預設值
+  }
+
+  // 根據範圍映射到對應的選項
+  if (minDays >= 2 && maxDays <= 4) {
+    return Frequency.twoToFour;
+  }
+  if (minDays >= 3 && maxDays <= 5) {
+    return Frequency.threeToFive;
+  }
+  if (minDays >= 4 && maxDays <= 7) {
+    return Frequency.fourToSeven;
+  }
+
+  // 預設值
+  return Frequency.threeToFive;
+};
+
+// 將 API 的 durationDays 映射到表單的 durationDays (字串)
+const mapDurationDaysToString = (days: number | null): DurationDays => {
+  if (days === null) {
+    return DurationDays.thirty; // 預設值
+  }
+
+  // 找到最接近的選項
+  const closest = DURATION_DAYS_NUMBER_OPTIONS.reduce((prev, curr) =>
+    Math.abs(curr - days) < Math.abs(prev - days) ? curr : prev
+  );
+
+  // 將數字轉換為對應的字串常數
+  return DurationDaysNumberToStringMap[closest];
+};
+
+// 將 API 的 PracticeTemplate 轉換成 ManualPracticeFormValues
+const convertTemplateToFormValues = (template: PracticeTemplateType): ManualPracticeFormValues => {
+  // 預設開始日期為今天
+  const today = new Date();
+  const startDate = format(today, "yyyy-MM-dd");
+
+  return {
     // Step 1
-    name: "學習 Vibe coding",
-    actionDescription: "搭配 Gemini,看 30 天線上教學、實際 做一個專案。",
-    durationMinutes: 40,
+    name: template.title,
+    actionDescription: template.practiceAction || template.title,
+    durationMinutes: template.sessionDurationMinutes ?? 30,
 
     // Step 2
-    startDate: "2026-01-01",
-    durationDays: DURATION_DAYS_OPTIONS[1].value,
-    frequency: FREQUENCY_OPTIONS[1].value,
+    startDate,
+    durationDays: mapDurationDaysToString(template.durationDays),
+    frequency: mapFrequencyToFormValue(template.frequencyMinDays, template.frequencyMaxDays),
 
     // Step 3
-    executionTiming: ["holiday", "commute", "beforeSleep"],
+    executionTiming: mapPracticeTimePeriodsToExecutionTiming(template.practiceTimePeriods),
     customTiming: "",
 
     // Step 4
-    tags: ["專案管理", "software", "applications", "產品設計", "AI"],
-    resources: [
-      {
-        id: "1",
-        name: "Hahow",
-        url: "https://hahow.in/",
-      },
-      {
-        id: "2",
-        name: "Hahow",
-      },
-      {
-        id: "3",
-        name: "我來試試看這個特別長的資源名稱",
-        url: "https://example.com/",
-      },
-    ],
-  },
+    tags: template.suggestedTags || [],
+    resources: [], // API 目前沒有 resources，先設為空陣列
+  };
+};
+
+// 將表單資料轉換成 API 請求格式
+const convertFormValuesToApiRequest = (
+  values: ManualPracticeFormValues
+): CreatePracticeRequestType => {
+  const frequency = parseFrequency(values.frequency as Frequency);
+  const practiceTimePeriods = mapExecutionTimingToPracticeTimePeriods(
+    values.executionTiming as ExecutionTiming[]
+  );
+
+  const request: Record<string, unknown> = {
+    title: values.name,
+    durationDays: parseInt(values.durationDays, 10),
+    frequencyMinDays: frequency.minDays,
+    frequencyMaxDays: frequency.maxDays,
+    sessionDurationMinutes: values.durationMinutes,
+  };
+
+  if (values.actionDescription) {
+    request.practiceAction = values.actionDescription;
+  }
+
+  if (values.startDate) {
+    request.startDate = values.startDate;
+  }
+
+  if (practiceTimePeriods.length > 0) {
+    request.practiceTimePeriods = practiceTimePeriods;
+  }
+
+  if (values.tags && values.tags.length > 0) {
+    request.tags = values.tags;
+  }
+
+  if (values.resources && values.resources.length > 0) {
+    request.resources = values.resources.map((resource) => ({
+      name: resource.name,
+      url: resource.url || undefined,
+    }));
+  }
+
+  if (values.customTiming) {
+    request.otherContext = values.customTiming;
+  }
+
+  return request as CreatePracticeRequestType;
 };
 
 export default function TemplateDetailPage() {
   const router = useRouter();
   const params = useParams();
   const templateId = params.templateId as string;
-  const defaultTemplate = templateData["learn-vibe-coding"];
-  const template = templateData[templateId as keyof typeof templateData] ?? defaultTemplate;
-  const [showActions, setShowActions] = useState(false);
 
-  if (!template) {
-    return null;
-  }
+  // 取得模板詳情
+  const { data, error, isLoading } = usePracticeTemplateById(templateId);
+
+  // 將 API 回應轉換成表單格式
+  const template = useMemo(() => {
+    if (!data?.data) {
+      return null;
+    }
+    return convertTemplateToFormValues(data.data);
+  }, [data]);
+
+  const [showActions, setShowActions] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -77,9 +183,55 @@ export default function TemplateDetailPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleRefresh = () => {
-    // TODO: 隨機模板數據
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      // 取得 1 個隨機模板
+      const response = await getRandomPracticeTemplates({
+        count: 1,
+      });
+
+      const templates = response.data?.data?.[0];
+
+      if (!templates) {
+        // 如果沒有模板，導航回列表頁面
+        router.push("/practices/create");
+        return;
+      }
+
+      router.replace(`/practices/create/template/${templates.id}`);
+    } catch (error) {
+      // 發生錯誤時導航回列表頁面
+      console.error("Failed to fetch random templates:", error);
+      router.push("/practices/create");
+    } finally {
+      setIsRefreshing(false);
+    }
   };
+
+  // Loading 狀態
+  if (isLoading) {
+    return (
+      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan flex items-center justify-center">
+        <Loader className="size-8 animate-spin text-white" />
+      </div>
+    );
+  }
+
+  // Error 狀態
+  if (error || !template) {
+    return (
+      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
+        <PageHeader leftAction="back" rightActionTo="/" variant="light" />
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-5">
+          <p className="text-white mb-4">載入模板時發生錯誤</p>
+          <Button variant="white" onClick={() => router.back()}>
+            返回
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
@@ -105,10 +257,12 @@ export default function TemplateDetailPage() {
               <Button
                 variant="white"
                 onClick={handleRefresh}
-                disabled={!showActions}
+                disabled={!showActions || isRefreshing}
                 className="group text-sm font-normal h-[35px] transition-opacity duration-500 ease-out"
               >
-                {showActions ? (
+                {isRefreshing ? (
+                  <Loader className="size-4.5 animate-spin" />
+                ) : showActions ? (
                   <RefreshCcw className="size-4.5 group-hover:animate-spin-reverse" />
                 ) : (
                   <Loader className="size-4.5 animate-spin" />
@@ -180,17 +334,66 @@ export default function TemplateDetailPage() {
           )}
         >
           <Button
-            onClick={() => {
-              // TODO: 處理開始實踐的邏輯（提交到 API）
-              // 提交成功後導航到成功頁面
-              router.push(
-                `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}`
-              );
+            onClick={async () => {
+              if (isSubmitting || !template) {
+                return;
+              }
+
+              setIsSubmitting(true);
+
+              try {
+                const apiRequest = convertFormValuesToApiRequest(template);
+
+                const response = await createPractice(apiRequest);
+
+                if (response.error) {
+                  const errorMessage =
+                    response.error &&
+                    typeof response.error === "object" &&
+                    "message" in response.error
+                      ? String(response.error.message)
+                      : "建立實踐失敗";
+                  console.error("Failed to create practice:", errorMessage);
+                  toast.error(errorMessage);
+                  setIsSubmitting(false);
+                  return;
+                }
+
+                // 取得新建立的實踐 ID
+                const practiceId = response.data?.data?.id;
+
+                // 提交成功後導航到成功頁面
+                if (practiceId) {
+                  router.push(
+                    `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}&practiceId=${encodeURIComponent(practiceId)}`
+                  );
+                } else {
+                  router.push(
+                    `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}`
+                  );
+                }
+              } catch (error) {
+                const errorMessage =
+                  error instanceof Error ? error.message : "建立實踐失敗，請稍後再試";
+                console.error("Failed to create practice:", error);
+                toast.error(errorMessage);
+                setIsSubmitting(false);
+              }
             }}
+            disabled={isSubmitting}
             className="w-full sm:max-w-[288px]"
           >
-            看起來不錯
-            <ArrowRightOutlineSvg className="size-4.5" />
+            {isSubmitting ? (
+              <>
+                <Loader className="size-4.5 animate-spin" />
+                建立中...
+              </>
+            ) : (
+              <>
+                看起來不錯
+                <ArrowRightOutlineSvg className="size-4.5" />
+              </>
+            )}
           </Button>
         </footer>
       </main>

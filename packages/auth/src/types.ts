@@ -4,6 +4,7 @@
  */
 export interface StoredUser {
   id: string;
+  customId: string | null;
   email: string | null;
   name: string | null;
   photoUrl?: string | null;
@@ -36,5 +37,8 @@ export interface AuthContextValue {
   /** 開啟登入 Dialog */
   openLoginDialog: (options?: { redirectUrl?: string; source?: "website" | "app" }) => void;
   /** 需要登入時自動打開 Dialog，如果已登入則執行回調 */
-  requireAuth: <T>(callback: () => T | Promise<T>, options?: { redirectUrl?: string; source?: "website" | "app" }) => T | Promise<T> | undefined;
+  requireAuth: <T>(
+    callback: () => T | Promise<T>,
+    options?: { redirectUrl?: string; source?: "website" | "app" }
+  ) => T | Promise<T> | undefined;
 }

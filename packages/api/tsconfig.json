@@ -1,5 +1,5 @@
 {
-  "extends": "@daodao/config/nextjs.json",
+  "extends": "@daodao/config/react.json",
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist"

@@ -1,11 +1,11 @@
+export type { FilterStatus } from "@/constants/task-status";
 export { AddTaskFAB } from "./add-task-fab";
 export { Banner } from "./banner";
-export type { CheckInData, CheckInStatus, CheckInStatusOptions } from "./check-in-sheet";
-export { CheckInButton } from "./check-in-sheet";
 export { CompletedSection } from "./completed-section";
 export { CompletedTaskCard } from "./completed-task-card";
 export { DashboardHeader } from "./dashboard-header";
-export type { FilterStatus, InProgressTask } from "./in-progress-section";
+export type { InProgressTask } from "./in-progress-section";
 export { InProgressSection } from "./in-progress-section";
 export { InProgressTaskCard } from "./in-progress-task-card";
+export { RandomPracticesSection } from "./random-practices-section";
 export { StatCard } from "./stat-card";

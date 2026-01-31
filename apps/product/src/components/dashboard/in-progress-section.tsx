@@ -10,21 +10,25 @@ import {
 import { cn } from "@daodao/ui/lib/utils";
 import { Ellipsis } from "lucide-react";
 import { useState } from "react";
-import type { TaskStatus } from "@/constants/task-status";
+import {
+  FilterStatus,
+  type FilterStatus as FilterStatusType,
+  type TaskStatus,
+} from "@/constants/task-status";
 import { InProgressTaskCard } from "./in-progress-task-card";
 
-export type FilterStatus = "all" | "draft" | "not-started" | "in-progress";
-
 export interface InProgressTask {
-  id: number;
+  id: string;
   label: string;
   title: string;
   description: string;
-  progress: string;
+  checkInCount: number;
+  progress: number;
   messagesCount: number;
   isUnreadMessages: boolean;
   theme: string;
   status: TaskStatus;
+  lastCheckInDate?: string | null;
 }
 
 interface InProgressSectionProps {
@@ -32,10 +36,17 @@ interface InProgressSectionProps {
 }
 
 export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+  console.log("tasks", tasks);
+  const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
 
   const filteredTasks =
-    filterStatus === "all" ? tasks : tasks.filter((task) => task.status === filterStatus);
+    filterStatus === FilterStatus.all
+      ? tasks
+      : tasks.filter((task) => task.status === filterStatus);
+
+  if (tasks.length === 0) {
+    return null;
+  }
 
   return (
     <section className="mb-6">
@@ -47,7 +58,8 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
               variant="ghost"
               size="icon"
               className={cn(
-                filterStatus !== "all" && "bg-light-cyan text-logo-cyan hover:text-logo-cyan"
+                filterStatus !== FilterStatus.all &&
+                  "bg-light-cyan text-logo-cyan hover:text-logo-cyan"
               )}
             >
               <Ellipsis className="size-6" />
@@ -55,26 +67,34 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              onClick={() => setFilterStatus("all")}
-              className={cn(filterStatus === "all" && "bg-accent text-accent-foreground")}
+              onClick={() => setFilterStatus(FilterStatus.all)}
+              className={cn(
+                filterStatus === FilterStatus.all && "bg-accent text-accent-foreground"
+              )}
             >
               全部
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => setFilterStatus("draft")}
-              className={cn(filterStatus === "draft" && "bg-accent text-accent-foreground")}
+              onClick={() => setFilterStatus(FilterStatus.draft)}
+              className={cn(
+                filterStatus === FilterStatus.draft && "bg-accent text-accent-foreground"
+              )}
             >
               草稿
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => setFilterStatus("not-started")}
-              className={cn(filterStatus === "not-started" && "bg-accent text-accent-foreground")}
+              onClick={() => setFilterStatus(FilterStatus.notStarted)}
+              className={cn(
+                filterStatus === FilterStatus.notStarted && "bg-accent text-accent-foreground"
+              )}
             >
               未開始
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => setFilterStatus("in-progress")}
-              className={cn(filterStatus === "in-progress" && "bg-accent text-accent-foreground")}
+              onClick={() => setFilterStatus(FilterStatus.inProgress)}
+              className={cn(
+                filterStatus === FilterStatus.inProgress && "bg-accent text-accent-foreground"
+              )}
             >
               進行中
             </DropdownMenuItem>
@@ -94,11 +114,13 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
             label={task.label}
             title={task.title}
             description={task.description}
+            checkInCount={task.checkInCount}
             progress={task.progress}
             messagesCount={task.messagesCount}
             theme={task.theme}
             isUnreadMessages={task.isUnreadMessages}
             status={task.status}
+            lastCheckInDate={task.lastCheckInDate}
           />
         ))}
       </div>

@@ -5,12 +5,7 @@
   "description": "API client package for DaoDao monorepo (OpenAPI)",
   "main": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./client": "./src/client.ts",
-    "./hooks": "./src/hooks.ts",
-    "./errors": "./src/errors.ts",
-    "./types": "./src/types.ts",
-    "./is-match": "./src/is-match.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "build": "tsc",
@@ -28,6 +23,7 @@
     "@daodao/config": "workspace:*",
     "next": "catalog:",
     "openapi-fetch": "^0.15.0",
+    "swr": "^2.3.8",
     "swr-openapi": "^5.5.0"
   },
   "devDependencies": {

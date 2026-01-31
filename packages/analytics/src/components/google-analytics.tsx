@@ -44,18 +44,9 @@ export function GoogleAnalytics() {
 }
 
 // Helper functions for tracking events
-export const trackEvent = (
-  action: string,
-  category: string,
-  label?: string,
-  value?: number
-) => {
+export const trackEvent = (action: string, category: string, label?: string, value?: number) => {
   const config = getAnalyticsConfig();
-  if (
-    typeof window !== "undefined" &&
-    window.gtag &&
-    config.googleAnalytics.enabled
-  ) {
+  if (typeof window !== "undefined" && window.gtag && config.googleAnalytics.enabled) {
     window.gtag("event", action, {
       event_category: category,
       event_label: label,

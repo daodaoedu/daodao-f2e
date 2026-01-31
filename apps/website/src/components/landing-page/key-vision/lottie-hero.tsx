@@ -35,19 +35,17 @@ export function LottieHero() {
   );
 
   if (!animationData) {
-    return <div className="aspect-564/396 w-full md:aspect-498/320" aria-hidden="true" />;
+    return null;
   }
 
   return (
-    <div className="aspect-564/396 w-full md:aspect-498/320" aria-hidden="true">
-      <Lottie
-        animationData={animationData}
-        loop={!prefersReduced}
-        autoplay={!prefersReduced}
-        style={{ width: "100%", height: "100%" }}
-        rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
-        initialSegment={prefersReduced ? [0, 0] : undefined}
-      />
-    </div>
+    <Lottie
+      animationData={animationData}
+      loop={!prefersReduced}
+      autoplay={!prefersReduced}
+      style={{ width: "100%", height: "100%" }}
+      rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+      initialSegment={prefersReduced ? [0, 0] : undefined}
+    />
   );
 }

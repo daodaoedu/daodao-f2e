@@ -1,38 +1,31 @@
 "use client";
 
-import {
-  ArrowRightOutlineSvg,
-  BlueSvg,
-  GreenSvg,
-  MessagesSvg,
-  PinkSvg,
-  YellowSvg,
-} from "@daodao/assets";
+import { ArrowRightOutlineSvg, MessagesSvg } from "@daodao/assets";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
 import { PenLine } from "lucide-react";
-import { getStatusConfig } from "@/constants/task-status";
-import { CheckInButton } from "./check-in-sheet";
-
-const themesMap = {
-  yellow: YellowSvg,
-  blue: BlueSvg,
-  pink: PinkSvg,
-  green: GreenSvg,
-};
+import { CheckInButton } from "@/components/check-in";
+import {
+  getThemeNameFromColor,
+  PracticeTheme,
+  practiceThemeSvgMap,
+} from "@/constants/practice-theme";
+import { getStatusConfig, TaskStatus } from "@/constants/task-status";
 
 interface InProgressTaskCardProps {
   label: string;
   id: string;
   title: string;
   description: string;
-  progress: string;
+  checkInCount: number;
+  progress: number;
   messagesCount: number;
   isUnreadMessages: boolean;
   theme: string;
   status: string;
+  lastCheckInDate?: string | null;
   onEdit?: () => void;
 }
 
@@ -41,16 +34,19 @@ export const InProgressTaskCard = ({
   id,
   title,
   description,
+  checkInCount,
   progress,
   messagesCount,
   isUnreadMessages,
   theme,
   status,
+  lastCheckInDate,
   onEdit,
 }: InProgressTaskCardProps) => {
-  const Theme = themesMap[theme as keyof typeof themesMap] ?? YellowSvg;
+  const themeName = getThemeNameFromColor(theme);
+  const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
   const statusInfo = getStatusConfig(status);
-  const isDraft = status === "draft";
+  const isDraft = status === TaskStatus.draft;
 
   return (
     <div className="relative w-[294px]">
@@ -93,7 +89,7 @@ export const InProgressTaskCard = ({
         <div className="flex items-center justify-between">
           <span className="text-xs flex gap-1">
             <span className="text-text-dark">已打卡</span>
-            <span className="text-text-dark font-semibold">{progress}</span>
+            <span className="text-text-dark font-semibold">{checkInCount}</span>
             <span className="text-text-dark">次</span>
           </span>
           {/* TODO: MVP 先不開放 */}
@@ -119,15 +115,18 @@ export const InProgressTaskCard = ({
           <CheckInButton
             variant="secondary"
             className="w-full sm:max-w-[288px]"
+            practiceId={id}
+            practiceStatus={status}
+            lastCheckInDate={lastCheckInDate ?? null}
             taskTitle={title}
             showIcon
-            onComplete={() => {}}
+            progressPercentage={progress}
           />
         )}
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 overflow-hidden rounded-b-full">
-        <Progress value={23} />
+        <Progress value={progress} />
       </div>
     </div>
   );

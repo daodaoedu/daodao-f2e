@@ -2,7 +2,7 @@
 
 import { ArrowRightOutlineSvg } from "@daodao/assets";
 import { CustomLink } from "@daodao/ui/components/custom-link";
-import { Settings, Archive, LibraryBig, SquareUser } from "lucide-react";
+import { Archive, LibraryBig, Settings, SquareUser } from "lucide-react";
 
 type SettingsItem = {
   id: string;
@@ -52,9 +52,7 @@ export const SettingsList = () => {
               aria-label={item.label}
             >
               <Icon className="size-4.5 text-light-gray shrink-0" />
-              <span className="flex-1 text-base text-text-dark">
-                {item.label}
-              </span>
+              <span className="flex-1 text-base text-text-dark">{item.label}</span>
               <ArrowRightOutlineSvg className="size-4.5 text-bg-dark shrink-0" />
             </CustomLink>
           </li>

@@ -22,6 +22,7 @@
   "dependencies": {
     "@daodao/api": "workspace:*",
     "@daodao/assets": "workspace:*",
+    "@daodao/auth": "workspace:*",
     "@daodao/i18n": "workspace:*",
     "@daodao/shared": "workspace:*",
     "@daodao/ui": "workspace:*",

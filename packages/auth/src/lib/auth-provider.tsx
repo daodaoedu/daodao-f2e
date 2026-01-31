@@ -1,13 +1,18 @@
 "use client";
 
-import { client, unauthorizedHandler } from "@daodao/api";
+import {
+  logout as apiLogout,
+  refreshToken as apiRefreshToken,
+  getCurrentUser,
+  unauthorizedHandler,
+} from "@daodao/api";
 import { getStorage, getStorageKey, StorageEnum } from "@daodao/shared";
 import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { LoginDialog } from "../components/login-dialog";
 import type { AuthContextValue, StoredUser } from "../types";
 import { initiateOAuthLogin } from "./auth-client";
 import { DEFAULT_REDIRECT_URL } from "./auth-constants";
-import { LoginDialog } from "../components/login-dialog";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
@@ -54,18 +59,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   /**
    * 檢查登入狀態
-   * 呼叫 /api/v1/users/me 端點（Cookie 自動發送）
+   * 使用統一的 API 服務獲取當前用戶資訊
    */
   const checkAuth = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await client.GET("/api/v1/users/me");
+      const response = await getCurrentUser();
 
       if (response.data && response.response.ok && response.data.data) {
         const userData = response.data.data;
         // 將完整的 API 使用者資訊轉換為簡化的存儲版本，避免記住敏感資訊
         const storedUser: StoredUser = {
           id: userData.id,
+          customId: userData.customId ?? null,
           email: userData.email ?? null,
           name: userData.name ?? null,
           photoUrl: userData.photoURL ?? null,
@@ -85,11 +91,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   /**
    * Token 刷新邏輯
-   * 統一處理 Token 刷新，避免重複代碼
+   * 使用統一的 API 服務刷新 Token
    */
   const handleTokenRefresh = useCallback(async (): Promise<boolean> => {
     try {
-      const response = await client.POST("/api/v1/auth/refresh");
+      const response = await apiRefreshToken();
       if (response.data && response.response.ok) {
         // Token 刷新成功，重新檢查登入狀態
         await checkAuth();
@@ -214,11 +220,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   /**
    * 登出
-   * 呼叫後端 API 清除 Cookie
+   * 使用統一的 API 服務登出
    */
   const logout = useCallback(async () => {
     try {
-      await client.POST("/api/v1/auth/logout");
+      await apiLogout();
     } catch (error) {
       console.error("Failed to logout:", error);
     } finally {

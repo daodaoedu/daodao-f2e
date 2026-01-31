@@ -51,10 +51,7 @@ export const posthogCapture = (event: string, properties?: Record<string, unknow
   }
 };
 
-export const posthogIdentify = (
-  distinctId: string,
-  properties?: Record<string, unknown>
-) => {
+export const posthogIdentify = (distinctId: string, properties?: Record<string, unknown>) => {
   if (typeof window !== "undefined" && window.posthog) {
     window.posthog.identify(distinctId, properties);
   }

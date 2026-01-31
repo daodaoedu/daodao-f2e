@@ -33,6 +33,7 @@
     "date-fns": "catalog:",
     "gsap": "catalog:",
     "lottie-react": "catalog:",
+    "lru-cache": "^11.2.5",
     "lucide-react": "catalog:",
     "matter-js": "^0.20.0",
     "motion": "catalog:",
@@ -41,6 +42,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
+    "swr": "^2.2.5",
     "zod": "catalog:"
   },
   "devDependencies": {

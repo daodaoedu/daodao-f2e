@@ -5,6 +5,7 @@ import { AuthProvider } from "@daodao/auth";
 import { type Locale, type Messages, NextIntlClientProvider } from "@daodao/i18n";
 import { type DeviceInfo, DeviceProvider, detectDeviceClient } from "@daodao/shared";
 import "@daodao/ui/globals.css";
+import { SwrConfigProvider } from "@daodao/api";
 import { DialogManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { SheetManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Toaster } from "@daodao/ui/components/sonner";
@@ -39,12 +40,14 @@ function GlobalProvider({
           <DeviceProvider initialDevice={initialDevice}>
             <NavigationBlockerProvider>
               <AuthProvider>
-                <DialogManagerProvider>
-                  <SheetManagerProvider>
-                    <Toaster />
-                    {children}
-                  </SheetManagerProvider>
-                </DialogManagerProvider>
+                <SwrConfigProvider>
+                  <DialogManagerProvider>
+                    <SheetManagerProvider>
+                      <Toaster />
+                      {children}
+                    </SheetManagerProvider>
+                  </DialogManagerProvider>
+                </SwrConfigProvider>
               </AuthProvider>
             </NavigationBlockerProvider>
           </DeviceProvider>

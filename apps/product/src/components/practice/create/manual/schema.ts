@@ -1,7 +1,14 @@
 import { addDays, format, isAfter, isBefore, isValid, parse, startOfDay } from "date-fns";
 import { z } from "zod";
+import {
+  DurationDays,
+  ExecutionTiming,
+  Frequency,
+  MAX_PRACTICE_TAGS,
+} from "@/constants/practice-form";
 
 // Form Options Constants
+// 這些選項使用 constants 中的值，確保與 schema 驗證一致
 export const DURATION_MINUTES_OPTIONS = [
   { value: 15, label: "15分鐘" },
   { value: 30, label: "30分鐘" },
@@ -10,25 +17,39 @@ export const DURATION_MINUTES_OPTIONS = [
 ] as const;
 
 export const DURATION_DAYS_OPTIONS = [
-  { value: "7", label: "7天" },
-  { value: "14", label: "14天" },
-  { value: "21", label: "21天" },
-  { value: "30", label: "30天" },
+  { value: DurationDays.seven, label: "7天" },
+  { value: DurationDays.fourteen, label: "14天" },
+  { value: DurationDays.twentyOne, label: "21天" },
+  { value: DurationDays.thirty, label: "30天" },
 ] as const;
 
 export const FREQUENCY_OPTIONS = [
-  { value: "2-4", label: "2-4", unit: "天", description: "輕鬆起步" },
-  { value: "3-5", label: "3-5", unit: "天", description: "紮實執行" },
-  { value: "4-7", label: "4-7", unit: "天", description: "密集小跑" },
+  {
+    value: Frequency.twoToFour,
+    label: "2-4",
+    unit: "天",
+    description: "輕鬆起步",
+  },
+  {
+    value: Frequency.threeToFive,
+    label: "3-5",
+    unit: "天",
+    description: "紮實執行",
+  },
+  {
+    value: Frequency.fourToSeven,
+    label: "4-7",
+    unit: "天",
+    description: "密集小跑",
+  },
 ] as const;
 
 export const EXECUTION_TIMING_OPTIONS = [
-  { value: "morning", label: "早上" },
-  { value: "lunchBreak", label: "午休" },
-  { value: "commute", label: "通勤中" },
-  { value: "holiday", label: "休假日" },
-  { value: "evening", label: "夜晚" },
-  { value: "beforeSleep", label: "睡前" },
+  { value: ExecutionTiming.morning, label: "早餐前" },
+  { value: ExecutionTiming.commute, label: "通勤時" },
+  { value: ExecutionTiming.lunchBreak, label: "午休時" },
+  { value: ExecutionTiming.evening, label: "晚餐後" },
+  { value: ExecutionTiming.beforeSleep, label: "睡前" },
 ] as const;
 
 // Form Schema
@@ -68,18 +89,20 @@ export const manualPracticeFormSchema = z.object({
         return { message: "日期不在允許的範圍內" };
       }
     ),
-  durationDays: z.enum(["7", "14", "21", "30"], { required_error: "請選擇想要持續多久" }),
-  frequency: z.enum(["2-4", "3-5", "4-7"], { required_error: "請選擇每週實踐頻率" }),
+  durationDays: z.nativeEnum(DurationDays, {
+    required_error: "請選擇想要持續多久",
+  }),
+  frequency: z.nativeEnum(Frequency, {
+    required_error: "請選擇每週實踐頻率",
+  }),
 
   // Step 3
   durationMinutes: z.number(),
-  executionTiming: z
-    .array(z.enum(["morning", "lunchBreak", "commute", "holiday", "evening", "beforeSleep"]))
-    .min(1, "請至少選擇一個執行時機"),
+  executionTiming: z.array(z.nativeEnum(ExecutionTiming)).min(1, "請至少選擇一個執行時機"),
   customTiming: z.string(),
 
   // Step 4
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()).max(MAX_PRACTICE_TAGS, `標籤最多 ${MAX_PRACTICE_TAGS} 個`).optional(),
   resources: z
     .array(
       z.object({

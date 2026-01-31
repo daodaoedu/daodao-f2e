@@ -2,12 +2,9 @@
 
 import { AnalyticsScripts } from "@daodao/analytics";
 import { AuthProvider } from "@daodao/auth";
-import {
-  type Locale,
-  type Messages,
-  NextIntlClientProvider,
-} from "@daodao/i18n";
+import { type Locale, type Messages, NextIntlClientProvider } from "@daodao/i18n";
 import "@daodao/ui/globals.css";
+import { SwrConfigProvider } from "@daodao/api";
 import { DialogManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
 
@@ -18,12 +15,7 @@ interface GlobalProviderProps {
   messages: Messages;
 }
 
-function GlobalProvider({
-  head,
-  locale,
-  children,
-  messages,
-}: GlobalProviderProps) {
+function GlobalProvider({ head, locale, children, messages }: GlobalProviderProps) {
   return (
     <html
       lang={locale}
@@ -34,14 +26,12 @@ function GlobalProvider({
       {head}
       <body>
         <AnalyticsScripts />
-        <NextIntlClientProvider
-          messages={messages}
-          locale={locale}
-          timeZone="Asia/Taipei"
-        >
+        <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
           <NavigationBlockerProvider>
             <DialogManagerProvider>
-              <AuthProvider>{children}</AuthProvider>
+              <AuthProvider>
+                <SwrConfigProvider>{children}</SwrConfigProvider>
+              </AuthProvider>
             </DialogManagerProvider>
           </NavigationBlockerProvider>
         </NextIntlClientProvider>

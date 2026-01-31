@@ -1,8 +1,9 @@
-"use client";
-
-import { SlidersHorizontal } from "lucide-react";
-import { PageHeader } from "@/components/layout";
-import { IslandHeader, PracticeSection, UserInfoCard } from "@/components/user";
+import { getUserByIdentifier } from "@daodao/api";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { cache } from "react";
+import { PracticeSection } from "@/components/practice";
+import { IslandHeader, UserInfoCard } from "@/components/user";
 
 /**
  * 個人頁面
@@ -12,64 +13,80 @@ import { IslandHeader, PracticeSection, UserInfoCard } from "@/components/user";
  * - /users/123 (userId)
  * - /users/john-doe (customId)
  */
-export default function UserProfilePage() {
-  const userData = {
-    name: "John Doe",
-    location: "Taiwan",
-    selfIntroduction: "I am a software engineer",
-    photoURL: "https://example.com/photo.jpg",
-  };
 
-  // 模擬資料 - 之後從 API 取得
-  const mockLearningType = "我是注重推理的探探島！";
-  const mockPractices = [
-    {
-      id: "1",
-      status: "draft" as const,
-      title: "閱讀原子習慣",
-      description: "點精油,跟着 Youtube 教學做",
-      tags: ["閱讀", "原子習慣", "心理學"],
+// 使用 React.cache() 避免在 generateMetadata 和 page 中重複請求
+const getCachedUserByIdentifier = cache(getUserByIdentifier);
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/users/[identifier]">): Promise<Metadata> {
+  const { identifier } = await params;
+
+  // 獲取用戶資料以生成 metadata（使用緩存版本）
+  const userResponse = await getCachedUserByIdentifier(identifier);
+
+  // 如果請求失敗或沒有資料，返回預設 metadata
+  if (!userResponse.data || !userResponse.response.ok) {
+    return {
+      title: "用戶個人頁面",
+      description: "查看用戶的個人資訊和實踐記錄",
+    };
+  }
+
+  const userData = userResponse.data?.data ?? userResponse.data;
+  const userName = userData?.name || "未命名用戶";
+  const userDescription = userData?.selfIntroduction || "查看用戶的個人資訊和實踐記錄";
+  const userPhotoURL = userData?.photoURL;
+
+  return {
+    title: `${userName} 的個人頁面`,
+    description: userDescription,
+    openGraph: {
+      title: `${userName} 的個人頁面`,
+      description: userDescription,
+      ...(userPhotoURL && {
+        images: [
+          {
+            url: userPhotoURL,
+            width: 1200,
+            height: 630,
+            alt: `${userName} 的頭像`,
+          },
+        ],
+      }),
+      type: "profile",
     },
-    {
-      id: "2",
-      status: "in-progress" as const,
-      title: "閱讀原子習慣",
-      description: "點精油,跟着 Youtube 教學做",
-      tags: ["閱讀", "原子習慣"],
+    twitter: {
+      card: "summary",
+      title: `${userName} 的個人頁面`,
+      description: userDescription,
+      ...(userPhotoURL && {
+        images: [userPhotoURL],
+      }),
     },
-  ];
-
-  const handleRetakeQuiz = () => {
-    // TODO: 導航到測驗頁面
-    console.log("重新測驗");
   };
+}
 
-  const handleViewDetails = () => {
-    // TODO: 顯示詳細說明
-    console.log("觀看詳細說明");
-  };
+export default async function UserProfilePage({
+  params,
+}: PageProps<"/[locale]/users/[identifier]">) {
+  const { identifier } = await params;
 
-  // 模擬社群媒體連結 - 之後從 API 取得
-  const mockSocialLinks = [
-    { platform: "line" as const, url: "https://line.me/ti/p/@example" },
-    { platform: "facebook" as const, url: "https://facebook.com/example" },
-    { platform: "instagram" as const, url: "https://instagram.com/example" },
-  ];
+  // 使用緩存版本避免重複請求（與 generateMetadata 共享）
+  const userResponse = await getCachedUserByIdentifier(identifier);
+
+  // 如果請求失敗或沒有資料，顯示 404
+  if (!userResponse.data || !userResponse.response.ok) {
+    notFound();
+  }
+
+  const userData = userResponse.data?.data;
+  const resultType = (userData.latestQuizResult?.resultType ?? "").toLowerCase();
+  const userId = userData.id;
 
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-[#B8E8FD]">
-      <IslandHeader
-        learningType={mockLearningType}
-        onRetakeQuiz={handleRetakeQuiz}
-        onViewDetails={handleViewDetails}
-      >
-        <PageHeader
-          title="我的小島"
-          rightActionTo="/settings"
-          rightLabel="設定"
-          rightActionIcon={<SlidersHorizontal className="size-6" />}
-        />
-      </IslandHeader>
+      <IslandHeader resultType={resultType} />
 
       <main className="max-w-[640px] mx-auto px-5 pb-[64px]">
         {/* 用戶個人資訊卡片 */}
@@ -78,11 +95,11 @@ export default function UserProfilePage() {
           location={userData.location || undefined}
           selfIntroduction={userData.selfIntroduction || undefined}
           photoURL={userData.photoURL || undefined}
-          socialLinks={mockSocialLinks}
+          socialLinks={userData.contactList || undefined}
         />
 
         {/* 「主題實踐」區塊 */}
-        <PracticeSection practices={mockPractices} />
+        <PracticeSection userId={userId} />
       </main>
     </div>
   );

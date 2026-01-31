@@ -1,5 +1,6 @@
 "use client";
 
+import { useExtractOgImage } from "@daodao/api";
 import { BookSvg } from "@daodao/assets";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
@@ -19,8 +20,9 @@ export interface ResourceCardProps {
   onRemove?: () => void;
 }
 
-export const ResourceCard = ({ resource, className, onClick, onRemove }: ResourceCardProps) => {
+const ResourceCardComponent = ({ resource, className, onClick, onRemove }: ResourceCardProps) => {
   const [imageError, setImageError] = React.useState(false);
+  const { data: ogImageData, isLoading } = useExtractOgImage(resource.url);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -29,15 +31,29 @@ export const ResourceCard = ({ resource, className, onClick, onRemove }: Resourc
     }
   };
 
+  // 決定顯示的圖片：優先使用 og:image，如果沒有或載入失敗則顯示預設圖示
+  const ogImageUrl = ogImageData?.ogImageUrl ?? null;
+  const shouldShowDefaultIcon = !ogImageUrl || imageError || isLoading || !resource.url;
+
   const cardContent = (
     <>
       <div className="relative aspect-169/93 rounded-t-lg overflow-hidden bg-bg-gray">
-        {imageError || !resource.url ? (
+        {shouldShowDefaultIcon ? (
           <div className="absolute inset-0 flex items-center justify-center bg-light-cyan">
-            <BookSvg width={100} height={95} className="opacity-50" />
+            {isLoading ? (
+              <div className="size-8 border-2 border-logo-cyan border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <BookSvg width={100} height={95} className="opacity-50" />
+            )}
           </div>
         ) : (
-          <Image src={resource.url} alt={resource.name} onError={() => setImageError(true)} fill />
+          <Image
+            src={ogImageUrl}
+            alt={resource.name}
+            onError={() => setImageError(true)}
+            fill
+            className="object-cover"
+          />
         )}
         {onRemove && (
           <button
@@ -83,3 +99,13 @@ export const ResourceCard = ({ resource, className, onClick, onRemove }: Resourc
     </div>
   );
 };
+
+export const ResourceCard = React.memo(ResourceCardComponent, (prevProps, nextProps) => {
+  // 只比較 resource 對象，忽略 onRemove 和 onClick 的變化
+  return (
+    prevProps.resource.id === nextProps.resource.id &&
+    prevProps.resource.name === nextProps.resource.name &&
+    prevProps.resource.url === nextProps.resource.url &&
+    prevProps.className === nextProps.className
+  );
+});

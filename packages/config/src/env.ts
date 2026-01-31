@@ -4,20 +4,7 @@
  */
 
 // 載入靜態生成的環境變數配置
-let staticEnv: Record<string, string> | null = null;
-
-try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const staticModule = require("../generated/env");
-  staticEnv = staticModule.env || null;
-} catch {
-  // 靜態檔案不存在時，在開發環境給出提示
-  if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
-    console.warn(
-      "[@daodao/config] Static env file not found. Run 'pnpm --filter @daodao/config generate:env' to generate it."
-    );
-  }
-}
+import { env } from "../generated/env";
 
 /**
  * 取得環境變數值
@@ -27,8 +14,8 @@ try {
  */
 export const getEnv = (key: string, defaultValue?: string): string | undefined => {
   // 優先使用靜態配置
-  if (staticEnv && key in staticEnv) {
-    const value = staticEnv[key];
+  if (env && key in env) {
+    const value = env[key as keyof typeof env];
     return value || defaultValue;
   }
 
@@ -49,8 +36,9 @@ export const getEnv = (key: string, defaultValue?: string): string | undefined =
  */
 export const getRequiredEnv = (key: string): string => {
   // 優先使用靜態配置
-  if (staticEnv && key in staticEnv && staticEnv[key]) {
-    return staticEnv[key];
+  const value = getEnv(key);
+  if (value) {
+    return value;
   }
 
   // 回退到 process.env（用於 Next.js build 時）

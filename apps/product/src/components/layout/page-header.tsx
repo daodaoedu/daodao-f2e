@@ -7,7 +7,7 @@ import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
 
-type PageHeaderProps = {
+export type PageHeaderProps = {
   /** 左側動作：'back' 顯示返回按鈕，null 顯示空佔位符 */
   leftAction?: "back" | null;
   /** 左側動作按鈕的文字，預設為 "返回" */

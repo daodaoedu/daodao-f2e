@@ -1,24 +1,24 @@
 // Components
 export { AnalyticsProvider, AnalyticsScripts } from "./components/analytics-provider";
-export { GoogleAnalytics, trackEvent, trackPageView } from "./components/google-analytics";
 export {
   Clarity,
+  clarityConsent,
+  clarityEvent,
   clarityIdentify,
   claritySetTag,
-  clarityEvent,
-  clarityConsent,
 } from "./components/clarity";
+export { GoogleAnalytics, trackEvent, trackPageView } from "./components/google-analytics";
 export {
   PostHog,
   posthogCapture,
+  posthogGetFeatureFlag,
   posthogIdentify,
+  posthogIsFeatureEnabled,
+  posthogOptIn,
+  posthogOptOut,
   posthogReset,
   posthogSetPersonProperties,
-  posthogOptOut,
-  posthogOptIn,
-  posthogIsFeatureEnabled,
-  posthogGetFeatureFlag,
 } from "./components/posthog";
 
 // Config
-export { getAnalyticsConfig, type AnalyticsConfig } from "./lib/config";
+export { type AnalyticsConfig, getAnalyticsConfig } from "./lib/config";

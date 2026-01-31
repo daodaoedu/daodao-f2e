@@ -1,61 +1,115 @@
 "use client";
 
+import type { UpdatePracticeRequestType } from "@daodao/api";
+import { updatePractice, useMyPractices, useUnarchivePractice } from "@daodao/api";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
-import { useCallback } from "react";
-
-type ArchivedPractice = {
-  id: string;
-  title: string;
-  description: string | null;
-  status: "archived";
-};
-
-// Mock 資料
-const practices: ArchivedPractice[] = [
-  {
-    id: "1",
-    title: "閱讀原子習慣",
-    description: "點精油, 跟著 Youtube 教學做",
-    status: "archived",
-  },
-  {
-    id: "2",
-    title: "閱讀原子習慣",
-    description: "點精油, 跟著 Youtube 教學做",
-    status: "archived",
-  },
-  {
-    id: "3",
-    title: "閱讀原子習慣",
-    description: "點精油, 跟著 Youtube 教學做",
-    status: "archived",
-  },
-];
+import { useCallback, useState } from "react";
 
 export const ArchivedContentList = () => {
-  const handleUnarchive = useCallback(async (_practiceId: string) => {
-    // 顯示 toast，帶有復原按鈕
-    return new Promise<void>((resolve) => {
-      const handleUnarchiveConfirm = () => {
-        // 用戶沒有點擊復原，確認取消封存
-        console.log('unarchive success');
-        resolve();
-      };
+  const [unarchivingIds, setUnarchivingIds] = useState<Set<string>>(new Set());
+  const { unarchivePractice } = useUnarchivePractice();
 
-      toast.success("實踐已成功取消封存", {
-        action: {
-          label: "復原",
-          onClick: () => {
-            // 用戶點擊復原，取消封存
-            resolve();
+  // 查詢已封存的實踐
+  const { data, isLoading, error, mutate } = useMyPractices({
+    status: "archived",
+    limit: 100,
+  });
+
+  const practices = data?.data || [];
+
+  const handleUnarchive = useCallback(
+    async (practiceId: string) => {
+      // 防止重複點擊
+      if (unarchivingIds.has(practiceId)) {
+        return;
+      }
+
+      setUnarchivingIds((prev) => new Set(prev).add(practiceId));
+
+      try {
+        // 使用封裝好的 hook 來取消封存（自動處理 cache 刷新）
+        await unarchivePractice(practiceId);
+
+        // 刷新已封存實踐列表的 cache
+        await mutate();
+
+        // 顯示成功 toast，帶有復原按鈕
+        toast.success("實踐已成功取消封存", {
+          action: {
+            label: "復原",
+            onClick: async () => {
+              // 用戶點擊復原，重新封存
+              try {
+                const restoreResponse = await updatePractice(practiceId, {
+                  status: "archived",
+                } as UpdatePracticeRequestType);
+
+                if (restoreResponse.error) {
+                  const errorMessage =
+                    restoreResponse.error &&
+                    typeof restoreResponse.error === "object" &&
+                    "message" in restoreResponse.error
+                      ? String(restoreResponse.error.message)
+                      : "復原失敗";
+                  console.error("Failed to restore archive:", errorMessage);
+                  toast.error(errorMessage);
+                  return;
+                }
+
+                // 刷新已封存實踐列表的 cache
+                await mutate();
+
+                toast.success("已復原封存");
+              } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : "復原失敗";
+                console.error("Failed to restore archive:", errorMessage);
+                toast.error(errorMessage);
+              }
+            },
           },
-        },
-        onAutoClose: handleUnarchiveConfirm,
-        onDismiss: handleUnarchiveConfirm,
-      });
-    });
-  }, []);
+        });
+
+        setUnarchivingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(practiceId);
+          return next;
+        });
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "取消封存失敗";
+        console.error("Failed to unarchive practice:", errorMessage);
+        toast.error(errorMessage);
+        setUnarchivingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(practiceId);
+          return next;
+        });
+      }
+    },
+    [unarchivePractice, mutate, unarchivingIds]
+  );
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-2xl p-6">
+        <h2 className="text-lg font-medium text-bg-dark mb-6">主題實踐</h2>
+        <div className="text-center py-8 text-basic-400">
+          <p>載入中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-2xl p-6">
+        <h2 className="text-lg font-medium text-bg-dark mb-6">主題實踐</h2>
+        <div className="text-center py-8 text-basic-400">
+          <p>載入失敗，請稍後再試</p>
+        </div>
+      </div>
+    );
+  }
 
   if (practices.length === 0) {
     return (
@@ -82,18 +136,17 @@ export const ArchivedContentList = () => {
               <h3 className="text-base font-medium text-text-dark line-clamp-1 mb-1">
                 {practice.title}
               </h3>
-              <p className="text-xs text-text-dark line-clamp-1">
-                {practice.description}
-              </p>
+              <p className="text-xs text-text-dark line-clamp-1">{practice.practiceAction || ""}</p>
             </div>
             <div className="shrink-0">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleUnarchive(practice.id)}
+                disabled={unarchivingIds.has(practice.id)}
                 className="h-9 px-5"
               >
-                取消封存
+                {unarchivingIds.has(practice.id) ? "處理中..." : "取消封存"}
               </Button>
             </div>
           </div>

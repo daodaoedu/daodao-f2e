@@ -3,7 +3,7 @@
  */
 import type { components } from "./types";
 
-type ApiErrorResponse = components["schemas"]["api-response.validators_apiErrorResponseSchema"];
+type ApiErrorResponse = components["responses"]["BadRequestError"]["content"]["application/json"];
 
 export class ApiError<
   T extends ApiErrorResponse["error"] = ApiErrorResponse["error"],

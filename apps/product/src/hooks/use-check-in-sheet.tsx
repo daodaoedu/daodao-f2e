@@ -2,14 +2,14 @@
 
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { useCallback, useRef } from "react";
-import type { CheckInData } from "@/components/dashboard/check-in-sheet";
-import { CheckInSheetContent } from "@/components/dashboard/check-in-sheet";
+import type { CheckInData } from "@/components/check-in";
+import { CheckInSheetContent } from "@/components/check-in";
 
-interface UseCheckInSheetOptions {
+interface IUseCheckInSheetOptions {
   /** 任務標題 */
   taskTitle: string;
   /** 打卡完成回調 */
-  onComplete: (data: CheckInData) => void;
+  onComplete: (data: CheckInData) => Promise<void> | void;
   /** 關閉時的回調 */
   onClose?: () => void;
 }
@@ -29,7 +29,7 @@ interface UseCheckInSheetOptions {
  * openCheckInSheet();
  * ```
  */
-export function useCheckInSheet({ taskTitle, onComplete, onClose }: UseCheckInSheetOptions) {
+export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInSheetOptions) {
   const { open } = useSheetManager();
   const closeRef = useRef<(() => void) | null>(null);
 
@@ -40,13 +40,11 @@ export function useCheckInSheet({ taskTitle, onComplete, onClose }: UseCheckInSh
       content: (
         <CheckInSheetContent
           taskTitle={taskTitle}
-          onComplete={(data) => {
-            onComplete(data);
+          onComplete={async (data) => {
+            // 先關閉 sheet
             closeRef.current?.();
-          }}
-          onClose={() => {
-            closeRef.current?.();
-            onClose?.();
+            // 然後執行 onComplete（會顯示 loading 和成功對話框）
+            await onComplete(data);
           }}
         />
       ),

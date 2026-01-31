@@ -1,8 +1,10 @@
 "use client";
 
+import { GoogleFilledSvg } from "@daodao/assets";
+import desktopLoginPng from "@daodao/assets/images/login/desktop-login.png";
+import mobileLoginPng from "@daodao/assets/images/login/mobile-login.png";
 import { useTranslations } from "@daodao/i18n";
 import { useIsMobile } from "@daodao/shared";
-import { Button } from "@daodao/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -17,12 +19,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@daodao/ui/components/animate-ui/components/radix/sheet";
+import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
-import { initiateOAuthLogin } from "../lib/auth-client";
-import { GoogleFilledSvg } from "@daodao/assets";
-import desktopLoginPng from "@daodao/assets/images/login/desktop-login.png";
-import mobileLoginPng from "@daodao/assets/images/login/mobile-login.png";
 import { Image } from "@daodao/ui/components/image";
+import { initiateOAuthLogin } from "../lib/auth-client";
 
 export interface LoginDialogProps {
   /** 是否開啟 Dialog */
@@ -70,8 +70,7 @@ export const LoginDialog = ({
       onLogin();
       return;
     }
-    const defaultSource =
-      source || (window.location.hostname.includes("app.") ? "app" : "website");
+    const defaultSource = source || (window.location.hostname.includes("app.") ? "app" : "website");
     initiateOAuthLogin(redirectUrl, defaultSource);
   };
 
@@ -94,7 +93,7 @@ export const LoginDialog = ({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent
           side="bottom"
-          className="h-auto max-h-[calc(100vh-64px)] overflow-y-auto gap-0"
+          className={`h-auto max-h-[calc(100vh-64px)] overflow-y-auto gap-0 ${className ?? ""}`}
         >
           <SheetHeader>
             <SheetTitle className="text-3xl font-medium text-bg-dark mb-2 mt-10">
@@ -156,7 +155,7 @@ export const LoginDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="w-fit sm:max-w-none overflow-hidden border-none"
+        className={`w-fit sm:max-w-none overflow-hidden border-none ${className ?? ""}`}
         from="bottom"
       >
         <div className="flex">
@@ -208,12 +207,7 @@ export const LoginDialog = ({
           </div>
 
           <div className="relative w-[268px] h-[440px]">
-            <Image
-              src={desktopLoginPng}
-              alt="Desktop Login"
-              fill
-              className="object-cover"
-            />
+            <Image src={desktopLoginPng} alt="Desktop Login" fill className="object-cover" />
           </div>
         </div>
       </DialogContent>

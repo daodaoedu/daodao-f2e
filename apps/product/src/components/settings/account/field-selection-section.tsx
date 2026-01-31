@@ -48,17 +48,9 @@ export const FieldSelectionSection = ({
   return (
     <div className="bg-white rounded-xl p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <FormLabel className="font-medium text-base text-text-dark">
-          {label}
-        </FormLabel>
+        <FormLabel className="font-medium text-base text-text-dark">{label}</FormLabel>
         {selectedFields.length > 0 && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleClear}
-            className="h-9"
-          >
+          <Button type="button" variant="outline" size="sm" onClick={handleClear} className="h-9">
             清空選項
           </Button>
         )}
@@ -74,11 +66,7 @@ export const FieldSelectionSection = ({
                 {Array.isArray(field.value) && field.value.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {field.value.map((field) => (
-                      <Badge
-                        key={field}
-                        variant="outline-blue"
-                        className="rounded-lg px-4 py-2"
-                      >
+                      <Badge key={field} variant="outline-blue" className="rounded-lg px-4 py-2">
                         {field}
                       </Badge>
                     ))}

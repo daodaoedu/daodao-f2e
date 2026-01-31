@@ -4,6 +4,7 @@ import {
   readdirSync,
   readFileSync,
   statSync,
+  unlinkSync,
   watch,
   writeFileSync,
 } from "node:fs";
@@ -281,8 +282,60 @@ function generateIndexFile(svgFiles: SvgFile[]): string {
   return `${exports}\n`;
 }
 
-function build() {
-  console.log("Building SVG components...");
+function needsRebuild(svgFile: SvgFile): boolean {
+  const sourceStat = statSync(svgFile.path);
+  const sourceMtime = sourceStat.mtimeMs;
+
+  let outputPath: string;
+  if (svgFile.isMask) {
+    outputPath = join(OUTPUT_DIR, svgFile.relativePath.replace(/\.mask\.svg$/, ".mask.ts"));
+  } else {
+    outputPath = join(OUTPUT_DIR, svgFile.relativePath.replace(/\.svg$/, ".tsx"));
+  }
+
+  if (!existsSync(outputPath)) {
+    return true;
+  }
+
+  const outputStat = statSync(outputPath);
+  const outputMtime = outputStat.mtimeMs;
+
+  // 如果源檔案比輸出檔案新，需要重新構建
+  return sourceMtime > outputMtime;
+}
+
+function getOutputPath(svgFile: SvgFile): string {
+  if (svgFile.isMask) {
+    return join(OUTPUT_DIR, svgFile.relativePath.replace(/\.mask\.svg$/, ".mask.ts"));
+  }
+  return join(OUTPUT_DIR, svgFile.relativePath.replace(/\.svg$/, ".tsx"));
+}
+
+function buildSingleFile(svgFile: SvgFile): void {
+  const outputPath = getOutputPath(svgFile);
+  const outputDir = dirname(outputPath);
+
+  if (!existsSync(outputDir)) {
+    mkdirSync(outputDir, { recursive: true });
+  }
+
+  if (svgFile.isMask) {
+    const constantCode = convertSvgToMaskDataUri(svgFile);
+    writeFileSync(outputPath, constantCode, "utf-8");
+  } else {
+    const componentCode = convertSvgToComponent(svgFile);
+    writeFileSync(outputPath, componentCode, "utf-8");
+  }
+
+  console.log(`✓ Converted ${svgFile.relativePath} -> ${svgFile.componentName}`);
+}
+
+function build(incremental: boolean = false) {
+  if (incremental) {
+    console.log("Building SVG components (incremental)...");
+  } else {
+    console.log("Building SVG components...");
+  }
 
   const svgFiles = getSvgFiles(SVG_DIR, SVG_DIR);
   const maskFiles = svgFiles.filter((f) => f.isMask);
@@ -290,47 +343,90 @@ function build() {
 
   console.log(`Found ${regularFiles.length} SVG files and ${maskFiles.length} mask SVG files`);
 
+  let rebuiltCount = 0;
+  let skippedCount = 0;
+
   // 處理普通 SVG 檔案
   for (const svgFile of regularFiles) {
-    const outputPath = join(OUTPUT_DIR, svgFile.relativePath.replace(/\.svg$/, ".tsx"));
-    const outputDir = dirname(outputPath);
-
-    if (!existsSync(outputDir)) {
-      mkdirSync(outputDir, { recursive: true });
+    if (incremental && !needsRebuild(svgFile)) {
+      skippedCount++;
+      continue;
     }
-
-    const componentCode = convertSvgToComponent(svgFile);
-    writeFileSync(outputPath, componentCode, "utf-8");
-
-    console.log(`✓ Converted ${svgFile.relativePath} -> ${svgFile.componentName}`);
+    buildSingleFile(svgFile);
+    rebuiltCount++;
   }
 
   // 處理 mask SVG 檔案
   for (const svgFile of maskFiles) {
-    const outputPath = join(OUTPUT_DIR, svgFile.relativePath.replace(/\.mask\.svg$/, ".mask.ts"));
-    const outputDir = dirname(outputPath);
-
-    if (!existsSync(outputDir)) {
-      mkdirSync(outputDir, { recursive: true });
+    if (incremental && !needsRebuild(svgFile)) {
+      skippedCount++;
+      continue;
     }
-
-    const constantCode = convertSvgToMaskDataUri(svgFile);
-    writeFileSync(outputPath, constantCode, "utf-8");
-
-    console.log(`✓ Converted ${svgFile.relativePath} -> ${svgFile.componentName}`);
+    buildSingleFile(svgFile);
+    rebuiltCount++;
   }
 
+  // 清理已刪除的檔案對應的輸出檔案
+  if (incremental && existsSync(OUTPUT_DIR)) {
+    const existingOutputFiles = getAllOutputFiles(OUTPUT_DIR);
+    const currentSvgFiles = new Set(svgFiles.map((f) => getOutputPath(f)));
+    const indexPath = join(OUTPUT_DIR, "index.ts");
+
+    for (const outputFile of existingOutputFiles) {
+      // 跳過 index.ts，因為它總是會被重新生成
+      if (outputFile === indexPath) {
+        continue;
+      }
+
+      if (!currentSvgFiles.has(outputFile)) {
+        // 這個輸出檔案對應的源檔案已經不存在了
+        if (existsSync(outputFile)) {
+          unlinkSync(outputFile);
+          console.log(`✓ Removed orphaned output: ${outputFile}`);
+        }
+      }
+    }
+  }
+
+  // 總是重新生成 index.ts，因為檔案列表可能變動
   const indexContent = generateIndexFile(svgFiles);
   const indexPath = join(OUTPUT_DIR, "index.ts");
   writeFileSync(indexPath, indexContent, "utf-8");
   console.log(`✓ Generated index.ts`);
 
-  console.log("Build completed!");
+  if (incremental) {
+    console.log(`Build completed! Rebuilt: ${rebuiltCount}, Skipped: ${skippedCount}`);
+  } else {
+    console.log("Build completed!");
+  }
+}
+
+function getAllOutputFiles(dir: string): string[] {
+  const files: string[] = [];
+  if (!existsSync(dir)) {
+    return files;
+  }
+
+  const entries = readdirSync(dir);
+
+  for (const entry of entries) {
+    const fullPath = join(dir, entry);
+    const stat = statSync(fullPath);
+
+    if (stat.isDirectory()) {
+      files.push(...getAllOutputFiles(fullPath));
+    } else if (entry.endsWith(".tsx") || entry.endsWith(".ts")) {
+      files.push(fullPath);
+    }
+  }
+
+  return files;
 }
 
 function watchFiles() {
   console.log("Watching for file changes...");
   let buildTimeout: NodeJS.Timeout | null = null;
+  const changedFiles = new Set<string>();
 
   const debouncedBuild = () => {
     if (buildTimeout) {
@@ -338,7 +434,12 @@ function watchFiles() {
     }
     buildTimeout = setTimeout(() => {
       try {
-        build();
+        if (changedFiles.size > 0) {
+          console.log(`\n🔄 Processing ${changedFiles.size} changed file(s)...`);
+          // 使用增量構建模式
+          build(true);
+          changedFiles.clear();
+        }
       } catch (error) {
         console.error("Build failed:", error);
       }
@@ -351,21 +452,35 @@ function watchFiles() {
       return;
     }
 
-    const watcher = watch(dir, { recursive: true }, (_eventType, filename) => {
+    const watcher = watch(dir, { recursive: true }, (eventType, filename) => {
       if (!filename) return;
 
       const fullPath = join(dir, filename);
       // 只處理 SVG 文件變動或目錄變動
       try {
         const stat = statSync(fullPath);
-        if (filename.endsWith(".svg") || stat.isDirectory()) {
-          console.log(`\n📁 File changed: ${filename}`);
+        if (filename.endsWith(".svg")) {
+          if (eventType === "rename") {
+            // 檔案被刪除
+            console.log(`\n🗑️  File removed: ${filename}`);
+            changedFiles.add(fullPath);
+            debouncedBuild();
+          } else if (stat.isFile()) {
+            // 檔案被修改
+            console.log(`\n📝 File changed: ${filename}`);
+            changedFiles.add(fullPath);
+            debouncedBuild();
+          }
+        } else if (stat.isDirectory()) {
+          // 目錄變動可能影響檔案列表
+          console.log(`\n📁 Directory changed: ${filename}`);
           debouncedBuild();
         }
       } catch {
-        // 文件可能被刪除，但我們仍然需要重新構建以更新 index
+        // 文件可能被刪除
         if (filename.endsWith(".svg")) {
-          console.log(`\n📁 File removed: ${filename}`);
+          console.log(`\n🗑️  File removed: ${filename}`);
+          changedFiles.add(fullPath);
           debouncedBuild();
         }
       }
@@ -384,9 +499,9 @@ function watchFiles() {
     process.exit(1);
   }
 
-  // 初始構建
+  // 初始構建（完整構建）
   try {
-    build();
+    build(false);
   } catch (error) {
     console.error("Initial build failed:", error);
     process.exit(1);

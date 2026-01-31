@@ -36,7 +36,7 @@
     "gsap": "catalog:",
     "lottie-react": "catalog:",
     "lucide-react": "catalog:",
-    "motion": "catalog:",
+    "motion": "^12.23.26",
     "next": "catalog:",
     "next-themes": "catalog:",
     "radix-ui": "^1.4.3",

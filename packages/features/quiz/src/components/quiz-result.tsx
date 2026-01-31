@@ -2,6 +2,7 @@
 
 import { HorizontalFullSvg, VerticalFullSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
+import { AuthButton } from "@daodao/auth";
 import { useRouter } from "@daodao/i18n/navigation";
 import {
   type CapturedImageData,
@@ -175,13 +176,13 @@ export const QuizResult = () => {
             再玩一次
           </Button>
 
-          <Button
+          <AuthButton
             variant="outline"
             className="mb-6 block w-full border-basic-400 text-basic-400 hover:bg-basic-400"
             onClick={handleViewAnalysis}
           >
             看深度分析
-          </Button>
+          </AuthButton>
 
           <footer className="flex flex-col items-center rounded-md bg-white p-5">
             <VerticalFullSvg className="w-24" />
