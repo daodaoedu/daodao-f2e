@@ -89,10 +89,10 @@ export default function Step5Screen() {
             {/* Preview Card */}
             <YStack
               padding="$5"
-              backgroundColor={values.color ? values.color + '15' : colors.primary.palest}
+              backgroundColor={values.color ? `${values.color}15` : colors.primary.palest}
               borderRadius="$md"
               borderWidth={1}
-              borderColor={values.color ? values.color + '30' : colors.primary.lighter}
+              borderColor={values.color ? `${values.color}30` : colors.primary.lighter}
               alignItems="center"
               gap="$3"
             >
@@ -176,7 +176,7 @@ export default function Step5Screen() {
                           key={tag}
                           paddingHorizontal="$2"
                           paddingVertical="$1"
-                          backgroundColor={values.color ? values.color + '20' : colors.primary.palest}
+                          backgroundColor={values.color ? `${values.color}20` : colors.primary.palest}
                           borderRadius="$sm"
                         >
                           <Text fontSize={12} color={values.color || colors.primary.base}>

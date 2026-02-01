@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useRouter } from 'expo-router'
-import { Controller } from 'react-hook-form'
 import { YStack, XStack, Text, ScrollView, Button, Input } from 'tamagui'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ChevronLeft, ChevronRight, X, Plus, Tag } from '@tamagui/lucide-icons'

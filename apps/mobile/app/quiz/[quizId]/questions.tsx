@@ -19,7 +19,7 @@ export default function QuizQuestionsScreen() {
   const isLastQuestion = currentIndex === questions.length - 1
   const progress = ((currentIndex + 1) / questions.length) * 100
 
-  const handleSelectOption = (optionId: string, value: string) => {
+  const handleSelectOption = (optionId: string, _value: string) => {
     setSelectedOption(optionId)
   }
 

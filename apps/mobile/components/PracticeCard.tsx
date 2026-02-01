@@ -506,4 +506,4 @@ export function PracticeCard({
   )
 }
 
-const styles = StyleSheet.create({})
+const _styles = StyleSheet.create({})

@@ -19,7 +19,7 @@ export default function AccountSettingsScreen() {
     try {
       // TODO: Implement API call
       Alert.alert('成功', '個人資料已更新')
-    } catch (error) {
+    } catch (_error) {
       Alert.alert('錯誤', '更新失敗，請稍後再試')
     } finally {
       setIsSaving(false)

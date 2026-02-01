@@ -43,14 +43,14 @@ export default function NotificationSettingsScreen() {
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
 
-  useEffect(() => {
-    checkPermission()
-  }, [])
-
   const checkPermission = async () => {
     const granted = await notificationService.requestPermissions()
     setHasPermission(granted)
   }
+
+  useEffect(() => {
+    checkPermission()
+  }, [])
 
   const toggleSetting = (key: string) => {
     setSettings(prev =>
@@ -88,10 +88,10 @@ export default function NotificationSettingsScreen() {
             {hasPermission === false && (
               <Card
                 padding="$4"
-                backgroundColor={colors.semantic.warning + '15'}
+                backgroundColor={`${colors.semantic.warning}15`}
                 borderRadius="$md"
                 borderWidth={1}
-                borderColor={colors.semantic.warning + '30'}
+                borderColor={`${colors.semantic.warning}30`}
               >
                 <YStack gap="$3">
                   <XStack alignItems="center" gap="$2">

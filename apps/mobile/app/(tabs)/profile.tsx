@@ -1,7 +1,7 @@
 import { useCallback, useState, useRef } from 'react'
 import { Pressable, StyleSheet, View as RNView, Linking, Dimensions, Animated } from 'react-native'
 import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, Card, ScrollView, Avatar, Button, View } from 'tamagui'
+import { YStack, XStack, Text, Card, Avatar, Button, } from 'tamagui'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LottieView from 'lottie-react-native'
 import {

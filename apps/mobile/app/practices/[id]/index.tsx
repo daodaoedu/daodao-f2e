@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Alert, RefreshControl, Pressable, StyleSheet } from 'react-native'
+import { Alert, RefreshControl, } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { YStack, XStack, Text, ScrollView, Button, Spinner, Card, View } from 'tamagui'
 import { SafeAreaView } from 'react-native-safe-area-context'

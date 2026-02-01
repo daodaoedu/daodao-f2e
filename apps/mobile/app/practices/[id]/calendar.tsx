@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { YStack, XStack, Text, Button, Spinner } from 'tamagui'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -122,7 +122,7 @@ export default function PracticeCalendarScreen() {
               {/* Current Streak */}
               <YStack
                 flex={1}
-                backgroundColor={colors.semantic.warning + '15'}
+                backgroundColor={`${colors.semantic.warning}15`}
                 padding="$3"
                 borderRadius="$md"
                 alignItems="center"
@@ -142,7 +142,7 @@ export default function PracticeCalendarScreen() {
               {/* Longest Streak */}
               <YStack
                 flex={1}
-                backgroundColor={colors.semantic.success + '15'}
+                backgroundColor={`${colors.semantic.success}15`}
                 padding="$3"
                 borderRadius="$md"
                 alignItems="center"

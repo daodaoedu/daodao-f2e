@@ -172,10 +172,10 @@ export default function AppearanceSettingsScreen() {
               </Text>
               <Card
                 padding="$4"
-                backgroundColor={accentColor + '15'}
+                backgroundColor={`${accentColor}15`}
                 borderRadius="$md"
                 borderWidth={1}
-                borderColor={accentColor + '30'}
+                borderColor={`${accentColor}30`}
               >
                 <YStack alignItems="center" gap="$3">
                   <YStack

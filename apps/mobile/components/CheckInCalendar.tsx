@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Calendar, DateData, LocaleConfig } from 'react-native-calendars'
+import { Calendar, type DateData, LocaleConfig } from 'react-native-calendars'
 import { YStack } from 'tamagui'
 import { colors } from '@/generated/design-tokens'
 

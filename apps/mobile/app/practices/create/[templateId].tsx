@@ -59,7 +59,7 @@ export default function TemplatePreviewScreen() {
             <YStack
               width={100}
               height={100}
-              backgroundColor={template.color + '20'}
+              backgroundColor={`${template.color}20`}
               borderRadius={50}
               alignItems="center"
               justifyContent="center"
@@ -121,7 +121,7 @@ export default function TemplatePreviewScreen() {
                       key={tag}
                       paddingHorizontal="$3"
                       paddingVertical="$1"
-                      backgroundColor={template.color + '15'}
+                      backgroundColor={`${template.color}15`}
                       borderRadius="$sm"
                     >
                       <Text fontSize={13} color={template.color}>

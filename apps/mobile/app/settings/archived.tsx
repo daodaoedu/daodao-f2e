@@ -152,10 +152,10 @@ export default function ArchivedPracticesScreen() {
                         <Button
                           flex={1}
                           size="$3"
-                          backgroundColor={colors.semantic.error + '10'}
+                          backgroundColor={`${colors.semantic.error}10`}
                           borderWidth={1}
-                          borderColor={colors.semantic.error + '30'}
-                          pressStyle={{ backgroundColor: colors.semantic.error + '20' }}
+                          borderColor={`${colors.semantic.error}30`}
+                          pressStyle={{ backgroundColor: `${colors.semantic.error}20` }}
                           onPress={() => handleDelete(practice)}
                         >
                           <XStack alignItems="center" gap="$1">

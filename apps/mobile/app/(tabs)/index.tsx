@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { RefreshControl, Alert, Pressable, StyleSheet, Dimensions, View as RNView } from 'react-native'
 import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Spinner, View } from 'tamagui'
+import { YStack, XStack, Text, ScrollView, Spinner, } from 'tamagui'
 
 const { width: screenWidth } = Dimensions.get('window')
 import { SafeAreaView } from 'react-native-safe-area-context'

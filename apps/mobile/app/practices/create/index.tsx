@@ -87,7 +87,7 @@ export default function CreatePracticeScreen() {
                         <YStack
                           width={48}
                           height={48}
-                          backgroundColor={template.color + '20'}
+                          backgroundColor={`${template.color}20`}
                           borderRadius={24}
                           alignItems="center"
                           justifyContent="center"

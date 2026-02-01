@@ -78,7 +78,7 @@ export const ShareableCheckInCard = forwardRef<View, ShareableCheckInCardProps>(
 
           {/* Streak Badge */}
           <XStack
-            backgroundColor={cardColor + '15'}
+            backgroundColor={`${cardColor}15`}
             padding="$3"
             borderRadius="$md"
             justifyContent="center"

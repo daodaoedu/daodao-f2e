@@ -1,5 +1,6 @@
-import React, { useRef, useCallback } from 'react'
-import { View, Alert } from 'react-native'
+import type React from 'react'
+import { useRef, useCallback } from 'react'
+import { type View, Alert } from 'react-native'
 import { Sheet, YStack, XStack, Text, Button, Spinner } from 'tamagui'
 import { X, Share2, Download } from '@tamagui/lucide-icons'
 import { colors } from '@/generated/design-tokens'

@@ -18,9 +18,9 @@ function formatDate(dateString: string): string {
   const diffDays = Math.round((nowOnly.getTime() - dateOnly.getTime()) / (1000 * 60 * 60 * 24))
 
   if (diffDays === 0) {
-    return '今天 ' + date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
+    return `今天 ${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`
   } else if (diffDays === 1) {
-    return '昨天 ' + date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
+    return `昨天 ${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`
   } else if (diffDays < 7) {
     return `${diffDays} 天前`
   } else {
@@ -56,7 +56,7 @@ export function CheckInList({ checkIns, emptyText = '還沒有打卡紀錄' }: C
             <YStack
               width={32}
               height={32}
-              backgroundColor={colors.semantic.success + '20'}
+              backgroundColor={`${colors.semantic.success}20`}
               borderRadius={16}
               alignItems="center"
               justifyContent="center"

@@ -13,7 +13,7 @@
     "build:production": "eas build --profile production",
     "submit:ios": "eas submit --platform ios",
     "submit:android": "eas submit --platform android",
-    "lint": "expo lint",
+    "lint": "biome lint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

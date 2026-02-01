@@ -10,7 +10,7 @@ interface RefreshTokenResponse {
 }
 
 // Token refresh state management
-let isRefreshing = false
+let _isRefreshing = false
 let refreshPromise: Promise<string> | null = null
 
 async function refreshAccessToken(): Promise<string> {
@@ -19,7 +19,7 @@ async function refreshAccessToken(): Promise<string> {
     return refreshPromise
   }
 
-  isRefreshing = true
+  _isRefreshing = true
 
   refreshPromise = (async () => {
     try {
@@ -57,7 +57,7 @@ async function refreshAccessToken(): Promise<string> {
 
       return data.accessToken
     } finally {
-      isRefreshing = false
+      _isRefreshing = false
       refreshPromise = null
     }
   })()
@@ -85,7 +85,7 @@ export async function apiClient<T>(
   if (!skipAuth) {
     const accessToken = await authStorage.getAccessToken()
     if (accessToken) {
-      ;(headers as Record<string, string>)['Authorization'] = `Bearer ${accessToken}`
+      ;(headers as Record<string, string>).Authorization = `Bearer ${accessToken}`
     }
   }
 
@@ -108,7 +108,7 @@ export async function apiClient<T>(
     if (response.status === 401 && !skipAuth) {
       try {
         const newToken = await refreshAccessToken()
-        ;(headers as Record<string, string>)['Authorization'] = `Bearer ${newToken}`
+        ;(headers as Record<string, string>).Authorization = `Bearer ${newToken}`
 
         // Retry request with new token
         response = await fetch(url, {

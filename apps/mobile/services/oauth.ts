@@ -1,7 +1,7 @@
 import * as WebBrowser from 'expo-web-browser'
 import * as AppleAuthentication from 'expo-apple-authentication'
 import Constants from 'expo-constants'
-import { type AuthTokens, type StoredUser } from './auth-storage'
+import type { AuthTokens, StoredUser } from './auth-storage'
 
 // Ensure WebBrowser session is properly closed
 WebBrowser.maybeCompleteAuthSession()

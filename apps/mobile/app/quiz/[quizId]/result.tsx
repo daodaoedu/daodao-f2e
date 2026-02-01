@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { YStack, XStack, Text, ScrollView, Button } from 'tamagui'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Share2, Home, RotateCcw } from '@tamagui/lucide-icons'
-import { mockIslandResults, type IslandResult, type QuizAnswer } from '@/types/quiz'
+import { mockIslandResults, type IslandResult, } from '@/types/quiz'
 import { colors } from '@/generated/design-tokens'
 
 export default function QuizResultScreen() {
@@ -26,7 +26,7 @@ export default function QuizResultScreen() {
     }, 2000)
 
     return () => clearTimeout(timer)
-  }, [answersParam])
+  }, [])
 
   if (showAnimation || !result) {
     return (
@@ -62,10 +62,10 @@ export default function QuizResultScreen() {
             <YStack
               width="100%"
               padding="$6"
-              backgroundColor={result.color + '15'}
+              backgroundColor={`${result.color}15`}
               borderRadius="$md"
               borderWidth={2}
-              borderColor={result.color + '30'}
+              borderColor={`${result.color}30`}
               alignItems="center"
               gap="$4"
             >
@@ -101,7 +101,7 @@ export default function QuizResultScreen() {
                     key={trait}
                     paddingHorizontal="$3"
                     paddingVertical="$2"
-                    backgroundColor={result.color + '15'}
+                    backgroundColor={`${result.color}15`}
                     borderRadius="$sm"
                   >
                     <Text fontSize={14} color={result.color} fontWeight="500">
