@@ -25,15 +25,14 @@ import {
   PracticeOverviewCard,
   ResourceCard,
 } from "@/components/practice";
+import { convertFormValuesToApiRequest } from "@/components/practice/create/manual/utils";
 import {
   DURATION_DAYS_NUMBER_OPTIONS,
   DurationDays,
   DurationDaysNumberToStringMap,
   type ExecutionTiming,
   Frequency,
-  mapExecutionTimingToPracticeTimePeriods,
   PracticeTimePeriodToExecutionTimingMap,
-  parseFrequency,
 } from "@/constants/practice-form";
 
 // 將 API 的 practiceTimePeriods 映射到 executionTiming
@@ -108,52 +107,6 @@ const convertTemplateToFormValues = (template: PracticeTemplateType): ManualPrac
   };
 };
 
-// 將表單資料轉換成 API 請求格式
-const convertFormValuesToApiRequest = (
-  values: ManualPracticeFormValues
-): CreatePracticeRequestType => {
-  const frequency = parseFrequency(values.frequency as Frequency);
-  const practiceTimePeriods = mapExecutionTimingToPracticeTimePeriods(
-    values.executionTiming as ExecutionTiming[]
-  );
-
-  const request: Record<string, unknown> = {
-    title: values.name,
-    durationDays: parseInt(values.durationDays, 10),
-    frequencyMinDays: frequency.minDays,
-    frequencyMaxDays: frequency.maxDays,
-    sessionDurationMinutes: values.durationMinutes,
-  };
-
-  if (values.actionDescription) {
-    request.practiceAction = values.actionDescription;
-  }
-
-  if (values.startDate) {
-    request.startDate = values.startDate;
-  }
-
-  if (practiceTimePeriods.length > 0) {
-    request.practiceTimePeriods = practiceTimePeriods;
-  }
-
-  if (values.tags && values.tags.length > 0) {
-    request.tags = values.tags;
-  }
-
-  if (values.resources && values.resources.length > 0) {
-    request.resources = values.resources.map((resource) => ({
-      name: resource.name,
-      url: resource.url || undefined,
-    }));
-  }
-
-  if (values.customTiming) {
-    request.otherContext = values.customTiming;
-  }
-
-  return request as CreatePracticeRequestType;
-};
 
 export default function TemplateDetailPage() {
   const router = useRouter();
@@ -342,9 +295,9 @@ export default function TemplateDetailPage() {
               setIsSubmitting(true);
 
               try {
-                const apiRequest = convertFormValuesToApiRequest(template);
+                const apiRequest = convertFormValuesToApiRequest(template, false);
 
-                const response = await createPractice(apiRequest);
+                const response = await createPractice(apiRequest as CreatePracticeRequestType);
 
                 if (response.error) {
                   const errorMessage =

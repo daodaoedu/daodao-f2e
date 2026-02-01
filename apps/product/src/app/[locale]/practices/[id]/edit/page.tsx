@@ -2,6 +2,7 @@
 
 import { type UpdatePracticeRequestType, updatePractice, usePracticeById } from "@daodao/api";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
+import { StorageEnum, getStorage } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
@@ -15,62 +16,14 @@ import { Step1 } from "@/components/practice/create/manual/steps/step-1";
 import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";
 import { Step4 } from "@/components/practice/create/manual/steps/step-4";
+import { convertFormValuesToApiRequest } from "@/components/practice/create/manual/utils";
 import {
   DurationDays,
   ExecutionTiming,
   Frequency,
-  mapExecutionTimingToPracticeTimePeriods,
   PracticeTimePeriodToExecutionTimingMap,
-  parseFrequency,
 } from "@/constants/practice-form";
 import { PracticeStatus } from "@/constants/practice-status";
-
-// 將表單資料轉換成 API 請求格式
-const convertFormValuesToApiRequest = (
-  values: ManualPracticeFormValues
-): UpdatePracticeRequestType => {
-  const frequency = parseFrequency(values.frequency as Frequency);
-  const practiceTimePeriods = mapExecutionTimingToPracticeTimePeriods(
-    values.executionTiming as ExecutionTiming[]
-  );
-
-  const request: Record<string, unknown> = {
-    title: values.name,
-    durationDays: parseInt(values.durationDays, 10),
-    frequencyMinDays: frequency.minDays,
-    frequencyMaxDays: frequency.maxDays,
-    sessionDurationMinutes: values.durationMinutes,
-  };
-
-  if (values.actionDescription) {
-    request.practiceAction = values.actionDescription;
-  }
-
-  if (values.startDate) {
-    request.startDate = values.startDate;
-  }
-
-  if (practiceTimePeriods.length > 0) {
-    request.practiceTimePeriods = practiceTimePeriods;
-  }
-
-  if (values.tags && values.tags.length > 0) {
-    request.tags = values.tags;
-  }
-
-  if (values.resources && values.resources.length > 0) {
-    request.resources = values.resources.map((resource) => ({
-      name: resource.name,
-      url: resource.url || undefined,
-    }));
-  }
-
-  if (values.customTiming) {
-    request.otherContext = values.customTiming;
-  }
-
-  return request as UpdatePracticeRequestType;
-};
 
 export default function EditPracticePage() {
   const router = useRouter();
@@ -78,8 +31,20 @@ export default function EditPracticePage() {
   const practiceId = params.id as string;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const draftStorage = getStorage<{ formValues: unknown; practiceId?: string }>(
+    StorageEnum.ManualPracticeDraft
+  );
 
   const { data: practiceData, isLoading, error } = usePracticeById(practiceId);
+
+  // 檢查並清空同個 practiceId 的暫存資料
+  useEffect(() => {
+    const savedDraft = draftStorage.get();
+    if (savedDraft?.practiceId === practiceId) {
+      // 如果是同個實踐 ID，清空暫存資料
+      draftStorage.remove();
+    }
+  }, [practiceId, draftStorage]);
 
   // 檢查實踐是否已經開始（狀態為 active）
   const isPracticeStarted = useMemo(() => {
@@ -129,10 +94,6 @@ export default function EditPracticePage() {
       .map((period: string) => PracticeTimePeriodToExecutionTimingMap[period])
       .filter((timing): timing is ExecutionTiming => timing !== undefined);
 
-    // 如果沒有有效的 executionTiming，使用預設值
-    const finalExecutionTiming =
-      executionTiming.length > 0 ? executionTiming : [ExecutionTiming.morning];
-
     // 轉換 resources: API 格式 -> 表單格式
     // 注意：API 回應中目前沒有 resources 欄位，暫時設為空陣列
     const resources: Array<{ id: string; name: string; url: string }> = [];
@@ -144,7 +105,7 @@ export default function EditPracticePage() {
       startDate: data.startDate || "",
       durationDays,
       frequency,
-      executionTiming: finalExecutionTiming,
+      executionTiming,
       customTiming: data.otherContext || "",
       tags: data.tags || [],
       resources,
@@ -188,24 +149,36 @@ export default function EditPracticePage() {
     setIsSubmitting(true);
 
     try {
-      const apiRequest = convertFormValuesToApiRequest(values);
+      // 編輯頁面送出時，isDraft 設為 false（正式發布）
+      const apiRequest = convertFormValuesToApiRequest(values, false);
 
       const response = await updatePractice(practiceId, apiRequest);
 
       // 檢查是否有錯誤
       if (response.error) {
+        const errorMessage =
+          response.error && typeof response.error === "object" && "message" in response.error
+            ? String(response.error.message)
+            : "儲存失敗，請稍後再試";
         console.error("Failed to update practice:", response.error);
-        toast.error("儲存失敗，請稍後再試");
+        toast.error(errorMessage);
         setIsSubmitting(false);
         return;
+      }
+
+      // 提交成功後清除暫存資料（如果有的話）
+      const savedDraft = draftStorage.get();
+      if (savedDraft?.practiceId === practiceId) {
+        draftStorage.remove();
       }
 
       // 提交成功後顯示成功訊息並導航回詳情頁面
       toast.success("實踐已成功更新");
       router.push(`/practices/${practiceId}`);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "儲存失敗，請稍後再試";
       console.error("Failed to update practice:", error);
-      toast.error("儲存失敗，請稍後再試");
+      toast.error(errorMessage);
       setIsSubmitting(false);
     }
   };

@@ -108,10 +108,6 @@ export default function PracticeDetailPage() {
       .map((period: string) => PracticeTimePeriodToExecutionTimingMap[period])
       .filter((timing): timing is ExecutionTiming => timing !== undefined);
 
-    // 如果沒有有效的 executionTiming，使用預設值
-    const finalExecutionTiming =
-      executionTiming.length > 0 ? executionTiming : [ExecutionTiming.morning];
-
     return {
       // Step 1
       name: data.title,
@@ -124,7 +120,7 @@ export default function PracticeDetailPage() {
       frequency,
 
       // Step 3
-      executionTiming: finalExecutionTiming,
+      executionTiming,
       customTiming: data.otherContext || "",
 
       // Step 4

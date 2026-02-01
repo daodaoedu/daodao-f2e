@@ -1,9 +1,14 @@
 "use client";
 
-import { type CreatePracticeRequestType, createPractice } from "@daodao/api";
+import {
+  type CreatePracticeRequestType,
+  type UpdatePracticeRequestType,
+  createPractice,
+  updatePractice,
+} from "@daodao/api";
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
-import { StorageEnum, useFormDraft } from "@daodao/shared";
+import { StorageEnum, getStorage, useFormDraft } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { Progress } from "@daodao/ui/components/progress";
@@ -19,13 +24,8 @@ import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";
 import { Step4 } from "@/components/practice/create/manual/steps/step-4";
 import { Step5 } from "@/components/practice/create/manual/steps/step-5";
-import {
-  type ExecutionTiming,
-  type Frequency,
-  mapExecutionTimingToPracticeTimePeriods,
-  parseFrequency,
-} from "@/constants/practice-form";
 import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
+import { convertFormValuesToApiRequest } from "@/components/practice/create/manual/utils";
 
 const TOTAL_STEPS = 5;
 
@@ -40,58 +40,22 @@ const defaultFormValues: Partial<ManualPracticeFormValues> = {
   resources: [],
 };
 
-// 將表單資料轉換成 API 請求格式
-const convertFormValuesToApiRequest = (
-  values: ManualPracticeFormValues
-): CreatePracticeRequestType => {
-  const frequency = parseFrequency(values.frequency as Frequency);
-  const practiceTimePeriods = mapExecutionTimingToPracticeTimePeriods(
-    values.executionTiming as ExecutionTiming[]
-  );
-
-  const request: Record<string, unknown> = {
-    title: values.name,
-    durationDays: parseInt(values.durationDays, 10),
-    frequencyMinDays: frequency.minDays,
-    frequencyMaxDays: frequency.maxDays,
-    sessionDurationMinutes: values.durationMinutes,
-  };
-
-  if (values.actionDescription) {
-    request.practiceAction = values.actionDescription;
-  }
-
-  if (values.startDate) {
-    request.startDate = values.startDate;
-  }
-
-  if (practiceTimePeriods.length > 0) {
-    request.practiceTimePeriods = practiceTimePeriods;
-  }
-
-  if (values.tags && values.tags.length > 0) {
-    request.tags = values.tags;
-  }
-
-  if (values.resources && values.resources.length > 0) {
-    request.resources = values.resources.map((resource) => ({
-      name: resource.name,
-      url: resource.url || undefined,
-    }));
-  }
-
-  if (values.customTiming) {
-    request.otherContext = values.customTiming;
-  }
-
-  return request as CreatePracticeRequestType;
-};
+// 擴展 DraftData 類型以包含 practiceId
+interface ExtendedDraftData<TFormValues> {
+  formValues: TFormValues;
+  currentStep?: number;
+  practiceId?: string;
+}
 
 export default function CreateManualPracticePage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [practiceId, setPracticeId] = useState<string | null>(null);
   const isRestoreDialogOpenRef = useRef(false);
+  const draftStorage = getStorage<ExtendedDraftData<ManualPracticeFormValues>>(
+    StorageEnum.ManualPracticeDraft
+  );
 
   const form = useForm<ManualPracticeFormValues>({
     resolver: zodResolver(manualPracticeFormSchema),
@@ -107,18 +71,100 @@ export default function CreateManualPracticePage() {
       currentStep,
     });
 
-  // 處理恢復暫存資料（包含恢復步驟）
+  // 處理恢復暫存資料（包含恢復步驟和 practiceId）
   const handleRestoreDraft = useCallback(() => {
+    const savedDraft = draftStorage.get();
+    
     restoreDraft();
 
     // 恢復當前步驟
-    if (draft?.currentStep && draft.currentStep >= 1 && draft.currentStep <= TOTAL_STEPS) {
-      setCurrentStep(draft.currentStep);
+    if (savedDraft?.currentStep && savedDraft.currentStep >= 1 && savedDraft.currentStep <= TOTAL_STEPS) {
+      setCurrentStep(savedDraft.currentStep);
     }
-  }, [draft, restoreDraft]);
+
+    // 恢復 practiceId
+    if (savedDraft?.practiceId) {
+      setPracticeId(savedDraft.practiceId);
+    }
+  }, [restoreDraft, draftStorage]);
+
+  // 在組件載入時檢查是否有 practiceId 需要恢復
+  useEffect(() => {
+    if (!isCheckingDraft && !showRestoreDialog) {
+      const savedDraft = draftStorage.get();
+      if (savedDraft?.practiceId && !practiceId) {
+        setPracticeId(savedDraft.practiceId);
+      }
+    }
+  }, [isCheckingDraft, showRestoreDialog, draftStorage, practiceId]);
 
   const name = form.watch("name");
   const actionDescription = form.watch("actionDescription");
+
+  // 儲存草稿到後端
+  const saveDraftToBackend = useCallback(
+    async (values: ManualPracticeFormValues) => {
+      try {
+        const apiRequest = convertFormValuesToApiRequest(values, true);
+
+        if (practiceId) {
+          // 如果有 practiceId，使用 PUT 更新草稿
+          const response = await updatePractice(practiceId, apiRequest as UpdatePracticeRequestType);
+
+          if (response.error) {
+            const errorMessage =
+              response.error && typeof response.error === "object" && "message" in response.error
+                ? String(response.error.message)
+                : "儲存草稿失敗";
+            console.error("Failed to update draft:", errorMessage);
+            // 草稿儲存失敗不顯示錯誤提示，避免打擾使用者
+            return false;
+          }
+
+          // 更新暫存資料中的 practiceId 和表單值
+          draftStorage.set({
+            formValues: values,
+            currentStep,
+            practiceId,
+          });
+
+          return true;
+        } else {
+          // 如果沒有 practiceId，使用 POST 建立草稿
+          const response = await createPractice(apiRequest as CreatePracticeRequestType);
+
+          if (response.error) {
+            const errorMessage =
+              response.error && typeof response.error === "object" && "message" in response.error
+                ? String(response.error.message)
+                : "儲存草稿失敗";
+            console.error("Failed to create draft:", errorMessage);
+            // 草稿儲存失敗不顯示錯誤提示，避免打擾使用者
+            return false;
+          }
+
+          // 取得新建立的實踐 ID
+          const newPracticeId = response.data?.data?.id;
+          if (newPracticeId) {
+            setPracticeId(newPracticeId);
+
+            // 更新暫存資料中的 practiceId 和表單值
+            draftStorage.set({
+              formValues: values,
+              currentStep,
+              practiceId: newPracticeId,
+            });
+          }
+
+          return true;
+        }
+      } catch (error) {
+        console.error("Failed to save draft:", error);
+        return false;
+      }
+    },
+    [practiceId, draftStorage, currentStep]
+  );
 
   const handleNext = async () => {
     let isValid = false;
@@ -143,6 +189,10 @@ export default function CreateManualPracticePage() {
     }
 
     if (isValid && currentStep < TOTAL_STEPS) {
+      // 在切換到下一步之前，儲存草稿到後端
+      const values = form.getValues();
+      await saveDraftToBackend(values);
+
       window.scrollTo(0, 0);
       setCurrentStep(currentStep + 1);
     } else if (isValid && currentStep === TOTAL_STEPS) {
@@ -165,9 +215,18 @@ export default function CreateManualPracticePage() {
     setIsSubmitting(true);
 
     try {
-      const apiRequest = convertFormValuesToApiRequest(values);
+      // 最後一步提交時，isDraft 設為 false（正式建立實踐）
+      const apiRequest = convertFormValuesToApiRequest(values, false);
 
-      const response = await createPractice(apiRequest);
+      let response;
+
+      if (practiceId) {
+        // 如果有 practiceId，使用 PUT 更新為正式實踐
+        response = await updatePractice(practiceId, apiRequest as UpdatePracticeRequestType);
+      } else {
+        // 如果沒有 practiceId，使用 POST 建立正式實踐
+        response = await createPractice(apiRequest as CreatePracticeRequestType);
+      }
 
       if (response.error) {
         // response.error 是整個響應物件，實際錯誤在 response.error.error
@@ -247,12 +306,12 @@ export default function CreateManualPracticePage() {
       clearDraft();
 
       // 取得新建立的實踐 ID
-      const practiceId = response.data?.data?.id;
+      const finalPracticeId = practiceId || response.data?.data?.id;
 
       // 提交後導航到成功頁面
-      if (practiceId) {
+      if (finalPracticeId) {
         router.push(
-          `/practices/create/success?practiceName=${encodeURIComponent(values.name || "")}&practiceId=${encodeURIComponent(practiceId)}`
+          `/practices/create/success?practiceName=${encodeURIComponent(values.name || "")}&practiceId=${encodeURIComponent(finalPracticeId)}`
         );
       } else {
         router.push(

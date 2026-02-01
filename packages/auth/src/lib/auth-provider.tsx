@@ -224,7 +224,6 @@ export const AuthProvider = ({
       console.error("Failed to check auth status:", error);
       clearAuthState();
     } finally {
-      console.log("checkAuth finally");
       setIsLoading(false);
     }
   }, [clearAuthState, setAuthState]);

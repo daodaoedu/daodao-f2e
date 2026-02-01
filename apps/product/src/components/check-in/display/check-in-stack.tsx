@@ -123,11 +123,11 @@ const pathElementToVertices = (pathElement: SVGPathElement, samples: number): Ma
 
 // SVG 配置：順序為綠、藍、紅、黃、橘
 const SVG_CONFIGS = [
-  { Component: CircleSvg },
-  { Component: HexagonSvg },
-  { Component: SemiCircleSvg },
-  { Component: SpeechBubbleSvg },
-  { Component: ClippedCircleSvg },
+  { id: "circle", Component: CircleSvg },
+  { id: "hexagon", Component: HexagonSvg },
+  { id: "semi-circle", Component: SemiCircleSvg },
+  { id: "speech-bubble", Component: SpeechBubbleSvg },
+  { id: "clipped-circle", Component: ClippedCircleSvg },
 ] as const;
 
 const CONTAINER_WIDTH = 448;
@@ -279,10 +279,11 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRefsRef = useRef<(SVGSVGElement | null)[]>([]);
   const bodiesRef = useRef<Matter.Body[]>([]);
-  const [positions, setPositions] = useState<IBodyPosition[]>([]);
+  const elementRefsRef = useRef<(HTMLAnchorElement | null)[]>([]);
   const [containerHeight, setContainerHeight] = useState(MIN_CONTAINER_HEIGHT);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const [svgGeometries, setSvgGeometries] = useState<(ISvgGeometry | null)[]>([]);
+  const [initialPositions, setInitialPositions] = useState<IBodyPosition[]>([]);
 
   // 將 API 資料轉換為 ICheckInItem[] 格式
   const items: ICheckInItem[] = useMemo(() => {
@@ -351,6 +352,9 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
       return;
     }
 
+    // 重置元素引用陣列
+    elementRefsRef.current = new Array(count).fill(null);
+
     // 初始化容器高度
     const initialHeight = Math.max(MIN_CONTAINER_HEIGHT, count * MIN_CONTAINER_HEIGHT);
     setContainerHeight(initialHeight);
@@ -416,16 +420,16 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
     bodiesRef.current = bodies;
     World.add(engine.world, bodies);
 
-    // 初始化位置
+    // 初始化位置（只用於初始渲染）
     const initialPositions = bodies.map(extractBodyPosition);
-    setPositions(initialPositions);
+    setInitialPositions(initialPositions);
 
     // 更新位置和容器高度
     let currentContainerHeight = initialHeight;
 
     const updatePositions = () => {
       // 限制所有物體的角度在 -20度 到 20度 之間
-      bodies.forEach((body) => {
+      bodies.forEach((body, index) => {
         // 限制角度
         const clampedAngle = clampAngle(body.angle);
         if (Math.abs(body.angle - clampedAngle) > 0.001) {
@@ -447,10 +451,32 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
         ) {
           Body.setAngularVelocity(body, 0);
         }
-      });
 
-      const newPositions = bodies.map(extractBodyPosition);
-      setPositions(newPositions);
+        // 直接更新 DOM 元素樣式，避免 React 重新渲染
+        const element = elementRefsRef.current[index];
+        if (!element) return;
+
+        const geometry = svgGeometries[index];
+        if (!geometry) return;
+
+        const { width, height } = geometry;
+        const x = Number.isFinite(body.position.x) ? body.position.x : 0;
+        const y = Number.isFinite(body.position.y) ? body.position.y : 0;
+        const angle = Number.isFinite(clampedAngle) ? clampedAngle : 0;
+        const w = Number.isFinite(width) ? width : 0;
+        const h = Number.isFinite(height) ? height : 0;
+
+        const left = x - w / 2 - WALL_THICKNESS;
+        const top = y - h / 2;
+
+        // 如果計算結果有效，直接更新 DOM
+        if (Number.isFinite(left) && Number.isFinite(top)) {
+          const transform = `rotate(${angle}rad) ${index % 5 === 3 ? "translateY(20px)" : ""}`;
+          element.style.left = `${left}px`;
+          element.style.top = `${top}px`;
+          element.style.transform = transform;
+        }
+      });
 
       // 計算所有物體的最大高度
       const maxY = bodies.reduce((max, body, index) => {
@@ -498,6 +524,8 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
       Runner.stop(runnerInstance);
       World.clear(engine.world, false);
       Engine.clear(engine);
+      // 清理元素引用
+      elementRefsRef.current = [];
     };
   }, [count, svgGeometries, getSvgRef]);
 
@@ -543,15 +571,15 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
     >
       {/* 隱藏的 SVG 區域，用於提取幾何數據 */}
       <div className="absolute opacity-0 pointer-events-none invisible h-px overflow-hidden">
-        {SVG_CONFIGS.map(({ Component }, i) => (
-          <Component key={Component.name} ref={handleSvgRef(i)} />
+        {SVG_CONFIGS.map(({ id, Component }, i) => (
+          <Component key={id} ref={handleSvgRef(i)} />
         ))}
       </div>
 
       {/* SVG clipPath 定義 */}
       <svg width="0" height="0" className="absolute" aria-hidden="true">
         <defs>
-          {positions.map((position, i) => {
+          {initialPositions.map((position, i) => {
             const geometry = svgGeometries[i];
             if (!geometry || !geometry.path) return null;
 
@@ -565,7 +593,7 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
       </svg>
 
       {/* 渲染物理物體 */}
-      {positions.map((position, i) => {
+      {initialPositions.map((position, i) => {
         const config = getSvgConfig(i);
         if (!config) return null;
         const { Component } = config;
@@ -601,6 +629,9 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
         return (
           <Link
             key={id}
+            ref={(el) => {
+              elementRefsRef.current[i] = el;
+            }}
             href={`/practices/${practiceId}/check-ins/${item.id}`}
             className="absolute cursor-pointer hover:shadow-2xl"
             style={{

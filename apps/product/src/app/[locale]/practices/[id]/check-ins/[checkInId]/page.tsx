@@ -111,7 +111,7 @@ export default function CheckInDetailPage() {
     return map;
   }, [checkInsData]);
 
-  // 建立 check-in ID 到原始日期的映射（用於 lastCheckInDate）
+  // 建立 check-in ID 到原始日期的映射
   const checkInIdToDateMap = useMemo(() => {
     const map = new Map<string, string>();
 
@@ -124,6 +124,39 @@ export default function CheckInDetailPage() {
     });
 
     return map;
+  }, [checkInsData]);
+
+  // 取得該實踐最後一次打卡的日期（日期最晚的那個）
+  const lastCheckInDate = useMemo(() => {
+    if (!checkInsData?.data || checkInsData.data.length === 0) {
+      return null;
+    }
+
+    const checkIns = checkInsData.data;
+    if (checkIns.length === 0) {
+      return null;
+    }
+
+    // 找到日期最晚的 check-in（假設 API 返回的資料已按日期排序，第一個是最新的）
+    // 為了安全起見，我們還是遍歷所有 check-ins 找出日期最晚的
+    let latestDate = checkIns[0]?.checkinDate;
+    if (!latestDate) {
+      return null;
+    }
+
+    let latestDateObj = parse(latestDate, "yyyy-MM-dd", new Date());
+
+    checkIns.forEach((checkIn) => {
+      const currentDateObj = parse(checkIn.checkinDate, "yyyy-MM-dd", new Date());
+      if (isValid(currentDateObj) && isValid(latestDateObj)) {
+        if (currentDateObj > latestDateObj) {
+          latestDate = checkIn.checkinDate;
+          latestDateObj = currentDateObj;
+        }
+      }
+    });
+
+    return latestDate;
   }, [checkInsData]);
 
   // 獲取目標 check-in 資料
@@ -226,7 +259,7 @@ export default function CheckInDetailPage() {
           variant="orange"
           className="w-full sm:max-w-[288px]"
           practiceId={practiceId}
-          lastCheckInDate={checkInIdToDateMap.get(checkInId) || null}
+          lastCheckInDate={lastCheckInDate}
           taskTitle={checkInData.practiceTitle}
           onComplete={handleCheckInComplete}
           progressPercentage={practiceData?.data?.progressPercentage ?? 0}

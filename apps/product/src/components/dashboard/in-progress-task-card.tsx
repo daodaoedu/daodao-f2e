@@ -26,7 +26,6 @@ interface InProgressTaskCardProps {
   theme: string;
   status: string;
   lastCheckInDate?: string | null;
-  onEdit?: () => void;
 }
 
 export const InProgressTaskCard = ({
@@ -41,7 +40,6 @@ export const InProgressTaskCard = ({
   theme,
   status,
   lastCheckInDate,
-  onEdit,
 }: InProgressTaskCardProps) => {
   const themeName = getThemeNameFromColor(theme);
   const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
@@ -107,9 +105,11 @@ export const InProgressTaskCard = ({
 
         {/* Check-in Button */}
         {isDraft ? (
-          <Button variant="secondary" onClick={onEdit}>
-            <PenLine className="size-4.5 text-logo-cyan" />
-            繼續編輯
+          <Button variant="secondary" asChild>
+            <CustomLink href={`/practices/${id}/edit`}>
+              <PenLine className="size-4.5 text-logo-cyan" />
+              繼續編輯
+            </CustomLink>
           </Button>
         ) : (
           <CheckInButton

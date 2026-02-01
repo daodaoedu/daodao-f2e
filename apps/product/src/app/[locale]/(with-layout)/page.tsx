@@ -54,7 +54,6 @@ export default function HomePage() {
           isUnreadMessages: false, // TODO: 需要從其他 API 取得
           theme: practice.themeColor || "#FCDD84",
           status: mapPracticeStatusToTaskStatus(practice.status),
-          // TODO: 需要從 practice.stats 或打卡記錄 API 獲取最新的打卡日期
           lastCheckInDate: null,
         });
       } else if (practice.status === PracticeStatus.completed) {

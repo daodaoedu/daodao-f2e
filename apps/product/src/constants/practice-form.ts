@@ -68,6 +68,7 @@ export type DurationDaysNumber = (typeof DurationDaysNumber)[keyof typeof Durati
 export const PracticeTimePeriodToExecutionTimingMap: Record<string, ExecutionTiming> = {
   morning: ExecutionTiming.morning,
   afternoon: ExecutionTiming.lunchBreak,
+  commute: ExecutionTiming.commute,
   evening: ExecutionTiming.evening,
   night: ExecutionTiming.beforeSleep,
 } as const;
@@ -111,10 +112,13 @@ export const ExecutionTimingToPracticeTimePeriodMap: Record<
  */
 export const mapExecutionTimingToPracticeTimePeriods = (
   executionTiming: ExecutionTiming[]
-): ("morning" | "afternoon" | "evening" | "night")[] => {
+): ("morning" | "afternoon" | "evening" | "night" | "commute")[] => {
   return executionTiming
     .map((timing) => ExecutionTimingToPracticeTimePeriodMap[timing])
-    .filter((period): period is "morning" | "afternoon" | "evening" | "night" => period !== null);
+    .filter(
+      (period): period is "morning" | "afternoon" | "evening" | "night" | "commute" =>
+        period !== null
+    );
 };
 
 /**

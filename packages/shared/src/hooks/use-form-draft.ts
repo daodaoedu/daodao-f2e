@@ -142,7 +142,10 @@ export function useFormDraft<TFormValues extends FieldValues>(
   // 手動儲存暫存資料
   const saveDraft = useCallback(() => {
     const currentFormValues = form.getValues();
+    const existingDraft = draftStorage.get();
+    // 保留現有的額外欄位（如 practiceId）
     draftStorage.set({
+      ...existingDraft,
       formValues: currentFormValues,
       currentStep,
     } as DraftData<TFormValues>);
@@ -205,7 +208,10 @@ export function useFormDraft<TFormValues extends FieldValues>(
     // 延遲儲存，避免頻繁寫入 storage
     saveTimeoutRef.current = setTimeout(() => {
       const currentFormValues = form.getValues();
+      const existingDraft = draftStorage.get();
+      // 保留現有的額外欄位（如 practiceId）
       draftStorage.set({
+        ...existingDraft,
         formValues: currentFormValues,
         currentStep,
       } as DraftData<TFormValues>);
@@ -249,7 +255,10 @@ export function useFormDraft<TFormValues extends FieldValues>(
     // 延遲儲存
     saveTimeoutRef.current = setTimeout(() => {
       const currentFormValues = form.getValues();
+      const existingDraft = draftStorage.get();
+      // 保留現有的額外欄位（如 practiceId）
       draftStorage.set({
+        ...existingDraft,
         formValues: currentFormValues,
         currentStep,
       } as DraftData<TFormValues>);

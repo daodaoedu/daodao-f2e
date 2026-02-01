@@ -55,10 +55,10 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
   );
 
   useLayoutEffect(() => {
-    if (contentRef.current) {
+    if (contentRef.current && totalMoodCount > 0) {
       setContentHeight(contentRef.current.scrollHeight);
     }
-  }, []);
+  }, [totalMoodCount]);
 
   const handleToggle = () => {
     setIsExpanded((prev) => !prev);
@@ -82,76 +82,87 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
     );
   }
 
+  // 當沒有打卡資料或沒有有效的心情資料時，不顯示心情排行
+  const hasMoodData = totalMoodCount > 0;
+
   return (
     <div>
       <h3 className="font-medium text-text-dark mb-3">打卡紀錄</h3>
       <div className="bg-white rounded-lg px-4 py-2">
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-xs text-text-dark font-medium">心情排行</div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleToggle}
-            onKeyDown={handleKeyDown}
-            className="size-4.5"
-            animation="none"
-            aria-label={isExpanded ? "收合" : "展開"}
-            aria-expanded={isExpanded}
-            aria-controls="mood-ranking-content"
-          >
-            <ChevronUp
+        {hasMoodData ? (
+          <>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-xs text-text-dark font-medium">心情排行</div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleToggle}
+                onKeyDown={handleKeyDown}
+                className="size-4.5"
+                animation="none"
+                aria-label={isExpanded ? "收合" : "展開"}
+                aria-expanded={isExpanded}
+                aria-controls="mood-ranking-content"
+              >
+                <ChevronUp
+                  className={cn(
+                    "size-4 text-text-dark transition-transform duration-300 ease-in-out",
+                    isExpanded && "rotate-180"
+                  )}
+                  aria-hidden="true"
+                />
+              </Button>
+            </div>
+            {/* Mood Ranking */}
+            <div
+              id="mood-ranking-content"
+              ref={contentRef}
               className={cn(
-                "size-4 text-text-dark transition-transform duration-300 ease-in-out",
-                isExpanded && "rotate-180"
+                "overflow-hidden transition-all duration-300 ease-in-out",
+                !isExpanded && "opacity-0",
+                isExpanded && "opacity-100"
               )}
-              aria-hidden="true"
-            />
-          </Button>
-        </div>
-        {/* Mood Ranking */}
-        <div
-          id="mood-ranking-content"
-          ref={contentRef}
-          className={cn(
-            "overflow-hidden transition-all duration-300 ease-in-out",
-            !isExpanded && "opacity-0",
-            isExpanded && "opacity-100"
-          )}
-          style={{
-            maxHeight: isExpanded ? `${contentHeight}px` : "0px",
-          }}
-          aria-hidden={!isExpanded}
-        >
-          <div className="flex justify-center gap-4">
-            {MOOD_OPTIONS.map((moodOption, index) => {
-              // 確保按照 MOOD_OPTIONS 的順序顯示，使用索引對應 moodStats
-              const stat = moodStats[index];
-              const count = stat?.mood === moodOption.id ? stat.count : 0;
-              const Emoji = moodOption.emoji;
-              return (
-                <div key={moodOption.id} className="flex flex-col items-center gap-1">
-                  <div className="relative w-1.5 h-15 bg-bg-gray rounded-full">
-                    <div
-                      className="absolute bottom-0 left-0 w-full h-full bg-logo-cyan rounded-full origin-bottom transition-transform duration-300"
-                      style={{
-                        transform: `scaleY(${totalMoodCount > 0 ? (count / totalMoodCount) * 100 : 0}%)`,
-                      }}
-                    />
-                  </div>
-                  <Emoji className="size-6" />
-                  <div
-                    className={cn(
-                      "text-xs text-center text-light-gray",
-                      count > 0 && " text-text-dark"
-                    )}
-                  >
-                    {count}
-                  </div>
-                </div>
-              );
-            })}
+              style={{
+                maxHeight: isExpanded ? `${contentHeight}px` : "0px",
+              }}
+              aria-hidden={!isExpanded}
+            >
+              <div className="flex justify-center gap-4">
+                {MOOD_OPTIONS.map((moodOption, index) => {
+                  // 確保按照 MOOD_OPTIONS 的順序顯示，使用索引對應 moodStats
+                  const stat = moodStats[index];
+                  const count = stat?.mood === moodOption.id ? stat.count : 0;
+                  const Emoji = moodOption.emoji;
+                  return (
+                    <div key={moodOption.id} className="flex flex-col items-center gap-1">
+                      <div className="relative w-1.5 h-15 bg-bg-gray rounded-full">
+                        <div
+                          className="absolute bottom-0 left-0 w-full h-full bg-logo-cyan rounded-full origin-bottom transition-transform duration-300"
+                          style={{
+                            transform: `scaleY(${totalMoodCount > 0 ? (count / totalMoodCount) * 100 : 0}%)`,
+                          }}
+                        />
+                      </div>
+                      <Emoji className="size-6" />
+                      <div
+                        className={cn(
+                          "text-xs text-center text-light-gray",
+                          count > 0 && " text-text-dark"
+                        )}
+                      >
+                        {count}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="text-xs text-text-dark font-medium text-center py-4">
+            尚無打卡紀錄
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
