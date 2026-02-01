@@ -43,6 +43,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          # For PR events, checkout the actual PR branch instead of merge commit
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       # ===== Node.js 環境設定 =====
       - name: Set up Node.js

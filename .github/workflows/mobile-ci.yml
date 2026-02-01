@@ -36,6 +36,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
@@ -59,6 +61,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
@@ -83,6 +87,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
@@ -104,4 +110,4 @@ jobs:
 
       - name: Validate EAS config
         working-directory: apps/mobile
-        run: eas build --platform all --non-interactive --dry-run
+        run: eas config --platform all
