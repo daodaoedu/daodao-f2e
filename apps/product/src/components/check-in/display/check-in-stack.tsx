@@ -544,7 +544,7 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
       {/* 隱藏的 SVG 區域，用於提取幾何數據 */}
       <div className="absolute opacity-0 pointer-events-none invisible h-px overflow-hidden">
         {SVG_CONFIGS.map(({ Component }, i) => (
-          <Component key={Component.name} ref={handleSvgRef(i)} />
+          <Component key={i} ref={handleSvgRef(i)} />
         ))}
       </div>
 

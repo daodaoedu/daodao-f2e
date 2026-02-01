@@ -2,9 +2,8 @@
 
 import { Button } from "@daodao/ui/components/button";
 import { ImageLightbox } from "@daodao/ui/components/image-lightbox";
-import { Share2, Trash2 } from "lucide-react";
+import { Share2 } from "lucide-react";
 import * as React from "react";
-import { DeleteCheckInResult, useDeleteCheckInDialog } from "@/hooks/use-delete-check-in-dialog";
 import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
 import type { ICheckInDisplayData, ICheckInFormData } from "../types";
 import { CheckInCard } from "./check-in-card";
@@ -20,16 +19,6 @@ export const CheckInDetail = ({ checkInData }: ICheckInDetailProps) => {
 
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
   const [lightboxIndex, setLightboxIndex] = React.useState(0);
-
-  // 處理刪除打卡
-  const { openDeleteDialog } = useDeleteCheckInDialog();
-
-  const handleDeleteCheckIn = async () => {
-    const result = await openDeleteDialog(checkInData.id);
-    if (result === DeleteCheckInResult.Deleted) {
-      // TODO: 實作刪除打卡功能
-    }
-  };
 
   // 處理分享打卡
   const { openShareSheet } = useShareCheckInSheet({
@@ -68,14 +57,6 @@ export const CheckInDetail = ({ checkInData }: ICheckInDetailProps) => {
         <Button variant="white" className="px-8" onClick={openShareSheet}>
           <Share2 className="size-4 mr-2" />
           分享這篇打卡
-        </Button>
-        <Button
-          variant="ghost"
-          className="px-8 text-white hover:text-white/80 border border-white"
-          onClick={handleDeleteCheckIn}
-        >
-          <Trash2 className="size-4.5" />
-          <span>刪除打卡</span>
         </Button>
       </div>
 

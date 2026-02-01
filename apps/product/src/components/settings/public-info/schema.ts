@@ -30,6 +30,8 @@ export const publicInfoFormSchema = z.object({
   linkedin: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
   github: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
   discord: z.string().optional(),
+  line: z.string().optional(),
+  threads: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
 });
 
 export type PublicInfoFormValues = z.infer<typeof publicInfoFormSchema>;

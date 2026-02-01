@@ -50,8 +50,8 @@ export const useCheckInSubmit = ({
       // 從 API response 中取得新的進度百分比
       // API 返回的 data 是 CheckInWithEncouragement 類型，包含 practiceProgressPercentage
       // 使用類型斷言來訪問 practiceProgressPercentage，因為類型定義可能不完整
-      const responseData = response.data?.data as
-        | (typeof response.data.data & { practiceProgressPercentage?: number })
+      const responseData = response.data as
+        | (typeof response.data & { practiceProgressPercentage?: number })
         | undefined;
       const newProgressPercentage =
         responseData &&

@@ -97,8 +97,8 @@ export default function PracticeSuccessPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.7 }}
         >
-          <p className="text-sm text-logo-cyan">鼓勵文字鼓勵文字鼓勵文字鼓勵文字</p>
-          <p className="text-sm text-logo-cyan">鼓勵文字鼓勵文字鼓勵文字</p>
+          <p className="text-sm text-logo-cyan">完成規劃已是踏出第一步，已為你推進 20% 進度！</p>
+          <p className="text-sm text-logo-cyan">期待你的第一次打卡分享！</p>
         </motion.div>
 
         {/* 按鈕區域 */}

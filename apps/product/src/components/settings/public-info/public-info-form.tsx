@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  setCurrentUserCustomId,
-  type UpdateUserRequest,
-  uploadImage,
-  useCurrentUser,
-  useUserMutations,
-} from "@daodao/api";
+import { useCurrentUser, useMutate, useUserMutations } from "@daodao/api";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
@@ -22,7 +16,8 @@ import { SocialLinksSection } from "./social-links-section";
 
 export const PublicInfoForm = () => {
   const { data: userData, isLoading, error: userError } = useCurrentUser();
-  const { updateCurrentUser } = useUserMutations();
+  const { updateCurrentUserWithFormData } = useUserMutations();
+  const mutate = useMutate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
@@ -41,6 +36,8 @@ export const PublicInfoForm = () => {
       linkedin: "",
       github: "",
       discord: "",
+      line: "",
+      threads: "",
     },
   });
 
@@ -57,12 +54,14 @@ export const PublicInfoForm = () => {
         location: user.location || "",
         personalSlogan: user.personalSlogan || "",
         selfIntroduction: user.selfIntroduction || "",
-        personalUrl: "",
+        personalUrl: contactList?.website || "",
         facebook: contactList?.facebook || "",
         instagram: contactList?.instagram || "",
         linkedin: contactList?.linkedin || "",
-        github: "", // API 中沒有此欄位
+        github: contactList?.github || "",
         discord: contactList?.discord || "",
+        line: contactList?.line || "",
+        threads: contactList?.threads || "",
       });
     }
   }, [userData, form.reset]);
@@ -71,26 +70,10 @@ export const PublicInfoForm = () => {
     setIsSubmitting(true);
 
     try {
-      // 先上傳頭像（如果有選擇新頭像）
-      let photoURL = values.photoURL;
-      if (avatarFile) {
-        try {
-          const uploadResponse = await uploadImage(avatarFile);
-          if (uploadResponse.data?.url) {
-            photoURL = uploadResponse.data.url;
-          }
-        } catch (error) {
-          console.error("Failed to upload avatar:", error);
-          toast.error("頭像上傳失敗，請稍後再試");
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
       // 準備 API 請求資料
       const updateData: {
         name?: string;
-        photoURL?: string;
+        customId?: string;
         location?: string;
         personalSlogan?: string;
         selfIntroduction?: string;
@@ -99,6 +82,8 @@ export const PublicInfoForm = () => {
           instagram?: string;
           linkedin?: string;
           discord?: string;
+          github?: string;
+          website?: string;
           line?: string;
           threads?: string;
         };
@@ -109,8 +94,10 @@ export const PublicInfoForm = () => {
         updateData.name = values.name;
       }
 
-      if (photoURL) {
-        updateData.photoURL = photoURL;
+      // 更新 customId（如果改變了）
+      const currentCustomId = userData?.data?.customId || "";
+      if (values.customId && values.customId !== currentCustomId) {
+        updateData.customId = values.customId;
       }
 
       if (values.location) {
@@ -125,110 +112,73 @@ export const PublicInfoForm = () => {
         updateData.selfIntroduction = values.selfIntroduction;
       }
 
-      // 更新社群連結（總是包含所有欄位，允許清空）
-      const contactList: {
-        facebook?: string;
-        instagram?: string;
-        linkedin?: string;
-        discord?: string;
-        line?: string;
-        threads?: string;
-      } = {};
+      // 更新社群連結
+      updateData.contactList = {
+        facebook: values.facebook || undefined,
+        instagram: values.instagram || undefined,
+        linkedin: values.linkedin || undefined,
+        discord: values.discord || undefined,
+        github: values.github || undefined,
+        website: values.personalUrl || undefined,
+        line: values.line || undefined,
+        threads: values.threads || undefined,
+      };
 
-      contactList.facebook = values.facebook;
-      contactList.instagram = values.instagram;
-      contactList.linkedin = values.linkedin;
-      contactList.discord = values.discord;
+      // 調用 FormData API 更新用戶資訊（包含圖片上傳）
+      await updateCurrentUserWithFormData(updateData, avatarFile || undefined);
 
-      updateData.contactList = contactList;
-
-      // 調用 API 更新用戶資訊
-      const response = await updateCurrentUser(updateData as UpdateUserRequest);
-
-      // 檢查錯誤
-      if (response.error) {
-        const error = response.error;
-        let errorMessage = "更新失敗，請稍後再試";
-
-        if (typeof error === "object" && error !== null) {
-          // 檢查是否有 details 陣列
-          if ("details" in error && Array.isArray(error.details)) {
-            const details = error.details as Array<{ path?: string; message?: string }>;
-
-            // 處理每個欄位錯誤
-            details.forEach((detail) => {
-              if (detail.path && detail.message) {
-                // 將錯誤設置到對應的表單欄位
-                const formFieldMap: Record<string, keyof PublicInfoFormValues> = {
-                  name: "name",
-                  photoURL: "photoURL",
-                  location: "location",
-                  personalSlogan: "personalSlogan",
-                  selfIntroduction: "selfIntroduction",
-                  customId: "customId",
-                };
-
-                const formField = formFieldMap[detail.path];
-                if (formField) {
-                  form.setError(formField, {
-                    type: "server",
-                    message: detail.message,
-                  });
-                }
-              }
-            });
-
-            // 使用第一個具體錯誤訊息作為 toast 訊息
-            const firstDetail = details[0];
-            if (firstDetail?.message) {
-              errorMessage = firstDetail.message;
-            }
-          } else if ("message" in error && error.message) {
-            // 如果沒有 details，使用頂層 message
-            errorMessage = String(error.message);
-          }
-        }
-
-        console.error("Failed to update user:", response.error);
-        toast.error(errorMessage);
-        setIsSubmitting(false);
-        return;
-      }
-
-      // 更新 customId（如果改變了）- 放在最後以減少資料不一致風險
-      const currentCustomId = userData?.data?.customId || "";
-      if (values.customId && values.customId !== currentCustomId) {
-        try {
-          const customIdResponse = await setCurrentUserCustomId(values.customId);
-          if (customIdResponse.error) {
-            const error = customIdResponse.error;
-            let errorMessage = "使用者 ID 設置失敗";
-
-            if (typeof error === "object" && error !== null) {
-              if ("message" in error && error.message) {
-                errorMessage = String(error.message);
-              }
-            }
-
-            toast.error(errorMessage);
-            setIsSubmitting(false);
-            return;
-          }
-        } catch (error) {
-          console.error("Failed to set customId:", error);
-          toast.error("使用者 ID 設置失敗，請稍後再試");
-          setIsSubmitting(false);
-          return;
-        }
-      }
+      // 刷新用戶資料
+      await mutate(["/api/v1/users/me"] as const);
 
       // 成功
       toast.success("公開資訊設定已更新");
       form.reset(form.getValues()); // 重置 dirty 狀態
       setAvatarFile(null); // 清除頭像檔案
     } catch (error) {
-      console.error("Unexpected error:", error);
-      toast.error("更新失敗，請稍後再試");
+      console.error("Failed to update user:", error);
+
+      // 處理錯誤
+      let errorMessage = "更新失敗，請稍後再試";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+
+        // 處理驗證錯誤詳情
+        const errorWithDetails = error as Error & {
+          details?: Array<{ path?: string; message?: string }>;
+        };
+        if (errorWithDetails.details && Array.isArray(errorWithDetails.details)) {
+          errorWithDetails.details.forEach((detail) => {
+            if (detail.path && detail.message) {
+              // 將錯誤設置到對應的表單欄位
+              const formFieldMap: Record<string, keyof PublicInfoFormValues> = {
+                name: "name",
+                photoURL: "photoURL",
+                location: "location",
+                personalSlogan: "personalSlogan",
+                selfIntroduction: "selfIntroduction",
+                customId: "customId",
+              };
+
+              const formField = formFieldMap[detail.path];
+              if (formField) {
+                form.setError(formField, {
+                  type: "server",
+                  message: detail.message,
+                });
+              }
+            }
+          });
+
+          // 使用第一個具體錯誤訊息作為 toast 訊息
+          const firstDetail = errorWithDetails.details[0];
+          if (firstDetail?.message) {
+            errorMessage = firstDetail.message;
+          }
+        }
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -263,7 +213,7 @@ export const PublicInfoForm = () => {
           onAvatarFileChange={setAvatarFile}
         />
 
-        <BasicInfoSection form={form} />
+        <BasicInfoSection form={form} initialCustomId={userData?.data?.customId || ""} />
 
         <IntroductionSection form={form} />
 
