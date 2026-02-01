@@ -64,7 +64,10 @@ export const PreferenceSelectionSheetContent = ({
 
   const canAddMore = maxSelection === null || selectedOptionIds.length < maxSelection;
   const hasSelection = selectedOptionIds.length > 0;
-  const selectionCount = maxSelection !== null ? `${selectedOptionIds.length}/${maxSelection}` : `${selectedOptionIds.length}`;
+  const selectionCount =
+    maxSelection !== null
+      ? `${selectedOptionIds.length}/${maxSelection}`
+      : `${selectedOptionIds.length}`;
 
   return (
     <div className="flex flex-col h-full">
@@ -84,7 +87,9 @@ export const PreferenceSelectionSheetContent = ({
                   className="w-full justify-between rounded-lg bg-very-light-blue border border-blue px-4 py-2 hover:bg-very-light-blue/80"
                   aria-label={`新增 ${option.name}`}
                 >
-                  <span className="text-sm text-left flex-1 whitespace-normal wrap-break-word">{option.name}</span>
+                  <span className="text-sm text-left flex-1 whitespace-normal wrap-break-word">
+                    {option.name}
+                  </span>
                   <Plus className="size-4.5 shrink-0 ml-2" />
                 </Button>
               ))}
@@ -111,7 +116,9 @@ export const PreferenceSelectionSheetContent = ({
                   className="w-full justify-between px-4 py-2 rounded-lg bg-white border border-blue transition-colors"
                   aria-label={`移除 ${option.name}`}
                 >
-                  <span className="text-left flex-1 whitespace-normal wrap-break-word">{option.name}</span>
+                  <span className="text-left flex-1 whitespace-normal wrap-break-word">
+                    {option.name}
+                  </span>
                   <X className="size-4.5 shrink-0 ml-2" />
                 </Button>
               ))}
@@ -121,9 +128,7 @@ export const PreferenceSelectionSheetContent = ({
               <p className="text-sm text-text-dark text-center py-4">尚未選擇任何選項</p>
             </div>
           )}
-          {!hasSelection && (
-            <p className="text-sm text-red">請選擇至少一個選項</p>
-          )}
+          {!hasSelection && <p className="text-sm text-red">請選擇至少一個選項</p>}
         </div>
       </div>
 

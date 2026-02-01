@@ -1,24 +1,24 @@
 "use client";
 
 import {
+  setCurrentUserCustomId,
+  type UpdateUserRequest,
+  uploadImage,
   useCurrentUser,
   useUserMutations,
-  type UpdateUserRequest,
-  setCurrentUserCustomId,
-  uploadImage,
 } from "@daodao/api";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
-import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { toast } from "@daodao/ui/components/sonner";
+import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AvatarUploadSection } from "./avatar-upload-section";
 import { BasicInfoSection } from "./basic-info-section";
 import { IntroductionSection } from "./introduction-section";
-import { SocialLinksSection } from "./social-links-section";
 import { type PublicInfoFormValues, publicInfoFormSchema } from "./schema";
+import { SocialLinksSection } from "./social-links-section";
 
 export const PublicInfoForm = () => {
   const { data: userData, isLoading, error: userError } = useCurrentUser();
@@ -65,8 +65,7 @@ export const PublicInfoForm = () => {
         discord: contactList?.discord || "",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData]);
+  }, [userData, form.reset]);
 
   const handleSubmit = async (values: PublicInfoFormValues) => {
     setIsSubmitting(true);
@@ -126,34 +125,7 @@ export const PublicInfoForm = () => {
         updateData.selfIntroduction = values.selfIntroduction;
       }
 
-      // 更新 customId（如果改變了）
-      const currentCustomId = userData?.data?.customId || "";
-      if (values.customId && values.customId !== currentCustomId) {
-        try {
-          const customIdResponse = await setCurrentUserCustomId(values.customId);
-          if (customIdResponse.error) {
-            const error = customIdResponse.error;
-            let errorMessage = "使用者 ID 設置失敗";
-
-            if (typeof error === "object" && error !== null) {
-              if ("message" in error && error.message) {
-                errorMessage = String(error.message);
-              }
-            }
-
-            toast.error(errorMessage);
-            setIsSubmitting(false);
-            return;
-          }
-        } catch (error) {
-          console.error("Failed to set customId:", error);
-          toast.error("使用者 ID 設置失敗，請稍後再試");
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
-      // 更新社群連結
+      // 更新社群連結（總是包含所有欄位，允許清空）
       const contactList: {
         facebook?: string;
         instagram?: string;
@@ -163,22 +135,12 @@ export const PublicInfoForm = () => {
         threads?: string;
       } = {};
 
-      if (values.facebook) {
-        contactList.facebook = values.facebook;
-      }
-      if (values.instagram) {
-        contactList.instagram = values.instagram;
-      }
-      if (values.linkedin) {
-        contactList.linkedin = values.linkedin;
-      }
-      if (values.discord) {
-        contactList.discord = values.discord;
-      }
+      contactList.facebook = values.facebook;
+      contactList.instagram = values.instagram;
+      contactList.linkedin = values.linkedin;
+      contactList.discord = values.discord;
 
-      if (Object.keys(contactList).length > 0) {
-        updateData.contactList = contactList;
-      }
+      updateData.contactList = contactList;
 
       // 調用 API 更新用戶資訊
       const response = await updateCurrentUser(updateData as UpdateUserRequest);
@@ -233,6 +195,33 @@ export const PublicInfoForm = () => {
         return;
       }
 
+      // 更新 customId（如果改變了）- 放在最後以減少資料不一致風險
+      const currentCustomId = userData?.data?.customId || "";
+      if (values.customId && values.customId !== currentCustomId) {
+        try {
+          const customIdResponse = await setCurrentUserCustomId(values.customId);
+          if (customIdResponse.error) {
+            const error = customIdResponse.error;
+            let errorMessage = "使用者 ID 設置失敗";
+
+            if (typeof error === "object" && error !== null) {
+              if ("message" in error && error.message) {
+                errorMessage = String(error.message);
+              }
+            }
+
+            toast.error(errorMessage);
+            setIsSubmitting(false);
+            return;
+          }
+        } catch (error) {
+          console.error("Failed to set customId:", error);
+          toast.error("使用者 ID 設置失敗，請稍後再試");
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // 成功
       toast.success("公開資訊設定已更新");
       form.reset(form.getValues()); // 重置 dirty 狀態
@@ -268,7 +257,11 @@ export const PublicInfoForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <AvatarUploadSection form={form} avatarFile={avatarFile} onAvatarFileChange={setAvatarFile} />
+        <AvatarUploadSection
+          form={form}
+          avatarFile={avatarFile}
+          onAvatarFileChange={setAvatarFile}
+        />
 
         <BasicInfoSection form={form} />
 

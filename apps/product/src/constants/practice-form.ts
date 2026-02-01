@@ -97,7 +97,7 @@ export const DurationDaysNumberToStringMap: Record<DurationDaysNumber, DurationD
  */
 export const ExecutionTimingToPracticeTimePeriodMap: Record<
   ExecutionTiming,
-  ("morning" | "afternoon" | "evening" | "night" | "commute")
+  "morning" | "afternoon" | "evening" | "night" | "commute"
 > = {
   [ExecutionTiming.morning]: "morning",
   [ExecutionTiming.lunchBreak]: "afternoon",

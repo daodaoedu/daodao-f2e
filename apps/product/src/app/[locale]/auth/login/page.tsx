@@ -1,8 +1,8 @@
 "use client";
 
 import { useAuth } from "@daodao/auth";
-import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 /**
  * 登入頁面

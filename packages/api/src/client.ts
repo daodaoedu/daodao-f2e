@@ -54,7 +54,8 @@ class UnauthorizedHandler {
       credentials: "include",
     };
 
-    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    const url =
+      typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
     const response = await fetch(input, fetchInit);
 
     // 如果不是 401 或沒有處理器，直接返回

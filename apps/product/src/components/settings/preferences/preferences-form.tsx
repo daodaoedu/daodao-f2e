@@ -1,26 +1,28 @@
 "use client";
 
-import { useCurrentUserPreferences, useAvailablePreferences, useUserMutations } from "@daodao/api";
+import type { PreferenceOption, PreferenceType, UpdatePreferencesRequest } from "@daodao/api";
+import { useAvailablePreferences, useCurrentUserPreferences, useUserMutations } from "@daodao/api";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
-import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { toast } from "@daodao/ui/components/sonner";
+import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  type PreferenceCategory,
-  type PreferenceType,
-  type PreferenceOption,
-} from "@daodao/api";
 import { PreferenceSection } from "./preference-section";
-import { preferencesFormSchema, type PreferencesFormValues } from "./schema";
+import { type PreferencesFormValues, preferencesFormSchema } from "./schema";
 
 export const PreferencesForm = () => {
-  const { data: preferencesData, isLoading: isLoadingPreferences, error: preferencesError } =
-    useCurrentUserPreferences();
-  const { data: availableData, isLoading: isLoadingAvailable, error: availableError } =
-    useAvailablePreferences();
+  const {
+    data: preferencesData,
+    isLoading: isLoadingPreferences,
+    error: preferencesError,
+  } = useCurrentUserPreferences();
+  const {
+    data: availableData,
+    isLoading: isLoadingAvailable,
+    error: availableError,
+  } = useAvailablePreferences();
   const { updateCurrentUserPreferences } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -82,8 +84,7 @@ export const PreferencesForm = () => {
         preferences: formDefaultValues,
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formDefaultValues, preferenceTypes.length]);
+  }, [formDefaultValues, preferenceTypes.length, form.reset]);
 
   const handleSubmit = async (values: PreferencesFormValues) => {
     console.log("Form submit triggered with values:", values);
@@ -112,14 +113,11 @@ export const PreferencesForm = () => {
         });
       });
 
-      // 調用 API
-      // 注意：根據錯誤訊息，後端期望 data.preferences 是一個 record（物件）
-      // 但 OpenAPI 定義是陣列，這裡先嘗試直接發送陣列格式
-      console.log("Sending preferences:", preferenceItems);
-      const response = await updateCurrentUserPreferences({
+      const requestData: UpdatePreferencesRequest = {
         preferences: preferenceItems,
-      } as Parameters<typeof updateCurrentUserPreferences>[0]);
-      
+      };
+      const response = await updateCurrentUserPreferences(requestData);
+
       console.log("API response:", response);
 
       // 檢查錯誤
@@ -131,7 +129,7 @@ export const PreferencesForm = () => {
           // 檢查是否有 details（可能是陣列或物件）
           if ("details" in error) {
             const details = error.details;
-            
+
             // 處理 details 為物件的情況（例如：{ "data.preferences": "Invalid input: ..." }）
             if (typeof details === "object" && details !== null && !Array.isArray(details)) {
               const detailEntries = Object.entries(details);
@@ -176,7 +174,7 @@ export const PreferencesForm = () => {
               }
             }
           }
-          
+
           // 如果沒有 details 或處理後沒有錯誤訊息，使用頂層 message
           if (errorMessage === "更新失敗，請稍後再試" && "message" in error && error.message) {
             errorMessage = String(error.message);
@@ -237,8 +235,11 @@ export const PreferencesForm = () => {
     console.error("Form validation errors:", errors);
     // 顯示表單驗證錯誤
     // React Hook Form 的錯誤格式可能是嵌套的
-    const formErrors = errors as Record<string, { _errors?: string[]; message?: string } | undefined>;
-    
+    const formErrors = errors as Record<
+      string,
+      { _errors?: string[]; message?: string } | undefined
+    >;
+
     // 檢查頂層錯誤
     if (formErrors.preferences) {
       const prefErrors = formErrors.preferences;
@@ -251,7 +252,7 @@ export const PreferencesForm = () => {
         return;
       }
     }
-    
+
     // 檢查其他欄位錯誤
     const errorMessages: string[] = [];
     const extractErrors = (obj: unknown, path = ""): void => {
@@ -267,9 +268,9 @@ export const PreferencesForm = () => {
         });
       }
     };
-    
+
     extractErrors(formErrors);
-    
+
     if (errorMessages.length > 0) {
       toast.error(errorMessages[0]);
     } else {

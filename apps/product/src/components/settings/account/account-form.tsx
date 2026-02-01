@@ -1,14 +1,19 @@
 "use client";
 
-import { useCurrentUser, useUserMutations, type UpdateUserRequest } from "@daodao/api";
+import { type UpdateUserRequest, useCurrentUser, useUserMutations } from "@daodao/api";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
-import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { toast } from "@daodao/ui/components/sonner";
+import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parse } from "date-fns";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import {
+  mapApiEducationStageToForm,
+  mapFormEducationStageToApi,
+} from "@/constants/education-stage";
+import { mapApiRoleToForm, mapFormRoleToApi } from "@/constants/user-role";
 import { FieldSelectionSection } from "./field-selection-section";
 import { PersonalInfoSection } from "./personal-info-section";
 import {
@@ -18,56 +23,6 @@ import {
   EDUCATION_STAGE_OPTIONS,
   ROLE_OPTIONS,
 } from "./schema";
-
-// 角色值對應：API 使用中文，表單使用英文
-const ROLE_MAP: Record<string, string> = {
-  學生: "student",
-  社會人士: "professional",
-  教師: "teacher",
-  其他: "other",
-};
-
-const REVERSE_ROLE_MAP: Record<string, string> = {
-  student: "學生",
-  professional: "社會人士",
-  teacher: "教師",
-  other: "其他",
-};
-
-// 將 API 的 roleList 值對應到表單值
-const mapApiRoleToForm = (apiRoleList: string[] | null | undefined): string => {
-  if (!apiRoleList || apiRoleList.length === 0) return "";
-  const firstRole = apiRoleList[0];
-  return firstRole ? ROLE_MAP[firstRole] || "" : "";
-};
-
-// 將表單的 role 值對應到 API 值
-const mapFormRoleToApi = (formValue: string): string[] | undefined => {
-  if (!formValue) return undefined;
-  const apiRole = REVERSE_ROLE_MAP[formValue];
-  return apiRole ? [apiRole] : undefined;
-};
-
-// 將 API 的 educationStage 值對應到表單值
-const mapApiEducationStageToForm = (
-  apiValue: "university" | "high" | "other" | null | undefined
-): string => {
-  if (!apiValue) return "";
-  if (apiValue === "university") return "university";
-  if (apiValue === "high") return "senior";
-  return "other";
-};
-
-// 將表單的 educationStage 值對應到 API 值
-const mapFormEducationStageToApi = (
-  formValue: string
-): "university" | "high" | "other" | undefined => {
-  if (formValue === "university") return "university";
-  if (formValue === "senior" || formValue === "junior" || formValue === "elementary") return "high";
-  if (formValue === "graduate") return "university";
-  if (formValue === "other" || formValue === "unlimited") return "other";
-  return undefined;
-};
 
 export const AccountForm = () => {
   const { data: userData, isLoading, error: userError } = useCurrentUser();
@@ -99,8 +54,7 @@ export const AccountForm = () => {
         explorationFields: user.interestList || [],
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData]);
+  }, [userData, form.reset]);
 
   const handleSubmit = async (values: AccountFormValues) => {
     setIsSubmitting(true);
@@ -132,14 +86,9 @@ export const AccountForm = () => {
         updateData.educationStage = apiEducationStage;
       }
 
-      // 轉換專業領域和探索領域
-      if (values.professionalFields.length > 0) {
-        updateData.tagList = values.professionalFields;
-      }
-
-      if (values.explorationFields.length > 0) {
-        updateData.interestList = values.explorationFields;
-      }
+      // 轉換專業領域和探索領域（總是包含，允許清空）
+      updateData.tagList = values.professionalFields;
+      updateData.interestList = values.explorationFields;
 
       // 調用 API
       const response = await updateCurrentUser(updateData as UpdateUserRequest);

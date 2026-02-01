@@ -4,7 +4,7 @@
  */
 
 import { client } from "../client";
-import type { paths } from "../types";
+import type { components, paths } from "../types";
 
 // ============================================================================
 // Types
@@ -24,12 +24,7 @@ type UpdateUserRequest = paths["/api/v1/users/{id}"]["put"]["requestBody"] exten
 }
   ? T
   : never;
-type UpdatePreferencesRequest =
-  paths["/api/v1/users/me/preferences"]["put"]["requestBody"] extends {
-    content: { "application/json": infer T };
-  }
-    ? T
-    : never;
+type UpdatePreferencesRequest = components["schemas"]["UpdatePreferencesRequest"];
 type UserPreferencesResponse =
   paths["/api/v1/users/me/preferences"]["get"]["responses"]["200"]["content"]["application/json"];
 type AvailablePreferencesResponse =

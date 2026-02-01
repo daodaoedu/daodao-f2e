@@ -1,8 +1,8 @@
 "use client";
 
 import { useUserPractices } from "@daodao/api";
-import { useAuth } from "@daodao/auth";
 import { ArrowRightOutlineSvg, ExperimentSvg, FlagSvg, NoteSvg } from "@daodao/assets";
+import { useAuth } from "@daodao/auth";
 import { useIsMobile, useScrollVisibility } from "@daodao/shared";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";

@@ -10,14 +10,10 @@ import {
   FormMessage,
 } from "@daodao/ui/components/form";
 import { Input } from "@daodao/ui/components/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@daodao/ui/components/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@daodao/ui/components/popover";
 import { cn } from "@daodao/ui/lib/utils";
-import { ChevronDownIcon, CheckIcon } from "lucide-react";
-import { useMemo, useState, useRef, useEffect } from "react";
+import { ChevronDownIcon } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type { PublicInfoFormValues } from "./schema";
 
@@ -55,9 +51,7 @@ export const BasicInfoSection = ({ form }: IBasicInfoSectionProps) => {
               <Input
                 {...field}
                 placeholder="請輸入公開顯示的名稱"
-                className={cn(
-                  form.formState.errors.name && "border-red focus-visible:border-red"
-                )}
+                className={cn(form.formState.errors.name && "border-red focus-visible:border-red")}
               />
             </FormControl>
             <FormMessage />
@@ -84,8 +78,8 @@ export const BasicInfoSection = ({ form }: IBasicInfoSectionProps) => {
               />
             </FormControl>
             <FormDescription className="text-xs text-light-gray mt-1">
-              ID 開頭及結尾僅可使用字符英文字母 (a-z) 與數字。中間可包含底線 (_) 與連字符
-              (-), 最少 3 個字符, 最多 50 個字符。
+              ID 開頭及結尾僅可使用字符英文字母 (a-z) 與數字。中間可包含底線 (_) 與連字符 (-), 最少
+              3 個字符, 最多 50 個字符。
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -151,15 +145,9 @@ const CityCombobox = ({ value, options, onChange, invalid }: ICityComboboxProps)
     const query = searchQuery.toLowerCase();
     return options.filter(
       (option) =>
-        option.label.toLowerCase().includes(query) ||
-        option.value.toLowerCase().includes(query)
+        option.label.toLowerCase().includes(query) || option.value.toLowerCase().includes(query)
     );
   }, [options, searchQuery]);
-
-  // 當過濾選項改變時，重置高亮索引
-  useEffect(() => {
-    setHighlightedIndex(0);
-  }, [filteredOptions.length, searchQuery]);
 
   // 當 Popover 打開時，聚焦到輸入框
   useEffect(() => {
@@ -252,7 +240,10 @@ const CityCombobox = ({ value, options, onChange, invalid }: ICityComboboxProps)
             <Input
               ref={inputRef}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setHighlightedIndex(0);
+              }}
               onKeyDown={handleKeyDown}
               placeholder="搜尋城市..."
               className="h-9"
@@ -260,14 +251,9 @@ const CityCombobox = ({ value, options, onChange, invalid }: ICityComboboxProps)
           </div>
 
           {/* 選項列表 */}
-          <div
-            ref={listRef}
-            className="max-h-[300px] overflow-y-auto p-1"
-          >
+          <div ref={listRef} className="max-h-[300px] overflow-y-auto p-1">
             {filteredOptions.length === 0 ? (
-              <div className="py-6 text-center text-sm text-light-gray">
-                沒有找到符合的城市
-              </div>
+              <div className="py-6 text-center text-sm text-light-gray">沒有找到符合的城市</div>
             ) : (
               filteredOptions.map((option, index) => (
                 <button

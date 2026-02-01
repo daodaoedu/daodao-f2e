@@ -95,7 +95,11 @@ export const PreferenceSection = ({
                 {Array.isArray(field.value) && field.value.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {selectedOptionNames.map((name, index) => (
-                      <Badge key={`${selectedOptionIds[index]}-${name}`} variant="outline-blue" className="rounded-lg px-4 py-2">
+                      <Badge
+                        key={selectedOptionIds[index]}
+                        variant="outline-blue"
+                        className="rounded-lg px-4 py-2"
+                      >
                         {name}
                       </Badge>
                     ))}

@@ -87,8 +87,8 @@ export default function Stack({
   const shouldDisableDrag = mobileClickOnly && isMobile;
   const shouldEnableClick = sendToBackOnClick || shouldDisableDrag;
 
-  const [stack, setStack] = useState<{ id: number; content: React.ReactNode }[]>(
-    () => cards.map((content: React.ReactNode, index: number) => ({ id: index + 1, content }))
+  const [stack, setStack] = useState<{ id: number; content: React.ReactNode }[]>(() =>
+    cards.map((content: React.ReactNode, index: number) => ({ id: index + 1, content }))
   );
 
   useEffect(() => {

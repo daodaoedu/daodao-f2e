@@ -6,9 +6,9 @@ import {
   getCurrentUser,
   unauthorizedHandler,
 } from "@daodao/api";
-import { getStorage, getStorageKey, StorageEnum } from "@daodao/shared";
-import { usePathname, useRouter } from "@daodao/i18n/navigation";
+import { usePathname } from "@daodao/i18n/navigation";
 import { routing } from "@daodao/i18n/routing";
+import { getStorage, getStorageKey, StorageEnum } from "@daodao/shared";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { LoginDialog } from "../components/login-dialog";
 import type { AuthContextValue, StoredUser } from "../types";
@@ -102,7 +102,7 @@ const removeLocalePrefix = (pathname: string): string => {
 
   const firstSegment = segments[0];
   // 檢查是否是有效的 locale
-  if (firstSegment && routing.locales.includes(firstSegment as any)) {
+  if (firstSegment && routing.locales.includes(firstSegment as (typeof routing.locales)[number])) {
     const remainingPath = segments.slice(1).join("/");
     return remainingPath ? `/${remainingPath}` : "/";
   }
@@ -172,7 +172,6 @@ export const AuthProvider = ({
   const [loginDialogDismissible, setLoginDialogDismissible] = useState(true);
   const userInfoStorage = useMemo(() => getStorage<StoredUser>(StorageEnum.UserInfo), []);
   const pathname = usePathname();
-  const router = useRouter();
 
   /**
    * 清除認證狀態
@@ -225,7 +224,7 @@ export const AuthProvider = ({
       console.error("Failed to check auth status:", error);
       clearAuthState();
     } finally {
-      console.log('checkAuth finally');
+      console.log("checkAuth finally");
       setIsLoading(false);
     }
   }, [clearAuthState, setAuthState]);
@@ -241,7 +240,7 @@ export const AuthProvider = ({
         return true;
       }
       return false;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }, []);
@@ -339,18 +338,13 @@ export const AuthProvider = ({
     defaultProtected,
     enableRouteProtection,
     onAuthRequired,
-    router,
   ]);
 
   /**
    * 開啟登入 Dialog
    */
   const openLoginDialog = useCallback(
-    (options?: {
-      redirectUrl?: string;
-      source?: "website" | "app";
-      dismissible?: boolean;
-    }) => {
+    (options?: { redirectUrl?: string; source?: "website" | "app"; dismissible?: boolean }) => {
       if (options?.redirectUrl) {
         setLoginDialogRedirectUrl(options.redirectUrl);
       } else {

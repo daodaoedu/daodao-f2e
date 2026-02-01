@@ -1,3 +1,4 @@
+export { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 export type { FilterStatus } from "@/constants/task-status";
 export { AddTaskFAB } from "./add-task-fab";
 export { Banner } from "./banner";
@@ -7,5 +8,4 @@ export { DashboardHeader } from "./dashboard-header";
 export type { InProgressTask } from "./in-progress-section";
 export { InProgressSection } from "./in-progress-section";
 export { InProgressTaskCard } from "./in-progress-task-card";
-export { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 export { StatCard } from "./stat-card";

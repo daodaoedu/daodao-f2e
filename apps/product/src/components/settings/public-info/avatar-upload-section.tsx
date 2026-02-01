@@ -52,7 +52,9 @@ export const AvatarUploadSection = ({
 
   const handleAvatarClick = () => {
     // 觸發 FileUpload 的點擊事件
-    const fileInput = fileUploadRef.current?.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = fileUploadRef.current?.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
     fileInput?.click();
   };
 
