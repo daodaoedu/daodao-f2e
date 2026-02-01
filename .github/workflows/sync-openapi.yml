@@ -36,10 +36,36 @@ jobs:
 
       - name: Fetch OpenAPI
         run: |
-          gh api repos/daodaoedu/daodao-server/contents/generated/openapi-types.ts \
+          set -euo pipefail
+          
+          # 獲取檔案內容
+          CONTENT=$(gh api repos/daodaoedu/daodao-server/contents/generated/openapi-types.ts \
             --method GET \
             --jq '.content' \
-            -f ref=dev | base64 -d > packages/api/src/types.ts
+            -f ref=dev) || {
+            echo "❌ Failed to fetch OpenAPI types from backend"
+            exit 1
+          }
+          
+          # 檢查內容是否為空
+          if [ -z "$CONTENT" ]; then
+            echo "❌ OpenAPI content is empty"
+            exit 1
+          fi
+          
+          # 解碼 base64 內容
+          echo "$CONTENT" | base64 -d > packages/api/src/types.ts || {
+            echo "❌ Failed to decode base64 content"
+            exit 1
+          }
+          
+          # 驗證檔案是否成功寫入且有內容
+          if [ ! -s packages/api/src/types.ts ]; then
+            echo "❌ Generated types.ts file is empty"
+            exit 1
+          fi
+          
+          echo "✅ Successfully fetched and decoded OpenAPI types"
 
       - name: Check for changes
         id: check_changes
