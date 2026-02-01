@@ -13627,10 +13627,7 @@ export interface paths {
                                 currentStreak: number;
                                 /** @description 最大連續天數 */
                                 maxStreak: number;
-                                /**
-                                 * Format: date-time
-                                 * @description 最後簽到時間
-                                 */
+                                /** @description 最後簽到時間 */
                                 lastCheckinAt?: string;
                             };
                             /**
@@ -25859,6 +25856,12 @@ export interface components {
              * @example 2024-01-16T08:30:00.000Z
              */
             firstCheckinAt?: string;
+            /**
+             * Format: date-time
+             * @description 最後打卡時間
+             * @example 2024-01-25T20:15:00.000Z
+             */
+            lastCheckinAt?: string;
             /**
              * @description 已打卡次數
              * @example 5
