@@ -280,12 +280,11 @@ export const createPracticeCheckInWithFormData = async (
     }
 
     // 2. 構建 API 請求資料
-    // @TODO: 注意：API 沒有 tags 欄位，所以 tags 會被忽略
-    // mood 已經在組件層轉換好了
     const checkInRequest: CreateCheckInRequestType = {
       mood: formData.mood,
       note: formData.description || undefined,
       imageUrls,
+      tags: formData.tags,
     };
 
     // 3. 調用 API 創建打卡記錄
