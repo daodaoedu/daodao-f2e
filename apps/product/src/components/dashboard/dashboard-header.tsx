@@ -1,5 +1,6 @@
 "use client";
 
+import type { ElementType } from "react";
 import { format } from "date-fns";
 import { StatCard } from "./stat-card";
 
@@ -7,7 +8,7 @@ interface Stat {
   label: string;
   value: string;
   unit: string;
-  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  icon: ElementType;
 }
 
 interface DashboardHeaderProps {
