@@ -1,13 +1,13 @@
 "use client";
 
+import type { ElementType } from "react";
 import { cn } from "@daodao/ui/lib/utils";
-import type * as React from "react";
 
 interface StatCardProps {
   label: string;
   value: string;
   unit: string;
-  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  icon: ElementType;
 }
 
 export const StatCard = ({ label, value, unit, icon: Icon }: StatCardProps) => {

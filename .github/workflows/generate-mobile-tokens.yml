@@ -1,0 +1,64 @@
+name: Generate Mobile Tokens
+
+on:
+  push:
+    branches:
+      - dev
+      - 'feat/**'
+    paths:
+      - 'packages/design-tokens/src/**'
+
+  workflow_dispatch:
+
+env:
+  HUSKY: 0
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate:
+    name: Generate Mobile Design Tokens
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate mobile tokens
+        run: pnpm --filter @daodao/design-tokens generate:mobile
+
+      - name: Check for changes
+        id: check
+        run: |
+          if git diff --quiet apps/mobile/generated/; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add apps/mobile/generated/
+          git commit -m "chore(mobile): auto-generate design tokens
+
+          Co-Authored-By: github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          git push

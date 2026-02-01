@@ -6,8 +6,13 @@ concurrency:
   cancel-in-progress: true
 
 # ===== 觸發條件設定 =====
+# 1. workflow_run：當 CI 完成後觸發（避免重複執行 CI）
+# 2. workflow_dispatch：手動觸發選項
 on:
-  push:
+  workflow_run:
+    workflows: ["Linode CI"]
+    types:
+      - completed
     branches:
       - main
       - dev
@@ -36,17 +41,11 @@ env:
   DOCKER_BUILDKIT: 1
 
 jobs:
-  # ===== 持續整合階段 =====
-  continuous_integration:
-    if: ${{ github.event_name == 'push' && !inputs.force_deploy }}
-    uses: ./.github/workflows/linode-ci.yml
-    secrets: inherit
-
   # ===== Docker 映像構建階段 - Website =====
   build-website:
     runs-on: ubuntu-latest
-    needs: [continuous_integration]
-    if: ${{ always() && (needs.continuous_integration.result == 'success' || inputs.force_deploy || needs.continuous_integration.result == 'skipped') && (inputs.app == 'all' || inputs.app == 'website' || inputs.app == '') }}
+    # 只在 CI 成功或手動強制部署時執行
+    if: ${{ github.event.workflow_run.conclusion == 'success' || inputs.force_deploy == true }}
     outputs:
       image-tag: ${{ steps.meta.outputs.image-tag }}
       image-digest: ${{ steps.build.outputs.digest }}
@@ -156,8 +155,8 @@ jobs:
   # ===== Docker 映像構建階段 - Product =====
   build-product:
     runs-on: ubuntu-latest
-    needs: [continuous_integration]
-    if: ${{ always() && (needs.continuous_integration.result == 'success' || inputs.force_deploy || needs.continuous_integration.result == 'skipped') && (inputs.app == 'all' || inputs.app == 'product' || inputs.app == '') }}
+    # 只在 CI 成功或手動強制部署時執行
+    if: ${{ github.event.workflow_run.conclusion == 'success' || inputs.force_deploy == true }}
     outputs:
       image-tag: ${{ steps.meta.outputs.image-tag }}
       image-digest: ${{ steps.build.outputs.digest }}

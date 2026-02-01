@@ -66,13 +66,12 @@ const getPlatformDisplayName = (platform: SocialPlatformType): string => {
 };
 
 const getSocialIcon = (platform: SocialPlatformType) => {
-  const platformMap: Partial<Record<SocialPlatformType, React.FC<React.SVGProps<SVGSVGElement>>>> =
-    {
-      [SocialPlatform.facebook]: FacebookSvg,
-      [SocialPlatform.instagram]: InstagramSvg,
-      [SocialPlatform.threads]: ThreadsSvg,
-      [SocialPlatform.linkedin]: LinkedInSvg,
-    };
+  const platformMap: Partial<Record<SocialPlatformType, typeof FacebookSvg>> = {
+    [SocialPlatform.facebook]: FacebookSvg,
+    [SocialPlatform.instagram]: InstagramSvg,
+    [SocialPlatform.threads]: ThreadsSvg,
+    [SocialPlatform.linkedin]: LinkedInSvg,
+  };
   const Icon = platformMap[platform];
   if (!Icon) return null;
   return <Icon className="size-8 md:size-4" />;

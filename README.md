@@ -7,8 +7,9 @@ DaoDao 前端專案的 monorepo 架構。
 ```
 daodao-f2e/
 ├── apps/                    # 應用程式
-│   ├── website/            # 靜態官網 (Next.js)
-│   └── product/            # 產品網站 (Next.js)
+│   ├── website/            # 靜態官網 (Next.js, port 3000)
+│   ├── product/            # 產品網站 (Next.js, port 3001)
+│   └── mobile/             # 行動 App (Expo/React Native)
 │
 ├── packages/               # 共享套件
 │   ├── shared/            # 共享工具函數與 hooks
@@ -30,20 +31,68 @@ daodao-f2e/
 
 ## 🚀 快速開始
 
+### 環境需求
+
+- Node.js >= 20.19.4
+- pnpm >= 10.20.0
+
 ### 安裝依賴
 
 ```bash
 pnpm install
 ```
 
-### 開發
+### 🌐 Web 開發 (Next.js)
 
 ```bash
-# 開發所有 apps (使用 Turborepo)
-pnpm dev
+pnpm dev            # 啟動全部 apps
+pnpm dev:website    # http://localhost:3000
+pnpm dev:product    # http://localhost:3001
+```
 
-# 開發特定 app
-pnpm --filter website dev
+### 📱 Mobile 開發 (Expo)
+
+**前置條件：**
+
+```bash
+# 安裝 EAS CLI (用於建置 App)
+npm install -g eas-cli
+
+# 登入 Expo 帳號
+eas login
+```
+
+**開發：**
+
+```bash
+pnpm dev:mobile     # 啟動 Expo 開發伺服器
+
+# 或進入 mobile 目錄執行
+cd apps/mobile
+pnpm dev:ios        # iOS 模擬器
+pnpm dev:android    # Android 模擬器
+pnpm dev:web        # Web 瀏覽器
+```
+
+**建置 Mobile App (使用 EAS Build)：**
+
+```bash
+# 從根目錄執行
+pnpm --filter @daodao/mobile build:dev        # 開發版本
+pnpm --filter @daodao/mobile build:preview    # 預覽版本
+pnpm --filter @daodao/mobile build:production # 正式版本
+
+# 或進入 mobile 目錄執行
+cd apps/mobile
+pnpm build:dev
+pnpm build:preview
+pnpm build:production
+```
+
+**類型檢查：**
+
+```bash
+pnpm --filter @daodao/mobile typecheck
 ```
 
 ### 構建
@@ -56,15 +105,19 @@ pnpm build
 pnpm --filter @daodao/shared build
 ```
 
-### Docker
+### 🐳 Docker
 
 ```bash
+# 開發環境
+pnpm docker:dev        # 啟動
+pnpm docker:dev:down   # 停止
+
+# 生產環境
+pnpm docker:prod       # 啟動
+pnpm docker:prod:down  # 停止
+
 # 構建專案並啟動 Docker 容器
 pnpm docker:build
-
-# 此命令會：
-# 1. 執行 pnpm build 構建所有專案
-# 2. 執行 docker-compose up -d --build 構建並啟動容器
 ```
 
 Docker Compose 會啟動兩個服務：
@@ -127,11 +180,19 @@ packages/ui
 
 ## 🛠️ 技術棧
 
+**Web:**
 - **Next.js 15+**: App Router
 - **React 19+**: UI 框架
-- **TypeScript 5.7+**: 類型安全
 - **TailwindCSS**: 樣式框架
 - **shadcn/ui**: 組件庫
+
+**Mobile:**
+- **Expo**: React Native 開發框架
+- **React Native**: 跨平台行動開發
+- **Tamagui**: UI 組件庫
+
+**共用:**
+- **TypeScript 5.7+**: 類型安全
 - **pnpm**: 套件管理
 - **Turborepo**: Monorepo 構建工具（任務並行執行與快取）
 - **Biome**: Linter & Formatter（替代 ESLint + Prettier）

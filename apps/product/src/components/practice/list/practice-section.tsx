@@ -1,5 +1,6 @@
 "use client";
 
+import type { ElementType } from "react";
 import { useUserPractices } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { ArrowRightOutlineSvg, ExperimentSvg, FlagSvg, NoteSvg } from "@daodao/assets";
@@ -40,7 +41,7 @@ interface Tab {
   id: TabType;
   label: string;
   disabled?: boolean;
-  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  Icon: ElementType;
 }
 
 /**
