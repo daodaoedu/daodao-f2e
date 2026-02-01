@@ -1,6 +1,6 @@
 // 自動生成，請勿手動修改
 // 來源: packages/design-tokens
-// 生成時間: 2026-01-31T05:17:41.872Z
+// 生成時間: 2026-02-01T02:33:33.839Z
 
 export const typography = {
   "fonts": {
