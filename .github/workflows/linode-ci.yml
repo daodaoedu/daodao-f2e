@@ -10,20 +10,20 @@ concurrency:
   cancel-in-progress: true
 
 # ===== 觸發條件設定 =====
-# 1. pull_request：當向 main 或 dev 分支提交 PR 時觸發
-# 2. workflow_call：被其他 workflow（如 CD）調用時執行
+# 1. push：當推送到 main, dev, feat/** 分支時觸發
+# 2. pull_request：當向 main 或 dev 分支提交 PR 時觸發
 # 3. workflow_dispatch：手動觸發選項
 # =======================
 on:
+  push:
+    branches:
+      - main
+      - dev
+      - 'feat/**'
   pull_request:
     branches:
       - main
       - dev
-  workflow_call:
-    outputs:
-      build-artifact:
-        description: "Name of the build artifact"
-        value: ${{ jobs.test.outputs.artifact-name }}
   workflow_dispatch:
 
 # ===== 全域環境變數 =====
