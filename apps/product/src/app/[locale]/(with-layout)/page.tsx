@@ -13,9 +13,9 @@ import {
   InProgressSection,
   type InProgressTask,
 } from "@/components/dashboard";
-import { RandomPracticesSection } from "@/components/practice";
 import type { CompletedTask } from "@/components/dashboard/completed-section";
 import { BackgroundAnimation } from "@/components/layout";
+import { RandomPracticesSection } from "@/components/practice";
 import { PracticeStatus } from "@/constants/practice-status";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 

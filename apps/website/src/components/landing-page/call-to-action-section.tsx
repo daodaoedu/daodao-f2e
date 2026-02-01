@@ -22,7 +22,11 @@ export function CallToActionSection() {
         你喜歡的學習生活了嗎？
       </h2>
       <div className="relative z-10">
-        <Button variant="ctaOrange" size="huge" onClick={() => openLoginDialog({ redirectUrl: "/" })}>
+        <Button
+          variant="ctaOrange"
+          size="huge"
+          onClick={() => openLoginDialog({ redirectUrl: "/" })}
+        >
           立即加入
         </Button>
       </div>

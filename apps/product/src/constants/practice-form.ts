@@ -97,11 +97,11 @@ export const DurationDaysNumberToStringMap: Record<DurationDaysNumber, DurationD
  */
 export const ExecutionTimingToPracticeTimePeriodMap: Record<
   ExecutionTiming,
-  ("morning" | "afternoon" | "evening" | "night") | null
+  "morning" | "afternoon" | "evening" | "night" | "commute"
 > = {
   [ExecutionTiming.morning]: "morning",
   [ExecutionTiming.lunchBreak]: "afternoon",
-  [ExecutionTiming.commute]: null, // API 不支援，忽略
+  [ExecutionTiming.commute]: "commute",
   [ExecutionTiming.evening]: "evening",
   [ExecutionTiming.beforeSleep]: "night",
 } as const;
@@ -132,4 +132,4 @@ export const parseFrequency = (frequency: Frequency): { minDays: number; maxDays
 /**
  * 實踐標籤最大數量限制
  */
-export const MAX_PRACTICE_TAGS = 3;
+export const MAX_PRACTICE_TAGS = 10;

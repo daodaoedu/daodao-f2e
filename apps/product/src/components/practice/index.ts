@@ -1,7 +1,5 @@
 // Shared components
 
-// Create components
-export * from "./create";
 // Manual practice schema and types
 export * from "./create/manual/schema";
 

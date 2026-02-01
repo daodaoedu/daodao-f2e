@@ -13,10 +13,10 @@ type SettingsItem = {
 
 const settingsItems: SettingsItem[] = [
   {
-    id: "domain-preference",
+    id: "preferences",
     label: "領域偏好設定",
     icon: LibraryBig,
-    href: "/settings/domain-preference",
+    href: "/settings/preferences",
   },
   {
     id: "account",

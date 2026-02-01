@@ -1,35 +1,11 @@
 import { differenceInYears } from "date-fns";
 import { z } from "zod";
+import { EDUCATION_STAGE_OPTIONS } from "@/constants/education-stage";
+import { AVAILABLE_FIELDS } from "@/constants/professional-fields";
+import { ROLE_OPTIONS } from "@/constants/user-role";
 
-// Form Options Constants
-export const ROLE_OPTIONS = [
-  { value: "student", label: "學生" },
-  { value: "professional", label: "社會人士" },
-  { value: "teacher", label: "教師" },
-  { value: "other", label: "其他" },
-] as const;
-
-export const EDUCATION_STAGE_OPTIONS = [
-  { value: "unlimited", label: "不設限" },
-  { value: "elementary", label: "國小" },
-  { value: "junior", label: "國中" },
-  { value: "senior", label: "高中" },
-  { value: "university", label: "大學" },
-  { value: "graduate", label: "研究所" },
-];
-
-export const AVAILABLE_FIELDS = [
-  "資訊與資訊通信科技(ICT)",
-  "法律",
-  "商業與管理",
-  "資訊與電腦科學",
-  "語言",
-  "商管與理財",
-  "社會創新與永續",
-  "教育",
-  "藝術與設計",
-  "工程與技術",
-];
+// Re-export constants for convenience
+export { AVAILABLE_FIELDS, EDUCATION_STAGE_OPTIONS, ROLE_OPTIONS };
 
 // Form Schema
 export const accountFormSchema = z.object({

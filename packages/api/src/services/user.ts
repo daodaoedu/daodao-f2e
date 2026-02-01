@@ -4,7 +4,7 @@
  */
 
 import { client } from "../client";
-import type { paths } from "../types";
+import type { components, paths } from "../types";
 
 // ============================================================================
 // Types
@@ -24,12 +24,23 @@ type UpdateUserRequest = paths["/api/v1/users/{id}"]["put"]["requestBody"] exten
 }
   ? T
   : never;
-type UpdatePreferencesRequest =
-  paths["/api/v1/users/me/preferences"]["put"]["requestBody"] extends {
-    content: { "application/json": infer T };
-  }
-    ? T
-    : never;
+type UpdatePreferencesRequest = components["schemas"]["UpdatePreferencesRequest"];
+type UserPreferencesResponse =
+  paths["/api/v1/users/me/preferences"]["get"]["responses"]["200"]["content"]["application/json"];
+type AvailablePreferencesResponse =
+  paths["/api/v1/users/preferences/available"]["get"]["responses"]["200"]["content"]["application/json"];
+
+// 明確定義偏好設定的型別
+// 從 API 回應中提取 preferences 陣列的元素型別
+type UserPreference = NonNullable<
+  NonNullable<UserPreferencesResponse["data"]>["preferences"]
+>[number];
+// 明確定義 PreferenceCategory 型別
+type PreferenceCategory = NonNullable<
+  NonNullable<UserPreferencesResponse["data"]>["categories"]
+>[number];
+type PreferenceType = NonNullable<AvailablePreferencesResponse["data"]>[number];
+type PreferenceOption = PreferenceType["options"][number];
 
 // API 定義中 query 參數是 string 類型，但使用時需要 number，所以定義一個轉換層
 export interface IGetUsersParams {
@@ -225,4 +236,10 @@ export type {
   CreateUserRequest,
   UpdateUserRequest,
   UpdatePreferencesRequest,
+  UserPreferencesResponse,
+  AvailablePreferencesResponse,
+  UserPreference,
+  PreferenceCategory,
+  PreferenceType,
+  PreferenceOption,
 };
