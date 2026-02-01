@@ -38,26 +38,62 @@ jobs:
         run: |
           set -euo pipefail
           
-          # 獲取檔案內容
-          CONTENT=$(gh api repos/daodaoedu/daodao-server/contents/generated/openapi-types.ts \
+          # 先獲取檔案資訊來檢查檔案是否存在
+          FILE_INFO=$(gh api repos/daodaoedu/daodao-server/contents/generated/openapi-types.ts \
             --method GET \
-            --jq '.content' \
             -f ref=dev) || {
             echo "❌ Failed to fetch OpenAPI types from backend"
             exit 1
           }
           
-          # 檢查內容是否為空
-          if [ -z "$CONTENT" ]; then
-            echo "❌ OpenAPI content is empty"
+          # 檢查檔案類型（應該是 "file"）
+          FILE_TYPE=$(echo "$FILE_INFO" | jq -r '.type // empty')
+          if [ "$FILE_TYPE" != "file" ]; then
+            echo "❌ File not found or is not a file (type: $FILE_TYPE)"
             exit 1
           fi
           
-          # 解碼 base64 內容
-          echo "$CONTENT" | base64 -d > packages/api/src/types.ts || {
-            echo "❌ Failed to decode base64 content"
-            exit 1
-          }
+          # 檢查檔案大小和 content 欄位
+          FILE_SIZE=$(echo "$FILE_INFO" | jq -r '.size // 0')
+          CONTENT=$(echo "$FILE_INFO" | jq -r '.content // empty')
+          
+          # 如果 content 為空或 null（通常發生在檔案 > 1MB 時），使用 git blob API
+          if [ -z "$CONTENT" ] || [ "$CONTENT" == "null" ] || [ "$CONTENT" == "0" ]; then
+            echo "⚠️  File is large ($FILE_SIZE bytes), using git blob API instead"
+            
+            # 獲取檔案的 sha
+            FILE_SHA=$(echo "$FILE_INFO" | jq -r '.sha // empty')
+            if [ -z "$FILE_SHA" ]; then
+              echo "❌ Failed to get file SHA"
+              exit 1
+            fi
+            
+            # 使用 git blob API 獲取檔案內容（已經是 base64 編碼）
+            BLOB_RESPONSE=$(gh api repos/daodaoedu/daodao-server/git/blobs/$FILE_SHA \
+              --method GET) || {
+              echo "❌ Failed to fetch file blob"
+              exit 1
+            }
+            
+            # 提取並解碼 base64 內容
+            BLOB_CONTENT=$(echo "$BLOB_RESPONSE" | jq -r '.content // empty')
+            if [ -z "$BLOB_CONTENT" ] || [ "$BLOB_CONTENT" == "null" ]; then
+              echo "❌ Blob content is empty"
+              exit 1
+            fi
+            
+            # 解碼 base64 內容（git blob API 返回的內容包含換行符，需要先移除）
+            echo "$BLOB_CONTENT" | tr -d '\n' | base64 -d > packages/api/src/types.ts || {
+              echo "❌ Failed to decode blob content"
+              exit 1
+            }
+          else
+            # 檔案較小，直接使用 content 欄位
+            echo "$CONTENT" | base64 -d > packages/api/src/types.ts || {
+              echo "❌ Failed to decode base64 content"
+              exit 1
+            }
+          fi
           
           # 驗證檔案是否成功寫入且有內容
           if [ ! -s packages/api/src/types.ts ]; then
@@ -66,6 +102,7 @@ jobs:
           fi
           
           echo "✅ Successfully fetched and decoded OpenAPI types"
+          echo "File size: $(wc -l < packages/api/src/types.ts) lines"
 
       - name: Check for changes
         id: check_changes
