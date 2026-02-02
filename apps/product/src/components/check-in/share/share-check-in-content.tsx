@@ -8,6 +8,7 @@ import XSvg from "@daodao/assets/images/social-icons/x-filled.svg";
 import { getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
+import { toast } from "@daodao/ui/components/sonner";
 import { Download, ExternalLink } from "lucide-react";
 import type { ICheckInFormData } from "../types";
 
@@ -55,8 +56,9 @@ export const ShareCheckInSheetContent = ({
       document.body.removeChild(link);
 
       URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error("下載圖片失敗:", error);
+      toast.success("圖片已下載");
+    } catch {
+      toast.error("下載失敗");
     }
   };
 
