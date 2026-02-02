@@ -26,6 +26,7 @@ import {
   type ManualPracticeFormValues,
   PracticeDetailTitle,
   PracticeOverviewCard,
+  ResourceCard,
 } from "@/components/practice";
 import {
   DurationDays,
@@ -62,9 +63,10 @@ export default function PracticeDetailPage() {
 
   // 將 API 資料轉換為頁面需要的格式
   const practice:
-    | (ManualPracticeFormValues & {
+    | (Omit<ManualPracticeFormValues, "resources"> & {
         total: number;
         currentProgress: number;
+        resources: { id: string; name: string; url?: string }[];
       })
     | null = useMemo(() => {
     if (!practiceData?.data) {
@@ -129,7 +131,11 @@ export default function PracticeDetailPage() {
 
       // Step 4
       tags: data.tags || [],
-      resources: [], // TODO: 需要從 API 取得資源列表
+      resources: (data.resources || []).map((resource) => ({
+        id: resource.id,
+        name: resource.name,
+        url: resource.url,
+      })),
 
       total: data.durationDays ?? 0,
       currentProgress: data.progressPercentage ?? 0,
@@ -300,6 +306,22 @@ export default function PracticeDetailPage() {
             showRemaining
           />
         </div>
+
+        {/* Resources Section */}
+        {practice.resources.length > 0 && (
+          <div className="mb-6">
+            <p className="text-base font-medium text-text-dark mb-4">使用的資源</p>
+            <div className="grid grid-cols-2 gap-3">
+              {practice.resources.map((resource) => (
+                <ResourceCard
+                  key={resource.id}
+                  resource={resource}
+                  onClick={resource.url ? () => window.open(resource.url, "_blank") : undefined}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Check-in Record Card */}
         <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
