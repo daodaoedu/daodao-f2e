@@ -3,7 +3,8 @@
  * 提供用戶相關的 API 調用函數和 Hooks
  */
 
-import { client } from "../client";
+import { getRequiredEnv } from "@daodao/config";
+import { client, unauthorizedHandler } from "../client";
 import type { components, paths } from "../types";
 
 // ============================================================================
@@ -119,12 +120,127 @@ export const getCurrentUser = async () => {
 };
 
 /**
- * 更新當前用戶資訊
+ * 更新當前用戶資訊（JSON 格式，不支援檔案上傳）
  */
 export const updateCurrentUser = async (data: UpdateUserRequest) => {
   return client.PUT("/api/v1/users/me", {
     body: data,
   });
+};
+
+/**
+ * 更新用戶 API 回應類型
+ */
+type UpdateUserResponse =
+  paths["/api/v1/users/me"]["put"]["responses"]["200"]["content"]["application/json"];
+
+/**
+ * FormData 版本的更新用戶請求類型
+ * 支援直接傳送檔案
+ */
+export interface UpdateUserFormDataRequest {
+  name?: string;
+  customId?: string;
+  location?: string;
+  gender?: string;
+  birthDay?: string;
+  selfIntroduction?: string;
+  personalSlogan?: string;
+  isOpenLocation?: boolean;
+  isOpenProfile?: boolean;
+  isSubscribeEmail?: boolean;
+  tagList?: string[];
+  roleList?: string[];
+  interestList?: string[];
+  contactList?: {
+    instagram?: string;
+    discord?: string;
+    line?: string;
+    facebook?: string;
+    threads?: string;
+    linkedin?: string;
+    website?: string;
+    github?: string;
+  };
+  wantToDoList?: string[];
+  professionalField?: string[];
+  educationStage?: string;
+  share?: string | string[];
+  preferences?: Record<string, string[]>;
+  referralSource?: string;
+}
+
+/**
+ * 更新當前用戶資訊（FormData 格式，支援圖片上傳）
+ * @param data 用戶資料
+ * @param photoFile 可選的頭像圖片檔案
+ * @returns 更新結果
+ */
+export const updateCurrentUserWithFormData = async (
+  data: UpdateUserFormDataRequest,
+  photoFile?: File
+): Promise<UpdateUserResponse> => {
+  const formData = new FormData();
+
+  // 基本欄位（string）
+  if (data.name) formData.append("name", data.name);
+  if (data.customId) formData.append("customId", data.customId);
+  if (data.location) formData.append("location", data.location);
+  if (data.gender) formData.append("gender", data.gender);
+  if (data.birthDay) formData.append("birthDay", data.birthDay);
+  if (data.selfIntroduction) formData.append("selfIntroduction", data.selfIntroduction);
+  if (data.personalSlogan) formData.append("personalSlogan", data.personalSlogan);
+
+  // Boolean 欄位需轉成字串
+  if (data.isOpenLocation !== undefined) {
+    formData.append("isOpenLocation", String(data.isOpenLocation));
+  }
+  if (data.isOpenProfile !== undefined) {
+    formData.append("isOpenProfile", String(data.isOpenProfile));
+  }
+  if (data.isSubscribeEmail !== undefined) {
+    formData.append("isSubscribeEmail", String(data.isSubscribeEmail));
+  }
+
+  // 其他 string 欄位
+  if (data.educationStage) formData.append("educationStage", data.educationStage);
+  if (data.referralSource) formData.append("referralSource", data.referralSource);
+
+  // 陣列/物件欄位需轉成 JSON 字串
+  if (data.tagList) formData.append("tagList", JSON.stringify(data.tagList));
+  if (data.roleList) formData.append("roleList", JSON.stringify(data.roleList));
+  if (data.interestList) formData.append("interestList", JSON.stringify(data.interestList));
+  if (data.contactList) formData.append("contactList", JSON.stringify(data.contactList));
+  if (data.wantToDoList) formData.append("wantToDoList", JSON.stringify(data.wantToDoList));
+  if (data.professionalField) formData.append("professionalField", JSON.stringify(data.professionalField));
+  if (data.share) formData.append("share", JSON.stringify(data.share));
+  if (data.preferences) formData.append("preferences", JSON.stringify(data.preferences));
+
+  // 圖片檔案（後端期望欄位名為 'avatar'）
+  if (photoFile) formData.append("avatar", photoFile);
+
+  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const response = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/users/me`, {
+    method: "PUT",
+    body: formData,
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({
+      error: { message: "更新失敗" },
+    }));
+    const error = new Error(errorData.error?.message || "更新失敗") as Error & {
+      details?: Array<{ path?: string; message?: string }>;
+    };
+    // 附加驗證錯誤詳情（供表單使用）
+    if (errorData.error?.details && Array.isArray(errorData.error.details)) {
+      error.details = errorData.error.details;
+    }
+    throw error;
+  }
+
+  return response.json();
 };
 
 /**
@@ -235,6 +351,7 @@ export type {
   UserListResponse,
   CreateUserRequest,
   UpdateUserRequest,
+  UpdateUserResponse,
   UpdatePreferencesRequest,
   UserPreferencesResponse,
   AvailablePreferencesResponse,

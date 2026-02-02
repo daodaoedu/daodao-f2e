@@ -1,5 +1,6 @@
 "use client";
 
+import { checkCustomIdAvailability } from "@daodao/api";
 import { useLocale, useTranslations } from "@daodao/i18n";
 import {
   FormControl,
@@ -12,18 +13,23 @@ import {
 import { Input } from "@daodao/ui/components/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@daodao/ui/components/popover";
 import { cn } from "@daodao/ui/lib/utils";
-import { ChevronDownIcon } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { CheckCircleIcon, ChevronDownIcon, LoaderIcon, XCircleIcon } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type { PublicInfoFormValues } from "./schema";
 
 interface IBasicInfoSectionProps {
   form: UseFormReturn<PublicInfoFormValues>;
+  initialCustomId?: string;
 }
 
-export const BasicInfoSection = ({ form }: IBasicInfoSectionProps) => {
+export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionProps) => {
   const locale = useLocale();
   const t = useTranslations();
+
+  // customId 即時檢查狀態
+  const [customIdStatus, setCustomIdStatus] = useState<"idle" | "checking" | "available" | "unavailable">("idle");
+  const checkTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // 取得城市選項
   const cityOptions = useMemo(() => {
@@ -35,6 +41,67 @@ export const BasicInfoSection = ({ form }: IBasicInfoSectionProps) => {
       }))
       .sort((a, b) => a.label.localeCompare(b.label, locale === "en" ? "en" : "zh-TW"));
   }, [t, locale]);
+
+  // customId 即時檢查函數（debounced）
+  const checkCustomId = useCallback(async (customId: string) => {
+    // 清除之前的 timeout
+    if (checkTimeoutRef.current) {
+      clearTimeout(checkTimeoutRef.current);
+    }
+
+    // 如果是空的或與原始值相同，不檢查
+    if (!customId || customId === initialCustomId) {
+      setCustomIdStatus("idle");
+      return;
+    }
+
+    // 本地格式驗證（基本格式檢查）
+    const customIdRegex = /^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$/i;
+    if (customId.length < 3 || customId.length > 50 || !customIdRegex.test(customId)) {
+      setCustomIdStatus("idle");
+      return;
+    }
+
+    setCustomIdStatus("checking");
+
+    // debounce 300ms
+    checkTimeoutRef.current = setTimeout(async () => {
+      try {
+        const response = await checkCustomIdAvailability(customId);
+        console.log("checkCustomIdAvailability response:", response);
+
+        // 檢查是否有錯誤
+        if (response.error) {
+          console.error("API error:", response.error);
+          setCustomIdStatus("idle");
+          return;
+        }
+
+        // 檢查可用性
+        if (response.data?.data?.available) {
+          setCustomIdStatus("available");
+        } else {
+          setCustomIdStatus("unavailable");
+          form.setError("customId", {
+            type: "server",
+            message: "此使用者 ID 已被使用",
+          });
+        }
+      } catch (err) {
+        console.error("checkCustomIdAvailability error:", err);
+        setCustomIdStatus("idle");
+      }
+    }, 300);
+  }, [initialCustomId, form]);
+
+  // 清理 timeout
+  useEffect(() => {
+    return () => {
+      if (checkTimeoutRef.current) {
+        clearTimeout(checkTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="bg-white rounded-xl p-4 space-y-4">
@@ -69,17 +136,46 @@ export const BasicInfoSection = ({ form }: IBasicInfoSectionProps) => {
               使用者 ID<span className="text-red ml-1">*</span>
             </FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                placeholder="請輸入使用者 ID"
-                className={cn(
-                  form.formState.errors.customId && "border-red focus-visible:border-red"
-                )}
-              />
+              <div className="relative">
+                <Input
+                  {...field}
+                  placeholder="請輸入使用者 ID"
+                  className={cn(
+                    "pr-10",
+                    form.formState.errors.customId && "border-red focus-visible:border-red",
+                    customIdStatus === "available" && "border-green focus-visible:border-green"
+                  )}
+                  onBlur={field.onBlur}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    // 當使用者輸入時，立即清除舊的驗證狀態
+                    if (customIdStatus === "available" || customIdStatus === "unavailable") {
+                      setCustomIdStatus("idle");
+                      form.clearErrors("customId");
+                    }
+                    checkCustomId(e.target.value);
+                  }}
+                />
+                {/* 狀態指示器 */}
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {customIdStatus === "checking" && (
+                    <LoaderIcon className="size-4 text-light-gray animate-spin" />
+                  )}
+                  {customIdStatus === "available" && (
+                    <CheckCircleIcon className="size-4 text-green" />
+                  )}
+                  {customIdStatus === "unavailable" && (
+                    <XCircleIcon className="size-4 text-red" />
+                  )}
+                </div>
+              </div>
             </FormControl>
             <FormDescription className="text-xs text-light-gray mt-1">
               ID 開頭及結尾僅可使用字符英文字母 (a-z) 與數字。中間可包含底線 (_) 與連字符 (-), 最少
               3 個字符, 最多 50 個字符。
+              {customIdStatus === "available" && (
+                <span className="text-green ml-1">✓ 此 ID 可以使用</span>
+              )}
             </FormDescription>
             <FormMessage />
           </FormItem>

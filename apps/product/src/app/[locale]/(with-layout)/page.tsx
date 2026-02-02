@@ -3,6 +3,7 @@
 import { useMyPracticeStats, useMyPractices } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
+import { format, parseISO } from "date-fns";
 import { CheckCircle2 } from "lucide-react";
 import { useMemo } from "react";
 import {
@@ -42,6 +43,12 @@ export default function HomePage() {
         practice.status === PracticeStatus.draft ||
         practice.status === PracticeStatus.notStarted;
 
+      // 將 ISO timestamp 轉換為 yyyy-MM-dd 格式
+      // API 回傳 lastCheckinAt 為 ISO 8601 格式 (e.g., "2024-01-20T09:00:00.000Z")
+      const lastCheckInDate = practice.lastCheckinAt
+        ? format(parseISO(practice.lastCheckinAt), "yyyy-MM-dd")
+        : null;
+
       if (isInProgress) {
         inProgressTasksData.push({
           id: practice.id,
@@ -54,8 +61,7 @@ export default function HomePage() {
           isUnreadMessages: false, // TODO: 需要從其他 API 取得
           theme: practice.themeColor || "#FCDD84",
           status: mapPracticeStatusToTaskStatus(practice.status),
-          // TODO: 需要從 practice.stats 或打卡記錄 API 獲取最新的打卡日期
-          lastCheckInDate: null,
+          lastCheckInDate,
         });
       } else if (practice.status === PracticeStatus.completed) {
         completedTasksData.push({
