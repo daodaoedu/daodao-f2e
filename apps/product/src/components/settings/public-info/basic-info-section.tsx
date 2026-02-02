@@ -68,6 +68,16 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
     checkTimeoutRef.current = setTimeout(async () => {
       try {
         const response = await checkCustomIdAvailability(customId);
+        console.log("checkCustomIdAvailability response:", response);
+
+        // 檢查是否有錯誤
+        if (response.error) {
+          console.error("API error:", response.error);
+          setCustomIdStatus("idle");
+          return;
+        }
+
+        // 檢查可用性
         if (response.data?.data?.available) {
           setCustomIdStatus("available");
         } else {
@@ -77,7 +87,8 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
             message: "此使用者 ID 已被使用",
           });
         }
-      } catch {
+      } catch (err) {
+        console.error("checkCustomIdAvailability error:", err);
         setCustomIdStatus("idle");
       }
     }, 300);
@@ -134,18 +145,15 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
                     form.formState.errors.customId && "border-red focus-visible:border-red",
                     customIdStatus === "available" && "border-green focus-visible:border-green"
                   )}
-                  onBlur={(e) => {
-                    field.onBlur();
-                    checkCustomId(e.target.value);
-                  }}
+                  onBlur={field.onBlur}
                   onChange={(e) => {
                     field.onChange(e);
-                    // 當值改變時，重置狀態（如果與原始值相同則設為 idle）
-                    if (e.target.value === initialCustomId) {
+                    // 當使用者輸入時，立即清除舊的驗證狀態
+                    if (customIdStatus === "available" || customIdStatus === "unavailable") {
                       setCustomIdStatus("idle");
-                    } else if (customIdStatus !== "idle") {
-                      setCustomIdStatus("idle");
+                      form.clearErrors("customId");
                     }
+                    checkCustomId(e.target.value);
                   }}
                 />
                 {/* 狀態指示器 */}
