@@ -109,6 +109,7 @@ jobs:
           echo "${{ secrets.ENV_DEV }}" > .env
           cp .env apps/website/.env
           cp .env apps/product/.env
+          cp .env apps/legacy/.env
 
       # ===== 構建驗證 =====
       - name: Build applications
