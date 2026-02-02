@@ -151,6 +151,49 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
           </FormItem>
         )}
       />
+
+      {/* Line */}
+      <FormField
+        control={form.control}
+        name="line"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="block font-medium text-text-dark mb-3">LINE</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                placeholder="請輸入 LINE ID"
+                className={cn(
+                  form.formState.errors.line && "border-red focus-visible:border-red"
+                )}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* Threads */}
+      <FormField
+        control={form.control}
+        name="threads"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="block font-medium text-text-dark mb-3">Threads</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                placeholder="請輸入 Threads 網址"
+                type="url"
+                className={cn(
+                  form.formState.errors.threads && "border-red focus-visible:border-red"
+                )}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 };

@@ -11,8 +11,10 @@ import type {
   CreateUserRequest,
   IGetUsersParams,
   UpdatePreferencesRequest,
+  UpdateUserFormDataRequest,
   UpdateUserRequest,
 } from "./user";
+import { updateCurrentUserWithFormData } from "./user";
 
 // ============================================================================
 // Query Hooks
@@ -132,12 +134,24 @@ export const useAvailablePreferences = () => {
 export const useUserMutations = () => {
   return {
     /**
-     * 更新當前用戶資訊
+     * 更新當前用戶資訊（JSON 格式，不支援檔案上傳）
      */
     updateCurrentUser: async (data: UpdateUserRequest) => {
       return client.PUT("/api/v1/users/me", {
         body: data,
       });
+    },
+
+    /**
+     * 更新當前用戶資訊（FormData 格式，支援圖片上傳）
+     * @param data 用戶資料
+     * @param photoFile 可選的頭像圖片檔案
+     */
+    updateCurrentUserWithFormData: async (
+      data: UpdateUserFormDataRequest,
+      photoFile?: File
+    ) => {
+      return updateCurrentUserWithFormData(data, photoFile);
     },
 
     /**

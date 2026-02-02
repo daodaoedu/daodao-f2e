@@ -8463,7 +8463,7 @@ export interface paths {
         };
         /**
          * 更新當前用戶資訊
-         * @description 更新已登入用戶的個人資料
+         * @description 更新已登入用戶的個人資料。支援 multipart/form-data 格式，可同時上傳頭像檔案。
          */
         put: {
             parameters: {
@@ -8474,6 +8474,56 @@ export interface paths {
             };
             requestBody?: {
                 content: {
+                    "multipart/form-data": {
+                        /**
+                         * Format: binary
+                         * @description 新頭像圖片（JPEG、PNG 或 WebP 格式，最大 500KB）
+                         */
+                        avatar?: string;
+                        /** @description 使用者姓名 */
+                        name?: string;
+                        /**
+                         * @description 性別
+                         * @enum {string}
+                         */
+                        gender?: "male" | "female" | "other";
+                        /** @description 出生日期 (YYYY-MM-DD) */
+                        birthDay?: string;
+                        /** @description 地區代碼 */
+                        location?: string;
+                        /** @description 教育階段 */
+                        educationStage?: string;
+                        /** @description 是否公開位置資訊 */
+                        isOpenLocation?: boolean;
+                        /** @description 是否公開個人資料 */
+                        isOpenProfile?: boolean;
+                        /** @description 是否訂閱電子郵件 */
+                        isSubscribeEmail?: boolean;
+                        /** @description 自我介紹 */
+                        selfIntroduction?: string;
+                        /** @description 分享內容 */
+                        share?: string;
+                        /** @description 想做的事情清單 (JSON 字串) */
+                        wantToDoList?: string;
+                        /** @description 標籤清單 (JSON 字串) */
+                        tagList?: string;
+                        /** @description 角色清單 (JSON 字串) */
+                        roleList?: string;
+                        /** @description 興趣清單 (JSON 字串) */
+                        interestList?: string;
+                        /** @description 偏好設定 (JSON 字串) */
+                        preferences?: string;
+                        /** @description 聯絡資訊 (JSON 字串) */
+                        contactList?: string;
+                        /** @description 專業領域 (JSON 字串) */
+                        professionalField?: string;
+                        /** @description 個人標語 */
+                        personalSlogan?: string;
+                        /** @description 資訊來源 */
+                        referralSource?: string;
+                        /** @description 自訂 ID */
+                        customId?: string;
+                    };
                     "application/json": components["schemas"]["UpdateUserRequest"];
                 };
             };
@@ -13297,7 +13347,7 @@ export interface paths {
         put?: never;
         /**
          * 創建簽到記錄
-         * @description 為指定實踐創建新的簽到記錄
+         * @description 為指定實踐創建新的簽到記錄。支援 multipart/form-data 格式，可同時上傳圖片檔案（最多 3 張）。
          */
         post: {
             parameters: {
@@ -13310,6 +13360,21 @@ export interface paths {
             };
             requestBody?: {
                 content: {
+                    "multipart/form-data": {
+                        /**
+                         * @description 學習心情
+                         * @enum {string}
+                         */
+                        mood?: "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
+                        /** @description 詳細描述（最多 300 字） */
+                        note?: string;
+                        /** @description 標籤（JSON 字串陣列，最多 10 個） */
+                        tags?: string;
+                        /** @description OG 圖片 URL（用於社群分享） */
+                        ogImageUrl?: string;
+                        /** @description 圖片檔案（最多 3 張，每張最大 500KB） */
+                        images?: string[];
+                    };
                     "application/json": components["schemas"]["CheckInRequest"];
                 };
             };
@@ -13552,7 +13617,7 @@ export interface paths {
                              *       "totalCheckIns": 45,
                              *       "currentStreak": 5,
                              *       "maxStreak": 12,
-                             *       "lastCheckInDate": "2024-01-20"
+                             *       "lastCheckinAt": "2024-01-20T09:00:00.000Z"
                              *     }
                              */
                             data: {
@@ -13562,8 +13627,8 @@ export interface paths {
                                 currentStreak: number;
                                 /** @description 最大連續天數 */
                                 maxStreak: number;
-                                /** @description 最後簽到日期 */
-                                lastCheckInDate?: string;
+                                /** @description 最後簽到時間 */
+                                lastCheckinAt?: string;
                             };
                             /**
                              * Format: date-time
@@ -21723,6 +21788,14 @@ export interface components {
              * @example others
              */
             referralSource?: ("instagram" | "facebook" | "discord" | "linkedin" | "friend_referral" | "others") | string;
+            /**
+             * @description 自訂 ID (可選)
+             * @example my_custom_id
+             * @example my_custom_id
+             * @example user123
+             * @example john_doe
+             */
+            customId?: string;
         };
         /** @description 格式化的用戶資料 */
         FormattedUserResponse: {
@@ -25783,6 +25856,12 @@ export interface components {
              * @example 2024-01-16T08:30:00.000Z
              */
             firstCheckinAt?: string;
+            /**
+             * Format: date-time
+             * @description 最後打卡時間
+             * @example 2024-01-25T20:15:00.000Z
+             */
+            lastCheckinAt?: string;
             /**
              * @description 已打卡次數
              * @example 5

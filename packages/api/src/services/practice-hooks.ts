@@ -5,11 +5,11 @@
  * 提供實踐相關的 React Hooks（用於 Client Components）
  */
 
+import { getRequiredEnv } from "@daodao/config";
 import { useRef } from "react";
-import { client } from "../client";
+import { client, unauthorizedHandler } from "../client";
 import { useMutate, useQuery } from "../hooks";
 import type { components, paths } from "../types";
-import { deleteMultipleImages, uploadMultipleImages } from "./image";
 import type {
   IGetMyPracticesParams,
   IGetPracticeCheckInsParams,
@@ -259,56 +259,57 @@ export const createPracticeCheckIn = async (practiceId: string, data: CreateChec
 };
 
 /**
- * 創建實踐打卡記錄（封裝函數，自動處理圖片上傳和資料轉換）
+ * 打卡 API 回應類型
+ */
+type CreateCheckInResponse =
+  paths["/api/v1/practices/{id}/checkins"]["post"]["responses"]["201"]["content"]["application/json"];
+
+/**
+ * 創建實踐打卡記錄（使用 FormData 統一提交）
  * @param practiceId 實踐 ID
- * @param formData 表單資料（包含圖片檔案）
+ * @param data 表單資料（包含圖片檔案）
  * @returns 創建結果
  */
 export const createPracticeCheckInWithFormData = async (
   practiceId: string,
-  formData: ICheckInFormData
-) => {
-  // 1. 上傳圖片（如果有）
-  let imageUrls: string[] = [];
-  let uploadedFilenames: string[] = [];
+  data: ICheckInFormData
+): Promise<CreateCheckInResponse> => {
+  const formData = new FormData();
 
-  try {
-    if (formData.media && formData.media.length > 0) {
-      const uploadResult = await uploadMultipleImages(formData.media);
-      imageUrls = uploadResult.data.urls.map((item) => item.url);
-      uploadedFilenames = uploadResult.data.urls.map((item) => item.filename);
-    }
+  // 基本欄位
+  if (data.mood) formData.append("mood", data.mood);
+  if (data.description) formData.append("note", data.description);
 
-    // 2. 構建 API 請求資料
-    const checkInRequest: CreateCheckInRequestType = {
-      mood: formData.mood,
-      note: formData.description || undefined,
-      imageUrls,
-      tags: formData.tags,
-    };
-
-    // 3. 調用 API 創建打卡記錄
-    const response = await createPracticeCheckIn(practiceId, checkInRequest);
-
-    // 如果創建失敗，清理已上傳的圖片
-    if (response.error && uploadedFilenames.length > 0) {
-      await deleteMultipleImages(uploadedFilenames).catch((error) => {
-        // 記錄刪除失敗的錯誤，但不影響主要錯誤的拋出
-        console.error("清理已上傳圖片失敗:", error);
-      });
-    }
-
-    return response;
-  } catch (error) {
-    // 如果圖片上傳或創建打卡記錄時發生異常，清理已上傳的圖片
-    if (uploadedFilenames.length > 0) {
-      await deleteMultipleImages(uploadedFilenames).catch((deleteError) => {
-        // 記錄刪除失敗的錯誤，但不影響主要錯誤的拋出
-        console.error("清理已上傳圖片失敗:", deleteError);
-      });
-    }
-    throw error;
+  // 陣列欄位需轉成 JSON 字串
+  if (data.tags && data.tags.length > 0) {
+    formData.append("tags", JSON.stringify(data.tags));
   }
+
+  // 圖片檔案（多張）
+  if (data.media && data.media.length > 0) {
+    data.media.forEach((file) => {
+      formData.append("images", file);
+    });
+  }
+
+  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const response = await unauthorizedHandler.wrapFetch(
+    `${baseUrl}/api/v1/practices/${practiceId}/checkins`,
+    {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({
+      error: { message: "打卡失敗" },
+    }));
+    throw new Error(error.error?.message || "打卡失敗");
+  }
+
+  return response.json();
 };
 
 /**
@@ -373,16 +374,8 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
   const mutate = useMutate();
 
   const createCheckIn = async (formData: ICheckInFormData) => {
-    // 創建打卡記錄
+    // 創建打卡記錄（函數會直接拋出錯誤）
     const response = await createPracticeCheckInWithFormData(practiceId, formData);
-
-    if (response.error) {
-      const errorMessage =
-        response.error && typeof response.error === "object" && "message" in response.error
-          ? String(response.error.message)
-          : "打卡失敗";
-      throw new Error(errorMessage);
-    }
 
     // 刷新打卡列表的 cache
     await mutate([

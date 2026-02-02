@@ -210,11 +210,15 @@ export default function PracticeDetailPage() {
     }
   };
 
+  const handleBack = () => {
+    router.push("/");
+  };
+
   // Loading 狀態
   if (isLoading) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" title="主題實踐" rightActionTo="/" />
+        <PageHeader leftAction="back" title="主題實踐" onLeftAction={handleBack} rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">載入中...</div>
@@ -227,7 +231,7 @@ export default function PracticeDetailPage() {
   if (error || !practice) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" title="主題實踐" rightActionTo="/" />
+        <PageHeader leftAction="back" title="主題實踐" onLeftAction={handleBack} rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">
@@ -240,7 +244,7 @@ export default function PracticeDetailPage() {
 
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-      <PageHeader leftAction="back" title="主題實踐" rightActionTo="/" />
+      <PageHeader leftAction="back" title="主題實踐" onLeftAction={handleBack} rightActionTo="/" />
 
       <BackgroundAnimation />
 
