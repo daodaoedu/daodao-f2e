@@ -39,7 +39,25 @@ export const ShareCheckInSheetContent = ({
 
   // 處理下載打卡圖片
   const handleDownloadImage = async () => {
-    // TODO: 實作下載圖片功能
+    const imageUrl = images?.[0];
+    if (!imageUrl) return;
+
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `check-in-${checkInData.date || Date.now()}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("下載圖片失敗:", error);
+    }
   };
 
   return (
