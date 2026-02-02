@@ -8,6 +8,7 @@ import XSvg from "@daodao/assets/images/social-icons/x-filled.svg";
 import { getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
+import { toast } from "@daodao/ui/components/sonner";
 import { Download, ExternalLink } from "lucide-react";
 import type { ICheckInFormData } from "../types";
 
@@ -39,7 +40,26 @@ export const ShareCheckInSheetContent = ({
 
   // 處理下載打卡圖片
   const handleDownloadImage = async () => {
-    // TODO: 實作下載圖片功能
+    const imageUrl = images?.[0];
+    if (!imageUrl) return;
+
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `check-in-${checkInData.date || Date.now()}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(blobUrl);
+      toast.success("圖片已下載");
+    } catch {
+      toast.error("下載失敗");
+    }
   };
 
   return (
