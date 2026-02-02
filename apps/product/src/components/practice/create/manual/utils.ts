@@ -1,7 +1,4 @@
-import {
-  type CreatePracticeRequestType,
-  type UpdatePracticeRequestType,
-} from "@daodao/api";
+import type { CreatePracticeRequestType, UpdatePracticeRequestType } from "@daodao/api";
 import {
   type ExecutionTiming,
   type Frequency,

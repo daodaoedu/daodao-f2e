@@ -1,166 +1,175 @@
-import { useCallback, useMemo } from 'react'
-import { RefreshControl, Alert, Pressable, StyleSheet, Dimensions, View as RNView } from 'react-native'
-import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Spinner, } from 'tamagui'
+import { useRouter } from "expo-router";
+import { useCallback, useMemo } from "react";
+import {
+  Alert,
+  Dimensions,
+  Pressable,
+  RefreshControl,
+  View as RNView,
+  StyleSheet,
+} from "react-native";
+import { ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 
-const { width: screenWidth } = Dimensions.get('window')
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Target, MoreHorizontal } from '@tamagui/lucide-icons'
-import { usePractices, useCheckIn } from '@/hooks/usePractices'
-import { PracticeCard, HomeBanner } from '@/components'
-import { colors } from '@/generated/design-tokens'
-import type { Practice } from '@/types/practice'
+const { width: screenWidth } = Dimensions.get("window");
+
+import { MoreHorizontal, Target } from "@tamagui/lucide-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { HomeBanner, PracticeCard } from "@/components";
+import { colors } from "@/generated/design-tokens";
+import { useCheckIn, usePractices } from "@/hooks/usePractices";
+import type { Practice } from "@/types/practice";
 
 // Mock data - 4 種顏色的卡片 (進行中)
 const MOCK_PRACTICES: Practice[] = [
   {
-    id: '1',
-    title: '學習做甜點',
-    description: '看食譜書和 Youtube 教學，每週末做一次',
+    id: "1",
+    title: "學習做甜點",
+    description: "看食譜書和 Youtube 教學，每週末做一次",
     targetDays: 30,
     completedDays: 2,
     currentStreak: 2,
     longestStreak: 2,
-    frequency: 'weekly',
+    frequency: "weekly",
     todayCheckedIn: false,
     isCompleted: false,
-    status: 'draft',
-    theme: 'yellow',
-    tags: ['料理', '烘焙'],
+    status: "draft",
+    theme: "yellow",
+    tags: ["料理", "烘焙"],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
-    id: '2',
-    title: '學習 React Hooks',
-    description: '每天學習 1.5 小時的 React Hooks 課程，包含理論學習、實作練習和筆記整理',
+    id: "2",
+    title: "學習 React Hooks",
+    description: "每天學習 1.5 小時的 React Hooks 課程，包含理論學習、實作練習和筆記整理",
     targetDays: 14,
     completedDays: 7,
     currentStreak: 5,
     longestStreak: 7,
-    frequency: 'daily',
+    frequency: "daily",
     todayCheckedIn: false,
     isCompleted: false,
-    status: 'in-progress',
-    theme: 'blue',
-    tags: ['程式', 'React', '前端'],
+    status: "in-progress",
+    theme: "blue",
+    tags: ["程式", "React", "前端"],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
-    id: '3',
-    title: '練習冥想',
-    description: '每天練習冥想 10 分鐘，包含正念冥想、呼吸練習和身體掃描',
+    id: "3",
+    title: "練習冥想",
+    description: "每天練習冥想 10 分鐘，包含正念冥想、呼吸練習和身體掃描",
     targetDays: 21,
     completedDays: 3,
     currentStreak: 3,
     longestStreak: 3,
-    frequency: 'daily',
+    frequency: "daily",
     todayCheckedIn: false,
     isCompleted: false,
-    status: 'not-started',
-    theme: 'pink',
-    tags: ['健康', '冥想', '正念'],
+    status: "not-started",
+    theme: "pink",
+    tags: ["健康", "冥想", "正念"],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
-    id: '4',
-    title: '閱讀英文文章',
-    description: '每天閱讀一篇英文新聞或部落格文章，累積單字量',
+    id: "4",
+    title: "閱讀英文文章",
+    description: "每天閱讀一篇英文新聞或部落格文章，累積單字量",
     targetDays: 30,
     completedDays: 10,
     currentStreak: 10,
     longestStreak: 10,
-    frequency: 'daily',
+    frequency: "daily",
     todayCheckedIn: true,
     isCompleted: false,
-    status: 'in-progress',
-    theme: 'green',
-    tags: ['語言', '英文', '閱讀'],
+    status: "in-progress",
+    theme: "green",
+    tags: ["語言", "英文", "閱讀"],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
-]
+];
 
 // Mock data - 已完成的實踐
 const MOCK_COMPLETED: Practice[] = [
   {
-    id: '5',
-    title: '練習冥想',
-    description: '每天練習冥想 10 分鐘，包含正念冥想、呼吸練習和身體掃描',
+    id: "5",
+    title: "練習冥想",
+    description: "每天練習冥想 10 分鐘，包含正念冥想、呼吸練習和身體掃描",
     targetDays: 21,
     completedDays: 21,
     currentStreak: 0,
     longestStreak: 21,
-    frequency: 'daily',
+    frequency: "daily",
     todayCheckedIn: false,
     isCompleted: true,
-    status: 'completed',
-    theme: 'blue',
-    tags: ['正念冥想', 'Youtube', '放鬆', '專注', '健康'],
+    status: "completed",
+    theme: "blue",
+    tags: ["正念冥想", "Youtube", "放鬆", "專注", "健康"],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
-]
+];
 
 export default function HomeScreen() {
-  const router = useRouter()
-  const {
-    activePractices,
-    completedPractices,
-    isLoading,
-    mutate,
-  } = usePractices()
-  const { checkIn, isChecking } = useCheckIn()
+  const router = useRouter();
+  const { activePractices, completedPractices, isLoading, mutate } = usePractices();
+  const { checkIn, isChecking } = useCheckIn();
 
   // 使用 mock data 或真實數據
   const inProgressPractices = useMemo(() => {
-    const realPractices = activePractices.filter(p => !p.isCompleted)
+    const realPractices = activePractices.filter((p) => !p.isCompleted);
     // 如果沒有真實數據，使用 mock data
-    return realPractices.length > 0 ? realPractices : MOCK_PRACTICES
-  }, [activePractices])
+    return realPractices.length > 0 ? realPractices : MOCK_PRACTICES;
+  }, [activePractices]);
 
   // 已完成的實踐
   const displayedCompletedPractices = useMemo(() => {
-    return completedPractices.length > 0 ? completedPractices : MOCK_COMPLETED
-  }, [completedPractices])
+    return completedPractices.length > 0 ? completedPractices : MOCK_COMPLETED;
+  }, [completedPractices]);
 
   const handleRefresh = useCallback(async () => {
-    await mutate()
-  }, [mutate])
+    await mutate();
+  }, [mutate]);
 
-  const handlePracticePress = useCallback((id: string) => {
-    router.push(`/practices/${id}`)
-  }, [router])
+  const handlePracticePress = useCallback(
+    (id: string) => {
+      router.push(`/practices/${id}`);
+    },
+    [router]
+  );
 
-  const handleCheckIn = useCallback(async (practiceId: string) => {
-    const result = await checkIn({ practiceId })
+  const handleCheckIn = useCallback(
+    async (practiceId: string) => {
+      const result = await checkIn({ practiceId });
 
-    if (!result.success && result.error) {
-      Alert.alert('打卡失敗', result.error)
-    }
-  }, [checkIn])
+      if (!result.success && result.error) {
+        Alert.alert("打卡失敗", result.error);
+      }
+    },
+    [checkIn]
+  );
 
   const handleAddPractice = useCallback(() => {
-    router.push('/practices/create')
-  }, [router])
+    router.push("/practices/create");
+  }, [router]);
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center">
           <Spinner size="large" color={colors.primary.base} />
         </YStack>
       </SafeAreaView>
-    )
+    );
   }
 
   // Banner 高度 (與 HomeBanner 同步)
-  const bannerHeight = Math.round(screenWidth / (195 / 60)) + 22
+  const bannerHeight = Math.round(screenWidth / (195 / 60)) + 22;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F7F7F7' }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F7F7" }} edges={["top"]}>
       {/* Fixed Banner */}
       <RNView style={styles.fixedBanner}>
         <HomeBanner />
@@ -180,19 +189,9 @@ export default function HomeScreen() {
       >
         <YStack>
           {/* 進行中區塊 - 淡灰背景（對應 Product 的 very-light-gray） */}
-          <YStack
-            backgroundColor="#F7F8F8"
-            paddingTop="$5"
-            gap="$5"
-            minHeight={400}
-          >
-
+          <YStack backgroundColor="#F7F8F8" paddingTop="$5" gap="$5" minHeight={400}>
             {/* 進行中標題 */}
-            <XStack
-              paddingHorizontal="$5"
-              alignItems="center"
-              justifyContent="space-between"
-            >
+            <XStack paddingHorizontal="$5" alignItems="center" justifyContent="space-between">
               <Text fontSize={18} fontWeight="500" color="$color">
                 進行中
               </Text>
@@ -208,7 +207,7 @@ export default function HomeScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
               >
-                {inProgressPractices.map(practice => (
+                {inProgressPractices.map((practice) => (
                   <PracticeCard
                     key={practice.id}
                     practice={practice}
@@ -235,11 +234,7 @@ export default function HomeScreen() {
                 <Text fontSize={16} color="$color" opacity={0.6} textAlign="center">
                   還沒有進行中的實踐
                 </Text>
-                <Text
-                  fontSize={14}
-                  color={colors.primary.base}
-                  onPress={handleAddPractice}
-                >
+                <Text fontSize={14} color={colors.primary.base} onPress={handleAddPractice}>
                   建立第一個實踐
                 </Text>
               </YStack>
@@ -252,7 +247,7 @@ export default function HomeScreen() {
                   已完成
                 </Text>
                 <YStack gap="$3">
-                  {displayedCompletedPractices.map(practice => (
+                  {displayedCompletedPractices.map((practice) => (
                     <PracticeCard
                       key={practice.id}
                       practice={practice}
@@ -268,16 +263,16 @@ export default function HomeScreen() {
         </YStack>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   fixedBanner: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     zIndex: 20,
-    pointerEvents: 'none',
+    pointerEvents: "none",
   },
-})
+});

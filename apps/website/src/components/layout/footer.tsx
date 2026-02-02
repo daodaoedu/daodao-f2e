@@ -66,6 +66,14 @@ export const Footer = () => {
             <div className="space-y-2">
               <div>
                 <CustomLink
+                  href="/resource"
+                  className="text-white/70 transition-colors hover:text-primary-base"
+                >
+                  {t("footer_find_resources")}
+                </CustomLink>
+              </div>
+              <div>
+                <CustomLink
                   href="/learning-marathons/2025S1"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >

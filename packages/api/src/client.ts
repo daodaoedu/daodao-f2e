@@ -6,6 +6,26 @@ import createClient, {
 } from "openapi-fetch";
 import type { paths } from "./types";
 
+/**
+ * Server 端 fetch：在 Next.js 環境下自動轉傳 incoming request 的 headers
+ *（Cookie、Authorization 等），讓後端 API 能識別使用者。
+ * 非 Next.js 或無 request context 時回退為一般 fetch。
+ */
+const serverFetchWithHeaders: typeof fetch = async (input, init) => {
+  let mergedHeaders = new Headers(init?.headers);
+  try {
+    const { headers: getHeaders } = await import("next/headers");
+    const headersList = getHeaders();
+    const resolved = headersList instanceof Promise ? await headersList : headersList;
+    resolved.forEach((value, key) => {
+      mergedHeaders.set(key, value);
+    });
+  } catch {
+    // 非 Next.js 或無 request context，不轉傳 headers
+  }
+  return fetch(input, { ...init, headers: mergedHeaders });
+};
+
 export const PREFIX = "dao-dao-server-api" as const;
 
 /**
@@ -129,7 +149,10 @@ export interface ApiClientConfig {
 export const client = createClient<paths>({
   baseUrl: getRequiredEnv("NEXT_PUBLIC_API_URL"),
   credentials: "include",
-  fetch: typeof window === "undefined" ? fetch : unauthorizedHandler.wrapFetch,
+  fetch:
+    typeof window === "undefined"
+      ? serverFetchWithHeaders
+      : unauthorizedHandler.wrapFetch,
 });
 
 type InitParam<Init> = Init extends undefined ? never : Init;

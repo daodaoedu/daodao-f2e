@@ -10,10 +10,11 @@
 
 ## 架構
 
-- **本地執行** `pnpm dev` → 啟動開發服務（端口 3000、3001）
+- **本地執行** `pnpm dev` → 啟動開發服務（website:3000、product:3001、legacy:5438）
 - **Docker nginx** → 反向代理到本地服務
   - **app-feat.daodao.so** → `http://localhost:3001` (product)
   - **feat.daodao.so** → `http://localhost:3000` (website)
+  - **feat.daodao.so/resource**、**feat.daodao.so/zh-TW/resource**、**feat.daodao.so/en/resource** → `http://localhost:5438` (legacy)
 
 ## 目錄結構
 
@@ -47,7 +48,7 @@ docker/development/
 在專案根目錄執行：
 
 ```bash
-# 啟動所有開發服務（website:3000, product:3001）
+# 啟動所有開發服務（website:3000, product:3001, legacy:5438）
 pnpm dev
 ```
 
@@ -115,6 +116,7 @@ pnpm docker:dev
 # 現在可以訪問：
 # - https://app-feat.daodao.so (product)
 # - https://feat.daodao.so (website)
+# - https://feat.daodao.so/resource、https://feat.daodao.so/zh-TW/resource、https://feat.daodao.so/en/resource (legacy)
 ```
 
 ## SSL 證書
@@ -160,6 +162,7 @@ docker-compose up -d
 # 檢查端口是否被佔用
 lsof -i :3000  # website
 lsof -i :3001  # product
+lsof -i :5438  # legacy（訪問 /resource 時需要）
 
 # 或直接訪問
 curl http://localhost:3000

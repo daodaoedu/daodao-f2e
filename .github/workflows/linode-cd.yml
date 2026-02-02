@@ -33,6 +33,7 @@ on:
           - all
           - website
           - product
+          - legacy
 
 # ===== 全域環境變數 =====
 env:
@@ -70,6 +71,7 @@ jobs:
           echo "${{ secrets.ENV_DEV }}" > .env
           cp .env apps/website/.env
           cp .env apps/product/.env
+          cp .env apps/legacy/.env
 
       - name: Install dependencies and build
         run: |
@@ -181,6 +183,7 @@ jobs:
           echo "${{ secrets.ENV_DEV }}" > .env
           cp .env apps/website/.env
           cp .env apps/product/.env
+          cp .env apps/legacy/.env
 
       - name: Install dependencies and build
         run: |
@@ -265,11 +268,125 @@ jobs:
           docker stop test-product || true
           docker rm test-product || true
 
+  # ===== Docker 映像構建階段 - Legacy =====
+  build-legacy:
+    runs-on: ubuntu-latest
+    # 只在 CI 成功或手動強制部署時執行
+    if: ${{ github.event.workflow_run.conclusion == 'success' || inputs.force_deploy == true }}
+    outputs:
+      image-tag: ${{ steps.meta.outputs.image-tag }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Create environment files
+        run: |
+          echo "${{ secrets.ENV_DEV }}" > .env
+          cp .env apps/website/.env
+          cp .env apps/product/.env
+          cp .env apps/legacy/.env
+
+      - name: Install dependencies and build
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+
+      - name: Set Environment Variables
+        id: meta
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "IMAGE_TAG=prod" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+            echo "image-tag=prod" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+            echo "IMAGE_TAG=dev" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+            echo "image-tag=dev" >> $GITHUB_OUTPUT
+          else
+            # Feature branch: feat/v3 → v3
+            BRANCH_NAME="${{ github.ref_name }}"
+            FEAT_NAME="${BRANCH_NAME#feat/}"
+            echo "IMAGE_TAG=feat" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+            echo "FEAT_BRANCH=${FEAT_NAME}" >> $GITHUB_ENV
+            echo "image-tag=feat" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push Legacy Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/Dockerfile
+          target: legacy
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-legacy:${{ env.IMAGE_TAG }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-legacy:${{ env.IMAGE_TAG }}-${{ github.sha }}
+          cache-from: |
+            type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-legacy:${{ env.IMAGE_TAG }}
+            type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-legacy:buildcache-${{ env.IMAGE_TAG }}
+            type=gha
+          cache-to: |
+            type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-legacy:buildcache-${{ env.IMAGE_TAG }},mode=max
+            type=gha,mode=max
+          build-args: |
+            APP_NAME=legacy
+            APP_PORT=3002
+            NODE_ENV=${{ env.NODE_ENV }}
+            BUILDKIT_INLINE_CACHE=1
+          platforms: linux/amd64
+
+      - name: Verify Legacy Docker image
+        run: |
+          echo "🧪 Verifying Legacy Docker image..."
+
+          docker run -d --name test-legacy \
+            -p 3012:3002 \
+            -e NODE_ENV=${{ env.NODE_ENV }} \
+            -e HOSTNAME=0.0.0.0 \
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-legacy:${{ env.IMAGE_TAG }}-${{ github.sha }}
+
+          sleep 15
+
+          if docker ps | grep test-legacy; then
+            echo "✅ Legacy container started successfully"
+          else
+            echo "❌ Legacy container failed to start"
+            docker logs test-legacy || true
+            exit 1
+          fi
+
+          docker stop test-legacy || true
+          docker rm test-legacy || true
+
   # ===== 部署階段 =====
   deploy:
     runs-on: ubuntu-latest
-    needs: [build-website, build-product]
-    if: ${{ always() && (needs.build-website.result == 'success' || needs.build-product.result == 'success') }}
+    needs: [build-website, build-product, build-legacy]
+    if: ${{ always() && (needs.build-website.result == 'success' || needs.build-product.result == 'success' || needs.build-legacy.result == 'success') }}
     environment: ${{ needs.build-website.outputs.image-tag == 'prod' && 'production' || 'development' }}
     timeout-minutes: 20
     steps:
@@ -317,11 +434,12 @@ jobs:
         env:
           LINODE_INSTANCE_IP: ${{ secrets.LINODE_INSTANCE_IP }}
           BRANCH_NAME: ${{ github.ref_name }}
-          IMAGE_TAG: ${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag }}
-          APP_ENV: ${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag }}
+          IMAGE_TAG: ${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag || needs.build-legacy.outputs.image-tag }}
+          APP_ENV: ${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag || needs.build-legacy.outputs.image-tag }}
           COMMIT_SHA: ${{ github.sha }}
           DEPLOY_WEBSITE: ${{ needs.build-website.result == 'success' }}
           DEPLOY_PRODUCT: ${{ needs.build-product.result == 'success' }}
+          DEPLOY_LEGACY: ${{ needs.build-legacy.result == 'success' }}
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           GIT_HUB_USERNAME: ${{ secrets.GIT_HUB_USERNAME }}
           GIT_HUB_ACCESS_TOKEN: ${{ secrets.GIT_HUB_ACCESS_TOKEN }}
@@ -464,6 +582,43 @@ jobs:
               done
             fi
 
+            # ===== 部署 Legacy =====
+            if [ "${DEPLOY_LEGACY}" = "true" ]; then
+              echo "=== Deploying Legacy ==="
+              SERVICE_NAME="\${APP_ENV}_legacy"
+
+              echo "Pulling Legacy image..."
+              docker pull \${DOCKER_HUB_USERNAME}/daodao-legacy:\${IMAGE_TAG}-\${COMMIT_SHA}
+
+              echo "Stopping old Legacy container..."
+              docker ps -a --filter "name=\${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker stop || true
+              docker ps -a --filter "name=\${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker rm || true
+
+              echo "Starting new Legacy container..."
+              DOCKER_HUB_USERNAME=\${DOCKER_HUB_USERNAME} IMAGE_TAG=\${IMAGE_TAG} COMMIT_SHA=\${COMMIT_SHA} \
+                docker compose --env-file \${ENV_FILE} -f \$COMPOSE_FILE up -d --wait --wait-timeout 90 \${SERVICE_NAME}
+
+              # 健康檢查
+              NEW_CONTAINER=\$(docker ps -q -f name=\${SERVICE_NAME} | head -1)
+              if [ -z "\$NEW_CONTAINER" ]; then
+                echo "❌ Legacy container failed to start"
+                exit 1
+              fi
+
+              for i in {1..10}; do
+                if docker exec \$NEW_CONTAINER wget --quiet --tries=1 --spider http://127.0.0.1:3002 2>/dev/null; then
+                  echo "✅ Legacy health check passed"
+                  break
+                fi
+                if [ \$i -eq 10 ]; then
+                  echo "❌ Legacy health check failed"
+                  docker logs \$NEW_CONTAINER --tail=50
+                  exit 1
+                fi
+                sleep 3
+              done
+            fi
+
             # ===== 清理舊映像 =====
             echo "Cleaning up old images..."
             docker image prune -f --filter "until=24h"
@@ -474,7 +629,7 @@ jobs:
   # ===== 部署後驗證 =====
   verify:
     runs-on: ubuntu-latest
-    needs: [deploy, build-website, build-product]
+    needs: [deploy, build-website, build-product, build-legacy]
     timeout-minutes: 10
     steps:
       - name: Set up SSH
@@ -488,13 +643,14 @@ jobs:
         run: |
           echo "APP_DIR=/root/daodao-f2e" >> $GITHUB_ENV
           echo "COMPOSE_FILE=docker-compose.yaml" >> $GITHUB_ENV
-          echo "APP_ENV=${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag }}" >> $GITHUB_ENV
+          echo "APP_ENV=${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag || needs.build-legacy.outputs.image-tag }}" >> $GITHUB_ENV
 
       - name: Deployment Verification
         env:
           LINODE_INSTANCE_IP: ${{ secrets.LINODE_INSTANCE_IP }}
           DEPLOY_WEBSITE: ${{ needs.build-website.result == 'success' }}
           DEPLOY_PRODUCT: ${{ needs.build-product.result == 'success' }}
+          DEPLOY_LEGACY: ${{ needs.build-legacy.result == 'success' }}
         run: |
           ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=3 root@$LINODE_INSTANCE_IP "
             set -e
@@ -517,13 +673,18 @@ jobs:
               docker logs ${{ env.APP_ENV }}_product --tail=10
             fi
 
+            if [ \"${{ env.DEPLOY_LEGACY }}\" = \"true\" ]; then
+              echo '=== Verifying Legacy ==='
+              docker logs ${{ env.APP_ENV }}_legacy --tail=10
+            fi
+
             echo '=== Deployment Verification Complete ==='
           "
 
   # ===== Discord 通知 =====
   notify:
     runs-on: ubuntu-latest
-    needs: [build-website, build-product, deploy, verify]
+    needs: [build-website, build-product, build-legacy, deploy, verify]
     if: always()
     steps:
       - name: Send Discord Notification
@@ -533,16 +694,17 @@ jobs:
           BRANCH="${{ github.ref_name }}"
           COMMIT_SHA="${{ github.sha }}"
           SHORT_SHA="${COMMIT_SHA:0:7}"
-          IMAGE_TAG="${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag }}"
+          IMAGE_TAG="${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag || needs.build-legacy.outputs.image-tag }}"
           CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
           BUILD_WEBSITE_STATUS="${{ needs.build-website.result }}"
           BUILD_PRODUCT_STATUS="${{ needs.build-product.result }}"
+          BUILD_LEGACY_STATUS="${{ needs.build-legacy.result }}"
           DEPLOY_STATUS="${{ needs.deploy.result }}"
           VERIFY_STATUS="${{ needs.verify.result || 'skipped' }}"
 
           # 判斷整體狀態
-          if [ "$BUILD_WEBSITE_STATUS" == "failure" ] || [ "$BUILD_PRODUCT_STATUS" == "failure" ]; then
+          if [ "$BUILD_WEBSITE_STATUS" == "failure" ] || [ "$BUILD_PRODUCT_STATUS" == "failure" ] || [ "$BUILD_LEGACY_STATUS" == "failure" ]; then
             COLOR=16711680
             STATUS="Build Failed"
             BADGE_URL="https://img.shields.io/badge/Build-Failed-red.png?style=for-the-badge&logo=docker&logoColor=white"
@@ -578,6 +740,13 @@ jobs:
               DEPLOYED_APPS="$DEPLOYED_APPS, Product"
             else
               DEPLOYED_APPS="Product"
+            fi
+          fi
+          if [ "$BUILD_LEGACY_STATUS" == "success" ]; then
+            if [ -n "$DEPLOYED_APPS" ]; then
+              DEPLOYED_APPS="$DEPLOYED_APPS, Legacy"
+            else
+              DEPLOYED_APPS="Legacy"
             fi
           fi
 

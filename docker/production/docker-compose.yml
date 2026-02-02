@@ -36,3 +36,22 @@ services:
     # 如果需要環境變數文件，取消下面的註解
     # env_file:
     #   - ../../.env.production
+
+  legacy:
+    build:
+      context: ../..
+      dockerfile: docker/production/Dockerfile
+      target: legacy
+      args:
+        APP_NAME: legacy
+        APP_PORT: 3002
+    container_name: daodao-legacy
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+    restart: unless-stopped
+    # 如果需要環境變數文件，取消下面的註解
+    # env_file:
+    #   - ../../.env.production

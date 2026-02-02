@@ -29,7 +29,7 @@ import {
 } from "@/components/practice";
 import {
   DurationDays,
-  ExecutionTiming,
+  type ExecutionTiming,
   Frequency,
   PracticeTimePeriodToExecutionTimingMap,
 } from "@/constants/practice-form";

@@ -1,11 +1,11 @@
-import { YStack, Text, Input, TextArea } from 'tamagui'
-import { colors } from '@/generated/design-tokens'
+import { Input, Text, TextArea, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
 
 interface FormFieldProps {
-  label: string
-  error?: string
-  required?: boolean
-  children?: React.ReactNode
+  label: string;
+  error?: string;
+  required?: boolean;
+  children?: React.ReactNode;
 }
 
 export function FormField({ label, error, required, children }: FormFieldProps) {
@@ -28,21 +28,21 @@ export function FormField({ label, error, required, children }: FormFieldProps) 
         </Text>
       )}
     </YStack>
-  )
+  );
 }
 
-import { XStack } from 'tamagui'
+import { XStack } from "tamagui";
 
 interface FormInputProps {
-  label: string
-  value: string
-  onChangeText: (text: string) => void
-  placeholder?: string
-  error?: string
-  required?: boolean
-  multiline?: boolean
-  numberOfLines?: number
-  maxLength?: number
+  label: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  error?: string;
+  required?: boolean;
+  multiline?: boolean;
+  numberOfLines?: number;
+  maxLength?: number;
 }
 
 export function FormInput({
@@ -56,7 +56,7 @@ export function FormInput({
   numberOfLines = 3,
   maxLength,
 }: FormInputProps) {
-  const InputComponent = multiline ? TextArea : Input
+  const InputComponent = multiline ? TextArea : Input;
 
   return (
     <FormField label={label} error={error} required={required}>
@@ -67,7 +67,7 @@ export function FormInput({
         placeholder={placeholder}
         borderColor={error ? colors.semantic.error : colors.basic[200]}
         focusStyle={{ borderColor: error ? colors.semantic.error : colors.primary.base }}
-        {...(multiline && { numberOfLines, textAlignVertical: 'top' as const })}
+        {...(multiline && { numberOfLines, textAlignVertical: "top" as const })}
         maxLength={maxLength}
       />
       {maxLength && (
@@ -76,5 +76,5 @@ export function FormInput({
         </Text>
       )}
     </FormField>
-  )
+  );
 }

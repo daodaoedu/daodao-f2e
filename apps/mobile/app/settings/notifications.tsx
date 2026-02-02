@@ -1,70 +1,68 @@
-import { useState, useEffect } from 'react'
-import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Card, Button, Switch } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, Bell, Clock, Trophy, MessageSquare } from '@tamagui/lucide-icons'
-import { notificationService } from '@/services/notifications'
-import { colors } from '@/generated/design-tokens'
+import { Bell, ChevronLeft, Clock, MessageSquare, Trophy } from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import { notificationService } from "@/services/notifications";
 
 interface NotificationSetting {
-  key: string
-  icon: typeof Bell
-  title: string
-  description: string
-  enabled: boolean
+  key: string;
+  icon: typeof Bell;
+  title: string;
+  description: string;
+  enabled: boolean;
 }
 
 export default function NotificationSettingsScreen() {
-  const router = useRouter()
+  const router = useRouter();
 
   const [settings, setSettings] = useState<NotificationSetting[]>([
     {
-      key: 'dailyReminder',
+      key: "dailyReminder",
       icon: Clock,
-      title: '每日提醒',
-      description: '在設定的時間提醒你打卡',
+      title: "每日提醒",
+      description: "在設定的時間提醒你打卡",
       enabled: true,
     },
     {
-      key: 'achievements',
+      key: "achievements",
       icon: Trophy,
-      title: '成就通知',
-      description: '達成里程碑時收到通知',
+      title: "成就通知",
+      description: "達成里程碑時收到通知",
       enabled: true,
     },
     {
-      key: 'social',
+      key: "social",
       icon: MessageSquare,
-      title: '社群通知',
-      description: '有人互動時收到通知',
+      title: "社群通知",
+      description: "有人互動時收到通知",
       enabled: false,
     },
-  ])
+  ]);
 
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null)
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
   const checkPermission = async () => {
-    const granted = await notificationService.requestPermissions()
-    setHasPermission(granted)
-  }
+    const granted = await notificationService.requestPermissions();
+    setHasPermission(granted);
+  };
 
   useEffect(() => {
-    checkPermission()
-  }, [])
+    checkPermission();
+  }, []);
 
   const toggleSetting = (key: string) => {
-    setSettings(prev =>
-      prev.map(s => (s.key === key ? { ...s, enabled: !s.enabled } : s))
-    )
-  }
+    setSettings((prev) => prev.map((s) => (s.key === key ? { ...s, enabled: !s.enabled } : s)));
+  };
 
   const requestPermission = async () => {
-    const granted = await notificationService.requestPermissions()
-    setHasPermission(granted)
-  }
+    const granted = await notificationService.requestPermissions();
+    setHasPermission(granted);
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
@@ -125,7 +123,7 @@ export default function NotificationSettingsScreen() {
               overflow="hidden"
             >
               {settings.map((setting, index) => {
-                const Icon = setting.icon
+                const Icon = setting.icon;
                 return (
                   <XStack
                     key={setting.key}
@@ -164,17 +162,12 @@ export default function NotificationSettingsScreen() {
                       <Switch.Thumb />
                     </Switch>
                   </XStack>
-                )
+                );
               })}
             </Card>
 
             {/* Info */}
-            <YStack
-              padding="$4"
-              backgroundColor={colors.basic[100]}
-              borderRadius="$md"
-              gap="$2"
-            >
+            <YStack padding="$4" backgroundColor={colors.basic[100]} borderRadius="$md" gap="$2">
               <Text fontSize={13} color="$color" opacity={0.6}>
                 提示：你可以在系統設定中完全關閉此 App 的通知。
               </Text>
@@ -183,5 +176,5 @@ export default function NotificationSettingsScreen() {
         </ScrollView>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

@@ -107,7 +107,6 @@ const convertTemplateToFormValues = (template: PracticeTemplateType): ManualPrac
   };
 };
 
-
 export default function TemplateDetailPage() {
   const router = useRouter();
   const params = useParams();

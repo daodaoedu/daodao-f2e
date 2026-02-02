@@ -4,9 +4,9 @@
  */
 export const typography = {
   fonts: {
-    heading: 'Inter',
-    body: 'Inter',
-    mono: 'JetBrains Mono',
+    heading: "Inter",
+    body: "Inter",
+    mono: "JetBrains Mono",
   },
 
   fontSizes: {
@@ -15,17 +15,17 @@ export const typography = {
     base: 16,
     lg: 18,
     xl: 20,
-    '2xl': 24,
-    '3xl': 30,
-    '4xl': 36,
-    '5xl': 48,
+    "2xl": 24,
+    "3xl": 30,
+    "4xl": 36,
+    "5xl": 48,
   },
 
   fontWeights: {
-    normal: '400',
-    medium: '500',
-    semibold: '600',
-    bold: '700',
+    normal: "400",
+    medium: "500",
+    semibold: "600",
+    bold: "700",
   },
 
   lineHeights: {
@@ -36,6 +36,6 @@ export const typography = {
     relaxed: 1.625,
     loose: 2,
   },
-} as const
+} as const;
 
-export type Typography = typeof typography
+export type Typography = typeof typography;

@@ -2,13 +2,13 @@
 
 import {
   type CreatePracticeRequestType,
-  type UpdatePracticeRequestType,
   createPractice,
+  type UpdatePracticeRequestType,
   updatePractice,
 } from "@daodao/api";
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
-import { StorageEnum, getStorage, useFormDraft } from "@daodao/shared";
+import { getStorage, StorageEnum, useFormDraft } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { Progress } from "@daodao/ui/components/progress";
@@ -24,8 +24,8 @@ import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";
 import { Step4 } from "@/components/practice/create/manual/steps/step-4";
 import { Step5 } from "@/components/practice/create/manual/steps/step-5";
-import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
 import { convertFormValuesToApiRequest } from "@/components/practice/create/manual/utils";
+import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
 
 const TOTAL_STEPS = 5;
 
@@ -74,11 +74,15 @@ export default function CreateManualPracticePage() {
   // 處理恢復暫存資料（包含恢復步驟和 practiceId）
   const handleRestoreDraft = useCallback(() => {
     const savedDraft = draftStorage.get();
-    
+
     restoreDraft();
 
     // 恢復當前步驟
-    if (savedDraft?.currentStep && savedDraft.currentStep >= 1 && savedDraft.currentStep <= TOTAL_STEPS) {
+    if (
+      savedDraft?.currentStep &&
+      savedDraft.currentStep >= 1 &&
+      savedDraft.currentStep <= TOTAL_STEPS
+    ) {
       setCurrentStep(savedDraft.currentStep);
     }
 
@@ -109,7 +113,10 @@ export default function CreateManualPracticePage() {
 
         if (practiceId) {
           // 如果有 practiceId，使用 PUT 更新草稿
-          const response = await updatePractice(practiceId, apiRequest as UpdatePracticeRequestType);
+          const response = await updatePractice(
+            practiceId,
+            apiRequest as UpdatePracticeRequestType
+          );
 
           if (response.error) {
             const errorMessage =

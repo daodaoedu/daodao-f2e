@@ -103,3 +103,48 @@ EXPOSE ${APP_PORT}
 # 設置工作目錄並啟動應用
 WORKDIR /app/apps/${APP_NAME}
 CMD ["node", "server.js"]
+
+# 生產階段 - Legacy (Standalone + Node.js)
+FROM node:20.19.4-alpine AS legacy
+
+ARG APP_NAME=legacy
+ARG APP_PORT=3002
+
+WORKDIR /app
+
+# 設置環境變數
+ENV NODE_ENV=production
+ENV PORT=${APP_PORT}
+
+# 創建非 root 用戶
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# 安裝 sharp 所需的系統依賴（根據 Next.js 官方建議）
+# 安裝 wget 用於健康檢查
+RUN apk add --no-cache libc6-compat wget
+
+# 從本地複製預先建置的 standalone 輸出（不設置所有權，保持 root）
+COPY apps/${APP_NAME}/.next/standalone ./
+COPY apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/.next/static
+COPY apps/${APP_NAME}/public ./apps/${APP_NAME}/public
+
+# 複製 packages 的靜態資源（不設置所有權，保持 root）
+COPY packages/assets/generated ./packages/assets/generated
+COPY packages/assets/images ./packages/assets/images
+
+# 設置複製的資源為只讀權限（檔案 644，目錄 755）
+# 保持 root 所有權，確保非 root 用戶沒有寫入權限
+# 注意：standalone 內容已複製到根目錄，不需要單獨設置權限
+RUN find ./apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/public ./packages/assets/generated ./packages/assets/images -type f -exec chmod 644 {} \; && \
+    find ./apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/public ./packages/assets/generated ./packages/assets/images -type d -exec chmod 755 {} \;
+
+# 切換到非 root 用戶
+USER nextjs
+
+# 暴露端口
+EXPOSE ${APP_PORT}
+
+# 設置工作目錄並啟動應用
+WORKDIR /app/apps/${APP_NAME}
+CMD ["node", "server.js"]

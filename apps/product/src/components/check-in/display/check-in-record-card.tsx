@@ -159,9 +159,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
             </div>
           </>
         ) : (
-          <div className="text-xs text-text-dark font-medium text-center py-4">
-            尚無打卡紀錄
-          </div>
+          <div className="text-xs text-text-dark font-medium text-center py-4">尚無打卡紀錄</div>
         )}
       </div>
     </div>

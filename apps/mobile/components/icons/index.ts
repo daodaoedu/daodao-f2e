@@ -1,2 +1,2 @@
-export * from './HomeIcon'
-export * from './UserIcon'
+export * from "./HomeIcon";
+export * from "./UserIcon";

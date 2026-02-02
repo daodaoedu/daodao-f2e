@@ -1,51 +1,47 @@
-import { useState } from 'react'
-import { Alert } from 'react-native'
-import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Card, Button, Avatar, Input } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, Camera, Trash2 } from '@tamagui/lucide-icons'
-import { useAuth } from '@/providers/AuthProvider'
-import { colors } from '@/generated/design-tokens'
+import { Camera, ChevronLeft, Trash2 } from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Avatar, Button, Card, Input, ScrollView, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function AccountSettingsScreen() {
-  const router = useRouter()
-  const { user, signOut } = useAuth()
+  const router = useRouter();
+  const { user, signOut } = useAuth();
 
-  const [name, setName] = useState(user?.name || '')
-  const [isSaving, setIsSaving] = useState(false)
+  const [name, setName] = useState(user?.name || "");
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
-    setIsSaving(true)
+    setIsSaving(true);
     try {
       // TODO: Implement API call
-      Alert.alert('成功', '個人資料已更新')
+      Alert.alert("成功", "個人資料已更新");
     } catch (_error) {
-      Alert.alert('錯誤', '更新失敗，請稍後再試')
+      Alert.alert("錯誤", "更新失敗，請稍後再試");
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      '刪除帳號',
-      '確定要刪除帳號嗎？此操作無法復原，所有資料將被永久刪除。',
-      [
-        { text: '取消', style: 'cancel' },
-        {
-          text: '刪除',
-          style: 'destructive',
-          onPress: async () => {
-            // TODO: Implement account deletion
-            await signOut()
-          },
+    Alert.alert("刪除帳號", "確定要刪除帳號嗎？此操作無法復原，所有資料將被永久刪除。", [
+      { text: "取消", style: "cancel" },
+      {
+        text: "刪除",
+        style: "destructive",
+        onPress: async () => {
+          // TODO: Implement account deletion
+          await signOut();
         },
-      ]
-    )
-  }
+      },
+    ]);
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
@@ -78,7 +74,7 @@ export default function AccountSettingsScreen() {
                       justifyContent="center"
                     >
                       <Text fontSize={32} fontWeight="600" color={colors.primary.darker}>
-                        {user?.name?.charAt(0) || '?'}
+                        {user?.name?.charAt(0) || "?"}
                       </Text>
                     </Avatar.Fallback>
                   )}
@@ -112,24 +108,14 @@ export default function AccountSettingsScreen() {
                   <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
                     姓名
                   </Text>
-                  <Input
-                    size="$4"
-                    value={name}
-                    onChangeText={setName}
-                    placeholder="輸入你的姓名"
-                  />
+                  <Input size="$4" value={name} onChangeText={setName} placeholder="輸入你的姓名" />
                 </YStack>
 
                 <YStack gap="$2">
                   <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
                     電子郵件
                   </Text>
-                  <Input
-                    size="$4"
-                    value={user?.email || ''}
-                    disabled
-                    opacity={0.6}
-                  />
+                  <Input size="$4" value={user?.email || ""} disabled opacity={0.6} />
                   <Text fontSize={11} color="$color" opacity={0.5}>
                     電子郵件無法修改
                   </Text>
@@ -146,7 +132,7 @@ export default function AccountSettingsScreen() {
               disabled={isSaving || name === user?.name}
             >
               <Text color={colors.basic.white} fontWeight="600">
-                {isSaving ? '儲存中...' : '儲存變更'}
+                {isSaving ? "儲存中..." : "儲存變更"}
               </Text>
             </Button>
 
@@ -175,5 +161,5 @@ export default function AccountSettingsScreen() {
         </ScrollView>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

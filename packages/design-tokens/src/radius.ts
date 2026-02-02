@@ -9,9 +9,9 @@ export const radius = {
   md: 12,
   lg: 16,
   xl: 20,
-  '2xl': 24,
-  '3xl': 32,
+  "2xl": 24,
+  "3xl": 32,
   full: 9999,
-} as const
+} as const;
 
-export type Radius = typeof radius
+export type Radius = typeof radius;

@@ -2,7 +2,7 @@
 
 import { type UpdatePracticeRequestType, updatePractice, usePracticeById } from "@daodao/api";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
-import { StorageEnum, getStorage } from "@daodao/shared";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";

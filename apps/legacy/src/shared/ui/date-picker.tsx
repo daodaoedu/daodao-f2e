@@ -1,0 +1,182 @@
+"use client";
+
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import * as React from "react";
+import type { DateRange, DayPickerRangeProps, DayPickerSingleProps } from "react-day-picker";
+import type { FieldPath, FieldValues } from "react-hook-form";
+
+import { cn } from "@/shared/lib/cn";
+import useControlledState from "@/shared/lib/use-controlled-state";
+import { Button } from "@/shared/ui/button";
+import { Calendar } from "@/shared/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
+import { type BaseFormFieldProps, FormFieldWrapper } from "./form";
+
+const defaultFormatStr = "yyyy/MM/dd";
+
+interface DatePickerProps extends Omit<DayPickerSingleProps, "mode"> {
+  className?: string;
+  disabled?: boolean;
+  formatStr?: string;
+  withIcon?: boolean;
+  placeholder?: string;
+  defaultValue?: Date;
+  value?: Date;
+  onChange?: (value?: Date) => void;
+}
+export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
+  (
+    {
+      className,
+      disabled,
+      formatStr = defaultFormatStr,
+      withIcon,
+      placeholder = "選擇日期",
+      defaultValue,
+      value,
+      onChange,
+      ...props
+    }: DatePickerProps,
+    ref
+  ) => {
+    const [internalDate, setInternalDate] = useControlledState(defaultValue, value, onChange);
+
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            ref={ref}
+            variant="ghost"
+            size="lg"
+            disabled={disabled}
+            className={cn(
+              "justify-start rounded border border-basic-200 px-3",
+              !internalDate && "text-muted-foreground",
+              "disabled:pointer-events-auto disabled:cursor-not-allowed disabled:text-inherit",
+              className
+            )}
+          >
+            {withIcon && <CalendarIcon />}
+            {internalDate ? format(internalDate, formatStr) : <span>{placeholder}</span>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={internalDate}
+            onSelect={setInternalDate}
+            initialFocus
+            {...props}
+          />
+        </PopoverContent>
+      </Popover>
+    );
+  }
+);
+
+interface DateRangePickerProps extends Omit<DayPickerRangeProps, "mode"> {
+  className?: string;
+  disabled?: boolean;
+  formatStr?: string;
+  separator?: React.ReactNode;
+  placeholder?: string;
+  withIcon?: boolean;
+  defaultValue?: DateRange;
+  value?: DateRange;
+  onChange?: (value?: DateRange) => void;
+}
+
+export const DateRangePicker = React.forwardRef<HTMLButtonElement, DateRangePickerProps>(
+  (
+    {
+      className,
+      disabled,
+      formatStr = defaultFormatStr,
+      separator = "-",
+      placeholder = "選擇日期",
+      withIcon,
+      defaultValue,
+      value,
+      onChange,
+      ...props
+    }: DateRangePickerProps,
+    ref
+  ) => {
+    const [internalDate, setInternalDate] = useControlledState(defaultValue, value, onChange);
+
+    return (
+      <div className="grid gap-2">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              ref={ref}
+              id="date"
+              variant="ghost"
+              size="lg"
+              disabled={disabled}
+              className={cn(
+                "min-w-48 justify-start rounded border border-basic-200",
+                !internalDate && "text-muted-foreground",
+                withIcon && "min-w-56",
+                className
+              )}
+            >
+              {withIcon && <CalendarIcon />}
+              {internalDate?.from ? (
+                internalDate.to ? (
+                  <>
+                    {format(internalDate.from, formatStr)} {separator}{" "}
+                    {format(internalDate.to, formatStr)}
+                  </>
+                ) : (
+                  format(internalDate.from, formatStr)
+                )
+              ) : (
+                <span>{placeholder}</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={internalDate?.from}
+              selected={internalDate}
+              onSelect={setInternalDate}
+              numberOfMonths={2}
+              {...props}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
+  }
+);
+
+interface FormDatePickerProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> extends Omit<DatePickerProps, "required">,
+    Omit<BaseFormFieldProps<TFieldValues, TName>, "defaultValue"> {}
+
+export const FormDatePicker = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  control,
+  name,
+  label,
+  required,
+  ...props
+}: FormDatePickerProps<TFieldValues, TName>) => (
+  <FormFieldWrapper
+    control={control}
+    name={name}
+    label={label}
+    required={required}
+    className="flex flex-col"
+  >
+    {(field) => <DatePicker {...field} {...props} />}
+  </FormFieldWrapper>
+);

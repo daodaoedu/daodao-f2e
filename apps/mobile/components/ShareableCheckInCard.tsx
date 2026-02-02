@@ -1,25 +1,25 @@
-import { forwardRef } from 'react'
-import { View } from 'react-native'
-import { YStack, XStack, Text } from 'tamagui'
-import { Flame, Check } from '@tamagui/lucide-icons'
-import { colors } from '@/generated/design-tokens'
-import type { Practice } from '@/types/practice'
+import { Check, Flame } from "@tamagui/lucide-icons";
+import { forwardRef } from "react";
+import { View } from "react-native";
+import { Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import type { Practice } from "@/types/practice";
 
 interface ShareableCheckInCardProps {
-  practice: Practice
-  streakCount: number
-  date?: Date
+  practice: Practice;
+  streakCount: number;
+  date?: Date;
 }
 
 export const ShareableCheckInCard = forwardRef<View, ShareableCheckInCardProps>(
   function ShareableCheckInCard({ practice, streakCount, date = new Date() }, ref) {
-    const formattedDate = date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+    const formattedDate = date.toLocaleDateString("zh-TW", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
-    const cardColor = practice.color || colors.primary.base
+    const cardColor = practice.color || colors.primary.base;
 
     return (
       <View ref={ref} collapsable={false}>
@@ -64,12 +64,7 @@ export const ShareableCheckInCard = forwardRef<View, ShareableCheckInCardProps>(
                 {practice.title}
               </Text>
               {practice.description && (
-                <Text
-                  fontSize={13}
-                  color={colors.basic[500]}
-                  textAlign="center"
-                  numberOfLines={2}
-                >
+                <Text fontSize={13} color={colors.basic[500]} textAlign="center" numberOfLines={2}>
                   {practice.description}
                 </Text>
               )}
@@ -124,6 +119,6 @@ export const ShareableCheckInCard = forwardRef<View, ShareableCheckInCardProps>(
           </XStack>
         </YStack>
       </View>
-    )
+    );
   }
-)
+);
