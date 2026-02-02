@@ -104,7 +104,11 @@ const convertTemplateToFormValues = (template: PracticeTemplateType): ManualPrac
 
     // Step 4
     tags: template.suggestedTags || [],
-    resources: [], // API 目前沒有 resources，先設為空陣列
+    resources: (template.resources || []).map((resource) => ({
+      id: resource.id,
+      name: resource.name,
+      url: resource.url,
+    }))
   };
 };
 
