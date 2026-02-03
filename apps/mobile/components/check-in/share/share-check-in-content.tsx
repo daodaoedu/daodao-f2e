@@ -3,7 +3,7 @@ import { Share, Alert, Linking } from "react-native";
 import { YStack, XStack, Text, Button, Image, View } from "tamagui";
 import { Share2, Download } from "@tamagui/lucide-icons";
 import * as MediaLibrary from "expo-media-library";
-import * as FileSystem from "expo-file-system/build/legacy";
+import { File, Directory, Paths } from "expo-file-system";
 import { colors } from "@/generated/design-tokens";
 import type { ICheckInFormData } from "../types";
 
@@ -70,12 +70,11 @@ export const ShareCheckInContent = ({
 
       // 如果是遠端 URL，先下載到本地
       if (!imageUrl.startsWith("file://") && !imageUrl.startsWith("content://")) {
-        const filename = `check-in-${Date.now()}.jpg`;
-        const downloadResult = await FileSystem.downloadAsync(
-          imageUrl,
-          FileSystem.documentDirectory + filename
-        );
-        localUri = downloadResult.uri;
+        const cacheDir = new Directory(Paths.cache);
+        const downloadedFile = await File.downloadFileAsync(imageUrl, cacheDir, {
+          idempotent: true,
+        });
+        localUri = downloadedFile.uri;
       }
 
       // 儲存到相簿
