@@ -20,7 +20,7 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
     if (value.length >= MAX_FILES) return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsMultipleSelection: true,
       selectionLimit: MAX_FILES - value.length,
       quality: 0.8,
@@ -45,7 +45,7 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
         <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
           上傳照片或影片
         </Text>
-        <Text fontSize={14} color={colors.basic[400]}>
+        <Text fontSize={14} color={colors.basic["400"]}>
           已上傳 {value.length}/{MAX_FILES} 張
         </Text>
       </XStack>
@@ -59,7 +59,7 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
               height={80}
               borderRadius="$sm"
               overflow="hidden"
-              backgroundColor={colors.basic[200]}
+              backgroundColor={colors.basic["200"]}
             >
               <Image
                 source={{ uri }}
@@ -82,8 +82,8 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
         {/* 上傳按鈕 */}
         {value.length < MAX_FILES && (
           <Pressable style={styles.uploadButton} onPress={handlePickImage}>
-            <Camera size={24} color={colors.basic[400]} />
-            <Text fontSize={12} color={colors.basic[400]}>
+            <Camera size={24} color={colors.basic["400"]} />
+            <Text fontSize={12} color={colors.basic["400"]}>
               點擊上傳
             </Text>
           </Pressable>
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: "#FF4444",
+    backgroundColor: colors.semantic.error,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#CCCCCC",
+    borderColor: colors.basic["300"],
     borderStyle: "dashed",
     alignItems: "center",
     justifyContent: "center",

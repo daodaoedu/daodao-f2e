@@ -1,4 +1,3 @@
-import { useState, useCallback } from "react";
 import { YStack, Button, XStack, Text } from "tamagui";
 import { Share2 } from "@tamagui/lucide-icons";
 import { colors } from "@/generated/design-tokens";
@@ -8,24 +7,19 @@ import { CheckInCard } from "./check-in-card";
 interface ICheckInDetailProps {
   checkInData: ICheckInDisplayData;
   onShare?: () => void;
+  onImagePress?: (index: number) => void;
 }
 
 /**
  * 打卡詳情組件 (Mobile)
  * 顯示完整的打卡內容和分享按鈕
  */
-export const CheckInDetail = ({ checkInData, onShare }: ICheckInDetailProps) => {
+export const CheckInDetail = ({
+  checkInData,
+  onShare,
+  onImagePress,
+}: ICheckInDetailProps) => {
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
-
-  const [lightboxIndex, setLightboxIndex] = useState(0);
-  const [_lightboxOpen, setLightboxOpen] = useState(false);
-
-  // 處理圖片點擊
-  const handleImagePress = useCallback((index: number) => {
-    setLightboxIndex(index);
-    setLightboxOpen(true);
-    // Note: Implement image lightbox modal for mobile if needed
-  }, []);
 
   return (
     <YStack width={350} marginHorizontal="auto">
@@ -36,7 +30,7 @@ export const CheckInDetail = ({ checkInData, onShare }: ICheckInDetailProps) => 
         content={content}
         tags={tags}
         images={images}
-        onImagePress={handleImagePress}
+        onImagePress={onImagePress}
       />
 
       {/* 分享按鈕 */}
@@ -61,5 +55,3 @@ export const CheckInDetail = ({ checkInData, onShare }: ICheckInDetailProps) => 
     </YStack>
   );
 };
-
-// Type re-export removed to avoid conflict with CheckInSheet

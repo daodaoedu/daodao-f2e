@@ -84,7 +84,7 @@ export const TagSelector = ({ value, onChange, onTagSelected }: ITagSelectorProp
             >
               <Text
                 fontSize={14}
-                color={isSelected ? colors.basic.white : colors.basic[600]}
+                color={isSelected ? colors.basic.white : colors.basic["600"]}
               >
                 {tag}
               </Text>
@@ -103,7 +103,7 @@ export const TagSelector = ({ value, onChange, onTagSelected }: ITagSelectorProp
           value={customTagInput}
           onChangeText={setCustomTagInput}
           onSubmitEditing={handleAddCustomTag}
-          borderColor={colors.basic[200]}
+          borderColor={colors.basic["200"]}
           focusStyle={{ borderColor: colors.primary.base }}
         />
         <Button
@@ -134,12 +134,12 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#16B9B3",
-    backgroundColor: "white",
+    borderColor: colors.primary.base,
+    backgroundColor: colors.basic.white,
     gap: 4,
   },
   tagSelected: {
-    backgroundColor: "#666666",
-    borderColor: "#666666",
+    backgroundColor: colors.basic["500"],
+    borderColor: colors.basic["500"],
   },
 });

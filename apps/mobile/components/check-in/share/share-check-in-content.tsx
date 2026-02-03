@@ -3,8 +3,11 @@ import { Share, Alert, Linking } from "react-native";
 import { YStack, XStack, Text, Button, Image, View } from "tamagui";
 import { Share2, Download } from "@tamagui/lucide-icons";
 import * as MediaLibrary from "expo-media-library";
+import * as FileSystem from "expo-file-system/build/legacy";
 import { colors } from "@/generated/design-tokens";
 import type { ICheckInFormData } from "../types";
+
+const SHARE_HASHTAG = "#島島阿學";
 
 interface IShareCheckInContentProps {
   taskTitle: string;
@@ -27,7 +30,7 @@ export const ShareCheckInContent = ({
   const imageUrl = images?.[0];
 
   // 準備分享內容
-  const shareText = `${taskTitle}\n${description || ""}\n\n#島島阿學`;
+  const shareText = `${taskTitle}\n${description || ""}\n\n${SHARE_HASHTAG}`;
 
   // 處理分享
   const handleShare = useCallback(async () => {
@@ -63,15 +66,22 @@ export const ShareCheckInContent = ({
         return;
       }
 
-      // 如果是本地 URI，直接儲存
-      if (imageUrl.startsWith("file://") || imageUrl.startsWith("content://")) {
-        await MediaLibrary.saveToLibraryAsync(imageUrl);
-        Alert.alert("儲存成功", "圖片已儲存到相簿");
-        onDownloadSuccess?.();
-      } else {
-        // 對於遠端 URL，提示用戶
-        Alert.alert("提示", "請長按圖片儲存到相簿");
+      let localUri = imageUrl;
+
+      // 如果是遠端 URL，先下載到本地
+      if (!imageUrl.startsWith("file://") && !imageUrl.startsWith("content://")) {
+        const filename = `check-in-${Date.now()}.jpg`;
+        const downloadResult = await FileSystem.downloadAsync(
+          imageUrl,
+          FileSystem.documentDirectory + filename
+        );
+        localUri = downloadResult.uri;
       }
+
+      // 儲存到相簿
+      await MediaLibrary.saveToLibraryAsync(localUri);
+      Alert.alert("儲存成功", "圖片已儲存到相簿");
+      onDownloadSuccess?.();
     } catch (error) {
       Alert.alert("儲存失敗", "無法儲存圖片到相簿");
     }

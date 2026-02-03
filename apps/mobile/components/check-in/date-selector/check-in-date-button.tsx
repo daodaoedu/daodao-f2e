@@ -35,9 +35,7 @@ export const CheckInDateButton = ({
   }, [itemMood]);
 
   const handlePress = () => {
-    if (hasCheckIn) {
-      onSelect(item.id);
-    }
+    onSelect(item.id);
   };
 
   return (
@@ -93,7 +91,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   buttonActive: {
-    backgroundColor: "#FF8C42", // orange
+    backgroundColor: colors.logo.orange,
   },
   buttonDisabled: {
     opacity: 0.3,

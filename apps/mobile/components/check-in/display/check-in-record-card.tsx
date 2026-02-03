@@ -3,7 +3,12 @@ import { Pressable, LayoutAnimation, Platform, UIManager } from "react-native";
 import { YStack, XStack, Text, View, Spinner } from "tamagui";
 import { ChevronUp } from "@tamagui/lucide-icons";
 import { colors } from "@/generated/design-tokens";
-import { MOOD_OPTIONS, type MoodType, mapApiMoodToMoodType } from "@/constants/mood";
+import {
+  MOOD_OPTIONS,
+  type MoodType,
+  type ApiMoodType,
+  mapApiMoodToMoodType,
+} from "@/constants/mood";
 import type { IMoodStat } from "../types";
 
 // Enable LayoutAnimation for Android
@@ -11,8 +16,10 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+const MAX_BAR_HEIGHT = 60;
+
 interface CheckInRecord {
-  mood?: string;
+  mood?: ApiMoodType;
 }
 
 interface ICheckInRecordCardProps {
@@ -47,7 +54,7 @@ export const CheckInRecordCard = ({
 
     // 統計每個心情的出現次數
     checkInsData.data.forEach((checkIn) => {
-      const moodType = mapApiMoodToMoodType(checkIn.mood as Parameters<typeof mapApiMoodToMoodType>[0]);
+      const moodType = mapApiMoodToMoodType(checkIn.mood);
       if (moodType) {
         const currentCount = moodCountMap.get(moodType) ?? 0;
         moodCountMap.set(moodType, currentCount + 1);
@@ -130,15 +137,16 @@ export const CheckInRecordCard = ({
             {MOOD_OPTIONS.map((moodOption, index) => {
               const stat = moodStats[index];
               const count = stat?.mood === moodOption.id ? stat.count : 0;
-              const barHeight = totalMoodCount > 0 ? (count / totalMoodCount) * 60 : 0;
+              const barHeight =
+                totalMoodCount > 0 ? (count / totalMoodCount) * MAX_BAR_HEIGHT : 0;
 
               return (
                 <YStack key={moodOption.id} alignItems="center" gap="$1">
                   {/* Bar */}
                   <View
                     width={6}
-                    height={60}
-                    backgroundColor={colors.basic[200]}
+                    height={MAX_BAR_HEIGHT}
+                    backgroundColor={colors.basic["200"]}
                     borderRadius={3}
                     overflow="hidden"
                     justifyContent="flex-end"
@@ -155,7 +163,7 @@ export const CheckInRecordCard = ({
                   {/* Count */}
                   <Text
                     fontSize={12}
-                    color={count > 0 ? colors.text.dark : colors.basic[400]}
+                    color={count > 0 ? colors.text.dark : colors.basic["400"]}
                     textAlign="center"
                   >
                     {count}
