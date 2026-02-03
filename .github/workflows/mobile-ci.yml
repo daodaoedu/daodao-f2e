@@ -51,6 +51,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Generate config env
+        run: pnpm --filter @daodao/config generate:env
+
       - name: TypeScript Check (mobile)
         run: pnpm --filter @daodao/mobile typecheck
 
