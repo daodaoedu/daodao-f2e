@@ -1,5 +1,7 @@
 export type { ICheckInDisplayData } from "../types";
-// Display components will be added here
-// export { CheckInCard } from "./check-in-card";
-// export { CheckInDetail } from "./check-in-detail";
-// export { CheckInRecordCard } from "./check-in-record-card";
+
+// Display components
+export { CheckInCard } from "./check-in-card";
+export { CheckInDetail } from "./check-in-detail";
+export { CheckInRecordCard } from "./check-in-record-card";
+export { CheckInStack } from "./check-in-stack";
