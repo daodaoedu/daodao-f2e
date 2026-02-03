@@ -1,7 +1,7 @@
 import { useCallback, useState, useRef } from 'react'
-import { Pressable, StyleSheet, View as RNView, Linking, Dimensions, Animated } from 'react-native'
+import { Pressable, StyleSheet, View as RNView, Linking, Animated, useWindowDimensions } from 'react-native'
 import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, Card, Avatar, Button, } from 'tamagui'
+import { YStack, XStack, Text, Card, Avatar, Button } from 'tamagui'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LottieView from 'lottie-react-native'
 import {
@@ -20,7 +20,6 @@ import { colors } from '@/generated/design-tokens'
 import activeShaper1Json from '@/assets/animations/active-shaper-1.json'
 import type { SocialLink } from '@/types/user'
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window')
 const bannerImage = require('@/assets/images/user-mobile-banner.png')
 const logoImage = require('@/assets/images/logo.png')
 const BANNER_HEIGHT = 420
@@ -95,7 +94,8 @@ type TabType = 'practices' | 'plans' | 'ideas'
 
 export default function ProfileScreen() {
   const router = useRouter()
-  const { user } = useCurrentUser()
+  const { width: screenWidth } = useWindowDimensions()
+  useCurrentUser()
   const [includeCompleted, setIncludeCompleted] = useState(true)
   const [activeTab, setActiveTab] = useState<TabType>('practices')
   const [showTopNav, setShowTopNav] = useState(false)
@@ -115,7 +115,7 @@ export default function ProfileScreen() {
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     {
       useNativeDriver: false,
-      listener: (event: any) => {
+      listener: (event: { nativeEvent: { contentOffset: { y: number } } }) => {
         const offsetY = event.nativeEvent.contentOffset.y
         setShowTopNav(offsetY > SCROLL_THRESHOLD)
       },
@@ -234,10 +234,10 @@ export default function ProfileScreen() {
       <RNView style={styles.fixedBackground} />
 
       {/* 固定 Banner - 會隨滾動變淡（在背景上方） */}
-      <Animated.View style={[styles.fixedBannerContainer, { opacity: bannerOpacity }]}>
+      <Animated.View style={[styles.fixedBannerContainer, { opacity: bannerOpacity, width: screenWidth }]}>
         <Animated.Image
           source={bannerImage}
-          style={styles.fixedBanner}
+          style={[styles.fixedBanner, { width: screenWidth }]}
           resizeMode="cover"
         />
       </Animated.View>
@@ -264,7 +264,7 @@ export default function ProfileScreen() {
       </SafeAreaView>
 
       {/* 固定 Lottie 動畫 - 會隨滾動變淡 */}
-      <Animated.View style={[styles.fixedLottie, { opacity: bannerOpacity }]}>
+      <Animated.View style={[styles.fixedLottie, { opacity: bannerOpacity, left: screenWidth / 2 - 75 }]}>
         <LottieView
           source={activeShaper1Json}
           autoPlay
@@ -580,12 +580,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    width: screenWidth,
     height: BANNER_HEIGHT,
     zIndex: 1,
   },
   fixedBanner: {
-    width: screenWidth,
     height: BANNER_HEIGHT,
   },
   fixedHeader: {
@@ -599,7 +597,6 @@ const styles = StyleSheet.create({
   fixedLottie: {
     position: 'absolute',
     top: 100,
-    left: screenWidth / 2 - 75,
     width: 150,
     height: 150,
     zIndex: 2,

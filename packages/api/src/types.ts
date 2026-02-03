@@ -112,6 +112,62 @@ export interface paths {
                                 parentTotalEstimate: number | null;
                             };
                             /**
+                             * @description Faceted search aggregations for filtering
+                             * @example {
+                             *       "majorCategory": [
+                             *         {
+                             *           "value": "education_learning",
+                             *           "count": 45
+                             *         },
+                             *         {
+                             *           "value": "nature_environment",
+                             *           "count": 32
+                             *         },
+                             *         {
+                             *           "value": "information_computer_science",
+                             *           "count": 28
+                             *         }
+                             *       ],
+                             *       "subCategory": [
+                             *         {
+                             *           "value": "physics",
+                             *           "count": 15
+                             *         },
+                             *         {
+                             *           "value": "biology",
+                             *           "count": 12
+                             *         },
+                             *         {
+                             *           "value": "mathematics",
+                             *           "count": 10
+                             *         }
+                             *       ]
+                             *     }
+                             */
+                            facets?: {
+                                /** @description Major category facet values (parent_id is NULL) */
+                                majorCategory?: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
+                                /** @description Sub category facet values (parent_id is NOT NULL) */
+                                subCategory?: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
+                            } & {
+                                [key: string]: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
+                            };
+                            /**
                              * Format: date-time
                              * @description ISO 8601 timestamp of the response
                              */
@@ -1029,6 +1085,62 @@ export interface paths {
                                 totalEstimate: number | null;
                                 /** @description Estimated total number of items in parent context (may be null) */
                                 parentTotalEstimate: number | null;
+                            };
+                            /**
+                             * @description Faceted search aggregations for filtering
+                             * @example {
+                             *       "majorCategory": [
+                             *         {
+                             *           "value": "education_learning",
+                             *           "count": 45
+                             *         },
+                             *         {
+                             *           "value": "nature_environment",
+                             *           "count": 32
+                             *         },
+                             *         {
+                             *           "value": "information_computer_science",
+                             *           "count": 28
+                             *         }
+                             *       ],
+                             *       "subCategory": [
+                             *         {
+                             *           "value": "physics",
+                             *           "count": 15
+                             *         },
+                             *         {
+                             *           "value": "biology",
+                             *           "count": 12
+                             *         },
+                             *         {
+                             *           "value": "mathematics",
+                             *           "count": 10
+                             *         }
+                             *       ]
+                             *     }
+                             */
+                            facets?: {
+                                /** @description Major category facet values (parent_id is NULL) */
+                                majorCategory?: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
+                                /** @description Sub category facet values (parent_id is NOT NULL) */
+                                subCategory?: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
+                            } & {
+                                [key: string]: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
                             };
                             /**
                              * Format: date-time
@@ -22243,21 +22355,21 @@ export interface components {
              */
             level: "beginner" | "intermediate" | "expert" | "all_levels";
             /**
-             * @description 主要分類
-             * @example 前端開發
-             * @example 前端開發
-             * @example 後端開發
-             * @example 數據科學
-             * @example 設計
+             * @description 主要分類 key（用於 URL 路徑參數）
+             * @example education_learning
+             * @example education_learning
+             * @example nature_environment
+             * @example information_computer_science
+             * @example arts_design
              */
             majorCategory?: string | null;
             /**
-             * @description 子分類
-             * @example React
-             * @example React
-             * @example Vue.js
-             * @example Node.js
-             * @example Python
+             * @description 子分類 key（用於 URL 路徑參數）
+             * @example physics
+             * @example physics
+             * @example biology
+             * @example mathematics
+             * @example chemistry
              */
             subCategory?: string | null;
             /**
@@ -22289,8 +22401,8 @@ export interface components {
          *       "type": "learning_platform_app",
          *       "cost": "free",
          *       "level": "intermediate",
-         *       "majorCategory": "前端開發",
-         *       "subCategory": "React",
+         *       "majorCategory": "information_computer_science",
+         *       "subCategory": "physics",
          *       "tags": [
          *         "JavaScript",
          *         "React",
@@ -22389,13 +22501,13 @@ export interface components {
              */
             level?: "beginner" | "intermediate" | "expert" | "all_levels";
             /**
-             * @description 主要分類
-             * @example 前端開發
+             * @description 主要分類 key（用於 URL 路徑參數）
+             * @example education_learning
              */
             majorCategory?: string | null;
             /**
-             * @description 子分類
-             * @example React
+             * @description 子分類 key（用於 URL 路徑參數）
+             * @example physics
              */
             subCategory?: string | null;
             /**
@@ -22434,10 +22546,15 @@ export interface components {
         /** @description 用戶基本資訊 */
         UserBasicInfo: {
             /**
-             * @description 用戶外部 ID
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @description 用戶內部 ID
+             * @example 123
              */
             id: string;
+            /**
+             * @description 用戶外部 ID (UUID)
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            _id: string;
             /**
              * @description 用戶名稱
              * @example 王小明
@@ -22446,8 +22563,8 @@ export interface components {
             /**
              * @description 用戶角色列表
              * @example [
-             *       "USER",
-             *       "EDUCATOR"
+             *       "Mentor",
+             *       "citizen"
              *     ]
              */
             roleList?: string[];
@@ -22542,13 +22659,13 @@ export interface components {
             avgRating: number | null;
             user: components["schemas"]["UserBasicInfo"];
             /**
-             * @description 主分類名稱
-             * @example 前端開發
+             * @description 主分類 key（用於 URL 路徑參數）
+             * @example education_learning
              */
             majorCategory: string | null;
             /**
-             * @description 子分類名稱
-             * @example React
+             * @description 子分類 key（用於 URL 路徑參數）
+             * @example physics
              */
             subCategory: string | null;
             /**
@@ -22611,12 +22728,12 @@ export interface components {
              */
             activeResources: number;
             /**
-             * @description 分類統計
+             * @description 分類統計（key 值對應資源數量）
              * @example {
-             *       "前端開發": 45,
-             *       "後端開發": 32,
-             *       "資料科學": 28,
-             *       "設計": 15
+             *       "education_learning": 45,
+             *       "nature_environment": 32,
+             *       "information_computer_science": 28,
+             *       "arts_design": 15
              *     }
              */
             categoryStats: {

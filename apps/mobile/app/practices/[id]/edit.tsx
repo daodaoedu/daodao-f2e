@@ -5,7 +5,7 @@ import { ChevronLeft, Pencil } from '@tamagui/lucide-icons'
 import { colors } from '@/generated/design-tokens'
 
 export default function PracticeEditScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>()
+  useLocalSearchParams<{ id: string }>()
   const router = useRouter()
 
   return (

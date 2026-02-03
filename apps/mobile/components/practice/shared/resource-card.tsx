@@ -1,6 +1,6 @@
 import { memo, useState, useCallback } from "react";
 import { Pressable, StyleSheet, Linking } from "react-native";
-import { YStack, XStack, Text, View, Image, Spinner } from "tamagui";
+import { XStack, Text, View, Image, Spinner } from "tamagui";
 import { Link2, X, BookOpen } from "@tamagui/lucide-icons";
 import { colors } from "@/generated/design-tokens";
 

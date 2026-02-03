@@ -39,7 +39,7 @@ function useProtectedRoute(isAuthenticated: boolean, isLoading: boolean) {
     // Prevent duplicate navigation
     if (targetRoute && targetRoute !== lastNavigationRef.current) {
       lastNavigationRef.current = targetRoute
-      router.replace(targetRoute as any)
+      router.replace(targetRoute as `${string}:${string}`)
     }
   }, [isAuthenticated, isLoading, segments, router])
 }

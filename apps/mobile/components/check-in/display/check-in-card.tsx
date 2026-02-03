@@ -39,7 +39,7 @@ export const CheckInCard = ({
     const dateStr = date.replace(/\./g, "-");
     const dateObj = new Date(dateStr);
 
-    if (!isNaN(dateObj.getTime())) {
+    if (!Number.isNaN(dateObj.getTime())) {
       const year = dateObj.getFullYear().toString();
       const month = String(dateObj.getMonth() + 1).padStart(2, "0");
       const day = String(dateObj.getDate()).padStart(2, "0");
@@ -101,7 +101,7 @@ export const CheckInCard = ({
           >
             {[...Array(5)].map((_, i) => (
               <View
-                key={i}
+                key={`binding-dot-${i}`}
                 width={12}
                 height={12}
                 borderRadius={6}
