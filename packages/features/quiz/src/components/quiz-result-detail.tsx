@@ -124,17 +124,8 @@ export const QuizResultDetail = ({ resultId }: QuizResultDetailProps) => {
               </ul>
             </section>
             <Button className="w-full font-bold" asChild>
-              <CustomLink
-                href="https://tally.so/r/w71dbZ"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                搶先體驗新功能測試
-              </CustomLink>
-            </Button>
-            <Button variant="outline" className="w-full font-bold" asChild>
-              <CustomLink href="/resource" target="_blank">
-                先挖掘更多優質資源！
+              <CustomLink href={`${process.env.NEXT_PUBLIC_APP_URL}/practices/create`}>
+                開始一個主題實踐
               </CustomLink>
             </Button>
           </div>
