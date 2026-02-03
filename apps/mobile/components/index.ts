@@ -1,3 +1,4 @@
+// Existing components
 export * from './PracticeCard'
 export * from './ProgressRing'
 export * from './StatCard'
@@ -10,3 +11,11 @@ export * from './FormField'
 export * from './ShareableCheckInCard'
 export * from './ShareCheckInSheet'
 export * from './HomeBanner'
+
+// Modular components (synced from product)
+export * from './check-in'
+export * from './dashboard'
+export * from './layout'
+export * from './practice'
+export * from './settings'
+export * from './user'
