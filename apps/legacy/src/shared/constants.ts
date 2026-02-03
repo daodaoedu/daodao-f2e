@@ -1,7 +1,11 @@
+import getEnv from "@/shared/config/env";
+
+const env = getEnv();
+
 export const SOCIAL_LINKS = {
   FACEBOOK: "https://www.facebook.com/daodao.edu",
   INSTAGRAM: "https://www.instagram.com/daodao_edu",
-  EMAIL: "contact@daoedu.tw",
+  EMAIL: env.contactEmail,
 } as const;
 
 // 錨點 ID 常數 - 用於頁面內元素的 id 屬性

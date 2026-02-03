@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[language]">): 
         "application/rss+xml": [
           {
             title: "島島阿學多元學習資源",
-            url: "https://www.daoedu.tw/rss/feed.xml",
+            url: `${websiteConfig.domainUrl}/rss/feed.xml`,
           },
         ],
       },

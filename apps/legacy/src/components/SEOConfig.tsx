@@ -2,7 +2,10 @@
 
 import Head from "next/head";
 import type { Graph, Thing, WebSite, WithContext } from "schema-dts";
+import getEnv from "@/shared/config/env";
 import { usePathname } from "@/shared/i18n/navigation";
+
+const env = getEnv();
 
 /**
  * Schema.org 常用類型參考指南
@@ -61,7 +64,7 @@ const defaultJsonLd: WithContext<WebSite> = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "島島阿學",
-  url: "https://www.daoedu.tw",
+  url: env.siteUrl,
   inLanguage: "zh-TW",
 };
 
@@ -72,7 +75,7 @@ export default function SEOConfig({
   keywords: originKeywords = "島島阿學",
   author = "島島阿學",
   copyright = "島島阿學",
-  imgLink = "https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg",
+  imgLink = `${env.siteUrl}/assets/brand/horizontal-primary-logo.svg`,
   imgWidth = 1200,
   imgHeight = 630,
   jsonLd = defaultJsonLd,
