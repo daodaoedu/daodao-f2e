@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { MOOD_OPTIONS, type MoodType } from "../../../constants/mood";
-import type { ICheckInFormData } from "../types";
+import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import type { ICheckInFormData } from "@/components/check-in/types";
 
 /**
  * 打卡表單驗證 schema

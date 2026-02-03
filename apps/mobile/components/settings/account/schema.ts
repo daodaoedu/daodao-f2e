@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { EDUCATION_STAGE_OPTIONS } from "../../../constants/education-stage";
-import { AVAILABLE_FIELDS } from "../../../constants/professional-fields";
-import { ROLE_OPTIONS } from "../../../constants/user-role";
+import { EDUCATION_STAGE_OPTIONS } from "@/constants/education-stage";
+import { AVAILABLE_FIELDS } from "@/constants/professional-fields";
+import { ROLE_OPTIONS } from "@/constants/user-role";
 
 // Re-export constants for convenience
 export { AVAILABLE_FIELDS, EDUCATION_STAGE_OPTIONS, ROLE_OPTIONS };

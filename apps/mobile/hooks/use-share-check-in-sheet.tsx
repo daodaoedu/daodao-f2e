@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import type { CheckInData } from "../types";
+import type { CheckInData } from "@/types";
 
 interface ShareCheckInData extends CheckInData {
   date: string;

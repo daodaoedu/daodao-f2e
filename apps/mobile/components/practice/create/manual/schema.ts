@@ -4,7 +4,7 @@ import {
   ExecutionTiming,
   Frequency,
   MAX_PRACTICE_TAGS,
-} from "../../../../constants/practice-form";
+} from "@/constants/practice-form";
 
 // Date utilities (native JS implementation)
 const parseDate = (dateStr: string): Date | null => {

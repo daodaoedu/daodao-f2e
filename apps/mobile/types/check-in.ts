@@ -1,4 +1,4 @@
-import type { MoodType } from "../constants/mood";
+import type { MoodType } from "@/constants/mood";
 
 /**
  * 打卡資料類型
