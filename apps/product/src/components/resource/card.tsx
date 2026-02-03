@@ -70,7 +70,7 @@ export function ResourceCard(props: ResourceCardProps) {
     label = [],
     level = "初級",
     viewCount = "尚未計算",
-    commentCount = 12,
+    commentCount = 0,
   } = props;
 
   const isNewResource = time

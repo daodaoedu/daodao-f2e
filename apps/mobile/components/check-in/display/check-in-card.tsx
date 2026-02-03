@@ -99,11 +99,15 @@ export const CheckInCard = ({
             right={16}
             justifyContent="space-around"
           >
-            <View width={12} height={12} borderRadius={6} backgroundColor={colors.basic[200]} />
-            <View width={12} height={12} borderRadius={6} backgroundColor={colors.basic[200]} />
-            <View width={12} height={12} borderRadius={6} backgroundColor={colors.basic[200]} />
-            <View width={12} height={12} borderRadius={6} backgroundColor={colors.basic[200]} />
-            <View width={12} height={12} borderRadius={6} backgroundColor={colors.basic[200]} />
+            {[...Array(5)].map((_, i) => (
+              <View
+                key={`binding-dot-${i}`}
+                width={12}
+                height={12}
+                borderRadius={6}
+                backgroundColor={colors.basic[200]}
+              />
+            ))}
           </XStack>
         </View>
 

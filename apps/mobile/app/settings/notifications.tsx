@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'expo-router'
 import { YStack, XStack, Text, ScrollView, Card, Button, Switch } from 'tamagui'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -43,15 +43,14 @@ export default function NotificationSettingsScreen() {
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
 
-  const checkPermission = async () => {
+  const checkPermission = useCallback(async () => {
     const granted = await notificationService.requestPermissions()
     setHasPermission(granted)
-  }
+  }, [])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run on mount
   useEffect(() => {
     checkPermission()
-  }, [])
+  }, [checkPermission])
 
   const toggleSetting = (key: string) => {
     setSettings(prev =>
