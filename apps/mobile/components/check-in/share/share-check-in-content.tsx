@@ -1,0 +1,161 @@
+import { useCallback } from "react";
+import { Share, Alert, Linking } from "react-native";
+import { YStack, XStack, Text, Button, Image, View } from "tamagui";
+import { Share2, Download } from "@tamagui/lucide-icons";
+import * as MediaLibrary from "expo-media-library";
+import { colors } from "@/generated/design-tokens";
+import type { ICheckInFormData } from "../types";
+
+interface IShareCheckInContentProps {
+  taskTitle: string;
+  checkInData: ICheckInFormData & { date: string; images?: string[] };
+  onDownloadSuccess?: () => void;
+  onShareSuccess?: () => void;
+}
+
+/**
+ * 分享打卡內容組件 (Mobile)
+ * 用於顯示分享選項和打卡圖片
+ */
+export const ShareCheckInContent = ({
+  taskTitle,
+  checkInData,
+  onDownloadSuccess,
+  onShareSuccess,
+}: IShareCheckInContentProps) => {
+  const { description, images } = checkInData;
+  const imageUrl = images?.[0];
+
+  // 準備分享內容
+  const shareText = `${taskTitle}\n${description || ""}\n\n#島島阿學`;
+
+  // 處理分享
+  const handleShare = useCallback(async () => {
+    try {
+      const result = await Share.share({
+        message: shareText,
+        title: taskTitle,
+      });
+
+      if (result.action === Share.sharedAction) {
+        onShareSuccess?.();
+      }
+    } catch (error) {
+      Alert.alert("分享失敗", "無法開啟分享功能");
+    }
+  }, [shareText, taskTitle, onShareSuccess]);
+
+  // 處理下載打卡圖片到相簿
+  const handleDownloadImage = useCallback(async () => {
+    if (!imageUrl) {
+      Alert.alert("無法下載", "沒有可下載的圖片");
+      return;
+    }
+
+    try {
+      // 請求相簿權限
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("權限不足", "需要相簿存取權限才能儲存圖片", [
+          { text: "取消", style: "cancel" },
+          { text: "前往設定", onPress: () => Linking.openSettings() },
+        ]);
+        return;
+      }
+
+      // 如果是本地 URI，直接儲存
+      if (imageUrl.startsWith("file://") || imageUrl.startsWith("content://")) {
+        await MediaLibrary.saveToLibraryAsync(imageUrl);
+        Alert.alert("儲存成功", "圖片已儲存到相簿");
+        onDownloadSuccess?.();
+      } else {
+        // 對於遠端 URL，提示用戶
+        Alert.alert("提示", "請長按圖片儲存到相簿");
+      }
+    } catch (error) {
+      Alert.alert("儲存失敗", "無法儲存圖片到相簿");
+    }
+  }, [imageUrl, onDownloadSuccess]);
+
+  return (
+    <YStack paddingHorizontal="$6" flex={1}>
+      <YStack flex={1} gap="$6">
+        {/* 標題 */}
+        <Text fontSize={20} fontWeight="500" color={colors.text.dark}>
+          {taskTitle}
+        </Text>
+
+        {/* 打卡圖片預覽 */}
+        {imageUrl && (
+          <View
+            width={350}
+            height={192}
+            borderRadius="$md"
+            overflow="hidden"
+            alignSelf="center"
+            backgroundColor={colors.basic.white}
+          >
+            <Image
+              source={{ uri: imageUrl }}
+              width="100%"
+              height="100%"
+              resizeMode="contain"
+            />
+          </View>
+        )}
+
+        {/* 分享按鈕 */}
+        <YStack gap="$4" alignItems="center">
+          <Text
+            fontSize={16}
+            fontWeight="500"
+            color={colors.text.dark}
+            textAlign="center"
+          >
+            分享到社群媒體
+          </Text>
+
+          <Button
+            size="$5"
+            backgroundColor={colors.primary.base}
+            pressStyle={{ backgroundColor: colors.primary.darker }}
+            onPress={handleShare}
+            width="100%"
+          >
+            <XStack alignItems="center" gap="$2">
+              <Share2 size={20} color={colors.basic.white} />
+              <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
+                分享
+              </Text>
+            </XStack>
+          </Button>
+        </YStack>
+      </YStack>
+
+      {/* 下載按鈕 */}
+      <YStack
+        borderTopWidth={1}
+        borderTopColor={colors.basic["200"]}
+        paddingVertical="$4"
+        marginTop="$4"
+      >
+        <Button
+          size="$4"
+          backgroundColor="transparent"
+          borderWidth={1}
+          borderColor={colors.basic["300"]}
+          pressStyle={{ backgroundColor: colors.basic["100"] }}
+          onPress={handleDownloadImage}
+          width="100%"
+        >
+          <XStack alignItems="center" gap="$2">
+            <Download size={18} color={colors.text.dark} />
+            <Text color={colors.text.dark} fontWeight="500">
+              下載打卡圖片
+            </Text>
+          </XStack>
+        </Button>
+      </YStack>
+    </YStack>
+  );
+};
