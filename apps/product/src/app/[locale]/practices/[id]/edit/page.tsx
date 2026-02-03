@@ -134,8 +134,11 @@ export default function EditPracticePage() {
       executionTiming.length > 0 ? executionTiming : [ExecutionTiming.morning];
 
     // 轉換 resources: API 格式 -> 表單格式
-    // 注意：API 回應中目前沒有 resources 欄位，暫時設為空陣列
-    const resources: Array<{ id: string; name: string; url: string }> = [];
+    const resources = (data.resources || []).map((resource) => ({
+      id: resource.id,
+      name: resource.name,
+      url: resource.url || "",
+    }));
 
     return {
       name: data.title || "",
