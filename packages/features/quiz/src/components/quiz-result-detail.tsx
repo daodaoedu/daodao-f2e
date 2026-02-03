@@ -124,7 +124,9 @@ export const QuizResultDetail = ({ resultId }: QuizResultDetailProps) => {
               </ul>
             </section>
             <Button className="w-full font-bold" asChild>
-              <CustomLink href="/">開始一個主題實踐</CustomLink>
+              <CustomLink href={`${process.env.NEXT_PUBLIC_APP_URL}/practices/create`}>
+                開始一個主題實踐
+              </CustomLink>
             </Button>
           </div>
           <footer>
