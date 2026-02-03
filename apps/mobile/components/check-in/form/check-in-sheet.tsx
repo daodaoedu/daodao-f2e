@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { YStack, XStack, Text, Button, Spinner, ScrollView } from "tamagui";
 import { Check, CalendarCheck } from "@tamagui/lucide-icons";
@@ -12,7 +12,6 @@ import { DescriptionField } from "./components/description-field";
 import { MediaUploadField } from "./components/media-upload-field";
 import { useCheckInImageRender } from "./hooks/use-check-in-image-render";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
-import { useCheckInSubmit } from "./hooks/use-check-in-submit";
 import { type CheckInFormValuesType, checkInFormSchema } from "./schema";
 
 // Export types for external use (avoid naming conflicts with legacy CheckInSheet)
@@ -34,8 +33,6 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
     handleSubmit,
     reset,
     formState: { errors },
-    setValue,
-    watch,
   } = useForm<CheckInFormValuesType>({
     resolver: zodResolver(checkInFormSchema),
     defaultValues: {
@@ -71,12 +68,6 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
     // 開始渲染流程
     await startRender(formData);
   };
-
-  // Watch form values for controlled components
-  const mood = watch("mood");
-  const tags = watch("tags");
-  const description = watch("description");
-  const mediaUris = watch("mediaUris");
 
   return (
     <YStack flex={1}>
@@ -217,14 +208,10 @@ interface ICheckInButtonProps extends ICheckInStatusOptions {
 export const CheckInButton = ({
   practiceStatus,
   lastCheckInDate,
-  practiceId,
-  taskTitle,
-  onComplete,
   showIcon,
-  progressPercentage = 0,
   style,
   onOpenSheet,
-}: ICheckInButtonProps & { onOpenSheet?: () => void }) => {
+}: Omit<ICheckInButtonProps, "practiceId" | "taskTitle" | "onComplete" | "progressPercentage"> & { onOpenSheet?: () => void }) => {
   const { canCheckIn, getButtonLabel } = useCheckInStatus({
     practiceStatus,
     lastCheckInDate,

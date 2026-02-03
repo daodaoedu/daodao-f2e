@@ -17,6 +17,9 @@ export * from "./practice-hooks";
 // Tag Service
 export * from "./tag";
 export * from "./tag-hooks";
+// Resource Service
+export * from "./resource";
+export * from "./resource-hooks";
 // User Service
 export * from "./user";
 export * from "./user-hooks";

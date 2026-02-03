@@ -8,6 +8,4 @@ export type PageHeaderProps = {
   rightAction?: React.ReactNode;
 };
 
-export type FooterProps = {
-  // Footer specific props
-};
+export type FooterProps = Record<string, never>;

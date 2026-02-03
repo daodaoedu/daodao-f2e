@@ -7,7 +7,7 @@ import { mockIslandResults, type IslandResult, } from '@/types/quiz'
 import { colors } from '@/generated/design-tokens'
 
 export default function QuizResultScreen() {
-  const { quizId, answers: answersParam } = useLocalSearchParams<{
+  const { quizId } = useLocalSearchParams<{
     quizId: string
     answers?: string
   }>()

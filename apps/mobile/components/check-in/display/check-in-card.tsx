@@ -39,7 +39,7 @@ export const CheckInCard = ({
     const dateStr = date.replace(/\./g, "-");
     const dateObj = new Date(dateStr);
 
-    if (!isNaN(dateObj.getTime())) {
+    if (!Number.isNaN(dateObj.getTime())) {
       const year = dateObj.getFullYear().toString();
       const month = String(dateObj.getMonth() + 1).padStart(2, "0");
       const day = String(dateObj.getDate()).padStart(2, "0");
@@ -99,15 +99,11 @@ export const CheckInCard = ({
             right={16}
             justifyContent="space-around"
           >
-            {[...Array(5)].map((_, i) => (
-              <View
-                key={i}
-                width={12}
-                height={12}
-                borderRadius={6}
-                backgroundColor={colors.basic[200]}
-              />
-            ))}
+            <View width={12} height={12} borderRadius={6} backgroundColor={colors.basic[200]} />
+            <View width={12} height={12} borderRadius={6} backgroundColor={colors.basic[200]} />
+            <View width={12} height={12} borderRadius={6} backgroundColor={colors.basic[200]} />
+            <View width={12} height={12} borderRadius={6} backgroundColor={colors.basic[200]} />
+            <View width={12} height={12} borderRadius={6} backgroundColor={colors.basic[200]} />
           </XStack>
         </View>
 

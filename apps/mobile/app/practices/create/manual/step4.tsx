@@ -20,7 +20,7 @@ const colorOptions = [
 export default function Step4Screen() {
   const router = useRouter()
   const { form, currentStep, totalSteps, nextStep, prevStep } = useCreatePractice()
-  const { control, watch, setValue, trigger, formState: { errors } } = form
+  const { watch, setValue, trigger, formState: { errors } } = form
 
   const [newTag, setNewTag] = useState('')
   const tags = watch('tags') || []

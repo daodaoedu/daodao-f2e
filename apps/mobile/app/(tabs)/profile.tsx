@@ -1,7 +1,7 @@
 import { useCallback, useState, useRef } from 'react'
-import { Pressable, StyleSheet, View as RNView, Linking, Dimensions, Animated } from 'react-native'
+import { Pressable, StyleSheet, View as RNView, Linking, Animated } from 'react-native'
 import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, Card, Avatar, Button, } from 'tamagui'
+import { YStack, XStack, Text, Card, Avatar, Button } from 'tamagui'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LottieView from 'lottie-react-native'
 import {
@@ -20,7 +20,7 @@ import { colors } from '@/generated/design-tokens'
 import activeShaper1Json from '@/assets/animations/active-shaper-1.json'
 import type { SocialLink } from '@/types/user'
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window')
+const screenWidth = 390 // Fixed width for consistency
 const bannerImage = require('@/assets/images/user-mobile-banner.png')
 const logoImage = require('@/assets/images/logo.png')
 const BANNER_HEIGHT = 420
@@ -95,7 +95,7 @@ type TabType = 'practices' | 'plans' | 'ideas'
 
 export default function ProfileScreen() {
   const router = useRouter()
-  const { user } = useCurrentUser()
+  useCurrentUser()
   const [includeCompleted, setIncludeCompleted] = useState(true)
   const [activeTab, setActiveTab] = useState<TabType>('practices')
   const [showTopNav, setShowTopNav] = useState(false)
@@ -115,7 +115,7 @@ export default function ProfileScreen() {
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     {
       useNativeDriver: false,
-      listener: (event: any) => {
+      listener: (event: { nativeEvent: { contentOffset: { y: number } } }) => {
         const offsetY = event.nativeEvent.contentOffset.y
         setShowTopNav(offsetY > SCROLL_THRESHOLD)
       },

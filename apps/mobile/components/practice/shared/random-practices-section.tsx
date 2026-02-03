@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from "react";
-import { Pressable, StyleSheet, Dimensions } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import { YStack, XStack, Text, View, Button } from "tamagui";
 import { ArrowRight } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";

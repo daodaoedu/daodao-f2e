@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { FlatList, Pressable, StyleSheet, type ListRenderItemInfo } from "react-native";
-import { YStack, XStack, Text, View } from "tamagui";
+import { YStack, Text, View } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { MOOD_OPTIONS, mapApiMoodToMoodType, type ApiMoodType } from "@/constants/mood";
 import type { ICheckInItem } from "../types";
@@ -26,7 +26,6 @@ interface CheckInsResponse {
 }
 
 interface ICheckInStackProps {
-  practiceId: string;
   checkInsData?: CheckInsResponse;
   onCheckInPress?: (checkInId: string) => void;
 }
@@ -44,7 +43,6 @@ const formatCheckInDate = (checkinDate: string): string => {
  * 用於顯示多個打卡記錄，以卡片列表形式呈現
  */
 export const CheckInStack = ({
-  practiceId,
   checkInsData,
   onCheckInPress,
 }: ICheckInStackProps) => {

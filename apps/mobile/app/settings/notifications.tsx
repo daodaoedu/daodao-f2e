@@ -48,6 +48,7 @@ export default function NotificationSettingsScreen() {
     setHasPermission(granted)
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run on mount
   useEffect(() => {
     checkPermission()
   }, [])

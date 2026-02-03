@@ -43,7 +43,7 @@ export const ShareCheckInContent = ({
       if (result.action === Share.sharedAction) {
         onShareSuccess?.();
       }
-    } catch (error) {
+    } catch (_error) {
       Alert.alert("分享失敗", "無法開啟分享功能");
     }
   }, [shareText, taskTitle, onShareSuccess]);
@@ -81,7 +81,7 @@ export const ShareCheckInContent = ({
       await MediaLibrary.saveToLibraryAsync(localUri);
       Alert.alert("儲存成功", "圖片已儲存到相簿");
       onDownloadSuccess?.();
-    } catch (error) {
+    } catch (_error) {
       Alert.alert("儲存失敗", "無法儲存圖片到相簿");
     }
   }, [imageUrl, onDownloadSuccess]);

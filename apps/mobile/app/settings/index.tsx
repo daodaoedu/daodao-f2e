@@ -124,7 +124,7 @@ export default function SettingsScreen() {
                         borderBottomWidth={index < group.items.length - 1 ? 1 : 0}
                         borderBottomColor="$borderColor"
                         pressStyle={{ backgroundColor: '$backgroundHover' }}
-                        onPress={() => router.push(item.route as any)}
+                        onPress={() => router.push(item.route as `${string}:${string}`)}
                       >
                         <XStack alignItems="center" gap="$3" flex={1}>
                           <YStack
