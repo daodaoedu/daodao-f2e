@@ -114,19 +114,15 @@ export const mapExecutionTimingToPracticeTimePeriods = (
 ): ("morning" | "afternoon" | "evening" | "night")[] => {
   return executionTiming
     .map((timing) => ExecutionTimingToPracticeTimePeriodMap[timing])
-    .filter((period): period is "morning" | "afternoon" | "evening" | "night" => period !== null);
+    .filter((period): period is "morning" | "afternoon" | "evening" | "night" => period !== "commute");
 };
 
 /**
  * 將表單的 frequency 轉換成 frequencyMinDays 和 frequencyMaxDays
  */
 export const parseFrequency = (frequency: Frequency): { minDays: number; maxDays: number } => {
-  const parts = frequency.split("-");
-  const minStr = parts[0];
-  const maxStr = parts[1];
-  const min = minStr ? Number.parseInt(minStr, 10) : 3;
-  const max = maxStr ? Number.parseInt(maxStr, 10) : 5;
-  return { minDays: min, maxDays: max };
+  const [minStr, maxStr] = frequency.split("-");
+  return { minDays: Number.parseInt(minStr, 10), maxDays: Number.parseInt(maxStr, 10) };
 };
 
 /**

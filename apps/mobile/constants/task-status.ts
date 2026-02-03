@@ -65,17 +65,19 @@ export const getStatusConfig = (status: TaskStatus | string): StatusConfig => {
  * 將 API 的 PracticeStatus 映射到 TaskStatus
  */
 export const mapPracticeStatusToTaskStatus = (status: PracticeStatus): TaskStatus => {
-  if (status === PracticeStatus.active) {
-    return TaskStatus.inProgress;
+  switch (status) {
+    case PracticeStatus.active:
+      return TaskStatus.inProgress;
+    case PracticeStatus.draft:
+      return TaskStatus.draft;
+    case PracticeStatus.notStarted:
+      return TaskStatus.notStarted;
+    case PracticeStatus.completed:
+      return TaskStatus.completed;
+    case PracticeStatus.archived:
+      // 封存狀態視為已完成
+      return TaskStatus.completed;
+    default:
+      return TaskStatus.completed;
   }
-  if (status === PracticeStatus.draft) {
-    return TaskStatus.draft;
-  }
-  if (status === PracticeStatus.notStarted) {
-    return TaskStatus.notStarted;
-  }
-  if (status === PracticeStatus.completed) {
-    return TaskStatus.completed;
-  }
-  return TaskStatus.completed;
 };

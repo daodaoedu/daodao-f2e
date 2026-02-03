@@ -19,7 +19,7 @@ export type PracticeCategory = (typeof practiceCategories)[number];
  * 將 API 返回的分類 ID 對應到顯示用的 label 和 icon
  */
 export const practiceCategoryMetadataMap: Record<
-  string,
+  PracticeCategory,
   { label: string; icon: string }
 > = {
   digital_skill: { label: "數位技能", icon: "laptop" },

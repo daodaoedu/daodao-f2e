@@ -27,19 +27,18 @@ export const uriToBase64 = async (uri: string): Promise<string> => {
 };
 
 /**
- * 將多個本地 URI 轉換為 base64 陣列
+ * 將多個本地 URI 轉換為 base64 陣列（並行處理）
  */
 export const convertMediaUrisToBase64 = async (uris: string[]): Promise<string[]> => {
-  const base64Strings: string[] = [];
-
-  for (const uri of uris) {
-    try {
-      const base64 = await uriToBase64(uri);
-      base64Strings.push(base64);
-    } catch (error) {
-      console.error("Error converting URI:", uri, error);
-    }
-  }
-
-  return base64Strings;
+  const results = await Promise.all(
+    uris.map(async (uri) => {
+      try {
+        return await uriToBase64(uri);
+      } catch (error) {
+        console.error("Error converting URI:", uri, error);
+        return null;
+      }
+    })
+  );
+  return results.filter((result): result is string => result !== null);
 };

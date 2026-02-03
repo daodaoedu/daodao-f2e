@@ -2,8 +2,6 @@ import { useCallback, useState } from "react";
 import type { CheckInData } from "@/types";
 
 interface UseCheckInSheetOptions {
-  /** 任務標題 */
-  taskTitle: string;
   /** 打卡完成回調 */
   onComplete: (data: CheckInData) => Promise<void> | void;
   /** 關閉時的回調 */
@@ -27,7 +25,6 @@ interface UseCheckInSheetReturn {
  * @example
  * ```tsx
  * const { isOpen, openCheckInSheet, closeCheckInSheet, handleComplete } = useCheckInSheet({
- *   taskTitle: "我的實踐",
  *   onComplete: handleCheckIn,
  *   onClose: handleClose,
  * });

@@ -1,16 +1,6 @@
 import { useCallback, useState } from "react";
-import type { CheckInData } from "@/types";
-
-interface ShareCheckInData extends CheckInData {
-  date: string;
-  images?: string[];
-}
 
 interface UseShareCheckInSheetOptions {
-  /** 任務標題 */
-  taskTitle: string;
-  /** 打卡資料 */
-  checkInData: ShareCheckInData;
   /** 關閉時的回調 */
   onClose?: () => void;
 }
@@ -30,8 +20,6 @@ interface UseShareCheckInSheetReturn {
  * @example
  * ```tsx
  * const { isOpen, openShareSheet, closeShareSheet } = useShareCheckInSheet({
- *   taskTitle: "我的實踐",
- *   checkInData: { ... },
  *   onClose: handleClose,
  * });
  *
@@ -40,8 +28,6 @@ interface UseShareCheckInSheetReturn {
  * <ShareCheckInSheet
  *   open={isOpen}
  *   onOpenChange={(open) => !open && closeShareSheet()}
- *   taskTitle={taskTitle}
- *   checkInData={checkInData}
  * />
  * ```
  */

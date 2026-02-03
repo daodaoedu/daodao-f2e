@@ -6,10 +6,6 @@ interface TagEditData {
 }
 
 interface UseTagEditSheetOptions {
-  /** 初始標籤 */
-  initialTags?: string[];
-  /** 初始關鍵字 */
-  initialKeyword?: string;
   /** 完成回調 */
   onComplete: (data: TagEditData) => void;
   /** 關閉時的回調 */
@@ -33,8 +29,6 @@ interface UseTagEditSheetReturn {
  * @example
  * ```tsx
  * const { isOpen, openTagEditSheet, closeTagEditSheet, handleComplete } = useTagEditSheet({
- *   initialTags: ["標籤1", "標籤2"],
- *   initialKeyword: "關鍵字",
  *   onComplete: handleComplete,
  *   onClose: handleClose,
  * });

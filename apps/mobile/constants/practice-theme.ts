@@ -44,13 +44,9 @@ export const PRACTICE_THEMES: PracticeTheme[] = PRACTICE_THEME_CONFIG.map((confi
 /**
  * 主題顏色值映射
  */
-export const practiceThemeColorMap = PRACTICE_THEME_CONFIG.reduce(
-  (acc, config) => {
-    acc[config.name] = config.color;
-    return acc;
-  },
-  {} as Record<PracticeTheme, string>
-);
+export const practiceThemeColorMap = Object.fromEntries(
+  PRACTICE_THEME_CONFIG.map((config) => [config.name, config.color])
+) as Record<PracticeTheme, string>;
 
 /**
  * 顏色值到主題名稱的反向映射

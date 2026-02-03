@@ -63,9 +63,11 @@ export function useArchivePracticeDialog() {
                   {
                     text: "確定",
                     style: "default",
+                    onPress: () => {
+                      resolve(ArchivePracticeResult.Archived);
+                    },
                   },
                 ]);
-                resolve(ArchivePracticeResult.Archived);
               },
             },
           ]
