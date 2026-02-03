@@ -1,4 +1,3 @@
-import { addDays, format, isAfter, isBefore, isValid, parse, startOfDay } from "date-fns";
 import { z } from "zod";
 import {
   DurationDays,
@@ -6,6 +5,31 @@ import {
   Frequency,
   MAX_PRACTICE_TAGS,
 } from "../../../../constants/practice-form";
+
+// Date utilities (native JS implementation)
+const parseDate = (dateStr: string): Date | null => {
+  const date = new Date(dateStr);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const startOfDay = (date: Date): Date => {
+  const result = new Date(date);
+  result.setHours(0, 0, 0, 0);
+  return result;
+};
+
+const addDays = (date: Date, days: number): Date => {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+};
+
+const formatDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}/${month}/${day}`;
+};
 
 // Form Options Constants
 // 這些選項使用 constants 中的值，確保與 schema 驗證一致
@@ -65,25 +89,25 @@ export const manualPracticeFormSchema = z.object({
     .refine(
       (val) => {
         if (!val) return false;
-        const date = parse(val, "yyyy-MM-dd", new Date());
-        if (!isValid(date)) return false;
+        const date = parseDate(val);
+        if (!date) return false;
         const today = startOfDay(new Date());
         const maxDate = startOfDay(addDays(new Date(), 14));
         const dateStartOfDay = startOfDay(date);
-        return !isBefore(dateStartOfDay, today) && !isAfter(dateStartOfDay, maxDate);
+        return dateStartOfDay >= today && dateStartOfDay <= maxDate;
       },
       (val) => {
         if (!val) return { message: "請選擇開始時間" };
-        const date = parse(val, "yyyy-MM-dd", new Date());
-        if (!isValid(date)) return { message: "請選擇有效的日期" };
+        const date = parseDate(val);
+        if (!date) return { message: "請選擇有效的日期" };
         const today = startOfDay(new Date());
         const maxDate = startOfDay(addDays(new Date(), 14));
         const dateStartOfDay = startOfDay(date);
-        if (isBefore(dateStartOfDay, today)) {
+        if (dateStartOfDay < today) {
           return { message: "日期不能早於今天" };
         }
-        if (isAfter(dateStartOfDay, maxDate)) {
-          const maxDateFormatted = format(maxDate, "yyyy/MM/dd");
+        if (dateStartOfDay > maxDate) {
+          const maxDateFormatted = formatDate(maxDate);
           return { message: `日期不能晚於 ${maxDateFormatted}` };
         }
         return { message: "日期不在允許的範圍內" };

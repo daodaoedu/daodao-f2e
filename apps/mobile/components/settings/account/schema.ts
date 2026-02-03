@@ -1,4 +1,3 @@
-import { differenceInYears } from "date-fns";
 import { z } from "zod";
 import { EDUCATION_STAGE_OPTIONS } from "../../../constants/education-stage";
 import { AVAILABLE_FIELDS } from "../../../constants/professional-fields";
@@ -6,6 +5,13 @@ import { ROLE_OPTIONS } from "../../../constants/user-role";
 
 // Re-export constants for convenience
 export { AVAILABLE_FIELDS, EDUCATION_STAGE_OPTIONS, ROLE_OPTIONS };
+
+// Date utilities (native JS implementation)
+const differenceInYears = (dateA: Date, dateB: Date): number => {
+  const diffMs = dateA.getTime() - dateB.getTime();
+  const diffDate = new Date(diffMs);
+  return Math.abs(diffDate.getUTCFullYear() - 1970);
+};
 
 // Form Schema
 export const accountFormSchema = z.object({

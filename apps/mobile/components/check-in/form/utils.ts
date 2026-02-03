@@ -1,10 +1,21 @@
-import * as FileSystem from "expo-file-system";
+/**
+ * Check-in form utilities
+ */
+
+// expo-file-system types (for optional dependency)
+interface FileSystemModule {
+  readAsStringAsync: (uri: string, options?: { encoding: string }) => Promise<string>;
+  EncodingType: { Base64: string };
+}
 
 /**
  * 將本地 URI 轉換為 base64 字串
+ * 需要 expo-file-system 套件
  */
 export const uriToBase64 = async (uri: string): Promise<string> => {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const FileSystem = require("expo-file-system") as FileSystemModule;
     const base64 = await FileSystem.readAsStringAsync(uri, {
       encoding: FileSystem.EncodingType.Base64,
     });
