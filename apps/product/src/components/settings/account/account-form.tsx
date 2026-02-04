@@ -9,11 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parse } from "date-fns";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  mapApiEducationStageToForm,
-  mapFormEducationStageToApi,
-} from "@/constants/education-stage";
-import { mapApiRoleToForm, mapFormRoleToApi } from "@/constants/user-role";
 import { FieldSelectionSection } from "./field-selection-section";
 import { PersonalInfoSection } from "./personal-info-section";
 import {
@@ -21,7 +16,8 @@ import {
   AVAILABLE_FIELDS,
   accountFormSchema,
   EDUCATION_STAGE_OPTIONS,
-  ROLE_OPTIONS,
+  INTEREST_CATEGORIES,
+  POSITION_OPTIONS,
 } from "./schema";
 
 export const AccountForm = () => {
@@ -34,7 +30,7 @@ export const AccountForm = () => {
     defaultValues: {
       email: "",
       birthday: undefined,
-      role: "",
+      position: [],
       educationStage: "",
       professionalFields: [],
       explorationFields: [],
@@ -48,8 +44,8 @@ export const AccountForm = () => {
       form.reset({
         email: user.email || "",
         birthday: user.birthDay ? parse(user.birthDay, "yyyy-MM-dd", new Date()) : undefined,
-        role: mapApiRoleToForm(user.roleList),
-        educationStage: mapApiEducationStageToForm(user.educationStage),
+        position: user.positionList || [],
+        educationStage: user.educationStage || "",
         professionalFields: user.tagList || [],
         explorationFields: user.interestList || [],
       });
@@ -63,8 +59,8 @@ export const AccountForm = () => {
       // 準備 API 請求資料
       const updateData: {
         birthDay?: string;
-        roleList?: string[];
-        educationStage?: "university" | "high" | "other";
+        positionList?: string[];
+        educationStage?: string;
         tagList?: string[];
         interestList?: string[];
       } = {};
@@ -74,16 +70,12 @@ export const AccountForm = () => {
         updateData.birthDay = format(values.birthday, "yyyy-MM-dd");
       }
 
-      // 轉換角色（單一值轉為陣列，並轉換為中文）
-      const apiRoleList = mapFormRoleToApi(values.role);
-      if (apiRoleList) {
-        updateData.roleList = apiRoleList;
-      }
+      // 身份（直接對應資料庫值，允許多選）
+      updateData.positionList = values.position;
 
-      // 轉換教育階段
-      const apiEducationStage = mapFormEducationStageToApi(values.educationStage);
-      if (apiEducationStage) {
-        updateData.educationStage = apiEducationStage;
+      // 教育階段（直接對應資料庫值）
+      if (values.educationStage) {
+        updateData.educationStage = values.educationStage;
       }
 
       // 轉換專業領域和探索領域（總是包含，允許清空）
@@ -109,7 +101,7 @@ export const AccountForm = () => {
                 // 將錯誤設置到對應的表單欄位
                 const formFieldMap: Record<string, keyof AccountFormValues> = {
                   birthDay: "birthday",
-                  roleList: "role",
+                  positionList: "position",
                   educationStage: "educationStage",
                   tagList: "professionalFields",
                   interestList: "explorationFields",
@@ -178,8 +170,15 @@ export const AccountForm = () => {
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <PersonalInfoSection
           form={form}
-          roleOptions={ROLE_OPTIONS}
           educationStageOptions={EDUCATION_STAGE_OPTIONS}
+        />
+
+        <FieldSelectionSection
+          form={form}
+          fieldName="position"
+          label="身份"
+          availableFields={POSITION_OPTIONS}
+          maxSelection={5}
         />
 
         <FieldSelectionSection
@@ -194,7 +193,7 @@ export const AccountForm = () => {
           form={form}
           fieldName="explorationFields"
           label="想探索的領域"
-          availableFields={AVAILABLE_FIELDS}
+          availableFields={INTEREST_CATEGORIES}
           maxSelection={5}
         />
 

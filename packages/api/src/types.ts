@@ -8258,7 +8258,7 @@ export interface paths {
                     /** @description 過濾教育階段 */
                     educationStage?: string;
                     /** @description 過濾角色清單（以逗號分隔） */
-                    roleList?: string;
+                    positionList?: string;
                     /** @description 過濾位置 */
                     location?: string;
                     /** @description 搜尋關鍵字 */
@@ -20557,8 +20557,8 @@ export interface components {
                 /**
                  * @description 用戶角色列表
                  * @example [
-                 *       "normal-student",
-                 *       "citizen"
+                 *       "normal_student",
+                 *       "educator"
                  *     ]
                  */
                 roleList?: string[];
@@ -21553,22 +21553,22 @@ export interface components {
             /**
              * @description 角色清單
              * @example [
-             *       "normal-student",
-             *       "citizen"
+             *       "normal_student",
+             *       "educator"
              *     ]
              * @example [
-             *       "normal-student",
-             *       "citizen"
+             *       "normal_student",
+             *       "educator"
              *     ]
              * @example [
-             *       "experimental-educator"
+             *       "experimental_educator"
              *     ]
              * @example [
              *       "parents",
              *       "other"
              *     ]
              */
-            roleList?: string[];
+            positionList?: string[];
             /**
              * @description 自我介紹
              * @example 我是一名前端工程師，熱愛學習新技術
@@ -21816,22 +21816,22 @@ export interface components {
             /**
              * @description 角色清單
              * @example [
-             *       "normal-student",
-             *       "citizen"
+             *       "normal_student",
+             *       "educator"
              *     ]
              * @example [
-             *       "normal-student",
-             *       "citizen"
+             *       "normal_student",
+             *       "educator"
              *     ]
              * @example [
-             *       "experimental-educator"
+             *       "experimental_educator"
              *     ]
              * @example [
              *       "parents",
              *       "other"
              *     ]
              */
-            roleList?: string[];
+            positionList?: string[];
             /**
              * @description 興趣分類清單 (category names)
              * @example [
@@ -22043,22 +22043,22 @@ export interface components {
             /**
              * @description 角色清單
              * @example [
-             *       "normal-student",
-             *       "citizen"
+             *       "normal_student",
+             *       "educator"
              *     ]
              * @example [
-             *       "normal-student",
-             *       "citizen"
+             *       "normal_student",
+             *       "educator"
              *     ]
              * @example [
-             *       "experimental-educator"
+             *       "experimental_educator"
              *     ]
              * @example [
              *       "parents",
              *       "other"
              *     ]
              */
-            roleList: string[] | null;
+            positionList: string[] | null;
             /** @description 基本資訊物件 */
             basicInfo: {
                 /**
@@ -22563,8 +22563,8 @@ export interface components {
             /**
              * @description 用戶角色列表
              * @example [
-             *       "Mentor",
-             *       "citizen"
+             *       "educator",
+             *       "parents"
              *     ]
              */
             roleList?: string[];
@@ -23386,8 +23386,8 @@ export interface components {
                 /**
                  * @description 用戶角色列表
                  * @example [
-                 *       "normal-student",
-                 *       "citizen"
+                 *       "normal_student",
+                 *       "educator"
                  *     ]
                  */
                 roleList?: string[];
@@ -23951,8 +23951,8 @@ export interface components {
          *         "name": "學習者小明",
          *         "photoURL": "https://example.com/avatar/123.jpg",
          *         "roleList": [
-         *           "normal-student",
-         *           "citizen"
+         *           "normal_student",
+         *           "educator"
          *         ],
          *         "educationStage": "university",
          *         "tagList": [
@@ -24825,8 +24825,8 @@ export interface components {
             /**
              * @description 角色列表
              * @example [
-             *       "normal-student",
-             *       "citizen"
+             *       "normal_student",
+             *       "educator"
              *     ]
              */
             roleList?: string[];

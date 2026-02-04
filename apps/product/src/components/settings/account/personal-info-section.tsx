@@ -28,13 +28,11 @@ type SelectOption = {
 
 interface PersonalInfoSectionProps {
   form: UseFormReturn<AccountFormValues>;
-  roleOptions: readonly SelectOption[];
   educationStageOptions: readonly SelectOption[];
 }
 
 export const PersonalInfoSection = ({
   form,
-  roleOptions,
   educationStageOptions,
 }: PersonalInfoSectionProps) => {
   return (
@@ -88,49 +86,6 @@ export const PersonalInfoSection = ({
             </FormItem>
           );
         }}
-      />
-
-      {/* 身份 */}
-      <FormField
-        control={form.control}
-        name="role"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="block font-medium text-text-dark mb-3">身份</FormLabel>
-            <FormControl>
-              <Select
-                value={field.value}
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  field.onBlur();
-                }}
-                disabled={field.disabled}
-              >
-                <SelectTrigger
-                  className={cn(
-                    "w-full h-10 px-4 py-2 text-left font-normal text-sm",
-                    "border border-bg-gray hover:border-logo-cyan bg-background rounded-lg",
-                    "focus-visible:border-2 focus-visible:border-logo-cyan focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#DEF5F5]",
-                    form.formState.errors.role && "border-red",
-                    "disabled:cursor-not-allowed disabled:border-bg-gray disabled:bg-very-light-gray",
-                    "data-placeholder:text-light-gray"
-                  )}
-                  aria-invalid={!!form.formState.errors.role}
-                >
-                  <SelectValue placeholder="請選擇身份" />
-                </SelectTrigger>
-                <SelectContent>
-                  {roleOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
       />
 
       {/* 教育階段 */}
