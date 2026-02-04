@@ -18,9 +18,10 @@ import { DURATION_DAYS_OPTIONS, FREQUENCY_OPTIONS, type ManualPracticeFormValues
 interface Step2Props {
   form: UseFormReturn<ManualPracticeFormValues>;
   disabled?: boolean;
+  minStartDate?: Date;
 }
 
-export const Step2 = ({ form, disabled = false }: Step2Props) => {
+export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
   const startDate = form.watch("startDate");
   const durationDays = form.watch("durationDays");
 
@@ -54,7 +55,7 @@ export const Step2 = ({ form, disabled = false }: Step2Props) => {
                   placeholder="選擇日期"
                   disabled={disabled}
                   onBlur={field.onBlur}
-                  minDate={new Date()}
+                  minDate={minStartDate ?? new Date()}
                   maxDate={addDays(new Date(), 14)}
                   onError={(errorMessage) => {
                     form.setError("startDate", { message: errorMessage });

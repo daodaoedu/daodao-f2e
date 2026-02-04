@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import { type ManualPracticeFormValues, manualPracticeFormSchema } from "@/components/practice";
+import { type ManualPracticeFormValues, createManualPracticeFormSchema } from "@/components/practice";
 import { Step1 } from "@/components/practice/create/manual/steps/step-1";
 import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";
@@ -85,6 +85,19 @@ export default function EditPracticePage() {
   const isPracticeStarted = useMemo(() => {
     return practiceData?.data?.status === PracticeStatus.active;
   }, [practiceData?.data?.status]);
+
+  // 取得實踐的創建日期，用於日期驗證的最小日期
+  const minStartDate = useMemo(() => {
+    if (practiceData?.data?.createdAt) {
+      return new Date(practiceData.data.createdAt);
+    }
+    return new Date();
+  }, [practiceData?.data?.createdAt]);
+
+  // 使用創建日期作為最小日期來創建 schema
+  const formSchema = useMemo(() => {
+    return createManualPracticeFormSchema({ minStartDate });
+  }, [minStartDate]);
 
   // 將 API 資料轉換為表單值
   const formValues: ManualPracticeFormValues | null = useMemo(() => {
@@ -171,7 +184,7 @@ export default function EditPracticePage() {
   }, []);
 
   const form = useForm<ManualPracticeFormValues>({
-    resolver: zodResolver(manualPracticeFormSchema),
+    resolver: zodResolver(formSchema),
     mode: "onSubmit",
     defaultValues: initialFormValues,
   });
@@ -254,7 +267,7 @@ export default function EditPracticePage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             <Step1 form={form} />
-            <Step2 form={form} disabled={isPracticeStarted} />
+            <Step2 form={form} disabled={isPracticeStarted} minStartDate={minStartDate} />
             <Step3 form={form} />
             <Step4 form={form} />
 

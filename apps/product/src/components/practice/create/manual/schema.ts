@@ -52,14 +52,18 @@ export const EXECUTION_TIMING_OPTIONS = [
   { value: ExecutionTiming.beforeSleep, label: "睡前" },
 ] as const;
 
-// Form Schema
-export const manualPracticeFormSchema = z.object({
-  // Step 1
-  name: z.string().min(1, "請輸入名稱"),
-  actionDescription: z.string().min(1, "請輸入實踐行動").max(50, "最多50字").default(""),
+// Schema 選項
+export interface ManualPracticeSchemaOptions {
+  // 開始日期的最小日期限制
+  // 編輯模式時可設為實踐的創建日期，允許保留原有的開始日期
+  // 如果未提供，驗證時會動態使用當前日期
+  minStartDate?: Date;
+}
 
-  // Step 2
-  startDate: z
+// 建立開始日期驗證 schema
+// minDate 為可選參數，若未提供則在驗證時使用當前日期（確保跨午夜時仍正確）
+const createStartDateSchema = (minDate?: Date) => {
+  return z
     .string()
     .min(1, "請選擇開始時間")
     .refine(
@@ -67,20 +71,27 @@ export const manualPracticeFormSchema = z.object({
         if (!val) return false;
         const date = parse(val, "yyyy-MM-dd", new Date());
         if (!isValid(date)) return false;
-        const today = startOfDay(new Date());
+        // 若有指定 minDate 則使用，否則使用當前日期
+        const minDateStartOfDay = startOfDay(minDate ?? new Date());
         const maxDate = startOfDay(addDays(new Date(), 14));
         const dateStartOfDay = startOfDay(date);
-        return !isBefore(dateStartOfDay, today) && !isAfter(dateStartOfDay, maxDate);
+        return !isBefore(dateStartOfDay, minDateStartOfDay) && !isAfter(dateStartOfDay, maxDate);
       },
       (val) => {
         if (!val) return { message: "請選擇開始時間" };
         const date = parse(val, "yyyy-MM-dd", new Date());
         if (!isValid(date)) return { message: "請選擇有效的日期" };
-        const today = startOfDay(new Date());
+        // 若有指定 minDate 則使用，否則使用當前日期
+        const minDateStartOfDay = startOfDay(minDate ?? new Date());
         const maxDate = startOfDay(addDays(new Date(), 14));
         const dateStartOfDay = startOfDay(date);
-        if (isBefore(dateStartOfDay, today)) {
-          return { message: "日期不能早於今天" };
+        if (isBefore(dateStartOfDay, minDateStartOfDay)) {
+          // 若是動態日期（今天），顯示「今天」；若是指定日期，顯示具體日期
+          if (!minDate) {
+            return { message: "日期不能早於今天" };
+          }
+          const minDateFormatted = format(minDateStartOfDay, "yyyy/MM/dd");
+          return { message: `日期不能早於 ${minDateFormatted}` };
         }
         if (isAfter(dateStartOfDay, maxDate)) {
           const maxDateFormatted = format(maxDate, "yyyy/MM/dd");
@@ -88,37 +99,55 @@ export const manualPracticeFormSchema = z.object({
         }
         return { message: "日期不在允許的範圍內" };
       }
-    ),
-  durationDays: z.nativeEnum(DurationDays, {
-    required_error: "請選擇想要持續多久",
-  }),
-  frequency: z.nativeEnum(Frequency, {
-    required_error: "請選擇每週實踐頻率",
-  }),
+    );
+};
 
-  // Step 3
-  durationMinutes: z.number(),
-  executionTiming: z.array(z.nativeEnum(ExecutionTiming)).min(1, "請至少選擇一個執行時機"),
-  customTiming: z.string(),
+// Form Schema 工廠函數
+export const createManualPracticeFormSchema = (options?: ManualPracticeSchemaOptions) => {
+  // 不提供預設值，讓 createStartDateSchema 在驗證時動態決定
+  const minStartDate = options?.minStartDate;
 
-  // Step 4
-  tags: z.array(z.string()).max(MAX_PRACTICE_TAGS, `標籤最多 ${MAX_PRACTICE_TAGS} 個`).optional(),
-  resources: z
-    .array(
-      z.object({
-        id: z.string(),
-        name: z.string().min(1, "請輸入資源名稱"),
-        url: z
-          .string()
-          .url("請輸入有效的網址")
-          .refine((val) => !val || val.startsWith("https://"), {
-            message: "網址必須使用 HTTPS",
-          })
-          .optional()
-          .or(z.literal("")),
-      })
-    )
-    .optional(),
-});
+  return z.object({
+    // Step 1
+    name: z.string().min(1, "請輸入名稱"),
+    actionDescription: z.string().min(1, "請輸入實踐行動").max(50, "最多50字").default(""),
+
+    // Step 2
+    startDate: createStartDateSchema(minStartDate),
+    durationDays: z.nativeEnum(DurationDays, {
+      required_error: "請選擇想要持續多久",
+    }),
+    frequency: z.nativeEnum(Frequency, {
+      required_error: "請選擇每週實踐頻率",
+    }),
+
+    // Step 3
+    durationMinutes: z.number(),
+    executionTiming: z.array(z.nativeEnum(ExecutionTiming)).min(1, "請至少選擇一個執行時機"),
+    customTiming: z.string(),
+
+    // Step 4
+    tags: z.array(z.string()).max(MAX_PRACTICE_TAGS, `標籤最多 ${MAX_PRACTICE_TAGS} 個`).optional(),
+    resources: z
+      .array(
+        z.object({
+          id: z.string(),
+          name: z.string().min(1, "請輸入資源名稱"),
+          url: z
+            .string()
+            .url("請輸入有效的網址")
+            .refine((val) => !val || val.startsWith("https://"), {
+              message: "網址必須使用 HTTPS",
+            })
+            .optional()
+            .or(z.literal("")),
+        })
+      )
+      .optional(),
+  });
+};
+
+// 預設 schema（用於創建模式）
+export const manualPracticeFormSchema = createManualPracticeFormSchema();
 
 export type ManualPracticeFormValues = z.infer<typeof manualPracticeFormSchema>;
