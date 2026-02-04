@@ -10,10 +10,10 @@ import { Progress } from "@daodao/ui/components/progress";
 import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import { type ManualPracticeFormValues, createManualPracticeFormSchema } from "@/components/practice";
+import { type ManualPracticeFormValues, manualPracticeFormSchema } from "@/components/practice";
 import { Step1 } from "@/components/practice/create/manual/steps/step-1";
 import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";
@@ -93,11 +93,8 @@ export default function CreateManualPracticePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isRestoreDialogOpenRef = useRef(false);
 
-  // 動態創建 schema，確保 minDate 是當前日期
-  const formSchema = useMemo(() => createManualPracticeFormSchema(), []);
-
   const form = useForm<ManualPracticeFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(manualPracticeFormSchema),
     defaultValues: defaultFormValues as ManualPracticeFormValues,
     mode: "onSubmit",
   });

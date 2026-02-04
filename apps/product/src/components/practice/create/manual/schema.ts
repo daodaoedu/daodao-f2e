@@ -54,13 +54,15 @@ export const EXECUTION_TIMING_OPTIONS = [
 
 // Schema 選項
 export interface ManualPracticeSchemaOptions {
-  // 開始日期的最小日期限制（預設為今天）
+  // 開始日期的最小日期限制
   // 編輯模式時可設為實踐的創建日期，允許保留原有的開始日期
+  // 如果未提供，驗證時會動態使用當前日期
   minStartDate?: Date;
 }
 
 // 建立開始日期驗證 schema
-const createStartDateSchema = (minDate: Date) => {
+// minDate 為可選參數，若未提供則在驗證時使用當前日期（確保跨午夜時仍正確）
+const createStartDateSchema = (minDate?: Date) => {
   return z
     .string()
     .min(1, "請選擇開始時間")
@@ -69,7 +71,8 @@ const createStartDateSchema = (minDate: Date) => {
         if (!val) return false;
         const date = parse(val, "yyyy-MM-dd", new Date());
         if (!isValid(date)) return false;
-        const minDateStartOfDay = startOfDay(minDate);
+        // 若有指定 minDate 則使用，否則使用當前日期
+        const minDateStartOfDay = startOfDay(minDate ?? new Date());
         const maxDate = startOfDay(addDays(new Date(), 14));
         const dateStartOfDay = startOfDay(date);
         return !isBefore(dateStartOfDay, minDateStartOfDay) && !isAfter(dateStartOfDay, maxDate);
@@ -78,10 +81,15 @@ const createStartDateSchema = (minDate: Date) => {
         if (!val) return { message: "請選擇開始時間" };
         const date = parse(val, "yyyy-MM-dd", new Date());
         if (!isValid(date)) return { message: "請選擇有效的日期" };
-        const minDateStartOfDay = startOfDay(minDate);
+        // 若有指定 minDate 則使用，否則使用當前日期
+        const minDateStartOfDay = startOfDay(minDate ?? new Date());
         const maxDate = startOfDay(addDays(new Date(), 14));
         const dateStartOfDay = startOfDay(date);
         if (isBefore(dateStartOfDay, minDateStartOfDay)) {
+          // 若是動態日期（今天），顯示「今天」；若是指定日期，顯示具體日期
+          if (!minDate) {
+            return { message: "日期不能早於今天" };
+          }
           const minDateFormatted = format(minDateStartOfDay, "yyyy/MM/dd");
           return { message: `日期不能早於 ${minDateFormatted}` };
         }
@@ -96,7 +104,8 @@ const createStartDateSchema = (minDate: Date) => {
 
 // Form Schema 工廠函數
 export const createManualPracticeFormSchema = (options?: ManualPracticeSchemaOptions) => {
-  const minStartDate = options?.minStartDate ?? new Date();
+  // 不提供預設值，讓 createStartDateSchema 在驗證時動態決定
+  const minStartDate = options?.minStartDate;
 
   return z.object({
     // Step 1
