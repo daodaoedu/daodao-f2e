@@ -4,12 +4,16 @@ import { Button } from "@daodao/ui/components/button";
 import { Input } from "@daodao/ui/components/input";
 import { Check, ChevronRight, Plus, X } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import type { FieldSelectionData } from "./use-field-selection-sheet";
+import type { FieldOption, FieldSelectionData } from "./use-field-selection-sheet";
 
 interface FieldSelectionSheetContentProps {
+  /** 初始選中的領域值（英文 value） */
   initialFields: string[];
-  availableFields: string[];
+  /** 可選的領域列表 { value, label } */
+  availableFields: readonly FieldOption[];
   maxSelection: number;
+  /** 自訂欄位的標籤文字，例如「其他角色」或「其他領域」 */
+  customFieldLabel?: string;
   onComplete: (data: FieldSelectionData) => void;
   onClose?: () => void;
 }
@@ -18,26 +22,37 @@ export const FieldSelectionSheetContent = ({
   initialFields = [],
   availableFields,
   maxSelection,
+  customFieldLabel = "其他領域",
   onComplete,
   onClose,
 }: FieldSelectionSheetContentProps) => {
+  // selectedFields 存儲的是 value（英文）
   const [selectedFields, setSelectedFields] = useState<string[]>(initialFields);
   const [customFieldInput, setCustomFieldInput] = useState("");
 
+  // 根據 value 取得 label 的輔助函數
+  const getLabelByValue = useCallback(
+    (value: string) => {
+      const field = availableFields.find((f) => f.value === value);
+      return field?.label ?? value; // 如果找不到就顯示原值（自訂領域）
+    },
+    [availableFields]
+  );
+
   // 過濾出未選中的可用領域
   const unselectedFields = useMemo(() => {
-    return availableFields.filter((field) => !selectedFields.includes(field));
+    return availableFields.filter((field) => !selectedFields.includes(field.value));
   }, [availableFields, selectedFields]);
 
   const handleAddField = useCallback(
-    (field: string) => {
-      if (selectedFields.includes(field)) {
+    (value: string) => {
+      if (selectedFields.includes(value)) {
         return;
       }
       if (selectedFields.length >= maxSelection) {
         return;
       }
-      setSelectedFields((prev) => [...prev, field]);
+      setSelectedFields((prev) => [...prev, value]);
     },
     [maxSelection, selectedFields]
   );
@@ -89,15 +104,15 @@ export const FieldSelectionSheetContent = ({
             <div className="flex flex-wrap gap-3">
               {unselectedFields.map((field) => (
                 <Button
-                  key={field}
+                  key={field.value}
                   type="button"
                   variant="ghost"
-                  onClick={() => handleAddField(field)}
+                  onClick={() => handleAddField(field.value)}
                   disabled={!canAddMore}
                   className="rounded-lg bg-very-light-blue border border-blue px-4 py-2"
-                  aria-label={`新增 ${field}`}
+                  aria-label={`新增 ${field.label}`}
                 >
-                  <span className="text-sm">{field}</span>
+                  <span className="text-sm">{field.label}</span>
                   <Plus className="size-4.5 shrink-0" />
                 </Button>
               ))}
@@ -107,16 +122,16 @@ export const FieldSelectionSheetContent = ({
 
         {/* 其他領域區塊 */}
         <div className="space-y-3">
-          <h3 className="text-sm text-text-dark">其他領域</h3>
+          <h3 className="text-sm text-text-dark">{customFieldLabel}</h3>
           <div className="flex gap-2">
             <Input
               value={customFieldInput}
               onChange={(e) => setCustomFieldInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="專業領域名稱"
+              placeholder="請輸入名稱"
               disabled={!canAddMore}
               className="flex-1"
-              aria-label="輸入自訂專業領域"
+              aria-label={`輸入${customFieldLabel}`}
             />
             <Button
               type="button"
@@ -137,16 +152,16 @@ export const FieldSelectionSheetContent = ({
           <div className="space-y-3">
             <h3 className="text-sm text-text-dark">已選擇</h3>
             <div className="flex flex-col gap-2.5 p-3 bg-light-blue border border-blue rounded-lg">
-              {selectedFields.map((field) => (
+              {selectedFields.map((value) => (
                 <Button
-                  key={field}
+                  key={value}
                   type="button"
                   variant="ghost"
-                  onClick={() => handleRemoveField(field)}
+                  onClick={() => handleRemoveField(value)}
                   className="px-4 py-2 rounded-lg bg-white border border-blue transition-colors"
-                  aria-label={`移除 ${field}`}
+                  aria-label={`移除 ${getLabelByValue(value)}`}
                 >
-                  <span className="text-left flex-1">{field}</span>
+                  <span className="text-left flex-1">{getLabelByValue(value)}</span>
                   <X className="size-4.5 shrink-0" />
                 </Button>
               ))}

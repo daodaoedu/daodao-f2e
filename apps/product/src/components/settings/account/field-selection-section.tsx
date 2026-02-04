@@ -10,15 +10,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@daodao/ui/components/form";
+import { useCallback } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type { AccountFormValues } from "./schema";
-import { useFieldSelectionSheet } from "./use-field-selection-sheet";
+import { type FieldOption, useFieldSelectionSheet } from "./use-field-selection-sheet";
 
 interface FieldSelectionSectionProps {
   form: UseFormReturn<AccountFormValues>;
-  fieldName: "professionalFields" | "explorationFields";
+  fieldName: "professionalFields" | "explorationFields" | "position";
   label: string;
-  availableFields: string[];
+  /** 可選的領域列表 { value, label } */
+  availableFields: readonly FieldOption[];
   maxSelection: number;
 }
 
@@ -31,11 +33,24 @@ export const FieldSelectionSection = ({
 }: FieldSelectionSectionProps) => {
   const selectedFields = form.watch(fieldName) || [];
 
+  // 根據 value 取得 label 的輔助函數
+  const getLabelByValue = useCallback(
+    (value: string) => {
+      const field = availableFields.find((f) => f.value === value);
+      return field?.label ?? value; // 如果找不到就顯示原值（自訂領域）
+    },
+    [availableFields]
+  );
+
+  // 根據欄位類型決定自訂欄位的標籤
+  const customFieldLabel = fieldName === "position" ? "其他角色" : "其他領域";
+
   const { openFieldSelectionSheet } = useFieldSelectionSheet({
     initialFields: selectedFields,
     availableFields,
     maxSelection,
     title: label,
+    customFieldLabel,
     onComplete: (data) => {
       form.setValue(fieldName, data.selectedFields);
     },
@@ -65,9 +80,9 @@ export const FieldSelectionSection = ({
               <div>
                 {Array.isArray(field.value) && field.value.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {field.value.map((field) => (
-                      <Badge key={field} variant="outline-blue" className="rounded-lg px-4 py-2">
-                        {field}
+                    {field.value.map((value) => (
+                      <Badge key={value} variant="outline-blue" className="rounded-lg px-4 py-2">
+                        {getLabelByValue(value)}
                       </Badge>
                     ))}
                   </div>

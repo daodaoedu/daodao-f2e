@@ -30,7 +30,7 @@ export const useUsers = (params?: IGetUsersParams) => {
         page: params?.page ? String(params.page) : undefined,
         pageSize: params?.pageSize ? String(params.pageSize) : undefined,
         educationStage: params?.educationStage ?? undefined,
-        roleList: params?.roleList ?? undefined,
+        positionList: params?.positionList ?? undefined,
         location: params?.location ?? undefined,
         search: params?.search ?? undefined,
       },
