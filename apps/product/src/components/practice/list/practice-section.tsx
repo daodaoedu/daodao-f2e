@@ -61,6 +61,7 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
     error,
   } = useUserPractices(userId, {
     limit: 16, // 取得足夠的實踐列表
+    status: "all", // 獲取所有狀態的實踐（未開始、進行中、已完成等）
   });
 
   // 判斷是否為自己的資料
