@@ -180,6 +180,7 @@ export const QuizResult = () => {
             variant="outline"
             className="mb-6 block w-full border-basic-400 text-basic-400 hover:bg-basic-400"
             onClick={handleViewAnalysis}
+            redirectUrl={`/quiz/result/${detail?.id}`}
           >
             看深度分析
           </AuthButton>

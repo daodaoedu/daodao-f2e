@@ -361,8 +361,8 @@ export default function CreateManualPracticePage() {
                 className="w-full sm:max-w-[288px]"
                 disabled={isCheckingDraft || isSubmitting}
               >
-                下一步
-                <ArrowRightOutlineSvg className="size-4.5" />
+                {currentStep === TOTAL_STEPS ? "完成新增" : "下一步"}
+                {currentStep !== TOTAL_STEPS && <ArrowRightOutlineSvg className="size-4.5" />}
               </Button>
             </footer>
           </form>
