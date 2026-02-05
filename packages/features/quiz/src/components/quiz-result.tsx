@@ -1,8 +1,9 @@
 "use client";
 
+import { saveQuizResult } from "@daodao/api";
 import { HorizontalFullSvg, VerticalFullSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
-import { AuthButton } from "@daodao/auth";
+import { AuthButton, useAuth } from "@daodao/auth";
 import { useRouter } from "@daodao/i18n/navigation";
 import {
   type CapturedImageData,
@@ -20,8 +21,10 @@ import { List, Slogan, Title } from "./styled";
 
 export const QuizResult = () => {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [resultImg, setResultImg] = useState<CapturedImageData | null>(null);
-  const { detail, theme, analysis, hasAnalysis } = useQuiz();
+  const [hasSavedResult, setHasSavedResult] = useState(false);
+  const { detail, theme, analysis, hasAnalysis, result } = useQuiz();
   const { rootStyle } = useResultStyles(theme);
   const mainRef = useRef<HTMLDivElement>(null);
 
@@ -50,6 +53,36 @@ export const QuizResult = () => {
       clearTimeout(timer);
     };
   }, [hasAnalysis, router]);
+
+  // 當用戶已登入且有測驗結果時，自動儲存到後端
+  useEffect(() => {
+    const saveResult = async () => {
+      if (!isAuthenticated || !hasAnalysis || !detail || hasSavedResult) {
+        return;
+      }
+
+      try {
+        // 轉換答案格式：從 { q1: { selectedAnswer: 'A' } } 轉為 { "1": { selectedAnswer: "A" } }
+        const formattedAnswers: Record<string, { selectedAnswer: string }> = {};
+        for (const [questionId, answer] of Object.entries(result)) {
+          const questionNumber = questionId.replace("q", "");
+          formattedAnswers[questionNumber] = { selectedAnswer: answer.selectedAnswer };
+        }
+
+        await saveQuizResult({
+          resultType: detail.id,
+          scores: analysis,
+          answers: formattedAnswers,
+        });
+        setHasSavedResult(true);
+      } catch (error) {
+        // 儲存失敗時靜默處理，不影響用戶體驗
+        console.error("Failed to save quiz result:", error);
+      }
+    };
+
+    saveResult();
+  }, [isAuthenticated, hasAnalysis, detail, hasSavedResult, result, analysis]);
 
   useEffect(() => {
     const renderResultImg = async () => {
