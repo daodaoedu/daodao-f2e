@@ -10,13 +10,13 @@ export interface ResourceLink {
   link: string;
 }
 
-// 角色 ID 常數
+// 角色 ID 常數 (使用大寫以符合 API 規格)
 export const ROLE_IDS = {
-  EXPLORER: "d", // 探究者
-  ACTOR: "a", // 行動者
-  ORGANIZER: "o", // 結構者
-  LINKER: "l", // 流動者
-  CONNECTOR: "c", // 連結者
+  EXPLORER: "D", // 探究者 (Discovery)
+  ACTOR: "A", // 行動者 (Action)
+  ORGANIZER: "O", // 結構者 (Organization)
+  LINKER: "L", // 流動者 (Leadership)
+  CONNECTOR: "C", // 連結者 (Connection)
 } as const;
 
 // 共同的標籤

@@ -24,12 +24,12 @@ interface IslandHeaderProps {
 }
 
 const resultTypeToLottiePathMap = new Map<string, () => Promise<object>>([
-  ["d", () => import("@daodao/assets/images/quiz/deep-explorer-1.json").then((m) => m.default)],
-  ["o", () => import("@daodao/assets/images/quiz/order-builder-1.json").then((m) => m.default)],
-  ["a", () => import("@daodao/assets/images/quiz/active-shaper-1.json").then((m) => m.default)],
-  ["l", () => import("@daodao/assets/images/quiz/liquid-integrator-1.json").then((m) => m.default)],
+  ["D", () => import("@daodao/assets/images/quiz/deep-explorer-1.json").then((m) => m.default)],
+  ["O", () => import("@daodao/assets/images/quiz/order-builder-1.json").then((m) => m.default)],
+  ["A", () => import("@daodao/assets/images/quiz/active-shaper-1.json").then((m) => m.default)],
+  ["L", () => import("@daodao/assets/images/quiz/liquid-integrator-1.json").then((m) => m.default)],
   [
-    "c",
+    "C",
     () => import("@daodao/assets/images/quiz/community-connector-1.json").then((m) => m.default),
   ],
 ]);

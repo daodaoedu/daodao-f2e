@@ -70,7 +70,7 @@ export const QuizResult = () => {
         }
 
         await saveQuizResult({
-          resultType: detail.id,
+          resultType: detail.id, // 已經是大寫格式 (L/C/A/D/O)
           scores: analysis,
           answers: formattedAnswers,
         });
