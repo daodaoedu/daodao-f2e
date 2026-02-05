@@ -8,7 +8,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { type Path, useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { type ManualPracticeFormValues, createManualPracticeFormSchema } from "@/components/practice";
 import { Step1 } from "@/components/practice/create/manual/steps/step-1";
@@ -24,6 +24,15 @@ import {
   parseFrequency,
 } from "@/constants/practice-form";
 import { PracticeStatus } from "@/constants/practice-status";
+
+// API 錯誤響應類型
+interface ApiErrorResponse {
+  error?: {
+    message?: string;
+    details?: Array<{ path?: string; message?: string }>;
+  };
+  message?: string;
+}
 
 // 將表單資料轉換成 API 請求格式
 const convertFormValuesToApiRequest = (
@@ -210,15 +219,7 @@ export default function EditPracticePage() {
 
       // 檢查是否有錯誤
       if (response.error) {
-        // response.error 是整個響應物件，實際錯誤在 response.error.error
-        const errorResponse = response.error as {
-          error?: {
-            message?: string;
-            details?: Array<{ path?: string; message?: string }>;
-          };
-          message?: string;
-        };
-
+        const errorResponse = response.error as ApiErrorResponse;
         const error = errorResponse.error || errorResponse;
         let errorMessage = "儲存失敗，請稍後再試";
 
@@ -231,8 +232,8 @@ export default function EditPracticePage() {
 
             details.forEach((detail) => {
               if (detail.path && detail.message) {
-                // 將錯誤設置到對應的表單欄位
-                form.setError(detail.path as keyof ManualPracticeFormValues, {
+                // 將錯誤設置到對應的表單欄位（使用 Path 支援嵌套路徑如 resources.0.name）
+                form.setError(detail.path as Path<ManualPracticeFormValues>, {
                   type: "server",
                   message: detail.message,
                 });
