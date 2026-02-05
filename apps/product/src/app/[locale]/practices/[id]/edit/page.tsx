@@ -8,7 +8,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { type Path, useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { type ManualPracticeFormValues, createManualPracticeFormSchema } from "@/components/practice";
 import { Step1 } from "@/components/practice/create/manual/steps/step-1";
@@ -24,6 +24,15 @@ import {
   parseFrequency,
 } from "@/constants/practice-form";
 import { PracticeStatus } from "@/constants/practice-status";
+
+// API 錯誤響應類型
+interface ApiErrorResponse {
+  error?: {
+    message?: string;
+    details?: Array<{ path?: string; message?: string }>;
+  };
+  message?: string;
+}
 
 // 將表單資料轉換成 API 請求格式
 const convertFormValuesToApiRequest = (
@@ -210,8 +219,40 @@ export default function EditPracticePage() {
 
       // 檢查是否有錯誤
       if (response.error) {
+        const errorResponse = response.error as ApiErrorResponse;
+        const error = errorResponse.error || errorResponse;
+        let errorMessage = "儲存失敗，請稍後再試";
+
+        // 處理錯誤訊息
+        if (typeof error === "object" && error !== null) {
+          // 檢查是否有 details 陣列
+          if ("details" in error && Array.isArray(error.details)) {
+            // 處理 details 陣列中的每個錯誤
+            const details = error.details;
+
+            details.forEach((detail) => {
+              if (detail.path && detail.message) {
+                // 將錯誤設置到對應的表單欄位（使用 Path 支援嵌套路徑如 resources.0.name）
+                form.setError(detail.path as Path<ManualPracticeFormValues>, {
+                  type: "server",
+                  message: detail.message,
+                });
+              }
+            });
+
+            // 使用第一個具體錯誤訊息作為 toast 訊息
+            const firstDetail = details[0];
+            if (firstDetail?.message) {
+              errorMessage = firstDetail.message;
+            }
+          } else if ("message" in error && error.message) {
+            // 如果沒有 details，使用頂層 message
+            errorMessage = String(error.message);
+          }
+        }
+
         console.error("Failed to update practice:", response.error);
-        toast.error("儲存失敗，請稍後再試");
+        toast.error(errorMessage);
         setIsSubmitting(false);
         return;
       }
