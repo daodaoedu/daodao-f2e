@@ -8,6 +8,8 @@ export const SocialPlatform = {
   threads: "threads",
   linkedin: "linkedin",
   discord: "discord",
+  website: "website",
+  github: "github",
 } as const;
 
 /**

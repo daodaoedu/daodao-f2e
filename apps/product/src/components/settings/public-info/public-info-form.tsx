@@ -112,16 +112,16 @@ export const PublicInfoForm = () => {
         updateData.selfIntroduction = values.selfIntroduction;
       }
 
-      // 更新社群連結
+      // 更新社群連結（使用空字串以便後端清空欄位）
       updateData.contactList = {
-        facebook: values.facebook || undefined,
-        instagram: values.instagram || undefined,
-        linkedin: values.linkedin || undefined,
-        discord: values.discord || undefined,
-        github: values.github || undefined,
-        website: values.personalUrl || undefined,
-        line: values.line || undefined,
-        threads: values.threads || undefined,
+        facebook: values.facebook,
+        instagram: values.instagram,
+        linkedin: values.linkedin,
+        discord: values.discord,
+        github: values.github,
+        website: values.personalUrl,
+        line: values.line,
+        threads: values.threads,
       };
 
       // 調用 FormData API 更新用戶資訊（包含圖片上傳）
