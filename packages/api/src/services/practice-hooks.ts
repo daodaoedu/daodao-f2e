@@ -6,7 +6,6 @@
  */
 
 import { getRequiredEnv } from "@daodao/config";
-import { useRef } from "react";
 import { client, unauthorizedHandler } from "../client";
 import { useMutate, useQuery } from "../hooks";
 import type { components, paths } from "../types";
@@ -405,15 +404,8 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
  */
 export const useArchivePractice = (practiceId: string) => {
   const mutate = useMutate();
-  const { data: practiceData } = usePracticeById(practiceId);
-
-  // 使用 useRef 保存原始狀態，供復原時使用
-  const originalStatusRef = useRef<string | null>(null);
 
   const archivePractice = async () => {
-    // 先獲取當前狀態作為原始狀態
-    originalStatusRef.current = practiceData?.data?.status || "active";
-
     const response = await updatePractice(practiceId, {
       status: "archived",
     } as UpdatePracticeRequestType);
@@ -433,18 +425,15 @@ export const useArchivePractice = (practiceId: string) => {
   };
 
   const restorePractice = async () => {
-    if (!originalStatusRef.current) {
-      throw new Error("無法復原：找不到原始狀態");
-    }
-
-    const response = await updatePractice(practiceId, {
-      status: originalStatusRef.current as
-        | "draft"
-        | "not_started"
-        | "active"
-        | "completed"
-        | "archived",
-    } as UpdatePracticeRequestType);
+    // 使用專門的 unarchive API 端點，而不是 PUT 更新狀態
+    // 後端會根據是否有打卡記錄自動決定恢復後的狀態（active 或 not_started）
+    const response = await client.POST("/api/v1/practices/{id}/unarchive", {
+      params: {
+        path: {
+          id: practiceId,
+        },
+      },
+    });
 
     if (response.error) {
       const errorMessage =
@@ -456,9 +445,6 @@ export const useArchivePractice = (practiceId: string) => {
 
     // 刷新相關的 cache
     await refreshPracticeCaches(mutate, practiceId);
-
-    // 清除保存的原始狀態
-    originalStatusRef.current = null;
 
     return response;
   };
