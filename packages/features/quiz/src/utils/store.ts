@@ -49,5 +49,10 @@ export const calculateQuizAnalysis = (
 
 export const getResultId = (analysis: Record<AnswerKeyType, number>): AnswerKeyType => {
   // analysis 物件必定包含所有 AnswerKeyType 鍵，因此排序後直接取第一個元素的鍵
-  return Object.entries(analysis).sort((a, b) => b[1] - a[1])[0][0] as AnswerKeyType;
+  const sorted = Object.entries(analysis).sort((a, b) => b[1] - a[1]);
+  const topResult = sorted[0];
+  if (!topResult) {
+    throw new Error("Cannot determine result from an empty analysis object.");
+  }
+  return topResult[0] as AnswerKeyType;
 };
