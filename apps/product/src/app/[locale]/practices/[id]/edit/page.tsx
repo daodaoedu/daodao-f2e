@@ -7,6 +7,7 @@ import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { startOfDay } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
@@ -95,15 +96,18 @@ export default function EditPracticePage() {
     return practiceData?.data?.status === PracticeStatus.active;
   }, [practiceData?.data?.status]);
 
-  // 取得實踐的創建日期，用於日期驗證的最小日期
+  // 取得日期驗證的最小日期
+  // 對於已排程的實踐，應該允許保留原本的開始日期（即使已經過去）
   const minStartDate = useMemo(() => {
-    if (practiceData?.data?.createdAt) {
-      return new Date(practiceData.data.createdAt);
-    }
-    return new Date();
-  }, [practiceData?.data?.createdAt]);
+    const today = startOfDay(new Date());
+    const practiceStartDate = practiceData?.data?.startDate
+      ? startOfDay(new Date(practiceData.data.startDate))
+      : today;
 
-  // 使用創建日期作為最小日期來創建 schema
+    return practiceStartDate < today ? practiceStartDate : today;
+  }, [practiceData?.data?.startDate]);
+
+  // 使用 minStartDate 來創建 schema
   const formSchema = useMemo(() => {
     return createManualPracticeFormSchema({ minStartDate });
   }, [minStartDate]);
