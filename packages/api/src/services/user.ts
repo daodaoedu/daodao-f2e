@@ -342,6 +342,27 @@ export const getLatestQuizResult = async () => {
   return client.GET("/api/v1/quiz/latest");
 };
 
+/**
+ * 保存測驗結果請求類型
+ */
+type SaveQuizResultRequest = components["schemas"]["SaveQuizResultRequest"];
+
+/**
+ * 保存測驗結果回應類型
+ */
+type SaveQuizResultResponse =
+  paths["/api/v1/quiz"]["post"]["responses"]["201"]["content"]["application/json"];
+
+/**
+ * 保存當前用戶的測驗結果
+ * @param data 測驗結果數據，包括 resultType、scores 和 answers
+ */
+export const saveQuizResult = async (data: SaveQuizResultRequest) => {
+  return client.POST("/api/v1/quiz", {
+    body: data,
+  });
+};
+
 // ============================================================================
 // Export Types
 // ============================================================================
@@ -359,4 +380,6 @@ export type {
   PreferenceCategory,
   PreferenceType,
   PreferenceOption,
+  SaveQuizResultRequest,
+  SaveQuizResultResponse,
 };
