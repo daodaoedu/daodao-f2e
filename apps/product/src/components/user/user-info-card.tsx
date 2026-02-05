@@ -1,6 +1,7 @@
 "use client";
 
 import FacebookSvg from "@daodao/assets/images/social-icons/facebook-filled.svg";
+import GithubSvg from "@daodao/assets/images/social-icons/github.svg";
 import InstagramSvg from "@daodao/assets/images/social-icons/instagram-filled.svg";
 import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin-filled.svg";
 import ThreadsSvg from "@daodao/assets/images/social-icons/threads-filled.svg";
@@ -9,7 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avata
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { toast } from "@daodao/ui/components/sonner";
-import { MapPin } from "lucide-react";
+import { Globe, MapPin } from "lucide-react";
+import type React from "react";
 import { useCallback } from "react";
 import {
   SocialPlatform,
@@ -26,12 +28,16 @@ export interface ISocialLinks {
   threads?: string | null;
   linkedin?: string | null;
   discord?: string | null;
+  website?: string | null;
+  github?: string | null;
 }
 
 /**
  * 社群媒體平台顯示順序
  */
 const SOCIAL_PLATFORM_ORDER: SocialPlatformType[] = [
+  SocialPlatform.website,
+  SocialPlatform.github,
   SocialPlatform.threads,
   SocialPlatform.facebook,
   SocialPlatform.instagram,
@@ -44,6 +50,8 @@ const SOCIAL_PLATFORM_ORDER: SocialPlatformType[] = [
  * 有圖示的社群媒體平台
  */
 const PLATFORMS_WITH_ICON: SocialPlatformType[] = [
+  SocialPlatform.website,
+  SocialPlatform.github,
   SocialPlatform.facebook,
   SocialPlatform.instagram,
   SocialPlatform.threads,
@@ -61,12 +69,18 @@ const getPlatformDisplayName = (platform: SocialPlatformType): string => {
     [SocialPlatform.threads]: "Threads",
     [SocialPlatform.linkedin]: "LinkedIn",
     [SocialPlatform.discord]: "Discord",
+    [SocialPlatform.website]: "個人網站",
+    [SocialPlatform.github]: "GitHub",
   };
   return displayNames[platform] || platform;
 };
 
 const getSocialIcon = (platform: SocialPlatformType) => {
-  const platformMap: Partial<Record<SocialPlatformType, typeof FacebookSvg>> = {
+  const platformMap: Partial<
+    Record<SocialPlatformType, React.ComponentType<{ className?: string }>>
+  > = {
+    [SocialPlatform.website]: Globe,
+    [SocialPlatform.github]: GithubSvg,
     [SocialPlatform.facebook]: FacebookSvg,
     [SocialPlatform.instagram]: InstagramSvg,
     [SocialPlatform.threads]: ThreadsSvg,
