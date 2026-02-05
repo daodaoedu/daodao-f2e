@@ -81,7 +81,8 @@ export default async function UserProfilePage({
   }
 
   const userData = userResponse.data?.data;
-  const resultType = (userData.latestQuizResult?.resultType ?? "").toLowerCase();
+  // 轉換為大寫以符合統一格式 (L/C/A/D/O)，同時相容舊的小寫資料
+  const resultType = (userData.latestQuizResult?.resultType ?? "").toUpperCase();
   const userId = userData.id;
 
   return (

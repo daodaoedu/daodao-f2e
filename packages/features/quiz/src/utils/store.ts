@@ -47,10 +47,10 @@ export const calculateQuizAnalysis = (
   return scores;
 };
 
-export const getResultId = (analysis: Record<AnswerKeyType, number>): string => {
+export const getResultId = (analysis: Record<AnswerKeyType, number>): AnswerKeyType => {
   return (
     Object.entries(analysis)
       .sort((a, b) => b[1] - a[1])
-      .map(([key]) => key)[0] ?? "a"
-  ).toLowerCase();
+      .map(([key]) => key)[0] ?? "A"
+  ) as AnswerKeyType;
 };

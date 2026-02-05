@@ -69,9 +69,8 @@ export const QuizResult = () => {
           formattedAnswers[questionNumber] = { selectedAnswer: answer.selectedAnswer };
         }
 
-        // resultType 需要轉換為大寫以符合 API 規格 (L/C/A/D/O)
         await saveQuizResult({
-          resultType: detail.id.toUpperCase(),
+          resultType: detail.id, // 已經是大寫格式 (L/C/A/D/O)
           scores: analysis,
           answers: formattedAnswers,
         });

@@ -12,7 +12,7 @@ import type { ITheme } from "../types";
 
 const themeList: ITheme[] = [
   {
-    id: "d",
+    id: "D",
     title: "探探島",
     backgroundColor: "#E9F3F5",
     color: "#48809A",
@@ -29,7 +29,7 @@ const themeList: ITheme[] = [
   },
 
   {
-    id: "a",
+    id: "A",
     title: "動動島",
     backgroundColor: "#F5F0E9",
     color: "#9A6948",
@@ -46,7 +46,7 @@ const themeList: ITheme[] = [
   },
 
   {
-    id: "o",
+    id: "O",
     title: "構構島",
     backgroundColor: "#E9F5EE",
     color: "#489A95",
@@ -63,7 +63,7 @@ const themeList: ITheme[] = [
   },
 
   {
-    id: "l",
+    id: "L",
     title: "跨跨島",
     backgroundColor: "#F5EDE9",
     color: "#CB6738",
@@ -80,7 +80,7 @@ const themeList: ITheme[] = [
   },
 
   {
-    id: "c",
+    id: "C",
     title: "連連島",
     backgroundColor: "#F5F4E9",
     color: "#9D8242",
