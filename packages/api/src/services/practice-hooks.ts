@@ -6,7 +6,6 @@
  */
 
 import { getRequiredEnv } from "@daodao/config";
-import { useRef } from "react";
 import { client, unauthorizedHandler } from "../client";
 import { useMutate, useQuery } from "../hooks";
 import type { components, paths } from "../types";
@@ -405,15 +404,8 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
  */
 export const useArchivePractice = (practiceId: string) => {
   const mutate = useMutate();
-  const { data: practiceData } = usePracticeById(practiceId);
-
-  // 使用 useRef 保存原始狀態，供復原時使用
-  const originalStatusRef = useRef<string | null>(null);
 
   const archivePractice = async () => {
-    // 先獲取當前狀態作為原始狀態
-    originalStatusRef.current = practiceData?.data?.status || "active";
-
     const response = await updatePractice(practiceId, {
       status: "archived",
     } as UpdatePracticeRequestType);
@@ -453,9 +445,6 @@ export const useArchivePractice = (practiceId: string) => {
 
     // 刷新相關的 cache
     await refreshPracticeCaches(mutate, practiceId);
-
-    // 清除保存的原始狀態
-    originalStatusRef.current = null;
 
     return response;
   };
