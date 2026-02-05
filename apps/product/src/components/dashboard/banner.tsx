@@ -68,8 +68,12 @@ export function Banner() {
           if (type !== "A") {
             const defaultLoader = resultTypeToLottiePathMap.get("A");
             if (defaultLoader) {
-              const defaultData = await defaultLoader();
-              setLottieJson(defaultData);
+              try {
+                const defaultData = await defaultLoader();
+                setLottieJson(defaultData);
+              } catch (fallbackError) {
+                console.error("Failed to load fallback Lottie animation:", fallbackError);
+              }
             }
           }
         }
