@@ -11,6 +11,7 @@ import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { toast } from "@daodao/ui/components/sonner";
 import { Globe, MapPin } from "lucide-react";
+import type React from "react";
 import { useCallback } from "react";
 import {
   SocialPlatform,
@@ -75,18 +76,15 @@ const getPlatformDisplayName = (platform: SocialPlatformType): string => {
 };
 
 const getSocialIcon = (platform: SocialPlatformType) => {
-  // 處理 lucide-react 圖標
-  if (platform === SocialPlatform.website) {
-    return <Globe className="size-8 md:size-4" />;
-  }
-
-  // 處理 SVG 圖標
-  const platformMap: Partial<Record<SocialPlatformType, typeof FacebookSvg>> = {
+  const platformMap: Partial<
+    Record<SocialPlatformType, React.ComponentType<{ className?: string }>>
+  > = {
+    [SocialPlatform.website]: Globe,
+    [SocialPlatform.github]: GithubSvg,
     [SocialPlatform.facebook]: FacebookSvg,
     [SocialPlatform.instagram]: InstagramSvg,
     [SocialPlatform.threads]: ThreadsSvg,
     [SocialPlatform.linkedin]: LinkedInSvg,
-    [SocialPlatform.github]: GithubSvg,
   };
   const Icon = platformMap[platform];
   if (!Icon) return null;
