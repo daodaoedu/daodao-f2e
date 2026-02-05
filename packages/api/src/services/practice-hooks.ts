@@ -475,9 +475,15 @@ export const useUnarchivePractice = () => {
   const mutate = useMutate();
 
   const unarchivePractice = async (practiceId: string) => {
-    const response = await updatePractice(practiceId, {
-      status: "active",
-    } as UpdatePracticeRequestType);
+    // 使用專門的 unarchive API 端點，而不是 PUT 更新狀態
+    // 後端會根據是否有打卡記錄自動決定恢復後的狀態（active 或 not_started）
+    const response = await client.POST("/api/v1/practices/{id}/unarchive", {
+      params: {
+        path: {
+          id: practiceId,
+        },
+      },
+    });
 
     if (response.error) {
       const errorMessage =
