@@ -47,11 +47,11 @@ export const useCheckInSubmit = ({
       // 關閉 loading toast
       toast.dismiss(loadingToast);
 
-      // 從 API response 中取得新的進度百分比
-      // API 返回的 data 是 CheckInWithEncouragement 類型，包含 practiceProgressPercentage
-      // 使用類型斷言來訪問 practiceProgressPercentage，因為類型定義可能不完整
+      // 從 API response 中取得新的進度百分比和鼓勵句
+      // API 返回的 data 是 CheckInWithEncouragement 類型，包含 practiceProgressPercentage 和 encouragement
+      // 使用類型斷言來訪問這些欄位，因為類型定義可能不完整
       const responseData = response.data as
-        | { practiceProgressPercentage?: number }
+        | { practiceProgressPercentage?: number; encouragement?: string }
         | undefined;
       const newProgressPercentage =
         responseData &&
@@ -59,11 +59,17 @@ export const useCheckInSubmit = ({
         typeof responseData.practiceProgressPercentage === "number"
           ? responseData.practiceProgressPercentage
           : progressPercentage;
+      const encouragement =
+        responseData &&
+        "encouragement" in responseData &&
+        typeof responseData.encouragement === "string"
+          ? responseData.encouragement
+          : undefined;
 
       // 顯示成功對話框
       const from = progressPercentage;
       const to = newProgressPercentage;
-      const result = await openSuccessDialog(from, to);
+      const result = await openSuccessDialog(from, to, encouragement);
 
       if (result.value === "complete") {
         // 成功對話框關閉後，執行原本的完成回調

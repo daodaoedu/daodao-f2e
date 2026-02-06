@@ -2,12 +2,12 @@
 
 import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
-import { toast } from "@daodao/ui/components/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isBefore, parse, startOfDay } from "date-fns";
 import { CalendarCheck, Check } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
+import { EarlyStartResult, useEarlyStartDialog } from "@/hooks/use-early-start-dialog";
 import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
 import { DescriptionField } from "./components/description-field";
 import { MediaUploadField } from "./components/media-upload-field";
@@ -28,16 +28,25 @@ export type { CheckInStatusType as CheckInStatus } from "@/constants/check-in-st
 interface ICheckInSheetContentProps {
   taskTitle: string;
   onComplete: (data: ICheckInFormData) => Promise<void> | void;
+  /** 初始值（用於編輯模式） */
+  initialValues?: Partial<CheckInFormValuesType>;
+  /** 提交按鈕文字 */
+  submitButtonText?: string;
 }
 
-export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetContentProps) => {
+export const CheckInSheetContent = ({
+  taskTitle,
+  onComplete,
+  initialValues,
+  submitButtonText = "完成打卡",
+}: ICheckInSheetContentProps) => {
   const form = useForm<CheckInFormValuesType>({
     resolver: zodResolver(checkInFormSchema),
     defaultValues: {
-      mood: null,
-      tags: [],
-      description: "",
-      media: [],
+      mood: initialValues?.mood ?? null,
+      tags: initialValues?.tags ?? [],
+      description: initialValues?.description ?? "",
+      media: initialValues?.media ?? [],
     },
   });
 
@@ -95,7 +104,7 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
         <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
           <Button type="submit" variant="orange" className="w-full" disabled={isRendering}>
             <Check className="size-4.5" />
-            {isRendering ? "打卡中..." : "完成打卡"}
+            {isRendering ? "儲存中..." : submitButtonText}
           </Button>
         </div>
       </form>
@@ -169,7 +178,11 @@ export const CheckInButton = ({
     },
   });
 
-  const handleClick = () => {
+  const { openEarlyStartDialog } = useEarlyStartDialog({
+    startDate: startDate || "",
+  });
+
+  const handleClick = async () => {
     if (!canCheckIn) return;
 
     // 檢查今天是否早於開始日期
@@ -177,10 +190,14 @@ export const CheckInButton = ({
       const today = startOfDay(new Date());
       const practiceStartDate = startOfDay(parse(startDate, "yyyy-MM-dd", new Date()));
       if (isBefore(today, practiceStartDate)) {
-        toast.warning("實踐尚未開始", {
-          description: "今天的日期早於實踐的開始日期，請在開始日期後再進行打卡。",
-        });
-        return;
+        // 彈出確認對話框，讓用戶決定是否提早開始
+        const result = await openEarlyStartDialog();
+        if (result !== EarlyStartResult.Confirmed) {
+          // 用戶取消，不繼續打卡
+          return;
+        }
+        // 用戶確認提早開始，繼續打卡流程
+        // 後端會自動調整實踐的起迄日
       }
     }
 

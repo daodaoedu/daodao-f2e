@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getResourceStats } from "@daodao/api";
 import {
   Breadcrumb,
   BreadcrumbItem,

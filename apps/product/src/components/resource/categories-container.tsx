@@ -24,7 +24,7 @@ export function CategoriesContainer({
   maxLength = CATEGORIES.length,
   selectedCategories,
   disabledCollapse = false,
-  categoryStats,
+  categoryStats: _categoryStats,
 }: CategoriesContainerProps) {
   const [isShowAll, setIsShowAll] = useState(false);
   const isMedium = useMediaQuery("isMedium");

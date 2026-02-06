@@ -2,6 +2,7 @@
 
 import {
   useArchivePractice,
+  useCurrentUser,
   useDeletePractice,
   useMyPractices,
   usePracticeById,
@@ -52,6 +53,10 @@ export default function PracticeDetailPage() {
   const { data: practicesListData } = useMyPractices({
     limit: 100, // 取得足夠的實踐列表來判斷前後實踐
   });
+  const { data: currentUserData } = useCurrentUser();
+
+  // 判斷當前用戶是否為實踐的擁有者
+  const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
   const { openArchiveDialog } = useArchivePracticeDialog();
   const { openDeleteDialog } = useDeletePracticeDialog();
   const { archivePractice, restorePractice } = useArchivePractice(practiceId);
@@ -267,20 +272,22 @@ export default function PracticeDetailPage() {
 
         <div className="flex items-center justify-between mb-4">
           <p className="text-base font-medium text-text-dark">執行方式</p>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Ellipsis className="size-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEdit}>編輯實踐</DropdownMenuItem>
-              <DropdownMenuItem onClick={handleArchive}>封存實踐</DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDelete} className="text-destructive">
-                刪除
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {isOwner && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Ellipsis className="size-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleEdit}>編輯實踐</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleArchive}>封存實踐</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+                  刪除
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
         {/* Practice Overview Card */}
         <PracticeOverviewCard
@@ -330,19 +337,21 @@ export default function PracticeDetailPage() {
         <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
       </div>
 
-      <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
-        {/* 打卡按鈕 */}
-        <CheckInButton
-          variant="orange"
-          className="w-full sm:max-w-[288px]"
-          practiceId={practiceId}
-          practiceStatus={practiceData?.data?.status}
-          lastCheckInDate={checkInsData?.data?.[0]?.checkinDate || null}
-          startDate={practice.startDate}
-          taskTitle={practice.name}
-          progressPercentage={practice?.currentProgress ?? 0}
-        />
-      </footer>
+      {isOwner && (
+        <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
+          {/* 打卡按鈕 */}
+          <CheckInButton
+            variant="orange"
+            className="w-full sm:max-w-[288px]"
+            practiceId={practiceId}
+            practiceStatus={practiceData?.data?.status}
+            lastCheckInDate={checkInsData?.data?.[0]?.checkinDate || null}
+            startDate={practice.startDate}
+            taskTitle={practice.name}
+            progressPercentage={practice?.currentProgress ?? 0}
+          />
+        </footer>
+      )}
     </div>
   );
 }

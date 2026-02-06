@@ -6,6 +6,7 @@ import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
 import { PenLine } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { CheckInButton } from "@/components/check-in";
 import {
   getThemeNameFromColor,
@@ -26,6 +27,7 @@ interface InProgressTaskCardProps {
   theme: string;
   status: string;
   lastCheckInDate?: string | null;
+  startDate?: string | null;
   onEdit?: () => void;
 }
 
@@ -41,15 +43,25 @@ export const InProgressTaskCard = ({
   theme,
   status,
   lastCheckInDate,
+  startDate,
   onEdit,
 }: InProgressTaskCardProps) => {
+  const router = useRouter();
   const themeName = getThemeNameFromColor(theme);
   const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
   const statusInfo = getStatusConfig(status);
   const isDraft = status === TaskStatus.draft;
 
+  const handleCardClick = () => {
+    router.push(`/practices/${id}`);
+  };
+
   return (
-    <div className="relative w-[294px]">
+    <button
+      type="button"
+      className="relative w-[294px] cursor-pointer text-left"
+      onClick={handleCardClick}
+    >
       <Theme className="rounded-[12px]" />
       {/* Label */}
       <div className="absolute inset-0 p-5 pb-6 z-10 flex flex-col gap-5">
@@ -76,7 +88,7 @@ export const InProgressTaskCard = ({
               </div>
             </div>
             <div className="shrink-0 self-center">
-              <Button variant="ghost" size="icon" asChild>
+              <Button variant="ghost" size="icon" asChild onClick={(e) => e.stopPropagation()}>
                 <CustomLink href={`/practices/${id}`}>
                   <ArrowRightOutlineSvg className="size-6 text-light-gray" />
                 </CustomLink>
@@ -105,29 +117,33 @@ export const InProgressTaskCard = ({
           </div>
         </div>
 
-        {/* Check-in Button */}
-        {isDraft ? (
-          <Button variant="secondary" onClick={onEdit}>
-            <PenLine className="size-4.5 text-logo-cyan" />
-            繼續編輯
-          </Button>
-        ) : (
-          <CheckInButton
-            variant="secondary"
-            className="w-full sm:max-w-[288px]"
-            practiceId={id}
-            practiceStatus={status}
-            lastCheckInDate={lastCheckInDate ?? null}
-            taskTitle={title}
-            showIcon
-            progressPercentage={progress}
-          />
-        )}
+        {/* Check-in Button - span 用於阻止點擊事件冒泡 */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: 此處用於阻止事件冒泡到父元素 */}
+        <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+          {isDraft ? (
+            <Button variant="secondary" onClick={onEdit}>
+              <PenLine className="size-4.5 text-logo-cyan" />
+              繼續編輯
+            </Button>
+          ) : (
+            <CheckInButton
+              variant="secondary"
+              className="w-full sm:max-w-[288px]"
+              practiceId={id}
+              practiceStatus={status}
+              lastCheckInDate={lastCheckInDate ?? null}
+              startDate={startDate ?? null}
+              taskTitle={title}
+              showIcon
+              progressPercentage={progress}
+            />
+          )}
+        </span>
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 overflow-hidden rounded-b-full">
         <Progress value={progress} />
       </div>
-    </div>
+    </button>
   );
 };

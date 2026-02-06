@@ -16,6 +16,9 @@ interface UseCheckInSuccessDialogOptions {
   to?: number;
 }
 
+/** 預設鼓勵句，當 API 未返回時使用 */
+const DEFAULT_ENCOURAGEMENT = "恭喜，你又成功行動了一次！";
+
 interface DelayedSplitTextProps {
   title: string;
   onLetterAnimationComplete: () => void;
@@ -276,10 +279,14 @@ function Step1Animation({ title, from, to }: Step1AnimationProps) {
   );
 }
 
-function Step2Animation() {
+interface Step2AnimationProps {
+  encouragement?: string;
+}
+
+function Step2Animation({ encouragement }: Step2AnimationProps) {
   return (
     <div className="space-y-1">
-      <p>恭喜，你又成功行動了一次！</p>
+      <p>{encouragement || DEFAULT_ENCOURAGEMENT}</p>
       <p>歡迎分享你的心得，和你有相同實踐的人會很想知道喔！</p>
     </div>
   );
@@ -289,13 +296,14 @@ interface CheckInSuccessContentProps {
   title: string;
   from: number;
   to: number;
+  encouragement?: string;
 }
 
-function CheckInSuccessContent({ title, from, to }: CheckInSuccessContentProps) {
+function CheckInSuccessContent({ title, from, to, encouragement }: CheckInSuccessContentProps) {
   return (
     <>
       <Step1Animation title={title} from={from} to={to} />
-      <Step2Animation />
+      <Step2Animation encouragement={encouragement} />
     </>
   );
 }
@@ -322,12 +330,19 @@ export function useCheckInSuccessDialog({
   const { openSuccessDialog: openDialog } = useDialog();
 
   const openSuccessDialog = useCallback(
-    (dynamicFrom?: number, dynamicTo?: number) => {
+    (dynamicFrom?: number, dynamicTo?: number, encouragement?: string) => {
       const finalFrom = dynamicFrom !== undefined ? dynamicFrom : from;
       const finalTo = dynamicTo !== undefined ? dynamicTo : to;
       return openDialog({
         title: "打卡成功!",
-        message: <CheckInSuccessContent title={title} from={finalFrom} to={finalTo} />,
+        message: (
+          <CheckInSuccessContent
+            title={title}
+            from={finalFrom}
+            to={finalTo}
+            encouragement={encouragement}
+          />
+        ),
         textAlign: "left",
         buttons: [
           // { label: "分享心得", value: "share", variant: "outline" },
