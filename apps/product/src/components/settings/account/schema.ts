@@ -21,6 +21,8 @@ export const accountFormSchema = z.object({
       { message: "必須年滿16歲" }
     )
     .optional(),
+  country: z.string().optional(),
+  location: z.string().optional(),
   position: z.array(z.string()).min(1, "請至少選擇一個身份").default([]),
   educationStage: z.string().min(1, "請選擇教育階段"),
   professionalFields: z.array(z.string()).max(5, "最多只能選擇5個專業領域").default([]),

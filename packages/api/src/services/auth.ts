@@ -3,8 +3,11 @@
  * 提供認證相關的 API 調用函數
  */
 
+import { getRequiredEnv } from "@daodao/config";
 import { client } from "../client";
 import type { paths } from "../types";
+
+const API_URL = getRequiredEnv("NEXT_PUBLIC_API_URL");
 
 // ============================================================================
 // Types
@@ -31,6 +34,13 @@ type ResetPasswordRequest = paths["/api/v1/auth/reset-password"]["post"]["reques
   ? T
   : never;
 type VerifyEmailRequest = paths["/api/v1/auth/verify-email"]["post"]["requestBody"] extends {
+  content: { "application/json": infer T };
+}
+  ? T
+  : never;
+type ResendVerificationRequest = NonNullable<
+  paths["/api/v1/auth/resend-verification"]["post"]["requestBody"]
+> extends {
   content: { "application/json": infer T };
 }
   ? T
@@ -100,13 +110,30 @@ export const verifyEmail = async (data: VerifyEmailRequest) => {
 };
 
 /**
+ * 重新發送驗證郵件
+ */
+export const resendVerificationEmail = async (data: ResendVerificationRequest) => {
+  return client.POST("/api/v1/auth/resend-verification", {
+    body: data,
+  });
+};
+
+/**
+ * 獲取當前認證用戶資訊（支援臨時用戶）
+ * 使用 /api/v1/auth/me 端點，可正確處理臨時用戶狀態
+ */
+export const getAuthMe = async () => {
+  return client.GET("/api/v1/auth/me");
+};
+
+/**
  * 啟動 Google OAuth 登入（重定向到後端）
  * 注意：這會觸發瀏覽器重定向，不返回 Response
  */
 export const initiateGoogleOAuth = (state?: string) => {
   const url = state
-    ? `/api/v1/auth/google?state=${encodeURIComponent(state)}`
-    : "/api/v1/auth/google";
+    ? `${API_URL}/api/v1/auth/google?state=${encodeURIComponent(state)}`
+    : `${API_URL}/api/v1/auth/google`;
   // 這會由瀏覽器處理重定向，不需要返回 Response
   if (typeof window !== "undefined") {
     window.location.href = url;
@@ -123,4 +150,5 @@ export type {
   ForgotPasswordRequest,
   ResetPasswordRequest,
   VerifyEmailRequest,
+  ResendVerificationRequest,
 };

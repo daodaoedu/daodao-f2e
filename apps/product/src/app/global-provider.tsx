@@ -47,9 +47,17 @@ function GlobalProvider({
                   <SheetManagerProvider>
                     <AuthProvider
                       defaultProtected
-                      publicPattern={["^/auth/login", "^/auth/callback", "^/users/"]}
+                      publicPattern={["^/auth/login", "^/auth/callback", "^/auth/onboarding", "^/auth/verify-email(/.*)?$", "^/users/"]}
                       onAuthRequired={(currentPath) => {
                         router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
+                      }}
+                      onboardingPath="/auth/onboarding"
+                      onTemporaryUser={() => {
+                        router.push("/auth/onboarding");
+                      }}
+                      emailVerificationPath="/auth/verify-email"
+                      onEmailUnverified={() => {
+                        router.push("/auth/verify-email/pending");
                       }}
                     >
                       <Toaster />

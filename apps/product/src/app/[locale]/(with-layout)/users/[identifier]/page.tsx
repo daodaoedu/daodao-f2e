@@ -70,7 +70,7 @@ export async function generateMetadata({
 export default async function UserProfilePage({
   params,
 }: PageProps<"/[locale]/users/[identifier]">) {
-  const { identifier } = await params;
+  const { identifier, locale } = await params;
 
   // 使用緩存版本避免重複請求（與 generateMetadata 共享）
   const userResponse = await getCachedUserByIdentifier(identifier);
@@ -93,7 +93,9 @@ export default async function UserProfilePage({
         {/* 用戶個人資訊卡片 */}
         <UserInfoCard
           name={userData.name || "未命名用戶"}
-          location={userData.location || undefined}
+          location={
+            (locale === "en" ? userData.locationNameEn : userData.locationNameZh) || undefined
+          }
           selfIntroduction={userData.selfIntroduction || undefined}
           photoURL={userData.photoURL || undefined}
           socialLinks={userData.contactList || undefined}

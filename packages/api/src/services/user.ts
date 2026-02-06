@@ -171,15 +171,10 @@ export interface UpdateUserFormDataRequest {
 }
 
 /**
- * 更新當前用戶資訊（FormData 格式，支援圖片上傳）
- * @param data 用戶資料
- * @param photoFile 可選的頭像圖片檔案
- * @returns 更新結果
+ * 建立用戶資料的 FormData
+ * 將 UpdateUserFormDataRequest 轉換為 FormData 格式
  */
-export const updateCurrentUserWithFormData = async (
-  data: UpdateUserFormDataRequest,
-  photoFile?: File
-): Promise<UpdateUserResponse> => {
+const buildUserFormData = (data: UpdateUserFormDataRequest, photoFile?: File): FormData => {
   const formData = new FormData();
 
   // 基本欄位（string）
@@ -219,18 +214,29 @@ export const updateCurrentUserWithFormData = async (
   // 圖片檔案（後端期望欄位名為 'avatar'）
   if (photoFile) formData.append("avatar", photoFile);
 
+  return formData;
+};
+
+/**
+ * 發送用戶 FormData 請求的共用邏輯
+ */
+const sendUserFormDataRequest = async <T>(
+  method: "POST" | "PUT",
+  formData: FormData,
+  errorMessage: string
+): Promise<T> => {
   const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
   const response = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/users/me`, {
-    method: "PUT",
+    method,
     body: formData,
     credentials: "include",
   });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({
-      error: { message: "更新失敗" },
+      error: { message: errorMessage },
     }));
-    const error = new Error(errorData.error?.message || "更新失敗") as Error & {
+    const error = new Error(errorData.error?.message || errorMessage) as Error & {
       details?: Array<{ path?: string; message?: string }>;
     };
     // 附加驗證錯誤詳情（供表單使用）
@@ -241,6 +247,40 @@ export const updateCurrentUserWithFormData = async (
   }
 
   return response.json();
+};
+
+/**
+ * 更新當前用戶資訊（FormData 格式，支援圖片上傳）
+ * @param data 用戶資料
+ * @param photoFile 可選的頭像圖片檔案
+ * @returns 更新結果
+ */
+export const updateCurrentUserWithFormData = async (
+  data: UpdateUserFormDataRequest,
+  photoFile?: File
+): Promise<UpdateUserResponse> => {
+  const formData = buildUserFormData(data, photoFile);
+  return sendUserFormDataRequest<UpdateUserResponse>("PUT", formData, "更新失敗");
+};
+
+/**
+ * 創建用戶 API 回應類型
+ */
+type CreateUserResponse =
+  paths["/api/v1/users/me"]["post"]["responses"]["201"]["content"]["application/json"];
+
+/**
+ * 創建當前用戶（用於臨時用戶完成 onboarding）
+ * @param data 用戶資料
+ * @param photoFile 可選的頭像圖片檔案
+ * @returns 創建結果
+ */
+export const createCurrentUserWithFormData = async (
+  data: UpdateUserFormDataRequest,
+  photoFile?: File
+): Promise<CreateUserResponse> => {
+  const formData = buildUserFormData(data, photoFile);
+  return sendUserFormDataRequest<CreateUserResponse>("POST", formData, "創建失敗");
 };
 
 /**

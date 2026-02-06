@@ -4343,7 +4343,34 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * 驗證電子郵件（連結點擊）
+         * @description 用於郵件中的點擊連結驗證，驗證後重定向到前端頁面
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description 電子郵件驗證令牌 */
+                    token: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 驗證後重定向到前端頁面 */
+                302: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                400: components["responses"]["BadRequestError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
         put?: never;
         /**
          * 驗證電子郵件
@@ -4373,6 +4400,52 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/resend-verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 重新發送驗證郵件
+         * @description 重新發送電子郵件驗證連結到指定郵箱
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ResendVerificationRequest"];
+                };
+            };
+            responses: {
+                /** @description 驗證郵件已重新發送 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ResendVerificationResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                404: components["responses"]["NotFoundError"];
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -18416,6 +18489,107 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得城市列表
+         * @description 取得可用的城市列表。支援按國家篩選、關鍵字搜尋、指定語系。
+         *
+         *     **查詢參數：**
+         *     - `country`: 國家代碼篩選 (ISO 3166-1 alpha-2，如 TW, JP, US)
+         *     - `search`: 搜尋關鍵字（支援城市代碼、中文名、英文名）
+         *     - `locale`: 語系 (zh-TW, en, default)，決定城市名稱顯示語言
+         *     - `limit`: 回傳數量限制 (預設 50，最大 200)
+         *
+         *     **使用範例：**
+         *     - 取得台灣所有城市: `?country=TW`
+         *     - 搜尋東京: `?search=tokyo` 或 `?search=東京`
+         *     - 英文顯示: `?locale=en`
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 國家代碼（ISO 3166-1 alpha-2） */
+                    country?: string;
+                    /** @description 搜尋關鍵字（支援城市代碼、中文名、英文名） */
+                    search?: string;
+                    /** @description 語系，決定城市名稱顯示語言 */
+                    locale?: "zh-TW" | "en" | "default";
+                    /** @description 回傳數量限制 */
+                    limit?: string | number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得城市列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GetCitiesResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cities/countries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得國家列表
+         * @description 取得所有可用的國家列表，用於國家選擇下拉選單。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得國家列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GetCountriesResponse"];
+                    };
+                };
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -18624,6 +18798,20 @@ export interface components {
              * @example verify@example.com
              * @example user@company.com
              * @example newuser@gmail.com
+             */
+            email: string;
+        };
+        /**
+         * @description 重新發送驗證郵件請求資料
+         * @example {
+         *       "email": "user@example.com"
+         *     }
+         */
+        ResendVerificationRequest: {
+            /**
+             * Format: email
+             * @description 需要重新發送驗證郵件的電子郵件地址
+             * @example user@example.com
              */
             email: string;
         };
@@ -19413,6 +19601,108 @@ export interface components {
                 /**
                  * @description 驗證結果訊息
                  * @example 郵件驗證成功
+                 */
+                message: string;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description 重新發送驗證郵件回應
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "message": "驗證郵件已重新發送"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        ResendVerificationResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: {
+                /**
+                 * @description 發送結果訊息
+                 * @example 驗證郵件已重新發送
                  */
                 message: string;
             };
@@ -21652,24 +21942,24 @@ export interface components {
              */
             isSendEmail?: boolean;
             /**
-             * @description ESCO 專業領域分類 (可複選，最多 3 個)
+             * @description 專業領域分類 (可複選，最多 3 個)
              * @example [
-             *       "information_and_communication_technologies_icts"
+             *       "technology_ict"
              *     ]
              * @example [
-             *       "information_and_communication_technologies_icts"
+             *       "technology_ict"
              *     ]
              * @example [
-             *       "education",
-             *       "business_administration_and_law"
+             *       "education_learning",
+             *       "business_management"
              *     ]
              * @example [
-             *       "arts_and_humanities",
-             *       "social_sciences_journalism_and_information",
-             *       "language_skills_and_knowledge"
+             *       "arts_creative_design",
+             *       "social_sciences",
+             *       "languages"
              *     ]
              */
-            professionalField?: ("information_and_communication_technologies_icts" | "business_administration_and_law" | "arts_and_humanities" | "natural_sciences_mathematics_and_statistics" | "engineering_manufacturing_and_construction" | "health_and_welfare" | "education" | "social_sciences_journalism_and_information" | "language_skills_and_knowledge" | "services" | "agriculture_forestry_fisheries_and_veterinary" | "others")[];
+            professionalField?: ("technology_ict" | "business_management" | "arts_creative_design" | "science_research" | "engineering_manufacturing" | "health_medicine" | "education_learning" | "social_sciences" | "languages" | "law" | "customer_service_hospitality" | "agriculture_environmental_sciences" | "others")[];
             /**
              * @description 個人標語 (一句話介紹自己)
              * @example 終身學習者,熱愛程式設計與教育
@@ -21865,24 +22155,24 @@ export interface components {
                 [key: string]: string[];
             };
             /**
-             * @description ESCO 專業領域分類 (可複選，最多 3 個)
+             * @description 專業領域分類 (可複選，最多 3 個)
              * @example [
-             *       "information_and_communication_technologies_icts"
+             *       "technology_ict"
              *     ]
              * @example [
-             *       "information_and_communication_technologies_icts"
+             *       "technology_ict"
              *     ]
              * @example [
-             *       "education",
-             *       "business_administration_and_law"
+             *       "education_learning",
+             *       "business_management"
              *     ]
              * @example [
-             *       "arts_and_humanities",
-             *       "social_sciences_journalism_and_information",
-             *       "language_skills_and_knowledge"
+             *       "arts_creative_design",
+             *       "social_sciences",
+             *       "languages"
              *     ]
              */
-            professionalField?: ("information_and_communication_technologies_icts" | "business_administration_and_law" | "arts_and_humanities" | "natural_sciences_mathematics_and_statistics" | "engineering_manufacturing_and_construction" | "health_and_welfare" | "education" | "social_sciences_journalism_and_information" | "language_skills_and_knowledge" | "services" | "agriculture_forestry_fisheries_and_veterinary" | "others")[];
+            professionalField?: ("technology_ict" | "business_management" | "arts_creative_design" | "science_research" | "engineering_manufacturing" | "health_medicine" | "education_learning" | "social_sciences" | "languages" | "law" | "customer_service_hospitality" | "agriculture_environmental_sciences" | "others")[];
             /**
              * @description 個人標語 (一句話介紹自己)
              * @example 終身學習者,熱愛程式設計與教育
@@ -21968,9 +22258,19 @@ export interface components {
             isSubscribeEmail: boolean;
             /**
              * @description 地區代碼
-             * @example taipei
+             * @example taipei_city
              */
             location: string | null;
+            /**
+             * @description 地區顯示名稱（繁體中文）
+             * @example 台北市, 台灣
+             */
+            locationNameZh: string | null;
+            /**
+             * @description 地區顯示名稱（英文）
+             * @example Taipei City, Taiwan
+             */
+            locationNameEn: string | null;
             /**
              * @description 自我介紹
              * @example 我是一名前端工程師，熱愛學習新技術
@@ -22135,12 +22435,12 @@ export interface components {
              */
             customIdCreatedAt: string | null;
             /**
-             * @description ESCO 專業領域分類 (陣列)
+             * @description 專業領域分類 (陣列)
              * @example [
-             *       "information_and_communication_technologies_icts"
+             *       "technology_ict"
              *     ]
              */
-            professionalField: ("information_and_communication_technologies_icts" | "business_administration_and_law" | "arts_and_humanities" | "natural_sciences_mathematics_and_statistics" | "engineering_manufacturing_and_construction" | "health_and_welfare" | "education" | "social_sciences_journalism_and_information" | "language_skills_and_knowledge" | "services" | "agriculture_forestry_fisheries_and_veterinary" | "others")[] | null;
+            professionalField: ("technology_ict" | "business_management" | "arts_creative_design" | "science_research" | "engineering_manufacturing" | "health_medicine" | "education_learning" | "social_sciences" | "languages" | "law" | "customer_service_hospitality" | "agriculture_environmental_sciences" | "others")[] | null;
             /**
              * @description 個人標語
              * @example 終身學習者,熱愛程式設計與教育
@@ -25909,6 +26209,92 @@ export interface components {
              */
             userId: string;
         };
+        /**
+         * @description 城市資料
+         * @example {
+         *       "id": 1,
+         *       "code": "taipei_city",
+         *       "name": "台北市",
+         *       "nameEn": "Taipei City",
+         *       "nameZhTw": "台北市",
+         *       "countryCode": "TW",
+         *       "countryName": "Taiwan",
+         *       "isActive": true
+         *     }
+         */
+        CityData: {
+            /**
+             * @description 城市 ID
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 城市代碼（唯一識別）
+             * @example taipei_city
+             */
+            code: string;
+            /**
+             * @description 城市顯示名稱（依語系）
+             * @example 台北市
+             */
+            name: string;
+            /**
+             * @description 英文名稱
+             * @example Taipei City
+             */
+            nameEn: string | null;
+            /**
+             * @description 繁體中文名稱
+             * @example 台北市
+             */
+            nameZhTw: string | null;
+            /**
+             * @description 國家代碼
+             * @example TW
+             */
+            countryCode: string | null;
+            /**
+             * @description 國家名稱
+             * @example Taiwan
+             */
+            countryName: string | null;
+            /**
+             * @description 是否啟用
+             * @example true
+             */
+            isActive: boolean;
+        };
+        /**
+         * @description 國家資料
+         * @example {
+         *       "id": 1,
+         *       "code": "TW",
+         *       "name": "Taiwan",
+         *       "nameEn": "Taiwan"
+         *     }
+         */
+        CountryData: {
+            /**
+             * @description 國家 ID
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 國家代碼（ISO 3166-1 alpha-2）
+             * @example TW
+             */
+            code: string;
+            /**
+             * @description 國家名稱
+             * @example Taiwan
+             */
+            name: string;
+            /**
+             * @description 英文名稱
+             * @example Taiwan
+             */
+            nameEn: string | null;
+        };
         /** @description 我的實踐項目 */
         MyPracticeItem: {
             /**
@@ -26582,6 +26968,93 @@ export interface components {
              * @example true
              */
             deleted: boolean;
+        };
+        /**
+         * @description 城市列表回應
+         * @example {
+         *       "success": true,
+         *       "data": [
+         *         {
+         *           "id": 1,
+         *           "code": "taipei_city",
+         *           "name": "台北市",
+         *           "nameEn": "Taipei City",
+         *           "nameZhTw": "台北市",
+         *           "countryCode": "TW",
+         *           "countryName": "Taiwan",
+         *           "isActive": true
+         *         },
+         *         {
+         *           "id": 2,
+         *           "code": "new_taipei_city",
+         *           "name": "新北市",
+         *           "nameEn": "New Taipei City",
+         *           "nameZhTw": "新北市",
+         *           "countryCode": "TW",
+         *           "countryName": "Taiwan",
+         *           "isActive": true
+         *         }
+         *       ],
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         */
+        GetCitiesResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description 城市資料陣列 */
+            data: components["schemas"]["CityData"][];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /** @description Optional metadata */
+            meta?: {
+                searchQuery?: string;
+                processingTime?: number;
+            };
+        };
+        /**
+         * @description 國家列表回應
+         * @example {
+         *       "success": true,
+         *       "data": [
+         *         {
+         *           "id": 1,
+         *           "code": "TW",
+         *           "name": "Taiwan",
+         *           "nameEn": "Taiwan"
+         *         },
+         *         {
+         *           "id": 2,
+         *           "code": "JP",
+         *           "name": "Japan",
+         *           "nameEn": "Japan"
+         *         }
+         *       ],
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         */
+        GetCountriesResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description 國家資料陣列 */
+            data: components["schemas"]["CountryData"][];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /** @description Optional metadata */
+            meta?: {
+                processingTime?: number;
+            };
         };
     };
     responses: {

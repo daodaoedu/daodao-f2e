@@ -1,15 +1,54 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "@daodao/i18n";
 import { ANCHOR_IDS, SOCIAL_LINKS } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { LanguageSwitcher } from "@daodao/ui/components/language-switcher";
-import { ChevronRight } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
+
+type SubscribeStatus = "idle" | "loading" | "success" | "error";
 
 export const Footer = () => {
   const t = useTranslations("common");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<SubscribeStatus>("idle");
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formId = process.env.NEXT_PUBLIC_KIT_FORM_ID;
+    if (!email || !formId) return;
+
+    setStatus("loading");
+    try {
+      const formData = new FormData();
+      formData.append("email_address", email);
+      if (name) {
+        formData.append("first_name", name);
+      }
+
+      const response = await fetch(
+        `https://app.kit.com/forms/${formId}/subscriptions`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        setStatus("success");
+        setName("");
+        setEmail("");
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  };
 
   return (
     <footer className="bg-basic-600 pb-20 pt-12 text-white md:pb-12">
@@ -108,16 +147,51 @@ export const Footer = () => {
           </div>
           <div className="space-y-4">
             <p className="text-lg text-primary-lighter">{t("footer_newsletter_title")}</p>
-            <form className="space-y-3">
+            <form className="space-y-3" onSubmit={handleSubscribe}>
               <input
-                className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/50 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-base"
-                type="email"
-                placeholder={t("footer_email_placeholder")}
+                className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/50 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-base disabled:opacity-50"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t("footer_name_placeholder")}
+                disabled={status === "loading" || status === "success"}
               />
-              <Button type="submit" variant="ctaPrimary" size="huge" className="w-full">
-                {t("footer_subscribe_button")}
-                <ChevronRight className="ml-2 size-5" />
+              <input
+                className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/50 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-base disabled:opacity-50"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t("footer_email_placeholder")}
+                disabled={status === "loading" || status === "success"}
+                required
+              />
+              <Button
+                type="submit"
+                variant="ctaPrimary"
+                size="huge"
+                className="w-full"
+                disabled={status === "loading" || status === "success" || !email}
+              >
+                {status === "loading" && t("footer_subscribing")}
+                {status === "success" && (
+                  <>
+                    {t("footer_subscribed")}
+                    <Check className="ml-2 size-5" />
+                  </>
+                )}
+                {(status === "idle" || status === "error") && (
+                  <>
+                    {t("footer_subscribe_button")}
+                    <ChevronRight className="ml-2 size-5" />
+                  </>
+                )}
               </Button>
+              {status === "success" && (
+                <p className="text-sm text-primary-lighter">{t("footer_subscribe_confirm_hint")}</p>
+              )}
+              {status === "error" && (
+                <p className="text-sm text-red-400">{t("footer_subscribe_error")}</p>
+              )}
             </form>
           </div>
         </div>
