@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@daodao/ui/components/dropdown-menu";
 import { toast } from "@daodao/ui/components/sonner";
-import { Archive, Ellipsis, Trash2 } from "lucide-react";
+import { Ellipsis } from "lucide-react";
 import { useMemo } from "react";
 import { CheckInButton, CheckInRecordCard, CheckInStack } from "@/components/check-in";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
@@ -220,15 +220,11 @@ export default function PracticeDetailPage() {
     }
   };
 
-  const handleBack = () => {
-    router.push("/");
-  };
-
   // Loading 狀態
   if (isLoading) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" title="主題實踐" onLeftAction={handleBack} rightActionTo="/" />
+        <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">載入中...</div>
@@ -241,7 +237,7 @@ export default function PracticeDetailPage() {
   if (error || !practice) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" title="主題實踐" onLeftAction={handleBack} rightActionTo="/" />
+        <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">
@@ -254,7 +250,7 @@ export default function PracticeDetailPage() {
 
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-      <PageHeader leftAction="back" title="主題實踐" onLeftAction={handleBack} rightActionTo="/" />
+      <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
 
       <BackgroundAnimation />
 
@@ -278,8 +274,10 @@ export default function PracticeDetailPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEdit} className="text-center">
-                編輯實踐
+              <DropdownMenuItem onClick={handleEdit}>編輯實踐</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleArchive}>封存實踐</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+                刪除
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -332,17 +330,6 @@ export default function PracticeDetailPage() {
         <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
       </div>
 
-      <div className="flex flex-col w-fit gap-4 mx-auto pb-40 pt-6">
-        <Button variant="white" className="px-8" onClick={handleArchive}>
-          <Archive className="size-4.5" />
-          <span>封存實踐</span>
-        </Button>
-        <Button variant="ghost" className="px-8 border border-logo-cyan" onClick={handleDelete}>
-          <Trash2 className="size-4.5" />
-          <span>刪除實踐</span>
-        </Button>
-      </div>
-
       <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
         {/* 打卡按鈕 */}
         <CheckInButton
@@ -351,6 +338,7 @@ export default function PracticeDetailPage() {
           practiceId={practiceId}
           practiceStatus={practiceData?.data?.status}
           lastCheckInDate={checkInsData?.data?.[0]?.checkinDate || null}
+          startDate={practice.startDate}
           taskTitle={practice.name}
           progressPercentage={practice?.currentProgress ?? 0}
         />

@@ -50,6 +50,11 @@ export interface ICheckInStatusOptions {
    * 如果沒有打卡記錄，應傳入 null
    */
   lastCheckInDate: string | null;
+  /**
+   * 實踐開始日期 (ISO 格式字串，例如 "2026-01-01")
+   * 用於檢查打卡日期是否早於開始日期
+   */
+  startDate?: string | null;
 }
 
 /**

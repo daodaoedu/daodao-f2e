@@ -236,9 +236,10 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
           )
         ) : (
           filteredPractices.map((practice) => (
-            <div
+            <CustomLink
               key={practice.id}
-              className="flex items-start gap-4 p-4 rounded-lg border-b border-bg-gray hover:shadow-sm transition-shadow bg-white"
+              href={`/practices/${practice.id}`}
+              className="block p-4 rounded-lg border-b border-bg-gray hover:shadow-sm transition-shadow bg-white"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-2">
@@ -264,15 +265,11 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
                     <p className="text-xs text-text-dark line-clamp-1">{practice.description}</p>
                   </div>
                   <div className="shrink-0">
-                    <Button variant="ghost" size="icon" asChild>
-                      <CustomLink href={`/practices/${practice.id}`}>
-                        <ArrowRightOutlineSvg className="size-5 text-light-gray" />
-                      </CustomLink>
-                    </Button>
+                    <ArrowRightOutlineSvg className="size-5 text-light-gray" />
                   </div>
                 </div>
               </div>
-            </div>
+            </CustomLink>
           ))
         )}
       </div>

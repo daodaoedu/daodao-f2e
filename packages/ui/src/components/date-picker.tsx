@@ -9,33 +9,11 @@ import { Calendar } from "./calendar";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
-function getRangeErrorMessage(
-  date: Date,
-  minDate: Date | undefined,
-  maxDate: Date | undefined
-): string | undefined {
-  const dateStartOfDay = startOfDay(date);
-  if (minDate && isBefore(dateStartOfDay, startOfDay(minDate))) {
-    return `日期不能早於 ${format(minDate, "yyyy/MM/dd")}`;
-  }
-  if (maxDate && isAfter(dateStartOfDay, startOfDay(maxDate))) {
-    return `日期不能晚於 ${format(maxDate, "yyyy/MM/dd")}`;
-  }
-  return undefined;
-}
-
 function formatDate(date: Date | undefined) {
   if (date && isValid(date)) {
     return format(date, "yyyy/MM/dd");
   }
   return "";
-}
-
-function isValidDate(date: Date | undefined) {
-  if (!date) {
-    return false;
-  }
-  return !Number.isNaN(date.getTime());
 }
 
 function isDateInRange(
@@ -66,7 +44,7 @@ interface DatePickerProps {
   disabled?: boolean;
   onChange?: (date: Date | undefined) => void;
   onBlur?: () => void;
-  onError?: (message: string) => void;
+  onError?: (errorMessage: string) => void;
 }
 
 const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
@@ -81,7 +59,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
       disabled = false,
       onChange,
       onBlur,
-      onError,
+      onError: _onError,
     },
     ref
   ) => {
@@ -111,63 +89,42 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
       }
     };
 
-    const handleRangeError = (inputDate: Date) => {
-      setIsRangeError(true);
-      const errorMessage = getRangeErrorMessage(inputDate, minDate, maxDate);
-      if (errorMessage) {
-        onError?.(errorMessage);
-      }
-    };
-
     return (
-      <div className="relative flex gap-2">
-        <Input
-          ref={ref}
-          value={inputValue}
-          placeholder={placeholder}
-          disabled={disabled}
-          className={cn("pr-10", className, (invalid || isRangeError) && "border-red")}
-          onChange={(e) => {
-            if (disabled) return;
-            const inputDate = new Date(e.target.value);
-            setInputValue(e.target.value);
-            if (isValidDate(inputDate)) {
-              if (isDateInRange(inputDate, minDate, maxDate)) {
-                handleDateChange(inputDate);
-              } else {
-                onChange?.(undefined);
-                setDate(undefined);
-                setMonth(undefined);
-                handleRangeError(inputDate);
-              }
-            } else {
-              setIsRangeError(false);
-              onChange?.(undefined);
-              setDate(undefined);
-              setMonth(undefined);
-            }
-          }}
-          onBlur={onBlur}
-          onKeyDown={(e) => {
-            if (disabled) return;
-            if (e.key === "ArrowDown") {
-              e.preventDefault();
-              setOpen(true);
-            }
-          }}
-        />
-        <Popover open={disabled ? false : open} onOpenChange={disabled ? undefined : setOpen}>
-          <PopoverTrigger asChild>
+      <Popover open={disabled ? false : open} onOpenChange={disabled ? undefined : setOpen}>
+        <PopoverTrigger asChild>
+          <div className="relative flex gap-2">
+            <Input
+              ref={ref}
+              value={inputValue}
+              placeholder={placeholder}
+              disabled={disabled}
+              readOnly
+              className={cn(
+                "pr-10 cursor-pointer",
+                className,
+                (invalid || isRangeError) && "border-red"
+              )}
+              onBlur={onBlur}
+              onKeyDown={(e) => {
+                if (disabled) return;
+                if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setOpen(true);
+                }
+              }}
+            />
             <Button
               id="date-picker"
               variant="ghost"
               disabled={disabled}
-              className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
+              type="button"
+              className="absolute top-1/2 right-2 size-6 -translate-y-1/2 pointer-events-none"
             >
               <CalendarIcon className="size-3.5" />
               <span className="sr-only">Select date</span>
             </Button>
-          </PopoverTrigger>
+          </div>
+        </PopoverTrigger>
           <PopoverContent
             className="w-auto overflow-hidden p-0"
             align="end"
@@ -196,8 +153,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
               }}
             />
           </PopoverContent>
-        </Popover>
-      </div>
+      </Popover>
     );
   }
 );

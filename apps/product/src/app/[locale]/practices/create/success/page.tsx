@@ -119,7 +119,7 @@ export default function PracticeSuccessPage() {
             className="inline-flex mb-px"
             animation="none"
           >
-            回到我的小島
+            回到主頁
             <ArrowRightOutlineSvg className="size-4.5" />
           </Button>
           {/* 倒數計時提示 */}
