@@ -149,6 +149,7 @@ export const ProfileSection = ({ form }: ProfileSectionProps) => {
           <FormItem>
             <FormLabel className="block font-medium text-text-dark mb-3">
               {t("steps.profile.birthDate")}
+              <span className="text-red ml-1">*</span>
             </FormLabel>
             <FormControl>
               <DatePicker
@@ -193,6 +194,7 @@ export const ProfileSection = ({ form }: ProfileSectionProps) => {
           <FormItem>
             <FormLabel className="block font-medium text-text-dark mb-3">
               {t("steps.profile.name")}
+              <span className="text-red ml-1">*</span>
             </FormLabel>
             <FormControl>
               <Input
@@ -214,6 +216,7 @@ export const ProfileSection = ({ form }: ProfileSectionProps) => {
           <FormItem>
             <FormLabel className="block font-medium text-text-dark mb-3">
               {t("steps.profile.username")}
+              <span className="text-red ml-1">*</span>
             </FormLabel>
             <FormControl>
               <div className="relative">
@@ -272,6 +275,7 @@ export const ProfileSection = ({ form }: ProfileSectionProps) => {
           <FormItem>
             <FormLabel className="block font-medium text-text-dark mb-3">
               {t("steps.profile.bio")}
+              <span className="text-red ml-1">*</span>
             </FormLabel>
             <FormControl>
               <Textarea

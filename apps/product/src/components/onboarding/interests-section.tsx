@@ -61,6 +61,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
           <FormItem>
             <FormLabel className="block font-medium text-text-dark mb-4">
               {t("steps.interests.professionalFieldsLabel")}
+              <span className="text-red ml-1">*</span>
               <span className="text-light-gray text-sm font-normal ml-2">
                 ({selectedProfessional.length}/5)
               </span>

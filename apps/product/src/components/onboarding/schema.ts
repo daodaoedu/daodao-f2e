@@ -25,30 +25,27 @@ export const onboardingFormSchema = z.object({
   // Step 1: Profile
   email: z.string().email(),
   birthDate: z
-    .date()
+    .date({ required_error: "請選擇生日" })
     .refine(
       (date) => {
         const age = differenceInYears(new Date(), date);
         return age >= 16;
       },
       { message: "島島阿學目前僅開放給年滿 16 歲的使用者註冊" }
-    )
-    .optional(),
-  name: z.string().max(50, "名字最多 50 字").optional().or(z.literal("")),
+    ),
+  name: z.string().min(1, "請輸入名字").max(50, "名字最多 50 字"),
   customId: z
     .string()
     .min(3, "帳號最少需要 3 個字符")
     .max(15, "帳號最多 15 個字符")
-    .refine((val) => customIdRegex.test(val), "僅限使用英文字母和數字")
-    .optional()
-    .or(z.literal("")),
-  personalSlogan: z.string().max(150, "個人標語最多 150 字").optional().or(z.literal("")),
+    .refine((val) => customIdRegex.test(val), "僅限使用英文字母和數字"),
+  personalSlogan: z.string().min(1, "請輸入個人標語").max(150, "個人標語最多 150 字"),
 
   // Step 2: Interests
   professionalFields: z
     .array(z.string())
-    .max(5, "最多只能選擇 5 個專業領域")
-    .default([]),
+    .min(1, "請至少選擇 1 個專業領域")
+    .max(5, "最多只能選擇 5 個專業領域"),
   interests: z
     .array(z.string())
     .min(1, "請至少選擇 1 個興趣領域")

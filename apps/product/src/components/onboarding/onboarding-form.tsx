@@ -119,28 +119,16 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
     setIsSubmitting(true);
 
     try {
-      // 組裝 API 請求資料
+      // 組裝 API 請求資料（所有欄位都是必填）
       const updateData: Parameters<typeof updateCurrentUserWithFormData>[0] = {
-        referralSource: values.referralSource,
+        birthDay: format(values.birthDate, "yyyy-MM-dd"),
+        name: values.name,
+        customId: values.customId,
+        personalSlogan: values.personalSlogan,
+        professionalField: values.professionalFields,
         interestList: values.interests,
+        referralSource: values.referralSource,
       };
-
-      // 選填欄位只有在有值時才加入
-      if (values.birthDate) {
-        updateData.birthDay = format(values.birthDate, "yyyy-MM-dd");
-      }
-      if (values.name) {
-        updateData.name = values.name;
-      }
-      if (values.customId) {
-        updateData.customId = values.customId;
-      }
-      if (values.personalSlogan) {
-        updateData.personalSlogan = values.personalSlogan;
-      }
-      if (values.professionalFields && values.professionalFields.length > 0) {
-        updateData.professionalField = values.professionalFields;
-      }
 
       // 臨時用戶使用 POST 創建，正常用戶使用 PUT 更新
       if (isTemporary) {
