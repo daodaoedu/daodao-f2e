@@ -6,7 +6,6 @@ import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
 import { PenLine } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { CheckInButton } from "@/components/check-in";
 import {
   getThemeNameFromColor,
@@ -46,21 +45,15 @@ export const InProgressTaskCard = ({
   startDate,
   onEdit,
 }: InProgressTaskCardProps) => {
-  const router = useRouter();
   const themeName = getThemeNameFromColor(theme);
   const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
   const statusInfo = getStatusConfig(status);
   const isDraft = status === TaskStatus.draft;
 
-  const handleCardClick = () => {
-    router.push(`/practices/${id}`);
-  };
-
   return (
-    <button
-      type="button"
-      className="relative w-[294px] cursor-pointer text-left"
-      onClick={handleCardClick}
+    <CustomLink
+      href={`/practices/${id}`}
+      className="relative block w-[294px] cursor-pointer text-left"
     >
       <Theme className="rounded-[12px]" />
       {/* Label */}
@@ -117,9 +110,17 @@ export const InProgressTaskCard = ({
           </div>
         </div>
 
-        {/* Check-in Button - span 用於阻止點擊事件冒泡 */}
+        {/* Check-in Button - span 用於阻止點擊事件冒泡和導航 */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: 此處用於阻止事件冒泡到父元素 */}
-        <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+        <span
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+          }}
+        >
           {isDraft ? (
             <Button variant="secondary" onClick={onEdit}>
               <PenLine className="size-4.5 text-logo-cyan" />
@@ -144,6 +145,6 @@ export const InProgressTaskCard = ({
       <div className="absolute bottom-0 left-0 right-0 overflow-hidden rounded-b-full">
         <Progress value={progress} />
       </div>
-    </button>
+    </CustomLink>
   );
 };

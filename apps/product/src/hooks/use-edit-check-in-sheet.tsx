@@ -50,8 +50,13 @@ export function useEditCheckInSheet({
           }}
           submitButtonText="儲存變更"
           onComplete={async (data) => {
-            closeRef.current?.();
-            await onComplete(data);
+            try {
+              await onComplete(data);
+              closeRef.current?.(); // 僅在成功時關閉
+            } catch {
+              // 預期 onComplete 的實作會處理錯誤（例如顯示 toast）
+              // 保持 Sheet 開啟，讓使用者可以重試
+            }
           }}
         />
       ),
