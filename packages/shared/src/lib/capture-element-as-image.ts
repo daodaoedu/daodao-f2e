@@ -113,6 +113,8 @@ export const captureElementAsImage = async (
     const dataUrl = await toJpeg(element, {
       quality: 0.95,
       pixelRatio: devicePixelRatio,
+      // 添加 cacheBust 繞過 Cloudflare 快取，確保獲取帶有 CORS headers 的回應
+      cacheBust: true,
     });
 
     const imageData: CapturedImageData = {

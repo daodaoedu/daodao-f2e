@@ -111,7 +111,7 @@ export function Banner() {
             "md:top-[calc(3/13*100%)] md:-translate-y-full md:text-[1.75rem]"
           )}
         >
-          我的小島
+          主頁
         </h1>
         <h2
           className={cn(

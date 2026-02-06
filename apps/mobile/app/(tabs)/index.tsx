@@ -5,7 +5,7 @@ import { YStack, XStack, Text, ScrollView, Spinner, } from 'tamagui'
 
 const { width: screenWidth } = Dimensions.get('window')
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Target, MoreHorizontal } from '@tamagui/lucide-icons'
+import { Target, MoreHorizontal, SlidersHorizontal } from '@tamagui/lucide-icons'
 import { usePractices, useCheckIn } from '@/hooks/usePractices'
 import { PracticeCard, HomeBanner } from '@/components'
 import { colors } from '@/generated/design-tokens'
@@ -146,6 +146,10 @@ export default function HomeScreen() {
     router.push('/practices/create')
   }, [router])
 
+  const handleSettings = useCallback(() => {
+    router.push('/settings')
+  }, [router])
+
   if (isLoading) {
     return (
       <SafeAreaView style={{ flex: 1 }} edges={['top']}>
@@ -164,6 +168,15 @@ export default function HomeScreen() {
       {/* Fixed Banner */}
       <RNView style={styles.fixedBanner}>
         <HomeBanner />
+      </RNView>
+
+      {/* 固定頂部右上角設定按鈕 */}
+      <RNView style={styles.fixedHeader}>
+        <XStack justifyContent="flex-end" paddingHorizontal="$5" paddingVertical="$3">
+          <Pressable onPress={handleSettings} hitSlop={8}>
+            <SlidersHorizontal size={24} color={colors.text.dark} />
+          </Pressable>
+        </XStack>
       </RNView>
 
       <ScrollView
@@ -279,5 +292,13 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 20,
     pointerEvents: 'none',
+  },
+  fixedHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 30,
+    backgroundColor: 'transparent',
   },
 })

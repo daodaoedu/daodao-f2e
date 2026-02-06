@@ -622,7 +622,7 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
             >
               <Emoji className="size-6" />
               <div className="text-xs text-bg-dark">
-                #{i + 1} {date}
+                #{count - i} {date}
               </div>
               <div className="max-w-40 text-bg-dark line-clamp-2">{content}</div>
             </div>

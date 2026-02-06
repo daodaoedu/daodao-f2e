@@ -44,7 +44,9 @@ export const ShareCheckInSheetContent = ({
     if (!imageUrl) return;
 
     try {
-      const response = await fetch(imageUrl);
+      // 添加時間戳參數繞過 Cloudflare 快取，確保獲取帶有 CORS headers 的回應
+      const urlWithCacheBust = `${imageUrl}${imageUrl.includes("?") ? "&" : "?"}_t=${Date.now()}`;
+      const response = await fetch(urlWithCacheBust);
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
 

@@ -18,79 +18,79 @@ export default function TabLayout() {
   return (
     <View style={{ flex: 1 }}>
       <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary.base,
-        tabBarInactiveTintColor: '#9CA3AF',
-        tabBarShowLabel: false, // Product 只顯示圖標
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
-          marginTop: 2,
-        },
-        tabBarIconStyle: {
-          marginTop: 4,
-        },
-        tabBarStyle: {
-          position: 'absolute',
-          backgroundColor: 'rgba(249, 254, 255, 0.9)',
-          borderTopWidth: 2,
-          borderTopColor: '#C1ECFF',
-          borderTopLeftRadius: 24,
-          borderTopRightRadius: 24,
-          height: Platform.OS === 'ios' ? 70 : 60,
-          paddingTop: 0,
-          paddingBottom: Platform.OS === 'ios' ? 16 : 8,
-          paddingHorizontal: 40,
-          ...Platform.select({
-            ios: {
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: -2 },
-              shadowOpacity: 0.05,
-              shadowRadius: 8,
-            },
-            android: {
-              elevation: 8,
-            },
-          }),
-        },
-        tabBarItemStyle: {
-          paddingVertical: 4,
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: '我的小島',
-          tabBarIcon: ({ color, focused }) => (
-            <HomeIcon size={32} color={color} filled={focused} />
-          ),
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: colors.primary.base,
+          tabBarInactiveTintColor: '#9CA3AF',
+          tabBarShowLabel: false, // Product 只顯示圖標
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: '500',
+            marginTop: 2,
+          },
+          tabBarIconStyle: {
+            marginTop: 4,
+          },
+          tabBarStyle: {
+            position: 'absolute',
+            backgroundColor: 'rgba(249, 254, 255, 0.9)',
+            borderTopWidth: 2,
+            borderTopColor: '#C1ECFF',
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+            height: Platform.OS === 'ios' ? 70 : 60,
+            paddingTop: 0,
+            paddingBottom: Platform.OS === 'ios' ? 16 : 8,
+            paddingHorizontal: 40,
+            ...Platform.select({
+              ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: -2 },
+                shadowOpacity: 0.05,
+                shadowRadius: 8,
+              },
+              android: {
+                elevation: 8,
+              },
+            }),
+          },
+          tabBarItemStyle: {
+            paddingVertical: 4,
+          },
         }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: '個人資料',
-          tabBarIcon: ({ color, focused }) => (
-            <UserIcon size={32} color={color} filled={focused} />
-          ),
-        }}
-      />
-      {/* 隱藏的頁面 - 保留路由但不在 Tab 顯示 */}
-      <Tabs.Screen
-        name="explore"
-        options={{
-          href: null, // 隱藏此 Tab
-        }}
-      />
-      <Tabs.Screen
-        name="create"
-        options={{
-          href: null, // 隱藏此 Tab，改用 FAB 進入
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: '主頁',
+            tabBarIcon: ({ color, focused }) => (
+              <HomeIcon size={32} color={color} filled={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: '我的小島',
+            tabBarIcon: ({ color, focused }) => (
+              <UserIcon size={32} color={color} filled={focused} />
+            ),
+          }}
+        />
+        {/* 隱藏的頁面 - 保留路由但不在 Tab 顯示 */}
+        <Tabs.Screen
+          name="explore"
+          options={{
+            href: null, // 隱藏此 Tab
+          }}
+        />
+        <Tabs.Screen
+          name="create"
+          options={{
+            href: null, // 隱藏此 Tab，改用 FAB 進入
+          }}
+        />
+      </Tabs>
 
       {/* FAB 按鈕 - 放在 Tab 層級以顯示在最上層 */}
       {showFab && (

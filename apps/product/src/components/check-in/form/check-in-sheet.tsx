@@ -2,7 +2,9 @@
 
 import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
+import { toast } from "@daodao/ui/components/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isBefore, parse, startOfDay } from "date-fns";
 import { CalendarCheck, Check } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
@@ -134,6 +136,7 @@ interface ICheckInButtonProps
 export const CheckInButton = ({
   practiceStatus,
   lastCheckInDate,
+  startDate,
   practiceId,
   taskTitle,
   onComplete,
@@ -168,6 +171,19 @@ export const CheckInButton = ({
 
   const handleClick = () => {
     if (!canCheckIn) return;
+
+    // 檢查今天是否早於開始日期
+    if (startDate) {
+      const today = startOfDay(new Date());
+      const practiceStartDate = startOfDay(parse(startDate, "yyyy-MM-dd", new Date()));
+      if (isBefore(today, practiceStartDate)) {
+        toast.warning("實踐尚未開始", {
+          description: "今天的日期早於實踐的開始日期，請在開始日期後再進行打卡。",
+        });
+        return;
+      }
+    }
+
     openCheckInSheet();
   };
 

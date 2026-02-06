@@ -7,6 +7,8 @@ import {
   MedalSolidSvg,
   SearchOutlineSvg,
   SearchSolidSvg,
+  SettingOutlineSvg,
+  SettingSolidSvg,
   UserOutlineSvg,
   UserSolidSvg,
 } from "@daodao/assets";
@@ -15,7 +17,7 @@ export const menuItems = [
   {
     activeIcon: HomeSolidSvg,
     icon: HomeOutlineSvg,
-    label: "我的小島",
+    label: "主頁",
     href: "/",
     isMatch: (pathname: string) => pathname === "/",
   },
@@ -46,8 +48,15 @@ export const menuItems = [
   {
     activeIcon: UserSolidSvg,
     icon: UserOutlineSvg,
-    label: "個人資料",
+    label: "我的小島",
     href: (identifier: string) => `/users/${identifier}`,
     isMatch: (pathname: string, identifier: string) => pathname.startsWith(`/users/${identifier}`),
+  },
+  {
+    activeIcon: SettingSolidSvg,
+    icon: SettingOutlineSvg,
+    label: "設定",
+    href: "/settings",
+    isMatch: (pathname: string) => pathname.startsWith("/settings"),
   },
 ];
