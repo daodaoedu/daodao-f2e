@@ -3,10 +3,11 @@
 import { usePracticeById, usePracticeCheckIns } from "@daodao/api";
 import { Deco4Svg } from "@daodao/assets";
 import { useParams } from "@daodao/i18n/navigation";
+import { toast } from "@daodao/ui/components/sonner";
 import { addDays, format, isValid, parse } from "date-fns";
 import { useMemo } from "react";
 import { CheckInButton, CheckInDateSelector, CheckInDetail } from "@/components/check-in";
-import type { ICheckInDisplayData } from "@/components/check-in/types";
+import type { ICheckInDisplayData, ICheckInFormData } from "@/components/check-in/types";
 import { PageHeader } from "@/components/layout";
 import { mapApiMoodToMoodType } from "@/constants/mood";
 
@@ -196,6 +197,18 @@ export default function CheckInDetailPage() {
     console.log("打卡資料:", data);
   };
 
+  const handleEditComplete = async (data: ICheckInFormData) => {
+    try {
+      // TODO: 實現更新打卡 API 調用（等待後端 API）
+      // await updateCheckIn(checkInId, data);
+      console.log("編輯打卡資料:", data);
+      toast.success("打卡已更新");
+    } catch (error) {
+      console.error("更新打卡失敗:", error);
+      toast.error("更新打卡失敗，請稍後再試");
+    }
+  };
+
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
       <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
@@ -217,7 +230,7 @@ export default function CheckInDetailPage() {
       />
 
       <main className="max-w-[448px] mx-auto pt-[88px] md:pt-3 px-5 pb-40">
-        <CheckInDetail checkInData={checkInData} />
+        <CheckInDetail checkInData={checkInData} onEditComplete={handleEditComplete} />
       </main>
 
       <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
@@ -226,7 +239,9 @@ export default function CheckInDetailPage() {
           variant="orange"
           className="w-full sm:max-w-[288px]"
           practiceId={practiceId}
+          practiceStatus={practiceData?.data?.status}
           lastCheckInDate={checkInIdToDateMap.get(checkInId) || null}
+          startDate={practiceData?.data?.startDate || null}
           taskTitle={checkInData.practiceTitle}
           onComplete={handleCheckInComplete}
           progressPercentage={practiceData?.data?.progressPercentage ?? 0}

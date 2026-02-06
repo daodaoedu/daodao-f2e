@@ -1,14 +1,6 @@
 "use client";
 
-import { Button } from "@daodao/ui/components/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@daodao/ui/components/dropdown-menu";
 import { cn } from "@daodao/ui/lib/utils";
-import { Ellipsis } from "lucide-react";
 import { useState } from "react";
 import {
   FilterStatus,
@@ -29,14 +21,21 @@ export interface InProgressTask {
   theme: string;
   status: TaskStatus;
   lastCheckInDate?: string | null;
+  startDate?: string | null;
 }
 
 interface InProgressSectionProps {
   tasks: InProgressTask[];
 }
 
+const filterOptions = [
+  { value: FilterStatus.all, label: "全部" },
+  { value: FilterStatus.draft, label: "草稿" },
+  { value: FilterStatus.notStarted, label: "未開始" },
+  { value: FilterStatus.inProgress, label: "進行中" },
+];
+
 export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
-  console.log("tasks", tasks);
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
 
   const filteredTasks =
@@ -50,56 +49,31 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
 
   return (
     <section className="mb-6">
-      <div className="max-w-[640px] px-5 mx-auto mb-3 flex items-center justify-between">
-        <h2 className="text-[1.125rem] font-medium text-bg-dark">進行中</h2>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
+      <div className="max-w-[640px] px-5 mx-auto mb-3">
+        <h2 className="text-[1.125rem] font-medium text-bg-dark mb-3">進行中</h2>
+        <div
+          role="tablist"
+          aria-label="任務篩選"
+          className="flex gap-2 overflow-x-auto scrollbar-hide"
+        >
+          {filterOptions.map((option) => (
+            <button
+              type="button"
+              key={option.value}
+              role="tab"
+              aria-selected={filterStatus === option.value}
+              onClick={() => setFilterStatus(option.value)}
               className={cn(
-                filterStatus !== FilterStatus.all &&
-                  "bg-light-cyan text-logo-cyan hover:text-logo-cyan"
+                "px-5 py-2 rounded-full text-sm whitespace-nowrap border transition-colors",
+                filterStatus === option.value
+                  ? "bg-primary-base border-primary-base text-white"
+                  : "bg-white border-primary-base text-primary-base"
               )}
             >
-              <Ellipsis className="size-6" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => setFilterStatus(FilterStatus.all)}
-              className={cn(
-                filterStatus === FilterStatus.all && "bg-accent text-accent-foreground"
-              )}
-            >
-              全部
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => setFilterStatus(FilterStatus.draft)}
-              className={cn(
-                filterStatus === FilterStatus.draft && "bg-accent text-accent-foreground"
-              )}
-            >
-              草稿
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => setFilterStatus(FilterStatus.notStarted)}
-              className={cn(
-                filterStatus === FilterStatus.notStarted && "bg-accent text-accent-foreground"
-              )}
-            >
-              未開始
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => setFilterStatus(FilterStatus.inProgress)}
-              className={cn(
-                filterStatus === FilterStatus.inProgress && "bg-accent text-accent-foreground"
-              )}
-            >
-              進行中
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
       <div
         className={cn(
@@ -121,6 +95,7 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
             isUnreadMessages={task.isUnreadMessages}
             status={task.status}
             lastCheckInDate={task.lastCheckInDate}
+            startDate={task.startDate}
           />
         ))}
       </div>

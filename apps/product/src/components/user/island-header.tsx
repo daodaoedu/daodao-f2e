@@ -12,7 +12,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lottie from "lottie-react";
-import { ChevronRight, RefreshCcw, SlidersHorizontal } from "lucide-react";
+import { ChevronRight, RefreshCcw } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { PageHeader, type PageHeaderProps } from "../layout/page-header";
 
@@ -100,9 +100,7 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
     if (isOwnProfile) {
       return {
         title: "我的小島",
-        rightActionTo: "/settings",
-        rightLabel: "設定",
-        rightActionIcon: <SlidersHorizontal className="size-6" />,
+        rightAction: null,
       };
     }
     return { leftAction: "back" };

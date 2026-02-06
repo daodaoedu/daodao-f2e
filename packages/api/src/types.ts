@@ -8886,7 +8886,7 @@ export interface paths {
         };
         /**
          * 刪除當前用戶
-         * @description 刪除當前已登入用戶的帳號
+         * @description 完全刪除當前用戶帳號及所有關聯資料，同時清除 OAuth 臨時用戶記錄以允許重新註冊。呼叫後會自動登出。
          */
         delete: {
             parameters: {
@@ -13653,7 +13653,118 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
+        /**
+         * 更新簽到記錄
+         * @description 更新指定的簽到記錄，需要身份驗證且只能編輯自己的記錄。支援 multipart/form-data 格式以便上傳新圖片。注意：打卡日期不可編輯。
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 實踐 ID（UUID 格式） */
+                    id: string;
+                    /** @description 簽到記錄 ID */
+                    checkInId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "multipart/form-data": {
+                        /**
+                         * @description 學習心情
+                         * @enum {string}
+                         */
+                        mood?: "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
+                        /** @description 詳細描述（最多 300 字） */
+                        note?: string;
+                        /** @description 標籤（JSON 字串陣列，最多 10 個） */
+                        tags?: string;
+                        /** @description OG 圖片 URL（用於社群分享） */
+                        ogImageUrl?: string;
+                        /** @description 圖片檔案（最多 3 張，每張最大 500KB） */
+                        images?: string[];
+                    };
+                    "application/json": components["schemas"]["UpdateCheckInRequest"];
+                };
+            };
+            responses: {
+                /** @description 成功更新簽到記錄 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            data: components["schemas"]["CheckInEntity"] & unknown;
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
         post?: never;
         /**
          * 刪除簽到記錄
@@ -21741,43 +21852,43 @@ export interface components {
         /** @description 用戶聯絡資訊 */
         ContactList: {
             /**
-             * @description Instagram 帳號
+             * @description Instagram 帳號（傳空字串清空）
              * @example @john_doe
              */
             instagram?: string;
             /**
-             * @description Discord 帳號
+             * @description Discord 帳號（傳空字串清空）
              * @example JohnDoe#1234
              */
             discord?: string;
             /**
-             * @description LINE ID
+             * @description LINE ID（傳空字串清空）
              * @example john_doe_line
              */
             line?: string;
             /**
-             * @description Facebook 帳號
+             * @description Facebook 帳號（傳空字串清空）
              * @example john.doe.fb
              */
             facebook?: string;
             /**
-             * @description Threads 帳號
+             * @description Threads 帳號（傳空字串清空）
              * @example @john_doe
              */
             threads?: string;
             /**
-             * @description LinkedIn 個人檔案網址或用戶名
+             * @description LinkedIn 個人檔案網址或用戶名（傳空字串清空）
              * @example john-doe-123456
              */
             linkedin?: string;
             /**
              * Format: uri
-             * @description 個人網站網址
+             * @description 個人網站網址（傳空字串清空）
              * @example https://johndoe.com
              */
             website?: string;
             /**
-             * @description GitHub 帳號或網址
+             * @description GitHub 帳號或網址（傳空字串清空）
              * @example johndoe
              */
             github?: string;
@@ -24149,6 +24260,59 @@ export interface components {
              *     ]
              */
             tags: string[];
+        };
+        /**
+         * @description 更新簽到記錄請求
+         * @example {
+         *       "mood": "happy",
+         *       "note": "今天閱讀了第三章，學到了很多新概念",
+         *       "imageUrls": [],
+         *       "ogImageUrl": null,
+         *       "tags": [
+         *         "專注",
+         *         "有收穫"
+         *       ]
+         *     }
+         */
+        UpdateCheckInRequest: {
+            /**
+             * @description 學習心情 (give_up: 想放棄, frustrated: 挫折, bored: 無聊, neutral: 普通, good: 不錯, happy: 開心)
+             * @example happy
+             * @example give_up
+             * @example frustrated
+             * @example bored
+             * @example neutral
+             * @example good
+             * @example happy
+             * @enum {string}
+             */
+            mood?: "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
+            /**
+             * @description 詳細描述（最多300字）
+             * @example 今天閱讀了第三章，學到了很多新概念
+             */
+            note?: string;
+            /**
+             * @description 打卡圖片 URL（最多3張）
+             * @example [
+             *       "https://example.com/image1.jpg"
+             *     ]
+             */
+            imageUrls?: string[];
+            /**
+             * Format: uri
+             * @description OG 圖片 URL（用於社群分享）
+             * @example null
+             */
+            ogImageUrl?: string | null;
+            /**
+             * @description 打卡標籤（最多10個）
+             * @example [
+             *       "專注",
+             *       "有收穫"
+             *     ]
+             */
+            tags?: string[];
         };
         /**
          * @description 實踐活動統計資訊

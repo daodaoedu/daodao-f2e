@@ -224,6 +224,7 @@ export const AuthProvider = ({
     if (typeof document !== "undefined") {
       const cookiesToClear = ["access_token", "refresh_token", "session", "auth_token"];
       cookiesToClear.forEach((name) => {
+        // biome-ignore lint/suspicious/noDocumentCookie: Cookie Store API 瀏覽器支援度不足，使用傳統方式清除 cookie
         document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
       });
     }

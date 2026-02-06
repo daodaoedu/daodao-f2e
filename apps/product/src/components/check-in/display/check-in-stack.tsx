@@ -123,11 +123,11 @@ const pathElementToVertices = (pathElement: SVGPathElement, samples: number): Ma
 
 // SVG 配置：順序為綠、藍、紅、黃、橘
 const SVG_CONFIGS = [
-  { Component: CircleSvg },
-  { Component: HexagonSvg },
-  { Component: SemiCircleSvg },
-  { Component: SpeechBubbleSvg },
-  { Component: ClippedCircleSvg },
+  { name: "circle", Component: CircleSvg },
+  { name: "hexagon", Component: HexagonSvg },
+  { name: "semi-circle", Component: SemiCircleSvg },
+  { name: "speech-bubble", Component: SpeechBubbleSvg },
+  { name: "clipped-circle", Component: ClippedCircleSvg },
 ] as const;
 
 const CONTAINER_WIDTH = 448;
@@ -543,8 +543,8 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
     >
       {/* 隱藏的 SVG 區域，用於提取幾何數據 */}
       <div className="absolute opacity-0 pointer-events-none invisible h-px overflow-hidden">
-        {SVG_CONFIGS.map(({ Component }, i) => (
-          <Component key={i} ref={handleSvgRef(i)} />
+        {SVG_CONFIGS.map(({ name, Component }, i) => (
+          <Component key={name} ref={handleSvgRef(i)} />
         ))}
       </div>
 

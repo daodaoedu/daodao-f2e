@@ -16,6 +16,8 @@ export type PageHeaderProps = {
   onLeftAction?: () => void;
   /** 中間標題，可選 */
   title?: string;
+  /** 右側動作：'close' 顯示關閉按鈕，null 隱藏右側按鈕，預設為 'close' */
+  rightAction?: "close" | null;
   /** 右側關閉按鈕的點擊處理函數，預設為 router.back() */
   onRightAction?: () => void;
   /** 關閉按鈕的目標路由，設定後會使用 router.replace() */
@@ -37,6 +39,7 @@ export const PageHeader = ({
   leftLabel = "返回",
   onLeftAction,
   title,
+  rightAction = "close",
   onRightAction,
   rightActionIcon = null,
   rightActionTo,
@@ -106,20 +109,22 @@ export const PageHeader = ({
 
       {/* Right Action */}
       <div className="flex items-center justify-end">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleRightAction}
-          aria-label={rightLabel}
-          animation="none"
-          className={cn(
-            isLight
-              ? "text-white hover:text-white bg-very-light-gray/50"
-              : "text-light-gray bg-very-light-gray/50"
-          )}
-        >
-          {rightActionIcon ?? <X className={cn("size-6", isLight && "size-5")} />}
-        </Button>
+        {rightAction !== null && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleRightAction}
+            aria-label={rightLabel}
+            animation="none"
+            className={cn(
+              isLight
+                ? "text-white hover:text-white bg-very-light-gray/50"
+                : "text-light-gray bg-very-light-gray/50"
+            )}
+          >
+            {rightActionIcon ?? <X className={cn("size-6", isLight && "size-5")} />}
+          </Button>
+        )}
       </div>
     </div>
   );

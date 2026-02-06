@@ -101,6 +101,7 @@ export const CheckInCard = ({
           >
             {[...Array(5)].map((_, i) => (
               <View
+                // biome-ignore lint/suspicious/noArrayIndexKey: 靜態裝飾元素，順序不會改變
                 key={`binding-dot-${i}`}
                 width={12}
                 height={12}

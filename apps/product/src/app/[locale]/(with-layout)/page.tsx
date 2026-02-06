@@ -62,6 +62,7 @@ export default function HomePage() {
           theme: practice.themeColor || "#FCDD84",
           status: mapPracticeStatusToTaskStatus(practice.status),
           lastCheckInDate,
+          startDate: practice.startDate || null,
         });
       } else if (practice.status === PracticeStatus.completed) {
         completedTasksData.push({
