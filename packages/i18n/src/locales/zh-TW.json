@@ -22,8 +22,13 @@
     "footer_terms_of_service": "服務條款",
     "footer_intellectual_property": "智慧財產權",
     "footer_newsletter_title": "訂閱電子報",
+    "footer_name_placeholder": "輸入您的名稱",
     "footer_email_placeholder": "輸入您的Email",
     "footer_subscribe_button": "訂閱",
+    "footer_subscribing": "訂閱中...",
+    "footer_subscribed": "訂閱成功！",
+    "footer_subscribe_confirm_hint": "請至信箱點擊確認連結完成訂閱",
+    "footer_subscribe_error": "訂閱失敗，請稍後再試",
     "footer_social_title": "追蹤島島",
     "footer_instagram_alt": "Instagram",
     "footer_facebook_alt": "Facebook",
@@ -4092,6 +4097,119 @@
     "login_dialog_terms_prefix": "註冊即代表您同意島島阿學的",
     "login_dialog_terms_link": "服務條款",
     "login_dialog_terms_and": "與",
-    "login_dialog_privacy_link": "隱私權政策"
+    "login_dialog_privacy_link": "隱私權政策",
+    "verifyEmail": {
+      "success": {
+        "verified": {
+          "title": "郵件驗證成功！",
+          "description": "歡迎加入島島阿學，開始探索你的學習之旅吧！"
+        },
+        "alreadyVerified": {
+          "title": "郵件已驗證",
+          "description": "您的郵件已經驗證過了，可以直接使用所有功能。"
+        },
+        "default": {
+          "title": "驗證成功",
+          "description": "您的郵件已成功驗證。"
+        }
+      },
+      "error": {
+        "missingToken": {
+          "title": "無效的驗證連結",
+          "description": "驗證連結缺少必要的參數，請檢查連結是否完整。"
+        },
+        "invalidToken": {
+          "title": "驗證連結已過期",
+          "description": "此驗證連結已過期或無效，請重新發送驗證郵件。"
+        },
+        "userNotFound": {
+          "title": "用戶不存在",
+          "description": "找不到此驗證連結對應的用戶帳號。"
+        },
+        "verificationFailed": {
+          "title": "驗證失敗",
+          "description": "驗證過程發生錯誤，請稍後再試。"
+        },
+        "unknown": {
+          "title": "發生錯誤",
+          "description": "發生未知錯誤，請稍後再試。"
+        }
+      },
+      "actions": {
+        "goToHome": "前往首頁",
+        "backToHome": "返回首頁"
+      },
+      "resend": {
+        "button": "重新發送驗證郵件",
+        "sending": "發送中...",
+        "success": "驗證郵件已重新發送，請檢查您的信箱",
+        "failed": "發送失敗，請稍後再試",
+        "noEmail": "無法取得郵件地址，請聯繫客服"
+      },
+      "pending": {
+        "title": "請驗證您的電子郵件",
+        "description": "我們已經發送驗證郵件到 {email}，請點擊郵件中的連結完成驗證。",
+        "descriptionNoEmail": "我們已經發送驗證郵件到您的信箱，請點擊郵件中的連結完成驗證。",
+        "checkSpam": "沒收到郵件？請檢查垃圾郵件資料夾",
+        "resendButton": "重新發送驗證郵件",
+        "resending": "發送中...",
+        "resendSuccess": "驗證郵件已重新發送",
+        "resendFailed": "發送失敗，請稍後再試",
+        "resendCooldown": "{seconds} 秒後可重新發送",
+        "logout": "使用其他帳號登入"
+      }
+    }
+  },
+  "onboarding": {
+    "steps": {
+      "profile": {
+        "title": "個人資料",
+        "email": "電子信箱",
+        "emailLinked": "此帳號已連結至 Google 帳戶",
+        "birthDate": "生日",
+        "birthDatePlaceholder": "請選擇你的生日",
+        "ageValid": "年齡符合註冊要求",
+        "ageInvalid": "島島阿學目前僅開放給年滿 16 歲的使用者註冊。歡迎符合年齡要求後再來加入我們！",
+        "name": "你的名字",
+        "namePlaceholder": "希望大家怎麼稱呼你",
+        "username": "使用者帳號",
+        "usernamePlaceholder": "設定你的專屬帳號",
+        "usernameHint": "僅可使用英文字母和數字，長度 3-15 個字元",
+        "usernameValid": "帳號名稱可以使用",
+        "usernameInvalid": "帳號名稱必須為 3-15 個字元，僅限使用英文字母和數字",
+        "usernameUnavailable": "此帳號名稱已被使用",
+        "bio": "個人標語",
+        "bioPlaceholder": "用一句話介紹自己"
+      },
+      "interests": {
+        "title": "專業與興趣領域",
+        "professionalFieldsLabel": "你的專業或正在學習的領域（選填，最多 5 個）",
+        "interestsLabel": "你有興趣探索的領域",
+        "interestsRequired": "必選",
+        "maxReached": "太棒了！我們已經有足夠資訊為你個人化學習體驗"
+      },
+      "referral": {
+        "title": "你如何得知島島阿學？",
+        "subtitle": "幫助我們了解如何讓更多人發現島島阿學",
+        "otherLabel": "請說明",
+        "otherPlaceholder": "請告訴我們你是如何得知島島阿學的..."
+      },
+      "success": {
+        "title": "歡迎加入島島阿學！",
+        "titleWithName": "{name}，歡迎加入島島阿學！",
+        "primaryButton": "前往完成偏好設定獲得個人化推薦",
+        "secondaryButton": "稍後設定",
+        "emailReminder": "記得到信箱收我們的歡迎信哦!"
+      }
+    },
+    "navigation": {
+      "previous": "上一步",
+      "next": "下一步",
+      "complete": "完成註冊",
+      "submitting": "提交中..."
+    },
+    "errors": {
+      "submitFailed": "提交失敗，請稍後再試"
+    }
   }
 }

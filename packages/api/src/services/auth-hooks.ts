@@ -10,6 +10,7 @@ import type {
   ForgotPasswordRequest,
   LoginRequest,
   RegisterRequest,
+  ResendVerificationRequest,
   ResetPasswordRequest,
   VerifyEmailRequest,
 } from "./auth";
@@ -80,6 +81,22 @@ export const useAuthMutations = () => {
       return client.POST("/api/v1/auth/verify-email", {
         body: data,
       });
+    },
+
+    /**
+     * 重新發送驗證郵件
+     */
+    resendVerificationEmail: async (data: ResendVerificationRequest) => {
+      return client.POST("/api/v1/auth/resend-verification", {
+        body: data,
+      });
+    },
+
+    /**
+     * 獲取當前認證用戶資訊
+     */
+    getAuthMe: async () => {
+      return client.GET("/api/v1/auth/me");
     },
   };
 };

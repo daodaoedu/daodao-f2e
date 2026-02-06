@@ -23,3 +23,5 @@ export * from "./resource-hooks";
 // User Service
 export * from "./user";
 export * from "./user-hooks";
+// Location Service
+export * from "./location-hooks";

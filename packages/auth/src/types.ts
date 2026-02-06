@@ -29,6 +29,10 @@ export interface AuthContextValue {
   user: StoredUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  /** 是否為臨時用戶（需要完成 onboarding） */
+  isTemporary: boolean;
+  /** Email 是否已驗證 */
+  isEmailVerified: boolean;
 
   // 方法
   login: (redirectUrl?: string) => Promise<void>;
@@ -45,4 +49,6 @@ export interface AuthContextValue {
     callback: () => T | Promise<T>,
     options?: { redirectUrl?: string; source?: "website" | "app" }
   ) => T | Promise<T> | undefined;
+  /** 重新檢查認證狀態（用於 onboarding 完成後刷新 isTemporary 狀態） */
+  refreshAuth: () => Promise<void>;
 }

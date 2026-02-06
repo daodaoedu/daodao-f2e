@@ -22,8 +22,13 @@
     "footer_terms_of_service": "Terms of Service",
     "footer_intellectual_property": "Intellectual Property Rights",
     "footer_newsletter_title": "Subscribe to Newsletter",
+    "footer_name_placeholder": "Enter your name",
     "footer_email_placeholder": "Enter your email",
     "footer_subscribe_button": "Subscribe",
+    "footer_subscribing": "Subscribing...",
+    "footer_subscribed": "Subscribed!",
+    "footer_subscribe_confirm_hint": "Please check your inbox and click the confirmation link",
+    "footer_subscribe_error": "Failed to subscribe, please try again",
     "footer_social_title": "Follow DaoDao",
     "footer_instagram_alt": "Instagram",
     "footer_facebook_alt": "Facebook",
@@ -4092,6 +4097,119 @@
     "login_dialog_terms_prefix": "By registering, you agree to DaoDao's",
     "login_dialog_terms_link": "Terms of Service",
     "login_dialog_terms_and": "and",
-    "login_dialog_privacy_link": "Privacy Policy"
+    "login_dialog_privacy_link": "Privacy Policy",
+    "verifyEmail": {
+      "success": {
+        "verified": {
+          "title": "Email Verified!",
+          "description": "Welcome to DaoDao! Start exploring your learning journey."
+        },
+        "alreadyVerified": {
+          "title": "Email Already Verified",
+          "description": "Your email has already been verified. You can use all features."
+        },
+        "default": {
+          "title": "Verification Successful",
+          "description": "Your email has been successfully verified."
+        }
+      },
+      "error": {
+        "missingToken": {
+          "title": "Invalid Verification Link",
+          "description": "The verification link is missing required parameters. Please check if the link is complete."
+        },
+        "invalidToken": {
+          "title": "Verification Link Expired",
+          "description": "This verification link has expired or is invalid. Please request a new verification email."
+        },
+        "userNotFound": {
+          "title": "User Not Found",
+          "description": "Cannot find the user account associated with this verification link."
+        },
+        "verificationFailed": {
+          "title": "Verification Failed",
+          "description": "An error occurred during verification. Please try again later."
+        },
+        "unknown": {
+          "title": "Error Occurred",
+          "description": "An unknown error occurred. Please try again later."
+        }
+      },
+      "actions": {
+        "goToHome": "Go to Home",
+        "backToHome": "Back to Home"
+      },
+      "resend": {
+        "button": "Resend Verification Email",
+        "sending": "Sending...",
+        "success": "Verification email has been resent. Please check your inbox.",
+        "failed": "Failed to send. Please try again later.",
+        "noEmail": "Unable to get email address. Please contact support."
+      },
+      "pending": {
+        "title": "Please Verify Your Email",
+        "description": "We've sent a verification email to {email}. Please click the link in the email to complete verification.",
+        "descriptionNoEmail": "We've sent a verification email to your inbox. Please click the link in the email to complete verification.",
+        "checkSpam": "Didn't receive the email? Please check your spam folder",
+        "resendButton": "Resend Verification Email",
+        "resending": "Sending...",
+        "resendSuccess": "Verification email has been resent",
+        "resendFailed": "Failed to send. Please try again later.",
+        "resendCooldown": "Resend available in {seconds} seconds",
+        "logout": "Sign in with another account"
+      }
+    }
+  },
+  "onboarding": {
+    "steps": {
+      "profile": {
+        "title": "Personal Information",
+        "email": "Email",
+        "emailLinked": "This account is linked to your Google account",
+        "birthDate": "Birthday",
+        "birthDatePlaceholder": "Select your birthday",
+        "ageValid": "Age meets registration requirements",
+        "ageInvalid": "DaoDao is currently only available for users aged 16 and above. Please come back when you meet the age requirement!",
+        "name": "Your Name",
+        "namePlaceholder": "How would you like others to call you",
+        "username": "Username",
+        "usernamePlaceholder": "Set your unique username",
+        "usernameHint": "Only letters and numbers allowed, 3-15 characters",
+        "usernameValid": "Username is available",
+        "usernameInvalid": "Username must be 3-15 characters, letters and numbers only",
+        "usernameUnavailable": "This username is already taken",
+        "bio": "Personal Tagline",
+        "bioPlaceholder": "Introduce yourself in one sentence"
+      },
+      "interests": {
+        "title": "Professional & Interest Fields",
+        "professionalFieldsLabel": "Your professional or learning fields (optional, max 5)",
+        "interestsLabel": "Fields you're interested in exploring",
+        "interestsRequired": "Required",
+        "maxReached": "Great! We have enough info to personalize your learning experience"
+      },
+      "referral": {
+        "title": "How did you hear about DaoDao?",
+        "subtitle": "Help us understand how to reach more people",
+        "otherLabel": "Please specify",
+        "otherPlaceholder": "Tell us how you discovered DaoDao..."
+      },
+      "success": {
+        "title": "Welcome to DaoDao!",
+        "titleWithName": "{name}, Welcome to DaoDao!",
+        "primaryButton": "Set up preferences for personalized recommendations",
+        "secondaryButton": "Set up later",
+        "emailReminder": "Don't forget to check your inbox for our welcome email!"
+      }
+    },
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next",
+      "complete": "Complete Registration",
+      "submitting": "Submitting..."
+    },
+    "errors": {
+      "submitFailed": "Submission failed, please try again later"
+    }
   }
 }

@@ -14,7 +14,7 @@ import type {
   UpdateUserFormDataRequest,
   UpdateUserRequest,
 } from "./user";
-import { updateCurrentUserWithFormData } from "./user";
+import { createCurrentUserWithFormData, updateCurrentUserWithFormData } from "./user";
 
 // ============================================================================
 // Query Hooks
@@ -152,6 +152,18 @@ export const useUserMutations = () => {
       photoFile?: File
     ) => {
       return updateCurrentUserWithFormData(data, photoFile);
+    },
+
+    /**
+     * 創建當前用戶（用於臨時用戶完成 onboarding）
+     * @param data 用戶資料
+     * @param photoFile 可選的頭像圖片檔案
+     */
+    createCurrentUserWithFormData: async (
+      data: UpdateUserFormDataRequest,
+      photoFile?: File
+    ) => {
+      return createCurrentUserWithFormData(data, photoFile);
     },
 
     /**

@@ -3,7 +3,7 @@
 import {
   logout as apiLogout,
   refreshToken as apiRefreshToken,
-  getCurrentUser,
+  getAuthMe,
   unauthorizedHandler,
 } from "@daodao/api";
 import { usePathname } from "@daodao/i18n/navigation";
@@ -66,6 +66,34 @@ export interface AuthProviderRouteConfig {
    * @param currentPath 當前路徑（包含 query string）
    */
   onAuthRequired?: (currentPath: string) => void;
+
+  /**
+   * Onboarding 頁面路徑（用於臨時用戶跳轉）
+   * 當用戶是臨時用戶時，會自動跳轉到此路徑
+   * 例如："/auth/onboarding"
+   */
+  onboardingPath?: string;
+
+  /**
+   * 當偵測到臨時用戶時的回調函數
+   * 如果提供了此函數，則會呼叫此函數而不是使用 onboardingPath 跳轉
+   * @param currentPath 當前路徑（包含 query string）
+   */
+  onTemporaryUser?: (currentPath: string) => void;
+
+  /**
+   * Email 驗證頁面路徑（用於未驗證 email 的用戶跳轉）
+   * 當用戶未驗證 email 時，會自動跳轉到此路徑
+   * 例如："/auth/verify-email"
+   */
+  emailVerificationPath?: string;
+
+  /**
+   * 當偵測到未驗證 email 的用戶時的回調函數
+   * 如果提供了此函數，則會呼叫此函數而不是使用 emailVerificationPath 跳轉
+   * @param currentPath 當前路徑（包含 query string）
+   */
+  onEmailUnverified?: (currentPath: string) => void;
 }
 
 interface AuthProviderProps {
@@ -75,6 +103,10 @@ interface AuthProviderProps {
   defaultProtected?: boolean;
   enableRouteProtection?: boolean;
   onAuthRequired?: (currentPath: string) => void;
+  onboardingPath?: string;
+  onTemporaryUser?: (currentPath: string) => void;
+  emailVerificationPath?: string;
+  onEmailUnverified?: (currentPath: string) => void;
 }
 
 /**
@@ -162,10 +194,16 @@ export const AuthProvider = ({
   defaultProtected = false,
   enableRouteProtection = true,
   onAuthRequired,
+  onboardingPath,
+  onTemporaryUser,
+  emailVerificationPath,
+  onEmailUnverified,
 }: AuthProviderProps) => {
   const [user, setUser] = useState<StoredUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTemporary, setIsTemporary] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(true); // 預設為 true，避免閃爍
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [loginDialogRedirectUrl, setLoginDialogRedirectUrl] = useState<string | undefined>();
   const [loginDialogSource, setLoginDialogSource] = useState<"website" | "app" | undefined>();
@@ -181,6 +219,14 @@ export const AuthProvider = ({
     setUser(null);
     setIsAuthenticated(false);
     userInfoStorage.remove();
+
+    // 清除可能的認證相關 cookies（僅限非 HttpOnly）
+    if (typeof document !== "undefined") {
+      const cookiesToClear = ["access_token", "refresh_token", "session", "auth_token"];
+      cookiesToClear.forEach((name) => {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      });
+    }
   }, [userInfoStorage]);
 
   /**
@@ -198,33 +244,42 @@ export const AuthProvider = ({
 
   /**
    * 檢查登入狀態
-   * 使用統一的 API 服務獲取當前用戶資訊
+   * 使用 /api/v1/auth/me 端點獲取當前用戶資訊（支援臨時用戶）
    */
   const checkAuth = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await getCurrentUser();
+      const response = await getAuthMe();
 
-      if (response.data && response.response.ok && response.data.data) {
-        const userData = response.data.data;
-        // 將完整的 API 使用者資訊轉換為簡化的存儲版本，避免記住敏感資訊
+      if (response.data?.data?.user) {
+        const userData = response.data.data.user;
+        const temporary = response.data.data.isTemporary ?? false;
+        const emailVerified = userData.email_verified ?? false;
+
+        setIsTemporary(temporary);
+        setIsEmailVerified(emailVerified);
+
+        // 即使是臨時用戶也要設置基本的認證狀態
         const storedUser: StoredUser = {
           id: userData.id,
-          customId: userData.customId ?? null,
+          customId: null,
           email: userData.email ?? null,
           name: userData.name ?? null,
-          photoUrl: userData.photoURL ?? null,
+          photoUrl: userData.photo_url ?? null,
         };
         setAuthState(storedUser);
       } else {
         // 未登入或 Token 無效
         clearAuthState();
+        setIsTemporary(false);
+        setIsEmailVerified(true); // 重置為 true
       }
     } catch (error) {
       console.error("Failed to check auth status:", error);
       clearAuthState();
+      setIsTemporary(false);
+      setIsEmailVerified(true); // 重置為 true
     } finally {
-      console.log("checkAuth finally");
       setIsLoading(false);
     }
   }, [clearAuthState, setAuthState]);
@@ -341,6 +396,87 @@ export const AuthProvider = ({
   ]);
 
   /**
+   * 臨時用戶處理：如果用戶是臨時用戶，跳轉到 onboarding 頁面
+   */
+  useEffect(() => {
+    // 如果還在載入中，不進行檢查
+    if (isLoading) {
+      return;
+    }
+
+    // 只處理已登入的臨時用戶
+    if (!isAuthenticated || !isTemporary) {
+      return;
+    }
+
+    // 移除 locale 前綴後檢查是否已在 onboarding 頁面
+    const pathnameWithoutLocale = removeLocalePrefix(pathname);
+    const isOnOnboardingPage = onboardingPath
+      ? pathnameWithoutLocale.startsWith(onboardingPath)
+      : false;
+
+    // 如果已在 onboarding 頁面，不需要跳轉
+    if (isOnOnboardingPage) {
+      return;
+    }
+
+    const currentUrl = pathname + (typeof window !== "undefined" ? window.location.search : "");
+
+    // 優先使用 onTemporaryUser 回調
+    if (onTemporaryUser) {
+      onTemporaryUser(currentUrl);
+    } else if (onboardingPath && typeof window !== "undefined") {
+      // 否則跳轉到 onboardingPath
+      window.location.href = onboardingPath;
+    }
+  }, [pathname, isAuthenticated, isLoading, isTemporary, onboardingPath, onTemporaryUser]);
+
+  /**
+   * Email 未驗證處理：如果用戶未驗證 email，跳轉到驗證頁面
+   * 注意：這個 effect 只在用戶不是臨時用戶時才執行（臨時用戶優先處理 onboarding）
+   */
+  useEffect(() => {
+    // 如果還在載入中，不進行檢查
+    if (isLoading) {
+      return;
+    }
+
+    // 只處理已登入、非臨時用戶、且未驗證 email 的用戶
+    if (!isAuthenticated || isTemporary || isEmailVerified) {
+      return;
+    }
+
+    // 移除 locale 前綴後檢查路徑
+    const pathnameWithoutLocale = removeLocalePrefix(pathname);
+
+    // 如果在 email 驗證頁面，不需要跳轉
+    const isOnVerificationPage = emailVerificationPath
+      ? pathnameWithoutLocale.startsWith(emailVerificationPath)
+      : false;
+    if (isOnVerificationPage) {
+      return;
+    }
+
+    // 如果在 onboarding 頁面，不需要跳轉（讓用戶看完 Success 頁面）
+    const isOnOnboardingPage = onboardingPath
+      ? pathnameWithoutLocale.startsWith(onboardingPath)
+      : false;
+    if (isOnOnboardingPage) {
+      return;
+    }
+
+    const currentUrl = pathname + (typeof window !== "undefined" ? window.location.search : "");
+
+    // 優先使用 onEmailUnverified 回調
+    if (onEmailUnverified) {
+      onEmailUnverified(currentUrl);
+    } else if (emailVerificationPath && typeof window !== "undefined") {
+      // 否則跳轉到 emailVerificationPath
+      window.location.href = emailVerificationPath;
+    }
+  }, [pathname, isAuthenticated, isLoading, isTemporary, isEmailVerified, onboardingPath, emailVerificationPath, onEmailUnverified]);
+
+  /**
    * 開啟登入 Dialog
    */
   const openLoginDialog = useCallback(
@@ -436,13 +572,16 @@ export const AuthProvider = ({
       user,
       isAuthenticated,
       isLoading,
+      isTemporary,
+      isEmailVerified,
       login,
       logout,
       refreshToken,
       openLoginDialog,
       requireAuth,
+      refreshAuth: checkAuth,
     }),
-    [user, isAuthenticated, isLoading, login, logout, refreshToken, openLoginDialog, requireAuth]
+    [user, isAuthenticated, isLoading, isTemporary, isEmailVerified, login, logout, refreshToken, openLoginDialog, requireAuth, checkAuth]
   );
 
   return (

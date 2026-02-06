@@ -1,6 +1,7 @@
 "use client";
 
-import { type UpdateUserRequest, useCurrentUser, useUserMutations } from "@daodao/api";
+import { type UpdateUserRequest, useCities, useCurrentUser, useUserMutations } from "@daodao/api";
+import { useLocale } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
@@ -21,15 +22,23 @@ import {
 } from "./schema";
 
 export const AccountForm = () => {
+  const locale = useLocale();
   const { data: userData, isLoading, error: userError } = useCurrentUser();
   const { updateCurrentUser } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 獲取城市列表以找到用戶 location 對應的 countryCode（傳入 locale 以支援多語系）
+  const { data: citiesData } = useCities({
+    locale: locale === "en" ? "en" : "zh-TW",
+  });
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema),
     defaultValues: {
       email: "",
       birthday: undefined,
+      country: "",
+      location: "",
       position: [],
       educationStage: "",
       professionalFields: [],
@@ -41,16 +50,28 @@ export const AccountForm = () => {
   useEffect(() => {
     if (userData?.data) {
       const user = userData.data;
+
+      // 根據 location 找到對應的 countryCode
+      let countryCode = "";
+      if (user.location && citiesData?.data) {
+        const city = citiesData.data.find((c) => c.code === user.location);
+        if (city?.countryCode) {
+          countryCode = city.countryCode;
+        }
+      }
+
       form.reset({
         email: user.email || "",
         birthday: user.birthDay ? parse(user.birthDay, "yyyy-MM-dd", new Date()) : undefined,
+        country: countryCode,
+        location: user.location || "",
         position: user.positionList || [],
         educationStage: user.educationStage || "",
-        professionalFields: user.tagList || [],
+        professionalFields: user.professionalField || [],
         explorationFields: user.interestList || [],
       });
     }
-  }, [userData, form.reset]);
+  }, [userData, citiesData, form.reset]);
 
   const handleSubmit = async (values: AccountFormValues) => {
     setIsSubmitting(true);
@@ -59,15 +80,21 @@ export const AccountForm = () => {
       // 準備 API 請求資料
       const updateData: {
         birthDay?: string;
+        location?: string;
         positionList?: string[];
         educationStage?: string;
-        tagList?: string[];
+        professionalField?: string[];
         interestList?: string[];
       } = {};
 
       // 轉換生日
       if (values.birthday) {
         updateData.birthDay = format(values.birthday, "yyyy-MM-dd");
+      }
+
+      // 居住地（城市代碼）
+      if (values.location) {
+        updateData.location = values.location;
       }
 
       // 身份（直接對應資料庫值，允許多選）
@@ -79,7 +106,7 @@ export const AccountForm = () => {
       }
 
       // 轉換專業領域和探索領域（總是包含，允許清空）
-      updateData.tagList = values.professionalFields;
+      updateData.professionalField = values.professionalFields;
       updateData.interestList = values.explorationFields;
 
       // 調用 API
@@ -101,9 +128,10 @@ export const AccountForm = () => {
                 // 將錯誤設置到對應的表單欄位
                 const formFieldMap: Record<string, keyof AccountFormValues> = {
                   birthDay: "birthday",
+                  location: "location",
                   positionList: "position",
                   educationStage: "educationStage",
-                  tagList: "professionalFields",
+                  professionalField: "professionalFields",
                   interestList: "explorationFields",
                 };
 
