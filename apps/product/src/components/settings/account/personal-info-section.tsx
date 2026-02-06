@@ -52,15 +52,6 @@ export const PersonalInfoSection = ({
   const countries = (countriesData?.data ?? []).filter((c) => c.code);
   const cities = (citiesData?.data ?? []).filter((c) => c.code);
 
-  // Debug: 檢查城市選擇器的狀態
-  console.log("[City Select Debug]", {
-    selectedCountry,
-    isLoadingCities,
-    citiesDataLength: citiesData?.data?.length,
-    filteredCitiesLength: cities.length,
-    rawCitiesData: citiesData?.data?.slice(0, 3), // 只顯示前3筆
-  });
-
   // 當國家變更時，清空城市選擇
   const handleCountryChange = (value: string) => {
     form.setValue("country", value);

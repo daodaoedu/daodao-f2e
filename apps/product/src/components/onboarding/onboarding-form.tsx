@@ -204,13 +204,13 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
       referralSource: "referralSource",
     };
 
-    for (const [apiField, formField] of Object.entries(mapping)) {
-      if (apiPath.includes(apiField)) {
-        return formField;
-      }
-    }
+    // 從 API 路徑中提取欄位名稱（例如 "/birthDay" -> "birthDay"）
+    const pathParts = apiPath.split("/").filter(Boolean);
+    const fieldName = pathParts[pathParts.length - 1];
 
-    return null;
+    // 使用完全相等比對，避免子字串誤判
+    if (!fieldName) return null;
+    return mapping[fieldName] ?? null;
   };
 
   return (

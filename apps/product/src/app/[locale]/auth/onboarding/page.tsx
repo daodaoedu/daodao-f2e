@@ -16,17 +16,14 @@ export default function OnboardingPage() {
   // 追蹤是否已經初始化過，避免 refreshAuth 導致組件重新掛載
   const [hasInitialized, setHasInitialized] = useState(false);
 
-  // 初始化完成後記錄狀態
+  // 處理初次載入邏輯：已登入則記錄狀態，未登入則重定向到首頁
   useEffect(() => {
-    if (!isLoading && isAuthenticated && !hasInitialized) {
-      setHasInitialized(true);
-    }
-  }, [isLoading, isAuthenticated, hasInitialized]);
-
-  // 未登入則重定向到首頁（只在初次載入時檢查）
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated && !hasInitialized) {
-      router.replace("/");
+    if (!isLoading && !hasInitialized) {
+      if (isAuthenticated) {
+        setHasInitialized(true);
+      } else {
+        router.replace("/");
+      }
     }
   }, [isLoading, isAuthenticated, hasInitialized, router]);
 

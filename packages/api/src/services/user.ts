@@ -171,15 +171,10 @@ export interface UpdateUserFormDataRequest {
 }
 
 /**
- * 更新當前用戶資訊（FormData 格式，支援圖片上傳）
- * @param data 用戶資料
- * @param photoFile 可選的頭像圖片檔案
- * @returns 更新結果
+ * 建立用戶資料的 FormData
+ * 將 UpdateUserFormDataRequest 轉換為 FormData 格式
  */
-export const updateCurrentUserWithFormData = async (
-  data: UpdateUserFormDataRequest,
-  photoFile?: File
-): Promise<UpdateUserResponse> => {
+const buildUserFormData = (data: UpdateUserFormDataRequest, photoFile?: File): FormData => {
   const formData = new FormData();
 
   // 基本欄位（string）
@@ -219,18 +214,29 @@ export const updateCurrentUserWithFormData = async (
   // 圖片檔案（後端期望欄位名為 'avatar'）
   if (photoFile) formData.append("avatar", photoFile);
 
+  return formData;
+};
+
+/**
+ * 發送用戶 FormData 請求的共用邏輯
+ */
+const sendUserFormDataRequest = async <T>(
+  method: "POST" | "PUT",
+  formData: FormData,
+  errorMessage: string
+): Promise<T> => {
   const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
   const response = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/users/me`, {
-    method: "PUT",
+    method,
     body: formData,
     credentials: "include",
   });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({
-      error: { message: "更新失敗" },
+      error: { message: errorMessage },
     }));
-    const error = new Error(errorData.error?.message || "更新失敗") as Error & {
+    const error = new Error(errorData.error?.message || errorMessage) as Error & {
       details?: Array<{ path?: string; message?: string }>;
     };
     // 附加驗證錯誤詳情（供表單使用）
@@ -241,6 +247,20 @@ export const updateCurrentUserWithFormData = async (
   }
 
   return response.json();
+};
+
+/**
+ * 更新當前用戶資訊（FormData 格式，支援圖片上傳）
+ * @param data 用戶資料
+ * @param photoFile 可選的頭像圖片檔案
+ * @returns 更新結果
+ */
+export const updateCurrentUserWithFormData = async (
+  data: UpdateUserFormDataRequest,
+  photoFile?: File
+): Promise<UpdateUserResponse> => {
+  const formData = buildUserFormData(data, photoFile);
+  return sendUserFormDataRequest<UpdateUserResponse>("PUT", formData, "更新失敗");
 };
 
 /**
@@ -259,67 +279,8 @@ export const createCurrentUserWithFormData = async (
   data: UpdateUserFormDataRequest,
   photoFile?: File
 ): Promise<CreateUserResponse> => {
-  const formData = new FormData();
-
-  // 基本欄位（string）
-  if (data.name) formData.append("name", data.name);
-  if (data.customId) formData.append("customId", data.customId);
-  if (data.location) formData.append("location", data.location);
-  if (data.gender) formData.append("gender", data.gender);
-  if (data.birthDay) formData.append("birthDay", data.birthDay);
-  if (data.selfIntroduction) formData.append("selfIntroduction", data.selfIntroduction);
-  if (data.personalSlogan) formData.append("personalSlogan", data.personalSlogan);
-
-  // Boolean 欄位需轉成字串
-  if (data.isOpenLocation !== undefined) {
-    formData.append("isOpenLocation", String(data.isOpenLocation));
-  }
-  if (data.isOpenProfile !== undefined) {
-    formData.append("isOpenProfile", String(data.isOpenProfile));
-  }
-  if (data.isSubscribeEmail !== undefined) {
-    formData.append("isSubscribeEmail", String(data.isSubscribeEmail));
-  }
-
-  // 其他 string 欄位
-  if (data.educationStage) formData.append("educationStage", data.educationStage);
-  if (data.referralSource) formData.append("referralSource", data.referralSource);
-
-  // 陣列/物件欄位需轉成 JSON 字串
-  if (data.tagList) formData.append("tagList", JSON.stringify(data.tagList));
-  if (data.roleList) formData.append("roleList", JSON.stringify(data.roleList));
-  if (data.interestList) formData.append("interestList", JSON.stringify(data.interestList));
-  if (data.contactList) formData.append("contactList", JSON.stringify(data.contactList));
-  if (data.wantToDoList) formData.append("wantToDoList", JSON.stringify(data.wantToDoList));
-  if (data.professionalField) formData.append("professionalField", JSON.stringify(data.professionalField));
-  if (data.share) formData.append("share", JSON.stringify(data.share));
-  if (data.preferences) formData.append("preferences", JSON.stringify(data.preferences));
-
-  // 圖片檔案（後端期望欄位名為 'avatar'）
-  if (photoFile) formData.append("avatar", photoFile);
-
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
-  const response = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/users/me`, {
-    method: "POST",
-    body: formData,
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({
-      error: { message: "創建失敗" },
-    }));
-    const error = new Error(errorData.error?.message || "創建失敗") as Error & {
-      details?: Array<{ path?: string; message?: string }>;
-    };
-    // 附加驗證錯誤詳情（供表單使用）
-    if (errorData.error?.details && Array.isArray(errorData.error.details)) {
-      error.details = errorData.error.details;
-    }
-    throw error;
-  }
-
-  return response.json();
+  const formData = buildUserFormData(data, photoFile);
+  return sendUserFormDataRequest<CreateUserResponse>("POST", formData, "創建失敗");
 };
 
 /**
