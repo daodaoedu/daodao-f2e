@@ -41,6 +41,9 @@ env:
   NODE_VERSION: 20
   PNPM_VERSION: 10
   DOCKER_BUILDKIT: 1
+  # 對於 workflow_run 事件，使用觸發 CI 的分支和 commit；對於 workflow_dispatch，使用當前值
+  BRANCH_NAME: ${{ github.event.workflow_run.head_branch || github.ref_name }}
+  COMMIT_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
 
 jobs:
   # ===== Docker 映像構建階段 - Website =====
@@ -81,18 +84,21 @@ jobs:
       - name: Set Environment Variables
         id: meta
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/prod" ]; then
+          # 使用全域 BRANCH_NAME 環境變數（對於 workflow_run 是觸發 CI 的分支）
+          BRANCH="${{ env.BRANCH_NAME }}"
+          echo "Building for branch: $BRANCH"
+
+          if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "prod" ]; then
             echo "IMAGE_TAG=prod" >> $GITHUB_ENV
             echo "NODE_ENV=production" >> $GITHUB_ENV
             echo "image-tag=prod" >> $GITHUB_OUTPUT
-          elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+          elif [ "$BRANCH" = "dev" ]; then
             echo "IMAGE_TAG=dev" >> $GITHUB_ENV
             echo "NODE_ENV=production" >> $GITHUB_ENV
             echo "image-tag=dev" >> $GITHUB_OUTPUT
           else
             # Feature branch: feat/v3 → v3
-            BRANCH_NAME="${{ github.ref_name }}"
-            FEAT_NAME="${BRANCH_NAME#feat/}"
+            FEAT_NAME="${BRANCH#feat/}"
             echo "IMAGE_TAG=feat" >> $GITHUB_ENV
             echo "NODE_ENV=production" >> $GITHUB_ENV
             echo "FEAT_BRANCH=${FEAT_NAME}" >> $GITHUB_ENV
@@ -118,7 +124,7 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}
-            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}-${{ github.sha }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}-${{ env.COMMIT_SHA }}
           cache-from: |
             type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}
             type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:buildcache-${{ env.IMAGE_TAG }}
@@ -140,7 +146,7 @@ jobs:
           docker run --rm -d --name test-website \
             -p 3010:3000 \
             -e NODE_ENV=${{ env.NODE_ENV }} \
-            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}-${{ github.sha }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}-${{ env.COMMIT_SHA }}
 
           sleep 15
 
@@ -192,18 +198,21 @@ jobs:
       - name: Set Environment Variables
         id: meta
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/prod" ]; then
+          # 使用全域 BRANCH_NAME 環境變數（對於 workflow_run 是觸發 CI 的分支）
+          BRANCH="${{ env.BRANCH_NAME }}"
+          echo "Building for branch: $BRANCH"
+
+          if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "prod" ]; then
             echo "IMAGE_TAG=prod" >> $GITHUB_ENV
             echo "NODE_ENV=production" >> $GITHUB_ENV
             echo "image-tag=prod" >> $GITHUB_OUTPUT
-          elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+          elif [ "$BRANCH" = "dev" ]; then
             echo "IMAGE_TAG=dev" >> $GITHUB_ENV
             echo "NODE_ENV=production" >> $GITHUB_ENV
             echo "image-tag=dev" >> $GITHUB_OUTPUT
           else
             # Feature branch: feat/v3 → v3
-            BRANCH_NAME="${{ github.ref_name }}"
-            FEAT_NAME="${BRANCH_NAME#feat/}"
+            FEAT_NAME="${BRANCH#feat/}"
             echo "IMAGE_TAG=feat" >> $GITHUB_ENV
             echo "NODE_ENV=production" >> $GITHUB_ENV
             echo "FEAT_BRANCH=${FEAT_NAME}" >> $GITHUB_ENV
@@ -229,7 +238,7 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}
-            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}-${{ github.sha }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}-${{ env.COMMIT_SHA }}
           cache-from: |
             type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}
             type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:buildcache-${{ env.IMAGE_TAG }}
@@ -252,7 +261,7 @@ jobs:
             -p 3011:3001 \
             -e NODE_ENV=${{ env.NODE_ENV }} \
             -e HOSTNAME=0.0.0.0 \
-            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}-${{ github.sha }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}-${{ env.COMMIT_SHA }}
 
           sleep 15
 
@@ -318,10 +327,11 @@ jobs:
       - name: Deploy to Linode
         env:
           LINODE_INSTANCE_IP: ${{ secrets.LINODE_INSTANCE_IP }}
-          BRANCH_NAME: ${{ github.ref_name }}
+          # 對於 workflow_run 事件，使用觸發 CI 的分支和 commit；對於 workflow_dispatch，使用當前分支
+          BRANCH_NAME: ${{ github.event.workflow_run.head_branch || github.ref_name }}
           IMAGE_TAG: ${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag }}
           APP_ENV: ${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag }}
-          COMMIT_SHA: ${{ github.sha }}
+          COMMIT_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
           DEPLOY_WEBSITE: ${{ needs.build-website.result == 'success' }}
           DEPLOY_PRODUCT: ${{ needs.build-product.result == 'success' }}
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -532,8 +542,9 @@ jobs:
         run: |
           AUTHOR="${{ github.actor }}"
           REPO="${{ github.repository }}"
-          BRANCH="${{ github.ref_name }}"
-          COMMIT_SHA="${{ github.sha }}"
+          # 使用全域環境變數（對於 workflow_run 事件是觸發 CI 的分支和 commit）
+          BRANCH="${{ env.BRANCH_NAME }}"
+          COMMIT_SHA="${{ env.COMMIT_SHA }}"
           SHORT_SHA="${COMMIT_SHA:0:7}"
           IMAGE_TAG="${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag }}"
           CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
