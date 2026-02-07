@@ -31,44 +31,62 @@ This document describes the required changes to update the website landing page 
 
 ---
 
-### 2. User Personas / Slogan Section
+### 2. User Personas / Slogan Section — 輪播卡片
 
 **Current:** Simple centered text slogan with island decoration background
-**Mockup:** Three user persona cards (Mia, Emma, Sophia) arranged around the slogan text, each with avatar, name, brief description, and tags
+**Mockup:** Slogan text + persona cards displayed as a **carousel (輪播)**
 
 | Item | Status | Action |
 |------|--------|--------|
 | Slogan text | Unchanged | Keep "每個人都有自己的學習小島，透過交流與分享，連結成群島" |
 | English subtitle | Unchanged | Keep "Where personal growth meets collective wisdom!" |
-| User persona cards | **New** | Add 3 persona cards around the slogan |
+| User persona cards | **New** | Carousel of persona cards in speech bubble style |
+| Bottom decoration | **New** | 兩個重疊半圓（teal + 淺藍色）作為區塊轉場 |
 
-**Mockup Content - 3 User Personas:**
+**Card Design (Speech Bubble Style):**
+
+每張卡片為對話泡泡造型（teal 色圓角邊框 + 底部尖角指向），內容結構：
+- **Avatar** — 圓形真實照片（非插畫），突出於卡片左上方
+- **Name** — 人名（粗體，teal 色）
+- **專業領域** — 標籤 + 值（虛線分隔）
+- **想探索** — 標籤 + 值（虛線分隔）
+- **Quote** — 淺藍色底的引言文字區塊
+
+**Confirmed Persona Data:**
 
 1. **Mia**
-   - Avatar: Girl with dark hair
-   - Description: Learning-related personal intro
-   - Tags: e.g., 藝術創作、數位學習
+   - Avatar: 咖啡拉花照片（圓形裁切）
+   - 專業領域: 前端開發
+   - 想探索: 心理學
+   - Quote: "最近開始對設計心理學有興趣，覺得研究人在想什麼很好玩"
 
-2. **Emma**
-   - Avatar: Girl with reddish/orange hair
-   - Description: Learning-related personal intro
-   - Tags: e.g., 語言學習、閱讀
+2. **Sophie**
+   - Avatar: 真人照片（女性，彩色頭飾，微笑）
+   - 專業領域: 產品設計
+   - 想探索: 用戶體驗研究
+   - Quote: "設計不只是美，更是解決問題的藝術"
 
-3. **Sophia**
-   - Avatar: Girl with curly hair
-   - Description: Learning-related personal intro
-   - Tags: e.g., 程式設計、音樂
+3. **Emma** (from desktop mockup, details TBD)
+   - Avatar: TBD
+   - 專業領域: TBD
+   - 想探索: TBD
+   - Quote: TBD
+
+**Display Mode: Carousel (輪播)**
+- 手機版：一次顯示一張卡片，可滑動切換
+- 桌面版：三張卡片分散排列在 slogan 周圍（參考 desktop mockup）
 
 **Required Assets:**
-- [ ] **Mia avatar** - Illustrated character avatar (SVG/PNG)
-- [ ] **Emma avatar** - Illustrated character avatar (SVG/PNG)
-- [ ] **Sophia avatar** - Illustrated character avatar (SVG/PNG)
-- [ ] Speech bubble / card background decorations
+- [ ] **Mia avatar photo** — 咖啡拉花圓形照片 (JPG/PNG, ~160x160px)
+- [ ] **Sophie avatar photo** — 真人圓形照片 (JPG/PNG, ~160x160px)
+- [ ] **Emma avatar photo** — TBD (JPG/PNG, ~160x160px)
+- [ ] 底部半圓裝飾（teal + 淺藍色），可能用 CSS/SVG 實現
 
 **Required Content:**
-- [ ] Each persona's description text (zh-TW and en)
-- [ ] Each persona's interest tags
-- [ ] Decide whether these are real user testimonials or fictional personas
+- [ ] **Emma 的完整資料** — 專業領域、想探索、Quote
+- [ ] 所有 persona 的英文翻譯
+- [ ] 確認是否還有更多 persona（目前確認 3 位）
+- [ ] Avatar 照片來源確認（是否需要授權 / 是否為示意圖）
 
 **Related Files:**
 - `apps/website/src/components/landing-page/slogan-section.tsx` (major refactor)
@@ -401,10 +419,10 @@ The following current sections are **not present** in the mockup and should be r
 - [ ] Banner character illustration (peeking mascot)
 - [ ] Learning DNA card graphic
 
-### User Persona Assets
-- [ ] Mia character avatar (SVG, ~80x80px)
-- [ ] Emma character avatar (SVG, ~80x80px)
-- [ ] Sophia character avatar (SVG, ~80x80px)
+### User Persona Assets (Real Photos)
+- [ ] Mia avatar photo — 咖啡拉花照片 (JPG/PNG, ~160x160px)
+- [ ] Sophie avatar photo — 真人照片 (JPG/PNG, ~160x160px)
+- [ ] Emma avatar photo — TBD (JPG/PNG, ~160x160px)
 
 ### UI Screenshots / Mockups
 - [ ] Check-in / learning log UI screenshot (for Footprint section)
@@ -425,7 +443,8 @@ The following current sections are **not present** in the mockup and should be r
 ## Summary: Required Content / Copy
 
 ### Text Content (needs zh-TW + en translations)
-- [ ] 3 user persona descriptions (Mia, Emma, Sophia)
+- [ ] Emma persona 完整資料（專業領域、想探索、Quote）
+- [ ] 3 位 persona 英文翻譯
 - [ ] Learning Foundation section title + subtitle (en translation)
 - [ ] 3 張主題實踐卡片資料（標籤、標題、描述、頻率、時長）
 - [ ] Quick Start section stats and descriptions
