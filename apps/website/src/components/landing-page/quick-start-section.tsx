@@ -1,130 +1,121 @@
 "use client";
 
 import { BulbSvg, ClockSolidSvg } from "@daodao/assets";
-import { useTranslations } from "@daodao/i18n";
-import { motion } from "motion/react";
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
-};
-
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.2 } },
-};
+import { Image } from "@daodao/ui/components/image";
 
 export function QuickStartSection() {
-  const t = useTranslations("common");
-
   const stats = [
-    { label: t("landing_quickstart_total_duration"), value: "14", unit: "天" },
-    { label: t("landing_quickstart_weekly_freq"), value: "3-5", unit: "天" },
-    { label: t("landing_quickstart_per_session"), value: "30", unit: "分鐘" },
+    { label: "總共持續", value: "14", unit: "天" },
+    { label: "每週頻率", value: "3-5", unit: "天" },
+    { label: "每次執行", value: "30", unit: "分鐘" },
   ];
 
   const timeSlots = [
-    t("landing_quickstart_before_breakfast"),
-    t("landing_quickstart_commute"),
-    t("landing_quickstart_before_bed"),
+    { label: "早餐前" },
+    { label: "通勤時" },
+    { label: "睡前" },
   ];
 
   return (
-    <section className="relative overflow-hidden bg-primary-base py-16 md:py-24">
-      {/* Top curve */}
-      <div
-        className="absolute -top-1 left-0 z-10 w-full bg-cover bg-center bg-no-repeat md:bg-top"
-        style={{
-          backgroundImage: 'url("/assets/landing-page/bg-curve-green.svg")',
-          height: "120px",
-        }}
-      />
+    <section className="relative overflow-hidden bg-[#F4F6F6] py-16 md:py-24">
+      <div className="container mx-auto px-6">
+        <div className="flex flex-col items-center">
+          {/* 標題 */}
+          <h2 className="mb-4 text-center text-[1.75rem] font-bold leading-tight md:text-3xl">
+            <span className="text-primary-base">快速啟動</span>
+            <span className="text-primary-darker">你的學習旅程</span>
+          </h2>
 
-      <div className="container mx-auto px-6 pt-16">
-        <motion.div
-          className="flex flex-col items-center"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ staggerChildren: 0.4 }}
-        >
-          {/* Step 0: Section Header */}
-          <motion.h2
-            className="mb-12 text-center text-[1.75rem] font-bold text-white"
-            variants={fadeInUp}
-            transition={{ duration: 0.5 }}
-          >
-            {t("landing_quickstart_title")}
-          </motion.h2>
+          {/* 副標題 */}
+          <p className="mb-10 text-center text-sm leading-relaxed text-basic-400">
+            給馬上想要行動的你
+            <br />
+            一個最沒有負擔的開始
+          </p>
 
-          {/* Steps 1-3: Stats Cards (staggered as a group) */}
-          <motion.div
-            className="mb-10 flex w-full max-w-lg flex-col gap-4 md:flex-row md:gap-6"
-            variants={staggerContainer}
-          >
+          {/* 統計卡片 */}
+          <div className="mb-10 flex w-full max-w-md justify-center gap-4">
             {stats.map((stat) => (
-              <motion.div
+              <div
                 key={stat.label}
-                className="flex flex-1 flex-col items-center rounded-2xl bg-white/15 px-6 py-5 backdrop-blur-sm"
-                variants={fadeInUp}
-                transition={{ duration: 0.5 }}
+                className="flex flex-1 flex-col items-center rounded-xl bg-white px-4 py-4 shadow-sm"
               >
-                <span className="text-sm text-white/80">{stat.label}</span>
+                <span className="text-sm text-basic-400">{stat.label}</span>
                 <div className="mt-1 flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-white">
+                  <span className="text-2xl font-bold text-primary-base">
                     {stat.value}
                   </span>
-                  <span className="text-sm text-white/80">{stat.unit}</span>
+                  <span className="text-sm text-basic-400">{stat.unit}</span>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
 
-          {/* Step 4: Execution Time */}
-          <motion.div
-            className="mb-10 flex flex-col items-center gap-4"
-            variants={fadeInUp}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="flex items-center gap-2">
-              <BulbSvg className="size-5 text-white" />
-              <span className="font-semibold text-white">
-                {t("landing_quickstart_timing")}
-              </span>
+          {/* 吉祥物和執行時機區塊 */}
+          <div className="relative mb-8 flex w-full max-w-md items-center justify-center">
+            {/* 左側：吉祥物插圖（無框） */}
+            <div className="relative z-10 -mr-8">
+              <Image
+                src="/assets/landing-page/mascot-rocket.svg"
+                alt="吉祥物"
+                width={160}
+                height={160}
+                className="object-contain"
+              />
             </div>
-            <div className="flex flex-wrap justify-center gap-3">
-              {timeSlots.map((label) => (
-                <div
-                  key={label}
-                  className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm text-white backdrop-blur-sm"
-                >
-                  <ClockSolidSvg className="size-4 text-white/80" />
-                  <span>{label}</span>
-                </div>
-              ))}
+
+            {/* 右側：執行時機 */}
+            <div className="relative z-20 flex w-[200px] flex-col rounded-xl bg-white p-5 pt-8 shadow-sm">
+              {/* 燈泡圖標突出在上方 */}
+              <div className="absolute -top-5 left-1/2 -translate-x-1/2">
+                <BulbSvg className="size-10 text-logo-yellow" />
+              </div>
+              <h3 className="mb-3 text-lg font-bold text-primary-darker">執行時機</h3>
+              <div className="flex flex-col gap-3">
+                {timeSlots.map((slot) => (
+                  <div key={slot.label} className="flex items-center gap-2">
+                    <ClockSolidSvg className="size-5 text-primary-base" />
+                    <span className="text-sm text-basic-400">{slot.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </motion.div>
 
-          {/* Step 5: Bottom message */}
-          <motion.p
-            className="text-center text-sm text-white/80"
-            variants={fadeInUp}
-            transition={{ duration: 0.5 }}
-          >
-            {t("landing_quickstart_message")}
-          </motion.p>
-        </motion.div>
-      </div>
+            {/* 右下角書本裝飾 */}
+            <div className="absolute -bottom-4 -right-4 z-0">
+              <Image
+                src="/assets/landing-page/deco-books.svg"
+                alt=""
+                width={80}
+                height={80}
+                className="object-contain opacity-60"
+              />
+            </div>
+          </div>
 
-      {/* Illustration placeholders */}
-      <div className="pointer-events-none absolute bottom-8 left-8 hidden opacity-30 md:block">
-        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-tips/40 text-4xl">
-          {/* TODO: Replace with star-on-paper-airplane illustration */}
-          ⭐
+          {/* 底部訊息 */}
+          <div className="rounded-full border border-primary-base bg-white px-6 py-3">
+            <p className="text-center text-sm text-primary-darker">
+              隨時修改沒有壓力，節奏由你決定
+            </p>
+          </div>
         </div>
       </div>
-      <div className="pointer-events-none absolute bottom-8 right-8 hidden opacity-30 md:block">
-        <BulbSvg className="size-12 text-white/40" />
+
+      {/* 底部波浪裝飾 */}
+      <div className="absolute -bottom-1 left-0 w-full">
+        <svg
+          viewBox="0 0 1440 120"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0 120V60C240 20 480 0 720 0C960 0 1200 20 1440 60V120H0Z"
+            fill="#16B9B3"
+          />
+        </svg>
       </div>
     </section>
   );

@@ -86,7 +86,7 @@ const testimonials = [
 
 export function TestimonialMarquee({ className }: TestimonialMarqueeProps) {
   return (
-    <section className={cn("section-block grid gap-9 overflow-hidden", className)}>
+    <section className={cn("section-block pb-8 grid gap-9 overflow-hidden", className)}>
       {/* 第一排（往右） */}
       <div className="animate-marquee-reverse mask-marquee hover:paused" aria-hidden="true">
         <div className="flex w-max gap-5 will-change-transform">
