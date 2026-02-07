@@ -81,7 +81,7 @@ jobs:
       - name: Set Environment Variables
         id: meta
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/prod" ]; then
             echo "IMAGE_TAG=prod" >> $GITHUB_ENV
             echo "NODE_ENV=production" >> $GITHUB_ENV
             echo "image-tag=prod" >> $GITHUB_OUTPUT
@@ -192,7 +192,7 @@ jobs:
       - name: Set Environment Variables
         id: meta
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/prod" ]; then
             echo "IMAGE_TAG=prod" >> $GITHUB_ENV
             echo "NODE_ENV=production" >> $GITHUB_ENV
             echo "image-tag=prod" >> $GITHUB_OUTPUT
