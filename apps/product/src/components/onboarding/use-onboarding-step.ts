@@ -40,14 +40,11 @@ export const useOnboardingStep = (initialStep = 1): UseOnboardingStepReturn => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   }, []);
 
-  const goToStep = useCallback(
-    (step: number) => {
-      if (step >= 1 && step <= totalSteps) {
-        setCurrentStep(step);
-      }
-    },
-    []
-  );
+  const goToStep = useCallback((step: number) => {
+    if (step >= 1 && step <= totalSteps) {
+      setCurrentStep(step);
+    }
+  }, []);
 
   return {
     currentStep,

@@ -83,10 +83,7 @@ export function LearningFoundationSection() {
   const tag = t("landing_foundation_tag");
 
   const cards = useMemo(
-    () =>
-      PRACTICE_CARDS.map((card) => (
-        <PracticeCard key={card.id} tag={tag} {...card} />
-      )),
+    () => PRACTICE_CARDS.map((card) => <PracticeCard key={card.id} tag={tag} {...card} />),
     [tag]
   );
 
@@ -99,12 +96,8 @@ export function LearningFoundationSection() {
             <h2 className="whitespace-pre-line text-[1.75rem] font-bold text-primary-darker">
               {t("landing_foundation_title")}
             </h2>
-            <p className="mt-3 text-sm text-basic-400">
-              {t("landing_foundation_subtitle_1")}
-            </p>
-            <p className="mt-1 text-sm text-basic-400">
-              {t("landing_foundation_subtitle_2")}
-            </p>
+            <p className="mt-3 text-sm text-basic-400">{t("landing_foundation_subtitle_1")}</p>
+            <p className="mt-1 text-sm text-basic-400">{t("landing_foundation_subtitle_2")}</p>
           </div>
 
           {/* Right: Card Stack */}

@@ -1,5 +1,5 @@
-import { YStack, Button, XStack, Text } from "tamagui";
 import { Share2 } from "@tamagui/lucide-icons";
+import { Button, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import type { ICheckInDisplayData } from "../types";
 import { CheckInCard } from "./check-in-card";
@@ -14,11 +14,7 @@ interface ICheckInDetailProps {
  * 打卡詳情組件 (Mobile)
  * 顯示完整的打卡內容和分享按鈕
  */
-export const CheckInDetail = ({
-  checkInData,
-  onShare,
-  onImagePress,
-}: ICheckInDetailProps) => {
+export const CheckInDetail = ({ checkInData, onShare, onImagePress }: ICheckInDetailProps) => {
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
 
   return (

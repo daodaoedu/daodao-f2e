@@ -1,10 +1,10 @@
 "use client";
 
-import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import { OnboardingForm } from "@/components/onboarding";
 import { useAuth } from "@daodao/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BackgroundAnimation, PageHeader } from "@/components/layout";
+import { OnboardingForm } from "@/components/onboarding";
 
 /**
  * Onboarding 頁面

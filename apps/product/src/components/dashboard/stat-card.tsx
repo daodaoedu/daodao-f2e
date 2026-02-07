@@ -1,7 +1,7 @@
 "use client";
 
-import type { ElementType } from "react";
 import { cn } from "@daodao/ui/lib/utils";
+import type { ElementType } from "react";
 
 interface StatCardProps {
   label: string;

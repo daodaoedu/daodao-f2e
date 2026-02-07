@@ -24,15 +24,13 @@ const customIdRegex = /^[a-zA-Z0-9]+$/;
 export const onboardingFormSchema = z.object({
   // Step 1: Profile
   email: z.string().email(),
-  birthDate: z
-    .date({ required_error: "請選擇生日" })
-    .refine(
-      (date) => {
-        const age = differenceInYears(new Date(), date);
-        return age >= 16;
-      },
-      { message: "島島阿學目前僅開放給年滿 16 歲的使用者註冊" }
-    ),
+  birthDate: z.date({ required_error: "請選擇生日" }).refine(
+    (date) => {
+      const age = differenceInYears(new Date(), date);
+      return age >= 16;
+    },
+    { message: "島島阿學目前僅開放給年滿 16 歲的使用者註冊" }
+  ),
   name: z.string().min(1, "請輸入名字").max(50, "名字最多 50 字"),
   customId: z
     .string()

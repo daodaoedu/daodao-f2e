@@ -1,21 +1,21 @@
-import { createTamagui, createTokens, createFont } from 'tamagui'
-import { shorthands } from '@tamagui/shorthands'
-import { tokens as defaultTokens } from '@tamagui/config/v3'
+import { tokens as defaultTokens } from "@tamagui/config/v3";
+import { shorthands } from "@tamagui/shorthands";
+import { createFont, createTamagui, createTokens } from "tamagui";
 // 使用腳本生成的 Mobile 版本 design tokens
-import { colors, spacing, radius, typography } from '@/generated/design-tokens'
+import { colors, radius, spacing, typography } from "@/generated/design-tokens";
 
 // 字體配置
 const headingFont = createFont({
-  family: 'Inter',
+  family: "Inter",
   size: {
     1: typography.fontSizes.xs,
     2: typography.fontSizes.sm,
     3: typography.fontSizes.base,
     4: typography.fontSizes.lg,
     5: typography.fontSizes.xl,
-    6: typography.fontSizes['2xl'],
-    7: typography.fontSizes['3xl'],
-    8: typography.fontSizes['4xl'],
+    6: typography.fontSizes["2xl"],
+    7: typography.fontSizes["3xl"],
+    8: typography.fontSizes["4xl"],
   },
   weight: {
     4: typography.fontWeights.normal,
@@ -24,14 +24,14 @@ const headingFont = createFont({
   },
   // face 映射確保原生平台正確渲染不同字重
   face: {
-    400: { normal: 'Inter_400' },
-    600: { normal: 'Inter_600' },
-    700: { normal: 'Inter_700' },
+    400: { normal: "Inter_400" },
+    600: { normal: "Inter_600" },
+    700: { normal: "Inter_700" },
   },
-})
+});
 
 const bodyFont = createFont({
-  family: 'Inter',
+  family: "Inter",
   size: {
     1: typography.fontSizes.xs,
     2: typography.fontSizes.sm,
@@ -44,11 +44,11 @@ const bodyFont = createFont({
     6: typography.fontWeights.semibold,
   },
   face: {
-    400: { normal: 'Inter_400' },
-    500: { normal: 'Inter_500' },
-    600: { normal: 'Inter_600' },
+    400: { normal: "Inter_400" },
+    500: { normal: "Inter_500" },
+    600: { normal: "Inter_600" },
   },
-})
+});
 
 // Tokens 配置
 const tokens = createTokens({
@@ -90,22 +90,22 @@ const tokens = createTokens({
     ...radius,
     true: radius.md, // 預設 radius 為 md
   },
-})
+});
 
 // 主題配置
 const lightTheme = {
-  background: '#FFFFFF',
+  background: "#FFFFFF",
   backgroundHover: colors.basic[50],
   backgroundPress: colors.basic[100],
   backgroundFocus: colors.basic[50],
   backgroundStrong: colors.basic[100],
-  backgroundTransparent: 'rgba(255,255,255,0)',
+  backgroundTransparent: "rgba(255,255,255,0)",
 
   color: colors.basic.black,
   colorHover: colors.basic[500],
   colorPress: colors.basic[400],
   colorFocus: colors.basic[500],
-  colorTransparent: 'rgba(0,0,0,0)',
+  colorTransparent: "rgba(0,0,0,0)",
 
   borderColor: colors.basic[200],
   borderColorHover: colors.basic[300],
@@ -115,9 +115,9 @@ const lightTheme = {
   primary: colors.primary.base,
   primaryHover: colors.primary.darker,
 
-  shadowColor: 'rgba(0,0,0,0.1)',
-  shadowColorHover: 'rgba(0,0,0,0.15)',
-}
+  shadowColor: "rgba(0,0,0,0.1)",
+  shadowColorHover: "rgba(0,0,0,0.15)",
+};
 
 const darkTheme = {
   background: colors.basic[600],
@@ -125,13 +125,13 @@ const darkTheme = {
   backgroundPress: colors.basic[400],
   backgroundFocus: colors.basic[500],
   backgroundStrong: colors.basic[500],
-  backgroundTransparent: 'rgba(0,0,0,0)',
+  backgroundTransparent: "rgba(0,0,0,0)",
 
   color: colors.basic[50],
   colorHover: colors.basic[100],
   colorPress: colors.basic[200],
   colorFocus: colors.basic[100],
-  colorTransparent: 'rgba(255,255,255,0)',
+  colorTransparent: "rgba(255,255,255,0)",
 
   borderColor: colors.basic[400],
   borderColorHover: colors.basic[300],
@@ -141,9 +141,9 @@ const darkTheme = {
   primary: colors.primary.lighter,
   primaryHover: colors.primary.base,
 
-  shadowColor: 'rgba(0,0,0,0.3)',
-  shadowColorHover: 'rgba(0,0,0,0.4)',
-}
+  shadowColor: "rgba(0,0,0,0.3)",
+  shadowColorHover: "rgba(0,0,0,0.4)",
+};
 
 export const config = createTamagui({
   tokens,
@@ -156,13 +156,13 @@ export const config = createTamagui({
     body: bodyFont,
   },
   shorthands,
-  defaultFont: 'body',
-})
+  defaultFont: "body",
+});
 
-export default config
+export default config;
 
 // 型別宣告
-export type AppConfig = typeof config
-declare module 'tamagui' {
+export type AppConfig = typeof config;
+declare module "tamagui" {
   interface TamaguiCustomConfig extends AppConfig {}
 }

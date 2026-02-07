@@ -1,11 +1,11 @@
 "use client";
 
-import { Mail } from "lucide-react";
 import { DefaultAvatarSvg } from "@daodao/assets";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
+import { Mail } from "lucide-react";
 
 interface UserInfo {
   id: string;

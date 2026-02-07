@@ -1,29 +1,40 @@
-import { YStack, XStack, Text, Card } from 'tamagui'
-import { Lock } from '@tamagui/lucide-icons'
-import { colors } from '@/generated/design-tokens'
-import type { Island } from '@/types/user'
+import { Lock } from "@tamagui/lucide-icons";
+import { Card, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import type { Island } from "@/types/user";
 
 // 安全地為 hex 顏色添加透明度
 function withOpacity(color: string, opacity: number): string {
   // 確保是有效的 hex 顏色格式
-  if (!color || !color.startsWith('#') || (color.length !== 7 && color.length !== 4)) {
-    return colors.primary.base + Math.round(opacity * 255).toString(16).padStart(2, '0')
+  if (!color || !color.startsWith("#") || (color.length !== 7 && color.length !== 4)) {
+    return (
+      colors.primary.base +
+      Math.round(opacity * 255)
+        .toString(16)
+        .padStart(2, "0")
+    );
   }
   // 轉換 3 位 hex 為 6 位
-  const hex = color.length === 4
-    ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
-    : color
-  return hex + Math.round(opacity * 255).toString(16).padStart(2, '0')
+  const hex =
+    color.length === 4
+      ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+      : color;
+  return (
+    hex +
+    Math.round(opacity * 255)
+      .toString(16)
+      .padStart(2, "0")
+  );
 }
 
 interface IslandCardProps {
-  island: Island
-  onPress?: () => void
+  island: Island;
+  onPress?: () => void;
 }
 
 export function IslandCard({ island, onPress }: IslandCardProps) {
-  const isLocked = !island.unlocked
-  const cardColor = island.color || colors.primary.base
+  const isLocked = !island.unlocked;
+  const cardColor = island.color || colors.primary.base;
 
   return (
     <Card
@@ -36,7 +47,7 @@ export function IslandCard({ island, onPress }: IslandCardProps) {
       pressStyle={onPress ? { scale: 0.98 } : undefined}
       onPress={onPress}
       accessible
-      accessibilityLabel={`${island.name} 島嶼${isLocked ? '（未解鎖）' : ''}`}
+      accessibilityLabel={`${island.name} 島嶼${isLocked ? "（未解鎖）" : ""}`}
     >
       <XStack gap="$3" alignItems="center">
         {/* Island Icon */}
@@ -57,31 +68,23 @@ export function IslandCard({ island, onPress }: IslandCardProps) {
 
         {/* Island Info */}
         <YStack flex={1} gap="$1">
-          <Text
-            fontSize={15}
-            fontWeight="600"
-            color={isLocked ? colors.basic[400] : '$color'}
-          >
+          <Text fontSize={15} fontWeight="600" color={isLocked ? colors.basic[400] : "$color"}>
             {island.name}
           </Text>
           <Text
             fontSize={12}
-            color={isLocked ? colors.basic[300] : '$color'}
+            color={isLocked ? colors.basic[300] : "$color"}
             opacity={isLocked ? 1 : 0.6}
             numberOfLines={1}
           >
-            {isLocked ? '完成更多實踐解鎖' : island.description}
+            {isLocked ? "完成更多實踐解鎖" : island.description}
           </Text>
         </YStack>
 
         {/* Progress */}
         {!isLocked && (
           <YStack alignItems="flex-end" gap="$1">
-            <Text
-              fontSize={14}
-              fontWeight="600"
-              color={cardColor}
-            >
+            <Text fontSize={14} fontWeight="600" color={cardColor}>
               {island.progress}%
             </Text>
             <YStack
@@ -102,12 +105,12 @@ export function IslandCard({ island, onPress }: IslandCardProps) {
         )}
       </XStack>
     </Card>
-  )
+  );
 }
 
 interface IslandListProps {
-  islands: Island[]
-  onIslandPress?: (island: Island) => void
+  islands: Island[];
+  onIslandPress?: (island: Island) => void;
 }
 
 export function IslandList({ islands, onIslandPress }: IslandListProps) {
@@ -119,12 +122,12 @@ export function IslandList({ islands, onIslandPress }: IslandListProps) {
           開始你的學習之旅，探索島嶼
         </Text>
       </YStack>
-    )
+    );
   }
 
   return (
     <YStack gap="$3">
-      {islands.map(island => (
+      {islands.map((island) => (
         <IslandCard
           key={island.id}
           island={island}
@@ -132,5 +135,5 @@ export function IslandList({ islands, onIslandPress }: IslandListProps) {
         />
       ))}
     </YStack>
-  )
+  );
 }

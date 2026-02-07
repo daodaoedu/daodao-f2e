@@ -1,18 +1,18 @@
-import type React from 'react'
-import { useRef, useCallback } from 'react'
-import { type View, Alert } from 'react-native'
-import { Sheet, YStack, XStack, Text, Button, Spinner } from 'tamagui'
-import { X, Share2, Download } from '@tamagui/lucide-icons'
-import { colors } from '@/generated/design-tokens'
-import type { Practice } from '@/types/practice'
-import { ShareableCheckInCard } from './ShareableCheckInCard'
-import { useShare } from '@/hooks/useShare'
+import { Download, Share2, X } from "@tamagui/lucide-icons";
+import type React from "react";
+import { useCallback, useRef } from "react";
+import { Alert, type View } from "react-native";
+import { Button, Sheet, Spinner, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import { useShare } from "@/hooks/useShare";
+import type { Practice } from "@/types/practice";
+import { ShareableCheckInCard } from "./ShareableCheckInCard";
 
 interface ShareCheckInSheetProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  practice: Practice | null
-  streakCount: number
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  practice: Practice | null;
+  streakCount: number;
 }
 
 export function ShareCheckInSheet({
@@ -21,46 +21,42 @@ export function ShareCheckInSheet({
   practice,
   streakCount,
 }: ShareCheckInSheetProps) {
-  const cardRef = useRef<View>(null)
+  const cardRef = useRef<View>(null);
 
-  const {
-    viewRef,
-    isCapturing,
-    isSharing,
-    isSaving,
-    share,
-    saveToGallery,
-  } = useShare({
-    practiceId: practice?.id || '',
-    practiceTitle: practice?.title || '',
+  const { viewRef, isCapturing, isSharing, isSaving, share, saveToGallery } = useShare({
+    practiceId: practice?.id || "",
+    practiceTitle: practice?.title || "",
     streakCount,
-  })
+  });
 
   // Sync the refs
-  const handleRefChange = useCallback((node: View | null) => {
-    cardRef.current = node
-    ;(viewRef as React.MutableRefObject<View | null>).current = node
-  }, [viewRef])
+  const handleRefChange = useCallback(
+    (node: View | null) => {
+      cardRef.current = node;
+      (viewRef as React.MutableRefObject<View | null>).current = node;
+    },
+    [viewRef]
+  );
 
   const handleShare = useCallback(async () => {
-    const result = await share()
+    const result = await share();
     if (!result.success && result.error) {
-      Alert.alert('分享失敗', result.error)
+      Alert.alert("分享失敗", result.error);
     }
-  }, [share])
+  }, [share]);
 
   const handleSave = useCallback(async () => {
-    const result = await saveToGallery()
+    const result = await saveToGallery();
     if (result.success) {
-      Alert.alert('儲存成功', '圖片已儲存到相簿')
+      Alert.alert("儲存成功", "圖片已儲存到相簿");
     } else if (result.error) {
-      Alert.alert('儲存失敗', result.error)
+      Alert.alert("儲存失敗", result.error);
     }
-  }, [saveToGallery])
+  }, [saveToGallery]);
 
-  if (!practice) return null
+  if (!practice) return null;
 
-  const isLoading = isCapturing || isSharing || isSaving
+  const isLoading = isCapturing || isSharing || isSaving;
 
   return (
     <Sheet
@@ -71,10 +67,7 @@ export function ShareCheckInSheet({
       dismissOnSnapToBottom
       zIndex={100001}
     >
-      <Sheet.Overlay
-        enterStyle={{ opacity: 0 }}
-        exitStyle={{ opacity: 0 }}
-      />
+      <Sheet.Overlay enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
       <Sheet.Frame
         padding="$4"
         backgroundColor="$background"
@@ -156,5 +149,5 @@ export function ShareCheckInSheet({
         </YStack>
       </Sheet.Frame>
     </Sheet>
-  )
+  );
 }

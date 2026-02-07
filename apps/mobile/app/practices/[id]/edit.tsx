@@ -1,15 +1,15 @@
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { YStack, XStack, Text, Button } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, Pencil } from '@tamagui/lucide-icons'
-import { colors } from '@/generated/design-tokens'
+import { ChevronLeft, Pencil } from "@tamagui/lucide-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
 
 export default function PracticeEditScreen() {
-  useLocalSearchParams<{ id: string }>()
-  const router = useRouter()
+  useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
@@ -28,24 +28,18 @@ export default function PracticeEditScreen() {
         </XStack>
 
         {/* Coming Soon */}
-        <YStack
-          flex={1}
-          alignItems="center"
-          justifyContent="center"
-          gap="$4"
-          padding="$4"
-        >
+        <YStack flex={1} alignItems="center" justifyContent="center" gap="$4" padding="$4">
           <Pencil size={64} color={colors.basic[300]} />
           <YStack alignItems="center" gap="$2">
             <Text fontSize={18} fontWeight="600" color="$color">
               即將推出
             </Text>
             <Text fontSize={14} color="$color" opacity={0.6} textAlign="center">
-              編輯功能開發中{'\n'}敬請期待
+              編輯功能開發中{"\n"}敬請期待
             </Text>
           </YStack>
         </YStack>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

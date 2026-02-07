@@ -38,13 +38,12 @@ type VerifyEmailRequest = paths["/api/v1/auth/verify-email"]["post"]["requestBod
 }
   ? T
   : never;
-type ResendVerificationRequest = NonNullable<
-  paths["/api/v1/auth/resend-verification"]["post"]["requestBody"]
-> extends {
-  content: { "application/json": infer T };
-}
-  ? T
-  : never;
+type ResendVerificationRequest =
+  NonNullable<paths["/api/v1/auth/resend-verification"]["post"]["requestBody"]> extends {
+    content: { "application/json": infer T };
+  }
+    ? T
+    : never;
 
 // ============================================================================
 // Client Functions (用於 Server Components 或直接調用)

@@ -475,7 +475,16 @@ export const AuthProvider = ({
       // 否則跳轉到 emailVerificationPath
       window.location.href = emailVerificationPath;
     }
-  }, [pathname, isAuthenticated, isLoading, isTemporary, isEmailVerified, onboardingPath, emailVerificationPath, onEmailUnverified]);
+  }, [
+    pathname,
+    isAuthenticated,
+    isLoading,
+    isTemporary,
+    isEmailVerified,
+    onboardingPath,
+    emailVerificationPath,
+    onEmailUnverified,
+  ]);
 
   /**
    * 開啟登入 Dialog
@@ -582,7 +591,19 @@ export const AuthProvider = ({
       requireAuth,
       refreshAuth: checkAuth,
     }),
-    [user, isAuthenticated, isLoading, isTemporary, isEmailVerified, login, logout, refreshToken, openLoginDialog, requireAuth, checkAuth]
+    [
+      user,
+      isAuthenticated,
+      isLoading,
+      isTemporary,
+      isEmailVerified,
+      login,
+      logout,
+      refreshToken,
+      openLoginDialog,
+      requireAuth,
+      checkAuth,
+    ]
   );
 
   return (

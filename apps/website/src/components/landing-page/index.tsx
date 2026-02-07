@@ -7,8 +7,8 @@ import { JoinSection } from "./join-section";
 import { KeyVision } from "./key-vision";
 import { LearningFoundationSection } from "./learning-foundation-section";
 import { Loader } from "./loader";
-import { PersonalitySection } from "./personality-section";
 import { PersonaSection } from "./persona-section";
+import { PersonalitySection } from "./personality-section";
 import { QuickStartSection } from "./quick-start-section";
 import { TestimonialMarquee } from "./testimonial-marquee";
 

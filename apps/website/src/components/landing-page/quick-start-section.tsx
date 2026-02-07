@@ -10,11 +10,7 @@ export function QuickStartSection() {
     { label: "每次執行", value: "30", unit: "分鐘" },
   ];
 
-  const timeSlots = [
-    { label: "早餐前" },
-    { label: "通勤時" },
-    { label: "睡前" },
-  ];
+  const timeSlots = [{ label: "早餐前" }, { label: "通勤時" }, { label: "睡前" }];
 
   return (
     <section className="relative overflow-hidden bg-[#F4F6F6] py-16 md:py-24">
@@ -42,9 +38,7 @@ export function QuickStartSection() {
               >
                 <span className="text-sm text-basic-400">{stat.label}</span>
                 <div className="mt-1 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold text-primary-base">
-                    {stat.value}
-                  </span>
+                  <span className="text-2xl font-bold text-primary-base">{stat.value}</span>
                   <span className="text-sm text-basic-400">{stat.unit}</span>
                 </div>
               </div>
@@ -105,16 +99,14 @@ export function QuickStartSection() {
       {/* 底部波浪裝飾 */}
       <div className="absolute -bottom-1 left-0 w-full">
         <svg
+          aria-hidden="true"
           viewBox="0 0 1440 120"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="w-full"
           preserveAspectRatio="none"
         >
-          <path
-            d="M0 120V60C240 20 480 0 720 0C960 0 1200 20 1440 60V120H0Z"
-            fill="#16B9B3"
-          />
+          <path d="M0 120V60C240 20 480 0 720 0C960 0 1200 20 1440 60V120H0Z" fill="#16B9B3" />
         </svg>
       </div>
     </section>

@@ -1,15 +1,15 @@
-import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Card, Button } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, ChevronRight, Clock, HelpCircle } from '@tamagui/lucide-icons'
-import { availableQuizzes } from '@/types/quiz'
-import { colors } from '@/generated/design-tokens'
+import { ChevronLeft, ChevronRight, Clock, HelpCircle } from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import { availableQuizzes } from "@/types/quiz";
 
 export default function QuizListScreen() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
@@ -49,7 +49,7 @@ export default function QuizListScreen() {
 
           {/* Quiz List */}
           <YStack gap="$4">
-            {availableQuizzes.map(quiz => (
+            {availableQuizzes.map((quiz) => (
               <Card
                 key={quiz.id}
                 padding="$4"
@@ -103,5 +103,5 @@ export default function QuizListScreen() {
         </ScrollView>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

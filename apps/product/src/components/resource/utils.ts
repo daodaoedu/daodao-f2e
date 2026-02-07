@@ -1,4 +1,4 @@
-import { CATEGORIES, SEARCH_TAGS, type ICategory } from "@/constants/resource";
+import { CATEGORIES, type ICategory, SEARCH_TAGS } from "@/constants/resource";
 
 export function parseCategoryHierarchy(source: string[] | null): ICategory[] {
   if (!Array.isArray(source) || source.length === 0) return [];

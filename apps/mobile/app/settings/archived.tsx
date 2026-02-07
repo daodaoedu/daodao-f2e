@@ -1,61 +1,53 @@
-import { useMemo } from 'react'
-import { Alert } from 'react-native'
-import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Card, Button } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, Archive, RotateCcw, Trash2 } from '@tamagui/lucide-icons'
-import { usePractices } from '@/hooks/usePractices'
-import { ProgressRing } from '@/components'
-import { colors } from '@/generated/design-tokens'
-import type { Practice } from '@/types/practice'
+import { Archive, ChevronLeft, RotateCcw, Trash2 } from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
+import { useMemo } from "react";
+import { Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
+import { ProgressRing } from "@/components";
+import { colors } from "@/generated/design-tokens";
+import { usePractices } from "@/hooks/usePractices";
+import type { Practice } from "@/types/practice";
 
 export default function ArchivedPracticesScreen() {
-  const router = useRouter()
-  const { practices } = usePractices()
+  const router = useRouter();
+  const { practices } = usePractices();
 
   // Filter archived practices
   const archivedPractices = useMemo(
-    () => practices.filter(p => p.status === 'archived'),
+    () => practices.filter((p) => p.status === "archived"),
     [practices]
-  )
+  );
 
   const handleRestore = (practice: Practice) => {
-    Alert.alert(
-      '恢復實踐',
-      `確定要恢復「${practice.title}」嗎？`,
-      [
-        { text: '取消', style: 'cancel' },
-        {
-          text: '恢復',
-          onPress: () => {
-            // TODO: Implement API call to restore practice
-            Alert.alert('成功', '實踐已恢復')
-          },
+    Alert.alert("恢復實踐", `確定要恢復「${practice.title}」嗎？`, [
+      { text: "取消", style: "cancel" },
+      {
+        text: "恢復",
+        onPress: () => {
+          // TODO: Implement API call to restore practice
+          Alert.alert("成功", "實踐已恢復");
         },
-      ]
-    )
-  }
+      },
+    ]);
+  };
 
   const handleDelete = (practice: Practice) => {
-    Alert.alert(
-      '永久刪除',
-      `確定要永久刪除「${practice.title}」嗎？此操作無法復原。`,
-      [
-        { text: '取消', style: 'cancel' },
-        {
-          text: '刪除',
-          style: 'destructive',
-          onPress: () => {
-            // TODO: Implement API call to delete practice
-            Alert.alert('成功', '實踐已刪除')
-          },
+    Alert.alert("永久刪除", `確定要永久刪除「${practice.title}」嗎？此操作無法復原。`, [
+      { text: "取消", style: "cancel" },
+      {
+        text: "刪除",
+        style: "destructive",
+        onPress: () => {
+          // TODO: Implement API call to delete practice
+          Alert.alert("成功", "實踐已刪除");
         },
-      ]
-    )
-  }
+      },
+    ]);
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
@@ -97,11 +89,12 @@ export default function ArchivedPracticesScreen() {
         ) : (
           <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
             <YStack gap="$3">
-              {archivedPractices.map(practice => {
-                const progress = practice.targetDays > 0
-                  ? Math.round((practice.completedDays / practice.targetDays) * 100)
-                  : 0
-                const cardColor = practice.color || colors.primary.base
+              {archivedPractices.map((practice) => {
+                const progress =
+                  practice.targetDays > 0
+                    ? Math.round((practice.completedDays / practice.targetDays) * 100)
+                    : 0;
+                const cardColor = practice.color || colors.primary.base;
 
                 return (
                   <Card
@@ -168,7 +161,7 @@ export default function ArchivedPracticesScreen() {
                       </XStack>
                     </YStack>
                   </Card>
-                )
+                );
               })}
             </YStack>
 
@@ -188,5 +181,5 @@ export default function ArchivedPracticesScreen() {
         )}
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

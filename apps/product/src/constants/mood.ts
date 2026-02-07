@@ -1,4 +1,3 @@
-import type { ElementType } from "react";
 import {
   BoredSvg,
   FineSvg,
@@ -7,6 +6,7 @@ import {
   HopelessSvg,
   NeutralSvg,
 } from "@daodao/assets";
+import type { ElementType } from "react";
 
 /**
  * 心情類型運行時常數

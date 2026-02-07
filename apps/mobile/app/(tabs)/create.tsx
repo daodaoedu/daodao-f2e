@@ -1,84 +1,84 @@
-import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, Card, ScrollView } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import {
   BookOpen,
-  Dumbbell,
   Brain,
-  Palette,
-  Code,
-  Music,
-  Pencil,
   ChevronRight,
-} from '@tamagui/lucide-icons'
-import { colors } from '@/generated/design-tokens'
+  Code,
+  Dumbbell,
+  Music,
+  Palette,
+  Pencil,
+} from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Card, ScrollView, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
 
 interface TemplateItem {
-  id: string
-  title: string
-  description: string
-  icon: typeof BookOpen
-  color: string
+  id: string;
+  title: string;
+  description: string;
+  icon: typeof BookOpen;
+  color: string;
 }
 
 const templates: TemplateItem[] = [
   {
-    id: 'reading',
-    title: '閱讀',
-    description: '每日閱讀 30 分鐘',
+    id: "reading",
+    title: "閱讀",
+    description: "每日閱讀 30 分鐘",
     icon: BookOpen,
     color: colors.practice.blue,
   },
   {
-    id: 'exercise',
-    title: '運動',
-    description: '每日運動健身',
+    id: "exercise",
+    title: "運動",
+    description: "每日運動健身",
     icon: Dumbbell,
     color: colors.practice.green,
   },
   {
-    id: 'meditation',
-    title: '冥想',
-    description: '每日靜心冥想',
+    id: "meditation",
+    title: "冥想",
+    description: "每日靜心冥想",
     icon: Brain,
     color: colors.practice.pink,
   },
   {
-    id: 'creative',
-    title: '創作',
-    description: '每日創意練習',
+    id: "creative",
+    title: "創作",
+    description: "每日創意練習",
     icon: Palette,
     color: colors.practice.yellow,
   },
   {
-    id: 'coding',
-    title: '程式',
-    description: '每日寫程式',
+    id: "coding",
+    title: "程式",
+    description: "每日寫程式",
     icon: Code,
     color: colors.primary.base,
   },
   {
-    id: 'music',
-    title: '音樂',
-    description: '每日練習樂器',
+    id: "music",
+    title: "音樂",
+    description: "每日練習樂器",
     icon: Music,
     color: colors.semantic.warning,
   },
-]
+];
 
 export default function CreateScreen() {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleTemplatePress = (templateId: string) => {
-    router.push(`/practices/create/${templateId}`)
-  }
+    router.push(`/practices/create/${templateId}`);
+  };
 
   const handleCustomPress = () => {
-    router.push('/practices/create/manual')
-  }
+    router.push("/practices/create/manual");
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <ScrollView flex={1} backgroundColor="$background">
         <YStack padding="$4" gap="$5">
           {/* Header */}
@@ -131,8 +131,8 @@ export default function CreateScreen() {
             </Text>
 
             <YStack gap="$3">
-              {templates.map(template => {
-                const Icon = template.icon
+              {templates.map((template) => {
+                const Icon = template.icon;
                 return (
                   <Card
                     key={template.id}
@@ -168,12 +168,12 @@ export default function CreateScreen() {
                       <ChevronRight size={20} color="$color" opacity={0.4} />
                     </XStack>
                   </Card>
-                )
+                );
               })}
             </YStack>
           </YStack>
         </YStack>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }

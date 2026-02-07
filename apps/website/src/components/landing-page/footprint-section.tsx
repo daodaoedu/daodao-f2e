@@ -37,28 +37,20 @@ const STEP_JOURNAL_SHOW = 3.5;
 function CheckInPanel({ t }: { t: (key: string) => string }) {
   return (
     <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-lg">
-      <h3 className="mb-4 text-lg font-bold text-primary-darker">
-        自己準備便當
-      </h3>
+      <h3 className="mb-4 text-lg font-bold text-primary-darker">自己準備便當</h3>
 
       {/* Emotion selector */}
-      <p className="mb-3 text-sm font-medium text-basic-400">
-        {t("landing_footprint_mood_label")}
-      </p>
+      <p className="mb-3 text-sm font-medium text-basic-400">{t("landing_footprint_mood_label")}</p>
       <div className="mb-5 flex justify-between gap-2">
         {EMOTIONS.map((emotion) => (
           <div
             key={emotion.key}
             className={`flex flex-col items-center gap-1 rounded-lg p-1.5 ${
-              emotion.key === "happy"
-                ? "bg-primary-palest ring-2 ring-primary-base"
-                : ""
+              emotion.key === "happy" ? "bg-primary-palest ring-2 ring-primary-base" : ""
             }`}
           >
             <emotion.Icon className="size-8" />
-            <span className="text-[10px] text-basic-400">
-              {t(emotion.labelKey)}
-            </span>
+            <span className="text-[10px] text-basic-400">{t(emotion.labelKey)}</span>
           </div>
         ))}
       </div>
@@ -84,8 +76,7 @@ function CheckInPanel({ t }: { t: (key: string) => string }) {
 
       {/* Description */}
       <p className="mb-1 text-sm font-medium text-basic-400">
-        {t("landing_footprint_description_label")}{" "}
-        <span className="text-basic-300">0/300</span>
+        {t("landing_footprint_description_label")} <span className="text-basic-300">0/300</span>
       </p>
       <div className="rounded-lg bg-basic-100 p-3 text-sm text-basic-400">
         挑戰完成了超美麗的日式便當，天啊太有成就感了吧！！下次要再開發一些新菜色～
@@ -100,10 +91,8 @@ function JournalPaper() {
       {/* Notebook holes */}
       <div className="flex justify-center gap-6 border-b border-basic-200 py-2">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className="size-3 rounded-full border-2 border-basic-300 bg-white"
-          />
+          // biome-ignore lint/suspicious/noArrayIndexKey: static list of decorative dots
+          <div key={i} className="size-3 rounded-full border-2 border-basic-300 bg-white" />
         ))}
       </div>
 
@@ -169,15 +158,9 @@ export function FootprintSection() {
       <div className="container mx-auto px-6">
         {/* Header */}
         <div className="mb-12 text-center">
-          <h2 className="text-[1.75rem] font-bold text-white">
-            {t("landing_footprint_title")}
-          </h2>
-          <p className="mt-2 text-sm text-white/70">
-            {t("landing_footprint_subtitle_1")}
-          </p>
-          <p className="text-sm text-white/70">
-            {t("landing_footprint_subtitle_2")}
-          </p>
+          <h2 className="text-[1.75rem] font-bold text-white">{t("landing_footprint_title")}</h2>
+          <p className="mt-2 text-sm text-white/70">{t("landing_footprint_subtitle_1")}</p>
+          <p className="text-sm text-white/70">{t("landing_footprint_subtitle_2")}</p>
         </div>
 
         {/* Animation Container */}

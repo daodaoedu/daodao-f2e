@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useInfiniteResources, type IGetResourceListParams } from "@daodao/api";
+import { type IGetResourceListParams, useInfiniteResources } from "@daodao/api";
 import { cn } from "@daodao/ui/lib/utils";
+import { useEffect, useRef } from "react";
 import { ResourceCard, ResourceCardSkeleton } from "./card";
 
 interface ResourceInfiniteContainerProps {

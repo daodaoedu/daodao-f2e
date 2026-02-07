@@ -38,8 +38,15 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
   const { isTemporary, refreshAuth, refreshToken } = useAuth();
   const { updateCurrentUserWithFormData, createCurrentUserWithFormData } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { currentStep, nextStep, prevStep, totalSteps, isFirstStep, isLastInputStep, isSuccessStep } =
-    useOnboardingStep();
+  const {
+    currentStep,
+    nextStep,
+    prevStep,
+    totalSteps,
+    isFirstStep,
+    isLastInputStep,
+    isSuccessStep,
+  } = useOnboardingStep();
 
   const form = useForm<OnboardingFormValues>({
     resolver: zodResolver(onboardingFormSchema),
@@ -218,31 +225,16 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
           <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-4 p-6 border-t border-light-gray bg-very-light-gray">
             <div className="w-full max-w-[448px] flex gap-4">
               {!isFirstStep && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="flex-1"
-                  onClick={prevStep}
-                >
+                <Button type="button" variant="ghost" className="flex-1" onClick={prevStep}>
                   {t("navigation.previous")}
                 </Button>
               )}
               {!isLastInputStep ? (
-                <Button
-                  type="button"
-                  variant="orange"
-                  className="flex-1"
-                  onClick={handleNext}
-                >
+                <Button type="button" variant="orange" className="flex-1" onClick={handleNext}>
                   {t("navigation.next")}
                 </Button>
               ) : (
-                <Button
-                  type="submit"
-                  variant="orange"
-                  className="flex-1"
-                  disabled={isSubmitting}
-                >
+                <Button type="submit" variant="orange" className="flex-1" disabled={isSubmitting}>
                   {isSubmitting ? t("navigation.submitting") : t("navigation.complete")}
                 </Button>
               )}

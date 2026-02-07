@@ -1,36 +1,36 @@
-import { useEffect, useState } from 'react'
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Button } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Share2, Home, RotateCcw } from '@tamagui/lucide-icons'
-import { mockIslandResults, type IslandResult, } from '@/types/quiz'
-import { colors } from '@/generated/design-tokens'
+import { Home, RotateCcw, Share2 } from "@tamagui/lucide-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import { type IslandResult, mockIslandResults } from "@/types/quiz";
 
 export default function QuizResultScreen() {
   const { quizId } = useLocalSearchParams<{
-    quizId: string
-    answers?: string
-  }>()
-  const router = useRouter()
+    quizId: string;
+    answers?: string;
+  }>();
+  const router = useRouter();
 
-  const [result, setResult] = useState<IslandResult | null>(null)
-  const [showAnimation, setShowAnimation] = useState(true)
+  const [result, setResult] = useState<IslandResult | null>(null);
+  const [showAnimation, setShowAnimation] = useState(true);
 
   useEffect(() => {
     // Simulate result calculation
     const timer = setTimeout(() => {
       // In real app, calculate based on answers
-      const randomIndex = Math.floor(Math.random() * mockIslandResults.length)
-      setResult(mockIslandResults[randomIndex])
-      setShowAnimation(false)
-    }, 2000)
+      const randomIndex = Math.floor(Math.random() * mockIslandResults.length);
+      setResult(mockIslandResults[randomIndex]);
+      setShowAnimation(false);
+    }, 2000);
 
-    return () => clearTimeout(timer)
-  }, [])
+    return () => clearTimeout(timer);
+  }, []);
 
   if (showAnimation || !result) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" backgroundColor="$background">
           <YStack alignItems="center" gap="$4">
             <Text fontSize={64}>🏝️</Text>
@@ -43,11 +43,11 @@ export default function QuizResultScreen() {
           </YStack>
         </YStack>
       </SafeAreaView>
-    )
+    );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
           <YStack alignItems="center" gap="$6" paddingVertical="$4">
@@ -96,7 +96,7 @@ export default function QuizResultScreen() {
                 你的特質
               </Text>
               <XStack gap="$2" flexWrap="wrap">
-                {result.traits.map(trait => (
+                {result.traits.map((trait) => (
                   <YStack
                     key={trait}
                     paddingHorizontal="$3"
@@ -117,12 +117,7 @@ export default function QuizResultScreen() {
               <Text fontSize={16} fontWeight="600" color="$color">
                 推薦實踐
               </Text>
-              <YStack
-                padding="$4"
-                backgroundColor={colors.basic[100]}
-                borderRadius="$md"
-                gap="$2"
-              >
+              <YStack padding="$4" backgroundColor={colors.basic[100]} borderRadius="$md" gap="$2">
                 {result.recommendations.map((rec, index) => (
                   <XStack key={rec} alignItems="center" gap="$2">
                     <YStack
@@ -153,7 +148,7 @@ export default function QuizResultScreen() {
             size="$5"
             backgroundColor={result.color}
             pressStyle={{ opacity: 0.8 }}
-            onPress={() => router.replace('/(tabs)')}
+            onPress={() => router.replace("/(tabs)")}
           >
             <XStack alignItems="center" gap="$2">
               <Home size={20} color={colors.basic.white} />
@@ -194,5 +189,5 @@ export default function QuizResultScreen() {
         </YStack>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

@@ -14,13 +14,7 @@ interface FeatureCardProps {
   className?: string;
 }
 
-function FeatureCard({
-  title,
-  description,
-  bgColor,
-  badge,
-  className = "",
-}: FeatureCardProps) {
+function FeatureCard({ title, description, bgColor, badge, className = "" }: FeatureCardProps) {
   return (
     <div
       className={`relative h-[160px] w-[150px] overflow-hidden rounded-[9px] px-4 py-6 md:h-[181px] md:w-[205px] md:px-[18px] md:py-[37px] ${bgColor} ${className}`}
@@ -32,7 +26,9 @@ function FeatureCard({
       )}
       <div className={badge ? "mt-4" : ""}>
         <h3 className="text-base font-bold text-primary-darker md:text-lg">{title}</h3>
-        <p className="mt-1 text-xs leading-relaxed text-basic-400 md:mt-2 md:text-sm">{description}</p>
+        <p className="mt-1 text-xs leading-relaxed text-basic-400 md:mt-2 md:text-sm">
+          {description}
+        </p>
       </div>
     </div>
   );
@@ -114,9 +110,7 @@ export function JoinSection() {
               {t("landing_join_cta")}
             </Button>
 
-            <p className="mt-3 text-[13px] text-white/70">
-              {t("landing_join_cta_note")}
-            </p>
+            <p className="mt-3 text-[13px] text-white/70">{t("landing_join_cta_note")}</p>
           </div>
         </div>
       </div>

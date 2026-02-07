@@ -1,41 +1,41 @@
-import { useState, useCallback, useEffect, useMemo } from 'react'
-import { Keyboard, Pressable, StyleSheet, ScrollView as RNScrollView } from 'react-native'
-import { Sheet, YStack, XStack, Text, Button, Input, Spinner, TextArea, View } from 'tamagui'
-import { Check, X, Sparkles, Share2, Plus, Camera } from '@tamagui/lucide-icons'
-import * as ImagePicker from 'expo-image-picker'
-import { colors } from '@/generated/design-tokens'
-import type { Practice } from '@/types/practice'
-import { analyticsService } from '@/services/analytics'
+import { Camera, Check, Plus, Share2, Sparkles, X } from "@tamagui/lucide-icons";
+import * as ImagePicker from "expo-image-picker";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Keyboard, Pressable, ScrollView as RNScrollView, StyleSheet } from "react-native";
+import { Button, Input, Sheet, Spinner, Text, TextArea, View, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import { analyticsService } from "@/services/analytics";
+import type { Practice } from "@/types/practice";
 
 // 心情類型定義
-export type MoodType = 'hopeless' | 'frustrated' | 'bored' | 'neutral' | 'fine' | 'happy'
+export type MoodType = "hopeless" | "frustrated" | "bored" | "neutral" | "fine" | "happy";
 
 // 心情選項 - 使用 emoji 文字
 const MOOD_OPTIONS: { id: MoodType; label: string; emoji: string }[] = [
-  { id: 'hopeless', label: '想放棄', emoji: '😩' },
-  { id: 'frustrated', label: '受挫', emoji: '😤' },
-  { id: 'bored', label: '無聊', emoji: '😐' },
-  { id: 'neutral', label: '普通', emoji: '🙂' },
-  { id: 'fine', label: '還不錯', emoji: '😊' },
-  { id: 'happy', label: '開心', emoji: '🥳' },
-]
+  { id: "hopeless", label: "想放棄", emoji: "😩" },
+  { id: "frustrated", label: "受挫", emoji: "😤" },
+  { id: "bored", label: "無聊", emoji: "😐" },
+  { id: "neutral", label: "普通", emoji: "🙂" },
+  { id: "fine", label: "還不錯", emoji: "😊" },
+  { id: "happy", label: "開心", emoji: "🥳" },
+];
 
 // 預設標籤
-const DEFAULT_TAGS = ['練習', '新概念', '實作', '有趣', '創造', '困難', '刻意練習']
+const DEFAULT_TAGS = ["練習", "新概念", "實作", "有趣", "創造", "困難", "刻意練習"];
 
 export interface CheckInData {
-  mood: MoodType
-  tags: string[]
-  description: string
-  media: string[]
+  mood: MoodType;
+  tags: string[];
+  description: string;
+  media: string[];
 }
 
 interface CheckInSheetProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  practice: Practice | null
-  onCheckIn: (data: CheckInData) => Promise<{ success: boolean; error?: string }>
-  onShare?: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  practice: Practice | null;
+  onCheckIn: (data: CheckInData) => Promise<{ success: boolean; error?: string }>;
+  onShare?: () => void;
 }
 
 export function CheckInSheet({
@@ -45,75 +45,75 @@ export function CheckInSheet({
   onCheckIn,
   onShare,
 }: CheckInSheetProps) {
-  const [selectedMood, setSelectedMood] = useState<MoodType | null>(null)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [customTags, setCustomTags] = useState<string[]>([])
-  const [customTagInput, setCustomTagInput] = useState('')
-  const [description, setDescription] = useState('')
-  const [media, setMedia] = useState<string[]>([])
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
+  const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [customTags, setCustomTags] = useState<string[]>([]);
+  const [customTagInput, setCustomTagInput] = useState("");
+  const [description, setDescription] = useState("");
+  const [media, setMedia] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // 合併預設標籤和自訂標籤
-  const allTags = useMemo(() => [...DEFAULT_TAGS, ...customTags], [customTags])
+  const allTags = useMemo(() => [...DEFAULT_TAGS, ...customTags], [customTags]);
 
   // Reset state when sheet closes
   useEffect(() => {
     if (!open) {
-      setSelectedMood(null)
-      setSelectedTags([])
-      setCustomTags([])
-      setCustomTagInput('')
-      setDescription('')
-      setMedia([])
-      setShowSuccess(false)
+      setSelectedMood(null);
+      setSelectedTags([]);
+      setCustomTags([]);
+      setCustomTagInput("");
+      setDescription("");
+      setMedia([]);
+      setShowSuccess(false);
     }
-  }, [open])
+  }, [open]);
 
   const handleAddCustomTag = useCallback(() => {
-    const trimmed = customTagInput.trim()
+    const trimmed = customTagInput.trim();
     if (trimmed && !allTags.includes(trimmed)) {
-      setCustomTags(prev => [...prev, trimmed])
-      setSelectedTags(prev => [...prev, trimmed])
-      setCustomTagInput('')
+      setCustomTags((prev) => [...prev, trimmed]);
+      setSelectedTags((prev) => [...prev, trimmed]);
+      setCustomTagInput("");
     }
-  }, [customTagInput, allTags])
+  }, [customTagInput, allTags]);
 
   const handleToggleTag = useCallback((tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-    )
-  }, [])
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  }, []);
 
   const handlePickImage = useCallback(async () => {
-    if (media.length >= 3) return
+    if (media.length >= 3) return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images', 'videos'],
+      mediaTypes: ["images", "videos"],
       allowsMultipleSelection: true,
       selectionLimit: 3 - media.length,
       quality: 0.8,
-    })
+    });
 
     if (!result.canceled) {
-      const newMedia = result.assets.map(asset => asset.uri)
-      setMedia(prev => [...prev, ...newMedia].slice(0, 3))
+      const newMedia = result.assets.map((asset) => asset.uri);
+      setMedia((prev) => [...prev, ...newMedia].slice(0, 3));
     }
-  }, [media.length])
+  }, [media.length]);
 
   const handleRemoveMedia = useCallback((index: number) => {
-    setMedia(prev => prev.filter((_, i) => i !== index))
-  }, [])
+    setMedia((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   const isFormValid = useMemo(() => {
-    return selectedMood !== null && selectedTags.length > 0 && description.trim().length > 0
-  }, [selectedMood, selectedTags, description])
+    return selectedMood !== null && selectedTags.length > 0 && description.trim().length > 0;
+  }, [selectedMood, selectedTags, description]);
 
   const handleSubmit = useCallback(async () => {
-    if (isSubmitting || !practice || !isFormValid || !selectedMood) return
+    if (isSubmitting || !practice || !isFormValid || !selectedMood) return;
 
-    Keyboard.dismiss()
-    setIsSubmitting(true)
+    Keyboard.dismiss();
+    setIsSubmitting(true);
 
     try {
       const result = await onCheckIn({
@@ -121,22 +121,31 @@ export function CheckInSheet({
         tags: selectedTags,
         description: description.trim(),
         media,
-      })
+      });
 
       if (result.success) {
         analyticsService.trackCheckIn({
           practice_id: practice.id,
           streak_count: practice.currentStreak + 1,
           has_note: true,
-        })
-        setShowSuccess(true)
+        });
+        setShowSuccess(true);
       }
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }, [isSubmitting, practice, isFormValid, selectedMood, selectedTags, description, media, onCheckIn])
+  }, [
+    isSubmitting,
+    practice,
+    isFormValid,
+    selectedMood,
+    selectedTags,
+    description,
+    media,
+    onCheckIn,
+  ]);
 
-  if (!practice) return null
+  if (!practice) return null;
 
   return (
     <Sheet
@@ -147,15 +156,8 @@ export function CheckInSheet({
       dismissOnSnapToBottom
       zIndex={100000}
     >
-      <Sheet.Overlay
-        enterStyle={{ opacity: 0 }}
-        exitStyle={{ opacity: 0 }}
-      />
-      <Sheet.Frame
-        backgroundColor="$background"
-        borderTopLeftRadius={20}
-        borderTopRightRadius={20}
-      >
+      <Sheet.Overlay enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
+      <Sheet.Frame backgroundColor="$background" borderTopLeftRadius={20} borderTopRightRadius={20}>
         <Sheet.Handle backgroundColor="$borderColor" />
 
         {showSuccess ? (
@@ -211,7 +213,7 @@ export function CheckInSheet({
                 backgroundColor="transparent"
                 borderWidth={1}
                 borderColor="$borderColor"
-                pressStyle={{ backgroundColor: '$backgroundHover' }}
+                pressStyle={{ backgroundColor: "$backgroundHover" }}
                 onPress={() => onOpenChange(false)}
               >
                 <Text color="$color" fontWeight="600">
@@ -234,12 +236,7 @@ export function CheckInSheet({
               <Text fontSize={20} fontWeight="700" color="$color">
                 打卡
               </Text>
-              <Button
-                size="$3"
-                circular
-                chromeless
-                onPress={() => onOpenChange(false)}
-              >
+              <Button size="$3" circular chromeless onPress={() => onOpenChange(false)}>
                 <X size={20} color="$color" />
               </Button>
             </XStack>
@@ -256,8 +253,8 @@ export function CheckInSheet({
                   心情如何?
                 </Text>
                 <XStack justifyContent="space-between">
-                  {MOOD_OPTIONS.map(mood => {
-                    const isSelected = selectedMood === mood.id
+                  {MOOD_OPTIONS.map((mood) => {
+                    const isSelected = selectedMood === mood.id;
                     return (
                       <Pressable
                         key={mood.id}
@@ -265,11 +262,11 @@ export function CheckInSheet({
                         style={[styles.moodItem, isSelected && styles.moodItemSelected]}
                       >
                         <Text fontSize={36}>{mood.emoji}</Text>
-                        <Text fontSize={12} color={isSelected ? '#333333' : '#999999'}>
+                        <Text fontSize={12} color={isSelected ? "#333333" : "#999999"}>
                           {mood.label}
                         </Text>
                       </Pressable>
-                    )
+                    );
                   })}
                 </XStack>
               </YStack>
@@ -280,25 +277,20 @@ export function CheckInSheet({
                   想法分享
                 </Text>
                 <XStack flexWrap="wrap" gap="$2" marginBottom="$3">
-                  {allTags.map(tag => {
-                    const isSelected = selectedTags.includes(tag)
+                  {allTags.map((tag) => {
+                    const isSelected = selectedTags.includes(tag);
                     return (
                       <Pressable
                         key={tag}
                         onPress={() => handleToggleTag(tag)}
                         style={[styles.tag, isSelected && styles.tagSelected]}
                       >
-                        <Text
-                          fontSize={14}
-                          color={isSelected ? 'white' : '#666666'}
-                        >
+                        <Text fontSize={14} color={isSelected ? "white" : "#666666"}>
                           {tag}
                         </Text>
-                        {isSelected && (
-                          <X size={14} color="white" style={{ marginLeft: 4 }} />
-                        )}
+                        {isSelected && <X size={14} color="white" style={{ marginLeft: 4 }} />}
                       </Pressable>
-                    )
+                    );
                   })}
                 </XStack>
 
@@ -320,7 +312,9 @@ export function CheckInSheet({
                   >
                     <XStack alignItems="center" gap="$1">
                       <Plus size={16} color="white" />
-                      <Text color="white" fontSize={14}>加入</Text>
+                      <Text color="white" fontSize={14}>
+                        加入
+                      </Text>
                     </XStack>
                   </Button>
                 </XStack>
@@ -329,7 +323,9 @@ export function CheckInSheet({
               {/* Description */}
               <YStack marginBottom="$6">
                 <XStack justifyContent="space-between" alignItems="center" marginBottom="$2">
-                  <Text fontSize={14} color="$color">詳細描述</Text>
+                  <Text fontSize={14} color="$color">
+                    詳細描述
+                  </Text>
                   <Text fontSize={14} color={colors.basic[400]}>
                     {description.length}/300
                   </Text>
@@ -338,7 +334,7 @@ export function CheckInSheet({
                   size="$4"
                   placeholder="簡單紀錄今天的發現，或卡關的地方"
                   value={description}
-                  onChangeText={text => setDescription(text.slice(0, 300))}
+                  onChangeText={(text) => setDescription(text.slice(0, 300))}
                   numberOfLines={4}
                   borderColor={colors.basic[200]}
                   focusStyle={{ borderColor: colors.primary.base }}
@@ -394,7 +390,7 @@ export function CheckInSheet({
             >
               <Button
                 size="$5"
-                backgroundColor={isFormValid ? '#FF8C42' : colors.basic[300]}
+                backgroundColor={isFormValid ? "#FF8C42" : colors.basic[300]}
                 pressStyle={{ opacity: 0.8 }}
                 onPress={handleSubmit}
                 disabled={!isFormValid || isSubmitting}
@@ -415,12 +411,12 @@ export function CheckInSheet({
         )}
       </Sheet.Frame>
     </Sheet>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   moodItem: {
-    alignItems: 'center',
+    alignItems: "center",
     opacity: 0.3,
     gap: 4,
   },
@@ -428,42 +424,42 @@ const styles = StyleSheet.create({
     opacity: 1,
   },
   tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#16B9B3',
-    backgroundColor: 'white',
+    borderColor: "#16B9B3",
+    backgroundColor: "white",
   },
   tagSelected: {
-    backgroundColor: '#666666',
-    borderColor: '#666666',
+    backgroundColor: "#666666",
+    borderColor: "#666666",
   },
   mediaPreview: {
-    position: 'relative',
+    position: "relative",
   },
   removeMedia: {
-    position: 'absolute',
+    position: "absolute",
     top: -8,
     right: -8,
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#FF4444',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#FF4444",
+    alignItems: "center",
+    justifyContent: "center",
   },
   uploadButton: {
     width: 80,
     height: 80,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#CCCCCC',
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: "#CCCCCC",
+    borderStyle: "dashed",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 4,
   },
-})
+});

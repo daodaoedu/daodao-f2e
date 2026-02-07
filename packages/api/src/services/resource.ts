@@ -4,7 +4,7 @@
  */
 
 import { client } from "../client";
-import type { paths, components } from "../types";
+import type { components, paths } from "../types";
 
 // ============================================================================
 // Types
@@ -24,11 +24,7 @@ export type IGetResourceListParams = NonNullable<
 export type ResourceData = components["schemas"]["ResourceData"];
 export type ResourceStats = components["schemas"]["ResourceStats"];
 
-export type {
-  ResourceListResponse,
-  ResourceDetailResponse,
-  ResourceStatsResponse,
-};
+export type { ResourceListResponse, ResourceDetailResponse, ResourceStatsResponse };
 
 // ============================================================================
 // Client Functions (用於 Server Components 或直接調用)

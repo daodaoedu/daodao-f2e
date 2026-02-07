@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import { View, Text } from "tamagui";
-import { colors } from "@/generated/design-tokens";
+import { Text, View } from "tamagui";
 import { MOOD_OPTIONS } from "@/constants/mood";
+import { colors } from "@/generated/design-tokens";
 import type { ICheckInDate, ICheckInDisplayData } from "../types";
 
 interface ICheckInDateButtonProps {
@@ -42,11 +42,7 @@ export const CheckInDateButton = ({
     <Pressable
       onPress={handlePress}
       disabled={!hasCheckIn}
-      accessibilityLabel={
-        hasCheckIn
-          ? `選擇 ${item.date} 的打卡記錄`
-          : `${item.date} 尚未打卡`
-      }
+      accessibilityLabel={hasCheckIn ? `選擇 ${item.date} 的打卡記錄` : `${item.date} 尚未打卡`}
       accessibilityRole="button"
       accessibilityState={{ selected: isActive, disabled: !hasCheckIn }}
       style={({ pressed }) => [

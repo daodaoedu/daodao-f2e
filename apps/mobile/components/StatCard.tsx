@@ -1,17 +1,17 @@
-import { YStack, XStack, Text, Card } from 'tamagui'
-import { TrendingUp, TrendingDown } from '@tamagui/lucide-icons'
-import type { ReactNode } from 'react'
-import { colors } from '@/generated/design-tokens'
+import { TrendingDown, TrendingUp } from "@tamagui/lucide-icons";
+import type { ReactNode } from "react";
+import { Card, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
 
 interface StatCardProps {
-  label: string
-  value: string | number
-  icon?: ReactNode
+  label: string;
+  value: string | number;
+  icon?: ReactNode;
   trend?: {
-    value: number
-    isPositive: boolean
-  }
-  color?: string
+    value: number;
+    isPositive: boolean;
+  };
+  color?: string;
 }
 
 export function StatCard({
@@ -55,12 +55,13 @@ export function StatCard({
                 fontSize={12}
                 color={trend.isPositive ? colors.semantic.success : colors.semantic.error}
               >
-                {trend.isPositive ? '+' : ''}{trend.value}%
+                {trend.isPositive ? "+" : ""}
+                {trend.value}%
               </Text>
             </XStack>
           )}
         </XStack>
       </YStack>
     </Card>
-  )
+  );
 }

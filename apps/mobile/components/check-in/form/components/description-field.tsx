@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { YStack, XStack, Text, TextArea } from "tamagui";
+import { Text, TextArea, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 
 const MAX_LENGTH = 300;

@@ -1,8 +1,8 @@
-import { useRef, useCallback, useEffect } from "react";
-import { FlatList, View, StyleSheet } from "react-native";
-import type { ICheckInDateSelectorProps } from "./types";
-import { CheckInDateButton } from "./check-in-date-button";
+import { useCallback, useEffect, useRef } from "react";
+import { FlatList, StyleSheet, View } from "react-native";
 import type { ICheckInDate } from "../types";
+import { CheckInDateButton } from "./check-in-date-button";
+import type { ICheckInDateSelectorProps } from "./types";
 
 const ITEM_GAP = 12;
 
@@ -29,9 +29,7 @@ export const CheckInDateSelector = ({
   useEffect(() => {
     if (!activeCheckInId || checkInDates.length === 0) return;
 
-    const activeIndex = checkInDates.findIndex(
-      (item) => item.id === activeCheckInId
-    );
+    const activeIndex = checkInDates.findIndex((item) => item.id === activeCheckInId);
     if (activeIndex >= 0 && flatListRef.current) {
       flatListRef.current.scrollToIndex({
         index: activeIndex,
@@ -56,10 +54,7 @@ export const CheckInDateSelector = ({
 
   const keyExtractor = useCallback((item: ICheckInDate) => item.id, []);
 
-  const ItemSeparator = useCallback(
-    () => <View style={styles.separator} />,
-    []
-  );
+  const ItemSeparator = useCallback(() => <View style={styles.separator} />, []);
 
   if (checkInDates.length === 0) {
     return null;

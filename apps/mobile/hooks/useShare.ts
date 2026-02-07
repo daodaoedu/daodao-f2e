@@ -1,86 +1,86 @@
-import { useState, useCallback, useRef, type MutableRefObject, type RefObject } from 'react'
-import type { View } from 'react-native'
-import { shareService } from '@/services/share'
-import { analyticsService } from '@/services/analytics'
+import { type MutableRefObject, type RefObject, useCallback, useRef, useState } from "react";
+import type { View } from "react-native";
+import { analyticsService } from "@/services/analytics";
+import { shareService } from "@/services/share";
 
 interface UseShareOptions {
-  practiceId: string
-  practiceTitle: string
-  streakCount: number
+  practiceId: string;
+  practiceTitle: string;
+  streakCount: number;
 }
 
 interface UseShareReturn {
-  viewRef: MutableRefObject<View | null>
-  isCapturing: boolean
-  isSharing: boolean
-  isSaving: boolean
-  share: () => Promise<{ success: boolean; error?: string }>
-  saveToGallery: () => Promise<{ success: boolean; error?: string }>
+  viewRef: MutableRefObject<View | null>;
+  isCapturing: boolean;
+  isSharing: boolean;
+  isSaving: boolean;
+  share: () => Promise<{ success: boolean; error?: string }>;
+  saveToGallery: () => Promise<{ success: boolean; error?: string }>;
 }
 
 export function useShare(options: UseShareOptions): UseShareReturn {
-  const { practiceId, practiceTitle, streakCount } = options
-  const viewRef = useRef<View | null>(null)
-  const [isCapturing, setIsCapturing] = useState(false)
-  const [isSharing, setIsSharing] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [capturedUri, setCapturedUri] = useState<string | null>(null)
+  const { practiceId, practiceTitle, streakCount } = options;
+  const viewRef = useRef<View | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [capturedUri, setCapturedUri] = useState<string | null>(null);
 
   const captureIfNeeded = useCallback(async (): Promise<string | null> => {
-    if (capturedUri) return capturedUri
+    if (capturedUri) return capturedUri;
 
-    setIsCapturing(true)
+    setIsCapturing(true);
     try {
-      const result = await shareService.captureView(viewRef as RefObject<View>)
+      const result = await shareService.captureView(viewRef as RefObject<View>);
       if (result.success && result.uri) {
-        setCapturedUri(result.uri)
-        return result.uri
+        setCapturedUri(result.uri);
+        return result.uri;
       }
-      return null
+      return null;
     } finally {
-      setIsCapturing(false)
+      setIsCapturing(false);
     }
-  }, [capturedUri])
+  }, [capturedUri]);
 
   const share = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
-    setIsSharing(true)
+    setIsSharing(true);
     try {
-      const uri = await captureIfNeeded()
+      const uri = await captureIfNeeded();
       if (!uri) {
-        return { success: false, error: '無法擷取圖片' }
+        return { success: false, error: "無法擷取圖片" };
       }
 
-      const shareText = shareService.generateCheckInShareText(practiceTitle, streakCount)
+      const shareText = shareService.generateCheckInShareText(practiceTitle, streakCount);
       const result = await shareService.share({
-        title: '分享打卡成果',
+        title: "分享打卡成果",
         message: shareText,
         imageUri: uri,
-      })
+      });
 
       if (result.success) {
         // Track share event
-        analyticsService.trackShareCheckIn({ practice_id: practiceId })
+        analyticsService.trackShareCheckIn({ practice_id: practiceId });
       }
 
-      return result
+      return result;
     } finally {
-      setIsSharing(false)
+      setIsSharing(false);
     }
-  }, [captureIfNeeded, practiceId, practiceTitle, streakCount])
+  }, [captureIfNeeded, practiceId, practiceTitle, streakCount]);
 
   const saveToGallery = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
-    setIsSaving(true)
+    setIsSaving(true);
     try {
-      const uri = await captureIfNeeded()
+      const uri = await captureIfNeeded();
       if (!uri) {
-        return { success: false, error: '無法擷取圖片' }
+        return { success: false, error: "無法擷取圖片" };
       }
 
-      return await shareService.saveToGallery(uri)
+      return await shareService.saveToGallery(uri);
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }, [captureIfNeeded])
+  }, [captureIfNeeded]);
 
   return {
     viewRef,
@@ -89,5 +89,5 @@ export function useShare(options: UseShareOptions): UseShareReturn {
     isSaving,
     share,
     saveToGallery,
-  }
+  };
 }

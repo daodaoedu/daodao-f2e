@@ -1,62 +1,62 @@
-import { useState, useCallback } from 'react'
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { YStack, XStack, Text, Button } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { X, ChevronRight, Check } from '@tamagui/lucide-icons'
-import { mockQuestions, type QuizAnswer } from '@/types/quiz'
-import { colors } from '@/generated/design-tokens'
+import { Check, ChevronRight, X } from "@tamagui/lucide-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import { mockQuestions, type QuizAnswer } from "@/types/quiz";
 
 export default function QuizQuestionsScreen() {
-  const { quizId } = useLocalSearchParams<{ quizId: string }>()
-  const router = useRouter()
+  const { quizId } = useLocalSearchParams<{ quizId: string }>();
+  const router = useRouter();
 
-  const questions = mockQuestions.filter(q => q.quizId === quizId)
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [answers, setAnswers] = useState<QuizAnswer[]>([])
-  const [selectedOption, setSelectedOption] = useState<string | null>(null)
+  const questions = mockQuestions.filter((q) => q.quizId === quizId);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<QuizAnswer[]>([]);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-  const currentQuestion = questions[currentIndex]
-  const isLastQuestion = currentIndex === questions.length - 1
-  const progress = ((currentIndex + 1) / questions.length) * 100
+  const currentQuestion = questions[currentIndex];
+  const isLastQuestion = currentIndex === questions.length - 1;
+  const progress = ((currentIndex + 1) / questions.length) * 100;
 
   const handleSelectOption = (optionId: string, _value: string) => {
-    setSelectedOption(optionId)
-  }
+    setSelectedOption(optionId);
+  };
 
   const handleNext = useCallback(() => {
-    if (!selectedOption || !currentQuestion) return
+    if (!selectedOption || !currentQuestion) return;
 
-    const option = currentQuestion.options.find(o => o.id === selectedOption)
-    if (!option) return
+    const option = currentQuestion.options.find((o) => o.id === selectedOption);
+    if (!option) return;
 
     const newAnswer: QuizAnswer = {
       questionId: currentQuestion.id,
       optionId: selectedOption,
       value: option.value,
-    }
+    };
 
-    const updatedAnswers = [...answers, newAnswer]
-    setAnswers(updatedAnswers)
+    const updatedAnswers = [...answers, newAnswer];
+    setAnswers(updatedAnswers);
 
     if (isLastQuestion) {
       // Navigate to result with answers
       router.replace({
-        pathname: '/quiz/[quizId]/result',
+        pathname: "/quiz/[quizId]/result",
         params: { quizId: quizId as string, answers: JSON.stringify(updatedAnswers) },
-      })
+      });
     } else {
-      setCurrentIndex(prev => prev + 1)
-      setSelectedOption(null)
+      setCurrentIndex((prev) => prev + 1);
+      setSelectedOption(null);
     }
-  }, [selectedOption, currentQuestion, answers, isLastQuestion, quizId, router])
+  }, [selectedOption, currentQuestion, answers, isLastQuestion, quizId, router]);
 
   const handleExit = () => {
-    router.back()
-  }
+    router.back();
+  };
 
   if (!currentQuestion) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" gap="$4">
           <Text fontSize={16} color="$color" opacity={0.6}>
             沒有找到題目
@@ -66,21 +66,15 @@ export default function QuizQuestionsScreen() {
           </Button>
         </YStack>
       </SafeAreaView>
-    )
+    );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" justifyContent="space-between" alignItems="center">
-          <Button
-            size="$4"
-            circular
-            chromeless
-            onPress={handleExit}
-            accessibilityLabel="離開測驗"
-          >
+          <Button size="$4" circular chromeless onPress={handleExit} accessibilityLabel="離開測驗">
             <X size={24} color="$color" />
           </Button>
           <Text fontSize={14} color="$color" opacity={0.6}>
@@ -91,12 +85,7 @@ export default function QuizQuestionsScreen() {
 
         {/* Progress Bar */}
         <YStack paddingHorizontal="$4">
-          <YStack
-            height={4}
-            backgroundColor={colors.basic[200]}
-            borderRadius={2}
-            overflow="hidden"
-          >
+          <YStack height={4} backgroundColor={colors.basic[200]} borderRadius={2} overflow="hidden">
             <YStack
               height="100%"
               width={`${progress}%`}
@@ -117,14 +106,14 @@ export default function QuizQuestionsScreen() {
           {/* Options */}
           <YStack gap="$3">
             {currentQuestion.options.map((option, index) => {
-              const isSelected = selectedOption === option.id
+              const isSelected = selectedOption === option.id;
               return (
                 <Button
                   key={option.id}
                   size="$5"
-                  backgroundColor={isSelected ? colors.primary.palest : '$background'}
+                  backgroundColor={isSelected ? colors.primary.palest : "$background"}
                   borderWidth={2}
-                  borderColor={isSelected ? colors.primary.base : '$borderColor'}
+                  borderColor={isSelected ? colors.primary.base : "$borderColor"}
                   pressStyle={{ backgroundColor: colors.primary.palest }}
                   onPress={() => handleSelectOption(option.id, option.value)}
                   justifyContent="flex-start"
@@ -150,14 +139,14 @@ export default function QuizQuestionsScreen() {
                     <Text
                       flex={1}
                       fontSize={15}
-                      color={isSelected ? colors.primary.darker : '$color'}
-                      fontWeight={isSelected ? '600' : '400'}
+                      color={isSelected ? colors.primary.darker : "$color"}
+                      fontWeight={isSelected ? "600" : "400"}
                     >
                       {option.text}
                     </Text>
                   </XStack>
                 </Button>
-              )
+              );
             })}
           </YStack>
         </YStack>
@@ -173,7 +162,7 @@ export default function QuizQuestionsScreen() {
           >
             <XStack alignItems="center" gap="$2">
               <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                {isLastQuestion ? '完成測驗' : '下一題'}
+                {isLastQuestion ? "完成測驗" : "下一題"}
               </Text>
               <ChevronRight size={20} color={colors.basic.white} />
             </XStack>
@@ -181,5 +170,5 @@ export default function QuizQuestionsScreen() {
         </YStack>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }
