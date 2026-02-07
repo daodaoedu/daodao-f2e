@@ -72,7 +72,17 @@ jobs:
 
       - name: Create environment files
         run: |
-          echo "${{ secrets.ENV_DEV }}" > .env
+          BRANCH="${{ env.BRANCH_NAME }}"
+          echo "Creating environment files for branch: $BRANCH"
+
+          if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "prod" ]; then
+            echo "Using PROD environment"
+            echo "${{ secrets.ENV_PROD }}" > .env
+          else
+            echo "Using DEV environment"
+            echo "${{ secrets.ENV_DEV }}" > .env
+          fi
+
           cp .env apps/website/.env
           cp .env apps/product/.env
 
@@ -186,7 +196,17 @@ jobs:
 
       - name: Create environment files
         run: |
-          echo "${{ secrets.ENV_DEV }}" > .env
+          BRANCH="${{ env.BRANCH_NAME }}"
+          echo "Creating environment files for branch: $BRANCH"
+
+          if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "prod" ]; then
+            echo "Using PROD environment"
+            echo "${{ secrets.ENV_PROD }}" > .env
+          else
+            echo "Using DEV environment"
+            echo "${{ secrets.ENV_DEV }}" > .env
+          fi
+
           cp .env apps/website/.env
           cp .env apps/product/.env
 
