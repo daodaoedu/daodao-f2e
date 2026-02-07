@@ -52,41 +52,58 @@ This document describes the required changes to update the website landing page 
 - **想探索** — 標籤 + 值（虛線分隔）
 - **Quote** — 淺藍色底的引言文字區塊
 
-**Confirmed Persona Data:**
+**Confirmed Persona Data (from desktop mockup, 以 Figma 為主):**
 
-1. **Mia**
+1. **Mia** (左側位置)
    - Avatar: 咖啡拉花照片（圓形裁切）
+   - 專業領域: 內容創作
+   - 想探索: 影片剪輯與後製
+   - Quote: "每個故事都值得被好好說出來，讓世界看見不同的聲音"
+
+2. **Emma** (上方中間位置)
+   - Avatar: 真人照片（深色頭髮女性）
+   - 專業領域: 潛水教練
+   - 想探索: 閱讀、商管與理財
+   - Quote: "深深著迷於海底的世界，希望能認識更多上山下海愛好者 ❤️"
+
+3. **Sophia** (右側位置)
+   - Avatar: 真人照片（亞洲女性）
+   - 專業領域: 數據分析
+   - 想探索: 攝影、視覺設計
+   - Quote: "用數據說故事，用鏡頭記錄生活的美好瞬間"
+
+**Additional Persona Data (from mobile mockup, 可能為同位置輪播的其他卡片):**
+
+4. **Mia (variant)**
    - 專業領域: 前端開發
    - 想探索: 心理學
    - Quote: "最近開始對設計心理學有興趣，覺得研究人在想什麼很好玩"
 
-2. **Sophie**
-   - Avatar: 真人照片（女性，彩色頭飾，微笑）
+5. **Sophie**
    - 專業領域: 產品設計
    - 想探索: 用戶體驗研究
    - Quote: "設計不只是美，更是解決問題的藝術"
 
-3. **Emma** (from desktop mockup, details TBD)
-   - Avatar: TBD
-   - 專業領域: TBD
-   - 想探索: TBD
-   - Quote: TBD
-
-**Display Mode: Carousel (輪播)**
-- 手機版：一次顯示一張卡片，可滑動切換
-- 桌面版：三張卡片分散排列在 slogan 周圍（參考 desktop mockup）
+**Display Mode: Desktop 三位置輪播**
+- **桌面版：** 三個固定位置（左、上中、右）圍繞 slogan 文字
+  - 每個位置有 **2-3 張卡片輪播**，穿插出現
+  - 位置和樣式以 Figma 為主
+  - 有動畫示意可參考
+- **手機版：** 一次顯示一張卡片，可滑動切換
+- **總計需要 6-9 張 persona 卡片**（3 個位置 × 每位置 2-3 張）
 
 **Required Assets:**
 - [ ] **Mia avatar photo** — 咖啡拉花圓形照片 (JPG/PNG, ~160x160px)
-- [ ] **Sophie avatar photo** — 真人圓形照片 (JPG/PNG, ~160x160px)
-- [ ] **Emma avatar photo** — TBD (JPG/PNG, ~160x160px)
+- [ ] **Emma avatar photo** — 真人圓形照片 (JPG/PNG, ~160x160px)
+- [ ] **Sophia avatar photo** — 真人圓形照片 (JPG/PNG, ~160x160px)
+- [ ] **額外 3-6 張 persona avatar photos** — 用於補足每個位置的 2-3 張輪播
 - [ ] 底部半圓裝飾（teal + 淺藍色），可能用 CSS/SVG 實現
 
 **Required Content:**
-- [ ] **Emma 的完整資料** — 專業領域、想探索、Quote
+- [ ] **額外 3-6 位 persona 完整資料**（Name、Avatar、專業領域、想探索、Quote）— 以補足 6-9 張卡片需求
 - [ ] 所有 persona 的英文翻譯
-- [ ] 確認是否還有更多 persona（目前確認 3 位）
 - [ ] Avatar 照片來源確認（是否需要授權 / 是否為示意圖）
+- [ ] Figma 動畫示意連結（供開發參考輪播動畫效果）
 
 **Related Files:**
 - `apps/website/src/components/landing-page/slogan-section.tsx` (major refactor)
@@ -419,10 +436,11 @@ The following current sections are **not present** in the mockup and should be r
 - [ ] Banner character illustration (peeking mascot)
 - [ ] Learning DNA card graphic
 
-### User Persona Assets (Real Photos)
+### User Persona Assets (Real Photos, 6-9 張)
 - [ ] Mia avatar photo — 咖啡拉花照片 (JPG/PNG, ~160x160px)
-- [ ] Sophie avatar photo — 真人照片 (JPG/PNG, ~160x160px)
-- [ ] Emma avatar photo — TBD (JPG/PNG, ~160x160px)
+- [ ] Emma avatar photo — 真人照片 (JPG/PNG, ~160x160px)
+- [ ] Sophia avatar photo — 真人照片 (JPG/PNG, ~160x160px)
+- [ ] 額外 3-6 張 persona avatar photos（補足每位置 2-3 張輪播需求）
 
 ### UI Screenshots / Mockups
 - [ ] Check-in / learning log UI screenshot (for Footprint section)
@@ -443,8 +461,8 @@ The following current sections are **not present** in the mockup and should be r
 ## Summary: Required Content / Copy
 
 ### Text Content (needs zh-TW + en translations)
-- [ ] Emma persona 完整資料（專業領域、想探索、Quote）
-- [ ] 3 位 persona 英文翻譯
+- [ ] 額外 3-6 位 persona 完整資料（補足 6-9 張輪播卡片）
+- [ ] 所有 persona 英文翻譯
 - [ ] Learning Foundation section title + subtitle (en translation)
 - [ ] 3 張主題實踐卡片資料（標籤、標題、描述、頻率、時長）
 - [ ] Quick Start section stats and descriptions
