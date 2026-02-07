@@ -19,11 +19,13 @@ on:
     branches:
       - main
       - dev
+      - prod
       - 'feat/**'
   pull_request:
     branches:
       - main
       - dev
+      - prod
   workflow_dispatch:
 
 # ===== 全域環境變數 =====
