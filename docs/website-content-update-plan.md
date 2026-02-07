@@ -12,27 +12,22 @@ This document describes the required changes to update the website landing page 
 
 ## Section-by-Section Comparison & Tasks
 
-### 1. Hero Section (Key Vision)
+### 1. Hero Section (Key Vision) — No Change
 
 **Current:** Lottie animation (right side) + text + "立即加入" CTA
-**Mockup:** Static illustration with people interacting + same text + "立即加入" CTA
+**Action:** Keep as-is. No changes needed.
 
 | Item | Status | Action |
 |------|--------|--------|
 | Headline text | Unchanged | Keep "讓學習成為充滿自我掌握、互助支持和看得見進步的美好日常" |
 | CTA button | Unchanged | Keep "立即加入" |
-| Hero illustration | **Changed** | Replace Lottie animation with static illustration |
-| Decorative elements | **Changed** | Update speech bubbles, stars, and character decorations |
+| Hero Lottie animation | Unchanged | Keep existing `key-vision-desktop.json` / `key-vision-mobile.json` |
+| Decorative elements | Unchanged | Keep existing decorations |
 
-**Required Assets:**
-- [ ] **Hero illustration (desktop)** - Static PNG/SVG of people chatting with speech bubbles, books, and learning elements (replaces `key-vision-desktop.json` Lottie)
-- [ ] **Hero illustration (mobile)** - Mobile-optimized version (replaces `key-vision-mobile.json` Lottie)
-- [ ] Decorative speech bubble icons (teal/orange color scheme)
+**Required Assets:** None — all existing assets retained.
 
 **Related Files:**
-- `apps/website/src/components/landing-page/key-vision/key-vision.tsx`
-- `apps/website/public/assets/landing-page/key-vision-desktop.json` (to be replaced)
-- `apps/website/public/assets/landing-page/key-vision-mobile.json` (to be replaced)
+- `apps/website/src/components/landing-page/key-vision/key-vision.tsx` (no changes)
 
 ---
 
@@ -366,8 +361,6 @@ The following current sections are **not present** in the mockup and should be r
 ## Summary: Required Assets Checklist
 
 ### Illustrations (High Priority)
-- [ ] Hero illustration - desktop version (PNG/SVG, ~1200x800px)
-- [ ] Hero illustration - mobile version (PNG/SVG, ~375x400px)
 - [ ] Community discussion illustration (PNG/SVG)
 - [ ] Banner character illustration (peeking mascot)
 - [ ] Learning DNA card graphic
@@ -419,7 +412,7 @@ The following current sections are **not present** in the mockup and should be r
 ## Proposed New Section Order
 
 ```
-1.  Hero (Key Vision) .............. [Updated - static illustration]
+1.  Hero (Key Vision) .............. [No change - keep Lottie animation]
 2.  User Personas + Slogan ......... [Refactored - add persona cards]
 3.  Learning Foundation ............ [New section]
 4.  Quick Start .................... [New - replaces Video Section]
@@ -449,19 +442,18 @@ The following current sections are **not present** in the mockup and should be r
 8. Build Transition Banner
 
 ### Phase 3: Refactor Existing Sections
-9. Refactor Hero to support static illustration
-10. Refactor Slogan section with user personas
-11. Refactor Feature Grid to 6-card layout
-12. Update Plan section layout
-13. Update Personality/Quiz section layout
+9. Refactor Slogan section with user personas
+10. Refactor Feature Grid to 6-card layout
+11. Update Plan section layout
+12. Update Personality/Quiz section layout
 
 ### Phase 4: Content & Assets Integration
-14. Integrate final illustrations and icons
-15. Add i18n translations for all new content
-16. Integrate UI screenshots / mockup images
+13. Integrate final illustrations and icons
+14. Add i18n translations for all new content
+15. Integrate UI screenshots / mockup images
 
 ### Phase 5: Polish
-17. Responsive design testing (desktop + mobile)
-18. Animation and interaction refinements
-19. Accessibility review
-20. Performance optimization (image sizes, lazy loading)
+16. Responsive design testing (desktop + mobile)
+17. Animation and interaction refinements
+18. Accessibility review
+19. Performance optimization (image sizes, lazy loading)
