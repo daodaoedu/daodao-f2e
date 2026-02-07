@@ -239,30 +239,79 @@ This document describes the required changes to update the website landing page 
 
 ---
 
-### 5. Learning Footprint Section (New)
+### 5. Learning Footprint Section — 打卡足跡 (New)
 
 **Current:** Does not exist
-**Mockup:** "打卡留下每一步足跡" with app screenshot showing check-in interface
+**Mockup:** "打卡留下每一步足跡" 含打卡面板 + 手帳 paper 雙畫面動畫切換
 
 | Item | Status | Action |
 |------|--------|--------|
 | Section title | **New** | "打卡留下每一步足跡" |
-| Subtitle | **New** | "手指的距離就能記錄" + description |
-| App UI preview | **New** | Screenshot of the check-in / learning log feature |
-| Background | **New** | Light teal/green gradient with wave pattern |
+| Subtitle | **New** | "不再只是憑感覺 / 在每一次實踐中看見自己的成長" |
+| Check-in panel | **New** | 互動式打卡面板（心情、想法、描述） |
+| Journal paper | **New** | 手帳風格的打卡紀錄展示 |
+| Background | **New** | Teal/green gradient with semicircle decorations |
 
-**Required Assets:**
-- [ ] **Check-in UI screenshot (desktop)** - PNG showing the learning log / check-in interface (the mobile-style app card shown in mockup)
-- [ ] **Check-in UI screenshot (mobile)** - Mobile-optimized version
-- [ ] Wave/curve background decoration (teal/green)
+**畫面 A — 打卡面板 (Check-in Panel):**
+- Title: "自己準備便當"（對應主題實踐）
+- **心情如何？** — 6 個情緒選項：
+  - 想放棄 (`hopeless.svg`)
+  - 受挫 (`frustrated.svg`)
+  - 無聊 (`bored.svg`)
+  - 普通 (`neutral.svg`)
+  - 還不錯 (`fine.svg`)
+  - 開心 (`happy.svg`) ← 選中狀態
+- **想法分享** — 可選標籤：實作、新概念、有趣 ✕、困難、下一步 ✕、改進、疑問
+- **詳細描述** (0/300)：
+  - 示範文字："挑戰完成了超美麗的日式便當，天啊太有成就感了吧！！下次要再開發一些新菜色～"
+
+**畫面 B — 手帳 Paper (Journal View):**
+- 筆記本造型（頂部圓孔裝訂、橫線紙）
+- 心情普通 icon + 標示
+- 打卡紀錄文字內容
+- 圓形郵戳印章："Practice Checked In 2026 01/01"
+- 標籤：#有趣 #下一步
+- 照片附件（便當照片）
+
+**Animation Spec (desktop/mobile 動畫效果一樣，重複循環):**
+
+```
+Step 1 (2秒)    Step 2 (1秒)    Step 3 (0.5秒)   Step 4 (3秒)
+┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
+│          │   │    ↓     │   │   ╱      │   │  ╱╱      │
+│  ┌────┐  │   │  ┌────┐  │   │  ╱ 色塊   │   │ ╱ 卡片   │
+│  │卡片│↑ │   │  │卡片│  │   │ ╱  ↑     │   │╱  ↑ 色塊  │
+│  └────┘  │   │  └────┘  │   │╱         │   │          │
+└──────────┘   └──────────┘   └──────────┘   └──────────┘
+ 卡片往上進場    卡片往下退場    背後色塊往       前面卡片往
+                              斜上角度進場     斜上角度進場
+              ←── 重複循環 ──→
+```
+
+**Reusable Assets (已有，可直接複用):**
+- ✅ `packages/assets/images/emotion/*.svg` — 6 個情緒 icon（完全吻合）
+- ✅ `packages/assets/images/dashboard/notebook-hole.svg` — 筆記本圓孔裝訂
+- ✅ `packages/assets/images/dashboard/stamp.svg` — 圓形印章（需修改文字內容）
+
+**Required Assets (需要新製作):**
+- [ ] **便當照片** — 示範用的食物照片（JPG, 用於手帳 paper 附件）
+- [ ] **Journal paper 背景** — 筆記本橫線紙背景（可用 CSS 實現）
+- [ ] **Practice Checked In 印章** — 自訂內容印章（可從 `stamp.svg` 修改，或用 CSS 實現）
+- [ ] **背景裝飾** — teal gradient + 半圓裝飾 + 星芒（可能用 CSS 實現）
 
 **Required Content:**
-- [ ] Section title and subtitle text (zh-TW and en)
-- [ ] Check-in feature descriptions
-- [ ] Sample check-in entries data
+- [ ] Section title and subtitle 英文翻譯
+- [ ] 打卡面板的範例資料（標題、心情、標籤、描述文字）
+- [ ] 想法分享標籤列表確認（實作、新概念、有趣、困難、下一步、改進、疑問）
+- [ ] 手帳照片附件來源
+- [ ] 動畫 timing 確認（2秒、1秒、0.5秒、3秒）
 
 **Related Files:**
 - New component: `apps/website/src/components/landing-page/footprint-section.tsx`
+- Reuse: `packages/assets/images/emotion/*.svg` (6 emotions)
+- Reuse: `packages/assets/images/dashboard/notebook-hole.svg`
+- `packages/i18n/src/locales/zh-TW.json`
+- `packages/i18n/src/locales/en.json`
 
 ---
 
@@ -480,7 +529,7 @@ The following current sections are **not present** in the mockup and should be r
 - [ ] 額外 3-6 張 persona avatar photos（補足每位置 2-3 張輪播需求）
 
 ### UI Screenshots / Mockups
-- [ ] Check-in / learning log UI screenshot (for Footprint section)
+- [ ] 便當照片（Footprint 手帳附件用）
 
 ### Icons (SVG)
 - [ ] 6 feature card icons (目標設定, 輕鬆成長, 片段式學習, 資源推薦, 社群互動, 同儕陪伴)
@@ -503,7 +552,8 @@ The following current sections are **not present** in the mockup and should be r
 - [ ] Learning Foundation section title + subtitle (en translation)
 - [ ] 3 張主題實踐卡片資料（標籤、標題、描述、頻率、時長）
 - [ ] Quick Start section 英文翻譯（stats + 執行時機 + 底部訊息）
-- [ ] Footprint section title + subtitle + descriptions
+- [ ] Footprint section title + subtitle 英文翻譯
+- [ ] 打卡面板範例資料（標題、心情、標籤、描述）
 - [ ] Community section title + description + member count
 - [ ] 6 feature card titles and descriptions
 - [ ] Updated Plan/Join section copy
