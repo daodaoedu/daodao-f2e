@@ -8,33 +8,33 @@ import {
   HopelessSvg,
   NeutralSvg,
 } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { AnimatePresence, motion } from "motion/react";
 import { type ElementType, useEffect, useState } from "react";
 
 interface EmotionItem {
   key: string;
-  label: string;
+  labelKey: string;
   Icon: ElementType;
 }
 
 const EMOTIONS: EmotionItem[] = [
-  { key: "hopeless", label: "想放棄", Icon: HopelessSvg },
-  { key: "frustrated", label: "受挫", Icon: FrustratedSvg },
-  { key: "bored", label: "無聊", Icon: BoredSvg },
-  { key: "neutral", label: "普通", Icon: NeutralSvg },
-  { key: "fine", label: "還不錯", Icon: FineSvg },
-  { key: "happy", label: "開心", Icon: HappySvg },
+  { key: "hopeless", labelKey: "landing_footprint_mood_hopeless", Icon: HopelessSvg },
+  { key: "frustrated", labelKey: "landing_footprint_mood_frustrated", Icon: FrustratedSvg },
+  { key: "bored", labelKey: "landing_footprint_mood_bored", Icon: BoredSvg },
+  { key: "neutral", labelKey: "landing_footprint_mood_neutral", Icon: NeutralSvg },
+  { key: "fine", labelKey: "landing_footprint_mood_fine", Icon: FineSvg },
+  { key: "happy", labelKey: "landing_footprint_mood_happy", Icon: HappySvg },
 ];
 
 const THOUGHT_TAGS = ["實作", "新概念", "有趣", "困難", "下一步", "改進", "疑問"];
-
 const SELECTED_TAGS = ["有趣", "下一步"];
 
 // Animation timing (in seconds)
 const STEP_PANEL_SHOW = 3;
 const STEP_JOURNAL_SHOW = 3.5;
 
-function CheckInPanel() {
+function CheckInPanel({ t }: { t: (key: string) => string }) {
   return (
     <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-lg">
       <h3 className="mb-4 text-lg font-bold text-primary-darker">
@@ -42,7 +42,9 @@ function CheckInPanel() {
       </h3>
 
       {/* Emotion selector */}
-      <p className="mb-3 text-sm font-medium text-basic-400">心情如何？</p>
+      <p className="mb-3 text-sm font-medium text-basic-400">
+        {t("landing_footprint_mood_label")}
+      </p>
       <div className="mb-5 flex justify-between gap-2">
         {EMOTIONS.map((emotion) => (
           <div
@@ -55,14 +57,16 @@ function CheckInPanel() {
           >
             <emotion.Icon className="size-8" />
             <span className="text-[10px] text-basic-400">
-              {emotion.label}
+              {t(emotion.labelKey)}
             </span>
           </div>
         ))}
       </div>
 
       {/* Thought tags */}
-      <p className="mb-2 text-sm font-medium text-basic-400">想法分享</p>
+      <p className="mb-2 text-sm font-medium text-basic-400">
+        {t("landing_footprint_thoughts_label")}
+      </p>
       <div className="mb-5 flex flex-wrap gap-2">
         {THOUGHT_TAGS.map((tag) => (
           <span
@@ -80,7 +84,8 @@ function CheckInPanel() {
 
       {/* Description */}
       <p className="mb-1 text-sm font-medium text-basic-400">
-        詳細描述 <span className="text-basic-300">0/300</span>
+        {t("landing_footprint_description_label")}{" "}
+        <span className="text-basic-300">0/300</span>
       </p>
       <div className="rounded-lg bg-basic-100 p-3 text-sm text-basic-400">
         挑戰完成了超美麗的日式便當，天啊太有成就感了吧！！下次要再開發一些新菜色～
@@ -148,6 +153,7 @@ function JournalPaper() {
 }
 
 export function FootprintSection() {
+  const t = useTranslations("common");
   const [showPanel, setShowPanel] = useState(true);
 
   useEffect(() => {
@@ -164,13 +170,13 @@ export function FootprintSection() {
         {/* Header */}
         <div className="mb-12 text-center">
           <h2 className="text-[1.75rem] font-bold text-white">
-            打卡留下每一步足跡
+            {t("landing_footprint_title")}
           </h2>
           <p className="mt-2 text-sm text-white/70">
-            不再只是憑感覺
+            {t("landing_footprint_subtitle_1")}
           </p>
           <p className="text-sm text-white/70">
-            在每一次實踐中看見自己的成長
+            {t("landing_footprint_subtitle_2")}
           </p>
         </div>
 
@@ -186,7 +192,7 @@ export function FootprintSection() {
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
               >
-                <CheckInPanel />
+                <CheckInPanel t={t} />
               </motion.div>
             ) : (
               <motion.div

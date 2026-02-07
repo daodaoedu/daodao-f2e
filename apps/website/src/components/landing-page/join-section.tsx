@@ -2,37 +2,10 @@
 
 import { CompassSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
+import { useTranslations } from "@daodao/i18n";
 import { ANCHOR_IDS } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { motion } from "motion/react";
-
-const FEATURE_CARDS = [
-  {
-    title: "目標探索",
-    description: "在實踐中 釐清動機與目標",
-    bgColor: "bg-[#E3F2FD]",
-    textColor: "text-primary-darker",
-  },
-  {
-    title: "資源推薦",
-    description: "龐大資源庫 支援你的學習",
-    bgColor: "bg-[#E8F5E9]",
-    textColor: "text-primary-darker",
-  },
-  {
-    title: "紀錄成長",
-    description: "所有足跡 一目瞭然",
-    bgColor: "bg-[#FFF8E1]",
-    textColor: "text-primary-darker",
-  },
-  {
-    title: "同儕推進",
-    description: "找到志趣相同的夥伴 共同成長",
-    bgColor: "bg-white",
-    textColor: "text-primary-darker",
-    badge: "即將推出",
-  },
-];
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -41,6 +14,31 @@ const cardVariants = {
 
 export function JoinSection() {
   const { openLoginDialog } = useAuth();
+  const t = useTranslations("common");
+
+  const featureCards = [
+    {
+      title: t("landing_join_goal"),
+      description: t("landing_join_goal_desc"),
+      bgColor: "bg-[#E3F2FD]",
+    },
+    {
+      title: t("landing_join_resource"),
+      description: t("landing_join_resource_desc"),
+      bgColor: "bg-[#E8F5E9]",
+    },
+    {
+      title: t("landing_join_growth"),
+      description: t("landing_join_growth_desc"),
+      bgColor: "bg-[#FFF8E1]",
+    },
+    {
+      title: t("landing_join_peer"),
+      description: t("landing_join_peer_desc"),
+      bgColor: "bg-white",
+      badge: t("landing_join_coming_soon"),
+    },
+  ];
 
   return (
     <section
@@ -53,9 +51,11 @@ export function JoinSection() {
           <div className="mb-4 inline-flex items-center gap-2">
             <CompassSvg className="size-8" />
           </div>
-          <h2 className="text-[1.75rem] font-bold text-white">加入島島阿學</h2>
+          <h2 className="text-[1.75rem] font-bold text-white">
+            {t("landing_join_title")}
+          </h2>
           <p className="mt-2 text-sm text-white/80">
-            成為 Beta 使用者，與我們一起打造更好的學習體驗
+            {t("landing_join_subtitle")}
           </p>
         </div>
 
@@ -67,7 +67,7 @@ export function JoinSection() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ staggerChildren: 0.15 }}
         >
-          {FEATURE_CARDS.map((card) => (
+          {featureCards.map((card) => (
             <motion.div
               key={card.title}
               className={`relative overflow-hidden rounded-2xl ${card.bgColor} p-6`}
@@ -79,7 +79,7 @@ export function JoinSection() {
                   {card.badge}
                 </span>
               )}
-              <h3 className={`text-lg font-bold ${card.textColor}`}>
+              <h3 className="text-lg font-bold text-primary-darker">
                 {card.title}
               </h3>
               <p className="mt-1 text-sm text-basic-400">{card.description}</p>
@@ -94,10 +94,10 @@ export function JoinSection() {
             size="huge"
             onClick={() => openLoginDialog({ redirectUrl: "/" })}
           >
-            立即免費註冊
+            {t("landing_join_cta")}
           </Button>
           <p className="mt-3 text-center text-[13px] text-white/70">
-            Beta 期間完全免費 · 無需信用卡
+            {t("landing_join_cta_note")}
           </p>
         </div>
       </div>

@@ -1,6 +1,11 @@
+"use client";
+
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 
 export function TransitionBanner() {
+  const t = useTranslations("common");
+
   return (
     <section className="relative overflow-hidden bg-primary-palest py-12 md:py-16">
       <div className="container mx-auto px-6">
@@ -18,9 +23,7 @@ export function TransitionBanner() {
 
           {/* Banner text */}
           <p className="text-center text-lg font-semibold text-primary-darker md:text-xl">
-            更多功能持續開發中，
-            <br className="md:hidden" />
-            為你找到更美好的學習生活
+            {t("landing_banner_text")}
           </p>
         </div>
       </div>

@@ -1,13 +1,13 @@
 "use client";
 
+import { ClockSolidSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import Stack from "@daodao/ui/components/stack";
-import { Image } from "@daodao/ui/components/image";
 import { useMemo } from "react";
 
 const PRACTICE_CARDS = [
   {
     id: 1,
-    tag: "主題實踐",
     title: "自己準備便當",
     description: "開始為自己做上班的健康午餐便當",
     frequency: "3-5 天/週",
@@ -17,7 +17,6 @@ const PRACTICE_CARDS = [
   },
   {
     id: 2,
-    tag: "主題實踐",
     title: "每日英文閱讀",
     description: "養成每天閱讀英文文章的習慣",
     frequency: "5-7 天/週",
@@ -27,7 +26,6 @@ const PRACTICE_CARDS = [
   },
   {
     id: 3,
-    tag: "主題實踐",
     title: "攝影散步練習",
     description: "用鏡頭記錄生活中的美好瞬間",
     frequency: "2-3 天/週",
@@ -45,7 +43,15 @@ function PracticeCard({
   duration,
   bgColor,
   borderColor,
-}: (typeof PRACTICE_CARDS)[number]) {
+}: {
+  tag: string;
+  title: string;
+  description: string;
+  frequency: string;
+  duration: string;
+  bgColor: string;
+  borderColor: string;
+}) {
   return (
     <div
       className={`${bgColor} ${borderColor} flex h-full w-full flex-col justify-between rounded-2xl border-2 p-6`}
@@ -60,21 +66,11 @@ function PracticeCard({
 
       <div className="mt-4 flex items-center gap-4 text-sm text-basic-400">
         <div className="flex items-center gap-1.5">
-          <Image
-            src="/assets/landing-page/icon-clock.svg"
-            alt=""
-            width={16}
-            height={16}
-          />
+          <ClockSolidSvg className="size-4 text-basic-300" />
           <span>{frequency}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Image
-            src="/assets/landing-page/icon-clock.svg"
-            alt=""
-            width={16}
-            height={16}
-          />
+          <ClockSolidSvg className="size-4 text-basic-300" />
           <span>{duration}</span>
         </div>
       </div>
@@ -83,9 +79,15 @@ function PracticeCard({
 }
 
 export function LearningFoundationSection() {
+  const t = useTranslations("common");
+  const tag = t("landing_foundation_tag");
+
   const cards = useMemo(
-    () => PRACTICE_CARDS.map((card) => <PracticeCard key={card.id} {...card} />),
-    []
+    () =>
+      PRACTICE_CARDS.map((card) => (
+        <PracticeCard key={card.id} tag={tag} {...card} />
+      )),
+    [tag]
   );
 
   return (
@@ -94,16 +96,14 @@ export function LearningFoundationSection() {
         <div className="flex flex-col items-center gap-12 md:flex-row md:gap-16">
           {/* Left: Text */}
           <div className="flex-1 text-center md:text-left">
-            <h2 className="text-[1.75rem] font-bold text-primary-darker">
-              從好奇開始
-              <br />
-              小步實踐生活裡的學習靈感
+            <h2 className="whitespace-pre-line text-[1.75rem] font-bold text-primary-darker">
+              {t("landing_foundation_title")}
             </h2>
             <p className="mt-3 text-sm text-basic-400">
-              7-30 天輕量學習計畫
+              {t("landing_foundation_subtitle_1")}
             </p>
             <p className="mt-1 text-sm text-basic-400">
-              不需要完美，只要開始探索就有收穫
+              {t("landing_foundation_subtitle_2")}
             </p>
           </div>
 

@@ -1,19 +1,8 @@
 "use client";
 
-import { Image } from "@daodao/ui/components/image";
+import { BulbSvg, ClockSolidSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { motion } from "motion/react";
-
-const STATS = [
-  { label: "總共持續", value: "14", unit: "天" },
-  { label: "每週頻率", value: "3-5", unit: "天" },
-  { label: "每次執行", value: "30", unit: "分鐘" },
-];
-
-const TIME_SLOTS = [
-  { icon: "/assets/landing-page/icon-clock.svg", label: "早餐前" },
-  { icon: "/assets/landing-page/icon-clock.svg", label: "通勤時" },
-  { icon: "/assets/landing-page/icon-clock.svg", label: "睡前" },
-];
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 24 },
@@ -26,6 +15,20 @@ const staggerContainer = {
 };
 
 export function QuickStartSection() {
+  const t = useTranslations("common");
+
+  const stats = [
+    { label: t("landing_quickstart_total_duration"), value: "14", unit: "天" },
+    { label: t("landing_quickstart_weekly_freq"), value: "3-5", unit: "天" },
+    { label: t("landing_quickstart_per_session"), value: "30", unit: "分鐘" },
+  ];
+
+  const timeSlots = [
+    t("landing_quickstart_before_breakfast"),
+    t("landing_quickstart_commute"),
+    t("landing_quickstart_before_bed"),
+  ];
+
   return (
     <section className="relative overflow-hidden bg-primary-base py-16 md:py-24">
       {/* Top curve */}
@@ -51,7 +54,7 @@ export function QuickStartSection() {
             variants={fadeInUp}
             transition={{ duration: 0.5 }}
           >
-            快速啟動你的學習旅程
+            {t("landing_quickstart_title")}
           </motion.h2>
 
           {/* Steps 1-3: Stats Cards (staggered as a group) */}
@@ -59,7 +62,7 @@ export function QuickStartSection() {
             className="mb-10 flex w-full max-w-lg flex-col gap-4 md:flex-row md:gap-6"
             variants={staggerContainer}
           >
-            {STATS.map((stat) => (
+            {stats.map((stat) => (
               <motion.div
                 key={stat.label}
                 className="flex flex-1 flex-col items-center rounded-2xl bg-white/15 px-6 py-5 backdrop-blur-sm"
@@ -84,29 +87,19 @@ export function QuickStartSection() {
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center gap-2">
-              <Image
-                src="/assets/landing-page/icon-bulb.svg"
-                alt=""
-                width={20}
-                height={20}
-                className="brightness-0 invert"
-              />
-              <span className="font-semibold text-white">執行時機</span>
+              <BulbSvg className="size-5 text-white" />
+              <span className="font-semibold text-white">
+                {t("landing_quickstart_timing")}
+              </span>
             </div>
             <div className="flex flex-wrap justify-center gap-3">
-              {TIME_SLOTS.map((slot) => (
+              {timeSlots.map((label) => (
                 <div
-                  key={slot.label}
+                  key={label}
                   className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm text-white backdrop-blur-sm"
                 >
-                  <Image
-                    src={slot.icon}
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="brightness-0 invert"
-                  />
-                  <span>{slot.label}</span>
+                  <ClockSolidSvg className="size-4 text-white/80" />
+                  <span>{label}</span>
                 </div>
               ))}
             </div>
@@ -118,7 +111,7 @@ export function QuickStartSection() {
             variants={fadeInUp}
             transition={{ duration: 0.5 }}
           >
-            隨時修改沒有壓力，節奏由你決定
+            {t("landing_quickstart_message")}
           </motion.p>
         </motion.div>
       </div>
@@ -131,13 +124,7 @@ export function QuickStartSection() {
         </div>
       </div>
       <div className="pointer-events-none absolute bottom-8 right-8 hidden opacity-30 md:block">
-        <Image
-          src="/assets/landing-page/icon-bulb.svg"
-          alt=""
-          width={48}
-          height={48}
-          className="brightness-0 invert opacity-40"
-        />
+        <BulbSvg className="size-12 text-white/40" />
       </div>
     </section>
   );
