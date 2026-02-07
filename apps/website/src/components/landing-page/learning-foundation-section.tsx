@@ -2,6 +2,7 @@
 
 import Stack from "@daodao/ui/components/stack";
 import { Image } from "@daodao/ui/components/image";
+import { useMemo } from "react";
 
 const PRACTICE_CARDS = [
   {
@@ -82,9 +83,10 @@ function PracticeCard({
 }
 
 export function LearningFoundationSection() {
-  const cards = PRACTICE_CARDS.map((card) => (
-    <PracticeCard key={card.id} {...card} />
-  ));
+  const cards = useMemo(
+    () => PRACTICE_CARDS.map((card) => <PracticeCard key={card.id} {...card} />),
+    []
+  );
 
   return (
     <section className="relative overflow-hidden bg-white py-16 md:py-24">

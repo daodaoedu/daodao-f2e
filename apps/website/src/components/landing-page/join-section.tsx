@@ -1,5 +1,6 @@
 "use client";
 
+import { CompassSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
 import { ANCHOR_IDS } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -50,22 +51,7 @@ export function JoinSection() {
         {/* Header */}
         <div className="mb-12 text-center">
           <div className="mb-4 inline-flex items-center gap-2">
-            {/* Compass icon placeholder - use existing dashboard compass */}
-            <div className="flex size-8 items-center justify-center rounded-full bg-tips">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-              </svg>
-            </div>
+            <CompassSvg className="size-8" />
           </div>
           <h2 className="text-[1.75rem] font-bold text-white">加入島島阿學</h2>
           <p className="mt-2 text-sm text-white/80">

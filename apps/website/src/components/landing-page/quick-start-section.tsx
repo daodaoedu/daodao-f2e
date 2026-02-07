@@ -20,6 +20,11 @@ const fadeInUp = {
   visible: { opacity: 1, y: 0 },
 };
 
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.2 } },
+};
+
 export function QuickStartSection() {
   return (
     <section className="relative overflow-hidden bg-primary-base py-16 md:py-24">
@@ -38,9 +43,9 @@ export function QuickStartSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ staggerChildren: 0.3 }}
+          transition={{ staggerChildren: 0.4 }}
         >
-          {/* Section Header */}
+          {/* Step 0: Section Header */}
           <motion.h2
             className="mb-12 text-center text-[1.75rem] font-bold text-white"
             variants={fadeInUp}
@@ -49,14 +54,17 @@ export function QuickStartSection() {
             快速啟動你的學習旅程
           </motion.h2>
 
-          {/* Stats Cards */}
-          <div className="mb-10 flex w-full max-w-lg flex-col gap-4 md:flex-row md:gap-6">
-            {STATS.map((stat, i) => (
+          {/* Steps 1-3: Stats Cards (staggered as a group) */}
+          <motion.div
+            className="mb-10 flex w-full max-w-lg flex-col gap-4 md:flex-row md:gap-6"
+            variants={staggerContainer}
+          >
+            {STATS.map((stat) => (
               <motion.div
                 key={stat.label}
                 className="flex flex-1 flex-col items-center rounded-2xl bg-white/15 px-6 py-5 backdrop-blur-sm"
                 variants={fadeInUp}
-                transition={{ duration: 0.5, delay: i * 0.15 }}
+                transition={{ duration: 0.5 }}
               >
                 <span className="text-sm text-white/80">{stat.label}</span>
                 <div className="mt-1 flex items-baseline gap-1">
@@ -67,9 +75,9 @@ export function QuickStartSection() {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
 
-          {/* Execution Time */}
+          {/* Step 4: Execution Time */}
           <motion.div
             className="mb-10 flex flex-col items-center gap-4"
             variants={fadeInUp}
@@ -104,7 +112,7 @@ export function QuickStartSection() {
             </div>
           </motion.div>
 
-          {/* Bottom message */}
+          {/* Step 5: Bottom message */}
           <motion.p
             className="text-center text-sm text-white/80"
             variants={fadeInUp}

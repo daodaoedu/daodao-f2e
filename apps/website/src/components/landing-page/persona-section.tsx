@@ -13,6 +13,13 @@ interface PersonaCard {
   quote: string;
 }
 
+// Desktop layout positions: left, top-center, right
+const DESKTOP_POSITIONS = [
+  "left-0 top-1/2 -translate-y-1/2",
+  "left-1/2 top-0 -translate-x-1/2",
+  "right-0 top-1/2 -translate-y-1/2",
+];
+
 // 3 positions × 2-3 cards each
 const PERSONA_POSITIONS: PersonaCard[][] = [
   // Left position - Mia's cards
@@ -125,13 +132,6 @@ function DesktopPersonaCarousel() {
     return () => clearInterval(interval);
   }, [rotateCards]);
 
-  // Positions: left, top-center, right
-  const positions = [
-    "left-0 top-1/2 -translate-y-1/2",
-    "left-1/2 top-0 -translate-x-1/2",
-    "right-0 top-1/2 -translate-y-1/2",
-  ];
-
   return (
     <div className="relative mx-auto hidden h-[400px] max-w-4xl md:block">
       {PERSONA_POSITIONS.map((cards, posIdx) => {
@@ -140,7 +140,7 @@ function DesktopPersonaCarousel() {
         if (!card) return null;
 
         return (
-          <div key={posIdx} className={`absolute ${positions[posIdx]}`}>
+          <div key={posIdx} className={`absolute ${DESKTOP_POSITIONS[posIdx]}`}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={`${posIdx}-${cardIndex}`}
@@ -159,19 +159,21 @@ function DesktopPersonaCarousel() {
   );
 }
 
+// Flattened for mobile single-card carousel
+const ALL_PERSONA_CARDS = PERSONA_POSITIONS.flat();
+
 // Mobile: single card carousel
 function MobilePersonaCarousel() {
-  const allCards = PERSONA_POSITIONS.flat();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % allCards.length);
+      setCurrentIndex((prev) => (prev + 1) % ALL_PERSONA_CARDS.length);
     }, 3500);
     return () => clearInterval(interval);
-  }, [allCards.length]);
+  }, [ALL_PERSONA_CARDS.length]);
 
-  const currentCard = allCards[currentIndex];
+  const currentCard = ALL_PERSONA_CARDS[currentIndex];
   if (!currentCard) return null;
 
   return (
@@ -190,10 +192,11 @@ function MobilePersonaCarousel() {
 
       {/* Dots indicator */}
       <div className="mt-6 flex gap-2">
-        {allCards.map((_, idx) => (
+        {ALL_PERSONA_CARDS.map((_, idx) => (
           <button
             key={idx}
             type="button"
+            aria-label={`查看第 ${idx + 1} 張卡片`}
             className={`h-2 rounded-full transition-all ${
               idx === currentIndex ? "w-6 bg-primary-base" : "w-2 bg-basic-200"
             }`}
