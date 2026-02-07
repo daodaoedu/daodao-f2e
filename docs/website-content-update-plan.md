@@ -77,29 +77,65 @@ This document describes the required changes to update the website landing page 
 
 ---
 
-### 3. Learning Foundation Section (New)
+### 3. Learning Foundation Section — 主題實踐卡片 (New)
 
 **Current:** Does not exist (Feature Grid section is in this position)
-**Mockup:** "從好奇開始 小步實踐生活裡的學習靈感" with a learning notes card UI preview
+**Mockup:** "從好奇開始 小步實踐生活裡的學習靈感" with interactive swipeable card stack
 
 | Item | Status | Action |
 |------|--------|--------|
 | Section title | **New** | "從好奇開始 小步實踐生活裡的學習靈感" |
-| Subtitle | **New** | "不需要完美計畫，只要開始記錄你的學習和觀察" |
-| Learning notes card | **New** | UI preview card showing "自己的學習筆記" |
-| Metrics | **New** | "3-5 次" and "30 分" indicators |
+| Subtitle line 1 | **New** | "7-30 天輕量學習計畫" |
+| Subtitle line 2 | **New** | "不需要完美，只要開始探索就有收穫" |
+| Card stack | **New** | 3 張可翻動的主題實踐卡片（黃色、粉色、藍色） |
+| Card content | **New** | 每張卡片含：標籤、標題、描述、頻率、時長 |
+| Decorative elements | **New** | 右側橘色菱形、藍綠色水平線條 |
+
+**Card Stack Design (3 cards):**
+
+前方卡片範例：
+- Tag badge: "主題實踐"
+- Title: "自己準備便當"
+- Description: "開始為自己做上班的健康午餐便當"
+- Metrics: "3-5 天/週" | "30 分/次"
+- CTA tooltip: "喜歡嗎？馬上開始！"
+- Arrow button (>) at bottom right
+
+卡片堆疊視覺：黃色（前）→ 粉色（中）→ 藍色（後），略微旋轉偏移
+
+**Interaction Spec:**
+- **翻卡片效果與 dashboard 一樣** — 重用 `packages/ui/src/components/stack.tsx` (Framer Motion Stack component)
+- **Scroll trigger:** 當使用者捲動到此位置，過了一秒之後，箭頭按鈕浮現 tooltip 顯示提示訊息
+- **點擊範圍：整張卡片**
+  - **點擊一下：** 進入實踐預覽頁
+  - **拖曳：** 切換卡片（翻到下一張）
+- **點擊後流程：** 直接開啟實踐預覽頁，當使用者選擇之後再讓他登入
+
+**Reusable Component:**
+- `packages/ui/src/components/stack.tsx` — Framer Motion 3D 翻卡片元件
+  - 支援 `sensitivity`, `sendToBackOnClick`, `autoplay`, `autoplayDelay`, `pauseOnHover`
+  - 使用 `perspective: 600` + `rotateX/rotateY` transforms
+  - 支援 drag + click 兩種互動方式
 
 **Required Assets:**
-- [ ] **Learning notes card mockup** - PNG/SVG showing the notes card UI (the yellow/green card shown in mockup with "自己的學習筆記")
-- [ ] Decorative elements (stars, leaves)
+- [ ] **卡片背景色** — 3 種顏色已確定：黃色 (front), 粉色 (middle), 藍色 (back)，不需額外圖片
+- [ ] **右側裝飾元素** — 橘色菱形 SVG、藍綠色水平線條 SVG（或可用 CSS 實現）
 
 **Required Content:**
-- [ ] Section title and subtitle text (zh-TW and en)
-- [ ] Learning card sample content
-- [ ] Metric descriptions (what do "3-5 次" and "30 分" represent?)
+- [ ] **3 張主題實踐卡片資料** — 每張卡片需要：
+  - 標籤 (e.g., "主題實踐")
+  - 標題 (e.g., "自己準備便當")
+  - 描述 (e.g., "開始為自己做上班的健康午餐便當")
+  - 頻率 (e.g., "3-5 天/週")
+  - 時長 (e.g., "30 分/次")
+- [ ] Section title and subtitle text (en translation)
+- [ ] Tooltip 提示文字 (e.g., "喜歡嗎？馬上開始！")
+- [ ] 點擊卡片後的目標 URL（實踐預覽頁路徑）
+- [ ] 卡片資料來源：靜態寫死 or 從 API 取得？
 
 **Related Files:**
 - New component: `apps/website/src/components/landing-page/learning-foundation-section.tsx`
+- Reuse: `packages/ui/src/components/stack.tsx` (card flip/stack interaction)
 - `packages/i18n/src/locales/zh-TW.json`
 - `packages/i18n/src/locales/en.json`
 
@@ -371,7 +407,6 @@ The following current sections are **not present** in the mockup and should be r
 - [ ] Sophia character avatar (SVG, ~80x80px)
 
 ### UI Screenshots / Mockups
-- [ ] Learning notes card preview image (for Learning Foundation section)
 - [ ] Check-in / learning log UI screenshot (for Footprint section)
 
 ### Icons (SVG)
@@ -391,7 +426,8 @@ The following current sections are **not present** in the mockup and should be r
 
 ### Text Content (needs zh-TW + en translations)
 - [ ] 3 user persona descriptions (Mia, Emma, Sophia)
-- [ ] Learning Foundation section title + subtitle + card content
+- [ ] Learning Foundation section title + subtitle (en translation)
+- [ ] 3 張主題實踐卡片資料（標籤、標題、描述、頻率、時長）
 - [ ] Quick Start section stats and descriptions
 - [ ] Footprint section title + subtitle + descriptions
 - [ ] Community section title + description + member count
@@ -406,6 +442,8 @@ The following current sections are **not present** in the mockup and should be r
 - [ ] User persona tags/interests
 - [ ] CTA link destinations for new sections
 - [ ] Whether to keep or update existing testimonial content
+- [ ] 主題實踐卡片資料來源 — 靜態寫死 or 從 API 取得？
+- [ ] 卡片點擊後目標 URL（實踐預覽頁路徑）
 
 ---
 
