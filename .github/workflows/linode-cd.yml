@@ -17,6 +17,7 @@ on:
     branches:
       - main
       - dev
+      - prod
       - 'feat/**'
   workflow_dispatch:
     inputs:
