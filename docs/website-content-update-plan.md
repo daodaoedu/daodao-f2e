@@ -315,113 +315,70 @@ Step 1 (2秒)    Step 2 (1秒)    Step 3 (0.5秒)   Step 4 (3秒)
 
 ---
 
-### 6. Community Section (New)
+### 6. Join Section — 加入島島阿學 (Replaces old Community + Feature Grid + Plan sections)
 
-**Current:** Community features are mentioned in the Feature Grid but don't have a dedicated section
-**Mockup:** "加入社群一起對話" with community stats and join CTA
-
-| Item | Status | Action |
-|------|--------|--------|
-| Section title | **New** | "加入社群一起對話" |
-| Description | **New** | Community feature description text |
-| Member count | **New** | "56人已經加入" (or dynamic number) |
-| CTA button | **New** | "加入學習社群" |
-| Illustration | **New** | Characters having a discussion |
-
-**Required Assets:**
-- [ ] **Community illustration** - PNG/SVG showing people in discussion (characters with speech bubbles)
-- [ ] Community-related icons
-
-**Required Content:**
-- [ ] Section description text (zh-TW and en)
-- [ ] Is the member count (56人) static or fetched from API?
-- [ ] CTA link destination (where does "加入學習社群" lead?)
-
-**Related Files:**
-- New component: `apps/website/src/components/landing-page/community-section.tsx`
-
----
-
-### 7. Feature Cards Grid (Refactored)
-
-**Current:** "告別三大學習困境" with 3 large feature cards (個人學習管理, 社群支持, 成長視覺化)
-**Mockup:** 6 smaller feature cards in a 2x3 grid layout
+**Current:** Separate sections for Feature Grid (3 cards) + Plan/Pricing
+**Mockup:** 統一的加入區塊，含 4 個功能卡片 + CTA，teal 背景
 
 | Item | Status | Action |
 |------|--------|--------|
-| Section layout | **Changed** | 3 cards → 6 cards (2x3 grid) |
-| Card style | **Changed** | Smaller, icon-focused cards with brief descriptions |
+| Section title | **Updated** | "加入島島阿學" |
+| Subtitle | **New** | "成為 Beta 使用者 / 與我們一起打造更好的學習體驗" |
+| Compass icon | **New** | 橘/黃色指南針 icon（左上角） |
+| Feature cards (4 張) | **Changed** | 2x2 grid，取代原本 3 or 6 張 |
+| CTA button | **Updated** | "立即免費註冊"（橘色按鈕） |
+| Supporting text | Unchanged | "Beta 期間完全免費 · 無需信用卡" |
+| Background | **Changed** | 整區 teal/primary 色背景 |
 
-**Mockup Feature Cards (6 items):**
+**4 Feature Cards (2x2 Grid):**
 
-1. **目標設定** (Goal Setting)
-   - Icon: Target/flag icon
-   - Brief description of goal setting feature
+1. **目標探索** — 淺藍色背景
+   - Description: "在實踐中 釐清動機與目標"
 
-2. **輕鬆成長** (Easy Growth)
-   - Icon: Growth/plant icon
-   - Brief description of growth tracking
+2. **資源推薦** — 淺綠色背景
+   - Description: "龐大資源庫 支援你的學習"
 
-3. **片段式學習** (Fragment Learning)
-   - Icon: Puzzle/time icon
-   - Brief description of micro-learning approach
+3. **紀錄成長** — 黃色背景
+   - Description: "所有足跡 一目瞭然"
 
-4. **資源推薦** (Resource Recommendations)
-   - Icon: Star/bookmark icon
-   - Brief description of resource discovery
+4. **同儕推進** — 白色背景 + **「即將推出」** badge
+   - Description: "找到志趣相同的夥伴 共同成長"
 
-5. **社群互動** (Community Interaction)
-   - Icon: People/chat icon
-   - Brief description of social features
+**Animation Spec (Scroll-triggered stagger):**
 
-6. **同儕陪伴** (Peer Support)
-   - Icon: Handshake/heart icon
-   - Brief description of peer learning
+```
+┌──────────┬──────────┬────────────────┐
+│ 出現順序1  │ 出現順序3  │                │
+│ 目標探索   │ 紀錄成長   │                │
+├──────────┼──────────┤   teal 背景     │
+│ 出現順序2  │ 出現順序4  │                │
+│ 資源推薦   │ 同儕推進   │                │
+└──────────┴──────────┴────────────────┘
+```
+- 4 張卡片依序淡入：1 → 2 → 3 → 4
+- 卡片位置略有偏移（上下錯開）
+
+**Reusable Assets (已有):**
+- ✅ `packages/assets/images/dashboard/compass.svg` — 橘/黃色指南針 icon
 
 **Required Assets:**
-- [ ] **6 feature icons** - SVG icons for each feature card (consistent style)
-- [ ] Card background illustrations or patterns (if any)
+- [ ] **卡片背景色** — 4 種顏色已確定（淺藍、淺綠、黃、白），不需額外圖片
+- [ ] **「即將推出」badge** — 可用 CSS 實現（斜角 ribbon 效果）
 
 **Required Content:**
-- [ ] 6 feature card titles (zh-TW and en)
-- [ ] 6 feature card descriptions (zh-TW and en)
-- [ ] Confirm the exact 6 features to highlight
+- [ ] 4 張功能卡片的英文翻譯
+- [ ] CTA "立即免費註冊" 的目標 URL
+- [ ] 確認「同儕推進」是否保留「即將推出」標示
 
 **Related Files:**
-- `apps/website/src/components/landing-page/feature-grid.tsx` (major refactor)
+- `apps/website/src/components/landing-page/feature-grid.tsx` (major refactor or replace)
+- `apps/website/src/components/landing-page/plan-section.tsx` (merge into this section)
 - `packages/i18n/src/locales/zh-TW.json`
 - `packages/i18n/src/locales/en.json`
 
 ---
 
-### 8. Join / Plan Section (Updated)
-
-**Current:** "加入島島阿學" with single pricing card and 5 feature bullets
-**Mockup:** "加入島島同學" with updated layout, service intro, and CTA
-
-| Item | Status | Action |
-|------|--------|--------|
-| Section title | Similar | "加入島島同學" (slightly different wording) |
-| Description | **Changed** | Updated pitch text |
-| CTA button | **Changed** | "立即免費試用" |
-| Layout | **Changed** | Different card layout with product details |
-
-**Required Assets:**
-- [ ] Updated decorative elements (if design changes)
-
-**Required Content:**
-- [ ] Updated section description (zh-TW and en)
-- [ ] Updated feature list items
-- [ ] Service details (pricing, trial info)
-- [ ] CTA destination URL
-
-**Related Files:**
-- `apps/website/src/components/landing-page/plan-section.tsx`
-- `packages/i18n/src/locales/zh-TW.json`
-
----
-
-### 9. Transition Banner (New / Replaces some existing sections)
+### 7. Transition Banner (New / Replaces some existing sections)
 
 **Current:** Typewriter Bubble section + Presentation section
 **Mockup:** Decorative banner with character illustration and text "更多功能持續開發中，為你找到更美好的學習生活"
@@ -448,7 +405,7 @@ Step 1 (2秒)    Step 2 (1秒)    Step 3 (0.5秒)   Step 4 (3秒)
 
 ---
 
-### 10. Learning DNA / Quiz Section (Updated)
+### 8. Learning DNA / Quiz Section (Updated)
 
 **Current:** Full-height section with background images, clock icon, mascot decorations
 **Mockup:** More compact layout with "發現你的學習DNA" card and "查看個人化結果" link
@@ -474,7 +431,7 @@ Step 1 (2秒)    Step 2 (1秒)    Step 3 (0.5秒)   Step 4 (3秒)
 
 ---
 
-### 11. Footer (Minor Updates)
+### 9. Footer (Minor Updates)
 
 **Current:** Dark footer with logo, about links, resource links, newsletter, social links
 **Mockup:** Similar structure with minor layout updates
@@ -498,18 +455,20 @@ Step 1 (2秒)    Step 2 (1秒)    Step 3 (0.5秒)   Step 4 (3秒)
 
 ---
 
-### 12. Sections to Remove or Repurpose
+### 10. Sections to Remove or Repurpose
 
 The following current sections are **not present** in the mockup and should be removed or reworked:
 
 | Section | Current Component | Action |
 |---------|-------------------|--------|
-| Typewriter Bubble | `typewriter-bubble.tsx` | **Remove** - Replaced by transition banner |
-| Presentation Section | `presentation-section.tsx` | **Remove** - Content merged elsewhere |
-| Video Section | `video-section.tsx` | **Remove** - Replaced by Quick Start section |
-| Function Carousel | `function-carousel.tsx` | **Remove** - Replaced by Feature Cards Grid |
-| Testimonial Marquee | `testimonial-marquee.tsx` | **Remove** - User personas now in slogan section |
-| Call to Action Section | `call-to-action-section.tsx` | **Remove** - CTA merged into Plan section |
+| Typewriter Bubble | `typewriter-bubble.tsx` | **Remove** — Replaced by Transition Banner (Section 7) |
+| Presentation Section | `presentation-section.tsx` | **Remove** — Content merged elsewhere |
+| Video Section | `video-section.tsx` | **Remove** — Replaced by Quick Start (Section 4) |
+| Function Carousel | `function-carousel.tsx` | **Remove** — Replaced by Join Section (Section 6) |
+| Testimonial Marquee | `testimonial-marquee.tsx` | **Remove** — User personas now in Slogan Section (Section 2) |
+| Call to Action Section | `call-to-action-section.tsx` | **Remove** — CTA merged into Join Section (Section 6) |
+| Feature Grid | `feature-grid.tsx` | **Major refactor** — Merged into Join Section (Section 6) |
+| Plan Section | `plan-section.tsx` | **Major refactor** — Merged into Join Section (Section 6) |
 
 ---
 
@@ -517,8 +476,7 @@ The following current sections are **not present** in the mockup and should be r
 
 ### Illustrations (High Priority)
 - [ ] **黃色星星角色騎紙飛機** — Quick Start 區左側插圖 (PNG/SVG)
-- [ ] **書本裝飾** — Quick Start 區右下角 (PNG/SVG)
-- [ ] Community discussion illustration (PNG/SVG)
+- [ ] **書本裝飾** — Quick Start 區右下角 (PNG/SVG)（可能可複用 `dashboard/book.svg`）
 - [ ] Banner character illustration (peeking mascot)
 - [ ] Learning DNA card graphic
 
@@ -532,8 +490,10 @@ The following current sections are **not present** in the mockup and should be r
 - [ ] 便當照片（Footprint 手帳附件用）
 
 ### Icons (SVG)
-- [ ] 6 feature card icons (目標設定, 輕鬆成長, 片段式學習, 資源推薦, 社群互動, 同儕陪伴)
-- [ ] Stats/metric icons (clock, calendar, activity)
+- [x] **指南針 icon** — Join Section 左上角（已有 `dashboard/compass.svg`）
+- [x] **燈泡 icon** — Quick Start 執行時機（已有 `dashboard/bulb.svg`）
+- [x] **時鐘 icon** — Quick Start 時段項目（已有 `landing-page/icon-clock.svg`）
+- [ ] Stats/metric icons (calendar, activity — 如需額外 icons)
 - [ ] LinkedIn social icon (if adding)
 - [ ] YouTube social icon (if adding)
 
@@ -554,20 +514,20 @@ The following current sections are **not present** in the mockup and should be r
 - [ ] Quick Start section 英文翻譯（stats + 執行時機 + 底部訊息）
 - [ ] Footprint section title + subtitle 英文翻譯
 - [ ] 打卡面板範例資料（標題、心情、標籤、描述）
-- [ ] Community section title + description + member count
-- [ ] 6 feature card titles and descriptions
-- [ ] Updated Plan/Join section copy
-- [ ] Transition banner text
-- [ ] Updated Quiz/DNA section CTA text
+- [ ] Join Section — 4 張功能卡片英文翻譯（目標探索、資源推薦、紀錄成長、同儕推進）
+- [ ] Transition banner text (zh-TW + en)
+- [ ] Updated Quiz/DNA section CTA text (zh-TW + en)
 
 ### Data / Configuration
-- [ ] Community member count - static or dynamic? (mockup shows "56人")
 - [ ] Quick Start stats — 確認是否固定值 (14 天, 3-5 天, 30 分鐘)
 - [ ] User persona tags/interests
-- [ ] CTA link destinations for new sections
-- [ ] Whether to keep or update existing testimonial content
+- [ ] Avatar 照片來源確認（是否需要授權 / 是否為示意圖）
+- [ ] CTA link destinations for new sections（Join "立即免費註冊" + 卡片點擊）
 - [ ] 主題實踐卡片資料來源 — 靜態寫死 or 從 API 取得？
 - [ ] 卡片點擊後目標 URL（實踐預覽頁路徑）
+- [ ] 確認「同儕推進」是否保留「即將推出」標示
+- [ ] Footprint 動畫 timing 確認（2秒、1秒、0.5秒、3秒）
+- [ ] Figma 動畫示意連結（供開發參考 Persona 輪播動畫效果）
 
 ---
 
@@ -575,16 +535,14 @@ The following current sections are **not present** in the mockup and should be r
 
 ```
 1.  Hero (Key Vision) .............. [No change - keep Lottie animation]
-2.  User Personas + Slogan ......... [Refactored - add persona cards]
-3.  Learning Foundation ............ [New section]
+2.  User Personas + Slogan ......... [Refactored - persona 輪播卡片]
+3.  Learning Foundation ............ [New - 主題實踐卡片堆疊]
 4.  Quick Start .................... [New - replaces Video Section]
-5.  Footprint ...................... [New section]
-6.  Community ...................... [New section]
-7.  Feature Cards Grid ............. [Refactored - 6 cards]
-8.  Join / Plan .................... [Updated]
-9.  Transition Banner .............. [New - replaces Typewriter + Presentation]
-10. Learning DNA / Quiz ............ [Updated layout]
-11. Footer ......................... [Minor updates]
+5.  Footprint ...................... [New - 打卡足跡動畫]
+6.  Join (加入島島阿學) ............ [Merged - 原 Community + Feature Grid + Plan]
+7.  Transition Banner .............. [New - replaces Typewriter + Presentation]
+8.  Learning DNA / Quiz ............ [Updated layout]
+9.  Footer ......................... [Minor updates]
 ```
 
 ---
@@ -592,30 +550,29 @@ The following current sections are **not present** in the mockup and should be r
 ## Implementation Priority
 
 ### Phase 1: Structure & Layout
-1. Restructure landing page component order
+1. Restructure landing page component order (9 sections)
 2. Remove deprecated sections (Typewriter, Presentation, Video, Carousel, Testimonial Marquee, CTA)
 3. Create skeleton components for new sections
 
 ### Phase 2: New Sections (with placeholder content)
-4. Build Learning Foundation section
-5. Build Quick Start section
-6. Build Footprint section
-7. Build Community section
+4. Build Learning Foundation section (card stack, reuse `stack.tsx`)
+5. Build Quick Start section (stagger animation)
+6. Build Footprint section (check-in + journal 動畫循環)
+7. Build Join section (merge Community + Feature Grid + Plan into 4-card layout)
 8. Build Transition Banner
 
 ### Phase 3: Refactor Existing Sections
-9. Refactor Slogan section with user personas
-10. Refactor Feature Grid to 6-card layout
-11. Update Plan section layout
-12. Update Personality/Quiz section layout
+9. Refactor Slogan section with persona 輪播卡片 (3 positions × 2-3 cards)
+10. Update Personality/Quiz section layout
+11. Minor footer updates
 
 ### Phase 4: Content & Assets Integration
-13. Integrate final illustrations and icons
-14. Add i18n translations for all new content
-15. Integrate UI screenshots / mockup images
+12. Integrate final illustrations and icons
+13. Add i18n translations for all new content (zh-TW + en)
+14. Integrate persona photos and mockup images
 
 ### Phase 5: Polish
-16. Responsive design testing (desktop + mobile)
-17. Animation and interaction refinements
-18. Accessibility review
-19. Performance optimization (image sizes, lazy loading)
+15. Responsive design testing (desktop + mobile)
+16. Animation and interaction refinements (Framer Motion stagger, card flip, footprint loop)
+17. Accessibility review
+18. Performance optimization (image sizes, lazy loading)
