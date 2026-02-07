@@ -176,31 +176,66 @@ This document describes the required changes to update the website landing page 
 
 ---
 
-### 4. Quick Start Section (New / Replaces Video Section)
+### 4. Quick Start Section — 實踐計畫概覽 (New / Replaces Video Section)
 
 **Current:** Video Section with two video placeholders
-**Mockup:** "快速啟動你的學習旅程" with stats grid and feature icons
+**Mockup:** 展示主題實踐計畫的結構概覽，搭配依序出現的動畫
 
 | Item | Status | Action |
 |------|--------|--------|
-| Section title | **Changed** | "快速啟動你的學習旅程" |
-| Subtitle | **New** | "最快只上線後不到 3 個月的佈局" |
-| Stats grid | **New** | 3 stat cards: 週共用時 14月 / 每週服務 3-5次 / 每次執行 30分鐘 |
-| Feature icons | **New** | 執行時間 + other feature highlights |
-| Bottom text | **New** | "瀏覽時改怎你有想？，更貴奮作決定" |
+| Section title | **New** | "快速啟動你的學習旅程" |
+| Stats cards (3 張) | **New** | 總共持續 14 天 / 每週頻率 3-5 天 / 每次執行 30 分鐘 |
+| 執行時機 | **New** | 燈泡 icon + 三個時段選項 |
+| Bottom message | **New** | "隨時修改沒有壓力，節奏由你決定" |
+| Illustration | **New** | 黃色星星角色騎紙飛機 + 書本裝飾 |
+
+**Content Layout:**
+
+```
+┌─────────────┬─────────────┬─────────────┐
+│  總共持續     │  每週頻率     │  每次執行     │
+│   14 天      │   3-5 天     │  30 分鐘     │
+└──────┬──────┴──────┬──────┴──────┬──────┘
+       │ 出現順序 1    │ 出現順序 2    │ 出現順序 3
+       └──────────────┴──────────────┘
+                      │
+              ┌───────▼────────┐
+              │  💡 執行時機     │  ← 出現順序 4
+              │  🕐 早餐前      │
+              │  🕐 通勤時      │
+              │  🕐 睡前        │
+              └───────┬────────┘
+                      │
+    ┌─────────────────▼──────────────────┐
+    │ 隨時修改沒有壓力，節奏由你決定        │  ← 出現順序 5
+    └────────────────────────────────────┘
+```
+
+**Animation Spec (Scroll-triggered sequential entrance):**
+- **出現順序 1:** 「總共持續 14 天」卡片淡入
+- **出現順序 2:** 「每週頻率 3-5 天」卡片淡入
+- **出現順序 3:** 「每次執行 30 分鐘」卡片淡入
+- **出現順序 4:** 「執行時機」區塊（含燈泡 icon + 3 個時段）淡入
+- **出現順序 5:** 底部訊息「隨時修改沒有壓力，節奏由你決定」淡入
+
+每個元素依序出現，可用 Framer Motion 的 stagger animation 實現。
 
 **Required Assets:**
-- [ ] **Feature icons** - SVG icons for each stat/feature item (clock, calendar, activity icons)
-- [ ] Background illustration (character with plants/growth theme)
+- [ ] **黃色星星角色騎紙飛機插圖** — PNG/SVG（左側裝飾，虛線框標示區域）
+- [ ] **書本插圖** — PNG/SVG（右下角裝飾）
+- [ ] **燈泡 icon** — SVG（執行時機標題旁）
+- [ ] **時鐘 icon** — SVG（3 個時段項目前，可複用現有 `icon-clock.svg`）
 
 **Required Content:**
-- [ ] Accurate stat numbers (are 14月, 3-5次, 30分鐘 final numbers?)
-- [ ] Feature highlight descriptions (zh-TW and en)
-- [ ] Bottom CTA text
+- [ ] 確認 stats 數據是固定值或需要動態：14 天 / 3-5 天 / 30 分鐘
+- [ ] 執行時機的時段選項是否為固定（早餐前、通勤時、睡前）
+- [ ] 所有文案的英文翻譯
 
 **Related Files:**
 - `apps/website/src/components/landing-page/video-section.tsx` (replace or refactor)
 - New component: `apps/website/src/components/landing-page/quick-start-section.tsx`
+- `packages/i18n/src/locales/zh-TW.json`
+- `packages/i18n/src/locales/en.json`
 
 ---
 
@@ -432,6 +467,8 @@ The following current sections are **not present** in the mockup and should be r
 ## Summary: Required Assets Checklist
 
 ### Illustrations (High Priority)
+- [ ] **黃色星星角色騎紙飛機** — Quick Start 區左側插圖 (PNG/SVG)
+- [ ] **書本裝飾** — Quick Start 區右下角 (PNG/SVG)
 - [ ] Community discussion illustration (PNG/SVG)
 - [ ] Banner character illustration (peeking mascot)
 - [ ] Learning DNA card graphic
@@ -465,7 +502,7 @@ The following current sections are **not present** in the mockup and should be r
 - [ ] 所有 persona 英文翻譯
 - [ ] Learning Foundation section title + subtitle (en translation)
 - [ ] 3 張主題實踐卡片資料（標籤、標題、描述、頻率、時長）
-- [ ] Quick Start section stats and descriptions
+- [ ] Quick Start section 英文翻譯（stats + 執行時機 + 底部訊息）
 - [ ] Footprint section title + subtitle + descriptions
 - [ ] Community section title + description + member count
 - [ ] 6 feature card titles and descriptions
@@ -475,7 +512,7 @@ The following current sections are **not present** in the mockup and should be r
 
 ### Data / Configuration
 - [ ] Community member count - static or dynamic? (mockup shows "56人")
-- [ ] Quick Start stats - confirm numbers (14月, 3-5次, 30分鐘)
+- [ ] Quick Start stats — 確認是否固定值 (14 天, 3-5 天, 30 分鐘)
 - [ ] User persona tags/interests
 - [ ] CTA link destinations for new sections
 - [ ] Whether to keep or update existing testimonial content
