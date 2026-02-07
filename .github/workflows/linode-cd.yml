@@ -1,0 +1,602 @@
+name: Linode CD
+
+# ===== 並發控制設定 =====
+concurrency:
+  group: linode-cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# ===== 觸發條件設定 =====
+# 1. workflow_run：當 CI 完成後觸發（避免重複執行 CI）
+#    - 排除 pull_request 事件，PR 只需要 CI 檢查，不需要部署
+# 2. workflow_dispatch：手動觸發選項
+on:
+  workflow_run:
+    workflows: ["Linode CI"]
+    types:
+      - completed
+    branches:
+      - main
+      - dev
+      - 'feat/**'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: '強制部署 (跳過 CI 檢查)'
+        required: false
+        default: false
+        type: boolean
+      app:
+        description: '要部署的應用'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - website
+          - product
+
+# ===== 全域環境變數 =====
+env:
+  NODE_VERSION: 20
+  PNPM_VERSION: 10
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  # ===== Docker 映像構建階段 - Website =====
+  build-website:
+    runs-on: ubuntu-latest
+    # 只在 CI 成功或手動強制部署時執行
+    if: ${{ (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true }}
+    outputs:
+      image-tag: ${{ steps.meta.outputs.image-tag }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Create environment files
+        run: |
+          echo "${{ secrets.ENV_DEV }}" > .env
+          cp .env apps/website/.env
+          cp .env apps/product/.env
+
+      - name: Install dependencies and build
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+
+      - name: Set Environment Variables
+        id: meta
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "IMAGE_TAG=prod" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+            echo "image-tag=prod" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+            echo "IMAGE_TAG=dev" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+            echo "image-tag=dev" >> $GITHUB_OUTPUT
+          else
+            # Feature branch: feat/v3 → v3
+            BRANCH_NAME="${{ github.ref_name }}"
+            FEAT_NAME="${BRANCH_NAME#feat/}"
+            echo "IMAGE_TAG=feat" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+            echo "FEAT_BRANCH=${FEAT_NAME}" >> $GITHUB_ENV
+            echo "image-tag=feat" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push Website Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/Dockerfile
+          target: website
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}-${{ github.sha }}
+          cache-from: |
+            type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}
+            type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:buildcache-${{ env.IMAGE_TAG }}
+            type=gha
+          cache-to: |
+            type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:buildcache-${{ env.IMAGE_TAG }},mode=max
+            type=gha,mode=max
+          build-args: |
+            APP_NAME=website
+            APP_PORT=3000
+            NODE_ENV=${{ env.NODE_ENV }}
+            BUILDKIT_INLINE_CACHE=1
+          platforms: linux/amd64
+
+      - name: Verify Website Docker image
+        run: |
+          echo "🧪 Verifying Website Docker image..."
+
+          docker run --rm -d --name test-website \
+            -p 3010:3000 \
+            -e NODE_ENV=${{ env.NODE_ENV }} \
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}-${{ github.sha }}
+
+          sleep 15
+
+          if docker ps | grep test-website; then
+            echo "✅ Website container started successfully"
+          else
+            echo "❌ Website container failed to start"
+            docker logs test-website
+            exit 1
+          fi
+
+          docker stop test-website || true
+
+  # ===== Docker 映像構建階段 - Product =====
+  build-product:
+    runs-on: ubuntu-latest
+    # 只在 CI 成功或手動強制部署時執行
+    if: ${{ (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true }}
+    outputs:
+      image-tag: ${{ steps.meta.outputs.image-tag }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Create environment files
+        run: |
+          echo "${{ secrets.ENV_DEV }}" > .env
+          cp .env apps/website/.env
+          cp .env apps/product/.env
+
+      - name: Install dependencies and build
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+
+      - name: Set Environment Variables
+        id: meta
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "IMAGE_TAG=prod" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+            echo "image-tag=prod" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+            echo "IMAGE_TAG=dev" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+            echo "image-tag=dev" >> $GITHUB_OUTPUT
+          else
+            # Feature branch: feat/v3 → v3
+            BRANCH_NAME="${{ github.ref_name }}"
+            FEAT_NAME="${BRANCH_NAME#feat/}"
+            echo "IMAGE_TAG=feat" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+            echo "FEAT_BRANCH=${FEAT_NAME}" >> $GITHUB_ENV
+            echo "image-tag=feat" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push Product Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/Dockerfile
+          target: product
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}-${{ github.sha }}
+          cache-from: |
+            type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}
+            type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:buildcache-${{ env.IMAGE_TAG }}
+            type=gha
+          cache-to: |
+            type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:buildcache-${{ env.IMAGE_TAG }},mode=max
+            type=gha,mode=max
+          build-args: |
+            APP_NAME=product
+            APP_PORT=3001
+            NODE_ENV=${{ env.NODE_ENV }}
+            BUILDKIT_INLINE_CACHE=1
+          platforms: linux/amd64
+
+      - name: Verify Product Docker image
+        run: |
+          echo "🧪 Verifying Product Docker image..."
+
+          docker run -d --name test-product \
+            -p 3011:3001 \
+            -e NODE_ENV=${{ env.NODE_ENV }} \
+            -e HOSTNAME=0.0.0.0 \
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}-${{ github.sha }}
+
+          sleep 15
+
+          if docker ps | grep test-product; then
+            echo "✅ Product container started successfully"
+          else
+            echo "❌ Product container failed to start"
+            docker logs test-product || true
+            exit 1
+          fi
+
+          docker stop test-product || true
+          docker rm test-product || true
+
+  # ===== 部署階段 =====
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build-website, build-product]
+    if: ${{ always() && (needs.build-website.result == 'success' || needs.build-product.result == 'success') }}
+    environment: ${{ needs.build-website.outputs.image-tag == 'prod' && 'production' || 'development' }}
+    timeout-minutes: 20
+    steps:
+      - name: Debug - Check secrets
+        run: |
+          echo "=== Checking Secrets ==="
+          if [ -z "${{ secrets.LINODE_SSH_PRIVATE_KEY }}" ]; then
+            echo "❌ LINODE_SSH_PRIVATE_KEY is EMPTY"
+          else
+            KEY_LENGTH=$(echo "${{ secrets.LINODE_SSH_PRIVATE_KEY }}" | wc -c)
+            echo "✅ LINODE_SSH_PRIVATE_KEY has value (length: $KEY_LENGTH chars)"
+          fi
+
+          if [ -z "${{ secrets.LINODE_INSTANCE_IP }}" ]; then
+            echo "❌ LINODE_INSTANCE_IP is EMPTY"
+          else
+            echo "✅ LINODE_INSTANCE_IP has value: ${{ secrets.LINODE_INSTANCE_IP }}"
+          fi
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LINODE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.LINODE_INSTANCE_IP }} >> ~/.ssh/known_hosts
+
+      - name: Create environment files on Linode
+        env:
+          LINODE_INSTANCE_IP: ${{ secrets.LINODE_INSTANCE_IP }}
+          ENV_PROD: ${{ secrets.ENV_PROD }}
+          ENV_DEV: ${{ secrets.ENV_DEV }}
+        run: |
+          # 確保目錄存在
+          ssh -o StrictHostKeyChecking=no root@$LINODE_INSTANCE_IP "mkdir -p /root/daodao-f2e"
+
+          # 創建 .env.prod
+          echo "$ENV_PROD" | ssh -o StrictHostKeyChecking=no root@$LINODE_INSTANCE_IP "cat > /root/daodao-f2e/.env.prod && chmod 600 /root/daodao-f2e/.env.prod"
+
+          # 創建 .env.dev
+          echo "$ENV_DEV" | ssh -o StrictHostKeyChecking=no root@$LINODE_INSTANCE_IP "cat > /root/daodao-f2e/.env.dev && chmod 600 /root/daodao-f2e/.env.dev"
+
+          echo "✅ Environment files created on Linode"
+
+      - name: Deploy to Linode
+        env:
+          LINODE_INSTANCE_IP: ${{ secrets.LINODE_INSTANCE_IP }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          IMAGE_TAG: ${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag }}
+          APP_ENV: ${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag }}
+          COMMIT_SHA: ${{ github.sha }}
+          DEPLOY_WEBSITE: ${{ needs.build-website.result == 'success' }}
+          DEPLOY_PRODUCT: ${{ needs.build-product.result == 'success' }}
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          GIT_HUB_USERNAME: ${{ secrets.GIT_HUB_USERNAME }}
+          GIT_HUB_ACCESS_TOKEN: ${{ secrets.GIT_HUB_ACCESS_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ConnectTimeout=10 root@$LINODE_INSTANCE_IP << ENDSSH
+            set -e
+            export APP_DIR=/root/daodao-f2e
+            export COMPOSE_FILE=docker-compose.yaml
+            export APP_ENV=${APP_ENV}
+            export DOCKER_HUB_USERNAME=${DOCKER_HUB_USERNAME}
+            export IMAGE_TAG=${IMAGE_TAG}
+            export COMMIT_SHA=${COMMIT_SHA}
+
+            echo "=== Starting deployment for \$APP_ENV environment ==="
+
+            # ===== 磁碟空間檢查 =====
+            echo "=== Pre-deployment Disk Space Check ==="
+            DISK_USAGE=\$(df / | tail -1 | awk '{print \$5}' | sed 's/%//')
+            DISK_AVAIL=\$(df -BG / | tail -1 | awk '{print \$4}' | sed 's/G//')
+
+            echo "Current disk usage: \${DISK_USAGE}%"
+            echo "Available space: \${DISK_AVAIL}GB"
+
+            if [ "\$DISK_USAGE" -gt 80 ] || [ "\$DISK_AVAIL" -lt 10 ]; then
+              echo "⚠️  Disk space is limited, cleaning up..."
+              docker builder prune -a -f || true
+              docker image prune -a -f --filter "until=48h" || true
+              docker container prune -f || true
+              docker volume prune -f || true
+              docker network prune -f || true
+            fi
+
+            # ===== 更新代碼 =====
+            if [ -d \$APP_DIR/.git ]; then
+              cd \$APP_DIR
+              echo "Updating existing repository..."
+              git fetch --depth 1 origin ${BRANCH_NAME}
+              git reset --hard FETCH_HEAD
+              git clean -fd -e '.env*'
+            else
+              # 如果目錄存在但不是 git repo，先清除
+              if [ -d \$APP_DIR ]; then
+                echo "Directory exists but is not a git repo, removing..."
+                rm -rf \$APP_DIR
+              fi
+              echo "Cloning repository..."
+              git clone --depth 1 --branch ${BRANCH_NAME} \
+                https://${GIT_HUB_USERNAME}:${GIT_HUB_ACCESS_TOKEN}@github.com/${GITHUB_REPOSITORY}.git \
+                \$APP_DIR
+              cd \$APP_DIR
+            fi
+
+            # ===== 確認環境文件 =====
+            # Feature 分支使用 dev 環境配置
+            if [ "\${APP_ENV}" = "feat" ]; then
+              ENV_FILE=".env.dev"
+            else
+              ENV_FILE=".env.\${APP_ENV}"
+            fi
+
+            if [ ! -f \${ENV_FILE} ]; then
+              echo "❌ Environment file \${ENV_FILE} not found"
+              exit 1
+            fi
+
+            echo "✅ Using environment file: \${ENV_FILE}"
+
+            # ===== 部署 Website =====
+            if [ "${DEPLOY_WEBSITE}" = "true" ]; then
+              echo "=== Deploying Website ==="
+              SERVICE_NAME="\${APP_ENV}_website"
+
+              echo "Pulling Website image..."
+              docker pull \${DOCKER_HUB_USERNAME}/daodao-website:\${IMAGE_TAG}-\${COMMIT_SHA}
+
+              echo "Stopping old Website container..."
+              docker ps -a --filter "name=\${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker stop || true
+              docker ps -a --filter "name=\${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker rm || true
+
+              echo "Starting new Website container..."
+              DOCKER_HUB_USERNAME=\${DOCKER_HUB_USERNAME} IMAGE_TAG=\${IMAGE_TAG} COMMIT_SHA=\${COMMIT_SHA} \
+                docker compose --env-file \${ENV_FILE} -f \$COMPOSE_FILE up -d --wait --wait-timeout 90 \${SERVICE_NAME}
+
+              # 健康檢查
+              NEW_CONTAINER=\$(docker ps -q -f name=\${SERVICE_NAME} | head -1)
+              if [ -z "\$NEW_CONTAINER" ]; then
+                echo "❌ Website container failed to start"
+                exit 1
+              fi
+
+              for i in {1..10}; do
+                if docker exec \$NEW_CONTAINER wget --quiet --tries=1 --spider http://127.0.0.1:3000 2>/dev/null; then
+                  echo "✅ Website health check passed"
+                  break
+                fi
+                if [ \$i -eq 10 ]; then
+                  echo "❌ Website health check failed"
+                  docker logs \$NEW_CONTAINER --tail=50
+                  exit 1
+                fi
+                sleep 3
+              done
+            fi
+
+            # ===== 部署 Product =====
+            if [ "${DEPLOY_PRODUCT}" = "true" ]; then
+              echo "=== Deploying Product ==="
+              SERVICE_NAME="\${APP_ENV}_product"
+
+              echo "Pulling Product image..."
+              docker pull \${DOCKER_HUB_USERNAME}/daodao-product:\${IMAGE_TAG}-\${COMMIT_SHA}
+
+              echo "Stopping old Product container..."
+              docker ps -a --filter "name=\${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker stop || true
+              docker ps -a --filter "name=\${SERVICE_NAME}" --format "{{.ID}}" | xargs -r docker rm || true
+
+              echo "Starting new Product container..."
+              DOCKER_HUB_USERNAME=\${DOCKER_HUB_USERNAME} IMAGE_TAG=\${IMAGE_TAG} COMMIT_SHA=\${COMMIT_SHA} \
+                docker compose --env-file \${ENV_FILE} -f \$COMPOSE_FILE up -d --wait --wait-timeout 90 \${SERVICE_NAME}
+
+              # 健康檢查
+              NEW_CONTAINER=\$(docker ps -q -f name=\${SERVICE_NAME} | head -1)
+              if [ -z "\$NEW_CONTAINER" ]; then
+                echo "❌ Product container failed to start"
+                exit 1
+              fi
+
+              for i in {1..10}; do
+                if docker exec \$NEW_CONTAINER wget --quiet --tries=1 --spider http://127.0.0.1:3001 2>/dev/null; then
+                  echo "✅ Product health check passed"
+                  break
+                fi
+                if [ \$i -eq 10 ]; then
+                  echo "❌ Product health check failed"
+                  docker logs \$NEW_CONTAINER --tail=50
+                  exit 1
+                fi
+                sleep 3
+              done
+            fi
+
+            # ===== 清理舊映像 =====
+            echo "Cleaning up old images..."
+            docker image prune -f --filter "until=24h"
+
+            echo "=== Deployment completed successfully ==="
+          ENDSSH
+
+  # ===== 部署後驗證 =====
+  verify:
+    runs-on: ubuntu-latest
+    needs: [deploy, build-website, build-product]
+    timeout-minutes: 10
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LINODE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.LINODE_INSTANCE_IP }} >> ~/.ssh/known_hosts
+
+      - name: Set Environment Variables
+        run: |
+          echo "APP_DIR=/root/daodao-f2e" >> $GITHUB_ENV
+          echo "COMPOSE_FILE=docker-compose.yaml" >> $GITHUB_ENV
+          echo "APP_ENV=${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag }}" >> $GITHUB_ENV
+
+      - name: Deployment Verification
+        env:
+          LINODE_INSTANCE_IP: ${{ secrets.LINODE_INSTANCE_IP }}
+          DEPLOY_WEBSITE: ${{ needs.build-website.result == 'success' }}
+          DEPLOY_PRODUCT: ${{ needs.build-product.result == 'success' }}
+        run: |
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=3 root@$LINODE_INSTANCE_IP "
+            set -e
+            echo '=== Deployment Verification Started ==='
+
+            echo '=== Checking Docker Containers ==='
+            docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+
+            echo '=== Checking System Resources ==='
+            echo 'Memory Usage:' && free -h
+            echo 'Disk Usage:' && df -h /
+
+            if [ \"${{ env.DEPLOY_WEBSITE }}\" = \"true\" ]; then
+              echo '=== Verifying Website ==='
+              docker logs ${{ env.APP_ENV }}_website --tail=10
+            fi
+
+            if [ \"${{ env.DEPLOY_PRODUCT }}\" = \"true\" ]; then
+              echo '=== Verifying Product ==='
+              docker logs ${{ env.APP_ENV }}_product --tail=10
+            fi
+
+            echo '=== Deployment Verification Complete ==='
+          "
+
+  # ===== Discord 通知 =====
+  notify:
+    runs-on: ubuntu-latest
+    needs: [build-website, build-product, deploy, verify]
+    if: always()
+    steps:
+      - name: Send Discord Notification
+        run: |
+          AUTHOR="${{ github.actor }}"
+          REPO="${{ github.repository }}"
+          BRANCH="${{ github.ref_name }}"
+          COMMIT_SHA="${{ github.sha }}"
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+          IMAGE_TAG="${{ needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag }}"
+          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          BUILD_WEBSITE_STATUS="${{ needs.build-website.result }}"
+          BUILD_PRODUCT_STATUS="${{ needs.build-product.result }}"
+          DEPLOY_STATUS="${{ needs.deploy.result }}"
+          VERIFY_STATUS="${{ needs.verify.result || 'skipped' }}"
+
+          # 判斷整體狀態
+          if [ "$BUILD_WEBSITE_STATUS" == "failure" ] || [ "$BUILD_PRODUCT_STATUS" == "failure" ]; then
+            COLOR=16711680
+            STATUS="Build Failed"
+            BADGE_URL="https://img.shields.io/badge/Build-Failed-red.png?style=for-the-badge&logo=docker&logoColor=white"
+          elif [ "$DEPLOY_STATUS" == "failure" ]; then
+            COLOR=16711680
+            STATUS="Deploy Failed"
+            BADGE_URL="https://img.shields.io/badge/Deploy-Failed-red.png?style=for-the-badge&logo=rocket&logoColor=white"
+          elif [ "$DEPLOY_STATUS" == "cancelled" ]; then
+            COLOR=8421504
+            STATUS="Deploy Cancelled"
+            BADGE_URL="https://img.shields.io/badge/Deploy-Cancelled-lightgrey.png?style=for-the-badge&logo=pause&logoColor=white"
+          elif [ "$VERIFY_STATUS" == "failure" ]; then
+            COLOR=16776960
+            STATUS="Verify Failed"
+            BADGE_URL="https://img.shields.io/badge/Verify-Failed-orange.png?style=for-the-badge&logo=search&logoColor=white"
+          elif [ "$DEPLOY_STATUS" == "success" ]; then
+            COLOR=3066993
+            STATUS="Deploy Success"
+            BADGE_URL="https://img.shields.io/badge/Deploy-Success-brightgreen.png?style=for-the-badge&logo=check-circle&logoColor=white"
+          else
+            COLOR=16776960
+            STATUS="Status Unknown"
+            BADGE_URL="https://img.shields.io/badge/Status-Unknown-yellow.png?style=for-the-badge&logo=question&logoColor=white"
+          fi
+
+          # 構建部署應用列表
+          DEPLOYED_APPS=""
+          if [ "$BUILD_WEBSITE_STATUS" == "success" ]; then
+            DEPLOYED_APPS="Website"
+          fi
+          if [ "$BUILD_PRODUCT_STATUS" == "success" ]; then
+            if [ -n "$DEPLOYED_APPS" ]; then
+              DEPLOYED_APPS="$DEPLOYED_APPS, Product"
+            else
+              DEPLOYED_APPS="Product"
+            fi
+          fi
+
+          curl -X POST -H "Content-Type: application/json" -d "{
+            \"embeds\": [{
+              \"color\": $COLOR,
+              \"title\": \"🚀 Linode Deployment - $STATUS\",
+              \"thumbnail\": {
+                \"url\": \"$BADGE_URL\"
+              },
+              \"fields\": [
+                {\"name\": \"Repository\", \"value\": \"$REPO\", \"inline\": false},
+                {\"name\": \"Branch\", \"value\": \"$BRANCH\", \"inline\": true},
+                {\"name\": \"Environment\", \"value\": \"$IMAGE_TAG\", \"inline\": true},
+                {\"name\": \"Applications\", \"value\": \"$DEPLOYED_APPS\", \"inline\": true},
+                {\"name\": \"Author\", \"value\": \"$AUTHOR\", \"inline\": true},
+                {\"name\": \"Commit\", \"value\": \"[\`$SHORT_SHA\`](https://github.com/$REPO/commit/$COMMIT_SHA)\", \"inline\": false}
+              ],
+              \"timestamp\": \"$CURRENT_TIME\"
+            }]
+          }" ${{ secrets.DISCORD_WEBHOOK_URL }}

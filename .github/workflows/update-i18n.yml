@@ -24,7 +24,7 @@ jobs:
       - name: Fetch i18n Translations
         run: pnpm i18n:fetch
         env:
-          NEXT_I18N_URL: ${{ secrets.NEXT_I18N_URL }}
+          GAS_I18N_URL: ${{ secrets.GAS_I18N_URL }}
 
       - name: Check for i18n changes
         id: check_changes

@@ -1,0 +1,282 @@
+name: Linode Emergency Rebuild
+
+# ===== 緊急重建工作流程 =====
+# 目的：在快取問題導致構建異常時，提供強制重建選項
+# 使用場景：
+#   1. Docker 快取導致的構建錯誤
+#   2. 依賴更新後的快取不一致問題
+#   3. 其他需要完全重新構建的情況
+# ===============================
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: '要重建的分支'
+        required: true
+        default: 'main'
+        type: choice
+        options:
+          - main
+          - dev
+      app:
+        description: '要重建的應用'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - website
+          - product
+      reason:
+        description: '重建原因'
+        required: true
+        type: string
+      skip_tests:
+        description: '跳過測試 (僅緊急情況)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: 20
+  PNPM_VERSION: 10
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  emergency-rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: ${{ inputs.branch == 'main' && 'production' || 'development' }}
+
+    steps:
+      # ===== 準備工作 =====
+      - name: Emergency rebuild preparation
+        run: |
+          echo "🚨 Emergency Rebuild Started"
+          echo "Branch: ${{ inputs.branch }}"
+          echo "App: ${{ inputs.app }}"
+          echo "Reason: ${{ inputs.reason }}"
+          echo "Skip Tests: ${{ inputs.skip_tests }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Time: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      # ===== 強制清除所有快取 =====
+      - name: Clear all caches
+        run: |
+          echo "🧹 Clearing all possible caches..."
+
+          # 清除 pnpm 快取
+          pnpm store prune || true
+
+          # 清除 Docker 相關快取
+          docker system prune -af || true
+          docker builder prune -af || true
+
+          echo "✅ Cache clearing completed"
+
+      # ===== 依賴安裝 =====
+      - name: Install dependencies (no cache)
+        run: |
+          echo "📦 Installing dependencies without cache..."
+          pnpm install --frozen-lockfile
+
+      # ===== 條件性測試 =====
+      - name: Run tests and checks
+        if: inputs.skip_tests == false
+        run: |
+          echo "🧪 Running quality checks..."
+          pnpm run typecheck
+          pnpm run lint
+
+      # ===== 構建應用 =====
+      - name: Build applications
+        run: |
+          echo "🏗️ Building applications..."
+          pnpm run build
+
+      # ===== 設置環境變數 =====
+      - name: Set environment variables
+        run: |
+          if [ "${{ inputs.branch }}" = "main" ]; then
+            echo "IMAGE_TAG=prod" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+          else
+            echo "IMAGE_TAG=dev" >> $GITHUB_ENV
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+          fi
+
+      # ===== Docker 構建設置 =====
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      # ===== 強制重建 Website =====
+      - name: Build Website image (no cache)
+        if: inputs.app == 'all' || inputs.app == 'website'
+        id: build-website
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/Dockerfile
+          push: true
+          no-cache: true
+          pull: true
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}-emergency-${{ github.sha }}
+          build-args: |
+            APP_NAME=website
+            APP_PORT=3000
+            NODE_ENV=${{ env.NODE_ENV }}
+          platforms: linux/amd64
+
+      # ===== 驗證 Website =====
+      - name: Verify Website build
+        if: inputs.app == 'all' || inputs.app == 'website'
+        run: |
+          echo "🧪 Verifying Website emergency rebuild..."
+
+          docker run --rm -d --name emergency-test-website \
+            -p 3020:3000 \
+            -e NODE_ENV=${{ env.NODE_ENV }} \
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}-emergency-${{ github.sha }}
+
+          sleep 20
+
+          if docker ps | grep emergency-test-website; then
+            echo "✅ Website emergency build verification passed"
+          else
+            echo "❌ Website emergency build verification failed"
+            docker logs emergency-test-website
+            exit 1
+          fi
+
+          docker stop emergency-test-website || true
+
+      # ===== 強制重建 Product =====
+      - name: Build Product image (no cache)
+        if: inputs.app == 'all' || inputs.app == 'product'
+        id: build-product
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/Dockerfile
+          push: true
+          no-cache: true
+          pull: true
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}-emergency-${{ github.sha }}
+          build-args: |
+            APP_NAME=product
+            APP_PORT=3001
+            NODE_ENV=${{ env.NODE_ENV }}
+          platforms: linux/amd64
+
+      # ===== 驗證 Product =====
+      - name: Verify Product build
+        if: inputs.app == 'all' || inputs.app == 'product'
+        run: |
+          echo "🧪 Verifying Product emergency rebuild..."
+
+          docker run --rm -d --name emergency-test-product \
+            -p 3021:3001 \
+            -e NODE_ENV=${{ env.NODE_ENV }} \
+            ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}-emergency-${{ github.sha }}
+
+          sleep 20
+
+          if docker ps | grep emergency-test-product; then
+            echo "✅ Product emergency build verification passed"
+          else
+            echo "❌ Product emergency build verification failed"
+            docker logs emergency-test-product
+            exit 1
+          fi
+
+          docker stop emergency-test-product || true
+
+      # ===== 成功通知 =====
+      - name: Send emergency rebuild success notification
+        if: success()
+        run: |
+          AUTHOR="${{ github.actor }}"
+          REPO="${{ github.repository }}"
+          BRANCH="${{ inputs.branch }}"
+          APP="${{ inputs.app }}"
+          COMMIT_SHA="${{ github.sha }}"
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          REASON="${{ inputs.reason }}"
+
+          curl -X POST -H "Content-Type: application/json" -d "{
+            \"embeds\": [{
+              \"color\": 16776960,
+              \"title\": \"⚠️ Emergency Rebuild Success\",
+              \"thumbnail\": {
+                \"url\": \"https://img.shields.io/badge/Emergency-Rebuild-yellow.png?style=for-the-badge&logo=github-actions&logoColor=white\"
+              },
+              \"fields\": [
+                {\"name\": \"Branch\", \"value\": \"$BRANCH\", \"inline\": true},
+                {\"name\": \"Application\", \"value\": \"$APP\", \"inline\": true},
+                {\"name\": \"Triggered by\", \"value\": \"$AUTHOR\", \"inline\": true},
+                {\"name\": \"Reason\", \"value\": \"$REASON\", \"inline\": false},
+                {\"name\": \"Commit\", \"value\": \"[\`$SHORT_SHA\`](https://github.com/$REPO/commit/$COMMIT_SHA)\", \"inline\": false}
+              ],
+              \"timestamp\": \"$CURRENT_TIME\"
+            }]
+          }" ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      # ===== 失敗通知 =====
+      - name: Send emergency rebuild failure notification
+        if: failure()
+        run: |
+          AUTHOR="${{ github.actor }}"
+          REPO="${{ github.repository }}"
+          BRANCH="${{ inputs.branch }}"
+          APP="${{ inputs.app }}"
+          COMMIT_SHA="${{ github.sha }}"
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          REASON="${{ inputs.reason }}"
+
+          curl -X POST -H "Content-Type: application/json" -d "{
+            \"embeds\": [{
+              \"color\": 16711680,
+              \"title\": \"❌ Emergency Rebuild Failed\",
+              \"thumbnail\": {
+                \"url\": \"https://img.shields.io/badge/Emergency-Failed-red.png?style=for-the-badge&logo=github-actions&logoColor=white\"
+              },
+              \"fields\": [
+                {\"name\": \"Branch\", \"value\": \"$BRANCH\", \"inline\": true},
+                {\"name\": \"Application\", \"value\": \"$APP\", \"inline\": true},
+                {\"name\": \"Triggered by\", \"value\": \"$AUTHOR\", \"inline\": true},
+                {\"name\": \"Reason\", \"value\": \"$REASON\", \"inline\": false},
+                {\"name\": \"Commit\", \"value\": \"[\`$SHORT_SHA\`](https://github.com/$REPO/commit/$COMMIT_SHA)\", \"inline\": false}
+              ],
+              \"timestamp\": \"$CURRENT_TIME\"
+            }]
+          }" ${{ secrets.DISCORD_WEBHOOK_URL }}

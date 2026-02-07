@@ -1,47 +1,63 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-node_modules
+# Dependencies
+node_modules/
 .pnp
 .pnp.js
 
-# next.js
-.next
-out
+# Testing
+coverage/
+*.log
 
-# typescript
-tsconfig.tsbuildinfo
+# Next.js
+.next/
+out/
+dist/
+build/
 
-# production
-build
+# Production
+*.tsbuildinfo
 
-# misc
+# Misc
 .DS_Store
 *.pem
 
-# debug
+# Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# env
+# Local env files
+.env*.local
 .env
-.env.*
-!.env.example
 
-.open-next
+# Vercel
 .vercel
-.vscode
-.yarn
-.wrangler
-bundled
-certificates
-public/sw.js
-public/sw.js.map
-public/workbox-*.js
-public/workbox-*.js.map
-*.md
-!/*.md
-!.docs/*.md
-!.gemini/*.md
-!.github/*.md
+
+# Turbo
+.turbo
+.turbo-cache
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# TypeScript
+*.tsbuildinfo
+
+# Generated files
+**/generated/
+# Exception: mobile design-tokens need to be tracked
+!apps/mobile/generated/
+!apps/mobile/generated/design-tokens/
+!apps/mobile/generated/design-tokens/**
+
+# Compiled JavaScript files in src directories (should only be in dist/)
+**/src/**/*.js
+**/src/**/*.js.map
+
+# Cursor
+.cursorindexingignore
+.specstory

@@ -1,0 +1,195 @@
+name: Linode CI
+
+# ===== 並發控制設定 =====
+# 目的：防止同一分支的多個 CI 檢查同時執行，避免資源浪費
+# group: 針對 PR 使用 head_ref，其他情況使用 ref
+# cancel-in-progress: 當新的 CI 檢查觸發時，自動取消舊的檢查
+# =======================
+concurrency:
+  group: linode-ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+# ===== 觸發條件設定 =====
+# 1. push：當推送到 main, dev, feat/** 分支時觸發
+# 2. pull_request：當向 main 或 dev 分支提交 PR 時觸發
+# 3. workflow_dispatch：手動觸發選項
+# =======================
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - 'feat/**'
+  pull_request:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+# ===== 全域環境變數 =====
+env:
+  NODE_VERSION: 20
+  PNPM_VERSION: 10
+
+jobs:
+  # ===== 主要測試與品質檢查階段 =====
+  test:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: build-files-${{ github.sha }}
+    steps:
+      # ===== 代碼檢出 =====
+      - name: Checkout code (shallow)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          # For PR events, checkout the actual PR branch instead of merge commit
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      # ===== Node.js 環境設定 =====
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # ===== 安裝 pnpm =====
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      # ===== 取得 pnpm store 路徑 =====
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      # ===== pnpm 依賴快取 =====
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      # ===== 依賴安裝 =====
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ===== Next.js 構建快取 =====
+      - name: Cache Next.js builds
+        uses: actions/cache@v4
+        with:
+          path: |
+            apps/website/.next/cache
+            apps/product/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+
+      # ===== 並行品質檢查 =====
+      - name: Run checks in parallel
+        run: |
+          echo "🔍 Running TypeScript type checking..."
+          pnpm run typecheck &
+
+          echo "📝 Running linting..."
+          pnpm run lint &
+
+          # 如果有測試，取消下面註解
+          # echo "🧪 Running tests..."
+          # pnpm test &
+
+          wait
+
+      # ===== 設定環境變數 =====
+      - name: Create environment files
+        run: |
+          echo "${{ secrets.ENV_DEV }}" > .env
+          cp .env apps/website/.env
+          cp .env apps/product/.env
+
+      # ===== 構建驗證 =====
+      - name: Build applications
+        run: |
+          echo "🏗️ Building all applications..."
+          pnpm run build
+
+      # ===== 上傳構建產物 =====
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-files-${{ github.sha }}
+          path: |
+            apps/website/.next
+            apps/product/.next
+            package.json
+            pnpm-lock.yaml
+            pnpm-workspace.yaml
+            turbo.json
+          retention-days: 1
+
+  # ===== CI 成功通知 =====
+  notify-success:
+    runs-on: ubuntu-latest
+    needs: test
+    if: success()
+    steps:
+      - name: Send CI Success Notification
+        run: |
+          AUTHOR="${{ github.actor }}"
+          REPO="${{ github.repository }}"
+          BRANCH="${{ github.ref_name }}"
+          COMMIT_SHA="${{ github.sha }}"
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          curl -X POST -H "Content-Type: application/json" -d "{
+            \"embeds\": [{
+              \"color\": 3066993,
+              \"title\": \"✅ Linode CI Passed\",
+              \"thumbnail\": {
+                \"url\": \"https://img.shields.io/badge/CI-Passed-brightgreen.png?style=for-the-badge&logo=github-actions&logoColor=white\"
+              },
+              \"fields\": [
+                {\"name\": \"Repository\", \"value\": \"$REPO\", \"inline\": false},
+                {\"name\": \"Branch\", \"value\": \"$BRANCH\", \"inline\": true},
+                {\"name\": \"Author\", \"value\": \"$AUTHOR\", \"inline\": true},
+                {\"name\": \"Commit\", \"value\": \"[\`$SHORT_SHA\`](https://github.com/$REPO/commit/$COMMIT_SHA)\", \"inline\": false}
+              ],
+              \"timestamp\": \"$CURRENT_TIME\"
+            }]
+          }" ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  # ===== CI 失敗通知 =====
+  notify-failure:
+    runs-on: ubuntu-latest
+    needs: test
+    if: failure()
+    steps:
+      - name: Send CI Failure Notification
+        run: |
+          AUTHOR="${{ github.actor }}"
+          REPO="${{ github.repository }}"
+          BRANCH="${{ github.ref_name }}"
+          COMMIT_SHA="${{ github.sha }}"
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          curl -X POST -H "Content-Type: application/json" -d "{
+            \"embeds\": [{
+              \"color\": 16711680,
+              \"title\": \"❌ Linode CI Failed\",
+              \"thumbnail\": {
+                \"url\": \"https://img.shields.io/badge/CI-Failed-red.png?style=for-the-badge&logo=github-actions&logoColor=white\"
+              },
+              \"fields\": [
+                {\"name\": \"Repository\", \"value\": \"$REPO\", \"inline\": false},
+                {\"name\": \"Branch\", \"value\": \"$BRANCH\", \"inline\": true},
+                {\"name\": \"Author\", \"value\": \"$AUTHOR\", \"inline\": true},
+                {\"name\": \"Commit\", \"value\": \"[\`$SHORT_SHA\`](https://github.com/$REPO/commit/$COMMIT_SHA)\", \"inline\": false}
+              ],
+              \"timestamp\": \"$CURRENT_TIME\"
+            }]
+          }" ${{ secrets.DISCORD_WEBHOOK_URL }}

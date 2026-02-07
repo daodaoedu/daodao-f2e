@@ -1,0 +1,8 @@
+{
+  "extends": "@daodao/config/react.json",
+  "compilerOptions": {
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*", "../../config/types/image.d.ts", "../../i18n/src/i18n.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
