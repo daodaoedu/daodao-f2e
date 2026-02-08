@@ -1,7 +1,7 @@
-import { memo, useState, useCallback } from "react";
-import { Pressable, StyleSheet, Linking } from "react-native";
-import { XStack, Text, View, Image, Spinner } from "tamagui";
-import { Link2, X, BookOpen } from "@tamagui/lucide-icons";
+import { BookOpen, Link2, X } from "@tamagui/lucide-icons";
+import { memo, useCallback, useState } from "react";
+import { Linking, Pressable, StyleSheet } from "react-native";
+import { Image, Spinner, Text, View, XStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 
 export interface ResourceCardData {
@@ -48,10 +48,7 @@ const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
   return (
     <Pressable
       onPress={handlePress}
-      style={({ pressed }) => [
-        styles.card,
-        pressed && styles.cardPressed,
-      ]}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
       accessibilityLabel={`開啟資源：${resource.name}`}
       accessibilityRole="link"
     >
@@ -90,18 +87,8 @@ const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
       </View>
 
       {/* Info Area */}
-      <XStack
-        alignItems="center"
-        justifyContent="space-between"
-        gap="$1"
-        padding="$2"
-      >
-        <Text
-          fontSize={12}
-          color={colors.text.dark}
-          numberOfLines={1}
-          flex={1}
-        >
+      <XStack alignItems="center" justifyContent="space-between" gap="$1" padding="$2">
+        <Text fontSize={12} color={colors.text.dark} numberOfLines={1} flex={1}>
           {resource.name}
         </Text>
         {resource.url && <Link2 size={16} color={colors.primary.base} />}

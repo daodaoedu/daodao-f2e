@@ -77,9 +77,7 @@ export const SettingsList = () => {
         aria-label="登出"
       >
         <LogOut className="size-4.5 shrink-0" />
-        <span className="flex-1 text-base text-left">
-          {isLoggingOut ? "登出中..." : "登出"}
-        </span>
+        <span className="flex-1 text-base text-left">{isLoggingOut ? "登出中..." : "登出"}</span>
       </button>
     </div>
   );

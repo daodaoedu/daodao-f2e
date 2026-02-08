@@ -58,7 +58,9 @@ export const SuccessSection = ({ userName }: SuccessSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          {userName ? t("steps.success.titleWithName", { name: userName }) : t("steps.success.title")}
+          {userName
+            ? t("steps.success.titleWithName", { name: userName })
+            : t("steps.success.title")}
         </motion.h1>
 
         {/* Email 提醒 */}
@@ -79,18 +81,10 @@ export const SuccessSection = ({ userName }: SuccessSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <Button
-            variant="ctaPrimary"
-            className="w-full"
-            onClick={handleGoToPreferences}
-          >
+          <Button variant="ctaPrimary" className="w-full" onClick={handleGoToPreferences}>
             {t("steps.success.primaryButton")}
           </Button>
-          <Button
-            variant="ghost"
-            className="w-full"
-            onClick={handleSkip}
-          >
+          <Button variant="ghost" className="w-full" onClick={handleSkip}>
             {t("steps.success.secondaryButton")}
           </Button>
         </motion.div>

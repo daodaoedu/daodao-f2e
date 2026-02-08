@@ -1,8 +1,8 @@
-import type { StaticImageData } from "next/image";
-import { cn } from "@daodao/ui/lib/utils";
 import { Badge } from "@daodao/ui/components/badge";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
+import { cn } from "@daodao/ui/lib/utils";
+import type { StaticImageData } from "next/image";
 import { SectionTitle } from "./section-title";
 
 interface HotTag {

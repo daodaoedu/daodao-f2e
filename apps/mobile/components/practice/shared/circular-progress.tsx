@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { Text } from "tamagui";
 import { colors } from "@/generated/design-tokens";
@@ -40,11 +40,7 @@ export const CircularProgress = ({
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now: value }}
     >
-      <Svg
-        width={size}
-        height={size}
-        style={styles.svg}
-      >
+      <Svg width={size} height={size} style={styles.svg}>
         {/* Background circle */}
         <Circle
           cx={size / 2}
@@ -69,11 +65,7 @@ export const CircularProgress = ({
       </Svg>
       {showText && (
         <View style={styles.textContainer}>
-          <Text
-            fontSize={size > 50 ? 16 : 12}
-            fontWeight="600"
-            color={textColor}
-          >
+          <Text fontSize={size > 50 ? 16 : 12} fontWeight="600" color={textColor}>
             {Math.round(value)}%
           </Text>
         </View>

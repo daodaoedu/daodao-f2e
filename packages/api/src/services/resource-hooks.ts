@@ -7,8 +7,8 @@
 
 import { useMemo } from "react";
 import useSWRInfinite from "swr/infinite";
-import { useQuery } from "../hooks";
 import { client } from "../client";
+import { useQuery } from "../hooks";
 import type { IGetResourceListParams, ResourceListResponse } from "./resource";
 
 // ============================================================================
@@ -121,9 +121,7 @@ export const useInfiniteResources = (params?: Omit<IGetResourceListParams, "curs
 
     // 如果有子分類，從 subCategory facets 中查找
     if (params?.subCategory) {
-      const subCategoryFacet = facets.subCategory?.find(
-        (f) => f.value === params.subCategory
-      );
+      const subCategoryFacet = facets.subCategory?.find((f) => f.value === params.subCategory);
       if (subCategoryFacet) return subCategoryFacet.count;
     }
 

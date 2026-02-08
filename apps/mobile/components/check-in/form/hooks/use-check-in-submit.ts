@@ -1,6 +1,6 @@
-import { Alert } from "react-native";
 import { useMutate } from "@daodao/api";
 import Constants from "expo-constants";
+import { Alert } from "react-native";
 import { mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import type { ICheckInFormData } from "../../types";

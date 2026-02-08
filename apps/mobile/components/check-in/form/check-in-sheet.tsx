@@ -1,15 +1,15 @@
-import { useCallback } from "react";
-import { Pressable, StyleSheet } from "react-native";
-import { YStack, XStack, Text, Button, Spinner, ScrollView } from "tamagui";
-import { Check, CalendarCheck } from "@tamagui/lucide-icons";
-import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarCheck, Check } from "@tamagui/lucide-icons";
+import { useCallback } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Pressable, StyleSheet } from "react-native";
+import { Button, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
-import { MoodSelector } from "./components/mood-selector";
-import { TagSelector } from "./components/tag-selector";
 import { DescriptionField } from "./components/description-field";
 import { MediaUploadField } from "./components/media-upload-field";
+import { MoodSelector } from "./components/mood-selector";
+import { TagSelector } from "./components/tag-selector";
 import { useCheckInImageRender } from "./hooks/use-check-in-image-render";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
 import { type CheckInFormValuesType, checkInFormSchema } from "./schema";
@@ -74,12 +74,7 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
       <ScrollView flex={1} contentContainerStyle={styles.scrollContent}>
         <YStack paddingHorizontal="$6">
           {/* Activity Title */}
-          <Text
-            fontSize={16}
-            fontWeight="500"
-            color={colors.text.dark}
-            marginBottom="$6"
-          >
+          <Text fontSize={16} fontWeight="500" color={colors.text.dark} marginBottom="$6">
             {taskTitle}
           </Text>
 
@@ -211,7 +206,9 @@ export const CheckInButton = ({
   showIcon,
   style,
   onOpenSheet,
-}: Omit<ICheckInButtonProps, "practiceId" | "taskTitle" | "onComplete" | "progressPercentage"> & { onOpenSheet?: () => void }) => {
+}: Omit<ICheckInButtonProps, "practiceId" | "taskTitle" | "onComplete" | "progressPercentage"> & {
+  onOpenSheet?: () => void;
+}) => {
   const { canCheckIn, getButtonLabel } = useCheckInStatus({
     practiceStatus,
     lastCheckInDate,
@@ -239,10 +236,7 @@ export const CheckInButton = ({
     >
       <XStack alignItems="center" gap="$2">
         {showIcon && <CalendarCheck size={18} color={colors.primary.base} />}
-        <Text
-          color={canCheckIn ? colors.text.dark : colors.basic["400"]}
-          fontWeight="500"
-        >
+        <Text color={canCheckIn ? colors.text.dark : colors.basic["400"]} fontWeight="500">
           {getButtonLabel()}
         </Text>
       </XStack>

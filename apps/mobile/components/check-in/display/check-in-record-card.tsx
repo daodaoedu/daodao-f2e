@@ -1,14 +1,14 @@
-import { useState, useMemo, useCallback } from "react";
-import { Pressable, LayoutAnimation, Platform, UIManager } from "react-native";
-import { YStack, XStack, Text, View, Spinner } from "tamagui";
 import { ChevronUp } from "@tamagui/lucide-icons";
-import { colors } from "@/generated/design-tokens";
+import { useCallback, useMemo, useState } from "react";
+import { LayoutAnimation, Platform, Pressable, UIManager } from "react-native";
+import { Spinner, Text, View, XStack, YStack } from "tamagui";
 import {
+  type ApiMoodType,
   MOOD_OPTIONS,
   type MoodType,
-  type ApiMoodType,
   mapApiMoodToMoodType,
 } from "@/constants/mood";
+import { colors } from "@/generated/design-tokens";
 import type { IMoodStat } from "../types";
 
 // Enable LayoutAnimation for Android
@@ -31,10 +31,7 @@ interface ICheckInRecordCardProps {
  * 打卡記錄卡片組件 (Mobile)
  * 顯示心情統計排行
  */
-export const CheckInRecordCard = ({
-  checkInsData,
-  isLoading = false,
-}: ICheckInRecordCardProps) => {
+export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInRecordCardProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   // 從打卡記錄計算心情統計
@@ -137,8 +134,7 @@ export const CheckInRecordCard = ({
             {MOOD_OPTIONS.map((moodOption, index) => {
               const stat = moodStats[index];
               const count = stat?.mood === moodOption.id ? stat.count : 0;
-              const barHeight =
-                totalMoodCount > 0 ? (count / totalMoodCount) * MAX_BAR_HEIGHT : 0;
+              const barHeight = totalMoodCount > 0 ? (count / totalMoodCount) * MAX_BAR_HEIGHT : 0;
 
               return (
                 <YStack key={moodOption.id} alignItems="center" gap="$1">

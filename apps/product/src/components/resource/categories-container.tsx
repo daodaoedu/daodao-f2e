@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { cn } from "@daodao/ui/lib/utils";
 import { Button } from "@daodao/ui/components/button";
-import { CATEGORIES, SEARCH_TAGS, type ICategory } from "@/constants/resource";
+import { cn } from "@daodao/ui/lib/utils";
+import { useMemo, useState } from "react";
+import { CATEGORIES, type ICategory, SEARCH_TAGS } from "@/constants/resource";
 import { useMediaQuery } from "@/hooks/resource/use-media-query";
-import { getCategories } from "./utils";
 import { CategoryCard } from "./category-card";
 import { SectionTitle } from "./section-title";
+import { getCategories } from "./utils";
 
 interface CategoriesContainerProps {
   className?: string;

@@ -86,12 +86,7 @@ function PersonaCardComponent({
       {/* Avatar + Name */}
       <div className="mb-3 flex items-center gap-3">
         <div className="size-10 overflow-hidden rounded-full bg-primary-palest">
-          <Image
-            src={card.avatar}
-            alt={card.name}
-            width={40}
-            height={40}
-          />
+          <Image src={card.avatar} alt={card.name} width={40} height={40} />
         </div>
         <span className="font-bold text-primary-base">{card.name}</span>
       </div>
@@ -110,9 +105,7 @@ function PersonaCardComponent({
 
       {/* Quote */}
       <div className="rounded-lg bg-mascot-bright-blue/20 p-3">
-        <p className="text-sm leading-relaxed text-basic-400">
-          &ldquo;{card.quote}&rdquo;
-        </p>
+        <p className="text-sm leading-relaxed text-basic-400">&ldquo;{card.quote}&rdquo;</p>
       </div>
 
       {/* Speech bubble tail */}
@@ -153,7 +146,8 @@ function DesktopPersonaCarousel({
   }, [rotateCards, isPaused]);
 
   return (
-    <div
+    // biome-ignore lint/a11y/noStaticElementInteractions: carousel pause on hover
+    <section
       className="relative mx-auto hidden h-[400px] max-w-4xl md:block"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -166,6 +160,7 @@ function DesktopPersonaCarousel({
         if (!card) return null;
 
         return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static position array
           <div key={posIdx} className={`absolute ${DESKTOP_POSITIONS[posIdx]}`}>
             <AnimatePresence mode="wait">
               <motion.div
@@ -185,7 +180,7 @@ function DesktopPersonaCarousel({
           </div>
         );
       })}
-    </div>
+    </section>
   );
 }
 
@@ -212,7 +207,8 @@ function MobilePersonaCarousel({
   if (!currentCard) return null;
 
   return (
-    <div
+    // biome-ignore lint/a11y/noStaticElementInteractions: carousel pause on hover
+    <section
       className="flex flex-col items-center md:hidden"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -239,7 +235,7 @@ function MobilePersonaCarousel({
       <div className="mt-6 flex gap-2">
         {ALL_PERSONA_CARDS.map((_, idx) => (
           <button
-            key={idx}
+            key={`dot-${idx}`}
             type="button"
             aria-label={`查看第 ${idx + 1} 張卡片`}
             className={`h-2 rounded-full transition-all ${
@@ -249,7 +245,7 @@ function MobilePersonaCarousel({
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 

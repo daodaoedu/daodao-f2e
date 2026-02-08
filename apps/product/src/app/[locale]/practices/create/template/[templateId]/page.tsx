@@ -108,7 +108,7 @@ const convertTemplateToFormValues = (template: PracticeTemplateType): ManualPrac
       id: resource.id,
       name: resource.name,
       url: resource.url,
-    }))
+    })),
   };
 };
 

@@ -1,12 +1,12 @@
-import Svg, { Path } from 'react-native-svg'
+import Svg, { Path } from "react-native-svg";
 
 interface UserIconProps {
-  size?: number
-  color?: string
-  filled?: boolean
+  size?: number;
+  color?: string;
+  filled?: boolean;
 }
 
-export function UserIcon({ size = 24, color = 'currentColor', filled = false }: UserIconProps) {
+export function UserIcon({ size = 24, color = "currentColor", filled = false }: UserIconProps) {
   if (filled) {
     return (
       <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
@@ -19,7 +19,7 @@ export function UserIcon({ size = 24, color = 'currentColor', filled = false }: 
           fill={color}
         />
       </Svg>
-    )
+    );
   }
 
   return (
@@ -33,5 +33,5 @@ export function UserIcon({ size = 24, color = 'currentColor', filled = false }: 
         fill={color}
       />
     </Svg>
-  )
+  );
 }

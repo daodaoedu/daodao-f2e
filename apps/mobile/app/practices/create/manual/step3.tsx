@@ -1,50 +1,54 @@
-import { useRouter } from 'expo-router'
-import { Controller } from 'react-hook-form'
-import { YStack, XStack, Text, ScrollView, Button, Switch } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, ChevronRight, Bell, Clock } from '@tamagui/lucide-icons'
-import { useCreatePractice } from '@/providers/CreatePracticeProvider'
-import { StepIndicator } from '@/components'
-import { colors } from '@/generated/design-tokens'
+import { Bell, ChevronLeft, ChevronRight, Clock } from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
+import { Controller } from "react-hook-form";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
+import { StepIndicator } from "@/components";
+import { colors } from "@/generated/design-tokens";
+import { useCreatePractice } from "@/providers/CreatePracticeProvider";
 
 const timeOptions = [
-  '06:00', '07:00', '08:00', '09:00', '10:00',
-  '12:00', '14:00', '16:00', '18:00', '20:00', '21:00', '22:00',
-]
+  "06:00",
+  "07:00",
+  "08:00",
+  "09:00",
+  "10:00",
+  "12:00",
+  "14:00",
+  "16:00",
+  "18:00",
+  "20:00",
+  "21:00",
+  "22:00",
+];
 
 export default function Step3Screen() {
-  const router = useRouter()
-  const { form, currentStep, totalSteps, nextStep, prevStep } = useCreatePractice()
-  const { control, watch, setValue, trigger } = form
+  const router = useRouter();
+  const { form, currentStep, totalSteps, nextStep, prevStep } = useCreatePractice();
+  const { control, watch, setValue, trigger } = form;
 
-  const reminderEnabled = watch('reminderEnabled')
-  const reminderTime = watch('reminderTime')
+  const reminderEnabled = watch("reminderEnabled");
+  const reminderTime = watch("reminderTime");
 
   const handleNext = async () => {
-    const isValid = await trigger(['reminderEnabled', 'reminderTime'])
+    const isValid = await trigger(["reminderEnabled", "reminderTime"]);
     if (isValid) {
-      nextStep()
-      router.push('/practices/create/manual/step4')
+      nextStep();
+      router.push("/practices/create/manual/step4");
     }
-  }
+  };
 
   const handleBack = () => {
-    prevStep()
-    router.back()
-  }
+    prevStep();
+    router.back();
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button
-            size="$4"
-            circular
-            chromeless
-            onPress={handleBack}
-            accessibilityLabel="返回"
-          >
+          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel="返回">
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>
@@ -116,20 +120,20 @@ export default function Step3Screen() {
                   </Text>
                 </XStack>
                 <XStack gap="$2" flexWrap="wrap">
-                  {timeOptions.map(time => (
+                  {timeOptions.map((time) => (
                     <Button
                       key={time}
                       size="$3"
-                      backgroundColor={reminderTime === time ? colors.primary.base : '$background'}
+                      backgroundColor={reminderTime === time ? colors.primary.base : "$background"}
                       borderWidth={1}
-                      borderColor={reminderTime === time ? colors.primary.base : '$borderColor'}
+                      borderColor={reminderTime === time ? colors.primary.base : "$borderColor"}
                       pressStyle={{ backgroundColor: colors.primary.palest }}
-                      onPress={() => setValue('reminderTime', time)}
+                      onPress={() => setValue("reminderTime", time)}
                       marginBottom="$2"
                     >
                       <Text
                         fontSize={14}
-                        color={reminderTime === time ? colors.basic.white : '$color'}
+                        color={reminderTime === time ? colors.basic.white : "$color"}
                       >
                         {time}
                       </Text>
@@ -140,12 +144,7 @@ export default function Step3Screen() {
             )}
 
             {/* Info */}
-            <YStack
-              padding="$4"
-              backgroundColor={colors.basic[100]}
-              borderRadius="$md"
-              gap="$2"
-            >
+            <YStack padding="$4" backgroundColor={colors.basic[100]} borderRadius="$md" gap="$2">
               <Text fontSize={13} color="$color" opacity={0.8}>
                 提示
               </Text>
@@ -174,5 +173,5 @@ export default function Step3Screen() {
         </YStack>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

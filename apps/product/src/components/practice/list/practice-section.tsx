@@ -1,6 +1,5 @@
 "use client";
 
-import type { ElementType } from "react";
 import { useUserPractices } from "@daodao/api";
 import { ArrowRightOutlineSvg, ExperimentSvg, FlagSvg, NoteSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
@@ -10,6 +9,7 @@ import { Button } from "@daodao/ui/components/button";
 import { Checkbox } from "@daodao/ui/components/checkbox";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
+import type { ElementType } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import type { PracticeStatus } from "@/constants/practice-status";

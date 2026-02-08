@@ -1,8 +1,8 @@
-import { useMemo, useCallback } from "react";
-import { FlatList, Pressable, StyleSheet, type ListRenderItemInfo } from "react-native";
-import { YStack, Text, View } from "tamagui";
+import { useCallback, useMemo } from "react";
+import { FlatList, type ListRenderItemInfo, Pressable, StyleSheet } from "react-native";
+import { Text, View, YStack } from "tamagui";
+import { type ApiMoodType, MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
-import { MOOD_OPTIONS, mapApiMoodToMoodType, type ApiMoodType } from "@/constants/mood";
 import type { ICheckInItem } from "../types";
 
 // Shape colors for visual variety
@@ -42,10 +42,7 @@ const formatCheckInDate = (checkinDate: string): string => {
  * 打卡堆疊組件 (Mobile)
  * 用於顯示多個打卡記錄，以卡片列表形式呈現
  */
-export const CheckInStack = ({
-  checkInsData,
-  onCheckInPress,
-}: ICheckInStackProps) => {
+export const CheckInStack = ({ checkInsData, onCheckInPress }: ICheckInStackProps) => {
   // 將 API 資料轉換為 ICheckInItem[] 格式
   const items: ICheckInItem[] = useMemo(() => {
     if (!checkInsData?.data) {

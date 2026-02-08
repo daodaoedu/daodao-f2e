@@ -114,7 +114,9 @@ export const mapExecutionTimingToPracticeTimePeriods = (
 ): ("morning" | "afternoon" | "evening" | "night")[] => {
   return executionTiming
     .map((timing) => ExecutionTimingToPracticeTimePeriodMap[timing])
-    .filter((period): period is "morning" | "afternoon" | "evening" | "night" => period !== "commute");
+    .filter(
+      (period): period is "morning" | "afternoon" | "evening" | "night" => period !== "commute"
+    );
 };
 
 /**

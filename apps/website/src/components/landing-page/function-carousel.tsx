@@ -1,6 +1,4 @@
-import { ANCHOR_IDS } from "@daodao/shared";
 import { Image } from "@daodao/ui/components/image";
-import { SectionHeader } from "@daodao/ui/components/section-header";
 
 interface FunctionCardProps {
   tag: string;
@@ -54,7 +52,7 @@ export function FunctionCard({ tag, title, description, imageUrl, action }: Func
   );
 }
 
-const functions = [
+const _functions = [
   {
     tag: "想法",
     title: "分享學習洞察",

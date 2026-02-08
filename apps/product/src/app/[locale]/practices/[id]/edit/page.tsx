@@ -11,7 +11,10 @@ import { startOfDay } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import { type ManualPracticeFormValues, createManualPracticeFormSchema } from "@/components/practice";
+import {
+  createManualPracticeFormSchema,
+  type ManualPracticeFormValues,
+} from "@/components/practice";
 import { Step1 } from "@/components/practice/create/manual/steps/step-1";
 import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";

@@ -74,7 +74,16 @@ export function useFieldSelectionSheet({
       },
     });
     closeRef.current = close;
-  }, [initialFields, availableFields, maxSelection, title, customFieldLabel, onComplete, onClose, open]);
+  }, [
+    initialFields,
+    availableFields,
+    maxSelection,
+    title,
+    customFieldLabel,
+    onComplete,
+    onClose,
+    open,
+  ]);
 
   return { openFieldSelectionSheet };
 }

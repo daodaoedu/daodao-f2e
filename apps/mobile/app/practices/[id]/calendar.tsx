@@ -1,27 +1,28 @@
-import { useMemo } from 'react'
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { YStack, XStack, Text, Button, Spinner } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, Flame, Target, TrendingUp } from '@tamagui/lucide-icons'
-import { usePractice, useCheckIns } from '@/hooks/usePractices'
-import { CheckInCalendar } from '@/components'
-import { colors } from '@/generated/design-tokens'
+import { ChevronLeft, Flame, Target, TrendingUp } from "@tamagui/lucide-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useMemo } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Spinner, Text, XStack, YStack } from "tamagui";
+import { CheckInCalendar } from "@/components";
+import { colors } from "@/generated/design-tokens";
+import { useCheckIns, usePractice } from "@/hooks/usePractices";
 
 export default function PracticeCalendarScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>()
-  const router = useRouter()
-  const { practice, isLoading: isPracticeLoading } = usePractice(id)
-  const { checkInDates, isLoading: isCheckInsLoading } = useCheckIns(id)
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
+  const { practice, isLoading: isPracticeLoading } = usePractice(id);
+  const { checkInDates, isLoading: isCheckInsLoading } = useCheckIns(id);
 
-  const isLoading = isPracticeLoading || isCheckInsLoading
+  const isLoading = isPracticeLoading || isCheckInsLoading;
 
   // 計算統計資料
   const stats = useMemo(() => {
-    if (!practice) return null
+    if (!practice) return null;
 
-    const completionRate = practice.targetDays > 0
-      ? Math.round((practice.completedDays / practice.targetDays) * 100)
-      : 0
+    const completionRate =
+      practice.targetDays > 0
+        ? Math.round((practice.completedDays / practice.targetDays) * 100)
+        : 0;
 
     return {
       completedDays: practice.completedDays,
@@ -29,22 +30,22 @@ export default function PracticeCalendarScreen() {
       currentStreak: practice.currentStreak,
       longestStreak: practice.longestStreak,
       completionRate,
-    }
-  }, [practice])
+    };
+  }, [practice]);
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center">
           <Spinner size="large" color={colors.primary.base} />
         </YStack>
       </SafeAreaView>
-    )
+    );
   }
 
   if (!practice) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" gap="$4">
           <Text fontSize={16} color="$color" opacity={0.6}>
             找不到此實踐
@@ -54,13 +55,13 @@ export default function PracticeCalendarScreen() {
           </Button>
         </YStack>
       </SafeAreaView>
-    )
+    );
   }
 
-  const cardColor = practice.color || colors.primary.base
+  const cardColor = practice.color || colors.primary.base;
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
@@ -85,10 +86,7 @@ export default function PracticeCalendarScreen() {
 
         {/* Calendar */}
         <YStack paddingHorizontal="$4">
-          <CheckInCalendar
-            checkInDates={checkInDates}
-            color={cardColor}
-          />
+          <CheckInCalendar checkInDates={checkInDates} color={cardColor} />
         </YStack>
 
         {/* Stats */}
@@ -161,12 +159,7 @@ export default function PracticeCalendarScreen() {
             </XStack>
 
             {/* Progress */}
-            <YStack
-              backgroundColor={colors.basic[100]}
-              padding="$4"
-              borderRadius="$md"
-              gap="$2"
-            >
+            <YStack backgroundColor={colors.basic[100]} padding="$4" borderRadius="$md" gap="$2">
               <XStack justifyContent="space-between" alignItems="center">
                 <Text fontSize={14} color="$color">
                   進度
@@ -193,5 +186,5 @@ export default function PracticeCalendarScreen() {
         )}
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

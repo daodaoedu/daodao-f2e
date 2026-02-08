@@ -52,9 +52,7 @@ export function CommunitySection() {
           </Button>
 
           {/* 說明文字 */}
-          <p className="mt-4 text-[13px] text-basic-300">
-            我們會在功能推出的第一時間聯繫你
-          </p>
+          <p className="mt-4 text-[13px] text-basic-300">我們會在功能推出的第一時間聯繫你</p>
         </div>
       </div>
     </section>

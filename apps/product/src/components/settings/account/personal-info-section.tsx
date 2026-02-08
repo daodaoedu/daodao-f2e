@@ -33,10 +33,7 @@ interface PersonalInfoSectionProps {
   educationStageOptions: readonly SelectOption[];
 }
 
-export const PersonalInfoSection = ({
-  form,
-  educationStageOptions,
-}: PersonalInfoSectionProps) => {
+export const PersonalInfoSection = ({ form, educationStageOptions }: PersonalInfoSectionProps) => {
   const locale = useLocale();
   const selectedCountry = form.watch("country");
 
@@ -142,7 +139,7 @@ export const PersonalInfoSection = ({
                   <SelectContent>
                     {countries.map((country) => (
                       <SelectItem key={country.code} value={country.code}>
-                        {locale === "en" ? (country.nameEn || country.name) : country.name}
+                        {locale === "en" ? country.nameEn || country.name : country.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -1,6 +1,6 @@
-import { StyleSheet } from "react-native";
-import { YStack, XStack, Text, View } from "tamagui";
 import { Clock } from "@tamagui/lucide-icons";
+import { StyleSheet } from "react-native";
+import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { EXECUTION_TIMING_OPTIONS, type ManualPracticeFormValues } from "../create/manual/schema";
 

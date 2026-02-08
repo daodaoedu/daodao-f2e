@@ -1,96 +1,103 @@
-import { useState, useCallback } from 'react'
-import { Alert, RefreshControl, } from 'react-native'
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Button, Spinner, Card, View } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import {
-  ChevronLeft,
-  ChevronRight,
-  Check,
-  X,
-  Tag,
-  Archive,
-  Trash2,
-} from '@tamagui/lucide-icons'
-import { usePractice, useCheckIn, useCheckIns } from '@/hooks/usePractices'
-import { ProgressRing, CheckInSheet, CheckInList, ShareCheckInSheet } from '@/components'
-import { colors } from '@/generated/design-tokens'
-import type { CheckInData } from '@/components/CheckInSheet'
+import { Archive, Check, ChevronLeft, ChevronRight, Tag, Trash2, X } from "@tamagui/lucide-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { Alert, RefreshControl } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Card, ScrollView, Spinner, Text, View, XStack, YStack } from "tamagui";
+import { CheckInList, CheckInSheet, ProgressRing, ShareCheckInSheet } from "@/components";
+import type { CheckInData } from "@/components/CheckInSheet";
+import { colors } from "@/generated/design-tokens";
+import { useCheckIn, useCheckIns, usePractice } from "@/hooks/usePractices";
 
 // 狀態標籤配置
-const statusConfig: Record<string, { label: string; backgroundColor: string; textColor: string }> = {
-  draft: { label: '草稿', backgroundColor: 'rgba(255, 255, 255, 0.8)', textColor: '#666666' },
-  'not-started': { label: '未開始', backgroundColor: '#E0F4FF', textColor: '#0088CC' },
-  'in-progress': { label: '進行中', backgroundColor: '#16B9B3', textColor: '#FFFFFF' },
-  active: { label: '進行中', backgroundColor: '#16B9B3', textColor: '#FFFFFF' },
-  completed: { label: '已完成', backgroundColor: '#10B981', textColor: '#FFFFFF' },
-}
+const statusConfig: Record<string, { label: string; backgroundColor: string; textColor: string }> =
+  {
+    draft: { label: "草稿", backgroundColor: "rgba(255, 255, 255, 0.8)", textColor: "#666666" },
+    "not-started": { label: "未開始", backgroundColor: "#E0F4FF", textColor: "#0088CC" },
+    "in-progress": { label: "進行中", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
+    active: { label: "進行中", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
+    completed: { label: "已完成", backgroundColor: "#10B981", textColor: "#FFFFFF" },
+  };
 
 // 執行時機標籤
 const timingLabels: Record<string, string> = {
-  holiday: '休假日',
-  commute: '通勤中',
-  beforeSleep: '睡前',
-  morning: '早晨',
-  lunch: '午休',
-  evening: '傍晚',
-}
+  holiday: "休假日",
+  commute: "通勤中",
+  beforeSleep: "睡前",
+  morning: "早晨",
+  lunch: "午休",
+  evening: "傍晚",
+};
 
 export default function PracticeDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>()
-  const router = useRouter()
-  const { practice, isLoading, mutate } = usePractice(id)
-  const { checkIn, isChecking } = useCheckIn()
-  const { checkIns } = useCheckIns(id)
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
+  const { practice, isLoading, mutate } = usePractice(id);
+  const { checkIn, isChecking } = useCheckIn();
+  const { checkIns } = useCheckIns(id);
 
-  const [showCheckInSheet, setShowCheckInSheet] = useState(false)
-  const [showShareSheet, setShowShareSheet] = useState(false)
+  const [showCheckInSheet, setShowCheckInSheet] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
 
-  const handleCheckIn = useCallback(async (data: CheckInData) => {
-    if (!id) return { success: false, error: '無效的實踐 ID' }
+  const handleCheckIn = useCallback(
+    async (data: CheckInData) => {
+      if (!id) return { success: false, error: "無效的實踐 ID" };
 
-    const result = await checkIn({ practiceId: id, note: data.description })
+      const result = await checkIn({ practiceId: id, note: data.description });
 
-    if (result.success) {
-      await mutate()
-    } else if (result.error) {
-      Alert.alert('打卡失敗', result.error)
-    }
+      if (result.success) {
+        await mutate();
+      } else if (result.error) {
+        Alert.alert("打卡失敗", result.error);
+      }
 
-    return result
-  }, [id, checkIn, mutate])
+      return result;
+    },
+    [id, checkIn, mutate]
+  );
 
   const handleRefresh = useCallback(async () => {
-    await mutate()
-  }, [mutate])
+    await mutate();
+  }, [mutate]);
 
   const handleArchive = useCallback(() => {
-    Alert.alert('封存實踐', '確定要封存此實踐嗎？', [
-      { text: '取消', style: 'cancel' },
-      { text: '封存', onPress: () => { /* TODO */ } },
-    ])
-  }, [])
+    Alert.alert("封存實踐", "確定要封存此實踐嗎？", [
+      { text: "取消", style: "cancel" },
+      {
+        text: "封存",
+        onPress: () => {
+          /* TODO */
+        },
+      },
+    ]);
+  }, []);
 
   const handleDelete = useCallback(() => {
-    Alert.alert('刪除實踐', '確定要刪除此實踐嗎？此操作無法復原。', [
-      { text: '取消', style: 'cancel' },
-      { text: '刪除', style: 'destructive', onPress: () => { /* TODO */ } },
-    ])
-  }, [])
+    Alert.alert("刪除實踐", "確定要刪除此實踐嗎？此操作無法復原。", [
+      { text: "取消", style: "cancel" },
+      {
+        text: "刪除",
+        style: "destructive",
+        onPress: () => {
+          /* TODO */
+        },
+      },
+    ]);
+  }, []);
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center">
           <Spinner size="large" color={colors.primary.base} />
         </YStack>
       </SafeAreaView>
-    )
+    );
   }
 
   if (!practice) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" gap="$4">
           <Text fontSize={16} color="$color" opacity={0.6}>
             找不到此實踐
@@ -100,23 +107,22 @@ export default function PracticeDetailScreen() {
           </Button>
         </YStack>
       </SafeAreaView>
-    )
+    );
   }
 
-  const progress = practice.targetDays > 0
-    ? Math.round((practice.completedDays / practice.targetDays) * 100)
-    : 0
+  const progress =
+    practice.targetDays > 0 ? Math.round((practice.completedDays / practice.targetDays) * 100) : 0;
 
-  const status = practice.status || 'in-progress'
-  const statusInfo = statusConfig[status] || statusConfig['in-progress']
+  const status = practice.status || "in-progress";
+  const statusInfo = statusConfig[status] || statusConfig["in-progress"];
 
   // 模擬執行時機數據
-  const executionTiming = ['holiday', 'commute', 'beforeSleep']
-  const frequency = '2-4'
-  const durationMinutes = 40
+  const executionTiming = ["holiday", "commute", "beforeSleep"];
+  const frequency = "2-4";
+  const durationMinutes = 40;
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <ScrollView
         flex={1}
         backgroundColor="$background"
@@ -147,7 +153,7 @@ export default function PracticeDetailScreen() {
             size="$4"
             circular
             chromeless
-            onPress={() => router.push('/')}
+            onPress={() => router.push("/")}
             accessibilityLabel="關閉"
           >
             <X size={20} color="$color" />
@@ -157,13 +163,7 @@ export default function PracticeDetailScreen() {
         <YStack paddingHorizontal="$5" gap="$4">
           {/* Title Section with Navigation */}
           <XStack alignItems="center" gap="$2" height={84}>
-            <Button
-              size="$4"
-              circular
-              backgroundColor="white"
-              opacity={0.5}
-              disabled
-            >
+            <Button size="$4" circular backgroundColor="white" opacity={0.5} disabled>
               <ChevronLeft size={24} color="$color" />
             </Button>
 
@@ -189,13 +189,7 @@ export default function PracticeDetailScreen() {
               </Text>
             </YStack>
 
-            <Button
-              size="$4"
-              circular
-              backgroundColor="white"
-              opacity={0.5}
-              disabled
-            >
+            <Button size="$4" circular backgroundColor="white" opacity={0.5} disabled>
               <ChevronRight size={24} color="$color" />
             </Button>
           </XStack>
@@ -214,27 +208,40 @@ export default function PracticeDetailScreen() {
               <YStack flex={1} paddingRight="$4">
                 {/* Description */}
                 <Text fontSize={15} fontWeight="500" color="$color" marginBottom="$3">
-                  {practice.description || '每天學習，持續進步'}
+                  {practice.description || "每天學習，持續進步"}
                 </Text>
 
                 {/* Frequency */}
-                <XStack marginBottom="$3" paddingBottom="$3" borderBottomWidth={1} borderBottomColor={colors.basic[200]}>
+                <XStack
+                  marginBottom="$3"
+                  paddingBottom="$3"
+                  borderBottomWidth={1}
+                  borderBottomColor={colors.basic[200]}
+                >
                   <YStack width={80}>
-                    <Text fontSize={12} color="$color" opacity={0.6}>一週</Text>
+                    <Text fontSize={12} color="$color" opacity={0.6}>
+                      一週
+                    </Text>
                     <XStack alignItems="baseline" gap={2}>
                       <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
                         {frequency}
                       </Text>
-                      <Text fontSize={12} color="$color">天</Text>
+                      <Text fontSize={12} color="$color">
+                        天
+                      </Text>
                     </XStack>
                   </YStack>
                   <YStack width={80}>
-                    <Text fontSize={12} color="$color" opacity={0.6}>一次</Text>
+                    <Text fontSize={12} color="$color" opacity={0.6}>
+                      一次
+                    </Text>
                     <XStack alignItems="baseline" gap={2}>
                       <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
                         {durationMinutes}
                       </Text>
-                      <Text fontSize={12} color="$color">分鐘</Text>
+                      <Text fontSize={12} color="$color">
+                        分鐘
+                      </Text>
                     </XStack>
                   </YStack>
                 </XStack>
@@ -242,7 +249,7 @@ export default function PracticeDetailScreen() {
                 {/* Tags */}
                 {practice.tags && practice.tags.length > 0 && (
                   <XStack flexWrap="wrap" gap="$2">
-                    {practice.tags.map(tag => (
+                    {practice.tags.map((tag) => (
                       <XStack
                         key={tag}
                         backgroundColor="#E0F4FF"
@@ -253,7 +260,9 @@ export default function PracticeDetailScreen() {
                         gap="$1"
                       >
                         <Tag size={14} color={colors.primary.lighter} />
-                        <Text fontSize={12} color="$color">{tag}</Text>
+                        <Text fontSize={12} color="$color">
+                          {tag}
+                        </Text>
                       </XStack>
                     ))}
                   </XStack>
@@ -275,17 +284,12 @@ export default function PracticeDetailScreen() {
           {/* Execution Timing & Duration */}
           <XStack gap="$3">
             {/* Execution Timing Card */}
-            <Card
-              flex={1}
-              backgroundColor={colors.primary.palest}
-              borderRadius={12}
-              padding="$4"
-            >
+            <Card flex={1} backgroundColor={colors.primary.palest} borderRadius={12} padding="$4">
               <Text fontSize={12} color={colors.primary.darker} marginBottom="$2">
                 執行時機
               </Text>
               <XStack flexWrap="wrap" gap="$1">
-                {executionTiming.map(timing => (
+                {executionTiming.map((timing) => (
                   <XStack
                     key={timing}
                     backgroundColor="white"
@@ -302,12 +306,7 @@ export default function PracticeDetailScreen() {
             </Card>
 
             {/* Duration Card */}
-            <Card
-              flex={1}
-              backgroundColor={colors.primary.palest}
-              borderRadius={12}
-              padding="$4"
-            >
+            <Card flex={1} backgroundColor={colors.primary.palest} borderRadius={12} padding="$4">
               <Text fontSize={12} color={colors.primary.darker} marginBottom="$2">
                 剩餘天數
               </Text>
@@ -393,12 +392,7 @@ export default function PracticeDetailScreen() {
             )}
           </Button>
         ) : (
-          <Button
-            size="$5"
-            backgroundColor={colors.semantic.success}
-            borderRadius="$md"
-            disabled
-          >
+          <Button size="$5" backgroundColor={colors.semantic.success} borderRadius="$md" disabled>
             <XStack alignItems="center" gap="$2">
               <Check size={18} color="white" />
               <Text color="white" fontWeight="600" fontSize={16}>
@@ -416,8 +410,8 @@ export default function PracticeDetailScreen() {
         practice={practice}
         onCheckIn={handleCheckIn}
         onShare={() => {
-          setShowCheckInSheet(false)
-          setTimeout(() => setShowShareSheet(true), 300)
+          setShowCheckInSheet(false);
+          setTimeout(() => setShowShareSheet(true), 300);
         }}
       />
 
@@ -429,5 +423,5 @@ export default function PracticeDetailScreen() {
         streakCount={practice.currentStreak + 1}
       />
     </SafeAreaView>
-  )
+  );
 }

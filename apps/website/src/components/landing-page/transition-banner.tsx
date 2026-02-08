@@ -13,12 +13,7 @@ export function TransitionBanner() {
           {/* Character illustration placeholder */}
           <div className="flex size-24 items-center justify-center rounded-2xl bg-mascot-aqua/30 md:size-32">
             {/* TODO: Replace with peeking mascot illustration */}
-            <Image
-              src="/assets/landing-page/deco-mascot.svg"
-              alt="吉祥物"
-              width={80}
-              height={80}
-            />
+            <Image src="/assets/landing-page/deco-mascot.svg" alt="吉祥物" width={80} height={80} />
           </div>
 
           {/* Banner text */}
@@ -29,12 +24,8 @@ export function TransitionBanner() {
       </div>
 
       {/* Decorative stars */}
-      <div className="pointer-events-none absolute left-[10%] top-4 text-tips/40">
-        ✦
-      </div>
-      <div className="pointer-events-none absolute bottom-4 right-[15%] text-tips/30">
-        ✦
-      </div>
+      <div className="pointer-events-none absolute left-[10%] top-4 text-tips/40">✦</div>
+      <div className="pointer-events-none absolute bottom-4 right-[15%] text-tips/30">✦</div>
     </section>
   );
 }

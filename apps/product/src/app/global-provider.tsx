@@ -47,7 +47,14 @@ function GlobalProvider({
                   <SheetManagerProvider>
                     <AuthProvider
                       defaultProtected
-                      publicPattern={["^/auth/login", "^/auth/callback", "^/auth/onboarding", "^/auth/verify-email(/.*)?$", "^/users/", "^/practices/[^/]+$"]}
+                      publicPattern={[
+                        "^/auth/login",
+                        "^/auth/callback",
+                        "^/auth/onboarding",
+                        "^/auth/verify-email(/.*)?$",
+                        "^/users/",
+                        "^/practices/[^/]+$",
+                      ]}
                       onAuthRequired={(currentPath) => {
                         router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
                       }}

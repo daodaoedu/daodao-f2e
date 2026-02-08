@@ -1,6 +1,5 @@
 "use client";
 
-import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { resendVerificationEmail } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
@@ -9,6 +8,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { Mail, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { BackgroundAnimation, PageHeader } from "@/components/layout";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
