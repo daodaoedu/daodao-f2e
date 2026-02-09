@@ -123,12 +123,7 @@ export const ProfileSection = ({ form }: ProfileSectionProps) => {
             </FormLabel>
             <FormControl>
               <div className="relative">
-                <Input
-                  {...field}
-                  readOnly
-                  disabled
-                  className="bg-very-light-gray pr-10"
-                />
+                <Input {...field} readOnly disabled className="bg-very-light-gray pr-10" />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
                   <LockIcon className="size-4 text-light-gray" />
                 </div>
@@ -163,10 +158,7 @@ export const ProfileSection = ({ form }: ProfileSectionProps) => {
             </FormControl>
             {birthDate && (
               <FormDescription
-                className={cn(
-                  "text-xs mt-1",
-                  isBirthDateValid ? "text-green" : "text-red"
-                )}
+                className={cn("text-xs mt-1", isBirthDateValid ? "text-green" : "text-red")}
               >
                 {isBirthDateValid ? (
                   <>
@@ -220,7 +212,9 @@ export const ProfileSection = ({ form }: ProfileSectionProps) => {
             </FormLabel>
             <FormControl>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-light-gray pointer-events-none">@</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-light-gray pointer-events-none">
+                  @
+                </span>
                 <Input
                   {...field}
                   placeholder={t("steps.profile.usernamePlaceholder")}
@@ -247,9 +241,7 @@ export const ProfileSection = ({ form }: ProfileSectionProps) => {
                   {customIdStatus === "available" && (
                     <CheckCircleIcon className="size-4 text-green" />
                   )}
-                  {customIdStatus === "unavailable" && (
-                    <XCircleIcon className="size-4 text-red" />
-                  )}
+                  {customIdStatus === "unavailable" && <XCircleIcon className="size-4 text-red" />}
                 </div>
               </div>
             </FormControl>

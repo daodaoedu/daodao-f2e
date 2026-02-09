@@ -1,19 +1,19 @@
-import { XStack, YStack, Text } from 'tamagui'
-import { Check } from '@tamagui/lucide-icons'
-import { colors } from '@/generated/design-tokens'
+import { Check } from "@tamagui/lucide-icons";
+import { Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
 
 interface StepIndicatorProps {
-  currentStep: number
-  totalSteps: number
+  currentStep: number;
+  totalSteps: number;
 }
 
 export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
   return (
     <XStack justifyContent="center" alignItems="center" gap="$2" paddingVertical="$3">
       {Array.from({ length: totalSteps }, (_, i) => {
-        const step = i + 1
-        const isCompleted = step < currentStep
-        const isCurrent = step === currentStep
+        const step = i + 1;
+        const isCompleted = step < currentStep;
+        const isCurrent = step === currentStep;
 
         return (
           <XStack key={step} alignItems="center" gap="$2">
@@ -25,8 +25,8 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
                 isCompleted
                   ? colors.primary.base
                   : isCurrent
-                  ? colors.primary.base
-                  : colors.basic[200]
+                    ? colors.primary.base
+                    : colors.basic[200]
               }
               alignItems="center"
               justifyContent="center"
@@ -52,8 +52,8 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
               />
             )}
           </XStack>
-        )
+        );
       })}
     </XStack>
-  )
+  );
 }

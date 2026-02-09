@@ -676,6 +676,11 @@
     );
   }
 
+  /* Hover paused - pause animation on hover */
+  .hover\:paused:hover {
+    animation-play-state: paused;
+  }
+
   /* Intersect mask */
   .mask-intersect {
     mask-image: var(--mobile-intersect-mask);

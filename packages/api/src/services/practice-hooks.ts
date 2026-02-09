@@ -312,6 +312,56 @@ export const createPracticeCheckInWithFormData = async (
 };
 
 /**
+ * 更新實踐打卡記錄（使用 FormData 統一提交）
+ * @param practiceId 實踐 ID
+ * @param checkInId 打卡記錄 ID
+ * @param data 表單資料（包含圖片檔案）
+ * @returns 更新結果
+ */
+export const updatePracticeCheckInWithFormData = async (
+  practiceId: string,
+  checkInId: string,
+  data: ICheckInFormData
+): Promise<CreateCheckInResponse> => {
+  const formData = new FormData();
+
+  // 基本欄位
+  if (data.mood) formData.append("mood", data.mood);
+  if (data.description) formData.append("note", data.description);
+
+  // 陣列欄位需轉成 JSON 字串
+  if (data.tags && data.tags.length > 0) {
+    formData.append("tags", JSON.stringify(data.tags));
+  }
+
+  // 圖片檔案（多張）
+  if (data.media && data.media.length > 0) {
+    data.media.forEach((file) => {
+      formData.append("images", file);
+    });
+  }
+
+  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const response = await unauthorizedHandler.wrapFetch(
+    `${baseUrl}/api/v1/practices/${practiceId}/checkins/${checkInId}`,
+    {
+      method: "PUT",
+      body: formData,
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({
+      error: { message: "更新打卡失敗" },
+    }));
+    throw new Error(error.error?.message || "更新打卡失敗");
+  }
+
+  return response.json();
+};
+
+/**
  * 刷新實踐相關的 cache（共用函數）
  * @param mutate mutate 函數
  * @param practiceId 實踐 ID
@@ -395,6 +445,39 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
   };
 
   return { createCheckIn };
+};
+
+/**
+ * Hook 用於更新實踐打卡記錄（自動處理 cache 刷新）
+ * @param practiceId 實踐 ID
+ * @param checkInId 打卡記錄 ID
+ * @returns 更新打卡記錄的函數
+ */
+export const useUpdatePracticeCheckIn = (practiceId: string, checkInId: string) => {
+  const mutate = useMutate();
+
+  const updateCheckIn = async (formData: ICheckInFormData) => {
+    const response = await updatePracticeCheckInWithFormData(practiceId, checkInId, formData);
+
+    // 刷新打卡列表的 cache
+    await mutate([
+      "/api/v1/practices/{id}/checkins",
+      {
+        params: {
+          path: {
+            id: practiceId,
+          },
+        },
+      },
+    ] as const);
+
+    // 刷新實踐相關的 cache
+    await refreshPracticeCaches(mutate, practiceId);
+
+    return response;
+  };
+
+  return { updateCheckIn };
 };
 
 /**

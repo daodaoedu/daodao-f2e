@@ -1,57 +1,77 @@
-import { useMemo } from 'react'
-import { StyleSheet } from 'react-native'
-import { YStack, XStack, Text, Card, Button, Spinner, View } from 'tamagui'
-import { Check, Flame, ChevronRight, PenLine } from '@tamagui/lucide-icons'
-import Svg, { Rect, Circle } from 'react-native-svg'
-import { colors } from '@/generated/design-tokens'
-import type { Practice } from '@/types/practice'
+import { Check, ChevronRight, Flame, PenLine } from "@tamagui/lucide-icons";
+import { useMemo } from "react";
+import { StyleSheet } from "react-native";
+import Svg, { Circle, Rect } from "react-native-svg";
+import { Button, Card, Spinner, Text, View, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import type { Practice } from "@/types/practice";
 
-type CardVariant = 'default' | 'gradient' | 'completed'
+type CardVariant = "default" | "gradient" | "completed";
 
 // 卡片尺寸 - 對應 Product 的 w-[294px]
-const CARD_WIDTH = 294
-const CARD_HEIGHT = 239
+const CARD_WIDTH = 294;
+const CARD_HEIGHT = 239;
 
 // SVG 背景組件 - 對應 Product 的 YellowSvg, BlueSvg, PinkSvg, GreenSvg
 // Product 使用 mix-blend-mode: soft-light，在 RN 中簡化為近似效果
 function YellowBackground() {
   return (
-    <Svg width={CARD_WIDTH} height={CARD_HEIGHT} viewBox="0 0 294 239" style={StyleSheet.absoluteFill}>
+    <Svg
+      width={CARD_WIDTH}
+      height={CARD_HEIGHT}
+      viewBox="0 0 294 239"
+      style={StyleSheet.absoluteFill}
+    >
       <Rect width="294" height="239" fill="#FFE394" />
       {/* 右側三個圓點 - 與 Product 一致 */}
       <Circle cx="276" cy="157" r="6" fill="white" fillOpacity={0.35} />
       <Circle cx="276" cy="185.6" r="6" fill="white" fillOpacity={0.35} />
       <Circle cx="276" cy="214.9" r="6" fill="white" fillOpacity={0.35} />
     </Svg>
-  )
+  );
 }
 
 function BlueBackground() {
   return (
-    <Svg width={CARD_WIDTH} height={CARD_HEIGHT} viewBox="0 0 294 239" style={StyleSheet.absoluteFill}>
+    <Svg
+      width={CARD_WIDTH}
+      height={CARD_HEIGHT}
+      viewBox="0 0 294 239"
+      style={StyleSheet.absoluteFill}
+    >
       <Rect width="294" height="239" fill="#C3EEFF" />
     </Svg>
-  )
+  );
 }
 
 function PinkBackground() {
   return (
-    <Svg width={CARD_WIDTH} height={CARD_HEIGHT} viewBox="0 0 294 239" style={StyleSheet.absoluteFill}>
+    <Svg
+      width={CARD_WIDTH}
+      height={CARD_HEIGHT}
+      viewBox="0 0 294 239"
+      style={StyleSheet.absoluteFill}
+    >
       <Rect width="294" height="239" fill="#FFC0C8" />
       {/* 右上三個圓點 */}
       <Circle cx="212" cy="22" r="6" fill="white" fillOpacity={0.35} />
       <Circle cx="240.6" cy="22" r="6" fill="white" fillOpacity={0.35} />
       <Circle cx="269.9" cy="22" r="6" fill="white" fillOpacity={0.35} />
     </Svg>
-  )
+  );
 }
 
 function GreenBackground() {
   return (
-    <Svg width={CARD_WIDTH} height={CARD_HEIGHT} viewBox="0 0 294 239" style={StyleSheet.absoluteFill}>
+    <Svg
+      width={CARD_WIDTH}
+      height={CARD_HEIGHT}
+      viewBox="0 0 294 239"
+      style={StyleSheet.absoluteFill}
+    >
       <Rect width="294" height="239" fill="#A0E8D0" />
     </Svg>
-  )
+  );
 }
 
 // 主題背景對應
@@ -60,52 +80,55 @@ const themeBackgrounds: Record<string, React.FC> = {
   blue: BlueBackground,
   pink: PinkBackground,
   green: GreenBackground,
-}
+};
 
 // 狀態標籤配置 - 對應 Product 的 Badge variants
-const statusConfig: Record<string, { label: string; backgroundColor: string; textColor: string; borderColor: string }> = {
+const statusConfig: Record<
+  string,
+  { label: string; backgroundColor: string; textColor: string; borderColor: string }
+> = {
   draft: {
     // outline-ghost: transparent bg, light-gray border
-    label: '草稿',
-    backgroundColor: 'transparent',
-    textColor: '#666666',
-    borderColor: '#9CA3AF', // light-gray
+    label: "草稿",
+    backgroundColor: "transparent",
+    textColor: "#666666",
+    borderColor: "#9CA3AF", // light-gray
   },
-  'not-started': {
+  "not-started": {
     // very-light-blue: very-light-blue bg and border
-    label: '未開始',
-    backgroundColor: '#E6FFFE', // very-light-blue
-    textColor: '#333333',
-    borderColor: '#E6FFFE',
+    label: "未開始",
+    backgroundColor: "#E6FFFE", // very-light-blue
+    textColor: "#333333",
+    borderColor: "#E6FFFE",
   },
-  'in-progress': {
+  "in-progress": {
     // default: logo-cyan bg, white text
-    label: '進行中',
-    backgroundColor: '#16B9B3', // logo-cyan
-    textColor: '#FFFFFF',
-    borderColor: 'transparent',
+    label: "進行中",
+    backgroundColor: "#16B9B3", // logo-cyan
+    textColor: "#FFFFFF",
+    borderColor: "transparent",
   },
   active: {
-    label: '進行中',
-    backgroundColor: '#16B9B3',
-    textColor: '#FFFFFF',
-    borderColor: 'transparent',
+    label: "進行中",
+    backgroundColor: "#16B9B3",
+    textColor: "#FFFFFF",
+    borderColor: "transparent",
   },
   completed: {
-    label: '已完成',
-    backgroundColor: '#16B9B3',
-    textColor: '#FFFFFF',
-    borderColor: 'transparent',
+    label: "已完成",
+    backgroundColor: "#16B9B3",
+    textColor: "#FFFFFF",
+    borderColor: "transparent",
   },
-}
+};
 
 interface PracticeCardProps {
-  practice: Practice
-  onPress?: () => void
-  onCheckIn?: () => void
-  showCheckInButton?: boolean
-  isCheckingIn?: boolean
-  variant?: CardVariant
+  practice: Practice;
+  onPress?: () => void;
+  onCheckIn?: () => void;
+  showCheckInButton?: boolean;
+  isCheckingIn?: boolean;
+  variant?: CardVariant;
 }
 
 export function PracticeCard({
@@ -114,31 +137,31 @@ export function PracticeCard({
   onCheckIn,
   showCheckInButton = true,
   isCheckingIn = false,
-  variant = 'default',
+  variant = "default",
 }: PracticeCardProps) {
   const progress = useMemo(() => {
     return practice.targetDays > 0
       ? Math.round((practice.completedDays / practice.targetDays) * 100)
-      : 0
-  }, [practice.completedDays, practice.targetDays])
+      : 0;
+  }, [practice.completedDays, practice.targetDays]);
 
   const accessibilityLabel = useMemo(() => {
-    const status = practice.todayCheckedIn ? '已完成' : '待完成'
-    const streak = practice.currentStreak > 0 ? `，連續 ${practice.currentStreak} 天` : ''
-    return `${practice.title}，${status}，進度 ${progress}%${streak}`
-  }, [practice.title, practice.todayCheckedIn, practice.currentStreak, progress])
+    const status = practice.todayCheckedIn ? "已完成" : "待完成";
+    const streak = practice.currentStreak > 0 ? `，連續 ${practice.currentStreak} 天` : "";
+    return `${practice.title}，${status}，進度 ${progress}%${streak}`;
+  }, [practice.title, practice.todayCheckedIn, practice.currentStreak, progress]);
 
   // 獲取主題
-  const theme = practice.theme || 'yellow'
-  const status = practice.status || 'in-progress'
-  const statusInfo = statusConfig[status] || statusConfig['in-progress']
-  const isDraft = status === 'draft'
+  const theme = practice.theme || "yellow";
+  const status = practice.status || "in-progress";
+  const statusInfo = statusConfig[status] || statusConfig["in-progress"];
+  const isDraft = status === "draft";
 
   // 獲取主題背景組件
-  const ThemeBackground = themeBackgrounds[theme] || themeBackgrounds.yellow
+  const ThemeBackground = themeBackgrounds[theme] || themeBackgrounds.yellow;
 
   // 漸層卡片樣式 (進行中區塊用)
-  if (variant === 'gradient') {
+  if (variant === "gradient") {
     return (
       <Card
         width={CARD_WIDTH}
@@ -155,7 +178,15 @@ export function PracticeCard({
         <ThemeBackground />
 
         {/* 內容層 - 絕對定位在 SVG 上方，底部留空給進度條 */}
-        <View position="absolute" top={0} left={0} right={0} bottom={10} padding={20} paddingBottom={16}>
+        <View
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={10}
+          padding={20}
+          paddingBottom={16}
+        >
           <YStack flex={1} gap={16}>
             {/* 頂部標籤列 */}
             <XStack justifyContent="space-between" alignItems="center">
@@ -191,20 +222,11 @@ export function PracticeCard({
             {/* 標題與描述 + 箭頭 */}
             <XStack flex={1} gap={8}>
               <YStack flex={1} gap={8}>
-                <Text
-                  fontSize={20}
-                  fontWeight="500"
-                  color="#333333"
-                  numberOfLines={1}
-                >
+                <Text fontSize={20} fontWeight="500" color="#333333" numberOfLines={1}>
                   {practice.title}
                 </Text>
-                <Text
-                  fontSize={12}
-                  color="#333333"
-                  numberOfLines={2}
-                >
-                  {practice.description || '每天學習，持續進步'}
+                <Text fontSize={12} color="#333333" numberOfLines={2}>
+                  {practice.description || "每天學習，持續進步"}
                 </Text>
               </YStack>
               {/* 右側箭頭 - light-gray */}
@@ -215,11 +237,15 @@ export function PracticeCard({
 
             {/* 打卡次數 */}
             <XStack alignItems="center" gap={4}>
-              <Text fontSize={12} color="#333333">已打卡</Text>
+              <Text fontSize={12} color="#333333">
+                已打卡
+              </Text>
               <Text fontSize={12} color="#333333" fontWeight="600">
                 {practice.completedDays}
               </Text>
-              <Text fontSize={12} color="#333333">次</Text>
+              <Text fontSize={12} color="#333333">
+                次
+              </Text>
             </XStack>
 
             {/* 打卡按鈕 - secondary variant: white bg, subtle cyan shadow */}
@@ -230,11 +256,11 @@ export function PracticeCard({
                 height={40}
                 pressStyle={{ opacity: 0.8 }}
                 onPress={(e) => {
-                  e.stopPropagation()
-                  onPress?.()
+                  e.stopPropagation();
+                  onPress?.();
                 }}
                 style={{
-                  shadowColor: 'rgba(22, 185, 179, 0.3)',
+                  shadowColor: "rgba(22, 185, 179, 0.3)",
                   shadowOffset: { width: 0, height: 3 },
                   shadowOpacity: 1,
                   shadowRadius: 0,
@@ -255,12 +281,12 @@ export function PracticeCard({
                 height={40}
                 pressStyle={{ opacity: 0.8 }}
                 onPress={(e) => {
-                  e.stopPropagation()
-                  onCheckIn?.()
+                  e.stopPropagation();
+                  onCheckIn?.();
                 }}
                 disabled={isCheckingIn}
                 style={{
-                  shadowColor: 'rgba(22, 185, 179, 0.3)',
+                  shadowColor: "rgba(22, 185, 179, 0.3)",
                   shadowOffset: { width: 0, height: 3 },
                   shadowOpacity: 1,
                   shadowRadius: 0,
@@ -294,20 +320,16 @@ export function PracticeCard({
           borderBottomLeftRadius={12}
           borderBottomRightRadius={12}
         >
-          <View
-            height={10}
-            width={`${progress}%`}
-            backgroundColor="#A6E0EC"
-          />
+          <View height={10} width={`${progress}%`} backgroundColor="#A6E0EC" />
         </View>
       </Card>
-    )
+    );
   }
 
   // 已完成卡片樣式 - 與 Product CompletedTaskCard 一致
-  if (variant === 'completed') {
-    const displayTags = practice.tags?.slice(0, 2) || []
-    const remainingTagsCount = (practice.tags?.length || 0) - 2
+  if (variant === "completed") {
+    const displayTags = practice.tags?.slice(0, 2) || [];
+    const remainingTagsCount = (practice.tags?.length || 0) - 2;
 
     return (
       <Card
@@ -342,7 +364,7 @@ export function PracticeCard({
 
             {/* Tags */}
             <XStack gap={8} alignItems="center" flexShrink={1}>
-              {displayTags.map(tag => (
+              {displayTags.map((tag) => (
                 <XStack
                   key={tag}
                   backgroundColor="#F3F4F6"
@@ -366,20 +388,11 @@ export function PracticeCard({
           {/* 中間：標題 + 描述 + 箭頭 */}
           <XStack gap={8} marginBottom={6}>
             <YStack flex={1} gap={4}>
-              <Text
-                fontSize={16}
-                fontWeight="500"
-                color="#333333"
-                numberOfLines={1}
-              >
+              <Text fontSize={16} fontWeight="500" color="#333333" numberOfLines={1}>
                 {practice.title}
               </Text>
-              <Text
-                fontSize={12}
-                color="#333333"
-                numberOfLines={2}
-              >
-                {practice.description || '每天學習，持續進步'}
+              <Text fontSize={12} color="#333333" numberOfLines={2}>
+                {practice.description || "每天學習，持續進步"}
               </Text>
             </YStack>
             <View alignSelf="center">
@@ -388,19 +401,14 @@ export function PracticeCard({
           </XStack>
 
           {/* 底部：進度條 */}
-          <View
-            height={6}
-            backgroundColor="#A6E0EC"
-            borderRadius={9999}
-            width="100%"
-          />
+          <View height={6} backgroundColor="#A6E0EC" borderRadius={9999} width="100%" />
         </YStack>
       </Card>
-    )
+    );
   }
 
   // 預設卡片樣式 (舊版)
-  const cardColor = practice.color || colors.primary.base
+  const cardColor = practice.color || colors.primary.base;
 
   return (
     <Card
@@ -419,13 +427,7 @@ export function PracticeCard({
         {/* Content */}
         <YStack flex={1} gap="$1">
           <XStack alignItems="center" gap="$2">
-            <Text
-              fontSize={16}
-              fontWeight="600"
-              color="$color"
-              numberOfLines={1}
-              flex={1}
-            >
+            <Text fontSize={16} fontWeight="600" color="$color" numberOfLines={1} flex={1}>
               {practice.title}
             </Text>
             {practice.todayCheckedIn && (
@@ -458,7 +460,7 @@ export function PracticeCard({
 
           {practice.tags && practice.tags.length > 0 && (
             <XStack gap="$1" flexWrap="wrap" marginTop="$1">
-              {practice.tags.slice(0, 3).map(tag => (
+              {practice.tags.slice(0, 3).map((tag) => (
                 <XStack
                   key={tag}
                   backgroundColor={colors.basic[100]}
@@ -483,8 +485,8 @@ export function PracticeCard({
               backgroundColor={cardColor}
               pressStyle={{ opacity: 0.8 }}
               onPress={(e) => {
-                e.stopPropagation()
-                onCheckIn?.()
+                e.stopPropagation();
+                onCheckIn?.();
               }}
               circular
               disabled={isCheckingIn}
@@ -503,7 +505,7 @@ export function PracticeCard({
         </XStack>
       </XStack>
     </Card>
-  )
+  );
 }
 
-const _styles = StyleSheet.create({})
+const _styles = StyleSheet.create({});

@@ -196,10 +196,7 @@ export const AccountForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <PersonalInfoSection
-          form={form}
-          educationStageOptions={EDUCATION_STAGE_OPTIONS}
-        />
+        <PersonalInfoSection form={form} educationStageOptions={EDUCATION_STAGE_OPTIONS} />
 
         <FieldSelectionSection
           form={form}

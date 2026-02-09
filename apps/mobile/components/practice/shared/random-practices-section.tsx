@@ -1,11 +1,11 @@
-import { useMemo, useCallback } from "react";
-import { Pressable, StyleSheet } from "react-native";
-import { YStack, XStack, Text, View, Button } from "tamagui";
+import { type PracticeTemplateType, useRandomPracticeTemplates } from "@daodao/api";
 import { ArrowRight } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
-import { useRandomPracticeTemplates, type PracticeTemplateType } from "@daodao/api";
-import { colors } from "@/generated/design-tokens";
+import { useCallback, useMemo } from "react";
+import { Pressable, StyleSheet } from "react-native";
+import { Button, Text, View, XStack, YStack } from "tamagui";
 import { PRACTICE_THEMES, PracticeTheme, practiceThemeColorMap } from "@/constants/practice-theme";
+import { colors } from "@/generated/design-tokens";
 
 interface IRandomPractice {
   id: string;
@@ -47,19 +47,10 @@ const RandomPracticeCard = ({ practice, theme, onAction }: IRandomPracticeCardPr
               主題實踐
             </Text>
           </View>
-          <Text
-            fontSize={18}
-            fontWeight="500"
-            color={colors.text.dark}
-            numberOfLines={2}
-          >
+          <Text fontSize={18} fontWeight="500" color={colors.text.dark} numberOfLines={2}>
             {practice.title}
           </Text>
-          <Text
-            fontSize={12}
-            color={colors.text.dark}
-            numberOfLines={2}
-          >
+          <Text fontSize={12} color={colors.text.dark} numberOfLines={2}>
             {practice.description}
           </Text>
         </YStack>

@@ -26,6 +26,6 @@ export const spacing = {
   24: 96,
   28: 112,
   32: 128,
-} as const
+} as const;
 
-export type Spacing = typeof spacing
+export type Spacing = typeof spacing;

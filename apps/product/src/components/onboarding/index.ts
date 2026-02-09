@@ -1,18 +1,12 @@
 // Main form component
-export { OnboardingForm } from "./onboarding-form";
 
 // Section components
 export { InterestsSection } from "./interests-section";
-export { ProfileSection } from "./profile-section";
-export { ReferralSection } from "./referral-section";
-export { SuccessSection } from "./success-section";
-
+export { OnboardingForm } from "./onboarding-form";
 // Stepper component
 export { OnboardingStepper } from "./onboarding-stepper";
-
-// Hooks
-export { useOnboardingStep } from "./use-onboarding-step";
-
+export { ProfileSection } from "./profile-section";
+export { ReferralSection } from "./referral-section";
 // Schema and types
 export {
   AVAILABLE_FIELDS,
@@ -24,3 +18,6 @@ export {
   REFERRAL_SOURCE_OPTIONS,
   referralStepSchema,
 } from "./schema";
+export { SuccessSection } from "./success-section";
+// Hooks
+export { useOnboardingStep } from "./use-onboarding-step";

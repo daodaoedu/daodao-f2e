@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { getResources } from "@daodao/api";
+import type { Metadata } from "next";
 import { CategoriesContainer, ResourceContainer, SectionTitle } from "@/components/resource";
 
 export const metadata: Metadata = {

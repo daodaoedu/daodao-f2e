@@ -1,19 +1,19 @@
-import { Tabs, useRouter, usePathname } from 'expo-router'
-import { Platform, Pressable, StyleSheet, View } from 'react-native'
-import { Plus } from '@tamagui/lucide-icons'
-import { colors } from '@/generated/design-tokens'
-import { HomeIcon, UserIcon } from '@/components/icons'
+import { Plus } from "@tamagui/lucide-icons";
+import { Tabs, usePathname, useRouter } from "expo-router";
+import { Platform, Pressable, StyleSheet, View } from "react-native";
+import { HomeIcon, UserIcon } from "@/components/icons";
+import { colors } from "@/generated/design-tokens";
 
 export default function TabLayout() {
-  const router = useRouter()
-  const pathname = usePathname()
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleAddPractice = () => {
-    router.push('/practices/create')
-  }
+    router.push("/practices/create");
+  };
 
   // 只在首頁顯示 FAB
-  const showFab = pathname === '/' || pathname === '/index'
+  const showFab = pathname === "/" || pathname === "/index";
 
   return (
     <View style={{ flex: 1 }}>
@@ -21,30 +21,30 @@ export default function TabLayout() {
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: colors.primary.base,
-          tabBarInactiveTintColor: '#9CA3AF',
+          tabBarInactiveTintColor: "#9CA3AF",
           tabBarShowLabel: false, // Product 只顯示圖標
           tabBarLabelStyle: {
             fontSize: 12,
-            fontWeight: '500',
+            fontWeight: "500",
             marginTop: 2,
           },
           tabBarIconStyle: {
             marginTop: 4,
           },
           tabBarStyle: {
-            position: 'absolute',
-            backgroundColor: 'rgba(249, 254, 255, 0.9)',
+            position: "absolute",
+            backgroundColor: "rgba(249, 254, 255, 0.9)",
             borderTopWidth: 2,
-            borderTopColor: '#C1ECFF',
+            borderTopColor: "#C1ECFF",
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
-            height: Platform.OS === 'ios' ? 70 : 60,
+            height: Platform.OS === "ios" ? 70 : 60,
             paddingTop: 0,
-            paddingBottom: Platform.OS === 'ios' ? 16 : 8,
+            paddingBottom: Platform.OS === "ios" ? 16 : 8,
             paddingHorizontal: 40,
             ...Platform.select({
               ios: {
-                shadowColor: '#000',
+                shadowColor: "#000",
                 shadowOffset: { width: 0, height: -2 },
                 shadowOpacity: 0.05,
                 shadowRadius: 8,
@@ -62,7 +62,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: '主頁',
+            title: "主頁",
             tabBarIcon: ({ color, focused }) => (
               <HomeIcon size={32} color={color} filled={focused} />
             ),
@@ -71,7 +71,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: '我的小島',
+            title: "我的小島",
             tabBarIcon: ({ color, focused }) => (
               <UserIcon size={32} color={color} filled={focused} />
             ),
@@ -104,25 +104,25 @@ export default function TabLayout() {
         </Pressable>
       )}
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   fab: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 82 : 72,
+    position: "absolute",
+    bottom: Platform.OS === "ios" ? 82 : 72,
     right: 20,
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#16B9B3',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
+    backgroundColor: "#16B9B3",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 10,
     zIndex: 999,
   },
-})
+});

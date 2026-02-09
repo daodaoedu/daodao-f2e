@@ -1,75 +1,62 @@
-import { useState } from 'react'
-import { Alert } from 'react-native'
-import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Button, Spinner } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, Check, Calendar, Target, Bell, Tag } from '@tamagui/lucide-icons'
-import { useCreatePractice } from '@/providers/CreatePracticeProvider'
-import { StepIndicator } from '@/components'
-import { api } from '@/services/api-client'
-import { colors } from '@/generated/design-tokens'
+import { Bell, Calendar, Check, ChevronLeft, Tag, Target } from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { StepIndicator } from "@/components";
+import { colors } from "@/generated/design-tokens";
+import { useCreatePractice } from "@/providers/CreatePracticeProvider";
+import { api } from "@/services/api-client";
 
 export default function Step5Screen() {
-  const router = useRouter()
-  const { form, currentStep, totalSteps, prevStep, resetForm } = useCreatePractice()
-  const { watch, handleSubmit } = form
+  const router = useRouter();
+  const { form, currentStep, totalSteps, prevStep, resetForm } = useCreatePractice();
+  const { watch, handleSubmit } = form;
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const values = watch()
+  const values = watch();
 
   const handleBack = () => {
-    prevStep()
-    router.back()
-  }
+    prevStep();
+    router.back();
+  };
 
   const onSubmit = async (data: typeof values) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
-      await api.post('/practices', data)
+      await api.post("/practices", data);
 
-      Alert.alert(
-        '建立成功',
-        '你的實踐已建立，開始你的旅程吧！',
-        [
-          {
-            text: '確定',
-            onPress: () => {
-              resetForm()
-              router.replace('/(tabs)')
-            },
+      Alert.alert("建立成功", "你的實踐已建立，開始你的旅程吧！", [
+        {
+          text: "確定",
+          onPress: () => {
+            resetForm();
+            router.replace("/(tabs)");
           },
-        ]
-      )
+        },
+      ]);
     } catch (error) {
-      Alert.alert(
-        '建立失敗',
-        error instanceof Error ? error.message : '請稍後再試'
-      )
+      Alert.alert("建立失敗", error instanceof Error ? error.message : "請稍後再試");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const frequencyLabel = {
-    daily: '每日',
-    weekly: '每週',
-    custom: '自訂',
-  }[values.frequency]
+    daily: "每日",
+    weekly: "每週",
+    custom: "自訂",
+  }[values.frequency];
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button
-            size="$4"
-            circular
-            chromeless
-            onPress={handleBack}
-            accessibilityLabel="返回"
-          >
+          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel="返回">
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>
@@ -105,12 +92,12 @@ export default function Step5Screen() {
                 justifyContent="center"
               >
                 <Text fontSize={28} color={colors.basic.white}>
-                  {values.icon || '✨'}
+                  {values.icon || "✨"}
                 </Text>
               </YStack>
               <YStack alignItems="center" gap="$1">
                 <Text fontSize={20} fontWeight="700" color="$color">
-                  {values.title || '未命名實踐'}
+                  {values.title || "未命名實踐"}
                 </Text>
                 {values.description && (
                   <Text fontSize={13} color="$color" opacity={0.6} textAlign="center">
@@ -121,12 +108,7 @@ export default function Step5Screen() {
             </YStack>
 
             {/* Details */}
-            <YStack
-              padding="$4"
-              backgroundColor={colors.basic[100]}
-              borderRadius="$md"
-              gap="$4"
-            >
+            <YStack padding="$4" backgroundColor={colors.basic[100]} borderRadius="$md" gap="$4">
               <XStack alignItems="center" gap="$3">
                 <Calendar size={20} color={values.color || colors.primary.base} />
                 <YStack flex={1}>
@@ -158,7 +140,7 @@ export default function Step5Screen() {
                     每日提醒
                   </Text>
                   <Text fontSize={15} fontWeight="500" color="$color">
-                    {values.reminderEnabled ? `已開啟（${values.reminderTime}）` : '未開啟'}
+                    {values.reminderEnabled ? `已開啟（${values.reminderTime}）` : "未開啟"}
                   </Text>
                 </YStack>
               </XStack>
@@ -171,12 +153,14 @@ export default function Step5Screen() {
                       標籤
                     </Text>
                     <XStack gap="$2" flexWrap="wrap">
-                      {values.tags.map(tag => (
+                      {values.tags.map((tag) => (
                         <YStack
                           key={tag}
                           paddingHorizontal="$2"
                           paddingVertical="$1"
-                          backgroundColor={values.color ? `${values.color}20` : colors.primary.palest}
+                          backgroundColor={
+                            values.color ? `${values.color}20` : colors.primary.palest
+                          }
                           borderRadius="$sm"
                         >
                           <Text fontSize={12} color={values.color || colors.primary.base}>
@@ -215,5 +199,5 @@ export default function Step5Screen() {
         </YStack>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

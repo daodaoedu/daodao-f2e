@@ -1,6 +1,4 @@
-import { ANCHOR_IDS } from "@daodao/shared";
 import { Image } from "@daodao/ui/components/image";
-import { SectionHeader } from "@daodao/ui/components/section-header";
 
 interface FunctionCardProps {
   tag: string;
@@ -54,7 +52,7 @@ export function FunctionCard({ tag, title, description, imageUrl, action }: Func
   );
 }
 
-const functions = [
+const _functions = [
   {
     tag: "想法",
     title: "分享學習洞察",
@@ -87,33 +85,7 @@ const functions = [
 
 export function FunctionCarousel() {
   return (
-    <section className="relative flex flex-col items-center justify-center overflow-x-clip bg-cyan-50 pt-16">
-      <div className="py-15 px-6 text-teal-800" id={ANCHOR_IDS.FEATURES}>
-        <SectionHeader
-          title="學習群島上的功能生態"
-          variant="dark"
-          size="md"
-          alignment="center"
-          showSubtitle={false}
-        />
-      </div>
-
-      {/* 簡化版：使用 overflow-x-auto 替代 Carousel */}
-      <div className="w-full overflow-x-auto px-6 py-4">
-        <div className="flex w-max gap-4 xl:mx-auto xl:w-full xl:justify-center">
-          {functions.map((func) => (
-            <FunctionCard
-              key={func.title}
-              tag={func.tag}
-              title={func.title}
-              description={func.description}
-              imageUrl={func.imageUrl}
-              action={func.action}
-            />
-          ))}
-        </div>
-      </div>
-
+    <section className="relative flex flex-col items-center justify-center overflow-x-clip bg-basic-white pt-16 pb-16">
       {/* 底部裝飾圖片 */}
       <picture className="relative aspect-111/53 w-full md:aspect-514/151">
         <source media="(max-width: 767px)" srcSet="/assets/landing-page/ribbon-mobile.svg" />

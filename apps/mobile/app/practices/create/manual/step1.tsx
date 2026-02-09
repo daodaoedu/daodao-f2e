@@ -1,31 +1,35 @@
-import { useRouter } from 'expo-router'
-import { Controller, useWatch } from 'react-hook-form'
-import { YStack, XStack, Text, ScrollView, Button, Input, TextArea } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
-import { useCreatePractice } from '@/providers/CreatePracticeProvider'
-import { StepIndicator } from '@/components'
-import { colors } from '@/generated/design-tokens'
+import { ChevronLeft, ChevronRight } from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
+import { Controller, useWatch } from "react-hook-form";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Input, ScrollView, Text, TextArea, XStack, YStack } from "tamagui";
+import { StepIndicator } from "@/components";
+import { colors } from "@/generated/design-tokens";
+import { useCreatePractice } from "@/providers/CreatePracticeProvider";
 
 export default function Step1Screen() {
-  const router = useRouter()
-  const { form, currentStep, totalSteps, nextStep } = useCreatePractice()
-  const { control, formState: { errors }, trigger } = form
+  const router = useRouter();
+  const { form, currentStep, totalSteps, nextStep } = useCreatePractice();
+  const {
+    control,
+    formState: { errors },
+    trigger,
+  } = form;
 
   // 使用 useWatch 避免整個組件重新渲染
-  const titleLength = useWatch({ control, name: 'title' })?.length || 0
-  const descriptionLength = useWatch({ control, name: 'description' })?.length || 0
+  const titleLength = useWatch({ control, name: "title" })?.length || 0;
+  const descriptionLength = useWatch({ control, name: "description" })?.length || 0;
 
   const handleNext = async () => {
-    const isValid = await trigger(['title', 'description'])
+    const isValid = await trigger(["title", "description"]);
     if (isValid) {
-      nextStep()
-      router.push('/practices/create/manual/step2')
+      nextStep();
+      router.push("/practices/create/manual/step2");
     }
-  }
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
@@ -58,7 +62,9 @@ export default function Step1Screen() {
                 <Text fontSize={14} fontWeight="500" color="$color">
                   實踐標題
                 </Text>
-                <Text fontSize={14} color={colors.semantic.error}>*</Text>
+                <Text fontSize={14} color={colors.semantic.error}>
+                  *
+                </Text>
               </XStack>
               <Controller
                 control={control}
@@ -70,7 +76,9 @@ export default function Step1Screen() {
                     onChangeText={onChange}
                     placeholder="例如：每日閱讀"
                     borderColor={errors.title ? colors.semantic.error : colors.basic[200]}
-                    focusStyle={{ borderColor: errors.title ? colors.semantic.error : colors.primary.base }}
+                    focusStyle={{
+                      borderColor: errors.title ? colors.semantic.error : colors.primary.base,
+                    }}
                     maxLength={50}
                   />
                 )}
@@ -80,7 +88,9 @@ export default function Step1Screen() {
                   <Text fontSize={12} color={colors.semantic.error}>
                     {errors.title.message}
                   </Text>
-                ) : <YStack />}
+                ) : (
+                  <YStack />
+                )}
                 <Text fontSize={11} color="$color" opacity={0.5}>
                   {titleLength}/50
                 </Text>
@@ -102,7 +112,9 @@ export default function Step1Screen() {
                     onChangeText={onChange}
                     placeholder="簡單描述這個實踐的目標..."
                     borderColor={errors.description ? colors.semantic.error : colors.basic[200]}
-                    focusStyle={{ borderColor: errors.description ? colors.semantic.error : colors.primary.base }}
+                    focusStyle={{
+                      borderColor: errors.description ? colors.semantic.error : colors.primary.base,
+                    }}
                     numberOfLines={4}
                     textAlignVertical="top"
                     maxLength={200}
@@ -114,7 +126,9 @@ export default function Step1Screen() {
                   <Text fontSize={12} color={colors.semantic.error}>
                     {errors.description.message}
                   </Text>
-                ) : <YStack />}
+                ) : (
+                  <YStack />
+                )}
                 <Text fontSize={11} color="$color" opacity={0.5}>
                   {descriptionLength}/200
                 </Text>
@@ -141,5 +155,5 @@ export default function Step1Screen() {
         </YStack>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

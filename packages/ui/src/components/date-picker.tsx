@@ -125,34 +125,34 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             </Button>
           </div>
         </PopoverTrigger>
-          <PopoverContent
-            className="w-auto overflow-hidden p-0"
-            align="end"
-            alignOffset={-8}
-            sideOffset={10}
-          >
-            <Calendar
-              mode="single"
-              selected={date}
-              captionLayout="dropdown"
-              month={month}
-              onMonthChange={setMonth}
-              disabled={(date) =>
-                (minDate && isBefore(date, startOfDay(minDate))) ||
-                (maxDate && isAfter(date, startOfDay(maxDate))) ||
-                false
+        <PopoverContent
+          className="w-auto overflow-hidden p-0"
+          align="end"
+          alignOffset={-8}
+          sideOffset={10}
+        >
+          <Calendar
+            mode="single"
+            selected={date}
+            captionLayout="dropdown"
+            month={month}
+            onMonthChange={setMonth}
+            disabled={(date) =>
+              (minDate && isBefore(date, startOfDay(minDate))) ||
+              (maxDate && isAfter(date, startOfDay(maxDate))) ||
+              false
+            }
+            onSelect={(calendarDate) => {
+              if (calendarDate && isDateInRange(calendarDate, minDate, maxDate)) {
+                handleDateChange(calendarDate);
+                setOpen(false);
+                onBlur?.();
+              } else if (!calendarDate) {
+                handleDateChange(undefined);
               }
-              onSelect={(calendarDate) => {
-                if (calendarDate && isDateInRange(calendarDate, minDate, maxDate)) {
-                  handleDateChange(calendarDate);
-                  setOpen(false);
-                  onBlur?.();
-                } else if (!calendarDate) {
-                  handleDateChange(undefined);
-                }
-              }}
-            />
-          </PopoverContent>
+            }}
+          />
+        </PopoverContent>
       </Popover>
     );
   }

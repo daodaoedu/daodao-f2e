@@ -1,6 +1,5 @@
 "use client";
 
-import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { resendVerificationEmail } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
@@ -10,6 +9,7 @@ import { CheckCircle, Mail, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
+import { BackgroundAnimation, PageHeader } from "@/components/layout";
 
 type VerificationStatus = "success" | "error";
 type VerificationMessage =

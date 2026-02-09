@@ -1,9 +1,9 @@
-import { useCallback } from "react";
-import { Share, Alert, Linking } from "react-native";
-import { YStack, XStack, Text, Button, Image, View } from "tamagui";
-import { Share2, Download } from "@tamagui/lucide-icons";
+import { Download, Share2 } from "@tamagui/lucide-icons";
+import { Directory, File, Paths } from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
-import { File, Directory, Paths } from "expo-file-system";
+import { useCallback } from "react";
+import { Alert, Linking, Share } from "react-native";
+import { Button, Image, Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import type { ICheckInFormData } from "../types";
 
@@ -104,23 +104,13 @@ export const ShareCheckInContent = ({
             alignSelf="center"
             backgroundColor={colors.basic.white}
           >
-            <Image
-              source={{ uri: imageUrl }}
-              width="100%"
-              height="100%"
-              resizeMode="contain"
-            />
+            <Image source={{ uri: imageUrl }} width="100%" height="100%" resizeMode="contain" />
           </View>
         )}
 
         {/* 分享按鈕 */}
         <YStack gap="$4" alignItems="center">
-          <Text
-            fontSize={16}
-            fontWeight="500"
-            color={colors.text.dark}
-            textAlign="center"
-          >
+          <Text fontSize={16} fontWeight="500" color={colors.text.dark} textAlign="center">
             分享到社群媒體
           </Text>
 

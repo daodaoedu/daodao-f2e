@@ -12,7 +12,7 @@ import { Input } from "@daodao/ui/components/input";
 import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
 import { cn } from "@daodao/ui/lib/utils";
 import type { UseFormReturn } from "react-hook-form";
-import { REFERRAL_SOURCE_OPTIONS, type OnboardingFormValues } from "./schema";
+import { type OnboardingFormValues, REFERRAL_SOURCE_OPTIONS } from "./schema";
 
 interface ReferralSectionProps {
   form: UseFormReturn<OnboardingFormValues>;
@@ -43,11 +43,7 @@ export const ReferralSection = ({ form }: ReferralSectionProps) => {
         render={({ field }) => (
           <FormItem>
             <FormControl>
-              <RadioGroup
-                value={field.value}
-                onValueChange={field.onChange}
-                className="space-y-3"
-              >
+              <RadioGroup value={field.value} onValueChange={field.onChange} className="space-y-3">
                 {REFERRAL_SOURCE_OPTIONS.map((option) => (
                   <label
                     key={option.value}

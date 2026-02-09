@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-import { notFound } from "next/navigation";
 import { getResourceById } from "@daodao/api";
 import {
   Breadcrumb,
@@ -9,7 +7,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@daodao/ui/components/breadcrumb";
-import { ResourceDetail, ResourceDetailClient, parseCategoryHierarchy } from "@/components/resource";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import {
+  parseCategoryHierarchy,
+  ResourceDetail,
+  ResourceDetailClient,
+} from "@/components/resource";
 
 interface ResourceDetailPageProps {
   params: Promise<{

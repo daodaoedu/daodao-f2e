@@ -163,9 +163,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
               <Input
                 {...field}
                 placeholder="請輸入 LINE ID"
-                className={cn(
-                  form.formState.errors.line && "border-red focus-visible:border-red"
-                )}
+                className={cn(form.formState.errors.line && "border-red focus-visible:border-red")}
               />
             </FormControl>
             <FormMessage />

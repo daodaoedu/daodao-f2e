@@ -1,7 +1,7 @@
 "use client";
 
-import type { ElementType } from "react";
 import { format } from "date-fns";
+import type { ElementType } from "react";
 import { StatCard } from "./stat-card";
 
 interface Stat {

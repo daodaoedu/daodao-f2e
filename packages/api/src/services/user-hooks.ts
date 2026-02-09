@@ -147,10 +147,7 @@ export const useUserMutations = () => {
      * @param data 用戶資料
      * @param photoFile 可選的頭像圖片檔案
      */
-    updateCurrentUserWithFormData: async (
-      data: UpdateUserFormDataRequest,
-      photoFile?: File
-    ) => {
+    updateCurrentUserWithFormData: async (data: UpdateUserFormDataRequest, photoFile?: File) => {
       return updateCurrentUserWithFormData(data, photoFile);
     },
 
@@ -159,10 +156,7 @@ export const useUserMutations = () => {
      * @param data 用戶資料
      * @param photoFile 可選的頭像圖片檔案
      */
-    createCurrentUserWithFormData: async (
-      data: UpdateUserFormDataRequest,
-      photoFile?: File
-    ) => {
+    createCurrentUserWithFormData: async (data: UpdateUserFormDataRequest, photoFile?: File) => {
       return createCurrentUserWithFormData(data, photoFile);
     },
 

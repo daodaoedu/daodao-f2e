@@ -1,5 +1,5 @@
-import { Stack } from 'expo-router'
-import { YStack } from 'tamagui'
+import { Stack } from "expo-router";
+import { YStack } from "tamagui";
 
 export default function AuthLayout() {
   return (
@@ -7,14 +7,14 @@ export default function AuthLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
-          animation: 'fade',
+          animation: "fade",
           contentStyle: {
-            backgroundColor: 'transparent',
+            backgroundColor: "transparent",
           },
         }}
       >
         <Stack.Screen name="login" />
       </Stack>
     </YStack>
-  )
+  );
 }

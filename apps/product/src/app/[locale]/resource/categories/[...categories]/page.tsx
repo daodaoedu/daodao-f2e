@@ -1,5 +1,4 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import bannerImage from "@daodao/assets/images/resource/banner.webp";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,13 +7,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@daodao/ui/components/breadcrumb";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import {
   CategoriesContainer,
+  parseCategoryHierarchy,
   ResourceBanner,
   ResourceInfiniteContainer,
-  parseCategoryHierarchy,
 } from "@/components/resource";
-import bannerImage from "@daodao/assets/images/resource/banner.webp";
 
 function parseToArray<T>(source: unknown): T[] {
   if (Array.isArray(source)) return source as T[];

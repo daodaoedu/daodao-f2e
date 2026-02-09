@@ -1,7 +1,7 @@
 export {
-  accountFormSchema,
   type AccountFormValues,
   AVAILABLE_FIELDS,
+  accountFormSchema,
   EDUCATION_STAGE_OPTIONS,
   ROLE_OPTIONS,
 } from "./schema";

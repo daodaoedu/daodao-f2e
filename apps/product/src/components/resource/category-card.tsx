@@ -1,9 +1,9 @@
 "use client";
 
 import { usePathname } from "@daodao/i18n/navigation";
-import { cn } from "@daodao/ui/lib/utils";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
+import { cn } from "@daodao/ui/lib/utils";
 import type { ICategory } from "@/constants/resource";
 
 type CategoryCardProps = {
@@ -46,9 +46,7 @@ export function CategoryCard(props: CategoryCardProps) {
         )}
       >
         <span className="text-xl font-bold">{label}</span>
-        {typeof count === "number" && (
-          <span className="text-sm opacity-90">{count} 筆資源</span>
-        )}
+        {typeof count === "number" && <span className="text-sm opacity-90">{count} 筆資源</span>}
       </div>
     </CustomLink>
   );
