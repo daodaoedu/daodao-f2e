@@ -1,6 +1,6 @@
 "use client";
 
-import { usePracticeById, usePracticeCheckIns } from "@daodao/api";
+import { usePracticeById, usePracticeCheckIns, useUpdatePracticeCheckIn } from "@daodao/api";
 import { Deco4Svg } from "@daodao/assets";
 import { useParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
@@ -60,6 +60,9 @@ export default function CheckInDetailPage() {
 
   // 獲取 practice 資料
   const { data: practiceData, isLoading: isLoadingPractice } = usePracticeById(practiceId);
+
+  // 更新打卡記錄
+  const { updateCheckIn } = useUpdatePracticeCheckIn(practiceId, checkInId);
 
   // 獲取所有 check-ins
   const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
@@ -199,13 +202,12 @@ export default function CheckInDetailPage() {
 
   const handleEditComplete = async (data: ICheckInFormData) => {
     try {
-      // TODO: 實現更新打卡 API 調用（等待後端 API）
-      // await updateCheckIn(checkInId, data);
-      console.log("編輯打卡資料:", data);
+      await updateCheckIn(data);
       toast.success("打卡已更新");
     } catch (error) {
       console.error("更新打卡失敗:", error);
       toast.error("更新打卡失敗，請稍後再試");
+      throw error;
     }
   };
 
