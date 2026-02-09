@@ -106,11 +106,10 @@ export default function CreatePracticePage() {
       return [];
     }
 
-    return data.data.map((template: PracticeTemplateType, index: number) => ({
-      id: index + 1,
+    return data.data.map((template: PracticeTemplateType) => ({
+      id: template.id,
       title: template.title,
       description: template.practiceAction || template.suggestedTags.join("、") || template.title,
-      templateId: template.id,
     }));
   }, [data]);
 
@@ -218,11 +217,11 @@ export default function CreatePracticePage() {
                         <button
                           key={practice.id}
                           type="button"
-                          onClick={() => handleTemplateSelect(practice.templateId)}
+                          onClick={() => handleTemplateSelect(practice.id)}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
-                              handleTemplateSelect(practice.templateId);
+                              handleTemplateSelect(practice.id);
                             }
                           }}
                           aria-label={`選擇提案：${practice.title}`}
