@@ -46,24 +46,14 @@ export default function CreatePracticePage() {
       return [];
     }
 
-    return categoriesData.data
-      .map((categoryId: string) => {
-        const metadata = practiceCategoryMetadataMap[categoryId];
-        if (!metadata) {
-          // 如果沒有對應的 metadata，使用預設值
-          return {
-            id: categoryId,
-            label: categoryId,
-            icon: LifeSvg,
-          };
-        }
-        return {
-          id: categoryId,
-          label: metadata.label,
-          icon: metadata.icon,
-        };
-      })
-      .filter((category): category is Category => category !== null);
+    return categoriesData.data.map((categoryId: string) => {
+      const metadata = practiceCategoryMetadataMap[categoryId];
+      return {
+        id: categoryId,
+        label: metadata?.label ?? categoryId,
+        icon: metadata?.icon ?? LifeSvg,
+      };
+    });
   }, [categoriesData]);
 
   // 預設選擇第一個分類，如果沒有分類則為空字串
@@ -106,11 +96,10 @@ export default function CreatePracticePage() {
       return [];
     }
 
-    return data.data.map((template: PracticeTemplateType, index: number) => ({
-      id: index + 1,
+    return data.data.map((template: PracticeTemplateType) => ({
+      id: template.id,
       title: template.title,
       description: template.practiceAction || template.suggestedTags.join("、") || template.title,
-      templateId: template.id,
     }));
   }, [data]);
 
@@ -186,7 +175,7 @@ export default function CreatePracticePage() {
         )}
 
         {/* Practice Cards Grid */}
-        <div className="relative w-[472px] mx-auto">
+        <div className="relative w-full md:w-[472px] mx-auto">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="size-8 animate-spin text-text-dark/60" />
@@ -209,27 +198,27 @@ export default function CreatePracticePage() {
               <p className="text-text-dark/70">目前沒有可用的模板</p>
             </div>
           ) : (
-            <Carousel className="w-full" opts={{ loop: false, align: "start" }}>
+            <Carousel key={selectedCategory} className="w-full" opts={{ loop: false, align: "start" }}>
               <CarouselContent className="-ml-2">
                 {practiceGroups.map((group) => (
-                  <CarouselItem key={group.id} className="pl-2 basis-1/2">
+                  <CarouselItem key={group.id} className="pl-2 basis-[80%] sm:basis-1/2">
                     <div className="flex flex-col gap-2">
                       {group.items.map((practice) => (
                         <button
                           key={practice.id}
                           type="button"
-                          onClick={() => handleTemplateSelect(practice.templateId)}
+                          onClick={() => handleTemplateSelect(practice.id)}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
-                              handleTemplateSelect(practice.templateId);
+                              handleTemplateSelect(practice.id);
                             }
                           }}
                           aria-label={`選擇提案：${practice.title}`}
                           className={cn(
                             "w-full bg-[#E9FEFFB2]/70 rounded-lg px-6 py-4 border-2 border-[#C1ECFF] cursor-pointer",
                             "text-left focus-visible:outline-2 focus-visible:outline-logo-cyan focus-visible:outline-offset-2",
-                            "flex items-center justify-between gap-2 group w-[232px] h-[104px] backdrop-blur-lg"
+                            "flex items-center justify-between gap-2 group h-[104px] backdrop-blur-lg"
                           )}
                         >
                           <div className="flex-1 flex flex-col h-full min-w-0">
@@ -252,13 +241,13 @@ export default function CreatePracticePage() {
               <CarouselPrevious
                 variant="ghost"
                 size="icon"
-                className="absolute -left-16 top-1/2 -translate-y-1/2 z-20 size-8 md:size-10 text-text-dark/70 hover:text-text-dark hover:opacity-100 bg-white/80 hover:bg-white shadow-md"
+                className="absolute -left-16 top-1/2 -translate-y-1/2 z-20 hidden md:flex size-10 text-text-dark/70 hover:text-text-dark hover:opacity-100 bg-white/80 hover:bg-white shadow-md"
                 aria-label="上一個"
               />
               <CarouselNext
                 variant="ghost"
                 size="icon"
-                className="absolute -right-16 top-1/2 -translate-y-1/2 z-20 size-8 md:size-10 text-text-dark/70 hover:text-text-dark hover:opacity-100 bg-white/80 hover:bg-white shadow-md"
+                className="absolute -right-16 top-1/2 -translate-y-1/2 z-20 hidden md:flex size-10 text-text-dark/70 hover:text-text-dark hover:opacity-100 bg-white/80 hover:bg-white shadow-md"
                 aria-label="下一個"
               />
             </Carousel>
