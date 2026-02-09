@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import { CheckInButton, CheckInDateSelector, CheckInDetail } from "@/components/check-in";
 import type { ICheckInDisplayData, ICheckInFormData } from "@/components/check-in/types";
 import { PageHeader } from "@/components/layout";
-import { mapApiMoodToMoodType } from "@/constants/mood";
+import { mapApiMoodToMoodType, mapMoodTypeToApiMood } from "@/constants/mood";
 
 /**
  * 將 API 的 checkinDate 格式轉換為顯示格式
@@ -202,7 +202,13 @@ export default function CheckInDetailPage() {
 
   const handleEditComplete = async (data: ICheckInFormData) => {
     try {
-      await updateCheckIn(data);
+      const apiMood = mapMoodTypeToApiMood(data.mood);
+      await updateCheckIn({
+        mood: apiMood,
+        tags: data.tags,
+        description: data.description,
+        media: data.media,
+      });
       toast.success("打卡已更新");
     } catch (error) {
       console.error("更新打卡失敗:", error);
