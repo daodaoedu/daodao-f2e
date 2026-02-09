@@ -18449,7 +18449,7 @@ export interface paths {
         };
         /**
          * 取得資料庫資訊
-         * @description 取得 MongoDB、PostgreSQL 和 Redis 的詳細資訊，包括欄位、索引、約束等
+         * @description 取得 PostgreSQL 和 Redis 的詳細資訊，包括欄位、索引、約束等
          */
         get: {
             parameters: {
@@ -18467,13 +18467,6 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            mongo: {
-                                [key: string]: {
-                                    fields: string[];
-                                };
-                            } | {
-                                error: string;
-                            };
                             postgres: {
                                 [key: string]: {
                                     columns: unknown[];
@@ -18517,7 +18510,7 @@ export interface paths {
         };
         /**
          * 取得系統監控資訊
-         * @description 取得系統資源使用情況，包括 CPU、記憶體、磁碟、MongoDB 和 PostgreSQL 狀態
+         * @description 取得系統資源使用情況，包括 CPU、記憶體、磁碟和 PostgreSQL 狀態
          */
         get: {
             parameters: {
@@ -18552,13 +18545,6 @@ export interface paths {
                                 processId: number;
                                 processTitle: string;
                                 processArgs: string[];
-                            };
-                            mongo: {
-                                status?: string;
-                                database?: string;
-                                collections?: unknown[];
-                                error?: string;
-                                details?: string;
                             };
                             postgres: {
                                 version?: string;
