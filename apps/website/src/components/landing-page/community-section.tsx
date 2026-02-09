@@ -1,16 +1,20 @@
 "use client";
 
 import { useAuth } from "@daodao/auth";
+import cooporationImg from "@daodao/assets/images/landing-page/cooporation.png";
+import { useUsers } from "@daodao/api";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 
 export function CommunitySection() {
   const { openLoginDialog } = useAuth();
+  const { data: usersData } = useUsers({ page: 1, pageSize: 1 });
+  const userCount = usersData?.pagination?.totalItems ?? 0;
 
   return (
     <section className="bg-white py-12 md:py-16">
       <div className="container mx-auto px-6">
-        <div className="mx-auto max-w-lg rounded-2xl border-2 border-[#16B9B3] bg-[#16B9B3]/5 px-6 py-10 text-center">
+        <div className="mx-auto max-w-lg rounded-2xl border-2 border-primary-base bg-primary-base/5 px-6 py-10 text-center">
           {/* 標題 */}
           <h2 className="text-[1.75rem] font-bold leading-tight">
             <span className="text-primary-base">加入社群</span>
@@ -29,7 +33,7 @@ export function CommunitySection() {
           {/* 插圖 */}
           <div className="relative mx-auto my-8 aspect-[4/3] w-full max-w-sm">
             <Image
-              src="/assets/landing-page/feature-community.png"
+              src={cooporationImg}
               alt="社群討論"
               fill
               className="object-contain"
@@ -38,8 +42,8 @@ export function CommunitySection() {
 
           {/* 統計數字 */}
           <p className="mb-4 text-lg">
-            <span className="text-2xl font-bold text-primary-base">56</span>
-            <span className="text-primary-darker">人等候加入中</span>
+            <span className="text-2xl font-bold text-primary-base">{userCount}</span>
+            <span className="text-primary-darker">人已加入</span>
           </p>
 
           {/* CTA 按鈕 */}

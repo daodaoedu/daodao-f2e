@@ -8,6 +8,7 @@ import {
   usePracticeTemplateById,
 } from "@daodao/api";
 import { ArrowRightOutlineSvg, CompassSvg, Deco4Svg } from "@daodao/assets";
+import { useAuth } from "@daodao/auth";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -16,7 +17,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { format } from "date-fns";
 import { Loader, RefreshCcw } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout";
 import {
   ExecutionDurationCard,
@@ -164,6 +165,9 @@ export default function TemplateDetailPage() {
   const params = useParams();
   const templateId = params.templateId as string;
 
+  // 取得認證狀態
+  const { requireAuth } = useAuth();
+
   // 取得模板詳情
   const { data, error, isLoading } = usePracticeTemplateById(templateId);
 
@@ -186,6 +190,62 @@ export default function TemplateDetailPage() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // 建立實踐的核心邏輯
+  const doCreatePractice = useCallback(async () => {
+    if (isSubmitting || !template) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const apiRequest = convertFormValuesToApiRequest(template);
+
+      const response = await createPractice(apiRequest);
+
+      if (response.error) {
+        const errorMessage =
+          response.error &&
+          typeof response.error === "object" &&
+          "message" in response.error
+            ? String(response.error.message)
+            : "建立實踐失敗";
+        console.error("Failed to create practice:", errorMessage);
+        toast.error(errorMessage);
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 取得新建立的實踐 ID
+      const practiceId = response.data?.data?.id;
+
+      // 提交成功後導航到成功頁面
+      if (practiceId) {
+        router.push(
+          `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}&practiceId=${encodeURIComponent(practiceId)}`
+        );
+      } else {
+        router.push(
+          `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}`
+        );
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "建立實踐失敗，請稍後再試";
+      console.error("Failed to create practice:", err);
+      toast.error(errorMessage);
+      setIsSubmitting(false);
+    }
+  }, [isSubmitting, template, router]);
+
+  // 處理建立按鈕點擊 - 使用 requireAuth 包裝
+  const handleCreate = useCallback(() => {
+    requireAuth(doCreatePractice, {
+      redirectUrl: typeof window !== "undefined" ? window.location.href : undefined,
+      source: "app",
+    });
+  }, [requireAuth, doCreatePractice]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -338,52 +398,7 @@ export default function TemplateDetailPage() {
           )}
         >
           <Button
-            onClick={async () => {
-              if (isSubmitting || !template) {
-                return;
-              }
-
-              setIsSubmitting(true);
-
-              try {
-                const apiRequest = convertFormValuesToApiRequest(template);
-
-                const response = await createPractice(apiRequest);
-
-                if (response.error) {
-                  const errorMessage =
-                    response.error &&
-                    typeof response.error === "object" &&
-                    "message" in response.error
-                      ? String(response.error.message)
-                      : "建立實踐失敗";
-                  console.error("Failed to create practice:", errorMessage);
-                  toast.error(errorMessage);
-                  setIsSubmitting(false);
-                  return;
-                }
-
-                // 取得新建立的實踐 ID
-                const practiceId = response.data?.data?.id;
-
-                // 提交成功後導航到成功頁面
-                if (practiceId) {
-                  router.push(
-                    `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}&practiceId=${encodeURIComponent(practiceId)}`
-                  );
-                } else {
-                  router.push(
-                    `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}`
-                  );
-                }
-              } catch (error) {
-                const errorMessage =
-                  error instanceof Error ? error.message : "建立實踐失敗，請稍後再試";
-                console.error("Failed to create practice:", error);
-                toast.error(errorMessage);
-                setIsSubmitting(false);
-              }
-            }}
+            onClick={handleCreate}
             disabled={isSubmitting}
             className="w-full sm:max-w-[288px]"
           >

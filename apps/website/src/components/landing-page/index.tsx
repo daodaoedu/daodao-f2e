@@ -29,9 +29,9 @@ export function LandingPage() {
       <CommunitySection />
       {/* 7. Testimonial Marquee — user testimonials with scrolling animation */}
       <TestimonialMarquee />
-      {/* 7. Join — merged Community + Feature Grid + Plan */}
+      {/* 8. Join — merged Community + Feature Grid + Plan */}
       <JoinSection />
-      {/* 6. Function Carousel — feature cards with ribbon banner */}
+      {/* 9. Function Carousel — feature cards with ribbon banner */}
       <FunctionCarousel />
       {/* 10. Learning DNA / Quiz — updated layout */}
       <PersonalitySection />

@@ -49,8 +49,20 @@ export function JoinSection() {
       </div>
 
       <div className="container mx-auto px-6">
-        <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:justify-center lg:gap-16">
-          {/* 左側：功能卡片區 */}
+        <div className="flex flex-col items-center gap-8 lg:flex-row lg:items-center lg:justify-center lg:gap-16">
+          {/* 標題區 - 手機版在最上方 */}
+          <div className="flex flex-col items-center text-center lg:hidden">
+            <h2 className="text-[1.75rem] font-bold text-white md:text-3xl">
+              {t("landing_join_title")}
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-white/80 md:text-base">
+              成為 Beta 使用者
+              <br />
+              與我們一起打造更好的學習體驗
+            </p>
+          </div>
+
+          {/* 功能卡片區 */}
           <div className="relative grid grid-cols-2 gap-2 md:gap-3">
             {/* 指南針裝飾 - 在目標探索卡片左上角 */}
             <div className="absolute -left-2 -top-4 z-10 md:-left-6 md:-top-2">
@@ -61,7 +73,7 @@ export function JoinSection() {
             <FeatureCard
               title={t("landing_join_goal")}
               description={t("landing_join_goal_desc")}
-              bgColor="bg-[#D4F1F4]"
+              bgColor="bg-primary-pale"
               className="mt-6 md:mt-8"
             />
 
@@ -69,7 +81,7 @@ export function JoinSection() {
             <FeatureCard
               title={t("landing_join_growth")}
               description={t("landing_join_growth_desc")}
-              bgColor="bg-[#FFE66D]"
+              bgColor="bg-logo-yellow"
               className="mt-12 md:mt-16"
             />
 
@@ -77,7 +89,7 @@ export function JoinSection() {
             <FeatureCard
               title={t("landing_join_resource")}
               description={t("landing_join_resource_desc")}
-              bgColor="bg-[#D4F1F4]"
+              bgColor="bg-primary-pale"
             />
 
             {/* 同儕推進 - 右下（有標籤） */}
@@ -90,12 +102,12 @@ export function JoinSection() {
             />
           </div>
 
-          {/* 右側：CTA 區 */}
+          {/* CTA 區 - 桌機版完整顯示，手機版只顯示按鈕 */}
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-            <h2 className="text-[1.75rem] font-bold text-white md:text-3xl">
+            <h2 className="hidden text-[1.75rem] font-bold text-white md:text-3xl lg:block">
               {t("landing_join_title")}
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-white/80 md:text-base">
+            <p className="mt-3 hidden text-sm leading-relaxed text-white/80 md:text-base lg:block">
               成為 Beta 使用者
               <br />
               與我們一起打造更好的學習體驗
@@ -104,7 +116,7 @@ export function JoinSection() {
             <Button
               variant="ctaOrange"
               size="huge"
-              className="mt-8"
+              className="lg:mt-8"
               onClick={() => openLoginDialog({ redirectUrl: "/" })}
             >
               {t("landing_join_cta")}
