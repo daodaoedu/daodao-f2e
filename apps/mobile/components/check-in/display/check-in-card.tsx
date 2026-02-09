@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { StyleSheet } from "react-native";
-import { YStack, XStack, Text, View, Image } from "tamagui";
-import { colors } from "@/generated/design-tokens";
+import { Image, Text, View, XStack, YStack } from "tamagui";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { colors } from "@/generated/design-tokens";
 
 interface ICheckInCardProps {
   taskTitle: string;
@@ -92,13 +92,7 @@ export const CheckInCard = ({
           borderTopLeftRadius="$md"
           borderTopRightRadius="$md"
         >
-          <XStack
-            position="absolute"
-            bottom={0}
-            left={16}
-            right={16}
-            justifyContent="space-around"
-          >
+          <XStack position="absolute" bottom={0} left={16} right={16} justifyContent="space-around">
             {[...Array(5)].map((_, i) => (
               <View
                 // biome-ignore lint/suspicious/noArrayIndexKey: 靜態裝飾元素，順序不會改變

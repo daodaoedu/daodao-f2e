@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations } from "@daodao/i18n";
 import { ANCHOR_IDS, SOCIAL_LINKS } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -8,6 +7,7 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { LanguageSwitcher } from "@daodao/ui/components/language-switcher";
 import { Check, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 type SubscribeStatus = "idle" | "loading" | "success" | "error";
 
@@ -30,13 +30,10 @@ export const Footer = () => {
         formData.append("first_name", name);
       }
 
-      const response = await fetch(
-        `https://app.kit.com/forms/${formId}/subscriptions`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch(`https://app.kit.com/forms/${formId}/subscriptions`, {
+        method: "POST",
+        body: formData,
+      });
 
       if (response.ok) {
         setStatus("success");

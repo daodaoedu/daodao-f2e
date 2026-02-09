@@ -27,26 +27,22 @@ export enum DeletePracticeResult {
 export function useDeletePracticeDialog() {
   const openDeleteDialog = useCallback(async (): Promise<DeletePracticeResult> => {
     return new Promise((resolve) => {
-      Alert.alert(
-        "確定刪除這個實踐？",
-        "確定要跟這個主題說再見了嗎？一旦刪除，就無法復原囉。",
-        [
-          {
-            text: "先不要",
-            style: "cancel",
-            onPress: () => {
-              resolve(DeletePracticeResult.Cancelled);
-            },
+      Alert.alert("確定刪除這個實踐？", "確定要跟這個主題說再見了嗎？一旦刪除，就無法復原囉。", [
+        {
+          text: "先不要",
+          style: "cancel",
+          onPress: () => {
+            resolve(DeletePracticeResult.Cancelled);
           },
-          {
-            text: "確定刪除",
-            style: "destructive",
-            onPress: () => {
-              resolve(DeletePracticeResult.Deleted);
-            },
+        },
+        {
+          text: "確定刪除",
+          style: "destructive",
+          onPress: () => {
+            resolve(DeletePracticeResult.Deleted);
           },
-        ]
-      );
+        },
+      ]);
     });
   }, []);
 

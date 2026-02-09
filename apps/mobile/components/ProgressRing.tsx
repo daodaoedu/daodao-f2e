@@ -1,16 +1,16 @@
-import { View } from 'react-native'
-import Svg, { Circle } from 'react-native-svg'
-import { Text, YStack } from 'tamagui'
-import { colors } from '@/generated/design-tokens'
+import { View } from "react-native";
+import Svg, { Circle } from "react-native-svg";
+import { Text, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
 
 interface ProgressRingProps {
-  progress: number // 0-100
-  size?: number
-  strokeWidth?: number
-  color?: string
-  backgroundColor?: string
-  showLabel?: boolean
-  label?: string
+  progress: number; // 0-100
+  size?: number;
+  strokeWidth?: number;
+  color?: string;
+  backgroundColor?: string;
+  showLabel?: boolean;
+  label?: string;
 }
 
 export function ProgressRing({
@@ -22,10 +22,10 @@ export function ProgressRing({
   showLabel = true,
   label,
 }: ProgressRingProps) {
-  const radius = (size - strokeWidth) / 2
-  const circumference = radius * 2 * Math.PI
-  const clampedProgress = Math.min(100, Math.max(0, progress))
-  const strokeDashoffset = circumference - (clampedProgress / 100) * circumference
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const clampedProgress = Math.min(100, Math.max(0, progress));
+  const strokeDashoffset = circumference - (clampedProgress / 100) * circumference;
 
   return (
     <YStack alignItems="center" justifyContent="center">
@@ -76,5 +76,5 @@ export function ProgressRing({
         )}
       </View>
     </YStack>
-  )
+  );
 }

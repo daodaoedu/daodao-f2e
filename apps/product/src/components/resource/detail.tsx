@@ -1,18 +1,18 @@
 "use client";
 
-import { Ellipsis, Globe, Share2 } from "lucide-react";
+import type { ResourceData } from "@daodao/api";
 import { BoxSvg, GroupSvg } from "@daodao/assets";
+import { Badge } from "@daodao/ui/components/badge";
+import { Button } from "@daodao/ui/components/button";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@daodao/ui/components/dropdown-menu";
-import { Badge } from "@daodao/ui/components/badge";
-import { Button } from "@daodao/ui/components/button";
-import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
-import type { ResourceData } from "@daodao/api";
+import { Ellipsis, Globe, Share2 } from "lucide-react";
 import { resourceTypeMap, targetAudienceTypeMap } from "@/constants/resource";
 
 interface ResourceDetailProps {

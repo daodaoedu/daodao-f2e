@@ -28,7 +28,9 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
   const t = useTranslations();
 
   // customId 即時檢查狀態
-  const [customIdStatus, setCustomIdStatus] = useState<"idle" | "checking" | "available" | "unavailable">("idle");
+  const [customIdStatus, setCustomIdStatus] = useState<
+    "idle" | "checking" | "available" | "unavailable"
+  >("idle");
   const checkTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // 取得城市選項
@@ -43,56 +45,59 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
   }, [t, locale]);
 
   // customId 即時檢查函數（debounced）
-  const checkCustomId = useCallback(async (customId: string) => {
-    // 清除之前的 timeout
-    if (checkTimeoutRef.current) {
-      clearTimeout(checkTimeoutRef.current);
-    }
-
-    // 如果是空的或與原始值相同，不檢查
-    if (!customId || customId === initialCustomId) {
-      setCustomIdStatus("idle");
-      return;
-    }
-
-    // 本地格式驗證（基本格式檢查）
-    const customIdRegex = /^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$/i;
-    if (customId.length < 3 || customId.length > 50 || !customIdRegex.test(customId)) {
-      setCustomIdStatus("idle");
-      return;
-    }
-
-    setCustomIdStatus("checking");
-
-    // debounce 300ms
-    checkTimeoutRef.current = setTimeout(async () => {
-      try {
-        const response = await checkCustomIdAvailability(customId);
-        console.log("checkCustomIdAvailability response:", response);
-
-        // 檢查是否有錯誤
-        if (response.error) {
-          console.error("API error:", response.error);
-          setCustomIdStatus("idle");
-          return;
-        }
-
-        // 檢查可用性
-        if (response.data?.data?.available) {
-          setCustomIdStatus("available");
-        } else {
-          setCustomIdStatus("unavailable");
-          form.setError("customId", {
-            type: "server",
-            message: "此使用者 ID 已被使用",
-          });
-        }
-      } catch (err) {
-        console.error("checkCustomIdAvailability error:", err);
-        setCustomIdStatus("idle");
+  const checkCustomId = useCallback(
+    async (customId: string) => {
+      // 清除之前的 timeout
+      if (checkTimeoutRef.current) {
+        clearTimeout(checkTimeoutRef.current);
       }
-    }, 300);
-  }, [initialCustomId, form]);
+
+      // 如果是空的或與原始值相同，不檢查
+      if (!customId || customId === initialCustomId) {
+        setCustomIdStatus("idle");
+        return;
+      }
+
+      // 本地格式驗證（基本格式檢查）
+      const customIdRegex = /^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$/i;
+      if (customId.length < 3 || customId.length > 50 || !customIdRegex.test(customId)) {
+        setCustomIdStatus("idle");
+        return;
+      }
+
+      setCustomIdStatus("checking");
+
+      // debounce 300ms
+      checkTimeoutRef.current = setTimeout(async () => {
+        try {
+          const response = await checkCustomIdAvailability(customId);
+          console.log("checkCustomIdAvailability response:", response);
+
+          // 檢查是否有錯誤
+          if (response.error) {
+            console.error("API error:", response.error);
+            setCustomIdStatus("idle");
+            return;
+          }
+
+          // 檢查可用性
+          if (response.data?.data?.available) {
+            setCustomIdStatus("available");
+          } else {
+            setCustomIdStatus("unavailable");
+            form.setError("customId", {
+              type: "server",
+              message: "此使用者 ID 已被使用",
+            });
+          }
+        } catch (err) {
+          console.error("checkCustomIdAvailability error:", err);
+          setCustomIdStatus("idle");
+        }
+      }, 300);
+    },
+    [initialCustomId, form]
+  );
 
   // 清理 timeout
   useEffect(() => {
@@ -164,9 +169,7 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
                   {customIdStatus === "available" && (
                     <CheckCircleIcon className="size-4 text-green" />
                   )}
-                  {customIdStatus === "unavailable" && (
-                    <XCircleIcon className="size-4 text-red" />
-                  )}
+                  {customIdStatus === "unavailable" && <XCircleIcon className="size-4 text-red" />}
                 </div>
               </div>
             </FormControl>

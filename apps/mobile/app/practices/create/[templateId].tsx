@@ -1,19 +1,19 @@
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Button } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, Check, Calendar, Target } from '@tamagui/lucide-icons'
-import { practiceTemplates } from '@/types/create-practice'
-import { colors } from '@/generated/design-tokens'
+import { Calendar, Check, ChevronLeft, Target } from "@tamagui/lucide-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import { practiceTemplates } from "@/types/create-practice";
 
 export default function TemplatePreviewScreen() {
-  const { templateId } = useLocalSearchParams<{ templateId: string }>()
-  const router = useRouter()
+  const { templateId } = useLocalSearchParams<{ templateId: string }>();
+  const router = useRouter();
 
-  const template = practiceTemplates.find(t => t.id === templateId)
+  const template = practiceTemplates.find((t) => t.id === templateId);
 
   if (!template) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" gap="$4">
           <Text fontSize={16} color="$color" opacity={0.6}>
             找不到此模板
@@ -23,19 +23,19 @@ export default function TemplatePreviewScreen() {
           </Button>
         </YStack>
       </SafeAreaView>
-    )
+    );
   }
 
   const handleUseTemplate = () => {
     // Navigate to manual flow with template values
     router.push({
-      pathname: '/practices/create/manual/step1',
+      pathname: "/practices/create/manual/step1",
       params: { templateId: template.id },
-    })
-  }
+    });
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
@@ -78,12 +78,7 @@ export default function TemplatePreviewScreen() {
 
           {/* Template Details */}
           <YStack gap="$4" marginBottom="$6">
-            <YStack
-              padding="$4"
-              backgroundColor={colors.basic[100]}
-              borderRadius="$md"
-              gap="$3"
-            >
+            <YStack padding="$4" backgroundColor={colors.basic[100]} borderRadius="$md" gap="$3">
               <XStack alignItems="center" gap="$3">
                 <Calendar size={20} color={template.color} />
                 <YStack flex={1}>
@@ -91,7 +86,7 @@ export default function TemplatePreviewScreen() {
                     頻率
                   </Text>
                   <Text fontSize={15} fontWeight="500" color="$color">
-                    {template.defaultValues.frequency === 'daily' ? '每日' : '每週'}
+                    {template.defaultValues.frequency === "daily" ? "每日" : "每週"}
                   </Text>
                 </YStack>
               </XStack>
@@ -116,7 +111,7 @@ export default function TemplatePreviewScreen() {
                   標籤
                 </Text>
                 <XStack gap="$2" flexWrap="wrap">
-                  {template.defaultValues.tags.map(tag => (
+                  {template.defaultValues.tags.map((tag) => (
                     <YStack
                       key={tag}
                       paddingHorizontal="$3"
@@ -155,7 +150,7 @@ export default function TemplatePreviewScreen() {
             backgroundColor="transparent"
             borderWidth={1}
             borderColor="$borderColor"
-            onPress={() => router.push('/practices/create/manual/step1')}
+            onPress={() => router.push("/practices/create/manual/step1")}
           >
             <Text color="$color" fontWeight="500">
               自訂設定
@@ -164,5 +159,5 @@ export default function TemplatePreviewScreen() {
         </YStack>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

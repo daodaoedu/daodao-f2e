@@ -77,9 +77,7 @@ export const CheckInDetail = ({ checkInData, onEditComplete }: ICheckInDetailPro
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={openEditCheckInSheet}>
-                編輯打卡
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={openEditCheckInSheet}>編輯打卡</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

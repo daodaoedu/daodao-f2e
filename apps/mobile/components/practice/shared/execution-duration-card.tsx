@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { StyleSheet } from "react-native";
-import { YStack, XStack, Text, View } from "tamagui";
+import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import type { ManualPracticeFormValues } from "../create/manual/schema";
 
@@ -47,9 +47,7 @@ export const ExecutionDurationCard = ({
     const today = new Date();
     const s = startDate ? parseDate(startDate) : null;
     const e = s ? addDays(s, d) : null;
-    const r = showRemaining && e
-      ? Math.min(d, Math.max(0, differenceInDays(e, today)))
-      : d;
+    const r = showRemaining && e ? Math.min(d, Math.max(0, differenceInDays(e, today))) : d;
 
     return { days: d, start: s, end: e, remainingDays: r };
   }, [durationDays, startDate, showRemaining]);

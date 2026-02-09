@@ -1,6 +1,5 @@
 "use client";
 
-import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { resendVerificationEmail } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
@@ -9,6 +8,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { Mail, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { BackgroundAnimation, PageHeader } from "@/components/layout";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
@@ -19,16 +19,17 @@ const RESEND_COOLDOWN_SECONDS = 60;
 export default function VerifyEmailPendingPage() {
   const t = useTranslations("auth.verifyEmail.pending");
   const router = useRouter();
-  const { user, isEmailVerified, logout, refreshAuth } = useAuth();
+  const { user, isAuthenticated, isEmailVerified, logout, refreshAuth } = useAuth();
   const [isResending, setIsResending] = useState(false);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
 
-  // 如果 email 已驗證，跳轉到首頁
+  // 只有當用戶已登入且 email 已驗證時，才跳轉到首頁
+  // 未認證用戶可以直接瀏覽此公開頁面
   useEffect(() => {
-    if (isEmailVerified) {
+    if (isAuthenticated && isEmailVerified) {
       router.replace("/");
     }
-  }, [isEmailVerified, router]);
+  }, [isAuthenticated, isEmailVerified, router]);
 
   // 定期檢查 email 驗證狀態
   useEffect(() => {

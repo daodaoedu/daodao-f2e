@@ -1,12 +1,12 @@
 "use client";
 
+import { getLatestQuizResult } from "@daodao/api";
 import {
   DesktopBannerSvg,
   desktopIntersectMaskDataUri,
   MobileBannerSvg,
   mobileIntersectMaskDataUri,
 } from "@daodao/assets";
-import { getLatestQuizResult } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { resultDetailMap } from "@daodao/features-quiz";
 import { cn } from "@daodao/ui/lib/utils";
@@ -18,7 +18,10 @@ const resultTypeToLottiePathMap = new Map<string, () => Promise<object>>([
   ["O", () => import("@daodao/assets/images/quiz/order-builder-2.json").then((m) => m.default)],
   ["A", () => import("@daodao/assets/images/quiz/active-shaper-2.json").then((m) => m.default)],
   ["L", () => import("@daodao/assets/images/quiz/liquid-integrator-2.json").then((m) => m.default)],
-  ["C", () => import("@daodao/assets/images/quiz/community-connector-2.json").then((m) => m.default)],
+  [
+    "C",
+    () => import("@daodao/assets/images/quiz/community-connector-2.json").then((m) => m.default),
+  ],
 ]);
 
 // 預設的 slogan（當無測驗結果時使用）

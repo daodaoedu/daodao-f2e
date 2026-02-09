@@ -1,19 +1,19 @@
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Button } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, Play, Clock, HelpCircle } from '@tamagui/lucide-icons'
-import { availableQuizzes } from '@/types/quiz'
-import { colors } from '@/generated/design-tokens'
+import { ChevronLeft, Clock, HelpCircle, Play } from "@tamagui/lucide-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import { availableQuizzes } from "@/types/quiz";
 
 export default function QuizStartScreen() {
-  const { quizId } = useLocalSearchParams<{ quizId: string }>()
-  const router = useRouter()
+  const { quizId } = useLocalSearchParams<{ quizId: string }>();
+  const router = useRouter();
 
-  const quiz = availableQuizzes.find(q => q.id === quizId)
+  const quiz = availableQuizzes.find((q) => q.id === quizId);
 
   if (!quiz) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" gap="$4">
           <Text fontSize={16} color="$color" opacity={0.6}>
             找不到此測驗
@@ -23,11 +23,11 @@ export default function QuizStartScreen() {
           </Button>
         </YStack>
       </SafeAreaView>
-    )
+    );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
@@ -151,5 +151,5 @@ export default function QuizStartScreen() {
         </YStack>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

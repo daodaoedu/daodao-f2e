@@ -207,7 +207,8 @@ const buildUserFormData = (data: UpdateUserFormDataRequest, photoFile?: File): F
   if (data.interestList) formData.append("interestList", JSON.stringify(data.interestList));
   if (data.contactList) formData.append("contactList", JSON.stringify(data.contactList));
   if (data.wantToDoList) formData.append("wantToDoList", JSON.stringify(data.wantToDoList));
-  if (data.professionalField) formData.append("professionalField", JSON.stringify(data.professionalField));
+  if (data.professionalField)
+    formData.append("professionalField", JSON.stringify(data.professionalField));
   if (data.share) formData.append("share", JSON.stringify(data.share));
   if (data.preferences) formData.append("preferences", JSON.stringify(data.preferences));
 

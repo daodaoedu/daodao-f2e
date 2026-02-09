@@ -1,9 +1,12 @@
-import { format } from "date-fns";
-import { ShellSvg } from "@daodao/assets";
 import type { ResourceData } from "@daodao/api";
+import { ShellSvg } from "@daodao/assets";
+import { format } from "date-fns";
 
 interface ResourceIntroductionProps {
-  resource: Pick<ResourceData, "description" | "videoUrl" | "favoriteCount" | "updatedAt" | "createdAt">;
+  resource: Pick<
+    ResourceData,
+    "description" | "videoUrl" | "favoriteCount" | "updatedAt" | "createdAt"
+  >;
 }
 
 export function ResourceIntroduction({ resource }: ResourceIntroductionProps) {

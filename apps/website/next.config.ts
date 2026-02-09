@@ -1,5 +1,10 @@
+import path from "node:path";
 import createNextIntlPlugin from "@daodao/i18n/plugin";
+import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
+
+// 載入 monorepo 根目錄的環境變數（apps/website -> ../../）
+loadEnvConfig(path.resolve(process.cwd(), "../.."));
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 

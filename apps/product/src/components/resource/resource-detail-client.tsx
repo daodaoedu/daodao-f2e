@@ -1,11 +1,11 @@
 "use client";
 
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
-import { Separator } from "@daodao/ui/components/separator";
 import type { ResourceData } from "@daodao/api";
-import { ResourceIntroduction } from "./introduction";
+import { Separator } from "@daodao/ui/components/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ContributorInfo } from "./contributor-info";
+import { ResourceIntroduction } from "./introduction";
 
 enum TabEnum {
   Introduction = "introduction",
@@ -40,11 +40,7 @@ export function ResourceDetailClient({
         <TabsTrigger value={TabEnum.Introduction} className="basis-1/3">
           介紹
         </TabsTrigger>
-        <TabsTrigger
-          value={TabEnum.Reviews}
-          className="basis-1/3"
-          disabled
-        >
+        <TabsTrigger value={TabEnum.Reviews} className="basis-1/3" disabled>
           心得 ({resource.reviewCount || 0})
         </TabsTrigger>
         <TabsTrigger
@@ -63,9 +59,7 @@ export function ResourceDetailClient({
       </TabsContent>
 
       <TabsContent value={TabEnum.Reviews}>
-        <div className="text-center text-gray-500 py-10">
-          心得分享功能尚未開放
-        </div>
+        <div className="text-center text-gray-500 py-10">心得分享功能尚未開放</div>
       </TabsContent>
 
       <TabsContent value={TabEnum.Contributor}>

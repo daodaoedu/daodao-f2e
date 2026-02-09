@@ -1,34 +1,34 @@
-import { YStack, XStack, Text, Card } from 'tamagui'
-import { Check, MessageSquare } from '@tamagui/lucide-icons'
-import { colors } from '@/generated/design-tokens'
-import type { CheckIn } from '@/types/practice'
+import { Check, MessageSquare } from "@tamagui/lucide-icons";
+import { Card, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import type { CheckIn } from "@/types/practice";
 
 interface CheckInListProps {
-  checkIns: CheckIn[]
-  emptyText?: string
+  checkIns: CheckIn[];
+  emptyText?: string;
 }
 
 function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
+  const date = new Date(dateString);
+  const now = new Date();
 
   // 使用日期比較而非時間差，避免午夜邊界問題
-  const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-  const nowOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const diffDays = Math.round((nowOnly.getTime() - dateOnly.getTime()) / (1000 * 60 * 60 * 24))
+  const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const nowOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.round((nowOnly.getTime() - dateOnly.getTime()) / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) {
-    return `今天 ${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`
+    return `今天 ${date.toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })}`;
   } else if (diffDays === 1) {
-    return `昨天 ${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`
+    return `昨天 ${date.toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })}`;
   } else if (diffDays < 7) {
-    return `${diffDays} 天前`
+    return `${diffDays} 天前`;
   } else {
-    return date.toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' })
+    return date.toLocaleDateString("zh-TW", { month: "short", day: "numeric" });
   }
 }
 
-export function CheckInList({ checkIns, emptyText = '還沒有打卡紀錄' }: CheckInListProps) {
+export function CheckInList({ checkIns, emptyText = "還沒有打卡紀錄" }: CheckInListProps) {
   if (checkIns.length === 0) {
     return (
       <YStack padding="$6" alignItems="center" justifyContent="center" gap="$2">
@@ -37,7 +37,7 @@ export function CheckInList({ checkIns, emptyText = '還沒有打卡紀錄' }: C
           {emptyText}
         </Text>
       </YStack>
-    )
+    );
   }
 
   return (
@@ -88,5 +88,5 @@ export function CheckInList({ checkIns, emptyText = '還沒有打卡紀錄' }: C
         </Card>
       ))}
     </YStack>
-  )
+  );
 }

@@ -1,7 +1,7 @@
-import { useState, useCallback, useMemo } from "react";
-import { Pressable, StyleSheet } from "react-native";
-import { YStack, XStack, Text, Input, Button } from "tamagui";
 import { Plus, X } from "@tamagui/lucide-icons";
+import { useCallback, useMemo, useState } from "react";
+import { Pressable, StyleSheet } from "react-native";
+import { Button, Input, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 
 // 預設標籤
@@ -29,9 +29,7 @@ export const TagSelector = ({ value, onChange, onTagSelected }: ITagSelectorProp
   const handleToggleTag = useCallback(
     (tag: string) => {
       const isSelected = value.includes(tag);
-      const newTags = isSelected
-        ? value.filter((t) => t !== tag)
-        : [...value, tag];
+      const newTags = isSelected ? value.filter((t) => t !== tag) : [...value, tag];
       onChange(newTags);
 
       // 當選中標籤時觸發回調
@@ -60,12 +58,7 @@ export const TagSelector = ({ value, onChange, onTagSelected }: ITagSelectorProp
 
   return (
     <YStack marginBottom="$6">
-      <Text
-        fontSize={16}
-        fontWeight="500"
-        color={colors.text.dark}
-        marginBottom="$3"
-      >
+      <Text fontSize={16} fontWeight="500" color={colors.text.dark} marginBottom="$3">
         想法分享
       </Text>
 
@@ -82,10 +75,7 @@ export const TagSelector = ({ value, onChange, onTagSelected }: ITagSelectorProp
               accessibilityRole="checkbox"
               accessibilityState={{ checked: isSelected }}
             >
-              <Text
-                fontSize={14}
-                color={isSelected ? colors.basic.white : colors.basic["600"]}
-              >
+              <Text fontSize={14} color={isSelected ? colors.basic.white : colors.basic["600"]}>
                 {tag}
               </Text>
               {isSelected && <X size={14} color={colors.basic.white} />}

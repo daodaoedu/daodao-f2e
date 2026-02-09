@@ -1,17 +1,17 @@
-import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, ScrollView, Card, Button } from 'tamagui'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronLeft, Plus } from '@tamagui/lucide-icons'
-import { practiceTemplates } from '@/types/create-practice'
-import { colors } from '@/generated/design-tokens'
+import { ChevronLeft, Plus } from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
+import { practiceTemplates } from "@/types/create-practice";
 
 export default function CreatePracticeScreen() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const categories = [...new Set(practiceTemplates.map(t => t.category))]
+  const categories = [...new Set(practiceTemplates.map((t) => t.category))];
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
@@ -38,7 +38,7 @@ export default function CreatePracticeScreen() {
             borderWidth={1}
             borderColor={colors.primary.lighter}
             pressStyle={{ scale: 0.98 }}
-            onPress={() => router.push('/practices/create/manual/step1')}
+            onPress={() => router.push("/practices/create/manual/step1")}
             marginBottom="$5"
           >
             <XStack gap="$3" alignItems="center">
@@ -64,15 +64,15 @@ export default function CreatePracticeScreen() {
           </Card>
 
           {/* Templates by Category */}
-          {categories.map(category => (
+          {categories.map((category) => (
             <YStack key={category} marginBottom="$5">
               <Text fontSize={14} fontWeight="600" color="$color" opacity={0.6} marginBottom="$3">
                 {category}
               </Text>
               <YStack gap="$3">
                 {practiceTemplates
-                  .filter(t => t.category === category)
-                  .map(template => (
+                  .filter((t) => t.category === category)
+                  .map((template) => (
                     <Card
                       key={template.id}
                       padding="$4"
@@ -111,5 +111,5 @@ export default function CreatePracticeScreen() {
         </ScrollView>
       </YStack>
     </SafeAreaView>
-  )
+  );
 }

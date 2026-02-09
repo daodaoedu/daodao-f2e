@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import { getResources } from "@daodao/api";
-import { ResourceBanner, CategoriesContainer, ResourceContainer } from "@/components/resource";
-import { HOT_TAGS } from "@/constants/resource";
 import bannerImage from "@daodao/assets/images/resource/banner.webp";
+import type { Metadata } from "next";
+import { CategoriesContainer, ResourceBanner, ResourceContainer } from "@/components/resource";
+import { HOT_TAGS } from "@/constants/resource";
 
 export const metadata: Metadata = {
   title: "多元學習資源列表｜島島阿學",

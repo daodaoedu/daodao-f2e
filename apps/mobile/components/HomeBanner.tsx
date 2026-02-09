@@ -1,19 +1,19 @@
-import { Dimensions, StyleSheet, View as RNView, Image } from 'react-native'
-import Svg, { Path, Defs, RadialGradient, Stop, ClipPath, G } from 'react-native-svg'
-import { XStack, Text } from 'tamagui'
-import LottieView from 'lottie-react-native'
-import activeShaper2Json from '@/assets/animations/active-shaper-2.json'
+import LottieView from "lottie-react-native";
+import { Dimensions, Image, View as RNView, StyleSheet } from "react-native";
+import Svg, { ClipPath, Defs, G, Path, RadialGradient, Stop } from "react-native-svg";
+import { Text, XStack } from "tamagui";
+import activeShaper2Json from "@/assets/animations/active-shaper-2.json";
 
-const { width: screenWidth } = Dimensions.get('window')
+const { width: screenWidth } = Dimensions.get("window");
 // Banner 高度 - 調整為更短
-const BANNER_HEIGHT = Math.round(screenWidth / (195 / 60))
+const BANNER_HEIGHT = Math.round(screenWidth / (195 / 60));
 
 // Logo 圖片
-const logoImage = require('@/assets/images/logo.png')
+const logoImage = require("@/assets/images/logo.png");
 
 export function HomeBanner() {
   // 根據 Product mobile-banner.svg (390x420) 的比例計算位置
-  const scale = screenWidth / 390
+  const scale = screenWidth / 390;
 
   return (
     <RNView style={[styles.container, { height: BANNER_HEIGHT + 30 }]}>
@@ -25,13 +25,7 @@ export function HomeBanner() {
         style={StyleSheet.absoluteFill}
       >
         <Defs>
-          <RadialGradient
-            id="bannerGradient"
-            cx="50%"
-            cy="0%"
-            rx="100%"
-            ry="100%"
-          >
+          <RadialGradient id="bannerGradient" cx="50%" cy="0%" rx="100%" ry="100%">
             <Stop offset="0" stopColor="#5FDAD5" />
             <Stop offset="1" stopColor="#E9FEFF" />
           </RadialGradient>
@@ -80,7 +74,6 @@ export function HomeBanner() {
             fill="white"
           />
         </G>
-
       </Svg>
 
       {/* Logo - 左上角 */}
@@ -113,24 +106,19 @@ export function HomeBanner() {
 
       {/* Octopus animation - 靠右貼 */}
       <RNView style={styles.octopusContainer}>
-        <LottieView
-          source={activeShaper2Json}
-          autoPlay
-          loop
-          style={styles.lottie}
-        />
+        <LottieView source={activeShaper2Json} autoPlay loop style={styles.lottie} />
       </RNView>
     </RNView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    overflow: 'visible',
+    width: "100%",
+    overflow: "visible",
   },
   logoContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 16,
     left: 20,
     zIndex: 10,
@@ -141,20 +129,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   contentContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 26,
     left: 0,
     right: 0,
-    alignItems: 'center',
+    alignItems: "center",
   },
   octopusContainer: {
-    position: 'absolute',
+    position: "absolute",
     right: 0,
     top: 35,
   },
   lottie: {
     width: 96,
     height: 96,
-    transform: [{ rotate: '3deg' }],
+    transform: [{ rotate: "3deg" }],
   },
-})
+});

@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { View, StyleSheet } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import { captureRef } from "react-native-view-shot";
 import { CheckInCard } from "../../display/check-in-card";
 import type { ICheckInFormData } from "../../types";

@@ -1,8 +1,8 @@
-import { useCallback } from "react";
-import { Pressable, StyleSheet } from "react-native";
-import { YStack, XStack, Text, View, Image } from "tamagui";
 import { Camera, X } from "@tamagui/lucide-icons";
 import * as ImagePicker from "expo-image-picker";
+import { useCallback } from "react";
+import { Pressable, StyleSheet } from "react-native";
+import { Image, Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 
 const MAX_FILES = 3;
@@ -61,12 +61,7 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
               overflow="hidden"
               backgroundColor={colors.basic["200"]}
             >
-              <Image
-                source={{ uri }}
-                width="100%"
-                height="100%"
-                resizeMode="cover"
-              />
+              <Image source={{ uri }} width="100%" height="100%" resizeMode="cover" />
             </View>
             <Pressable
               style={styles.removeButton}
