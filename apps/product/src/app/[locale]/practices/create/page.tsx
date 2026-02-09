@@ -46,24 +46,14 @@ export default function CreatePracticePage() {
       return [];
     }
 
-    return categoriesData.data
-      .map((categoryId: string) => {
-        const metadata = practiceCategoryMetadataMap[categoryId];
-        if (!metadata) {
-          // 如果沒有對應的 metadata，使用預設值
-          return {
-            id: categoryId,
-            label: categoryId,
-            icon: LifeSvg,
-          };
-        }
-        return {
-          id: categoryId,
-          label: metadata.label,
-          icon: metadata.icon,
-        };
-      })
-      .filter((category): category is Category => category !== null);
+    return categoriesData.data.map((categoryId: string) => {
+      const metadata = practiceCategoryMetadataMap[categoryId];
+      return {
+        id: categoryId,
+        label: metadata?.label ?? categoryId,
+        icon: metadata?.icon ?? LifeSvg,
+      };
+    });
   }, [categoriesData]);
 
   // 預設選擇第一個分類，如果沒有分類則為空字串
@@ -74,7 +64,8 @@ export default function CreatePracticePage() {
     if (categories.length > 0 && !selectedCategory) {
       setSelectedCategory(categories[0]?.id ?? "");
     }
-  }, [categories, selectedCategory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only run when categories changes
+  }, [categories]);
 
   // 取得實踐模板列表
   const {
@@ -208,7 +199,7 @@ export default function CreatePracticePage() {
               <p className="text-text-dark/70">目前沒有可用的模板</p>
             </div>
           ) : (
-            <Carousel className="w-full" opts={{ loop: false, align: "start" }}>
+            <Carousel key={selectedCategory} className="w-full" opts={{ loop: false, align: "start" }}>
               <CarouselContent className="-ml-2">
                 {practiceGroups.map((group) => (
                   <CarouselItem key={group.id} className="pl-2 basis-1/2">
