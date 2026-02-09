@@ -64,8 +64,7 @@ export default function CreatePracticePage() {
     if (categories.length > 0 && !selectedCategory) {
       setSelectedCategory(categories[0]?.id ?? "");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only run when categories changes
-  }, [categories]);
+  }, [categories, selectedCategory]);
 
   // 取得實踐模板列表
   const {
