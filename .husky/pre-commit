@@ -1,2 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# 確保 pnpm 可被找到（Homebrew 安裝路徑）
+export PATH="/opt/homebrew/bin:$PATH"
+
 pnpm lint
 pnpm typecheck

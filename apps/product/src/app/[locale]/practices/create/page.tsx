@@ -23,13 +23,6 @@ import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { BgRadialAnimation } from "@/components/layout/bg-radial-animation";
 import { practiceCategoryMetadataMap } from "@/constants/practice-category";
 
-// 類別定義
-interface Category {
-  id: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
-
 export default function CreatePracticePage() {
   const router = useRouter();
 

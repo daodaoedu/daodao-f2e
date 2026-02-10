@@ -12,30 +12,47 @@ import { DEFAULT_REDIRECT_URL } from "./auth-constants";
 const OAUTH_STATE_EXPIRY = 10 * 60 * 1000;
 
 /**
- * 生成隨機字串（用於 nonce）
+ * 生成加密安全的隨機字串（用於 nonce）
  */
 const generateNonce = (): string => {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("");
 };
 
 /**
  * 編碼 OAuth State 參數
+ * 使用 base64url 編碼（與後端一致）
  * @param state OAuth State 物件
- * @returns Base64 編碼的字串
+ * @returns Base64url 編碼的字串
  */
 export const encodeOAuthState = (state: OAuthState): string => {
   const json = JSON.stringify(state);
-  return btoa(json);
+  // 使用標準 base64 編碼後轉換為 base64url
+  // base64url: + -> -, / -> _, 移除 = 填充
+  return btoa(json)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 };
 
 /**
  * 解碼 OAuth State 參數
- * @param encodedState Base64 編碼的字串
+ * 使用 base64url 解碼（與後端一致）
+ * @param encodedState Base64url 編碼的字串
  * @returns OAuth State 物件
  */
 export const decodeOAuthState = (encodedState: string): OAuthState | null => {
   try {
-    const json = atob(encodedState);
+    // 將 base64url 轉換回標準 base64
+    // base64url: - -> +, _ -> /, 補回 = 填充
+    let base64 = encodedState.replace(/-/g, "+").replace(/_/g, "/");
+    // 補回填充字元
+    const padding = base64.length % 4;
+    if (padding) {
+      base64 += "=".repeat(4 - padding);
+    }
+    const json = atob(base64);
     return JSON.parse(json) as OAuthState;
   } catch {
     return null;
@@ -45,15 +62,14 @@ export const decodeOAuthState = (encodedState: string): OAuthState | null => {
 /**
  * 驗證 OAuth State 參數
  * @param state OAuth State 物件
- * @param verifyNonce 是否驗證 nonce（預設: true）
  * @returns 是否有效
  */
 export const validateOAuthState = (state: OAuthState): boolean => {
   const now = Date.now();
   const elapsed = now - state.timestamp;
 
-  // 檢查時效性（10 分鐘內有效）
-  if (elapsed > OAUTH_STATE_EXPIRY) {
+  // 檢查時效性（10 分鐘內有效，且不允許未來時間戳）
+  if (elapsed < 0 || elapsed > OAUTH_STATE_EXPIRY) {
     return false;
   }
 
