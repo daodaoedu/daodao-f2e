@@ -115,7 +115,7 @@ export default function CheckInDetailPage() {
     return map;
   }, [checkInsData]);
 
-  // 建立 check-in ID 到原始日期的映射（用於 lastCheckInDate）
+  // 建立 check-in ID 到時間戳的映射（用於 lastCheckInDate 的 24 小時冷卻判斷）
   const checkInIdToDateMap = useMemo(() => {
     const map = new Map<string, string>();
 
@@ -124,7 +124,7 @@ export default function CheckInDetailPage() {
     }
 
     checkInsData.data.forEach((checkIn) => {
-      map.set(String(checkIn.id), checkIn.checkinDate);
+      map.set(String(checkIn.id), checkIn.createdAt);
     });
 
     return map;
