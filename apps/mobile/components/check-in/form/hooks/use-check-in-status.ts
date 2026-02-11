@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { CheckInStatus, type CheckInStatusType } from "@/constants/check-in-status";
 import type { ICheckInStatusOptions } from "../../types";
 
-const CHECK_IN_COOLDOWN_HOURS = 24;
+const CHECK_IN_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 
 /**
  * 檢查距離上次打卡是否未滿 24 小時
@@ -21,7 +21,7 @@ const isWithinCooldown = (dateString: string | null | undefined): boolean => {
 
       const now = new Date();
       const diffMs = now.getTime() - checkInTime.getTime();
-      return diffMs < CHECK_IN_COOLDOWN_HOURS * 60 * 60 * 1000;
+      return diffMs < CHECK_IN_COOLDOWN_MS;
     }
 
     // 日期字串 (yyyy-MM-dd)：退回使用同一天判斷
@@ -30,6 +30,9 @@ const isWithinCooldown = (dateString: string | null | undefined): boolean => {
 
     const checkInDate = new Date(year, month - 1, day);
     if (Number.isNaN(checkInDate.getTime())) return false;
+
+    // 驗證日期沒有溢出（例如 "2024-02-30" 會變成 3 月 1 日）
+    if (checkInDate.getDate() !== day) return false;
 
     const today = new Date();
     return (
@@ -53,12 +56,12 @@ export const useCheckInStatus = (options: ICheckInStatusOptions) => {
     const isPracticeCompleted = practiceStatus === "completed" || practiceStatus === "archived";
 
     // 檢查距離上次打卡是否未滿 24 小時
-    const isTodayCheckedIn = isWithinCooldown(lastCheckInDate);
+    const isCheckInLocked = isWithinCooldown(lastCheckInDate);
 
-    // 決定最終狀態（優先級：已完成 > 今天已打卡 > 可打卡）
+    // 決定最終狀態（優先級：已完成 > 冷卻中 > 可打卡）
     const getStatus = (): CheckInStatusType => {
       if (isPracticeCompleted) return CheckInStatus.practiceCompleted;
-      if (isTodayCheckedIn) return CheckInStatus.alreadyCheckedIn;
+      if (isCheckInLocked) return CheckInStatus.alreadyCheckedIn;
       return CheckInStatus.available;
     };
     const status = getStatus();
@@ -69,7 +72,7 @@ export const useCheckInStatus = (options: ICheckInStatusOptions) => {
         case CheckInStatus.practiceCompleted:
           return "實踐已完成";
         case CheckInStatus.alreadyCheckedIn:
-          return "今天已打過卡囉！";
+          return "24 小時內已打過卡囉！";
         case CheckInStatus.available:
           return "打卡";
         default:
@@ -83,7 +86,7 @@ export const useCheckInStatus = (options: ICheckInStatusOptions) => {
     return {
       status,
       isPracticeCompleted,
-      isTodayCheckedIn,
+      isCheckInLocked,
       canCheckIn,
       getButtonLabel,
     };
