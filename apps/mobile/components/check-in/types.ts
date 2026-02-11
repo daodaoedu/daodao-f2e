@@ -44,7 +44,9 @@ export interface ICheckInStatusOptions {
    */
   practiceStatus?: string;
   /**
-   * 最後打卡日期 (ISO 格式字串，例如 "2026-01-01")
+   * 最後打卡時間
+   * 支援 ISO 8601 時間戳 (e.g., "2024-01-20T09:00:00.000Z") 或日期字串 (e.g., "2024-01-20")
+   * 傳入時間戳時可精確判斷 24 小時冷卻；僅傳入日期時退回使用同一天判斷
    * 如果沒有打卡記錄，應傳入 null
    */
   lastCheckInDate: string | null;

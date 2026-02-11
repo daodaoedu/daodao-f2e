@@ -3,7 +3,7 @@
 import { useMyPracticeStats, useMyPractices } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
-import { format, parseISO } from "date-fns";
+
 import { CheckCircle2 } from "lucide-react";
 import { useMemo } from "react";
 import {
@@ -43,11 +43,8 @@ export default function HomePage() {
         practice.status === PracticeStatus.draft ||
         practice.status === PracticeStatus.notStarted;
 
-      // 將 ISO timestamp 轉換為 yyyy-MM-dd 格式
-      // API 回傳 lastCheckinAt 為 ISO 8601 格式 (e.g., "2024-01-20T09:00:00.000Z")
-      const lastCheckInDate = practice.lastCheckinAt
-        ? format(parseISO(practice.lastCheckinAt), "yyyy-MM-dd")
-        : null;
+      // 直接使用 ISO 8601 時間戳，以支援精確的 24 小時冷卻判斷
+      const lastCheckInDate = practice.lastCheckinAt ?? null;
 
       if (isInProgress) {
         inProgressTasksData.push({

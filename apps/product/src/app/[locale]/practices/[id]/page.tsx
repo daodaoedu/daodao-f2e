@@ -345,7 +345,7 @@ export default function PracticeDetailPage() {
             className="w-full sm:max-w-[288px]"
             practiceId={practiceId}
             practiceStatus={practiceData?.data?.status}
-            lastCheckInDate={checkInsData?.data?.[0]?.checkinDate || null}
+            lastCheckInDate={checkInsData?.data?.[0]?.createdAt || null}
             startDate={practice.startDate}
             taskTitle={practice.name}
             progressPercentage={practice?.currentProgress ?? 0}
