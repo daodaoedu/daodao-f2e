@@ -325,12 +325,12 @@ export const updatePracticeCheckInWithFormData = async (
 ): Promise<CreateCheckInResponse> => {
   const formData = new FormData();
 
-  // 基本欄位
-  if (data.mood) formData.append("mood", data.mood);
-  if (data.description) formData.append("note", data.description);
+  // 基本欄位 - 使用 !== undefined 確保空字串也能被發送
+  if (data.mood !== undefined) formData.append("mood", data.mood);
+  if (data.description !== undefined) formData.append("note", data.description);
 
-  // 陣列欄位需轉成 JSON 字串
-  if (data.tags && data.tags.length > 0) {
+  // 陣列欄位需轉成 JSON 字串 - 空陣列也要發送以便清除標籤
+  if (data.tags !== undefined) {
     formData.append("tags", JSON.stringify(data.tags));
   }
 
@@ -426,7 +426,7 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
     // 創建打卡記錄（函數會直接拋出錯誤）
     const response = await createPracticeCheckInWithFormData(practiceId, formData);
 
-    // 刷新打卡列表的 cache
+    // 刷新打卡列表的 cache（使用空 query 對象來匹配所有 query 參數組合）
     await mutate([
       "/api/v1/practices/{id}/checkins",
       {
@@ -434,6 +434,7 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
           path: {
             id: practiceId,
           },
+          query: {},
         },
       },
     ] as const);
@@ -459,7 +460,7 @@ export const useUpdatePracticeCheckIn = (practiceId: string, checkInId: string) 
   const updateCheckIn = async (formData: ICheckInFormData) => {
     const response = await updatePracticeCheckInWithFormData(practiceId, checkInId, formData);
 
-    // 刷新打卡列表的 cache
+    // 刷新打卡列表的 cache（使用空 query 對象來匹配所有 query 參數組合）
     await mutate([
       "/api/v1/practices/{id}/checkins",
       {
@@ -467,6 +468,7 @@ export const useUpdatePracticeCheckIn = (practiceId: string, checkInId: string) 
           path: {
             id: practiceId,
           },
+          query: {},
         },
       },
     ] as const);

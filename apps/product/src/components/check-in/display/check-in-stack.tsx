@@ -316,13 +316,29 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
   const getSvgConfig = useCallback((index: number) => SVG_CONFIGS[index % SVG_CONFIGS.length], []);
 
   const getSvgRef = useCallback(
-    (index: number) => svgRefsRef.current[index % svgRefsRef.current.length],
+    (index: number) => svgRefsRef.current[index % SVG_CONFIGS.length],
     []
   );
 
   // 從實際渲染的 SVG 元素中提取幾何數據
   useEffect(() => {
-    const frameId = requestAnimationFrame(() => {
+    if (count === 0) return;
+
+    let currentFrameId: number | undefined;
+    let isCancelled = false;
+
+    // 檢查所有 SVG refs 是否已準備好
+    const checkAndExtractGeometries = () => {
+      if (isCancelled) return;
+
+      // 確保所有需要的 SVG refs 都已經存在
+      const allRefsReady = SVG_CONFIGS.every((_, i) => svgRefsRef.current[i] != null);
+      if (!allRefsReady) {
+        // 如果還沒準備好，稍後再試
+        currentFrameId = requestAnimationFrame(checkAndExtractGeometries);
+        return;
+      }
+
       const geometries: (ISvgGeometry | null)[] = [];
 
       for (let i = 0; i < count; i++) {
@@ -333,12 +349,17 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
 
       // 只有在所有幾何數據都準備好時才更新
       const allReady = geometries.every((g) => g !== null);
-      if (allReady) {
+      if (allReady && !isCancelled) {
         setSvgGeometries(geometries);
       }
-    });
+    };
 
-    return () => cancelAnimationFrame(frameId);
+    currentFrameId = requestAnimationFrame(checkAndExtractGeometries);
+
+    return () => {
+      isCancelled = true;
+      if (currentFrameId) cancelAnimationFrame(currentFrameId);
+    };
   }, [count, getSvgRef]);
 
   useEffect(() => {
@@ -621,9 +642,7 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
               )}
             >
               <Emoji className="size-6" />
-              <div className="text-xs text-bg-dark">
-                #{count - i} {date}
-              </div>
+              <div className="text-xs text-bg-dark">{date}</div>
               <div className="max-w-40 text-bg-dark line-clamp-2">{content}</div>
             </div>
           </Link>
