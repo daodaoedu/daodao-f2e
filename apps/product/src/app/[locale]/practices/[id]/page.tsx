@@ -333,7 +333,7 @@ export default function PracticeDetailPage() {
       </main>
 
       {/* CheckIn Stack */}
-      <div className="max-w-[448px] mx-auto">
+      <div className="max-w-[448px] mx-auto pb-24">
         <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
       </div>
 
