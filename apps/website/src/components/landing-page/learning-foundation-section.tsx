@@ -6,7 +6,7 @@ import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 import Stack from "@daodao/ui/components/stack";
 import { ChevronRight, Loader2 } from "lucide-react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 
 // 主題 SVG 背景組件映射（參考 product/src/constants/practice-theme.ts）
 const themeSvgMap = {
@@ -43,9 +43,6 @@ const convertTemplateToCard = (template: PracticeTemplateType, index: number) =>
   templateId: template.id,
 });
 
-// 滑動檢測閾值（像素）
-const SWIPE_THRESHOLD = 10;
-
 function PracticeCard({
   tag,
   title,
@@ -56,6 +53,7 @@ function PracticeCard({
   durationUnit,
   theme,
   templateId,
+  isActive = false,
   onClick,
 }: {
   tag: string;
@@ -67,44 +65,18 @@ function PracticeCard({
   durationUnit: string;
   theme: PracticeTheme;
   templateId: string;
+  isActive?: boolean;
   onClick?: (templateId: string) => void;
 }) {
   const ThemeSvg = themeSvgMap[theme];
-  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
-  const isDraggingRef = useRef(false);
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    pointerStartRef.current = { x: e.clientX, y: e.clientY };
-    isDraggingRef.current = false;
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!pointerStartRef.current) return;
-    const dx = Math.abs(e.clientX - pointerStartRef.current.x);
-    const dy = Math.abs(e.clientY - pointerStartRef.current.y);
-    // 如果移動超過閾值，視為滑動
-    if (dx > SWIPE_THRESHOLD || dy > SWIPE_THRESHOLD) {
-      isDraggingRef.current = true;
-    }
-  };
-
-  const handleClick = () => {
-    // 如果是滑動，不執行點擊
-    if (isDraggingRef.current) {
-      isDraggingRef.current = false;
-      return;
-    }
+  const handleIconClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onClick?.(templateId);
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      className="relative h-full w-full overflow-hidden rounded-2xl text-left cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
-    >
+    <div className="relative h-full w-full overflow-hidden rounded-2xl text-left">
       {/* SVG 背景 */}
       <ThemeSvg className="absolute inset-0 size-full" preserveAspectRatio="xMidYMid slice" />
 
@@ -118,15 +90,17 @@ function PracticeCard({
           <p className="mt-2 text-sm text-basic-400">{description}</p>
         </div>
 
-        {/* Speech bubble */}
-        <div className="mt-4 flex justify-end">
-          <div className="relative">
-            <div className="rounded-lg bg-basic-500 px-4 py-2 text-sm text-white">
-              喜歡嗎？馬上開始！
+        {/* Speech bubble - 只有當前顯示的卡片顯示 */}
+        {isActive && (
+          <div className="mt-4 flex justify-end">
+            <div className="relative">
+              <div className="rounded-lg bg-basic-500 px-4 py-2 text-sm text-white">
+                喜歡嗎？馬上開始！
+              </div>
+              <div className="absolute -bottom-2 right-8 size-0 border-x-8 border-t-8 border-x-transparent border-t-basic-500" />
             </div>
-            <div className="absolute -bottom-2 right-8 size-0 border-x-8 border-t-8 border-x-transparent border-t-basic-500" />
           </div>
-        </div>
+        )}
 
         {/* Stats + next button */}
         <div className="mt-4 flex items-end justify-between">
@@ -141,13 +115,17 @@ function PracticeCard({
             </div>
           </div>
 
-          {/* Next button */}
-          <div className="flex size-12 items-center justify-center rounded-full bg-white/80 shadow-sm group-hover:bg-white transition-colors">
+          {/* Next button - 只有這裡可以點擊跳轉 */}
+          <button
+            type="button"
+            onClick={handleIconClick}
+            className="flex size-12 items-center justify-center rounded-full bg-white/80 shadow-sm hover:bg-white active:scale-95 transition-all cursor-pointer"
+          >
             <ChevronRight className="size-5 text-basic-400" />
-          </div>
+          </button>
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -220,8 +198,7 @@ export function LearningFoundationSection() {
           ) : cards.length > 0 ? (
             <Stack
               cards={cards}
-              sendToBackOnClick={false}
-              mobileClickOnly
+              sendToBackOnClick
               autoplay
               autoplayDelay={4000}
               pauseOnHover
