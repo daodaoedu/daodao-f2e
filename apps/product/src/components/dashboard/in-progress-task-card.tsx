@@ -81,11 +81,9 @@ export const InProgressTaskCard = ({
               </div>
             </div>
             <div className="shrink-0 self-center">
-              <Button variant="ghost" size="icon" asChild onClick={(e) => e.stopPropagation()}>
-                <CustomLink href={`/practices/${id}`}>
-                  <ArrowRightOutlineSvg className="size-6 text-light-gray" />
-                </CustomLink>
-              </Button>
+              <span className="inline-flex items-center justify-center size-10">
+                <ArrowRightOutlineSvg className="size-6 text-light-gray" />
+              </span>
             </div>
           </div>
         </div>

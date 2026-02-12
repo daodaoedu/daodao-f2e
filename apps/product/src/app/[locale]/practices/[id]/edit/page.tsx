@@ -280,7 +280,7 @@ export default function EditPracticePage() {
   if (isLoading) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" title="編輯實踐" rightActionTo="/" />
+        <PageHeader leftAction="back" leftLabel="" title="編輯實踐" rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">載入中...</div>
@@ -293,7 +293,7 @@ export default function EditPracticePage() {
   if (error || !practiceData?.data) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" title="編輯實踐" rightActionTo="/" />
+        <PageHeader leftAction="back" leftLabel="" title="編輯實踐" rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">

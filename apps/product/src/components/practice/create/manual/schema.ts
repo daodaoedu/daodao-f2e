@@ -123,7 +123,7 @@ export const createManualPracticeFormSchema = (options?: ManualPracticeSchemaOpt
 
     // Step 3
     durationMinutes: z.number(),
-    executionTiming: z.array(z.nativeEnum(ExecutionTiming)).min(1, "請至少選擇一個執行時機"),
+    executionTiming: z.array(z.nativeEnum(ExecutionTiming)),
     customTiming: z.string(),
 
     // Step 4
@@ -144,7 +144,13 @@ export const createManualPracticeFormSchema = (options?: ManualPracticeSchemaOpt
         })
       )
       .optional(),
-  });
+  }).refine(
+    (data) => data.executionTiming.length > 0 || data.customTiming.trim().length > 0,
+    {
+      message: "請至少選擇一個執行時機或填寫其他時段",
+      path: ["executionTiming"],
+    }
+  );
 };
 
 // 預設 schema（用於創建模式）

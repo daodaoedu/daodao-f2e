@@ -21,6 +21,7 @@ export const publicInfoFormSchema = z.object({
     .min(3, "ID 最少需要 3 個字符")
     .max(50, "ID 最多 50 個字符")
     .refine((val) => customIdRegex.test(val), "請依照 ID 的格式規則輸入"),
+  country: z.string().optional(),
   location: z.string().optional(),
   personalSlogan: z.string().min(1, "此為必填欄位").max(150, "個人標語最多 150 字"),
   selfIntroduction: z.string().max(350, "關於我最多 350 字").optional(),

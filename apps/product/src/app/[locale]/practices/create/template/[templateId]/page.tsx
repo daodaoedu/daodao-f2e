@@ -289,9 +289,6 @@ export default function TemplateDetailPage() {
         <PageHeader leftAction="back" leftLabel="" rightActionTo="/" variant="light" />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-5">
           <p className="text-white mb-4">載入模板時發生錯誤</p>
-          <Button variant="white" onClick={() => router.back()}>
-            返回
-          </Button>
         </div>
       </div>
     );

@@ -2,61 +2,18 @@ import { useMemo } from "react";
 import { CheckInStatus, type CheckInStatusType } from "@/constants/check-in-status";
 import type { ICheckInStatusOptions } from "../../types";
 
-const CHECK_IN_COOLDOWN_MS = 24 * 60 * 60 * 1000;
-
-/**
- * 檢查距離上次打卡是否未滿 24 小時
- * 支援 ISO 8601 時間戳 (e.g., "2024-01-20T09:00:00.000Z") 和日期字串 (e.g., "2024-01-20")
- * - ISO 時間戳：精確計算是否未滿 24 小時
- * - 日期字串：退回使用「是否為同一天」的判斷
- */
-const isWithinCooldown = (dateString: string | null | undefined): boolean => {
-  if (!dateString) return false;
-
-  try {
-    // ISO 8601 時間戳（包含 "T"）：精確計算 24 小時
-    if (dateString.includes("T")) {
-      const checkInTime = new Date(dateString);
-      if (Number.isNaN(checkInTime.getTime())) return false;
-
-      const now = new Date();
-      const diffMs = now.getTime() - checkInTime.getTime();
-      return diffMs < CHECK_IN_COOLDOWN_MS;
-    }
-
-    // 日期字串 (yyyy-MM-dd)：退回使用同一天判斷
-    const [year, month, day] = dateString.split("-").map(Number);
-    if (!year || !month || !day) return false;
-
-    const checkInDate = new Date(year, month - 1, day);
-    if (Number.isNaN(checkInDate.getTime())) return false;
-
-    // 驗證日期沒有溢出（例如 "2024-02-30" 會變成 3 月 1 日）
-    if (checkInDate.getDate() !== day) return false;
-
-    const today = new Date();
-    return (
-      checkInDate.getFullYear() === today.getFullYear() &&
-      checkInDate.getMonth() === today.getMonth() &&
-      checkInDate.getDate() === today.getDate()
-    );
-  } catch {
-    return false;
-  }
-};
-
 /**
  * Hook 用於檢查打卡狀態 (Mobile)
  */
 export const useCheckInStatus = (options: ICheckInStatusOptions) => {
-  const { practiceStatus, lastCheckInDate } = options;
+  const { practiceStatus } = options;
 
   return useMemo(() => {
     // 檢查實踐是否已完成
     const isPracticeCompleted = practiceStatus === "completed" || practiceStatus === "archived";
 
-    // 檢查距離上次打卡是否未滿 24 小時
-    const isCheckInLocked = isWithinCooldown(lastCheckInDate);
+    // 不限制打卡冷卻時間
+    const isCheckInLocked = false;
 
     // 決定最終狀態（優先級：已完成 > 冷卻中 > 可打卡）
     const getStatus = (): CheckInStatusType => {
@@ -90,5 +47,5 @@ export const useCheckInStatus = (options: ICheckInStatusOptions) => {
       canCheckIn,
       getButtonLabel,
     };
-  }, [practiceStatus, lastCheckInDate]);
+  }, [practiceStatus]);
 };

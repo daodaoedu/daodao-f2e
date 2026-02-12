@@ -122,7 +122,7 @@ export const manualPracticeFormSchema = z.object({
 
   // Step 3
   durationMinutes: z.number(),
-  executionTiming: z.array(z.nativeEnum(ExecutionTiming)).min(1, "請至少選擇一個執行時機"),
+  executionTiming: z.array(z.nativeEnum(ExecutionTiming)),
   customTiming: z.string(),
 
   // Step 4
@@ -143,6 +143,12 @@ export const manualPracticeFormSchema = z.object({
       })
     )
     .optional(),
-});
+}).refine(
+  (data) => data.executionTiming.length > 0 || data.customTiming.trim().length > 0,
+  {
+    message: "請至少選擇一個執行時機或填寫其他時段",
+    path: ["executionTiming"],
+  }
+);
 
 export type ManualPracticeFormValues = z.infer<typeof manualPracticeFormSchema>;
