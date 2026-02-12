@@ -163,7 +163,6 @@ export default function CheckInDetailPage() {
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
         <PageHeader
-          leftAction="back"
           title="打卡紀錄"
           rightActionTo={`/practices/${practiceId}`}
           variant="light"
@@ -182,7 +181,6 @@ export default function CheckInDetailPage() {
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
         <PageHeader
-          leftAction="back"
           title="打卡紀錄"
           rightActionTo={`/practices/${practiceId}`}
           variant="light"
@@ -230,7 +228,6 @@ export default function CheckInDetailPage() {
       />
 
       <PageHeader
-        leftAction="back"
         title="打卡紀錄"
         rightActionTo={`/practices/${practiceId}`}
         variant="light"
