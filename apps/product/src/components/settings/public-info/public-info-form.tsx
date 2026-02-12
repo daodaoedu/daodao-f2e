@@ -1,6 +1,7 @@
 "use client";
 
-import { useCurrentUser, useMutate, useUserMutations } from "@daodao/api";
+import { useCities, useCurrentUser, useMutate, useUserMutations } from "@daodao/api";
+import { useLocale } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
@@ -15,11 +16,19 @@ import { type PublicInfoFormValues, publicInfoFormSchema } from "./schema";
 import { SocialLinksSection } from "./social-links-section";
 
 export const PublicInfoForm = () => {
+  const locale = useLocale();
   const { data: userData, isLoading, error: userError } = useCurrentUser();
   const { updateCurrentUserWithFormData } = useUserMutations();
   const mutate = useMutate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
+  // 使用 search 參數精確搜尋用戶的城市，以獲取 countryCode
+  const userLocation = userData?.data?.location;
+  const { data: citiesData } = useCities({
+    search: userLocation || undefined,
+    locale: locale === "en" ? "en" : "zh-TW",
+  });
 
   const form = useForm<PublicInfoFormValues>({
     resolver: zodResolver(publicInfoFormSchema),
@@ -27,6 +36,7 @@ export const PublicInfoForm = () => {
       photoURL: "",
       name: "",
       customId: "",
+      country: "",
       location: "",
       personalSlogan: "",
       selfIntroduction: "",
@@ -47,10 +57,20 @@ export const PublicInfoForm = () => {
       const user = userData.data;
       const contactList = user.contactList;
 
+      // 根據 location 找到對應的 countryCode
+      let countryCode = "";
+      if (user.location && citiesData?.data) {
+        const city = citiesData.data.find((c) => c.code === user.location);
+        if (city?.countryCode) {
+          countryCode = city.countryCode;
+        }
+      }
+
       form.reset({
         photoURL: user.photoURL || "",
         name: user.name || "",
         customId: user.customId || "",
+        country: countryCode,
         location: user.location || "",
         personalSlogan: user.personalSlogan || "",
         selfIntroduction: user.selfIntroduction || "",
@@ -64,7 +84,7 @@ export const PublicInfoForm = () => {
         threads: contactList?.threads || "",
       });
     }
-  }, [userData, form.reset]);
+  }, [userData, citiesData, form.reset]);
 
   const handleSubmit = async (values: PublicInfoFormValues) => {
     setIsSubmitting(true);
