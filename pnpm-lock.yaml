@@ -360,6 +360,9 @@ importers:
       react-hook-form:
         specifier: 'catalog:'
         version: 7.69.0(react@19.2.3)
+      recharts:
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       swr:
         specifier: ^2.2.5
         version: 2.3.8(react@19.2.3)
@@ -6498,7 +6501,7 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   global-dirs@0.1.1:
     resolution: {integrity: sha512-NknMLn7F2J7aflwFOlGdNIuCDpN3VGoSoB+aap3KABFWbHVn1TCgFC+np23J8W2BiZbjfEw3BFBycSMv1AFblg==}

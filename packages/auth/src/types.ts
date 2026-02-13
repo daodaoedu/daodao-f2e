@@ -8,6 +8,8 @@ export interface StoredUser {
   email: string | null;
   name: string | null;
   photoUrl?: string | null;
+  roles: string[];
+  permissions: string[];
 }
 
 /**
@@ -51,4 +53,14 @@ export interface AuthContextValue {
   ) => T | Promise<T> | undefined;
   /** 重新檢查認證狀態（用於 onboarding 完成後刷新 isTemporary 狀態） */
   refreshAuth: () => Promise<void>;
+
+  // 角色與權限
+  roles: string[];
+  permissions: string[];
+  /** 檢查使用者是否擁有指定角色 */
+  hasRole: (role: string) => boolean;
+  /** 檢查使用者是否擁有指定權限 */
+  hasPermission: (permission: string) => boolean;
+  /** 檢查使用者是否為管理員（擁有任何 admin 相關角色） */
+  isAdmin: boolean;
 }

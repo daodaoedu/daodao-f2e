@@ -42,6 +42,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
+    "recharts": "catalog:",
     "swr": "^2.2.5",
     "zod": "catalog:"
   },
