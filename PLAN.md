@@ -66,26 +66,27 @@
 
 ### 路由結構
 
-在 product app 新增 admin 路由群組 `(admin)`，使用獨立的 admin layout（側邊導航列）：
+在 product app 新增 `admin/` 路由資料夾，直接使用 `admin/layout.tsx` 作為 Admin 專用 layout：
 
 ```
-apps/product/src/app/[locale]/(admin)/
-├── layout.tsx                          # Admin 專用 layout（側邊導航 + 頂部列）
-├── admin/
-│   ├── page.tsx                        # 總覽儀表板 (/admin)
-│   ├── users/
-│   │   ├── page.tsx                    # 使用者統計 (/admin/users)
-│   │   └── [userId]/
-│   │       └── page.tsx                # 使用者詳情 (/admin/users/[userId])
-│   ├── practices/
-│   │   └── page.tsx                    # 主題實踐管理 (/admin/practices)
-│   ├── email/
-│   │   └── page.tsx                    # 郵件管理 (/admin/email)
-│   ├── roles/
-│   │   └── page.tsx                    # 角色權限管理 (/admin/roles)
-│   └── system/
-│       └── page.tsx                    # 系統監控 (/admin/system)
+apps/product/src/app/[locale]/admin/
+├── layout.tsx                          # Admin 專用 layout（側邊導航 + 頂部列 + 權限檢查）
+├── page.tsx                            # 總覽儀表板 (/admin)
+├── users/
+│   ├── page.tsx                        # 使用者統計 (/admin/users)
+│   └── [userId]/
+│       └── page.tsx                    # 使用者詳情 (/admin/users/[userId])
+├── practices/
+│   └── page.tsx                        # 主題實踐管理 (/admin/practices)
+├── email/
+│   └── page.tsx                        # 郵件管理 (/admin/email)
+├── roles/
+│   └── page.tsx                        # 角色權限管理 (/admin/roles)
+└── system/
+    └── page.tsx                        # 系統監控 (/admin/system)
 ```
+
+> 不使用 `(admin)` route group 外包，因為所有 admin 頁面都共用 `/admin` 前綴，直接用 `admin/` 資料夾即可產生對應 URL 並掛載 layout。
 
 ### API Service 層
 
@@ -117,7 +118,7 @@ packages/api/src/services/
   - 本月新增使用者數（對比上月）
   - 活躍使用者數 + 活躍率
   - 郵件發送成功率
-- **DAU/WAU/MAU 趨勢圖**：折線圖顯示日活/週活/月活及各自趨勢
+- **DAU/WAU/MAU 指標卡片**：顯示日活/週活/月活數值及趨勢箭頭（↑↓ 百分比變化），因後端 `active-users` API 回傳的是當前快照而非時間序列
 - **郵件服務健康狀態**：狀態指示燈 (healthy/degraded/unhealthy)、SMTP 連線、佇列大小
 - **快速連結**：跳轉到各子頁面
 
@@ -173,13 +174,16 @@ packages/api/src/services/
 ### 頁面 3：使用者詳情 (`/admin/users/[userId]`)
 
 **對應 API：**
-- `GET /api/v1/admin/users/{userId}/role`
-- `PUT /api/v1/admin/users/{userId}/role`
-- `GET /api/v1/practices/user/{userId}`
-- `GET /api/v1/practices/stats?userId={userId}`
+- `GET /api/v1/users/{id}` — 取得用戶基本資料（`FormattedUserResponse`：name、email、photoURL、createdDate、loginCount、lastLoginAt、profileViews 等）
+- `GET /api/v1/admin/users/{userId}/role` — 取得用戶角色（`UserRoleInfo`：userId、role）
+- `PUT /api/v1/admin/users/{userId}/role` — 更新用戶角色（需超級管理員）
+- `GET /api/v1/practices/user/{userId}` — 取得該用戶的實踐列表（分頁）
+- `GET /api/v1/practices/stats?userId={userId}` — 取得該用戶的實踐統計
+
+> **注意**：`FormattedUserResponse` 不包含 `email_verified`、`is_active`、`roles[]`、`permissions[]` 等管理欄位。這些欄位僅存在於 `GET /api/v1/me/auth` 回應中（僅限當前用戶）。若需要在 admin 詳情頁顯示這些欄位，需請後端新增 `GET /api/v1/admin/users/{userId}` API。
 
 **UI 元件：**
-- **使用者資訊卡片**：頭像、暱稱、email、註冊時間
+- **使用者資訊卡片**：頭像（photoURL）、暱稱（name）、email、註冊時間（createdDate）、最後登入（lastLoginAt）、登入次數（loginCount）
 - **角色管理**：當前角色顯示 + 修改角色下拉選單
 - **該用戶的實踐統計**：總實踐數、活躍數、完成數、總簽到次數、平均連續天數、最大連續天數
 - **該用戶的實踐列表**：表格顯示，支援分頁和狀態篩選
@@ -279,13 +283,21 @@ packages/api/src/services/
 
 ## 四、實作步驟
 
+### Phase 0：Auth 系統擴充（前置條件）
+
+> 後端 `GET /api/v1/me/auth` 已回傳 `roles[]` 和 `permissions[]`，但前端 `AuthProvider` 完全未解析這些欄位。這是整個 Admin 介面的權限基礎，必須先完成。
+
+1. 擴充 `StoredUser` 型別（`packages/auth/src/types.ts`）：新增 `roles: string[]`、`permissions: string[]` 欄位
+2. 更新 `AuthProvider.checkAuth()`（`packages/auth/src/lib/auth-provider.tsx`）：從 `getAuthMe()` 回應中解析 `roles` 和 `permissions` 並存入 state
+3. 擴充 `AuthContextValue`（`packages/auth/src/types.ts`）：新增 `roles: string[]`、`permissions: string[]`、`hasRole(role: string): boolean`、`hasPermission(perm: string): boolean` 等 helper
+4. 在 `StoredUser` localStorage 快取中一併保存 `roles` / `permissions`（非敏感資訊，可加速頁面載入判斷）
+
 ### Phase 1：基礎架構
-1. 建立 admin 路由群組和 layout
-2. 建立 admin 側邊導航元件
-3. 建立 admin API service (`packages/api/src/services/admin.ts`)
-4. 建立 admin SWR hooks (`packages/api/src/services/admin-hooks.ts`)
-5. 建立 email API service 和 hooks
-6. 在 AuthProvider 中加入 admin 路由保護（需管理員權限才能進入）
+5. 建立 `admin/layout.tsx`：使用 `useAuthContext()` 檢查 `roles` 是否包含 admin 角色，無權限時導回首頁或顯示 403 頁面
+6. 建立 admin 側邊導航元件
+7. 建立 admin API service (`packages/api/src/services/admin.ts`)
+8. 建立 admin SWR hooks (`packages/api/src/services/admin-hooks.ts`)
+9. 建立 email API service 和 hooks
 
 ### Phase 2：總覽儀表板
 7. 實作 KPI 卡片元件（可複用）
@@ -337,7 +349,19 @@ packages/api/src/services/
 
 ## 六、權限保護策略
 
-1. **Admin Layout 層級**：在 `(admin)/layout.tsx` 中呼叫 `getCurrentUser()` 確認角色是否為 admin
-2. **路由保護**：在 `AuthProvider` 的 `publicPattern` 中不包含 `/admin`，確保所有 admin 路由需登入
-3. **API 層**：後端已對所有 admin API 做 401/403 檢查，前端不需重複驗證，但需處理錯誤回應
-4. **超級管理員操作**：如角色/權限 CRUD、用戶角色指派等，前端可根據用戶權限隱藏/禁用操作按鈕
+1. **Auth 系統擴充（Phase 0）**：擴充 `StoredUser` 和 `AuthContextValue`，從 `GET /api/v1/me/auth` 解析 `roles[]` 和 `permissions[]`，提供 `hasRole()` / `hasPermission()` helper
+2. **Admin Layout 層級**：在 `admin/layout.tsx` 中使用 `useAuthContext()` 取得 `roles`，檢查是否包含 admin 角色。無權限時導回首頁或顯示 403 頁面
+3. **路由保護**：`AuthProvider` 的 `publicPattern` 不包含 `/admin`（現有設定已自動保護），確保所有 admin 路由需登入
+4. **API 層**：後端已對所有 admin API 做 401/403 檢查，前端不需重複驗證，但需處理錯誤回應（如 token 過期重新導向）
+5. **超級管理員操作**：如角色/權限 CRUD、用戶角色指派等，前端使用 `hasPermission('role:manage')` 判斷是否顯示操作按鈕
+
+### 資料流說明
+
+```
+用戶登入
+  → GET /api/v1/me/auth
+  → 回傳 { user: { roles: ["admin"], permissions: ["user:read", ...] } }
+  → AuthProvider 解析並存入 context + localStorage
+  → admin/layout.tsx 用 useAuthContext().roles 判斷權限
+  → 各頁面用 hasPermission() 控制操作按鈕顯示
+```
