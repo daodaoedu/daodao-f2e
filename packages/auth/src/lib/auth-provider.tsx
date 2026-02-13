@@ -602,10 +602,7 @@ export const AuthProvider = ({
     [permissions]
   );
   const isAdmin = useMemo(
-    () =>
-      roles.some(
-        (r) => r === "admin" || r === "Admin" || r === "SuperAdmin" || r === "superadmin"
-      ),
+    () => roles.some((r) => r.toLowerCase().includes("admin")),
     [roles]
   );
 

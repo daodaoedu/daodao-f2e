@@ -319,54 +319,58 @@ function EmailSendTab() {
       <div className="rounded-xl border border-border bg-white p-5 shadow-sm space-y-4">
         {emailType === "custom" ? (
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label htmlFor="email-recipient" className="block text-sm font-medium mb-1">
               收件人
-              <input
-                type="email"
-                value={recipient}
-                onChange={(e) => setRecipient(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal"
-                placeholder="user@example.com"
-              />
             </label>
+            <input
+              id="email-recipient"
+              type="email"
+              value={recipient}
+              onChange={(e) => setRecipient(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal"
+              placeholder="user@example.com"
+            />
           </div>
         ) : (
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label htmlFor="email-bulk-recipients" className="block text-sm font-medium mb-1">
               收件人列表（每行一個，最多 100 位）
-              <textarea
-                value={bulkRecipients}
-                onChange={(e) => setBulkRecipients(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm h-24 resize-y font-normal"
-                placeholder={"user1@example.com\nuser2@example.com"}
-              />
             </label>
+            <textarea
+              id="email-bulk-recipients"
+              value={bulkRecipients}
+              onChange={(e) => setBulkRecipients(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm h-24 resize-y font-normal"
+              placeholder={"user1@example.com\nuser2@example.com"}
+            />
           </div>
         )}
 
         <div>
-          <label className="block text-sm font-medium mb-1">
+          <label htmlFor="email-subject" className="block text-sm font-medium mb-1">
             主旨
-            <input
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal"
-              placeholder="郵件主旨"
-            />
           </label>
+          <input
+            id="email-subject"
+            type="text"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal"
+            placeholder="郵件主旨"
+          />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">
+          <label htmlFor="email-body" className="block text-sm font-medium mb-1">
             內容（HTML）
-            <textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm h-40 resize-y font-mono font-normal"
-              placeholder="<p>郵件內容...</p>"
-            />
           </label>
+          <textarea
+            id="email-body"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm h-40 resize-y font-mono font-normal"
+            placeholder="<p>郵件內容...</p>"
+          />
         </div>
 
         {result && (

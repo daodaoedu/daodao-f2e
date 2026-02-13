@@ -85,10 +85,10 @@ function ExportButton() {
   const [format, setFormat] = useState<"csv" | "excel">("csv");
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleExport = (type: "registrations" | "activity" | "full") => {
-    const url = getAdminExportUrl({ format, type });
-    window.open(url, "_blank");
-    setIsOpen(false);
+  const getExportLabel = (type: "registrations" | "activity" | "full") => {
+    if (type === "registrations") return "註冊統計";
+    if (type === "activity") return "活躍度統計";
+    return "完整資料";
   };
 
   return (
@@ -114,18 +114,16 @@ function ExportButton() {
             </select>
           </div>
           {(["registrations", "activity", "full"] as const).map((type) => (
-            <button
+            <a
               key={type}
-              type="button"
-              onClick={() => handleExport(type)}
-              className="w-full px-3 py-2 text-left text-sm hover:bg-basic-50"
+              href={getAdminExportUrl({ format, type })}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setIsOpen(false)}
+              className="block w-full px-3 py-2 text-left text-sm hover:bg-basic-50"
             >
-              {type === "registrations"
-                ? "註冊統計"
-                : type === "activity"
-                  ? "活躍度統計"
-                  : "完整資料"}
-            </button>
+              {getExportLabel(type)}
+            </a>
           ))}
         </div>
       )}

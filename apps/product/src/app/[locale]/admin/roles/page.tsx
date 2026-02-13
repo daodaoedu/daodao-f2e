@@ -4,7 +4,7 @@ import { useAdminMutations, useAdminPermissions, useAdminRole, useAdminRoles } f
 import { useAuth } from "@daodao/auth";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronDown, ChevronRight, Plus, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type TabId = "roles" | "permissions";
 
@@ -56,6 +56,8 @@ function RolesTab() {
 
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [expandedRoleId, setExpandedRoleId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const roles = (data?.data ?? []) as Array<{
     id?: number;
@@ -66,19 +68,34 @@ function RolesTab() {
   }>;
 
   const handleCreateRole = async (name: string, description: string) => {
-    await mutations.createRole({ name, description });
-    mutate();
-    setShowCreateDialog(false);
+    setError(null);
+    try {
+      await mutations.createRole({ name, description });
+      mutate();
+      setShowCreateDialog(false);
+    } catch (_err) {
+      setError("建立角色失敗，請重試");
+    }
   };
 
   const handleDeleteRole = async (id: string) => {
-    if (!confirm("確定要刪除此角色？")) return;
-    await mutations.deleteRole(id);
-    mutate();
+    setError(null);
+    try {
+      await mutations.deleteRole(id);
+      mutate();
+    } catch (_err) {
+      setError("刪除角色失敗，請重試");
+    } finally {
+      setDeleteConfirmId(null);
+    }
   };
 
   return (
     <div className="space-y-4">
+      {error && (
+        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+      )}
+
       {canManage && (
         <button
           type="button"
@@ -96,6 +113,15 @@ function RolesTab() {
           title="新增角色"
           onClose={() => setShowCreateDialog(false)}
           onSubmit={handleCreateRole}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirmId && (
+        <ConfirmDialog
+          message="確定要刪除此角色？"
+          onConfirm={() => handleDeleteRole(deleteConfirmId)}
+          onCancel={() => setDeleteConfirmId(null)}
         />
       )}
 
@@ -134,7 +160,7 @@ function RolesTab() {
                   {canManage && (
                     <button
                       type="button"
-                      onClick={() => handleDeleteRole(String(role.id))}
+                      onClick={() => setDeleteConfirmId(String(role.id))}
                       className="rounded p-1 text-basic-300 hover:bg-red-50 hover:text-red-500"
                     >
                       <Trash2 className="size-4" />
@@ -252,6 +278,8 @@ function PermissionsTab() {
   const canManage = hasPermission("role:manage");
 
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const permissions = (data?.data ?? []) as Array<{
     id?: number;
@@ -261,19 +289,34 @@ function PermissionsTab() {
   }>;
 
   const handleCreate = async (name: string, description: string) => {
-    await mutations.createPermission({ name, description });
-    mutate();
-    setShowCreateDialog(false);
+    setError(null);
+    try {
+      await mutations.createPermission({ name, description });
+      mutate();
+      setShowCreateDialog(false);
+    } catch (_err) {
+      setError("建立權限失敗，請重試");
+    }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("確定要刪除此權限？")) return;
-    await mutations.deletePermission(id);
-    mutate();
+    setError(null);
+    try {
+      await mutations.deletePermission(id);
+      mutate();
+    } catch (_err) {
+      setError("刪除權限失敗，請重試");
+    } finally {
+      setDeleteConfirmId(null);
+    }
   };
 
   return (
     <div className="space-y-4">
+      {error && (
+        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+      )}
+
       {canManage && (
         <button
           type="button"
@@ -291,6 +334,15 @@ function PermissionsTab() {
           namePlaceholder="resource:action (例如 user:read)"
           onClose={() => setShowCreateDialog(false)}
           onSubmit={handleCreate}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirmId && (
+        <ConfirmDialog
+          message="確定要刪除此權限？"
+          onConfirm={() => handleDelete(deleteConfirmId)}
+          onCancel={() => setDeleteConfirmId(null)}
         />
       )}
 
@@ -323,7 +375,7 @@ function PermissionsTab() {
                     <td className="px-4 py-3">
                       <button
                         type="button"
-                        onClick={() => handleDelete(String(perm.id))}
+                        onClick={() => setDeleteConfirmId(String(perm.id))}
                         className="rounded p-1 text-basic-300 hover:bg-red-50 hover:text-red-500"
                       >
                         <Trash2 className="size-4" />
@@ -369,37 +421,49 @@ function CreateDialog({
     }
   };
 
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    },
+    [onClose]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: overlay backdrop click to close dialog */}
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: overlay backdrop click to close dialog */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-label={title}>
+      <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
       <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
         <h3 className="mb-4 text-lg font-semibold">{title}</h3>
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label htmlFor="create-dialog-name" className="block text-sm font-medium mb-1">
               名稱
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal"
-                placeholder={namePlaceholder}
-              />
             </label>
+            <input
+              id="create-dialog-name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal"
+              placeholder={namePlaceholder}
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label htmlFor="create-dialog-description" className="block text-sm font-medium mb-1">
               描述
-              <input
-                type="text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal"
-                placeholder="描述（選填）"
-              />
             </label>
+            <input
+              id="create-dialog-description"
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal"
+              placeholder="描述（選填）"
+            />
           </div>
         </div>
         <div className="mt-4 flex justify-end gap-2">
@@ -417,6 +481,53 @@ function CreateDialog({
             className="rounded-lg bg-primary-base px-4 py-2 text-sm text-white disabled:opacity-50"
           >
             {isSubmitting ? "建立中..." : "建立"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ConfirmDialog({
+  message,
+  onConfirm,
+  onCancel,
+}: {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCancel();
+    },
+    [onCancel]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="alertdialog" aria-modal="true" aria-label="確認操作">
+      <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
+      <div className="relative w-full max-w-sm rounded-xl bg-white p-6 shadow-lg">
+        <p className="mb-4 text-sm">{message}</p>
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-lg border border-border px-4 py-2 text-sm hover:bg-basic-50"
+          >
+            取消
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-lg bg-red-500 px-4 py-2 text-sm text-white hover:bg-red-600"
+          >
+            確定刪除
           </button>
         </div>
       </div>

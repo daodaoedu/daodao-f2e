@@ -33,6 +33,7 @@ export default function UserDetailPage() {
 
   const [selectedRoleId, setSelectedRoleId] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const user = userData?.data as
     | {
@@ -78,11 +79,13 @@ export default function UserDetailPage() {
   const handleSaveRole = async () => {
     if (!selectedRoleId) return;
     setIsSaving(true);
+    setSaveError(null);
     try {
       await mutations.updateUserRole(userId, Number(selectedRoleId));
       mutateRole();
     } catch (err) {
       console.error("Failed to update role:", err);
+      setSaveError("角色更新失敗，請重試");
     } finally {
       setIsSaving(false);
     }
@@ -113,7 +116,7 @@ export default function UserDetailPage() {
       <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
         <div className="flex items-start gap-4">
           {user?.photoUrl ? (
-            <img src={user.photoUrl} alt="" className="size-16 rounded-full object-cover" />
+            <img src={user.photoUrl} alt={user.name ?? "使用者頭像"} className="size-16 rounded-full object-cover" />
           ) : (
             <div className="flex size-16 items-center justify-center rounded-full bg-primary-base/10 text-xl font-bold text-primary-base">
               {user?.name?.[0] ?? "?"}
@@ -167,6 +170,9 @@ export default function UserDetailPage() {
             >
               {isSaving ? "儲存中..." : "儲存變更"}
             </button>
+            {saveError && (
+              <span className="text-sm text-red-600">{saveError}</span>
+            )}
           </div>
         )}
       </div>
@@ -200,9 +206,9 @@ export default function UserDetailPage() {
                 </tr>
               </thead>
               <tbody>
-                {loginHistory.records.map((record) => (
+                {loginHistory.records.map((record, index) => (
                   <tr
-                    key={`login-${record.loginAt ?? record.ipAddress}`}
+                    key={`login-${index}-${record.loginAt ?? record.ipAddress}`}
                     className="border-b border-border/50"
                   >
                     <td className="px-4 py-2 whitespace-nowrap">
