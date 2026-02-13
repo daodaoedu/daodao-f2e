@@ -29,7 +29,6 @@ import { PracticeSummaryCard } from "./practice-summary-card";
 
 interface PracticeSummaryPageProps {
   summary: PracticeSummary;
-  practiceId: string;
 }
 
 /**
@@ -48,7 +47,7 @@ const MoodIconMap: Record<MoodType, ComponentType<{ className?: string }>> = {
  * 實踐完成總結頁面元件
  * @description 顯示實踐完成的慶祝頁面、摘要圖片和分享功能
  */
-export function PracticeSummaryPage({ summary, practiceId: _practiceId }: PracticeSummaryPageProps) {
+export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
   const router = useRouter();
 
   // 使用摘要圖片生成 hook

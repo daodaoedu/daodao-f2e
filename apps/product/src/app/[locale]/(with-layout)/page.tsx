@@ -97,9 +97,8 @@ export default function HomePage() {
 
   // 根據篩選狀態過濾進行中的任務
   const filteredInProgressTasks = useMemo(() => {
-    if (filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed) {
-      return inProgressTasks;
-    }
+    if (filterStatus === FilterStatus.completed) return [];
+    if (filterStatus === FilterStatus.all) return inProgressTasks;
     return inProgressTasks.filter((task) => task.status === filterStatus);
   }, [inProgressTasks, filterStatus]);
 

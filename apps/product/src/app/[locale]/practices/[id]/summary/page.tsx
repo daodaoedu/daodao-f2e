@@ -113,5 +113,5 @@ export default function PracticeSummaryPageRoute() {
     );
   }
 
-  return <PracticeSummaryPage summary={summary} practiceId={practiceId} />;
+  return <PracticeSummaryPage summary={summary} />;
 }
