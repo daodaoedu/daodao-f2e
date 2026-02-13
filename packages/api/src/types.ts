@@ -18440,6 +18440,418 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得使用者列表
+         * @description 取得使用者列表，支援搜尋、篩選、分頁。包含 email_verified、is_active、roles、permissions 等管理欄位。需要管理員權限。
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 搜尋名稱或 email */
+                    search?: string;
+                    /** @description 篩選角色 ID */
+                    roleId?: string;
+                    /** @description 篩選啟用狀態 */
+                    isActive?: "true" | "false";
+                    /** @description 篩選 email 驗證狀態 */
+                    isVerified?: "true" | "false";
+                    /** @description 頁數 */
+                    page?: string;
+                    /** @description 每頁數量 */
+                    limit?: string;
+                    /** @description 排序欄位 */
+                    sortBy?: "createdAt" | "lastLoginAt" | "name" | "email";
+                    /** @description 排序方向 */
+                    sortOrder?: "asc" | "desc";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得使用者列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminUserListResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得使用者詳情
+         * @description 取得使用者完整詳情，包含 roles、permissions、loginHistory、activityStats 等管理欄位。需要管理員權限。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 用戶內部 ID */
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得使用者詳情 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminUserDetailResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{userId}/login-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得使用者登入歷史
+         * @description 取得指定使用者的登入歷史記錄，支援日期範圍篩選。需要管理員權限。
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 開始日期 */
+                    startDate?: string;
+                    /** @description 結束日期 */
+                    endDate?: string;
+                    /** @description 頁數 */
+                    page?: string;
+                    /** @description 每頁數量 */
+                    limit?: string;
+                };
+                header?: never;
+                path: {
+                    /** @description 用戶內部 ID */
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得登入歷史 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminLoginHistoryResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{userId}/activity-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得使用者活躍統計
+         * @description 取得指定使用者的活躍統計數據。需要管理員權限。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 用戶內部 ID */
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得活躍統計 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminActivityStatsResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{userId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 更新使用者狀態
+         * @description 啟用或停用使用者帳號。需要超級管理員權限。
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 用戶內部 ID */
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateUserStatusRequest"];
+                };
+            };
+            responses: {
+                /** @description 使用者狀態更新成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UpdateUserStatusResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/practices/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得實踐統計
+         * @description 取得全站實踐統計數據，包含總數、各狀態數量、分類統計等。需要管理員權限。
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 開始日期 */
+                    startDate?: string;
+                    /** @description 結束日期 */
+                    endDate?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得實踐統計 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PracticeStatsResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/user-stats/active-users/trend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得活躍用戶趨勢
+         * @description 取得 DAU/WAU/MAU 時間序列資料，用於繪製趨勢圖表。預設 30 天，最多 90 天。需要管理員權限。
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 查詢天數（預設 30，最大 90） */
+                    days?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得活躍用戶趨勢 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ActiveUsersTrendResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/email/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得郵件發送歷史
+         * @description 取得郵件發送歷史記錄，支援多條件篩選、分頁、排序。包含統計摘要。需要管理員權限。
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 郵件類型 */
+                    emailType?: string;
+                    /** @description 發送狀態 */
+                    status?: "sent" | "failed" | "pending";
+                    /** @description 收件人 email */
+                    recipient?: string;
+                    /** @description 用戶 ID */
+                    userId?: string;
+                    /** @description 開始日期 */
+                    startDate?: string;
+                    /** @description 結束日期 */
+                    endDate?: string;
+                    /** @description 頁數 */
+                    page?: string;
+                    /** @description 每頁數量 */
+                    limit?: string;
+                    /** @description 排序欄位 */
+                    sortBy?: "sentAt" | "createdAt";
+                    /** @description 排序方向 */
+                    sortOrder?: "asc" | "desc";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得郵件歷史 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmailHistoryResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/db-info": {
         parameters: {
             query?: never;
@@ -18449,7 +18861,7 @@ export interface paths {
         };
         /**
          * 取得資料庫資訊
-         * @description 取得 MongoDB、PostgreSQL 和 Redis 的詳細資訊，包括欄位、索引、約束等
+         * @description 取得 PostgreSQL 和 Redis 的詳細資訊，包括欄位、索引、約束等
          */
         get: {
             parameters: {
@@ -18467,13 +18879,6 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            mongo: {
-                                [key: string]: {
-                                    fields: string[];
-                                };
-                            } | {
-                                error: string;
-                            };
                             postgres: {
                                 [key: string]: {
                                     columns: unknown[];
@@ -18517,7 +18922,7 @@ export interface paths {
         };
         /**
          * 取得系統監控資訊
-         * @description 取得系統資源使用情況，包括 CPU、記憶體、磁碟、MongoDB 和 PostgreSQL 狀態
+         * @description 取得系統資源使用情況，包括 CPU、記憶體、磁碟和 PostgreSQL 狀態
          */
         get: {
             parameters: {
@@ -18552,13 +18957,6 @@ export interface paths {
                                 processId: number;
                                 processTitle: string;
                                 processArgs: string[];
-                            };
-                            mongo: {
-                                status?: string;
-                                database?: string;
-                                collections?: unknown[];
-                                error?: string;
-                                details?: string;
                             };
                             postgres: {
                                 version?: string;
@@ -26373,6 +26771,555 @@ export interface components {
              */
             userId: string;
         };
+        AdminUserListQuery: {
+            /**
+             * @description 搜尋名稱或 email
+             * @example john
+             */
+            search?: string;
+            /**
+             * @description 篩選角色 ID
+             * @example 2
+             */
+            roleId?: string;
+            /**
+             * @description 篩選啟用狀態
+             * @example true
+             * @enum {string}
+             */
+            isActive?: "true" | "false";
+            /**
+             * @description 篩選 email 驗證狀態
+             * @example true
+             * @enum {string}
+             */
+            isVerified?: "true" | "false";
+            /**
+             * @description 頁數
+             * @example 1
+             */
+            page?: string;
+            /**
+             * @description 每頁數量
+             * @example 20
+             */
+            limit?: string;
+            /**
+             * @description 排序欄位
+             * @default createdAt
+             * @example createdAt
+             * @enum {string}
+             */
+            sortBy: "createdAt" | "lastLoginAt" | "name" | "email";
+            /**
+             * @description 排序方向
+             * @default desc
+             * @example desc
+             * @enum {string}
+             */
+            sortOrder: "asc" | "desc";
+        };
+        AdminUserIdParam: {
+            /**
+             * @description 用戶內部 ID
+             * @example 123
+             */
+            userId: string;
+        };
+        AdminLoginHistoryQuery: {
+            /**
+             * @description 開始日期
+             * @example 2024-01-01
+             */
+            startDate?: string;
+            /**
+             * @description 結束日期
+             * @example 2024-01-31
+             */
+            endDate?: string;
+            /**
+             * @description 頁數
+             * @example 1
+             */
+            page?: string;
+            /**
+             * @description 每頁數量
+             * @example 20
+             */
+            limit?: string;
+        };
+        UpdateUserStatusRequest: {
+            /**
+             * @description 是否啟用帳號
+             * @example true
+             */
+            isActive: boolean;
+        };
+        RoleInfo: {
+            /**
+             * @description 角色 ID
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 角色名稱
+             * @example Admin
+             */
+            name: string;
+            /**
+             * @description 角色描述
+             * @example 系統管理員
+             */
+            description: string | null;
+        };
+        AdminUserListItem: {
+            /**
+             * @description 用戶外部 ID (UUID)
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            id: string;
+            /**
+             * @description 用戶內部 ID
+             * @example 123
+             */
+            internalId: number;
+            /**
+             * @description 用戶名稱
+             * @example 王小明
+             */
+            name: string | null;
+            /**
+             * @description 電子郵件
+             * @example user@example.com
+             */
+            email: string | null;
+            /**
+             * @description 頭像 URL
+             * @example https://example.com/avatar.jpg
+             */
+            photoURL: string | null;
+            /**
+             * @description Email 是否已驗證
+             * @example true
+             */
+            emailVerified: boolean;
+            /**
+             * @description Email 驗證時間
+             * @example 2024-01-15T10:30:00.000Z
+             */
+            emailVerifiedAt: string | null;
+            /**
+             * @description 帳號是否啟用
+             * @example true
+             */
+            isActive: boolean;
+            /** @description 用戶角色列表 */
+            roles: components["schemas"]["RoleInfo"][];
+            /**
+             * @description 用戶權限列表
+             * @example [
+             *       "users:read",
+             *       "users:write"
+             *     ]
+             */
+            permissions: string[];
+            /**
+             * @description 建立時間
+             * @example 2024-01-15T10:30:00.000Z
+             */
+            createdAt: string;
+            /**
+             * @description 最後登入時間
+             * @example 2024-01-20T08:30:00.000Z
+             */
+            lastLoginAt: string | null;
+        };
+        AdminUserDetailData: {
+            /** @description 用戶外部 ID (UUID) */
+            id: string;
+            /** @description 用戶內部 ID */
+            internalId: number;
+            /** @description 用戶名稱 */
+            name: string | null;
+            /** @description 電子郵件 */
+            email: string | null;
+            /** @description 頭像 URL */
+            photoURL: string | null;
+            /** @description Email 是否已驗證 */
+            emailVerified: boolean;
+            /** @description Email 驗證時間 */
+            emailVerifiedAt: string | null;
+            /** @description 帳號是否啟用 */
+            isActive: boolean;
+            /** @description 用戶角色列表 */
+            roles: components["schemas"]["RoleInfo"][];
+            /** @description 用戶權限列表 */
+            permissions: string[];
+            /** @description 最近登入歷史（最近 10 筆） */
+            recentLoginHistory: components["schemas"]["LoginHistoryRecord"][];
+            activityStats: components["schemas"]["UserActivityStats"];
+            /** @description 建立時間 */
+            createdAt: string;
+            /** @description 更新時間 */
+            updatedAt: string;
+        };
+        LoginHistoryRecord: {
+            /**
+             * @description 記錄 ID
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 裝置類型
+             * @example desktop
+             */
+            deviceType: string | null;
+            /**
+             * @description 作業系統
+             * @example macOS 14.0
+             */
+            os: string | null;
+            /**
+             * @description 瀏覽器
+             * @example Chrome 120
+             */
+            browser: string | null;
+            /** @description User-Agent 字串 */
+            userAgent: string | null;
+            /**
+             * @description IP 地址
+             * @example 192.168.1.1
+             */
+            ipAddress: string | null;
+            /**
+             * @description 登入時間
+             * @example 2024-01-20T08:30:00.000Z
+             */
+            loginAt: string | null;
+        };
+        /** @description 活躍統計 */
+        UserActivityStats: {
+            /** @description 最後登入時間 */
+            lastLoginAt: string | null;
+            /** @description 最後活動時間 */
+            lastActiveAt: string | null;
+            /**
+             * @description 總登入次數
+             * @example 42
+             */
+            loginCount: number;
+            /**
+             * @description 個人檔案被查看次數
+             * @example 128
+             */
+            profileViews: number;
+            /**
+             * @description 最近 30 天登入次數
+             * @example 15
+             */
+            recentLoginCount: number;
+        };
+        PracticeStatsQuery: {
+            /**
+             * @description 開始日期
+             * @example 2024-01-01
+             */
+            startDate?: string;
+            /**
+             * @description 結束日期
+             * @example 2024-01-31
+             */
+            endDate?: string;
+        };
+        ActiveUsersTrendQuery: {
+            /**
+             * @description 查詢天數（預設 30，最大 90）
+             * @example 30
+             */
+            days?: string;
+        };
+        PracticeStatsData: {
+            /**
+             * @description 總實踐數
+             * @example 500
+             */
+            totalPractices: number;
+            /**
+             * @description 進行中的實踐數
+             * @example 150
+             */
+            activePractices: number;
+            /**
+             * @description 已完成的實踐數
+             * @example 300
+             */
+            completedPractices: number;
+            /**
+             * @description 平均完成率（百分比）
+             * @example 65.5
+             */
+            averageCompletionRate: number;
+            /** @description 依分類統計 */
+            practicesByCategory: components["schemas"]["PracticesByCategory"][];
+            /** @description 依狀態統計 */
+            practicesByStatus: components["schemas"]["PracticesByStatus"][];
+        };
+        PracticesByCategory: {
+            /**
+             * @description 分類名稱
+             * @example 程式設計
+             */
+            category: string;
+            /**
+             * @description 數量
+             * @example 25
+             */
+            count: number;
+        };
+        PracticesByStatus: {
+            /**
+             * @description 狀態名稱
+             * @example active
+             */
+            status: string;
+            /**
+             * @description 數量
+             * @example 100
+             */
+            count: number;
+        };
+        ActiveUsersTrendData: {
+            /** @description 時間序列資料 */
+            trend: components["schemas"]["ActiveUsersTrendDataPoint"][];
+            metadata: components["schemas"]["ActiveUsersTrendMetadata"];
+        };
+        ActiveUsersTrendDataPoint: {
+            /**
+             * @description 日期 (YYYY-MM-DD)
+             * @example 2024-01-15
+             */
+            date: string;
+            /**
+             * @description 日活躍用戶數
+             * @example 156
+             */
+            dau: number;
+            /**
+             * @description 週活躍用戶數
+             * @example 534
+             */
+            wau: number;
+            /**
+             * @description 月活躍用戶數
+             * @example 892
+             */
+            mau: number;
+        };
+        /** @description 元資料 */
+        ActiveUsersTrendMetadata: {
+            /**
+             * @description 查詢的天數
+             * @example 30
+             */
+            days: number;
+            /**
+             * @description 開始日期
+             * @example 2024-01-01
+             */
+            startDate: string;
+            /**
+             * @description 結束日期
+             * @example 2024-01-30
+             */
+            endDate: string;
+            /**
+             * @description 是否因超過最大範圍而被限制
+             * @example false
+             */
+            isLimited: boolean;
+            /**
+             * @description 資料生成時間
+             * @example 2024-01-31T10:30:00.000Z
+             */
+            generatedAt: string;
+        };
+        EmailHistoryQuery: {
+            /**
+             * @description 郵件類型
+             * @example verification
+             */
+            emailType?: string;
+            /**
+             * @description 發送狀態
+             * @example sent
+             * @enum {string}
+             */
+            status?: "sent" | "failed" | "pending";
+            /**
+             * Format: email
+             * @description 收件人 email
+             * @example user@example.com
+             */
+            recipient?: string;
+            /**
+             * @description 用戶 ID
+             * @example 123
+             */
+            userId?: string;
+            /**
+             * @description 開始日期
+             * @example 2024-01-01
+             */
+            startDate?: string;
+            /**
+             * @description 結束日期
+             * @example 2024-01-31
+             */
+            endDate?: string;
+            /**
+             * @description 頁數
+             * @example 1
+             */
+            page?: string;
+            /**
+             * @description 每頁數量
+             * @example 50
+             */
+            limit?: string;
+            /**
+             * @description 排序欄位
+             * @default sentAt
+             * @example sentAt
+             * @enum {string}
+             */
+            sortBy: "sentAt" | "createdAt";
+            /**
+             * @description 排序方向
+             * @default desc
+             * @example desc
+             * @enum {string}
+             */
+            sortOrder: "asc" | "desc";
+        };
+        EmailHistoryRecord: {
+            /**
+             * @description 記錄 ID
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 用戶 ID
+             * @example 123
+             */
+            userId: number;
+            /**
+             * @description 收件人 email
+             * @example user@example.com
+             */
+            recipientEmail: string | null;
+            /**
+             * @description 郵件類型
+             * @example verification
+             */
+            emailType: string;
+            /**
+             * @description 郵件主題
+             * @example 請驗證您的電子郵件
+             */
+            subject: string | null;
+            /**
+             * @description 發送狀態
+             * @example sent
+             * @enum {string}
+             */
+            status: "sent" | "failed" | "pending";
+            /**
+             * @description 發送時間
+             * @example 2024-01-15T10:30:00.000Z
+             */
+            sentAt: string | null;
+            /**
+             * @description 建立時間
+             * @example 2024-01-15T10:30:00.000Z
+             */
+            createdAt: string | null;
+            /**
+             * @description 關聯實體類型
+             * @example practice
+             */
+            entityType: string | null;
+            /**
+             * @description 關聯實體 ID
+             * @example 456
+             */
+            entityId: number | null;
+        };
+        EmailHistoryStats: {
+            /**
+             * @description 總記錄數
+             * @example 1000
+             */
+            totalRecords: number;
+            /**
+             * @description 已發送數量
+             * @example 950
+             */
+            sentCount: number;
+            /**
+             * @description 失敗數量
+             * @example 30
+             */
+            failedCount: number;
+            /**
+             * @description 待發送數量
+             * @example 20
+             */
+            pendingCount: number;
+            /**
+             * @description 成功率（百分比）
+             * @example 95
+             */
+            successRate: number;
+        };
+        EmailHistoryResponseData: {
+            /** @description 郵件記錄列表 */
+            records: components["schemas"]["EmailHistoryRecord"][];
+            pagination: components["schemas"]["Pagination"];
+            stats: components["schemas"]["EmailHistoryStats"] & unknown;
+        };
+        /** @description 分頁資訊 */
+        Pagination: {
+            /**
+             * @description 當前頁數
+             * @example 1
+             */
+            currentPage: number;
+            /**
+             * @description 總頁數
+             * @example 10
+             */
+            totalPages: number;
+            /**
+             * @description 總記錄數
+             * @example 500
+             */
+            totalCount: number;
+            /**
+             * @description 是否有下一頁
+             * @example true
+             */
+            hasNext: boolean;
+            /**
+             * @description 是否有上一頁
+             * @example false
+             */
+            hasPrev: boolean;
+            /**
+             * @description 每頁數量
+             * @example 50
+             */
+            limit: number;
+        };
         /**
          * @description 城市資料
          * @example {
@@ -26531,7 +27478,7 @@ export interface components {
              */
             hasResources: boolean;
             /**
-             * @description 進度百分比 (0-100)
+             * @description 進度百分比 (可超過 100%，表示超額完成)
              * @example 45
              */
             progressPercentage?: number;
@@ -26911,7 +27858,7 @@ export interface components {
              */
             success: true;
             /** @description The main response data */
-            data: components["schemas"]["LoginHistoryRecord"][];
+            data: (components["schemas"]["LoginHistoryRecord"] & unknown)[];
             /**
              * Format: date-time
              * @description ISO 8601 timestamp of the response
@@ -26964,48 +27911,6 @@ export interface components {
             } & {
                 [key: string]: unknown;
             };
-        };
-        /** @description 登入歷史記錄 */
-        LoginHistoryRecord: {
-            /**
-             * @description 登入記錄 ID
-             * @example 1
-             */
-            id: number;
-            /**
-             * @description 裝置類型
-             * @example desktop
-             * @example desktop
-             * @example mobile
-             * @example tablet
-             */
-            deviceType: string | null;
-            /**
-             * @description 作業系統
-             * @example macOS 14.0
-             */
-            os: string | null;
-            /**
-             * @description 瀏覽器
-             * @example Chrome 120
-             */
-            browser: string | null;
-            /**
-             * @description 完整 User-Agent 字串
-             * @example Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
-             */
-            userAgent: string | null;
-            /**
-             * @description IP 地址
-             * @example 192.168.1.1
-             */
-            ipAddress: string | null;
-            /**
-             * Format: date-time
-             * @description 登入時間
-             * @example 2024-01-20T08:30:00.000Z
-             */
-            loginAt: string | null;
         };
         /**
          * @description 用戶活躍統計回應
@@ -27041,7 +27946,7 @@ export interface components {
              * @enum {boolean}
              */
             success: true;
-            data: components["schemas"]["UserActivityStats"];
+            data: components["schemas"]["UserActivityStats"] & unknown;
             /**
              * Format: date-time
              * @description ISO 8601 timestamp of the response
@@ -27096,42 +28001,813 @@ export interface components {
             };
         };
         /** @description The main response data */
-        UserActivityStats: {
-            /**
-             * Format: date-time
-             * @description 最後登入時間
-             * @example 2024-01-20T08:30:00.000Z
-             */
-            lastLoginAt: string | null;
-            /**
-             * Format: date-time
-             * @description 最後活動時間
-             * @example 2024-01-20T14:25:00.000Z
-             */
-            lastActiveAt: string | null;
-            /**
-             * @description 總登入次數
-             * @example 42
-             */
-            loginCount: number;
-            /**
-             * @description 個人檔案被查看次數
-             * @example 128
-             */
-            profileViews: number;
-            /**
-             * @description 最近 30 天登入次數
-             * @example 15
-             */
-            recentLoginCount: number;
-        };
-        /** @description The main response data */
         DeleteTemplateResponse: {
             /**
              * @description 是否成功刪除
              * @example true
              */
             deleted: boolean;
+        };
+        /**
+         * @description Paginated response format for page-based pagination
+         * @example {
+         *       "success": true,
+         *       "data": [
+         *         {
+         *           "id": 1,
+         *           "title": "React 入門教程",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-10T10:00:00Z"
+         *         },
+         *         {
+         *           "id": 2,
+         *           "title": "Vue.js 進階指南",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-11T10:00:00Z"
+         *         }
+         *       ],
+         *       "pagination": {
+         *         "currentPage": 1,
+         *         "totalPages": 5,
+         *         "totalItems": 50,
+         *         "itemsPerPage": 10,
+         *         "hasNext": true,
+         *         "hasPrev": false
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "searchTime": 45,
+         *         "cacheHit": false,
+         *         "categoryCounts": {
+         *           "前端開發": 25,
+         *           "後端開發": 18,
+         *           "資料科學": 7
+         *         }
+         *       }
+         *     }
+         */
+        AdminUserListResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description Array of paginated data items */
+            data: components["schemas"]["AdminUserListItem"][];
+            /**
+             * @description Pagination information
+             * @example {
+             *       "currentPage": 1,
+             *       "totalPages": 5,
+             *       "totalItems": 50,
+             *       "itemsPerPage": 10,
+             *       "hasNext": true,
+             *       "hasPrev": false
+             *     }
+             * @example {
+             *       "currentPage": 3,
+             *       "totalPages": 8,
+             *       "totalItems": 156,
+             *       "itemsPerPage": 20,
+             *       "hasNext": true,
+             *       "hasPrev": true
+             *     }
+             */
+            pagination: {
+                /** @description Current page number (1-based) */
+                currentPage: number;
+                /** @description Total number of pages */
+                totalPages: number;
+                /** @description Total number of items across all pages */
+                totalItems: number;
+                /** @description Number of items per page */
+                itemsPerPage: number;
+                /** @description Whether there are more pages after current page */
+                hasNext: boolean;
+                /** @description Whether there are pages before current page */
+                hasPrev: boolean;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        AdminUserDetailResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            data: components["schemas"]["AdminUserDetailData"] & unknown;
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description Paginated response format for page-based pagination
+         * @example {
+         *       "success": true,
+         *       "data": [
+         *         {
+         *           "id": 1,
+         *           "title": "React 入門教程",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-10T10:00:00Z"
+         *         },
+         *         {
+         *           "id": 2,
+         *           "title": "Vue.js 進階指南",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-11T10:00:00Z"
+         *         }
+         *       ],
+         *       "pagination": {
+         *         "currentPage": 1,
+         *         "totalPages": 5,
+         *         "totalItems": 50,
+         *         "itemsPerPage": 10,
+         *         "hasNext": true,
+         *         "hasPrev": false
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "searchTime": 45,
+         *         "cacheHit": false,
+         *         "categoryCounts": {
+         *           "前端開發": 25,
+         *           "後端開發": 18,
+         *           "資料科學": 7
+         *         }
+         *       }
+         *     }
+         */
+        AdminLoginHistoryResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description Array of paginated data items */
+            data: components["schemas"]["LoginHistoryRecord"][];
+            /**
+             * @description Pagination information
+             * @example {
+             *       "currentPage": 1,
+             *       "totalPages": 5,
+             *       "totalItems": 50,
+             *       "itemsPerPage": 10,
+             *       "hasNext": true,
+             *       "hasPrev": false
+             *     }
+             * @example {
+             *       "currentPage": 3,
+             *       "totalPages": 8,
+             *       "totalItems": 156,
+             *       "itemsPerPage": 20,
+             *       "hasNext": true,
+             *       "hasPrev": true
+             *     }
+             */
+            pagination: {
+                /** @description Current page number (1-based) */
+                currentPage: number;
+                /** @description Total number of pages */
+                totalPages: number;
+                /** @description Total number of items across all pages */
+                totalItems: number;
+                /** @description Number of items per page */
+                itemsPerPage: number;
+                /** @description Whether there are more pages after current page */
+                hasNext: boolean;
+                /** @description Whether there are pages before current page */
+                hasPrev: boolean;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        AdminActivityStatsResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            data: components["schemas"]["UserActivityStats"] & unknown;
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        UpdateUserStatusResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            data: components["schemas"]["UpdateUserStatusData"];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /** @description The main response data */
+        UpdateUserStatusData: {
+            /** @description 用戶外部 ID */
+            id: string;
+            /** @description 更新後的狀態 */
+            isActive: boolean;
+            /** @description 更新時間 */
+            updatedAt: string;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        PracticeStatsResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            data: components["schemas"]["PracticeStatsData"] & unknown;
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        ActiveUsersTrendResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            data: components["schemas"]["ActiveUsersTrendData"] & unknown;
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        EmailHistoryResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            data: components["schemas"]["EmailHistoryResponseData"] & unknown;
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
         };
         /**
          * @description 城市列表回應

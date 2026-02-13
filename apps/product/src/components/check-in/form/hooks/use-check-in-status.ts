@@ -1,43 +1,54 @@
-import { isSameDay, isValid, parse } from "date-fns";
 import { useMemo } from "react";
 import { CheckInStatus, type CheckInStatusType } from "@/constants/check-in-status";
 import type { ICheckInStatusOptions } from "../../types";
 
 /**
- * 檢查指定日期是否為今天
+ * 判斷實踐是否已到期
+ * @param endDate 結束日期 (YYYY-MM-DD 格式)
+ * @param practiceStatus 實踐狀態
+ * @returns 是否已到期
  */
-const isDateToday = (dateString: string | null | undefined): boolean => {
-  if (!dateString) return false;
+const checkIsExpired = (endDate?: string | null, practiceStatus?: string): boolean => {
+  // 如果狀態是 completed，則視為已到期
+  if (practiceStatus === "completed") return true;
 
-  try {
-    const checkInDate = parse(dateString, "yyyy-MM-dd", new Date());
-
-    if (!isValid(checkInDate)) return false;
-
-    const today = new Date();
-    return isSameDay(checkInDate, today);
-  } catch {
-    return false;
+  // 如果有結束日期，檢查是否已過期
+  if (endDate) {
+    const endDateTime = new Date(endDate);
+    endDateTime.setHours(23, 59, 59, 999); // 設置為當天結束
+    return new Date() > endDateTime;
   }
+
+  return false;
 };
 
 /**
  * Hook 用於檢查打卡狀態
  */
 export const useCheckInStatus = (options: ICheckInStatusOptions) => {
-  const { practiceStatus, lastCheckInDate } = options;
+  const { practiceStatus, endDate } = options;
 
   return useMemo(() => {
-    // 檢查實踐是否已完成
+    // 檢查實踐是否已完成（包含封存）
     const isPracticeCompleted = practiceStatus === "completed" || practiceStatus === "archived";
 
-    // 檢查今天是否已打卡
-    const isTodayCheckedIn = isDateToday(lastCheckInDate);
+    // 檢查實踐是否已到期（可觀看總結）
+    const isExpired = checkIsExpired(endDate, practiceStatus);
 
-    // 決定最終狀態（優先級：已完成 > 今天已打卡 > 可打卡）
+    // 不限制打卡冷卻時間
+    const isCheckInLocked = false;
+
+    // 決定最終狀態（優先級：已到期可觀看總結 > 已封存 > 冷卻中 > 可打卡）
     const getStatus = (): CheckInStatusType => {
-      if (isPracticeCompleted) return CheckInStatus.practiceCompleted;
-      if (isTodayCheckedIn) return CheckInStatus.alreadyCheckedIn;
+      // 已到期且非封存狀態 -> 可觀看總結
+      if (isExpired && practiceStatus !== "archived") {
+        return CheckInStatus.viewSummary;
+      }
+      // 已封存 -> 實踐已完成（不可操作）
+      if (practiceStatus === "archived") {
+        return CheckInStatus.practiceCompleted;
+      }
+      if (isCheckInLocked) return CheckInStatus.alreadyCheckedIn;
       return CheckInStatus.available;
     };
     const status = getStatus();
@@ -45,10 +56,12 @@ export const useCheckInStatus = (options: ICheckInStatusOptions) => {
     // 取得按鈕文字
     const getButtonLabel = (): string => {
       switch (status) {
+        case CheckInStatus.viewSummary:
+          return "觀看總結";
         case CheckInStatus.practiceCompleted:
           return "實踐已完成";
         case CheckInStatus.alreadyCheckedIn:
-          return "今天已打過卡囉！";
+          return "24 小時內已打過卡囉！";
         case CheckInStatus.available:
           return "打卡";
         default:
@@ -56,15 +69,20 @@ export const useCheckInStatus = (options: ICheckInStatusOptions) => {
       }
     };
 
-    // 是否可以點擊
+    // 是否可以點擊打卡（不包含觀看總結）
     const canCheckIn = status === CheckInStatus.available;
+
+    // 是否可以點擊按鈕（包含打卡和觀看總結）
+    const canClick = status === CheckInStatus.available || status === CheckInStatus.viewSummary;
 
     return {
       status,
       isPracticeCompleted,
-      isTodayCheckedIn,
+      isExpired,
+      isCheckInLocked,
       canCheckIn,
+      canClick,
       getButtonLabel,
     };
-  }, [practiceStatus, lastCheckInDate]);
+  }, [practiceStatus, endDate]);
 };

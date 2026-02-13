@@ -297,6 +297,22 @@ export default function PracticeDetailPage() {
           tags={practice.tags}
           progress={practice.currentProgress}
           showProgress
+          creator={
+            !isOwner && practiceData?.data?.user
+              ? {
+                  id: practiceData.data.user.id,
+                  name: practiceData.data.user.name,
+                  photoURL: practiceData.data.user.photoURL,
+                  date: practiceData.data.startDate
+                    ? new Date(practiceData.data.startDate).toLocaleDateString("zh-TW", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      }).replace(/-/g, "/")
+                    : undefined,
+                }
+              : undefined
+          }
         />
 
         {/* Execution Timing and Remaining Cards */}
@@ -333,20 +349,21 @@ export default function PracticeDetailPage() {
       </main>
 
       {/* CheckIn Stack */}
-      <div className="max-w-[448px] mx-auto">
+      <div className="max-w-[448px] mx-auto pb-24">
         <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
       </div>
 
       {isOwner && (
         <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
-          {/* 打卡按鈕 */}
+          {/* 打卡按鈕 / 觀看總結按鈕 */}
           <CheckInButton
             variant="orange"
             className="w-full sm:max-w-[288px]"
             practiceId={practiceId}
             practiceStatus={practiceData?.data?.status}
-            lastCheckInDate={checkInsData?.data?.[0]?.checkinDate || null}
+            lastCheckInDate={checkInsData?.data?.[0]?.createdAt || null}
             startDate={practice.startDate}
+            endDate={practiceData?.data?.endDate}
             taskTitle={practice.name}
             progressPercentage={practice?.currentProgress ?? 0}
           />

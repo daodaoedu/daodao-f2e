@@ -96,7 +96,7 @@ export const CheckInStack = ({ checkInsData, onCheckInPress }: ICheckInStackProp
 
             {/* Date */}
             <Text fontSize={12} color={colors.text.dark} fontWeight="500">
-              #{index + 1} {item.date}
+              {item.date}
             </Text>
 
             {/* Content preview */}

@@ -1,5 +1,5 @@
 import { motion, type PanInfo, useMotionValue, useTransform } from "motion/react";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 interface CardRotateProps {
   children: React.ReactNode;
@@ -163,7 +163,9 @@ export default function Stack({
                 damping: animationConfig.damping,
               }}
             >
-              {card.content}
+              {React.isValidElement(card.content)
+                ? React.cloneElement(card.content, { isActive: index === stack.length - 1 } as Record<string, unknown>)
+                : card.content}
             </motion.div>
           </CardRotate>
         );

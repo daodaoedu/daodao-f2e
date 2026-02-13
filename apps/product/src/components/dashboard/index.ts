@@ -1,5 +1,4 @@
 export { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
-export type { FilterStatus } from "@/constants/task-status";
 export { AddTaskFAB } from "./add-task-fab";
 export { Banner } from "./banner";
 export { CompletedSection } from "./completed-section";

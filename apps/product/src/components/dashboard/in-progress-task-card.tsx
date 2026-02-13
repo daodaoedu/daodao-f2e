@@ -27,6 +27,7 @@ interface InProgressTaskCardProps {
   status: string;
   lastCheckInDate?: string | null;
   startDate?: string | null;
+  endDate?: string | null;
   onEdit?: () => void;
 }
 
@@ -43,6 +44,7 @@ export const InProgressTaskCard = ({
   status,
   lastCheckInDate,
   startDate,
+  endDate,
   onEdit,
 }: InProgressTaskCardProps) => {
   const themeName = getThemeNameFromColor(theme);
@@ -81,11 +83,9 @@ export const InProgressTaskCard = ({
               </div>
             </div>
             <div className="shrink-0 self-center">
-              <Button variant="ghost" size="icon" asChild onClick={(e) => e.stopPropagation()}>
-                <CustomLink href={`/practices/${id}`}>
-                  <ArrowRightOutlineSvg className="size-6 text-light-gray" />
-                </CustomLink>
-              </Button>
+              <span className="inline-flex items-center justify-center size-10">
+                <ArrowRightOutlineSvg className="size-6 text-light-gray" />
+              </span>
             </div>
           </div>
         </div>
@@ -134,6 +134,7 @@ export const InProgressTaskCard = ({
               practiceStatus={status}
               lastCheckInDate={lastCheckInDate ?? null}
               startDate={startDate ?? null}
+              endDate={endDate ?? null}
               taskTitle={title}
               showIcon
               progressPercentage={progress}

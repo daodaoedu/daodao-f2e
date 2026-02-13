@@ -10,3 +10,6 @@ export * from "./detail";
 export * from "./list";
 
 export * from "./shared";
+
+// Summary components
+export * from "./summary";

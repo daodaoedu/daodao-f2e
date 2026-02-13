@@ -204,6 +204,8 @@ export const AuthProvider = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isTemporary, setIsTemporary] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(true); // 預設為 true，避免閃爍
+  const [roles, setRoles] = useState<string[]>([]);
+  const [permissions, setPermissions] = useState<string[]>([]);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [loginDialogRedirectUrl, setLoginDialogRedirectUrl] = useState<string | undefined>();
   const [loginDialogSource, setLoginDialogSource] = useState<"website" | "app" | undefined>();
@@ -260,6 +262,11 @@ export const AuthProvider = ({
         setIsTemporary(temporary);
         setIsEmailVerified(emailVerified);
 
+        const userRoles = userData.roles ?? [];
+        const userPermissions = userData.permissions ?? [];
+        setRoles(userRoles);
+        setPermissions(userPermissions);
+
         // 即使是臨時用戶也要設置基本的認證狀態
         const storedUser: StoredUser = {
           id: userData.id,
@@ -267,6 +274,8 @@ export const AuthProvider = ({
           email: userData.email ?? null,
           name: userData.name ?? null,
           photoUrl: userData.photo_url ?? null,
+          roles: userRoles,
+          permissions: userPermissions,
         };
         setAuthState(storedUser);
       } else {
@@ -274,12 +283,16 @@ export const AuthProvider = ({
         clearAuthState();
         setIsTemporary(false);
         setIsEmailVerified(true); // 重置為 true
+        setRoles([]);
+        setPermissions([]);
       }
     } catch (error) {
       console.error("Failed to check auth status:", error);
       clearAuthState();
       setIsTemporary(false);
       setIsEmailVerified(true); // 重置為 true
+      setRoles([]);
+      setPermissions([]);
     } finally {
       setIsLoading(false);
     }
@@ -323,6 +336,8 @@ export const AuthProvider = ({
     if (cachedUser) {
       setUser(cachedUser);
       setIsAuthenticated(true);
+      setRoles(cachedUser.roles ?? []);
+      setPermissions(cachedUser.permissions ?? []);
       setIsLoading(false);
     }
 
@@ -342,8 +357,12 @@ export const AuthProvider = ({
         if (newUserInfo) {
           setUser(newUserInfo);
           setIsAuthenticated(true);
+          setRoles(newUserInfo.roles ?? []);
+          setPermissions(newUserInfo.permissions ?? []);
         } else {
           clearAuthState();
+          setRoles([]);
+          setPermissions([]);
         }
       }
     };
@@ -577,6 +596,16 @@ export const AuthProvider = ({
     }
   }, [handleTokenRefresh, clearAuthState, openLoginDialog]);
 
+  const hasRole = useCallback((role: string) => roles.includes(role), [roles]);
+  const hasPermission = useCallback(
+    (permission: string) => permissions.includes(permission),
+    [permissions]
+  );
+  const isAdmin = useMemo(
+    () => roles.some((r) => r.toLowerCase().includes("admin")),
+    [roles]
+  );
+
   const value: AuthContextValue = useMemo(
     () => ({
       user,
@@ -590,6 +619,11 @@ export const AuthProvider = ({
       openLoginDialog,
       requireAuth,
       refreshAuth: checkAuth,
+      roles,
+      permissions,
+      hasRole,
+      hasPermission,
+      isAdmin,
     }),
     [
       user,
@@ -603,6 +637,11 @@ export const AuthProvider = ({
       openLoginDialog,
       requireAuth,
       checkAuth,
+      roles,
+      permissions,
+      hasRole,
+      hasPermission,
+      isAdmin,
     ]
   );
 

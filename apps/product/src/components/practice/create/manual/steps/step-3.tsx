@@ -79,7 +79,7 @@ export const Step3 = ({ form }: Step3Props) => {
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between mb-3">
-              <FormLabel required className="text-base font-medium text-text-dark">
+              <FormLabel className="text-base font-medium text-text-dark">
                 執行時機
               </FormLabel>
               <FormDescription className="text-sm text-light-gray">多選</FormDescription>

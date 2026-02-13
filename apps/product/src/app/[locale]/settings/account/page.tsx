@@ -6,7 +6,7 @@ import { AccountForm } from "@/components/settings/account";
 export default function AccountSettingsPage() {
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto">
-      <PageHeader leftAction="back" title="帳號設定" />
+      <PageHeader leftAction="back" leftLabel="" title="帳號設定" />
 
       <BackgroundAnimation />
 

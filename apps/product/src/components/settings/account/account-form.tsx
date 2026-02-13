@@ -27,8 +27,10 @@ export const AccountForm = () => {
   const { updateCurrentUser } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 獲取城市列表以找到用戶 location 對應的 countryCode（傳入 locale 以支援多語系）
+  // 使用 search 參數精確搜尋用戶的城市，以獲取 countryCode
+  const userLocation = userData?.data?.location;
   const { data: citiesData } = useCities({
+    search: userLocation || undefined,
     locale: locale === "en" ? "en" : "zh-TW",
   });
 

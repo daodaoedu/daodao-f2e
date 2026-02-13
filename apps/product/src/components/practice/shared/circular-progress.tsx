@@ -21,7 +21,8 @@ export const CircularProgress = ({
 }: CircularProgressProps) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (value / 100) * circumference;
+  const clampedValue = Math.min(100, Math.max(0, value));
+  const offset = circumference - (clampedValue / 100) * circumference;
 
   return (
     <div className={cn("relative inline-flex items-center justify-center", className)}>
@@ -30,7 +31,7 @@ export const CircularProgress = ({
         height={size}
         className="transform -rotate-90"
         role="img"
-        aria-label={`進度 ${value}%`}
+        aria-label={`進度 ${Math.round(value)}%`}
       >
         {/* Background circle */}
         <circle

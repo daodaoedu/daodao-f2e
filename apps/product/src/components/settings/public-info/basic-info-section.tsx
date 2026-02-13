@@ -1,7 +1,7 @@
 "use client";
 
-import { checkCustomIdAvailability } from "@daodao/api";
-import { useLocale, useTranslations } from "@daodao/i18n";
+import { checkCustomIdAvailability, useCities, useCountries } from "@daodao/api";
+import { useLocale } from "@daodao/i18n";
 import {
   FormControl,
   FormDescription,
@@ -11,10 +11,16 @@ import {
   FormMessage,
 } from "@daodao/ui/components/form";
 import { Input } from "@daodao/ui/components/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@daodao/ui/components/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@daodao/ui/components/select";
 import { cn } from "@daodao/ui/lib/utils";
-import { CheckCircleIcon, ChevronDownIcon, LoaderIcon, XCircleIcon } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CheckCircleIcon, LoaderIcon, MapPin, XCircleIcon } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type { PublicInfoFormValues } from "./schema";
 
@@ -25,7 +31,7 @@ interface IBasicInfoSectionProps {
 
 export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionProps) => {
   const locale = useLocale();
-  const t = useTranslations();
+  const selectedCountry = form.watch("country");
 
   // customId 即時檢查狀態
   const [customIdStatus, setCustomIdStatus] = useState<
@@ -33,16 +39,23 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
   >("idle");
   const checkTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 取得城市選項
-  const cityOptions = useMemo(() => {
-    const cities: Record<string, string> = t.raw("cities") as Record<string, string>;
-    return Object.entries(cities)
-      .map(([key, value]) => ({
-        value: key,
-        label: value,
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label, locale === "en" ? "en" : "zh-TW"));
-  }, [t, locale]);
+  // 獲取國家列表
+  const { data: countriesData, isLoading: isLoadingCountries } = useCountries();
+
+  // 根據選擇的國家獲取城市列表（傳入 locale 以支援多語系）
+  const { data: citiesData, isLoading: isLoadingCities } = useCities({
+    country: selectedCountry || undefined,
+    locale: locale === "en" ? "en" : "zh-TW",
+  });
+
+  const countries = (countriesData?.data ?? []).filter((c) => c.code);
+  const cities = (citiesData?.data ?? []).filter((c) => c.code);
+
+  // 當國家變更時，清空城市選擇
+  const handleCountryChange = (value: string) => {
+    form.setValue("country", value);
+    form.setValue("location", "");
+  };
 
   // customId 即時檢查函數（debounced）
   const checkCustomId = useCallback(
@@ -185,205 +198,101 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
         )}
       />
 
-      {/* 居住地 */}
+      {/* 居住地 - 國家 */}
+      <FormField
+        control={form.control}
+        name="country"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="block font-medium text-text-dark mb-3">居住地</FormLabel>
+            <FormControl>
+              <div className="relative">
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-light-gray z-10" />
+                <Select
+                  value={field.value || ""}
+                  onValueChange={handleCountryChange}
+                  disabled={field.disabled || isLoadingCountries}
+                >
+                  <SelectTrigger
+                    className={cn(
+                      "w-full h-10 pl-11 pr-4 py-2 text-left font-normal text-sm",
+                      "border border-bg-gray hover:border-logo-cyan bg-background rounded-lg",
+                      "focus-visible:border-2 focus-visible:border-logo-cyan focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#DEF5F5]",
+                      form.formState.errors.country && "border-red",
+                      "disabled:cursor-not-allowed disabled:border-bg-gray disabled:bg-very-light-gray",
+                      "data-placeholder:text-light-gray"
+                    )}
+                    aria-invalid={!!form.formState.errors.country}
+                  >
+                    <SelectValue placeholder={isLoadingCountries ? "載入中..." : "請選擇國家"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map((country) => (
+                      <SelectItem key={country.code} value={country.code}>
+                        {locale === "en" ? country.nameEn || country.name : country.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* 居住地 - 城市 */}
       <FormField
         control={form.control}
         name="location"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block font-medium text-text-dark mb-3">居住地</FormLabel>
             <FormControl>
-              <CityCombobox
-                value={field.value || ""}
-                options={cityOptions}
-                onChange={(value) => {
-                  field.onChange(value || undefined);
-                  field.onBlur();
-                }}
-                invalid={!!form.formState.errors.location}
-              />
+              <div className="relative">
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-light-gray z-10" />
+                <Select
+                  value={field.value || ""}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    field.onBlur();
+                  }}
+                  disabled={field.disabled || !selectedCountry || isLoadingCities}
+                >
+                  <SelectTrigger
+                    className={cn(
+                      "w-full h-10 pl-11 pr-4 py-2 text-left font-normal text-sm",
+                      "border border-bg-gray hover:border-logo-cyan bg-background rounded-lg",
+                      "focus-visible:border-2 focus-visible:border-logo-cyan focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#DEF5F5]",
+                      form.formState.errors.location && "border-red",
+                      "disabled:cursor-not-allowed disabled:border-bg-gray disabled:bg-very-light-gray",
+                      "data-placeholder:text-light-gray"
+                    )}
+                    aria-invalid={!!form.formState.errors.location}
+                  >
+                    <SelectValue
+                      placeholder={
+                        !selectedCountry
+                          ? "請先選擇國家"
+                          : isLoadingCities
+                            ? "載入中..."
+                            : "請選擇城市"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cities.map((city) => (
+                      <SelectItem key={city.code} value={city.code}>
+                        {city.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
     </div>
-  );
-};
-
-interface ICityOption {
-  value: string;
-  label: string;
-}
-
-interface ICityComboboxProps {
-  value: string;
-  options: ICityOption[];
-  onChange: (value: string) => void;
-  invalid?: boolean;
-}
-
-const CityCombobox = ({ value, options, onChange, invalid }: ICityComboboxProps) => {
-  const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
-  const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
-
-  // 取得選中的選項標籤
-  const selectedOption = useMemo(() => {
-    return options.find((option) => option.value === value);
-  }, [options, value]);
-
-  // 過濾選項
-  const filteredOptions = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return options;
-    }
-    const query = searchQuery.toLowerCase();
-    return options.filter(
-      (option) =>
-        option.label.toLowerCase().includes(query) || option.value.toLowerCase().includes(query)
-    );
-  }, [options, searchQuery]);
-
-  // 當 Popover 打開時，聚焦到輸入框
-  useEffect(() => {
-    if (open && inputRef.current) {
-      // 延遲一下確保 Popover 已經完全打開
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-    } else if (!open) {
-      // 關閉時清空搜尋並重置高亮
-      setSearchQuery("");
-      setHighlightedIndex(0);
-    }
-  }, [open]);
-
-  // 處理選項點擊
-  const handleSelectOption = (optionValue: string) => {
-    onChange(optionValue);
-    setOpen(false);
-    setSearchQuery("");
-    setHighlightedIndex(0);
-  };
-
-  // 處理鍵盤導航
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Escape") {
-      setOpen(false);
-      setSearchQuery("");
-      setHighlightedIndex(0);
-    } else if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlightedIndex((prev) => {
-        const nextIndex = prev < filteredOptions.length - 1 ? prev + 1 : 0;
-        // 滾動到可見區域
-        optionRefs.current[nextIndex]?.scrollIntoView({
-          block: "nearest",
-          behavior: "smooth",
-        });
-        return nextIndex;
-      });
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightedIndex((prev) => {
-        const nextIndex = prev > 0 ? prev - 1 : filteredOptions.length - 1;
-        // 滾動到可見區域
-        optionRefs.current[nextIndex]?.scrollIntoView({
-          block: "nearest",
-          behavior: "smooth",
-        });
-        return nextIndex;
-      });
-    } else if (e.key === "Enter" && filteredOptions.length > 0) {
-      e.preventDefault();
-      const selectedValue = filteredOptions[highlightedIndex]?.value;
-      if (selectedValue) {
-        handleSelectOption(selectedValue);
-      }
-    }
-  };
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          className={cn(
-            "flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-bg-gray hover:border-logo-cyan bg-background text-sm",
-            "px-4 py-2 focus-visible:px-[15px] focus-visible:py-[9px]",
-            "focus-visible:border-2 focus-visible:border-logo-cyan focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#DEF5F5]",
-            "disabled:cursor-not-allowed disabled:border-bg-gray disabled:bg-very-light-gray disabled:text-light-gray",
-            invalid && "border-red",
-            !selectedOption && "text-light-gray"
-          )}
-          aria-invalid={invalid}
-        >
-          <span className="flex-1 text-left truncate">
-            {selectedOption ? selectedOption.label : "請選擇"}
-          </span>
-          <ChevronDownIcon className="size-4 opacity-50 shrink-0" />
-        </button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-(--radix-popover-trigger-width) p-0"
-        align="start"
-        sideOffset={4}
-      >
-        <div className="flex flex-col">
-          {/* 搜尋輸入框 */}
-          <div className="p-2 border-b border-bg-gray">
-            <Input
-              ref={inputRef}
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setHighlightedIndex(0);
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder="搜尋城市..."
-              className="h-9"
-            />
-          </div>
-
-          {/* 選項列表 */}
-          <div ref={listRef} className="max-h-[300px] overflow-y-auto p-1">
-            {filteredOptions.length === 0 ? (
-              <div className="py-6 text-center text-sm text-light-gray">沒有找到符合的城市</div>
-            ) : (
-              filteredOptions.map((option, index) => (
-                <button
-                  key={option.value}
-                  ref={(el) => {
-                    optionRefs.current[index] = el;
-                  }}
-                  type="button"
-                  onClick={() => handleSelectOption(option.value)}
-                  className={cn(
-                    "w-full flex items-center rounded-sm py-1.5 px-2 text-sm text-left",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    "focus:bg-accent focus:text-accent-foreground outline-hidden",
-                    "transition-colors",
-                    "city-option-item",
-                    highlightedIndex === index && "bg-accent text-accent-foreground"
-                  )}
-                  style={{
-                    contentVisibility: "auto",
-                    containIntrinsicSize: "0 36px",
-                  }}
-                >
-                  <span className={cn("flex-1", value === option.value && "font-medium")}>
-                    {option.label}
-                  </span>
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
   );
 };

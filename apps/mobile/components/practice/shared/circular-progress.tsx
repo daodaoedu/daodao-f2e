@@ -26,11 +26,12 @@ export const CircularProgress = ({
   progressColor = colors.primary.base,
   backgroundColor = colors.basic["200"],
 }: CircularProgressProps) => {
-  const { radius, circumference, offset } = useMemo(() => {
+  const { radius, circumference, offset, clampedValue } = useMemo(() => {
     const r = (size - strokeWidth) / 2;
     const c = r * 2 * Math.PI;
-    const o = c - (value / 100) * c;
-    return { radius: r, circumference: c, offset: o };
+    const clamped = Math.min(100, Math.max(0, value));
+    const o = c - (clamped / 100) * c;
+    return { radius: r, circumference: c, offset: o, clampedValue: clamped };
   }, [size, strokeWidth, value]);
 
   return (
@@ -38,7 +39,7 @@ export const CircularProgress = ({
       style={[styles.container, { width: size, height: size }]}
       accessibilityLabel={`進度 ${Math.round(value)}%`}
       accessibilityRole="progressbar"
-      accessibilityValue={{ min: 0, max: 100, now: value }}
+      accessibilityValue={{ min: 0, max: 100, now: clampedValue }}
     >
       <Svg width={size} height={size} style={styles.svg}>
         {/* Background circle */}
