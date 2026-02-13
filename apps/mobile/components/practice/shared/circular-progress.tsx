@@ -37,7 +37,7 @@ export const CircularProgress = ({
   return (
     <View
       style={[styles.container, { width: size, height: size }]}
-      accessibilityLabel={`進度 ${Math.round(clampedValue)}%`}
+      accessibilityLabel={`進度 ${Math.round(value)}%`}
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now: clampedValue }}
     >
@@ -67,7 +67,7 @@ export const CircularProgress = ({
       {showText && (
         <View style={styles.textContainer}>
           <Text fontSize={size > 50 ? 16 : 12} fontWeight="600" color={textColor}>
-            {Math.round(clampedValue)}%
+            {Math.round(value)}%
           </Text>
         </View>
       )}
