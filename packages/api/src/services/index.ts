@@ -3,9 +3,15 @@
  * 統一導出所有 domain-specific 的 API 服務
  */
 
+// Admin Service
+export * from "./admin";
+export * from "./admin-hooks";
 // Auth Service
 export * from "./auth";
 export * from "./auth-hooks";
+// Email Service
+export * from "./email";
+export * from "./email-hooks";
 // Image Service
 export * from "./image";
 // Location Service
