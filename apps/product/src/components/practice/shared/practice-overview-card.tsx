@@ -1,9 +1,18 @@
 "use client";
 
-import { TagSolidSvg } from "@daodao/assets";
+import { DefaultAvatarSvg, TagSolidSvg } from "@daodao/assets";
+import { Link } from "@daodao/i18n/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
 import type { ManualPracticeFormValues } from "../create/manual/schema";
 import { CircularProgress } from "./circular-progress";
+
+interface CreatorInfo {
+  id: string;
+  name: string;
+  photoURL?: string | null;
+  date?: string;
+}
 
 interface PracticeOverviewCardProps {
   actionDescription: ManualPracticeFormValues["actionDescription"];
@@ -13,6 +22,8 @@ interface PracticeOverviewCardProps {
   // 詳情頁專用屬性
   progress?: number; // 進度值
   showProgress?: boolean; // 是否顯示進度條
+  // 公開頁面顯示建立者資訊
+  creator?: CreatorInfo;
 }
 
 export const PracticeOverviewCard = ({
@@ -22,10 +33,33 @@ export const PracticeOverviewCard = ({
   tags,
   progress,
   showProgress = false,
+  creator,
 }: PracticeOverviewCardProps) => {
   return (
     <div className="relative bg-white rounded-lg p-4 mb-4 shadow-sm">
-      <div className="flex items-start gap-4">
+      {/* 建立者資訊 - 僅在公開頁面顯示 */}
+      {creator && (
+        <div className="flex items-center gap-2 mb-3">
+          <Link href={`/users/${creator.id}`}>
+            <Avatar className="size-8">
+              {creator.photoURL && <AvatarImage src={creator.photoURL} />}
+              <AvatarFallback>
+                <DefaultAvatarSvg />
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+          <Link
+            href={`/users/${creator.id}`}
+            className="text-sm font-medium text-text-dark hover:underline"
+          >
+            {creator.name}
+          </Link>
+          {creator.date && (
+            <span className="text-sm text-text-dark/60">{creator.date}</span>
+          )}
+        </div>
+      )}
+      <div className="relative flex items-start gap-4">
         {/* Overview Text */}
         <div className="flex-1">
           <p className="font-medium text-text-dark mb-3 pr-[88px]">{actionDescription}</p>
@@ -68,7 +102,7 @@ export const PracticeOverviewCard = ({
 
         {/* Circular Progress - 僅在詳情頁顯示 */}
         {showProgress && typeof progress === "number" && (
-          <div className="absolute right-4 top-4">
+          <div className="absolute right-0 top-0">
             <CircularProgress value={progress} />
           </div>
         )}

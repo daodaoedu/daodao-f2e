@@ -3,9 +3,10 @@
 import { useMyPracticeStats, useMyPractices } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
+import { cn } from "@daodao/ui/lib/utils";
 
 import { CheckCircle2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   AddTaskFAB,
   Banner,
@@ -18,10 +19,23 @@ import type { CompletedTask } from "@/components/dashboard/completed-section";
 import { BackgroundAnimation } from "@/components/layout";
 import { RandomPracticesSection } from "@/components/practice";
 import { PracticeStatus } from "@/constants/practice-status";
-import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
+import {
+  FilterStatus,
+  type FilterStatus as FilterStatusType,
+  mapPracticeStatusToTaskStatus,
+} from "@/constants/task-status";
+
+const filterOptions = [
+  { value: FilterStatus.all, label: "全部" },
+  { value: FilterStatus.draft, label: "草稿" },
+  { value: FilterStatus.notStarted, label: "未開始" },
+  { value: FilterStatus.inProgress, label: "進行中" },
+  { value: FilterStatus.completed, label: "已完成" },
+];
 
 export default function HomePage() {
   const router = useRouter();
+  const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
 
   // 取得所有實踐（不傳 status 參數，取得所有狀態）
   const { data: allPracticesData, isLoading } = useMyPractices({
@@ -60,6 +74,7 @@ export default function HomePage() {
           status: mapPracticeStatusToTaskStatus(practice.status),
           lastCheckInDate,
           startDate: practice.startDate || null,
+          endDate: practice.endDate || null,
         });
       } else if (practice.status === PracticeStatus.completed) {
         completedTasksData.push({
@@ -79,6 +94,13 @@ export default function HomePage() {
       completedTasks: completedTasksData,
     };
   }, [allPracticesData]);
+
+  // 根據篩選狀態過濾進行中的任務
+  const filteredInProgressTasks = useMemo(() => {
+    if (filterStatus === FilterStatus.completed) return [];
+    if (filterStatus === FilterStatus.all) return inProgressTasks;
+    return inProgressTasks.filter((task) => task.status === filterStatus);
+  }, [inProgressTasks, filterStatus]);
 
   // 轉換統計數據
   const stats = useMemo(() => {
@@ -107,6 +129,10 @@ export default function HomePage() {
   // 判斷是否有任何實踐資料
   const hasPractices = inProgressTasks.length > 0 || completedTasks.length > 0;
 
+  // 根據篩選狀態決定顯示哪些區塊
+  const showInProgress = filterStatus !== FilterStatus.completed;
+  const showCompleted = filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
+
   // Loading 狀態處理
   if (isLoading) {
     return (
@@ -132,8 +158,35 @@ export default function HomePage() {
         <DashboardHeader stats={stats} />
         {hasPractices ? (
           <>
-            <InProgressSection tasks={inProgressTasks} />
-            <CompletedSection tasks={completedTasks} />
+            {/* 篩選 Tag */}
+            <div className="max-w-[640px] px-5 mx-auto mb-4">
+              <div
+                role="tablist"
+                aria-label="任務篩選"
+                className="flex gap-2 overflow-x-auto scrollbar-hide"
+              >
+                {filterOptions.map((option) => (
+                  <button
+                    type="button"
+                    key={option.value}
+                    role="tab"
+                    aria-selected={filterStatus === option.value}
+                    onClick={() => setFilterStatus(option.value)}
+                    className={cn(
+                      "px-5 py-2 rounded-full text-sm whitespace-nowrap border transition-colors",
+                      filterStatus === option.value
+                        ? "bg-primary-base border-primary-base text-white"
+                        : "bg-white border-primary-base text-primary-base"
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {showInProgress && <InProgressSection tasks={filteredInProgressTasks} />}
+            {showCompleted && <CompletedSection tasks={completedTasks} />}
           </>
         ) : (
           <RandomPracticesSection />

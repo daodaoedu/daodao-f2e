@@ -32,6 +32,8 @@ export interface ICheckInDate {
   id: string;
   date: string;
   hasCheckIn?: boolean;
+  /** 該日打卡次數（用於決定按鈕顏色深淺） */
+  checkInCount?: number;
 }
 
 export type { CheckInStatusType };
@@ -55,6 +57,11 @@ export interface ICheckInStatusOptions {
    * 用於檢查打卡日期是否早於開始日期
    */
   startDate?: string | null;
+  /**
+   * 實踐結束日期 (ISO 格式字串，例如 "2026-01-31")
+   * 用於判斷實踐是否已到期，到期後顯示「觀看總結」按鈕
+   */
+  endDate?: string | null;
 }
 
 /**
