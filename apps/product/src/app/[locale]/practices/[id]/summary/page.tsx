@@ -2,9 +2,26 @@
 
 import { useCurrentUser, usePracticeById, usePracticeSummary } from "@daodao/api";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
+import { endOfDay, isAfter } from "date-fns";
 import { useEffect, useMemo } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { PracticeSummaryPage } from "@/components/practice/summary";
+import { PracticeStatus } from "@/constants/practice-status";
+
+/**
+ * 頁面狀態 Shell（Loading / Error / 重新導向等共用外框）
+ */
+function PageShell({ message }: { message: string }) {
+  return (
+    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+      <PageHeader leftAction="back" leftLabel="" title="" rightActionTo="/" />
+      <BackgroundAnimation />
+      <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
+        <div className="text-center text-text-dark">{message}</div>
+      </main>
+    </div>
+  );
+}
 
 /**
  * 實踐完成總結頁面
@@ -29,13 +46,11 @@ export default function PracticeSummaryPageRoute() {
     const { status, endDate } = practiceData.data;
 
     // 如果狀態是 completed，則視為已到期
-    if (status === "completed") return true;
+    if (status === PracticeStatus.completed) return true;
 
     // 如果有結束日期，檢查是否已過期
     if (endDate) {
-      const endDateTime = new Date(endDate);
-      endDateTime.setHours(23, 59, 59, 999); // 設置為當天結束
-      return new Date() > endDateTime;
+      return isAfter(new Date(), endOfDay(new Date(endDate)));
     }
 
     return false;
@@ -61,56 +76,22 @@ export default function PracticeSummaryPageRoute() {
 
   // Loading 狀態
   if (isPracticeLoading || isUserLoading) {
-    return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" leftLabel="" title="" rightActionTo="/" />
-        <BackgroundAnimation />
-        <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
-          <div className="text-center text-text-dark">載入中...</div>
-        </main>
-      </div>
-    );
+    return <PageShell message="載入中..." />;
   }
 
   // 權限不足或實踐未到期（等待重定向）
   if (!isOwner || !isExpired) {
-    return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" leftLabel="" title="" rightActionTo="/" />
-        <BackgroundAnimation />
-        <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
-          <div className="text-center text-text-dark">重新導向中...</div>
-        </main>
-      </div>
-    );
+    return <PageShell message="重新導向中..." />;
   }
 
   // 摘要載入中
   if (isSummaryLoading) {
-    return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" leftLabel="" title="" rightActionTo="/" />
-        <BackgroundAnimation />
-        <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
-          <div className="text-center text-text-dark">正在生成總結...</div>
-        </main>
-      </div>
-    );
+    return <PageShell message="正在生成總結..." />;
   }
 
   // 摘要載入錯誤
   if (summaryError || !summary) {
-    return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" leftLabel="" title="" rightActionTo="/" />
-        <BackgroundAnimation />
-        <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
-          <div className="text-center text-text-dark">
-            {summaryError || "無法載入總結資料"}
-          </div>
-        </main>
-      </div>
-    );
+    return <PageShell message={summaryError ? "載入失敗，請稍後再試" : "無法載入總結資料"} />;
   }
 
   return <PracticeSummaryPage summary={summary} />;
