@@ -2,7 +2,7 @@
 
 import { useRouter } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckInDateButton } from "./check-in-date-button";
 import type { ICheckInDateSelectorProps } from "./types";
 
@@ -15,6 +15,13 @@ export const MobileCheckInDateSelector = ({
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
+  const navRef = useRef<HTMLElement>(null);
+
+  // 滑鼠拖曳滾動相關
+  const isMouseDown = useRef(false);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragScrollLeft = useRef(0);
 
   // 處理滾動時隱藏/顯示面板
   useEffect(() => {
@@ -52,6 +59,39 @@ export const MobileCheckInDateSelector = ({
     };
   }, []);
 
+  // 滑鼠拖曳：按下
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!navRef.current) return;
+    isMouseDown.current = true;
+    isDragging.current = false;
+    dragStartX.current = e.pageX;
+    dragScrollLeft.current = navRef.current.scrollLeft;
+  }, []);
+
+  // 滑鼠拖曳：移動
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isMouseDown.current || !navRef.current) return;
+    const walk = e.pageX - dragStartX.current;
+    // 超過 3px 才視為拖曳，避免影響按鈕點擊
+    if (!isDragging.current && Math.abs(walk) > 3) {
+      isDragging.current = true;
+      navRef.current.style.cursor = "grabbing";
+    }
+    if (isDragging.current) {
+      e.preventDefault();
+      navRef.current.scrollLeft = dragScrollLeft.current - walk;
+    }
+  }, []);
+
+  // 滑鼠拖曳：放開
+  const handleMouseUp = useCallback(() => {
+    isMouseDown.current = false;
+    isDragging.current = false;
+    if (navRef.current) {
+      navRef.current.style.cursor = "";
+    }
+  }, []);
+
   // 處理日期選擇
   const handleDateSelect = (selectedCheckInId: string) => {
     if (selectedCheckInId !== activeCheckInId) {
@@ -61,12 +101,17 @@ export const MobileCheckInDateSelector = ({
 
   return (
     <nav
+      ref={navRef}
       className={cn(
-        "fixed top-0 left-0 right-0 overflow-x-auto scrollbar-hide bg-[#E9FEFFB2]/70 border-b-2 border-[#E9FEFFB2] rounded-b-3xl backdrop-blur-lg transition-transform duration-300 ease-in-out px-10",
+        "fixed top-0 left-0 right-0 overflow-x-auto scrollbar-hide bg-[#E9FEFFB2]/70 border-b-2 border-[#E9FEFFB2] rounded-b-3xl backdrop-blur-lg transition-transform duration-300 ease-in-out px-10 cursor-grab",
         !isVisible && "-translate-y-full"
       )}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
     >
-      <div className="flex items-center justify-center gap-4 w-fit pb-5 pt-[72px]">
+      <div className="flex items-center justify-center gap-4 w-fit mx-auto pb-5 pt-[72px] md:pt-[120px]">
         {checkInDates.map((item, index) => (
           <CheckInDateButton
             key={item.id}
