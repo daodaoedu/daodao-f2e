@@ -1,11 +1,13 @@
 "use client";
 
+import { useRouter } from "@daodao/i18n/navigation";
 import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isBefore, parse, startOfDay } from "date-fns";
-import { CalendarCheck, Check } from "lucide-react";
+import { CalendarCheck, Check, Eye } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { CheckInStatus } from "@/constants/check-in-status";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
 import { EarlyStartResult, useEarlyStartDialog } from "@/hooks/use-early-start-dialog";
 import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
@@ -116,7 +118,7 @@ interface ICheckInButtonProps
   extends ICheckInStatusOptions,
     Omit<ButtonProps, "onClick" | "children"> {
   /**
-   * 實踐 ID（用於 API 調用）
+   * 實踐 ID（用於 API 調用和導向總結頁面）
    */
   practiceId: string;
   /**
@@ -135,17 +137,24 @@ interface ICheckInButtonProps
    * 打卡前的進度百分比（用於顯示進度動畫）
    */
   progressPercentage?: number;
+  /**
+   * 實踐結束日期 (ISO 格式字串，例如 "2026-01-31")
+   * 用於判斷實踐是否已到期，到期後顯示「觀看總結」按鈕
+   */
+  endDate?: string | null;
 }
 
 /**
  * 統一的打卡按鈕組件
  * 根據打卡狀態自動顯示對應的文字和禁用狀態
- * 點擊後會自動打開 CheckInSheet（除非提供了自訂 onClick）
+ * - 實踐進行中：點擊打開 CheckInSheet
+ * - 實踐已到期：點擊導向總結頁面
  */
 export const CheckInButton = ({
   practiceStatus,
   lastCheckInDate,
   startDate,
+  endDate,
   practiceId,
   taskTitle,
   onComplete,
@@ -155,9 +164,11 @@ export const CheckInButton = ({
   progressPercentage = 0,
   ...props
 }: ICheckInButtonProps) => {
-  const { canCheckIn, getButtonLabel } = useCheckInStatus({
+  const router = useRouter();
+  const { status, canCheckIn, canClick, getButtonLabel } = useCheckInStatus({
     practiceStatus,
     lastCheckInDate,
+    endDate,
   });
 
   const { submitCheckIn } = useCheckInSubmit({
@@ -183,6 +194,12 @@ export const CheckInButton = ({
   });
 
   const handleClick = async () => {
+    // 如果是觀看總結狀態，導向總結頁面
+    if (status === CheckInStatus.viewSummary) {
+      router.push(`/practices/${practiceId}/summary`);
+      return;
+    }
+
     if (!canCheckIn) return;
 
     // 檢查今天是否早於開始日期
@@ -204,15 +221,24 @@ export const CheckInButton = ({
     openCheckInSheet();
   };
 
+  // 決定顯示的圖標
+  const renderIcon = () => {
+    if (!showIcon) return null;
+    if (status === CheckInStatus.viewSummary) {
+      return <Eye className="size-4.5 text-logo-cyan" />;
+    }
+    return <CalendarCheck className="size-4.5 text-logo-cyan" />;
+  };
+
   return (
     <Button
       variant={variant}
       onClick={handleClick}
-      disabled={!canCheckIn}
+      disabled={!canClick}
       className={className}
       {...props}
     >
-      {showIcon && <CalendarCheck className="size-4.5 text-logo-cyan" />}
+      {renderIcon()}
       {getButtonLabel()}
     </Button>
   );

@@ -179,7 +179,7 @@ export const CheckInCard = ({
               )}
 
               {/* 文字內容 */}
-              <p className="text-text-dark font-medium whitespace-pre-wrap">{content}</p>
+              <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">{content}</p>
 
               {/* 標籤 */}
               {tags && tags.length > 0 && (

@@ -2,7 +2,6 @@
 
 import { ArrowRightOutlineSvg, MessagesSvg } from "@daodao/assets";
 import { Badge } from "@daodao/ui/components/badge";
-import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
 import { Eye } from "lucide-react";
@@ -29,7 +28,8 @@ export const CompletedTaskCard = ({
   className,
 }: CompletedTaskCardProps) => {
   return (
-    <div
+    <CustomLink
+      href={`/practices/${id}`}
       className={cn(
         "flex flex-col gap-1 rounded-[12px] border border-border bg-white px-4 py-3 transition-shadow hover:shadow-sm",
         className
@@ -61,11 +61,7 @@ export const CompletedTaskCard = ({
           <p className="text-xs text-text-dark">{description}</p>
         </div>
         <div className="shrink-0 self-center">
-          <Button variant="ghost" size="icon" asChild>
-            <CustomLink href={`/practices/${id}`}>
-              <ArrowRightOutlineSvg className="size-6 text-light-gray" />
-            </CustomLink>
-          </Button>
+          <ArrowRightOutlineSvg className="size-6 text-light-gray" />
         </div>
       </div>
 
@@ -82,6 +78,6 @@ export const CompletedTaskCard = ({
           <span className="text-text-dark">{commentCount}</span>
         </div>
       </div>
-    </div>
+    </CustomLink>
   );
 };

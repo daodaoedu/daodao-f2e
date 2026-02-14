@@ -31,6 +31,8 @@ export interface ICheckInDate {
   id: string;
   date: string;
   hasCheckIn?: boolean;
+  /** 該日打卡次數（用於決定按鈕顏色深淺） */
+  checkInCount?: number;
 }
 
 export type { CheckInStatusType };

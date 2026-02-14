@@ -24,29 +24,38 @@ const formatCheckInDate = (checkinDate: string): string => {
 };
 
 /**
+ * 日期打卡資訊
+ */
+interface IDateCheckInInfo {
+  id: string;
+  count: number;
+}
+
+/**
  * 生成完整的日期列表（從開始日期到結束日期）
  */
 const generateFullDateRange = (
   startDate: string,
   durationDays: number,
-  checkInsMap: Map<string, string>
-): Array<{ id: string; date: string; hasCheckIn: boolean }> => {
+  checkInsMap: Map<string, IDateCheckInInfo>
+): Array<{ id: string; date: string; hasCheckIn: boolean; checkInCount: number }> => {
   const start = parse(startDate, "yyyy-MM-dd", new Date());
   if (!isValid(start)) {
     return [];
   }
 
-  const dates: Array<{ id: string; date: string; hasCheckIn: boolean }> = [];
+  const dates: Array<{ id: string; date: string; hasCheckIn: boolean; checkInCount: number }> = [];
 
   for (let i = 0; i < durationDays; i++) {
     const currentDate = addDays(start, i);
     const dateString = format(currentDate, "yyyy-MM-dd");
-    const checkInId = checkInsMap.get(dateString);
+    const checkInInfo = checkInsMap.get(dateString);
 
     dates.push({
-      id: checkInId || `empty-${dateString}`,
+      id: checkInInfo?.id || `empty-${dateString}`,
       date: dateString,
-      hasCheckIn: !!checkInId,
+      hasCheckIn: !!checkInInfo,
+      checkInCount: checkInInfo?.count || 0,
     });
   }
 
@@ -100,16 +109,26 @@ export default function CheckInDetailPage() {
     return map;
   }, [checkInsData, practiceData]);
 
-  // 建立日期到 check-in ID 的映射（用於生成日期列表）
+  // 建立日期到 check-in 資訊的映射（用於生成日期列表，包含打卡次數）
   const checkInDateToIdMap = useMemo(() => {
-    const map = new Map<string, string>();
+    const map = new Map<string, IDateCheckInInfo>();
 
     if (!checkInsData?.data) {
       return map;
     }
 
     checkInsData.data.forEach((checkIn) => {
-      map.set(checkIn.checkinDate, String(checkIn.id));
+      const existing = map.get(checkIn.checkinDate);
+      if (existing) {
+        // 同一天有多筆打卡，累加次數
+        existing.count += 1;
+      } else {
+        // 第一筆打卡，設定 ID 和次數
+        map.set(checkIn.checkinDate, {
+          id: String(checkIn.id),
+          count: 1,
+        });
+      }
     });
 
     return map;
@@ -219,22 +238,26 @@ export default function CheckInDetailPage() {
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
       <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
 
-      {/* 日期選擇器 */}
+      {/* 日期選擇器（mobile 版本整合標題列） */}
       <CheckInDateSelector
         checkInDates={fullCheckInDates}
         checkIns={checkInsRecord}
         activeCheckInId={checkInId}
         practiceId={practiceId}
-      />
-
-      <PageHeader
         title="打卡紀錄"
-        rightActionTo={`/practices/${practiceId}`}
-        variant="light"
-        disableLightOn="mobile"
+        closeActionTo={`/practices/${practiceId}`}
       />
 
-      <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
+      {/* Desktop 版本的標題列 */}
+      <div className="hidden md:block">
+        <PageHeader
+          title="打卡紀錄"
+          rightActionTo={`/practices/${practiceId}`}
+          variant="light"
+        />
+      </div>
+
+      <main className="max-w-[448px] mx-auto pt-[150px] md:pt-3 px-5 pb-52">
         <CheckInDetail checkInData={checkInData} onEditComplete={handleEditComplete} />
       </main>
 
@@ -247,6 +270,7 @@ export default function CheckInDetailPage() {
           practiceStatus={practiceData?.data?.status}
           lastCheckInDate={checkInIdToDateMap.get(checkInId) || null}
           startDate={practiceData?.data?.startDate || null}
+          endDate={practiceData?.data?.endDate || null}
           taskTitle={checkInData.practiceTitle}
           onComplete={handleCheckInComplete}
           progressPercentage={practiceData?.data?.progressPercentage ?? 0}

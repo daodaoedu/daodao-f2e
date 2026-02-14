@@ -202,13 +202,13 @@ function AlwaysOpenTooltip({
       <div className="absolute bottom-[167px] left-12 right-12 h-[12px] bg-very-light-gray rounded-full">
         <div
           className="w-full h-full bg-linear-90 from-blue to-logo-cyan rounded-full origin-left"
-          style={{ transform: `scaleX(${percentage}%)` }}
+          style={{ transform: `scaleX(${Math.min(percentage, 100)}%)` }}
         />
         <TooltipTrigger
           render={
             <div
               className="absolute top-0 h-full aspect-square -translate-x-1/2"
-              style={{ left: `${percentage}%` }}
+              style={{ left: `${Math.min(percentage, 100)}%` }}
             >
               {showFireworks && <Fireworks />}
             </div>

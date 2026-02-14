@@ -31,7 +31,7 @@ export const CircularProgress = ({
         height={size}
         className="transform -rotate-90"
         role="img"
-        aria-label={`進度 ${clampedValue}%`}
+        aria-label={`進度 ${Math.round(value)}%`}
       >
         {/* Background circle */}
         <circle
@@ -64,7 +64,7 @@ export const CircularProgress = ({
             textClassName
           )}
         >
-          {Math.round(clampedValue)}%
+          {Math.round(value)}%
         </div>
       )}
     </div>

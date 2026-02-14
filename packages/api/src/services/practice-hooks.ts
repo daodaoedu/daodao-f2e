@@ -6,6 +6,7 @@
  */
 
 import { getRequiredEnv } from "@daodao/config";
+import useSWR from "swr";
 import { client, unauthorizedHandler } from "../client";
 import { useMutate, useQuery } from "../hooks";
 import type { components, paths } from "../types";
@@ -16,7 +17,9 @@ import type {
   IGetPracticeTemplatesParams,
   IGetRandomPracticeTemplatesParams,
   IGetUserPracticesParams,
+  PracticeSummary,
 } from "./practice";
+import { getPracticeSummary } from "./practice";
 
 // ============================================================================
 // Types
@@ -182,6 +185,60 @@ export const useUserPractices = (userId: string, params?: IGetUserPracticesParam
       },
     },
   });
+};
+
+/**
+ * 獲取實踐完成摘要的 Hook
+ * @description 用於生成實踐完成總結圖片，組合實踐詳情、打卡記錄和鼓勵句
+ * @param practiceId 實踐 ID
+ * @param options SWR 選項
+ * @returns 實踐摘要資料和狀態
+ */
+export const usePracticeSummary = (
+  practiceId: string | null | undefined,
+  options?: {
+    /** 是否啟用查詢（預設 true） */
+    enabled?: boolean;
+    /** 防止重複請求的間隔（毫秒），預設 2000 */
+    dedupingInterval?: number;
+  }
+) => {
+  // 確保 practiceId 類型穩定（字串）
+  const normalizedId = practiceId ? String(practiceId) : null;
+  const enabled = options?.enabled !== false && !!normalizedId;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{
+    data: PracticeSummary | null;
+    error: string | null;
+  }>(
+    // 使用 RESTful 風格的字串作為 key，更穩定且易於除錯
+    enabled ? `/api/v1/practices/${normalizedId}/summary` : null,
+    async () => {
+      if (!normalizedId) {
+        return { data: null, error: "缺少實踐 ID" };
+      }
+      return getPracticeSummary(normalizedId);
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: options?.dedupingInterval ?? 2000, // 防止 2 秒內重複請求
+      shouldRetryOnError: false, // 失敗不自動重試
+    }
+  );
+
+  return {
+    /** 實踐摘要資料 */
+    summary: data?.data ?? null,
+    /** 錯誤訊息 */
+    error: error?.message ?? data?.error ?? null,
+    /** 是否正在載入 */
+    isLoading,
+    /** 是否正在重新驗證 */
+    isValidating,
+    /** 重新獲取資料 */
+    refetch: mutate,
+  };
 };
 
 // ============================================================================

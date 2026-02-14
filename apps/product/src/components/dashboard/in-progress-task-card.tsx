@@ -27,6 +27,7 @@ interface InProgressTaskCardProps {
   status: string;
   lastCheckInDate?: string | null;
   startDate?: string | null;
+  endDate?: string | null;
   onEdit?: () => void;
 }
 
@@ -43,6 +44,7 @@ export const InProgressTaskCard = ({
   status,
   lastCheckInDate,
   startDate,
+  endDate,
   onEdit,
 }: InProgressTaskCardProps) => {
   const themeName = getThemeNameFromColor(theme);
@@ -132,6 +134,7 @@ export const InProgressTaskCard = ({
               practiceStatus={status}
               lastCheckInDate={lastCheckInDate ?? null}
               startDate={startDate ?? null}
+              endDate={endDate ?? null}
               taskTitle={title}
               showIcon
               progressPercentage={progress}
