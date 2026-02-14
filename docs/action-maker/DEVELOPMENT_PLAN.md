@@ -747,3 +747,558 @@ export const fallbackActionsMap = new Map<CategoryType, IAction[]>([
 7. **Accessibility**：確保 progress bar 有 `aria-valuenow`/`aria-valuemax`，輸入框有 `<label>` 關聯
 8. **「重新選擇」不重複呼叫 API**：Step 3 返回 Step 2 時使用 `router.replace` 並從 context 讀取已生成的 actions，避免重複 API 請求
 9. **設計參考圖**：`image 1.png` 為 Hahow 學習日誌設計參考，非 Action Maker 直接設計稿，僅供結果卡片排版借鑑
+
+---
+
+## 13. 後端 API 與資料庫需求
+
+> 後端為獨立 repository（`daodao-server`），前端透過 `@daodao/api`（openapi-fetch）呼叫 REST API。
+> 以下為 Action Maker 需要後端新增的 endpoints、資料表、與整合需求。
+
+### 13.1 新增 API Endpoints
+
+參照現有 quiz 的 `/api/v1/quiz` 與 practice 的 `/api/v1/practices` 模式，新增 `/api/v1/action-maker` 命名空間。
+
+#### 13.1.1 `POST /api/v1/action-maker/generate` — 產生行動建議
+
+根據使用者輸入的分類與主題，產生三個等級的個人化行動建議。
+
+```yaml
+POST /api/v1/action-maker/generate
+Auth: Optional（未登入也可使用，但中級/進階回傳鎖定狀態）
+
+Request Body:
+  category:       string (required)  # enum: interest|social|health|academic|work|finance
+  topic:          string (required)  # 使用者自訂主題文字，max 100 chars
+  selectedTags:   string[] (optional) # 使用者選擇的推薦標籤
+
+Response 200:
+  success: true
+  data:
+    actions:
+      - id:          string (uuid)
+        categoryId:  string
+        level:       "beginner"
+        title:       string
+        description: string
+        duration:    string
+        tip:         string
+        rationale:   string
+      - id:          string (uuid)
+        categoryId:  string
+        level:       "intermediate"
+        locked:      boolean          # true if user not authenticated
+        title:       string | null    # null if locked
+        description: string | null
+        duration:    string | null
+        tip:         string | null
+        rationale:   string | null
+      - id:          string (uuid)
+        categoryId:  string
+        level:       "advanced"
+        locked:      boolean
+        title:       string | null
+        description: string | null
+        duration:    string | null
+        tip:         string | null
+        rationale:   string | null
+  timestamp: string (ISO 8601)
+
+Error Responses:
+  400: Bad Request（category 不合法、topic 為空或超過 100 字）
+  429: Too Many Requests（rate limit，防止濫用）
+  500: Internal Server Error
+```
+
+#### 13.1.2 `POST /api/v1/action-maker/results` — 儲存結果
+
+登入使用者完成流程後，將結果存入後端。參照 quiz 的 `POST /api/v1/quiz`。
+
+```yaml
+POST /api/v1/action-maker/results
+Auth: Required (401 if not authenticated)
+
+Request Body:
+  nickname:       string (required)  # max 20 chars
+  category:       string (required)  # enum: interest|social|health|academic|work|finance
+  topic:          string (required)  # max 100 chars
+  selectedTags:   string[] (optional)
+  action:
+    id:           string (required)  # action uuid from generate response, or "custom"
+    level:        string (required)  # enum: beginner|intermediate|advanced|custom
+    title:        string (required)
+    description:  string (required)
+    duration:     string (optional)
+  triggerTiming:  string (required)  # e.g. "晚餐後"
+  isCustomAction: boolean (required) # 是否為使用者自訂行動
+
+Response 201:
+  success: true
+  data:
+    id:           number
+    userId:       number
+    nickname:     string
+    category:     string
+    topic:        string
+    actionLevel:  string
+    actionTitle:  string
+    triggerTiming: string
+    isCustomAction: boolean
+    completedAt:  string (ISO 8601)
+  timestamp: string (ISO 8601)
+
+Error Responses:
+  400: Bad Request
+  401: Unauthorized
+  500: Internal Server Error
+```
+
+#### 13.1.3 `GET /api/v1/action-maker/results/latest` — 取得最新結果
+
+登入使用者取回最近一次的 Action Maker 結果。參照 quiz 的 `GET /api/v1/quiz/latest`。
+
+```yaml
+GET /api/v1/action-maker/results/latest
+Auth: Required
+
+Response 200:
+  success: true
+  data:
+    id:            number
+    nickname:      string
+    category:      string
+    topic:         string
+    selectedTags:  string[]
+    action:
+      id:          string
+      level:       string
+      title:       string
+      description: string
+      duration:    string | null
+      tip:         string | null
+      rationale:   string | null
+    triggerTiming: string
+    isCustomAction: boolean
+    completedAt:   string (ISO 8601)
+  timestamp: string (ISO 8601)
+
+Error Responses:
+  401: Unauthorized
+  404: Not Found（使用者尚未完成任何 Action Maker）
+  500: Internal Server Error
+```
+
+#### 13.1.4 `GET /api/v1/action-maker/results` — 取得歷史結果列表（選配）
+
+```yaml
+GET /api/v1/action-maker/results
+Auth: Required
+Query Params:
+  limit:  number (default: 10, max: 50)
+  cursor: string (optional, cursor-based pagination)
+
+Response 200:
+  success: true
+  data:
+    results: ActionMakerResultData[]
+    pagination:
+      nextCursor: string | null
+      hasMore:    boolean
+  timestamp: string (ISO 8601)
+```
+
+---
+
+### 13.2 資料庫 Schema
+
+#### 13.2.1 `action_maker_results` 表
+
+儲存使用者完成的 Action Maker 結果，對應 `POST /api/v1/action-maker/results`。
+
+```sql
+CREATE TABLE action_maker_results (
+  id              SERIAL PRIMARY KEY,
+  user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  nickname        VARCHAR(20) NOT NULL,
+  category        VARCHAR(20) NOT NULL CHECK (category IN (
+                    'interest', 'social', 'health', 'academic', 'work', 'finance'
+                  )),
+  topic           VARCHAR(100) NOT NULL,
+  selected_tags   JSONB DEFAULT '[]',
+
+  -- 選擇的行動
+  action_id       VARCHAR(50),               -- generate API 回傳的 uuid, or "custom"
+  action_level    VARCHAR(20) NOT NULL CHECK (action_level IN (
+                    'beginner', 'intermediate', 'advanced', 'custom'
+                  )),
+  action_title    VARCHAR(100) NOT NULL,
+  action_description TEXT NOT NULL,
+  action_duration VARCHAR(30),
+
+  -- 啟動時機
+  trigger_timing  VARCHAR(100) NOT NULL,
+  is_custom_action BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- 時間戳
+  completed_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- 索引
+CREATE INDEX idx_action_maker_results_user_id ON action_maker_results(user_id);
+CREATE INDEX idx_action_maker_results_category ON action_maker_results(category);
+CREATE INDEX idx_action_maker_results_completed_at ON action_maker_results(completed_at DESC);
+
+-- user_id + completed_at 用於快速查詢「最新結果」
+CREATE INDEX idx_action_maker_results_user_latest
+  ON action_maker_results(user_id, completed_at DESC);
+```
+
+#### 13.2.2 `action_maker_generations` 表（選配，用於分析）
+
+記錄 generate API 的呼叫紀錄，用於分析熱門分類、主題、產生品質。
+
+```sql
+CREATE TABLE action_maker_generations (
+  id              SERIAL PRIMARY KEY,
+  user_id         INTEGER REFERENCES users(id) ON DELETE SET NULL,  -- nullable (未登入)
+  category        VARCHAR(20) NOT NULL,
+  topic           VARCHAR(100) NOT NULL,
+  selected_tags   JSONB DEFAULT '[]',
+
+  -- API 回應紀錄
+  generated_actions JSONB NOT NULL,           -- 完整的 3 筆行動建議 JSON
+  is_fallback     BOOLEAN NOT NULL DEFAULT FALSE,  -- 是否使用了 fallback 資料
+  response_time_ms INTEGER,                   -- API 回應時間 (ms)
+
+  -- 時間戳
+  created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- 索引
+CREATE INDEX idx_action_maker_generations_category ON action_maker_generations(category);
+CREATE INDEX idx_action_maker_generations_created_at ON action_maker_generations(created_at DESC);
+```
+
+#### ER Diagram
+
+```
+users (existing)
+  │ 1
+  │
+  ├──── * action_maker_results
+  │       - id (PK)
+  │       - user_id (FK → users.id)
+  │       - nickname, category, topic
+  │       - action_level, action_title, action_description
+  │       - trigger_timing, is_custom_action
+  │       - completed_at
+  │
+  └──── * action_maker_generations (optional)
+          - id (PK)
+          - user_id (FK → users.id, nullable)
+          - category, topic, selected_tags
+          - generated_actions (JSONB)
+          - is_fallback, response_time_ms
+          - created_at
+```
+
+---
+
+### 13.3 行動建議產生策略
+
+generate API 需在後端產生個人化的行動建議。有以下三種可行方案：
+
+#### 方案 A：模板引擎（推薦 MVP）
+
+預先建立行動模板資料，根據分類 + 關鍵字匹配產生：
+
+```sql
+CREATE TABLE action_maker_templates (
+  id              SERIAL PRIMARY KEY,
+  category        VARCHAR(20) NOT NULL,
+  level           VARCHAR(20) NOT NULL,
+  title_template  VARCHAR(100) NOT NULL,     -- e.g. "探索{topic}相關材料"
+  description_template TEXT NOT NULL,
+  duration        VARCHAR(30) NOT NULL,
+  tip_template    TEXT NOT NULL,
+  rationale_template TEXT NOT NULL,
+  keywords        TEXT[] DEFAULT '{}',        -- 匹配關鍵字
+  priority        INTEGER DEFAULT 0,          -- 排序優先級
+  is_active       BOOLEAN DEFAULT TRUE,
+  created_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 每個分類 × 3 等級 = 至少 18 筆模板
+-- 可設多組模板，根據 keywords 匹配最適合的
+CREATE INDEX idx_templates_category_level
+  ON action_maker_templates(category, level, priority DESC);
+```
+
+產生邏輯：
+1. 根據 `category` + `level` 篩選模板
+2. 比對 `topic` 和 `selectedTags` 與模板的 `keywords`
+3. 選出最佳匹配的模板
+4. 將 `{topic}` 等 placeholder 替換為使用者輸入
+5. 回傳三個等級的行動建議
+
+#### 方案 B：AI 生成（進階）
+
+串接 LLM API（如 OpenAI / Claude）即時產生：
+
+- 優點：高度個人化，不需維護模板資料
+- 缺點：回應時間較長（2-5s）、成本、需要 prompt 工程
+- 適用場景：MVP 驗證後升級
+
+```
+Prompt 範例：
+使用者分類：{category}
+使用者主題：{topic}
+請為以下三個等級各產生一個每日微習慣行動建議：
+1. 初學（約 10-15 分鐘）
+2. 中級（約 20-30 分鐘）
+3. 進階（約 30-60 分鐘）
+每個建議包含：title, description, duration, tip, rationale
+```
+
+#### 方案 C：混合模式（推薦長期）
+
+- 熱門分類/主題使用預建模板（快速回應）
+- 冷門主題使用 AI 生成
+- 將 AI 生成結果快取到模板庫，漸進式充實內容
+
+---
+
+### 13.4 前端 API 整合（packages/api 側）
+
+需在 `daodao-server` 的 OpenAPI spec 新增 endpoints 後，重新產生 `types.ts`。前端側新增：
+
+#### 13.4.1 新增 Service 檔案
+
+```typescript
+// packages/api/src/services/action-maker.ts （server-side）
+
+import { client } from "../client";
+
+export type GenerateActionsRequest = {
+  category: string;
+  topic: string;
+  selectedTags?: string[];
+};
+
+export type ActionMakerResultData = {
+  id: number;
+  nickname: string;
+  category: string;
+  topic: string;
+  actionLevel: string;
+  actionTitle: string;
+  triggerTiming: string;
+  isCustomAction: boolean;
+  completedAt: string;
+};
+
+export async function generateActions(data: GenerateActionsRequest) {
+  return client.POST("/api/v1/action-maker/generate", {
+    body: data,
+  });
+}
+
+export async function saveActionMakerResult(data: SaveActionMakerResultRequest) {
+  return client.POST("/api/v1/action-maker/results", {
+    body: data,
+  });
+}
+
+export async function getLatestActionMakerResult() {
+  return client.GET("/api/v1/action-maker/results/latest");
+}
+```
+
+```typescript
+// packages/api/src/services/action-maker-hooks.ts （client-side）
+
+import { useQuery, useMutate } from "../hooks";
+
+export const useLatestActionMakerResult = () =>
+  useQuery("GET", "/api/v1/action-maker/results/latest");
+
+export const useActionMakerResults = (params?: { limit?: number; cursor?: string }) =>
+  useQuery("GET", "/api/v1/action-maker/results", {
+    params: { query: params },
+  });
+```
+
+#### 13.4.2 OpenAPI Schema 定義（供後端參考）
+
+以下為建議新增到 `daodao-server` OpenAPI spec 的 schema：
+
+```yaml
+components:
+  schemas:
+    GenerateActionsRequest:
+      type: object
+      required: [category, topic]
+      properties:
+        category:
+          type: string
+          enum: [interest, social, health, academic, work, finance]
+          description: 六大分類
+        topic:
+          type: string
+          maxLength: 100
+          description: 使用者自訂主題
+        selectedTags:
+          type: array
+          items:
+            type: string
+          description: 使用者選擇的推薦標籤
+
+    GeneratedAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        categoryId:
+          type: string
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        locked:
+          type: boolean
+          default: false
+        title:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        duration:
+          type: string
+          nullable: true
+        tip:
+          type: string
+          nullable: true
+        rationale:
+          type: string
+          nullable: true
+
+    GenerateActionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          type: object
+          properties:
+            actions:
+              type: array
+              items:
+                $ref: '#/components/schemas/GeneratedAction'
+              minItems: 3
+              maxItems: 3
+        timestamp:
+          type: string
+          format: date-time
+
+    SaveActionMakerResultRequest:
+      type: object
+      required: [nickname, category, topic, action, triggerTiming, isCustomAction]
+      properties:
+        nickname:
+          type: string
+          maxLength: 20
+        category:
+          type: string
+          enum: [interest, social, health, academic, work, finance]
+        topic:
+          type: string
+          maxLength: 100
+        selectedTags:
+          type: array
+          items:
+            type: string
+        action:
+          type: object
+          required: [id, level, title, description]
+          properties:
+            id:
+              type: string
+            level:
+              type: string
+              enum: [beginner, intermediate, advanced, custom]
+            title:
+              type: string
+            description:
+              type: string
+            duration:
+              type: string
+        triggerTiming:
+          type: string
+          maxLength: 100
+        isCustomAction:
+          type: boolean
+
+    ActionMakerResultData:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        nickname:
+          type: string
+        category:
+          type: string
+        topic:
+          type: string
+        selectedTags:
+          type: array
+          items:
+            type: string
+        action:
+          $ref: '#/components/schemas/GeneratedAction'
+        triggerTiming:
+          type: string
+        isCustomAction:
+          type: boolean
+        completedAt:
+          type: string
+          format: date-time
+```
+
+---
+
+### 13.5 Rate Limiting 與安全性
+
+| 項目 | 規則 | 說明 |
+|------|------|------|
+| `POST /generate` | 10 次/分鐘/IP | 防止未登入使用者濫用 |
+| `POST /generate` (authenticated) | 30 次/分鐘/user | 登入使用者較寬鬆 |
+| `POST /results` | 5 次/分鐘/user | 結果儲存不需高頻 |
+| Input sanitization | XSS 過濾 | `topic`, `nickname`, `triggerTiming` 需過濾 HTML/script |
+| Topic 長度 | max 100 chars | 前後端雙重驗證 |
+| Nickname 長度 | max 20 chars | 前後端雙重驗證 |
+
+---
+
+### 13.6 後端開發任務
+
+| # | 任務 | 說明 | 依賴 |
+|---|------|------|------|
+| B.1 | 建立 `action_maker_results` 資料表 | Migration + Entity | - |
+| B.2 | 建立 `action_maker_templates` 資料表 | Migration + Entity + Seed data | - |
+| B.3 | 建立 `action_maker_generations` 資料表 | Migration + Entity | - |
+| B.4 | 實作 `POST /api/v1/action-maker/generate` | Controller + Service + 模板匹配邏輯 | B.2 |
+| B.5 | 實作 `POST /api/v1/action-maker/results` | Controller + Service + Validation | B.1 |
+| B.6 | 實作 `GET /api/v1/action-maker/results/latest` | Controller + Service | B.1 |
+| B.7 | 實作 `GET /api/v1/action-maker/results` | Controller + Service + Pagination | B.1 |
+| B.8 | 更新 OpenAPI spec | 新增 schemas + endpoints | B.4-B.7 |
+| B.9 | 前端 `types.ts` 同步 | GitHub Actions 觸發 openapi-typescript 重新產生 | B.8 |
+| B.10 | 新增 Rate Limiting | 針對 generate endpoint 的限流 | B.4 |
+| B.11 | Seed 模板資料 | 6 分類 × 3 等級 × 至少 3 套模板 = 54+ 筆 | B.2 |
+| B.12 | （選配）AI 生成整合 | 串接 LLM API 作為模板引擎的補充 | B.4 |
