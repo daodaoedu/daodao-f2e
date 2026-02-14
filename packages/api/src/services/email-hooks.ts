@@ -41,6 +41,7 @@ export const useEmailHistory = (params?: IGetEmailHistoryParams) => {
         limit: params?.limit ? String(params.limit) : undefined,
         sortBy: params?.sortBy,
         sortOrder: params?.sortOrder,
+        opened: params?.opened,
       },
     },
   });
