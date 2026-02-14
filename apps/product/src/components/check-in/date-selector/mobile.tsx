@@ -4,7 +4,7 @@ import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { CheckInDateButton } from "./check-in-date-button";
 import type { ICheckInDateSelectorProps } from "./types";
 
@@ -19,6 +19,13 @@ export const MobileCheckInDateSelector = ({
   const router = useSafeRouter();
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
+  const navRef = useRef<HTMLElement>(null);
+
+  // 滑鼠拖曳滾動相關
+  const isMouseDown = useRef(false);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragScrollLeft = useRef(0);
 
   // 處理滾動時隱藏/顯示面板
   useEffect(() => {
@@ -56,6 +63,52 @@ export const MobileCheckInDateSelector = ({
     };
   }, []);
 
+  // 滑鼠拖曳：按下
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!navRef.current) return;
+    isMouseDown.current = true;
+    isDragging.current = false;
+    dragStartX.current = e.pageX;
+    dragScrollLeft.current = navRef.current.scrollLeft;
+  }, []);
+
+  // 滑鼠拖曳：移動
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isMouseDown.current || !navRef.current) return;
+    const walk = e.pageX - dragStartX.current;
+    // 超過 3px 才視為拖曳，避免影響按鈕點擊
+    if (!isDragging.current && Math.abs(walk) > 3) {
+      isDragging.current = true;
+      navRef.current.style.cursor = "grabbing";
+    }
+    if (isDragging.current) {
+      e.preventDefault();
+      navRef.current.scrollLeft = dragScrollLeft.current - walk;
+    }
+  }, []);
+
+  // 滑鼠拖曳：放開
+  const handleMouseUp = useCallback(() => {
+    isMouseDown.current = false;
+    if (navRef.current) {
+      navRef.current.style.cursor = "";
+    }
+    // 延遲重置拖曳狀態，讓 click 事件能夠在 capture 階段被攔截
+    if (isDragging.current) {
+      requestAnimationFrame(() => {
+        isDragging.current = false;
+      });
+    }
+  }, []);
+
+  // 攔截拖曳後的 click 事件，避免觸發非預期的頁面導航
+  const handleClickCapture = useCallback((e: React.MouseEvent) => {
+    if (isDragging.current) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, []);
+
   // 處理日期選擇
   const handleDateSelect = (selectedCheckInId: string) => {
     if (selectedCheckInId !== activeCheckInId) {
@@ -74,10 +127,16 @@ export const MobileCheckInDateSelector = ({
 
   return (
     <nav
+      ref={navRef}
       className={cn(
         "fixed top-0 left-0 right-0 z-30 bg-[#E9FEFFB2]/70 border-b-2 border-[#E9FEFFB2] rounded-b-3xl backdrop-blur-lg transition-transform duration-300 ease-in-out",
         !isVisible && "-translate-y-full"
       )}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onClickCapture={handleClickCapture}
     >
       {/* 標題列 */}
       <div className="flex items-center justify-between px-5 pt-4">
