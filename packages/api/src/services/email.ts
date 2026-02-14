@@ -41,6 +41,7 @@ export interface IGetEmailHistoryParams {
   limit?: number;
   sortBy?: "sentAt" | "createdAt";
   sortOrder?: "asc" | "desc";
+  opened?: "true" | "false";
 }
 
 // ============================================================================
@@ -76,6 +77,7 @@ export const getEmailHistory = async (params?: IGetEmailHistoryParams) => {
         limit: params?.limit ? String(params.limit) : undefined,
         sortBy: params?.sortBy,
         sortOrder: params?.sortOrder,
+        opened: params?.opened,
       },
     },
   });

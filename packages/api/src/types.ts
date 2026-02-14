@@ -10592,6 +10592,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/email/track/open/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 追蹤 email 開啟事件
+         * @description 透過追蹤像素記錄 email 開啟事件，回傳 1x1 透明 GIF。此為公開 endpoint，不需認證。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 追蹤 Token (UUID) */
+                    token: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 1x1 透明 GIF 圖片 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "image/gif": unknown;
+                    };
+                };
+                /** @description 請求過於頻繁 */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/comments": {
         parameters: {
             query?: never;
@@ -16355,8 +16404,12 @@ export interface paths {
                                 totalUsers: number;
                                 /** @description 活躍率（百分比） */
                                 activeRate: number;
-                                /** @description 細分統計 */
-                                breakdown?: unknown;
+                                /** @description 分組統計（按角色/地區/教育階段） */
+                                groups?: {
+                                    group: string;
+                                    activeUsers: number;
+                                    inactiveUsers: number;
+                                }[];
                             };
                             metadata: {
                                 activeWithinDays?: number;
@@ -16685,12 +16738,10 @@ export interface paths {
                             data: {
                                 cohorts: {
                                     cohortDate: string;
-                                    cohortSize: number;
-                                    retentionByDay: {
-                                        day: number;
-                                        retainedUsers: number;
-                                        retentionRate: number;
-                                    }[];
+                                    size: number;
+                                    retention: {
+                                        [key: string]: number;
+                                    };
                                 }[];
                                 averageRetention: {
                                     day1: number;
@@ -18823,6 +18874,8 @@ export interface paths {
                     sortBy?: "sentAt" | "createdAt";
                     /** @description 排序方向 */
                     sortOrder?: "asc" | "desc";
+                    /** @description 開啟狀態篩選 */
+                    opened?: "true" | "false";
                 };
                 header?: never;
                 path?: never;
@@ -27043,17 +27096,22 @@ export interface components {
              * @description 總實踐數
              * @example 500
              */
-            totalPractices: number;
+            total: number;
             /**
              * @description 進行中的實踐數
              * @example 150
              */
-            activePractices: number;
+            active: number;
             /**
              * @description 已完成的實踐數
              * @example 300
              */
-            completedPractices: number;
+            completed: number;
+            /**
+             * @description 總簽到數
+             * @example 1200
+             */
+            totalCheckIns: number;
             /**
              * @description 平均完成率（百分比）
              * @example 65.5
@@ -27200,6 +27258,12 @@ export interface components {
              * @enum {string}
              */
             sortOrder: "asc" | "desc";
+            /**
+             * @description 開啟狀態篩選
+             * @example true
+             * @enum {string}
+             */
+            opened?: "true" | "false";
         };
         EmailHistoryRecord: {
             /**
@@ -27253,6 +27317,21 @@ export interface components {
              * @example 456
              */
             entityId: number | null;
+            /**
+             * @description 追蹤 Token
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            trackingToken: string | null;
+            /**
+             * @description 首次開啟時間
+             * @example 2024-01-15T12:00:00.000Z
+             */
+            openedAt: string | null;
+            /**
+             * @description 開啟次數
+             * @example 3
+             */
+            openCount: number;
         };
         EmailHistoryStats: {
             /**
@@ -27280,6 +27359,16 @@ export interface components {
              * @example 95
              */
             successRate: number;
+            /**
+             * @description 已開啟數量
+             * @example 800
+             */
+            openedCount: number;
+            /**
+             * @description 開啟率（百分比）
+             * @example 84.21
+             */
+            openRate: number;
         };
         EmailHistoryResponseData: {
             /** @description 郵件記錄列表 */

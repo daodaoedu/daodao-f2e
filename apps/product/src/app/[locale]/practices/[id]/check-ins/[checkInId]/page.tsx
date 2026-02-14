@@ -187,7 +187,7 @@ export default function CheckInDetailPage() {
           variant="light"
           disableLightOn="mobile"
         />
-        <main className="max-w-[448px] mx-auto pt-[88px] md:pt-3 px-5 pb-40">
+        <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
           <div className="text-center text-white">載入中...</div>
         </main>
       </div>
@@ -205,7 +205,7 @@ export default function CheckInDetailPage() {
           variant="light"
           disableLightOn="mobile"
         />
-        <main className="max-w-[448px] mx-auto pt-[88px] md:pt-3 px-5 pb-40">
+        <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
           <div className="text-center text-white">找不到打卡記錄</div>
         </main>
       </div>
