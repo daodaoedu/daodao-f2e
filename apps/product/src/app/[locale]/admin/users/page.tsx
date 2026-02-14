@@ -191,7 +191,7 @@ function RegistrationsTab() {
       </div>
 
       {/* Chart */}
-      <div className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      <div className="min-w-0 rounded-xl border border-border bg-white p-5 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold">註冊趨勢圖</h3>
         {isLoading ? (
           <div className="flex h-64 items-center justify-center">
@@ -201,10 +201,10 @@ function RegistrationsTab() {
           <div className="flex h-64 items-center justify-center text-basic-300">暫無資料</div>
         ) : (
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
+            <BarChart data={chartData} margin={{ left: -10, right: 10 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" fontSize={12} />
-              <YAxis fontSize={12} />
+              <XAxis dataKey="name" fontSize={11} tick={{ fontSize: 11 }} angle={-30} textAnchor="end" height={50} />
+              <YAxis fontSize={12} width={40} />
               <Tooltip />
               <Bar dataKey="count" fill="#16B9B3" radius={[4, 4, 0, 0]} name="註冊數" />
             </BarChart>
@@ -252,7 +252,7 @@ function ActivityTab() {
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Pie Chart */}
-        <div className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <div className="min-w-0 rounded-xl border border-border bg-white p-5 shadow-sm">
           <h3 className="mb-4 text-lg font-semibold">活躍度比例</h3>
           {isLoading ? (
             <div className="flex h-64 items-center justify-center">
@@ -266,8 +266,8 @@ function ActivityTab() {
                     data={pieData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
+                    innerRadius={50}
+                    outerRadius={80}
                     dataKey="value"
                     label={({ name, percent }: { name: string; percent: number }) =>
                       `${name} ${(percent * 100).toFixed(1)}%`
@@ -292,7 +292,7 @@ function ActivityTab() {
         </div>
 
         {/* Group Analysis */}
-        <div className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <div className="min-w-0 rounded-xl border border-border bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold">分組分析</h3>
             <select
@@ -570,7 +570,7 @@ function DeviceChart({
   );
 
   return (
-    <div className="rounded-xl border border-border bg-white p-5 shadow-sm">
+    <div className="min-w-0 rounded-xl border border-border bg-white p-5 shadow-sm">
       <h3 className="mb-4 text-lg font-semibold">{title}</h3>
       {chartData.length === 0 ? (
         <div className="flex h-48 items-center justify-center text-basic-300">暫無資料</div>
@@ -582,7 +582,7 @@ function DeviceChart({
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                outerRadius={65}
+                outerRadius={55}
                 dataKey="value"
                 label={({ name, percent }: { name: string; percent: number }) =>
                   `${name} ${(percent * 100).toFixed(0)}%`
