@@ -90,9 +90,22 @@ export const MobileCheckInDateSelector = ({
   // 滑鼠拖曳：放開
   const handleMouseUp = useCallback(() => {
     isMouseDown.current = false;
-    isDragging.current = false;
     if (navRef.current) {
       navRef.current.style.cursor = "";
+    }
+    // 延遲重置拖曳狀態，讓 click 事件能夠在 capture 階段被攔截
+    if (isDragging.current) {
+      requestAnimationFrame(() => {
+        isDragging.current = false;
+      });
+    }
+  }, []);
+
+  // 攔截拖曳後的 click 事件，避免觸發非預期的頁面導航
+  const handleClickCapture = useCallback((e: React.MouseEvent) => {
+    if (isDragging.current) {
+      e.preventDefault();
+      e.stopPropagation();
     }
   }, []);
 
@@ -123,6 +136,7 @@ export const MobileCheckInDateSelector = ({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onClickCapture={handleClickCapture}
     >
       {/* 標題列 */}
       <div className="flex items-center justify-between px-5 pt-4">

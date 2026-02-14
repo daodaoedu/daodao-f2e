@@ -435,33 +435,7 @@ function EmailTrackingTab() {
     sortOrder: "desc",
   });
 
-  const historyData = data?.data as
-    | {
-        records?: Array<{
-          id?: number;
-          recipientEmail?: string | null;
-          emailType?: string;
-          subject?: string | null;
-          sentAt?: string | null;
-          status?: string;
-          openedAt?: string | null;
-          openCount?: number;
-        }>;
-        pagination?: {
-          currentPage?: number;
-          totalPages?: number;
-          totalCount?: number;
-          hasNext?: boolean;
-          hasPrev?: boolean;
-        };
-        stats?: {
-          totalRecords?: number;
-          sentCount?: number;
-          openedCount?: number;
-          openRate?: number;
-        };
-      }
-    | undefined;
+  const historyData = data?.data;
 
   const records = historyData?.records ?? [];
   const pagination = historyData?.pagination;
