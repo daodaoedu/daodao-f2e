@@ -163,7 +163,7 @@ export const MobileCheckInDateSelector = ({
 
       {/* 日期選擇器 */}
       <div className="overflow-x-auto scrollbar-hide px-10">
-        <div className="flex items-center justify-center gap-4 w-fit pb-5 pt-4">
+        <div className="flex items-center justify-center gap-4 w-fit mx-auto pb-5 pt-4">
           {checkInDates.map((item, index) => (
             <CheckInDateButton
               key={item.id}
