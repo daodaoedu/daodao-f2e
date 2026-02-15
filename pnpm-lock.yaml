@@ -406,6 +406,9 @@ importers:
       '@daodao/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@daodao/features-action-maker':
+        specifier: workspace:*
+        version: link:../../packages/features/action-maker
       '@daodao/features-quiz':
         specifier: workspace:*
         version: link:../../packages/features/quiz
@@ -596,6 +599,55 @@ importers:
       tsx:
         specifier: ^4.19.4
         version: 4.21.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  packages/features/action-maker:
+    dependencies:
+      '@daodao/api':
+        specifier: workspace:*
+        version: link:../../api
+      '@daodao/assets':
+        specifier: workspace:*
+        version: link:../../assets
+      '@daodao/auth':
+        specifier: workspace:*
+        version: link:../../auth
+      '@daodao/i18n':
+        specifier: workspace:*
+        version: link:../../i18n
+      '@daodao/shared':
+        specifier: workspace:*
+        version: link:../../shared
+      '@daodao/ui':
+        specifier: workspace:*
+        version: link:../../ui
+      lottie-react:
+        specifier: 'catalog:'
+        version: 2.4.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      lucide-react:
+        specifier: 'catalog:'
+        version: 0.475.0(react@19.2.3)
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.3(react@19.2.3)
+    devDependencies:
+      '@daodao/config':
+        specifier: workspace:*
+        version: link:../../config
+      '@types/node':
+        specifier: 'catalog:'
+        version: 20.19.30
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.7)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -10088,7 +10140,7 @@ snapshots:
       '@babel/helper-module-imports': 7.28.6
       '@babel/helper-plugin-utils': 7.28.6
       '@babel/plugin-syntax-jsx': 7.28.6(@babel/core@7.28.6)
-      '@babel/types': 7.28.6
+      '@babel/types': 7.29.0
     transitivePeerDependencies:
       - supports-color
 
@@ -10954,7 +11006,7 @@ snapshots:
 
   '@expo/xcpretty@4.4.0':
     dependencies:
-      '@babel/code-frame': 7.28.6
+      '@babel/code-frame': 7.29.0
       chalk: 4.1.2
       js-yaml: 4.1.1
 
@@ -15066,9 +15118,9 @@ snapshots:
   babel-literal-to-ast@2.1.0(@babel/core@7.28.6):
     dependencies:
       '@babel/core': 7.28.6
-      '@babel/parser': 7.28.6
+      '@babel/parser': 7.29.0
       '@babel/traverse': 7.28.6
-      '@babel/types': 7.28.6
+      '@babel/types': 7.29.0
     transitivePeerDependencies:
       - supports-color
 
@@ -15115,7 +15167,7 @@ snapshots:
 
   babel-plugin-react-compiler@1.0.0:
     dependencies:
-      '@babel/types': 7.28.6
+      '@babel/types': 7.29.0
 
   babel-plugin-react-native-web@0.21.2: {}
 
@@ -17921,7 +17973,7 @@ snapshots:
   metro-transform-plugins@0.83.3:
     dependencies:
       '@babel/core': 7.28.6
-      '@babel/generator': 7.28.6
+      '@babel/generator': 7.29.1
       '@babel/template': 7.28.6
       '@babel/traverse': 7.28.6
       flow-enums-runtime: 0.0.6
@@ -17932,9 +17984,9 @@ snapshots:
   metro-transform-worker@0.83.3:
     dependencies:
       '@babel/core': 7.28.6
-      '@babel/generator': 7.28.6
-      '@babel/parser': 7.28.6
-      '@babel/types': 7.28.6
+      '@babel/generator': 7.29.1
+      '@babel/parser': 7.29.0
+      '@babel/types': 7.29.0
       flow-enums-runtime: 0.0.6
       metro: 0.83.3
       metro-babel-transformer: 0.83.3
@@ -17951,13 +18003,13 @@ snapshots:
 
   metro@0.83.3:
     dependencies:
-      '@babel/code-frame': 7.28.6
+      '@babel/code-frame': 7.29.0
       '@babel/core': 7.28.6
-      '@babel/generator': 7.28.6
-      '@babel/parser': 7.28.6
+      '@babel/generator': 7.29.1
+      '@babel/parser': 7.29.0
       '@babel/template': 7.28.6
       '@babel/traverse': 7.28.6
-      '@babel/types': 7.28.6
+      '@babel/types': 7.29.0
       accepts: 1.3.8
       chalk: 4.1.2
       ci-info: 2.0.0
