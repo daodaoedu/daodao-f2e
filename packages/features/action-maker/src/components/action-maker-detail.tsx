@@ -7,8 +7,10 @@ import { NavigationButtons } from "./navigation-buttons";
 import { ProgressBar } from "./progress-bar";
 import { StarryBackground } from "./starry-background";
 
+const DEFAULT_BADGE = { bg: "bg-[#4CAF50]", label: "初學" } as const;
+
 const BADGE_STYLES: Record<string, { bg: string; label: string }> = {
-	beginner: { bg: "bg-[#4CAF50]", label: "初學" },
+	beginner: DEFAULT_BADGE,
 	intermediate: { bg: "bg-[#5B8DB8]", label: "中級" },
 	advanced: { bg: "bg-[#B8865B]", label: "進階" },
 };
@@ -24,7 +26,7 @@ export function ActionMakerDetail() {
 		return null;
 	}
 
-	const badge = BADGE_STYLES[action.level] ?? BADGE_STYLES.beginner;
+	const badge = BADGE_STYLES[action.level] ?? DEFAULT_BADGE;
 
 	const handleComplete = () => {
 		if (!isValidTriggerTiming(timing)) return;

@@ -89,10 +89,10 @@ export function ActionMakerActions() {
 					<div className="flex flex-1 flex-col gap-5 px-6 pt-8">
 						<h2 className="text-xl font-bold text-white">自訂你的行動</h2>
 
-						<div>
-							<label className="mb-1 block text-sm text-[#7B9FC4]">
+						<label className="block">
+							<span className="mb-1 block text-sm text-[#7B9FC4]">
 								行動標題
-							</label>
+							</span>
 							<input
 								type="text"
 								value={customTitle}
@@ -101,12 +101,12 @@ export function ActionMakerActions() {
 								placeholder="例如：練習烏克麗麗和弦"
 								className="w-full rounded-xl border border-[#BCD5EE]/30 bg-[#18215E]/80 px-4 py-3 text-white placeholder:text-[#7B9FC4] focus:border-[#BCD5EE]/60 focus:outline-none"
 							/>
-						</div>
+						</label>
 
-						<div>
-							<label className="mb-1 block text-sm text-[#7B9FC4]">
+						<label className="block">
+							<span className="mb-1 block text-sm text-[#7B9FC4]">
 								具體行動內容
-							</label>
+							</span>
 							<textarea
 								value={customDescription}
 								onChange={(e) => setCustomDescription(e.target.value)}
@@ -115,15 +115,15 @@ export function ActionMakerActions() {
 								placeholder="例如：每天花 15 分鐘練習 C、G、Am、F 四個和弦的轉換"
 								className="w-full resize-none rounded-xl border border-[#BCD5EE]/30 bg-[#18215E]/80 px-4 py-3 text-white placeholder:text-[#7B9FC4] focus:border-[#BCD5EE]/60 focus:outline-none"
 							/>
-							<div className="mt-1 text-right text-xs text-[#7B9FC4]">
+							<span className="mt-1 block text-right text-xs text-[#7B9FC4]">
 								{customDescription.length} / {limits.CUSTOM_DESCRIPTION_MAX_LENGTH}
-							</div>
-						</div>
+							</span>
+						</label>
 
-						<div>
-							<label className="mb-1 block text-sm text-[#7B9FC4]">
+						<label className="block">
+							<span className="mb-1 block text-sm text-[#7B9FC4]">
 								預估時間（選填）
-							</label>
+							</span>
 							<input
 								type="text"
 								value={customDuration}
@@ -131,7 +131,7 @@ export function ActionMakerActions() {
 								placeholder="例如：約 15 分鐘"
 								className="w-full rounded-xl border border-[#BCD5EE]/30 bg-[#18215E]/80 px-4 py-3 text-white placeholder:text-[#7B9FC4] focus:border-[#BCD5EE]/60 focus:outline-none"
 							/>
-						</div>
+						</label>
 					</div>
 
 					<div className="mx-auto w-full max-w-sm">

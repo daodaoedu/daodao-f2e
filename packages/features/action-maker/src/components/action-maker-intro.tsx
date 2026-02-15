@@ -1,5 +1,8 @@
 "use client";
 
+import titleAnimationData from "@daodao/assets/images/action-maker/title.json";
+import Lottie from "lottie-react";
+import { useMemo } from "react";
 import { NavigationButtons } from "./navigation-buttons";
 import { StarryBackground } from "./starry-background";
 
@@ -8,16 +11,27 @@ interface ActionMakerIntroProps {
 }
 
 export function ActionMakerIntro({ onStart }: ActionMakerIntroProps) {
+	const prefersReduced = useMemo(
+		() =>
+			typeof window !== "undefined" &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+		[],
+	);
+
 	return (
 		<StarryBackground>
 			<div className="flex min-h-dvh flex-col items-center justify-center px-6">
 				<div className="flex flex-col items-center gap-6 text-center">
-					{/* Title - TODO: Replace with Lottie animation from title.json */}
-					<h1 className="text-4xl font-bold leading-tight text-white md:text-5xl">
-						建立微習慣
-						<br />
-						抓住你的星
-					</h1>
+					{/* Lottie title animation */}
+					<div className="w-full max-w-xs" role="img" aria-label="建立微習慣，抓住你的星">
+						<Lottie
+							animationData={titleAnimationData}
+							loop={!prefersReduced}
+							autoplay={!prefersReduced}
+							style={{ width: "100%", height: "auto" }}
+							initialSegment={prefersReduced ? [0, 0] : undefined}
+						/>
+					</div>
 
 					<p className="text-lg text-[#BCD5EE]">定好習慣，目標就離你不遠！</p>
 

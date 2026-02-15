@@ -115,7 +115,7 @@ export function ActionMakerProvider({ children }: React.PropsWithChildren) {
 	// Restore from sessionStorage on mount
 	useEffect(() => {
 		const stored = getStorage<IActionMakerState>(StorageEnum.ActionMaker).get();
-		if (stored && stored.userInput && isValidCategory(stored.userInput.category)) {
+		if (stored?.userInput && isValidCategory(stored.userInput.category)) {
 			dispatch({ type: "RESTORE", payload: stored });
 		}
 	}, []);

@@ -1,8 +1,12 @@
+import {
+	CategoryAcademicSvg,
+	CategoryFinanceSvg,
+	CategoryHealthSvg,
+	CategoryInterestSvg,
+	CategorySocialSvg,
+	CategoryWorkSvg,
+} from "@daodao/assets";
 import type { CategoryType, ICategory } from "../types";
-
-// SVG icons will be imported from @daodao/assets once they are added.
-// For now, use placeholder components.
-const PlaceholderIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => null;
 
 export const categoryMap = new Map<CategoryType, ICategory>([
 	[
@@ -10,7 +14,7 @@ export const categoryMap = new Map<CategoryType, ICategory>([
 		{
 			id: "interest",
 			label: "興趣",
-			icon: PlaceholderIcon,
+			icon: CategoryInterestSvg,
 			tags: [
 				"學會鉤針",
 				"登上百岳",
@@ -31,7 +35,7 @@ export const categoryMap = new Map<CategoryType, ICategory>([
 		{
 			id: "social",
 			label: "人際",
-			icon: PlaceholderIcon,
+			icon: CategorySocialSvg,
 			tags: [
 				"每週約一位朋友",
 				"練習傾聽技巧",
@@ -48,7 +52,7 @@ export const categoryMap = new Map<CategoryType, ICategory>([
 		{
 			id: "health",
 			label: "健康",
-			icon: PlaceholderIcon,
+			icon: CategoryHealthSvg,
 			tags: [
 				"每日走一萬步",
 				"學習冥想",
@@ -65,7 +69,7 @@ export const categoryMap = new Map<CategoryType, ICategory>([
 		{
 			id: "academic",
 			label: "學業",
-			icon: PlaceholderIcon,
+			icon: CategoryAcademicSvg,
 			tags: [
 				"每日閱讀 30 分鐘",
 				"學習新語言",
@@ -82,7 +86,7 @@ export const categoryMap = new Map<CategoryType, ICategory>([
 		{
 			id: "work",
 			label: "工作",
-			icon: PlaceholderIcon,
+			icon: CategoryWorkSvg,
 			tags: [
 				"學習時間管理",
 				"建立個人品牌",
@@ -99,7 +103,7 @@ export const categoryMap = new Map<CategoryType, ICategory>([
 		{
 			id: "finance",
 			label: "金錢",
-			icon: PlaceholderIcon,
+			icon: CategoryFinanceSvg,
 			tags: [
 				"記帳習慣",
 				"學習投資基礎",

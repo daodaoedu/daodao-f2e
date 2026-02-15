@@ -26,6 +26,7 @@
     "@daodao/i18n": "workspace:*",
     "@daodao/shared": "workspace:*",
     "@daodao/ui": "workspace:*",
+    "lottie-react": "catalog:",
     "lucide-react": "catalog:"
   },
   "devDependencies": {

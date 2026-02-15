@@ -14,7 +14,7 @@ export type ActionLevel = "beginner" | "intermediate" | "advanced";
 export interface ICategory {
 	id: CategoryType;
 	label: string;
-	icon: React.FC<React.SVGProps<SVGSVGElement>>;
+	icon: React.ComponentType<Omit<React.SVGProps<SVGSVGElement>, "ref">>;
 	tags: string[];
 }
 

@@ -1,18 +1,69 @@
 "use client";
 
+import { useAuth } from "@daodao/auth";
+import { captureElementAsImage, getShareAPI } from "@daodao/shared";
+import { useCallback, useRef } from "react";
 import { useActionMaker } from "../hooks/use-action-maker";
 import { NavigationButtons } from "./navigation-buttons";
 import { StarryBackground } from "./starry-background";
 
+const DEFAULT_BADGE = { bg: "bg-[#4CAF50]", label: "初學" } as const;
+const CUSTOM_BADGE = { bg: "bg-[#7B9FC4]", label: "自訂" } as const;
+
 const BADGE_STYLES: Record<string, { bg: string; label: string }> = {
-	beginner: { bg: "bg-[#4CAF50]", label: "初學" },
+	beginner: DEFAULT_BADGE,
 	intermediate: { bg: "bg-[#5B8DB8]", label: "中級" },
 	advanced: { bg: "bg-[#B8865B]", label: "進階" },
-	custom: { bg: "bg-[#7B9FC4]", label: "自訂" },
+	custom: CUSTOM_BADGE,
 };
 
 export function ActionMakerResult() {
 	const { result, reset, navigateTo } = useActionMaker();
+	const { isAuthenticated, openLoginDialog } = useAuth();
+	const cardRef = useRef<HTMLDivElement>(null);
+
+	const handleShare = useCallback(async () => {
+		if (!result) return;
+
+		// Try capturing the result card as image first
+		let imageFile: File | undefined;
+		if (cardRef.current) {
+			const imageData = await captureElementAsImage(cardRef.current);
+			if (imageData) {
+				const blob = await fetch(imageData.src).then((r) => r.blob());
+				imageFile = new File([blob], "action-maker-result.jpg", {
+					type: "image/jpeg",
+				});
+			}
+		}
+
+		const shareText = `${result.nickname}抓住了${result.categoryLabel}之星！每天${result.triggerTiming}，${result.action.title}`;
+
+		// Try native share with image
+		if (navigator.share) {
+			try {
+				const shareData: ShareData = {
+					title: `${result.nickname}的微習慣`,
+					text: shareText,
+				};
+				if (imageFile && navigator.canShare?.({ files: [imageFile] })) {
+					shareData.files = [imageFile];
+				}
+				await navigator.share(shareData);
+				return;
+			} catch {
+				// User cancelled or not supported, fall through to social share
+			}
+		}
+
+		// Fallback: use social share buttons via getShareAPI
+		const shareAPI = getShareAPI({
+			url: "/action-maker",
+			title: `${result.nickname}的微習慣`,
+			text: shareText,
+		});
+		shareAPI.facebookShare?.();
+	}, [result]);
 
 	if (!result) {
 		navigateTo("/action-maker", { replace: true });
@@ -21,31 +72,28 @@ export function ActionMakerResult() {
 
 	const badge =
 		BADGE_STYLES[result.action.level] ??
-		(result.isCustomAction ? BADGE_STYLES.custom : BADGE_STYLES.beginner);
-
-	const handleShare = async () => {
-		if (navigator.share) {
-			try {
-				await navigator.share({
-					title: `${result.nickname}的微習慣`,
-					text: `${result.nickname}抓住了${result.categoryLabel}之星！每天${result.triggerTiming}，${result.action.title}`,
-				});
-			} catch {
-				// User cancelled share
-			}
-		}
-	};
+		(result.isCustomAction ? CUSTOM_BADGE : DEFAULT_BADGE);
 
 	const handlePlayAgain = () => {
 		reset();
 		navigateTo("/action-maker");
 	};
 
+	const handleRegister = () => {
+		openLoginDialog({
+			redirectUrl: "/action-maker/result",
+			source: "website",
+		});
+	};
+
 	return (
 		<StarryBackground>
 			<div className="flex min-h-dvh flex-col items-center px-6 pb-8 pt-12">
 				{/* Result Card */}
-				<div className="w-full max-w-sm rounded-2xl border border-[rgba(188,213,238,0.3)] bg-[rgba(24,33,94,0.7)] p-6">
+				<div
+					ref={cardRef}
+					className="w-full max-w-sm rounded-2xl border border-[rgba(188,213,238,0.3)] bg-[rgba(24,33,94,0.7)] p-6"
+				>
 					<div className="flex flex-col gap-4">
 						{/* Header */}
 						<div>
@@ -100,18 +148,21 @@ export function ActionMakerResult() {
 						showRefreshIcon
 					/>
 
-					{/* Registration CTA - TODO: integrate with @daodao/auth useAuth */}
-					<div className="mt-4 text-center">
-						<p className="mb-3 text-sm text-[#7B9FC4]">
-							加入島島阿學，記錄你的學習旅程
-						</p>
-						<button
-							type="button"
-							className="w-full rounded-full bg-gradient-to-r from-[#5B8DB8] to-[#7B9FC4] py-3 text-base font-medium text-white"
-						>
-							註冊
-						</button>
-					</div>
+					{/* Registration CTA - only show when not authenticated */}
+					{!isAuthenticated && (
+						<div className="mt-4 text-center">
+							<p className="mb-3 text-sm text-[#7B9FC4]">
+								加入島島阿學，記錄你的學習旅程
+							</p>
+							<button
+								type="button"
+								onClick={handleRegister}
+								className="w-full rounded-full bg-gradient-to-r from-[#5B8DB8] to-[#7B9FC4] py-3 text-base font-medium text-white transition-all hover:brightness-110"
+							>
+								註冊
+							</button>
+						</div>
+					)}
 				</div>
 			</div>
 		</StarryBackground>

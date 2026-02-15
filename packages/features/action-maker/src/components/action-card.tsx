@@ -1,9 +1,12 @@
 "use client";
 
+import { useAuth } from "@daodao/auth";
 import type { IAction } from "../types";
 
+const DEFAULT_BADGE = { bg: "bg-[#4CAF50]", label: "初學" } as const;
+
 const BADGE_STYLES: Record<string, { bg: string; label: string }> = {
-	beginner: { bg: "bg-[#4CAF50]", label: "初學" },
+	beginner: DEFAULT_BADGE,
 	intermediate: { bg: "bg-[#5B8DB8]", label: "中級" },
 	advanced: { bg: "bg-[#B8865B]", label: "進階" },
 };
@@ -15,7 +18,8 @@ interface ActionCardProps {
 }
 
 export function ActionCard({ action, isSelected, onSelect }: ActionCardProps) {
-	const badge = BADGE_STYLES[action.level] ?? BADGE_STYLES.beginner;
+	const { openLoginDialog } = useAuth();
+	const badge = BADGE_STYLES[action.level] ?? DEFAULT_BADGE;
 
 	if (action.locked) {
 		return (
@@ -35,6 +39,12 @@ export function ActionCard({ action, isSelected, onSelect }: ActionCardProps) {
 				</p>
 				<button
 					type="button"
+					onClick={() =>
+						openLoginDialog({
+							redirectUrl: "/action-maker/actions",
+							source: "website",
+						})
+					}
 					className="rounded-full border border-white/50 px-6 py-2 text-sm text-white transition-colors hover:bg-white/10"
 				>
 					快速註冊

@@ -19,10 +19,7 @@ interface UseGenerateActionsReturn {
 
 /**
  * Hook to call the backend API to generate personalized action suggestions.
- * Falls back to static data on failure.
- *
- * NOTE: When the backend API is ready, replace the fetch call with
- * `client.POST("/api/v1/action-maker/generate", ...)` from `@daodao/api`.
+ * Falls back to static data on API failure or when backend is not available.
  */
 export function useGenerateActions(
 	input: UseGenerateActionsInput | null,
@@ -37,30 +34,68 @@ export function useGenerateActions(
 		if (!input || hasRequested.current) return;
 		hasRequested.current = true;
 
-		setIsLoading(true);
-		setError(null);
-		setIsFallback(false);
+		const controller = new AbortController();
 
-		// TODO: Replace with actual API call when backend is ready:
-		// client.POST("/api/v1/action-maker/generate", {
-		//   body: { category: input.category, topic: input.topic, selectedTags: input.tags },
-		//   signal: controller.signal,
-		// })
+		const generate = async () => {
+			setIsLoading(true);
+			setError(null);
+			setIsFallback(false);
 
-		// For now, simulate API call with fallback data + delay
-		const timer = setTimeout(() => {
-			const fallback = getFallbackActions(input.category);
-			if (fallback.length > 0) {
-				setActions(fallback);
-				setIsFallback(true);
-			} else {
-				setError(new Error("No actions available for this category"));
+			try {
+				const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+				if (!apiUrl) throw new Error("API URL not configured");
+
+				const response = await fetch(
+					`${apiUrl}/api/v1/action-maker/generate`,
+					{
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						credentials: "include",
+						body: JSON.stringify({
+							category: input.category,
+							topic: input.topic,
+							selectedTags: input.tags ?? [],
+						}),
+						signal: controller.signal,
+					},
+				);
+
+				if (!response.ok) {
+					throw new Error(`API returned ${response.status}`);
+				}
+
+				const responseData: { actions?: IAction[] } = await response.json();
+				if (responseData.actions && responseData.actions.length > 0) {
+					setActions(responseData.actions);
+				} else {
+					throw new Error("No actions returned from API");
+				}
+			} catch (err) {
+				// On any API failure, fall back to static data
+				if (controller.signal.aborted) return;
+
+				const fallback = getFallbackActions(input.category);
+				if (fallback.length > 0) {
+					setActions(fallback);
+					setIsFallback(true);
+				} else {
+					setError(
+						err instanceof Error
+							? err
+							: new Error("No actions available for this category"),
+					);
+				}
+			} finally {
+				if (!controller.signal.aborted) {
+					setIsLoading(false);
+				}
 			}
-			setIsLoading(false);
-		}, 1500);
+		};
+
+		generate();
 
 		return () => {
-			clearTimeout(timer);
+			controller.abort();
 		};
 	}, [input]);
 
