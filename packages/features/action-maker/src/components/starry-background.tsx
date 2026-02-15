@@ -1,5 +1,7 @@
 "use client";
 
+import { amVarStyle } from "./styled";
+
 const STAR_COUNT = 60;
 
 function generateStars() {
@@ -20,8 +22,8 @@ export function StarryBackground({ children }: React.PropsWithChildren) {
 		<div
 			className="relative min-h-dvh overflow-hidden"
 			style={{
-				background:
-					"linear-gradient(180deg, #0D1333 0%, #18215E 40%, #1E2D6F 100%)",
+				...amVarStyle,
+				background: "var(--am-bg-gradient)",
 			}}
 		>
 			{/* Stars */}

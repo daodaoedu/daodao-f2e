@@ -17,20 +17,8 @@ export function ActionLoading({ categoryLabel }: ActionLoadingProps) {
 			{/* Progress bar animation */}
 			<div className="w-64">
 				<div className="h-1 overflow-hidden rounded-full bg-[#7B9FC4]/30">
-					<div
-						className="h-full rounded-full bg-white animate-[loading_1.5s_ease-in-out_infinite]"
-						style={{
-							width: "40%",
-							animation: "loading 1.5s ease-in-out infinite",
-						}}
-					/>
+					<div className="h-full w-[40%] rounded-full bg-white animate-am-loading" />
 				</div>
-				<style>{`
-					@keyframes loading {
-						0% { transform: translateX(-100%); }
-						100% { transform: translateX(350%); }
-					}
-				`}</style>
 			</div>
 
 			<p className="text-sm text-[#7B9FC4]">尋找適合的行動...</p>

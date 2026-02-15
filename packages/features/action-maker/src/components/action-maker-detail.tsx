@@ -7,12 +7,12 @@ import { NavigationButtons } from "./navigation-buttons";
 import { ProgressBar } from "./progress-bar";
 import { StarryBackground } from "./starry-background";
 
-const DEFAULT_BADGE = { bg: "bg-[#4CAF50]", label: "初學" } as const;
+const DEFAULT_BADGE = { bg: "bg-[var(--am-badge-beginner)]", label: "初學" } as const;
 
 const BADGE_STYLES: Record<string, { bg: string; label: string }> = {
 	beginner: DEFAULT_BADGE,
-	intermediate: { bg: "bg-[#5B8DB8]", label: "中級" },
-	advanced: { bg: "bg-[#B8865B]", label: "進階" },
+	intermediate: { bg: "bg-[var(--am-badge-intermediate)]", label: "中級" },
+	advanced: { bg: "bg-[var(--am-badge-advanced)]", label: "進階" },
 };
 
 export function ActionMakerDetail() {

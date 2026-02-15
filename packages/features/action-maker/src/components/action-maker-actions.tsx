@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useActionMaker } from "../hooks/use-action-maker";
 import { useGenerateActions } from "../hooks/use-generate-actions";
 import type { IAction } from "../types";
@@ -43,9 +43,11 @@ export function ActionMakerActions() {
 		: "";
 
 	// Store API actions in context when they arrive
-	if (apiActions && apiActions.length > 0 && existingActions.length === 0) {
-		dispatch({ type: "SET_ACTIONS", payload: apiActions });
-	}
+	useEffect(() => {
+		if (apiActions && apiActions.length > 0 && existingActions.length === 0) {
+			dispatch({ type: "SET_ACTIONS", payload: apiActions });
+		}
+	}, [apiActions, existingActions.length, dispatch]);
 
 	const handleSelectAction = () => {
 		const action = actions[selectedIndex];

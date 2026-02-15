@@ -3,12 +3,12 @@
 import { useAuth } from "@daodao/auth";
 import type { IAction } from "../types";
 
-const DEFAULT_BADGE = { bg: "bg-[#4CAF50]", label: "初學" } as const;
+const DEFAULT_BADGE = { bg: "bg-[var(--am-badge-beginner)]", label: "初學" } as const;
 
 const BADGE_STYLES: Record<string, { bg: string; label: string }> = {
 	beginner: DEFAULT_BADGE,
-	intermediate: { bg: "bg-[#5B8DB8]", label: "中級" },
-	advanced: { bg: "bg-[#B8865B]", label: "進階" },
+	intermediate: { bg: "bg-[var(--am-badge-intermediate)]", label: "中級" },
+	advanced: { bg: "bg-[var(--am-badge-advanced)]", label: "進階" },
 };
 
 interface ActionCardProps {
@@ -24,7 +24,7 @@ export function ActionCard({ action, isSelected, onSelect }: ActionCardProps) {
 	if (action.locked) {
 		return (
 			<div
-				className={`flex min-h-[200px] w-[280px] flex-shrink-0 flex-col items-center justify-center gap-4 rounded-2xl border border-[rgba(188,213,238,0.3)] bg-[rgba(24,33,94,0.6)] p-5 snap-center ${
+				className={`flex min-h-[200px] w-[280px] flex-shrink-0 flex-col items-center justify-center gap-4 rounded-2xl border border-[var(--am-card-border)] bg-[var(--am-card-bg)] p-5 snap-center ${
 					isSelected ? "ring-2 ring-white/50" : ""
 				}`}
 			>
@@ -60,7 +60,7 @@ export function ActionCard({ action, isSelected, onSelect }: ActionCardProps) {
 			className={`flex min-h-[200px] w-[280px] flex-shrink-0 cursor-pointer flex-col gap-3 rounded-2xl border p-5 text-left transition-all snap-center ${
 				isSelected
 					? "border-white/60 bg-[rgba(24,33,94,0.8)] ring-2 ring-white/30"
-					: "border-[rgba(188,213,238,0.3)] bg-[rgba(24,33,94,0.6)] hover:border-white/40"
+					: "border-[var(--am-card-border)] bg-[var(--am-card-bg)] hover:border-white/40"
 			}`}
 		>
 			{/* Header */}

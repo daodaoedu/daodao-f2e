@@ -676,6 +676,19 @@
     );
   }
 
+  /* Action Maker loading bar animation */
+  .animate-am-loading {
+    animation: am-loading 1.5s ease-in-out infinite;
+  }
+  @keyframes am-loading {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(350%);
+    }
+  }
+
   /* Hover paused - pause animation on hover */
   .hover\:paused:hover {
     animation-play-state: paused;
