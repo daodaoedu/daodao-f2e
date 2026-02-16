@@ -21,9 +21,11 @@ interface ICheckInDetailProps {
   checkInData: ICheckInDisplayData;
   /** 編輯完成回調 */
   onEditComplete?: (data: ICheckInFormData) => Promise<void> | void;
+  /** 標題下方額外內容（如同日打卡切換導航） */
+  afterTitle?: React.ReactNode;
 }
 
-export const CheckInDetail = ({ checkInData, onEditComplete }: ICheckInDetailProps) => {
+export const CheckInDetail = ({ checkInData, onEditComplete, afterTitle }: ICheckInDetailProps) => {
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
 
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
@@ -92,6 +94,7 @@ export const CheckInDetail = ({ checkInData, onEditComplete }: ICheckInDetailPro
         images={images}
         onImageClick={handleImageClick}
         showTape={true}
+        afterTitle={afterTitle}
       />
 
       <div className="flex flex-col w-fit gap-4 mx-auto">
