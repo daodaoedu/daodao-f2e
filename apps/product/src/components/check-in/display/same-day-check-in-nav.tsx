@@ -3,6 +3,7 @@
 import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { Button } from "@daodao/ui/components/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useCallback } from "react";
 
 interface ISameDayCheckInNavProps {
   /** 同一天所有打卡的 ID 陣列（按 createdAt 排序） */
