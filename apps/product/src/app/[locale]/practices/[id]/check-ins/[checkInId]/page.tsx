@@ -6,7 +6,7 @@ import { useParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { addDays, format, isValid, parse } from "date-fns";
 import { useMemo } from "react";
-import { CheckInButton, CheckInDateSelector, CheckInDetail } from "@/components/check-in";
+import { CheckInButton, CheckInDateSelector, CheckInDetail, SameDayCheckInNav } from "@/components/check-in";
 import type { ICheckInDisplayData, ICheckInFormData } from "@/components/check-in/types";
 import { PageHeader } from "@/components/layout";
 import { mapApiMoodToMoodType, mapMoodTypeToApiMood } from "@/constants/mood";
@@ -110,6 +110,7 @@ export default function CheckInDetailPage() {
   }, [checkInsData, practiceData]);
 
   // 建立日期到 check-in 資訊的映射（用於生成日期列表，包含打卡次數）
+  // 按 createdAt 排序後再建立，確保每日第一筆 ID 與同日切換導航的排序一致
   const checkInDateToIdMap = useMemo(() => {
     const map = new Map<string, IDateCheckInInfo>();
 
@@ -117,13 +118,15 @@ export default function CheckInDetailPage() {
       return map;
     }
 
-    checkInsData.data.forEach((checkIn) => {
+    const sorted = [...checkInsData.data].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+
+    sorted.forEach((checkIn) => {
       const existing = map.get(checkIn.checkinDate);
       if (existing) {
-        // 同一天有多筆打卡，累加次數
         existing.count += 1;
       } else {
-        // 第一筆打卡，設定 ID 和次數
         map.set(checkIn.checkinDate, {
           id: String(checkIn.id),
           count: 1,
@@ -148,6 +151,35 @@ export default function CheckInDetailPage() {
 
     return map;
   }, [checkInsData]);
+
+  // 計算同日打卡 ID 列表（用於同日多筆打卡切換）
+  const { sameDayCheckInIds, currentIndexInDay, activeCheckInDate } = useMemo(() => {
+    if (!checkInsData?.data) {
+      return { sameDayCheckInIds: [], currentIndexInDay: 0, activeCheckInDate: "" };
+    }
+
+    // 找到目前打卡的日期
+    const currentCheckIn = checkInsData.data.find((c) => String(c.id) === checkInId);
+    if (!currentCheckIn) {
+      return { sameDayCheckInIds: [], currentIndexInDay: 0, activeCheckInDate: "" };
+    }
+
+    const currentDate = currentCheckIn.checkinDate;
+
+    // 篩選同日所有打卡，按 createdAt 排序（舊→新）
+    const sameDayItems = checkInsData.data
+      .filter((c) => c.checkinDate === currentDate)
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+    const ids = sameDayItems.map((c) => String(c.id));
+    const index = ids.indexOf(checkInId);
+
+    return {
+      sameDayCheckInIds: ids,
+      currentIndexInDay: index >= 0 ? index : 0,
+      activeCheckInDate: currentDate,
+    };
+  }, [checkInsData, checkInId]);
 
   // 獲取目標 check-in 資料
   const checkInData = useMemo(() => {
@@ -243,6 +275,7 @@ export default function CheckInDetailPage() {
         checkInDates={fullCheckInDates}
         checkIns={checkInsRecord}
         activeCheckInId={checkInId}
+        activeDate={activeCheckInDate}
         practiceId={practiceId}
         title="打卡紀錄"
         closeActionTo={`/practices/${practiceId}`}
@@ -257,8 +290,18 @@ export default function CheckInDetailPage() {
         />
       </div>
 
-      <main className="max-w-[448px] mx-auto pt-[150px] md:pt-3 px-5 pb-52">
-        <CheckInDetail checkInData={checkInData} onEditComplete={handleEditComplete} />
+      <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">
+        <CheckInDetail
+          checkInData={checkInData}
+          onEditComplete={handleEditComplete}
+          afterTitle={
+            <SameDayCheckInNav
+              sameDayCheckInIds={sameDayCheckInIds}
+              currentIndex={currentIndexInDay}
+              practiceId={practiceId}
+            />
+          }
+        />
       </main>
 
       <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">

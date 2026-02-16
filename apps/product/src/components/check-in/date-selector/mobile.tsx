@@ -4,7 +4,7 @@ import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
 import { CheckInDateButton } from "./check-in-date-button";
 import type { ICheckInDateSelectorProps } from "./types";
 
@@ -13,6 +13,7 @@ export const MobileCheckInDateSelector = ({
   checkIns,
   practiceId,
   activeCheckInId,
+  activeDate,
   title,
   closeActionTo,
 }: ICheckInDateSelectorProps) => {
@@ -20,6 +21,8 @@ export const MobileCheckInDateSelector = ({
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
   const navRef = useRef<HTMLElement>(null);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // 滑鼠拖曳滾動相關
   const isMouseDown = useRef(false);
@@ -62,6 +65,20 @@ export const MobileCheckInDateSelector = ({
       cancelAnimationFrame(rafId);
     };
   }, []);
+
+  // 元件掛載時立即定位到選中的日期按鈕（不使用動畫，避免閃跳）
+  useLayoutEffect(() => {
+    if (!activeDate || !scrollContainerRef.current) return;
+
+    const activeIndex = checkInDates.findIndex((item) => item.date === activeDate);
+    if (activeIndex < 0) return;
+
+    const buttons = scrollContainerRef.current.querySelectorAll("button");
+    const activeButton = buttons[activeIndex];
+    if (activeButton) {
+      activeButton.scrollIntoView({ behavior: "instant", inline: "center", block: "nearest" });
+    }
+  }, [activeDate, checkInDates]);
 
   // 滑鼠拖曳：按下
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -162,7 +179,7 @@ export const MobileCheckInDateSelector = ({
       </div>
 
       {/* 日期選擇器 */}
-      <div className="overflow-x-auto scrollbar-hide px-10">
+      <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-hide px-10">
         <div className="flex items-center justify-center gap-4 w-fit mx-auto pb-5 pt-4">
           {checkInDates.map((item, index) => (
             <CheckInDateButton
@@ -171,6 +188,7 @@ export const MobileCheckInDateSelector = ({
               index={index}
               checkIns={checkIns}
               activeCheckInId={activeCheckInId}
+              activeDate={activeDate}
               onSelect={handleDateSelect}
             />
           ))}

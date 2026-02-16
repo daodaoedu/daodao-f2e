@@ -4,6 +4,7 @@ import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
 import { type CapturedImageData, captureElementAsImage } from "@daodao/shared";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
+import type * as React from "react";
 import { useEffect, useRef } from "react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 
@@ -18,6 +19,8 @@ interface ICheckInCardProps {
   onImageClick?: (index: number) => void;
   showTape?: boolean;
   onMaskedImageReady?: (maskedImageData: CapturedImageData) => void;
+  /** 標題下方插入的額外內容（例如同日打卡切換導航） */
+  afterTitle?: React.ReactNode;
 }
 
 /**
@@ -91,6 +94,7 @@ export const CheckInCard = ({
   onImageClick,
   showTape = true,
   onMaskedImageReady,
+  afterTitle,
 }: ICheckInCardProps) => {
   const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
   const MoodEmoji = moodOption?.emoji;
@@ -138,6 +142,9 @@ export const CheckInCard = ({
       <div className={`px-2 pb-5 text-center ${titleClassName}`}>
         <h2 className="text-lg font-semibold line-clamp-2">{taskTitle}</h2>
       </div>
+
+      {/* 標題下方額外內容（如同日打卡切換） */}
+      {afterTitle}
 
       {/* 筆記本風格內容區 */}
       <div className="relative bg-white pb-9 mb-5 mt-5 rounded-b">
