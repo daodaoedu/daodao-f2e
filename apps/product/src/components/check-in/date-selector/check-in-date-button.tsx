@@ -10,6 +10,8 @@ interface ICheckInDateButtonProps {
   index: number;
   checkIns: Record<string, ICheckInDisplayData>;
   activeCheckInId: string;
+  /** 目前打卡的日期（yyyy-MM-dd），用於同日多筆打卡時正確高亮 */
+  activeDate?: string;
   onSelect: (checkInId: string) => void;
   className?: string;
 }
@@ -28,11 +30,13 @@ export const CheckInDateButton = ({
   index,
   checkIns,
   activeCheckInId,
+  activeDate,
   onSelect,
   className,
 }: ICheckInDateButtonProps) => {
   const hasCheckIn = item.hasCheckIn ?? !!checkIns[item.id];
-  const isActive = hasCheckIn && item.id === activeCheckInId;
+  // 優先使用日期比對（支援同日多筆打卡切換時仍正確高亮），否則降級為 ID 比對
+  const isActive = hasCheckIn && (activeDate ? item.date === activeDate : item.id === activeCheckInId);
   const itemCheckIn = checkIns[item.id];
   const itemMood = itemCheckIn?.mood;
   const itemMoodOption = itemMood ? MOOD_OPTIONS.find((option) => option.id === itemMood) : null;

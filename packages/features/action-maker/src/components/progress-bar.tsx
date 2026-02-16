@@ -1,5 +1,8 @@
 "use client";
 
+import { Fragment } from "react";
+import StepDotSvg from "@daodao/assets/images/action-maker/step-dot.svg";
+
 interface ProgressBarProps {
 	current: number;
 	total?: number;
@@ -12,7 +15,7 @@ export function ProgressBar({ current, total = 4 }: ProgressBarProps) {
 				{current} / {total}
 			</span>
 			<div
-				className="flex items-center gap-0"
+				className="flex items-center"
 				role="progressbar"
 				aria-valuenow={current}
 				aria-valuemin={1}
@@ -24,26 +27,30 @@ export function ProgressBar({ current, total = 4 }: ProgressBarProps) {
 					const isCompleted = step < current;
 
 					return (
-						<div key={step} className="flex flex-1 items-center">
-							{/* Dot */}
-							<div
-								className={`relative flex-shrink-0 rounded-full transition-all duration-300 ${
-									isActive
-										? "h-4 w-4 bg-white shadow-[0_0_12px_rgba(255,255,255,0.6)]"
-										: isCompleted
-											? "h-2.5 w-2.5 bg-white"
-											: "h-2.5 w-2.5 border border-[#7B9FC4] bg-transparent"
-								}`}
-							/>
-							{/* Line between dots */}
-							{step < total && (
+						<Fragment key={step}>
+							{/* Line before dot (except first) */}
+							{step > 1 && (
 								<div
 									className={`h-px flex-1 ${
-										isCompleted ? "bg-white" : "bg-[#7B9FC4]/40"
+										isCompleted || isActive
+											? "bg-white"
+											: "bg-[#7B9FC4]/40"
 									}`}
 								/>
 							)}
-						</div>
+							{/* Dot */}
+							{isActive ? (
+								<StepDotSvg className="size-7 shrink-0" />
+							) : (
+								<div
+									className={`shrink-0 rounded-full transition-all duration-300 ${
+										isCompleted
+											? "h-2.5 w-2.5 bg-white"
+											: "h-2.5 w-2.5 border border-[#7B9FC4] bg-transparent"
+									}`}
+								/>
+							)}
+						</Fragment>
 					);
 				})}
 			</div>

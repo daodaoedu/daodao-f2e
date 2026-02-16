@@ -41,61 +41,26 @@ export function useGenerateActions(
 			setError(null);
 			setIsFallback(false);
 
-			try {
-				const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-				if (!apiUrl) throw new Error("API URL not configured");
+			// TODO: restore API call when backend is ready
+			// Mock: simulate loading delay then use fallback data
+			await new Promise((r) => setTimeout(r, 800));
+			if (controller.signal.aborted) return;
 
-				const response = await fetch(
-					`${apiUrl}/api/v1/action-maker/generate`,
-					{
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						credentials: "include",
-						body: JSON.stringify({
-							category: input.category,
-							topic: input.topic,
-							selectedTags: input.tags ?? [],
-						}),
-						signal: controller.signal,
-					},
-				);
-
-				if (!response.ok) {
-					throw new Error(`API returned ${response.status}`);
-				}
-
-				const responseData: { actions?: IAction[] } = await response.json();
-				if (responseData.actions && responseData.actions.length > 0) {
-					setActions(responseData.actions);
-				} else {
-					throw new Error("No actions returned from API");
-				}
-			} catch (err) {
-				// On any API failure, fall back to static data
-				if (controller.signal.aborted) return;
-
-				const fallback = getFallbackActions(input.category);
-				if (fallback.length > 0) {
-					setActions(fallback);
-					setIsFallback(true);
-				} else {
-					setError(
-						err instanceof Error
-							? err
-							: new Error("No actions available for this category"),
-					);
-				}
-			} finally {
-				if (!controller.signal.aborted) {
-					setIsLoading(false);
-				}
+			const fallback = getFallbackActions(input.category);
+			if (fallback.length > 0) {
+				setActions(fallback);
+				setIsFallback(true);
+			} else {
+				setError(new Error("No actions available for this category"));
 			}
+			setIsLoading(false);
 		};
 
 		generate();
 
 		return () => {
 			controller.abort();
+			hasRequested.current = false;
 		};
 	}, [input]);
 

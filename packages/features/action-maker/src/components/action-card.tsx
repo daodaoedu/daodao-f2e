@@ -3,12 +3,12 @@
 import { useAuth } from "@daodao/auth";
 import type { IAction } from "../types";
 
-const DEFAULT_BADGE = { bg: "bg-[var(--am-badge-beginner)]", label: "初學" } as const;
+const DEFAULT_BADGE = { bg: "bg-[var(--am-badge-beginner)] border border-[var(--am-badge-beginner-border)] text-[var(--am-badge-beginner-border)]", label: "初學" } as const;
 
 const BADGE_STYLES: Record<string, { bg: string; label: string }> = {
 	beginner: DEFAULT_BADGE,
-	intermediate: { bg: "bg-[var(--am-badge-intermediate)]", label: "中級" },
-	advanced: { bg: "bg-[var(--am-badge-advanced)]", label: "進階" },
+	intermediate: { bg: "bg-[var(--am-badge-intermediate)] border border-[var(--am-badge-intermediate-border)] text-[var(--am-badge-intermediate-border)]", label: "中級" },
+	advanced: { bg: "bg-[var(--am-badge-advanced)] border border-[var(--am-badge-advanced-border)] text-[var(--am-badge-advanced-border)]", label: "進階" },
 };
 
 interface ActionCardProps {
@@ -28,7 +28,7 @@ export function ActionCard({ action, isSelected, onSelect }: ActionCardProps) {
 					isSelected ? "ring-2 ring-white/50" : ""
 				}`}
 			>
-				<span className={`rounded-full px-3 py-1 text-xs text-white ${badge.bg}`}>
+				<span className={`rounded-full px-3 py-1 text-xs ${badge.bg}`}>
 					{badge.label}
 				</span>
 				<div className="text-4xl opacity-30">🪐</div>
@@ -65,7 +65,7 @@ export function ActionCard({ action, isSelected, onSelect }: ActionCardProps) {
 		>
 			{/* Header */}
 			<div className="flex items-start justify-between">
-				<span className={`rounded-full px-3 py-1 text-xs text-white ${badge.bg}`}>
+				<span className={`rounded-full px-3 py-1 text-xs ${badge.bg}`}>
 					{badge.label}
 				</span>
 				{action.duration && (
