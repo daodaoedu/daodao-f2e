@@ -5,7 +5,7 @@
   "scripts": {
     "postinstall": "husky && pnpm typegen",
     "typegen": "next typegen",
-    "dev": "next dev -p 3000",
+    "dev": "next dev --turbopack -p 3000",
     "build": "next build",
     "start": "pnpm dlx serve@latest out -p 3000",
     "lint": "biome lint .",

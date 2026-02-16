@@ -14,7 +14,7 @@ export function ActionMakerNickname() {
 	const handleNext = () => {
 		if (!isValidNickname(nickname)) return;
 		dispatch({ type: "SET_NICKNAME", payload: nickname.trim() });
-		navigateTo("/action-maker/topic");
+		navigateTo("/action-maker/actions");
 	};
 
 	return (

@@ -2,7 +2,7 @@
 
 import { useRouter } from "@daodao/i18n/navigation";
 import { getStorage, StorageEnum } from "@daodao/shared";
-import { createContext, useCallback, useEffect, useMemo, useReducer } from "react";
+import { createContext, useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef } from "react";
 import type {
 	CategoryType,
 	IAction,
@@ -112,6 +112,9 @@ export function ActionMakerProvider({ children }: React.PropsWithChildren) {
 
 	const result = useMemo(() => buildResult(state), [state]);
 
+	// Skip persisting initialState on first render (which overwrites good sessionStorage data)
+	const isFirstRender = useRef(true);
+
 	// Restore from sessionStorage on mount
 	useEffect(() => {
 		const stored = getStorage<IActionMakerState>(StorageEnum.ActionMaker).get();
@@ -120,8 +123,12 @@ export function ActionMakerProvider({ children }: React.PropsWithChildren) {
 		}
 	}, []);
 
-	// Persist to sessionStorage on state change
-	useEffect(() => {
+	// Persist to sessionStorage synchronously on state change (before navigation/paint)
+	useLayoutEffect(() => {
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			return;
+		}
 		getStorage<IActionMakerState>(StorageEnum.ActionMaker).set(state);
 	}, [state]);
 
