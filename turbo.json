@@ -1,11 +1,18 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "concurrency": "12",
+  "concurrency": "13",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "out/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**",
+        "out/**"
+      ]
     },
     "dev": {
       "cache": false,
@@ -16,11 +23,15 @@
       "persistent": true
     },
     "lint": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "typecheck": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "format": {
@@ -32,7 +43,9 @@
       "outputs": []
     },
     "check": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "check:fix": {
@@ -43,5 +56,9 @@
       "cache": false
     }
   },
-  "globalDependencies": ["tsconfig.json", "turbo.json", "biome.json"]
+  "globalDependencies": [
+    "tsconfig.json",
+    "turbo.json",
+    "biome.json"
+  ]
 }

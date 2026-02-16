@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { amVarStyle } from "./styled";
 
 const STAR_COUNT = 60;
@@ -12,12 +13,13 @@ function generateStars() {
 		size: Math.random() * 2 + 1,
 		delay: `${Math.random() * 3}s`,
 		duration: `${Math.random() * 2 + 2}s`,
+		opacity: 0.6 + Math.random() * 0.4,
 	}));
 }
 
-const stars = generateStars();
-
 export function StarryBackground({ children }: React.PropsWithChildren) {
+	const [stars] = useState(() => generateStars());
+
 	return (
 		<div
 			className="relative min-h-dvh overflow-hidden"
@@ -39,7 +41,7 @@ export function StarryBackground({ children }: React.PropsWithChildren) {
 							height: `${star.size}px`,
 							animationDelay: star.delay,
 							animationDuration: star.duration,
-							opacity: 0.6 + Math.random() * 0.4,
+							opacity: star.opacity,
 						}}
 					/>
 				))}
