@@ -249,8 +249,8 @@ function RecentActiveSection() {
   const limit = 20;
 
   const { data, isLoading } = useAdminUsers({
-    isActive: true,
-    isVerified: true,
+    isActive: "true",
+    isVerified: "true",
     sortBy,
     sortOrder: "desc",
     page: page + 1,
