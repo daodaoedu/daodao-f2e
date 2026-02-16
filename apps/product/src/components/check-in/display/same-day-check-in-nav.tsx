@@ -25,17 +25,17 @@ export const SameDayCheckInNav = ({
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < total - 1;
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     if (hasPrev) {
       router.push(`/practices/${practiceId}/check-ins/${sameDayCheckInIds[currentIndex - 1]}`);
     }
-  };
+  }, [hasPrev, router, practiceId, sameDayCheckInIds, currentIndex]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (hasNext) {
       router.push(`/practices/${practiceId}/check-ins/${sameDayCheckInIds[currentIndex + 1]}`);
     }
-  };
+  }, [hasNext, router, practiceId, sameDayCheckInIds, currentIndex]);
 
   return (
     <div className="relative flex items-center justify-between mb-6 pb-5">
