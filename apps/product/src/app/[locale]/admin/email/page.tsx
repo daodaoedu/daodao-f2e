@@ -7,13 +7,12 @@ import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { StatCard } from "../../../../components/admin/stat-card";
 
-type TabId = "stats" | "health" | "send" | "tracking";
+type TabId = "stats" | "health" | "send";
 
 const tabs: { id: TabId; label: string }[] = [
   { id: "stats", label: "郵件統計" },
   { id: "health", label: "服務健康" },
   { id: "send", label: "發送郵件" },
-  { id: "tracking", label: "開啟追蹤" },
 ];
 
 export default function EmailPage() {
@@ -44,18 +43,29 @@ export default function EmailPage() {
       {activeTab === "stats" && <EmailStatsTab />}
       {activeTab === "health" && <EmailHealthTab />}
       {activeTab === "send" && <EmailSendTab />}
-      {activeTab === "tracking" && <EmailTrackingTab />}
     </div>
   );
 }
 
 // ============================================================================
-// Tab 1: Email Stats
+// Tab 1: Email Stats (merged with Open Tracking)
 // ============================================================================
 
+const EMAIL_TYPE_OPTIONS = [
+  { value: "", label: "全部類型" },
+  { value: "auth_register", label: "註冊確認" },
+  { value: "auth_password_reset", label: "密碼重設" },
+  { value: "auth_email_verify", label: "信箱驗證" },
+  { value: "practice_created", label: "實踐建立" },
+  { value: "practice_first_checkin", label: "首次打卡" },
+  { value: "practice_weekly_summary", label: "每週回顧" },
+  { value: "practice_final_summary", label: "實踐完成" },
+  { value: "notification", label: "一般通知" },
+];
+
 function EmailStatsTab() {
-  const { data, isLoading } = useEmailStats();
-  const emailStats = data?.data as
+  const { data: statsData, isLoading: statsLoading } = useEmailStats();
+  const emailStats = statsData?.data as
     | {
         totalSent?: number;
         totalFailed?: number;
@@ -70,13 +80,54 @@ function EmailStatsTab() {
   const chartData = useMemo(
     () =>
       (emailStats?.byTemplate ?? []).map((item) => ({
-        name: item.template ?? "Unknown",
+        name: EMAIL_TYPE_OPTIONS.find((o) => o.value === item.template)?.label ?? item.template ?? "Unknown",
         count: item.count ?? 0,
       })),
     [emailStats]
   );
 
-  if (isLoading) {
+  // Tracking state
+  const [openedFilter, setOpenedFilter] = useState<"true" | "false" | "">("");
+  const [emailTypeFilter, setEmailTypeFilter] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const [page, setPage] = useState(1);
+  const limit = 20;
+
+  const { data: historyRaw, isLoading: historyLoading } = useEmailHistory({
+    opened: openedFilter || undefined,
+    emailType: emailTypeFilter || undefined,
+    startDate: startDate || undefined,
+    endDate: endDate || undefined,
+    page,
+    limit,
+    sortBy: "sentAt",
+    sortOrder: "desc",
+  });
+
+  const historyData = historyRaw?.data;
+  const records = historyData?.records ?? [];
+  const pagination = historyData?.pagination;
+  const trackingStats = historyData?.stats;
+
+  const formatDate = (dateStr: string | null | undefined) => {
+    if (!dateStr) return "-";
+    const d = new Date(dateStr);
+    return d.toLocaleString("zh-TW", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getEmailTypeLabel = (type: string) => {
+    const found = EMAIL_TYPE_OPTIONS.find((o) => o.value === type);
+    return found?.label ?? type;
+  };
+
+  if (statsLoading && historyLoading) {
     return (
       <div className="flex h-48 items-center justify-center">
         <div className="size-6 animate-spin rounded-full border-2 border-primary-base border-t-transparent" />
@@ -86,15 +137,22 @@ function EmailStatsTab() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <StatCard title="總發送數" value={emailStats?.totalSent ?? 0} />
         <StatCard title="總失敗數" value={emailStats?.totalFailed ?? 0} />
         <StatCard
           title="成功率"
           value={emailStats?.successRate !== undefined ? `${emailStats.successRate}%` : "N/A"}
         />
+        <StatCard title="總開啟數" value={trackingStats?.openedCount ?? 0} />
+        <StatCard
+          title="開啟率"
+          value={(trackingStats?.sentCount ?? 0) > 0 ? `${trackingStats?.openRate ?? 0}%` : "N/A"}
+        />
       </div>
 
+      {/* Chart */}
       <div className="rounded-xl border border-border bg-white p-5 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold">按模板分類</h3>
         {chartData.length === 0 ? (
@@ -111,6 +169,168 @@ function EmailStatsTab() {
           </ResponsiveContainer>
         )}
       </div>
+
+      {/* Tracking Section */}
+      <h3 className="text-lg font-semibold text-text-dark">開啟追蹤</h3>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 rounded-xl border border-border bg-white p-4 shadow-sm">
+        <div>
+          <label htmlFor="tracking-opened" className="block text-xs font-medium text-basic-400 mb-1">
+            開啟狀態
+          </label>
+          <select
+            id="tracking-opened"
+            value={openedFilter}
+            onChange={(e) => { setOpenedFilter(e.target.value as "true" | "false" | ""); setPage(1); }}
+            className="rounded-lg border border-border px-3 py-1.5 text-sm"
+          >
+            <option value="">全部</option>
+            <option value="true">已開啟</option>
+            <option value="false">未開啟</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="tracking-email-type" className="block text-xs font-medium text-basic-400 mb-1">
+            郵件類型
+          </label>
+          <select
+            id="tracking-email-type"
+            value={emailTypeFilter}
+            onChange={(e) => { setEmailTypeFilter(e.target.value); setPage(1); }}
+            className="rounded-lg border border-border px-3 py-1.5 text-sm"
+          >
+            {EMAIL_TYPE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="tracking-start-date" className="block text-xs font-medium text-basic-400 mb-1">
+            開始日期
+          </label>
+          <input
+            id="tracking-start-date"
+            type="date"
+            value={startDate}
+            onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
+            className="rounded-lg border border-border px-3 py-1.5 text-sm"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="tracking-end-date" className="block text-xs font-medium text-basic-400 mb-1">
+            結束日期
+          </label>
+          <input
+            id="tracking-end-date"
+            type="date"
+            value={endDate}
+            onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
+            className="rounded-lg border border-border px-3 py-1.5 text-sm"
+          />
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto rounded-xl border border-border bg-white shadow-sm">
+        <table className="w-full text-left text-sm">
+          <thead>
+            <tr className="border-b border-border bg-basic-50">
+              <th className="px-4 py-3 font-medium text-basic-400">收件人</th>
+              <th className="px-4 py-3 font-medium text-basic-400">郵件類型</th>
+              <th className="px-4 py-3 font-medium text-basic-400">主旨</th>
+              <th className="px-4 py-3 font-medium text-basic-400">發送時間</th>
+              <th className="px-4 py-3 font-medium text-basic-400">狀態</th>
+              <th className="px-4 py-3 font-medium text-basic-400">首次開啟</th>
+              <th className="px-4 py-3 font-medium text-basic-400 text-right">開啟次數</th>
+            </tr>
+          </thead>
+          <tbody>
+            {records.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-4 py-8 text-center text-basic-300">
+                  暫無資料
+                </td>
+              </tr>
+            ) : (
+              records.map((record) => (
+                <tr key={record.id} className="border-b border-border last:border-0 hover:bg-basic-50/50">
+                  <td className="px-4 py-3 text-text-dark">
+                    {record.recipientEmail ?? "-"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-block rounded-full bg-primary-base/10 px-2 py-0.5 text-xs font-medium text-primary-base">
+                      {getEmailTypeLabel(record.emailType ?? "")}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 max-w-[200px] truncate" title={record.subject ?? ""}>
+                    {record.subject ?? "-"}
+                  </td>
+                  <td className="px-4 py-3 text-basic-400 whitespace-nowrap">
+                    {formatDate(record.sentAt)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={cn(
+                        "inline-block rounded-full px-2 py-0.5 text-xs font-medium",
+                        record.status === "sent"
+                          ? "bg-green-50 text-green-700"
+                          : record.status === "failed"
+                            ? "bg-red-50 text-red-700"
+                            : "bg-yellow-50 text-yellow-700"
+                      )}
+                    >
+                      {record.status === "sent" ? "已發送" : record.status === "failed" ? "失敗" : "待發送"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-basic-400 whitespace-nowrap">
+                    {formatDate(record.openedAt)}
+                  </td>
+                  <td className="px-4 py-3 text-right font-medium">
+                    {(record.openCount ?? 0) > 0 ? (
+                      <span className="text-primary-base">{record.openCount}</span>
+                    ) : (
+                      <span className="text-basic-300">0</span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      {pagination && (pagination.totalPages ?? 0) > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-basic-400">
+            共 {pagination.totalCount ?? 0} 筆，第 {pagination.currentPage ?? 1} / {pagination.totalPages ?? 1} 頁
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={!pagination.hasPrev}
+              className="rounded-lg border border-border px-3 py-1.5 text-sm disabled:opacity-50"
+            >
+              上一頁
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={!pagination.hasNext}
+              className="rounded-lg border border-border px-3 py-1.5 text-sm disabled:opacity-50"
+            >
+              下一頁
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -400,249 +620,3 @@ function EmailSendTab() {
   );
 }
 
-// ============================================================================
-// Tab 4: Email Tracking
-// ============================================================================
-
-const EMAIL_TYPE_OPTIONS = [
-  { value: "", label: "全部類型" },
-  { value: "auth_register", label: "註冊確認" },
-  { value: "auth_password_reset", label: "密碼重設" },
-  { value: "auth_email_verify", label: "信箱驗證" },
-  { value: "practice_created", label: "實踐建立" },
-  { value: "practice_first_checkin", label: "首次打卡" },
-  { value: "practice_weekly_summary", label: "每週回顧" },
-  { value: "practice_final_summary", label: "實踐完成" },
-  { value: "notification", label: "一般通知" },
-];
-
-function EmailTrackingTab() {
-  const [openedFilter, setOpenedFilter] = useState<"true" | "false" | "">("");
-  const [emailTypeFilter, setEmailTypeFilter] = useState<string>("");
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const [page, setPage] = useState(1);
-  const limit = 20;
-
-  const { data, isLoading } = useEmailHistory({
-    opened: openedFilter || undefined,
-    emailType: emailTypeFilter || undefined,
-    startDate: startDate || undefined,
-    endDate: endDate || undefined,
-    page,
-    limit,
-    sortBy: "sentAt",
-    sortOrder: "desc",
-  });
-
-  const historyData = data?.data;
-
-  const records = historyData?.records ?? [];
-  const pagination = historyData?.pagination;
-  const stats = historyData?.stats;
-
-  const totalOpened = stats?.openedCount ?? 0;
-  const openRate = stats?.openRate ?? 0;
-  const totalSent = stats?.sentCount ?? 0;
-
-  const formatDate = (dateStr: string | null | undefined) => {
-    if (!dateStr) return "-";
-    const d = new Date(dateStr);
-    return d.toLocaleString("zh-TW", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const getEmailTypeLabel = (type: string) => {
-    const found = EMAIL_TYPE_OPTIONS.find((o) => o.value === type);
-    return found?.label ?? type;
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex h-48 items-center justify-center">
-        <div className="size-6 animate-spin rounded-full border-2 border-primary-base border-t-transparent" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard title="總開啟數" value={totalOpened} />
-        <StatCard
-          title="開啟率"
-          value={totalSent > 0 ? `${openRate}%` : "N/A"}
-        />
-        <StatCard
-          title="總發送數"
-          value={totalSent}
-        />
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 rounded-xl border border-border bg-white p-4 shadow-sm">
-        <div>
-          <label htmlFor="tracking-opened" className="block text-xs font-medium text-basic-400 mb-1">
-            開啟狀態
-          </label>
-          <select
-            id="tracking-opened"
-            value={openedFilter}
-            onChange={(e) => { setOpenedFilter(e.target.value as "true" | "false" | ""); setPage(1); }}
-            className="rounded-lg border border-border px-3 py-1.5 text-sm"
-          >
-            <option value="">全部</option>
-            <option value="true">已開啟</option>
-            <option value="false">未開啟</option>
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="tracking-email-type" className="block text-xs font-medium text-basic-400 mb-1">
-            郵件類型
-          </label>
-          <select
-            id="tracking-email-type"
-            value={emailTypeFilter}
-            onChange={(e) => { setEmailTypeFilter(e.target.value); setPage(1); }}
-            className="rounded-lg border border-border px-3 py-1.5 text-sm"
-          >
-            {EMAIL_TYPE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="tracking-start-date" className="block text-xs font-medium text-basic-400 mb-1">
-            開始日期
-          </label>
-          <input
-            id="tracking-start-date"
-            type="date"
-            value={startDate}
-            onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
-            className="rounded-lg border border-border px-3 py-1.5 text-sm"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="tracking-end-date" className="block text-xs font-medium text-basic-400 mb-1">
-            結束日期
-          </label>
-          <input
-            id="tracking-end-date"
-            type="date"
-            value={endDate}
-            onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
-            className="rounded-lg border border-border px-3 py-1.5 text-sm"
-          />
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto rounded-xl border border-border bg-white shadow-sm">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-border bg-basic-50">
-              <th className="px-4 py-3 font-medium text-basic-400">收件人</th>
-              <th className="px-4 py-3 font-medium text-basic-400">郵件類型</th>
-              <th className="px-4 py-3 font-medium text-basic-400">主旨</th>
-              <th className="px-4 py-3 font-medium text-basic-400">發送時間</th>
-              <th className="px-4 py-3 font-medium text-basic-400">狀態</th>
-              <th className="px-4 py-3 font-medium text-basic-400">首次開啟</th>
-              <th className="px-4 py-3 font-medium text-basic-400 text-right">開啟次數</th>
-            </tr>
-          </thead>
-          <tbody>
-            {records.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-basic-300">
-                  暫無資料
-                </td>
-              </tr>
-            ) : (
-              records.map((record) => (
-                <tr key={record.id} className="border-b border-border last:border-0 hover:bg-basic-50/50">
-                  <td className="px-4 py-3 text-text-dark">
-                    {record.recipientEmail ?? "-"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="inline-block rounded-full bg-primary-base/10 px-2 py-0.5 text-xs font-medium text-primary-base">
-                      {getEmailTypeLabel(record.emailType ?? "")}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 max-w-[200px] truncate" title={record.subject ?? ""}>
-                    {record.subject ?? "-"}
-                  </td>
-                  <td className="px-4 py-3 text-basic-400 whitespace-nowrap">
-                    {formatDate(record.sentAt)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={cn(
-                        "inline-block rounded-full px-2 py-0.5 text-xs font-medium",
-                        record.status === "sent"
-                          ? "bg-green-50 text-green-700"
-                          : record.status === "failed"
-                            ? "bg-red-50 text-red-700"
-                            : "bg-yellow-50 text-yellow-700"
-                      )}
-                    >
-                      {record.status === "sent" ? "已發送" : record.status === "failed" ? "失敗" : "待發送"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-basic-400 whitespace-nowrap">
-                    {formatDate(record.openedAt)}
-                  </td>
-                  <td className="px-4 py-3 text-right font-medium">
-                    {(record.openCount ?? 0) > 0 ? (
-                      <span className="text-primary-base">{record.openCount}</span>
-                    ) : (
-                      <span className="text-basic-300">0</span>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {pagination && (pagination.totalPages ?? 0) > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-basic-400">
-            共 {pagination.totalCount ?? 0} 筆，第 {pagination.currentPage ?? 1} / {pagination.totalPages ?? 1} 頁
-          </p>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={!pagination.hasPrev}
-              className="rounded-lg border border-border px-3 py-1.5 text-sm disabled:opacity-50"
-            >
-              上一頁
-            </button>
-            <button
-              type="button"
-              onClick={() => setPage((p) => p + 1)}
-              disabled={!pagination.hasNext}
-              className="rounded-lg border border-border px-3 py-1.5 text-sm disabled:opacity-50"
-            >
-              下一頁
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}

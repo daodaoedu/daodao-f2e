@@ -2,12 +2,12 @@
 
 import {
   getAdminExportUrl,
-  useAdminActivity,
   useAdminDeviceAnalytics,
   useAdminPopularProfiles,
   useAdminRegistrations,
   useAdminRetention,
   useAdminSegmentation,
+  useAdminUsers,
 } from "@daodao/api";
 import { Link } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
@@ -26,19 +26,17 @@ import {
   YAxis,
 } from "recharts";
 
-type TabId = "registrations" | "activity" | "retention" | "devices" | "segmentation" | "popular";
+type TabId = "overview" | "retention" | "devices" | "popular";
 
 const tabs: { id: TabId; label: string }[] = [
-  { id: "registrations", label: "註冊統計" },
-  { id: "activity", label: "活躍度" },
+  { id: "overview", label: "使用者總覽" },
   { id: "retention", label: "留存率" },
   { id: "devices", label: "裝置" },
-  { id: "segmentation", label: "分群" },
   { id: "popular", label: "熱門排行" },
 ];
 
 export default function UsersStatsPage() {
-  const [activeTab, setActiveTab] = useState<TabId>("registrations");
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
 
   return (
     <div className="space-y-6">
@@ -67,11 +65,9 @@ export default function UsersStatsPage() {
       </div>
 
       {/* Tab Content */}
-      {activeTab === "registrations" && <RegistrationsTab />}
-      {activeTab === "activity" && <ActivityTab />}
+      {activeTab === "overview" && <OverviewTab />}
       {activeTab === "retention" && <RetentionTab />}
       {activeTab === "devices" && <DevicesTab />}
-      {activeTab === "segmentation" && <SegmentationTab />}
       {activeTab === "popular" && <PopularTab />}
     </div>
   );
@@ -132,10 +128,38 @@ function ExportButton() {
 }
 
 // ============================================================================
-// Tab 1: Registrations
+// Tab: Overview (合併 註冊統計 + 活躍度 + 使用者清單 + 分群)
 // ============================================================================
 
-function RegistrationsTab() {
+function OverviewTab() {
+  return (
+    <div className="space-y-8">
+      {/* 註冊統計 */}
+      <section>
+        <h2 className="mb-4 text-lg font-bold text-text-dark">註冊統計</h2>
+        <RegistrationsSection />
+      </section>
+
+      {/* 分群 */}
+      <section>
+        <h2 className="mb-4 text-lg font-bold text-text-dark">分群</h2>
+        <SegmentationSection />
+      </section>
+
+      {/* 使用者清單 */}
+      <section>
+        <h2 className="mb-4 text-lg font-bold text-text-dark">使用者清單</h2>
+        <RecentActiveSection />
+      </section>
+    </div>
+  );
+}
+
+// ============================================================================
+// Section: Registrations
+// ============================================================================
+
+function RegistrationsSection() {
   const [groupBy, setGroupBy] = useState<
     "day" | "week" | "month" | "year" | "location" | "role" | "education_stage"
   >("month");
@@ -216,138 +240,207 @@ function RegistrationsTab() {
 }
 
 // ============================================================================
-// Tab 2: Activity
+// Section: Recent Active Users
 // ============================================================================
 
-const ACTIVITY_COLORS = ["#16B9B3", "#E5E7EB"];
+function RecentActiveSection() {
+  const [page, setPage] = useState(0);
+  const [sortBy, setSortBy] = useState<"lastLoginAt" | "createdAt" | "name" | "email">("lastLoginAt");
+  const limit = 20;
 
-function ActivityTab() {
-  const [groupBy, setGroupBy] = useState<"role" | "location" | "education_stage" | undefined>(
-    undefined
-  );
-  const { data, isLoading } = useAdminActivity({ groupBy });
+  const { data, isLoading } = useAdminUsers({
+    isActive: true,
+    isVerified: true,
+    sortBy,
+    sortOrder: "desc",
+    page: page + 1,
+    limit,
+  });
 
-  const activityData = data?.data as
+  type UserItem = {
+    id: string;
+    internalId: number;
+    name: string | null;
+    email: string | null;
+    photoURL: string | null;
+    lastLoginAt: string | null;
+    lastActiveAt: string | null;
+    createdAt: string;
+    isActive: boolean;
+    roles: Array<{ id: number; name: string; description: string | null }>;
+  };
+
+  // swr-openapi 的 data = response body = { success, data: [...], pagination: {...} }
+  const response = data as
     | {
-        activeUsers?: number;
-        inactiveUsers?: number;
-        activeRate?: number;
-        groups?: Array<{
-          group?: string;
-          activeUsers?: number;
-          inactiveUsers?: number;
-        }>;
+        data?: UserItem[];
+        pagination?: {
+          currentPage: number;
+          totalPages: number;
+          totalItems: number;
+          itemsPerPage: number;
+          hasNext: boolean;
+          hasPrev: boolean;
+        };
       }
     | undefined;
 
-  const pieData = useMemo(() => {
-    if (!activityData) return [];
-    return [
-      { name: "活躍", value: activityData.activeUsers ?? 0 },
-      { name: "不活躍", value: activityData.inactiveUsers ?? 0 },
-    ];
-  }, [activityData]);
+  const users = response?.data ?? [];
+  const pagination = response?.pagination;
+  const totalPages = pagination?.totalPages ?? 1;
+
+  function formatRelativeTime(dateStr: string | null | undefined) {
+    if (!dateStr) return "—";
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return "剛剛";
+    if (diffMin < 60) return `${diffMin} 分鐘前`;
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return `${diffHour} 小時前`;
+    const diffDay = Math.floor(diffHour / 24);
+    if (diffDay < 30) return `${diffDay} 天前`;
+    return date.toLocaleDateString();
+  }
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {/* Pie Chart */}
-        <div className="min-w-0 rounded-xl border border-border bg-white p-5 shadow-sm">
-          <h3 className="mb-4 text-lg font-semibold">活躍度比例</h3>
-          {isLoading ? (
-            <div className="flex h-64 items-center justify-center">
-              <div className="size-6 animate-spin rounded-full border-2 border-primary-base border-t-transparent" />
-            </div>
-          ) : (
-            <>
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    dataKey="value"
-                    label={({ name, percent }: { name: string; percent: number }) =>
-                      `${name} ${(percent * 100).toFixed(1)}%`
-                    }
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell
-                        key={entry.name}
-                        fill={ACTIVITY_COLORS[index % ACTIVITY_COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="mt-2 text-center text-sm text-basic-400">
-                活躍: {activityData?.activeUsers?.toLocaleString()} / 不活躍:{" "}
-                {activityData?.inactiveUsers?.toLocaleString()}
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Group Analysis */}
-        <div className="min-w-0 rounded-xl border border-border bg-white p-5 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold">分組分析</h3>
-            <select
-              value={groupBy ?? ""}
-              onChange={(e) => setGroupBy((e.target.value || undefined) as typeof groupBy)}
-              className="rounded-lg border border-border px-3 py-1.5 text-sm"
-            >
-              <option value="">不分組</option>
-              <option value="role">按角色</option>
-              <option value="location">按地區</option>
-              <option value="education_stage">按教育階段</option>
-            </select>
-          </div>
-          {isLoading ? (
-            <div className="flex h-48 items-center justify-center">
-              <div className="size-6 animate-spin rounded-full border-2 border-primary-base border-t-transparent" />
-            </div>
-          ) : activityData?.groups && activityData.groups.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border text-left text-basic-400">
-                    <th className="pb-2 pr-4">分組</th>
-                    <th className="pb-2 pr-4">活躍</th>
-                    <th className="pb-2">不活躍</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {activityData.groups.map((group) => (
-                    <tr key={group.group} className="border-b border-border/50">
-                      <td className="py-2 pr-4">{group.group}</td>
-                      <td className="py-2 pr-4 font-medium text-green-600">
-                        {group.activeUsers?.toLocaleString()}
-                      </td>
-                      <td className="py-2 text-basic-400">
-                        {group.inactiveUsers?.toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="flex h-48 items-center justify-center text-basic-300">
-              請選擇分組方式
-            </div>
-          )}
-        </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="flex items-center gap-2 text-sm text-basic-400">
+          排序依據
+          <select
+            value={sortBy}
+            onChange={(e) => { setSortBy(e.target.value as typeof sortBy); setPage(0); }}
+            className="rounded-lg border border-border px-3 py-1.5 text-sm text-text-dark"
+          >
+            <option value="lastLoginAt">上次登入</option>
+            <option value="createdAt">加入時間</option>
+            <option value="name">姓名</option>
+            <option value="email">Email</option>
+          </select>
+        </label>
+        {pagination && (
+          <span className="text-sm text-basic-400">
+            共 {pagination.totalItems.toLocaleString()} 位
+          </span>
+        )}
       </div>
+
+      <div className="rounded-xl border border-border bg-white shadow-sm overflow-x-auto">
+        {isLoading ? (
+          <div className="flex h-48 items-center justify-center">
+            <div className="size-6 animate-spin rounded-full border-2 border-primary-base border-t-transparent" />
+          </div>
+        ) : users.length === 0 ? (
+          <div className="flex h-48 items-center justify-center text-basic-300">暫無資料</div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-basic-400">
+                <th className="px-4 py-3">#</th>
+                <th className="px-4 py-3">頭像</th>
+                <th className="px-4 py-3">姓名</th>
+                <th className="px-4 py-3">Email</th>
+                <th className="px-4 py-3">角色</th>
+                <th className="px-4 py-3">加入時間</th>
+                <th className="px-4 py-3">上次登入</th>
+                <th className="px-4 py-3">上次操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user, i) => (
+                <tr key={user.id} className="border-b border-border/50 hover:bg-basic-50">
+                  <td className="px-4 py-3 text-basic-400">{page * limit + i + 1}</td>
+                  <td className="px-4 py-3">
+                    {user.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt=""
+                        className="size-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex size-8 items-center justify-center rounded-full bg-basic-100 text-xs text-basic-400">
+                        {user.name?.[0] ?? "?"}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/admin/users/${user.internalId}`}
+                      className="text-primary-base hover:underline"
+                    >
+                      {user.name ?? "—"}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 text-basic-400">{user.email ?? "—"}</td>
+                  <td className="px-4 py-3">
+                    {user.roles.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {user.roles.map((role) => (
+                          <span
+                            key={role.id}
+                            className="inline-block rounded-full bg-primary-base/10 px-2 py-0.5 text-xs font-medium text-primary-base"
+                          >
+                            {role.name}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-basic-300">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-basic-400">
+                    <span title={new Date(user.createdAt).toLocaleString()}>
+                      {formatRelativeTime(user.createdAt)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-basic-400">
+                    <span title={user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : ""}>
+                      {formatRelativeTime(user.lastLoginAt)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-basic-400">
+                    <span title={user.lastActiveAt ? new Date(user.lastActiveAt).toLocaleString() : ""}>
+                      {formatRelativeTime(user.lastActiveAt)}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <button
+            type="button"
+            disabled={page === 0}
+            onClick={() => setPage(page - 1)}
+            className="rounded-lg border border-border px-3 py-1.5 text-sm disabled:opacity-50"
+          >
+            上一頁
+          </button>
+          <span className="text-sm text-basic-400">
+            {page + 1} / {totalPages}
+          </span>
+          <button
+            type="button"
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage(page + 1)}
+            className="rounded-lg border border-border px-3 py-1.5 text-sm disabled:opacity-50"
+          >
+            下一頁
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
 // ============================================================================
-// Tab 3: Retention
+// Tab: Retention
 // ============================================================================
 
 function RetentionTab() {
@@ -492,7 +585,7 @@ function RetentionTab() {
 }
 
 // ============================================================================
-// Tab 4: Devices
+// Tab: Devices
 // ============================================================================
 
 const DEVICE_COLORS = ["#16B9B3", "#FF9F1C", "#6366F1", "#EC4899", "#94A3B8"];
@@ -619,7 +712,7 @@ function DeviceChart({
 }
 
 // ============================================================================
-// Tab 5: Segmentation
+// Section: Segmentation
 // ============================================================================
 
 const SEGMENT_COLORS: Record<string, string> = {
@@ -630,7 +723,7 @@ const SEGMENT_COLORS: Record<string, string> = {
   dormant: "#EF4444",
 };
 
-function SegmentationTab() {
+function SegmentationSection() {
   const { data, isLoading } = useAdminSegmentation();
 
   const segmentData = data?.data as
@@ -726,7 +819,7 @@ function SegmentationTab() {
 }
 
 // ============================================================================
-// Tab 6: Popular Profiles
+// Tab: Popular Profiles
 // ============================================================================
 
 function PopularTab() {
