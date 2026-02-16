@@ -127,7 +127,7 @@ function EmailStatsTab() {
     return found?.label ?? type;
   };
 
-  if (statsLoading && historyLoading) {
+  if (statsLoading || historyLoading) {
     return (
       <div className="flex h-48 items-center justify-center">
         <div className="size-6 animate-spin rounded-full border-2 border-primary-base border-t-transparent" />
