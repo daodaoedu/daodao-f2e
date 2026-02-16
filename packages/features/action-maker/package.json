@@ -1,13 +1,15 @@
 {
-  "name": "@daodao/website",
+  "name": "@daodao/features-action-maker",
   "version": "0.0.0",
   "private": true,
+  "description": "Action Maker feature module for DaoDao monorepo",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "postinstall": "husky && pnpm typegen",
-    "typegen": "next typegen",
-    "dev": "next dev -p 3000",
-    "build": "next build",
-    "start": "pnpm dlx serve@latest out -p 3000",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
@@ -15,32 +17,28 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
-    "clean": "pnpm dlx rimraf .next out node_modules"
+    "clean": "pnpm dlx rimraf dist node_modules"
   },
   "dependencies": {
-    "@daodao/analytics": "workspace:*",
     "@daodao/api": "workspace:*",
     "@daodao/assets": "workspace:*",
     "@daodao/auth": "workspace:*",
-    "@daodao/features-action-maker": "workspace:*",
-    "@daodao/features-quiz": "workspace:*",
     "@daodao/i18n": "workspace:*",
     "@daodao/shared": "workspace:*",
     "@daodao/ui": "workspace:*",
-    "@next/env": "catalog:",
     "lottie-react": "catalog:",
-    "lucide-react": "catalog:",
-    "motion": "catalog:",
-    "next": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:"
+    "lucide-react": "catalog:"
   },
   "devDependencies": {
     "@daodao/config": "workspace:*",
-    "@tailwindcss/postcss": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "react": "catalog:",
     "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }
