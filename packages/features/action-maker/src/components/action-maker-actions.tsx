@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+	Carousel,
+	CarouselContent,
+	CarouselItem,
+	type CarouselApi,
+} from "@daodao/ui/components/carousel";
 import { useActionMaker } from "../hooks/use-action-maker";
 import { useGenerateActions } from "../hooks/use-generate-actions";
 import type { IAction } from "../types";
@@ -33,6 +39,7 @@ export function ActionMakerActions() {
 	const actions = existingActions.length > 0 ? existingActions : (apiActions ?? []);
 
 	const [selectedIndex, setSelectedIndex] = useState(0);
+	const [carouselApi, setCarouselApi] = useState<CarouselApi>();
 	const [showCustomForm, setShowCustomForm] = useState(false);
 	const [customTitle, setCustomTitle] = useState("");
 	const [customDescription, setCustomDescription] = useState("");
@@ -48,6 +55,22 @@ export function ActionMakerActions() {
 			dispatch({ type: "SET_ACTIONS", payload: apiActions });
 		}
 	}, [apiActions, existingActions.length, dispatch]);
+
+	// Sync carousel scroll with selectedIndex
+	useEffect(() => {
+		if (!carouselApi) return;
+		const onSelect = () => setSelectedIndex(carouselApi.selectedScrollSnap());
+		carouselApi.on("select", onSelect);
+		return () => { carouselApi.off("select", onSelect); };
+	}, [carouselApi]);
+
+	const handleCardSelect = useCallback(
+		(index: number) => {
+			setSelectedIndex(index);
+			carouselApi?.scrollTo(index);
+		},
+		[carouselApi],
+	);
 
 	const handleSelectAction = () => {
 		const action = actions[selectedIndex];
@@ -170,19 +193,26 @@ export function ActionMakerActions() {
 					</div>
 
 					{/* Carousel */}
-					<div
-						className="flex gap-4 overflow-x-auto px-6 pb-4 snap-x snap-mandatory scrollbar-none"
-						style={{ scrollbarWidth: "none" }}
+					<Carousel
+						opts={{ loop: true, align: "center" }}
+						setApi={setCarouselApi}
+						className="w-full"
 					>
-						{actions.map((action, i) => (
-							<ActionCard
-								key={action.id}
-								action={action}
-								isSelected={selectedIndex === i}
-								onSelect={() => setSelectedIndex(i)}
-							/>
-						))}
-					</div>
+						<CarouselContent className="-ml-8">
+							{actions.map((action, i) => (
+								<CarouselItem
+									key={action.id}
+									className="basis-[312px] flex justify-center pl-8"
+								>
+									<ActionCard
+										action={action}
+										isSelected={selectedIndex === i}
+										onSelect={() => handleCardSelect(i)}
+									/>
+								</CarouselItem>
+							))}
+						</CarouselContent>
+					</Carousel>
 				</div>
 
 				<div className="mx-auto w-full max-w-sm">

@@ -1,8 +1,12 @@
-"use client";
+import { ActionMakerIntro } from "@daodao/features-action-maker";
+import type { Metadata } from "next";
 
-import { ActionMakerIntro, useActionMaker } from "@daodao/features-action-maker";
+export const metadata: Metadata = {
+	title: "建立微習慣，抓住你的星",
+	description:
+		"總是覺得規劃新年目標很難嗎？我們陪你一步一步建立小習慣，每天都比昨天更進步一些。",
+};
 
 export default function ActionMakerPage() {
-	const { navigateTo } = useActionMaker();
-	return <ActionMakerIntro onStart={() => navigateTo("/action-maker/nickname")} />;
+	return <ActionMakerIntro />;
 }

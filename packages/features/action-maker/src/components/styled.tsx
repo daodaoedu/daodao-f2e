@@ -9,9 +9,12 @@ export const AM_VARS = {
 	"--am-white": "#FFFFFF",
 	"--am-card-bg": "rgba(24, 33, 94, 0.6)",
 	"--am-card-border": "rgba(188, 213, 238, 0.3)",
-	"--am-badge-beginner": "#4CAF50",
-	"--am-badge-intermediate": "#5B8DB8",
-	"--am-badge-advanced": "#B8865B",
+	"--am-badge-beginner": "#3C4433",
+	"--am-badge-beginner-border": "#BCE88299",
+	"--am-badge-intermediate": "#245859",
+	"--am-badge-intermediate-border": "#95EEF399",
+	"--am-badge-advanced": "#572F32",
+	"--am-badge-advanced-border": "#FFC4C499",
 } as const;
 
 export const amVarStyle = AM_VARS as React.CSSProperties;

@@ -13,22 +13,18 @@ export function CategoryStar({ category, isSelected, onSelect }: CategoryStarPro
 		<button
 			type="button"
 			onClick={() => onSelect(category.id)}
-			className={`flex flex-col items-center gap-2 rounded-xl p-4 transition-all ${
-				isSelected
-					? "bg-white/10 ring-2 ring-white/40"
-					: "hover:bg-white/5"
-			}`}
+			className="flex h-[220px] w-[180px] flex-shrink-0 snap-center flex-col items-center justify-center gap-2"
 		>
-			<div className="flex h-16 w-16 items-center justify-center">
-				<category.icon className="h-12 w-12" />
-			</div>
-			<span
-				className={`rounded-full px-3 py-1 text-sm ${
-					isSelected ? "bg-white/20 text-white" : "text-[#BCD5EE]"
-				}`}
-			>
-				{category.label}
-			</span>
+			<category.icon
+				width={isSelected ? 180 : 104}
+				height={isSelected ? 180 : 104}
+				className={`transition-all duration-300 ${isSelected ? "opacity-100" : "opacity-30"}`}
+			/>
+			{isSelected && (
+				<span className="rounded-full bg-white/20 px-5 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
+					{category.label}
+				</span>
+			)}
 		</button>
 	);
 }
