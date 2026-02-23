@@ -130,7 +130,7 @@ export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCar
 
             {/* 過程心情 - 右上 */}
             {summary.topMoods.length > 0 && (
-              <div className="absolute right-0 top-0">
+              <div className="absolute right-2 top-0">
                 <div className="text-sm text-text-dark mb-2">過程心情</div>
                 <div className="relative">
                   {summary.topMoods.map((moodStat, index) => {
@@ -138,7 +138,7 @@ export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCar
                     return index === 0 ? (
                       <MoodIcon key={moodStat.mood} className="w-14 h-14 relative z-10" />
                     ) : (
-                      <MoodIcon key={moodStat.mood} className="w-10 h-10 absolute -top-1 -right-6 z-0" />
+                      <MoodIcon key={moodStat.mood} className="w-10 h-10 absolute -top-1 -right-4 z-0" />
                     );
                   })}
                 </div>

@@ -208,7 +208,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
             </Button>
           </div>
 
-          {/* 下載打卡圖片按鈕 */}
+          {/* 下載圖片按鈕 */}
           <Button
             type="button"
             variant="ctaOrange"
@@ -217,7 +217,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
             disabled={isGenerating}
           >
             <Download className="size-4.5" />
-            {isGenerating ? "正在生成圖片..." : "下載打卡圖片"}
+            {isGenerating ? "正在生成圖片..." : "下載圖片"}
           </Button>
         </motion.section>
 
