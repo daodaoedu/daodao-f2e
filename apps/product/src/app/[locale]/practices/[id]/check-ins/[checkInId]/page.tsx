@@ -70,7 +70,7 @@ export default function CheckInDetailPage() {
   // 獲取 practice 資料
   const { data: practiceData, isLoading: isLoadingPractice } = usePracticeById(practiceId);
 
-  const { data: currentUserData } = useCurrentUser();
+  const { data: currentUserData, isLoading: isLoadingCurrentUser } = useCurrentUser();
 
   // 更新打卡記錄
   const { updateCheckIn } = useUpdatePracticeCheckIn(practiceId, checkInId);
@@ -211,7 +211,7 @@ export default function CheckInDetailPage() {
   }, [checkInsMap]);
 
   // Loading 狀態
-  if (isLoadingPractice || isLoadingCheckIns) {
+  if (isLoadingPractice || isLoadingCheckIns || isLoadingCurrentUser) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
@@ -247,7 +247,7 @@ export default function CheckInDetailPage() {
   }
 
   // 判斷當前用戶是否為實踐的擁有者
-  const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
+  const isOwner = !!practiceData?.data?.user?.id && practiceData.data.user.id === currentUserData?.data?.id;
 
   const handleCheckInComplete = (data: unknown) => {
     // TODO: 處理打卡資料
