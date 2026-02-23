@@ -1,6 +1,6 @@
 "use client";
 
-import { usePracticeById, usePracticeCheckIns, useUpdatePracticeCheckIn } from "@daodao/api";
+import { useCurrentUser, usePracticeById, usePracticeCheckIns, useUpdatePracticeCheckIn } from "@daodao/api";
 import { Deco4Svg } from "@daodao/assets";
 import { useParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
@@ -69,6 +69,8 @@ export default function CheckInDetailPage() {
 
   // 獲取 practice 資料
   const { data: practiceData, isLoading: isLoadingPractice } = usePracticeById(practiceId);
+
+  const { data: currentUserData } = useCurrentUser();
 
   // 更新打卡記錄
   const { updateCheckIn } = useUpdatePracticeCheckIn(practiceId, checkInId);
@@ -244,6 +246,9 @@ export default function CheckInDetailPage() {
     );
   }
 
+  // 判斷當前用戶是否為實踐的擁有者
+  const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
+
   const handleCheckInComplete = (data: unknown) => {
     // TODO: 處理打卡資料
     console.log("打卡資料:", data);
@@ -304,21 +309,23 @@ export default function CheckInDetailPage() {
         />
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
-        {/* 打卡按鈕 */}
-        <CheckInButton
-          variant="orange"
-          className="w-full sm:max-w-[288px]"
-          practiceId={practiceId}
-          practiceStatus={practiceData?.data?.status}
-          lastCheckInDate={checkInIdToDateMap.get(checkInId) || null}
-          startDate={practiceData?.data?.startDate || null}
-          endDate={practiceData?.data?.endDate || null}
-          taskTitle={checkInData.practiceTitle}
-          onComplete={handleCheckInComplete}
-          progressPercentage={practiceData?.data?.progressPercentage ?? 0}
-        />
-      </footer>
+      {isOwner && (
+        <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
+          {/* 打卡按鈕 */}
+          <CheckInButton
+            variant="orange"
+            className="w-full sm:max-w-[288px]"
+            practiceId={practiceId}
+            practiceStatus={practiceData?.data?.status}
+            lastCheckInDate={checkInIdToDateMap.get(checkInId) || null}
+            startDate={practiceData?.data?.startDate || null}
+            endDate={practiceData?.data?.endDate || null}
+            taskTitle={checkInData.practiceTitle}
+            onComplete={handleCheckInComplete}
+            progressPercentage={practiceData?.data?.progressPercentage ?? 0}
+          />
+        </footer>
+      )}
     </div>
   );
 }
