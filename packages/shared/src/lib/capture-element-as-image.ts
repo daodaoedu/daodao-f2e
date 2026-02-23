@@ -83,7 +83,7 @@ const cropImage = async (
           options.height
         );
 
-        const croppedDataUrl = canvas.toDataURL("image/jpeg", 0.95);
+        const croppedDataUrl = canvas.toDataURL("image/png");
 
         resolve({
           src: croppedDataUrl,
@@ -108,10 +108,9 @@ export const captureElementAsImage = async (
   cropOptions?: CropOptions
 ): Promise<CapturedImageData | null> => {
   try {
-    const { toJpeg } = await import("html-to-image");
+    const { toPng } = await import("html-to-image");
     const devicePixelRatio = window.devicePixelRatio || 1;
-    const dataUrl = await toJpeg(element, {
-      quality: 0.95,
+    const dataUrl = await toPng(element, {
       pixelRatio: devicePixelRatio,
       // 添加 cacheBust 繞過 Cloudflare 快取，確保獲取帶有 CORS headers 的回應
       cacheBust: true,
