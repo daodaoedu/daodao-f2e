@@ -67,9 +67,7 @@ const convertFormValuesToApiRequest = (
     request.practiceTimePeriods = practiceTimePeriods;
   }
 
-  if (values.tags && values.tags.length > 0) {
-    request.tags = values.tags;
-  }
+  request.tags = values.tags || [];
 
   request.resources = (values.resources || []).map((resource) => ({
     name: resource.name,
