@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "@daodao/ui/components/sonner";
 import { NotificationItem } from "./notification-item";
 import type { INotificationData } from "./notification-item";
 import { NotificationType } from "@/constants/notification-type";
@@ -137,19 +138,38 @@ export function NotificationList() {
   const [notifications, setNotifications] = useState<INotificationData[]>(MOCK_NOTIFICATIONS);
 
   const handleConnectAgree = (id: string) => {
+    const notification = notifications.find((n) => n.id === id);
     setNotifications((prev) =>
       prev.map((n) =>
         n.id === id ? { ...n, type: NotificationType.connectAgree } : n
       )
     );
+    if (notification) {
+      toast.success(`你同意了 ${notification.actor.name} 的連結請求，你們現在可以有更多互動了！`);
+    }
   };
 
   const handleConnectReject = (id: string) => {
+    const notification = notifications.find((n) => n.id === id);
     setNotifications((prev) =>
       prev.map((n) =>
         n.id === id ? { ...n, type: NotificationType.connectRejected } : n
       )
     );
+    if (notification) {
+      toast.success(`已忽略 ${notification.actor.name} 的連結請求`, {
+        action: {
+          label: "復原",
+          onClick: () => {
+            setNotifications((prev) =>
+              prev.map((n) =>
+                n.id === id ? { ...n, type: NotificationType.connect } : n
+              )
+            );
+          },
+        },
+      });
+    }
   };
 
   // 以 isRead 分組：未讀 = 最新，已讀 = 稍早
