@@ -4,7 +4,7 @@ import { NotificationList } from "@/components/notifications";
 export default function NotificationsPage() {
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto">
-      <PageHeader title="通知" rightAction={null} />
+      <PageHeader title="通知測試" rightAction={null} />
 
       <BackgroundAnimation />
 
