@@ -93,7 +93,7 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
                     )}
                   />
                   {"badge" in item && item.badge && (
-                    <span className="absolute top-0 right-0 size-2 rounded-full bg-red-500" />
+                    <span className="absolute top-0 left-0 size-2 rounded-full bg-red-500" />
                   )}
                 </span>
                 <span

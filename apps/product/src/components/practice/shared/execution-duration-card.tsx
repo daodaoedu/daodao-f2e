@@ -1,6 +1,5 @@
 "use client";
 
-import { IslandSvg } from "@daodao/assets";
 import { addDays, differenceInDays, format, isValid, parse } from "date-fns";
 import type { ManualPracticeFormValues } from "../create/manual/schema";
 
@@ -27,11 +26,7 @@ export const ExecutionDurationCard = ({
     showRemaining && end ? Math.min(days, Math.max(0, differenceInDays(end, today))) : days;
 
   return (
-    <div className="relative bg-white rounded-lg p-4 flex flex-col justify-between min-h-[120px]">
-      {/* Cloud Illustration Background */}
-      <div className="absolute -bottom-[10px] -right-[30px]">
-        <IslandSvg width={86} height={31} />
-      </div>
+    <div className="bg-white rounded-lg p-4 flex flex-col justify-between min-h-[120px]">
       {showRemaining ? (
         <div>
           <h3 className="text-xs text-text-dark">剩餘</h3>

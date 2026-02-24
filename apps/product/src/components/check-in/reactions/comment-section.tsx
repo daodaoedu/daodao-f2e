@@ -1,12 +1,13 @@
 "use client";
 
 import type React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { Send } from "lucide-react";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
+import { LottieEmoji } from "./lottie-emoji";
 
 // ============================================================================
 // Types
@@ -21,7 +22,7 @@ export interface ICommentReply {
   id: string;
   author: ICommentAuthor;
   content: string;
-  reaction?: ReactionTypeType;
+  reactions?: ReactionTypeType[];
   time: string;
 }
 
@@ -29,13 +30,13 @@ export interface IComment {
   id: string;
   author: ICommentAuthor;
   content: string;
-  reaction?: ReactionTypeType;
+  reactions?: ReactionTypeType[];
   time: string;
   replies?: ICommentReply[];
 }
 
 // ============================================================================
-// Avatar color (same pattern as notification-item)
+// Avatar color
 // ============================================================================
 
 const AVATAR_COLORS = [
@@ -45,21 +46,6 @@ const AVATAR_COLORS = [
 
 function getAvatarColor(name: string) {
   return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length] ?? "bg-[#C8FFF2]";
-}
-
-// ============================================================================
-// CommentAvatar
-// ============================================================================
-
-function CommentAvatar({ author, size = "md" }: { author: ICommentAuthor; size?: "sm" | "md" }) {
-  return (
-    <Avatar className={cn("shrink-0", size === "sm" ? "size-7" : "size-9")}>
-      {author.photoURL && <AvatarImage src={author.photoURL} alt={author.name} />}
-      <AvatarFallback className={cn("text-sm font-medium text-text-dark", getAvatarColor(author.name))}>
-        {author.name.slice(0, 1)}
-      </AvatarFallback>
-    </Avatar>
-  );
 }
 
 // ============================================================================
@@ -73,35 +59,57 @@ interface CommentBubbleProps {
 }
 
 function CommentBubble({ comment, isReply = false, onReply }: CommentBubbleProps) {
-  const reactionConfig = comment.reaction ? REACTION_CONFIG[comment.reaction] : null;
+  // Show first reaction emoji as the avatar badge
+  const firstReaction = comment.reactions?.[0];
+  const reactionConfig = firstReaction ? REACTION_CONFIG[firstReaction] : null;
 
   return (
-    <div className="flex gap-2">
-      <CommentAvatar author={comment.author} size={isReply ? "sm" : "md"} />
-      <div className="flex-1 min-w-0">
-        <div className="bg-[#F2F7F7] rounded-2xl rounded-tl-sm px-3 py-2">
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <span className="text-sm font-semibold text-text-dark">{comment.author.name}</span>
-            {reactionConfig && (
-              <span className="text-sm" title={reactionConfig.label}>
-                {reactionConfig.emoji}
-              </span>
-            )}
-          </div>
-          <p className="text-sm text-text-dark leading-5">{comment.content}</p>
-        </div>
-        <div className="flex items-center gap-3 mt-1 px-1">
-          <span className="text-xs text-text-dark/50">{comment.time}</span>
-          {!isReply && onReply && (
-            <button
-              type="button"
-              onClick={onReply}
-              className="text-xs text-text-dark/50 hover:text-logo-cyan transition-colors"
-            >
-              回覆
-            </button>
+    // level 2 replies: indent by 40px (avatar width) to align under parent content
+    <div className={cn("flex gap-[11px] items-start", isReply && "pl-[40px]")}>
+      {/* Avatar + reaction badge */}
+      <div className="relative shrink-0">
+        <Avatar className="size-10">
+          {comment.author.photoURL && (
+            <AvatarImage src={comment.author.photoURL} alt={comment.author.name} />
           )}
+          <AvatarFallback
+            className={cn("text-sm font-medium text-text-dark", getAvatarColor(comment.author.name))}
+          >
+            {comment.author.name.slice(0, 1)}
+          </AvatarFallback>
+        </Avatar>
+        {/* Emoji badge on avatar bottom-right */}
+        {reactionConfig && !isReply && (
+          <div className="absolute -bottom-1 -right-1.5 size-6 rounded-full bg-[#E8FAF9] flex items-center justify-center shadow-sm">
+            <LottieEmoji
+              url={reactionConfig.lottieUrl}
+              fallback={reactionConfig.emoji}
+              size={18}
+              play={false}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Text content (no bubble background) */}
+      <div className="flex-1 min-w-0">
+        {/* Author + time */}
+        <div className="flex items-center gap-2 mb-0.5">
+          <span className="text-sm font-semibold text-[#295E5C]">{comment.author.name}</span>
+          <span className="text-xs text-[#295E5C]/50">{comment.time}</span>
         </div>
+        {/* Content */}
+        <p className="text-sm text-[#295E5C] leading-5 whitespace-pre-wrap">{comment.content}</p>
+        {/* 回覆 link */}
+        {!isReply && onReply && (
+          <button
+            type="button"
+            onClick={onReply}
+            className="text-sm font-medium text-logo-cyan mt-1"
+          >
+            回覆
+          </button>
+        )}
       </div>
     </div>
   );
@@ -113,14 +121,14 @@ function CommentBubble({ comment, isReply = false, onReply }: CommentBubbleProps
 
 interface CommentSectionProps {
   comments: IComment[];
-  selectedReaction: ReactionTypeType | null;
+  selectedReactions: ReactionTypeType[];
   inputRef?: React.RefObject<HTMLTextAreaElement | null>;
-  onSubmit: (content: string, reaction: ReactionTypeType | null) => void;
+  onSubmit: (content: string, reactions: ReactionTypeType[]) => void;
 }
 
 export function CommentSection({
   comments,
-  selectedReaction,
+  selectedReactions,
   inputRef: externalRef,
   onSubmit,
 }: CommentSectionProps) {
@@ -129,14 +137,38 @@ export function CommentSection({
   const internalRef = useRef<HTMLTextAreaElement>(null);
   const ref = externalRef ?? internalRef;
 
-  const placeholder = selectedReaction
-    ? REACTION_CONFIG[selectedReaction].placeholder
-    : "留下你的想法...";
+  // Track the previous set to detect newly added reactions
+  const prevSelectedRef = useRef<ReactionTypeType[]>([]);
+
+  // When reactions are added: append their placeholder text and scroll to input
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ref.current is intentionally excluded — it's stable and doesn't trigger re-renders
+  useEffect(() => {
+    const prev = prevSelectedRef.current;
+    const newlyAdded = selectedReactions.filter((r) => !prev.includes(r));
+
+    if (newlyAdded.length > 0) {
+      setInputValue((current) => {
+        const additions = newlyAdded.map((r) => REACTION_CONFIG[r].placeholder).join(" ");
+        return current.trim() ? `${current.trim()} ${additions}` : additions;
+      });
+      setTimeout(() => {
+        const el = ref.current;
+        if (!el) return;
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.focus();
+        const len = el.value.length;
+        el.setSelectionRange(len, len);
+      }, 100);
+    }
+
+    prevSelectedRef.current = selectedReactions;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedReactions]);
 
   const handleSubmit = () => {
     const trimmed = inputValue.trim();
     if (!trimmed) return;
-    onSubmit(trimmed, selectedReaction);
+    onSubmit(trimmed, selectedReactions);
     setInputValue("");
     setReplyTo(null);
   };
@@ -152,24 +184,24 @@ export function CommentSection({
     <div className="flex flex-col">
       {/* 留言列表 */}
       {comments.length > 0 && (
-        <div className="flex flex-col gap-4 px-4 pt-2 pb-4">
+        <div className="flex flex-col gap-5 px-4 pt-4 pb-4">
           {comments.map((comment) => (
-            <div key={comment.id} className="flex flex-col gap-2">
+            <div key={comment.id}>
               <CommentBubble
                 comment={comment}
                 onReply={() => setReplyTo(comment.id)}
               />
-              {/* 回覆（最多一層） */}
+              {/* Replies */}
               {comment.replies?.map((reply) => (
-                <div key={reply.id} className="pl-8">
+                <div key={reply.id} className="mt-3">
                   <CommentBubble comment={reply} isReply />
                 </div>
               ))}
-              {/* 回覆輸入框 */}
+              {/* Inline reply input */}
               {replyTo === comment.id && (
-                <div className="pl-8 flex gap-2 items-end">
+                <div className="pl-[40px] flex gap-2 items-center mt-3">
                   <textarea
-                    className="flex-1 resize-none rounded-xl border border-[#E4EAE9] bg-white px-3 py-2 text-sm text-text-dark placeholder:text-text-dark/40 focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px]"
+                    className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px]"
                     placeholder={`回覆 ${comment.author.name}...`}
                     rows={1}
                   />
@@ -186,23 +218,41 @@ export function CommentSection({
         </div>
       )}
 
-      {/* 留言輸入框 */}
-      <div className="flex gap-2 items-end px-4 py-3 border-t border-[#E4EAE9]">
-        {/* 選取中的反應指示 */}
-        {selectedReaction && (
-          <span className="mb-2 text-lg shrink-0" title={REACTION_CONFIG[selectedReaction].label}>
-            {REACTION_CONFIG[selectedReaction].emoji}
-          </span>
+      {/* 主留言輸入框 */}
+      <div className="bg-white border-t border-[#E4EAE9] flex gap-2 items-center px-4 py-3">
+        {/* Selected reaction emojis (or grey dot when none) */}
+        {selectedReactions.length > 0 ? (
+          <div className="flex shrink-0 gap-0.5">
+            {selectedReactions.map((type) => (
+              <div
+                key={type}
+                className="size-6 rounded-full bg-[#E8FAF9] flex items-center justify-center"
+              >
+                <LottieEmoji
+                  url={REACTION_CONFIG[type].lottieUrl}
+                  fallback={REACTION_CONFIG[type].emoji}
+                  size={20}
+                  play
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="shrink-0 size-6 rounded-full bg-[#E4EAE9]" />
         )}
+
+        {/* Input */}
         <textarea
           ref={ref as React.RefObject<HTMLTextAreaElement>}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={selectedReactions.length === 0 ? "寫下你的留言..." : ""}
           rows={1}
-          className="flex-1 resize-none rounded-2xl border border-[#E4EAE9] bg-[#F2F7F7] px-4 py-2.5 text-sm text-text-dark placeholder:text-text-dark/40 focus:outline-none focus:border-logo-cyan transition-colors"
+          className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10"
         />
+
+        {/* Send */}
         <Button
           size="icon"
           onClick={handleSubmit}

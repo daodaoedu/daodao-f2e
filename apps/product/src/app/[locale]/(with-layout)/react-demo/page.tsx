@@ -1,157 +1,149 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-import { CheckInCard } from "@/components/check-in/display/check-in-card";
-import { CommentSection, ReactionBar } from "@/components/check-in/reactions";
-import type { IComment, IReactionCount } from "@/components/check-in/reactions";
-import { MoodType } from "@/constants/mood";
+import { useCallback } from "react";
+import { useRouter } from "@daodao/i18n/navigation";
+import { BackgroundAnimation, PageHeader } from "@/components/layout";
+import {
+  ExecutionDurationCard,
+  ExecutionTimingCard,
+  PracticeDetailTitle,
+  PracticeOverviewCard,
+} from "@/components/practice";
+import { CheckInRecordCard, CheckInStack } from "@/components/check-in";
+import { ReactionBar, ViewAllCommentsButton } from "@/components/check-in/reactions";
+import type { IReactionCount } from "@/components/check-in/reactions";
+import { ExecutionTiming, Frequency, DurationDays } from "@/constants/practice-form";
+import { PracticeStatus } from "@/constants/practice-status";
 import { ReactionType, type ReactionTypeType } from "@/constants/reaction-type";
 
 // ============================================================================
-// Mock Data
+// Mock Data — 模擬「Enn 正在瀏覽 Vincent 的實踐」
 // ============================================================================
 
-const MOCK_CHECK_IN = {
-  taskTitle: "練習寫小說",
-  date: "2026.02.20",
-  mood: MoodType.happy,
-  content: "今天在 Blog 上更新了一小篇，終於把卡了兩週的情節寫出來了！雖然只有 800 字，但感覺突破了一個關卡。有得到一些讀者回應，很受到鼓舞。",
-  tags: ["寫作", "堅持", "小說"],
-  images: [],
+export const MOCK_PRACTICE = {
+  name: "練習寫小說",
+  status: PracticeStatus.active,
+  actionDescription: "每天至少寫 500 字，可以是正文、人物設定或場景描述，不求完美只求持續",
+  frequency: Frequency.twoToFour,
+  durationMinutes: 30,
+  durationDays: DurationDays.twentyOne,
+  startDate: "2026-02-10",
+  executionTiming: [ExecutionTiming.morning],
+  tags: ["寫作", "創意", "小說"],
+  creator: {
+    id: "vincent-mock-id",
+    name: "Vincent",
+    photoURL: undefined,
+    date: "2026/02/10",
+  },
 };
 
-const MOCK_INITIAL_REACTIONS: IReactionCount[] = [
+// 符合 PracticeCheckInsResponse 格式的 mock 打卡資料
+export const MOCK_CHECK_INS_DATA = {
+  success: true as const,
+  data: [
+    { id: 1, practiceId: 1, userId: 2, checkinDate: "2026-02-22", mood: "happy" as const, note: "今天終於把卡了兩週的情節寫出來了！雖然只有 800 字，但感覺突破了一個關卡。", imageUrls: [], ogImageUrl: null, tags: ["寫作", "突破"], createdAt: "2026-02-22T10:00:00.000Z" },
+    { id: 2, practiceId: 1, userId: 2, checkinDate: "2026-02-20", mood: "neutral" as const, note: "今天狀態不太好，只寫了 300 字，但還是有寫就好。", imageUrls: [], ogImageUrl: null, tags: ["堅持"], createdAt: "2026-02-20T10:00:00.000Z" },
+    { id: 3, practiceId: 1, userId: 2, checkinDate: "2026-02-18", mood: "happy" as const, note: "靈感大爆發！一口氣寫了 1500 字，角色的背景故事越來越清晰了。", imageUrls: [], ogImageUrl: null, tags: ["靈感", "寫作"], createdAt: "2026-02-18T10:00:00.000Z" },
+    { id: 4, practiceId: 1, userId: 2, checkinDate: "2026-02-16", mood: "good" as const, note: "今天練習了對話節奏，讀了一些參考書，有新的靈感。", imageUrls: [], ogImageUrl: null, tags: ["學習", "寫作"], createdAt: "2026-02-16T10:00:00.000Z" },
+    { id: 5, practiceId: 1, userId: 2, checkinDate: "2026-02-14", mood: "frustrated" as const, note: "今天寫的內容感覺很差，但還是逼自己完成了 500 字。", imageUrls: [], ogImageUrl: null, tags: ["堅持"], createdAt: "2026-02-14T10:00:00.000Z" },
+    { id: 6, practiceId: 1, userId: 2, checkinDate: "2026-02-12", mood: "good" as const, note: "重新規劃了故事大綱，感覺走向更清晰了。", imageUrls: [], ogImageUrl: null, tags: ["計畫", "寫作"], createdAt: "2026-02-12T10:00:00.000Z" },
+  ],
+  pagination: { currentPage: 1, totalPages: 1, totalItems: 6, itemsPerPage: 30, hasNext: false, hasPrev: false },
+  timestamp: "2026-02-24T00:00:00.000Z",
+};
+
+export const MOCK_INITIAL_REACTIONS: IReactionCount[] = [
   { type: ReactionType.encourage, count: 3, latestActorName: "Sarah" },
-  { type: ReactionType.learned, count: 1, latestActorName: "Alex" },
-  { type: ReactionType.sameHere, count: 2, latestActorName: "Jordan" },
-  { type: ReactionType.useful, count: 0 },
-  { type: ReactionType.curious, count: 0 },
+  { type: ReactionType.fire,      count: 1, latestActorName: "Alex" },
+  { type: ReactionType.sameHere,  count: 2, latestActorName: "Jordan" },
+  { type: ReactionType.touched,   count: 0 },
+  { type: ReactionType.useful,    count: 0 },
+  { type: ReactionType.curious,   count: 0 },
 ];
 
-const MOCK_INITIAL_COMMENTS: IComment[] = [
-  {
-    id: "c1",
-    author: { name: "Sarah" },
-    content: "看到你的進展真好，我很期待看你的新作！堅持下去你一定可以的 💪",
-    reaction: ReactionType.encourage,
-    time: "2 小時前",
-    replies: [
-      {
-        id: "r1",
-        author: { name: "Vincent" },
-        content: "謝謝你！你的鼓勵讓我今天又繼續寫了 300 字 😊",
-        time: "1 小時前",
-      },
-    ],
-  },
-  {
-    id: "c2",
-    author: { name: "Alex" },
-    content: "這點對我很有啟發，特別是你說「卡關就先跳過」這個策略，我之前都是卡在那邊硬想，難怪進度超慢",
-    reaction: ReactionType.learned,
-    time: "3 小時前",
-  },
-  {
-    id: "c3",
-    author: { name: "Jordan" },
-    content: "我也是！我也在練習每天寫一段，真的很難維持，但看到你分享就覺得自己不孤單",
-    reaction: ReactionType.sameHere,
-    time: "5 小時前",
-  },
-];
+export const TOTAL_COMMENT_COUNT = 3;
 
 // ============================================================================
 // Page
 // ============================================================================
 
 export default function ReactDemoPage() {
-  const [reactions, setReactions] = useState<IReactionCount[]>(MOCK_INITIAL_REACTIONS);
-  const [selectedReaction, setSelectedReaction] = useState<ReactionTypeType | null>(null);
-  const [comments, setComments] = useState<IComment[]>(MOCK_INITIAL_COMMENTS);
-  const commentInputRef = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter();
 
+  // On the main page, clicking a reaction navigates directly to the comments page
+  // with the reaction pre-selected so the comment input is pre-filled.
   const handleReactionClick = useCallback((type: ReactionTypeType) => {
-    // 在 setSelectedReaction updater 內讀取「點擊當下」的前一個值，避免 stale closure
-    setSelectedReaction((prev) => {
-      const wasSelected = prev === type;
-
-      // 更新計數（同步在此 updater 內呼叫，確保讀到正確的 wasSelected）
-      setReactions((prevReactions) =>
-        prevReactions.map((r) => {
-          if (r.type !== type) return r;
-          return { ...r, count: wasSelected ? Math.max(0, r.count - 1) : r.count + 1 };
-        })
-      );
-
-      // 若是新選取（非取消），捲動到留言輸入框並 focus
-      if (!wasSelected) {
-        setTimeout(() => {
-          commentInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-          commentInputRef.current?.focus();
-        }, 50);
-      }
-
-      return wasSelected ? null : type;
-    });
-  }, []);
-
-  const handleCommentClick = useCallback(() => {
-    commentInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    commentInputRef.current?.focus();
-  }, []);
-
-  const handleCommentSubmit = useCallback((content: string, reaction: ReactionTypeType | null) => {
-    const newComment: IComment = {
-      id: `c-${Date.now()}`,
-      author: { name: "Enn" },
-      content,
-      reaction: reaction ?? undefined,
-      time: "剛剛",
-      replies: [],
-    };
-    setComments((prev) => [newComment, ...prev]);
-  }, []);
+    router.push(`/react-demo/comments?reaction=${type}`);
+  }, [router]);
 
   return (
-    <div className="min-h-screen bg-[#F2F7F7]">
-      <div className="max-w-[448px] mx-auto px-4 pt-6 pb-40">
+    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+      <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
+      <BackgroundAnimation />
 
-        {/* 頁面標題 */}
-        <p className="text-xs text-text-dark/40 text-center mb-4">
+      <main className="max-w-[448px] mx-auto px-5 pb-10">
+        <p className="text-xs text-text-dark/40 text-center pt-2 pb-1">
           [Prototype] 快速回應與留言
         </p>
 
-        {/* 打卡卡片 */}
-        <CheckInCard
-          taskTitle={MOCK_CHECK_IN.taskTitle}
-          date={MOCK_CHECK_IN.date}
-          mood={MOCK_CHECK_IN.mood}
-          content={MOCK_CHECK_IN.content}
-          tags={MOCK_CHECK_IN.tags}
-          images={MOCK_CHECK_IN.images}
-          showTape
+        <PracticeDetailTitle
+          title={MOCK_PRACTICE.name}
+          status={MOCK_PRACTICE.status}
+          onPrevious={() => {}}
+          onNext={() => {}}
+          hasPrevious={false}
+          hasNext={false}
         />
 
-        {/* 反應 + 留言區塊 */}
-        <div className="mt-3 bg-white rounded-2xl overflow-hidden shadow-sm">
-          {/* Reaction Bar */}
-          <ReactionBar
-            reactions={reactions}
-            selectedReaction={selectedReaction}
-            commentCount={comments.length}
-            onReactionClick={handleReactionClick}
-            onCommentClick={handleCommentClick}
-          />
+        <p className="text-base font-medium text-text-dark mb-4">執行方式</p>
 
-          {/* Comment Section */}
-          <CommentSection
-            comments={comments}
-            selectedReaction={selectedReaction}
-            inputRef={commentInputRef}
-            onSubmit={handleCommentSubmit}
+        <PracticeOverviewCard
+          actionDescription={MOCK_PRACTICE.actionDescription}
+          frequency={MOCK_PRACTICE.frequency}
+          durationMinutes={MOCK_PRACTICE.durationMinutes}
+          tags={MOCK_PRACTICE.tags}
+          progress={62}
+          showProgress
+          creator={MOCK_PRACTICE.creator}
+        />
+
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <ExecutionTimingCard executionTiming={MOCK_PRACTICE.executionTiming} />
+          <ExecutionDurationCard
+            durationDays={MOCK_PRACTICE.durationDays}
+            startDate={MOCK_PRACTICE.startDate}
+            showRemaining
           />
         </div>
 
+        {/* ── 留言迴響（快速回應）── */}
+        <p className="text-base font-medium text-text-dark mb-3">留言迴響</p>
+        <div className="bg-white rounded-lg shadow-sm mb-6">
+          {/* Reaction Buttons — 水平滑動 */}
+          <ReactionBar
+            reactions={MOCK_INITIAL_REACTIONS}
+            selectedReactions={[]}
+            onReactionClick={handleReactionClick}
+            className="overflow-x-auto flex-nowrap scrollbar-none"
+          />
+
+          {/* 全部留言 按鈕 */}
+          <div className="px-4 pb-4">
+            <ViewAllCommentsButton
+              commentCount={TOTAL_COMMENT_COUNT}
+              onClick={() => router.push("/react-demo/comments")}
+            />
+          </div>
+        </div>
+
+        {/* ── 打卡紀錄 ── */}
+        <CheckInRecordCard checkInsData={MOCK_CHECK_INS_DATA} />
+      </main>
+
+      {/* 打卡堆疊 */}
+      <div className="max-w-[448px] mx-auto pb-24">
+        <CheckInStack practiceId="react-demo" checkInsData={MOCK_CHECK_INS_DATA} />
       </div>
     </div>
   );

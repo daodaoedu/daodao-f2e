@@ -1,8 +1,8 @@
 "use client";
 
 import { cn } from "@daodao/ui/lib/utils";
-import { MessageCircle } from "lucide-react";
 import { REACTION_CONFIG, REACTION_TYPE_LIST, type ReactionTypeType } from "@/constants/reaction-type";
+import { LottieEmoji } from "./lottie-emoji";
 
 // ============================================================================
 // Types
@@ -17,30 +17,24 @@ export interface IReactionCount {
 
 interface ReactionBarProps {
   reactions: IReactionCount[];
-  selectedReaction: ReactionTypeType | null;
-  commentCount: number;
+  selectedReactions: ReactionTypeType[];
   onReactionClick: (type: ReactionTypeType) => void;
-  onCommentClick: () => void;
+  /** 覆蓋容器的 className，可用來控制 scroll / wrap 行為 */
+  className?: string;
 }
 
 // ============================================================================
 // Component
 // ============================================================================
 
-export function ReactionBar({
-  reactions,
-  selectedReaction,
-  commentCount,
-  onReactionClick,
-  onCommentClick,
-}: ReactionBarProps) {
+export function ReactionBar({ reactions, selectedReactions, onReactionClick, className }: ReactionBarProps) {
   return (
-    <div className="flex items-center gap-2 flex-wrap px-4 py-3">
+    <div className={cn("flex items-center gap-2 px-4 py-3", className ?? "flex-wrap")}>
       {REACTION_TYPE_LIST.map((type) => {
         const config = REACTION_CONFIG[type];
         const reactionData = reactions.find((r) => r.type === type);
         const count = reactionData?.count ?? 0;
-        const isSelected = selectedReaction === type;
+        const isSelected = selectedReactions.includes(type);
 
         return (
           <button
@@ -48,34 +42,27 @@ export function ReactionBar({
             type="button"
             onClick={() => onReactionClick(type)}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all border",
+              "flex shrink-0 items-center gap-1 h-9 px-4 rounded-full text-sm transition-all border whitespace-nowrap",
               isSelected
-                ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
-                : "border-[#E4EAE9] bg-white text-text-dark hover:border-logo-cyan/50"
+                ? "border-logo-cyan bg-[#F5FFFD] text-logo-cyan font-medium"
+                : "border-[#9FB5B8] bg-white text-[#295E5C] hover:border-logo-cyan/60"
             )}
           >
-            <span>{config.emoji}</span>
-            <span className="text-xs leading-none">{config.label}</span>
+            <LottieEmoji
+              url={config.lottieUrl}
+              fallback={config.emoji}
+              size={20}
+              play={isSelected}
+            />
+            <span className="text-sm leading-none">{config.label}</span>
             {count > 0 && (
-              <span className={cn("text-xs font-medium", isSelected ? "text-logo-cyan" : "text-text-dark/60")}>
+              <span className={cn("text-sm font-medium", isSelected ? "text-logo-cyan" : "text-[#295E5C]/60")}>
                 {count}
               </span>
             )}
           </button>
         );
       })}
-
-      {/* 留言按鈕 */}
-      <button
-        type="button"
-        onClick={onCommentClick}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border border-[#E4EAE9] bg-white text-text-dark hover:border-logo-cyan/50 transition-all"
-      >
-        <MessageCircle className="size-4" />
-        {commentCount > 0 && (
-          <span className="text-xs font-medium text-text-dark/60">{commentCount}</span>
-        )}
-      </button>
     </div>
   );
 }
