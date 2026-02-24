@@ -151,7 +151,7 @@ export const usePracticeSummaryImage = ({
       const date = new Date();
       const dateString = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;
       const sanitizedName = sanitizeFilename(practiceName);
-      link.download = `${sanitizedName}_總結_${dateString}.jpg`;
+      link.download = `${sanitizedName}_總結_${dateString}.png`;
 
       // 觸發下載
       document.body.appendChild(link);

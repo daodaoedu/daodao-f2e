@@ -7,12 +7,14 @@ import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { PreferenceSection } from "./preference-section";
 import { type PreferencesFormValues, preferencesFormSchema } from "./schema";
 
 export const PreferencesForm = () => {
+  const router = useRouter();
   const {
     data: preferencesData,
     isLoading: isLoadingPreferences,
@@ -190,6 +192,11 @@ export const PreferencesForm = () => {
       // 成功
       toast.success("偏好設定已更新");
       form.reset(form.getValues()); // 重置 dirty 狀態
+
+      // 延遲後返回設定首頁，讓使用者看到成功訊息
+      setTimeout(() => {
+        router.push("/settings");
+      }, 500);
     } catch (error) {
       console.error("Unexpected error:", error);
       toast.error("更新失敗，請稍後再試");

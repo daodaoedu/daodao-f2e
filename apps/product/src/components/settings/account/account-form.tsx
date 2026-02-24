@@ -8,6 +8,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parse } from "date-fns";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FieldSelectionSection } from "./field-selection-section";
@@ -22,6 +23,7 @@ import {
 } from "./schema";
 
 export const AccountForm = () => {
+  const router = useRouter();
   const locale = useLocale();
   const { data: userData, isLoading, error: userError } = useCurrentUser();
   const { updateCurrentUser } = useUserMutations();
@@ -50,12 +52,13 @@ export const AccountForm = () => {
 
   // 當用戶資料載入完成時，更新表單預設值
   useEffect(() => {
-    if (userData?.data) {
+    // 確保 userData 和 citiesData 都載入完成後才初始化表單
+    if (userData?.data && citiesData?.data) {
       const user = userData.data;
 
       // 根據 location 找到對應的 countryCode
       let countryCode = "";
-      if (user.location && citiesData?.data) {
+      if (user.location) {
         const city = citiesData.data.find((c) => c.code === user.location);
         if (city?.countryCode) {
           countryCode = city.countryCode;
@@ -167,6 +170,11 @@ export const AccountForm = () => {
       // 成功
       toast.success("帳號設定已更新");
       form.reset(form.getValues()); // 重置 dirty 狀態
+
+      // 延遲後返回設定首頁，讓使用者看到成功訊息
+      setTimeout(() => {
+        router.push("/settings");
+      }, 500);
     } catch (error) {
       console.error("Unexpected error:", error);
       toast.error("更新失敗，請稍後再試");
