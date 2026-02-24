@@ -298,7 +298,7 @@ export default function CheckInDetailPage() {
       <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">
         <CheckInDetail
           checkInData={checkInData}
-          onEditComplete={handleEditComplete}
+          onEditComplete={isOwner ? handleEditComplete : undefined}
           afterTitle={
             <SameDayCheckInNav
               sameDayCheckInIds={sameDayCheckInIds}
