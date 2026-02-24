@@ -57,6 +57,7 @@ function GlobalProvider({
                         "^/auth/verify-email(/.*)?$",
                         "^/users/",
                         "^/practices/[^/]+$",
+                        "^/react-demo",
                       ]}
                       onAuthRequired={(currentPath) => {
                         router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
