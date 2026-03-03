@@ -4202,6 +4202,32 @@
         "resendCooldown": "Resend available in {seconds} seconds",
         "logout": "Sign in with another account"
       }
+    },
+    "oauthError": {
+      "stateExpired": {
+        "title": "Login Link Expired",
+        "description": "This login link has expired. Please click the login button again."
+      },
+      "invalidState": {
+        "title": "Invalid Login Request",
+        "description": "This login request is invalid. Please click the login button again."
+      },
+      "invalidRedirectUri": {
+        "title": "Invalid Redirect URL",
+        "description": "The redirect URL for this login request is not allowed. Please contact support."
+      },
+      "serverError": {
+        "title": "Server Error",
+        "description": "A server error occurred during login. Please try again later."
+      },
+      "unknown": {
+        "title": "Login Failed",
+        "description": "An unknown error occurred during login. Please try again later."
+      },
+      "actions": {
+        "retry": "Try Again",
+        "backToHome": "Back to Home"
+      }
     }
   },
   "onboarding": {

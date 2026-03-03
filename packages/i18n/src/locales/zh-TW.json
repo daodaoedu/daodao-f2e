@@ -4202,6 +4202,32 @@
         "resendCooldown": "{seconds} 秒後可重新發送",
         "logout": "使用其他帳號登入"
       }
+    },
+    "oauthError": {
+      "stateExpired": {
+        "title": "登入連結已過期",
+        "description": "此登入連結已超過有效期，請重新點擊登入按鈕。"
+      },
+      "invalidState": {
+        "title": "無效的登入請求",
+        "description": "登入請求無效，請重新點擊登入按鈕。"
+      },
+      "invalidRedirectUri": {
+        "title": "無效的跳轉位址",
+        "description": "此登入請求的跳轉位址不被允許，請聯繫客服。"
+      },
+      "serverError": {
+        "title": "伺服器發生錯誤",
+        "description": "登入過程發生伺服器錯誤，請稍後再試。"
+      },
+      "unknown": {
+        "title": "登入失敗",
+        "description": "登入過程發生未知錯誤，請稍後再試。"
+      },
+      "actions": {
+        "retry": "重新登入",
+        "backToHome": "返回首頁"
+      }
     }
   },
   "onboarding": {
