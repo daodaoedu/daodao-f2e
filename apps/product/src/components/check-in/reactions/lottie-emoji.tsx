@@ -11,7 +11,7 @@ interface LottieEmojiProps {
   /** px — 寬高 */
   size?: number;
   /**
-   * play=true  → autoplay + loop（選取 / hover 狀態）
+   * play=true  → autoplay once（播放一次後停止）
    * play=false → 靜止在第一格
    */
   play?: boolean;
@@ -51,7 +51,7 @@ export function LottieEmoji({ url, fallback, size = 28, play = false }: LottieEm
   return (
     <Lottie
       animationData={animationData}
-      loop={play}
+      loop={false}
       autoplay={play}
       style={{ width: size, height: size, flexShrink: 0 }}
     />

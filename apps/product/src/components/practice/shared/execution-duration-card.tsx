@@ -26,7 +26,7 @@ export const ExecutionDurationCard = ({
     showRemaining && end ? Math.min(days, Math.max(0, differenceInDays(end, today))) : days;
 
   return (
-    <div className="bg-white rounded-lg p-4 flex flex-col justify-between min-h-[120px]">
+    <div className="bg-very-light-blue rounded-lg p-4 flex flex-col justify-between min-h-[120px]">
       {showRemaining ? (
         <div>
           <h3 className="text-xs text-text-dark">剩餘</h3>

@@ -4,6 +4,7 @@ import { DefaultAvatarSvg, TagSolidSvg } from "@daodao/assets";
 import { Link } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
+import { cn } from "@daodao/ui/lib/utils";
 import type { ManualPracticeFormValues } from "../create/manual/schema";
 import { CircularProgress } from "./circular-progress";
 
@@ -24,6 +25,8 @@ interface PracticeOverviewCardProps {
   showProgress?: boolean; // 是否顯示進度條
   // 公開頁面顯示建立者資訊
   creator?: CreatorInfo;
+  /** 覆蓋根元素的 className（用於嵌入更大卡片時移除自帶的 shadow/rounded） */
+  className?: string;
 }
 
 export const PracticeOverviewCard = ({
@@ -34,9 +37,10 @@ export const PracticeOverviewCard = ({
   progress,
   showProgress = false,
   creator,
+  className,
 }: PracticeOverviewCardProps) => {
   return (
-    <div className="relative bg-white rounded-lg p-4 mb-4 shadow-sm">
+    <div className={cn("relative bg-white rounded-lg p-4 mb-4 shadow-sm", className)}>
       {/* 建立者資訊 - 僅在公開頁面顯示 */}
       {creator && (
         <div className="flex items-center gap-2 mb-3">

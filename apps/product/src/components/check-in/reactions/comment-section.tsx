@@ -5,8 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
-import { Send } from "lucide-react";
+import { MoreHorizontal, Pencil, Send, Trash2 } from "lucide-react";
+import { LikeOutlineSvg, DialogOutlineSvg } from "@daodao/assets";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
+import { useDialog } from "@daodao/ui/hooks/use-dialog";
+import { toast } from "@daodao/ui/components/sonner";
 import { LottieEmoji } from "./lottie-emoji";
 
 // ============================================================================
@@ -49,6 +52,113 @@ function getAvatarColor(name: string) {
 }
 
 // ============================================================================
+// Comment Reaction Picker
+// ============================================================================
+
+const PICKER_REACTIONS: ReactionTypeType[] = [
+  "encourage",
+  "touched",
+  "fire",
+  "useful",
+];
+
+function CommentReactionPickerButton() {
+  const [open, setOpen] = useState(false);
+  const [selectedReactions, setSelectedReactions] = useState<ReactionTypeType[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  const handleToggle = (type: ReactionTypeType) => {
+    setSelectedReactions((prev) =>
+      prev.includes(type) ? [] : [type]
+    );
+  };
+
+  const hasSelection = selectedReactions.length > 0;
+
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: hover trigger for emoji picker
+    <div
+      ref={containerRef}
+      className="relative flex items-center"
+      onMouseEnter={() => setOpen(true)}
+    >
+      {/* Emoji picker popup */}
+      {open && (
+        <div className="absolute bottom-full left-0 mb-2 flex gap-1 bg-white rounded-full shadow-lg border border-[#E4EAE9] px-2 py-1.5 z-10">
+          {PICKER_REACTIONS.map((type) => {
+            const config = REACTION_CONFIG[type];
+            const isSelected = selectedReactions.includes(type);
+            return (
+              <div key={type} className="group/emoji relative flex flex-col items-center">
+                {/* Tooltip label */}
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 bg-[#295E5C] text-white text-xs rounded-full whitespace-nowrap opacity-0 group-hover/emoji:opacity-100 transition-opacity pointer-events-none">
+                  {config.label}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleToggle(type)}
+                  className={cn(
+                    "size-7 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer",
+                    isSelected ? "bg-[#E8FAF9]" : "hover:bg-[#F0F9F8]"
+                  )}
+                >
+                  <LottieEmoji
+                    url={config.lottieUrl}
+                    fallback={config.emoji}
+                    size={18}
+                    play={true}
+                  />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {/* Main button */}
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          "flex items-center gap-1 text-xs transition-colors cursor-pointer",
+          hasSelection ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-logo-cyan"
+        )}
+      >
+        {hasSelection ? (
+          <>
+            <div className="flex items-center">
+              {selectedReactions.slice(-2).map((type, i) => (
+                <div key={type} className={cn("size-4", i > 0 && "-ml-1")}>
+                  <LottieEmoji
+                    url={REACTION_CONFIG[type].lottieUrl}
+                    fallback={REACTION_CONFIG[type].emoji}
+                    size={16}
+                    play={true}
+                  />
+                </div>
+              ))}
+            </div>
+            <span>{selectedReactions.length}</span>
+          </>
+        ) : (
+          <LikeOutlineSvg className="size-5" />
+        )}
+      </button>
+    </div>
+  );
+}
+
+// ============================================================================
 // CommentBubble (single comment or reply)
 // ============================================================================
 
@@ -56,18 +166,42 @@ interface CommentBubbleProps {
   comment: IComment | ICommentReply;
   isReply?: boolean;
   onReply?: () => void;
+  isOwn?: boolean;
+  onEdit?: (id: string, content: string) => void;
+  onDelete?: (id: string) => void;
 }
 
-function CommentBubble({ comment, isReply = false, onReply }: CommentBubbleProps) {
-  // Show first reaction emoji as the avatar badge
-  const firstReaction = comment.reactions?.[0];
-  const reactionConfig = firstReaction ? REACTION_CONFIG[firstReaction] : null;
+function CommentBubble({ comment, isReply = false, onReply, isOwn = false, onEdit, onDelete }: CommentBubbleProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editValue, setEditValue] = useState(comment.content);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const { openWarningDialog } = useDialog();
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
+
+  const handleSaveEdit = () => {
+    const trimmed = editValue.trim();
+    if (trimmed) {
+      onEdit?.(comment.id, trimmed);
+      toast.success("已更新留言");
+    }
+    setEditing(false);
+  };
 
   return (
-    // level 2 replies: indent by 40px (avatar width) to align under parent content
     <div className={cn("flex gap-[11px] items-start", isReply && "pl-[40px]")}>
-      {/* Avatar + reaction badge */}
-      <div className="relative shrink-0">
+      {/* Avatar */}
+      <div className="shrink-0">
         <Avatar className="size-10">
           {comment.author.photoURL && (
             <AvatarImage src={comment.author.photoURL} alt={comment.author.name} />
@@ -78,37 +212,117 @@ function CommentBubble({ comment, isReply = false, onReply }: CommentBubbleProps
             {comment.author.name.slice(0, 1)}
           </AvatarFallback>
         </Avatar>
-        {/* Emoji badge on avatar bottom-right */}
-        {reactionConfig && !isReply && (
-          <div className="absolute -bottom-1 -right-1.5 size-6 rounded-full bg-[#E8FAF9] flex items-center justify-center shadow-sm">
-            <LottieEmoji
-              url={reactionConfig.lottieUrl}
-              fallback={reactionConfig.emoji}
-              size={18}
-              play={false}
-            />
-          </div>
-        )}
       </div>
 
-      {/* Text content (no bubble background) */}
+      {/* Text content */}
       <div className="flex-1 min-w-0">
-        {/* Author + time */}
+        {/* Author + time + own-comment menu */}
         <div className="flex items-center gap-2 mb-0.5">
           <span className="text-sm font-semibold text-[#295E5C]">{comment.author.name}</span>
           <span className="text-xs text-[#295E5C]/50">{comment.time}</span>
+          {isOwn && !editing && (
+            <div ref={menuRef} className="relative ml-auto">
+              <button
+                type="button"
+                onClick={() => setMenuOpen((v) => !v)}
+                className={cn(
+                  "p-0.5 rounded transition-colors cursor-pointer",
+                  menuOpen ? "text-text-dark bg-[#E4EAE9]" : "text-[#9FB5B8] hover:text-text-dark"
+                )}
+              >
+                <MoreHorizontal className="size-4" />
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-1 z-20 min-w-[100px]">
+                  <button
+                    type="button"
+                    onClick={() => { setMenuOpen(false); setEditing(true); }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                  >
+                    <Pencil className="size-3.5" />
+                    <span>修改</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setMenuOpen(false);
+                      const result = await openWarningDialog({
+                        title: "確定刪除這則留言？",
+                        message: "一旦刪除就無法復原。",
+                        textAlign: "left",
+                        buttons: [
+                          { label: "確定刪除", value: "confirm", variant: "outline" },
+                          { label: "先不要", value: "cancel", variant: "orange" },
+                        ],
+                      });
+                      if (result.value === "confirm") {
+                        onDelete?.(comment.id);
+                        toast.success("已刪除留言");
+                      }
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="size-3.5" />
+                    <span>刪除</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-        {/* Content */}
-        <p className="text-sm text-[#295E5C] leading-5 whitespace-pre-wrap">{comment.content}</p>
-        {/* 回覆 link */}
-        {!isReply && onReply && (
-          <button
-            type="button"
-            onClick={onReply}
-            className="text-sm font-medium text-logo-cyan mt-1"
-          >
-            回覆
-          </button>
+
+        {/* Content or edit mode */}
+        {editing ? (
+          <div className="flex flex-col gap-2">
+            <textarea
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              // biome-ignore lint/a11y/noAutofocus: intentional UX for inline edit
+              autoFocus
+              rows={3}
+              className="w-full resize-none rounded-lg border border-logo-cyan bg-white px-3 py-2 text-sm text-[#295E5C] focus:outline-none"
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={() => { setEditing(false); setEditValue(comment.content); }}
+                className="text-xs px-3 py-1 rounded-full border border-[#E4EAE9] text-[#9FB5B8] hover:bg-[#F0F9F8] cursor-pointer transition-colors"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveEdit}
+                className="text-xs px-3 py-1 rounded-full bg-logo-cyan text-white hover:bg-logo-cyan/80 cursor-pointer transition-colors"
+              >
+                儲存
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-[#295E5C] leading-5 whitespace-pre-wrap">{comment.content}</p>
+        )}
+
+        {/* Actions: 👍 + 💬 (hidden while editing) */}
+        {!editing && (
+          <div className="flex items-center gap-3 mt-1.5">
+            <CommentReactionPickerButton />
+            {!isReply && onReply && (
+              <button
+                type="button"
+                onClick={onReply}
+                className={cn(
+                  "flex items-center gap-1 text-xs transition-colors cursor-pointer",
+                  "text-[#9FB5B8] hover:text-logo-cyan"
+                )}
+              >
+                <DialogOutlineSvg className="size-5" />
+                {"replies" in comment && comment.replies && comment.replies.length > 0 && (
+                  <span>{comment.replies.length}</span>
+                )}
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -124,6 +338,12 @@ interface CommentSectionProps {
   selectedReactions: ReactionTypeType[];
   inputRef?: React.RefObject<HTMLTextAreaElement | null>;
   onSubmit: (content: string, reactions: ReactionTypeType[]) => void;
+  /** 是否顯示「更多留言」摺疊按鈕 */
+  hasMoreComments?: boolean;
+  /** 當前登入用戶的名稱，用於判斷是否為自己的留言 */
+  currentUserName?: string;
+  onEditComment?: (id: string, content: string) => void;
+  onDeleteComment?: (id: string) => void;
 }
 
 export function CommentSection({
@@ -131,9 +351,18 @@ export function CommentSection({
   selectedReactions,
   inputRef: externalRef,
   onSubmit,
+  hasMoreComments = false,
+  currentUserName,
+  onEditComment,
+  onDeleteComment,
 }: CommentSectionProps) {
   const [inputValue, setInputValue] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  const PREVIEW_COUNT = 2;
+  const previewComments = hasMoreComments ? comments.slice(0, PREVIEW_COUNT) : comments;
+  const hiddenComments = hasMoreComments ? comments.slice(PREVIEW_COUNT) : [];
+  const hiddenCount = hiddenComments.length;
   const internalRef = useRef<HTMLTextAreaElement>(null);
   const ref = externalRef ?? internalRef;
 
@@ -182,19 +411,60 @@ export function CommentSection({
 
   return (
     <div className="flex flex-col">
+      {/* 主留言輸入框（置頂） */}
+      <div className="bg-white border-b border-[#E4EAE9] flex gap-2 items-center px-4 py-3">
+        {/* User avatar */}
+        <Avatar className="size-9 shrink-0">
+          <AvatarImage src="https://i.pravatar.cc/36?img=47" alt="我" />
+          <AvatarFallback className={cn("text-sm font-medium text-text-dark", getAvatarColor("Me"))}>
+            我
+          </AvatarFallback>
+        </Avatar>
+
+        {/* Input */}
+        <textarea
+          ref={ref as React.RefObject<HTMLTextAreaElement>}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={selectedReactions.length === 0 ? "寫下你的留言..." : ""}
+          rows={1}
+          className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10"
+        />
+
+        {/* Send */}
+        <Button
+          size="icon"
+          onClick={handleSubmit}
+          disabled={!inputValue.trim()}
+          className="shrink-0 size-10 rounded-full bg-logo-cyan hover:bg-logo-cyan/80 disabled:opacity-40"
+        >
+          <Send className="size-4" />
+        </Button>
+      </div>
+
       {/* 留言列表 */}
       {comments.length > 0 && (
-        <div className="flex flex-col gap-5 px-4 pt-4 pb-4">
-          {comments.map((comment) => (
+        <div className="flex flex-col gap-5 px-4 pt-4 pb-2">
+          {previewComments.map((comment) => (
             <div key={comment.id}>
               <CommentBubble
                 comment={comment}
                 onReply={() => setReplyTo(comment.id)}
+                isOwn={!!currentUserName && comment.author.name === currentUserName}
+                onEdit={onEditComment}
+                onDelete={onDeleteComment}
               />
               {/* Replies */}
               {comment.replies?.map((reply) => (
                 <div key={reply.id} className="mt-3">
-                  <CommentBubble comment={reply} isReply />
+                  <CommentBubble
+                    comment={reply}
+                    isReply
+                    isOwn={!!currentUserName && reply.author.name === currentUserName}
+                    onEdit={onEditComment}
+                    onDelete={onDeleteComment}
+                  />
                 </div>
               ))}
               {/* Inline reply input */}
@@ -218,50 +488,83 @@ export function CommentSection({
         </div>
       )}
 
-      {/* 主留言輸入框 */}
-      <div className="bg-white border-t border-[#E4EAE9] flex gap-2 items-center px-4 py-3">
-        {/* Selected reaction emojis (or grey dot when none) */}
-        {selectedReactions.length > 0 ? (
-          <div className="flex shrink-0 gap-0.5">
-            {selectedReactions.map((type) => (
-              <div
-                key={type}
-                className="size-6 rounded-full bg-[#E8FAF9] flex items-center justify-center"
-              >
-                <LottieEmoji
-                  url={REACTION_CONFIG[type].lottieUrl}
-                  fallback={REACTION_CONFIG[type].emoji}
-                  size={20}
-                  play
-                />
+      {/* 更多留言（帶動畫展開） */}
+      {hasMoreComments && hiddenCount > 0 && (
+        <>
+          {/* 展開按鈕 */}
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="w-full py-3 text-sm text-[#9FB5B8] flex items-center justify-between px-4 border-t border-[#E4EAE9] hover:text-text-dark/60 transition-colors cursor-pointer"
+          >
+            <span>{expanded ? "收起留言" : "更多留言"}</span>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className={cn("transition-transform duration-300", expanded && "rotate-180")}
+            >
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </button>
+
+          {/* 隱藏留言：用 grid-rows 做高度動畫 */}
+          <div
+            className={cn(
+              "grid transition-all duration-300 ease-in-out",
+              expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            )}
+          >
+            <div className="overflow-hidden">
+              <div className="flex flex-col gap-5 px-4 pt-2 pb-4">
+                {hiddenComments.map((comment) => (
+                  <div key={comment.id}>
+                    <CommentBubble
+                      comment={comment}
+                      onReply={() => setReplyTo(comment.id)}
+                      isOwn={!!currentUserName && comment.author.name === currentUserName}
+                      onEdit={onEditComment}
+                      onDelete={onDeleteComment}
+                    />
+                    {comment.replies?.map((reply) => (
+                      <div key={reply.id} className="mt-3">
+                        <CommentBubble
+                          comment={reply}
+                          isReply
+                          isOwn={!!currentUserName && reply.author.name === currentUserName}
+                          onEdit={onEditComment}
+                          onDelete={onDeleteComment}
+                        />
+                      </div>
+                    ))}
+                    {replyTo === comment.id && (
+                      <div className="pl-[40px] flex gap-2 items-center mt-3">
+                        <textarea
+                          className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px]"
+                          placeholder={`回覆 ${comment.author.name}...`}
+                          rows={1}
+                        />
+                        <Button
+                          size="icon"
+                          className="shrink-0 size-9 rounded-full bg-logo-cyan hover:bg-logo-cyan/80"
+                        >
+                          <Send className="size-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        ) : (
-          <div className="shrink-0 size-6 rounded-full bg-[#E4EAE9]" />
-        )}
-
-        {/* Input */}
-        <textarea
-          ref={ref as React.RefObject<HTMLTextAreaElement>}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={selectedReactions.length === 0 ? "寫下你的留言..." : ""}
-          rows={1}
-          className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10"
-        />
-
-        {/* Send */}
-        <Button
-          size="icon"
-          onClick={handleSubmit}
-          disabled={!inputValue.trim()}
-          className="shrink-0 size-10 rounded-full bg-logo-cyan hover:bg-logo-cyan/80 disabled:opacity-40"
-        >
-          <Send className="size-4" />
-        </Button>
-      </div>
+        </>
+      )}
     </div>
   );
 }
