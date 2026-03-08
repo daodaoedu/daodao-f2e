@@ -364,7 +364,7 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
   const practice = isOwner ? MOCK_PRACTICE : MOCK_PRACTICE_OTHERS;
 
   const [activeTab, setActiveTab] = useState<Tab>("comments");
-  const [infoExpanded, setInfoExpanded] = useState(true);
+  const [infoExpanded, setInfoExpanded] = useState(false);
   const [selectedReactions, _setSelectedReactions] = useState<ReactionTypeType[]>([]);
   const [comments, setComments] = useState<IComment[]>(MOCK_COMMENTS);
   const [headerReactions, setHeaderReactions] = useState<ReactionTypeType[]>([]);
