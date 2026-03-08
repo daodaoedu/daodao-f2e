@@ -365,7 +365,10 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
   const [headerReactions, setHeaderReactions] = useState<ReactionTypeType[]>([]);
   const [practiceMenuOpen, setPracticeMenuOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [resources, setResources] = useState(MOCK_RESOURCES);
+  const [openResourceMenuId, setOpenResourceMenuId] = useState<string | null>(null);
   const practiceMenuRef = useRef<HTMLDivElement>(null);
+  const resourceMenuRef = useRef<HTMLDivElement>(null);
   const commentsRef = useRef<HTMLDivElement>(null);
   const { open: openSheet } = useSheetManager();
   const { openWarningDialog } = useDialog();
@@ -380,6 +383,17 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [practiceMenuOpen]);
+
+  useEffect(() => {
+    if (!openResourceMenuId) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (resourceMenuRef.current && !resourceMenuRef.current.contains(e.target as Node)) {
+        setOpenResourceMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [openResourceMenuId]);
 
   const handleCommentSubmit = useCallback((content: string, submittedReactions: ReactionTypeType[]) => {
     const newComment: IComment = {
@@ -714,12 +728,12 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
 
         {activeTab === "resources" && (
           <div className="px-4 pt-4 flex flex-col gap-3 pb-4">
-            {MOCK_RESOURCES.map((resource) => (
+            {resources.map((resource) => (
               <div
                 key={resource.id}
-                className="flex items-stretch rounded-lg border border-[#E4EAE9] bg-white shadow-sm p-2 gap-3"
+                className="flex items-stretch rounded-lg border border-[#E4EAE9] bg-white p-2 gap-3"
               >
-                {/* Thumbnail — image with gap from card edges */}
+                {/* Thumbnail */}
                 <div className="shrink-0 w-[100px] rounded overflow-hidden bg-[#D4E8E6]">
                   {resource.imageUrl ? (
                     <img
@@ -739,9 +753,42 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
                 </div>
 
                 {/* Menu */}
-                <button type="button" className="shrink-0 p-1 text-[#9FB5B8] hover:text-text-dark transition-colors cursor-pointer self-start">
-                  <MoreHorizontal className="size-4" />
-                </button>
+                <div ref={openResourceMenuId === resource.id ? resourceMenuRef : null} className="relative self-start">
+                  <button
+                    type="button"
+                    onClick={() => setOpenResourceMenuId(openResourceMenuId === resource.id ? null : resource.id)}
+                    className="p-1 text-[#9FB5B8] hover:text-text-dark transition-colors cursor-pointer"
+                  >
+                    <MoreHorizontal className="size-4" />
+                  </button>
+                  {isOwner && openResourceMenuId === resource.id && (
+                    <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[100px]">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setOpenResourceMenuId(null);
+                          const result = await openWarningDialog({
+                            title: "確定刪除這個資源？",
+                            message: "刪除後無法復原。",
+                            textAlign: "left",
+                            buttons: [
+                              { label: "確定刪除", value: "confirm", variant: "outline" },
+                              { label: "先不要", value: "cancel", variant: "orange" },
+                            ],
+                          });
+                          if (result.value === "confirm") {
+                            setResources((prev) => prev.filter((r) => r.id !== resource.id));
+                            toast.success("已刪除資源");
+                          }
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="size-[18px] shrink-0" />
+                        <span>刪除</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
