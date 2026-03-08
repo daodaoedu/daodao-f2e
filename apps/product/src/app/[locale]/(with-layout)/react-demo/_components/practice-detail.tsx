@@ -22,7 +22,6 @@ import {
   Archive,
   ChevronDown,
   ChevronUp,
-  ExternalLink,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -122,32 +121,28 @@ const MOCK_COMMENTS: IComment[] = [
 interface IResource {
   id: string;
   title: string;
-  description?: string;
   url: string;
-  emoji: string;
+  imageUrl?: string;
 }
 
 const MOCK_RESOURCES: IResource[] = [
   {
     id: "r1",
     title: "原子習慣",
-    description: "詹姆斯・克利爾 著",
     url: "books.com.tw/products/0010822522",
-    emoji: "📗",
+    imageUrl: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&q=80",
   },
   {
     id: "r2",
     title: "如何每天寫 500 字：給新手的寫作指南",
-    description: "Medium 文章",
     url: "medium.com/@writer/how-to-write-500-words",
-    emoji: "📝",
+    imageUrl: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&q=80",
   },
   {
     id: "r3",
     title: "故事的解剖",
-    description: "羅伯特・麥基 著",
     url: "books.com.tw/products/0010360297",
-    emoji: "📕",
+    imageUrl: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&q=80",
   },
 ];
 
@@ -722,24 +717,29 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
             {MOCK_RESOURCES.map((resource) => (
               <div
                 key={resource.id}
-                className="flex items-center gap-3 rounded-xl border border-[#E4EAE9] bg-white overflow-hidden"
+                className="flex items-stretch rounded-xl border border-[#E4EAE9] bg-white overflow-hidden shadow-sm"
               >
-                {/* Rectangular thumbnail */}
-                <div className="shrink-0 w-[72px] h-[72px] bg-[#D4E8E6] flex items-center justify-center text-3xl">
-                  {resource.emoji}
+                {/* Thumbnail — full-height image */}
+                <div className="shrink-0 w-[120px] bg-[#D4E8E6]">
+                  {resource.imageUrl ? (
+                    <img
+                      src={resource.imageUrl}
+                      alt={resource.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#D4E8E6]" />
+                  )}
                 </div>
 
                 {/* Info */}
-                <div className="flex-1 min-w-0 py-3 pr-1">
-                  <p className="text-sm font-medium text-text-dark leading-snug">{resource.title}</p>
-                  <p className="flex items-center gap-1 text-xs text-logo-cyan mt-1">
-                    <ExternalLink className="size-3 shrink-0" />
-                    <span className="truncate">{resource.url}</span>
-                  </p>
+                <div className="flex-1 min-w-0 p-3">
+                  <p className="text-sm font-semibold text-[#295E5C] leading-snug">{resource.title}</p>
+                  <p className="text-xs text-logo-cyan mt-1.5 truncate">{resource.url}</p>
                 </div>
 
                 {/* Menu */}
-                <button type="button" className="shrink-0 p-3 text-[#9FB5B8] hover:text-text-dark transition-colors cursor-pointer">
+                <button type="button" className="shrink-0 p-3 text-[#9FB5B8] hover:text-text-dark transition-colors cursor-pointer self-start">
                   <MoreHorizontal className="size-4" />
                 </button>
               </div>
