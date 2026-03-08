@@ -717,10 +717,10 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
             {MOCK_RESOURCES.map((resource) => (
               <div
                 key={resource.id}
-                className="flex items-stretch rounded-xl border border-[#E4EAE9] bg-white overflow-hidden shadow-sm"
+                className="flex items-stretch rounded-lg border border-[#E4EAE9] bg-white shadow-sm p-2 gap-3"
               >
-                {/* Thumbnail — full-height image */}
-                <div className="shrink-0 w-[120px] bg-[#D4E8E6]">
+                {/* Thumbnail — image with gap from card edges */}
+                <div className="shrink-0 w-[100px] rounded overflow-hidden bg-[#D4E8E6]">
                   {resource.imageUrl ? (
                     <img
                       src={resource.imageUrl}
@@ -733,13 +733,13 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
                 </div>
 
                 {/* Info */}
-                <div className="flex-1 min-w-0 p-3">
+                <div className="flex-1 min-w-0 py-1">
                   <p className="text-sm font-semibold text-[#295E5C] leading-snug">{resource.title}</p>
                   <p className="text-xs text-logo-cyan mt-1.5 truncate">{resource.url}</p>
                 </div>
 
                 {/* Menu */}
-                <button type="button" className="shrink-0 p-3 text-[#9FB5B8] hover:text-text-dark transition-colors cursor-pointer self-start">
+                <button type="button" className="shrink-0 p-1 text-[#9FB5B8] hover:text-text-dark transition-colors cursor-pointer self-start">
                   <MoreHorizontal className="size-4" />
                 </button>
               </div>
