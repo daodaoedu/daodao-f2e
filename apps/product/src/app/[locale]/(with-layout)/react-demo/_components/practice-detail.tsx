@@ -156,7 +156,14 @@ const MOCK_FOLLOWERS: { id: string; name: string; time: string; photoURL: string
   { id: "f3", name: "Leo Wang",  time: "3 小時前", photoURL: "https://i.pravatar.cc/40?img=52", following: false, reaction: "encourage" },
 ];
 
-function BrowseActivityContent({ commentCount }: { commentCount: number }) {
+const BROWSE_ACTIVITY_REACTIONS: ReactionTypeType[] = [
+  ReactionType.encourage,
+  ReactionType.touched,
+  ReactionType.fire,
+  ReactionType.useful,
+];
+
+function BrowseActivityContent({ commentCount, reactions }: { commentCount: number; reactions: IReactionCount[] }) {
   const [tab, setTab] = useState<"data" | "echo">("data");
   const [followers, setFollowers] = useState(MOCK_FOLLOWERS);
 
@@ -202,6 +209,23 @@ function BrowseActivityContent({ commentCount }: { commentCount: number }) {
               <span className="text-sm font-medium">{count}</span>
             </div>
           ))}
+          {/* 表情反應人數 */}
+          <div className="flex items-center gap-3 py-4 text-[#295E5C]">
+            <span className="text-[#9FB5B8]"><LikeOutlineSvg className="size-5" /></span>
+            <span className="flex-1 text-sm">迴響</span>
+            <div className="flex items-center gap-2">
+              {BROWSE_ACTIVITY_REACTIONS.map((type) => {
+                const config = REACTION_CONFIG[type];
+                const count = reactions.find((r) => r.type === type)?.count ?? 0;
+                return (
+                  <div key={type} className="flex items-center gap-0.5 bg-[#F0F9F8] rounded-full px-2 py-1">
+                    <LottieEmoji url={config.lottieUrl} fallback={config.emoji} size={16} play={false} />
+                    <span className="text-xs font-medium text-[#295E5C]">{count}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
 
@@ -438,7 +462,7 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
     setPracticeMenuOpen(false);
     openSheet({
       title: "瀏覽活動",
-      content: <BrowseActivityContent commentCount={comments.length} />,
+      content: <BrowseActivityContent commentCount={comments.length} reactions={MOCK_INITIAL_REACTIONS} />,
       dismissible: true,
       closeOnEscape: true,
       showCloseButton: true,
