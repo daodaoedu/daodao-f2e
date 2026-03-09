@@ -42,7 +42,7 @@ export const menuItems = [
     icon: BellOutlineSvg,
     label: "最新通知",
     href: "/notifications",
-    hidden: true,
+    badge: true,
     isMatch: (pathname: string) => pathname === "/notifications",
   },
   {

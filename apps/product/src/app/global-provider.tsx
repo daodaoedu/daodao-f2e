@@ -2,6 +2,7 @@
 
 import { AnalyticsScripts } from "@daodao/analytics";
 import { AuthProvider } from "@daodao/auth";
+import { getEnv } from "@daodao/config";
 import { type Locale, type Messages, NextIntlClientProvider } from "@daodao/i18n";
 import { type DeviceInfo, DeviceProvider, detectDeviceClient } from "@daodao/shared";
 import "@daodao/ui/globals.css";
@@ -28,6 +29,7 @@ function GlobalProvider({
   initialDevice = detectDeviceClient(),
 }: GlobalProviderProps) {
   const router = useRouter();
+  const debugMode = getEnv("NEXT_PUBLIC_DEBUG_MODE") === "true";
 
   return (
     <html
@@ -46,7 +48,8 @@ function GlobalProvider({
                 <DialogManagerProvider>
                   <SheetManagerProvider>
                     <AuthProvider
-                      defaultProtected
+                      enableRouteProtection={!debugMode}
+                      defaultProtected={!debugMode}
                       publicPattern={[
                         "^/auth/login",
                         "^/auth/callback",
@@ -54,6 +57,7 @@ function GlobalProvider({
                         "^/auth/verify-email(/.*)?$",
                         "^/users/",
                         "^/practices/[^/]+$",
+                        "^/react-demo",
                       ]}
                       onAuthRequired={(currentPath) => {
                         router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);

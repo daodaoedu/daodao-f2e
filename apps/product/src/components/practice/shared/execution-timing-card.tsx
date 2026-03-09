@@ -1,6 +1,6 @@
 "use client";
 
-import { BookSvg, BulbSvg, ClockSolidSvg } from "@daodao/assets";
+import { BookSvg, ClockSolidSvg } from "@daodao/assets";
 import { Badge } from "@daodao/ui/components/badge";
 import { EXECUTION_TIMING_OPTIONS, type ManualPracticeFormValues } from "../create/manual/schema";
 
@@ -14,12 +14,7 @@ export const ExecutionTimingCard = ({
   customTiming,
 }: ExecutionTimingCardProps) => {
   return (
-    <div className="relative bg-light-cyan rounded-lg px-4 pt-8 pb-3 md:pb-12">
-      {/* Lightbulb Icon */}
-      <div className="absolute top-0 left-2.5 -translate-y-1/2">
-        <BulbSvg width={42} height={53} />
-      </div>
-
+    <div className="relative bg-light-cyan rounded-lg p-4 pb-3 md:pb-12">
       {/* Book Illustration Background */}
       <div className="absolute bottom-0 right-0 w-[108px] h-[100px] overflow-hidden">
         <BookSvg width={126} height={118} className="opacity-70" />

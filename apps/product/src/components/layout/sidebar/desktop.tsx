@@ -85,12 +85,17 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
                 )}
                 aria-label={item.label}
               >
-                <Icon
-                  className={cn(
-                    "shrink-0 size-9 text-light-gray transition-colors",
-                    isActive && "text-logo-cyan"
+                <span className="relative">
+                  <Icon
+                    className={cn(
+                      "shrink-0 size-9 text-light-gray transition-colors",
+                      isActive && "text-logo-cyan"
+                    )}
+                  />
+                  {"badge" in item && item.badge && (
+                    <span className="absolute top-0 left-0 size-2 rounded-full bg-red-500" />
                   )}
-                />
+                </span>
                 <span
                   className={cn(
                     "flex-1 text-base font-normal transition-all duration-300 whitespace-nowrap",
