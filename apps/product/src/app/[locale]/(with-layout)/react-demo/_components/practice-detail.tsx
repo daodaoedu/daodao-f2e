@@ -264,7 +264,6 @@ function ReactionPickerButton({
   onReactionToggle: (type: ReactionTypeType) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const hasSelection = selectedReactions.length > 0;
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -328,7 +327,6 @@ function ReactionPickerButton({
         )}
       >
         <LikeOutlineSvg className="size-[22px]" />
-        {hasSelection && <span className="text-sm font-medium">{selectedReactions.length}</span>}
       </button>
     </div>
   );
