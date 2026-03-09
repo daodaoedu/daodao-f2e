@@ -159,6 +159,16 @@ const MOCK_FOLLOWERS: { id: string; name: string; time: string; photoURL: string
 function BrowseActivityContent({ commentCount }: { commentCount: number }) {
   const [tab, setTab] = useState<"data" | "echo">("data");
   const [followers, setFollowers] = useState(MOCK_FOLLOWERS);
+  const [reactionFilter, setReactionFilter] = useState<"all" | ReactionTypeType>("all");
+
+  const reactionCounts = followers.reduce<Record<string, number>>((acc, f) => {
+    acc[f.reaction] = (acc[f.reaction] || 0) + 1;
+    return acc;
+  }, {});
+  const uniqueReactions = [...new Set(followers.map((f) => f.reaction))] as ReactionTypeType[];
+  const filteredFollowers = reactionFilter === "all"
+    ? followers
+    : followers.filter((f) => f.reaction === reactionFilter);
 
   const toggleFollow = (id: string) => {
     setFollowers((prev) =>
@@ -207,8 +217,45 @@ function BrowseActivityContent({ commentCount }: { commentCount: number }) {
 
       {/* 迴響 tab */}
       {tab === "echo" && (
-        <div className="flex flex-col gap-1 px-4 mt-2">
-          {followers.map((f) => (
+        <div className="flex flex-col">
+          {/* Reaction filter bar */}
+          <div className="flex overflow-x-auto border-b border-[#E4EAE9] mx-4 mt-1">
+            <button
+              type="button"
+              onClick={() => setReactionFilter("all")}
+              className={cn(
+                "shrink-0 flex items-center gap-1 px-3 py-2.5 text-sm font-medium relative whitespace-nowrap cursor-pointer transition-colors",
+                reactionFilter === "all" ? "text-logo-cyan" : "text-[#9FB5B8]"
+              )}
+            >
+              全部 {followers.length}
+              {reactionFilter === "all" && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-logo-cyan rounded-full" />}
+            </button>
+            {uniqueReactions.map((reaction) => {
+              const config = REACTION_CONFIG[reaction];
+              const count = reactionCounts[reaction] || 0;
+              const isActive = reactionFilter === reaction;
+              return (
+                <button
+                  key={reaction}
+                  type="button"
+                  onClick={() => setReactionFilter(reaction)}
+                  className={cn(
+                    "shrink-0 flex items-center gap-1 px-3 py-2.5 text-sm font-medium relative whitespace-nowrap cursor-pointer transition-colors",
+                    isActive ? "text-logo-cyan" : "text-[#9FB5B8]"
+                  )}
+                >
+                  <LottieEmoji url={config.lottieUrl} fallback={config.emoji} size={18} play={false} />
+                  {count}
+                  {isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-logo-cyan rounded-full" />}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Followers list */}
+          <div className="flex flex-col gap-1 px-4 mt-2">
+          {filteredFollowers.map((f) => (
             <div key={f.id} className="flex items-center gap-3 py-3">
               <div className="relative shrink-0">
                 <Avatar className="size-10">
@@ -239,6 +286,7 @@ function BrowseActivityContent({ commentCount }: { commentCount: number }) {
               </button>
             </div>
           ))}
+          </div>
         </div>
       )}
     </div>
@@ -298,7 +346,7 @@ function ReactionPickerButton({
                 </div>
                 <button
                   type="button"
-                  onClick={() => onReactionToggle(type)}
+                  onClick={() => { onReactionToggle(type); setOpen(false); }}
                   className={cn(
                     "size-9 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer",
                     isSelected ? "bg-[#E8FAF9]" : "hover:bg-[#F0F9F8]"
