@@ -213,13 +213,13 @@ function BrowseActivityContent({ commentCount, reactions }: { commentCount: numb
           <div className="flex items-center gap-3 py-4 text-[#295E5C]">
             <span className="text-[#9FB5B8]"><LikeOutlineSvg className="size-5" /></span>
             <span className="flex-1 text-sm">迴響</span>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="flex items-center gap-2">
               {BROWSE_ACTIVITY_REACTIONS.map((type) => {
                 const config = REACTION_CONFIG[type];
                 const count = reactions.find((r) => r.type === type)?.count ?? 0;
                 return (
-                  <div key={type} className="flex flex-col items-center gap-0.5 bg-[#F0F9F8] rounded-xl px-2 py-1.5">
-                    <LottieEmoji url={config.lottieUrl} fallback={config.emoji} size={20} play={false} />
+                  <div key={type} className="flex items-center gap-0.5 bg-[#F0F9F8] rounded-full px-2 py-1">
+                    <LottieEmoji url={config.lottieUrl} fallback={config.emoji} size={16} play={false} />
                     <span className="text-xs font-medium text-[#295E5C]">{count}</span>
                   </div>
                 );
