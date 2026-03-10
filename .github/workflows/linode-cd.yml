@@ -604,7 +604,10 @@ jobs:
           DEPLOY_WEBSITE: ${{ needs.build-website.result == 'success' }}
           DEPLOY_PRODUCT: ${{ needs.build-product.result == 'success' }}
         run: |
-          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=3 root@$LINODE_INSTANCE_IP "
+          DEPLOY_WEBSITE=${{ env.DEPLOY_WEBSITE }}
+          DEPLOY_PRODUCT=${{ env.DEPLOY_PRODUCT }}
+          APP_ENV=${{ env.APP_ENV }}
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=3 root@$LINODE_INSTANCE_IP << ENDSSH
             set -e
             echo '=== Deployment Verification Started ==='
 
@@ -615,45 +618,44 @@ jobs:
             echo 'Memory Usage:' && free -h
             echo 'Disk Usage:' && df -h /
 
-            if [ \"${{ env.DEPLOY_WEBSITE }}\" = \"true\" ]; then
+            if [ "$DEPLOY_WEBSITE" = "true" ]; then
               echo '=== Verifying Website ==='
-              WEBSITE_STATUS=\$(docker inspect --format='{{.State.Status}}' ${{ env.APP_ENV }}_website 2>/dev/null || echo 'not found')
-              WEBSITE_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' ${{ env.APP_ENV }}_website 2>/dev/null || echo 'no health check')
+              WEBSITE_STATUS=\$(docker inspect --format='{{.State.Status}}' ${APP_ENV}_website 2>/dev/null || echo 'not found')
+              WEBSITE_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' ${APP_ENV}_website 2>/dev/null || echo 'no health check')
               echo "Container Status: \$WEBSITE_STATUS"
               echo "Health Status: \$WEBSITE_HEALTH"
 
               if [ "\$WEBSITE_STATUS" != "running" ]; then
                 echo "❌ Website container is not running"
-                # 嘗試讀取日誌（如果支援的話）
-                docker logs ${{ env.APP_ENV }}_website --tail=20 2>/dev/null || echo "Logs not available (logging driver may not support reading)"
+                docker logs ${APP_ENV}_website --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
               if [ "\$WEBSITE_HEALTH" = "unhealthy" ]; then
                 echo "❌ Website container is unhealthy"
-                docker logs ${{ env.APP_ENV }}_website --tail=20 2>/dev/null || echo "Logs not available"
+                docker logs ${APP_ENV}_website --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
               echo "✅ Website is running and healthy"
             fi
 
-            if [ \"${{ env.DEPLOY_PRODUCT }}\" = \"true\" ]; then
+            if [ "$DEPLOY_PRODUCT" = "true" ]; then
               echo '=== Verifying Product ==='
-              PRODUCT_STATUS=\$(docker inspect --format='{{.State.Status}}' ${{ env.APP_ENV }}_product 2>/dev/null || echo 'not found')
-              PRODUCT_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' ${{ env.APP_ENV }}_product 2>/dev/null || echo 'no health check')
+              PRODUCT_STATUS=\$(docker inspect --format='{{.State.Status}}' ${APP_ENV}_product 2>/dev/null || echo 'not found')
+              PRODUCT_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' ${APP_ENV}_product 2>/dev/null || echo 'no health check')
               echo "Container Status: \$PRODUCT_STATUS"
               echo "Health Status: \$PRODUCT_HEALTH"
 
               if [ "\$PRODUCT_STATUS" != "running" ]; then
                 echo "❌ Product container is not running"
-                docker logs ${{ env.APP_ENV }}_product --tail=20 2>/dev/null || echo "Logs not available (logging driver may not support reading)"
+                docker logs ${APP_ENV}_product --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
               if [ "\$PRODUCT_HEALTH" = "unhealthy" ]; then
                 echo "❌ Product container is unhealthy"
-                docker logs ${{ env.APP_ENV }}_product --tail=20 2>/dev/null || echo "Logs not available"
+                docker logs ${APP_ENV}_product --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
@@ -661,7 +663,7 @@ jobs:
             fi
 
             echo '=== Deployment Verification Complete ==='
-          "
+          ENDSSH
 
   # ===== Discord 通知 =====
   notify:

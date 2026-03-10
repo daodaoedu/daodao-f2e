@@ -8,7 +8,9 @@ import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
 import { MoreHorizontal, Pencil, Send, Trash2 } from "lucide-react";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { upsertReaction, removeReaction, useReactions } from "@daodao/api";
+import type { ReactionTypeValue } from "@daodao/api";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
@@ -84,8 +86,36 @@ function CommentBubble({
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
-  const [commentReactions, setCommentReactions] = useState<ReactionTypeType[]>([]);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const commentNumericId = Number(comment.id);
+  const { data: reactionsData, mutate: mutateReactions } = useReactions({
+    targetType: "comment",
+    targetId: commentNumericId,
+  });
+  const [, startReactionTransition] = useTransition();
+
+  const currentUserReaction = (reactionsData?.data?.currentUserReaction ?? null) as ReactionTypeType | null;
+  const commentReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
+
+  const handleCommentReactionToggle = useCallback(
+    (type: ReactionTypeType) => {
+      const isSelected = currentUserReaction === type;
+      startReactionTransition(async () => {
+        if (isSelected) {
+          await removeReaction({ targetType: "comment", targetId: commentNumericId });
+        } else {
+          await upsertReaction({
+            targetType: "comment",
+            targetId: commentNumericId,
+            reactionType: type as ReactionTypeValue,
+          });
+        }
+        await mutateReactions();
+      });
+    },
+    [currentUserReaction, commentNumericId, mutateReactions],
+  );
   const { openWarningDialog } = useDialog();
 
   useEffect(() => {
@@ -257,9 +287,7 @@ function CommentBubble({
           <div className="flex items-center gap-3 mt-1.5">
             <ReactionPickerButton
               selectedReactions={commentReactions}
-              onToggle={(type) =>
-                setCommentReactions((prev) => (prev.includes(type) ? [] : [type]))
-              }
+              onToggle={handleCommentReactionToggle}
               variant="comment"
             />
             {!isReply && onReply && (

@@ -10656,7 +10656,7 @@ export interface paths {
             parameters: {
                 query: {
                     /** @description 查詢的目標類型 */
-                    targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "portfolio" | "practice";
+                    targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio";
                     /** @description 目標對象ID */
                     targetId: string;
                 };
@@ -11114,6 +11114,289 @@ export interface paths {
                 401: components["responses"]["UnauthorizedError"];
                 403: components["responses"]["ForbiddenError"];
                 404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得反應計數
+         * @description 取得指定目標的各類型反應計數與當前用戶狀態
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description 反應目標類型 */
+                    targetType: "practice" | "comment";
+                    /** @description 目標內部 ID */
+                    targetId: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得反應資料 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            data: components["schemas"]["GetReactionsResponse"] & unknown;
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        /**
+         * 新增或更換反應
+         * @description 對指定目標送出快速反應；同一用戶同一目標只保留一筆（UPSERT）
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpsertReactionRequest"];
+                };
+            };
+            responses: {
+                /** @description 反應已更新，回傳最新計數 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            data: components["schemas"]["GetReactionsResponse"] & unknown;
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        /**
+         * 取消反應
+         * @description 刪除當前用戶對指定目標的反應
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["RemoveReactionRequest"];
+                };
+            };
+            responses: {
+                /** @description 反應已刪除，回傳最新計數 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            data: components["schemas"]["GetReactionsResponse"] & unknown;
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -24353,7 +24636,7 @@ export interface components {
              * @example resource
              * @enum {string}
              */
-            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "portfolio" | "practice";
+            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio";
             /**
              * @description 留言內容
              * @example 這個資源非常有用，謝謝分享！
@@ -24400,7 +24683,7 @@ export interface components {
              * @example outcome
              * @enum {string}
              */
-            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "portfolio" | "practice";
+            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio";
             /**
              * @description 目標對象的唯一識別碼
              * @example 123e4567-e89b-12d3-a456-426614174000
@@ -26823,6 +27106,72 @@ export interface components {
              * @example 123
              */
             userId: string;
+        };
+        /** @description 單種反應的計數資訊 */
+        ReactionCount: {
+            /**
+             * @description 反應類型
+             * @example fire
+             */
+            type: string;
+            /**
+             * @description 計數
+             * @example 3
+             */
+            count: number;
+            /**
+             * @description 最新反應的用戶名稱
+             * @example 王小明
+             */
+            latestActorName: string | null;
+        };
+        /** @description 反應查詢回應 */
+        GetReactionsResponse: {
+            /** @description 各類型反應計數 */
+            reactions: components["schemas"]["ReactionCount"][];
+            /**
+             * @description 當前用戶的反應類型（未反應為 null）
+             * @example fire
+             */
+            currentUserReaction: string | null;
+        };
+        /** @description 新增或更換反應的請求資料 */
+        UpsertReactionRequest: {
+            /**
+             * @description 反應目標類型
+             * @example practice
+             * @enum {string}
+             */
+            targetType: "practice" | "comment";
+            /**
+             * @description 目標內部 ID
+             * @example 1
+             */
+            targetId: number;
+            /**
+             * @description 反應類型
+             * @example fire
+             * @example useful
+             * @example fire
+             * @example touched
+             * @example curious
+             * @enum {string}
+             */
+            reactionType: "useful" | "fire" | "touched" | "curious";
+        };
+        /** @description 刪除反應的請求資料 */
+        RemoveReactionRequest: {
+            /**
+             * @description 反應目標類型
+             * @example practice
+             * @enum {string}
+             */
+            targetType: "practice" | "comment";
+            /**
+             * @description 目標內部 ID
+             * @example 1
+             */
+            targetId: number;
         };
         AdminUserListQuery: {
             /**

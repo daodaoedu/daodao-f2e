@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { decodeOAuthState, verifyAndConsumeOAuthState } from "../lib/auth-client";
 import { DEFAULT_REDIRECT_URL, ONBOARDING_URL } from "../lib/auth-constants";
 
@@ -30,6 +31,10 @@ export const useRedirectAfterLogin = () => {
   useEffect(() => {
     const stateParam = searchParams.get("state");
     const isNewUser = searchParams.get("isNewUser") === "true";
+
+    // 通知其他 tab/window OAuth 已完成（處理 Android Chrome Custom Tab 場景）
+    // CCT 與主 Chrome 共享 localStorage，主 tab 可以透過 storage event 偵測並重新驗證
+    getStorage<number>(StorageEnum.AuthSignal).set(Date.now());
 
     if (!stateParam) {
       // 沒有 state 參數，根據是否為新用戶決定跳轉
