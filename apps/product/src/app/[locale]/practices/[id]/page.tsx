@@ -8,6 +8,7 @@ import {
   useComments,
   useCurrentUser,
   useDeletePractice,
+  useMyPractices,
   usePracticeById,
   usePracticeCheckIns,
 } from "@daodao/api";
@@ -56,6 +57,7 @@ interface IPracticeDetailData {
   durationDays: DurationDays;
   frequency: Frequency;
   executionTiming: ExecutionTiming[];
+  customTiming: string;
   tags: string[];
   resources: { id: string; name: string; url?: string }[];
   progress: number;
@@ -174,6 +176,7 @@ export default function PracticeDetailPage() {
     targetType: "practice",
     targetId: practiceId,
   });
+  const { data: practicesListData } = useMyPractices({ limit: 100 });
   const { data: currentUserData } = useCurrentUser();
 
   const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
@@ -223,6 +226,7 @@ export default function PracticeDetailPage() {
       durationDays,
       frequency,
       executionTiming: finalExecutionTiming,
+      customTiming: data.otherContext || "",
       tags: data.tags || [],
       resources: (data.resources || []).map((resource) => ({
         id: resource.id,
@@ -241,6 +245,30 @@ export default function PracticeDetailPage() {
 
     return rawComments.filter(isApiCommentNode).map((comment) => mapComment(comment));
   }, [commentsData]);
+
+  const { previousPracticeId, nextPracticeId, hasPrevious, hasNext } = useMemo(() => {
+    const practices = practicesListData?.data || [];
+    const currentIndex = practices.findIndex((p) => String(p.id) === practiceId);
+    if (currentIndex === -1) {
+      return { previousPracticeId: null, nextPracticeId: null, hasPrevious: false, hasNext: false };
+    }
+    const previousPractice = currentIndex > 0 ? practices[currentIndex - 1] : null;
+    const nextPractice = currentIndex < practices.length - 1 ? practices[currentIndex + 1] : null;
+    return {
+      previousPracticeId: previousPractice ? String(previousPractice.id) : null,
+      nextPracticeId: nextPractice ? String(nextPractice.id) : null,
+      hasPrevious: previousPractice !== null,
+      hasNext: nextPractice !== null,
+    };
+  }, [practicesListData, practiceId]);
+
+  const handlePrevious = () => {
+    if (previousPracticeId) router.push(`/practices/${previousPracticeId}`);
+  };
+
+  const handleNext = () => {
+    if (nextPracticeId) router.push(`/practices/${nextPracticeId}`);
+  };
 
   const handleEdit = () => {
     router.push(`/practices/${practiceId}/edit`);
@@ -390,6 +418,7 @@ export default function PracticeDetailPage() {
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
       <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
+      <BackgroundAnimation />
 
       <PracticeDetailShell
         practice={{
@@ -402,6 +431,7 @@ export default function PracticeDetailPage() {
           durationDays: practice.durationDays,
           startDate: practice.startDate,
           executionTiming: practice.executionTiming,
+          customTiming: practice.customTiming,
           tags: practice.tags,
           progress: practice.progress,
           creator:
@@ -424,6 +454,10 @@ export default function PracticeDetailPage() {
         currentUserName={currentUserData?.data?.name || undefined}
         currentUserPhotoURL={getCurrentUserPhotoURL(currentUserData?.data)}
         commentCount={practiceData?.data?.stats?.commentCount}
+        hasPrevious={hasPrevious}
+        hasNext={hasNext}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
         onEditPractice={handleEdit}
         onArchivePractice={() => {
           void handleArchive();

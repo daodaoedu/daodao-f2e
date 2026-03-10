@@ -27,6 +27,7 @@ import {
   ExecutionTimingCard,
   PracticeOverviewCard,
 } from "@/components/practice";
+import { PracticeDetailTitle } from "@/components/practice/detail/practice-detail-title";
 import type { DurationDays, ExecutionTiming, Frequency } from "@/constants/practice-form";
 import type { PracticeStatus } from "@/constants/practice-status";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
@@ -55,6 +56,7 @@ interface IPracticeDetailViewModel {
   durationDays: DurationDays;
   startDate?: string;
   executionTiming: ExecutionTiming[];
+  customTiming?: string;
   tags: string[];
   progress: number;
   creator?: IPracticeDetailCreator;
@@ -88,6 +90,10 @@ interface IPracticeDetailShellProps {
   currentUserName?: string;
   currentUserPhotoURL?: string;
   commentCount?: number;
+  hasPrevious?: boolean;
+  hasNext?: boolean;
+  onPrevious?: () => void;
+  onNext?: () => void;
   onEditPractice: () => void;
   onArchivePractice: () => void;
   onDeletePractice: () => void;
@@ -411,6 +417,10 @@ export function PracticeDetailShell({
   commentCount,
   onEditPractice,
   onArchivePractice,
+  hasPrevious = false,
+  hasNext = false,
+  onPrevious,
+  onNext,
   onDeletePractice,
   onReportPractice,
   onToggleFollowPractice,
@@ -594,7 +604,14 @@ export function PracticeDetailShell({
           </div>
         </div>
 
-        <h1 className="text-xl font-bold text-text-dark mb-3">{practice.title}</h1>
+        <PracticeDetailTitle
+          title={practice.title}
+          status={practice.status}
+          hasPrevious={hasPrevious}
+          hasNext={hasNext}
+          onPrevious={onPrevious ?? (() => {})}
+          onNext={onNext ?? (() => {})}
+        />
 
         <div className="bg-white rounded-lg shadow-sm mb-4 overflow-hidden">
           <PracticeOverviewCard
@@ -626,7 +643,7 @@ export function PracticeDetailShell({
             >
               <div className="overflow-hidden">
                 <div className="grid grid-cols-2 gap-3 pb-3">
-                  <ExecutionTimingCard executionTiming={practice.executionTiming} />
+                  <ExecutionTimingCard executionTiming={practice.executionTiming} customTiming={practice.customTiming} />
                   <ExecutionDurationCard
                     durationDays={practice.durationDays}
                     startDate={practice.startDate || ""}
