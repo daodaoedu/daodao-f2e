@@ -87,14 +87,14 @@ export const TOTAL_COMMENT_COUNT = 3;
 const MOCK_COMMENTS: IComment[] = [
   {
     id: "c1",
-    author: { name: "Sarah" },
+    author: { name: "Sarah", userId: "u1" },
     content: "看到你的進展真好，我很期待看你的新作！堅持下去你一定可以的 💪",
     reactions: [ReactionType.encourage],
     time: "2 小時前",
     replies: [
       {
         id: "r1",
-        author: { name: "Vincent" },
+        author: { name: "Vincent", userId: "u2" },
         content: "謝謝你！你的鼓勵讓我今天又繼續寫了 300 字 😊",
         time: "1 小時前",
       },
@@ -102,14 +102,14 @@ const MOCK_COMMENTS: IComment[] = [
   },
   {
     id: "c2",
-    author: { name: "Alex" },
+    author: { name: "Alex", userId: "u3" },
     content: "這點對我很有啟發，特別是你說「卡關就先跳過」這個策略，我之前都是卡在那邊硬想，難怪進度超慢",
     reactions: [ReactionType.fire],
     time: "3 小時前",
   },
   {
     id: "c3",
-    author: { name: "Jordan" },
+    author: { name: "Jordan", userId: "u4" },
     content: "我也是！我也在練習每天寫一段，真的很難維持，但看到你分享就覺得自己不孤單",
     reactions: [ReactionType.sameHere],
     time: "5 小時前",
@@ -119,7 +119,7 @@ const MOCK_COMMENTS: IComment[] = [
 interface IResource {
   id: string;
   title: string;
-  url: string;
+  url?: string;
   imageUrl?: string;
 }
 
@@ -127,19 +127,18 @@ const MOCK_RESOURCES: IResource[] = [
   {
     id: "r1",
     title: "原子習慣",
-    url: "books.com.tw/products/0010822522",
+    url: "https://www.books.com.tw/products/0010822522",
     imageUrl: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&q=80",
   },
   {
     id: "r2",
     title: "如何每天寫 500 字：給新手的寫作指南",
-    url: "medium.com/@writer/how-to-write-500-words",
+    url: "https://medium.com/@writer/how-to-write-500-words",
     imageUrl: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&q=80",
   },
   {
     id: "r3",
     title: "故事的解剖",
-    url: "books.com.tw/products/0010360297",
     imageUrl: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&q=80",
   },
 ];
@@ -775,8 +774,23 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
             {resources.map((resource) => (
               <div
                 key={resource.id}
-                className="flex items-stretch rounded-lg border border-[#E4EAE9] bg-white p-2 gap-3"
+                className={cn(
+                  "relative flex items-stretch rounded-lg border border-[#E4EAE9] bg-white p-2 gap-3 transition-colors",
+                  resource.url ? "hover:bg-[#F0F9F8]" : "hover:bg-[#F7FAFA]"
+                )}
               >
+                {/* Full-card link overlay (has-url only) */}
+                {resource.url && (
+                  <a
+                    href={resource.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute inset-0 rounded-lg z-[1]"
+                  >
+                    <span className="sr-only">{resource.title}</span>
+                  </a>
+                )}
+
                 {/* Thumbnail */}
                 <div className="shrink-0 w-[100px] rounded overflow-hidden bg-[#D4E8E6]">
                   {resource.imageUrl ? (
@@ -793,11 +807,16 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
                 {/* Info */}
                 <div className="flex-1 min-w-0 py-1">
                   <p className="text-sm font-semibold text-[#295E5C] leading-snug">{resource.title}</p>
-                  <p className="text-xs text-logo-cyan mt-1.5 truncate">{resource.url}</p>
+                  {resource.url && (
+                    <p className="text-xs text-logo-cyan mt-1.5 truncate">{resource.url}</p>
+                  )}
                 </div>
 
                 {/* Menu */}
-                <div ref={openResourceMenuId === resource.id ? resourceMenuRef : null} className="relative self-start">
+                <div
+                  ref={openResourceMenuId === resource.id ? resourceMenuRef : null}
+                  className="relative self-start z-10"
+                >
                   <button
                     type="button"
                     onClick={() => setOpenResourceMenuId(openResourceMenuId === resource.id ? null : resource.id)}

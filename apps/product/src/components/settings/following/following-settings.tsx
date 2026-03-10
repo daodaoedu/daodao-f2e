@@ -60,7 +60,7 @@ export const FollowingSettings = () => {
 
   const handleUnfollowUser = (id: string) => {
     setFollowedUsers((prev) => prev.filter((u) => u.id !== id));
-    toast.success("已取消追蹤");
+    toast.success("已取消關注");
   };
 
   const handleUnfollowPractice = (id: string) => {
@@ -82,7 +82,7 @@ export const FollowingSettings = () => {
               tab === t ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-text-dark/60"
             )}
           >
-            {t === "users" ? "追蹤的使用者" : "關注的實踐"}
+            {t === "users" ? "關注的使用者" : "關注的實踐"}
             {tab === t && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-logo-cyan rounded-full" />
             )}
@@ -95,7 +95,7 @@ export const FollowingSettings = () => {
         <div className="flex flex-col gap-2">
           {followedUsers.length === 0 ? (
             <div className="text-center py-12 text-[#9FB5B8] text-sm">
-              尚未追蹤任何使用者
+              尚未關注任何使用者
             </div>
           ) : (
             followedUsers.map((user) => (
@@ -121,7 +121,7 @@ export const FollowingSettings = () => {
                   onClick={() => handleUnfollowUser(user.id)}
                   className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                 >
-                  取消追蹤
+                  取消關注
                 </Button>
               </div>
             ))

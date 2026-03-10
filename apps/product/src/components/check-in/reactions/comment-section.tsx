@@ -10,6 +10,7 @@ import { LikeOutlineSvg, DialogOutlineSvg } from "@daodao/assets";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { toast } from "@daodao/ui/components/sonner";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import { LottieEmoji } from "./lottie-emoji";
 
 // ============================================================================
@@ -19,6 +20,7 @@ import { LottieEmoji } from "./lottie-emoji";
 export interface ICommentAuthor {
   name: string;
   photoURL?: string;
+  userId?: string;
 }
 
 export interface ICommentReply {
@@ -218,7 +220,13 @@ function CommentBubble({ comment, isReply = false, onReply, isOwn = false, onEdi
       <div className="flex-1 min-w-0">
         {/* Author + time + own-comment menu */}
         <div className="flex items-center gap-2 mb-0.5">
-          <span className="text-sm font-semibold text-[#295E5C]">{comment.author.name}</span>
+          {comment.author.userId ? (
+            <CustomLink href={`/users/${comment.author.userId}`} className="text-sm font-semibold text-[#295E5C] hover:underline">
+              {comment.author.name}
+            </CustomLink>
+          ) : (
+            <span className="text-sm font-semibold text-[#295E5C]">{comment.author.name}</span>
+          )}
           <span className="text-xs text-[#295E5C]/50">{comment.time}</span>
           {isOwn && !editing && (
             <div ref={menuRef} className="relative ml-auto">

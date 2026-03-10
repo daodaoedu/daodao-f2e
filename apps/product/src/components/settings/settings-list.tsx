@@ -2,7 +2,7 @@
 
 import { ArrowRightOutlineSvg, TelescopeSvg } from "@daodao/assets";
 import { CustomLink } from "@daodao/ui/components/custom-link";
-import { Archive, LibraryBig, LogOut, MessagesSquare, Settings, SquareUser } from "lucide-react";
+import { Archive, HeartHandshake, LibraryBig, LogOut, MessagesSquare, Settings, SquareUser } from "lucide-react";
 import { useLogoutDialog } from "@/hooks/use-logout-dialog";
 
 type SettingsItem = {
@@ -24,6 +24,12 @@ const socialItems: SettingsItem[] = [
     label: "關注設定",
     icon: TelescopeSvg,
     href: "/settings/following",
+  },
+  {
+    id: "connections",
+    label: "連結的夥伴",
+    icon: HeartHandshake,
+    href: "/settings/connections",
   },
 ];
 
