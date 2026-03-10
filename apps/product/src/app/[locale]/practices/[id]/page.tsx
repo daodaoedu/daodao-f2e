@@ -162,7 +162,7 @@ export default function PracticeDetailPage() {
   const params = useParams();
   const practiceId = params.id as string;
 
-  const { data: practiceData, isLoading, error } = usePracticeById(practiceId);
+  const { data: practiceData, isLoading, error, mutate: mutatePractice } = usePracticeById(practiceId);
   const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
     limit: 30,
   });
@@ -306,9 +306,9 @@ export default function PracticeDetailPage() {
       }
 
       toast.success("留言成功！");
-      await mutateComments();
+      await Promise.all([mutateComments(), mutatePractice()]);
     },
-    [mutateComments, practiceId]
+    [mutateComments, mutatePractice, practiceId]
   );
 
   const handleCommentEdit = useCallback(
