@@ -1,0 +1,192 @@
+"use client";
+
+import { LikeOutlineSvg } from "@daodao/assets";
+import { cn } from "@daodao/ui/lib/utils";
+import { useEffect, useRef, useState } from "react";
+import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
+import { LottieEmoji } from "./lottie-emoji";
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export interface ReactionPickerButtonProps {
+  selectedReactions: ReactionTypeType[];
+  onToggle: (type: ReactionTypeType) => void;
+  /**
+   * "card"    — 卡片層級，較大按鈕（size-9 / emoji 24），無計數
+   * "comment" — 留言層級，較小按鈕（size-7 / emoji 18），顯示計數
+   */
+  variant?: "card" | "comment";
+}
+
+const PICKER_REACTIONS: ReactionTypeType[] = ["useful", "fire", "touched", "curious"];
+
+const LONG_PRESS_DELAY = 400;
+
+// ============================================================================
+// ReactionPickerButton
+// ============================================================================
+
+export function ReactionPickerButton({
+  selectedReactions,
+  onToggle,
+  variant = "comment",
+}: ReactionPickerButtonProps) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // 用來區分最後一次互動是 touch 還是 mouse，避免 touch 後誤觸 mouseenter
+  const lastInteractionWasTouch = useRef(false);
+
+  // 點擊外部關閉
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [open]);
+
+  const clearLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  // ── Desktop: hover 開啟 ──
+  const handleMouseEnter = () => {
+    if (lastInteractionWasTouch.current) return;
+    setOpen(true);
+  };
+
+  // ── Mobile: 長按開啟 ──
+  const handleTouchStart = () => {
+    lastInteractionWasTouch.current = true;
+    longPressTimer.current = setTimeout(() => {
+      setOpen(true);
+    }, LONG_PRESS_DELAY);
+  };
+
+  const handleTouchEnd = () => {
+    clearLongPress();
+    // 短暫重設，讓後續 mouseenter 仍可正常觸發（桌機切換場景）
+    setTimeout(() => {
+      lastInteractionWasTouch.current = false;
+    }, 500);
+  };
+
+  const handleTouchMove = () => {
+    // 滑動時取消長按
+    clearLongPress();
+  };
+
+  const isCard = variant === "card";
+  const hasSelection = selectedReactions.length > 0;
+  const pickerButtonSize = isCard ? "size-9" : "size-7";
+  const emojiSize = isCard ? 24 : 18;
+
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: hover/long-press trigger for emoji picker
+    <div
+      ref={containerRef}
+      className={cn(
+        "relative",
+        isCard ? "w-full flex items-center justify-center" : "flex items-center"
+      )}
+      onMouseEnter={handleMouseEnter}
+    >
+      {/* Emoji picker popup */}
+      {open && (
+        <div
+          className={cn(
+            "absolute bottom-full mb-2 flex gap-1 bg-white rounded-full shadow-lg border border-[#E4EAE9] px-2 py-1.5 z-10",
+            isCard ? "left-1/2 -translate-x-1/2" : "left-0"
+          )}
+        >
+          {PICKER_REACTIONS.map((type) => {
+            const config = REACTION_CONFIG[type];
+            const isSelected = selectedReactions.includes(type);
+            return (
+              <div key={type} className="group/emoji relative flex flex-col items-center">
+                {/* Tooltip — desktop hover only */}
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 bg-[#295E5C] text-white text-xs rounded-full whitespace-nowrap opacity-0 group-hover/emoji:opacity-100 transition-opacity pointer-events-none">
+                  {config.label}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onToggle(type);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer",
+                    pickerButtonSize,
+                    isSelected ? "bg-[#E8FAF9]" : "hover:bg-[#F0F9F8]"
+                  )}
+                >
+                  <LottieEmoji
+                    url={config.lottieUrl}
+                    fallback={config.emoji}
+                    size={emojiSize}
+                    play={true}
+                  />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Main trigger button */}
+      <button
+        type="button"
+        // 防止瀏覽器長按跳出系統選單
+        onContextMenu={(e) => e.preventDefault()}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchMove}
+        className={cn(
+          "flex items-center gap-1.5 transition-colors cursor-pointer select-none",
+          isCard
+            ? "p-1.5 text-text-dark"
+            : cn(
+                "h-auto px-0 gap-1 text-xs",
+                hasSelection ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-logo-cyan"
+              )
+        )}
+      >
+        {hasSelection ? (
+          <>
+            <div className="flex items-center">
+              {selectedReactions.slice(-2).map((type, i) => (
+                <div
+                  key={type}
+                  className={cn(isCard ? "size-[22px]" : "size-4", i > 0 && "-ml-1")}
+                >
+                  <LottieEmoji
+                    url={REACTION_CONFIG[type].lottieUrl}
+                    fallback={REACTION_CONFIG[type].emoji}
+                    size={isCard ? 22 : 16}
+                    play={true}
+                  />
+                </div>
+              ))}
+            </div>
+            {!isCard && <span>{selectedReactions.length}</span>}
+          </>
+        ) : (
+          <LikeOutlineSvg className={isCard ? "size-[22px]" : "size-5"} />
+        )}
+      </button>
+    </div>
+  );
+}
