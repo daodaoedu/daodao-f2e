@@ -9,6 +9,9 @@ export * from "./admin-hooks";
 // Auth Service
 export * from "./auth";
 export * from "./auth-hooks";
+// Comments Service
+export * from "./comments";
+export * from "./comments-hooks";
 // Email Service
 export * from "./email";
 export * from "./email-hooks";

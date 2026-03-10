@@ -1,7 +1,11 @@
 "use client";
 
 import {
+  createComment,
+  deleteComment,
+  updateComment,
   useArchivePractice,
+  useComments,
   useCurrentUser,
   useDeletePractice,
   useMyPractices,
@@ -9,30 +13,21 @@ import {
   usePracticeCheckIns,
 } from "@daodao/api";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
-import { Button } from "@daodao/ui/components/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@daodao/ui/components/dropdown-menu";
 import { toast } from "@daodao/ui/components/sonner";
-import { Ellipsis } from "lucide-react";
-import { useMemo } from "react";
-import { CheckInButton, CheckInRecordCard, CheckInStack } from "@/components/check-in";
+import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
+import { zhTW } from "date-fns/locale";
+import { useCallback, useMemo } from "react";
+import { CheckInButton } from "@/components/check-in";
+import type { IComment, ICommentReply } from "@/components/check-in/reactions";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
+import { PracticeDetailShell } from "@/components/practice";
 import {
-  ExecutionDurationCard,
-  ExecutionTimingCard,
-  type ManualPracticeFormValues,
-  PracticeDetailTitle,
-  PracticeOverviewCard,
-  ResourceCard,
-} from "@/components/practice";
-import {
-  DurationDays,
-  ExecutionTiming,
-  Frequency,
+  type DurationDays,
+  DurationDays as DurationDaysConst,
+  type ExecutionTiming,
+  ExecutionTiming as ExecutionTimingConst,
+  type Frequency,
+  Frequency as FrequencyConst,
   PracticeTimePeriodToExecutionTimingMap,
 } from "@/constants/practice-form";
 import {
@@ -41,111 +36,243 @@ import {
 } from "@/hooks/use-archive-practice-dialog";
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
 
+interface IApiCommentUser {
+  name?: string;
+  photoURL?: string | null;
+}
+
+interface IApiCommentNode {
+  id: number | string;
+  content?: string;
+  createdAt?: string;
+  user?: IApiCommentUser;
+  replies?: unknown[];
+}
+
+interface IPracticeDetailData {
+  title: string;
+  actionDescription: string;
+  durationMinutes: number;
+  startDate: string;
+  durationDays: DurationDays;
+  frequency: Frequency;
+  executionTiming: ExecutionTiming[];
+  customTiming: string;
+  tags: string[];
+  resources: { id: string; name: string; url?: string }[];
+  progress: number;
+}
+
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
+  if (typeof error !== "object" || error === null) {
+    return fallbackMessage;
+  }
+
+  if ("details" in error && Array.isArray(error.details) && error.details.length > 0) {
+    const firstDetail = error.details[0];
+    if (
+      typeof firstDetail === "object" &&
+      firstDetail !== null &&
+      "message" in firstDetail &&
+      typeof firstDetail.message === "string"
+    ) {
+      return firstDetail.message;
+    }
+  }
+
+  if ("message" in error && typeof error.message === "string") {
+    return error.message;
+  }
+
+  return fallbackMessage;
+}
+
+function isApiCommentNode(comment: unknown): comment is IApiCommentNode {
+  if (typeof comment !== "object" || comment === null) {
+    return false;
+  }
+
+  if (!("id" in comment)) {
+    return false;
+  }
+
+  return true;
+}
+
+function formatCommentTime(createdAt?: string): string {
+  if (!createdAt) {
+    return "剛剛";
+  }
+
+  const parsedDate = parseISO(createdAt);
+  if (!isValid(parsedDate)) {
+    return "剛剛";
+  }
+
+  return formatDistanceToNow(parsedDate, {
+    addSuffix: true,
+    locale: zhTW,
+  });
+}
+
+function mapReply(reply: IApiCommentNode): ICommentReply {
+  return {
+    id: String(reply.id),
+    author: {
+      name: reply.user?.name || "匿名使用者",
+      photoURL: reply.user?.photoURL || undefined,
+    },
+    content: reply.content || "",
+    time: formatCommentTime(reply.createdAt),
+  };
+}
+
+function mapComment(comment: IApiCommentNode): IComment {
+  const rawReplies = Array.isArray(comment.replies) ? comment.replies : [];
+  const mappedReplies = rawReplies.filter(isApiCommentNode).map(mapReply);
+
+  return {
+    id: String(comment.id),
+    author: {
+      name: comment.user?.name || "匿名使用者",
+      photoURL: comment.user?.photoURL || undefined,
+    },
+    content: comment.content || "",
+    time: formatCommentTime(comment.createdAt),
+    replies: mappedReplies,
+  };
+}
+
+function getCurrentUserPhotoURL(currentUser: unknown): string | undefined {
+  if (typeof currentUser !== "object" || currentUser === null) {
+    return undefined;
+  }
+
+  if ("photoURL" in currentUser && typeof currentUser.photoURL === "string") {
+    return currentUser.photoURL;
+  }
+
+  if ("photoUrl" in currentUser && typeof currentUser.photoUrl === "string") {
+    return currentUser.photoUrl;
+  }
+
+  return undefined;
+}
+
 export default function PracticeDetailPage() {
   const router = useRouter();
   const params = useParams();
   const practiceId = params.id as string;
 
-  const { data: practiceData, isLoading, error } = usePracticeById(practiceId);
+  const { data: practiceData, isLoading, error, mutate: mutatePractice } = usePracticeById(practiceId);
   const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
     limit: 30,
   });
-  const { data: practicesListData } = useMyPractices({
-    limit: 100, // 取得足夠的實踐列表來判斷前後實踐
+  const {
+    data: commentsData,
+    isLoading: isLoadingComments,
+    mutate: mutateComments,
+  } = useComments({
+    targetType: "practice",
+    targetId: practiceId,
   });
+  const { data: practicesListData } = useMyPractices({ limit: 100 });
   const { data: currentUserData } = useCurrentUser();
 
-  // 判斷當前用戶是否為實踐的擁有者
   const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
   const { openArchiveDialog } = useArchivePracticeDialog();
   const { openDeleteDialog } = useDeletePracticeDialog();
   const { archivePractice, restorePractice } = useArchivePractice(practiceId);
   const { deletePractice: deletePracticeById } = useDeletePractice(practiceId);
 
-  const handleEdit = () => {
-    router.push(`/practices/${practiceId}/edit`);
-  };
-
-  // 將 API 資料轉換為頁面需要的格式
-  const practice:
-    | (Omit<ManualPracticeFormValues, "resources"> & {
-        total: number;
-        currentProgress: number;
-        resources: { id: string; name: string; url?: string }[];
-      })
-    | null = useMemo(() => {
+  const practice: IPracticeDetailData | null = useMemo(() => {
     if (!practiceData?.data) {
       return null;
     }
 
     const data = practiceData.data;
 
-    // 轉換 durationDays: number -> DurationDays (字串字面量)
-    let durationDays: DurationDays = DurationDays.seven;
-    if (data.durationDays) {
-      const durationDaysNumber = data.durationDays;
-      if (durationDaysNumber === 7) {
-        durationDays = DurationDays.seven;
-      } else if (durationDaysNumber === 14) {
-        durationDays = DurationDays.fourteen;
-      } else if (durationDaysNumber === 21) {
-        durationDays = DurationDays.twentyOne;
-      } else if (durationDaysNumber === 30) {
-        durationDays = DurationDays.thirty;
-      }
+    let durationDays: DurationDays = DurationDaysConst.seven;
+    if (data.durationDays === 14) {
+      durationDays = DurationDaysConst.fourteen;
+    } else if (data.durationDays === 21) {
+      durationDays = DurationDaysConst.twentyOne;
+    } else if (data.durationDays === 30) {
+      durationDays = DurationDaysConst.thirty;
     }
 
-    // 轉換 frequency: frequencyMinDays + frequencyMaxDays -> Frequency
     const frequencyMin = data.frequencyMinDays ?? 0;
     const frequencyMax = data.frequencyMaxDays ?? 0;
-    let frequency: Frequency = Frequency.twoToFour;
-    if (frequencyMin > 0 && frequencyMax > 0) {
-      const frequencyStr = `${frequencyMin}-${frequencyMax}` as Frequency;
-      if (
-        frequencyStr === Frequency.twoToFour ||
-        frequencyStr === Frequency.threeToFive ||
-        frequencyStr === Frequency.fourToSeven
-      ) {
-        frequency = frequencyStr;
-      }
+    let frequency: Frequency = FrequencyConst.twoToFour;
+    if (frequencyMin === 3 && frequencyMax === 5) {
+      frequency = FrequencyConst.threeToFive;
+    }
+    if (frequencyMin === 4 && frequencyMax === 7) {
+      frequency = FrequencyConst.fourToSeven;
     }
 
-    // 轉換 executionTiming: practiceTimePeriods -> ExecutionTiming[]
-    const executionTiming: ExecutionTiming[] = (data.practiceTimePeriods || [])
+    const executionTiming = (data.practiceTimePeriods || [])
       .map((period: string) => PracticeTimePeriodToExecutionTimingMap[period])
       .filter((timing): timing is ExecutionTiming => timing !== undefined);
 
-    // 如果沒有有效的 executionTiming，使用預設值
     const finalExecutionTiming =
-      executionTiming.length > 0 ? executionTiming : [ExecutionTiming.morning];
+      executionTiming.length > 0 ? executionTiming : [ExecutionTimingConst.morning];
 
     return {
-      // Step 1
-      name: data.title,
+      title: data.title,
       actionDescription: data.practiceAction || "",
       durationMinutes: data.sessionDurationMinutes ?? 0,
-
-      // Step 2
       startDate: data.startDate || "",
       durationDays,
       frequency,
-
-      // Step 3
       executionTiming: finalExecutionTiming,
       customTiming: data.otherContext || "",
-
-      // Step 4
       tags: data.tags || [],
       resources: (data.resources || []).map((resource) => ({
         id: resource.id,
         name: resource.name,
         url: resource.url,
       })),
-
-      total: data.durationDays ?? 0,
-      currentProgress: data.progressPercentage ?? 0,
+      progress: data.progressPercentage ?? 0,
     };
   }, [practiceData]);
+
+  const comments = useMemo(() => {
+    const rawComments = commentsData?.data;
+    if (!Array.isArray(rawComments)) {
+      return [];
+    }
+
+    return rawComments.filter(isApiCommentNode).map((comment) => mapComment(comment));
+  }, [commentsData]);
+
+  const { previousPracticeId, nextPracticeId, hasPrevious, hasNext } = useMemo(() => {
+    const practices = practicesListData?.data || [];
+    const currentIndex = practices.findIndex((p) => String(p.id) === practiceId);
+    if (currentIndex === -1) {
+      return { previousPracticeId: null, nextPracticeId: null, hasPrevious: false, hasNext: false };
+    }
+    const previousPractice = currentIndex > 0 ? practices[currentIndex - 1] : null;
+    const nextPractice = currentIndex < practices.length - 1 ? practices[currentIndex + 1] : null;
+    return {
+      previousPracticeId: previousPractice ? String(previousPractice.id) : null,
+      nextPracticeId: nextPractice ? String(nextPractice.id) : null,
+      hasPrevious: previousPractice !== null,
+      hasNext: nextPractice !== null,
+    };
+  }, [practicesListData, practiceId]);
+
+  const handlePrevious = () => {
+    if (previousPracticeId) router.push(`/practices/${previousPracticeId}`);
+  };
+
+  const handleNext = () => {
+    if (nextPracticeId) router.push(`/practices/${nextPracticeId}`);
+  };
+
+  const handleEdit = () => {
+    router.push(`/practices/${practiceId}/edit`);
+  };
 
   const handleArchive = async () => {
     const result = await openArchiveDialog({
@@ -153,20 +280,20 @@ export default function PracticeDetailPage() {
         try {
           await restorePractice();
           toast.success("實踐已成功復原");
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : "復原失敗";
+        } catch (restoreError) {
+          const errorMessage = restoreError instanceof Error ? restoreError.message : "復原失敗";
           console.error("Failed to restore practice:", errorMessage);
           toast.error(errorMessage);
         }
       },
     });
+
     if (result === ArchivePracticeResult.Archived) {
       try {
         await archivePractice();
-        // 導航到封存頁面
         router.push("/settings/archived");
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "封存失敗";
+      } catch (archiveError) {
+        const errorMessage = archiveError instanceof Error ? archiveError.message : "封存失敗";
         console.error("Failed to archive practice:", errorMessage);
         toast.error(errorMessage);
       }
@@ -178,57 +305,85 @@ export default function PracticeDetailPage() {
     if (result === DeletePracticeResult.Deleted) {
       try {
         await deletePracticeById();
-        // 導航到實踐列表頁面
         router.push("/");
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "刪除失敗";
+      } catch (deleteError) {
+        const errorMessage = deleteError instanceof Error ? deleteError.message : "刪除失敗";
         console.error("Failed to delete practice:", errorMessage);
         toast.error(errorMessage);
       }
     }
   };
 
-  // 計算當前實踐在列表中的位置，並判斷是否有上一個和下一個實踐
-  const { previousPracticeId, nextPracticeId, hasPrevious, hasNext } = useMemo(() => {
-    const practices = practicesListData?.data || [];
-    const currentIndex = practices.findIndex((practice) => String(practice.id) === practiceId);
+  const handleCommentSubmit = useCallback(
+    async (content: string, parentId?: string) => {
+      const response = await createComment({
+        targetType: "practice",
+        targetId: practiceId,
+        content,
+        visibility: "public",
+        parentId: parentId ? Number(parentId) : undefined,
+      });
 
-    if (currentIndex === -1) {
-      return {
-        previousPracticeId: null,
-        nextPracticeId: null,
-        hasPrevious: false,
-        hasNext: false,
-      };
-    }
+      if (response.error) {
+        const errorMessage = getErrorMessage(response.error, "留言失敗");
+        console.error("Failed to create comment:", errorMessage);
+        toast.error(errorMessage);
+        return;
+      }
 
-    const previousPractice = currentIndex > 0 ? practices[currentIndex - 1] : null;
-    const nextPractice = currentIndex < practices.length - 1 ? practices[currentIndex + 1] : null;
+      toast.success("留言成功！");
+      await Promise.all([mutateComments(), mutatePractice()]);
+    },
+    [mutateComments, mutatePractice, practiceId]
+  );
 
-    return {
-      previousPracticeId: previousPractice ? String(previousPractice.id) : null,
-      nextPracticeId: nextPractice ? String(nextPractice.id) : null,
-      hasPrevious: previousPractice !== null,
-      hasNext: nextPractice !== null,
-    };
-  }, [practicesListData, practiceId]);
+  const handleCommentEdit = useCallback(
+    async (commentId: string, content: string) => {
+      const parsedCommentId = Number(commentId);
+      if (!Number.isFinite(parsedCommentId)) {
+        toast.error("留言 ID 無效");
+        return false;
+      }
 
-  const handlePrevious = () => {
-    if (previousPracticeId) {
-      router.push(`/practices/${previousPracticeId}`);
-    }
-  };
+      const response = await updateComment(parsedCommentId, { content });
+      if (response.error) {
+        const errorMessage = getErrorMessage(response.error, "更新留言失敗");
+        console.error("Failed to update comment:", errorMessage);
+        toast.error(errorMessage);
+        return false;
+      }
 
-  const handleNext = () => {
-    if (nextPracticeId) {
-      router.push(`/practices/${nextPracticeId}`);
-    }
-  };
+      await mutateComments();
+      return true;
+    },
+    [mutateComments]
+  );
 
-  // Loading 狀態
+  const handleCommentDelete = useCallback(
+    async (commentId: string) => {
+      const parsedCommentId = Number(commentId);
+      if (!Number.isFinite(parsedCommentId)) {
+        toast.error("留言 ID 無效");
+        return false;
+      }
+
+      const response = await deleteComment(parsedCommentId);
+      if (response.error) {
+        const errorMessage = getErrorMessage(response.error, "刪除留言失敗");
+        console.error("Failed to delete comment:", errorMessage);
+        toast.error(errorMessage);
+        return false;
+      }
+
+      await mutateComments();
+      return true;
+    },
+    [mutateComments]
+  );
+
   if (isLoading) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
         <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
@@ -238,10 +393,9 @@ export default function PracticeDetailPage() {
     );
   }
 
-  // Error 狀態
   if (error || !practice) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
         <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
@@ -253,122 +407,87 @@ export default function PracticeDetailPage() {
     );
   }
 
-  return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-      <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
+  let creatorDate: string | undefined;
+  if (!isOwner && practiceData?.data?.startDate) {
+    const parsedStartDate = parseISO(practiceData.data.startDate);
+    if (isValid(parsedStartDate)) {
+      creatorDate = format(parsedStartDate, "yyyy/MM/dd");
+    }
+  }
 
+  return (
+    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
+      <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
       <BackgroundAnimation />
 
-      <main className="max-w-[448px] mx-auto px-5 pb-6">
-        {/* Practice Title Section */}
-        <PracticeDetailTitle
-          title={practice.name}
-          status={practiceData?.data?.status}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-          hasPrevious={hasPrevious}
-          hasNext={hasNext}
-        />
-
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-base font-medium text-text-dark">執行方式</p>
-          {isOwner && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Ellipsis className="size-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleEdit}>編輯實踐</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleArchive}>封存實踐</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleDelete} className="text-destructive">
-                  刪除
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </div>
-        {/* Practice Overview Card */}
-        <PracticeOverviewCard
-          actionDescription={practice.actionDescription || ""}
-          frequency={practice.frequency}
-          durationMinutes={practice.durationMinutes}
-          tags={practice.tags}
-          progress={practice.currentProgress}
-          showProgress
-          creator={
+      <PracticeDetailShell
+        practice={{
+          id: practiceId,
+          title: practice.title,
+          status: practiceData?.data?.status,
+          actionDescription: practice.actionDescription,
+          frequency: practice.frequency,
+          durationMinutes: practice.durationMinutes,
+          durationDays: practice.durationDays,
+          startDate: practice.startDate,
+          executionTiming: practice.executionTiming,
+          customTiming: practice.customTiming,
+          tags: practice.tags,
+          progress: practice.progress,
+          creator:
             !isOwner && practiceData?.data?.user
               ? {
                   id: practiceData.data.user.id,
                   name: practiceData.data.user.name,
                   photoURL: practiceData.data.user.photoURL,
-                  date: practiceData.data.startDate
-                    ? new Date(practiceData.data.startDate).toLocaleDateString("zh-TW", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      }).replace(/-/g, "/")
-                    : undefined,
+                  date: creatorDate,
                 }
-              : undefined
-          }
-        />
-
-        {/* Execution Timing and Remaining Cards */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <ExecutionTimingCard
-            executionTiming={practice.executionTiming}
-            customTiming={practice.customTiming}
-          />
-          <ExecutionDurationCard
-            durationDays={practice.durationDays}
-            startDate={practice.startDate}
-            showRemaining
-          />
-        </div>
-
-        {/* Resources Section */}
-        {practice.resources.length > 0 && (
-          <div className="mb-6">
-            <p className="text-base font-medium text-text-dark mb-4">使用的資源</p>
-            <div className="grid grid-cols-2 gap-3">
-              {practice.resources.map((resource) => (
-                <ResourceCard
-                  key={resource.id}
-                  resource={resource}
-                  onClick={resource.url ? () => window.open(resource.url, "_blank") : undefined}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Check-in Record Card */}
-        <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
-      </main>
-
-      {/* CheckIn Stack */}
-      <div className="max-w-[448px] mx-auto pb-24">
-        <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
-      </div>
-
-      {isOwner && (
-        <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
-          {/* 打卡按鈕 / 觀看總結按鈕 */}
-          <CheckInButton
-            variant="orange"
-            className="w-full sm:max-w-[288px]"
-            practiceId={practiceId}
-            practiceStatus={practiceData?.data?.status}
-            lastCheckInDate={checkInsData?.data?.[0]?.createdAt || null}
-            startDate={practice.startDate}
-            endDate={practiceData?.data?.endDate}
-            taskTitle={practice.name}
-            progressPercentage={practice?.currentProgress ?? 0}
-          />
-        </footer>
-      )}
+              : undefined,
+          resources: practice.resources,
+        }}
+        practiceId={practiceId}
+        isOwner={isOwner}
+        checkInsData={checkInsData}
+        isLoadingCheckIns={isLoadingCheckIns}
+        isLoadingComments={isLoadingComments}
+        comments={comments}
+        currentUserName={currentUserData?.data?.name || undefined}
+        currentUserPhotoURL={getCurrentUserPhotoURL(currentUserData?.data)}
+        commentCount={practiceData?.data?.stats?.commentCount}
+        hasPrevious={hasPrevious}
+        hasNext={hasNext}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        onEditPractice={handleEdit}
+        onArchivePractice={() => {
+          void handleArchive();
+        }}
+        onDeletePractice={() => {
+          void handleDelete();
+        }}
+        onSubmitComment={(content, parentId) => {
+          void handleCommentSubmit(content, parentId);
+        }}
+        onEditComment={handleCommentEdit}
+        onDeleteComment={handleCommentDelete}
+        footer={
+          isOwner ? (
+            <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
+              <CheckInButton
+                variant="orange"
+                className="w-full sm:max-w-[288px]"
+                practiceId={practiceId}
+                practiceStatus={practiceData?.data?.status}
+                lastCheckInDate={checkInsData?.data?.[0]?.createdAt || undefined}
+                startDate={practice.startDate}
+                endDate={practiceData?.data?.endDate}
+                taskTitle={practice.title}
+                progressPercentage={practice.progress}
+              />
+            </footer>
+          ) : null
+        }
+      />
     </div>
   );
 }
