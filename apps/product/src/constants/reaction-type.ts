@@ -34,20 +34,20 @@ export const REACTION_CONFIG: Record<ReactionTypeType, IReactionConfig> = {
   touched: {
     lottieUrl: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f493/lottie.json",
     emoji: "💓",
-    label: "很感動",
-    placeholder: "你的故事讓我很感動，因為...",
+    label: "共鳴",
+    placeholder: "你說的這點我很有共鳴，因為...",
   },
   fire: {
     lottieUrl: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/lottie.json",
     emoji: "🔥",
-    label: "學到了",
+    label: "啟發",
     placeholder: "這點對我很有啟發，特別是...",
   },
   useful: {
     lottieUrl: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f44d_1f3fb/lottie.json",
-    emoji: "👍",
-    label: "這好用",
-    placeholder: "這好實用！我會想要應用在...",
+    emoji: "👍🏻",
+    label: "加油",
+    placeholder: "你做得很好，繼續加油！我覺得...",
   },
   sameHere: {
     lottieUrl: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f633/lottie.json",
@@ -58,8 +58,8 @@ export const REACTION_CONFIG: Record<ReactionTypeType, IReactionConfig> = {
   curious: {
     lottieUrl: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f9d0/lottie.json",
     emoji: "🧐",
-    label: "想知道...",
-    placeholder: "這部分好有趣，想多請教關於...？",
+    label: "好奇",
+    placeholder: "這部分好有趣，我很好奇關於...？",
   },
 };
 

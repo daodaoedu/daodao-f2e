@@ -1,8 +1,8 @@
 "use client";
 
-import { ArrowRightOutlineSvg } from "@daodao/assets";
+import { ArrowRightOutlineSvg, TelescopeSvg } from "@daodao/assets";
 import { CustomLink } from "@daodao/ui/components/custom-link";
-import { Archive, LibraryBig, LogOut, Settings, SquareUser } from "lucide-react";
+import { Archive, LibraryBig, LogOut, MessagesSquare, Settings, SquareUser } from "lucide-react";
 import { useLogoutDialog } from "@/hooks/use-logout-dialog";
 
 type SettingsItem = {
@@ -11,6 +11,21 @@ type SettingsItem = {
   icon: React.ComponentType<{ className?: string }>;
   href: string;
 };
+
+const socialItems: SettingsItem[] = [
+  {
+    id: "interaction",
+    label: "互動設定",
+    icon: MessagesSquare,
+    href: "/settings/interaction",
+  },
+  {
+    id: "following",
+    label: "關注設定",
+    icon: TelescopeSvg,
+    href: "/settings/following",
+  },
+];
 
 const settingsItems: SettingsItem[] = [
   {
@@ -39,6 +54,21 @@ const settingsItems: SettingsItem[] = [
   },
 ];
 
+function SettingsItemLink({ item }: { item: SettingsItem }) {
+  const Icon = item.icon;
+  return (
+    <CustomLink
+      href={item.href}
+      className="flex items-center gap-2 py-4 px-3 hover:bg-light-blue transition-colors"
+      aria-label={item.label}
+    >
+      <Icon className="size-4.5 text-light-gray shrink-0" />
+      <span className="flex-1 text-base text-text-dark">{item.label}</span>
+      <ArrowRightOutlineSvg className="size-4.5 text-bg-dark shrink-0" />
+    </CustomLink>
+  );
+}
+
 export const SettingsList = () => {
   const { openLogoutDialog, isLoggingOut } = useLogoutDialog();
 
@@ -48,24 +78,15 @@ export const SettingsList = () => {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* 所有設定項目 — 統一間距 */}
       <ul className="flex flex-col gap-2">
-        {settingsItems.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <li key={item.id}>
-              <CustomLink
-                href={item.href}
-                className="flex items-center gap-2 p-3 rounded bg-white hover:bg-light-blue transition-colors"
-                aria-label={item.label}
-              >
-                <Icon className="size-4.5 text-light-gray shrink-0" />
-                <span className="flex-1 text-base text-text-dark">{item.label}</span>
-                <ArrowRightOutlineSvg className="size-4.5 text-bg-dark shrink-0" />
-              </CustomLink>
-            </li>
-          );
-        })}
+        {[...socialItems, ...settingsItems].map((item) => (
+          <li key={item.id}>
+            <div className="rounded bg-white overflow-hidden">
+              <SettingsItemLink item={item} />
+            </div>
+          </li>
+        ))}
       </ul>
 
       {/* 登出按鈕 */}

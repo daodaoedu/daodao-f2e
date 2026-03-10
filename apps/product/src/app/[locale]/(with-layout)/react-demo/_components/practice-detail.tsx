@@ -76,12 +76,10 @@ export const MOCK_CHECK_INS_DATA = {
 };
 
 export const MOCK_INITIAL_REACTIONS: IReactionCount[] = [
-  { type: ReactionType.encourage, count: 3, latestActorName: "Sarah" },
-  { type: ReactionType.fire,      count: 1, latestActorName: "Alex" },
-  { type: ReactionType.sameHere,  count: 2, latestActorName: "Jordan" },
-  { type: ReactionType.touched,   count: 0 },
-  { type: ReactionType.useful,    count: 0 },
-  { type: ReactionType.curious,   count: 0 },
+  { type: ReactionType.useful,  count: 3, latestActorName: "Sarah" },
+  { type: ReactionType.fire,    count: 1, latestActorName: "Alex" },
+  { type: ReactionType.touched, count: 2, latestActorName: "Jordan" },
+  { type: ReactionType.curious, count: 0 },
 ];
 
 export const TOTAL_COMMENT_COUNT = 3;
@@ -298,10 +296,10 @@ function BrowseActivityContent({ commentCount }: { commentCount: number }) {
 // ============================================================================
 
 const PICKER_REACTIONS: ReactionTypeType[] = [
-  ReactionType.encourage,
-  ReactionType.touched,
-  ReactionType.fire,
   ReactionType.useful,
+  ReactionType.fire,
+  ReactionType.touched,
+  ReactionType.curious,
 ];
 
 function ReactionPickerButton({
@@ -688,10 +686,10 @@ export function PracticeDetail({ isOwner = true }: PracticeDetailProps) {
               >
                 <div className="flex">
                   <div className="size-7 rounded-full bg-[#E8FAF9] flex items-center justify-center ring-2 ring-white">
-                    <LottieEmoji url={REACTION_CONFIG.fire.lottieUrl} fallback="🔥" size={18} play={false} />
+                    <LottieEmoji url={REACTION_CONFIG.useful.lottieUrl} fallback="👍🏻" size={18} play={false} />
                   </div>
                   <div className="size-7 rounded-full bg-[#E8FAF9] flex items-center justify-center ring-2 ring-white -ml-1.5">
-                    <LottieEmoji url={REACTION_CONFIG.touched.lottieUrl} fallback="💓" size={18} play={false} />
+                    <LottieEmoji url={REACTION_CONFIG.fire.lottieUrl} fallback="🔥" size={18} play={false} />
                   </div>
                 </div>
                 <span className="text-sm text-text-dark/60">Joy 與其他 12 人</span>
