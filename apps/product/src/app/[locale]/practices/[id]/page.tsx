@@ -192,11 +192,9 @@ export default function PracticeDetailPage() {
     let durationDays: DurationDays = DurationDaysConst.seven;
     if (data.durationDays === 14) {
       durationDays = DurationDaysConst.fourteen;
-    }
-    if (data.durationDays === 21) {
+    } else if (data.durationDays === 21) {
       durationDays = DurationDaysConst.twentyOne;
-    }
-    if (data.durationDays === 30) {
+    } else if (data.durationDays === 30) {
       durationDays = DurationDaysConst.thirty;
     }
 
@@ -421,6 +419,7 @@ export default function PracticeDetailPage() {
         isOwner={isOwner}
         checkInsData={checkInsData}
         isLoadingCheckIns={isLoadingCheckIns}
+        isLoadingComments={isLoadingComments}
         comments={comments}
         currentUserName={currentUserData?.data?.name || undefined}
         currentUserPhotoURL={getCurrentUserPhotoURL(currentUserData?.data)}
@@ -455,10 +454,6 @@ export default function PracticeDetailPage() {
           ) : null
         }
       />
-
-      {isLoadingComments && (
-        <div className="max-w-[448px] mx-auto px-4 pb-8 text-xs text-[#9FB5B8]">留言載入中...</div>
-      )}
     </div>
   );
 }

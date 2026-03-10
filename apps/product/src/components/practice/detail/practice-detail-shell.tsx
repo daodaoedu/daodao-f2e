@@ -83,6 +83,7 @@ interface IPracticeDetailShellProps {
   isOwner: boolean;
   checkInsData: React.ComponentProps<typeof CheckInRecordCard>["checkInsData"];
   isLoadingCheckIns: boolean;
+  isLoadingComments?: boolean;
   comments: IComment[];
   currentUserName?: string;
   currentUserPhotoURL?: string;
@@ -303,8 +304,13 @@ function PracticeResourceListCard({ resource, isOwner, onEditPractice }: IPracti
         type="button"
         variant="ghost"
         onClick={() => {
-          if (resource.url) {
-            window.open(resource.url, "_blank");
+          try {
+            const { protocol } = new URL(resource.url ?? "");
+            if (protocol === "https:" || protocol === "http:") {
+              window.open(resource.url, "_blank");
+            }
+          } catch {
+            // 無效 URL，略過
           }
         }}
         className="h-auto p-0 flex flex-1 items-stretch gap-3 text-left justify-start hover:bg-transparent"
@@ -358,7 +364,14 @@ function PracticeResourceListCard({ resource, isOwner, onEditPractice }: IPracti
                 variant="ghost"
                 onClick={() => {
                   setMenuOpen(false);
-                  window.open(resource.url, "_blank");
+                  try {
+                    const { protocol } = new URL(resource.url ?? "");
+                    if (protocol === "https:" || protocol === "http:") {
+                      window.open(resource.url, "_blank");
+                    }
+                  } catch {
+                    // 無效 URL，略過
+                  }
                 }}
                 className="w-full h-auto justify-start rounded-none px-3 py-2 text-xs text-[#295E5C] hover:bg-[#F0F9F8]"
               >
@@ -391,6 +404,7 @@ export function PracticeDetailShell({
   isOwner,
   checkInsData,
   isLoadingCheckIns,
+  isLoadingComments = false,
   comments,
   currentUserName,
   currentUserPhotoURL,
@@ -723,16 +737,20 @@ export function PracticeDetailShell({
 
       {activeTab === "comments" && (
         <div className="mx-4 mt-4 mb-4 bg-white rounded-xl overflow-hidden shadow-sm">
-          <CommentSection
-            comments={comments}
-            selectedReactions={[]}
-            onSubmit={(content, _reactions, parentId) => onSubmitComment(content, parentId)}
-            hasMoreComments
-            currentUserName={currentUserName}
-            currentUserPhotoURL={currentUserPhotoURL}
-            onEditComment={onEditComment}
-            onDeleteComment={onDeleteComment}
-          />
+          {isLoadingComments ? (
+            <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">留言載入中...</div>
+          ) : (
+            <CommentSection
+              comments={comments}
+              selectedReactions={[]}
+              onSubmit={(content, _reactions, parentId) => onSubmitComment(content, parentId)}
+              hasMoreComments
+              currentUserName={currentUserName}
+              currentUserPhotoURL={currentUserPhotoURL}
+              onEditComment={onEditComment}
+              onDeleteComment={onDeleteComment}
+            />
+          )}
         </div>
       )}
 

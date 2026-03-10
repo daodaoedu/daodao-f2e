@@ -12,6 +12,8 @@ import { useEffect, useRef, useState } from "react";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
+const PREVIEW_COUNT = 2;
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -99,12 +101,13 @@ function CommentBubble({
 
   const handleSaveEdit = async () => {
     const trimmed = editValue.trim();
-    if (trimmed) {
-      const result = await onEdit?.(comment.id, trimmed);
-      if (result !== false) {
-        toast.success("已更新留言");
-      }
+    if (!trimmed) return;
+    const result = await onEdit?.(comment.id, trimmed);
+    if (result === false) {
+      toast.error("更新留言失敗，請再試一次");
+      return;
     }
+    toast.success("已更新留言");
     setEditing(false);
   };
 
@@ -316,7 +319,6 @@ export function CommentSection({
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyInputs, setReplyInputs] = useState<Record<string, string>>({});
   const [expanded, setExpanded] = useState(false);
-  const PREVIEW_COUNT = 2;
   const previewComments = hasMoreComments ? comments.slice(0, PREVIEW_COUNT) : comments;
   const hiddenComments = hasMoreComments ? comments.slice(PREVIEW_COUNT) : [];
   const hiddenCount = hiddenComments.length;
@@ -337,14 +339,14 @@ export function CommentSection({
         const additions = newlyAdded.map((r) => REACTION_CONFIG[r].placeholder).join(" ");
         return current.trim() ? `${current.trim()} ${additions}` : additions;
       });
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         const el = ref.current;
         if (!el) return;
         el.scrollIntoView({ behavior: "smooth", block: "center" });
         el.focus();
         const len = el.value.length;
         el.setSelectionRange(len, len);
-      }, 100);
+      });
     }
 
     prevSelectedRef.current = selectedReactions;
@@ -540,10 +542,24 @@ export function CommentSection({
                           className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px]"
                           placeholder={`回覆 ${comment.author.name}...`}
                           rows={1}
+                          value={replyInputs[comment.id] ?? ""}
+                          onChange={(event) =>
+                            setReplyInputs((prev) => ({
+                              ...prev,
+                              [comment.id]: event.target.value,
+                            }))
+                          }
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" && !event.shiftKey) {
+                              event.preventDefault();
+                              handleReplySubmit(comment.id);
+                            }
+                          }}
                         />
                         <Button
                           size="icon"
                           className="shrink-0 size-9 rounded-full bg-logo-cyan hover:bg-logo-cyan/80"
+                          onClick={() => handleReplySubmit(comment.id)}
                         >
                           <Send className="size-4" />
                         </Button>
