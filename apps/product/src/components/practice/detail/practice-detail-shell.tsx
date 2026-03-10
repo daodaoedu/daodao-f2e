@@ -1,6 +1,7 @@
 "use client";
 
-import { useExtractOgImage } from "@daodao/api";
+import { useExtractOgImage, useReactions, upsertReaction, removeReaction } from "@daodao/api";
+import type { ReactionTypeValue } from "@daodao/api";
 import {
   BookSvg,
   ChartColumnIncreasingSvg,
@@ -18,7 +19,7 @@ import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
 import { Archive, ChevronDown, ChevronUp, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { CheckInRecordCard, CheckInStack } from "@/components/check-in";
 import { CommentSection, ReactionPickerButton, type IComment } from "@/components/check-in/reactions";
 import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
@@ -434,8 +435,36 @@ export function PracticeDetailShell({
   const [activeTab, setActiveTab] = useState<TabType>("comments");
   const [infoExpanded, setInfoExpanded] = useState(false);
   const [practiceMenuOpen, setPracticeMenuOpen] = useState(false);
-  const [headerReactions, setHeaderReactions] = useState<ReactionTypeType[]>([]);
   const commentsRef = useRef<HTMLDivElement>(null);
+
+  const numericPracticeId = Number(practiceId);
+  const { data: reactionsData, mutate: mutateReactions } = useReactions({
+    targetType: "practice",
+    targetId: numericPracticeId,
+  });
+  const [, startReactionTransition] = useTransition();
+
+  const currentUserReaction = (reactionsData?.data?.currentUserReaction ?? null) as ReactionTypeType | null;
+  const headerReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
+
+  const handleHeaderReactionToggle = useCallback(
+    (type: ReactionTypeType) => {
+      const isSelected = currentUserReaction === type;
+      startReactionTransition(async () => {
+        if (isSelected) {
+          await removeReaction({ targetType: "practice", targetId: numericPracticeId });
+        } else {
+          await upsertReaction({
+            targetType: "practice",
+            targetId: numericPracticeId,
+            reactionType: type as ReactionTypeValue,
+          });
+        }
+        await mutateReactions();
+      });
+    },
+    [currentUserReaction, numericPracticeId, mutateReactions],
+  );
   const { open: openSheet } = useSheetManager();
   const { openWarningDialog } = useDialog();
 
@@ -705,9 +734,7 @@ export function PracticeDetailShell({
             <div className="flex-1 flex justify-center rounded-xl hover:bg-gray-100 transition-colors py-1">
               <ReactionPickerButton
                 selectedReactions={headerReactions}
-                onToggle={(type) =>
-                  setHeaderReactions((prev) => (prev.includes(type) ? [] : [type]))
-                }
+                onToggle={handleHeaderReactionToggle}
                 variant="card"
               />
             </div>

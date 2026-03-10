@@ -52,6 +52,7 @@ function GlobalProvider({
                         "^/auth/callback",
                         "^/auth/onboarding",
                         "^/auth/verify-email(/.*)?$",
+                        "^/auth/error",
                         "^/users/",
                         "^/practices/[^/]+$",
                       ]}

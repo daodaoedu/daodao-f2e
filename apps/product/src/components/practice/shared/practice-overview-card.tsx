@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avata
 import { Badge } from "@daodao/ui/components/badge";
 import type { ManualPracticeFormValues } from "../create/manual/schema";
 import { CircularProgress } from "./circular-progress";
+import { ReactionSection } from "@/components/social";
 
 interface CreatorInfo {
   id: string;
@@ -20,10 +21,12 @@ interface PracticeOverviewCardProps {
   durationMinutes: ManualPracticeFormValues["durationMinutes"];
   tags?: ManualPracticeFormValues["tags"];
   // 詳情頁專用屬性
-  progress?: number; // 進度值
-  showProgress?: boolean; // 是否顯示進度條
+  progress?: number;
+  showProgress?: boolean;
   // 公開頁面顯示建立者資訊
   creator?: CreatorInfo;
+  // 快速反應 + 留言（提供 practiceId 時顯示）
+  practiceId?: number;
 }
 
 export const PracticeOverviewCard = ({
@@ -34,6 +37,7 @@ export const PracticeOverviewCard = ({
   progress,
   showProgress = false,
   creator,
+  practiceId,
 }: PracticeOverviewCardProps) => {
   return (
     <div className="relative bg-white rounded-lg p-4 mb-4 shadow-sm">
@@ -107,6 +111,14 @@ export const PracticeOverviewCard = ({
           </div>
         )}
       </div>
+
+      {/* 反應列 */}
+      {practiceId !== undefined && (
+        <ReactionSection
+          targetType="practice"
+          targetId={practiceId}
+        />
+      )}
     </div>
   );
 };

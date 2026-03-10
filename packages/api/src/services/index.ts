@@ -25,6 +25,9 @@ export * from "./og-image-hooks";
 // Practice Service
 export * from "./practice";
 export * from "./practice-hooks";
+// Reaction Service
+export * from "./reaction";
+export * from "./reaction-hooks";
 // Resource Service
 export * from "./resource";
 export * from "./resource-hooks";
