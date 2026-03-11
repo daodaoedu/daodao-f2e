@@ -16,12 +16,19 @@ import type { IGetReactionsParams } from "./reaction";
  * 取得目標反應計數的 Hook
  */
 export const useReactions = (params: IGetReactionsParams) => {
-  return useQuery("/api/v1/reactions", {
-    params: {
-      query: {
-        targetType: params.targetType,
-        targetId: params.targetId,
+  return useQuery(
+    "/api/v1/reactions",
+    {
+      params: {
+        query: {
+          targetType: params.targetType,
+          targetId: params.targetId,
+        },
       },
     },
-  });
+    {
+      refreshInterval: 30_000,
+      revalidateOnFocus: true,
+    },
+  );
 };
