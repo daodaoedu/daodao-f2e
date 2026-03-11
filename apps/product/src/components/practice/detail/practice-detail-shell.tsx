@@ -1,7 +1,7 @@
 "use client";
 
-import { useExtractOgImage, useReactions, upsertReaction, removeReaction } from "@daodao/api";
 import type { ReactionTypeValue } from "@daodao/api";
+import { removeReaction, upsertReaction, useExtractOgImage, useReactions } from "@daodao/api";
 import {
   BookSvg,
   ChartColumnIncreasingSvg,
@@ -21,7 +21,11 @@ import { Archive, ChevronDown, ChevronUp, MoreHorizontal, Pencil, Trash2 } from 
 import type React from "react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { CheckInRecordCard, CheckInStack } from "@/components/check-in";
-import { CommentSection, ReactionPickerButton, type IComment } from "@/components/check-in/reactions";
+import {
+  CommentSection,
+  type IComment,
+  ReactionPickerButton,
+} from "@/components/check-in/reactions";
 import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
 import {
   ExecutionDurationCard,
@@ -128,9 +132,7 @@ function BrowseActivityContent({
   }, {});
   const uniqueReactions = [...new Set(followers.map((f) => f.reaction))] as ReactionTypeType[];
   const filteredFollowers =
-    reactionFilter === "all"
-      ? followers
-      : followers.filter((f) => f.reaction === reactionFilter);
+    reactionFilter === "all" ? followers : followers.filter((f) => f.reaction === reactionFilter);
   const followCount = followers.filter((f) => f.following).length;
 
   return (
@@ -208,7 +210,12 @@ function BrowseActivityContent({
                       isActive ? "text-logo-cyan" : "text-[#9FB5B8]"
                     )}
                   >
-                    <LottieEmoji url={config.lottieUrl} fallback={config.emoji} size={18} play={false} />
+                    <LottieEmoji
+                      url={config.lottieUrl}
+                      fallback={config.emoji}
+                      size={18}
+                      play={false}
+                    />
                     {count}
                     {isActive && (
                       <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-logo-cyan rounded-full" />
@@ -282,7 +289,11 @@ interface IPracticeResourceListCardProps {
   onEditPractice: () => void;
 }
 
-function PracticeResourceListCard({ resource, isOwner, onEditPractice }: IPracticeResourceListCardProps) {
+function PracticeResourceListCard({
+  resource,
+  isOwner,
+  onEditPractice,
+}: IPracticeResourceListCardProps) {
   const [imageError, setImageError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -437,14 +448,14 @@ export function PracticeDetailShell({
   const [practiceMenuOpen, setPracticeMenuOpen] = useState(false);
   const commentsRef = useRef<HTMLDivElement>(null);
 
-  const numericPracticeId = Number(practiceId);
   const { data: reactionsData, mutate: mutateReactions } = useReactions({
     targetType: "practice",
-    targetId: numericPracticeId,
+    targetId: practiceId,
   });
   const [, startReactionTransition] = useTransition();
 
-  const currentUserReaction = (reactionsData?.data?.currentUserReaction ?? null) as ReactionTypeType | null;
+  const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
+    null) as ReactionTypeType | null;
   const headerReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
 
   const handleHeaderReactionToggle = useCallback(
@@ -452,18 +463,18 @@ export function PracticeDetailShell({
       const isSelected = currentUserReaction === type;
       startReactionTransition(async () => {
         if (isSelected) {
-          await removeReaction({ targetType: "practice", targetId: numericPracticeId });
+          await removeReaction({ targetType: "practice", targetId: practiceId });
         } else {
           await upsertReaction({
             targetType: "practice",
-            targetId: numericPracticeId,
+            targetId: practiceId,
             reactionType: type as ReactionTypeValue,
           });
         }
         await mutateReactions();
       });
     },
-    [currentUserReaction, numericPracticeId, mutateReactions],
+    [currentUserReaction, practiceId, mutateReactions]
   );
   const { open: openSheet } = useSheetManager();
   const { openWarningDialog } = useDialog();
@@ -481,7 +492,7 @@ export function PracticeDetailShell({
           viewCount={browseActivity?.viewCount ?? 0}
           commentCount={commentCount ?? comments.length}
           followers={followers}
-          onToggleFollow={(id) => {
+          onToggleFollow={(_id) => {
             if (!followers.length) {
               toast("功能開發中");
               return;
@@ -672,7 +683,10 @@ export function PracticeDetailShell({
             >
               <div className="overflow-hidden">
                 <div className="grid grid-cols-2 gap-3 pb-3">
-                  <ExecutionTimingCard executionTiming={practice.executionTiming} customTiming={practice.customTiming} />
+                  <ExecutionTimingCard
+                    executionTiming={practice.executionTiming}
+                    customTiming={practice.customTiming}
+                  />
                   <ExecutionDurationCard
                     durationDays={practice.durationDays}
                     startDate={practice.startDate || ""}
@@ -687,7 +701,10 @@ export function PracticeDetailShell({
               // 優先用 API followers；沒有時若使用者已按讚，用 headerReactions
               const displayReactions =
                 followers.length > 0
-                  ? ([...new Set(followers.map((f) => f.reaction))].slice(0, 2) as ReactionTypeType[])
+                  ? ([...new Set(followers.map((f) => f.reaction))].slice(
+                      0,
+                      2
+                    ) as ReactionTypeType[])
                   : headerReactions.slice(0, 2);
               const firstName = followers[0]?.name;
               const text =
