@@ -97,6 +97,18 @@ function CommentBubble({
   const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
     null) as ReactionTypeType | null;
   const commentReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
+  const totalReactionCount = (reactionsData?.data?.reactions ?? []).reduce(
+    (sum, r) => sum + r.count,
+    0,
+  );
+  // 所有有人按過的 reaction 類型，按數量排序，當前用戶的排第一（參考 practice-detail-shell 作法）
+  const activeReactionTypes = (reactionsData?.data?.reactions ?? [])
+    .filter((r) => r.count > 0)
+    .sort((a, b) => b.count - a.count)
+    .map((r) => r.type as ReactionTypeType);
+  const displayReactions = currentUserReaction
+    ? [currentUserReaction, ...activeReactionTypes.filter((t) => t !== currentUserReaction)].slice(0, 3)
+    : activeReactionTypes.slice(0, 3);
 
   const handleCommentReactionToggle = useCallback(
     (type: ReactionTypeType) => {
@@ -289,6 +301,8 @@ function CommentBubble({
               selectedReactions={commentReactions}
               onToggle={handleCommentReactionToggle}
               variant="comment"
+              totalCount={totalReactionCount > 0 ? totalReactionCount : undefined}
+              displayReactions={displayReactions.length > 0 ? displayReactions : undefined}
             />
             {!isReply && onReply && (
               <Button
