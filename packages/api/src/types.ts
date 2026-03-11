@@ -11138,8 +11138,8 @@ export interface paths {
                 query: {
                     /** @description 反應目標類型 */
                     targetType: "practice" | "comment";
-                    /** @description 目標內部 ID */
-                    targetId: number;
+                    /** @description 目標外部 ID（UUID） */
+                    targetId: string;
                 };
                 header?: never;
                 path?: never;
@@ -27144,10 +27144,10 @@ export interface components {
              */
             targetType: "practice" | "comment";
             /**
-             * @description 目標內部 ID
-             * @example 1
+             * @description 目標外部 ID（UUID）
+             * @example 32859587-f159-43fd-93e7-fcc890661781
              */
-            targetId: number;
+            targetId: string;
             /**
              * @description 反應類型
              * @example fire
@@ -27168,10 +27168,10 @@ export interface components {
              */
             targetType: "practice" | "comment";
             /**
-             * @description 目標內部 ID
-             * @example 1
+             * @description 目標外部 ID（UUID）
+             * @example 32859587-f159-43fd-93e7-fcc890661781
              */
-            targetId: number;
+            targetId: string;
         };
         AdminUserListQuery: {
             /**

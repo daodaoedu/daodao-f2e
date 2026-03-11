@@ -1,17 +1,17 @@
 "use client";
 
-import { useCallback, useTransition } from "react";
-import { upsertReaction, removeReaction, useReactions } from "@daodao/api";
 import type { ReactionTypeValue } from "@daodao/api";
-import { ReactionBar, ReactionPickerButton } from "@/components/check-in/reactions";
+import { removeReaction, upsertReaction, useReactions } from "@daodao/api";
+import { useCallback, useTransition } from "react";
 import type { IReactionCount } from "@/components/check-in/reactions";
+import { ReactionBar, ReactionPickerButton } from "@/components/check-in/reactions";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 
 export interface ReactionSectionProps {
   /** 目標類型，目前支援 'practice' */
   targetType: "practice";
-  /** 目標的內部 ID */
-  targetId: number;
+  /** 目標的外部 ID（UUID） */
+  targetId: string;
   /** 反應變更回調（可選） */
   onReactionChange?: (type: ReactionTypeType | null) => void;
 }
@@ -54,7 +54,7 @@ export function ReactionSection({ targetType, targetId, onReactionChange }: Reac
         await mutate();
       });
     },
-    [currentUserReaction, targetType, targetId, mutate, onReactionChange],
+    [currentUserReaction, targetType, targetId, mutate, onReactionChange]
   );
 
   return (

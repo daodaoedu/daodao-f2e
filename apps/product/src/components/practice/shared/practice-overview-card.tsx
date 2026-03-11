@@ -4,9 +4,9 @@ import { DefaultAvatarSvg, TagSolidSvg } from "@daodao/assets";
 import { Link } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
+import { ReactionSection } from "@/components/social";
 import type { ManualPracticeFormValues } from "../create/manual/schema";
 import { CircularProgress } from "./circular-progress";
-import { ReactionSection } from "@/components/social";
 
 interface CreatorInfo {
   id: string;
@@ -26,7 +26,7 @@ interface PracticeOverviewCardProps {
   // 公開頁面顯示建立者資訊
   creator?: CreatorInfo;
   // 快速反應 + 留言（提供 practiceId 時顯示）
-  practiceId?: number;
+  practiceId?: string;
 }
 
 export const PracticeOverviewCard = ({
@@ -58,9 +58,7 @@ export const PracticeOverviewCard = ({
           >
             {creator.name}
           </Link>
-          {creator.date && (
-            <span className="text-sm text-text-dark/60">{creator.date}</span>
-          )}
+          {creator.date && <span className="text-sm text-text-dark/60">{creator.date}</span>}
         </div>
       )}
       <div className="relative flex items-start gap-4">
@@ -113,12 +111,7 @@ export const PracticeOverviewCard = ({
       </div>
 
       {/* 反應列 */}
-      {practiceId !== undefined && (
-        <ReactionSection
-          targetType="practice"
-          targetId={practiceId}
-        />
-      )}
+      {practiceId !== undefined && <ReactionSection targetType="practice" targetId={practiceId} />}
     </div>
   );
 };

@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactionTypeValue } from "@daodao/api";
+import { removeReaction, upsertReaction, useReactions } from "@daodao/api";
 import { DialogOutlineSvg } from "@daodao/assets";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
@@ -9,8 +11,6 @@ import { cn } from "@daodao/ui/lib/utils";
 import { MoreHorizontal, Pencil, Send, Trash2 } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
-import { upsertReaction, removeReaction, useReactions } from "@daodao/api";
-import type { ReactionTypeValue } from "@daodao/api";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
@@ -88,14 +88,14 @@ function CommentBubble({
   const [editValue, setEditValue] = useState(comment.content);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const commentNumericId = Number(comment.id);
   const { data: reactionsData, mutate: mutateReactions } = useReactions({
     targetType: "comment",
-    targetId: commentNumericId,
+    targetId: comment.id,
   });
   const [, startReactionTransition] = useTransition();
 
-  const currentUserReaction = (reactionsData?.data?.currentUserReaction ?? null) as ReactionTypeType | null;
+  const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
+    null) as ReactionTypeType | null;
   const commentReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
 
   const handleCommentReactionToggle = useCallback(
@@ -103,18 +103,18 @@ function CommentBubble({
       const isSelected = currentUserReaction === type;
       startReactionTransition(async () => {
         if (isSelected) {
-          await removeReaction({ targetType: "comment", targetId: commentNumericId });
+          await removeReaction({ targetType: "comment", targetId: comment.id });
         } else {
           await upsertReaction({
             targetType: "comment",
-            targetId: commentNumericId,
+            targetId: comment.id,
             reactionType: type as ReactionTypeValue,
           });
         }
         await mutateReactions();
       });
     },
-    [currentUserReaction, commentNumericId, mutateReactions],
+    [currentUserReaction, comment.id, mutateReactions]
   );
   const { openWarningDialog } = useDialog();
 

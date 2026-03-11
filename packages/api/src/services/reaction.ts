@@ -10,9 +10,7 @@ import type { components, paths } from "../types";
 // Types
 // ============================================================================
 
-type GetReactionsQuery = NonNullable<
-  paths["/api/v1/reactions"]["get"]["parameters"]["query"]
->;
+type GetReactionsQuery = NonNullable<paths["/api/v1/reactions"]["get"]["parameters"]["query"]>;
 
 export type ReactionTargetType = GetReactionsQuery["targetType"];
 
@@ -26,7 +24,7 @@ export type RemoveReactionRequest = components["schemas"]["RemoveReactionRequest
 
 export interface IGetReactionsParams {
   targetType: ReactionTargetType;
-  targetId: number;
+  targetId: string;
 }
 
 // ============================================================================
