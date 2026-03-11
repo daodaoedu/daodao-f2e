@@ -698,23 +698,42 @@ export function PracticeDetailShell({
 
             {(() => {
               const followers = browseActivity?.followers ?? [];
-              // 優先用 API followers；沒有時若使用者已按讚，用 headerReactions
+              // 從 reactions API 取出有人按的類型（所有人共享的 aggregate）
+              const activeReactions = (reactionsData?.data?.reactions ?? [])
+                .filter((r) => r.count > 0)
+                .slice(0, 2);
+              const totalReactionCount = (reactionsData?.data?.reactions ?? []).reduce(
+                (sum, r) => sum + r.count,
+                0,
+              );
+              const latestActorName =
+                (reactionsData?.data?.reactions ?? []).find((r) => r.count > 0)?.latestActorName ??
+                null;
+              // 優先用 API followers；沒有時用 aggregate reactions（所有人共享）
               const displayReactions =
                 followers.length > 0
                   ? ([...new Set(followers.map((f) => f.reaction))].slice(
                       0,
                       2
                     ) as ReactionTypeType[])
-                  : headerReactions.slice(0, 2);
+                  : activeReactions.map((r) => r.type as ReactionTypeType);
               const firstName = followers[0]?.name;
               const text =
                 followers.length > 1
                   ? `${firstName} 與其他 ${followers.length - 1} 人`
                   : followers.length === 1
                     ? firstName
-                    : headerReactions.length > 0
-                      ? "你"
-                      : "觀看瀏覽活動";
+                    : currentUserReaction
+                      ? totalReactionCount > 1
+                        ? `你 與其他 ${totalReactionCount - 1} 人`
+                        : "你"
+                      : totalReactionCount > 0
+                        ? latestActorName
+                          ? totalReactionCount > 1
+                            ? `${latestActorName} 與其他 ${totalReactionCount - 1} 人`
+                            : latestActorName
+                          : `${totalReactionCount} 人`
+                        : "觀看瀏覽活動";
               return (
                 <button
                   type="button"

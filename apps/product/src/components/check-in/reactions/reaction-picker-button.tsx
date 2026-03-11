@@ -18,6 +18,10 @@ export interface ReactionPickerButtonProps {
    * "comment" — 留言層級，較小按鈕（size-7 / emoji 18），顯示計數
    */
   variant?: "card" | "comment";
+  /** comment variant 的總反應計數（所有用戶，非僅當前用戶） */
+  totalCount?: number;
+  /** 要疊加顯示的 reaction 類型（aggregate，最多 3 個），參考主題實踐的 browseActivity 作法 */
+  displayReactions?: ReactionTypeType[];
 }
 
 const PICKER_REACTIONS: ReactionTypeType[] = ["useful", "fire", "touched", "curious"];
@@ -32,6 +36,8 @@ export function ReactionPickerButton({
   selectedReactions,
   onToggle,
   variant = "comment",
+  totalCount,
+  displayReactions,
 }: ReactionPickerButtonProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -164,27 +170,52 @@ export function ReactionPickerButton({
               )
         )}
       >
-        {hasSelection ? (
-          <>
+        {isCard ? (
+          /* card variant：顯示當前用戶的 reaction emoji，或預設 👍 */
+          hasSelection ? (
             <div className="flex items-center">
               {selectedReactions.slice(-2).map((type, i) => (
-                <div
-                  key={type}
-                  className={cn(isCard ? "size-[22px]" : "size-4", i > 0 && "-ml-1")}
-                >
+                <div key={type} className={cn("size-[22px]", i > 0 && "-ml-1")}>
                   <LottieEmoji
                     url={REACTION_CONFIG[type].lottieUrl}
                     fallback={REACTION_CONFIG[type].emoji}
-                    size={isCard ? 22 : 16}
+                    size={22}
                     play={true}
                   />
                 </div>
               ))}
             </div>
-            {!isCard && <span>{selectedReactions.length}</span>}
-          </>
+          ) : (
+            <LikeOutlineSvg className="size-[22px]" />
+          )
         ) : (
-          <LikeOutlineSvg className={isCard ? "size-[22px]" : "size-5"} />
+          /* comment variant：Facebook 疊加圓圈（displayReactions）+ 總數 */
+          <>
+            {displayReactions && displayReactions.length > 0 ? (
+              <div className="flex items-center">
+                {displayReactions.slice(0, 3).map((type, i) => (
+                  <div
+                    key={type}
+                    className={cn(
+                      "size-5 rounded-full flex items-center justify-center ring-1 ring-white",
+                      selectedReactions.includes(type) ? "bg-[#E8FAF9]" : "bg-[#F0F4F4]",
+                      i > 0 && "-ml-1"
+                    )}
+                  >
+                    <LottieEmoji
+                      url={REACTION_CONFIG[type].lottieUrl}
+                      fallback={REACTION_CONFIG[type].emoji}
+                      size={14}
+                      play={selectedReactions.includes(type)}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <LikeOutlineSvg className="size-5" />
+            )}
+            {totalCount != null && totalCount > 0 && <span>{totalCount}</span>}
+          </>
         )}
       </button>
     </div>

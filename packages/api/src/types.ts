@@ -11405,6 +11405,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reactions/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得個別用戶反應列表
+         * @description 取得指定目標的每位反應用戶詳細資料（含名稱、頭像、反應類型、時間）
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description 反應目標類型 */
+                    targetType: "practice" | "comment";
+                    /** @description 目標外部 ID（UUID） */
+                    targetId: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得反應列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            data: components["schemas"]["GetReactionsListResponse"] & unknown;
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/images/{filename}": {
         parameters: {
             query?: never;
@@ -27134,6 +27195,27 @@ export interface components {
              * @example fire
              */
             currentUserReaction: string | null;
+        };
+        /** @description 單筆用戶反應資料 */
+        ReactionListItem: {
+            /** @description 用戶外部 ID（UUID） */
+            userId: string;
+            /** @description 用戶名稱 */
+            name: string;
+            /** @description 用戶頭像 URL */
+            photoURL: string | null;
+            /**
+             * @description 反應類型
+             * @example fire
+             */
+            reactionType: string;
+            /** @description 反應時間（ISO 8601） */
+            reactedAt: string;
+        };
+        /** @description 個別用戶反應列表回應 */
+        GetReactionsListResponse: {
+            /** @description 反應列表 */
+            items: components["schemas"]["ReactionListItem"][];
         };
         /** @description 新增或更換反應的請求資料 */
         UpsertReactionRequest: {
