@@ -11,6 +11,7 @@ import {
   useMyPractices,
   usePracticeById,
   usePracticeCheckIns,
+  useReactionsList,
 } from "@daodao/api";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
@@ -178,6 +179,10 @@ export default function PracticeDetailPage() {
   });
   const { data: practicesListData } = useMyPractices({ limit: 100 });
   const { data: currentUserData } = useCurrentUser();
+  const { data: reactionsListData } = useReactionsList({
+    targetType: "practice",
+    targetId: practiceId,
+  });
 
   const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
   const { openArchiveDialog } = useArchivePracticeDialog();
@@ -470,6 +475,16 @@ export default function PracticeDetailPage() {
         }}
         onEditComment={handleCommentEdit}
         onDeleteComment={handleCommentDelete}
+        browseActivity={{
+          followers: (reactionsListData?.data?.items ?? []).map((item) => ({
+            id: item.userId,
+            name: item.name,
+            photoURL: item.photoURL ?? undefined,
+            time: formatCommentTime(item.reactedAt),
+            following: false,
+            reaction: item.reactionType as "useful" | "fire" | "touched" | "curious",
+          })),
+        }}
         footer={
           isOwner ? (
             <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">

@@ -19,6 +19,11 @@ export type ReactionTypeValue = components["schemas"]["UpsertReactionRequest"]["
 export type GetReactionsResponse =
   paths["/api/v1/reactions"]["get"]["responses"]["200"]["content"]["application/json"];
 
+export type GetReactionsListResponse =
+  paths["/api/v1/reactions/list"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type ReactionListItem = components["schemas"]["ReactionListItem"];
+
 export type UpsertReactionRequest = components["schemas"]["UpsertReactionRequest"];
 export type RemoveReactionRequest = components["schemas"]["RemoveReactionRequest"];
 
@@ -57,4 +62,18 @@ export const upsertReaction = async (data: UpsertReactionRequest) => {
  */
 export const removeReaction = async (data: RemoveReactionRequest) => {
   return client.DELETE("/api/v1/reactions", { body: data });
+};
+
+/**
+ * 取得目標的個別用戶反應列表
+ */
+export const getReactionsList = async (params: IGetReactionsParams) => {
+  return client.GET("/api/v1/reactions/list", {
+    params: {
+      query: {
+        targetType: params.targetType,
+        targetId: params.targetId,
+      },
+    },
+  });
 };
