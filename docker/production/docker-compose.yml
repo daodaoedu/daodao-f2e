@@ -13,6 +13,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - KEEP_ALIVE_TIMEOUT=75000
     restart: unless-stopped
     # 如果需要環境變數文件，取消下面的註解
     # env_file:
@@ -32,6 +33,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
+      - KEEP_ALIVE_TIMEOUT=75000
     restart: unless-stopped
     # 如果需要環境變數文件，取消下面的註解
     # env_file:
