@@ -620,20 +620,26 @@ jobs:
 
             if [ "$DEPLOY_WEBSITE" = "true" ]; then
               echo '=== Verifying Website ==='
-              WEBSITE_STATUS=\$(docker inspect --format='{{.State.Status}}' ${APP_ENV}_website 2>/dev/null || echo 'not found')
-              WEBSITE_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' ${APP_ENV}_website 2>/dev/null || echo 'no health check')
+              WEBSITE_CONTAINER=\$(docker ps -q -f name=${APP_ENV}_website | head -1)
+              if [ -z "\$WEBSITE_CONTAINER" ]; then
+                WEBSITE_STATUS='not found'
+                WEBSITE_HEALTH='no health check'
+              else
+                WEBSITE_STATUS=\$(docker inspect --format='{{.State.Status}}' \$WEBSITE_CONTAINER 2>/dev/null || echo 'not found')
+                WEBSITE_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' \$WEBSITE_CONTAINER 2>/dev/null || echo 'no health check')
+              fi
               echo "Container Status: \$WEBSITE_STATUS"
               echo "Health Status: \$WEBSITE_HEALTH"
 
               if [ "\$WEBSITE_STATUS" != "running" ]; then
                 echo "❌ Website container is not running"
-                docker logs ${APP_ENV}_website --tail=20 2>/dev/null || echo 'Logs not available'
+                [ -n "\$WEBSITE_CONTAINER" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
               if [ "\$WEBSITE_HEALTH" = "unhealthy" ]; then
                 echo "❌ Website container is unhealthy"
-                docker logs ${APP_ENV}_website --tail=20 2>/dev/null || echo 'Logs not available'
+                [ -n "\$WEBSITE_CONTAINER" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
@@ -642,20 +648,26 @@ jobs:
 
             if [ "$DEPLOY_PRODUCT" = "true" ]; then
               echo '=== Verifying Product ==='
-              PRODUCT_STATUS=\$(docker inspect --format='{{.State.Status}}' ${APP_ENV}_product 2>/dev/null || echo 'not found')
-              PRODUCT_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' ${APP_ENV}_product 2>/dev/null || echo 'no health check')
+              PRODUCT_CONTAINER=\$(docker ps -q -f name=${APP_ENV}_product | head -1)
+              if [ -z "\$PRODUCT_CONTAINER" ]; then
+                PRODUCT_STATUS='not found'
+                PRODUCT_HEALTH='no health check'
+              else
+                PRODUCT_STATUS=\$(docker inspect --format='{{.State.Status}}' \$PRODUCT_CONTAINER 2>/dev/null || echo 'not found')
+                PRODUCT_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' \$PRODUCT_CONTAINER 2>/dev/null || echo 'no health check')
+              fi
               echo "Container Status: \$PRODUCT_STATUS"
               echo "Health Status: \$PRODUCT_HEALTH"
 
               if [ "\$PRODUCT_STATUS" != "running" ]; then
                 echo "❌ Product container is not running"
-                docker logs ${APP_ENV}_product --tail=20 2>/dev/null || echo 'Logs not available'
+                [ -n "\$PRODUCT_CONTAINER" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
               if [ "\$PRODUCT_HEALTH" = "unhealthy" ]; then
                 echo "❌ Product container is unhealthy"
-                docker logs ${APP_ENV}_product --tail=20 2>/dev/null || echo 'Logs not available'
+                [ -n "\$PRODUCT_CONTAINER" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
