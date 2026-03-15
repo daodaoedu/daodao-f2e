@@ -57,7 +57,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
           ref: ${{ env.BRANCH_NAME }}
 
       - name: Detect file changes
@@ -163,7 +163,7 @@ jobs:
       - name: Install dependencies and build
         run: |
           pnpm install --frozen-lockfile
-          pnpm run build
+          pnpm --filter @daodao/website build
 
       - name: Set Environment Variables
         id: meta
@@ -289,7 +289,7 @@ jobs:
       - name: Install dependencies and build
         run: |
           pnpm install --frozen-lockfile
-          pnpm run build
+          pnpm --filter @daodao/product build
 
       - name: Set Environment Variables
         id: meta
