@@ -163,7 +163,7 @@ jobs:
       - name: Install dependencies and build
         run: |
           pnpm install --frozen-lockfile
-          pnpm run build
+          pnpm turbo build --filter=@daodao/website
 
       - name: Set Environment Variables
         id: meta
@@ -289,7 +289,7 @@ jobs:
       - name: Install dependencies and build
         run: |
           pnpm install --frozen-lockfile
-          pnpm run build
+          pnpm turbo build --filter=@daodao/product
 
       - name: Set Environment Variables
         id: meta
@@ -617,21 +617,26 @@ jobs:
 
             if [ \"${{ env.DEPLOY_WEBSITE }}\" = \"true\" ]; then
               echo '=== Verifying Website ==='
-              WEBSITE_STATUS=\$(docker inspect --format='{{.State.Status}}' ${{ env.APP_ENV }}_website 2>/dev/null || echo 'not found')
-              WEBSITE_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' ${{ env.APP_ENV }}_website 2>/dev/null || echo 'no health check')
+              WEBSITE_CONTAINER=\$(docker ps -q -f name=${{ env.APP_ENV }}_website | head -1)
+              if [ -z \"\$WEBSITE_CONTAINER\" ]; then
+                WEBSITE_STATUS='not found'
+                WEBSITE_HEALTH='no health check'
+              else
+                WEBSITE_STATUS=\$(docker inspect --format='{{.State.Status}}' \$WEBSITE_CONTAINER 2>/dev/null || echo 'not found')
+                WEBSITE_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' \$WEBSITE_CONTAINER 2>/dev/null || echo 'no health check')
+              fi
               echo "Container Status: \$WEBSITE_STATUS"
               echo "Health Status: \$WEBSITE_HEALTH"
 
-              if [ "\$WEBSITE_STATUS" != "running" ]; then
+              if [ \"\$WEBSITE_STATUS\" != \"running\" ]; then
                 echo "❌ Website container is not running"
-                # 嘗試讀取日誌（如果支援的話）
-                docker logs ${{ env.APP_ENV }}_website --tail=20 2>/dev/null || echo "Logs not available (logging driver may not support reading)"
+                [ -n \"\$WEBSITE_CONTAINER\" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
-              if [ "\$WEBSITE_HEALTH" = "unhealthy" ]; then
+              if [ \"\$WEBSITE_HEALTH\" = \"unhealthy\" ]; then
                 echo "❌ Website container is unhealthy"
-                docker logs ${{ env.APP_ENV }}_website --tail=20 2>/dev/null || echo "Logs not available"
+                [ -n \"\$WEBSITE_CONTAINER\" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
@@ -640,20 +645,26 @@ jobs:
 
             if [ \"${{ env.DEPLOY_PRODUCT }}\" = \"true\" ]; then
               echo '=== Verifying Product ==='
-              PRODUCT_STATUS=\$(docker inspect --format='{{.State.Status}}' ${{ env.APP_ENV }}_product 2>/dev/null || echo 'not found')
-              PRODUCT_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' ${{ env.APP_ENV }}_product 2>/dev/null || echo 'no health check')
+              PRODUCT_CONTAINER=\$(docker ps -q -f name=${{ env.APP_ENV }}_product | head -1)
+              if [ -z \"\$PRODUCT_CONTAINER\" ]; then
+                PRODUCT_STATUS='not found'
+                PRODUCT_HEALTH='no health check'
+              else
+                PRODUCT_STATUS=\$(docker inspect --format='{{.State.Status}}' \$PRODUCT_CONTAINER 2>/dev/null || echo 'not found')
+                PRODUCT_HEALTH=\$(docker inspect --format='{{.State.Health.Status}}' \$PRODUCT_CONTAINER 2>/dev/null || echo 'no health check')
+              fi
               echo "Container Status: \$PRODUCT_STATUS"
               echo "Health Status: \$PRODUCT_HEALTH"
 
-              if [ "\$PRODUCT_STATUS" != "running" ]; then
+              if [ \"\$PRODUCT_STATUS\" != \"running\" ]; then
                 echo "❌ Product container is not running"
-                docker logs ${{ env.APP_ENV }}_product --tail=20 2>/dev/null || echo "Logs not available (logging driver may not support reading)"
+                [ -n \"\$PRODUCT_CONTAINER\" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
-              if [ "\$PRODUCT_HEALTH" = "unhealthy" ]; then
+              if [ \"\$PRODUCT_HEALTH\" = \"unhealthy\" ]; then
                 echo "❌ Product container is unhealthy"
-                docker logs ${{ env.APP_ENV }}_product --tail=20 2>/dev/null || echo "Logs not available"
+                [ -n \"\$PRODUCT_CONTAINER\" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
