@@ -50,6 +50,7 @@ function GlobalProvider({
                       publicPattern={[
                         "^/auth/login",
                         "^/auth/callback",
+                        "^/auth/error",
                         "^/auth/onboarding",
                         "^/auth/verify-email(/.*)?$",
                         "^/users/",
