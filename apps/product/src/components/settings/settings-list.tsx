@@ -3,7 +3,7 @@
 import { ArrowRightOutlineSvg, TelescopeSvg } from "@daodao/assets";
 import { useSettingsCompletion } from "@daodao/api";
 import { CustomLink } from "@daodao/ui/components/custom-link";
-import { AlertCircle, Archive, HeartHandshake, LibraryBig, LogOut, MessagesSquare, Settings, SquareUser } from "lucide-react";
+import { AlertCircle, Archive, Bell, HeartHandshake, LibraryBig, LogOut, MessagesSquare, Settings, SquareUser } from "lucide-react";
 import { useLogoutDialog } from "@/hooks/use-logout-dialog";
 
 type SettingsItem = {
@@ -56,6 +56,12 @@ const settingsItems: SettingsItem[] = [
     icon: SquareUser,
     href: "/settings/public-info",
     completionKey: "publicInfo",
+  },
+  {
+    id: "notifications",
+    label: "通知設定",
+    icon: Bell,
+    href: "/settings/notifications",
   },
   {
     id: "archived",

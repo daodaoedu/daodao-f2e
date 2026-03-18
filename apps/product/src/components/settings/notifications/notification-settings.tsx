@@ -90,7 +90,7 @@ export const NotificationSettings = () => {
     if (!data) return;
     setGlobalEnabled(data.globalEnabled);
     const newPrefs: PreferencesMap = { ...DEFAULT_PREFS };
-    for (const p of data.preferences) {
+    for (const p of data.preferences ?? []) {
       if (p.channel === "N01" && newPrefs[p.notificationType]) {
         newPrefs[p.notificationType] = { emailEnabled: p.isEnabled };
       }
