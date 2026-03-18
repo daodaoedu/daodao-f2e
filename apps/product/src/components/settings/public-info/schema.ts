@@ -33,6 +33,7 @@ export const publicInfoFormSchema = z.object({
   discord: z.string().optional(),
   line: z.string().optional(),
   threads: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
+  hideConnectionsCount: z.boolean().optional(),
 });
 
 export type PublicInfoFormValues = z.infer<typeof publicInfoFormSchema>;

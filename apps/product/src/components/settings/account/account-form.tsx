@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parse } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { mutate } from "swr";
 import { useForm } from "react-hook-form";
 import { FieldSelectionSection } from "./field-selection-section";
 import { PersonalInfoSection } from "./personal-info-section";
@@ -140,6 +141,7 @@ export const AccountForm = () => {
       // 成功
       toast.success("帳號設定已更新");
       form.reset(form.getValues()); // 重置 dirty 狀態
+      mutate('/api/v1/users/settings-summary');
 
       // 延遲後返回設定首頁，讓使用者看到成功訊息
       setTimeout(() => {

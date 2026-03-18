@@ -80,15 +80,13 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
 
       setCustomIdStatus("checking");
 
-      // debounce 300ms
+      // debounce 500ms
       checkTimeoutRef.current = setTimeout(async () => {
         try {
           const response = await checkCustomIdAvailability(customId);
-          console.log("checkCustomIdAvailability response:", response);
 
           // 檢查是否有錯誤
           if (response.error) {
-            console.error("API error:", response.error);
             setCustomIdStatus("idle");
             return;
           }
@@ -107,7 +105,7 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
           console.error("checkCustomIdAvailability error:", err);
           setCustomIdStatus("idle");
         }
-      }, 300);
+      }, 500);
     },
     [initialCustomId, form]
   );
