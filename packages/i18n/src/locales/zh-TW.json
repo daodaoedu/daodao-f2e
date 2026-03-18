@@ -4146,7 +4146,7 @@
       "success": {
         "verified": {
           "title": "郵件驗證成功！",
-          "description": "歡迎加入島島阿學，開始探索你的學習之旅吧！"
+          "description": "完成個人設定，獲得更精準的學習推薦。"
         },
         "alreadyVerified": {
           "title": "郵件已驗證",
@@ -4180,7 +4180,7 @@
         }
       },
       "actions": {
-        "goToHome": "前往首頁",
+        "goToHome": "前往完成個人設定",
         "backToHome": "返回首頁"
       },
       "resend": {
