@@ -14,6 +14,7 @@ import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
 import { DescriptionField } from "./components/description-field";
 import { MediaUploadField } from "./components/media-upload-field";
 import { MoodSelector } from "./components/mood-selector";
+import { ReflectionQuestion } from "./components/reflection-question";
 import { TagSelector } from "./components/tag-selector";
 import { useCheckInImageRender } from "./hooks/use-check-in-image-render";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
@@ -61,11 +62,6 @@ export const CheckInSheetContent = ({
   });
 
   const onSubmit = async (values: CheckInFormValuesType) => {
-    // Zod 驗證已確保 mood 不是 null
-    if (values.mood === null) {
-      return;
-    }
-
     // 保存表單資料
     const formData: ICheckInFormData = {
       mood: values.mood,
@@ -93,6 +89,7 @@ export const CheckInSheetContent = ({
         <div className="mb-8">
           <h3 className="text-base font-medium mb-3 text-text-dark">想法分享</h3>
           <TagSelector form={form} />
+          <ReflectionQuestion />
           <DescriptionField form={form} />
         </div>
 

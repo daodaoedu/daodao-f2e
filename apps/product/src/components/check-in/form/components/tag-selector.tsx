@@ -20,6 +20,7 @@ interface ITagSelectorProps {
  */
 export const TagSelector = ({ form }: ITagSelectorProps) => {
   const [customTagInput, setCustomTagInput] = useState("");
+  const [promptEnabled, setPromptEnabled] = useState(false);
   const locale = useLocale();
   const tags = form.watch("tags");
   const { fetchAndAddPrompt } = useTagPrompt(form);
@@ -51,8 +52,9 @@ export const TagSelector = ({ form }: ITagSelectorProps) => {
 
     if (!tagExists) {
       form.setValue("tags", [...currentTags, trimmedTag]);
-      // 取得該自訂標籤的引導句
-      await fetchAndAddPrompt(trimmedTag);
+      if (promptEnabled) {
+        await fetchAndAddPrompt(trimmedTag);
+      }
     }
     setCustomTagInput("");
   };
@@ -77,8 +79,8 @@ export const TagSelector = ({ form }: ITagSelectorProps) => {
             : [...currentTags, tag];
           field.onChange(newTags);
 
-          // 當選中標籤時，取得該標籤的引導句並更新 description
-          if (!isSelected) {
+          // 當選中標籤且引導句開啟時，取得該標籤的引導句並更新 description
+          if (!isSelected && promptEnabled) {
             await fetchAndAddPrompt(tag);
           }
         };
@@ -87,6 +89,27 @@ export const TagSelector = ({ form }: ITagSelectorProps) => {
           <FormItem className="mb-3">
             <FormControl>
               <div>
+                {/* 引導句開關 */}
+                <div className="flex items-center gap-2 mb-3">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={promptEnabled}
+                    onClick={() => setPromptEnabled((v) => !v)}
+                    className={cn(
+                      "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+                      promptEnabled ? "bg-logo-gray" : "bg-gray-200"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transition-transform",
+                        promptEnabled ? "translate-x-4" : "translate-x-0"
+                      )}
+                    />
+                  </button>
+                  <span className="text-sm text-gray-500">引導句</span>
+                </div>
                 <div className="flex flex-wrap gap-x-2 gap-y-3 mb-3">
                   {availableTags.map((tag) => {
                     const isSelected = field.value?.includes(tag);
