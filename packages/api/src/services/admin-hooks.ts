@@ -21,11 +21,11 @@ import type {
 // ============================================================================
 
 export const useAdminOverview = () => {
-  return useQuery("/api/v1/admin/user-stats/overview");
+  return useQuery("/api/v1/admin/user-stats/overview", {});
 };
 
 export const useAdminActiveUsers = () => {
-  return useQuery("/api/v1/admin/user-stats/active-users");
+  return useQuery("/api/v1/admin/user-stats/active-users", {});
 };
 
 export const useAdminActiveUsersTrend = (days?: number) => {
@@ -101,7 +101,7 @@ export const useAdminPopularProfiles = (params?: IGetPopularProfilesParams) => {
 };
 
 export const useAdminSegmentation = () => {
-  return useQuery("/api/v1/admin/user-stats/segmentation");
+  return useQuery("/api/v1/admin/user-stats/segmentation", {});
 };
 
 // ============================================================================

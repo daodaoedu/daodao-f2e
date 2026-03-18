@@ -30,6 +30,7 @@
     "@next/env": "catalog:",
     "@vercel/og": "^0.8.6",
     "add": "^2.0.6",
+    "browser-image-compression": "^2.0.2",
     "date-fns": "catalog:",
     "gsap": "catalog:",
     "lottie-react": "catalog:",
