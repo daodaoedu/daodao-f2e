@@ -1,6 +1,7 @@
 "use client";
 
 import { type CreatePracticeRequestType, createPractice } from "@daodao/api";
+import type { PrivacyStatus } from "@/components/practice/shared/privacy-status-selector";
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { StorageEnum, useFormDraft } from "@daodao/shared";
@@ -91,6 +92,7 @@ export default function CreateManualPracticePage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus>("private");
   const isRestoreDialogOpenRef = useRef(false);
 
   const form = useForm<ManualPracticeFormValues>({
@@ -165,7 +167,10 @@ export default function CreateManualPracticePage() {
     setIsSubmitting(true);
 
     try {
-      const apiRequest = convertFormValuesToApiRequest(values);
+      const apiRequest = {
+        ...convertFormValuesToApiRequest(values),
+        privacy_status: privacyStatus,
+      } as CreatePracticeRequestType;
 
       const response = await createPractice(apiRequest);
 
@@ -340,7 +345,13 @@ export default function CreateManualPracticePage() {
             {currentStep === 2 && <Step2 form={form} />}
             {currentStep === 3 && <Step3 form={form} />}
             {currentStep === 4 && <Step4 form={form} />}
-            {currentStep === 5 && <Step5 form={form} />}
+            {currentStep === 5 && (
+              <Step5
+                form={form}
+                privacyStatus={privacyStatus}
+                onPrivacyStatusChange={setPrivacyStatus}
+              />
+            )}
 
             {/* Navigation Buttons */}
             <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray">

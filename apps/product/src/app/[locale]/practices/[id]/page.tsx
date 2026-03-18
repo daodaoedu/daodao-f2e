@@ -12,12 +12,14 @@ import {
   usePracticeById,
   usePracticeCheckIns,
   useReactionsList,
+  useRecordView,
 } from "@daodao/api";
+import { posthogCapture } from "@daodao/analytics";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
 import { zhTW } from "date-fns/locale";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { CheckInButton } from "@/components/check-in";
 import type { IComment, ICommentReply } from "@/components/check-in/reactions";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
@@ -38,8 +40,10 @@ import {
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
 
 interface IApiCommentUser {
+  id?: string;
   name?: string;
   photoURL?: string | null;
+  customId?: string | null;
 }
 
 interface IApiCommentNode {
@@ -122,6 +126,8 @@ function mapReply(reply: IApiCommentNode): ICommentReply {
     author: {
       name: reply.user?.name || "匿名使用者",
       photoURL: reply.user?.photoURL || undefined,
+      userId: reply.user?.id || undefined,
+      customId: reply.user?.customId ?? undefined,
     },
     content: reply.content || "",
     time: formatCommentTime(reply.createdAt),
@@ -137,6 +143,8 @@ function mapComment(comment: IApiCommentNode): IComment {
     author: {
       name: comment.user?.name || "匿名使用者",
       photoURL: comment.user?.photoURL || undefined,
+      userId: comment.user?.id || undefined,
+      customId: comment.user?.customId ?? undefined,
     },
     content: comment.content || "",
     time: formatCommentTime(comment.createdAt),
@@ -189,6 +197,21 @@ export default function PracticeDetailPage() {
   const { openDeleteDialog } = useDeletePracticeDialog();
   const { archivePractice, restorePractice } = useArchivePractice(practiceId);
   const { deletePractice: deletePracticeById } = useDeletePractice(practiceId);
+
+  const recordView = useRecordView();
+
+  useEffect(() => {
+    if (practiceId) {
+      recordView("practice", practiceId);
+      posthogCapture("content_viewed", {
+        entity_type: "practice",
+        entity_id: practiceId,
+        referrer: typeof document !== "undefined" ? document.referrer || null : null,
+        platform: "web",
+      });
+    }
+  // recordView 是 useCallback 空 deps，referrer 取自 mount 時的 document，故意只跑一次
+  }, [practiceId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const practice: IPracticeDetailData | null = useMemo(() => {
     if (!practiceData?.data) {
@@ -457,6 +480,7 @@ export default function PracticeDetailPage() {
         isLoadingComments={isLoadingComments}
         comments={comments}
         currentUserName={currentUserData?.data?.name || undefined}
+        currentUserId={currentUserData?.data?.id || undefined}
         currentUserPhotoURL={getCurrentUserPhotoURL(currentUserData?.data)}
         commentCount={practiceData?.data?.stats?.commentCount}
         hasPrevious={hasPrevious}
@@ -476,6 +500,7 @@ export default function PracticeDetailPage() {
         onEditComment={handleCommentEdit}
         onDeleteComment={handleCommentDelete}
         browseActivity={{
+          viewCount: practiceData?.data?.stats?.viewCount,
           followers: (reactionsListData?.data?.items ?? []).map((item) => ({
             id: item.userId,
             name: item.name,

@@ -1,6 +1,7 @@
 "use client";
 
 import type { MoodType, PracticeSummary } from "@daodao/api";
+import { updatePractice } from "@daodao/api";
 import {
   ArrowRightOutlineSvg,
   BoredSvg,
@@ -20,9 +21,11 @@ import { useRouter } from "@daodao/i18n/navigation";
 import { getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
-import { Download, ExternalLink } from "lucide-react";
+import { cn } from "@daodao/ui/lib/utils";
+import { Download, ExternalLink, Globe } from "lucide-react";
 import { motion } from "motion/react";
 import type { ComponentType } from "react";
+import { useState } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { usePracticeSummaryImage } from "./hooks";
 import { PracticeSummaryCard } from "./practice-summary-card";
@@ -49,6 +52,8 @@ const MoodIconMap: Record<MoodType, ComponentType<{ className?: string }>> = {
  */
 export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
   const router = useRouter();
+  const [isPublic, setIsPublic] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   // 使用摘要圖片生成 hook
   const {
@@ -61,6 +66,17 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
 
   const handleBackToHome = () => {
     router.push("/");
+  };
+
+  const handlePublish = async () => {
+    if (isPublic || isPublishing) return;
+    setIsPublishing(true);
+    try {
+      await updatePractice(summary.practiceId, { privacy_status: "public" } as any);
+      setIsPublic(true);
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   // 準備分享內容
@@ -89,6 +105,30 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
       <ConfettiAnimation />
 
       <main className="relative max-w-[448px] mx-auto px-5 pb-24">
+        {/* Public toggle */}
+        <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-xl p-4 mb-4 border border-[#C1ECFF]">
+          <div className="flex items-center gap-2">
+            <Globe className="size-4 text-logo-cyan" />
+            <div>
+              <p className="text-sm font-medium text-text-dark">公開至靈感廣場</p>
+              <p className="text-xs text-text-dark/50">讓其他人看到你的實踐成果</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handlePublish}
+            disabled={isPublic || isPublishing}
+            className={cn(
+              "px-4 py-1.5 rounded-full text-sm font-medium transition-colors",
+              isPublic
+                ? "bg-[#E6FBF8] text-logo-cyan cursor-default"
+                : "bg-logo-cyan text-white hover:bg-logo-cyan/90"
+            )}
+          >
+            {isPublic ? "已公開 ✓" : isPublishing ? "處理中..." : "公開"}
+          </button>
+        </div>
+
         {/* 慶祝區塊 */}
         <section className="text-center py-6">
           <motion.div
