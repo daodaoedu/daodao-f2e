@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@daodao/config": "workspace:*",
-    "next": "catalog:",
     "openapi-fetch": "^0.15.0",
     "swr": "^2.3.8",
     "swr-openapi": "^5.5.0"
@@ -36,6 +35,10 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
+    "next": ">=15.0.0",
     "react": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "next": { "optional": true }
   }
 }
