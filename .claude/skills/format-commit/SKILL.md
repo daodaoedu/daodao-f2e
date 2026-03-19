@@ -12,7 +12,7 @@ description: Use when committing changes - asks user for commit type and Why, au
 ### 步驟 1: 分析當前變更
 
 1. 執行 `git status` 查看當前變更的檔案
-2. 執行 `git diff --stat HEAD` 查看變更統計
+2. 執行 `git diff --stat --staged` 查看變更統計
 3. 簡要總結變更的範圍和影響
 
 ### 步驟 2: 引導使用者填寫內容
@@ -20,6 +20,7 @@ description: Use when committing changes - asks user for commit type and Why, au
 使用 AskUserQuestion 工具詢問使用者：
 
 **第一個問題 - Commit 類型和範圍：**
+
 - header: "Commit 類型"
 - question: "這次的變更屬於哪種類型？"
 - options:
@@ -33,11 +34,13 @@ description: Use when committing changes - asks user for commit type and Why, au
   - chore: 建置或輔助工具變更
 
 **第二個問題 - 影響範圍：**
+
 - header: "影響範圍"
 - question: "這次變更主要影響哪個模組或功能？（例如：ci/cd, auth, api, ui）"
 - 使用 "Other" 選項讓使用者自行輸入
 
 **第三個問題 - 簡短描述：**
+
 - header: "簡短描述"
 - question: "請用一句話描述這次的變更（50 字以內）"
 - 使用 "Other" 選項讓使用者自行輸入
@@ -47,6 +50,7 @@ description: Use when committing changes - asks user for commit type and Why, au
 **Why — 詢問使用者：**
 
 使用 AskUserQuestion：
+
 - question: "請列出需要這次變更的原因（可以多選或補充）"
 - multiSelect: true
 - options: 根據 git diff 分析提供常見原因
@@ -54,7 +58,7 @@ description: Use when committing changes - asks user for commit type and Why, au
 
 **How — 從 git diff 自動推導，不詢問使用者：**
 
-執行 `git diff HEAD` 分析實際變更內容，自行歸納出 3-5 個具體的解決方式。
+執行 `git diff --staged` 分析實際變更內容，自行歸納出 3-5 個具體的解決方式。
 How 描述的是「做了什麼」，答案已在 code changes 中，不需要使用者選擇。
 
 ### 步驟 4: 生成 Commit Message
@@ -87,22 +91,24 @@ How 描述的是「做了什麼」，答案已在 code changes 中，不需要�
 ## 格式規範
 
 ### 標題格式
+
 - 使用 `type(scope): 描述` 格式
 - 描述使用繁體中文，簡潔明確
 - 如需更詳細說明，使用 `—` 分隔：`type(scope): 簡短描述 — 更詳細說明`
 
 ### Why 區塊
+
 - 每個項目以 `-` 開頭
 - 說明問題點或需求背景
 - 使用繁體中文
 - 具體且明確，避免模糊描述
 
 ### How 區塊
+
 - 每個項目以 `-` 開頭
 - 說明具體的解決方案或實作方式
 - 可包含技術細節（檔案名、函式名、參數等）
 - 使用繁體中文，技術術語保留英文
-
 
 ## 範例
 

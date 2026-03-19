@@ -25,6 +25,7 @@ export interface ICommentAuthor {
   name: string;
   photoURL?: string;
   userId?: string;
+  numericUserId?: number;
   customId?: string | null;
 }
 
@@ -71,6 +72,7 @@ function getAvatarColor(name: string) {
 
 interface MentionCandidate {
   userId: string;
+  numericUserId?: number;
   name: string;
   photoURL?: string;
   customId?: string | null;
@@ -110,6 +112,7 @@ interface MentionInputProps {
   inputRef?: React.RefObject<HTMLTextAreaElement | null>;
   participants: MentionCandidate[];
   autoFocus?: boolean;
+  onMentionSelect?: (candidate: MentionCandidate) => void;
 }
 
 function MentionInput({
@@ -122,6 +125,7 @@ function MentionInput({
   inputRef,
   participants,
   autoFocus,
+  onMentionSelect,
 }: MentionInputProps) {
   const localRef = useRef<HTMLTextAreaElement>(null);
   const ref = (inputRef ?? localRef) as React.RefObject<HTMLTextAreaElement>;
@@ -155,6 +159,7 @@ function MentionInput({
     const after = value.slice(mentionStart + 1 + (mentionQuery?.length ?? 0));
     const next = `${before}${mention} ${after}`;
     onChange(next);
+    onMentionSelect?.(candidate);
     setMentionQuery(null);
     setMentionStart(-1);
     requestAnimationFrame(() => {
@@ -499,7 +504,12 @@ interface CommentSectionProps {
   comments: IComment[];
   selectedReactions: ReactionTypeType[];
   inputRef?: React.RefObject<HTMLTextAreaElement | null>;
-  onSubmit: (content: string, reactions: ReactionTypeType[], parentId?: string) => void;
+  onSubmit: (
+    content: string,
+    reactions: ReactionTypeType[],
+    parentId?: string,
+    mentionedUserIds?: number[]
+  ) => void;
   /** 是否顯示「更多留言」摺疊按鈕 */
   hasMoreComments?: boolean;
   /** 當前登入用戶的名稱（顯示用） */
@@ -527,6 +537,8 @@ export function CommentSection({
   const [inputValue, setInputValue] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyInputs, setReplyInputs] = useState<Record<string, string>>({});
+  const [mentionedIds, setMentionedIds] = useState<Map<number, string>>(new Map());
+  const [replyMentionedIds, setReplyMentionedIds] = useState<Record<string, Map<number, string>>>({});
   const [expanded, setExpanded] = useState(false);
   const previewComments = hasMoreComments ? comments.slice(0, PREVIEW_COUNT) : comments;
   const hiddenComments = hasMoreComments ? comments.slice(PREVIEW_COUNT) : [];
@@ -543,6 +555,7 @@ export function CommentSection({
         seen.add(comment.author.userId);
         result.push({
           userId: comment.author.userId,
+          numericUserId: comment.author.numericUserId,
           name: comment.author.name,
           photoURL: comment.author.photoURL,
           customId: comment.author.customId,
@@ -553,6 +566,7 @@ export function CommentSection({
           seen.add(reply.author.userId);
           result.push({
             userId: reply.author.userId,
+            numericUserId: reply.author.numericUserId,
             name: reply.author.name,
             photoURL: reply.author.photoURL,
             customId: reply.author.customId,
@@ -560,7 +574,7 @@ export function CommentSection({
         }
       }
     }
-    return result;
+    return result.filter((p) => p.numericUserId !== undefined);
   }, [comments]);
 
   // Track the previous set to detect newly added reactions
@@ -594,8 +608,14 @@ export function CommentSection({
   const handleSubmit = () => {
     const trimmed = inputValue.trim();
     if (!trimmed) return;
-    onSubmit(trimmed, selectedReactions);
+
+    const activeMentionIds = [...mentionedIds.entries()]
+      .filter(([, handle]) => trimmed.includes(`@${handle}`))
+      .map(([id]) => id);
+
+    onSubmit(trimmed, selectedReactions, undefined, activeMentionIds);
     setInputValue("");
+    setMentionedIds(new Map());
     setReplyTo(null);
   };
 
@@ -611,8 +631,19 @@ export function CommentSection({
     const replyValue = replyInputs[parentId] ?? "";
     const trimmed = replyValue.trim();
     if (!trimmed) return;
-    onSubmit(trimmed, selectedReactions, parentId);
+
+    const replyMentions = replyMentionedIds[parentId] ?? new Map<number, string>();
+    const activeMentionIds = [...replyMentions.entries()]
+      .filter(([, handle]) => trimmed.includes(`@${handle}`))
+      .map(([id]) => id);
+
+    onSubmit(trimmed, selectedReactions, parentId, activeMentionIds);
     setReplyInputs((prev) => ({ ...prev, [parentId]: "" }));
+    setReplyMentionedIds((prev) => {
+      const next = { ...prev };
+      delete next[parentId];
+      return next;
+    });
     setReplyTo(null);
   };
 
@@ -667,6 +698,16 @@ export function CommentSection({
             rows={1}
             participants={participants}
             className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
+            onMentionSelect={(candidate) => {
+              if (!candidate.numericUserId) return;
+              const pid = String(comment.id);
+              setReplyMentionedIds((prev) => {
+                const prevMap = prev[pid] ?? new Map<number, string>();
+                const next = new Map(prevMap);
+                next.set(candidate.numericUserId!, candidate.customId || candidate.name);
+                return { ...prev, [pid]: next };
+              });
+            }}
           />
           <Button
             size="icon"
@@ -706,6 +747,14 @@ export function CommentSection({
           inputRef={ref}
           participants={participants}
           className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10 w-full"
+          onMentionSelect={(candidate) => {
+            if (!candidate.numericUserId) return;
+            setMentionedIds((prev) => {
+              const next = new Map(prev);
+              next.set(candidate.numericUserId!, candidate.customId || candidate.name);
+              return next;
+            });
+          }}
         />
 
         {/* Send */}

@@ -46,6 +46,7 @@ userStorage.remove();
 ```
 
 **可用的 StorageEnum：**
+
 - `StorageEnum.Quiz` - sessionStorage，用於存儲使用者做島島測試的資料
 - `StorageEnum.UserInfo` - localStorage，用於存儲使用者資訊（非敏感資料）
 - `StorageEnum.Whitelist` - localStorage，用於存儲外連結受信任網站列表
@@ -54,6 +55,7 @@ userStorage.remove();
 **禁止直接使用 `localStorage` 或 `sessionStorage`**
 
 新增 storage key 的流程：
+
 1. 在 `packages/shared/src/lib/storage.ts` 的 `StorageEnum` 中新增 key
 2. 在 `mapStorageKeyToStorageType` 中定義對應的 storage 類型
 3. 添加適當的註解說明該 storage 的用途
@@ -228,6 +230,7 @@ export type TaskStatus = typeof TaskStatus[keyof typeof TaskStatus];
 ```
 
 **命名規範：**
+
 - 運行時常數：PascalCase，例如 `TaskStatus`, `MoodType`, `CheckInStatus`
 - 類型名稱：PascalCase，以 `Type` 作為後綴（可省略），例如 `TaskStatus`, `MoodType`, `CheckInStatusType`
 - 常數屬性：camelCase，例如 `notStarted`, `inProgress`, `alreadyCheckedIn`
@@ -244,6 +247,7 @@ if (status === TaskStatus.inProgress) {
 ```
 
 **現有的運行時常數：**
+
 - `MoodType` - `constants/mood.ts`
 - `TaskStatus` - `constants/task-status.tsx`
 - `FilterStatus` - `constants/task-status.tsx`
@@ -254,6 +258,7 @@ if (status === TaskStatus.inProgress) {
 ### Type & Interface Naming Conventions
 
 **命名規範：**
+
 - **Types**：PascalCase + `Type` 後綴，例如 `TaskStatusType`, `MoodType`, `CheckInStatusType`
 - **Interfaces**：PascalCase + `I` 前綴，例如 `ICheckInFormData`, `IUserInfo`, `ITaskItem`
 - **Component Props**：PascalCase + `ComponentProps` 後綴，例如 `ButtonProps`, `CheckInSheetProps`, `UserInfoCardProps`
@@ -365,3 +370,11 @@ export const updateResource = async (id: string, data: UpdateRequestType) => {
 ## Commit 規範
 
 每次執行 git commit 時，必須使用 `.claude/skills/format-commit/SKILL.md` skill 的流程來產生 commit message。
+
+流程：
+
+1. 詢問使用者 commit 類型（feat / fix / refactor / perf / docs / style / test / chore）
+2. 詢問影響範圍與簡短描述
+3. 詢問 Why（原因）
+4. 從 git diff 自動推導 How（做了什麼）
+5. 產生 commit message 並請使用者確認後執行

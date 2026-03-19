@@ -1,0 +1,42 @@
+import { forwardRef } from "react";
+import type { SVGProps, Ref } from "react";
+
+interface SvgComponentProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
+  ref?: Ref<SVGSVGElement>;
+}
+
+const PinkSvg = forwardRef<SVGSVGElement, Omit<SVGProps<SVGSVGElement>, "ref">>(
+  function PinkSvg(props, ref) {
+    return (
+      <svg viewBox="0 0 294 239" fill="none" xmlns="http://www.w3.org/2000/svg" ref={ref} {...props}>
+        <g clipPath="url(#clip0_687_2801)">
+<rect width="294" height="239" fill="#FFC0C8"/>
+<g style={{ mixBlendMode: "screen" }}>
+<path d="M97 0H195.5V98.5C182.568 98.5083 169.761 95.9667 157.81 91.0204C145.86 86.074 135.001 78.8199 125.854 69.6725C116.706 60.5251 109.45 49.6637 104.499 37.709C99.5482 25.7543 97 12.9406 97 0Z" fill="url(#paint0_linear_687_2801)" fillOpacity="0.4"/>
+<path d="M294 97.3807C267.9 97.3974 242.862 87.1484 224.391 68.8871C205.92 50.6259 195.528 25.8475 195.5 0H294V97.3807Z" fill="url(#paint1_linear_687_2801)" fillOpacity="0.4"/>
+</g>
+<path d="M78.5838 198.294C61.3487 198.294 31.7297 209.017 21.1647 236.272C20.5632 237.823 21.6816 239.499 23.3455 239.499H133.822C135.486 239.499 136.604 237.823 136.003 236.272C125.438 209.017 95.8189 198.294 78.5838 198.294Z" fill="#FFA4AB"/>
+<path d="M218.048 22.0138C218.044 18.6925 215.346 16.0026 212.021 16.006C208.696 16.0093 206.003 18.7045 206.006 22.0259C206.01 25.3473 208.708 28.0371 212.033 28.0338C215.358 28.0304 218.051 25.3352 218.048 22.0138Z" fill="white" fillOpacity="0.5"/>
+<path d="M246.641 22.02C246.641 18.6986 243.945 16.0061 240.62 16.0061C237.295 16.0061 234.599 18.6986 234.599 22.02C234.599 25.3414 237.295 28.0339 240.62 28.0339C243.945 28.0339 246.641 25.3414 246.641 22.02Z" fill="white" fillOpacity="0.5"/>
+<path d="M275.99 22.02C275.99 18.6986 273.294 16.0061 269.969 16.0061C266.644 16.0061 263.948 18.6986 263.948 22.02C263.948 25.3414 266.644 28.0339 269.969 28.0339C273.294 28.0339 275.99 25.3414 275.99 22.02Z" fill="white" fillOpacity="0.5"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_687_2801" x1="146.25" y1="0" x2="146.25" y2="98.5" gradientUnits="userSpaceOnUse">
+<stop stopColor="#E0DDFF"/>
+<stop offset="1" stopColor="#666299"/>
+</linearGradient>
+<linearGradient id="paint1_linear_687_2801" x1="244.75" y1="0" x2="244.75" y2="97.3807" gradientUnits="userSpaceOnUse">
+<stop stopColor="#E0DDFF"/>
+<stop offset="1" stopColor="#666299"/>
+</linearGradient>
+<clipPath id="clip0_687_2801">
+<rect width="294" height="239" fill="white"/>
+</clipPath>
+</defs>
+      </svg>
+    );
+  }
+);
+
+export default PinkSvg;
+export type { SvgComponentProps };

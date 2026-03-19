@@ -1,0 +1,22 @@
+import { forwardRef } from "react";
+import type { SVGProps, Ref } from "react";
+
+interface SvgComponentProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
+  ref?: Ref<SVGSVGElement>;
+}
+
+const FrustratedSvg = forwardRef<SVGSVGElement, Omit<SVGProps<SVGSVGElement>, "ref">>(
+  function FrustratedSvg(props, ref) {
+    return (
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" ref={ref} {...props}>
+        <path d="M35.2622 48H12.7378C5.70301 48 0 42.2963 0 35.2614V12.7375C0 5.70259 5.70301 0 12.7378 0H35.2622C42.297 0 48 5.70259 48 12.7375V35.2614C48 42.2963 42.297 48 35.2622 48Z" fill="#98E4F1"/>
+<path d="M32.656 34.8343C33.8587 34.8343 34.7574 33.6681 34.4457 32.4761C33.2836 28.0291 28.9072 24.7224 23.6864 24.7224C18.4656 24.7224 14.0895 28.0291 12.9274 32.4761C12.6157 33.6681 13.5145 34.8343 14.7168 34.8343L21.5306 33.9C22.8945 33.7129 24.2766 33.7107 25.6411 33.8935L32.656 34.8343Z" fill="#343332"/>
+<path d="M10.7952 17.0048C10.7952 15.3452 12.1059 14 13.7234 14C15.3403 14 16.6511 15.3452 16.6511 17.0048C16.6511 18.6641 15.3403 20.0096 13.7234 20.0096C12.1059 20.0096 10.7952 18.6641 10.7952 17.0048Z" fill="#343332"/>
+<path d="M31.2958 17.0048C31.2958 15.3452 32.6066 14 34.2234 14C35.8409 14 37.1517 15.3452 37.1517 17.0048C37.1517 18.6641 35.8409 20.0096 34.2234 20.0096C32.6066 20.0096 31.2958 18.6641 31.2958 17.0048Z" fill="#343332"/>
+      </svg>
+    );
+  }
+);
+
+export default FrustratedSvg;
+export type { SvgComponentProps };

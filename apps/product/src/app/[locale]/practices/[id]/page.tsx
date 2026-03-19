@@ -51,6 +51,7 @@ interface IApiCommentNode {
   content?: string;
   createdAt?: string;
   user?: IApiCommentUser;
+  userId?: number;
   replies?: unknown[];
 }
 
@@ -127,6 +128,7 @@ function mapReply(reply: IApiCommentNode): ICommentReply {
       name: reply.user?.name || "匿名使用者",
       photoURL: reply.user?.photoURL || undefined,
       userId: reply.user?.id || undefined,
+      numericUserId: reply.userId ?? undefined,
       customId: reply.user?.customId ?? undefined,
     },
     content: reply.content || "",
@@ -144,6 +146,7 @@ function mapComment(comment: IApiCommentNode): IComment {
       name: comment.user?.name || "匿名使用者",
       photoURL: comment.user?.photoURL || undefined,
       userId: comment.user?.id || undefined,
+      numericUserId: comment.userId ?? undefined,
       customId: comment.user?.customId ?? undefined,
     },
     content: comment.content || "",
@@ -343,13 +346,14 @@ export default function PracticeDetailPage() {
   };
 
   const handleCommentSubmit = useCallback(
-    async (content: string, parentId?: string) => {
+    async (content: string, parentId?: string, mentionedUserIds?: number[]) => {
       const response = await createComment({
         targetType: "practice",
         targetId: practiceId,
         content,
         visibility: "public",
         parentId: parentId ? Number(parentId) : undefined,
+        mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
       });
 
       if (response.error) {
@@ -494,8 +498,8 @@ export default function PracticeDetailPage() {
         onDeletePractice={() => {
           void handleDelete();
         }}
-        onSubmitComment={(content, parentId) => {
-          void handleCommentSubmit(content, parentId);
+        onSubmitComment={(content, parentId, mentionedUserIds) => {
+          void handleCommentSubmit(content, parentId, mentionedUserIds);
         }}
         onEditComment={handleCommentEdit}
         onDeleteComment={handleCommentDelete}
