@@ -21,6 +21,14 @@ config.resolver.unstable_enablePackageExports = true;
 // 支援 workspace packages
 config.resolver.disableHierarchicalLookup = false;
 
+// 強制 singleton 套件都解析到 app 自身的 node_modules，避免 monorepo 中出現重複實例
+// （packages/api 有自己的 react/swr，會導致「Cannot read property 'useDebugValue' of null」）
+config.resolver.extraNodeModules = {
+  react: path.resolve(projectRoot, "node_modules/react"),
+  "react-native": path.resolve(projectRoot, "node_modules/react-native"),
+  swr: path.resolve(projectRoot, "node_modules/swr"),
+};
+
 module.exports = withTamagui(config, {
   components: ["tamagui"],
   config: "./tamagui.config.ts",
