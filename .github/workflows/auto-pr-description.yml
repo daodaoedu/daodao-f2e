@@ -21,23 +21,23 @@ jobs:
 
       - name: Get commit log
         id: commits
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
         run: |
-          BASE="${{ github.event.pull_request.base.ref }}"
-          HEAD="${{ github.event.pull_request.head.ref }}"
-          COMMITS=$(git log origin/$BASE..origin/$HEAD --pretty=format:"- %s (%h)" | head -50)
-          echo "COMMITS<<EOF" >> $GITHUB_OUTPUT
-          echo "$COMMITS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          COMMITS=$(git log "origin/$BASE..origin/$HEAD" --pretty=format:"- %s (%h)" | head -50)
+          echo "COMMITS<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$COMMITS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Generate PR description with GitHub Models
         id: generate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMITS: ${{ steps.commits.outputs.COMMITS }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
         run: |
-          COMMITS="${{ steps.commits.outputs.COMMITS }}"
-          BASE="${{ github.event.pull_request.base.ref }}"
-          HEAD="${{ github.event.pull_request.head.ref }}"
-
           RESPONSE=$(curl -s -X POST "https://models.inference.ai.azure.com/chat/completions" \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Content-Type: application/json" \
@@ -50,7 +50,7 @@ jobs:
                 messages: [
                   {
                     role: "system",
-                    content: "你是一個專業的技術文件撰寫者。根據 git commit 列表，產生繁體中文的 PR description。格式必須嚴格按照以下 markdown 結構，不要加其他內容：\n\n## Why is this necessary?\n\n- （說明這批變更的目的和原因，3-5 點）\n\n## How does it address?\n\n- （說明具體做了什麼，3-5 點）\n\n## Screenshots/Demo\n\n<!-- 如果有 UI 變更，請提供截圖或 Demo -->"
+                    content: "你是一個專業的技術文件撰寫者。根據 git commit 列表，產生繁體中文的 PR description。格式必須嚴格按照以下 markdown 結構，不要加其他內容：\n\n## Why is this necessary?\n\n- （說明這批變更的目的和原因，3-5 點）\n\n## How does it address?\n\n- （說明具體做了什麼，3-5 點）"
                   },
                   {
                     role: "user",
@@ -69,19 +69,19 @@ jobs:
             exit 1
           fi
 
-          echo "BODY<<EOF" >> $GITHUB_OUTPUT
-          echo "$BODY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "BODY<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$BODY" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
           echo "✅ Description generated"
 
       - name: Update PR description
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BODY: ${{ steps.generate.outputs.BODY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
         run: |
-          BODY="${{ steps.generate.outputs.BODY }}"
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-
-          gh api repos/${{ github.repository }}/pulls/$PR_NUMBER \
+          gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" \
             --method PATCH \
             -f body="$BODY"
 
