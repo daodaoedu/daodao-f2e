@@ -1,5 +1,8 @@
 import * as SecureStore from "expo-secure-store";
 
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so";
+const REQUEST_TIMEOUT = 30_000; // 30 秒，與原 api-client.ts 一致
+
 const KEYS = {
   ACCESS_TOKEN: "daodao_access_token",
   REFRESH_TOKEN: "daodao_refresh_token",
@@ -75,3 +78,41 @@ export const authStorage = {
     return !!token;
   },
 };
+
+/**
+ * 使用 refresh token 取得新的 access token 並存回 SecureStore。
+ * 含 30 秒 timeout（與原 api-client.ts 的 refreshAccessToken 一致）。
+ * 若刷新失敗，清除所有 auth 資料（強制登出）。
+ */
+export async function refreshTokens(): Promise<void> {
+  const refreshToken = await authStorage.getRefreshToken();
+  if (!refreshToken) throw new Error("No refresh token available");
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      await authStorage.clearAll();
+      throw new Error("Token refresh failed");
+    }
+
+    const data: { accessToken: string; refreshToken: string } = await response.json();
+    await authStorage.setTokens(data);
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error("Token refresh timeout");
+    }
+    throw error;
+  }
+}
