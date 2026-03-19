@@ -85,7 +85,7 @@ export const PublicInfoForm = () => {
         discord: contactList?.discord || "",
         line: contactList?.line || "",
         threads: contactList?.threads || "",
-        hideConnectionsCount: user.hideConnectionsCount ?? false,
+        hideConnectionsCount: (user as { hideConnectionsCount?: boolean }).hideConnectionsCount ?? false,
       });
     }
   }, [userData, citiesData, form.reset]);
@@ -157,7 +157,7 @@ export const PublicInfoForm = () => {
 
       // 刷新用戶資料
       await mutate(["/api/v1/users/me"] as const);
-      mutate('/api/v1/users/settings-summary');
+      mutate(['/api/v1/users/settings-summary'] as const);
 
       // 成功
       toast.success("公開資訊設定已更新");

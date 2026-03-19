@@ -272,7 +272,7 @@ const ConnectionsTab = () => {
 const FollowingTab = () => {
   const [subTab, setSubTab] = useState<"users" | "practices">("users");
   const { data: currentUserData } = useCurrentUser();
-  const userId = currentUserData?.user?.id ?? "";
+  const userId = currentUserData?.data?.id ?? "";
   const { openWarningDialog } = useDialog();
 
   const { data: followingData, isLoading: loadingFollowing } = useFollowing({ userId });
@@ -289,8 +289,7 @@ const FollowingTab = () => {
   const handleUnfollow = async (targetType: "user" | "practice", targetId: string) => {
     const result = await openWarningDialog({
       title: "取消關注",
-      description: "確定要取消關注嗎？",
-      confirmLabel: "取消關注",
+      message: "確定要取消關注嗎？",
     });
     if (!result) return;
     try {

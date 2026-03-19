@@ -88,11 +88,10 @@ export const NotificationSettings = () => {
   // Sync from API response
   useEffect(() => {
     if (!data) return;
-    setGlobalEnabled(data.globalEnabled);
     const newPrefs: PreferencesMap = { ...DEFAULT_PREFS };
-    for (const p of data.preferences ?? []) {
-      if (p.channel === "N01" && newPrefs[p.notificationType]) {
-        newPrefs[p.notificationType] = { emailEnabled: p.isEnabled };
+    for (const p of data.data ?? []) {
+      if (p.channel === "N01" && newPrefs[p.type]) {
+        newPrefs[p.type] = { emailEnabled: p.isEnabled };
       }
     }
     setPrefs(newPrefs);
@@ -119,7 +118,7 @@ export const NotificationSettings = () => {
     setIsSaving(true);
     try {
       await updateNotificationPreferences({
-        preferences: [{ notificationType, channel: "N01", isEnabled: emailEnabled }],
+        preferences: [{ type: notificationType, channel: "N01", isEnabled: emailEnabled }],
       });
       mutate();
     } catch {
