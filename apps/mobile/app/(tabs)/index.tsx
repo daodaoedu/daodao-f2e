@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { HomeBanner, PracticeCard } from "@/components";
 import { colors } from "@/generated/design-tokens";
 import { useCheckIn, usePractices } from "@/hooks/usePractices";
+import { useCurrentUser } from "@daodao/api";
 import type { Practice } from "@/types/practice";
 
 // Mock data - 4 種顏色的卡片 (進行中)
@@ -116,6 +117,8 @@ export default function HomeScreen() {
   const router = useRouter();
   const { activePractices, completedPractices, isLoading, mutate } = usePractices();
   const { checkIn, isChecking } = useCheckIn();
+  const { data: me, error: meError } = useCurrentUser();
+  console.log("[Auth Bridge Test]", { me, error: meError });
 
   // 使用 mock data 或真實數據
   const inProgressPractices = useMemo(() => {

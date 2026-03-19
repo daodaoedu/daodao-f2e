@@ -90,10 +90,6 @@ class UnauthorizedHandler {
     const body: BodyInit | null | undefined =
       input instanceof Request ? (input.body as BodyInit | null) : init?.body;
 
-    if (__DEV__) {
-      console.log("[wrapFetch]", { url, method, hasMobileProvider: !!_mobileTokenProvider });
-    }
-
     let fetchInit: RequestInit;
 
     if (_mobileTokenProvider) {
