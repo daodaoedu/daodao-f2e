@@ -6,7 +6,7 @@ import type { AuthTokens, StoredUser } from "./auth-storage";
 // Ensure WebBrowser session is properly closed
 WebBrowser.maybeCompleteAuthSession();
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so";
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "https://server-dev.daodao.so";
 const API_URL = `${API_BASE_URL}/api/v1`;
 
 interface OAuthResult {
