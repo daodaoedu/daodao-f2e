@@ -346,13 +346,14 @@ export default function PracticeDetailPage() {
   };
 
   const handleCommentSubmit = useCallback(
-    async (content: string, parentId?: string) => {
+    async (content: string, parentId?: string, mentionedUserIds?: number[]) => {
       const response = await createComment({
         targetType: "practice",
         targetId: practiceId,
         content,
         visibility: "public",
         parentId: parentId ? Number(parentId) : undefined,
+        mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
       });
 
       if (response.error) {
@@ -497,8 +498,8 @@ export default function PracticeDetailPage() {
         onDeletePractice={() => {
           void handleDelete();
         }}
-        onSubmitComment={(content, parentId) => {
-          void handleCommentSubmit(content, parentId);
+        onSubmitComment={(content, parentId, mentionedUserIds) => {
+          void handleCommentSubmit(content, parentId, mentionedUserIds);
         }}
         onEditComment={handleCommentEdit}
         onDeleteComment={handleCommentDelete}

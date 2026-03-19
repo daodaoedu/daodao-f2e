@@ -99,7 +99,7 @@ interface IPracticeDetailShellProps {
   onArchivePractice: () => void;
   onDeletePractice: () => void;
   onDeleteResource?: (resourceId: string) => void;
-  onSubmitComment: (content: string, parentId?: string) => void;
+  onSubmitComment: (content: string, parentId?: string, mentionedUserIds?: number[]) => void;
   onEditComment: (id: string, content: string) => Promise<unknown> | unknown;
   onDeleteComment: (id: string) => Promise<unknown> | unknown;
   footer?: React.ReactNode;
@@ -662,7 +662,7 @@ export function PracticeDetailShell({
             <CommentSection
               comments={comments}
               selectedReactions={[]}
-              onSubmit={(content, _reactions, parentId) => onSubmitComment(content, parentId)}
+              onSubmit={(content, _reactions, parentId, mentionedUserIds) => onSubmitComment(content, parentId, mentionedUserIds)}
               hasMoreComments
               currentUserName={currentUserName}
               currentUserId={currentUserId}
