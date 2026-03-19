@@ -3,10 +3,33 @@ import createClient, {
   type ClientPathsWithMethod,
   type FetchResponse,
   type MaybeOptionalInit,
+  type Middleware,
 } from "openapi-fetch";
 import type { paths } from "./types";
 
 export const PREFIX = "dao-dao-server-api" as const;
+
+// ============================================================================
+// Mobile Auth Provider
+// ============================================================================
+
+/**
+ * Mobile 平台的 token provider。
+ * 設定後，wrapFetch 改用 Bearer token 驗證，不帶 credentials: "include"。
+ * Web（product）不設定此值，維持 cookie 行為。
+ */
+let _mobileTokenProvider: (() => Promise<string | null>) | null = null;
+
+/** openapi-fetch middleware 實例，用於覆蓋 mobile 的 baseUrl */
+let _baseUrlMiddleware: Middleware | null = null;
+
+export function setMobileTokenProvider(fn: () => Promise<string | null>): void {
+  _mobileTokenProvider = fn;
+}
+
+export function clearMobileTokenProvider(): void {
+  _mobileTokenProvider = null;
+}
 
 /**
  * 401 錯誤處理器類別
@@ -48,12 +71,31 @@ class UnauthorizedHandler {
    * @returns Response 物件
    */
   wrapFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    // 確保 credentials 被設置，以支援跨域 cookie
-    const fetchInit: RequestInit = {
-      ...init,
-      credentials: "include",
-    };
+    // openapi-fetch 以單一 Request object 呼叫此函式，init 永遠為 undefined。
+    // 必須從 input（Request object）讀取現有 headers，不能依賴 init?.headers。
+    const existingHeaders: Record<string, string> =
+      input instanceof Request
+        ? Object.fromEntries(input.headers.entries())
+        : Object.fromEntries(new Headers(init?.headers).entries());
 
+    let fetchInit: RequestInit;
+
+    if (_mobileTokenProvider) {
+      // Mobile path：Bearer token，不帶 credentials cookie
+      const token = await _mobileTokenProvider();
+      fetchInit = {
+        ...init,
+        headers: {
+          ...existingHeaders,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      };
+    } else {
+      // Web path：維持現有 cookie 行為
+      fetchInit = { ...init, headers: existingHeaders, credentials: "include" };
+    }
+
+    // URL 解析（Expo/Hermes 已內建 URL global，since RN 0.63）
     let url: string;
     if (typeof input === "string") {
       url = input;
@@ -62,6 +104,7 @@ class UnauthorizedHandler {
     } else {
       url = input.url;
     }
+
     const response = await fetch(input, fetchInit);
 
     // 如果不是 401 或沒有處理器，直接返回
@@ -70,19 +113,16 @@ class UnauthorizedHandler {
     }
 
     // 如果是 refresh token endpoint 返回 401，直接返回，避免死鎖
-    const isRefreshEndpoint = url.includes("/api/v1/auth/refresh");
-    if (isRefreshEndpoint) {
+    if (url.includes("/api/v1/auth/refresh")) {
       return response;
     }
 
-    // 如果正在刷新，等待刷新完成
+    // 如果正在刷新，等待刷新完成後重試
     if (this.isRefreshing && this.refreshPromise) {
       const refreshSuccess = await this.refreshPromise;
       if (refreshSuccess) {
-        // 刷新成功，重試原請求（確保 credentials 被傳遞）
-        return fetch(input, fetchInit);
+        return this._retryWithFreshToken(input, fetchInit);
       }
-      // 刷新失敗，返回原始 401 響應
       return response;
     }
 
@@ -93,16 +133,36 @@ class UnauthorizedHandler {
     try {
       const refreshSuccess = await this.refreshPromise;
       if (refreshSuccess) {
-        // 刷新成功，重試原請求（確保 credentials 被傳遞）
-        return fetch(input, fetchInit);
+        return this._retryWithFreshToken(input, fetchInit);
       }
-      // 刷新失敗，返回原始 401 響應
       return response;
     } finally {
-      // 重置刷新狀態
       this.isRefreshing = false;
       this.refreshPromise = null;
     }
+  };
+
+  /**
+   * 401 refresh 成功後重試原請求，重新取最新 token。
+   * fetchInit 保留原始 method/body 等，Authorization 被新 token 覆蓋。
+   * fetchInit.headers 是已展開的 plain object，spread order 正確（新 token 覆蓋舊值）。
+   */
+  private _retryWithFreshToken = async (
+    input: RequestInfo | URL,
+    fetchInit: RequestInit
+  ): Promise<Response> => {
+    if (_mobileTokenProvider) {
+      const newToken = await _mobileTokenProvider();
+      return fetch(input, {
+        ...fetchInit,
+        headers: {
+          ...(fetchInit.headers as Record<string, string>),
+          ...(newToken ? { Authorization: `Bearer ${newToken}` } : {}),
+        },
+      });
+    }
+    // Web path：cookie 已由 refresh 更新，直接重試
+    return fetch(input, fetchInit);
   };
 }
 
@@ -128,9 +188,51 @@ export interface ApiClientConfig {
  */
 export const client = createClient<paths>({
   baseUrl: getRequiredEnv("NEXT_PUBLIC_API_URL"),
-  credentials: "include",
+  // credentials 由 wrapFetch 依平台設定（web: "include", mobile: 不設定）
   fetch: typeof window === "undefined" ? fetch : unauthorizedHandler.wrapFetch,
 });
+
+/**
+ * 初始化 mobile 的 API client。
+ * - 設定 Bearer token provider（_mobileTokenProvider）
+ * - 透過 openapi-fetch middleware 覆蓋 baseUrl（host/protocol/port）
+ * 在 AuthProvider mount 時呼叫；在 unmount 時呼叫 clearMobileClient。
+ */
+export function initMobileClient(config: {
+  baseUrl: string;
+  getToken: () => Promise<string | null>;
+}): void {
+  setMobileTokenProvider(config.getToken);
+
+  // 移除舊 middleware，防止 Fast Refresh 重複註冊
+  if (_baseUrlMiddleware) {
+    client.eject(_baseUrlMiddleware);
+  }
+
+  _baseUrlMiddleware = {
+    onRequest({ request }) {
+      const url = new URL(request.url);
+      const base = new URL(config.baseUrl);
+      url.protocol = base.protocol;
+      url.host = base.host;
+      url.port = base.port;
+      return new Request(url.toString(), request);
+    },
+  };
+
+  client.use(_baseUrlMiddleware);
+}
+
+/**
+ * 清除 mobile client 設定。在 AuthProvider unmount 時呼叫。
+ */
+export function clearMobileClient(): void {
+  clearMobileTokenProvider();
+  if (_baseUrlMiddleware) {
+    client.eject(_baseUrlMiddleware);
+    _baseUrlMiddleware = null;
+  }
+}
 
 type InitParam<Init> = Init extends undefined ? never : Init;
 
