@@ -574,7 +574,7 @@ export function CommentSection({
         }
       }
     }
-    return result;
+    return result.filter((p) => p.numericUserId !== undefined);
   }, [comments]);
 
   // Track the previous set to detect newly added reactions
