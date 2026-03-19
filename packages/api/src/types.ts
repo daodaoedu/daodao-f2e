@@ -25935,6 +25935,11 @@ export interface components {
              * @example 100
              */
             parentId?: number;
+            /**
+             * @description 提及的用户IDs
+             * @example [1, 2, 3]
+             */
+            mentionedUserIds?: number[];
         };
         /** @description 更新留言的請求資料 */
         UpdateCommentRequest: {
