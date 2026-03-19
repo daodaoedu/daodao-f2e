@@ -120,10 +120,11 @@ export function ReactionPickerButton({
       {open && (
         <div
           className={cn(
-            "absolute bottom-full mb-2 flex gap-1 bg-white rounded-full shadow-lg border border-[#E4EAE9] px-2 py-1.5 z-10",
+            "absolute bottom-full pb-2 z-10 flex flex-col items-center",
             isCard ? "left-1/2 -translate-x-1/2" : "left-0"
           )}
         >
+        <div className="flex gap-1 bg-white rounded-full shadow-lg border border-[#E4EAE9] px-2 py-1.5">
           {PICKER_REACTIONS.map((type) => {
             const config = REACTION_CONFIG[type];
             const isSelected = selectedReactions.includes(type);
@@ -155,6 +156,7 @@ export function ReactionPickerButton({
               </div>
             );
           })}
+        </div>
         </div>
       )}
 
