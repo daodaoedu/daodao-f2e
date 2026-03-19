@@ -1,6 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so";
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "https://server-dev.daodao.so";
 const REQUEST_TIMEOUT = 30_000; // 30 秒，與原 api-client.ts 一致
 
 const KEYS = {

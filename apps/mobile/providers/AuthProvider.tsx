@@ -35,7 +35,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 // 在模組載入時（React 渲染前）立即初始化，確保 SWR 第一次 fetch 就用正確的 baseUrl 與 token
 // 若放在 useEffect 裡，children 已掛載並發出 fetch 後才執行，導致首次 fetch 打到 localhost:4000
 initMobileClient({
-  baseUrl: process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so",
+  baseUrl: process.env.EXPO_PUBLIC_API_URL ?? "https://server-dev.daodao.so",
   getToken: () => authStorage.getAccessToken(),
 });
 
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       unauthorizedHandler.clearHandler();
       // Fast Refresh 後重新初始化
       initMobileClient({
-        baseUrl: process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so",
+        baseUrl: process.env.EXPO_PUBLIC_API_URL ?? "https://server-dev.daodao.so",
         getToken: () => authStorage.getAccessToken(),
       });
     };
