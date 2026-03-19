@@ -12,7 +12,7 @@ description: Use when committing changes - asks user for commit type and Why, au
 ### 步驟 1: 分析當前變更
 
 1. 執行 `git status` 查看當前變更的檔案
-2. 執行 `git diff --stat --staged` 查看變更統計
+2. 執行 `git diff --stat HEAD` 查看變更統計
 3. 簡要總結變更的範圍和影響
 
 ### 步驟 2: 引導使用者填寫內容
@@ -54,7 +54,7 @@ description: Use when committing changes - asks user for commit type and Why, au
 
 **How — 從 git diff 自動推導，不詢問使用者：**
 
-執行 `git diff --staged` 分析實際變更內容，自行歸納出 3-5 個具體的解決方式。
+執行 `git diff HEAD` 分析實際變更內容，自行歸納出 3-5 個具體的解決方式。
 How 描述的是「做了什麼」，答案已在 code changes 中，不需要使用者選擇。
 
 ### 步驟 4: 生成 Commit Message
