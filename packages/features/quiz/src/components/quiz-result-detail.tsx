@@ -33,9 +33,8 @@ export const QuizResultDetail = ({ resultId }: QuizResultDetailProps) => {
             <HorizontalFullSvg className="h-[22px]" />
           </header>
           <BackButton
-            label="返回結果頁"
+            label="返回上一頁"
             className="text-sm font-normal"
-            onClick={(router) => router.push("/quiz/result")}
           />
           <h1 className="heading-md mb-3">群島全圖鑑</h1>
           <section className="mb-4 flex items-center">

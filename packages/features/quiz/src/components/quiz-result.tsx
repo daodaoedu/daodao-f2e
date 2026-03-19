@@ -226,7 +226,13 @@ export const QuizResult = () => {
               這裡，是個人成長與集體智慧交會的所在。
             </p>
             <Button className="w-full" asChild>
-              <CustomLink href="/">前往 島島阿學</CustomLink>
+              {isAuthenticated ? (
+                <CustomLink href={process.env.NEXT_PUBLIC_APP_URL || "https://app.daodao.so"}>
+                  回到 島島阿學
+                </CustomLink>
+              ) : (
+                <CustomLink href="/">前往 島島阿學</CustomLink>
+              )}
             </Button>
           </footer>
         </div>

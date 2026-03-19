@@ -31,9 +31,6 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
 
   return (
     <section className="mb-6">
-      <div className="max-w-[640px] px-5 mx-auto mb-3">
-        <h2 className="text-[1.125rem] font-medium text-bg-dark">進行中</h2>
-      </div>
       <div
         className={cn(
           "max-w-[640px] px-5 mx-auto",
