@@ -90,6 +90,10 @@ class UnauthorizedHandler {
     const body: BodyInit | null | undefined =
       input instanceof Request ? (input.body as BodyInit | null) : init?.body;
 
+    if (__DEV__) {
+      console.log("[wrapFetch]", { url, method, hasMobileProvider: !!_mobileTokenProvider });
+    }
+
     let fetchInit: RequestInit;
 
     if (_mobileTokenProvider) {
@@ -97,7 +101,8 @@ class UnauthorizedHandler {
       const token = await _mobileTokenProvider();
       fetchInit = {
         method,
-        body,
+        // GET/HEAD 不帶 body：React Native Hermes 遇到 body: null 的 GET 會拋出 Network request failed
+        ...(body != null ? { body } : {}),
         headers: {
           ...existingHeaders,
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -105,7 +110,7 @@ class UnauthorizedHandler {
       };
     } else {
       // Web path：維持現有 cookie 行為
-      fetchInit = { method, body, headers: existingHeaders, credentials: "include" };
+      fetchInit = { method, ...(body != null ? { body } : {}), headers: existingHeaders, credentials: "include" };
     }
 
     const response = await fetch(url, fetchInit);
