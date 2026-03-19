@@ -163,6 +163,7 @@ jobs:
       - name: Install dependencies and build
         run: |
           pnpm install --frozen-lockfile
+          pnpm --filter @daodao/config generate:env
           pnpm --filter @daodao/website build
 
       - name: Set Environment Variables
@@ -289,6 +290,7 @@ jobs:
       - name: Install dependencies and build
         run: |
           pnpm install --frozen-lockfile
+          pnpm --filter @daodao/config generate:env
           pnpm --filter @daodao/product build
 
       - name: Set Environment Variables
