@@ -8,7 +8,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { mutate } from "swr";
+import { mutate as globalMutate } from "swr";
 import { useForm } from "react-hook-form";
 import { AvatarUploadSection } from "./avatar-upload-section";
 import { BasicInfoSection } from "./basic-info-section";
@@ -157,7 +157,7 @@ export const PublicInfoForm = () => {
 
       // 刷新用戶資料
       await mutate(["/api/v1/users/me"] as const);
-      mutate('/api/v1/users/settings-summary');
+      globalMutate('/api/v1/users/settings-summary');
 
       // 成功
       toast.success("公開資訊設定已更新");
