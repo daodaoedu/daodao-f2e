@@ -1,16 +1,13 @@
-name: Auto PR Description (dev → prod)
+name: Auto PR Description
 
 on:
   pull_request:
     types: [opened]
-    branches:
-      - prod
 
 jobs:
   generate_description:
     name: Generate PR Description with GitHub Models
     runs-on: ubuntu-latest
-    if: github.head_ref == 'dev'
     permissions:
       pull-requests: write
       contents: read
@@ -25,7 +22,9 @@ jobs:
       - name: Get commit log
         id: commits
         run: |
-          COMMITS=$(git log origin/prod..origin/dev --pretty=format:"- %s (%h)" | head -50)
+          BASE="${{ github.event.pull_request.base.ref }}"
+          HEAD="${{ github.event.pull_request.head.ref }}"
+          COMMITS=$(git log origin/$BASE..origin/$HEAD --pretty=format:"- %s (%h)" | head -50)
           echo "COMMITS<<EOF" >> $GITHUB_OUTPUT
           echo "$COMMITS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -36,12 +35,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           COMMITS="${{ steps.commits.outputs.COMMITS }}"
+          BASE="${{ github.event.pull_request.base.ref }}"
+          HEAD="${{ github.event.pull_request.head.ref }}"
 
           RESPONSE=$(curl -s -X POST "https://models.inference.ai.azure.com/chat/completions" \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
               --arg commits "$COMMITS" \
+              --arg base "$BASE" \
+              --arg head "$HEAD" \
               '{
                 model: "gpt-4o-mini",
                 messages: [
@@ -51,7 +54,7 @@ jobs:
                   },
                   {
                     role: "user",
-                    content: ("以下是這次 dev → prod 的 commit 列表：\n\n" + $commits + "\n\n請根據這些 commits 產生 PR description。")
+                    content: ("以下是這次 " + $head + " → " + $base + " 的 commit 列表：\n\n" + $commits + "\n\n請根據這些 commits 產生 PR description。")
                   }
                 ],
                 temperature: 0.3
