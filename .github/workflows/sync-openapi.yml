@@ -104,12 +104,32 @@ jobs:
           echo "✅ Successfully fetched and decoded OpenAPI types"
           echo "File size: $(wc -l < packages/api/src/types.ts) lines"
 
+      - name: Fetch AI Backend OpenAPI and Generate Types
+        run: |
+          set -euo pipefail
+
+          echo "📡 Fetching openapi.json from AI backend..."
+          curl -sf https://ai-dev.daodao.so/openapi.json -o /tmp/ai-openapi.json || {
+            echo "❌ Failed to fetch AI backend OpenAPI from ai-dev.daodao.so"
+            exit 1
+          }
+
+          echo "⚙️  Generating TypeScript types..."
+          cd packages/api
+          pnpm exec openapi-typescript /tmp/ai-openapi.json -o src/ai-types.ts || {
+            echo "❌ Failed to generate AI types"
+            exit 1
+          }
+
+          echo "✅ AI types generated"
+          echo "File size: $(wc -l < src/ai-types.ts) lines"
+
       - name: Check for changes
         id: check_changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add packages/api/src/types.ts
+          git add packages/api/src/types.ts packages/api/src/ai-types.ts
           git diff --cached --quiet || echo "changes=true" >> $GITHUB_OUTPUT
 
       - name: Commit and Push
