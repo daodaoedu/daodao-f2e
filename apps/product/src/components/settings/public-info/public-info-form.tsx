@@ -157,7 +157,7 @@ export const PublicInfoForm = () => {
 
       // 刷新用戶資料
       await mutate(["/api/v1/users/me"] as const);
-      mutate(['/api/v1/users/settings-summary'] as const);
+      mutate('/api/v1/users/settings-summary');
 
       // 成功
       toast.success("公開資訊設定已更新");

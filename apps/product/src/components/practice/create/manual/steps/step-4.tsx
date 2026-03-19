@@ -42,7 +42,10 @@ export const Step4 = ({ form }: Step4Props) => {
     setIsFetchingTitle(true);
     try {
       // 使用 og-image API 擷取頁面標題（title 為選填欄位）
-      const result = await extractOgImage({ url: trimmedUrl });
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("timeout")), 8000)
+      );
+      const result = await Promise.race([extractOgImage({ url: trimmedUrl }), timeout]);
       if (result.success && result.data.title) {
         setResourceName(result.data.title.slice(0, 100));
       } else {

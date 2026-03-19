@@ -17,6 +17,7 @@ import {
   VerifiedSvg,
   XFilledSvg,
 } from "@daodao/assets";
+import { toast } from "@daodao/ui/components/sonner";
 import { useRouter } from "@daodao/i18n/navigation";
 import { getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -74,6 +75,8 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
     try {
       await updatePractice(summary.practiceId, { privacy_status: "public" } as any);
       setIsPublic(true);
+    } catch {
+      toast.error("公開失敗，請稍後再試");
     } finally {
       setIsPublishing(false);
     }

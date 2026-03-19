@@ -172,7 +172,7 @@ function PracticeResourceListCard({
       )}
     >
       {/* Full-card link overlay (has-url only) */}
-      {resource.url && (
+      {resource.url && /^https?:\/\//.test(resource.url) && (
         <a
           href={resource.url}
           target="_blank"
