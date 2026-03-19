@@ -190,7 +190,7 @@ function MentionInput({
         autoFocus={autoFocus}
       />
       {mentionQuery !== null && filtered.length > 0 && (
-        <div className="absolute bottom-full left-0 mb-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-1 z-20 min-w-[160px] max-h-44 overflow-y-auto">
+        <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-1 z-20 min-w-[160px] max-h-44 overflow-y-auto">
           {filtered.map((p) => (
             <button
               key={p.userId}
@@ -414,7 +414,7 @@ function CommentBubble({
               value={editValue}
               onChange={setEditValue}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
+                if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
                   e.preventDefault();
                   void handleSaveEdit();
                 }
@@ -648,7 +648,7 @@ export function CommentSection({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
       handleSubmit();
     }
@@ -689,7 +689,7 @@ export function CommentSection({
               setReplyInputs((prev) => ({ ...prev, [comment.id]: v }))
             }
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
                 e.preventDefault();
                 handleReplySubmit(comment.id);
               }
