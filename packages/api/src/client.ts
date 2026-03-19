@@ -78,13 +78,26 @@ class UnauthorizedHandler {
         ? Object.fromEntries(input.headers.entries())
         : Object.fromEntries(new Headers(init?.headers).entries());
 
+    // React Native fetch 不可靠地處理 fetch(Request, init)；
+    // 統一提取 url / method / body，以 fetch(urlString, fullInit) 呼叫。
+    const url: string =
+      input instanceof Request
+        ? input.url
+        : input instanceof URL
+          ? input.toString()
+          : input;
+    const method: string = input instanceof Request ? input.method : (init?.method ?? "GET");
+    const body: BodyInit | null | undefined =
+      input instanceof Request ? (input.body as BodyInit | null) : init?.body;
+
     let fetchInit: RequestInit;
 
     if (_mobileTokenProvider) {
       // Mobile path：Bearer token，不帶 credentials cookie
       const token = await _mobileTokenProvider();
       fetchInit = {
-        ...init,
+        method,
+        body,
         headers: {
           ...existingHeaders,
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -92,20 +105,10 @@ class UnauthorizedHandler {
       };
     } else {
       // Web path：維持現有 cookie 行為
-      fetchInit = { ...init, headers: existingHeaders, credentials: "include" };
+      fetchInit = { method, body, headers: existingHeaders, credentials: "include" };
     }
 
-    // URL 解析（Expo/Hermes 已內建 URL global，since RN 0.63）
-    let url: string;
-    if (typeof input === "string") {
-      url = input;
-    } else if (input instanceof URL) {
-      url = input.toString();
-    } else {
-      url = input.url;
-    }
-
-    const response = await fetch(input, fetchInit);
+    const response = await fetch(url, fetchInit);
 
     // 如果不是 401 或沒有處理器，直接返回
     if (response.status !== 401 || !this.onUnauthorized) {
@@ -151,9 +154,15 @@ class UnauthorizedHandler {
     input: RequestInfo | URL,
     fetchInit: RequestInit
   ): Promise<Response> => {
+    const url: string =
+      input instanceof Request
+        ? input.url
+        : input instanceof URL
+          ? input.toString()
+          : input;
     if (_mobileTokenProvider) {
       const newToken = await _mobileTokenProvider();
-      return fetch(input, {
+      return fetch(url, {
         ...fetchInit,
         headers: {
           ...(fetchInit.headers as Record<string, string>),
@@ -162,7 +171,7 @@ class UnauthorizedHandler {
       });
     }
     // Web path：cookie 已由 refresh 更新，直接重試
-    return fetch(input, fetchInit);
+    return fetch(url, fetchInit);
   };
 }
 
