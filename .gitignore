@@ -64,3 +64,6 @@ pnpm-debug.log*
 # Cursor
 .cursorindexingignore
 .specstory
+
+# Git worktrees
+.worktrees/
