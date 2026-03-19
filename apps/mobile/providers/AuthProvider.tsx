@@ -8,8 +8,13 @@ import {
   useRef,
   useState,
 } from "react";
+import {
+  clearMobileClient,
+  initMobileClient,
+  unauthorizedHandler,
+} from "@daodao/api";
 import { analyticsService } from "@/services/analytics";
-import { type AuthTokens, authStorage, type StoredUser } from "@/services/auth-storage";
+import { type AuthTokens, authStorage, refreshTokens, type StoredUser } from "@/services/auth-storage";
 
 interface AuthState {
   user: StoredUser | null;
@@ -64,6 +69,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
   });
 
   const isMountedRef = useRef(true);
+
+  // Initialize @daodao/api client for mobile（Bearer token + baseUrl override）
+  useEffect(() => {
+    initMobileClient({
+      baseUrl: process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so",
+      getToken: () => authStorage.getAccessToken(),
+    });
+
+    unauthorizedHandler.setHandler(async () => {
+      try {
+        await refreshTokens();
+        return true;
+      } catch {
+        return false;
+      }
+    });
+
+    return () => {
+      // cleanup：避免 React Fast Refresh 重複註冊 middleware 與 handler
+      clearMobileClient();
+      unauthorizedHandler.clearHandler();
+    };
+  }, []);
 
   // Initialize: Load auth state from SecureStore
   useEffect(() => {
