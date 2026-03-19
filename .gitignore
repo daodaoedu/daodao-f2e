@@ -53,6 +53,9 @@ pnpm-debug.log*
 !apps/mobile/generated/
 !apps/mobile/generated/design-tokens/
 !apps/mobile/generated/design-tokens/**
+# Exception: assets generated files need to be tracked (CI can't run build scripts)
+!packages/assets/generated/
+!packages/assets/generated/**
 
 # Compiled JavaScript files in src directories (should only be in dist/)
 **/src/**/*.js

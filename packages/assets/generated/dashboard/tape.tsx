@@ -1,0 +1,19 @@
+import { forwardRef } from "react";
+import type { SVGProps, Ref } from "react";
+
+interface SvgComponentProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
+  ref?: Ref<SVGSVGElement>;
+}
+
+const TapeSvg = forwardRef<SVGSVGElement, Omit<SVGProps<SVGSVGElement>, "ref">>(
+  function TapeSvg(props, ref) {
+    return (
+      <svg viewBox="0 0 70 38" fill="none" xmlns="http://www.w3.org/2000/svg" ref={ref} {...props}>
+        <path d="M69.6184 19.9364L5.4616 37.4756L3.79971 34.4502L3.41961 30.0224L1.46012 25.911L2.31815 19.7507L6.01027e-05 17.5389L64.1569 -0.000233361L65.8913 2.95291L65.8873 7.72111L67.8448 10.0871L67.8648 17.4002L69.6184 19.9364Z" fill="#99ECFF"/>
+      </svg>
+    );
+  }
+);
+
+export default TapeSvg;
+export type { SvgComponentProps };

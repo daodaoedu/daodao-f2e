@@ -1,0 +1,19 @@
+import { forwardRef } from "react";
+import type { SVGProps, Ref } from "react";
+
+interface SvgComponentProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
+  ref?: Ref<SVGSVGElement>;
+}
+
+const HexagonSvg = forwardRef<SVGSVGElement, Omit<SVGProps<SVGSVGElement>, "ref">>(
+  function HexagonSvg(props, ref) {
+    return (
+      <svg width="197" height="225" viewBox="0 0 197 225" fill="none" xmlns="http://www.w3.org/2000/svg" ref={ref} {...props}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M94.513 1.06805C96.985 -0.356045 100.028 -0.355954 102.5 1.06828L192.994 53.2075C195.473 54.6356 197 57.2786 197 60.1392V164.393C197 167.254 195.473 169.896 192.994 171.325L102.5 223.466C100.028 224.891 96.9849 224.891 94.5128 223.466L4.00643 171.324C1.5276 169.896 0 167.253 0 164.393V60.1396C0 57.2787 1.52766 54.6356 4.00657 53.2076L94.513 1.06805Z" fill="#4BE8FF"/>
+      </svg>
+    );
+  }
+);
+
+export default HexagonSvg;
+export type { SvgComponentProps };

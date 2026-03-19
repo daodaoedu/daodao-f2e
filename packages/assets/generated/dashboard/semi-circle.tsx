@@ -1,0 +1,19 @@
+import { forwardRef } from "react";
+import type { SVGProps, Ref } from "react";
+
+interface SvgComponentProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
+  ref?: Ref<SVGSVGElement>;
+}
+
+const SemiCircleSvg = forwardRef<SVGSVGElement, Omit<SVGProps<SVGSVGElement>, "ref">>(
+  function SemiCircleSvg(props, ref) {
+    return (
+      <svg width="268" height="138" viewBox="0 0 268 138" fill="none" xmlns="http://www.w3.org/2000/svg" ref={ref} {...props}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M267.262 129.973C267.507 134.384 263.901 137.973 259.483 137.973H7.79054C3.37226 137.973 -0.232875 134.384 0.0118151 129.973C4.03177 57.4971 62.3189 0 133.637 0C204.955 0 263.242 57.4971 267.262 129.973Z" fill="#F9E41C"/>
+      </svg>
+    );
+  }
+);
+
+export default SemiCircleSvg;
+export type { SvgComponentProps };

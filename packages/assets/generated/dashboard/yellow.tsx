@@ -1,0 +1,48 @@
+import { forwardRef } from "react";
+import type { SVGProps, Ref } from "react";
+
+interface SvgComponentProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
+  ref?: Ref<SVGSVGElement>;
+}
+
+const YellowSvg = forwardRef<SVGSVGElement, Omit<SVGProps<SVGSVGElement>, "ref">>(
+  function YellowSvg(props, ref) {
+    return (
+      <svg viewBox="0 0 294 239" fill="none" xmlns="http://www.w3.org/2000/svg" ref={ref} {...props}>
+        <g clipPath="url(#clip0_687_3244)">
+<rect width="294" height="239" fill="#FFE394"/>
+<g style={{ mixBlendMode: "soft-light" }}>
+<path d="M149 234.215C149 235.81 148.973 237.419 148.905 239H0V93.2454C2.67069 93.0818 5.35502 93 8.06659 93C85.8981 93.0136 149 156.226 149 234.215Z" fill="url(#paint0_linear_687_3244)" fillOpacity="0.7"/>
+</g>
+<g style={{ mixBlendMode: "soft-light" }}>
+<path d="M80 234.251C80 235.834 79.9595 237.431 79.8514 239H0V162.446C2.61985 162.149 5.29374 162 7.99461 162C47.7515 162 80 194.351 80 234.251Z" fill="url(#paint1_linear_687_3244)"/>
+</g>
+<path d="M276.026 163.048C279.347 163.044 282.037 160.346 282.034 157.021C282.03 153.696 279.335 151.003 276.014 151.006C272.692 151.009 270.003 153.708 270.006 157.033C270.009 160.358 272.705 163.051 276.026 163.048Z" fill="white" fillOpacity="0.5"/>
+<path d="M276.02 191.641C279.341 191.641 282.034 188.945 282.034 185.62C282.034 182.295 279.341 179.599 276.02 179.599C272.698 179.599 270.006 182.295 270.006 185.62C270.006 188.945 272.698 191.641 276.02 191.641Z" fill="white" fillOpacity="0.5"/>
+<path d="M276.02 220.99C279.341 220.99 282.034 218.294 282.034 214.969C282.034 211.644 279.341 208.948 276.02 208.948C272.698 208.948 270.006 211.644 270.006 214.969C270.006 218.294 272.698 220.99 276.02 220.99Z" fill="white" fillOpacity="0.5"/>
+<g style={{ mixBlendMode: "plus-darker" }} opacity="0.1">
+<path d="M196 146.356C223.025 146.356 244.929 168.258 244.929 195.279C217.905 195.279 196 173.378 196 146.356Z" fill="#E96A14"/>
+<path d="M244.929 97.4335C271.954 97.4335 293.858 119.335 293.858 146.356C293.858 173.378 271.954 195.279 244.929 195.279C244.929 168.258 223.025 146.356 196 146.356C196 119.335 217.905 97.4335 244.929 97.4335Z" fill="#FFB073"/>
+<path d="M245 98C272.062 98 294 76.062 294 49C294 21.938 272.062 0 245 0C217.938 0 196 21.938 196 49C196 76.062 217.938 98 245 98Z" fill="#FF9A4D"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_687_3244" x1="74.5" y1="93" x2="74.5" y2="239" gradientUnits="userSpaceOnUse">
+<stop stopColor="#5C8E99"/>
+<stop offset="1" stopColor="#99ECFF"/>
+</linearGradient>
+<linearGradient id="paint1_linear_687_3244" x1="40" y1="162" x2="40" y2="239" gradientUnits="userSpaceOnUse">
+<stop stopColor="#8D8C99"/>
+<stop offset="1" stopColor="#EBE9FF"/>
+</linearGradient>
+<clipPath id="clip0_687_3244">
+<rect width="294" height="239" fill="white"/>
+</clipPath>
+</defs>
+      </svg>
+    );
+  }
+);
+
+export default YellowSvg;
+export type { SvgComponentProps };
