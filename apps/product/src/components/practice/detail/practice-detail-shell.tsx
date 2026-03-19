@@ -285,6 +285,22 @@ export function PracticeDetailShell({
   const [practiceMenuOpen, setPracticeMenuOpen] = useState(false);
   const [isFollowingPractice, setIsFollowingPractice] = useState(false);
   const commentsRef = useRef<HTMLDivElement>(null);
+  const practiceMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!practiceMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (practiceMenuRef.current && !practiceMenuRef.current.contains(e.target as Node)) {
+        setPracticeMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [practiceMenuOpen]);
 
   const { data: reactionsData, mutate: mutateReactions } = useReactions({
     targetType: "practice",
@@ -366,7 +382,7 @@ export function PracticeDetailShell({
             <div />
           )}
 
-          <div className="relative">
+          <div ref={practiceMenuRef} className="relative">
             <Button
               type="button"
               size="icon"

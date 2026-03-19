@@ -16,12 +16,15 @@ export interface ReactionPickerButtonProps {
   /**
    * "card"    — 卡片層級，較大按鈕（size-9 / emoji 24），無計數
    * "comment" — 留言層級，較小按鈕（size-7 / emoji 18），顯示計數
+   * "summary" — 摘要列，圓形 emoji 泡泡 + "X 與其他 N 人" 文字
    */
-  variant?: "card" | "comment";
-  /** comment variant 的總反應計數（所有用戶，非僅當前用戶） */
+  variant?: "card" | "comment" | "summary";
+  /** comment / summary variant 的總反應計數（所有用戶，非僅當前用戶） */
   totalCount?: number;
-  /** 要疊加顯示的 reaction 類型（aggregate，最多 3 個），參考主題實踐的 browseActivity 作法 */
+  /** 要疊加顯示的 reaction 類型（aggregate，最多 3 個） */
   displayReactions?: ReactionTypeType[];
+  /** summary variant：第一個反應者姓名 */
+  firstReactorName?: string;
 }
 
 const PICKER_REACTIONS: ReactionTypeType[] = ["useful", "fire", "touched", "curious"];
@@ -38,6 +41,7 @@ export function ReactionPickerButton({
   variant = "comment",
   totalCount,
   displayReactions,
+  firstReactorName,
 }: ReactionPickerButtonProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -101,6 +105,7 @@ export function ReactionPickerButton({
   };
 
   const isCard = variant === "card";
+  const isSummary = variant === "summary";
   const hasSelection = selectedReactions.length > 0;
   const pickerButtonSize = isCard ? "size-9" : "size-7";
   const emojiSize = isCard ? 24 : 18;
@@ -116,8 +121,85 @@ export function ReactionPickerButton({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Emoji picker popup */}
-      {open && (
+      {/* Summary variant：圓形 emoji 泡泡 + "X 與其他 N 人" */}
+      {isSummary && (
+        <>
+          {open && (
+            <div className="absolute bottom-full pb-2 z-10 flex flex-col items-center left-0">
+              <div className="flex gap-1 bg-white rounded-full shadow-lg border border-[#E4EAE9] px-2 py-1.5">
+                {PICKER_REACTIONS.map((type) => {
+                  const config = REACTION_CONFIG[type];
+                  const isSelected = selectedReactions.includes(type);
+                  return (
+                    <div key={type} className="group/emoji relative flex flex-col items-center">
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 bg-[#295E5C] text-white text-xs rounded-full whitespace-nowrap opacity-0 group-hover/emoji:opacity-100 transition-opacity pointer-events-none">
+                        {config.label}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { onToggle(type); setOpen(false); }}
+                        className={cn(
+                          "size-9 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer",
+                          isSelected ? "bg-[#E8FAF9]" : "hover:bg-[#F0F9F8]"
+                        )}
+                      >
+                        <LottieEmoji url={config.lottieUrl} fallback={config.emoji} size={24} play={true} />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          <button
+            type="button"
+            onContextMenu={(e) => e.preventDefault()}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onTouchMove={handleTouchMove}
+            className="flex items-center gap-2 cursor-pointer select-none"
+          >
+            {/* Emoji 圓圈 */}
+            {(displayReactions && displayReactions.length > 0) || hasSelection ? (
+              <div className="flex items-center">
+                {(displayReactions && displayReactions.length > 0 ? displayReactions : selectedReactions)
+                  .slice(0, 2)
+                  .map((type, i) => (
+                    <div
+                      key={type}
+                      className={cn(
+                        "size-7 rounded-full flex items-center justify-center ring-2 ring-white",
+                        selectedReactions.includes(type) ? "bg-[#E8FAF9]" : "bg-[#EAF7FF]",
+                        i > 0 && "-ml-1.5"
+                      )}
+                    >
+                      <LottieEmoji
+                        url={REACTION_CONFIG[type].lottieUrl}
+                        fallback={REACTION_CONFIG[type].emoji}
+                        size={18}
+                        play={selectedReactions.includes(type)}
+                      />
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <LikeOutlineSvg className="size-6 text-[#9FB5B8]" />
+            )}
+            {/* 文字摘要 */}
+            {totalCount != null && totalCount > 0 && (
+              <span className="text-sm text-[#295E5C]">
+                {firstReactorName
+                  ? totalCount > 1
+                    ? `${firstReactorName} 與其他 ${totalCount - 1} 人`
+                    : firstReactorName
+                  : `${totalCount} 人`}
+              </span>
+            )}
+          </button>
+        </>
+      )}
+      {/* Emoji picker popup (card / comment variant) */}
+      {!isSummary && open && (
         <div
           className={cn(
             "absolute bottom-full pb-2 z-10 flex flex-col items-center",
@@ -160,90 +242,92 @@ export function ReactionPickerButton({
         </div>
       )}
 
-      {/* Main trigger button */}
-      <button
-        type="button"
-        // 防止瀏覽器長按跳出系統選單
-        onContextMenu={(e) => e.preventDefault()}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onTouchMove={handleTouchMove}
-        className={cn(
-          "flex items-center gap-1.5 transition-colors cursor-pointer select-none",
-          isCard
-            ? "p-1.5 text-text-dark"
-            : cn(
-                "h-auto px-0 gap-1 text-xs",
-                hasSelection ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-logo-cyan"
-              )
-        )}
-      >
-        {isCard ? (
-          /* card variant：顯示聚合 reaction emoji（含他人）+ 總數，或預設 👍 */
-          <>
-            {displayReactions && displayReactions.length > 0 ? (
-              <div className="flex items-center">
-                {displayReactions.slice(0, 2).map((type, i) => (
-                  <div key={type} className={cn("size-[22px]", i > 0 && "-ml-1")}>
-                    <LottieEmoji
-                      url={REACTION_CONFIG[type].lottieUrl}
-                      fallback={REACTION_CONFIG[type].emoji}
-                      size={22}
-                      play={selectedReactions.includes(type)}
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : hasSelection ? (
-              <div className="flex items-center">
-                {selectedReactions.slice(-2).map((type, i) => (
-                  <div key={type} className={cn("size-[22px]", i > 0 && "-ml-1")}>
-                    <LottieEmoji
-                      url={REACTION_CONFIG[type].lottieUrl}
-                      fallback={REACTION_CONFIG[type].emoji}
-                      size={22}
-                      play={true}
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <LikeOutlineSvg className="size-[22px]" />
-            )}
-            {totalCount != null && totalCount > 0 && (
-              <span className="text-sm font-medium">{totalCount}</span>
-            )}
-          </>
-        ) : (
-          /* comment variant：Facebook 疊加圓圈（displayReactions）+ 總數 */
-          <>
-            {displayReactions && displayReactions.length > 0 ? (
-              <div className="flex items-center">
-                {displayReactions.slice(0, 3).map((type, i) => (
-                  <div
-                    key={type}
-                    className={cn(
-                      "size-5 rounded-full flex items-center justify-center ring-1 ring-white",
-                      selectedReactions.includes(type) ? "bg-[#E8FAF9]" : "bg-[#F0F4F4]",
-                      i > 0 && "-ml-1"
-                    )}
-                  >
-                    <LottieEmoji
-                      url={REACTION_CONFIG[type].lottieUrl}
-                      fallback={REACTION_CONFIG[type].emoji}
-                      size={14}
-                      play={selectedReactions.includes(type)}
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <LikeOutlineSvg className="size-5" />
-            )}
-            {totalCount != null && totalCount > 0 && <span>{totalCount}</span>}
-          </>
-        )}
-      </button>
+      {/* Main trigger button (card / comment variant) */}
+      {!isSummary && (
+        <button
+          type="button"
+          // 防止瀏覽器長按跳出系統選單
+          onContextMenu={(e) => e.preventDefault()}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onTouchMove={handleTouchMove}
+          className={cn(
+            "flex items-center gap-1.5 transition-colors cursor-pointer select-none",
+            isCard
+              ? "p-1.5 text-text-dark"
+              : cn(
+                  "h-auto px-0 gap-1 text-xs",
+                  hasSelection ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-logo-cyan"
+                )
+          )}
+        >
+          {isCard ? (
+            /* card variant：顯示聚合 reaction emoji（含他人）+ 總數，或預設 👍 */
+            <>
+              {displayReactions && displayReactions.length > 0 ? (
+                <div className="flex items-center">
+                  {displayReactions.slice(0, 2).map((type, i) => (
+                    <div key={type} className={cn("size-[22px]", i > 0 && "-ml-1")}>
+                      <LottieEmoji
+                        url={REACTION_CONFIG[type].lottieUrl}
+                        fallback={REACTION_CONFIG[type].emoji}
+                        size={22}
+                        play={selectedReactions.includes(type)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : hasSelection ? (
+                <div className="flex items-center">
+                  {selectedReactions.slice(-2).map((type, i) => (
+                    <div key={type} className={cn("size-[22px]", i > 0 && "-ml-1")}>
+                      <LottieEmoji
+                        url={REACTION_CONFIG[type].lottieUrl}
+                        fallback={REACTION_CONFIG[type].emoji}
+                        size={22}
+                        play={true}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <LikeOutlineSvg className="size-[22px]" />
+              )}
+              {totalCount != null && totalCount > 0 && (
+                <span className="text-sm font-medium">{totalCount}</span>
+              )}
+            </>
+          ) : (
+            /* comment variant：Facebook 疊加圓圈（displayReactions）+ 總數 */
+            <>
+              {displayReactions && displayReactions.length > 0 ? (
+                <div className="flex items-center">
+                  {displayReactions.slice(0, 3).map((type, i) => (
+                    <div
+                      key={type}
+                      className={cn(
+                        "size-5 rounded-full flex items-center justify-center ring-1 ring-white",
+                        selectedReactions.includes(type) ? "bg-[#E8FAF9]" : "bg-[#F0F4F4]",
+                        i > 0 && "-ml-1"
+                      )}
+                    >
+                      <LottieEmoji
+                        url={REACTION_CONFIG[type].lottieUrl}
+                        fallback={REACTION_CONFIG[type].emoji}
+                        size={14}
+                        play={selectedReactions.includes(type)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <LikeOutlineSvg className="size-5" />
+              )}
+              {totalCount != null && totalCount > 0 && <span>{totalCount}</span>}
+            </>
+          )}
+        </button>
+      )}
     </div>
   );
 }

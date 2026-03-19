@@ -6,6 +6,8 @@ import {
   removeReaction,
   unfollowTarget,
   upsertReaction,
+  useComments,
+  usePracticeById,
   useReactions,
   useReactionsList,
 } from "@daodao/api";
@@ -24,6 +26,7 @@ import { useSheetManager } from "@daodao/ui/components/animate-ui/components/rad
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { MoreHorizontal } from "lucide-react";
+import { useRouter } from "@daodao/i18n/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import {
@@ -74,8 +77,11 @@ export function PracticeShowcaseCard({
   const [menuOpen, setMenuOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   const { open: openSheet } = useSheetManager();
+  const { data: practiceData } = usePracticeById(id);
   const { data: reactionsListData } = useReactionsList({ targetType: "practice", targetId: id });
+  const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -124,8 +130,8 @@ export function PracticeShowcaseCard({
       title: "瀏覽活動",
       content: (
         <BrowseActivityContent
-          viewCount={0}
-          commentCount={commentCount}
+          viewCount={practiceData?.data?.stats?.viewCount ?? 0}
+          commentCount={commentsData?.data?.length ?? commentCount}
           followers={followers}
         />
       ),
@@ -160,7 +166,11 @@ export function PracticeShowcaseCard({
   );
 
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#E8F8FF]">
+    // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
+    <div
+      className="bg-white rounded-2xl p-4 shadow-sm border border-[#E8F8FF] cursor-pointer"
+      onClick={() => router.push(`/practices/${id}`)}
+    >
       {/* Header row */}
       <div className="flex items-center gap-2 mb-2">
         <Badge variant={statusInfo.variant} size="sm" className="w-fit">
@@ -173,7 +183,8 @@ export function PracticeShowcaseCard({
         )}
 
         {/* More menu */}
-        <div ref={menuRef} className="relative">
+        {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
+        <div ref={menuRef} className="relative" onClick={(e) => e.stopPropagation()}>
           <Button
             type="button"
             size="icon"
@@ -230,16 +241,16 @@ export function PracticeShowcaseCard({
       </div>
 
       {/* Title */}
-      <Link href={`/practices/${id}`}>
-        <h3 className="font-semibold text-text-dark text-base mb-2 line-clamp-2 hover:underline">
-          {title}
-        </h3>
-      </Link>
+      <h3 className="font-semibold text-text-dark text-base mb-2 line-clamp-2">
+        {title}
+      </h3>
 
       {/* Avatar + action/frequency block */}
       {(user || actionDescription || frequencyMinDays || frequencyMaxDays || sessionDurationMinutes) && (
         <div className="flex items-start gap-3 mb-3">
           {user && (
+            // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
+            <span onClick={(e) => e.stopPropagation()}>
             <Link href={`/users/${user.id}`} className="shrink-0">
               <Avatar className="size-16">
                 {user.photoUrl && <AvatarImage src={user.photoUrl} />}
@@ -248,6 +259,7 @@ export function PracticeShowcaseCard({
                 </AvatarFallback>
               </Avatar>
             </Link>
+            </span>
           )}
           <div className="flex-1 min-w-0">
             {actionDescription && (
@@ -277,30 +289,69 @@ export function PracticeShowcaseCard({
         </div>
       )}
 
-      {/* Bottom bar: reaction + comment (same pattern as detail page) */}
-      <div className="flex items-center border-t border-[#E4EAE9] pt-3 mt-3">
-        <div className="flex-1 flex justify-center rounded-xl hover:bg-gray-100 transition-colors py-1">
-          <ReactionPickerButton
-            selectedReactions={selectedReactions}
-            onToggle={handleToggle}
-            variant="card"
-            totalCount={totalCount}
-            displayReactions={displayReactions}
-          />
-        </div>
-
-        <div className="w-px h-5 bg-[#E4EAE9]" />
+      {/* Bottom bar: summary layout */}
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
+      <div
+        className="flex items-center justify-between border-t border-[#E4EAE9] pt-3 mt-3"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ReactionPickerButton
+          selectedReactions={selectedReactions}
+          onToggle={handleToggle}
+          variant="summary"
+          totalCount={totalCount}
+          displayReactions={displayReactions}
+          firstReactorName={reactionsListData?.data?.items[0]?.name}
+        />
 
         <Link
           href={`/practices/${id}`}
-          className="flex-1 flex justify-center rounded-xl hover:bg-gray-100 transition-colors py-1"
+          className="flex items-center gap-1.5 text-[#9FB5B8] hover:text-text-dark transition-colors"
         >
-          <div className="flex items-center gap-1.5 p-1.5 text-text-dark">
-            <DialogOutlineSvg className="size-[22px]" />
-            {commentCount > 0 && <span className="text-sm font-medium">{commentCount}</span>}
-          </div>
+          <DialogOutlineSvg className="size-6" />
+          {(() => {
+            const count = commentsData?.data?.length ?? commentCount;
+            return count > 0 ? <span className="text-sm font-medium">{count}</span> : null;
+          })()}
         </Link>
       </div>
+
+      {/* Comment preview: up to 2 latest top-level comments */}
+      {(() => {
+        const allComments = commentsData?.data ?? [];
+        const preview = allComments.slice(-2);
+        if (preview.length === 0) return null;
+        // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
+        return (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+          <div
+            className="mt-3 flex flex-col gap-2 border-t border-[#E4EAE9] pt-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {preview.map((comment) => (
+              <div key={comment.id} className="flex items-start gap-2">
+                <Avatar className="size-6 shrink-0 mt-0.5">
+                  {comment.user?.photoURL && (
+                    <AvatarImage src={comment.user.photoURL} alt={comment.user.name} />
+                  )}
+                  <AvatarFallback className="text-[10px] font-medium text-text-dark bg-[#E8FAF9]">
+                    {(comment.user?.name ?? "?").slice(0, 1)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <span className="text-xs font-semibold text-[#295E5C] mr-1.5">
+                    {comment.user?.name ?? "匿名"}
+                  </span>
+                  <span className="text-xs text-text-dark line-clamp-1">{comment.content}</span>
+                </div>
+                <span className="shrink-0 text-[11px] text-[#9FB5B8]">
+                  {formatRelativeTime(comment.createdAt)}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
     </div>
   );
 }
