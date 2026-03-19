@@ -32,6 +32,13 @@ interface AuthContextValue extends AuthState {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// 在模組載入時（React 渲染前）立即初始化，確保 SWR 第一次 fetch 就用正確的 baseUrl 與 token
+// 若放在 useEffect 裡，children 已掛載並發出 fetch 後才執行，導致首次 fetch 打到 localhost:4000
+initMobileClient({
+  baseUrl: process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so",
+  getToken: () => authStorage.getAccessToken(),
+});
+
 function useProtectedRoute(isAuthenticated: boolean, isLoading: boolean) {
   const segments = useSegments();
   const router = useRouter();
@@ -70,13 +77,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const isMountedRef = useRef(true);
 
-  // Initialize @daodao/api client for mobile（Bearer token + baseUrl override）
+  // 設定 401 自動刷新 handler；cleanup 時清除 middleware 與 handler（處理 Fast Refresh）
   useEffect(() => {
-    initMobileClient({
-      baseUrl: process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so",
-      getToken: () => authStorage.getAccessToken(),
-    });
-
     unauthorizedHandler.setHandler(async () => {
       try {
         await refreshTokens();
@@ -87,9 +89,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
 
     return () => {
-      // cleanup：避免 React Fast Refresh 重複註冊 middleware 與 handler
       clearMobileClient();
       unauthorizedHandler.clearHandler();
+      // Fast Refresh 後重新初始化
+      initMobileClient({
+        baseUrl: process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so",
+        getToken: () => authStorage.getAccessToken(),
+      });
     };
   }, []);
 
