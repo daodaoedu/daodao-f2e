@@ -307,14 +307,19 @@ export function PracticeDetailShell({
     targetId: practiceId,
   });
   const [, startReactionTransition] = useTransition();
+  // undefined = no pending (use server data), null = optimistically removed, type = optimistically set
+  const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(undefined);
 
   const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
     null) as ReactionTypeType | null;
-  const headerReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
+  const effectiveReaction = pendingReaction !== undefined ? pendingReaction : currentUserReaction;
+  const headerReactions: ReactionTypeType[] = effectiveReaction ? [effectiveReaction] : [];
 
   const handleHeaderReactionToggle = useCallback(
     (type: ReactionTypeType) => {
       const isSelected = currentUserReaction === type;
+      // Optimistic update: reflect change immediately before API resolves
+      setPendingReaction(isSelected ? null : type);
       startReactionTransition(async () => {
         if (isSelected) {
           await removeReaction({ targetType: "practice", targetId: practiceId });
@@ -326,6 +331,7 @@ export function PracticeDetailShell({
           });
         }
         await mutateReactions();
+        setPendingReaction(undefined);
       });
     },
     [currentUserReaction, practiceId, mutateReactions]

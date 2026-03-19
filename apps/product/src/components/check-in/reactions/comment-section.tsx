@@ -251,10 +251,12 @@ function CommentBubble({
     targetId: comment.id,
   });
   const [, startReactionTransition] = useTransition();
+  const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(undefined);
 
   const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
     null) as ReactionTypeType | null;
-  const commentReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
+  const effectiveReaction = pendingReaction !== undefined ? pendingReaction : currentUserReaction;
+  const commentReactions: ReactionTypeType[] = effectiveReaction ? [effectiveReaction] : [];
   const totalReactionCount = (reactionsData?.data?.reactions ?? []).reduce(
     (sum, r) => sum + r.count,
     0,
@@ -263,13 +265,14 @@ function CommentBubble({
     .filter((r) => r.count > 0)
     .sort((a, b) => b.count - a.count)
     .map((r) => r.type as ReactionTypeType);
-  const displayReactions = currentUserReaction
-    ? [currentUserReaction, ...activeReactionTypes.filter((t) => t !== currentUserReaction)].slice(0, 3)
+  const displayReactions = effectiveReaction
+    ? [effectiveReaction, ...activeReactionTypes.filter((t) => t !== effectiveReaction)].slice(0, 3)
     : activeReactionTypes.slice(0, 3);
 
   const handleCommentReactionToggle = useCallback(
     (type: ReactionTypeType) => {
       const isSelected = currentUserReaction === type;
+      setPendingReaction(isSelected ? null : type);
       startReactionTransition(async () => {
         if (isSelected) {
           await removeReaction({ targetType: "comment", targetId: comment.id });
@@ -281,6 +284,7 @@ function CommentBubble({
           });
         }
         await mutateReactions();
+        setPendingReaction(undefined);
       });
     },
     [currentUserReaction, comment.id, mutateReactions]
