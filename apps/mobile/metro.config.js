@@ -22,11 +22,17 @@ config.resolver.unstable_enablePackageExports = true;
 config.resolver.disableHierarchicalLookup = false;
 
 // 強制 singleton 套件都解析到 app 自身的 node_modules，避免 monorepo 中出現重複實例
-// （packages/api 有自己的 react/swr，會導致「Cannot read property 'useDebugValue' of null」）
-config.resolver.extraNodeModules = {
-  react: path.resolve(projectRoot, "node_modules/react"),
-  "react-native": path.resolve(projectRoot, "node_modules/react-native"),
-  swr: path.resolve(projectRoot, "node_modules/swr"),
+// packages/api 的 node_modules 有自己的 react@19.2.3，而 apps/mobile 用 react@19.1.0，
+// 造成兩個不同物理路徑的 React 實例 → "Cannot read property 'useDebugValue' of null"
+// 使用 resolveRequest（比 extraNodeModules 更低層級）強制所有 require('react') 等指向同一路徑
+const SINGLETONS = new Set(["react", "react-native", "swr"]);
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  const base = moduleName.split("/")[0];
+  if (SINGLETONS.has(base)) {
+    const realPath = require.resolve(moduleName, { paths: [projectRoot] });
+    return { filePath: realPath, type: "sourceFile" };
+  }
+  return context.resolveRequest(context, moduleName, platform);
 };
 
 module.exports = withTamagui(config, {
