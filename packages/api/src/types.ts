@@ -870,6 +870,116 @@ export interface paths {
         };
         trace?: never;
     };
+    "/api/v1/resources/{resourceId}/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 記錄資源瀏覽
+         * @description 記錄使用者瀏覽資源事件（24h 去重）
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 資源 ID */
+                    resourceId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 記錄成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /**
+                                 * @description 目前瀏覽數
+                                 * @example 42
+                                 */
+                                viewCount: number;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/resources/{resourceId}/tags": {
         parameters: {
             query?: never;
@@ -3007,6 +3117,145 @@ export interface paths {
                 500: components["responses"]["InternalServerError"];
             };
         };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/footprints": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得我的學習足跡
+         * @description 取得當前用戶在實踐上留下的留言（學習足跡），依留言時間倒序排列，支援分頁
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 分頁頁碼，從1開始 */
+                    page?: number;
+                    /** @description 每頁顯示的足跡數量 */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功獲取學習足跡列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description Array of paginated data items */
+                            data: components["schemas"]["MyLearningFootprintItem"][];
+                            /**
+                             * @description Pagination information
+                             * @example {
+                             *       "currentPage": 1,
+                             *       "totalPages": 5,
+                             *       "totalItems": 50,
+                             *       "itemsPerPage": 10,
+                             *       "hasNext": true,
+                             *       "hasPrev": false
+                             *     }
+                             * @example {
+                             *       "currentPage": 3,
+                             *       "totalPages": 8,
+                             *       "totalItems": 156,
+                             *       "itemsPerPage": 20,
+                             *       "hasNext": true,
+                             *       "hasPrev": true
+                             *     }
+                             */
+                            pagination: {
+                                /** @description Current page number (1-based) */
+                                currentPage: number;
+                                /** @description Total number of pages */
+                                totalPages: number;
+                                /** @description Total number of items across all pages */
+                                totalItems: number;
+                                /** @description Number of items per page */
+                                itemsPerPage: number;
+                                /** @description Whether there are more pages after current page */
+                                hasNext: boolean;
+                                /** @description Whether there are pages before current page */
+                                hasPrev: boolean;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -9596,6 +9845,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/settings-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 獲取設定頁完整度摘要
+         * @description 回傳用戶個人設定的完整度，包含 onboarding、偏好、帳號、公開資訊四個區塊的完成狀態
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功獲取設定完整度 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                            data: {
+                                completed: number;
+                                total: number;
+                                sections: {
+                                    onboarding: boolean;
+                                    preferences: boolean;
+                                    account: boolean;
+                                    publicInfo: boolean;
+                                };
+                            };
+                            timestamp: string;
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/preferences/available": {
         parameters: {
             query?: never;
@@ -9734,6 +10037,75 @@ export interface paths {
                         };
                     };
                 };
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/profile/{identifier}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得 Profile 聚合資料
+         * @description 根據 custom_id 或 external_id 取得用戶 Profile 聚合資訊，包含近期實踐數、共同 circle 數等。無需登入，但帶 JWT 可取得 commonCirclesCount。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 用戶 custom_id 或 external_id（UUID） */
+                    identifier: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功取得 Profile 聚合資料 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                            data: {
+                                id: string;
+                                name: string | null;
+                                customId: string | null;
+                                photoURL: string | null;
+                                headline: string | null;
+                                educationStage: string | null;
+                                recentPracticeCount: number;
+                                commonCirclesCount: number | null;
+                                hideConnectionsCount: boolean;
+                                connectionsCount: number | null;
+                                contactList: {
+                                    instagram: string | null;
+                                    discord: string | null;
+                                    line: string | null;
+                                    facebook: string | null;
+                                    threads: string | null;
+                                    linkedin: string | null;
+                                    github: string | null;
+                                    website: string | null;
+                                };
+                            };
+                            timestamp: string;
+                        };
+                    };
+                };
+                404: components["responses"]["NotFoundError"];
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -11448,7 +11820,51 @@ export interface paths {
                              * @description ISO 8601 timestamp of the response
                              */
                             timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
                             meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
                                 [key: string]: unknown;
                             };
                         };
@@ -13599,6 +14015,8 @@ export interface paths {
                          * @enum {string}
                          */
                         status?: "draft" | "not_started" | "active" | "completed" | "archived";
+                        /** @enum {string} */
+                        privacyStatus?: "private" | "public" | "delayed";
                         /**
                          * @description 是否存為草稿（true: 設為草稿, false: 發布）
                          * @example false
@@ -19496,6 +19914,741 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notifications/unsubscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取消訂閱 Email 通知 */
+        get: {
+            parameters: {
+                query: {
+                    token: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 退訂成功 HTML 頁面 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/html": {
+                            html: string;
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得通知偏好設定 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationPreferencesApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        /** 更新通知偏好設定 */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateNotificationPreferencesBody"];
+                };
+            };
+            responses: {
+                /** @description 更新成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationActionApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 全部標記已讀 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationActionApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 標記單則通知已讀 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 通知 ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationActionApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得 In-App 通知列表（含 cursor 分頁與未讀數） */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 分頁游標（上一頁最後一筆通知的 cursor） */
+                    cursor?: string;
+                    /** @description 每頁筆數（1-100，預設 20） */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationListApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/follows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 關注用戶或主題實踐 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["FollowTargetBody"];
+                };
+            };
+            responses: {
+                /** @description 關注成功 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FollowActionApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/follows/{targetType}/{targetId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 取消關注 */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    targetType: "user" | "practice";
+                    targetId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 取消關注成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FollowActionApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connections/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 發送連結請求 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["SendConnectionRequestBody"];
+                };
+            };
+            responses: {
+                /** @description 請求已送出 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ConnectionActionApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connections/request/{requestId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 撤回連結請求 */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 連結請求 ID */
+                    requestId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 撤回成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ConnectionActionApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        /** 接受或拒絕連結請求 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 連結請求 ID */
+                    requestId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateConnectionRequestBody"];
+                };
+            };
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ConnectionActionApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/connections/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 解除連結（取消夥伴關係） */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 用戶 external_id */
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 解除成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ConnectionActionApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得我的夥伴列表 */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ConnectionListApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connections/requests/incoming": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得收到的連結請求 */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ConnectionRequestListApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connections/requests/outgoing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得發出的連結請求 */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ConnectionRequestListApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/buddy-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 接受或忽略 Buddy 請求 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Buddy 請求 ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateBuddyRequestBody"];
+                };
+            };
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BuddyRequestActionApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/buddy-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 查詢收到的待處理 Buddy 請求列表 */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BuddyRequestListApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/practices/{id}/buddy-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 發送 Buddy 請求 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 實踐 external_id */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateBuddyRequestBody"];
+                };
+            };
+            responses: {
+                /** @description 請求已送出 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BuddyRequestActionApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -20913,7 +22066,7 @@ export interface components {
              */
             name?: string;
         };
-        /** @description 寄送歡迎信給新用戶的請求資料。根據 hasCompletedQuiz 決定使用哪個版本：已做測驗版本（簡短，1 個 CTA）或未做測驗版本（詳細，2 個 CTA） */
+        /** @description 寄送歡迎信給新用戶的請求資料。根據 referralSource 決定使用哪個版本：social-media（找到你的學習社群）、community（和學習夥伴一起走）或 default（詳細引導） */
         WelcomeEmailRequest: {
             /**
              * Format: email
@@ -20933,22 +22086,16 @@ export interface components {
              */
             name: string;
             /**
-             * @description 是否已完成學習類型測驗（決定使用哪個版本歡迎信）
-             * @example false
+             * @description 用戶來源管道（如 instagram, discord, friend_referral 等），用於決定歡迎信版本
+             * @example instagram
              */
-            hasCompletedQuiz: boolean;
+            referralSource?: string;
             /**
              * Format: uri
-             * @description 主題實踐連結（兩版本共用）
-             * @example https://daodao.so/practice/create
+             * @description 主題實踐連結
+             * @example https://daodao.so/practices
              */
             practiceUrl?: string;
-            /**
-             * Format: uri
-             * @description 學習類型測驗連結（僅未做測驗版本使用）
-             * @example https://daodao.so/quiz
-             */
-            quizUrl?: string;
             /**
              * Format: uri
              * @description 海星插圖 URL
@@ -23097,6 +24244,11 @@ export interface components {
              */
             referralSource?: ("instagram" | "facebook" | "discord" | "linkedin" | "friend_referral" | "others") | string;
             /**
+             * @description 是否隱藏人脈數量
+             * @example false
+             */
+            hideConnectionsCount?: boolean;
+            /**
              * @description 自訂 ID (可選)
              * @example my_custom_id
              * @example my_custom_id
@@ -24674,6 +25826,11 @@ export interface components {
              * @example https://example.com/avatar.jpg
              */
             photoURL: string | null;
+            /**
+             * @description 用戶自訂 ID，用於 @mention
+             * @example my_custom_id
+             */
+            customId: string | null;
         };
         /** @description 留言基本資料 */
         CommentBase: {
@@ -27196,27 +28353,6 @@ export interface components {
              */
             currentUserReaction: string | null;
         };
-        /** @description 單筆用戶反應資料 */
-        ReactionListItem: {
-            /** @description 用戶外部 ID（UUID） */
-            userId: string;
-            /** @description 用戶名稱 */
-            name: string;
-            /** @description 用戶頭像 URL */
-            photoURL: string | null;
-            /**
-             * @description 反應類型
-             * @example fire
-             */
-            reactionType: string;
-            /** @description 反應時間（ISO 8601） */
-            reactedAt: string;
-        };
-        /** @description 個別用戶反應列表回應 */
-        GetReactionsListResponse: {
-            /** @description 反應列表 */
-            items: components["schemas"]["ReactionListItem"][];
-        };
         /** @description 新增或更換反應的請求資料 */
         UpsertReactionRequest: {
             /**
@@ -27239,7 +28375,7 @@ export interface components {
              * @example curious
              * @enum {string}
              */
-            reactionType: "useful" | "fire" | "touched" | "curious";
+            reactionType: "encourage" | "touched" | "fire" | "useful" | "sameHere" | "curious";
         };
         /** @description 刪除反應的請求資料 */
         RemoveReactionRequest: {
@@ -27254,6 +28390,27 @@ export interface components {
              * @example 32859587-f159-43fd-93e7-fcc890661781
              */
             targetId: string;
+        };
+        /** @description 單筆用戶反應資料 */
+        ReactionListItem: {
+            /** @description 用戶外部 ID（UUID） */
+            userId: string;
+            /** @description 用戶名稱 */
+            name: string;
+            /** @description 用戶頭像 URL */
+            photoURL: string | null;
+            /**
+             * @description 反應類型
+             * @example fire
+             */
+            reactionType: string;
+            /** @description 反應時間（ISO 8601） */
+            reactedAt: string;
+        };
+        /** @description 個別用戶反應列表回應 */
+        GetReactionsListResponse: {
+            /** @description 反應列表 */
+            items: components["schemas"]["ReactionListItem"][];
         };
         AdminUserListQuery: {
             /**
@@ -27926,6 +29083,971 @@ export interface components {
              */
             nameEn: string | null;
         };
+        NotificationItem: {
+            /**
+             * @description 通知 ID
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 通知類型
+             * @example buddy_request
+             */
+            type: string;
+            /**
+             * @description 關聯實體類型
+             * @example practice
+             */
+            entity_type: string | null;
+            /**
+             * @description 關聯實體 ID
+             * @example 550e8400
+             */
+            entity_id: string | null;
+            /**
+             * @description 優先級
+             * @example normal
+             */
+            priority: string;
+            /**
+             * @description 是否已讀
+             * @example false
+             */
+            is_read: boolean;
+            /**
+             * @description 聚合鍵
+             * @example null
+             */
+            aggregation_key: string | null;
+            /**
+             * @description 聚合數量
+             * @example 1
+             */
+            aggregation_count: number;
+            /**
+             * @description 建立時間（ISO 8601）
+             * @example 2024-01-15T10:30:00.000Z
+             */
+            created_at: string;
+            actor: components["schemas"]["NotificationActor"];
+        };
+        /** @description 發送者資訊 */
+        NotificationActor: {
+            /**
+             * @description 發送者 ID
+             * @example 42
+             */
+            id: number;
+            /**
+             * @description 發送者暱稱
+             * @example 小明
+             */
+            nickname: string | null;
+        } | null;
+        NotificationListData: {
+            /** @description 通知列表 */
+            notifications: components["schemas"]["NotificationItem"][];
+            /**
+             * @description 下一頁游標
+             * @example null
+             */
+            nextCursor: string | null;
+            /**
+             * @description 未讀通知數
+             * @example 3
+             */
+            unreadCount: number;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        NotificationListApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            data: components["schemas"]["NotificationListData"] & unknown;
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        NotificationPreferencesApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: components["schemas"]["NotificationPreferenceItem"][];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        NotificationPreferenceItem: {
+            /**
+             * @description 通知類型
+             * @example buddy_request
+             */
+            type: string;
+            /**
+             * @description 通知渠道
+             * @example N01
+             */
+            channel: string;
+            /**
+             * @description 是否啟用
+             * @example true
+             */
+            isEnabled: boolean;
+        };
+        FollowTargetBody: {
+            /**
+             * @description 關注對象類型
+             * @example user
+             * @enum {string}
+             */
+            targetType: "user" | "practice";
+            /**
+             * @description 關注對象的唯一識別碼（external_id）
+             * @example abc123
+             */
+            targetId: string;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        FollowListApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: components["schemas"]["FollowItem"][];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        FollowItem: {
+            /** @description 用戶內部 ID */
+            userId: number;
+            /** @description 用戶 external_id */
+            externalId: string;
+            /** @description 用戶暱稱 */
+            nickname: string | null;
+            /** @description 關注時間 ISO 8601 */
+            followedAt: string;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        FollowActionApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: {
+                message: string;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        SendConnectionRequestBody: {
+            /**
+             * @description 收到請求的用戶 external_id
+             * @example abc123
+             */
+            receiverExternalId: string;
+            /**
+             * @description 連結原因（標準門檻下必填，最多 50 字）
+             * @example 我們都在學 React，希望能互相鼓勵
+             */
+            intent?: string;
+            /** @description 從主題實踐頁發出時帶入的實踐 external_id（選填） */
+            contextPracticeExternalId?: string;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        ConnectionListApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: components["schemas"]["ConnectionItem"][];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        ConnectionItem: {
+            connectionId: number;
+            userId: number;
+            externalId: string;
+            nickname: string | null;
+            connectedAt: string;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        ConnectionRequestListApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: components["schemas"]["ConnectionRequestItem"][];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        ConnectionRequestItem: {
+            requestId: number;
+            requesterExternalId: string;
+            requesterNickname: string | null;
+            intent: string | null;
+            interactionCount: number;
+            createdAt: string;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        ConnectionActionApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: {
+                message: string;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        CreateBuddyRequestBody: {
+            /**
+             * @description 被請求的用戶 external_id
+             * @example abc123
+             */
+            receiverExternalId: string;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        BuddyRequestListApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: components["schemas"]["BuddyRequestItem"][];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        BuddyRequestItem: {
+            requestId: number;
+            requesterExternalId: string;
+            requesterNickname: string | null;
+            practiceId: number;
+            practiceTitle: string;
+            createdAt: string;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        BuddyRequestActionApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: {
+                message: string;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
         /** @description 我的實踐項目 */
         MyPracticeItem: {
             /**
@@ -28045,6 +30167,27 @@ export interface components {
              *     ]
              */
             tags: string[];
+        };
+        /** @description 學習足跡項目 */
+        MyLearningFootprintItem: {
+            /** @description 留言ID */
+            id: number;
+            /** @description 留言內容 */
+            content: string;
+            /**
+             * Format: date-time
+             * @description 留言時間
+             */
+            createdAt: string;
+            /**
+             * Format: uuid
+             * @description 關聯實踐的外部UUID
+             */
+            practiceId: string;
+            /** @description 關聯實踐的標題 */
+            practiceTitle: string;
+            /** @description 關聯實踐是否已刪除 */
+            practiceDeleted: boolean;
         };
         /** @description 更新個人偏好設定的請求資料 */
         UpdatePreferencesRequest: {
@@ -29415,6 +31558,139 @@ export interface components {
             meta?: {
                 processingTime?: number;
             };
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        NotificationActionApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: {
+                message: string;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        UpdateNotificationPreferencesBody: {
+            /**
+             * @description 是否全域啟用通知
+             * @example true
+             */
+            globalEnabled?: boolean;
+            /** @description 通知偏好設定列表 */
+            preferences?: {
+                /**
+                 * @description 通知類型
+                 * @example buddy_request
+                 */
+                type: string;
+                /**
+                 * @description 通知渠道（N01=Email, N02=In-App, N03=Push）
+                 * @example N01
+                 * @enum {string}
+                 */
+                channel: "N01" | "N02" | "N03";
+                /**
+                 * @description 是否啟用
+                 * @example true
+                 */
+                isEnabled: boolean;
+            }[];
+        };
+        UpdateConnectionRequestBody: {
+            /**
+             * @description 對連結請求的回應動作
+             * @example accept
+             * @enum {string}
+             */
+            action: "accept" | "reject";
+        };
+        UpdateBuddyRequestBody: {
+            /**
+             * @description 對 Buddy 請求的回應動作
+             * @example accepted
+             * @enum {string}
+             */
+            status: "accepted" | "ignored";
         };
     };
     responses: {

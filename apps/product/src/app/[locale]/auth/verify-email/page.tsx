@@ -49,10 +49,10 @@ export default function VerifyEmailPage() {
     try {
       // 先刷新認證狀態，確保 isEmailVerified 更新
       await refreshAuth();
-      router.push("/");
+      router.push("/settings");
     } catch (error) {
       console.error("Failed to refresh auth:", error);
-      router.push("/");
+      router.push("/settings");
     }
   }, [refreshAuth, router]);
 

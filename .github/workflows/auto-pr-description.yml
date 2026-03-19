@@ -1,0 +1,88 @@
+name: Auto PR Description
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  generate_description:
+    name: Generate PR Description with GitHub Models
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+      models: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get commit log
+        id: commits
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
+        run: |
+          COMMITS=$(git log "origin/$BASE..origin/$HEAD" --pretty=format:"- %s (%h)" | head -50)
+          echo "COMMITS<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$COMMITS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Generate PR description with GitHub Models
+        id: generate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMITS: ${{ steps.commits.outputs.COMMITS }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
+        run: |
+          RESPONSE=$(curl -s -X POST "https://models.inference.ai.azure.com/chat/completions" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg commits "$COMMITS" \
+              --arg base "$BASE" \
+              --arg head "$HEAD" \
+              '{
+                model: "gpt-4o-mini",
+                messages: [
+                  {
+                    role: "system",
+                    content: "你是一個專業的技術文件撰寫者。根據 git commit 列表，產生繁體中文的 PR description。格式必須嚴格按照以下 markdown 結構，不要加其他內容：\n\n## Why is this necessary?\n\n- （說明這批變更的目的和原因，3-5 點）\n\n## How does it address?\n\n- （說明具體做了什麼，3-5 點）"
+                  },
+                  {
+                    role: "user",
+                    content: ("以下是這次 " + $head + " → " + $base + " 的 commit 列表：\n\n" + $commits + "\n\n請根據這些 commits 產生 PR description。")
+                  }
+                ],
+                temperature: 0.3
+              }'
+            )")
+
+          BODY=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
+
+          if [ -z "$BODY" ]; then
+            echo "❌ Failed to generate description"
+            echo "$RESPONSE"
+            exit 1
+          fi
+
+          echo "BODY<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$BODY" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "✅ Description generated"
+
+      - name: Update PR description
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BODY: ${{ steps.generate.outputs.BODY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" \
+            --method PATCH \
+            -f body="$BODY"
+
+          echo "✅ PR #$PR_NUMBER description updated"

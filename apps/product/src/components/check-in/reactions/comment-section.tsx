@@ -5,12 +5,13 @@ import { removeReaction, upsertReaction, useReactions } from "@daodao/api";
 import { DialogOutlineSvg } from "@daodao/assets";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
 import { MoreHorizontal, Pencil, Send, Trash2 } from "lucide-react";
 import type React from "react";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
@@ -23,6 +24,8 @@ const PREVIEW_COUNT = 2;
 export interface ICommentAuthor {
   name: string;
   photoURL?: string;
+  userId?: string;
+  customId?: string | null;
 }
 
 export interface ICommentReply {
@@ -63,6 +66,154 @@ function getAvatarColor(name: string) {
 }
 
 // ============================================================================
+// @mention helpers
+// ============================================================================
+
+interface MentionCandidate {
+  userId: string;
+  name: string;
+  photoURL?: string;
+  customId?: string | null;
+}
+
+/** Renders comment content with @mention tokens highlighted */
+function renderContent(content: string) {
+  const parts = content.split(/(@\S+)/g);
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.startsWith("@") ? (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static split segments
+          <span key={i} className="text-logo-cyan font-medium">
+            {part}
+          </span>
+        ) : (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static split segments
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
+
+// ============================================================================
+// MentionInput — textarea with @mention dropdown
+// ============================================================================
+
+interface MentionInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  placeholder?: string;
+  rows?: number;
+  className?: string;
+  inputRef?: React.RefObject<HTMLTextAreaElement | null>;
+  participants: MentionCandidate[];
+  autoFocus?: boolean;
+}
+
+function MentionInput({
+  value,
+  onChange,
+  onKeyDown,
+  placeholder,
+  rows = 1,
+  className,
+  inputRef,
+  participants,
+  autoFocus,
+}: MentionInputProps) {
+  const localRef = useRef<HTMLTextAreaElement>(null);
+  const ref = (inputRef ?? localRef) as React.RefObject<HTMLTextAreaElement>;
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [mentionStart, setMentionStart] = useState(-1);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    onChange(newValue);
+
+    const cursor = e.target.selectionStart ?? newValue.length;
+    const textBeforeCursor = newValue.slice(0, cursor);
+    const lastAt = textBeforeCursor.lastIndexOf("@");
+
+    if (lastAt !== -1) {
+      const afterAt = textBeforeCursor.slice(lastAt + 1);
+      if (!afterAt.includes(" ") && !afterAt.includes("\n")) {
+        setMentionStart(lastAt);
+        setMentionQuery(afterAt);
+        return;
+      }
+    }
+
+    setMentionQuery(null);
+    setMentionStart(-1);
+  };
+
+  const handleSelect = (candidate: MentionCandidate) => {
+    const mention = `@${candidate.customId || candidate.name}`;
+    const before = value.slice(0, mentionStart);
+    const after = value.slice(mentionStart + 1 + (mentionQuery?.length ?? 0));
+    const next = `${before}${mention} ${after}`;
+    onChange(next);
+    setMentionQuery(null);
+    setMentionStart(-1);
+    requestAnimationFrame(() => {
+      const el = ref.current;
+      if (!el) return;
+      el.focus();
+      const pos = before.length + mention.length + 1;
+      el.setSelectionRange(pos, pos);
+    });
+  };
+
+  const filtered =
+    mentionQuery !== null
+      ? participants.filter((p) => p.name.toLowerCase().includes(mentionQuery.toLowerCase()))
+      : [];
+
+  return (
+    <div className="relative flex-1 min-w-0">
+      <textarea
+        ref={ref}
+        value={value}
+        onChange={handleChange}
+        onKeyDown={onKeyDown}
+        placeholder={placeholder}
+        rows={rows}
+        className={className}
+        // biome-ignore lint/a11y/noAutofocus: intentional UX for inline edit
+        autoFocus={autoFocus}
+      />
+      {mentionQuery !== null && filtered.length > 0 && (
+        <div className="absolute bottom-full left-0 mb-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-1 z-20 min-w-[160px] max-h-44 overflow-y-auto">
+          {filtered.map((p) => (
+            <button
+              key={p.userId}
+              type="button"
+              onMouseDown={(e) => {
+                e.preventDefault(); // keep textarea focused
+                handleSelect(p);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors text-left"
+            >
+              <Avatar className="size-6 shrink-0">
+                {p.photoURL && <AvatarImage src={p.photoURL} alt={p.name} />}
+                <AvatarFallback
+                  className={cn("text-xs font-medium text-text-dark", getAvatarColor(p.name))}
+                >
+                  {p.name.slice(0, 1)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="truncate">{p.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
 // CommentBubble (single comment or reply)
 // ============================================================================
 
@@ -73,6 +224,7 @@ interface CommentBubbleProps {
   isOwn?: boolean;
   onEdit?: (id: string, content: string) => Promise<unknown> | unknown;
   onDelete?: (id: string) => Promise<unknown> | unknown;
+  participants: MentionCandidate[];
 }
 
 function CommentBubble({
@@ -82,6 +234,7 @@ function CommentBubble({
   isOwn = false,
   onEdit,
   onDelete,
+  participants,
 }: CommentBubbleProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -101,7 +254,6 @@ function CommentBubble({
     (sum, r) => sum + r.count,
     0,
   );
-  // 所有有人按過的 reaction 類型，按數量排序，當前用戶的排第一（參考 practice-detail-shell 作法）
   const activeReactionTypes = (reactionsData?.data?.reactions ?? [])
     .filter((r) => r.count > 0)
     .sort((a, b) => b.count - a.count)
@@ -145,10 +297,7 @@ function CommentBubble({
     const trimmed = editValue.trim();
     if (!trimmed) return;
     const result = await onEdit?.(comment.id, trimmed);
-    if (result === false) {
-      toast.error("更新留言失敗，請再試一次");
-      return;
-    }
+    if (result === false) return; // page-level handler already shows the error toast
     toast.success("已更新留言");
     setEditing(false);
   };
@@ -180,9 +329,18 @@ function CommentBubble({
       <div className="flex-1 min-w-0">
         {/* Author + time + own-comment menu */}
         <div className="flex items-center gap-2 mb-0.5">
-          <span className={cn("font-semibold text-[#295E5C]", authorTextClass)}>
-            {comment.author.name}
-          </span>
+          {comment.author.userId ? (
+            <CustomLink
+              href={`/users/${comment.author.userId}`}
+              className={cn("font-semibold text-[#295E5C] hover:underline", authorTextClass)}
+            >
+              {comment.author.name}
+            </CustomLink>
+          ) : (
+            <span className={cn("font-semibold text-[#295E5C]", authorTextClass)}>
+              {comment.author.name}
+            </span>
+          )}
           <span className={cn("text-[#295E5C]/50", timeTextClass)}>{comment.time}</span>
           {isOwn && !editing && (
             <div ref={menuRef} className="relative ml-auto">
@@ -247,12 +405,18 @@ function CommentBubble({
         {/* Content or edit mode */}
         {editing ? (
           <div className="flex flex-col gap-2">
-            <textarea
+            <MentionInput
               value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              // biome-ignore lint/a11y/noAutofocus: intentional UX for inline edit
-              autoFocus
+              onChange={setEditValue}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  void handleSaveEdit();
+                }
+              }}
               rows={3}
+              autoFocus
+              participants={participants}
               className="w-full resize-none rounded-lg border border-logo-cyan bg-white px-3 py-2 text-sm text-[#295E5C] focus:outline-none"
             />
             <div className="flex gap-2 justify-end">
@@ -290,11 +454,11 @@ function CommentBubble({
                 回覆
               </span>
             )}
-            {comment.content}
+            {renderContent(comment.content)}
           </p>
         )}
 
-        {/* Actions: 👍 + 💬 (hidden while editing) */}
+        {/* Actions: reaction + reply (hidden while editing) */}
         {!editing && (
           <div className="flex items-center gap-3 mt-1.5">
             <ReactionPickerButton
@@ -338,8 +502,10 @@ interface CommentSectionProps {
   onSubmit: (content: string, reactions: ReactionTypeType[], parentId?: string) => void;
   /** 是否顯示「更多留言」摺疊按鈕 */
   hasMoreComments?: boolean;
-  /** 當前登入用戶的名稱，用於判斷是否為自己的留言 */
+  /** 當前登入用戶的名稱（顯示用） */
   currentUserName?: string;
+  /** 當前登入用戶的 ID，用於判斷是否為自己的留言 */
+  currentUserId?: string;
   /** 當前登入用戶的頭像 URL */
   currentUserPhotoURL?: string;
   onEditComment?: (id: string, content: string) => Promise<unknown> | unknown;
@@ -353,6 +519,7 @@ export function CommentSection({
   onSubmit,
   hasMoreComments = false,
   currentUserName,
+  currentUserId,
   currentUserPhotoURL,
   onEditComment,
   onDeleteComment,
@@ -366,6 +533,35 @@ export function CommentSection({
   const hiddenCount = hiddenComments.length;
   const internalRef = useRef<HTMLTextAreaElement>(null);
   const ref = externalRef ?? internalRef;
+
+  // Derive participants list from all comment authors for @mention dropdown
+  const participants = useMemo<MentionCandidate[]>(() => {
+    const seen = new Set<string>();
+    const result: MentionCandidate[] = [];
+    for (const comment of comments) {
+      if (comment.author.userId && !seen.has(comment.author.userId)) {
+        seen.add(comment.author.userId);
+        result.push({
+          userId: comment.author.userId,
+          name: comment.author.name,
+          photoURL: comment.author.photoURL,
+          customId: comment.author.customId,
+        });
+      }
+      for (const reply of comment.replies ?? []) {
+        if (reply.author.userId && !seen.has(reply.author.userId)) {
+          seen.add(reply.author.userId);
+          result.push({
+            userId: reply.author.userId,
+            name: reply.author.name,
+            photoURL: reply.author.photoURL,
+            customId: reply.author.customId,
+          });
+        }
+      }
+    }
+    return result;
+  }, [comments]);
 
   // Track the previous set to detect newly added reactions
   const prevSelectedRef = useRef<ReactionTypeType[]>([]);
@@ -403,6 +599,14 @@ export function CommentSection({
     setReplyTo(null);
   };
 
+  const handleSetReplyTo = (id: string | null) => {
+    // Clear any draft text for the reply box being closed
+    if (replyTo && replyTo !== id) {
+      setReplyInputs((prev) => ({ ...prev, [replyTo]: "" }));
+    }
+    setReplyTo(id);
+  };
+
   const handleReplySubmit = (parentId: string) => {
     const replyValue = replyInputs[parentId] ?? "";
     const trimmed = replyValue.trim();
@@ -418,6 +622,63 @@ export function CommentSection({
       handleSubmit();
     }
   };
+
+  const renderCommentBlock = (comment: IComment) => (
+    <div key={comment.id}>
+      <CommentBubble
+        comment={comment}
+        onReply={() => handleSetReplyTo(comment.id)}
+        isOwn={!!currentUserId && comment.author.userId === currentUserId}
+        onEdit={onEditComment}
+        onDelete={onDeleteComment}
+        participants={participants}
+      />
+      {/* Replies */}
+      {comment.replies?.map((reply) => (
+        <div
+          key={reply.id}
+          className="mt-3 ml-6 pl-4 border-l border-[#E4EAE9] bg-[#F7FBFB] rounded-lg"
+        >
+          <CommentBubble
+            comment={reply}
+            isReply
+            isOwn={!!currentUserId && reply.author.userId === currentUserId}
+            onEdit={onEditComment}
+            onDelete={onDeleteComment}
+            participants={participants}
+          />
+        </div>
+      ))}
+      {/* Inline reply input */}
+      {replyTo === comment.id && (
+        <div className="pl-[40px] flex gap-2 items-center mt-3">
+          <MentionInput
+            value={replyInputs[comment.id] ?? ""}
+            onChange={(v) =>
+              setReplyInputs((prev) => ({ ...prev, [comment.id]: v }))
+            }
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleReplySubmit(comment.id);
+              }
+            }}
+            placeholder={`${comment.author.name}...`}
+            rows={1}
+            participants={participants}
+            className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
+          />
+          <Button
+            size="icon"
+            className="shrink-0 size-9 rounded-full bg-logo-cyan hover:bg-logo-cyan/80"
+            onClick={() => handleReplySubmit(comment.id)}
+          >
+            <Send className="size-4" />
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="flex flex-col">
@@ -435,15 +696,16 @@ export function CommentSection({
           </AvatarFallback>
         </Avatar>
 
-        {/* Input */}
-        <textarea
-          ref={ref as React.RefObject<HTMLTextAreaElement>}
+        {/* Input with @mention support */}
+        <MentionInput
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={setInputValue}
           onKeyDown={handleKeyDown}
           placeholder={selectedReactions.length === 0 ? "寫下你的留言..." : ""}
           rows={1}
-          className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10"
+          inputRef={ref}
+          participants={participants}
+          className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10 w-full"
         />
 
         {/* Send */}
@@ -460,62 +722,7 @@ export function CommentSection({
       {/* 留言列表 */}
       {comments.length > 0 && (
         <div className="flex flex-col gap-5 px-4 pt-4 pb-2">
-          {previewComments.map((comment) => (
-            <div key={comment.id}>
-              <CommentBubble
-                comment={comment}
-                onReply={() => setReplyTo(comment.id)}
-                isOwn={!!currentUserName && comment.author.name === currentUserName}
-                onEdit={onEditComment}
-                onDelete={onDeleteComment}
-              />
-              {/* Replies */}
-              {comment.replies?.map((reply) => (
-                <div
-                  key={reply.id}
-                  className="mt-3 ml-6 pl-4 border-l border-[#E4EAE9] bg-[#F7FBFB] rounded-lg"
-                >
-                  <CommentBubble
-                    comment={reply}
-                    isReply
-                    isOwn={!!currentUserName && reply.author.name === currentUserName}
-                    onEdit={onEditComment}
-                    onDelete={onDeleteComment}
-                  />
-                </div>
-              ))}
-              {/* Inline reply input */}
-              {replyTo === comment.id && (
-                <div className="pl-[40px] flex gap-2 items-center mt-3">
-                  <textarea
-                    className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px]"
-                    placeholder={`回覆 ${comment.author.name}...`}
-                    rows={1}
-                    value={replyInputs[comment.id] ?? ""}
-                    onChange={(event) =>
-                      setReplyInputs((prev) => ({
-                        ...prev,
-                        [comment.id]: event.target.value,
-                      }))
-                    }
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" && !event.shiftKey) {
-                        event.preventDefault();
-                        handleReplySubmit(comment.id);
-                      }
-                    }}
-                  />
-                  <Button
-                    size="icon"
-                    className="shrink-0 size-9 rounded-full bg-logo-cyan hover:bg-logo-cyan/80"
-                    onClick={() => handleReplySubmit(comment.id)}
-                  >
-                    <Send className="size-4" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          ))}
+          {previewComments.map(renderCommentBlock)}
         </div>
       )}
 
@@ -555,60 +762,7 @@ export function CommentSection({
           >
             <div className="overflow-hidden">
               <div className="flex flex-col gap-5 px-4 pt-2 pb-4">
-                {hiddenComments.map((comment) => (
-                  <div key={comment.id}>
-                    <CommentBubble
-                      comment={comment}
-                      onReply={() => setReplyTo(comment.id)}
-                      isOwn={!!currentUserName && comment.author.name === currentUserName}
-                      onEdit={onEditComment}
-                      onDelete={onDeleteComment}
-                    />
-                    {comment.replies?.map((reply) => (
-                      <div
-                        key={reply.id}
-                        className="mt-3 ml-6 pl-4 border-l border-[#E4EAE9] bg-[#F7FBFB] rounded-lg"
-                      >
-                        <CommentBubble
-                          comment={reply}
-                          isReply
-                          isOwn={!!currentUserName && reply.author.name === currentUserName}
-                          onEdit={onEditComment}
-                          onDelete={onDeleteComment}
-                        />
-                      </div>
-                    ))}
-                    {replyTo === comment.id && (
-                      <div className="pl-[40px] flex gap-2 items-center mt-3">
-                        <textarea
-                          className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px]"
-                          placeholder={`回覆 ${comment.author.name}...`}
-                          rows={1}
-                          value={replyInputs[comment.id] ?? ""}
-                          onChange={(event) =>
-                            setReplyInputs((prev) => ({
-                              ...prev,
-                              [comment.id]: event.target.value,
-                            }))
-                          }
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" && !event.shiftKey) {
-                              event.preventDefault();
-                              handleReplySubmit(comment.id);
-                            }
-                          }}
-                        />
-                        <Button
-                          size="icon"
-                          className="shrink-0 size-9 rounded-full bg-logo-cyan hover:bg-logo-cyan/80"
-                          onClick={() => handleReplySubmit(comment.id)}
-                        >
-                          <Send className="size-4" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {hiddenComments.map(renderCommentBlock)}
               </div>
             </div>
           </div>

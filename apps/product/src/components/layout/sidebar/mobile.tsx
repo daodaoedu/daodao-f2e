@@ -7,6 +7,7 @@ import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
@@ -35,12 +36,16 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
                   className="flex items-center text-text-dark"
                   aria-label={item.label}
                 >
-                  <Icon
-                    className={cn(
-                      "shrink-0 size-9 text-light-gray transition-colors",
-                      isActive && "text-logo-cyan"
-                    )}
-                  />
+                  {item.href === "/notifications" ? (
+                    <NotificationBell isActive={isActive} />
+                  ) : (
+                    <Icon
+                      className={cn(
+                        "shrink-0 size-9 text-light-gray transition-colors",
+                        isActive && "text-logo-cyan"
+                      )}
+                    />
+                  )}
                 </CustomLink>
               </li>
             );

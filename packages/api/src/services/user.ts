@@ -11,6 +11,48 @@ import type { components, paths } from "../types";
 // Types
 // ============================================================================
 
+/**
+ * 個人檔案頁 API 回應型別
+ * 對應後端 GET /api/v1/users/profile/:identifier
+ */
+export interface UserProfileData {
+  id: string;
+  name: string | null;
+  photoURL: string | null;
+  customId: string | null;
+  location: string | null;
+  locationNameZh: string | null;
+  locationNameEn: string | null;
+  selfIntroduction: string | null;
+  personalSlogan: string | null;
+  contactList: {
+    instagram?: string | null;
+    discord?: string | null;
+    line?: string | null;
+    facebook?: string | null;
+    threads?: string | null;
+    linkedin?: string | null;
+    website?: string | null;
+    github?: string | null;
+  } | null;
+  latestQuizResult: {
+    id: number;
+    resultType: string;
+    scores: Record<string, number>;
+    completedAt: string;
+  } | null;
+  connectionsCount: number;
+  followersCount: number;
+  recentPracticeCount: number;
+  commonCirclesCount: number | null;
+  hideConnectionsCount: boolean;
+}
+
+export interface UserProfileResponse {
+  success: true;
+  data: UserProfileData;
+}
+
 type UserResponse =
   paths["/api/v1/users/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
 type UserListResponse =
@@ -110,6 +152,35 @@ export const getUserByIdentifier = async (identifier: string) => {
 
   // 如果 customId 查詢失敗，嘗試用 ID 查詢
   return getUserById(identifier);
+};
+
+/**
+ * 透過 identifier 取得個人檔案頁資料（新版 profile endpoint）
+ * 若傳入 token 則附加 Authorization header，以便取得登入相關欄位
+ * （connectionsCount、followersCount、commonCirclesCount、hideConnectionsCount 等）
+ */
+export const getUserProfileByIdentifier = async (
+  identifier: string,
+  token?: string
+): Promise<UserProfileResponse> => {
+  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  const response = await unauthorizedHandler.wrapFetch(
+    `${baseUrl}/api/v1/users/profile/${encodeURIComponent(identifier)}`,
+    {
+      method: "GET",
+      credentials: "include",
+      headers,
+    }
+  );
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: { message: "Failed to fetch user profile" } }));
+    throw new Error(errorData?.error?.message ?? "Failed to fetch user profile");
+  }
+  return response.json();
 };
 
 /**
@@ -402,6 +473,33 @@ export const saveQuizResult = async (data: SaveQuizResultRequest) => {
   return client.POST("/api/v1/quiz", {
     body: data,
   });
+};
+
+export interface SettingsSummary {
+  completed: number;
+  total: number;
+  sections: {
+    onboarding: boolean;
+    preferences: boolean;
+    account: boolean;
+    publicInfo: boolean;
+  };
+}
+
+/**
+ * 獲取設定頁完整度摘要
+ */
+export const getSettingsSummary = async (): Promise<SettingsSummary> => {
+  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const response = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/users/settings-summary`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch settings summary');
+  }
+  const data = await response.json();
+  return data.data as SettingsSummary;
 };
 
 // ============================================================================

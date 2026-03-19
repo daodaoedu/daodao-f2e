@@ -8,13 +8,19 @@ import {
   PracticeOverviewCard,
   ResourceCard,
 } from "@/components/practice";
+import {
+  type PrivacyStatus,
+  PrivacyStatusSelector,
+} from "@/components/practice/shared/privacy-status-selector";
 import type { ManualPracticeFormValues } from "../schema";
 
 interface Step5Props {
   form: UseFormReturn<ManualPracticeFormValues>;
+  privacyStatus?: PrivacyStatus;
+  onPrivacyStatusChange?: (value: PrivacyStatus) => void;
 }
 
-export const Step5 = ({ form }: Step5Props) => {
+export const Step5 = ({ form, privacyStatus, onPrivacyStatusChange }: Step5Props) => {
   const formValues = form.getValues();
   const {
     name,
@@ -76,6 +82,14 @@ export const Step5 = ({ form }: Step5Props) => {
           </div>
         </div>
       )}
+
+      {/* Privacy Status */}
+      <div className="mt-6 bg-white rounded-lg p-4 shadow-sm">
+        <PrivacyStatusSelector
+          value={privacyStatus ?? "private"}
+          onChange={onPrivacyStatusChange ?? (() => {})}
+        />
+      </div>
     </div>
   );
 };

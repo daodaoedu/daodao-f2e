@@ -1,6 +1,10 @@
 "use client";
 
 import { type UpdatePracticeRequestType, updatePractice, usePracticeById } from "@daodao/api";
+import {
+  type PrivacyStatus,
+  PrivacyStatusSelector,
+} from "@/components/practice/shared/privacy-status-selector";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
@@ -87,6 +91,7 @@ export default function EditPracticePage() {
   const practiceId = params.id as string;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus>("private");
 
   const { data: practiceData, isLoading, error } = usePracticeById(practiceId);
 
@@ -206,7 +211,11 @@ export default function EditPracticePage() {
     if (formValues) {
       form.reset(formValues);
     }
-  }, [formValues, form]);
+    if (practiceData?.data) {
+      const ps = (practiceData.data as Record<string, unknown>).privacyStatus as PrivacyStatus | undefined;
+      if (ps) setPrivacyStatus(ps);
+    }
+  }, [formValues, form, practiceData]);
 
   const handleSubmit = async (values: ManualPracticeFormValues) => {
     if (isSubmitting) {
@@ -216,7 +225,10 @@ export default function EditPracticePage() {
     setIsSubmitting(true);
 
     try {
-      const apiRequest = convertFormValuesToApiRequest(values);
+      const apiRequest = {
+        ...convertFormValuesToApiRequest(values),
+        privacy_status: privacyStatus,
+      } as UpdatePracticeRequestType;
 
       const response = await updatePractice(practiceId, apiRequest);
 
@@ -314,6 +326,14 @@ export default function EditPracticePage() {
             <Step2 form={form} disabled={isPracticeStarted} minStartDate={minStartDate} />
             <Step3 form={form} />
             <Step4 form={form} />
+
+            {/* Privacy Status */}
+            <div className="bg-white rounded-lg p-4 shadow-sm">
+              <PrivacyStatusSelector
+                value={privacyStatus}
+                onChange={setPrivacyStatus}
+              />
+            </div>
 
             {/* Save Button */}
             <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray">

@@ -5,14 +5,17 @@ import GithubSvg from "@daodao/assets/images/social-icons/github.svg";
 import InstagramSvg from "@daodao/assets/images/social-icons/instagram-filled.svg";
 import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin-filled.svg";
 import ThreadsSvg from "@daodao/assets/images/social-icons/threads-filled.svg";
+import { followTarget, unfollowTarget, sendConnectionRequest, useCurrentUser, useFollowStatus } from "@daodao/api";
 import { useIsMobile } from "@daodao/shared";
+import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
+import MarkdownRenderer from "@daodao/ui/components/markdown-renderer";
 import { toast } from "@daodao/ui/components/sonner";
-import { Globe, MapPin } from "lucide-react";
+import { Globe, MapPin, Users } from "lucide-react";
 import type React from "react";
-import { useCallback } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   SocialPlatform,
   type SocialPlatform as SocialPlatformType,
@@ -97,6 +100,15 @@ interface UserInfoCardProps {
   selfIntroduction?: string;
   photoURL?: string;
   socialLinks?: ISocialLinks;
+  personalSlogan?: string;
+  connectionsCount?: number;
+  followersCount?: number;
+  hideConnectionsCount?: boolean;
+  recentPracticeCount?: number;
+  commonCirclesCount?: number | null;
+  isOwnProfile?: boolean;
+  isAuthenticated?: boolean;
+  targetUserId?: string;
 }
 
 /**
@@ -108,8 +120,36 @@ export function UserInfoCard({
   selfIntroduction,
   photoURL,
   socialLinks,
+  personalSlogan,
+  connectionsCount,
+  followersCount,
+  hideConnectionsCount,
+  recentPracticeCount,
+  commonCirclesCount,
+  isOwnProfile = false,
+  isAuthenticated = false,
+  targetUserId,
 }: UserInfoCardProps) {
   const isMobile = useIsMobile();
+  const [followLoading, setFollowLoading] = useState(false);
+  const [connectLoading, setConnectLoading] = useState(false);
+  const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
+  const { openInfoDialog } = useDialog();
+  const intentRef = useRef("");
+
+  // 用 client-side hook 判斷登入狀態（server-side cookie 無法自動帶入）
+  const { data: currentUserData } = useCurrentUser();
+  const currentUserId = currentUserData?.data?.id ?? null;
+  const clientIsAuthenticated = currentUserId !== null;
+  const clientIsOwnProfile = targetUserId != null && currentUserId === targetUserId;
+
+  // 查詢是否已關注（僅在已登入且非自己頁面時查詢）
+  const { data: followStatusData } = useFollowStatus(
+    "user",
+    clientIsAuthenticated && !clientIsOwnProfile ? targetUserId : undefined
+  );
+  const currentIsFollowing = isFollowing ?? followStatusData?.data?.isFollowing ?? false;
+
   // 複製文字到剪貼簿的處理函數
   const handleCopy = useCallback(async (text: string) => {
     try {
@@ -119,6 +159,66 @@ export function UserInfoCard({
       toast.error("複製失敗");
     }
   }, []);
+
+  const handleFollow = useCallback(async () => {
+    if (!targetUserId) return;
+    setFollowLoading(true);
+    try {
+      if (currentIsFollowing) {
+        await unfollowTarget("user", targetUserId);
+        setIsFollowing(false);
+        toast.success("已取消關注");
+      } else {
+        await followTarget({ targetType: "user", targetId: targetUserId });
+        setIsFollowing(true);
+        toast.success("已關注");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "操作失敗");
+    } finally {
+      setFollowLoading(false);
+    }
+  }, [targetUserId, currentIsFollowing]);
+
+  const handleConnect = useCallback(async () => {
+    if (!targetUserId) return;
+
+    intentRef.current = "";
+    const result = await openInfoDialog({
+      title: "請求連結",
+      content: (
+        <div className="p-4">
+          <p className="text-sm text-gray-600 mb-3">填寫連結原因，讓對方更了解你的請求動機。</p>
+          <textarea
+            className="w-full border border-gray-300 rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
+            rows={3}
+            maxLength={50}
+            placeholder="請簡短說明連結原因（最多 50 字）"
+            onChange={(e) => { intentRef.current = e.target.value; }}
+          />
+        </div>
+      ),
+      buttons: [
+        { label: "取消", value: "cancel", variant: "outline" },
+        { label: "送出", value: "confirm", variant: "default" },
+      ],
+    });
+
+    if (result.value !== "confirm") return;
+
+    setConnectLoading(true);
+    try {
+      await sendConnectionRequest({
+        receiverExternalId: targetUserId,
+        intent: intentRef.current.trim() || undefined,
+      });
+      toast.success("已送出連結請求");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "請求失敗");
+    } finally {
+      setConnectLoading(false);
+    }
+  }, [targetUserId, openInfoDialog]);
 
   // 按照定義的順序將物件轉換為陣列並分離有圖示和沒有圖示的連結
   const socialLinksArray = socialLinks
@@ -141,11 +241,17 @@ export function UserInfoCard({
 
   const hasSocialLinks = linksWithIcon.length > 0 || linksWithoutIcon.length > 0;
 
+  // 是否顯示 Connect/Follow 按鈕（用 client-side hook 判斷，避免 SSR cookie 問題）
+  const showConnectionButtons = clientIsAuthenticated && !clientIsOwnProfile;
+
   const moreContent = (
     <>
-      {/* 個人簡介 */}
+      {/* About Me - 使用 MarkdownRenderer 渲染，未填寫時隱藏 */}
       {selfIntroduction && (
-        <p className="text-xs text-text-dark mb-4 md:mb-3">{selfIntroduction}</p>
+        <MarkdownRenderer
+          source={selfIntroduction}
+          className="text-xs text-text-dark mb-4 md:mb-3 prose prose-xs max-w-none"
+        />
       )}
 
       {/* 社群媒體連結 */}
@@ -221,6 +327,10 @@ export function UserInfoCard({
         <div className="flex-1">
           <div className="mb-3">
             <h2 className="text-[22px] font-medium mb-1 text-bg-dark truncate">{name}</h2>
+            {/* Headline (personalSlogan) - 未填寫時不顯示 */}
+            {personalSlogan && (
+              <p className="text-sm text-text-dark mb-1">{personalSlogan}</p>
+            )}
             {location && (
               <div className="flex items-center gap-2">
                 <MapPin className="size-4.5 text-text-dark" />
@@ -228,10 +338,84 @@ export function UserInfoCard({
               </div>
             )}
           </div>
+
+          {/* Connections & Followers 數量 */}
+          {(connectionsCount !== undefined || followersCount !== undefined) && (
+            <div className="flex items-center gap-4 mb-3 text-xs text-text-dark">
+              {connectionsCount !== undefined && (
+                <div className="flex items-center gap-1">
+                  <Users className="size-3.5" />
+                  <span>
+                    <span className="font-medium">
+                      {hideConnectionsCount ? "—" : connectionsCount}
+                    </span>{" "}
+                    Connections
+                  </span>
+                </div>
+              )}
+              {followersCount !== undefined && (
+                <div className="flex items-center gap-1">
+                  <span>
+                    <span className="font-medium">{followersCount}</span> Followers
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 近 7 天實踐次數 */}
+          {recentPracticeCount !== undefined && (
+            <p className="text-xs text-text-dark mb-3">
+              近 7 天{" "}
+              <span className="font-medium">{recentPracticeCount}</span>{" "}
+              次實踐
+            </p>
+          )}
+
+          {/* 共同 Circle 數量 - 僅在已登入且非自己的頁面，且 commonCirclesCount > 0 */}
+          {isAuthenticated && !isOwnProfile && commonCirclesCount != null && commonCirclesCount > 0 && (
+            <p className="text-xs text-text-dark mb-3">
+              {commonCirclesCount} 個共同 Circle
+            </p>
+          )}
+
+          {/* 編輯個人檔案按鈕 - 自己的頁面 */}
+          {isOwnProfile && (
+            <div className="mb-3">
+              <Button variant="outline" size="sm" className="h-8 text-xs" asChild>
+                <CustomLink href="/settings/public-info" prefetch={false}>
+                  編輯個人檔案
+                </CustomLink>
+              </Button>
+            </div>
+          )}
+
           {!isMobile && moreContent}
         </div>
       </div>
       {isMobile && <div className="mt-4">{moreContent}</div>}
+
+      {/* 關注 / 請求連結 按鈕 - 已登入且非自己的頁面 */}
+      {showConnectionButtons && (
+        <div className="flex gap-3 mt-5">
+          <Button
+            variant={currentIsFollowing ? "outline" : "default"}
+            className={`flex-1 h-12 text-base rounded-full ${currentIsFollowing ? "bg-primary-lightest border-primary-lighter text-primary-base hover:bg-primary-lightest" : ""}`}
+            onClick={handleFollow}
+            disabled={followLoading}
+          >
+            {currentIsFollowing ? "取消關注" : "+ 關注"}
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1 h-12 text-base rounded-full border-primary-base text-primary-base hover:bg-primary-base hover:text-white"
+            onClick={handleConnect}
+            disabled={connectLoading}
+          >
+            請求連結
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

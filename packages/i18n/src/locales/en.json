@@ -4146,7 +4146,7 @@
       "success": {
         "verified": {
           "title": "Email Verified!",
-          "description": "Welcome to DaoDao! Start exploring your learning journey."
+          "description": "Complete your profile settings for more personalized learning recommendations."
         },
         "alreadyVerified": {
           "title": "Email Already Verified",
@@ -4180,7 +4180,7 @@
         }
       },
       "actions": {
-        "goToHome": "Go to Home",
+        "goToHome": "Complete Profile Settings",
         "backToHome": "Back to Home"
       },
       "resend": {

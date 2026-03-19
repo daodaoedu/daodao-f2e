@@ -361,3 +361,7 @@ export const updateResource = async (id: string, data: UpdateRequestType) => {
 ```
 
 **禁止：** 將 import 語句分散在檔案中間、將 type 定義放在函數實作之後
+
+## Commit 規範
+
+每次執行 git commit 時，必須使用 `.claude/skills/format-commit/SKILL.md` skill 的流程來產生 commit message。

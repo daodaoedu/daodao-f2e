@@ -68,10 +68,15 @@ export function ReactionPickerButton({
     }
   };
 
-  // ── Desktop: hover 開啟 ──
+  // ── Desktop: hover 開啟／關閉 ──
   const handleMouseEnter = () => {
     if (lastInteractionWasTouch.current) return;
     setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (lastInteractionWasTouch.current) return;
+    setOpen(false);
   };
 
   // ── Mobile: 長按開啟 ──
@@ -109,15 +114,17 @@ export function ReactionPickerButton({
         isCard ? "w-full flex items-center justify-center" : "flex items-center"
       )}
       onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Emoji picker popup */}
       {open && (
         <div
           className={cn(
-            "absolute bottom-full mb-2 flex gap-1 bg-white rounded-full shadow-lg border border-[#E4EAE9] px-2 py-1.5 z-10",
+            "absolute bottom-full pb-2 z-10 flex flex-col items-center",
             isCard ? "left-1/2 -translate-x-1/2" : "left-0"
           )}
         >
+        <div className="flex gap-1 bg-white rounded-full shadow-lg border border-[#E4EAE9] px-2 py-1.5">
           {PICKER_REACTIONS.map((type) => {
             const config = REACTION_CONFIG[type];
             const isSelected = selectedReactions.includes(type);
@@ -150,6 +157,7 @@ export function ReactionPickerButton({
             );
           })}
         </div>
+        </div>
       )}
 
       {/* Main trigger button */}
@@ -171,23 +179,41 @@ export function ReactionPickerButton({
         )}
       >
         {isCard ? (
-          /* card variant：顯示當前用戶的 reaction emoji，或預設 👍 */
-          hasSelection ? (
-            <div className="flex items-center">
-              {selectedReactions.slice(-2).map((type, i) => (
-                <div key={type} className={cn("size-[22px]", i > 0 && "-ml-1")}>
-                  <LottieEmoji
-                    url={REACTION_CONFIG[type].lottieUrl}
-                    fallback={REACTION_CONFIG[type].emoji}
-                    size={22}
-                    play={true}
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <LikeOutlineSvg className="size-[22px]" />
-          )
+          /* card variant：顯示聚合 reaction emoji（含他人）+ 總數，或預設 👍 */
+          <>
+            {displayReactions && displayReactions.length > 0 ? (
+              <div className="flex items-center">
+                {displayReactions.slice(0, 2).map((type, i) => (
+                  <div key={type} className={cn("size-[22px]", i > 0 && "-ml-1")}>
+                    <LottieEmoji
+                      url={REACTION_CONFIG[type].lottieUrl}
+                      fallback={REACTION_CONFIG[type].emoji}
+                      size={22}
+                      play={selectedReactions.includes(type)}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : hasSelection ? (
+              <div className="flex items-center">
+                {selectedReactions.slice(-2).map((type, i) => (
+                  <div key={type} className={cn("size-[22px]", i > 0 && "-ml-1")}>
+                    <LottieEmoji
+                      url={REACTION_CONFIG[type].lottieUrl}
+                      fallback={REACTION_CONFIG[type].emoji}
+                      size={22}
+                      play={true}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <LikeOutlineSvg className="size-[22px]" />
+            )}
+            {totalCount != null && totalCount > 0 && (
+              <span className="text-sm font-medium">{totalCount}</span>
+            )}
+          </>
         ) : (
           /* comment variant：Facebook 疊加圓圈（displayReactions）+ 總數 */
           <>

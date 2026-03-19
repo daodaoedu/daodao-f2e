@@ -1,4 +1,5 @@
 export { BackgroundAnimation } from "./background-animation";
+export { Banner } from "./banner";
 export { Footer } from "./footer";
 export { PageHeader } from "./page-header";
 export { ResourceFooter } from "./resource-footer";

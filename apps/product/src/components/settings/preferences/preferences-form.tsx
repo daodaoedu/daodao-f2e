@@ -9,6 +9,7 @@ import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { mutate } from "swr";
 import { useForm } from "react-hook-form";
 import { PreferenceSection } from "./preference-section";
 import { type PreferencesFormValues, preferencesFormSchema } from "./schema";
@@ -192,6 +193,7 @@ export const PreferencesForm = () => {
       // 成功
       toast.success("偏好設定已更新");
       form.reset(form.getValues()); // 重置 dirty 狀態
+      mutate('/api/v1/users/settings-summary');
 
       // 延遲後返回設定首頁，讓使用者看到成功訊息
       setTimeout(() => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRightOutlineSvg } from "@daodao/assets";
+import { extractOgImage } from "@daodao/api";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import {
@@ -25,6 +26,43 @@ interface Step4Props {
 export const Step4 = ({ form }: Step4Props) => {
   const [resourceName, setResourceName] = useState("");
   const [resourceUrl, setResourceUrl] = useState("");
+  const [isFetchingTitle, setIsFetchingTitle] = useState(false);
+
+  const handleFetchTitle = async () => {
+    const trimmedUrl = resourceUrl.trim();
+    if (!trimmedUrl) return;
+
+    // 先驗證 URL 格式，避免送出無效請求
+    try {
+      new URL(trimmedUrl);
+    } catch {
+      return;
+    }
+
+    setIsFetchingTitle(true);
+    try {
+      // 使用 og-image API 擷取頁面標題（title 為選填欄位）
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("timeout")), 8000)
+      );
+      const result = await Promise.race([extractOgImage({ url: trimmedUrl }), timeout]);
+      if (result.success && result.data.title) {
+        setResourceName(result.data.title.slice(0, 100));
+      } else {
+        form.setError("resources", {
+          type: "manual",
+          message: "找不到網頁標題，請手動輸入",
+        });
+      }
+    } catch {
+      form.setError("resources", {
+        type: "manual",
+        message: "擷取網頁標題失敗，請手動輸入",
+      });
+    } finally {
+      setIsFetchingTitle(false);
+    }
+  };
 
   const { openTagEditSheet } = useTagEditSheet({
     initialTags: form.watch("tags") || [],
@@ -151,7 +189,7 @@ export const Step4 = ({ form }: Step4Props) => {
                     placeholder="資源名稱"
                     className="w-full mb-3"
                     value={resourceName}
-                    maxLength={20}
+                    maxLength={100}
                     onChange={(e) => setResourceName(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
@@ -160,19 +198,32 @@ export const Step4 = ({ form }: Step4Props) => {
                       }
                     }}
                   />
-                  <Input
-                    type="url"
-                    placeholder="網址（選填），例如 https://www.google.com/"
-                    className="w-full mb-3"
-                    value={resourceUrl}
-                    onChange={(e) => setResourceUrl(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleAddResource();
-                      }
-                    }}
-                  />
+                  <div className="flex gap-2 mb-3">
+                    <Input
+                      type="url"
+                      placeholder="網址（選填），例如 https://www.google.com/"
+                      className="flex-1"
+                      value={resourceUrl}
+                      onChange={(e) => setResourceUrl(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddResource();
+                        }
+                      }}
+                    />
+                    {resourceUrl.trim() && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleFetchTitle}
+                        disabled={isFetchingTitle}
+                        className="shrink-0"
+                      >
+                        {isFetchingTitle ? "擷取中..." : "擷取名稱"}
+                      </Button>
+                    )}
+                  </div>
                   <FormMessage className="mb-3" />
                   <Button
                     type="button"

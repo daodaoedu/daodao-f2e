@@ -132,7 +132,7 @@ export const createManualPracticeFormSchema = (options?: ManualPracticeSchemaOpt
       .array(
         z.object({
           id: z.string(),
-          name: z.string().min(1, "請輸入資源名稱"),
+          name: z.string().min(1, "請輸入資源名稱").max(100, "最多100字"),
           url: z
             .string()
             .url("請輸入有效的網址")
