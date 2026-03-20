@@ -6,12 +6,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { ProgressRing } from "@/components";
 import { colors } from "@/generated/design-tokens";
-import { usePractices } from "@/hooks/usePractices";
+import { usePracticeGroups } from "@/hooks/use-practice-groups";
 import type { Practice } from "@/types/practice";
 
 export default function ArchivedPracticesScreen() {
   const router = useRouter();
-  const { practices } = usePractices();
+  const { practices } = usePracticeGroups();
 
   // Filter archived practices
   const archivedPractices = useMemo(
