@@ -7,6 +7,7 @@ import { Button, Card, ScrollView, Spinner, Text, View, XStack, YStack } from "t
 import { CheckInList, CheckInSheet, ProgressRing, ShareCheckInSheet } from "@/components";
 import type { CheckInData } from "@/components/CheckInSheet";
 import { colors } from "@/generated/design-tokens";
+import { useArchivePractice, useDeletePractice } from "@daodao/api";
 import { useCheckIn, useCheckIns, usePractice } from "@/hooks/usePractices";
 import { computeStreaks, isTodayCheckedIn } from "@/hooks/use-practice-groups";
 import type { CombinedStatus, Practice } from "@/types/practice";
@@ -38,9 +39,13 @@ export default function PracticeDetailScreen() {
   const { practice, isLoading, mutate } = usePractice(id);
   const { checkIn, isChecking } = useCheckIn();
   const { checkIns, checkInDates } = useCheckIns(id);
+  const { archivePractice } = useArchivePractice(id ?? "");
+  const { deletePractice } = useDeletePractice(id ?? "");
 
   const [showCheckInSheet, setShowCheckInSheet] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleCheckIn = useCallback(
     async (data: CheckInData) => {
@@ -68,12 +73,20 @@ export default function PracticeDetailScreen() {
       { text: "取消", style: "cancel" },
       {
         text: "封存",
-        onPress: () => {
-          /* TODO */
+        onPress: async () => {
+          setIsArchiving(true);
+          try {
+            await archivePractice();
+            router.back();
+          } catch (e) {
+            Alert.alert("封存失敗", e instanceof Error ? e.message : "請稍後再試");
+          } finally {
+            setIsArchiving(false);
+          }
         },
       },
     ]);
-  }, []);
+  }, [archivePractice, router]);
 
   const handleDelete = useCallback(() => {
     Alert.alert("刪除實踐", "確定要刪除此實踐嗎？此操作無法復原。", [
@@ -81,12 +94,20 @@ export default function PracticeDetailScreen() {
       {
         text: "刪除",
         style: "destructive",
-        onPress: () => {
-          /* TODO */
+        onPress: async () => {
+          setIsDeleting(true);
+          try {
+            await deletePractice();
+            router.replace("/");
+          } catch (e) {
+            Alert.alert("刪除失敗", e instanceof Error ? e.message : "請稍後再試");
+          } finally {
+            setIsDeleting(false);
+          }
         },
       },
     ]);
-  }, []);
+  }, [deletePractice, router]);
 
   if (isLoading) {
     return (
@@ -366,6 +387,8 @@ export default function PracticeDetailScreen() {
               borderRadius="$md"
               paddingHorizontal="$6"
               onPress={handleArchive}
+              disabled={isArchiving || isDeleting}
+              opacity={isArchiving || isDeleting ? 0.6 : 1}
             >
               <XStack alignItems="center" gap="$2">
                 <Archive size={18} color="$color" />
@@ -380,6 +403,8 @@ export default function PracticeDetailScreen() {
               borderRadius="$md"
               paddingHorizontal="$6"
               onPress={handleDelete}
+              disabled={isArchiving || isDeleting}
+              opacity={isArchiving || isDeleting ? 0.6 : 1}
             >
               <XStack alignItems="center" gap="$2">
                 <Trash2 size={18} color="$color" />
