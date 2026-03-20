@@ -7,7 +7,7 @@ import { Button, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { StepIndicator } from "@/components";
 import { colors } from "@/generated/design-tokens";
 import { useCreatePractice } from "@/providers/CreatePracticeProvider";
-import { api } from "@/services/api-client";
+import { createPractice } from "@daodao/api";
 
 export default function Step5Screen() {
   const router = useRouter();
@@ -27,7 +27,19 @@ export default function Step5Screen() {
     setIsSubmitting(true);
 
     try {
-      await api.post("/practices", data);
+      // CreatePracticeInput（wizard form）和 CreatePracticeRequestType（API schema）欄位不同名，
+      // 需做 mapping。API 要求 practiceTimePeriods（必填）和 isDraft（必填）。
+      const result = await createPractice({
+        title: data.title,
+        practiceAction: data.description,
+        durationDays: data.targetDays,
+        tags: data.tags ?? [],
+        practiceTimePeriods: [], // wizard form 目前未收集此欄位
+        isDraft: false,
+      });
+      if (result.error) {
+        throw new Error("建立失敗");
+      }
 
       Alert.alert("建立成功", "你的實踐已建立，開始你的旅程吧！", [
         {
