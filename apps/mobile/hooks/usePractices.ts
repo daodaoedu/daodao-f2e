@@ -6,7 +6,7 @@ import {
   usePracticeById,
   usePracticeCheckIns,
 } from "@daodao/api";
-import type { components } from "@daodao/api/src/types";
+import type { components } from "@daodao/api";
 
 // 正確名稱是 CheckInEntity（不是 CheckInItem）
 type CheckInItem = components["schemas"]["CheckInEntity"];

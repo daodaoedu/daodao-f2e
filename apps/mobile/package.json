@@ -14,7 +14,9 @@
     "submit:ios": "eas submit --platform ios",
     "submit:android": "eas submit --platform android",
     "lint": "biome lint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@daodao/api": "workspace:*",

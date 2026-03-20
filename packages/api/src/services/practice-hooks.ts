@@ -26,6 +26,7 @@ import { getPracticeSummary } from "./practice";
 // ============================================================================
 
 export type CreatePracticeRequestType = components["schemas"]["CreatePracticeRequest"];
+export type MyPracticeItemType = components["schemas"]["MyPracticeItem"];
 
 type UpdatePracticeRequestBody = paths["/api/v1/practices/{id}"]["put"]["requestBody"];
 export type UpdatePracticeRequestType = UpdatePracticeRequestBody extends {

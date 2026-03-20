@@ -18,3 +18,6 @@ export * from "./services";
 
 // Export SWR configuration
 export * from "./swr-config";
+
+// Export types (for use in client code)
+export type { components, paths } from "./types";

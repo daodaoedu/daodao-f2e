@@ -1,10 +1,9 @@
 // apps/mobile/hooks/use-practice-groups.ts
 import { useMemo } from "react";
-import { useMyPractices } from "@daodao/api";
-import type { components } from "@daodao/api/src/types";
+import { useMyPractices, type MyPracticeItemType } from "@daodao/api";
 import type { CombinedStatus, Practice } from "@/types/practice";
 
-type MyPracticeItem = components["schemas"]["MyPracticeItem"];
+type MyPracticeItem = MyPracticeItemType;
 
 // Task 5a 會擴充此檔案加入 computeStreaks
 export function isTodayCheckedIn(lastCheckinAt?: string | null): boolean {
