@@ -1,4 +1,4 @@
-import { Plus } from "@tamagui/lucide-icons";
+import { Bell, Plus, Settings } from "@tamagui/lucide-icons";
 import { Tabs, usePathname, useRouter } from "expo-router";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { HomeIcon, UserIcon } from "@/components/icons";
@@ -12,8 +12,8 @@ export default function TabLayout() {
     router.push("/practices/create");
   };
 
-  // 只在首頁顯示 FAB
-  const showFab = pathname === "/" || pathname === "/index";
+  // FAB 在 Home tab 顯示（pathname === "/" 涵蓋兩個 sub-tabs）
+  const showFab = pathname === "/";
 
   return (
     <View style={{ flex: 1 }}>
@@ -22,7 +22,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarActiveTintColor: colors.primary.base,
           tabBarInactiveTintColor: "#9CA3AF",
-          tabBarShowLabel: false, // Product 只顯示圖標
+          tabBarShowLabel: false,
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: "500",
@@ -69,6 +69,13 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="notifications"
+          options={{
+            title: "通知",
+            tabBarIcon: ({ color }) => <Bell size={28} color={color} />,
+          }}
+        />
+        <Tabs.Screen
           name="profile"
           options={{
             title: "我的小島",
@@ -77,22 +84,16 @@ export default function TabLayout() {
             ),
           }}
         />
-        {/* 隱藏的頁面 - 保留路由但不在 Tab 顯示 */}
         <Tabs.Screen
-          name="explore"
+          name="settings"
           options={{
-            href: null, // 隱藏此 Tab
-          }}
-        />
-        <Tabs.Screen
-          name="create"
-          options={{
-            href: null, // 隱藏此 Tab，改用 FAB 進入
+            title: "設定",
+            tabBarIcon: ({ color }) => <Settings size={28} color={color} />,
           }}
         />
       </Tabs>
 
-      {/* FAB 按鈕 - 放在 Tab 層級以顯示在最上層 */}
+      {/* FAB - 在 Home tab 顯示 */}
       {showFab && (
         <Pressable
           style={styles.fab}
