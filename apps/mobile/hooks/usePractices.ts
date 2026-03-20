@@ -1,89 +1,50 @@
+// apps/mobile/hooks/usePractices.ts
 import { useCallback, useMemo, useRef, useState } from "react";
-import useSWR from "swr";
-import { api } from "@/services/api-client";
-import type { CheckIn, Practice, PracticeStats, PracticesResponse } from "@/types/practice";
+import {
+  createPracticeCheckIn,
+  useMutate,
+  usePracticeById,
+  usePracticeCheckIns,
+} from "@daodao/api";
+import type { components } from "@daodao/api/src/types";
 
-const PRACTICES_KEY = "/practices";
+// 正確名稱是 CheckInEntity（不是 CheckInItem）
+type CheckInItem = components["schemas"]["CheckInEntity"];
 
-async function fetchPractices(): Promise<PracticesResponse> {
-  return api.get<PracticesResponse>(PRACTICES_KEY);
-}
+// ── usePractice ───────────────────────────────────────────────────────────────
 
-const defaultStats: PracticeStats = {
-  totalPractices: 0,
-  activePractices: 0,
-  completedToday: 0,
-  totalToday: 0,
-  currentStreak: 0,
-  totalCheckIns: 0,
-};
-
-export function usePractices() {
-  const { data, error, isLoading, mutate } = useSWR<PracticesResponse>(
-    PRACTICES_KEY,
-    fetchPractices,
-    {
-      revalidateOnFocus: false, // 避免過度 revalidation
-      revalidateOnReconnect: true,
-      dedupingInterval: 10000, // 10 秒內不重複請求
-      errorRetryCount: 3,
-      errorRetryInterval: 1000,
-    }
-  );
-
-  const practices = data?.practices ?? [];
-  const stats = data?.stats ?? defaultStats;
-
-  // 使用 useMemo 避免每次 render 都重新計算
-  const { activePractices, completedPractices, todayPending, todayCompleted } = useMemo(() => {
-    // 進行中的實踐 (包含 draft, not-started, in-progress, active)
-    const activeStatuses = ["draft", "not-started", "in-progress", "active"];
-    const active = practices.filter((p) => activeStatuses.includes(p.status));
-
-    // 已完成的實踐
-    const completed = practices.filter((p) => p.status === "completed" || p.isCompleted);
-
-    const pending = active.filter((p) => !p.todayCheckedIn);
-    const done = active.filter((p) => p.todayCheckedIn);
-
-    return {
-      activePractices: active,
-      completedPractices: completed,
-      todayPending: pending,
-      todayCompleted: done,
-    };
-  }, [practices]);
-
+// 注意：此 wrapper 僅應在 `[id]` route component 使用，id 由路由保證非空。
+export function usePractice(id: string) {
+  const { data, error, isLoading, mutate } = usePracticeById(id);
   return {
-    practices,
-    activePractices,
-    completedPractices,
-    todayPending,
-    todayCompleted,
-    stats,
+    practice: data?.data ?? undefined,
     isLoading,
     error,
     mutate,
   };
 }
 
-export function usePractice(id: string | undefined) {
-  const { data, error, isLoading, mutate } = useSWR<Practice>(
-    id ? `/practices/${id}` : null,
-    () => api.get<Practice>(`/practices/${id}`),
-    {
-      revalidateOnFocus: false,
-      errorRetryCount: 2,
-    }
+// ── useCheckIns ───────────────────────────────────────────────────────────────
+
+// 注意：同 usePractice，id 由 [id] 路由保證非空。
+export function useCheckIns(practiceId: string) {
+  const { data, error, isLoading, mutate } = usePracticeCheckIns(practiceId, {
+    limit: 365,
+  });
+
+  const checkIns: CheckInItem[] = data?.data ?? [];
+
+  // CheckInEntity 有 checkinDate（YYYY-MM-DD）和 createdAt（ISO datetime）兩個欄位
+  // 用 checkinDate 語義更正確（記錄打卡日期，不受 createdAt 時區影響）
+  const checkInDates = useMemo(
+    () => checkIns.map((ci) => ci.checkinDate),
+    [checkIns]
   );
 
-  return {
-    practice: data,
-    isLoading,
-    error,
-    mutate,
-  };
+  return { checkIns, checkInDates, isLoading, error, mutate };
 }
+
+// ── useCheckIn ────────────────────────────────────────────────────────────────
 
 interface CheckInParams {
   practiceId: string;
@@ -95,35 +56,10 @@ interface CheckInResult {
   error?: string;
 }
 
-export function useCheckIns(practiceId: string | undefined) {
-  const { data, error, isLoading, mutate } = useSWR<CheckIn[]>(
-    practiceId ? `/practices/${practiceId}/check-ins` : null,
-    () => api.get<CheckIn[]>(`/practices/${practiceId}/check-ins`),
-    {
-      revalidateOnFocus: false,
-      errorRetryCount: 2,
-    }
-  );
-
-  // 轉換為日曆所需的日期格式 (YYYY-MM-DD)
-  const checkInDates = useMemo(() => {
-    if (!data) return [];
-    return data.map((checkIn) => checkIn.createdAt.split("T")[0]);
-  }, [data]);
-
-  return {
-    checkIns: data ?? [],
-    checkInDates,
-    isLoading,
-    error,
-    mutate,
-  };
-}
-
 export function useCheckIn() {
   const [isChecking, setIsChecking] = useState(false);
   const isCheckingRef = useRef(false);
-  const { mutate: mutatePractices } = usePractices();
+  const mutate = useMutate();
 
   const checkIn = useCallback(
     async ({ practiceId, note }: CheckInParams): Promise<CheckInResult> => {
@@ -135,11 +71,22 @@ export function useCheckIn() {
       setIsChecking(true);
 
       try {
-        await api.post(`/practices/${practiceId}/check-in`, { note });
-
-        // 成功後才更新資料
-        await mutatePractices();
-
+        // CheckInRequest 的 tags 是必填（non-optional）
+        await createPracticeCheckIn(practiceId, {
+          note: note ?? "",
+          imageUrls: [],
+          tags: [],
+        });
+        // swr-openapi 的 useMutate key 格式是 2-tuple：[path, { params }]
+        // 順序：先刷新詳情，再刷新列表（與 packages/api 的 refreshPracticeCaches 一致）
+        await mutate([
+          "/api/v1/practices/{id}",
+          { params: { path: { id: practiceId } } },
+        ] as const);
+        await mutate([
+          "/api/v1/me/practices",
+          { params: { query: {} } },
+        ] as const);
         return { success: true };
       } catch (error) {
         const message = error instanceof Error ? error.message : "打卡失敗，請稍後再試";
@@ -149,7 +96,7 @@ export function useCheckIn() {
         setIsChecking(false);
       }
     },
-    [mutatePractices]
+    [mutate]
   );
 
   return { checkIn, isChecking };
