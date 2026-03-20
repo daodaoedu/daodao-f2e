@@ -9,7 +9,7 @@ import { colors } from "@/generated/design-tokens";
 
 export default function ArchivedPracticesScreen() {
   const router = useRouter();
-  const { data, mutate } = useMyPractices({ status: "archived" } as any);
+  const { data, mutate } = useMyPractices({ status: "archived" });
   const archivedPractices = (data?.data as any[]) ?? [];
   const { unarchivePractice } = useUnarchivePractice();
 
@@ -96,7 +96,7 @@ export default function ArchivedPracticesScreen() {
                   (practice.durationDays ?? 0) > 0
                     ? Math.round(((practice.checkInCount ?? 0) / practice.durationDays) * 100)
                     : 0;
-                const cardColor = practice.color || colors.primary.base;
+                const cardColor = practice.themeColor || colors.primary.base;
 
                 return (
                   <Card
