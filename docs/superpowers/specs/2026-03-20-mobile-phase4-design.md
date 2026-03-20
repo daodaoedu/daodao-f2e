@@ -146,12 +146,14 @@ Profile tab 使用與 `/users/[identifier]` 相同的頁面結構，但固定顯
 
 ### 新增
 - `apps/mobile/app/(tabs)/notifications.tsx` — 通知列表頁（**Plan 3 的 `app/notifications/index.tsx` 尚未建立，此 Plan 直接在 tabs 層建立**）
-  - 使用 `useNotifications({ limit: 50 })` from `@daodao/api`
+  - 使用 `useNotifications({ limit: 50 })` from `@daodao/api`（30 秒 polling）
   - 顯示通知列表（title、body、isRead 指示點、timestamp）
+  - 點擊通知 → mark as read + 導航到對應資源
   - Pull-to-refresh
-  - Mark as read 於 Plan 7 補上；此 Plan 先做 read-only list
+  - **Mark as read 在此 Phase 完整實作**（需在 `packages/api/src/services/notification-hooks.ts` 新增 `markNotificationRead(id)` mutation，呼叫 `client.PUT("/api/v1/notifications/{id}/read", ...)`）
 
 ### 修改
+- `packages/api/src/services/notification-hooks.ts` — 新增 `markNotificationRead(id)` mutation function
 - `apps/mobile/app/(tabs)/_layout.tsx` — tab 定義改為 4 個
 - `apps/mobile/app/(tabs)/index.tsx` — 加入「我的」/「靈感」頁籤切換、接真實資料
 - `apps/mobile/app/(tabs)/profile.tsx` — 接真實資料（IslandHeader + UserInfoCard + PracticeSection）
@@ -180,5 +182,5 @@ Profile tab 使用與 `/users/[identifier]` 相同的頁面結構，但固定顯
 
 - Auth Onboarding / Email 驗證（→ Plan 5）
 - Settings 補全：preferences、public-info、following、connections、interaction（→ Plan 6）
-- Notifications mark as read / deep linking（→ Plan 7）
+- Notifications deep linking 進階邏輯（若通知需跳轉到複雜巢狀路由）
 - Social feed、Resource、Footprints、Admin（永久跳過）
