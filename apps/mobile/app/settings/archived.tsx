@@ -93,8 +93,8 @@ export default function ArchivedPracticesScreen() {
             <YStack gap="$3">
               {archivedPractices.map((practice: any) => {
                 const progress =
-                  practice.targetDays > 0
-                    ? Math.round((practice.completedDays / practice.targetDays) * 100)
+                  (practice.durationDays ?? 0) > 0
+                    ? Math.round(((practice.checkInCount ?? 0) / practice.durationDays) * 100)
                     : 0;
                 const cardColor = practice.color || colors.primary.base;
 
@@ -121,7 +121,7 @@ export default function ArchivedPracticesScreen() {
                             {practice.title}
                           </Text>
                           <Text fontSize={12} color="$color" opacity={0.6}>
-                            {practice.completedDays} / {practice.targetDays} 天完成
+                            {practice.checkInCount ?? 0} / {practice.durationDays ?? 0} 天完成
                           </Text>
                         </YStack>
                       </XStack>
