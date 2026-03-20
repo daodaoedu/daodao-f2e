@@ -4,10 +4,11 @@ export * from "./use-check-in-sheet";
 export * from "./use-check-in-success-dialog";
 export * from "./use-delete-check-in-dialog";
 export * from "./use-delete-practice-dialog";
+export * from "./use-practice-groups";
 export * from "./use-restore-draft-dialog";
 export * from "./use-share-check-in-sheet";
 export * from "./use-tag-edit-sheet";
 export * from "./useAnalytics";
-export * from "./useCurrentUser";
+// useCurrentUser 移除（改從 @daodao/api import）
 export * from "./usePractices";
 export * from "./useShare";
