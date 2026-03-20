@@ -53,16 +53,27 @@ export interface IShowcaseFeedParams {
   status?: "active" | "completed";
   sort_by?: string;
   limit?: number;
+  accessToken?: string;
 }
 
 // ============================================================================
 // AI backend fetcher
 // ============================================================================
 
-async function fetchAiBackend<T>(path: string): Promise<T> {
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_AI_API_URL");
+async function fetchAiBackend<T>(path: string, options?: { accessToken?: string }): Promise<T> {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_AI_API_URL ??
+    process.env.EXPO_PUBLIC_AI_API_URL ??
+    (() => { throw new Error("AI_API_URL env var is not set"); })();
+
+  const headers: Record<string, string> = {};
+  if (options?.accessToken) {
+    headers["Authorization"] = `Bearer ${options.accessToken}`;
+  }
+
   const res = await fetch(`${baseUrl}${path}`, {
-    credentials: "include",
+    credentials: options?.accessToken ? "omit" : "include",
+    headers,
   });
   if (!res.ok) throw new Error(`AI backend error: ${res.status}`);
   return res.json() as Promise<T>;
@@ -123,7 +134,7 @@ export function useShowcaseFeed(params: IShowcaseFeedParams) {
   const { data, error, isLoading, isValidating, size, setSize } =
     useSWRInfinite<AIResponse<IShowcasePractice[]>>(
       getKey,
-      (path: string) => fetchAiBackend<AIResponse<IShowcasePractice[]>>(path),
+      (path: string) => fetchAiBackend<AIResponse<IShowcasePractice[]>>(path, { accessToken: params?.accessToken }),
       {
         revalidateFirstPage: false,
         revalidateOnFocus: false,
