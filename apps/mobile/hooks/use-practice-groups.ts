@@ -5,7 +5,6 @@ import type { CombinedStatus, Practice } from "@/types/practice";
 
 type MyPracticeItem = MyPracticeItemType;
 
-// Task 5a 會擴充此檔案加入 computeStreaks
 export function isTodayCheckedIn(lastCheckinAt?: string | null): boolean {
   if (!lastCheckinAt) return false;
   const today = new Date().toISOString().split("T")[0];

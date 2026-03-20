@@ -10,8 +10,7 @@ import { colors } from "@/generated/design-tokens";
 import { useArchivePractice, useDeletePractice } from "@daodao/api";
 import { useCheckIn, useCheckIns, usePractice } from "@/hooks/usePractices";
 import { computeStreaks, isTodayCheckedIn } from "@/hooks/use-practice-groups";
-import type { CombinedStatus, Practice } from "@/types/practice";
-import type { CheckIn } from "@/types/practice";
+import type { CheckIn, CombinedStatus, Practice } from "@/types/practice";
 
 // 狀態標籤配置
 const statusConfig: Record<string, { label: string; backgroundColor: string; textColor: string }> =
