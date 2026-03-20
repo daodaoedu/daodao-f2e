@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useCallback, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Linking,
   Pressable,
@@ -24,8 +25,7 @@ import Svg, { Circle, Path, Rect } from "react-native-svg";
 import { Avatar, Button, Card, Text, XStack, YStack } from "tamagui";
 import activeShaper1Json from "@/assets/animations/active-shaper-1.json";
 import { colors } from "@/generated/design-tokens";
-import { useCurrentUser } from "@daodao/api";
-import type { SocialLink } from "@/types/user";
+import { useCurrentUser, useUserPractices } from "@daodao/api";
 
 const bannerImage = require("@/assets/images/user-mobile-banner.png");
 const logoImage = require("@/assets/images/logo.png");
@@ -102,7 +102,12 @@ type TabType = "practices" | "plans" | "ideas";
 export default function ProfileScreen() {
   const router = useRouter();
   const { width: screenWidth } = useWindowDimensions();
-  useCurrentUser();
+  const { data: currentUserResp, isLoading: userLoading } = useCurrentUser();
+  const currentUser = currentUserResp?.data;
+  const userId = currentUser?.id ?? "";
+  const { data: practicesResp } = useUserPractices(userId, undefined);
+  const allPractices = practicesResp?.data ?? [];
+
   const [includeCompleted, setIncludeCompleted] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("practices");
   const [showTopNav, setShowTopNav] = useState(false);
@@ -132,53 +137,33 @@ export default function ProfileScreen() {
     { key: "ideas", label: "想法", icon: StickyNote, disabled: true },
   ];
 
-  // Mock 用戶資料 - 之後從 API 取得
-  const mockUser = {
-    name: "John Doe",
-    location: "Taiwan",
-    bio: "I am a software engineer",
-    avatar: undefined,
+  // 從 API 資料建構顯示用物件
+  const displayUser = {
+    name: currentUser?.name ?? "",
+    location: currentUser?.locationNameZh ?? currentUser?.location ?? null,
+    bio: currentUser?.selfIntroduction ?? null,
+    avatar: currentUser?.photoURL ?? undefined,
   };
 
-  // Mock 社群連結
-  const mockSocialLinks: SocialLink[] = [
-    { platform: "line", url: "https://line.me/ti/p/@example" },
-    { platform: "facebook", url: "https://facebook.com/example" },
-  ];
+  // 從 contactList 轉換社群連結為 { platform, url } 格式
+  const socialLinks: Array<{ platform: string; url: string }> = (() => {
+    const cl = currentUser?.contactList;
+    if (!cl) return [];
+    const links: Array<{ platform: string; url: string }> = [];
+    if (cl.line) links.push({ platform: "line", url: cl.line });
+    if (cl.facebook) links.push({ platform: "facebook", url: cl.facebook });
+    if (cl.instagram) links.push({ platform: "instagram", url: cl.instagram });
+    if (cl.threads) links.push({ platform: "threads", url: cl.threads });
+    if (cl.linkedin) links.push({ platform: "linkedin", url: cl.linkedin });
+    return links;
+  })();
 
-  // Mock 主題實踐資料
-  const mockPractices: Array<{
-    id: string;
-    status: "draft" | "in-progress" | "completed";
-    title: string;
-    description: string;
-    tags: string[];
-  }> = [
-    {
-      id: "1",
-      status: "draft",
-      title: "閱讀原子習慣",
-      description: "點精油,跟着 Youtube 教學做",
-      tags: ["閱讀", "原子習慣", "心理學"],
-    },
-    {
-      id: "2",
-      status: "in-progress",
-      title: "閱讀原子習慣",
-      description: "點精油,跟着 Youtube 教學做",
-      tags: ["閱讀", "原子習慣"],
-    },
-  ];
-
-  // 強制使用 mock 資料來測試 UI（之後改為實際資料）
-  const displayUser = mockUser;
-  const socialLinks = mockSocialLinks;
   const learningType = "我是注重推理的探探島！";
 
   // 根據篩選條件顯示的實踐列表
   const displayedPractices = includeCompleted
-    ? mockPractices
-    : mockPractices.filter((p) => p.status !== "completed");
+    ? allPractices
+    : allPractices.filter((p) => p.status !== "completed");
 
   // 獲取狀態標籤配置
   const getStatusBadge = (status: string) => {
@@ -187,14 +172,17 @@ export default function ProfileScreen() {
         return { label: "草稿", bg: colors.background.gray, color: colors.text.dark };
       case "in-progress":
       case "active":
+      case "not_started":
         return {
-          label: "進行中",
+          label: status === "not_started" ? "未開始" : "進行中",
           bg: "transparent",
           color: colors.logo.cyan,
           border: colors.logo.cyan,
         };
       case "completed":
         return { label: "已完成", bg: colors.logo.cyan, color: colors.text.light };
+      case "archived":
+        return { label: "已封存", bg: colors.background.gray, color: colors.text.muted };
       default:
         return {
           label: "進行中",
@@ -366,6 +354,12 @@ export default function ProfileScreen() {
 
           {/* 主要內容區 - 透明背景，讓固定背景色透出 */}
           <YStack paddingTop="$3" paddingHorizontal="$5" paddingBottom={120} minHeight={300}>
+            {/* Loading 狀態 */}
+            {userLoading && (
+              <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical={40}>
+                <ActivityIndicator size="large" color={colors.logo.cyan} />
+              </YStack>
+            )}
             {/* 用戶資料卡片 - 與 Product UserInfoCard 對齊 */}
             <Card
               backgroundColor={colors.background.light}
@@ -420,7 +414,7 @@ export default function ProfileScreen() {
               {/* 社群媒體連結 */}
               {socialLinks.length > 0 && (
                 <XStack gap={12} marginTop={16}>
-                  {socialLinks.map((link: SocialLink) => (
+                  {socialLinks.map((link) => (
                     <Pressable
                       key={link.platform}
                       onPress={() => handleSocialPress(link.url)}
@@ -534,7 +528,7 @@ export default function ProfileScreen() {
                                 {practice.title}
                               </Text>
                               <Text fontSize={12} color={colors.text.dark} numberOfLines={1}>
-                                {practice.description || ""}
+                                {practice.practiceAction || ""}
                               </Text>
                             </YStack>
                             <ChevronRight size={20} color={colors.text.muted} />
