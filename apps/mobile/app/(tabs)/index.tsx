@@ -16,7 +16,8 @@ import { MoreHorizontal, SlidersHorizontal, Target } from "@tamagui/lucide-icons
 import { SafeAreaView } from "react-native-safe-area-context";
 import { HomeBanner, PracticeCard } from "@/components";
 import { colors } from "@/generated/design-tokens";
-import { useCheckIn, usePractices } from "@/hooks/usePractices";
+import { useCheckIn } from "@/hooks/usePractices";
+import { usePracticeGroups } from "@/hooks/use-practice-groups";
 import type { Practice } from "@/types/practice";
 
 // Mock data - 4 種顏色的卡片 (進行中)
@@ -114,12 +115,12 @@ const MOCK_COMPLETED: Practice[] = [
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { activePractices, completedPractices, isLoading, mutate } = usePractices();
+  const { activePractices, completedPractices, isLoading, mutate } = usePracticeGroups();
   const { checkIn, isChecking } = useCheckIn();
 
   // 使用 mock data 或真實數據
   const inProgressPractices = useMemo(() => {
-    const realPractices = activePractices.filter((p) => !p.isCompleted);
+    const realPractices = activePractices;
     // 如果沒有真實數據，使用 mock data
     return realPractices.length > 0 ? realPractices : MOCK_PRACTICES;
   }, [activePractices]);
