@@ -34,3 +34,9 @@ export const useNotifications = (params?: { cursor?: string; limit?: number }) =
 export const useNotificationPreferences = () => {
   return useQuery("/api/v1/notifications/preferences", {});
 };
+
+// ============================================================================
+// Mutation Functions
+// ============================================================================
+
+export { markNotificationRead, markAllNotificationsRead } from "./notification";
