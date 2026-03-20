@@ -43,7 +43,7 @@ export function usePracticeGroups() {
 
   const rawPractices: MyPracticeItem[] = data?.data ?? [];
 
-  const { activePractices, completedPractices, todayPending, todayCompleted } = useMemo(() => {
+  const { practices, activePractices, completedPractices, todayPending, todayCompleted } = useMemo(() => {
     const active = rawPractices.filter((p) =>
       ["draft", "not_started", "active"].includes(p.status)
     );
@@ -51,6 +51,7 @@ export function usePracticeGroups() {
     const pending = active.filter((p) => !isTodayCheckedIn(p.lastCheckinAt ?? undefined));
     const done = active.filter((p) => isTodayCheckedIn(p.lastCheckinAt ?? undefined));
     return {
+      practices: rawPractices.map(toCardPractice),
       activePractices: active.map(toCardPractice),
       completedPractices: completed.map(toCardPractice),
       todayPending: pending.map(toCardPractice),
@@ -59,7 +60,7 @@ export function usePracticeGroups() {
   }, [rawPractices]);
 
   return {
-    practices: rawPractices.map(toCardPractice),
+    practices,
     activePractices,
     completedPractices,
     todayPending,
