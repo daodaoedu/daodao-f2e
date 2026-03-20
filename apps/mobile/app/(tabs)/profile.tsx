@@ -24,7 +24,7 @@ import Svg, { Circle, Path, Rect } from "react-native-svg";
 import { Avatar, Button, Card, Text, XStack, YStack } from "tamagui";
 import activeShaper1Json from "@/assets/animations/active-shaper-1.json";
 import { colors } from "@/generated/design-tokens";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useCurrentUser } from "@daodao/api";
 import type { SocialLink } from "@/types/user";
 
 const bannerImage = require("@/assets/images/user-mobile-banner.png");
