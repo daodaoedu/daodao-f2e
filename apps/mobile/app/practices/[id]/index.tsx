@@ -8,12 +8,15 @@ import { CheckInList, CheckInSheet, ProgressRing, ShareCheckInSheet } from "@/co
 import type { CheckInData } from "@/components/CheckInSheet";
 import { colors } from "@/generated/design-tokens";
 import { useCheckIn, useCheckIns, usePractice } from "@/hooks/usePractices";
+import { computeStreaks, isTodayCheckedIn } from "@/hooks/use-practice-groups";
+import type { CombinedStatus, Practice } from "@/types/practice";
+import type { CheckIn } from "@/types/practice";
 
 // 狀態標籤配置
 const statusConfig: Record<string, { label: string; backgroundColor: string; textColor: string }> =
   {
     draft: { label: "草稿", backgroundColor: "rgba(255, 255, 255, 0.8)", textColor: "#666666" },
-    "not-started": { label: "未開始", backgroundColor: "#E0F4FF", textColor: "#0088CC" },
+    "not_started": { label: "未開始", backgroundColor: "#E0F4FF", textColor: "#0088CC" },
     "in-progress": { label: "進行中", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
     active: { label: "進行中", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
     completed: { label: "已完成", backgroundColor: "#10B981", textColor: "#FFFFFF" },
@@ -34,7 +37,7 @@ export default function PracticeDetailScreen() {
   const router = useRouter();
   const { practice, isLoading, mutate } = usePractice(id);
   const { checkIn, isChecking } = useCheckIn();
-  const { checkIns } = useCheckIns(id);
+  const { checkIns, checkInDates } = useCheckIns(id);
 
   const [showCheckInSheet, setShowCheckInSheet] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
@@ -110,8 +113,35 @@ export default function PracticeDetailScreen() {
     );
   }
 
-  const progress =
-    practice.targetDays > 0 ? Math.round((practice.completedDays / practice.targetDays) * 100) : 0;
+  const progress = practice.progressPercentage ?? 0;
+
+  // 建立符合本地 Practice 型別的物件供舊版組件（CheckInSheet/ShareCheckInSheet）使用
+  const { currentStreak, longestStreak } = computeStreaks(checkInDates);
+  const practiceForUI: Practice = {
+    id: practice.id,
+    title: practice.title,
+    description: practice.practiceAction,
+    frequency: "daily",
+    targetDays: practice.durationDays ?? 0,
+    completedDays: practice.checkInCount,
+    currentStreak,
+    longestStreak,
+    status: (practice.status === "not_started" ? "not-started" : practice.status) as CombinedStatus,
+    tags: practice.tags,
+    color: practice.themeColor,
+    todayCheckedIn: isTodayCheckedIn(practice.lastCheckinAt),
+    isCompleted: practice.status === "completed",
+    createdAt: practice.createdAt,
+    updatedAt: practice.updatedAt ?? practice.createdAt,
+  };
+
+  // CheckInEntity.id 是 number；本地 CheckIn.id 是 string
+  const checkInsForList: CheckIn[] = checkIns.map((ci) => ({
+    id: String(ci.id),
+    practiceId: String(ci.practiceId ?? ""),
+    note: ci.note,
+    createdAt: ci.createdAt,
+  }));
 
   const status = practice.status || "in-progress";
   const statusInfo = statusConfig[status] || statusConfig["in-progress"];
@@ -208,7 +238,7 @@ export default function PracticeDetailScreen() {
               <YStack flex={1} paddingRight="$4">
                 {/* Description */}
                 <Text fontSize={15} fontWeight="500" color="$color" marginBottom="$3">
-                  {practice.description || "每天學習，持續進步"}
+                  {practice.practiceAction || "每天學習，持續進步"}
                 </Text>
 
                 {/* Frequency */}
@@ -312,10 +342,10 @@ export default function PracticeDetailScreen() {
               </Text>
               <XStack alignItems="baseline" gap={4}>
                 <Text fontSize={24} fontWeight="600" color={colors.primary.darker}>
-                  {practice.targetDays - practice.completedDays}
+                  {(practice.durationDays ?? 0) - practice.checkInCount}
                 </Text>
                 <Text fontSize={12} color={colors.primary.darker}>
-                  / {practice.targetDays} 天
+                  / {practice.durationDays ?? 0} 天
                 </Text>
               </XStack>
             </Card>
@@ -326,7 +356,7 @@ export default function PracticeDetailScreen() {
             <Text fontSize={16} fontWeight="600" color="$color">
               打卡紀錄
             </Text>
-            <CheckInList checkIns={checkIns || []} />
+            <CheckInList checkIns={checkInsForList} />
           </YStack>
 
           {/* Action Buttons */}
@@ -371,7 +401,7 @@ export default function PracticeDetailScreen() {
         borderTopWidth={1}
         borderTopColor="$borderColor"
       >
-        {!practice.todayCheckedIn ? (
+        {!isTodayCheckedIn(practice.lastCheckinAt) ? (
           <Button
             size="$5"
             backgroundColor="#FF8C42"
@@ -407,7 +437,7 @@ export default function PracticeDetailScreen() {
       <CheckInSheet
         open={showCheckInSheet}
         onOpenChange={setShowCheckInSheet}
-        practice={practice}
+        practice={practiceForUI}
         onCheckIn={handleCheckIn}
         onShare={() => {
           setShowCheckInSheet(false);
@@ -419,8 +449,8 @@ export default function PracticeDetailScreen() {
       <ShareCheckInSheet
         open={showShareSheet}
         onOpenChange={setShowShareSheet}
-        practice={practice}
-        streakCount={practice.currentStreak + 1}
+        practice={practiceForUI}
+        streakCount={practiceForUI.currentStreak + 1}
       />
     </SafeAreaView>
   );
