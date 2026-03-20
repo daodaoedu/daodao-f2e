@@ -6,6 +6,7 @@ import { Button, Spinner, Text, XStack, YStack } from "tamagui";
 import { CheckInCalendar } from "@/components";
 import { colors } from "@/generated/design-tokens";
 import { useCheckIns, usePractice } from "@/hooks/usePractices";
+import { computeStreaks } from "@/hooks/use-practice-groups";
 
 export default function PracticeCalendarScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -19,19 +20,16 @@ export default function PracticeCalendarScreen() {
   const stats = useMemo(() => {
     if (!practice) return null;
 
-    const completionRate =
-      practice.targetDays > 0
-        ? Math.round((practice.completedDays / practice.targetDays) * 100)
-        : 0;
+    const { currentStreak, longestStreak } = computeStreaks(checkInDates);
 
     return {
-      completedDays: practice.completedDays,
-      targetDays: practice.targetDays,
-      currentStreak: practice.currentStreak,
-      longestStreak: practice.longestStreak,
-      completionRate,
+      completedDays: practice.checkInCount,
+      targetDays: practice.durationDays ?? 0,
+      currentStreak,
+      longestStreak,
+      completionRate: practice.progressPercentage ?? 0,
     };
-  }, [practice]);
+  }, [practice, checkInDates]);
 
   if (isLoading) {
     return (
@@ -58,7 +56,7 @@ export default function PracticeCalendarScreen() {
     );
   }
 
-  const cardColor = practice.color || colors.primary.base;
+  const cardColor = practice.themeColor || colors.primary.base;
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
