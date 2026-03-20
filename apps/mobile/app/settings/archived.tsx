@@ -10,8 +10,7 @@ import { colors } from "@/generated/design-tokens";
 export default function ArchivedPracticesScreen() {
   const router = useRouter();
   const { data, mutate } = useMyPractices({ status: "archived" } as any);
-  const allPractices = (data?.data as any[]) ?? [];
-  const archivedPractices = allPractices.filter((p: any) => p.status === "archived");
+  const archivedPractices = (data?.data as any[]) ?? [];
   const { unarchivePractice } = useUnarchivePractice();
 
   const handleRestore = (practice: { id: string; title: string }) => {
