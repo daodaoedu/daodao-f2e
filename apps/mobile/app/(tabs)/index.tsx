@@ -1,300 +1,269 @@
+import { useMyPractices, useMyPracticeStats, useShowcaseFeed } from "@daodao/api";
 import { useRouter } from "expo-router";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
-  Alert,
-  Dimensions,
+  FlatList,
   Pressable,
   RefreshControl,
-  View as RNView,
+  ScrollView as RNScrollView,
   StyleSheet,
 } from "react-native";
-import { ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
-
-const { width: screenWidth } = Dimensions.get("window");
-
-import { MoreHorizontal, SlidersHorizontal, Target } from "@tamagui/lucide-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { HomeBanner, PracticeCard } from "@/components";
+import { Input, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { PracticeCard } from "@/components";
 import { colors } from "@/generated/design-tokens";
-import { useCheckIn } from "@/hooks/usePractices";
-import { usePracticeGroups } from "@/hooks/use-practice-groups";
-import type { Practice } from "@/types/practice";
+import { authStorage } from "@/services/auth-storage";
 
-// Mock data - 4 種顏色的卡片 (進行中)
-const MOCK_PRACTICES: Practice[] = [
-  {
-    id: "1",
-    title: "學習做甜點",
-    description: "看食譜書和 Youtube 教學，每週末做一次",
-    targetDays: 30,
-    completedDays: 2,
-    currentStreak: 2,
-    longestStreak: 2,
-    frequency: "weekly",
-    todayCheckedIn: false,
-    isCompleted: false,
-    status: "draft",
-    theme: "yellow",
-    tags: ["料理", "烘焙"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    title: "學習 React Hooks",
-    description: "每天學習 1.5 小時的 React Hooks 課程，包含理論學習、實作練習和筆記整理",
-    targetDays: 14,
-    completedDays: 7,
-    currentStreak: 5,
-    longestStreak: 7,
-    frequency: "daily",
-    todayCheckedIn: false,
-    isCompleted: false,
-    status: "in-progress",
-    theme: "blue",
-    tags: ["程式", "React", "前端"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "3",
-    title: "練習冥想",
-    description: "每天練習冥想 10 分鐘，包含正念冥想、呼吸練習和身體掃描",
-    targetDays: 21,
-    completedDays: 3,
-    currentStreak: 3,
-    longestStreak: 3,
-    frequency: "daily",
-    todayCheckedIn: false,
-    isCompleted: false,
-    status: "not-started",
-    theme: "pink",
-    tags: ["健康", "冥想", "正念"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "4",
-    title: "閱讀英文文章",
-    description: "每天閱讀一篇英文新聞或部落格文章，累積單字量",
-    targetDays: 30,
-    completedDays: 10,
-    currentStreak: 10,
-    longestStreak: 10,
-    frequency: "daily",
-    todayCheckedIn: true,
-    isCompleted: false,
-    status: "in-progress",
-    theme: "green",
-    tags: ["語言", "英文", "閱讀"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+type HomeTab = "mine" | "explore";
 
-// Mock data - 已完成的實踐
-const MOCK_COMPLETED: Practice[] = [
-  {
-    id: "5",
-    title: "練習冥想",
-    description: "每天練習冥想 10 分鐘，包含正念冥想、呼吸練習和身體掃描",
-    targetDays: 21,
-    completedDays: 21,
-    currentStreak: 0,
-    longestStreak: 21,
-    frequency: "daily",
-    todayCheckedIn: false,
-    isCompleted: true,
-    status: "completed",
-    theme: "blue",
-    tags: ["正念冥想", "Youtube", "放鬆", "專注", "健康"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
-
-export default function HomeScreen() {
+function MineTab() {
   const router = useRouter();
-  const { activePractices, completedPractices, isLoading, mutate } = usePracticeGroups();
-  const { checkIn, isChecking } = useCheckIn();
+  const { data: practicesData, isLoading, mutate } = useMyPractices();
+  const { data: statsData } = useMyPracticeStats();
 
-  // 使用 mock data 或真實數據
-  const inProgressPractices = useMemo(() => {
-    const realPractices = activePractices;
-    // 如果沒有真實數據，使用 mock data
-    return realPractices.length > 0 ? realPractices : MOCK_PRACTICES;
-  }, [activePractices]);
-
-  // 已完成的實踐
-  const displayedCompletedPractices = useMemo(() => {
-    return completedPractices.length > 0 ? completedPractices : MOCK_COMPLETED;
-  }, [completedPractices]);
+  const allPractices = (practicesData?.data as any[]) ?? [];
+  const inProgress = allPractices.filter(
+    (p: any) =>
+      p.status === "active" ||
+      p.status === "draft" ||
+      p.status === "not_started" ||
+      p.status === "in-progress" ||
+      p.status === "not-started"
+  );
+  const completed = allPractices.filter((p: any) => p.status === "completed");
+  const stats = (statsData?.data as any) ?? null;
 
   const handleRefresh = useCallback(async () => {
     await mutate();
   }, [mutate]);
 
-  const handlePracticePress = useCallback(
-    (id: string) => {
-      router.push(`/practices/${id}`);
-    },
-    [router]
-  );
-
-  const handleCheckIn = useCallback(
-    async (practiceId: string) => {
-      const result = await checkIn({ practiceId });
-
-      if (!result.success && result.error) {
-        Alert.alert("打卡失敗", result.error);
-      }
-    },
-    [checkIn]
-  );
-
-  const handleAddPractice = useCallback(() => {
-    router.push("/practices/create");
-  }, [router]);
-
-  const handleSettings = useCallback(() => {
-    router.push("/settings");
-  }, [router]);
-
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-        <YStack flex={1} alignItems="center" justifyContent="center">
-          <Spinner size="large" color={colors.primary.base} />
-        </YStack>
-      </SafeAreaView>
+      <YStack flex={1} alignItems="center" justifyContent="center">
+        <Spinner size="large" color={colors.primary.base} />
+      </YStack>
     );
   }
 
-  // Banner 高度 (與 HomeBanner 同步)
-  const bannerHeight = Math.round(screenWidth / (195 / 60)) + 22;
+  return (
+    <RNScrollView
+      style={{ flex: 1, backgroundColor: "transparent" }}
+      refreshControl={
+        <RefreshControl
+          refreshing={false}
+          onRefresh={handleRefresh}
+          tintColor={colors.primary.base}
+        />
+      }
+      contentContainerStyle={{ paddingBottom: 120 }}
+    >
+      {stats && (
+        <XStack paddingHorizontal="$5" paddingVertical="$3" gap="$4">
+          <YStack alignItems="center">
+            <Text fontSize={20} fontWeight="600" color={colors.primary.base}>
+              {stats.currentStreak ?? 0}
+            </Text>
+            <Text fontSize={11} color={colors.text.muted}>
+              連續登入天數
+            </Text>
+          </YStack>
+          <YStack alignItems="center">
+            <Text fontSize={20} fontWeight="600" color={colors.primary.base}>
+              {stats.totalCheckIns ?? 0}
+            </Text>
+            <Text fontSize={11} color={colors.text.muted}>
+              總打卡次數
+            </Text>
+          </YStack>
+        </XStack>
+      )}
+
+      <YStack paddingTop="$3" gap="$3">
+        <XStack paddingHorizontal="$5">
+          <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
+            進行中
+          </Text>
+        </XStack>
+        {inProgress.length > 0 ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+          >
+            {inProgress.map((practice: any) => (
+              <PracticeCard
+                key={practice.id}
+                practice={practice as any}
+                onPress={() => router.push(`/practices/${practice.id}`)}
+                variant="gradient"
+              />
+            ))}
+          </ScrollView>
+        ) : (
+          <YStack
+            marginHorizontal="$5"
+            padding="$6"
+            alignItems="center"
+            backgroundColor="$background"
+            borderRadius="$md"
+            borderWidth={1}
+            borderColor="$borderColor"
+          >
+            <Text fontSize={14} color="$color" opacity={0.5}>
+              還沒有進行中的實踐
+            </Text>
+          </YStack>
+        )}
+      </YStack>
+
+      {completed.length > 0 && (
+        <YStack paddingTop="$4" gap="$3" paddingHorizontal="$5">
+          <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
+            已完成
+          </Text>
+          {completed.map((practice: any) => (
+            <PracticeCard
+              key={practice.id}
+              practice={practice as any}
+              onPress={() => router.push(`/practices/${practice.id}`)}
+              showCheckInButton={false}
+              variant="completed"
+            />
+          ))}
+        </YStack>
+      )}
+    </RNScrollView>
+  );
+}
+
+function ExploreTab() {
+  const router = useRouter();
+  const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
+  const [keyword, setKeyword] = useState("");
+  const { practices, isLoading, hasMore, loadMore } = useShowcaseFeed({
+    keyword: keyword || undefined,
+    accessToken,
+  });
+
+  useEffect(() => {
+    authStorage.getAccessToken().then((token) => {
+      setAccessToken(token ?? undefined);
+    });
+  }, []);
+
+  if (isLoading && practices.length === 0) {
+    return (
+      <YStack flex={1} alignItems="center" justifyContent="center">
+        <Spinner size="large" color={colors.primary.base} />
+      </YStack>
+    );
+  }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F7F7" }} edges={["top"]}>
-      {/* Fixed Banner */}
-      <RNView style={styles.fixedBanner}>
-        <HomeBanner />
-      </RNView>
-
-      {/* 固定頂部右上角設定按鈕 */}
-      <RNView style={styles.fixedHeader}>
-        <XStack justifyContent="flex-end" paddingHorizontal="$5" paddingVertical="$3">
-          <Pressable onPress={handleSettings} hitSlop={8}>
-            <SlidersHorizontal size={24} color={colors.text.dark} />
-          </Pressable>
-        </XStack>
-      </RNView>
-
-      <ScrollView
-        flex={1}
-        backgroundColor="transparent"
-        refreshControl={
-          <RefreshControl
-            refreshing={false}
-            onRefresh={handleRefresh}
-            tintColor={colors.primary.base}
-          />
-        }
-        contentContainerStyle={{ paddingTop: bannerHeight - 30 }}
-      >
-        <YStack>
-          {/* 進行中區塊 - 淡灰背景（對應 Product 的 very-light-gray） */}
-          <YStack backgroundColor="#F7F8F8" paddingTop="$5" gap="$5" minHeight={400}>
-            {/* 進行中標題 */}
-            <XStack paddingHorizontal="$5" alignItems="center" justifyContent="space-between">
-              <Text fontSize={18} fontWeight="500" color="$color">
-                進行中
+    <YStack flex={1}>
+      <XStack paddingHorizontal="$4" paddingVertical="$2">
+        <Input
+          flex={1}
+          value={keyword}
+          onChangeText={setKeyword}
+          placeholder="搜尋靈感..."
+          fontSize={14}
+          borderColor="$borderColor"
+          focusStyle={{ borderColor: colors.primary.base }}
+        />
+      </XStack>
+      <FlatList
+        data={practices}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120, gap: 12 }}
+        renderItem={({ item }) => (
+          <Pressable onPress={() => router.push(`/practices/${item.id}`)}>
+            <YStack
+              padding="$4"
+              backgroundColor="$background"
+              borderRadius="$md"
+              borderWidth={1}
+              borderColor="$borderColor"
+            >
+              <Text
+                fontSize={15}
+                fontWeight="500"
+                color={colors.text.dark}
+                numberOfLines={2}
+              >
+                {item.title}
               </Text>
-              <Pressable hitSlop={8}>
-                <MoreHorizontal size={24} color={colors.basic[400]} />
-              </Pressable>
-            </XStack>
-
-            {/* 橫向滾動卡片 */}
-            {inProgressPractices.length > 0 ? (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
-              >
-                {inProgressPractices.map((practice) => (
-                  <PracticeCard
-                    key={practice.id}
-                    practice={practice}
-                    onPress={() => handlePracticePress(practice.id)}
-                    onCheckIn={() => handleCheckIn(practice.id)}
-                    isCheckingIn={isChecking}
-                    variant="gradient"
-                  />
-                ))}
-              </ScrollView>
-            ) : (
-              <YStack
-                marginHorizontal="$5"
-                padding="$6"
-                alignItems="center"
-                justifyContent="center"
-                gap="$3"
-                backgroundColor="$background"
-                borderRadius="$md"
-                borderWidth={1}
-                borderColor="$borderColor"
-              >
-                <Target size={48} color={colors.basic[300]} />
-                <Text fontSize={16} color="$color" opacity={0.6} textAlign="center">
-                  還沒有進行中的實踐
+              {item.user?.name && (
+                <Text fontSize={12} color={colors.text.muted} marginTop="$1">
+                  {item.user.name}
                 </Text>
-                <Text fontSize={14} color={colors.primary.base} onPress={handleAddPractice}>
-                  建立第一個實踐
-                </Text>
-              </YStack>
-            )}
-
-            {/* 已完成區塊 */}
-            {displayedCompletedPractices.length > 0 && (
-              <YStack gap="$3" paddingHorizontal="$5" paddingBottom={120}>
-                <Text fontSize={18} fontWeight="500" color="$color">
-                  已完成
-                </Text>
-                <YStack gap="$3">
-                  {displayedCompletedPractices.map((practice) => (
-                    <PracticeCard
-                      key={practice.id}
-                      practice={practice}
-                      onPress={() => handlePracticePress(practice.id)}
-                      showCheckInButton={false}
-                      variant="completed"
-                    />
-                  ))}
-                </YStack>
-              </YStack>
-            )}
+              )}
+            </YStack>
+          </Pressable>
+        )}
+        onEndReached={() => {
+          if (hasMore) loadMore();
+        }}
+        onEndReachedThreshold={0.3}
+        ListEmptyComponent={
+          <YStack padding="$8" alignItems="center">
+            <Text fontSize={14} color="$color" opacity={0.5}>
+              沒有靈感內容
+            </Text>
           </YStack>
-        </YStack>
-      </ScrollView>
+        }
+      />
+    </YStack>
+  );
+}
+
+export default function HomeScreen() {
+  const [activeTab, setActiveTab] = useState<HomeTab>("mine");
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F8F8" }} edges={["top"]}>
+      <XStack
+        paddingHorizontal="$5"
+        paddingVertical="$3"
+        backgroundColor="#F7F8F8"
+        borderBottomWidth={1}
+        borderBottomColor="#E5E7EB"
+      >
+        <XStack backgroundColor="#EEEEEE" borderRadius={8} padding={2}>
+          {(["mine", "explore"] as const).map((tab) => (
+            <Pressable
+              key={tab}
+              onPress={() => setActiveTab(tab)}
+              style={[styles.segmentButton, activeTab === tab && styles.segmentButtonActive]}
+            >
+              <Text
+                fontSize={14}
+                fontWeight={activeTab === tab ? "600" : "400"}
+                color={activeTab === tab ? colors.text.dark : colors.text.muted}
+              >
+                {tab === "mine" ? "我的" : "靈感"}
+              </Text>
+            </Pressable>
+          ))}
+        </XStack>
+      </XStack>
+      {activeTab === "mine" ? <MineTab /> : <ExploreTab />}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  fixedBanner: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 20,
-    pointerEvents: "none",
+  segmentButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: 6,
   },
-  fixedHeader: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 30,
-    backgroundColor: "transparent",
+  segmentButtonActive: {
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
 });
