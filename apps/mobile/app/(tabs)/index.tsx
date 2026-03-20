@@ -1,4 +1,5 @@
-import { useMyPractices, useMyPracticeStats, useShowcaseFeed } from "@daodao/api";
+import { useMyPracticeStats, useShowcaseFeed } from "@daodao/api";
+import { usePracticeGroups } from "@/hooks/use-practice-groups";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -18,19 +19,9 @@ type HomeTab = "mine" | "explore";
 
 function MineTab() {
   const router = useRouter();
-  const { data: practicesData, isLoading, mutate } = useMyPractices();
+  const { activePractices, completedPractices, isLoading, mutate } = usePracticeGroups();
   const { data: statsData } = useMyPracticeStats();
 
-  const allPractices = (practicesData?.data as any[]) ?? [];
-  const inProgress = allPractices.filter(
-    (p: any) =>
-      p.status === "active" ||
-      p.status === "draft" ||
-      p.status === "not_started" ||
-      p.status === "in-progress" ||
-      p.status === "not-started"
-  );
-  const completed = allPractices.filter((p: any) => p.status === "completed");
   const stats = (statsData?.data as any) ?? null;
 
   const handleRefresh = useCallback(async () => {
@@ -84,16 +75,16 @@ function MineTab() {
             進行中
           </Text>
         </XStack>
-        {inProgress.length > 0 ? (
+        {activePractices.length > 0 ? (
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
           >
-            {inProgress.map((practice: any) => (
+            {activePractices.map((practice) => (
               <PracticeCard
                 key={practice.id}
-                practice={practice as any}
+                practice={practice}
                 onPress={() => router.push(`/practices/${practice.id}`)}
                 variant="gradient"
               />
@@ -116,15 +107,15 @@ function MineTab() {
         )}
       </YStack>
 
-      {completed.length > 0 && (
+      {completedPractices.length > 0 && (
         <YStack paddingTop="$4" gap="$3" paddingHorizontal="$5">
           <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
             已完成
           </Text>
-          {completed.map((practice: any) => (
+          {completedPractices.map((practice) => (
             <PracticeCard
               key={practice.id}
-              practice={practice as any}
+              practice={practice}
               onPress={() => router.push(`/practices/${practice.id}`)}
               showCheckInButton={false}
               variant="completed"
