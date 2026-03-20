@@ -1,46 +1,49 @@
+import { deletePractice, useMyPractices, useUnarchivePractice } from "@daodao/api";
 import { Archive, ChevronLeft, RotateCcw, Trash2 } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { ProgressRing } from "@/components";
 import { colors } from "@/generated/design-tokens";
-import { usePracticeGroups } from "@/hooks/use-practice-groups";
-import type { Practice } from "@/types/practice";
 
 export default function ArchivedPracticesScreen() {
   const router = useRouter();
-  const { practices } = usePracticeGroups();
+  const { data, mutate } = useMyPractices({ status: "archived" } as any);
+  const allPractices = (data?.data as any[]) ?? [];
+  const archivedPractices = allPractices.filter((p: any) => p.status === "archived");
+  const { unarchivePractice } = useUnarchivePractice();
 
-  // Filter archived practices
-  const archivedPractices = useMemo(
-    () => practices.filter((p) => p.status === "archived"),
-    [practices]
-  );
-
-  const handleRestore = (practice: Practice) => {
+  const handleRestore = (practice: { id: string; title: string }) => {
     Alert.alert("恢復實踐", `確定要恢復「${practice.title}」嗎？`, [
       { text: "取消", style: "cancel" },
       {
         text: "恢復",
-        onPress: () => {
-          // TODO: Implement API call to restore practice
-          Alert.alert("成功", "實踐已恢復");
+        onPress: async () => {
+          try {
+            await unarchivePractice(practice.id);
+            await mutate();
+          } catch (e) {
+            Alert.alert("恢復失敗", e instanceof Error ? e.message : "請稍後再試");
+          }
         },
       },
     ]);
   };
 
-  const handleDelete = (practice: Practice) => {
+  const handleDelete = (practice: { id: string; title: string }) => {
     Alert.alert("永久刪除", `確定要永久刪除「${practice.title}」嗎？此操作無法復原。`, [
       { text: "取消", style: "cancel" },
       {
         text: "刪除",
         style: "destructive",
-        onPress: () => {
-          // TODO: Implement API call to delete practice
-          Alert.alert("成功", "實踐已刪除");
+        onPress: async () => {
+          try {
+            await deletePractice(practice.id);
+            await mutate();
+          } catch (e) {
+            Alert.alert("刪除失敗", e instanceof Error ? e.message : "請稍後再試");
+          }
         },
       },
     ]);
@@ -89,7 +92,7 @@ export default function ArchivedPracticesScreen() {
         ) : (
           <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
             <YStack gap="$3">
-              {archivedPractices.map((practice) => {
+              {archivedPractices.map((practice: any) => {
                 const progress =
                   practice.targetDays > 0
                     ? Math.round((practice.completedDays / practice.targetDays) * 100)
