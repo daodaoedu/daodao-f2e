@@ -735,10 +735,8 @@ export function CommentSection({
             <AvatarImage src={currentUserPhotoURL} alt={currentUserName || "我"} />
           )}
           <AvatarFallback
-            className={cn("text-sm font-medium text-text-dark", getAvatarColor("Me"))}
-          >
-            {(currentUserName || "我").slice(0, 1)}
-          </AvatarFallback>
+            className={cn(getAvatarColor("Me"))}
+          />
         </Avatar>
 
         {/* Input with @mention support */}
