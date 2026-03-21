@@ -287,7 +287,7 @@ function Step2Animation({ encouragement }: Step2AnimationProps) {
   return (
     <div className="space-y-1">
       <p>{encouragement || DEFAULT_ENCOURAGEMENT}</p>
-      <p>歡迎分享你的心得，和你有相同實踐的人會很想知道喔！</p>
+      <p className="text-sm text-text-dark/60">想留下更多紀錄嗎？繼續填寫標籤、心得與照片吧！</p>
     </div>
   );
 }
@@ -345,7 +345,7 @@ export function useCheckInSuccessDialog({
         ),
         textAlign: "left",
         buttons: [
-          // { label: "分享心得", value: "share", variant: "outline" },
+          { label: "繼續分享心得", value: "share", variant: "outline" },
           { label: "完成", value: "complete", variant: "orange" },
         ],
       });

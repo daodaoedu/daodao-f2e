@@ -19,7 +19,7 @@ export const ReflectionQuestion = () => {
           type="button"
           role="switch"
           aria-checked={enabled}
-          aria-label="靈感開關"
+          aria-label="給我一點靈感"
           onClick={() => setEnabled((v) => !v)}
           className={cn(
             "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
@@ -33,7 +33,7 @@ export const ReflectionQuestion = () => {
             )}
           />
         </button>
-        <span className="text-sm text-gray-500">靈感開關</span>
+        <span className="text-sm text-gray-500">給我一點靈感</span>
       </div>
 
       {/* 問題卡片 */}

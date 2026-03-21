@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
@@ -8,6 +9,7 @@ import { isBefore, parse, startOfDay } from "date-fns";
 import { CalendarCheck, Check, Eye } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { CheckInStatus } from "@/constants/check-in-status";
+import { useCheckInPhase2Sheet } from "@/hooks/use-check-in-phase2-sheet";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
 import { EarlyStartResult, useEarlyStartDialog } from "@/hooks/use-early-start-dialog";
 import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
@@ -85,17 +87,6 @@ export const CheckInSheetContent = ({
         {/* Mood Selection */}
         <MoodSelector form={form} />
 
-        {/* Thought Sharing */}
-        <div className="mb-8">
-          <h3 className="text-base font-medium mb-3 text-text-dark">想法分享</h3>
-          <TagSelector form={form} />
-          <ReflectionQuestion />
-          <DescriptionField form={form} />
-        </div>
-
-        {/* Media Upload */}
-        <MediaUploadField form={form} />
-
         {/* Hidden CheckInCard for rendering */}
         {renderCheckInCard()}
 
@@ -168,11 +159,14 @@ export const CheckInButton = ({
     endDate,
   });
 
+  const { openPhase2Sheet } = useCheckInPhase2Sheet({ practiceId, taskTitle });
+
   const { submitCheckIn } = useCheckInSubmit({
     practiceId,
     taskTitle,
     progressPercentage,
     onComplete,
+    onOpenPhase2: openPhase2Sheet,
   });
 
   const { openCheckInSheet } = useCheckInSheet({
@@ -238,5 +232,80 @@ export const CheckInButton = ({
       {renderIcon()}
       {getButtonLabel()}
     </Button>
+  );
+};
+
+// ============================================================================
+// Phase 2 Sheet Content（想法分享 + 上傳照片）
+// ============================================================================
+
+interface ICheckInPhase2SheetContentProps {
+  taskTitle: string;
+  onComplete: (data: Omit<ICheckInFormData, "mood">) => Promise<void> | void;
+  /** API 無資料時的備用標籤列表（例如 mock 環境） */
+  suggestedTags?: string[];
+}
+
+/**
+ * 打卡第二階段表單
+ * 讓使用者在快速打卡（心情）完成後，進一步填寫標籤、心得描述與照片
+ */
+export const CheckInPhase2SheetContent = ({
+  taskTitle,
+  onComplete,
+  suggestedTags,
+}: ICheckInPhase2SheetContentProps) => {
+  const form = useForm<CheckInFormValuesType>({
+    resolver: zodResolver(checkInFormSchema),
+    defaultValues: {
+      mood: null,
+      tags: [],
+      description: "",
+      media: [],
+    },
+  });
+
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const onSubmit = async (values: CheckInFormValuesType) => {
+    setIsSubmitting(true);
+    try {
+      await onComplete({
+        tags: values.tags,
+        description: values.description,
+        media: values.media,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="px-6">
+        {/* Activity Title */}
+        <h2 className="text-md leading-8 font-medium text-bg-dark wrap-break-word mb-6">
+          {taskTitle}
+        </h2>
+
+        {/* Thought Sharing */}
+        <div className="mb-8">
+          <h3 className="text-base font-medium mb-3 text-text-dark">想法分享</h3>
+          <TagSelector form={form} fallbackTags={suggestedTags} />
+          <DescriptionField form={form} beforeTextarea={<ReflectionQuestion />} />
+        </div>
+
+        {/* Media Upload */}
+        <MediaUploadField form={form} />
+
+        {/* Submit Button */}
+        <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
+          <Button type="submit" variant="orange" className="w-full" disabled={isSubmitting}>
+            <Check className="size-4.5" />
+            {isSubmitting ? "儲存中..." : "儲存心得"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };

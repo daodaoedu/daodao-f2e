@@ -13,12 +13,14 @@ import type { CheckInFormValuesType } from "../schema";
 
 interface ITagSelectorProps {
   form: UseFormReturn<CheckInFormValuesType>;
+  /** API 無資料時的備用標籤列表（例如 mock 環境） */
+  fallbackTags?: string[];
 }
 
 /**
  * 標籤選擇器組件
  */
-export const TagSelector = ({ form }: ITagSelectorProps) => {
+export const TagSelector = ({ form, fallbackTags }: ITagSelectorProps) => {
   const [customTagInput, setCustomTagInput] = useState("");
   const [promptEnabled, setPromptEnabled] = useState(false);
   const locale = useLocale();
@@ -37,10 +39,13 @@ export const TagSelector = ({ form }: ITagSelectorProps) => {
     return tagPromptsData.data.map((item: { tagName: string }) => item.tagName).slice(0, 8);
   }, [tagPromptsData]);
 
-  // 合併 API 取得的標籤和使用者自訂的標籤
+  // API 無資料時使用 fallbackTags
+  const baseTagList = availableTagsFromApi.length > 0 ? availableTagsFromApi : (fallbackTags ?? []);
+
+  // 合併標籤來源和使用者自訂的標籤
   const availableTags = useMemo(
-    () => Array.from(new Set([...availableTagsFromApi, ...(tags || [])])),
-    [availableTagsFromApi, tags]
+    () => Array.from(new Set([...baseTagList, ...(tags || [])])),
+    [baseTagList, tags]
   );
 
   const handleAddCustomTag = async () => {
@@ -108,7 +113,7 @@ export const TagSelector = ({ form }: ITagSelectorProps) => {
                       )}
                     />
                   </button>
-                  <span className="text-sm text-gray-500">引導句</span>
+                  <span className="text-sm text-gray-500">自動填入文字</span>
                 </div>
                 <div className="flex flex-wrap gap-x-2 gap-y-3 mb-3">
                   {availableTags.map((tag) => {
