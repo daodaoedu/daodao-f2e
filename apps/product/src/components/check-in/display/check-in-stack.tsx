@@ -1,11 +1,7 @@
 "use client";
 
 import type { PracticeCheckInsResponse } from "@daodao/api";
-import CircleSvg from "@daodao/assets/images/dashboard/circle.svg";
-import ClippedCircleSvg from "@daodao/assets/images/dashboard/clipped-circle.svg";
-import HexagonSvg from "@daodao/assets/images/dashboard/hexagon.svg";
-import SemiCircleSvg from "@daodao/assets/images/dashboard/semi-circle.svg";
-import SpeechBubbleSvg from "@daodao/assets/images/dashboard/speech-bubble.svg";
+import CoconutItemSvg from "@daodao/assets/images/dashboard/coconut-item.svg";
 import { Link } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid, parse } from "date-fns";
@@ -121,14 +117,8 @@ const pathElementToVertices = (pathElement: SVGPathElement, samples: number): Ma
   return cleanedVertices;
 };
 
-// SVG 配置：順序為綠、藍、紅、黃、橘
-const SVG_CONFIGS = [
-  { name: "circle", Component: CircleSvg },
-  { name: "hexagon", Component: HexagonSvg },
-  { name: "semi-circle", Component: SemiCircleSvg },
-  { name: "speech-bubble", Component: SpeechBubbleSvg },
-  { name: "clipped-circle", Component: ClippedCircleSvg },
-] as const;
+// SVG 配置：使用椰子形狀（圓形物理碰撞體 + 椰子視覺）
+const SVG_CONFIGS = [{ name: "coconut-item", Component: CoconutItemSvg }] as const;
 
 const CONTAINER_WIDTH = 448;
 const MIN_CONTAINER_HEIGHT = 300;

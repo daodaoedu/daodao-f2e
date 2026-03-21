@@ -5,3 +5,4 @@ export { CheckInDetail } from "./check-in-detail";
 export { CheckInRecordCard } from "./check-in-record-card";
 export { CheckInStack } from "./check-in-stack";
 export { SameDayCheckInNav } from "./same-day-check-in-nav";
+export { CoconutStamp } from "./coconut-stamp";

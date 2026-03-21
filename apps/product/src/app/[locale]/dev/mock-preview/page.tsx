@@ -4,12 +4,13 @@ import { useSheetManager } from "@daodao/ui/components/animate-ui/components/rad
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { CalendarCheck } from "lucide-react";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { PracticeDetailShell } from "@/components/practice";
 import {
   CheckInPhase2SheetContent,
   CheckInSheetContent,
+  CoconutStamp,
   type CheckInData,
 } from "@/components/check-in";
 import { mockCheckInsResponse, mockPractice, mockUser } from "@/components/check-in/mock-data";
@@ -126,6 +127,47 @@ function MockCheckInButton({
   );
 }
 
+/**
+ * 椰子圖章 Demo 區塊
+ * 可點選按鈕重新觸發動畫
+ */
+function CoconutStampDemo() {
+  const [key, setKey] = useState(0);
+  const [animated, setAnimated] = useState(false);
+
+  const triggerAnimation = () => {
+    setAnimated(true);
+    setKey((k) => k + 1);
+  };
+
+  return (
+    <div className="mx-4 mb-32 mt-6 rounded-2xl bg-white p-6 shadow-sm">
+      <p className="text-sm font-semibold text-gray-500 mb-1">椰子圖章 Demo</p>
+      <p className="text-xs text-gray-400 mb-4">第一次打卡時觸發放大 + 旋轉光芒動畫</p>
+
+      <div className="flex flex-col items-center gap-4">
+        <CoconutStamp key={key} animated={animated} className="my-2" />
+
+        <div className="flex gap-3">
+          <Button variant="outline" size="sm" onClick={triggerAnimation}>
+            ✨ 播放動畫（首次打卡）
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setAnimated(false);
+              setKey((k) => k + 1);
+            }}
+          >
+            靜態顯示
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MockPreviewPage() {
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
@@ -182,6 +224,8 @@ export default function MockPreviewPage() {
           </footer>
         }
       />
+
+      <CoconutStampDemo />
     </div>
   );
 }

@@ -14,6 +14,7 @@ import { useEditCheckInSheet } from "@/hooks/use-edit-check-in-sheet";
 import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
 import type { ICheckInDisplayData, ICheckInFormData } from "../types";
 import { CheckInCard } from "./check-in-card";
+import { CoconutStamp } from "./coconut-stamp";
 
 export type { ICheckInDisplayData as CheckInData };
 
@@ -23,9 +24,16 @@ interface ICheckInDetailProps {
   onEditComplete?: (data: ICheckInFormData) => Promise<void> | void;
   /** 標題下方額外內容（如同日打卡切換導航） */
   afterTitle?: React.ReactNode;
+  /** 是否為第一次打卡（觸發椰子圖章放大 + 光芒動畫） */
+  isFirstCheckIn?: boolean;
 }
 
-export const CheckInDetail = ({ checkInData, onEditComplete, afterTitle }: ICheckInDetailProps) => {
+export const CheckInDetail = ({
+  checkInData,
+  onEditComplete,
+  afterTitle,
+  isFirstCheckIn = false,
+}: ICheckInDetailProps) => {
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
 
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
@@ -96,6 +104,9 @@ export const CheckInDetail = ({ checkInData, onEditComplete, afterTitle }: IChec
         showTape={true}
         afterTitle={afterTitle}
       />
+
+      {/* 椰子圖章（第一次打卡時有放大 + 旋轉光芒動畫） */}
+      <CoconutStamp animated={isFirstCheckIn} className="my-6" />
 
       <div className="flex flex-col w-fit gap-4 mx-auto">
         {/* 分享按鈕 */}

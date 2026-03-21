@@ -1,0 +1,24 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="csg" cx="38%" cy="30%" r="68%">
+      <stop offset="0%" stop-color="#CFA06E"/>
+      <stop offset="55%" stop-color="#9A6235"/>
+      <stop offset="100%" stop-color="#5C3319"/>
+    </radialGradient>
+  </defs>
+  <!-- Stamp background -->
+  <circle cx="50" cy="50" r="48" fill="#FFF8EE"/>
+  <!-- Outer dashed border -->
+  <circle cx="50" cy="50" r="46" fill="none" stroke="#9A6235" stroke-width="2.5" stroke-dasharray="5 3"/>
+  <!-- Inner ring -->
+  <circle cx="50" cy="50" r="40" fill="none" stroke="#9A6235" stroke-width="1" stroke-dasharray="3 4" opacity="0.55"/>
+  <!-- Coconut body -->
+  <circle cx="50" cy="51" r="27" fill="url(#csg)"/>
+  <!-- Fiber texture -->
+  <path d="M27 46 Q38 32 50 30 Q62 32 73 46" stroke="#3D1A06" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+  <path d="M25 56 Q38 44 50 42 Q62 44 75 56" stroke="#3D1A06" stroke-width="1" stroke-linecap="round" opacity="0.22"/>
+  <!-- Three coconut eyes -->
+  <circle cx="43" cy="52" r="4" fill="#1C0900"/>
+  <circle cx="57" cy="52" r="4" fill="#1C0900"/>
+  <circle cx="50" cy="63" r="4" fill="#1C0900"/>
+</svg>

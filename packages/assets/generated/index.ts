@@ -22,6 +22,8 @@ export { default as BookSvg } from "./dashboard/book";
 export { default as BulbSvg } from "./dashboard/bulb";
 export { default as CircleSvg } from "./dashboard/circle";
 export { default as ClippedCircleSvg } from "./dashboard/clipped-circle";
+export { default as CoconutItemSvg } from "./dashboard/coconut-item";
+export { default as CoconutSvg } from "./dashboard/coconut";
 export { default as CompassSvg } from "./dashboard/compass";
 export { default as Deco1Svg } from "./dashboard/deco-1";
 export { default as Deco2Svg } from "./dashboard/deco-2";
