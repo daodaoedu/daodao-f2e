@@ -11,7 +11,7 @@ export const mockUser = {
   id: "mock-user-001",
   _id: "550e8400-e29b-41d4-a716-446655440001",
   name: "陳曉雯",
-  photoURL: "https://api.dicebear.com/7.x/avataaars/svg?seed=daodao-mock-user",
+  photoURL: null,
   educationStage: "university",
   selfIntroduction: "喜歡探索新事物、慢慢累積自己的習慣。",
   tagList: ["自我成長", "閱讀", "程式學習"],
