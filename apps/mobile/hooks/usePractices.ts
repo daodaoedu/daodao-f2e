@@ -2,6 +2,35 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 import { api } from "@/services/api-client";
 import type { CheckIn, Practice, PracticeStats, PracticesResponse } from "@/types/practice";
+import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
+import type { TaskStatus } from "@/constants/task-status";
+import type { PracticeStatus } from "@/constants/practice-status";
+
+export interface InProgressTask {
+  id: string;
+  label: string;
+  title: string;
+  description: string;
+  checkInCount: number;
+  progress: number;
+  messagesCount: number;
+  isUnreadMessages: boolean;
+  theme: string;
+  status: TaskStatus;
+  lastCheckInDate?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
+export interface CompletedTask {
+  id: string;
+  label: string;
+  title: string;
+  description: string;
+  viewCount: number;
+  commentCount: number;
+  tags: string[];
+}
 
 const PRACTICES_KEY = "/practices";
 
@@ -54,12 +83,56 @@ export function usePractices() {
     };
   }, [practices]);
 
+  const { inProgressTasks, completedTasks } = useMemo(() => {
+    const inProgressTasksData: InProgressTask[] = [];
+    const completedTasksData: CompletedTask[] = [];
+
+    for (const practice of practices) {
+      const taskStatus = mapPracticeStatusToTaskStatus(practice.status as PracticeStatus);
+      const isCompleted = taskStatus === "completed";
+
+      if (!isCompleted) {
+        inProgressTasksData.push({
+          id: practice.id,
+          label: "主題實踐",
+          title: practice.title,
+          description: practice.description || "",
+          checkInCount: practice.completedDays || 0,
+          progress: practice.targetDays
+            ? Math.round((practice.completedDays / practice.targetDays) * 100)
+            : 0,
+          messagesCount: 0,
+          isUnreadMessages: false,
+          theme: practice.theme || "yellow",
+          status: taskStatus,
+          lastCheckInDate: null,
+          startDate: practice.createdAt || null,
+          endDate: null,
+        });
+      } else {
+        completedTasksData.push({
+          id: practice.id,
+          label: "主題實踐",
+          title: practice.title,
+          description: practice.description || "",
+          viewCount: 0,
+          commentCount: 0,
+          tags: practice.tags || [],
+        });
+      }
+    }
+
+    return { inProgressTasks: inProgressTasksData, completedTasks: completedTasksData };
+  }, [practices]);
+
   return {
     practices,
     activePractices,
     completedPractices,
     todayPending,
     todayCompleted,
+    inProgressTasks,
+    completedTasks,
     stats,
     isLoading,
     error,
