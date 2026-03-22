@@ -57,7 +57,7 @@ const statusConfig: Record<TaskStatus, StatusConfig> = {
   },
   [TaskStatus.completed]: {
     label: "已完成",
-    variant: "default",
+    variant: "outline-logo",
   },
 };
 

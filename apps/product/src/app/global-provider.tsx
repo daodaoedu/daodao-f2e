@@ -55,6 +55,7 @@ function GlobalProvider({
                         "^/auth/error",
                         "^/users/",
                         "^/practices/[^/]+$",
+                        "^/dev/",
                       ]}
                       onAuthRequired={(currentPath) => {
                         router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
