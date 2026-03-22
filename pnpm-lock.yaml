@@ -155,6 +155,9 @@ importers:
       '@tamagui/toast':
         specifier: ^1.121.9
         version: 1.144.3(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
+      date-fns:
+        specifier: 'catalog:'
+        version: 3.6.0
       expo:
         specifier: ~54.0.32
         version: 54.0.32(@babel/core@7.28.6)(@expo/metro-runtime@5.0.4(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0)))(expo-router@5.0.7)(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
