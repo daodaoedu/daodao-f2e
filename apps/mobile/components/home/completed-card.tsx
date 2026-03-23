@@ -1,6 +1,6 @@
-import { ArrowRight } from "@tamagui/lucide-icons";
+import { ArrowRight, Eye, MessageSquare } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View as RNView } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import type { CompletedTask } from "@/hooks/usePractices";
@@ -11,7 +11,7 @@ interface CompletedCardProps {
 
 export function CompletedCard({ task }: CompletedCardProps) {
   const router = useRouter();
-  const { id, label, title, description, tags } = task;
+  const { id, label, title, description, viewCount, commentCount, tags } = task;
 
   return (
     <Pressable
@@ -36,7 +36,7 @@ export function CompletedCard({ task }: CompletedCardProps) {
       </XStack>
 
       {/* Title + description + arrow */}
-      <XStack gap="$2" marginVertical="$1.5">
+      <XStack gap="$2" marginBottom="$1.5">
         <YStack flex={1}>
           <Text fontSize={16} fontWeight="500" color={colors.text.dark} marginBottom="$1">
             {title}
@@ -48,8 +48,20 @@ export function CompletedCard({ task }: CompletedCardProps) {
         </View>
       </XStack>
 
-      {/* Progress indicator (completed = full) */}
-      <View style={styles.progressFull} />
+      {/* Progress line (completed = full blue) */}
+      <RNView style={styles.progressLine} />
+
+      {/* Engagement Stats — hidden, aligned with product */}
+      {/* <XStack gap="$3" alignItems="center">
+        <XStack alignItems="center" gap="$1">
+          <Eye size={16} color={colors.text.dark} />
+          <Text fontSize={12} color={colors.text.dark}>{viewCount}</Text>
+        </XStack>
+        <XStack alignItems="center" gap="$1">
+          <MessageSquare size={16} color={colors.text.dark} />
+          <Text fontSize={12} color={colors.text.dark}>{commentCount}</Text>
+        </XStack>
+      </XStack> */}
     </Pressable>
   );
 }
@@ -77,8 +89,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 2,
   },
-  progressFull: {
-    height: 6,
+  progressLine: {
+    height: 1.5,
     borderRadius: 999,
     backgroundColor: "#3B82F6",
     width: "100%",

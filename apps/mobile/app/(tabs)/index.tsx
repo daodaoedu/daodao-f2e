@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View as RNView } from "react-native";
-import { Spinner, Text, YStack, ScrollView } from "tamagui";
+import { CheckCircle2, MessageSquare } from "@tamagui/lucide-icons";
+import { Text, YStack, ScrollView } from "tamagui";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { colors } from "@/generated/design-tokens";
@@ -11,7 +12,6 @@ import {
   TabSwitcher,
   type TabType,
   ShowcaseSearchBar,
-  ShowcaseFilterBar,
   type ShowcaseFilterState,
   ShowcaseCard,
   BrewingCard,
@@ -84,8 +84,18 @@ export default function HomeScreen() {
 
   const dashboardStats = useMemo(
     () => [
-      { label: "連續登入", value: String(stats.currentStreak || 0), unit: "天" },
-      { label: "獲得迴響", value: String(stats.totalCheckIns || 0), unit: "次" },
+      {
+        label: "連續登入",
+        value: String(stats.currentStreak || 0),
+        unit: "天",
+        icon: <CheckCircle2 size={48} color={colors.text.dark} style={{ transform: [{ rotate: "-12deg" }] }} />,
+      },
+      {
+        label: "獲得迴響",
+        value: String(stats.totalCheckIns || 0),
+        unit: "次",
+        icon: <MessageSquare size={48} color={colors.text.dark} style={{ transform: [{ rotate: "-12deg" }] }} />,
+      },
     ],
     [stats]
   );
@@ -112,10 +122,10 @@ export default function HomeScreen() {
             onSearch={handleSearch}
           />
         </YStack>
-        <ShowcaseFilterBar filters={filters} onFiltersChange={handleFiltersChange} />
+        {/* TODO: ShowcaseFilterBar hidden for now */}
       </YStack>
     ),
-    [activeTab, searchValue, filters, handleSearch, handleFiltersChange]
+    [activeTab, searchValue, handleSearch]
   );
 
   const renderShowcaseFooter = useCallback(
@@ -143,7 +153,7 @@ export default function HomeScreen() {
     if (isMyLoading) {
       return (
         <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical="$8">
-          <Spinner size="large" color={colors.primary.base} />
+          <Text color={colors.text.dark}>載入中...</Text>
         </YStack>
       );
     }

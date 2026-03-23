@@ -7,7 +7,6 @@ export * from "./CheckInSheet";
 export * from "./check-in";
 export * from "./dashboard";
 export * from "./FormField";
-export * from "./IslandCard";
 export * from "./layout";
 export * from "./ProgressRing";
 export * from "./practice";
