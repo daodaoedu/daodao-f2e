@@ -50,11 +50,11 @@ function FollowerRow({ follower }: { follower: IBrowseActivityFollower }) {
             {follower.name.slice(0, 1)}
           </AvatarFallback>
         </Avatar>
-        <div className="absolute -bottom-1 -right-1 size-5 rounded-full bg-white ring-1 ring-white flex items-center justify-center">
+        <div className="absolute -bottom-1 -right-1 size-6 rounded-full bg-white shadow-md flex items-center justify-center">
           <LottieEmoji
             url={REACTION_CONFIG[follower.reaction].lottieUrl}
             fallback={REACTION_CONFIG[follower.reaction].emoji}
-            size={14}
+            size={18}
             play={false}
           />
         </div>

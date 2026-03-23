@@ -23,6 +23,7 @@ export const FilterStatus = {
   draft: "draft",
   notStarted: "not-started",
   inProgress: "in-progress",
+  completed: "completed",
 } as const;
 
 /**

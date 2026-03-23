@@ -95,7 +95,7 @@ const buildShowcaseQuery = (params: IShowcaseFeedParams, afterId?: string | null
   if (params.duration_min != null) query.set("duration_min", String(params.duration_min));
   if (params.duration_max != null) query.set("duration_max", String(params.duration_max));
   if (params.tags && params.tags.length > 0) {
-    params.tags.forEach((tag) => query.append("tags[]", tag));
+    params.tags.forEach((tag) => { query.append("tags[]", tag); });
   }
   return query.toString();
 };

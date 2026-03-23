@@ -166,7 +166,7 @@ export const getUserProfileByIdentifier = async (
   const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
   const headers: Record<string, string> = {};
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headers.Authorization = `Bearer ${token}`;
   }
   const response = await unauthorizedHandler.wrapFetch(
     `${baseUrl}/api/v1/users/profile/${encodeURIComponent(identifier)}`,

@@ -4,14 +4,13 @@ import { useAuth } from "@/providers/AuthProvider";
 import { api } from "@/services/api-client";
 import type { UserProfile } from "@/types/user";
 
-const DEFAULT_STATS = {
-  totalPractices: 0,
-  completedPractices: 0,
-  totalCheckIns: 0,
-  currentStreak: 0,
-  longestStreak: 0,
-  joinedDays: 0,
-} as const;
+/**
+ * 後端 /users/me 回傳格式：{ success: true, data: FormattedUserResponse }
+ */
+interface UsersMeResponse {
+  success: boolean;
+  data: UserProfile;
+}
 
 export function useCurrentUser() {
   const { user: authUser, isAuthenticated } = useAuth();
@@ -20,20 +19,27 @@ export function useCurrentUser() {
     if (!authUser) return undefined;
     return {
       id: authUser.id,
-      email: authUser.email,
       name: authUser.name,
-      avatar: authUser.avatar,
-      createdAt: "",
-      updatedAt: "",
-      islands: [],
-      socialLinks: [],
-      stats: DEFAULT_STATS,
+      email: authUser.email,
+      photoURL: authUser.avatar ?? null,
+      selfIntroduction: null,
+      personalSlogan: null,
+      location: null,
+      locationNameZh: null,
+      locationNameEn: null,
+      contactList: null,
+      latestQuizResult: null,
+      tagList: null,
+      customId: null,
     };
   }, [authUser]);
 
   const { data, error, isLoading, mutate } = useSWR<UserProfile>(
     isAuthenticated ? "/users/me" : null,
-    () => api.get<UserProfile>("/users/me"),
+    async () => {
+      const res = await api.get<UsersMeResponse>("/users/me");
+      return res.data;
+    },
     {
       revalidateOnFocus: false,
       errorRetryCount: 2,

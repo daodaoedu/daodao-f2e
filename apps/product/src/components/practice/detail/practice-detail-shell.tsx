@@ -10,7 +10,6 @@ import {
   TelescopeSvg,
 } from "@daodao/assets";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
-import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
@@ -378,7 +377,7 @@ export function PracticeDetailShell({
 
   return (
     <div className="flex-1 max-w-[448px] mx-auto w-full pb-24">
-      <div className="px-4 pt-3">
+      <div className="px-4 pt-[60px]">
         <div className="flex items-center justify-between mb-2">
           {statusInfo ? (
             <Badge variant={statusInfo.variant} size="sm">
@@ -526,6 +525,7 @@ export function PracticeDetailShell({
           />
 
           <div className="px-4">
+            <div className="border-t border-[#E4EAE9] mb-2" />
             <Button
               type="button"
               variant="ghost"
@@ -621,7 +621,7 @@ export function PracticeDetailShell({
                       ))}
                     </div>
                   )}
-                  <span className="text-sm text-text-dark/60">{text}</span>
+                  <span className="text-sm text-text-dark">{text}</span>
                 </button>
               );
             })()}
@@ -701,7 +701,9 @@ export function PracticeDetailShell({
           <div className="px-4">
             <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
           </div>
+          <div className="pt-10">
           <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
+        </div>
         </div>
       )}
 

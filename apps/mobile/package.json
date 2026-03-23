@@ -14,7 +14,9 @@
     "submit:ios": "eas submit --platform ios",
     "submit:android": "eas submit --platform android",
     "lint": "biome lint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@daodao/api": "workspace:*",
@@ -33,6 +35,7 @@
     "@tamagui/sheet": "2.0.0-rc.0",
     "@tamagui/shorthands": "^1.121.9",
     "@tamagui/toast": "^1.121.9",
+    "date-fns": "catalog:",
     "expo": "~54.0.32",
     "expo-apple-authentication": "~7.2.1",
     "expo-constants": "~18.0.5",

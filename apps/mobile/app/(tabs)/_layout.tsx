@@ -1,7 +1,7 @@
 import { Plus } from "@tamagui/lucide-icons";
 import { Tabs, usePathname, useRouter } from "expo-router";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
-import { HomeIcon, UserIcon } from "@/components/icons";
+import { BellIcon, HomeIcon, SettingsIcon, UserIcon } from "@/components/icons";
 import { colors } from "@/generated/design-tokens";
 
 export default function TabLayout() {
@@ -69,11 +69,29 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="notifications"
+          options={{
+            title: "最新通知",
+            tabBarIcon: ({ color, focused }) => (
+              <BellIcon size={32} color={color} filled={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="profile"
           options={{
             title: "我的小島",
             tabBarIcon: ({ color, focused }) => (
               <UserIcon size={32} color={color} filled={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: "設定",
+            tabBarIcon: ({ color, focused }) => (
+              <SettingsIcon size={32} color={color} filled={focused} />
             ),
           }}
         />

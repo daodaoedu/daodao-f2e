@@ -312,7 +312,7 @@ function CommentBubble({
   };
 
   const avatarSizeClass = isReply ? "size-8" : "size-10";
-  const authorTextClass = isReply ? "text-xs" : "text-sm";
+  const authorTextClass = "text-sm";
   const timeTextClass = isReply ? "text-[11px]" : "text-xs";
 
   return (
@@ -455,7 +455,7 @@ function CommentBubble({
           <p
             className={cn(
               "text-[#295E5C] leading-5 whitespace-pre-wrap",
-              isReply ? "text-xs" : "text-sm"
+              "text-sm"
             )}
           >
             {isReply && (
