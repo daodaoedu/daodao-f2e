@@ -64,7 +64,10 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
   return (
     <Pressable
       style={styles.card}
-      onPress={() => router.push(`/practices/${id}` as any)}
+      onPress={() => router.push({
+        pathname: `/practices/${id}`,
+        params: { showcaseData: JSON.stringify(practice) },
+      } as any)}
     >
       {/* Header row */}
       <XStack alignItems="center" gap="$2" marginBottom="$2">

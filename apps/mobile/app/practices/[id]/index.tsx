@@ -5,9 +5,12 @@ import { Alert, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Spinner, Text, View, XStack, YStack } from "tamagui";
 import { CheckInList, CheckInSheet, ProgressRing, ShareCheckInSheet } from "@/components";
-import type { CheckInData } from "@/components/CheckInSheet";
+import type { ICheckInData } from "@/components/CheckInSheet";
 import { colors } from "@/generated/design-tokens";
 import { useCheckIn, useCheckIns, usePractice } from "@/hooks/usePractices";
+import { useAuth } from "@/providers/AuthProvider";
+import { PublicPracticeView } from "@/components/practice/detail/PublicPracticeView";
+import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
 
 // 狀態標籤配置
 const statusConfig: Record<string, { label: string; backgroundColor: string; textColor: string }> =
@@ -30,8 +33,9 @@ const timingLabels: Record<string, string> = {
 };
 
 export default function PracticeDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, showcaseData } = useLocalSearchParams<{ id: string; showcaseData?: string }>();
   const router = useRouter();
+  const { user: currentUser } = useAuth();
   const { practice, isLoading, mutate } = usePractice(id);
   const { checkIn, isChecking } = useCheckIn();
   const { checkIns } = useCheckIns(id);
@@ -40,7 +44,7 @@ export default function PracticeDetailScreen() {
   const [showShareSheet, setShowShareSheet] = useState(false);
 
   const handleCheckIn = useCallback(
-    async (data: CheckInData) => {
+    async (data: ICheckInData) => {
       if (!id) return { success: false, error: "無效的實踐 ID" };
 
       const result = await checkIn({ practiceId: id, note: data.description });
@@ -85,6 +89,10 @@ export default function PracticeDetailScreen() {
     ]);
   }, []);
 
+  // Parse showcase data passed from 靈感 tab
+  const showcasePractice = showcaseData ? JSON.parse(showcaseData) as IShowcasePractice : null;
+  const isPublicView = showcasePractice != null && showcasePractice.user?.id !== currentUser?.id;
+
   if (isLoading) {
     return (
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -92,6 +100,31 @@ export default function PracticeDetailScreen() {
           <Spinner size="large" color={colors.primary.base} />
         </YStack>
       </SafeAreaView>
+    );
+  }
+
+  // Public practice view (from 靈感 tab)
+  if (isPublicView && showcasePractice) {
+    return (
+      <PublicPracticeView
+        practice={{
+          id: showcasePractice.id,
+          title: showcasePractice.title,
+          status: showcasePractice.status,
+          practiceAction: showcasePractice.practice_action ?? undefined,
+          startDate: showcasePractice.start_date,
+          endDate: showcasePractice.end_date,
+          frequencyMinDays: showcasePractice.frequency_min_days,
+          frequencyMaxDays: showcasePractice.frequency_max_days,
+          sessionDurationMinutes: showcasePractice.session_duration_minutes,
+          user: showcasePractice.user ? {
+            id: showcasePractice.user.id,
+            name: showcasePractice.user.name,
+            photoUrl: showcasePractice.user.photo_url,
+          } : undefined,
+        }}
+        onRefresh={async () => {}}
+      />
     );
   }
 
