@@ -117,28 +117,23 @@ const ConnectionsTab = () => {
           <h2 className="text-xs font-medium text-[#9FB5B8] px-1">收到的請求</h2>
           <div className="flex flex-col gap-2">
             {incomingRequests.map((req) => {
-              const user = req.requester;
-              const name = user?.name ?? "用戶";
-              const userId = user?.identifier || user?.id || req.requesterId;
+              const name = req.requesterNickname ?? "用戶";
               return (
-                <div key={req.id} className="bg-white rounded-lg p-3 flex flex-col gap-3">
+                <div key={req.requestId} className="bg-white rounded-lg p-3 flex flex-col gap-3">
                   <div className="flex items-center gap-3">
                     <Avatar className="size-10 shrink-0">
-                      <AvatarImage src={user?.photoURL} alt={name} />
+                      <AvatarImage src={req.requesterPhotoUrl ?? undefined} alt={name} />
                       <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
                         {name.slice(0, 1)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <CustomLink
-                        href={`/users/${user?.identifier ?? userId}`}
+                        href={`/users/${req.requesterExternalId}`}
                         className="text-sm font-medium text-text-dark hover:underline"
                       >
                         {name}
                       </CustomLink>
-                      {user?.bio && (
-                        <p className="text-xs text-[#9FB5B8] truncate">{user.bio}</p>
-                      )}
                     </div>
                   </div>
 
@@ -151,7 +146,7 @@ const ConnectionsTab = () => {
                   <div className="flex gap-2">
                     <Button
                       size="sm"
-                      onClick={() => handleAccept(req.id, name)}
+                      onClick={() => handleAccept(String(req.requestId), name)}
                       className="flex-1 h-8 text-xs cursor-pointer bg-logo-cyan hover:bg-logo-cyan/90 text-white"
                     >
                       接受
@@ -159,7 +154,7 @@ const ConnectionsTab = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleIgnore(req.id, name)}
+                      onClick={() => handleIgnore(String(req.requestId), name)}
                       className="flex-1 h-8 text-xs cursor-pointer"
                     >
                       忽略
@@ -178,20 +173,18 @@ const ConnectionsTab = () => {
           <h2 className="text-xs font-medium text-[#9FB5B8] px-1">發出的請求</h2>
           <div className="flex flex-col gap-2">
             {outgoingRequests.map((req) => {
-              const user = req.receiver;
-              const name = user?.name ?? "用戶";
-              const userId = user?.identifier || user?.id || req.receiverId;
+              const name = req.receiverNickname ?? "用戶";
               return (
-                <div key={req.id} className="bg-white rounded-lg p-3 flex items-center gap-3">
+                <div key={req.requestId} className="bg-white rounded-lg p-3 flex items-center gap-3">
                   <Avatar className="size-10 shrink-0">
-                    <AvatarImage src={user?.photoURL} alt={name} />
+                    <AvatarImage src={req.receiverPhotoUrl ?? undefined} alt={name} />
                     <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
                       {name.slice(0, 1)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <CustomLink
-                      href={`/users/${user?.identifier ?? userId}`}
+                      href={`/users/${req.receiverExternalId}`}
                       className="text-sm font-medium text-text-dark hover:underline"
                     >
                       {name}
@@ -201,7 +194,7 @@ const ConnectionsTab = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleWithdraw(req.id, name)}
+                    onClick={() => handleWithdraw(String(req.requestId), name)}
                     className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                   >
                     撤回
@@ -225,32 +218,27 @@ const ConnectionsTab = () => {
         ) : (
           <div className="flex flex-col gap-2">
             {connections.map((conn) => {
-              const partner = conn.partner;
-              const name = partner?.name ?? "用戶";
-              const partnerId = partner?.identifier || partner?.id || conn.userAId;
+              const name = conn.nickname ?? "用戶";
               return (
-                <div key={conn.id} className="bg-white rounded-lg p-3 flex items-center gap-3">
+                <div key={conn.connectionId} className="bg-white rounded-lg p-3 flex items-center gap-3">
                   <Avatar className="size-10 shrink-0">
-                    <AvatarImage src={partner?.photoURL} alt={name} />
+                    <AvatarImage src={conn.photoUrl ?? undefined} alt={name} />
                     <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
                       {name.slice(0, 1)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <CustomLink
-                      href={`/users/${partner?.identifier ?? partnerId}`}
+                      href={`/users/${conn.externalId}`}
                       className="text-sm font-medium text-text-dark hover:underline"
                     >
                       {name}
                     </CustomLink>
-                    {partner?.bio && (
-                      <p className="text-xs text-[#9FB5B8] truncate">{partner.bio}</p>
-                    )}
                   </div>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDisconnect(partnerId, name)}
+                    onClick={() => handleDisconnect(conn.externalId, name)}
                     className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                   >
                     解除連結
