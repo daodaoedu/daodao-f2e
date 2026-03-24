@@ -107,43 +107,36 @@ export const ConnectionsSettings = () => {
           {/* 收到的 */}
           {incomingRequests.length > 0 && (
             <div className="flex flex-col gap-2">
-              {incomingRequests.map((req, index) => {
-                const reqAny = req as any;
-                const user = req.requester;
-                const name = reqAny.requesterNickname || user?.name || "用戶";
-                const userId = reqAny.requesterExternalId || user?.identifier || user?.id || req.requesterId;
-                const requestId = reqAny.requestId || req.id;
+              {incomingRequests.map((req) => {
+                const name = req.requesterNickname || "用戶";
                 return (
-                  <div key={requestId || `incoming-${index}`} className="bg-white rounded-lg p-3 flex flex-col gap-3">
+                  <div key={req.requestId} className="bg-white rounded-lg p-3 flex flex-col gap-3">
                     <div className="flex items-center gap-3">
-                      <CustomLink href={`/users/${userId}`} className="shrink-0">
+                      <CustomLink href={`/users/${req.requesterExternalId}`} className="shrink-0">
                         <Avatar className="size-10">
-                          <AvatarImage src={user?.photoURL} alt={name} />
+                          <AvatarImage src={req.requesterPhotoUrl ?? undefined} alt={name} />
                           <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
                             {name.slice(0, 1)}
                           </AvatarFallback>
                         </Avatar>
                       </CustomLink>
                       <div className="flex-1 min-w-0">
-                        <CustomLink href={`/users/${userId}`} className="text-sm font-medium text-text-dark hover:underline">
+                        <CustomLink href={`/users/${req.requesterExternalId}`} className="text-sm font-medium text-text-dark hover:underline">
                           {name}
                         </CustomLink>
-                        {user?.bio && (
-                          <p className="text-xs text-[#9FB5B8] truncate">{user.bio}</p>
-                        )}
                       </div>
                     </div>
 
-                    {reqAny.intent && (
+                    {req.intent && (
                       <p className="text-xs text-text-dark/70 bg-[#F7FAFA] rounded-lg px-3 py-2 leading-relaxed border border-[#E4EAE9]">
-                        「{reqAny.intent}」
+                        「{req.intent}」
                       </p>
                     )}
 
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        onClick={() => handleAccept(String(requestId), name)}
+                        onClick={() => handleAccept(String(req.requestId), name)}
                         className="flex-1 h-8 text-xs cursor-pointer bg-logo-cyan hover:bg-logo-cyan/90 text-white"
                       >
                         接受
@@ -151,7 +144,7 @@ export const ConnectionsSettings = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleIgnore(String(requestId), name)}
+                        onClick={() => handleIgnore(String(req.requestId), name)}
                         className="flex-1 h-8 text-xs cursor-pointer"
                       >
                         忽略
@@ -166,24 +159,20 @@ export const ConnectionsSettings = () => {
           {/* 發出的 */}
           {outgoingRequests.length > 0 && (
             <div className="flex flex-col gap-2">
-              {outgoingRequests.map((req, index) => {
-                const reqAny = req as any;
-                const user = req.receiver;
-                const name = reqAny.receiverNickname || user?.name || "用戶";
-                const userId = reqAny.receiverExternalId || user?.identifier || user?.id || req.receiverId;
-                const requestId = reqAny.requestId || req.id;
+              {outgoingRequests.map((req) => {
+                const name = req.receiverNickname || "用戶";
                 return (
-                  <div key={requestId || `outgoing-${index}`} className="bg-white rounded-lg p-3 flex items-center gap-3">
-                    <CustomLink href={`/users/${userId}`} className="shrink-0">
+                  <div key={req.requestId} className="bg-white rounded-lg p-3 flex items-center gap-3">
+                    <CustomLink href={`/users/${req.receiverExternalId}`} className="shrink-0">
                       <Avatar className="size-10">
-                        <AvatarImage src={user?.photoURL} alt={name} />
+                        <AvatarImage src={req.receiverPhotoUrl ?? undefined} alt={name} />
                         <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
                           {name.slice(0, 1)}
                         </AvatarFallback>
                       </Avatar>
                     </CustomLink>
                     <div className="flex-1 min-w-0">
-                      <CustomLink href={`/users/${userId}`} className="text-sm font-medium text-text-dark hover:underline">
+                      <CustomLink href={`/users/${req.receiverExternalId}`} className="text-sm font-medium text-text-dark hover:underline">
                         {name}
                       </CustomLink>
                       <p className="text-xs text-[#9FB5B8]">等待對方回應</p>
@@ -191,7 +180,7 @@ export const ConnectionsSettings = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleWithdraw(String(requestId), name)}
+                      onClick={() => handleWithdraw(String(req.requestId), name)}
                       className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                     >
                       撤回
@@ -215,33 +204,27 @@ export const ConnectionsSettings = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {connections.map((conn, index) => {
-              const connAny = conn as any;
-              const partner = conn.partner;
-              const name = connAny.nickname || partner?.name || "用戶";
-              const partnerId = connAny.externalId || partner?.identifier || partner?.id || conn.userAId;
+            {connections.map((conn) => {
+              const name = conn.nickname || "用戶";
               return (
-                <div key={connAny.connectionId || conn.id || partnerId || `conn-${index}`} className="bg-white rounded-lg p-3 flex items-center gap-3">
-                  <CustomLink href={`/users/${partnerId}`} className="shrink-0">
+                <div key={conn.connectionId} className="bg-white rounded-lg p-3 flex items-center gap-3">
+                  <CustomLink href={`/users/${conn.externalId}`} className="shrink-0">
                     <Avatar className="size-10">
-                      <AvatarImage src={partner?.photoURL} alt={name} />
+                      <AvatarImage src={conn.photoUrl ?? undefined} alt={name} />
                       <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
                         {name.slice(0, 1)}
                       </AvatarFallback>
                     </Avatar>
                   </CustomLink>
                   <div className="flex-1 min-w-0">
-                    <CustomLink href={`/users/${partnerId}`} className="text-sm font-medium text-text-dark hover:underline">
+                    <CustomLink href={`/users/${conn.externalId}`} className="text-sm font-medium text-text-dark hover:underline">
                       {name}
                     </CustomLink>
-                    {partner?.bio && (
-                      <p className="text-xs text-[#9FB5B8] truncate">{partner.bio}</p>
-                    )}
                   </div>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDisconnect(partnerId, name)}
+                    onClick={() => handleDisconnect(conn.externalId, name)}
                     className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                   >
                     解除連結

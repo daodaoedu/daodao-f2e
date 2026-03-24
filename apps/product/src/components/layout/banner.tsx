@@ -152,11 +152,11 @@ export function Banner() {
         <DesktopBannerSvg className="hidden md:block w-full" />
         <h2
           className={cn(
-            "absolute left-1/2 -translate-x-1/2 max-w-[540px] min-w-44 w-1/2",
+            "absolute left-1/2 -translate-x-1/2 max-w-[80%] md:max-w-[540px]",
             "flex items-center justify-center pointer-events-auto",
-            "bg-white/70 rounded-full text-text-dark border border-white",
-            "bottom-[70%] -translate-y-full h-7 text-sm",
-            "md:top-[42%] md:-translate-y-full md:h-10 md:text-[1.125rem]"
+            "bg-white/70 rounded-full text-text-dark border border-white px-4 py-1",
+            "bottom-[70%] -translate-y-full text-sm",
+            "md:top-[42%] md:-translate-y-full md:py-2 md:text-[1.125rem]"
           )}
         >
           {slogan}

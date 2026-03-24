@@ -6,48 +6,36 @@ import { unauthorizedHandler } from "../client";
 // (Follow/Connection API は types.ts 生成前のため手動定義)
 // ============================================================================
 
-export interface IConnectionUserProfile {
-  id: string;
-  name: string;
-  photoURL?: string;
-  bio?: string;
-  identifier?: string;
-}
-
 export interface IConnectionRequest {
-  id: string;
-  requesterId: string;
-  receiverId: string;
-  intent?: string;
-  status: "pending" | "accepted" | "rejected";
-  contextPracticeId?: string;
+  requestId: number;
+  requesterExternalId: string;
+  requesterNickname: string | null;
+  requesterPhotoUrl: string | null;
+  receiverExternalId: string;
+  receiverNickname: string | null;
+  receiverPhotoUrl: string | null;
+  intent: string | null;
+  interactionCount: number;
   createdAt: string;
-  updatedAt: string;
-  requester?: IConnectionUserProfile;
-  receiver?: IConnectionUserProfile;
 }
 
-export interface IConnection {
-  id: string;
-  userAId: string;
-  userBId: string;
+export interface IConnectionItem {
+  connectionId: number;
+  userId: number;
+  externalId: string;
+  nickname: string | null;
+  photoUrl: string | null;
   connectedAt: string;
-  partner?: IConnectionUserProfile;
 }
 
-export interface IPaginatedConnectionRequests {
-  data: IConnectionRequest[];
-  total: number;
-  page: number;
-  limit: number;
+export interface IApiResponse<T> {
+  success: boolean;
+  data: T;
+  timestamp: string;
 }
 
-export interface IPaginatedConnections {
-  data: IConnection[];
-  total: number;
-  page: number;
-  limit: number;
-}
+export type IPaginatedConnectionRequests = IApiResponse<IConnectionRequest[]>;
+export type IPaginatedConnections = IApiResponse<IConnectionItem[]>;
 
 export interface ISendConnectionRequestBody {
   receiverExternalId: string;

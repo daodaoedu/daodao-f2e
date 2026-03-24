@@ -97,6 +97,7 @@ const getSocialIcon = (platform: SocialPlatformType) => {
 
 interface UserInfoCardProps {
   name: string;
+  customId?: string;
   location?: string;
   selfIntroduction?: string;
   photoURL?: string;
@@ -117,6 +118,7 @@ interface UserInfoCardProps {
  */
 export function UserInfoCard({
   name,
+  customId,
   location,
   selfIntroduction,
   photoURL,
@@ -348,6 +350,9 @@ export function UserInfoCard({
         <div className="flex-1">
           <div className="mb-3">
             <h2 className="text-[22px] font-medium mb-1 text-bg-dark truncate">{name}</h2>
+            {customId && (
+              <p className="text-sm text-text-dark/60 mb-1">@{customId}</p>
+            )}
             {/* Headline (personalSlogan) - 未填寫時不顯示 */}
             {personalSlogan && (
               <p className="text-sm text-text-dark mb-1">{personalSlogan}</p>
