@@ -26,6 +26,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@/generated/design-tokens";
 import { getStatusConfig } from "@/constants/task-status";
 import {
+  PICKER_REACTIONS,
   REACTION_CONFIG,
   type ReactionTypeType,
 } from "@/constants/reaction-type";
@@ -170,8 +171,8 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
   // Browse activity emoji circles
   const browseDisplayReactions =
     reactors.length > 0
-      ? ([...new Set(reactors.map((r) => r.reactionType))].slice(0, 2) as ReactionTypeType[])
-      : displayReactions.slice(0, 2);
+      ? ([...new Set(reactors.map((r) => r.reactionType))].slice(0, PICKER_REACTIONS.length) as ReactionTypeType[])
+      : displayReactions.slice(0, PICKER_REACTIONS.length);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>

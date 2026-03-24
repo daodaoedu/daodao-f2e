@@ -64,3 +64,6 @@ export const REACTION_CONFIG: Record<ReactionTypeType, IReactionConfig> = {
 };
 
 export const REACTION_TYPE_LIST = Object.keys(REACTION_CONFIG) as ReactionTypeType[];
+
+/** Picker 可選的 reaction 子集（決定顯示上限） */
+export const PICKER_REACTIONS: ReactionTypeType[] = ["useful", "fire", "touched", "curious"];

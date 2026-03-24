@@ -38,7 +38,7 @@ import {
 } from "@/components/practice/shared/browse-activity-content";
 import type { DurationDays, ExecutionTiming, Frequency } from "@/constants/practice-form";
 import type { PracticeStatus } from "@/constants/practice-status";
-import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
+import { PICKER_REACTIONS, REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig, mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 
 interface IPracticeDetailResource {
@@ -563,7 +563,7 @@ export function PracticeDetailShell({
               // 從 reactions API 取出有人按的類型（所有人共享的 aggregate）
               const activeReactions = (reactionsData?.data?.reactions ?? [])
                 .filter((r) => r.count > 0)
-                .slice(0, 2);
+                .slice(0, PICKER_REACTIONS.length);
               const totalReactionCount = (reactionsData?.data?.reactions ?? []).reduce(
                 (sum, r) => sum + r.count,
                 0,
@@ -576,7 +576,7 @@ export function PracticeDetailShell({
                 followers.length > 0
                   ? ([...new Set(followers.map((f) => f.reaction))].slice(
                       0,
-                      2
+                      PICKER_REACTIONS.length
                     ) as ReactionTypeType[])
                   : activeReactions.map((r) => r.type as ReactionTypeType);
               const firstName = followers[0]?.name;
