@@ -8,9 +8,9 @@ import { cn } from "@daodao/ui/lib/utils";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef } from "react";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
-import { NotificationBell } from "@/components/notifications/notification-bell";
 
 gsap.registerPlugin(ScrollTrigger);
 

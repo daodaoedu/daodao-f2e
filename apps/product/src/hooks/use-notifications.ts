@@ -6,25 +6,24 @@
  */
 
 export {
-  useNotifications,
-  useNotificationPreferences,
-  getNotificationPreferences,
-  updateNotificationPreferences,
-  markNotificationRead,
-  markAllNotificationsRead,
   acceptBuddyRequest,
-  ignoreBuddyRequest,
-  type GetNotificationsResponse,
   type GetNotificationPreferencesResponse,
+  type GetNotificationsResponse,
+  getNotificationPreferences,
+  ignoreBuddyRequest,
+  markAllNotificationsRead,
+  markNotificationRead,
   type UpdateNotificationPreferencesRequest,
+  updateNotificationPreferences,
+  useNotificationPreferences,
+  useNotifications,
 } from "@daodao/api";
 
 import { respondConnectionRequest } from "@daodao/api";
 
-export { respondConnectionRequest } from "@daodao/api";
-
 // Re-export types used by notification-list / notification-item
 export type { IGetNotificationsParams } from "@daodao/api";
+export { respondConnectionRequest } from "@daodao/api";
 
 import { useNotifications } from "@daodao/api";
 

@@ -12,16 +12,11 @@ interface PracticeDetailTitleProps {
   hasNext: boolean;
 }
 
-export const PracticeDetailTitle = ({
-  title,
-  status,
-}: PracticeDetailTitleProps) => {
+export const PracticeDetailTitle = ({ title, status }: PracticeDetailTitleProps) => {
   const taskStatus = status ? mapPracticeStatusToTaskStatus(status) : undefined;
   const _statusInfo = taskStatus ? getStatusConfig(taskStatus) : undefined;
 
   return (
-    <h1 className="text-lg font-semibold text-text-dark text-left line-clamp-2 mb-6">
-      {title}
-    </h1>
+    <h1 className="text-lg font-semibold text-text-dark text-left line-clamp-2 mb-6">{title}</h1>
   );
 };

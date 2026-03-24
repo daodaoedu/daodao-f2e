@@ -208,9 +208,7 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
           </div>
         )}
         <div className="absolute left-1/2 top-[92px] md:top-[127px] -translate-x-1/2 w-[149px] h-[140px] md:w-[168px] md:h-[158px]">
-          {lottieJson && (
-            <Lottie animationData={lottieJson} className="*:w-full *:h-full" />
-          )}
+          {lottieJson && <Lottie animationData={lottieJson} className="*:w-full *:h-full" />}
           {isOwnProfile && (
             <>
               <div

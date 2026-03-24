@@ -1,22 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "@daodao/ui/components/sonner";
 import { Button } from "@daodao/ui/components/button";
-import { NotificationItem } from "./notification-item";
-import type { INotificationData } from "./notification-item";
-import { NotificationType } from "@/constants/notification-type";
+import { toast } from "@daodao/ui/components/sonner";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { mutate as globalMutate } from "swr";
+import { NotificationType } from "@/constants/notification-type";
+import type { NotificationApiItem } from "@/hooks/use-notifications";
 import {
-  useNotifications,
-  markNotificationRead,
-  markAllNotificationsRead,
   acceptConnectionRequest,
   ignoreConnectionRequest,
+  markAllNotificationsRead,
+  markNotificationRead,
+  useNotifications,
 } from "@/hooks/use-notifications";
-import type { NotificationApiItem } from "@/hooks/use-notifications";
 import { formatRelativeTime } from "@/utils/format-time";
+import type { INotificationData } from "./notification-item";
+import { NotificationItem } from "./notification-item";
 
 // ============================================================================
 // Helpers
@@ -48,7 +48,8 @@ function apiItemToDisplay(item: NotificationApiItem): INotificationData {
     content: item.content,
     connectMessage: item.connectMessage,
     aggregationCount: item.aggregationCount,
-    connectionRequestId: item.connectionRequestId != null ? String(item.connectionRequestId) : undefined,
+    connectionRequestId:
+      item.connectionRequestId != null ? String(item.connectionRequestId) : undefined,
     buddyRequestId: item.buddyRequestId,
     time: formatRelativeTime(item.createdAt),
     isRead: item.isRead,
@@ -128,7 +129,9 @@ const revalidateAllNotifications = () =>
 export function NotificationList() {
   const router = useRouter();
   const { data, isLoading } = useNotifications();
-  const [localOverrides, setLocalOverrides] = useState<Record<string, Partial<INotificationData>>>({});
+  const [localOverrides, setLocalOverrides] = useState<Record<string, Partial<INotificationData>>>(
+    {}
+  );
 
   const rawItems = data?.data?.notifications ?? [];
   const apiItems = rawItems as unknown as NotificationApiItem[];

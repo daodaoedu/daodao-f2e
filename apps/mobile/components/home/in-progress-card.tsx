@@ -1,10 +1,14 @@
-import { ArrowRight, MessageSquare, PenLine } from "@tamagui/lucide-icons";
+import { ArrowRight, PenLine } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, View as RNView } from "react-native";
-import { Button, Text, View, XStack, YStack } from "tamagui";
-import { colors } from "@/generated/design-tokens";
+import { Pressable, View as RNView, StyleSheet } from "react-native";
+import { Text, View, XStack, YStack } from "tamagui";
+import {
+  getThemeNameFromColor,
+  PracticeTheme,
+  practiceThemeColorMap,
+} from "@/constants/practice-theme";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
-import { getThemeNameFromColor, practiceThemeColorMap, PracticeTheme } from "@/constants/practice-theme";
+import { colors } from "@/generated/design-tokens";
 import type { IInProgressTask } from "@/hooks/usePractices";
 
 interface InProgressCardProps {
@@ -13,41 +17,47 @@ interface InProgressCardProps {
 
 export function InProgressCard({ task }: InProgressCardProps) {
   const router = useRouter();
-  const { id, label, title, description, checkInCount, progress, messagesCount, isUnreadMessages, theme, status, lastCheckInDate, startDate, endDate } = task;
+  const { id, label, title, description, checkInCount, progress, theme, status } = task;
 
   const themeName = getThemeNameFromColor(theme);
-  const themeColor = practiceThemeColorMap[themeName] ?? practiceThemeColorMap[PracticeTheme.yellow];
+  const themeColor =
+    practiceThemeColorMap[themeName] ?? practiceThemeColorMap[PracticeTheme.yellow];
   const statusInfo = getStatusConfig(status);
   const isDraft = status === TaskStatus.draft;
 
   const handleCheckIn = () => {
-    router.push(`/practices/${id}` as any);
+    router.push(`/practices/${id}` as `/practices/${string}`);
   };
 
   const handleEdit = () => {
-    router.push(`/practices/${id}/edit` as any);
+    router.push(`/practices/${id}/edit` as `/practices/${string}/edit`);
   };
 
   return (
     <Pressable
       style={[styles.card, { backgroundColor: themeColor }]}
-      onPress={() => router.push(`/practices/${id}` as any)}
+      onPress={() => router.push(`/practices/${id}` as `/practices/${string}`)}
     >
       <YStack flex={1} padding="$4" paddingBottom="$5" gap="$4">
         <YStack flex={1} gap="$2">
           {/* Badges */}
           <XStack justifyContent="space-between" gap="$2">
             <View style={styles.badgeSecondary}>
-              <Text fontSize={12} color={colors.text.dark}>{label}</Text>
+              <Text fontSize={12} color={colors.text.dark}>
+                {label}
+              </Text>
             </View>
             {statusInfo && (
-              <View style={[
-                styles.badge,
-                status === TaskStatus.inProgress
-                  ? styles.badgeActive
-                  : styles.badgeDefault,
-              ]}>
-                <Text fontSize={12} color={status === TaskStatus.inProgress ? "white" : colors.text.dark}>
+              <View
+                style={[
+                  styles.badge,
+                  status === TaskStatus.inProgress ? styles.badgeActive : styles.badgeDefault,
+                ]}
+              >
+                <Text
+                  fontSize={12}
+                  color={status === TaskStatus.inProgress ? "white" : colors.text.dark}
+                >
                   {statusInfo.label}
                 </Text>
               </View>
@@ -75,9 +85,15 @@ export function InProgressCard({ task }: InProgressCardProps) {
         {/* Check-in count + messages (hidden) */}
         <XStack alignItems="center" justifyContent="space-between">
           <XStack alignItems="center" gap="$1">
-            <Text fontSize={12} color={colors.text.dark}>已打卡</Text>
-            <Text fontSize={12} fontWeight="600" color={colors.text.dark}>{checkInCount}</Text>
-            <Text fontSize={12} color={colors.text.dark}>次</Text>
+            <Text fontSize={12} color={colors.text.dark}>
+              已打卡
+            </Text>
+            <Text fontSize={12} fontWeight="600" color={colors.text.dark}>
+              {checkInCount}
+            </Text>
+            <Text fontSize={12} color={colors.text.dark}>
+              次
+            </Text>
           </XStack>
           {/* TODO: MVP 先不開放 — aligned with product */}
           {/* <XStack alignItems="center" gap="$1">
@@ -97,7 +113,9 @@ export function InProgressCard({ task }: InProgressCardProps) {
           {isDraft ? (
             <XStack alignItems="center" justifyContent="center" gap="$2">
               <PenLine size={18} color="#16B9B3" />
-              <Text fontSize={14} fontWeight="600" color={colors.text.dark}>繼續編輯</Text>
+              <Text fontSize={14} fontWeight="600" color={colors.text.dark}>
+                繼續編輯
+              </Text>
             </XStack>
           ) : (
             <Text fontSize={14} fontWeight="600" color={colors.text.dark} textAlign="center">

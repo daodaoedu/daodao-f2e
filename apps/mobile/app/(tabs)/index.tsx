@@ -1,29 +1,33 @@
-import { useCallback, useMemo, useState } from "react";
-import { FlatList, RefreshControl, StyleSheet, View as RNView } from "react-native";
 import { CheckCircle2, MessageSquare } from "@tamagui/lucide-icons";
-import { Text, YStack, ScrollView } from "tamagui";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { colors } from "@/generated/design-tokens";
-import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
-import { usePractices } from "@/hooks/usePractices";
-import { useShowcaseFeed, type IShowcaseFeedParams, type IShowcasePractice } from "@/hooks/useShowcaseFeed";
+import { useCallback, useMemo, useState } from "react";
+import { FlatList, RefreshControl, View as RNView, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView, Text, YStack } from "tamagui";
 import {
-  TabSwitcher,
-  type TabType,
-  ShowcaseSearchBar,
-  type IShowcaseFilterState,
-  ShowcaseCard,
   BrewingCard,
+  CompletedCard,
   DashboardHeader,
   FilterPills,
   InProgressCard,
-  CompletedCard,
+  type IShowcaseFilterState,
+  ShowcaseCard,
+  ShowcaseSearchBar,
+  TabSwitcher,
+  type TabType,
 } from "@/components/home";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
+import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
+import { colors } from "@/generated/design-tokens";
+import { usePractices } from "@/hooks/usePractices";
+import {
+  type IShowcaseFeedParams,
+  type IShowcasePractice,
+  useShowcaseFeed,
+} from "@/hooks/useShowcaseFeed";
 
 export default function HomeScreen() {
-  const router = useRouter();
+  const _router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>("inspire");
 
   // ── Inspire tab state ──
@@ -58,7 +62,7 @@ export default function HomeScreen() {
     setKeyword(value);
   }, []);
 
-  const handleFiltersChange = useCallback((newFilters: IShowcaseFilterState) => {
+  const _handleFiltersChange = useCallback((newFilters: IShowcaseFilterState) => {
     setFilters(newFilters);
   }, []);
 
@@ -80,7 +84,8 @@ export default function HomeScreen() {
 
   const hasPractices = inProgressTasks.length > 0 || completedTasks.length > 0;
   const showInProgress = filterStatus !== FilterStatus.completed;
-  const showCompleted = filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
+  const showCompleted =
+    filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
 
   const dashboardStats = useMemo(
     () => [
@@ -88,13 +93,25 @@ export default function HomeScreen() {
         label: "連續登入",
         value: String(stats.currentStreak || 0),
         unit: "天",
-        icon: <CheckCircle2 size={48} color={colors.text.dark} style={{ transform: [{ rotate: "-12deg" }] }} />,
+        icon: (
+          <CheckCircle2
+            size={48}
+            color={colors.text.dark}
+            style={{ transform: [{ rotate: "-12deg" }] }}
+          />
+        ),
       },
       {
         label: "獲得迴響",
         value: String(stats.totalCheckIns || 0),
         unit: "次",
-        icon: <MessageSquare size={48} color={colors.text.dark} style={{ transform: [{ rotate: "-12deg" }] }} />,
+        icon: (
+          <MessageSquare
+            size={48}
+            color={colors.text.dark}
+            style={{ transform: [{ rotate: "-12deg" }] }}
+          />
+        ),
       },
     ],
     [stats]
@@ -103,11 +120,7 @@ export default function HomeScreen() {
   // ── Inspire tab render ──
   const renderShowcaseItem = useCallback(
     ({ item }: { item: IShowcasePractice }) =>
-      item.is_brewing ? (
-        <BrewingCard practice={item} />
-      ) : (
-        <ShowcaseCard practice={item} />
-      ),
+      item.is_brewing ? <BrewingCard practice={item} /> : <ShowcaseCard practice={item} />,
     []
   );
 
@@ -142,7 +155,9 @@ export default function HomeScreen() {
     () =>
       !isShowcaseLoading ? (
         <YStack alignItems="center" paddingVertical="$8">
-          <Text color="rgba(0,0,0,0.5)" fontSize={14}>沒有找到相關實踐</Text>
+          <Text color="rgba(0,0,0,0.5)" fontSize={14}>
+            沒有找到相關實踐
+          </Text>
         </YStack>
       ) : null,
     [isShowcaseLoading]
@@ -184,7 +199,9 @@ export default function HomeScreen() {
             {/* Completed cards — vertical list */}
             {showCompleted && completedTasks.length > 0 && (
               <YStack gap="$3" marginBottom="$4">
-                <Text fontSize={18} fontWeight="500" color={colors.text.dark}>已完成</Text>
+                <Text fontSize={18} fontWeight="500" color={colors.text.dark}>
+                  已完成
+                </Text>
                 {completedTasks.map((task) => (
                   <CompletedCard key={task.id} task={task} />
                 ))}
@@ -195,8 +212,14 @@ export default function HomeScreen() {
       </YStack>
     );
   }, [
-    isMyLoading, dashboardStats, hasPractices, filterStatus,
-    showInProgress, filteredInProgressTasks, showCompleted, completedTasks,
+    isMyLoading,
+    dashboardStats,
+    hasPractices,
+    filterStatus,
+    showInProgress,
+    filteredInProgressTasks,
+    showCompleted,
+    completedTasks,
   ]);
 
   // ── Main render ──

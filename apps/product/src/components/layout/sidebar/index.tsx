@@ -1,7 +1,7 @@
 "use client";
 
-import { useAuthContext } from "@daodao/auth";
 import { useCurrentUser } from "@daodao/api";
+import { useAuthContext } from "@daodao/auth";
 import { useIsMobile } from "@daodao/shared";
 import { DesktopSidebar } from "./desktop";
 import { MobileSidebar } from "./mobile";

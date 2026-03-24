@@ -1,9 +1,19 @@
 "use client";
 
-import { ArrowRightOutlineSvg, TelescopeSvg } from "@daodao/assets";
 import { useSettingsCompletion } from "@daodao/api";
+import { ArrowRightOutlineSvg, TelescopeSvg } from "@daodao/assets";
 import { CustomLink } from "@daodao/ui/components/custom-link";
-import { AlertCircle, Archive, Bell, HeartHandshake, LibraryBig, LogOut, MessagesSquare, Settings, SquareUser } from "lucide-react";
+import {
+  AlertCircle,
+  Archive,
+  Bell,
+  HeartHandshake,
+  LibraryBig,
+  LogOut,
+  MessagesSquare,
+  Settings,
+  SquareUser,
+} from "lucide-react";
 import { useLogoutDialog } from "@/hooks/use-logout-dialog";
 
 type SettingsItem = {
@@ -71,13 +81,7 @@ const settingsItems: SettingsItem[] = [
   },
 ];
 
-function SettingsItemLink({
-  item,
-  isIncomplete,
-}: {
-  item: SettingsItem;
-  isIncomplete?: boolean;
-}) {
+function SettingsItemLink({ item, isIncomplete }: { item: SettingsItem; isIncomplete?: boolean }) {
   const Icon = item.icon;
   return (
     <CustomLink
@@ -87,9 +91,7 @@ function SettingsItemLink({
     >
       <Icon className="size-4.5 text-light-gray shrink-0" />
       <span className="flex-1 text-base text-text-dark">{item.label}</span>
-      {isIncomplete && (
-        <AlertCircle className="size-4 text-orange shrink-0" />
-      )}
+      {isIncomplete && <AlertCircle className="size-4 text-orange shrink-0" />}
       <ArrowRightOutlineSvg className="size-4.5 text-bg-dark shrink-0" />
     </CustomLink>
   );
@@ -113,7 +115,9 @@ export const SettingsList = () => {
       {data && (
         <div className="flex items-center gap-2 px-3 py-2 rounded bg-white">
           <span className="text-sm text-text-gray">個人設定完整度</span>
-          <span className="ml-auto text-sm font-medium text-text-dark">{data.completed}/{data.total}</span>
+          <span className="ml-auto text-sm font-medium text-text-dark">
+            {data.completed}/{data.total}
+          </span>
         </div>
       )}
       <ul className="flex flex-col gap-2">

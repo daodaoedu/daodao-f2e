@@ -35,8 +35,12 @@ export function LottieEmoji({ url, fallback, size = 28, play = false }: LottieEm
         cache.set(url, data);
         if (!cancelled) setAnimationData(data);
       })
-      .catch(() => {/* 靜默失敗，顯示 fallback */});
-    return () => { cancelled = true; };
+      .catch(() => {
+        /* 靜默失敗，顯示 fallback */
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [url]);
 
   if (!animationData) {

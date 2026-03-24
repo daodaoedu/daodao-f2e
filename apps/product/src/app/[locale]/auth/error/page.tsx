@@ -8,11 +8,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 
-type OAuthErrorReason =
-  | "state_expired"
-  | "invalid_state"
-  | "invalid_redirect_uri"
-  | "server_error";
+type OAuthErrorReason = "state_expired" | "invalid_state" | "invalid_redirect_uri" | "server_error";
 
 /**
  * OAuth 登入錯誤頁面
@@ -75,11 +71,7 @@ export default function AuthErrorPage() {
 
           <div className="flex flex-col gap-3 w-full mt-8">
             {canRetry && (
-              <Button
-                variant="orange"
-                className="w-full"
-                onClick={() => openLoginDialog()}
-              >
+              <Button variant="orange" className="w-full" onClick={() => openLoginDialog()}>
                 {t("actions.retry")}
               </Button>
             )}

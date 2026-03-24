@@ -25,9 +25,7 @@ export function ViewAllCommentsButton({
       )}
     >
       全部留言
-      {commentCount != null && commentCount > 0 && (
-        <span>({commentCount})</span>
-      )}
+      {commentCount != null && commentCount > 0 && <span>({commentCount})</span>}
     </button>
   );
 }

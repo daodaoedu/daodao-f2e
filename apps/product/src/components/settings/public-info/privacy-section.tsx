@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  FormControl,
-  FormField,
-  FormItem,
-} from "@daodao/ui/components/form";
+import { FormControl, FormField, FormItem } from "@daodao/ui/components/form";
 import { cn } from "@daodao/ui/lib/utils";
 import type { UseFormReturn } from "react-hook-form";
 import type { PublicInfoFormValues } from "./schema";
@@ -61,10 +57,7 @@ export const PrivacySection = ({ form }: IPrivacySectionProps) => {
                 </p>
               </div>
               <FormControl>
-                <Toggle
-                  checked={field.value ?? false}
-                  onCheckedChange={field.onChange}
-                />
+                <Toggle checked={field.value ?? false} onCheckedChange={field.onChange} />
               </FormControl>
             </div>
           </FormItem>

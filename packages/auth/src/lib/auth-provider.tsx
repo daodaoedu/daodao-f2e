@@ -625,10 +625,7 @@ export const AuthProvider = ({
     (permission: string) => permissions.includes(permission),
     [permissions]
   );
-  const isAdmin = useMemo(
-    () => roles.some((r) => r.toLowerCase().includes("admin")),
-    [roles]
-  );
+  const isAdmin = useMemo(() => roles.some((r) => r.toLowerCase().includes("admin")), [roles]);
 
   const value: AuthContextValue = useMemo(
     () => ({

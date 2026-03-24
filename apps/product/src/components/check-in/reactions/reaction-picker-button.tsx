@@ -3,7 +3,11 @@
 import { LikeOutlineSvg } from "@daodao/assets";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import { PICKER_REACTIONS, REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
+import {
+  PICKER_REACTIONS,
+  REACTION_CONFIG,
+  type ReactionTypeType,
+} from "@/constants/reaction-type";
 import { LottieEmoji } from "./lottie-emoji";
 
 // ============================================================================
@@ -60,7 +64,7 @@ function ReactionEmojiStack({
           className={cn(
             circleClassName,
             selectedReactions.includes(type) ? selectedCircleClassName : unselectedCircleClassName,
-            i > 0 && overlapClassName,
+            i > 0 && overlapClassName
           )}
         >
           <LottieEmoji
@@ -181,13 +185,21 @@ export function ReactionPickerButton({
                       </div>
                       <button
                         type="button"
-                        onClick={() => { onToggle(type); setOpen(false); }}
+                        onClick={() => {
+                          onToggle(type);
+                          setOpen(false);
+                        }}
                         className={cn(
                           "size-9 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer",
                           isSelected ? "bg-[#E8FAF9]" : "hover:bg-[#F0F9F8]"
                         )}
                       >
-                        <LottieEmoji url={config.lottieUrl} fallback={config.emoji} size={24} play={true} />
+                        <LottieEmoji
+                          url={config.lottieUrl}
+                          fallback={config.emoji}
+                          size={24}
+                          play={true}
+                        />
                       </button>
                     </div>
                   );
@@ -206,7 +218,11 @@ export function ReactionPickerButton({
             {/* Emoji 圓圈 */}
             {(displayReactions && displayReactions.length > 0) || hasSelection ? (
               <ReactionEmojiStack
-                reactions={displayReactions && displayReactions.length > 0 ? displayReactions : selectedReactions}
+                reactions={
+                  displayReactions && displayReactions.length > 0
+                    ? displayReactions
+                    : selectedReactions
+                }
                 selectedReactions={selectedReactions}
                 size={18}
                 circleClassName="size-7 rounded-full flex items-center justify-center ring-2 ring-white"
@@ -238,39 +254,39 @@ export function ReactionPickerButton({
             isCard ? "left-1/2 -translate-x-1/2" : "left-0"
           )}
         >
-        <div className="flex gap-1 bg-white rounded-full shadow-lg border border-[#E4EAE9] px-2 py-1.5">
-          {PICKER_REACTIONS.map((type) => {
-            const config = REACTION_CONFIG[type];
-            const isSelected = selectedReactions.includes(type);
-            return (
-              <div key={type} className="group/emoji relative flex flex-col items-center">
-                {/* Tooltip — desktop hover only */}
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 bg-[#295E5C] text-white text-xs rounded-full whitespace-nowrap opacity-0 group-hover/emoji:opacity-100 transition-opacity pointer-events-none">
-                  {config.label}
+          <div className="flex gap-1 bg-white rounded-full shadow-lg border border-[#E4EAE9] px-2 py-1.5">
+            {PICKER_REACTIONS.map((type) => {
+              const config = REACTION_CONFIG[type];
+              const isSelected = selectedReactions.includes(type);
+              return (
+                <div key={type} className="group/emoji relative flex flex-col items-center">
+                  {/* Tooltip — desktop hover only */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 bg-[#295E5C] text-white text-xs rounded-full whitespace-nowrap opacity-0 group-hover/emoji:opacity-100 transition-opacity pointer-events-none">
+                    {config.label}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onToggle(type);
+                      setOpen(false);
+                    }}
+                    className={cn(
+                      "rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer",
+                      pickerButtonSize,
+                      isSelected ? "bg-[#E8FAF9]" : "hover:bg-[#F0F9F8]"
+                    )}
+                  >
+                    <LottieEmoji
+                      url={config.lottieUrl}
+                      fallback={config.emoji}
+                      size={emojiSize}
+                      play={true}
+                    />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onToggle(type);
-                    setOpen(false);
-                  }}
-                  className={cn(
-                    "rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer",
-                    pickerButtonSize,
-                    isSelected ? "bg-[#E8FAF9]" : "hover:bg-[#F0F9F8]"
-                  )}
-                >
-                  <LottieEmoji
-                    url={config.lottieUrl}
-                    fallback={config.emoji}
-                    size={emojiSize}
-                    play={true}
-                  />
-                </button>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -298,7 +314,11 @@ export function ReactionPickerButton({
             <>
               {(displayReactions && displayReactions.length > 0) || hasSelection ? (
                 <ReactionEmojiStack
-                  reactions={displayReactions && displayReactions.length > 0 ? displayReactions : selectedReactions}
+                  reactions={
+                    displayReactions && displayReactions.length > 0
+                      ? displayReactions
+                      : selectedReactions
+                  }
                   selectedReactions={selectedReactions}
                   size={22}
                   circleClassName="size-[22px]"

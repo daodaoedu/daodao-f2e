@@ -177,7 +177,9 @@ export const getUserProfileByIdentifier = async (
     }
   );
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ error: { message: "Failed to fetch user profile" } }));
+    const errorData = await response
+      .json()
+      .catch(() => ({ error: { message: "Failed to fetch user profile" } }));
     throw new Error(errorData?.error?.message ?? "Failed to fetch user profile");
   }
   return response.json();
@@ -492,11 +494,11 @@ export interface SettingsSummary {
 export const getSettingsSummary = async (): Promise<SettingsSummary> => {
   const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
   const response = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/users/settings-summary`, {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
   });
   if (!response.ok) {
-    throw new Error('Failed to fetch settings summary');
+    throw new Error("Failed to fetch settings summary");
   }
   const data = await response.json();
   return data.data as SettingsSummary;

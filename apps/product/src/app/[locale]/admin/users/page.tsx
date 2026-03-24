@@ -227,7 +227,14 @@ function RegistrationsSection() {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData} margin={{ left: -10, right: 10 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" fontSize={11} tick={{ fontSize: 11 }} angle={-30} textAnchor="end" height={50} />
+              <XAxis
+                dataKey="name"
+                fontSize={11}
+                tick={{ fontSize: 11 }}
+                angle={-30}
+                textAnchor="end"
+                height={50}
+              />
               <YAxis fontSize={12} width={40} />
               <Tooltip />
               <Bar dataKey="count" fill="#16B9B3" radius={[4, 4, 0, 0]} name="註冊數" />
@@ -245,7 +252,9 @@ function RegistrationsSection() {
 
 function RecentActiveSection() {
   const [page, setPage] = useState(0);
-  const [sortBy, setSortBy] = useState<"lastLoginAt" | "createdAt" | "name" | "email">("lastLoginAt");
+  const [sortBy, setSortBy] = useState<"lastLoginAt" | "createdAt" | "name" | "email">(
+    "lastLoginAt"
+  );
   const limit = 20;
 
   const { data, isLoading } = useAdminUsers({
@@ -311,7 +320,10 @@ function RecentActiveSection() {
           排序依據
           <select
             value={sortBy}
-            onChange={(e) => { setSortBy(e.target.value as typeof sortBy); setPage(0); }}
+            onChange={(e) => {
+              setSortBy(e.target.value as typeof sortBy);
+              setPage(0);
+            }}
             className="rounded-lg border border-border px-3 py-1.5 text-sm text-text-dark"
           >
             <option value="lastLoginAt">上次登入</option>
@@ -396,12 +408,16 @@ function RecentActiveSection() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-basic-400">
-                    <span title={user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : ""}>
+                    <span
+                      title={user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : ""}
+                    >
                       {formatRelativeTime(user.lastLoginAt)}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-basic-400">
-                    <span title={user.lastActiveAt ? new Date(user.lastActiveAt).toLocaleString() : ""}>
+                    <span
+                      title={user.lastActiveAt ? new Date(user.lastActiveAt).toLocaleString() : ""}
+                    >
                       {formatRelativeTime(user.lastActiveAt)}
                     </span>
                   </td>

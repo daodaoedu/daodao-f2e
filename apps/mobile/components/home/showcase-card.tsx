@@ -1,15 +1,15 @@
 import { MessageCircle, MoreHorizontal } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
+import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
 import { Image, Pressable, StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
-import { colors } from "@/generated/design-tokens";
-import { getStatusConfig } from "@/constants/task-status";
-import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
-import { upsertReaction, removeReaction } from "@/hooks/useReactions";
 import type { ReactionTypeType } from "@/constants/reaction-type";
-import type { ReactNode } from "react";
+import { getStatusConfig } from "@/constants/task-status";
+import { colors } from "@/generated/design-tokens";
+import { removeReaction, upsertReaction } from "@/hooks/useReactions";
+import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
 
 interface ShowcaseCardProps {
   practice: IShowcasePractice;
@@ -25,9 +25,17 @@ function formatDate(dateStr?: string | null): string | null {
 export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
   const router = useRouter();
   const {
-    id, title, status, start_date, end_date, user,
-    practice_action, frequency_min_days, frequency_max_days,
-    session_duration_minutes, comment_count = 0,
+    id,
+    title,
+    status,
+    start_date,
+    end_date,
+    user,
+    practice_action,
+    frequency_min_days,
+    frequency_max_days,
+    session_duration_minutes,
+    comment_count = 0,
   } = practice;
 
   const { reactions = [] } = practice;
@@ -64,16 +72,25 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
   return (
     <Pressable
       style={styles.card}
-      onPress={() => router.push({
-        pathname: `/practices/${id}`,
-        params: { showcaseData: JSON.stringify(practice) },
-      } as any)}
+      onPress={() =>
+        router.push({
+          pathname: `/practices/${id}` as `/practices/${string}`,
+          params: { showcaseData: JSON.stringify(practice) },
+        })
+      }
     >
       {/* Header row */}
       <XStack alignItems="center" gap="$2" marginBottom="$2">
         {statusInfo && (
-          <View style={[styles.badge, { backgroundColor: taskStatus === "completed" ? "#6B7280" : colors.primary.base }]}>
-            <Text fontSize={12} color="white">{statusInfo.label}</Text>
+          <View
+            style={[
+              styles.badge,
+              { backgroundColor: taskStatus === "completed" ? "#6B7280" : colors.primary.base },
+            ]}
+          >
+            <Text fontSize={12} color="white">
+              {statusInfo.label}
+            </Text>
           </View>
         )}
         {startFmt && endFmt && (
@@ -87,7 +104,13 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
       </XStack>
 
       {/* Title */}
-      <Text fontSize={16} fontWeight="600" color={colors.text.dark} marginBottom="$2" numberOfLines={2}>
+      <Text
+        fontSize={16}
+        fontWeight="600"
+        color={colors.text.dark}
+        marginBottom="$2"
+        numberOfLines={2}
+      >
         {title}
       </Text>
 
@@ -99,7 +122,9 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
               {user.photo_url ? (
                 <Image source={{ uri: user.photo_url }} style={styles.avatarImage} />
               ) : (
-                <Text fontSize={20} color="#9CA3AF">{(user.name ?? "?")[0]}</Text>
+                <Text fontSize={20} color="#9CA3AF">
+                  {(user.name ?? "?")[0]}
+                </Text>
               )}
             </View>
           )}
@@ -117,13 +142,19 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
                       ? frequency_min_days
                       : `${frequency_min_days}-${frequency_max_days}`}
                   </Text>
-                  <Text fontSize={14} color="rgba(0,0,0,0.6)" marginLeft={2}>天/週</Text>
+                  <Text fontSize={14} color="rgba(0,0,0,0.6)" marginLeft={2}>
+                    天/週
+                  </Text>
                 </XStack>
               )}
               {session_duration_minutes && (
                 <XStack alignItems="center">
-                  <Text fontSize={14} fontWeight="600" color="#16B9B3">{session_duration_minutes}</Text>
-                  <Text fontSize={14} color="rgba(0,0,0,0.6)" marginLeft={2}>分鐘/次</Text>
+                  <Text fontSize={14} fontWeight="600" color="#16B9B3">
+                    {session_duration_minutes}
+                  </Text>
+                  <Text fontSize={14} color="rgba(0,0,0,0.6)" marginLeft={2}>
+                    分鐘/次
+                  </Text>
                 </XStack>
               )}
             </XStack>
@@ -146,7 +177,9 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
         <XStack alignItems="center" gap="$1.5">
           <MessageCircle size={20} color="#9FB5B8" />
           {comment_count > 0 && (
-            <Text fontSize={14} fontWeight="500" color="#9FB5B8">{comment_count}</Text>
+            <Text fontSize={14} fontWeight="500" color="#9FB5B8">
+              {comment_count}
+            </Text>
           )}
         </XStack>
       </View>

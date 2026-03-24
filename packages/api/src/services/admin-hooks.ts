@@ -182,10 +182,7 @@ export const useUserRole = (userId: string) => {
 // Practices Stats Hooks
 // ============================================================================
 
-export const useAdminPracticesStats = (params?: {
-  startDate?: string;
-  endDate?: string;
-}) => {
+export const useAdminPracticesStats = (params?: { startDate?: string; endDate?: string }) => {
   return useQuery("/api/v1/admin/practices/stats", {
     params: { query: { startDate: params?.startDate, endDate: params?.endDate } },
   });

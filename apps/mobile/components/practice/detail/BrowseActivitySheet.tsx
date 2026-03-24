@@ -47,16 +47,26 @@ export function BrowseActivitySheet({
       >
         <Sheet.Handle backgroundColor="$borderColor" />
 
-        <Text fontSize={18} fontWeight="600" marginBottom="$4">瀏覽活動</Text>
+        <Text fontSize={18} fontWeight="600" marginBottom="$4">
+          瀏覽活動
+        </Text>
 
         <XStack gap="$6" marginBottom="$4">
           <YStack>
-            <Text fontSize={12} color="rgba(0,0,0,0.5)">留言數</Text>
-            <Text fontSize={20} fontWeight="600">{commentCount}</Text>
+            <Text fontSize={12} color="rgba(0,0,0,0.5)">
+              留言數
+            </Text>
+            <Text fontSize={20} fontWeight="600">
+              {commentCount}
+            </Text>
           </YStack>
           <YStack>
-            <Text fontSize={12} color="rgba(0,0,0,0.5)">反應數</Text>
-            <Text fontSize={20} fontWeight="600">{reactors.length}</Text>
+            <Text fontSize={12} color="rgba(0,0,0,0.5)">
+              反應數
+            </Text>
+            <Text fontSize={20} fontWeight="600">
+              {reactors.length}
+            </Text>
           </YStack>
         </XStack>
 
@@ -64,7 +74,11 @@ export function BrowseActivitySheet({
           {reactors.map((reactor) => {
             const config = REACTION_CONFIG[reactor.reactionType as keyof typeof REACTION_CONFIG];
             return (
-              <XStack key={`${reactor.userId}-${reactor.reactionType}`} alignItems="center" gap="$3">
+              <XStack
+                key={`${reactor.userId}-${reactor.reactionType}`}
+                alignItems="center"
+                gap="$3"
+              >
                 <View style={styles.avatar}>
                   {reactor.photoURL ? (
                     <Image source={{ uri: reactor.photoURL }} style={styles.avatarImage} />
@@ -74,9 +88,13 @@ export function BrowseActivitySheet({
                     </Text>
                   )}
                 </View>
-                <Text fontSize={14} color="#1a1a1a" flex={1}>{reactor.name}</Text>
+                <Text fontSize={14} color="#1a1a1a" flex={1}>
+                  {reactor.name}
+                </Text>
                 <Text fontSize={16}>{config?.emoji ?? "👍"}</Text>
-                <Text fontSize={12} color="#9FB5B8">{formatRelativeTime(reactor.reactedAt)}</Text>
+                <Text fontSize={12} color="#9FB5B8">
+                  {formatRelativeTime(reactor.reactedAt)}
+                </Text>
               </XStack>
             );
           })}

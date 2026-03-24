@@ -8,9 +8,9 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { useState } from "react";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
-import { NotificationBell } from "@/components/notifications/notification-bell";
 
 export const DesktopSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();

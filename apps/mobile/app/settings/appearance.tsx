@@ -8,7 +8,12 @@ import { colors } from "@/generated/design-tokens";
 
 type ThemeModeType = "light" | "dark" | "system";
 
-const themeOptions: { value: ThemeModeType; label: string; icon: typeof Sun; description: string }[] = [
+const themeOptions: {
+  value: ThemeModeType;
+  label: string;
+  icon: typeof Sun;
+  description: string;
+}[] = [
   {
     value: "light",
     label: "淺色模式",

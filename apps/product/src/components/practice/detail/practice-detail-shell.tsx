@@ -1,7 +1,14 @@
 "use client";
 
 import type { ReactionTypeValue } from "@daodao/api";
-import { followTarget, removeReaction, unfollowTarget, upsertReaction, useExtractOgImage, useReactions } from "@daodao/api";
+import {
+  followTarget,
+  removeReaction,
+  unfollowTarget,
+  upsertReaction,
+  useExtractOgImage,
+  useReactions,
+} from "@daodao/api";
 import {
   BookSvg,
   ChartColumnIncreasingSvg,
@@ -38,7 +45,11 @@ import {
 } from "@/components/practice/shared/browse-activity-content";
 import type { DurationDays, ExecutionTiming, Frequency } from "@/constants/practice-form";
 import type { PracticeStatus } from "@/constants/practice-status";
-import { PICKER_REACTIONS, REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
+import {
+  PICKER_REACTIONS,
+  REACTION_CONFIG,
+  type ReactionTypeType,
+} from "@/constants/reaction-type";
 import { getStatusConfig, mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 
 interface IPracticeDetailResource {
@@ -307,7 +318,9 @@ export function PracticeDetailShell({
   });
   const [, startReactionTransition] = useTransition();
   // undefined = no pending (use server data), null = optimistically removed, type = optimistically set
-  const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(undefined);
+  const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(
+    undefined
+  );
 
   const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
     null) as ReactionTypeType | null;
@@ -566,7 +579,7 @@ export function PracticeDetailShell({
                 .slice(0, PICKER_REACTIONS.length);
               const totalReactionCount = (reactionsData?.data?.reactions ?? []).reduce(
                 (sum, r) => sum + r.count,
-                0,
+                0
               );
               const latestActorName =
                 (reactionsData?.data?.reactions ?? []).find((r) => r.count > 0)?.latestActorName ??
@@ -685,7 +698,9 @@ export function PracticeDetailShell({
             <CommentSection
               comments={comments}
               selectedReactions={[]}
-              onSubmit={(content, _reactions, parentId, mentionedUserIds) => onSubmitComment(content, parentId, mentionedUserIds)}
+              onSubmit={(content, _reactions, parentId, mentionedUserIds) =>
+                onSubmitComment(content, parentId, mentionedUserIds)
+              }
               hasMoreComments
               currentUserName={currentUserName}
               currentUserId={currentUserId}
@@ -703,8 +718,8 @@ export function PracticeDetailShell({
             <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
           </div>
           <div className="pt-10">
-          <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
-        </div>
+            <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
+          </div>
         </div>
       )}
 

@@ -38,13 +38,24 @@ export function LottieEmoji({ url, fallback, size = 28, play = false }: LottieEm
       .catch((error) => {
         console.error(`Failed to fetch Lottie animation from ${url}:`, error);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [url]);
 
   if (!animationData) {
     // 載入中：顯示備用靜態 emoji
     return (
-      <span style={{ width: size, height: size, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.75 }}>
+      <span
+        style={{
+          width: size,
+          height: size,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: size * 0.75,
+        }}
+      >
         {fallback ?? ""}
       </span>
     );

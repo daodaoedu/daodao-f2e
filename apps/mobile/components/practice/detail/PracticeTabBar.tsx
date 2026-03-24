@@ -21,9 +21,10 @@ export function PracticeTabBar({ activeTab, onTabChange, commentCount }: Practic
     <XStack borderBottomWidth={1} borderBottomColor="#E5E7EB">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.key;
-        const label = tab.key === "comments" && commentCount != null && commentCount > 0
-          ? `${tab.label} (${commentCount})`
-          : tab.label;
+        const label =
+          tab.key === "comments" && commentCount != null && commentCount > 0
+            ? `${tab.label} (${commentCount})`
+            : tab.label;
         return (
           <Pressable
             key={tab.key}

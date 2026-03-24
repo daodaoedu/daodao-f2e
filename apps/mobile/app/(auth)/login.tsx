@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Alert, Linking, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Image, Spinner, Text, XStack, YStack } from "tamagui";
-import { colors } from "@/generated/design-tokens";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
+import { colors } from "@/generated/design-tokens";
 import { useAuth } from "@/providers/AuthProvider";
 import { oauthService } from "@/services/oauth";
 
@@ -87,14 +87,8 @@ export default function LoginScreen() {
                   <Spinner color={colors.basic.white} />
                 ) : (
                   <XStack alignItems="center" gap="$2.5">
-                    <Text color={colors.basic.white} fontSize={20}>
-
-                    </Text>
-                    <Text
-                      color={colors.basic.white}
-                      fontWeight="500"
-                      fontSize={16}
-                    >
+                    <Text color={colors.basic.white} fontSize={20}></Text>
+                    <Text color={colors.basic.white} fontWeight="500" fontSize={16}>
                       Apple 帳號註冊 / 登入
                     </Text>
                   </XStack>
@@ -158,12 +152,7 @@ export default function LoginScreen() {
         </YStack>
 
         {/* 底部插圖 */}
-        <Image
-          source={mobileLoginImage}
-          width="100%"
-          height={290}
-          resizeMode="cover"
-        />
+        <Image source={mobileLoginImage} width="100%" height={290} resizeMode="cover" />
       </YStack>
     </SafeAreaView>
   );

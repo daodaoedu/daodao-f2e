@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useEffect, useCallback, useState } from "react";
 import { Button } from "@daodao/ui/components/button";
-import { Send } from "lucide-react";
 import { cn } from "@daodao/ui/lib/utils";
+import { Send } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 
 // ============================================================================
@@ -47,9 +47,7 @@ export function CommentInput({ reactionType, onSubmit, disabled, className }: Co
     prevReactionTypeRef.current = reactionType;
   }, [reactionType]);
 
-  const placeholder = reactionType
-    ? REACTION_CONFIG[reactionType].placeholder
-    : "寫下你的留言...";
+  const placeholder = reactionType ? REACTION_CONFIG[reactionType].placeholder : "寫下你的留言...";
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();

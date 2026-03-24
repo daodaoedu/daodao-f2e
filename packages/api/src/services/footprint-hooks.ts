@@ -1,7 +1,7 @@
 "use client";
+import { getRequiredEnv } from "@daodao/config";
 import useSWR from "swr";
 import { unauthorizedHandler } from "../client";
-import { getRequiredEnv } from "@daodao/config";
 
 export interface IFootprintItem {
   id: number;
@@ -35,9 +35,7 @@ const getMyFootprints = async (page = 1, limit = 20): Promise<IFootprintsRespons
 };
 
 export const useMyFootprints = (page = 1) => {
-  return useSWR(
-    ["/api/v1/me/footprints", page],
-    () => getMyFootprints(page),
-    { revalidateOnFocus: false }
-  );
+  return useSWR(["/api/v1/me/footprints", page], () => getMyFootprints(page), {
+    revalidateOnFocus: false,
+  });
 };

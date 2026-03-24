@@ -1,19 +1,19 @@
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, Pressable, RefreshControl } from "react-native";
-import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
-import { colors } from "@/generated/design-tokens";
 import { NotificationType } from "@/constants/notification-type";
-import { formatRelativeTime } from "@/utils/format-time";
+import { colors } from "@/generated/design-tokens";
 import {
-  useNotifications,
-  markNotificationRead,
+  type INotificationApiItem,
   markAllNotificationsRead,
+  markNotificationRead,
   respondConnectionRequest,
   revalidateAllNotifications,
-  type INotificationApiItem,
+  useNotifications,
 } from "@/hooks/useNotifications";
+import { formatRelativeTime } from "@/utils/format-time";
 
 // ============================================================================
 // Helpers
@@ -31,8 +31,15 @@ function normalizeType(backendType: string): string {
 }
 
 const AVATAR_COLORS = [
-  "#FFD6C8", "#C8FFE4", "#C8DCFF", "#FFC8F0",
-  "#FEFFC8", "#C8FFF2", "#E4C8FF", "#FFE4C8", "#C8F0FF",
+  "#FFD6C8",
+  "#C8FFE4",
+  "#C8DCFF",
+  "#FFC8F0",
+  "#FEFFC8",
+  "#C8FFF2",
+  "#E4C8FF",
+  "#FFE4C8",
+  "#C8F0FF",
 ];
 
 function getAvatarColor(name: string): string {
@@ -109,9 +116,7 @@ function NotificationRow({
 
         {/* 頭像 */}
         <Avatar circular size="$5">
-          {item.actor.photoURL ? (
-            <Avatar.Image src={item.actor.photoURL} />
-          ) : null}
+          {item.actor.photoURL ? <Avatar.Image src={item.actor.photoURL} /> : null}
           <Avatar.Fallback backgroundColor={getAvatarColor(item.actor.name)}>
             <Text fontSize={16} fontWeight="600" color="$color">
               {item.actor.name.slice(0, 1)}
@@ -147,7 +152,10 @@ function NotificationRow({
         {isConnect && (
           <XStack gap="$2">
             <Pressable
-              onPress={(e) => { e.stopPropagation?.(); onAcceptConnect(item); }}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                onAcceptConnect(item);
+              }}
               style={{
                 backgroundColor: colors.primary.base,
                 borderRadius: 8,
@@ -155,10 +163,15 @@ function NotificationRow({
                 paddingVertical: 6,
               }}
             >
-              <Text fontSize={13} fontWeight="600" color="white">同意</Text>
+              <Text fontSize={13} fontWeight="600" color="white">
+                同意
+              </Text>
             </Pressable>
             <Pressable
-              onPress={(e) => { e.stopPropagation?.(); onRejectConnect(item); }}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                onRejectConnect(item);
+              }}
               style={{
                 backgroundColor: "#E4EAE9",
                 borderRadius: 8,
@@ -166,7 +179,9 @@ function NotificationRow({
                 paddingVertical: 6,
               }}
             >
-              <Text fontSize={13} fontWeight="600" color="$color">忽略</Text>
+              <Text fontSize={13} fontWeight="600" color="$color">
+                忽略
+              </Text>
             </Pressable>
           </XStack>
         )}
@@ -190,24 +205,27 @@ export default function NotificationsScreen() {
     setRefreshing(false);
   }, [mutate]);
 
-  const handlePress = useCallback(async (item: INotificationApiItem) => {
-    if (!item.isRead) {
-      markNotificationRead(item.id).catch(() => {});
-      revalidateAllNotifications();
-    }
+  const handlePress = useCallback(
+    async (item: INotificationApiItem) => {
+      if (!item.isRead) {
+        markNotificationRead(item.id).catch(() => {});
+        revalidateAllNotifications();
+      }
 
-    // Deep link based on entity type
-    switch (item.entityType) {
-      case "practice":
-      case "comment":
-        if (item.entityId) router.push(`/practices/${item.entityId}` as never);
-        break;
-      case "user":
-      case "connection":
-        if (item.actor.id) router.push(`/users/${item.actor.id}` as never);
-        break;
-    }
-  }, [router]);
+      // Deep link based on entity type
+      switch (item.entityType) {
+        case "practice":
+        case "comment":
+          if (item.entityId) router.push(`/practices/${item.entityId}` as never);
+          break;
+        case "user":
+        case "connection":
+          if (item.actor.id) router.push(`/users/${item.actor.id}` as never);
+          break;
+      }
+    },
+    [router]
+  );
 
   const handleAcceptConnect = useCallback(async (item: INotificationApiItem) => {
     if (!item.connectionRequestId) return;
@@ -265,7 +283,11 @@ export default function NotificationsScreen() {
             flex={1}
             contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100 }}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary.base} />
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={colors.primary.base}
+              />
             }
           >
             {notifications.length === 0 ? (
@@ -279,7 +301,13 @@ export default function NotificationsScreen() {
                 {/* 未讀 */}
                 {unread.length > 0 && (
                   <YStack gap="$1">
-                    <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingVertical="$2">
+                    <Text
+                      fontSize={13}
+                      fontWeight="600"
+                      color="$color"
+                      opacity={0.5}
+                      paddingVertical="$2"
+                    >
                       最新
                     </Text>
                     {unread.map((item) => (
@@ -297,7 +325,13 @@ export default function NotificationsScreen() {
                 {/* 已讀 */}
                 {read.length > 0 && (
                   <YStack gap="$1">
-                    <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingVertical="$2">
+                    <Text
+                      fontSize={13}
+                      fontWeight="600"
+                      color="$color"
+                      opacity={0.5}
+                      paddingVertical="$2"
+                    >
                       稍早
                     </Text>
                     {read.map((item) => (

@@ -1,6 +1,6 @@
 import useSWR from "swr";
-import { api } from "@/services/api-client";
 import type { ReactionTypeType } from "@/constants/reaction-type";
+import { api } from "@/services/api-client";
 
 // ── Types ──
 

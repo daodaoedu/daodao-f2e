@@ -71,7 +71,10 @@ export const followTarget = async (body: IFollowTarget): Promise<void> => {
   }
 };
 
-export const unfollowTarget = async (targetType: "user" | "practice", targetId: string): Promise<void> => {
+export const unfollowTarget = async (
+  targetType: "user" | "practice",
+  targetId: string
+): Promise<void> => {
   const res = await unauthorizedHandler.wrapFetch(
     `${getBaseUrl()}/api/v1/follows/${targetType}/${targetId}`,
     { method: "DELETE", credentials: "include" }

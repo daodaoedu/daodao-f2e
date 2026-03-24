@@ -1,18 +1,18 @@
 "use client";
 
-import type React from "react";
-import { CustomLink } from "@daodao/ui/components/custom-link";
 import { ArrowRightOutlineSvg, MoreSvg } from "@daodao/assets";
+import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@daodao/ui/components/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { cn } from "@daodao/ui/lib/utils";
 import { Check, X } from "lucide-react";
+import type React from "react";
 import type { NotificationTypeType } from "@/constants/notification-type";
 import { NotificationType } from "@/constants/notification-type";
 
@@ -85,18 +85,19 @@ function getAvatarColor(name: string): string {
 // ============================================================================
 
 function NotificationText({ notification }: { notification: INotificationData }) {
-  const { type, actor, practice, content, reaction, connectMessage, aggregationCount } = notification;
+  const { type, actor, practice, content, reaction, connectMessage, aggregationCount } =
+    notification;
   const count = aggregationCount ?? 1;
   const name = <span className="font-semibold">{actor.name}</span>;
-  const suffix = count > 1 ? <span className="text-text-dark/60">與其他 {count - 1} 人</span> : null;
-  const practiceName = practice ? (
-    <span className="font-semibold">「{practice.name}」</span>
-  ) : null;
+  const suffix =
+    count > 1 ? <span className="text-text-dark/60">與其他 {count - 1} 人</span> : null;
+  const practiceName = practice ? <span className="font-semibold">「{practice.name}」</span> : null;
 
   if (type === NotificationType.reaction) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name}{suffix && <> {suffix}</>} 對你的主題實踐{practiceName}給了反應：{reaction ?? "🙌"}
+        {name}
+        {suffix && <> {suffix}</>} 對你的主題實踐{practiceName}給了反應：{reaction ?? "🙌"}
       </p>
     );
   }
@@ -104,18 +105,13 @@ function NotificationText({ notification }: { notification: INotificationData })
   if (type === NotificationType.comment) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} 回覆了你的主題實踐{practiceName}：
-        <span className="font-semibold">{content}</span>
+        {name} 回覆了你的主題實踐{practiceName}：<span className="font-semibold">{content}</span>
       </p>
     );
   }
 
   if (type === NotificationType.followUser) {
-    return (
-      <p className="text-sm leading-5 truncate">
-        {name} 關注了你
-      </p>
-    );
+    return <p className="text-sm leading-5 truncate">{name} 關注了你</p>;
   }
 
   if (type === NotificationType.followPractice) {
@@ -129,9 +125,7 @@ function NotificationText({ notification }: { notification: INotificationData })
   if (type === NotificationType.connect) {
     return (
       <div className="flex flex-col gap-1">
-        <p className="text-sm leading-5">
-          {name} 對你發出了連結請求
-        </p>
+        <p className="text-sm leading-5">{name} 對你發出了連結請求</p>
         {connectMessage && (
           <p className="text-sm leading-5 text-text-dark/70 bg-[#F2F7F7] rounded px-2 py-1 line-clamp-2">
             「{connectMessage}」
@@ -142,26 +136,17 @@ function NotificationText({ notification }: { notification: INotificationData })
   }
 
   if (type === NotificationType.agreeConnect) {
-    return (
-      <p className="text-sm leading-5 truncate">
-        恭喜！{name} 同意了你的連結請求
-      </p>
-    );
+    return <p className="text-sm leading-5 truncate">恭喜！{name} 同意了你的連結請求</p>;
   }
 
   if (type === NotificationType.connectAgree || type === NotificationType.connectRejected) {
-    return (
-      <p className="text-sm leading-5 truncate">
-        {name} 對你發出了連結請求
-      </p>
-    );
+    return <p className="text-sm leading-5 truncate">{name} 對你發出了連結請求</p>;
   }
 
   if (type === NotificationType.updatePracticeCheckin) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} 更新了主題實踐{practiceName}：
-        <span className="font-semibold">{content}</span>
+        {name} 更新了主題實踐{practiceName}：<span className="font-semibold">{content}</span>
       </p>
     );
   }
@@ -206,12 +191,8 @@ function NotificationRightAction({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => onConnectAgree?.(id)}>
-            同意連結
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onConnectReject?.(id)}>
-            忽略
-          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onConnectAgree?.(id)}>同意連結</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onConnectReject?.(id)}>忽略</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     );
@@ -281,9 +262,7 @@ export function NotificationItem({
       tabIndex={isClickable ? 0 : undefined}
     >
       {/* 未讀橘點 badge */}
-      {!isRead && (
-        <div className="absolute left-3 top-3.5 size-1.5 rounded-full bg-[#FF6E0B]" />
-      )}
+      {!isRead && <div className="absolute left-3 top-3.5 size-1.5 rounded-full bg-[#FF6E0B]" />}
 
       {/* 頭像 */}
       {actor.id ? (
@@ -294,7 +273,9 @@ export function NotificationItem({
         >
           <Avatar className="size-[60px]">
             {actor.photoURL && <AvatarImage src={actor.photoURL} alt={actor.name} />}
-            <AvatarFallback className={cn("text-base font-medium text-text-dark", getAvatarColor(actor.name))}>
+            <AvatarFallback
+              className={cn("text-base font-medium text-text-dark", getAvatarColor(actor.name))}
+            >
               {actor.name.slice(0, 1)}
             </AvatarFallback>
           </Avatar>
@@ -302,7 +283,9 @@ export function NotificationItem({
       ) : (
         <Avatar className="size-[60px] shrink-0">
           {actor.photoURL && <AvatarImage src={actor.photoURL} alt={actor.name} />}
-          <AvatarFallback className={cn("text-base font-medium text-text-dark", getAvatarColor(actor.name))}>
+          <AvatarFallback
+            className={cn("text-base font-medium text-text-dark", getAvatarColor(actor.name))}
+          >
             {actor.name.slice(0, 1)}
           </AvatarFallback>
         </Avatar>

@@ -14,19 +14,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Text, XStack, YStack } from "tamagui";
 import activeShaper1Json from "@/assets/animations/active-shaper-1.json";
-import { colors } from "@/generated/design-tokens";
+import { CompletedCard, DashboardHeader, FilterPills, InProgressCard } from "@/components/home";
+import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
+import { UserInfoCard } from "@/components/user";
 import { getQuizThemeMessage } from "@/constants/quiz-theme";
 import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
+import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { usePractices } from "@/hooks/usePractices";
-import {
-  DashboardHeader,
-  FilterPills,
-  InProgressCard,
-  CompletedCard,
-} from "@/components/home";
-import { UserInfoCard } from "@/components/user";
-import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 
 const bannerImage = require("@/assets/images/user-mobile-banner.png");
 const logoImage = require("@/assets/images/logo.png");
@@ -76,7 +71,8 @@ export default function ProfileScreen() {
 
   const hasPractices = inProgressTasks.length > 0 || completedTasks.length > 0;
   const showInProgress = filterStatus !== FilterStatus.completed;
-  const showCompleted = filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
+  const showCompleted =
+    filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
 
   const dashboardStats = useMemo(
     () => [
@@ -84,13 +80,25 @@ export default function ProfileScreen() {
         label: "連續登入",
         value: String(stats.currentStreak || 0),
         unit: "天",
-        icon: <CheckCircle2 size={48} color={colors.text.dark} style={{ transform: [{ rotate: "-12deg" }] }} />,
+        icon: (
+          <CheckCircle2
+            size={48}
+            color={colors.text.dark}
+            style={{ transform: [{ rotate: "-12deg" }] }}
+          />
+        ),
       },
       {
         label: "獲得迴響",
         value: String(stats.totalCheckIns || 0),
         unit: "次",
-        icon: <MessageSquare size={48} color={colors.text.dark} style={{ transform: [{ rotate: "-12deg" }] }} />,
+        icon: (
+          <MessageSquare
+            size={48}
+            color={colors.text.dark}
+            style={{ transform: [{ rotate: "-12deg" }] }}
+          />
+        ),
       },
     ],
     [stats]
@@ -178,9 +186,7 @@ export default function ProfileScreen() {
             )}
           </XStack>
           <Text fontSize={16} fontWeight="500" color={colors.text.dark} marginBottom="$3">
-            {isEmptyResult
-              ? "你是哪一種島？快來測驗看看！"
-              : `我是${learningTypeMessage}`}
+            {isEmptyResult ? "你是哪一種島？快來測驗看看！" : `我是${learningTypeMessage}`}
           </Text>
           <Button
             backgroundColor={colors.logo.orange}
@@ -219,7 +225,7 @@ export default function ProfileScreen() {
 
           {/* 主要內容區 */}
           <YStack paddingHorizontal="$4" paddingBottom={120} minHeight={300}>
-            {(isUserLoading || isMyLoading) ? (
+            {isUserLoading || isMyLoading ? (
               <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical="$8">
                 <Text color={colors.text.dark}>載入中...</Text>
               </YStack>
@@ -260,7 +266,9 @@ export default function ProfileScreen() {
                     {/* Completed cards — vertical list */}
                     {showCompleted && completedTasks.length > 0 && (
                       <YStack gap="$3" marginBottom="$4">
-                        <Text fontSize={18} fontWeight="500" color={colors.text.dark}>已完成</Text>
+                        <Text fontSize={18} fontWeight="500" color={colors.text.dark}>
+                          已完成
+                        </Text>
                         {completedTasks.map((task) => (
                           <CompletedCard key={task.id} task={task} />
                         ))}

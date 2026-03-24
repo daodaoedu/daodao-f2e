@@ -2,10 +2,10 @@ import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Avatar, Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import useSWR from "swr";
-import { api } from "@/services/api-client";
+import { Avatar, Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { api } from "@/services/api-client";
 
 interface IConnectionUser {
   id: string;
@@ -34,17 +34,31 @@ interface IConnection {
 export default function ConnectionsSettingsScreen() {
   const router = useRouter();
 
-  const { data: incomingRequests, isLoading: loadingIncoming, mutate: mutateIncoming } = useSWR<IConnectionRequest[]>(
+  const {
+    data: incomingRequests,
+    isLoading: loadingIncoming,
+    mutate: mutateIncoming,
+  } = useSWR<IConnectionRequest[]>(
     "/connections/requests/incoming",
-    () => api.get<{ data: IConnectionRequest[] }>("/connections/requests/incoming").then((r) => r.data),
+    () =>
+      api.get<{ data: IConnectionRequest[] }>("/connections/requests/incoming").then((r) => r.data),
     { revalidateOnFocus: false }
   );
-  const { data: outgoingRequests, isLoading: loadingOutgoing, mutate: mutateOutgoing } = useSWR<IConnectionRequest[]>(
+  const {
+    data: outgoingRequests,
+    isLoading: loadingOutgoing,
+    mutate: mutateOutgoing,
+  } = useSWR<IConnectionRequest[]>(
     "/connections/requests/outgoing",
-    () => api.get<{ data: IConnectionRequest[] }>("/connections/requests/outgoing").then((r) => r.data),
+    () =>
+      api.get<{ data: IConnectionRequest[] }>("/connections/requests/outgoing").then((r) => r.data),
     { revalidateOnFocus: false }
   );
-  const { data: connections, isLoading: loadingConnections, mutate: mutateConnections } = useSWR<IConnection[]>(
+  const {
+    data: connections,
+    isLoading: loadingConnections,
+    mutate: mutateConnections,
+  } = useSWR<IConnection[]>(
     "/connections",
     () => api.get<{ data: IConnection[] }>("/connections").then((r) => r.data),
     { revalidateOnFocus: false }
@@ -123,50 +137,109 @@ export default function ConnectionsSettingsScreen() {
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel="返回">
+          <Button
+            size="$4"
+            circular
+            chromeless
+            onPress={() => router.back()}
+            accessibilityLabel="返回"
+          >
             <ChevronLeft size={24} color="$color" />
           </Button>
-          <Text fontSize={18} fontWeight="600" color="$color">連結的夥伴</Text>
+          <Text fontSize={18} fontWeight="600" color="$color">
+            連結的夥伴
+          </Text>
         </XStack>
 
         <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
           {isLoading ? (
             <YStack alignItems="center" paddingVertical="$8">
-              <Text fontSize={14} color="$color" opacity={0.5}>載入中...</Text>
+              <Text fontSize={14} color="$color" opacity={0.5}>
+                載入中...
+              </Text>
             </YStack>
           ) : (
             <YStack gap="$5">
               {hasPending && (
                 <YStack gap="$3">
-                  <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingLeft="$1">待處理請求</Text>
+                  <Text
+                    fontSize={13}
+                    fontWeight="600"
+                    color="$color"
+                    opacity={0.5}
+                    paddingLeft="$1"
+                  >
+                    待處理請求
+                  </Text>
                   {incoming.map((req) => {
                     const user = req.requester;
                     const name = user?.name ?? "用戶";
                     return (
-                      <Card key={req.id ?? `in-${req.requesterId}`} padding="$3" backgroundColor="$background" borderRadius="$md" borderWidth={1} borderColor="$borderColor">
+                      <Card
+                        key={req.id ?? `in-${req.requesterId}`}
+                        padding="$3"
+                        backgroundColor="$background"
+                        borderRadius="$md"
+                        borderWidth={1}
+                        borderColor="$borderColor"
+                      >
                         <YStack gap="$3">
                           <XStack alignItems="center" gap="$3">
                             <Avatar circular size="$4">
-                              {user?.photoURL ? <Avatar.Image source={{ uri: user.photoURL }} /> : (
-                                <Avatar.Fallback backgroundColor={colors.primary.palest}><Text fontSize={14} fontWeight="600" color={colors.primary.base}>{name.slice(0, 1)}</Text></Avatar.Fallback>
+                              {user?.photoURL ? (
+                                <Avatar.Image source={{ uri: user.photoURL }} />
+                              ) : (
+                                <Avatar.Fallback backgroundColor={colors.primary.palest}>
+                                  <Text fontSize={14} fontWeight="600" color={colors.primary.base}>
+                                    {name.slice(0, 1)}
+                                  </Text>
+                                </Avatar.Fallback>
                               )}
                             </Avatar>
                             <YStack flex={1}>
-                              <Text fontSize={14} fontWeight="500" color="$color">{name}</Text>
-                              {user?.bio && <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>{user.bio}</Text>}
+                              <Text fontSize={14} fontWeight="500" color="$color">
+                                {name}
+                              </Text>
+                              {user?.bio && (
+                                <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>
+                                  {user.bio}
+                                </Text>
+                              )}
                             </YStack>
                           </XStack>
                           {req.intent && (
-                            <YStack padding="$2" backgroundColor={colors.basic[100]} borderRadius="$sm">
-                              <Text fontSize={12} color="$color" opacity={0.7}>「{req.intent}」</Text>
+                            <YStack
+                              padding="$2"
+                              backgroundColor={colors.basic[100]}
+                              borderRadius="$sm"
+                            >
+                              <Text fontSize={12} color="$color" opacity={0.7}>
+                                「{req.intent}」
+                              </Text>
                             </YStack>
                           )}
                           <XStack gap="$2">
-                            <Button flex={1} size="$3" backgroundColor={colors.primary.base} onPress={() => handleAccept(req.id)}>
-                              <Text fontSize={13} color={colors.basic.white} fontWeight="500">接受</Text>
+                            <Button
+                              flex={1}
+                              size="$3"
+                              backgroundColor={colors.primary.base}
+                              onPress={() => handleAccept(req.id)}
+                            >
+                              <Text fontSize={13} color={colors.basic.white} fontWeight="500">
+                                接受
+                              </Text>
                             </Button>
-                            <Button flex={1} size="$3" backgroundColor="transparent" borderWidth={1} borderColor="$borderColor" onPress={() => handleIgnore(req.id, name)}>
-                              <Text fontSize={13} color="$color">忽略</Text>
+                            <Button
+                              flex={1}
+                              size="$3"
+                              backgroundColor="transparent"
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                              onPress={() => handleIgnore(req.id, name)}
+                            >
+                              <Text fontSize={13} color="$color">
+                                忽略
+                              </Text>
                             </Button>
                           </XStack>
                         </YStack>
@@ -177,19 +250,44 @@ export default function ConnectionsSettingsScreen() {
                     const user = req.receiver;
                     const name = user?.name ?? "用戶";
                     return (
-                      <Card key={req.id ?? `out-${req.receiverId}`} padding="$3" backgroundColor="$background" borderRadius="$md" borderWidth={1} borderColor="$borderColor">
+                      <Card
+                        key={req.id ?? `out-${req.receiverId}`}
+                        padding="$3"
+                        backgroundColor="$background"
+                        borderRadius="$md"
+                        borderWidth={1}
+                        borderColor="$borderColor"
+                      >
                         <XStack alignItems="center" gap="$3">
                           <Avatar circular size="$4">
-                            {user?.photoURL ? <Avatar.Image source={{ uri: user.photoURL }} /> : (
-                              <Avatar.Fallback backgroundColor={colors.primary.palest}><Text fontSize={14} fontWeight="600" color={colors.primary.base}>{name.slice(0, 1)}</Text></Avatar.Fallback>
+                            {user?.photoURL ? (
+                              <Avatar.Image source={{ uri: user.photoURL }} />
+                            ) : (
+                              <Avatar.Fallback backgroundColor={colors.primary.palest}>
+                                <Text fontSize={14} fontWeight="600" color={colors.primary.base}>
+                                  {name.slice(0, 1)}
+                                </Text>
+                              </Avatar.Fallback>
                             )}
                           </Avatar>
                           <YStack flex={1}>
-                            <Text fontSize={14} fontWeight="500" color="$color">{name}</Text>
-                            <Text fontSize={12} color="$color" opacity={0.5}>等待對方回應</Text>
+                            <Text fontSize={14} fontWeight="500" color="$color">
+                              {name}
+                            </Text>
+                            <Text fontSize={12} color="$color" opacity={0.5}>
+                              等待對方回應
+                            </Text>
                           </YStack>
-                          <Button size="$3" backgroundColor="transparent" borderWidth={1} borderColor="$borderColor" onPress={() => handleWithdraw(req.id, name)}>
-                            <Text fontSize={12} color="$color">撤回</Text>
+                          <Button
+                            size="$3"
+                            backgroundColor="transparent"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                            onPress={() => handleWithdraw(req.id, name)}
+                          >
+                            <Text fontSize={12} color="$color">
+                              撤回
+                            </Text>
                           </Button>
                         </XStack>
                       </Card>
@@ -204,7 +302,9 @@ export default function ConnectionsSettingsScreen() {
                 </Text>
                 {conns.length === 0 ? (
                   <YStack alignItems="center" paddingVertical="$8">
-                    <Text fontSize={14} color="$color" opacity={0.5}>尚未與任何人建立連結</Text>
+                    <Text fontSize={14} color="$color" opacity={0.5}>
+                      尚未與任何人建立連結
+                    </Text>
                   </YStack>
                 ) : (
                   conns.map((conn) => {
@@ -212,19 +312,46 @@ export default function ConnectionsSettingsScreen() {
                     const name = partner?.name ?? "用戶";
                     const partnerId = partner?.identifier ?? partner?.id ?? conn.userAId;
                     return (
-                      <Card key={conn.id ?? `c-${conn.userAId}-${conn.userBId}`} padding="$3" backgroundColor="$background" borderRadius="$md" borderWidth={1} borderColor="$borderColor">
+                      <Card
+                        key={conn.id ?? `c-${conn.userAId}-${conn.userBId}`}
+                        padding="$3"
+                        backgroundColor="$background"
+                        borderRadius="$md"
+                        borderWidth={1}
+                        borderColor="$borderColor"
+                      >
                         <XStack alignItems="center" gap="$3">
                           <Avatar circular size="$4">
-                            {partner?.photoURL ? <Avatar.Image source={{ uri: partner.photoURL }} /> : (
-                              <Avatar.Fallback backgroundColor={colors.primary.palest}><Text fontSize={14} fontWeight="600" color={colors.primary.base}>{name.slice(0, 1)}</Text></Avatar.Fallback>
+                            {partner?.photoURL ? (
+                              <Avatar.Image source={{ uri: partner.photoURL }} />
+                            ) : (
+                              <Avatar.Fallback backgroundColor={colors.primary.palest}>
+                                <Text fontSize={14} fontWeight="600" color={colors.primary.base}>
+                                  {name.slice(0, 1)}
+                                </Text>
+                              </Avatar.Fallback>
                             )}
                           </Avatar>
                           <YStack flex={1}>
-                            <Text fontSize={14} fontWeight="500" color="$color">{name}</Text>
-                            {partner?.bio && <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>{partner.bio}</Text>}
+                            <Text fontSize={14} fontWeight="500" color="$color">
+                              {name}
+                            </Text>
+                            {partner?.bio && (
+                              <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>
+                                {partner.bio}
+                              </Text>
+                            )}
                           </YStack>
-                          <Button size="$3" backgroundColor="transparent" borderWidth={1} borderColor="$borderColor" onPress={() => handleDisconnect(partnerId, name)}>
-                            <Text fontSize={12} color="$color">解除連結</Text>
+                          <Button
+                            size="$3"
+                            backgroundColor="transparent"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                            onPress={() => handleDisconnect(partnerId, name)}
+                          >
+                            <Text fontSize={12} color="$color">
+                              解除連結
+                            </Text>
                           </Button>
                         </XStack>
                       </Card>

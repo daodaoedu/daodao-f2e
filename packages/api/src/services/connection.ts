@@ -54,7 +54,9 @@ export interface IPaginationParams {
 
 const getBaseUrl = () => getRequiredEnv("NEXT_PUBLIC_API_URL");
 
-export const sendConnectionRequest = async (body: ISendConnectionRequestBody): Promise<IConnectionRequest> => {
+export const sendConnectionRequest = async (
+  body: ISendConnectionRequestBody
+): Promise<IConnectionRequest> => {
   const res = await unauthorizedHandler.wrapFetch(`${getBaseUrl()}/api/v1/connections/request`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -99,24 +101,25 @@ export const withdrawConnectionRequest = async (requestId: string): Promise<void
 };
 
 export const disconnectUser = async (userId: string): Promise<void> => {
-  const res = await unauthorizedHandler.wrapFetch(
-    `${getBaseUrl()}/api/v1/connections/${userId}`,
-    { method: "DELETE", credentials: "include" }
-  );
+  const res = await unauthorizedHandler.wrapFetch(`${getBaseUrl()}/api/v1/connections/${userId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err?.error?.message ?? "解除連結失敗");
   }
 };
 
-export const getConnections = async (params?: IPaginationParams): Promise<IPaginatedConnections> => {
+export const getConnections = async (
+  params?: IPaginationParams
+): Promise<IPaginatedConnections> => {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
   if (params?.limit) query.set("limit", String(params.limit));
-  const res = await unauthorizedHandler.wrapFetch(
-    `${getBaseUrl()}/api/v1/connections?${query}`,
-    { credentials: "include" }
-  );
+  const res = await unauthorizedHandler.wrapFetch(`${getBaseUrl()}/api/v1/connections?${query}`, {
+    credentials: "include",
+  });
   if (!res.ok) throw new Error("載入夥伴列表失敗");
   return res.json();
 };

@@ -61,7 +61,11 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
           onKeyDown={handleKeyDown}
         />
         {value && (
-          <button type="button" onClick={handleClear} className="text-text-dark/40 hover:text-text-dark/70">
+          <button
+            type="button"
+            onClick={handleClear}
+            className="text-text-dark/40 hover:text-text-dark/70"
+          >
             <X className="size-4" />
           </button>
         )}

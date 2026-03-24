@@ -12,10 +12,10 @@ import {
 } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
-import { useAuth } from "@/providers/AuthProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface ISettingItem {
   icon: typeof Settings;

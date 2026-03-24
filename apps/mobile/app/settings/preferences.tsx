@@ -3,10 +3,10 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import useSWR from "swr";
-import { api } from "@/services/api-client";
+import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { api } from "@/services/api-client";
 
 interface IPreferenceOption {
   id: number;
@@ -41,7 +41,10 @@ export default function PreferencesSettingsScreen() {
 
   const { data: userPrefs, isLoading: isLoadingPrefs } = useSWR<IUserPreference[]>(
     "/users/me/preferences",
-    () => api.get<{ data: { preferences: IUserPreference[] } }>("/users/me/preferences").then((r) => r.data.preferences),
+    () =>
+      api
+        .get<{ data: { preferences: IUserPreference[] } }>("/users/me/preferences")
+        .then((r) => r.data.preferences),
     { revalidateOnFocus: false }
   );
 
@@ -72,18 +75,21 @@ export default function PreferencesSettingsScreen() {
     }
   }, [initialSelections]);
 
-  const toggleOption = useCallback((typeId: string, optionId: number, maxSelections: number | null) => {
-    setSelections((prev) => {
-      const current = prev[typeId] || [];
-      if (current.includes(optionId)) {
-        return { ...prev, [typeId]: current.filter((id) => id !== optionId) };
-      }
-      if (maxSelections && current.length >= maxSelections) {
-        return prev;
-      }
-      return { ...prev, [typeId]: [...current, optionId] };
-    });
-  }, []);
+  const toggleOption = useCallback(
+    (typeId: string, optionId: number, maxSelections: number | null) => {
+      setSelections((prev) => {
+        const current = prev[typeId] || [];
+        if (current.includes(optionId)) {
+          return { ...prev, [typeId]: current.filter((id) => id !== optionId) };
+        }
+        if (maxSelections && current.length >= maxSelections) {
+          return prev;
+        }
+        return { ...prev, [typeId]: [...current, optionId] };
+      });
+    },
+    []
+  );
 
   const handleSave = async () => {
     setIsSubmitting(true);
@@ -108,9 +114,7 @@ export default function PreferencesSettingsScreen() {
 
       await api.put("/users/me/preferences", { preferences: preferenceItems });
 
-      Alert.alert("成功", "偏好設定已更新", [
-        { text: "確定", onPress: () => router.back() },
-      ]);
+      Alert.alert("成功", "偏好設定已更新", [{ text: "確定", onPress: () => router.back() }]);
     } catch {
       Alert.alert("錯誤", "更新失敗，請稍後再試");
     } finally {
@@ -124,22 +128,42 @@ export default function PreferencesSettingsScreen() {
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel="返回">
+          <Button
+            size="$4"
+            circular
+            chromeless
+            onPress={() => router.back()}
+            accessibilityLabel="返回"
+          >
             <ChevronLeft size={24} color="$color" />
           </Button>
-          <Text fontSize={18} fontWeight="600" color="$color" flex={1}>領域偏好設定</Text>
-          <Button size="$3" backgroundColor={colors.primary.base} pressStyle={{ opacity: 0.8 }} onPress={handleSave} disabled={isSubmitting || isLoading}>
-            <Text color={colors.basic.white} fontWeight="600" fontSize={14}>{isSubmitting ? "儲存中..." : "儲存"}</Text>
+          <Text fontSize={18} fontWeight="600" color="$color" flex={1}>
+            領域偏好設定
+          </Text>
+          <Button
+            size="$3"
+            backgroundColor={colors.primary.base}
+            pressStyle={{ opacity: 0.8 }}
+            onPress={handleSave}
+            disabled={isSubmitting || isLoading}
+          >
+            <Text color={colors.basic.white} fontWeight="600" fontSize={14}>
+              {isSubmitting ? "儲存中..." : "儲存"}
+            </Text>
           </Button>
         </XStack>
 
         {isLoading ? (
           <YStack flex={1} alignItems="center" justifyContent="center">
-            <Text fontSize={14} color="$color" opacity={0.5}>載入中...</Text>
+            <Text fontSize={14} color="$color" opacity={0.5}>
+              載入中...
+            </Text>
           </YStack>
         ) : preferenceTypes.length === 0 ? (
           <YStack flex={1} alignItems="center" justifyContent="center">
-            <Text fontSize={14} color="$color" opacity={0.5}>目前沒有可用的偏好設定</Text>
+            <Text fontSize={14} color="$color" opacity={0.5}>
+              目前沒有可用的偏好設定
+            </Text>
           </YStack>
         ) : (
           <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
@@ -150,9 +174,13 @@ export default function PreferencesSettingsScreen() {
                 return (
                   <YStack key={preferenceType.id} gap="$3">
                     <YStack gap="$1" paddingLeft="$1">
-                      <Text fontSize={15} fontWeight="600" color="$color">{preferenceType.name}</Text>
+                      <Text fontSize={15} fontWeight="600" color="$color">
+                        {preferenceType.name}
+                      </Text>
                       {preferenceType.description && (
-                        <Text fontSize={12} color="$color" opacity={0.5}>{preferenceType.description}</Text>
+                        <Text fontSize={12} color="$color" opacity={0.5}>
+                          {preferenceType.description}
+                        </Text>
                       )}
                       {preferenceType.maxSelections && (
                         <Text fontSize={12} color="$color" opacity={0.5}>
@@ -171,11 +199,18 @@ export default function PreferencesSettingsScreen() {
                             borderWidth={1}
                             borderColor={isSelected ? colors.primary.base : "$borderColor"}
                             pressStyle={{ opacity: 0.7 }}
-                            onPress={() => toggleOption(typeId, option.id, preferenceType.maxSelections)}
+                            onPress={() =>
+                              toggleOption(typeId, option.id, preferenceType.maxSelections)
+                            }
                           >
                             <XStack alignItems="center" gap="$1">
                               {isSelected && <Check size={14} color={colors.primary.base} />}
-                              <Text fontSize={13} color={isSelected ? colors.primary.base : "$color"}>{option.name}</Text>
+                              <Text
+                                fontSize={13}
+                                color={isSelected ? colors.primary.base : "$color"}
+                              >
+                                {option.name}
+                              </Text>
                             </XStack>
                           </Button>
                         );

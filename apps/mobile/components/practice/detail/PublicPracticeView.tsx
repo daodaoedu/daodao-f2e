@@ -1,3 +1,15 @@
+import {
+  BarChart3,
+  ChevronDown,
+  ChevronLeft,
+  ChevronUp,
+  Flag,
+  MessageCircle,
+  MoreHorizontal,
+  Tag,
+  Telescope,
+} from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   Alert,
@@ -9,41 +21,29 @@ import {
   RefreshControl,
   StyleSheet,
 } from "react-native";
-import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronUp,
-  Flag,
-  MessageCircle,
-  MoreHorizontal,
-  Telescope,
-  BarChart3,
-  Tag,
-} from "@tamagui/lucide-icons";
-import { Button, ScrollView, Text, View, XStack, YStack } from "tamagui";
-import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors } from "@/generated/design-tokens";
-import { getStatusConfig } from "@/constants/task-status";
+import { Button, ScrollView, Text, View, XStack, YStack } from "tamagui";
+import { CheckInList } from "@/components";
+import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
 import {
   PICKER_REACTIONS,
   REACTION_CONFIG,
   type ReactionTypeType,
 } from "@/constants/reaction-type";
+import { getStatusConfig } from "@/constants/task-status";
+import { colors } from "@/generated/design-tokens";
+import { useComments } from "@/hooks/useComments";
+import { followTarget, unfollowTarget, useFollowStatus } from "@/hooks/useFollow";
+import { useCheckIns } from "@/hooks/usePractices";
 import {
+  removeReaction,
+  upsertReaction,
   useReactions,
   useReactionsList,
-  upsertReaction,
-  removeReaction,
 } from "@/hooks/useReactions";
-import { useComments } from "@/hooks/useComments";
-import { useFollowStatus, followTarget, unfollowTarget } from "@/hooks/useFollow";
-import { useCheckIns } from "@/hooks/usePractices";
-import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
-import { CommentSection } from "./CommentSection";
 import { BrowseActivitySheet } from "./BrowseActivitySheet";
-import { PracticeTabBar, type PracticeTab } from "./PracticeTabBar";
-import { CheckInList } from "@/components";
+import { CommentSection } from "./CommentSection";
+import { type PracticeTab, PracticeTabBar } from "./PracticeTabBar";
 
 interface PublicPracticeViewProps {
   practice: {
@@ -151,9 +151,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
   const browseActivityText = (() => {
     if (reactors.length > 0) {
       const firstName = reactors[0]?.name;
-      return reactors.length > 1
-        ? `${firstName} 與其他 ${reactors.length - 1} 人`
-        : firstName;
+      return reactors.length > 1 ? `${firstName} 與其他 ${reactors.length - 1} 人` : firstName;
     }
     if (currentUserReaction) {
       return totalCount > 1 ? `你 與其他 ${totalCount - 1} 人` : "你";
@@ -171,7 +169,10 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
   // Browse activity emoji circles
   const browseDisplayReactions =
     reactors.length > 0
-      ? ([...new Set(reactors.map((r) => r.reactionType))].slice(0, PICKER_REACTIONS.length) as ReactionTypeType[])
+      ? ([...new Set(reactors.map((r) => r.reactionType))].slice(
+          0,
+          PICKER_REACTIONS.length
+        ) as ReactionTypeType[])
       : displayReactions.slice(0, PICKER_REACTIONS.length);
 
   return (
@@ -208,8 +209,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
                   style={[
                     styles.badge,
                     {
-                      backgroundColor:
-                        taskStatus === "completed" ? "#6B7280" : colors.primary.base,
+                      backgroundColor: taskStatus === "completed" ? "#6B7280" : colors.primary.base,
                     },
                   ]}
                 >
@@ -222,12 +222,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
               )}
 
               <View style={{ position: "relative" }}>
-                <Button
-                  size="$3"
-                  circular
-                  chromeless
-                  onPress={() => setMenuOpen(!menuOpen)}
-                >
+                <Button size="$3" circular chromeless onPress={() => setMenuOpen(!menuOpen)}>
                   <MoreHorizontal size={20} color="$color" />
                 </Button>
 
@@ -275,10 +270,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
                           size={18}
                           color={isFollowing ? colors.primary.base : "#295E5C"}
                         />
-                        <Text
-                          fontSize={14}
-                          color={isFollowing ? colors.primary.base : "#295E5C"}
-                        >
+                        <Text fontSize={14} color={isFollowing ? colors.primary.base : "#295E5C"}>
                           {isFollowing ? "取消關注" : "關注"}
                         </Text>
                       </XStack>
@@ -320,10 +312,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
                 <XStack alignItems="center" gap="$2" marginBottom="$3">
                   <View style={styles.creatorAvatar}>
                     {user.photoUrl ? (
-                      <Image
-                        source={{ uri: user.photoUrl }}
-                        style={styles.creatorAvatarImage}
-                      />
+                      <Image source={{ uri: user.photoUrl }} style={styles.creatorAvatarImage} />
                     ) : (
                       <Text fontSize={12} color="#9CA3AF">
                         {(user.name ?? "?")[0]}
@@ -338,12 +327,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
 
               {/* Action description */}
               {(practiceAction || description) && (
-                <Text
-                  fontSize={15}
-                  fontWeight="500"
-                  color={colors.text.dark}
-                  marginBottom="$3"
-                >
+                <Text fontSize={15} fontWeight="500" color={colors.text.dark} marginBottom="$3">
                   {practiceAction || description}
                 </Text>
               )}
@@ -415,10 +399,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
               <View style={styles.divider} />
 
               {/* ── "更多資訊" expandable (matches product) ── */}
-              <Pressable
-                onPress={() => setInfoExpanded((v) => !v)}
-                style={styles.moreInfoButton}
-              >
+              <Pressable onPress={() => setInfoExpanded((v) => !v)} style={styles.moreInfoButton}>
                 <Text fontSize={14} color="#9FB5B8">
                   更多資訊
                 </Text>
@@ -453,23 +434,15 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
               )}
 
               {/* ── Browse Activity button (matches product) ── */}
-              <Pressable
-                onPress={handleBrowseActivity}
-                style={styles.browseActivityButton}
-              >
+              <Pressable onPress={handleBrowseActivity} style={styles.browseActivityButton}>
                 {browseDisplayReactions.length > 0 && (
                   <XStack alignItems="center">
                     {browseDisplayReactions.map((type, i) => (
                       <View
                         key={type}
-                        style={[
-                          styles.browseEmojiCircle,
-                          i > 0 && { marginLeft: -6 },
-                        ]}
+                        style={[styles.browseEmojiCircle, i > 0 && { marginLeft: -6 }]}
                       >
-                        <Text fontSize={16}>
-                          {REACTION_CONFIG[type]?.emoji ?? "👍"}
-                        </Text>
+                        <Text fontSize={16}>{REACTION_CONFIG[type]?.emoji ?? "👍"}</Text>
                       </View>
                     ))}
                   </XStack>
@@ -494,10 +467,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
 
                 <View style={styles.bottomBarDivider} />
 
-                <Pressable
-                  style={styles.bottomBarHalf}
-                  onPress={() => setActiveTab("comments")}
-                >
+                <Pressable style={styles.bottomBarHalf} onPress={() => setActiveTab("comments")}>
                   <XStack alignItems="center" gap="$1.5" justifyContent="center">
                     <MessageCircle size={20} color={colors.text.dark} />
                     <Text fontSize={14} fontWeight="500" color={colors.text.dark}>
@@ -516,9 +486,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
             />
 
             {/* ── Tab content ── */}
-            {activeTab === "comments" && (
-              <CommentSection targetType="practice" targetId={id} />
-            )}
+            {activeTab === "comments" && <CommentSection targetType="practice" targetId={id} />}
 
             {activeTab === "checkins" &&
               (checkInsError ? (

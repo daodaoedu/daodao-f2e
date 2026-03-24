@@ -38,10 +38,7 @@ export function JoinSection() {
   const t = useTranslations("common");
 
   return (
-    <section
-      className="relative overflow-hidden bg-primary-base py-16 md:py-24"
-
-    >
+    <section className="relative overflow-hidden bg-primary-base py-16 md:py-24">
       {/* 右上角十字星裝飾 */}
       <div className="absolute right-8 top-8 text-3xl text-primary-lighter md:right-16 md:top-12">
         ✦

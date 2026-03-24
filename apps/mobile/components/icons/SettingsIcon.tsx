@@ -6,7 +6,11 @@ interface SettingsIconProps {
   filled?: boolean;
 }
 
-export function SettingsIcon({ size = 24, color = "currentColor", filled = false }: SettingsIconProps) {
+export function SettingsIcon({
+  size = 24,
+  color = "currentColor",
+  filled = false,
+}: SettingsIconProps) {
   if (filled) {
     return (
       <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">

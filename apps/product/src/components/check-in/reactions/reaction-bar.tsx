@@ -1,7 +1,11 @@
 "use client";
 
 import { cn } from "@daodao/ui/lib/utils";
-import { REACTION_CONFIG, REACTION_TYPE_LIST, type ReactionTypeType } from "@/constants/reaction-type";
+import {
+  REACTION_CONFIG,
+  REACTION_TYPE_LIST,
+  type ReactionTypeType,
+} from "@/constants/reaction-type";
 import { LottieEmoji } from "./lottie-emoji";
 
 // ============================================================================
@@ -27,7 +31,12 @@ interface ReactionBarProps {
 // Component
 // ============================================================================
 
-export function ReactionBar({ reactions, selectedReactions, onReactionClick, className }: ReactionBarProps) {
+export function ReactionBar({
+  reactions,
+  selectedReactions,
+  onReactionClick,
+  className,
+}: ReactionBarProps) {
   return (
     <div className={cn("flex items-center gap-2 px-4 py-3", className ?? "flex-wrap")}>
       {REACTION_TYPE_LIST.map((type) => {
@@ -56,7 +65,12 @@ export function ReactionBar({ reactions, selectedReactions, onReactionClick, cla
             />
             <span className="text-sm leading-none">{config.label}</span>
             {count > 0 && (
-              <span className={cn("text-sm font-medium", isSelected ? "text-logo-cyan" : "text-[#295E5C]/60")}>
+              <span
+                className={cn(
+                  "text-sm font-medium",
+                  isSelected ? "text-logo-cyan" : "text-[#295E5C]/60"
+                )}
+              >
                 {count}
               </span>
             )}

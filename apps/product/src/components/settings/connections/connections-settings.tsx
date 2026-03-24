@@ -1,6 +1,11 @@
 "use client";
 
-import { useConnectionMutations, useConnections, useIncomingConnectionRequests, useOutgoingConnectionRequests } from "@daodao/api";
+import {
+  useConnectionMutations,
+  useConnections,
+  useIncomingConnectionRequests,
+  useOutgoingConnectionRequests,
+} from "@daodao/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -21,11 +26,7 @@ export const ConnectionsSettings = () => {
   const connections = connectionsData?.data ?? [];
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">
-        載入中...
-      </div>
-    );
+    return <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">載入中...</div>;
   }
 
   const handleAccept = async (requestId: string, name: string) => {
@@ -98,7 +99,6 @@ export const ConnectionsSettings = () => {
 
   return (
     <div className="flex flex-col gap-5">
-
       {/* ── 待處理請求 ── */}
       {hasPending && (
         <section className="flex flex-col gap-2">
@@ -121,7 +121,10 @@ export const ConnectionsSettings = () => {
                         </Avatar>
                       </CustomLink>
                       <div className="flex-1 min-w-0">
-                        <CustomLink href={`/users/${req.requesterExternalId}`} className="text-sm font-medium text-text-dark hover:underline">
+                        <CustomLink
+                          href={`/users/${req.requesterExternalId}`}
+                          className="text-sm font-medium text-text-dark hover:underline"
+                        >
                           {name}
                         </CustomLink>
                       </div>
@@ -162,7 +165,10 @@ export const ConnectionsSettings = () => {
               {outgoingRequests.map((req) => {
                 const name = req.receiverNickname || "用戶";
                 return (
-                  <div key={req.requestId} className="bg-white rounded-lg p-3 flex items-center gap-3">
+                  <div
+                    key={req.requestId}
+                    className="bg-white rounded-lg p-3 flex items-center gap-3"
+                  >
                     <CustomLink href={`/users/${req.receiverExternalId}`} className="shrink-0">
                       <Avatar className="size-10">
                         <AvatarImage src={req.receiverPhotoUrl ?? undefined} alt={name} />
@@ -172,7 +178,10 @@ export const ConnectionsSettings = () => {
                       </Avatar>
                     </CustomLink>
                     <div className="flex-1 min-w-0">
-                      <CustomLink href={`/users/${req.receiverExternalId}`} className="text-sm font-medium text-text-dark hover:underline">
+                      <CustomLink
+                        href={`/users/${req.receiverExternalId}`}
+                        className="text-sm font-medium text-text-dark hover:underline"
+                      >
                         {name}
                       </CustomLink>
                       <p className="text-xs text-[#9FB5B8]">等待對方回應</p>
@@ -199,15 +208,16 @@ export const ConnectionsSettings = () => {
           已連結的夥伴 {connections.length > 0 && `· ${connections.length} 人`}
         </h2>
         {connections.length === 0 ? (
-          <div className="text-center py-12 text-[#9FB5B8] text-sm">
-            尚未與任何人建立連結
-          </div>
+          <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未與任何人建立連結</div>
         ) : (
           <div className="flex flex-col gap-2">
             {connections.map((conn) => {
               const name = conn.nickname || "用戶";
               return (
-                <div key={conn.connectionId} className="bg-white rounded-lg p-3 flex items-center gap-3">
+                <div
+                  key={conn.connectionId}
+                  className="bg-white rounded-lg p-3 flex items-center gap-3"
+                >
                   <CustomLink href={`/users/${conn.externalId}`} className="shrink-0">
                     <Avatar className="size-10">
                       <AvatarImage src={conn.photoUrl ?? undefined} alt={name} />
@@ -217,7 +227,10 @@ export const ConnectionsSettings = () => {
                     </Avatar>
                   </CustomLink>
                   <div className="flex-1 min-w-0">
-                    <CustomLink href={`/users/${conn.externalId}`} className="text-sm font-medium text-text-dark hover:underline">
+                    <CustomLink
+                      href={`/users/${conn.externalId}`}
+                      className="text-sm font-medium text-text-dark hover:underline"
+                    >
                       {name}
                     </CustomLink>
                   </div>

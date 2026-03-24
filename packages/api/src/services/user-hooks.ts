@@ -15,7 +15,11 @@ import type {
   UpdateUserFormDataRequest,
   UpdateUserRequest,
 } from "./user";
-import { createCurrentUserWithFormData, getSettingsSummary, updateCurrentUserWithFormData } from "./user";
+import {
+  createCurrentUserWithFormData,
+  getSettingsSummary,
+  updateCurrentUserWithFormData,
+} from "./user";
 
 // ============================================================================
 // Query Hooks
@@ -225,7 +229,7 @@ export const useUserMutations = () => {
  */
 export const useSettingsCompletion = () => {
   const { data, error, isLoading, mutate } = useSWR(
-    '/api/v1/users/settings-summary',
+    "/api/v1/users/settings-summary",
     getSettingsSummary,
     { revalidateOnFocus: false }
   );
@@ -234,6 +238,6 @@ export const useSettingsCompletion = () => {
     data,
     error,
     isLoading,
-    revalidate: mutate
+    revalidate: mutate,
   };
 };

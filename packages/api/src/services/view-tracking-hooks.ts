@@ -15,27 +15,24 @@ export type ViewTrackingEntityType = "practice" | "resource";
  * 進入詳情頁時呼叫，不等待結果
  */
 export const useRecordView = () => {
-  return useCallback(
-    (entityType: ViewTrackingEntityType, entityId: string | number) => {
-      if (entityType === "practice") {
-        client
-          .POST("/api/v1/practices/{id}/view", {
-            params: { path: { id: String(entityId) } },
-            body: { entityType: "practice", entityId: String(entityId) },
-          })
-          .catch(() => {
-            // fire-and-forget: ignore errors
-          });
-      } else if (entityType === "resource") {
-        client
-          .POST("/api/v1/resources/{resourceId}/view", {
-            params: { path: { resourceId: String(entityId) } },
-          })
-          .catch(() => {
-            // fire-and-forget: ignore errors
-          });
-      }
-    },
-    []
-  );
+  return useCallback((entityType: ViewTrackingEntityType, entityId: string | number) => {
+    if (entityType === "practice") {
+      client
+        .POST("/api/v1/practices/{id}/view", {
+          params: { path: { id: String(entityId) } },
+          body: { entityType: "practice", entityId: String(entityId) },
+        })
+        .catch(() => {
+          // fire-and-forget: ignore errors
+        });
+    } else if (entityType === "resource") {
+      client
+        .POST("/api/v1/resources/{resourceId}/view", {
+          params: { path: { resourceId: String(entityId) } },
+        })
+        .catch(() => {
+          // fire-and-forget: ignore errors
+        });
+    }
+  }, []);
 };

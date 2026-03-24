@@ -142,7 +142,6 @@ function PersonaCardComponent({
           <div className="absolute -top-2 left-6 size-0 border-x-8 border-b-8 border-x-transparent border-b-primary-palest" />
         </div>
       </div>
-
     </div>
   );
 }
@@ -322,12 +321,7 @@ export function PersonaSection() {
         />
         {/* Island decoration */}
         <div className="mt-6 flex justify-center">
-          <Image
-            src="/assets/landing-page/island-mobile.svg"
-            alt=""
-            width={236}
-            height={48}
-          />
+          <Image src="/assets/landing-page/island-mobile.svg" alt="" width={236} height={48} />
         </div>
       </div>
     </section>

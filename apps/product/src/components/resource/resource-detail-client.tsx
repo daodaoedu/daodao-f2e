@@ -1,12 +1,12 @@
 "use client";
 
+import { posthogCapture } from "@daodao/analytics";
 import type { ResourceData } from "@daodao/api";
 import { useRecordView } from "@daodao/api";
-import { posthogCapture } from "@daodao/analytics";
 import { Separator } from "@daodao/ui/components/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
-import { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { ContributorInfo } from "./contributor-info";
 import { ResourceIntroduction } from "./introduction";
 
@@ -41,8 +41,8 @@ export function ResourceDetailClient({
         platform: "web",
       });
     }
-  // recordView 是 useCallback 空 deps，referrer 取自 mount 時的 document，故意只跑一次
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    // recordView 是 useCallback 空 deps，referrer 取自 mount 時的 document，故意只跑一次
+  }, [recordView, resource.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const currentTab = (searchParams.get("tab") as TabEnum) ?? defaultTab;
 

@@ -31,7 +31,7 @@ const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(
 
     React.useEffect(() => {
       setHasError(false);
-    }, [src]);
+    }, []);
 
     if (!src || hasError) return null;
 

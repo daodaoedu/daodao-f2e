@@ -9,9 +9,9 @@
  * client and server components. The consumer app manages the RSC boundary.
  */
 
+import { getRequiredEnv } from "@daodao/config";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
-import { getRequiredEnv } from "@daodao/config";
 
 // ============================================================================
 // Types
@@ -95,7 +95,9 @@ const buildShowcaseQuery = (params: IShowcaseFeedParams, afterId?: string | null
   if (params.duration_min != null) query.set("duration_min", String(params.duration_min));
   if (params.duration_max != null) query.set("duration_max", String(params.duration_max));
   if (params.tags && params.tags.length > 0) {
-    params.tags.forEach((tag) => { query.append("tags[]", tag); });
+    params.tags.forEach((tag) => {
+      query.append("tags[]", tag);
+    });
   }
   return query.toString();
 };
@@ -104,34 +106,24 @@ const buildShowcaseQuery = (params: IShowcaseFeedParams, afterId?: string | null
  * Infinite scroll hook for the 靈感 (showcase) feed from AI backend.
  */
 export function useShowcaseFeed(params: IShowcaseFeedParams) {
-  const getKey = (
-    pageIndex: number,
-    previousPageData: AIResponse<IShowcasePractice[]> | null
-  ) => {
+  const getKey = (pageIndex: number, previousPageData: AIResponse<IShowcasePractice[]> | null) => {
     // Stop if previous page has no next cursor
     if (previousPageData && !previousPageData.pagination?.hasNext) return null;
 
-    const afterId =
-      pageIndex === 0
-        ? null
-        : previousPageData?.pagination?.cursors?.end ?? null;
+    const afterId = pageIndex === 0 ? null : (previousPageData?.pagination?.cursors?.end ?? null);
 
     const qs = buildShowcaseQuery(params, afterId);
     return `/api/v1/users/practices?${qs}`;
   };
 
-  const { data, error, isLoading, isValidating, size, setSize } =
-    useSWRInfinite<AIResponse<IShowcasePractice[]>>(
-      getKey,
-      (path: string) => fetchAiBackend<AIResponse<IShowcasePractice[]>>(path),
-      {
-        revalidateFirstPage: false,
-        revalidateOnFocus: false,
-      }
-    );
+  const { data, error, isLoading, isValidating, size, setSize } = useSWRInfinite<
+    AIResponse<IShowcasePractice[]>
+  >(getKey, (path: string) => fetchAiBackend<AIResponse<IShowcasePractice[]>>(path), {
+    revalidateFirstPage: false,
+    revalidateOnFocus: false,
+  });
 
-  const practices: IShowcasePractice[] =
-    data?.flatMap((page) => page.data ?? []) ?? [];
+  const practices: IShowcasePractice[] = data?.flatMap((page) => page.data ?? []) ?? [];
 
   // Default to false until first page resolves to avoid spurious prefetch on mount
   const hasMore = data ? (data[data.length - 1]?.pagination?.hasNext ?? false) : false;

@@ -10,7 +10,11 @@ interface ReactionAggregateLabelProps {
  * 反應聚合顯示文字
  * 例：「王小明 與其他 5 人覺得很有啟發」
  */
-export function ReactionAggregateLabel({ type, count, latestActorName }: ReactionAggregateLabelProps) {
+export function ReactionAggregateLabel({
+  type,
+  count,
+  latestActorName,
+}: ReactionAggregateLabelProps) {
   if (count === 0) return null;
 
   const config = REACTION_CONFIG[type];

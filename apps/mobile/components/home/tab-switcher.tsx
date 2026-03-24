@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet } from "react-native";
-import { Text, XStack, View } from "tamagui";
+import { Text, View, XStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 
 export type TabType = "inspire" | "mine";

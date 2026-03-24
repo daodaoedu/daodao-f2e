@@ -24,7 +24,9 @@ export function BrewingCard({ practice }: BrewingCardProps) {
           marginBottom="$3"
         >
           <Text fontSize={16}>🍵</Text>
-          <Text fontSize={12} color="rgba(0,0,0,0.6)">內容醞釀中，完成後解鎖！</Text>
+          <Text fontSize={12} color="rgba(0,0,0,0.6)">
+            內容醞釀中，完成後解鎖！
+          </Text>
         </XStack>
       }
     />

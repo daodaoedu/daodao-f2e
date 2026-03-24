@@ -26,7 +26,7 @@ export const useNotifications = (params?: { cursor?: string; limit?: number }) =
     {
       refreshInterval: 30 * 1000,
       revalidateOnFocus: true,
-    },
+    }
   );
 };
 

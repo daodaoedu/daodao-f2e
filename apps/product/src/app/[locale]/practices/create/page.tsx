@@ -191,7 +191,11 @@ export default function CreatePracticePage() {
               <p className="text-text-dark/70">目前沒有可用的模板</p>
             </div>
           ) : (
-            <Carousel key={selectedCategory} className="w-full" opts={{ loop: false, align: "start" }}>
+            <Carousel
+              key={selectedCategory}
+              className="w-full"
+              opts={{ loop: false, align: "start" }}
+            >
               <CarouselContent className="-ml-2">
                 {practiceGroups.map((group) => (
                   <CarouselItem key={group.id} className="pl-2 basis-[80%] sm:basis-1/2">

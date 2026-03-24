@@ -12,7 +12,11 @@ import { cn } from "@daodao/ui/lib/utils";
 import { MoreHorizontal, Pencil, Send, Trash2 } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { PICKER_REACTIONS, REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
+import {
+  PICKER_REACTIONS,
+  REACTION_CONFIG,
+  type ReactionTypeType,
+} from "@/constants/reaction-type";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
 const PREVIEW_COUNT = 2;
@@ -251,7 +255,9 @@ function CommentBubble({
     targetId: comment.id,
   });
   const [, startReactionTransition] = useTransition();
-  const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(undefined);
+  const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(
+    undefined
+  );
 
   const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
     null) as ReactionTypeType | null;
@@ -259,14 +265,17 @@ function CommentBubble({
   const commentReactions: ReactionTypeType[] = effectiveReaction ? [effectiveReaction] : [];
   const totalReactionCount = (reactionsData?.data?.reactions ?? []).reduce(
     (sum, r) => sum + r.count,
-    0,
+    0
   );
   const activeReactionTypes = (reactionsData?.data?.reactions ?? [])
     .filter((r) => r.count > 0)
     .sort((a, b) => b.count - a.count)
     .map((r) => r.type as ReactionTypeType);
   const displayReactions = effectiveReaction
-    ? [effectiveReaction, ...activeReactionTypes.filter((t) => t !== effectiveReaction)].slice(0, PICKER_REACTIONS.length)
+    ? [effectiveReaction, ...activeReactionTypes.filter((t) => t !== effectiveReaction)].slice(
+        0,
+        PICKER_REACTIONS.length
+      )
     : activeReactionTypes.slice(0, PICKER_REACTIONS.length);
 
   const handleCommentReactionToggle = useCallback(
@@ -452,12 +461,7 @@ function CommentBubble({
             </div>
           </div>
         ) : (
-          <p
-            className={cn(
-              "text-[#295E5C] leading-5 whitespace-pre-wrap",
-              "text-sm"
-            )}
-          >
+          <p className={cn("text-[#295E5C] leading-5 whitespace-pre-wrap", "text-sm")}>
             {renderContent(comment.content)}
           </p>
         )}
@@ -537,7 +541,9 @@ export function CommentSection({
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyInputs, setReplyInputs] = useState<Record<string, string>>({});
   const [mentionedIds, setMentionedIds] = useState<Map<number, string>>(new Map());
-  const [replyMentionedIds, setReplyMentionedIds] = useState<Record<string, Map<number, string>>>({});
+  const [replyMentionedIds, setReplyMentionedIds] = useState<Record<string, Map<number, string>>>(
+    {}
+  );
   const [expanded, setExpanded] = useState(false);
   const previewComments = hasMoreComments ? comments.slice(0, PREVIEW_COUNT) : comments;
   const hiddenComments = hasMoreComments ? comments.slice(PREVIEW_COUNT) : [];
@@ -684,9 +690,7 @@ export function CommentSection({
         <div className="pl-[40px] flex gap-2 items-center mt-3">
           <MentionInput
             value={replyInputs[comment.id] ?? ""}
-            onChange={(v) =>
-              setReplyInputs((prev) => ({ ...prev, [comment.id]: v }))
-            }
+            onChange={(v) => setReplyInputs((prev) => ({ ...prev, [comment.id]: v }))}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
                 e.preventDefault();
@@ -703,7 +707,7 @@ export function CommentSection({
               setReplyMentionedIds((prev) => {
                 const prevMap = prev[pid] ?? new Map<number, string>();
                 const next = new Map(prevMap);
-                next.set(candidate.numericUserId!, candidate.customId || candidate.name);
+                next.set(candidate.numericUserId as number, candidate.customId || candidate.name);
                 return { ...prev, [pid]: next };
               });
             }}
@@ -729,9 +733,7 @@ export function CommentSection({
           {currentUserPhotoURL && (
             <AvatarImage src={currentUserPhotoURL} alt={currentUserName || "我"} />
           )}
-          <AvatarFallback
-            className={cn(getAvatarColor("Me"))}
-          />
+          <AvatarFallback className={cn(getAvatarColor("Me"))} />
         </Avatar>
 
         {/* Input with @mention support */}
@@ -748,7 +750,7 @@ export function CommentSection({
             if (!candidate.numericUserId) return;
             setMentionedIds((prev) => {
               const next = new Map(prev);
-              next.set(candidate.numericUserId!, candidate.customId || candidate.name);
+              next.set(candidate.numericUserId as number, candidate.customId || candidate.name);
               return next;
             });
           }}

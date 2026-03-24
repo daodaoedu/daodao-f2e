@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuth } from "@daodao/auth";
-import cooporationImg from "@daodao/assets/images/landing-page/cooporation.png";
 import { useUsers } from "@daodao/api";
+import cooporationImg from "@daodao/assets/images/landing-page/cooporation.png";
+import { useAuth } from "@daodao/auth";
 import { ANCHOR_IDS } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
@@ -33,12 +33,7 @@ export function CommunitySection() {
 
           {/* 插圖 */}
           <div className="relative mx-auto my-8 aspect-[4/3] w-full max-w-sm">
-            <Image
-              src={cooporationImg}
-              alt="社群討論"
-              fill
-              className="object-contain"
-            />
+            <Image src={cooporationImg} alt="社群討論" fill className="object-contain" />
           </div>
 
           {/* 統計數字 */}

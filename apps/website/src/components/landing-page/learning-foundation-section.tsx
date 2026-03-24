@@ -150,19 +150,15 @@ export function LearningFoundationSection() {
 
     return data.data.map((template, index) => {
       const cardData = convertTemplateToCard(template, index);
-      return (
-        <PracticeCard
-          key={cardData.id}
-          tag={tag}
-          {...cardData}
-          onClick={handleCardClick}
-        />
-      );
+      return <PracticeCard key={cardData.id} tag={tag} {...cardData} onClick={handleCardClick} />;
     });
   }, [data, tag, handleCardClick]);
 
   return (
-    <section id={ANCHOR_IDS.LEARNING_INSPIRATION} className="relative overflow-hidden bg-white py-16 md:py-24">
+    <section
+      id={ANCHOR_IDS.LEARNING_INSPIRATION}
+      className="relative overflow-hidden bg-white py-16 md:py-24"
+    >
       {/* Background blur decorations */}
       <Image
         src="/assets/landing-page/bg-blur-1.svg"

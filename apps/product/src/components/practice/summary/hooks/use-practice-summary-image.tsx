@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  captureElementAsImage,
-  type CapturedImageData,
-} from "@daodao/shared";
+import { type CapturedImageData, captureElementAsImage } from "@daodao/shared";
 import { useCallback, useRef, useState } from "react";
 
 interface UsePracticeSummaryImageOptions {
@@ -36,13 +33,15 @@ interface UsePracticeSummaryImageReturn {
  * @returns 安全的檔案名稱
  */
 const sanitizeFilename = (name: string): string => {
-  return name
-    .replace(/[/\\?%*:|"<>]/g, "-") // 移除不安全字元
-    .replace(/^\.+/, "") // 移除開頭的點
-    .replace(/\.+$/, "") // 移除結尾的點
-    .replace(/\s+/g, "_") // 空白轉底線
-    .slice(0, 50)
-    .trim() || "practice"; // 確保不為空
+  return (
+    name
+      .replace(/[/\\?%*:|"<>]/g, "-") // 移除不安全字元
+      .replace(/^\.+/, "") // 移除開頭的點
+      .replace(/\.+$/, "") // 移除結尾的點
+      .replace(/\s+/g, "_") // 空白轉底線
+      .slice(0, 50)
+      .trim() || "practice"
+  ); // 確保不為空
 };
 
 /**

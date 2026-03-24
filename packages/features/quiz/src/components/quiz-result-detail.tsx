@@ -32,10 +32,7 @@ export const QuizResultDetail = ({ resultId }: QuizResultDetailProps) => {
           <header className="mb-1">
             <HorizontalFullSvg className="h-[22px]" />
           </header>
-          <BackButton
-            label="返回上一頁"
-            className="text-sm font-normal"
-          />
+          <BackButton label="返回上一頁" className="text-sm font-normal" />
           <h1 className="heading-md mb-3">群島全圖鑑</h1>
           <section className="mb-4 flex items-center">
             <div className="flex flex-1 flex-col gap-2">

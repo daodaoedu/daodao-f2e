@@ -4,12 +4,12 @@
 // ============================================================================
 
 export const ReactionType = {
-  encourage: "encourage",   // 🥰 一起加油！
-  touched:   "touched",     // 💓 很感動！
-  fire:      "fire",        // 🔥 學到了！
-  useful:    "useful",      // 👍 這好用！
-  sameHere:  "sameHere",    // 😳 我也是！
-  curious:   "curious",     // 🧐 想知道...
+  encourage: "encourage", // 🥰 一起加油！
+  touched: "touched", // 💓 很感動！
+  fire: "fire", // 🔥 學到了！
+  useful: "useful", // 👍 這好用！
+  sameHere: "sameHere", // 😳 我也是！
+  curious: "curious", // 🧐 想知道...
 } as const;
 
 export type ReactionTypeType = (typeof ReactionType)[keyof typeof ReactionType];

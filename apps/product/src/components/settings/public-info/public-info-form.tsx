@@ -8,8 +8,8 @@ import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { mutate as globalMutate } from "swr";
 import { useForm } from "react-hook-form";
+import { mutate as globalMutate } from "swr";
 import { AvatarUploadSection } from "./avatar-upload-section";
 import { BasicInfoSection } from "./basic-info-section";
 import { IntroductionSection } from "./introduction-section";
@@ -85,7 +85,8 @@ export const PublicInfoForm = () => {
         discord: contactList?.discord || "",
         line: contactList?.line || "",
         threads: contactList?.threads || "",
-        hideConnectionsCount: (user as { hideConnectionsCount?: boolean }).hideConnectionsCount ?? false,
+        hideConnectionsCount:
+          (user as { hideConnectionsCount?: boolean }).hideConnectionsCount ?? false,
       });
     }
   }, [userData, citiesData, form.reset]);
@@ -157,7 +158,7 @@ export const PublicInfoForm = () => {
 
       // 刷新用戶資料
       await mutate(["/api/v1/users/me"] as const);
-      globalMutate('/api/v1/users/settings-summary');
+      globalMutate("/api/v1/users/settings-summary");
 
       // 成功
       toast.success("公開資訊設定已更新");

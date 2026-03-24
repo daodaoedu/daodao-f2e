@@ -3,4 +3,4 @@ export type {
   CheckInStatus,
   CheckInStatusOptions,
 } from "./check-in-sheet";
-export { CheckInButton, CheckInSheetContent, CheckInPhase2SheetContent } from "./check-in-sheet";
+export { CheckInButton, CheckInPhase2SheetContent, CheckInSheetContent } from "./check-in-sheet";

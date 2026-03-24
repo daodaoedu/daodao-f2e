@@ -18,15 +18,14 @@ import {
   FlagOutlineSvg,
   TelescopeSvg,
 } from "@daodao/assets";
-import { Link } from "@daodao/i18n/navigation";
+import { Link, useRouter } from "@daodao/i18n/navigation";
+import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
-import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { MoreHorizontal } from "lucide-react";
-import { useRouter } from "@daodao/i18n/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import {
@@ -145,11 +144,14 @@ export function PracticeShowcaseCard({
   const { data: reactionsData, mutate } = useReactions({ targetType: "practice", targetId: id });
   const [, startTransition] = useTransition();
 
-  const currentUserReaction = (reactionsData?.data?.currentUserReaction ?? null) as ReactionTypeType | null;
+  const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
+    null) as ReactionTypeType | null;
   const selectedReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
   const allReactions = reactionsData?.data?.reactions ?? [];
   const totalCount = allReactions.reduce((sum, r) => sum + r.count, 0);
-  const displayReactions = allReactions.filter((r) => r.count > 0).map((r) => r.type as ReactionTypeType);
+  const displayReactions = allReactions
+    .filter((r) => r.count > 0)
+    .map((r) => r.type as ReactionTypeType);
 
   const handleToggle = useCallback(
     (type: ReactionTypeType) => {
@@ -158,16 +160,21 @@ export function PracticeShowcaseCard({
         if (isSelected) {
           await removeReaction({ targetType: "practice", targetId: id });
         } else {
-          await upsertReaction({ targetType: "practice", targetId: id, reactionType: type as ReactionTypeValue });
+          await upsertReaction({
+            targetType: "practice",
+            targetId: id,
+            reactionType: type as ReactionTypeValue,
+          });
         }
         await mutate();
       });
     },
-    [currentUserReaction, id, mutate],
+    [currentUserReaction, id, mutate]
   );
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
+    // biome-ignore lint/a11y/noStaticElementInteractions: card click for navigation
     <div
       className="bg-white rounded-2xl p-4 shadow-sm border border-[#E8F8FF] cursor-pointer"
       onClick={() => router.push(`/practices/${id}`)}
@@ -185,6 +192,7 @@ export function PracticeShowcaseCard({
 
         {/* More menu */}
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: stop card click */}
         <div ref={menuRef} className="relative" onClick={(e) => e.stopPropagation()}>
           <Button
             type="button"
@@ -242,24 +250,27 @@ export function PracticeShowcaseCard({
       </div>
 
       {/* Title */}
-      <h3 className="font-semibold text-text-dark text-base mb-2 line-clamp-2">
-        {title}
-      </h3>
+      <h3 className="font-semibold text-text-dark text-base mb-2 line-clamp-2">{title}</h3>
 
       {/* Avatar + action/frequency block */}
-      {(user || actionDescription || frequencyMinDays || frequencyMaxDays || sessionDurationMinutes) && (
+      {(user ||
+        actionDescription ||
+        frequencyMinDays ||
+        frequencyMaxDays ||
+        sessionDurationMinutes) && (
         <div className="flex items-start gap-3 mb-3">
           {user && (
             // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
+            // biome-ignore lint/a11y/noStaticElementInteractions: stop card click
             <span onClick={(e) => e.stopPropagation()}>
-            <Link href={`/users/${user.id}`} className="shrink-0">
-              <Avatar className="size-16">
-                {user.photoUrl && <AvatarImage src={user.photoUrl} />}
-                <AvatarFallback>
-                  <DefaultAvatarSvg />
-                </AvatarFallback>
-              </Avatar>
-            </Link>
+              <Link href={`/users/${user.id}`} className="shrink-0">
+                <Avatar className="size-16">
+                  {user.photoUrl && <AvatarImage src={user.photoUrl} />}
+                  <AvatarFallback>
+                    <DefaultAvatarSvg />
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
             </span>
           )}
           <div className="flex-1 min-w-0">
@@ -292,6 +303,7 @@ export function PracticeShowcaseCard({
 
       {/* Bottom bar: summary layout */}
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: stop card click */}
       <div
         className="flex items-center justify-between border-t border-[#E4EAE9] pt-3 mt-3"
         onClick={(e) => e.stopPropagation()}
@@ -322,9 +334,10 @@ export function PracticeShowcaseCard({
         const allComments = commentsData?.data ?? [];
         const preview = allComments.slice(-2);
         if (preview.length === 0) return null;
-        // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
         return (
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+          // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
+          // biome-ignore lint/a11y/noStaticElementInteractions: stop card click
           <div
             className="mt-3 flex flex-col gap-2 border-t border-[#E4EAE9] pt-3"
             onClick={(e) => e.stopPropagation()}

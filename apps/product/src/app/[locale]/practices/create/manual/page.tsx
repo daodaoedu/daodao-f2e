@@ -1,7 +1,6 @@
 "use client";
 
 import { type CreatePracticeRequestType, createPractice } from "@daodao/api";
-import type { PrivacyStatus } from "@/components/practice/shared/privacy-status-selector";
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { StorageEnum, useFormDraft } from "@daodao/shared";
@@ -20,6 +19,7 @@ import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";
 import { Step4 } from "@/components/practice/create/manual/steps/step-4";
 import { Step5 } from "@/components/practice/create/manual/steps/step-5";
+import type { PrivacyStatus } from "@/components/practice/shared/privacy-status-selector";
 import {
   type ExecutionTiming,
   type Frequency,
