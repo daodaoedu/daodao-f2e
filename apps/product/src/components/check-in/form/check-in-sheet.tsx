@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
@@ -54,7 +54,7 @@ export const CheckInSheetContent = ({
     },
   });
 
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (values: CheckInFormValuesType) => {
     setIsSubmitting(true);
@@ -233,7 +233,9 @@ export const CheckInButton = ({
 
 interface ICheckInPhase2SheetContentProps {
   taskTitle: string;
-  onComplete: (data: Omit<ICheckInFormData, "mood">) => Promise<void> | void;
+  /** Phase 1 選擇的心情（用於渲染卡片圖） */
+  mood: ICheckInFormData["mood"];
+  onComplete: (data: ICheckInFormData) => Promise<void> | void;
   /** API 無資料時的備用標籤列表（例如 mock 環境） */
   suggestedTags?: string[];
 }
@@ -244,29 +246,32 @@ interface ICheckInPhase2SheetContentProps {
  */
 export const CheckInPhase2SheetContent = ({
   taskTitle,
+  mood,
   onComplete,
   suggestedTags,
 }: ICheckInPhase2SheetContentProps) => {
   const form = useForm<CheckInFormValuesType>({
     resolver: zodResolver(checkInFormSchema),
     defaultValues: {
-      mood: null,
+      mood,
       tags: [],
       description: "",
       media: [],
     },
   });
 
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (values: CheckInFormValuesType) => {
     setIsSubmitting(true);
     try {
       await onComplete({
+        mood: values.mood,
         tags: values.tags,
         description: values.description,
         media: values.media,
       });
+      form.reset();
     } finally {
       setIsSubmitting(false);
     }

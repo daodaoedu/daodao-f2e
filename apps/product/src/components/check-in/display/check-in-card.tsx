@@ -1,11 +1,9 @@
 "use client";
 
 import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
-import { type CapturedImageData, captureElementAsImage } from "@daodao/shared";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
 import type * as React from "react";
-import { useEffect, useRef } from "react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 
 interface ICheckInCardProps {
@@ -18,66 +16,9 @@ interface ICheckInCardProps {
   titleClassName?: string;
   onImageClick?: (index: number) => void;
   showTape?: boolean;
-  onMaskedImageReady?: (maskedImageData: CapturedImageData) => void;
   /** 標題下方插入的額外內容（例如同日打卡切換導航） */
   afterTitle?: React.ReactNode;
 }
-
-/**
- * 在圖片上套用漸層遮罩
- */
-const applyGradientMask = async (imageData: CapturedImageData): Promise<CapturedImageData> => {
-  return new Promise((resolve) => {
-    const img = document.createElement("img");
-    img.crossOrigin = "anonymous";
-
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-
-      if (!ctx) {
-        resolve(imageData);
-        return;
-      }
-
-      // 使用高解析度 Canvas 以獲得清晰圖片
-      const devicePixelRatio = window.devicePixelRatio || 1;
-      const targetWidth = imageData.width * devicePixelRatio;
-      const targetHeight = imageData.height * devicePixelRatio;
-
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-
-      // 縮放 context 以保持正確的繪製比例
-      ctx.scale(devicePixelRatio, devicePixelRatio);
-
-      // 繪製原始圖片
-      ctx.drawImage(img, 0, 0, imageData.width, imageData.height);
-
-      // 繪製漸層遮罩
-      const gradient = ctx.createLinearGradient(0, 0, 0, imageData.height);
-      gradient.addColorStop(0.5, "rgba(255, 255, 255, 0)");
-      gradient.addColorStop(1, "#FFFFFF");
-
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, imageData.width, imageData.height);
-
-      const maskedDataUrl = canvas.toDataURL("image/jpeg", 0.95);
-
-      resolve({
-        src: maskedDataUrl,
-        width: imageData.width,
-        height: imageData.height,
-      });
-    };
-
-    img.onerror = () => {
-      resolve(imageData);
-    };
-
-    img.src = imageData.src;
-  });
-};
 
 /**
  * 打卡卡片組件
@@ -93,7 +34,6 @@ export const CheckInCard = ({
   titleClassName = "text-white",
   onImageClick,
   showTape = true,
-  onMaskedImageReady,
   afterTitle,
 }: ICheckInCardProps) => {
   const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
@@ -108,33 +48,6 @@ export const CheckInCard = ({
   const dateMonthDay = isValid(dateObj)
     ? format(dateObj, "MM/dd")
     : date.split(/[.-]/).slice(1).join("/") || "";
-
-  const mainRef = useRef<HTMLDivElement>(null);
-  const checkInImageRef = useRef<CapturedImageData | null>(null);
-
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      if (!mainRef.current) return;
-      const element = mainRef.current;
-      const actualWidth = element.clientWidth;
-      const actualHeight = element.clientHeight;
-      const imageData = await captureElementAsImage(element, {
-        width: actualWidth,
-        height: actualHeight,
-        x: 0,
-        y: 0,
-      });
-      if (imageData) {
-        const maskedImageData = await applyGradientMask(imageData);
-        checkInImageRef.current = maskedImageData;
-        onMaskedImageReady?.(maskedImageData);
-      }
-    }, 500);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [onMaskedImageReady]);
 
   return (
     <div className="max-w-[350px] mx-auto">
@@ -152,11 +65,10 @@ export const CheckInCard = ({
         <NotebookHoleSvg className="absolute -top-7 left-0" />
 
         <main
-          ref={mainRef}
           className="pt-4.5 bg-white max-h-[460px] overflow-y-auto scrollbar-hide px-5"
         >
           <div
-            className="pb-24"
+            className={images && images.filter(Boolean).length > 0 ? "pb-24" : "pb-8"}
             style={{
               backgroundImage:
                 "linear-gradient(to bottom, transparent 0px, transparent 38px, #99ECFF 38px, #99ECFF 39px)",
@@ -198,9 +110,9 @@ export const CheckInCard = ({
               )}
 
               {/* 圖片區域 */}
-              {images && images.length > 0 && (
+              {images && images.filter(Boolean).length > 0 && (
                 <div className="relative -mt-14">
-                  {images.slice(0, 3).map((imageUrl: string, displayIndex: number) => {
+                  {images.filter(Boolean).slice(0, 3).map((imageUrl: string, displayIndex: number) => {
                     const actualIndex = displayIndex;
                     const imageElement = (
                       <>

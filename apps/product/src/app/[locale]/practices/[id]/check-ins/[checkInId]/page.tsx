@@ -99,8 +99,7 @@ export default function CheckInDetailPage() {
         date: formatCheckInDate(checkIn.checkinDate),
         mood: moodType,
         content: checkIn.note || "",
-        // @TODO: 後續再處理 tags
-        tags: [],
+        tags: checkIn.tags || [],
         images: checkIn.imageUrls || [],
         practiceTitle: practiceData.data.title,
       };
