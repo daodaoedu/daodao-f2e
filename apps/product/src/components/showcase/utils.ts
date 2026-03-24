@@ -1,5 +1,5 @@
 import { format, parseISO } from "date-fns";
-import { REACTION_CONFIG } from "@/constants/reaction-type";
+import { PICKER_REACTIONS, REACTION_CONFIG } from "@/constants/reaction-type";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import type { IReactionCountItem } from "@daodao/api";
 
@@ -17,7 +17,7 @@ export const buildCheerDisplay = (reactions?: IReactionCountItem[]): CheerDispla
   const sorted = [...reactions].filter((r) => r.count > 0).sort((a, b) => b.count - a.count);
   if (sorted.length === 0) return null;
 
-  const topTwo = sorted.slice(0, 2);
+  const topTwo = sorted.slice(0, PICKER_REACTIONS.length);
   const emojis = topTwo.map((r) => {
     const config = REACTION_CONFIG[r.type as ReactionTypeType];
     return config?.emoji ?? "🔥";

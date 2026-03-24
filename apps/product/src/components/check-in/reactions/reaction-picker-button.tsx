@@ -3,7 +3,7 @@
 import { LikeOutlineSvg } from "@daodao/assets";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
+import { PICKER_REACTIONS, REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 import { LottieEmoji } from "./lottie-emoji";
 
 // ============================================================================
@@ -21,15 +21,59 @@ export interface ReactionPickerButtonProps {
   variant?: "card" | "comment" | "summary";
   /** comment / summary variant 的總反應計數（所有用戶，非僅當前用戶） */
   totalCount?: number;
-  /** 要疊加顯示的 reaction 類型（aggregate，最多 3 個） */
+  /** 要疊加顯示的 reaction 類型（aggregate，最多 4 個） */
   displayReactions?: ReactionTypeType[];
   /** summary variant：第一個反應者姓名 */
   firstReactorName?: string;
 }
 
-const PICKER_REACTIONS: ReactionTypeType[] = ["useful", "fire", "touched", "curious"];
-
 const LONG_PRESS_DELAY = 400;
+
+// ============================================================================
+// ReactionEmojiStack — 疊加 emoji 圓圈（共用）
+// ============================================================================
+
+interface ReactionEmojiStackProps {
+  reactions: ReactionTypeType[];
+  selectedReactions?: ReactionTypeType[];
+  size: number;
+  circleClassName: string;
+  selectedCircleClassName?: string;
+  unselectedCircleClassName?: string;
+  overlapClassName?: string;
+}
+
+function ReactionEmojiStack({
+  reactions,
+  selectedReactions = [],
+  size,
+  circleClassName,
+  selectedCircleClassName,
+  unselectedCircleClassName,
+  overlapClassName = "-ml-1",
+}: ReactionEmojiStackProps) {
+  return (
+    <div className="flex items-center">
+      {reactions.slice(0, PICKER_REACTIONS.length).map((type, i) => (
+        <div
+          key={type}
+          className={cn(
+            circleClassName,
+            selectedReactions.includes(type) ? selectedCircleClassName : unselectedCircleClassName,
+            i > 0 && overlapClassName,
+          )}
+        >
+          <LottieEmoji
+            url={REACTION_CONFIG[type].lottieUrl}
+            fallback={REACTION_CONFIG[type].emoji}
+            size={size}
+            play={selectedReactions.includes(type)}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // ============================================================================
 // ReactionPickerButton
@@ -161,27 +205,15 @@ export function ReactionPickerButton({
           >
             {/* Emoji 圓圈 */}
             {(displayReactions && displayReactions.length > 0) || hasSelection ? (
-              <div className="flex items-center">
-                {(displayReactions && displayReactions.length > 0 ? displayReactions : selectedReactions)
-                  .slice(0, 2)
-                  .map((type, i) => (
-                    <div
-                      key={type}
-                      className={cn(
-                        "size-7 rounded-full flex items-center justify-center ring-2 ring-white",
-                        selectedReactions.includes(type) ? "bg-[#E8FAF9]" : "bg-[#EAF7FF]",
-                        i > 0 && "-ml-1.5"
-                      )}
-                    >
-                      <LottieEmoji
-                        url={REACTION_CONFIG[type].lottieUrl}
-                        fallback={REACTION_CONFIG[type].emoji}
-                        size={18}
-                        play={selectedReactions.includes(type)}
-                      />
-                    </div>
-                  ))}
-              </div>
+              <ReactionEmojiStack
+                reactions={displayReactions && displayReactions.length > 0 ? displayReactions : selectedReactions}
+                selectedReactions={selectedReactions}
+                size={18}
+                circleClassName="size-7 rounded-full flex items-center justify-center ring-2 ring-white"
+                selectedCircleClassName="bg-[#E8FAF9]"
+                unselectedCircleClassName="bg-[#EAF7FF]"
+                overlapClassName="-ml-1.5"
+              />
             ) : (
               <LikeOutlineSvg className="size-6 text-[#9FB5B8]" />
             )}
@@ -264,32 +296,13 @@ export function ReactionPickerButton({
           {isCard ? (
             /* card variant：顯示聚合 reaction emoji（含他人）+ 總數，或預設 👍 */
             <>
-              {displayReactions && displayReactions.length > 0 ? (
-                <div className="flex items-center">
-                  {displayReactions.slice(0, 2).map((type, i) => (
-                    <div key={type} className={cn("size-[22px]", i > 0 && "-ml-1")}>
-                      <LottieEmoji
-                        url={REACTION_CONFIG[type].lottieUrl}
-                        fallback={REACTION_CONFIG[type].emoji}
-                        size={22}
-                        play={selectedReactions.includes(type)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              ) : hasSelection ? (
-                <div className="flex items-center">
-                  {selectedReactions.slice(-2).map((type, i) => (
-                    <div key={type} className={cn("size-[22px]", i > 0 && "-ml-1")}>
-                      <LottieEmoji
-                        url={REACTION_CONFIG[type].lottieUrl}
-                        fallback={REACTION_CONFIG[type].emoji}
-                        size={22}
-                        play={true}
-                      />
-                    </div>
-                  ))}
-                </div>
+              {(displayReactions && displayReactions.length > 0) || hasSelection ? (
+                <ReactionEmojiStack
+                  reactions={displayReactions && displayReactions.length > 0 ? displayReactions : selectedReactions}
+                  selectedReactions={selectedReactions}
+                  size={22}
+                  circleClassName="size-[22px]"
+                />
               ) : (
                 <LikeOutlineSvg className="size-[22px]" />
               )}
@@ -301,25 +314,14 @@ export function ReactionPickerButton({
             /* comment variant：Facebook 疊加圓圈（displayReactions）+ 總數 */
             <>
               {displayReactions && displayReactions.length > 0 ? (
-                <div className="flex items-center">
-                  {displayReactions.slice(0, 3).map((type, i) => (
-                    <div
-                      key={type}
-                      className={cn(
-                        "size-5 rounded-full flex items-center justify-center ring-1 ring-white",
-                        selectedReactions.includes(type) ? "bg-[#E8FAF9]" : "bg-[#F0F4F4]",
-                        i > 0 && "-ml-1"
-                      )}
-                    >
-                      <LottieEmoji
-                        url={REACTION_CONFIG[type].lottieUrl}
-                        fallback={REACTION_CONFIG[type].emoji}
-                        size={14}
-                        play={selectedReactions.includes(type)}
-                      />
-                    </div>
-                  ))}
-                </div>
+                <ReactionEmojiStack
+                  reactions={displayReactions}
+                  selectedReactions={selectedReactions}
+                  size={14}
+                  circleClassName="size-5 rounded-full flex items-center justify-center ring-1 ring-white"
+                  selectedCircleClassName="bg-[#E8FAF9]"
+                  unselectedCircleClassName="bg-[#EAF7FF]"
+                />
               ) : (
                 <LikeOutlineSvg className="size-5" />
               )}

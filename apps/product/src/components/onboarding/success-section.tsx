@@ -23,7 +23,7 @@ export const SuccessSection = ({ userName }: SuccessSectionProps) => {
   const router = useRouter();
 
   const handleGoToPreferences = () => {
-    router.push("/settings/preferences");
+    router.push("/");
   };
 
   const handleSkip = () => {

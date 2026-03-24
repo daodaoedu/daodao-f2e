@@ -10,6 +10,41 @@ import {
 
 const LONG_PRESS_DELAY = 400;
 
+// ── ReactionEmojiStack — 疊加 emoji 圓圈（共用） ──
+
+interface ReactionEmojiStackProps {
+  reactions: ReactionTypeType[];
+  selectedReaction?: ReactionTypeType | null;
+  emojiSize: number;
+  overlap: number;
+  showCircle?: boolean;
+}
+
+function ReactionEmojiStack({
+  reactions,
+  selectedReaction,
+  emojiSize,
+  overlap,
+  showCircle,
+}: ReactionEmojiStackProps) {
+  return (
+    <XStack alignItems="center">
+      {reactions.slice(0, PICKER_REACTIONS.length).map((type, i) => (
+        <View
+          key={type}
+          style={[
+            showCircle && styles.emojiCircle,
+            showCircle && selectedReaction === type && styles.emojiCircleSelected,
+            i > 0 && { marginLeft: overlap },
+          ]}
+        >
+          <Text fontSize={emojiSize}>{REACTION_CONFIG[type]?.emoji ?? "👍"}</Text>
+        </View>
+      ))}
+    </XStack>
+  );
+}
+
 interface ReactionPickerButtonProps {
   selectedReaction: ReactionTypeType | null;
   onToggle: (type: ReactionTypeType) => void;
@@ -105,25 +140,13 @@ export function ReactionPickerButton({
         {isSummary ? (
           <XStack alignItems="center" gap="$2">
             {hasReactions ? (
-              <XStack alignItems="center">
-                {(displayReactions.length > 0
-                  ? displayReactions.slice(0, 2)
-                  : selectedReaction
-                    ? [selectedReaction]
-                    : []
-                ).map((type, i) => (
-                  <View
-                    key={type}
-                    style={[
-                      styles.emojiCircle,
-                      selectedReaction === type && styles.emojiCircleSelected,
-                      i > 0 && { marginLeft: -6 },
-                    ]}
-                  >
-                    <Text fontSize={14}>{REACTION_CONFIG[type]?.emoji ?? "👍"}</Text>
-                  </View>
-                ))}
-              </XStack>
+              <ReactionEmojiStack
+                reactions={displayReactions.length > 0 ? displayReactions : selectedReaction ? [selectedReaction] : []}
+                selectedReaction={selectedReaction}
+                emojiSize={14}
+                overlap={-6}
+                showCircle
+              />
             ) : (
               <ThumbsUp size={20} color="#9FB5B8" />
             )}
@@ -134,13 +157,12 @@ export function ReactionPickerButton({
         ) : (
           <XStack alignItems="center" justifyContent="center" gap="$2" width="100%">
             {displayReactions.length > 0 ? (
-              <XStack alignItems="center">
-                {displayReactions.slice(0, 2).map((type, i) => (
-                  <View key={type} style={[{ marginLeft: i > 0 ? -4 : 0 }]}>
-                    <Text fontSize={18}>{REACTION_CONFIG[type]?.emoji ?? "👍"}</Text>
-                  </View>
-                ))}
-              </XStack>
+              <ReactionEmojiStack
+                reactions={displayReactions}
+                selectedReaction={selectedReaction}
+                emojiSize={18}
+                overlap={-4}
+              />
             ) : selectedReaction ? (
               <Text fontSize={18}>{REACTION_CONFIG[selectedReaction]?.emoji ?? "👍"}</Text>
             ) : (

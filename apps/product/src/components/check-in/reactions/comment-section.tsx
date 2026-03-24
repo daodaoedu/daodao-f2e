@@ -12,7 +12,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { MoreHorizontal, Pencil, Send, Trash2 } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
+import { PICKER_REACTIONS, REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
 const PREVIEW_COUNT = 2;
@@ -266,8 +266,8 @@ function CommentBubble({
     .sort((a, b) => b.count - a.count)
     .map((r) => r.type as ReactionTypeType);
   const displayReactions = effectiveReaction
-    ? [effectiveReaction, ...activeReactionTypes.filter((t) => t !== effectiveReaction)].slice(0, 3)
-    : activeReactionTypes.slice(0, 3);
+    ? [effectiveReaction, ...activeReactionTypes.filter((t) => t !== effectiveReaction)].slice(0, PICKER_REACTIONS.length)
+    : activeReactionTypes.slice(0, PICKER_REACTIONS.length);
 
   const handleCommentReactionToggle = useCallback(
     (type: ReactionTypeType) => {

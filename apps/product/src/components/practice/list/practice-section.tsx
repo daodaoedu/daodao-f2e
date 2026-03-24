@@ -200,19 +200,21 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
       {/* 標題和篩選 */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-medium text-bg-dark">主題實踐</h2>
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="include-completed"
-            checked={includeCompleted}
-            onCheckedChange={(checked) => setIncludeCompleted(checked === true)}
-          />
-          <label
-            htmlFor="include-completed"
-            className="text-sm text-text-dark cursor-pointer select-none"
-          >
-            包含已完成
-          </label>
-        </div>
+        {practices.length > 0 && (
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="include-completed"
+              checked={includeCompleted}
+              onCheckedChange={(checked) => setIncludeCompleted(checked === true)}
+            />
+            <label
+              htmlFor="include-completed"
+              className="text-sm text-text-dark cursor-pointer select-none"
+            >
+              包含已完成
+            </label>
+          </div>
+        )}
       </div>
 
       {/* 子導航 */}
