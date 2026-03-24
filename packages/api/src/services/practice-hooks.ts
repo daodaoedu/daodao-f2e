@@ -393,11 +393,9 @@ export const updatePracticeCheckInWithFormData = async (
     formData.append("tags", JSON.stringify(data.tags));
   }
 
-  // 既有圖片 URL（要保留的）
+  // 既有圖片 URL（要保留的）— 空陣列代表清空所有圖片
   if (data.existingImageUrls !== undefined) {
-    data.existingImageUrls.forEach((url) => {
-      formData.append("imageUrls[]", url);
-    });
+    formData.append("imageUrls", JSON.stringify(data.existingImageUrls));
   }
 
   // 新上傳的圖片檔案（多張）
