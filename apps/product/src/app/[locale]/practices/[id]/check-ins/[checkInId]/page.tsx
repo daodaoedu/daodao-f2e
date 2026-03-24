@@ -261,6 +261,7 @@ export default function CheckInDetailPage() {
         tags: data.tags,
         description: data.description,
         media: data.media,
+        existingImageUrls: data.existingImageUrls,
       });
       toast.success("打卡已更新");
     } catch (error) {

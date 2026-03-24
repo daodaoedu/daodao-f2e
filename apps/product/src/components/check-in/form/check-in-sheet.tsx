@@ -34,6 +34,8 @@ interface ICheckInSheetContentProps {
   onComplete: (data: ICheckInFormData) => Promise<void> | void;
   /** 初始值（用於編輯模式） */
   initialValues?: Partial<CheckInFormValuesType>;
+  /** 既有的圖片 URL（編輯模式時顯示） */
+  existingImages?: string[];
   /** 提交按鈕文字 */
   submitButtonText?: string;
 }
@@ -42,6 +44,7 @@ export const CheckInSheetContent = ({
   taskTitle,
   onComplete,
   initialValues,
+  existingImages,
   submitButtonText = "完成打卡",
 }: ICheckInSheetContentProps) => {
   const form = useForm<CheckInFormValuesType>({
@@ -55,6 +58,7 @@ export const CheckInSheetContent = ({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [keptExistingImages, setKeptExistingImages] = useState<string[]>(existingImages ?? []);
 
   const onSubmit = async (values: CheckInFormValuesType) => {
     setIsSubmitting(true);
@@ -64,6 +68,7 @@ export const CheckInSheetContent = ({
         tags: values.tags,
         description: values.description,
         media: values.media,
+        existingImageUrls: keptExistingImages.length > 0 || existingImages?.length ? keptExistingImages : undefined,
       });
       form.reset();
     } finally {
@@ -81,6 +86,20 @@ export const CheckInSheetContent = ({
 
         {/* Mood Selection */}
         <MoodSelector form={form} />
+
+        {/* Thought Sharing (tags, description, media) */}
+        {initialValues && (
+          <div className="mb-8">
+            <h3 className="text-base font-medium mb-3 text-text-dark">想法分享</h3>
+            <TagSelector form={form} />
+            <DescriptionField form={form} beforeTextarea={<ReflectionQuestion />} />
+            <MediaUploadField
+              form={form}
+              existingImages={existingImages}
+              onExistingImagesChange={setKeptExistingImages}
+            />
+          </div>
+        )}
 
         {/* Complete Button */}
         <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">

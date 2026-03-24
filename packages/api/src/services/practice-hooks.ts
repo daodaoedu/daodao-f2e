@@ -295,6 +295,8 @@ export interface ICheckInFormData {
   tags: string[];
   description: string;
   media: File[];
+  /** 編輯時要保留的既有圖片 URL */
+  existingImageUrls?: string[];
 }
 
 /**
@@ -391,7 +393,14 @@ export const updatePracticeCheckInWithFormData = async (
     formData.append("tags", JSON.stringify(data.tags));
   }
 
-  // 圖片檔案（多張）
+  // 既有圖片 URL（要保留的）
+  if (data.existingImageUrls !== undefined) {
+    data.existingImageUrls.forEach((url) => {
+      formData.append("imageUrls[]", url);
+    });
+  }
+
+  // 新上傳的圖片檔案（多張）
   if (data.media && data.media.length > 0) {
     data.media.forEach((file) => {
       formData.append("images", file);

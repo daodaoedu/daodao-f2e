@@ -8,6 +8,7 @@ import {
   FormMessage,
 } from "@daodao/ui/components/form";
 import imageCompression from "browser-image-compression";
+import { X } from "lucide-react";
 import { useCallback, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type { CheckInFormValuesType } from "../schema";
@@ -20,6 +21,10 @@ const ALLOWED_TYPES = [...COMPRESSIBLE_TYPES, "image/gif"];
 
 interface IMediaUploadFieldProps {
   form: UseFormReturn<CheckInFormValuesType>;
+  /** 既有的圖片 URL（編輯模式時顯示） */
+  existingImages?: string[];
+  /** 既有圖片變更時的回調（使用者刪除既有圖片） */
+  onExistingImagesChange?: (urls: string[]) => void;
 }
 
 /**
@@ -27,8 +32,18 @@ interface IMediaUploadFieldProps {
  * - 可壓縮格式（JPG/PNG/WebP）超過 500KB 自動壓縮
  * - GIF 超過 500KB 直接拒絕（壓縮會丟失動畫）
  */
-export const MediaUploadField = ({ form }: IMediaUploadFieldProps) => {
+export const MediaUploadField = ({ form, existingImages = [], onExistingImagesChange }: IMediaUploadFieldProps) => {
   const [isCompressing, setIsCompressing] = useState(false);
+  const [keptImages, setKeptImages] = useState<string[]>(existingImages);
+
+  const handleRemoveExistingImage = useCallback(
+    (index: number) => {
+      const updated = keptImages.filter((_, i) => i !== index);
+      setKeptImages(updated);
+      onExistingImagesChange?.(updated);
+    },
+    [keptImages, onExistingImagesChange]
+  );
 
   const handleFilesChange = useCallback(
     async (newFiles: File[], fieldOnChange: (files: File[]) => void) => {
@@ -109,16 +124,38 @@ export const MediaUploadField = ({ form }: IMediaUploadFieldProps) => {
             </FormLabel>
 
             <FormDescription className="text-sm text-light-gray">
-              {isCompressing ? "壓縮中..." : `已上傳 ${field.value?.length || 0}/3 張`}
+              {isCompressing ? "壓縮中..." : `已上傳 ${keptImages.length + (field.value?.length || 0)}/3 張`}
             </FormDescription>
           </div>
+
+          {/* 既有圖片預覽（可刪除） */}
+          {keptImages.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {keptImages.map((url, index) => (
+                <div key={url} className="relative">
+                  <div className="size-20 rounded-lg overflow-hidden border-2 border-gray-200">
+                    <img src={url} alt={`既有圖片 ${index + 1}`} className="w-full h-full object-cover" />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveExistingImage(index)}
+                    className="absolute top-2 right-2 size-5 bg-[#295E5C66]/40 text-white rounded-full flex items-center justify-center"
+                    aria-label="移除圖片"
+                  >
+                    <X className="size-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <FormControl>
             <FileUpload
               files={field.value}
               onFilesChange={(newFiles) => handleFilesChange(newFiles, field.onChange)}
               accept="image/jpeg,image/png,image/webp,image/gif"
               multiple
-              maxFiles={3}
+              maxFiles={3 - keptImages.length}
               disabled={isCompressing}
             />
           </FormControl>
