@@ -12,19 +12,21 @@ const LONG_PRESS_DELAY = 400;
 
 // ── ReactionEmojiStack — 疊加 emoji 圓圈（共用） ──
 
+interface ReactionEmojiStackProps {
+  reactions: ReactionTypeType[];
+  selectedReaction?: ReactionTypeType | null;
+  emojiSize: number;
+  overlap: number;
+  showCircle?: boolean;
+}
+
 function ReactionEmojiStack({
   reactions,
   selectedReaction,
   emojiSize,
   overlap,
   showCircle,
-}: {
-  reactions: ReactionTypeType[];
-  selectedReaction?: ReactionTypeType | null;
-  emojiSize: number;
-  overlap: number;
-  showCircle?: boolean;
-}) {
+}: ReactionEmojiStackProps) {
   return (
     <XStack alignItems="center">
       {reactions.slice(0, PICKER_REACTIONS.length).map((type, i) => (

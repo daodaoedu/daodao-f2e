@@ -38,6 +38,8 @@ interface ReactionEmojiStackProps {
   selectedReactions?: ReactionTypeType[];
   size: number;
   circleClassName: string;
+  selectedCircleClassName?: string;
+  unselectedCircleClassName?: string;
   overlapClassName?: string;
 }
 
@@ -46,6 +48,8 @@ function ReactionEmojiStack({
   selectedReactions = [],
   size,
   circleClassName,
+  selectedCircleClassName,
+  unselectedCircleClassName,
   overlapClassName = "-ml-1",
 }: ReactionEmojiStackProps) {
   return (
@@ -55,6 +59,7 @@ function ReactionEmojiStack({
           key={type}
           className={cn(
             circleClassName,
+            selectedReactions.includes(type) ? selectedCircleClassName : unselectedCircleClassName,
             i > 0 && overlapClassName,
           )}
         >
@@ -205,6 +210,8 @@ export function ReactionPickerButton({
                 selectedReactions={selectedReactions}
                 size={18}
                 circleClassName="size-7 rounded-full flex items-center justify-center ring-2 ring-white"
+                selectedCircleClassName="bg-[#E8FAF9]"
+                unselectedCircleClassName="bg-[#EAF7FF]"
                 overlapClassName="-ml-1.5"
               />
             ) : (
@@ -312,6 +319,8 @@ export function ReactionPickerButton({
                   selectedReactions={selectedReactions}
                   size={14}
                   circleClassName="size-5 rounded-full flex items-center justify-center ring-1 ring-white"
+                  selectedCircleClassName="bg-[#E8FAF9]"
+                  unselectedCircleClassName="bg-[#EAF7FF]"
                 />
               ) : (
                 <LikeOutlineSvg className="size-5" />
