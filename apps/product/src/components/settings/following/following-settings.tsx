@@ -80,12 +80,14 @@ export const FollowingSettings = () => {
               if (!user) return null;
               return (
                 <div key={user.id} className="flex items-center gap-3 bg-white rounded-lg p-3">
-                  <Avatar className="size-10 shrink-0">
-                    <AvatarImage src={user.photoURL} alt={user.name} />
-                    <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
-                      {user.name.slice(0, 1)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <CustomLink href={`/users/${user.identifier ?? user.id}`} className="shrink-0">
+                    <Avatar className="size-10">
+                      <AvatarImage src={user.photoURL} alt={user.name} />
+                      <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
+                        {user.name.slice(0, 1)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </CustomLink>
                   <div className="flex-1 min-w-0">
                     <CustomLink href={`/users/${user.identifier ?? user.id}`} className="text-sm font-medium text-text-dark hover:underline">
                       {user.name}
