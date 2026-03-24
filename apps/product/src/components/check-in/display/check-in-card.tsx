@@ -198,12 +198,10 @@ export const CheckInCard = ({
               )}
 
               {/* 圖片區域 */}
-              {images && images.length > 1 && (
+              {images && images.length > 0 && (
                 <div className="relative -mt-14">
-                  {images.slice(1, 4).map((imageUrl: string, displayIndex: number) => {
-                    // displayIndex 是顯示時的索引（0, 1, 2）
-                    // 實際的圖片索引是 displayIndex + 1（1, 2, 3）
-                    const actualIndex = displayIndex + 1;
+                  {images.slice(0, 3).map((imageUrl: string, displayIndex: number) => {
+                    const actualIndex = displayIndex;
                     const imageElement = (
                       <>
                         {displayIndex === 0 && showTape && (
