@@ -16,8 +16,9 @@ export type GetNotificationsResponse =
 export type GetNotificationPreferencesResponse =
   paths["/api/v1/notifications/preferences"]["get"]["responses"]["200"]["content"]["application/json"];
 
-export type UpdateNotificationPreferencesRequest =
-  NonNullable<paths["/api/v1/notifications/preferences"]["put"]["requestBody"]>["content"]["application/json"];
+export type UpdateNotificationPreferencesRequest = NonNullable<
+  paths["/api/v1/notifications/preferences"]["put"]["requestBody"]
+>["content"]["application/json"];
 
 export type NotificationActionResponse =
   paths["/api/v1/notifications/read-all"]["patch"]["responses"]["200"]["content"]["application/json"];
@@ -53,9 +54,7 @@ export const getNotificationPreferences = async () => {
 };
 
 /** 更新通知偏好設定（含全局開關） */
-export const updateNotificationPreferences = async (
-  body: UpdateNotificationPreferencesRequest,
-) => {
+export const updateNotificationPreferences = async (body: UpdateNotificationPreferencesRequest) => {
   return client.PUT("/api/v1/notifications/preferences", { body });
 };
 

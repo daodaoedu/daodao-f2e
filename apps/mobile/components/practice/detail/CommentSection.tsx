@@ -1,14 +1,14 @@
+import { Pencil, Send, Trash2 } from "@tamagui/lucide-icons";
 import { useCallback, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, TextInput } from "react-native";
-import { Send, Pencil, Trash2 } from "@tamagui/lucide-icons";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import {
   type Comment,
-  useComments,
   createComment,
-  updateComment,
   deleteComment,
+  updateComment,
+  useComments,
 } from "@/hooks/useComments";
 import { useAuth } from "@/providers/AuthProvider";
 import { formatRelativeTime } from "@/utils/format-time";
@@ -82,7 +82,9 @@ export function CommentSection({ targetType, targetId }: CommentSectionProps) {
       <YStack gap="$3" paddingVertical="$3">
         {comments.length === 0 ? (
           <YStack alignItems="center" paddingVertical="$8">
-            <Text color="rgba(0,0,0,0.4)" fontSize={14}>還沒有留言</Text>
+            <Text color="rgba(0,0,0,0.4)" fontSize={14}>
+              還沒有留言
+            </Text>
           </YStack>
         ) : (
           comments.map((comment) => {
@@ -136,7 +138,9 @@ export function CommentSection({ targetType, targetId }: CommentSectionProps) {
       >
         {editingId && (
           <Pressable onPress={cancelEdit}>
-            <Text fontSize={12} color={colors.primary.base}>取消</Text>
+            <Text fontSize={12} color={colors.primary.base}>
+              取消
+            </Text>
           </Pressable>
         )}
         <TextInput

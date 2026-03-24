@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { analyticsService } from "@/services/analytics";
-import { type IAuthTokens, authStorage, type IStoredUser } from "@/services/auth-storage";
+import { authStorage, type IAuthTokens, type IStoredUser } from "@/services/auth-storage";
 
 interface IAuthState {
   user: IStoredUser | null;

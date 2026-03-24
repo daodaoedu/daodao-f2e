@@ -29,7 +29,7 @@ export const useReactions = (params: IGetReactionsParams) => {
     {
       refreshInterval: 30_000,
       revalidateOnFocus: true,
-    },
+    }
   );
 };
 
@@ -50,6 +50,6 @@ export const useReactionsList = (params: IGetReactionsParams) => {
     {
       refreshInterval: 30_000,
       revalidateOnFocus: true,
-    },
+    }
   );
 };

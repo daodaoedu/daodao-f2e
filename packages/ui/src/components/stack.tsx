@@ -164,7 +164,9 @@ export default function Stack({
               }}
             >
               {React.isValidElement(card.content)
-                ? React.cloneElement(card.content, { isActive: index === stack.length - 1 } as Record<string, unknown>)
+                ? React.cloneElement(card.content, {
+                    isActive: index === stack.length - 1,
+                  } as Record<string, unknown>)
                 : card.content}
             </motion.div>
           </CardRotate>

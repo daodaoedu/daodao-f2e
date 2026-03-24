@@ -3,9 +3,9 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
+import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { api } from "@/services/api-client";
-import { colors } from "@/generated/design-tokens";
 
 export default function InteractionSettingsScreen() {
   const router = useRouter();
@@ -54,11 +54,7 @@ export default function InteractionSettingsScreen() {
             borderColor="$borderColor"
             overflow="hidden"
           >
-            <XStack
-              padding="$4"
-              alignItems="center"
-              justifyContent="space-between"
-            >
+            <XStack padding="$4" alignItems="center" justifyContent="space-between">
               <YStack flex={1} gap="$1">
                 <Text fontSize={15} color="$color">
                   公開我的實踐

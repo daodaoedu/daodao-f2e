@@ -1,7 +1,7 @@
+import { ThumbsUp } from "@tamagui/lucide-icons";
 import { useCallback, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet } from "react-native";
 import { Text, View, XStack } from "tamagui";
-import { ThumbsUp } from "@tamagui/lucide-icons";
 import {
   PICKER_REACTIONS,
   REACTION_CONFIG,
@@ -96,9 +96,7 @@ export function ReactionPickerButton({
   const summaryText = (() => {
     if (totalCount <= 0) return null;
     if (firstReactorName) {
-      return totalCount > 1
-        ? `${firstReactorName} 與其他 ${totalCount - 1} 人`
-        : firstReactorName;
+      return totalCount > 1 ? `${firstReactorName} 與其他 ${totalCount - 1} 人` : firstReactorName;
     }
     return `${totalCount} 人`;
   })();
@@ -141,7 +139,13 @@ export function ReactionPickerButton({
           <XStack alignItems="center" gap="$2">
             {hasReactions ? (
               <ReactionEmojiStack
-                reactions={displayReactions.length > 0 ? displayReactions : selectedReaction ? [selectedReaction] : []}
+                reactions={
+                  displayReactions.length > 0
+                    ? displayReactions
+                    : selectedReaction
+                      ? [selectedReaction]
+                      : []
+                }
                 selectedReaction={selectedReaction}
                 emojiSize={14}
                 overlap={-6}
@@ -151,7 +155,9 @@ export function ReactionPickerButton({
               <ThumbsUp size={20} color="#9FB5B8" />
             )}
             {summaryText && (
-              <Text fontSize={13} color="#295E5C">{summaryText}</Text>
+              <Text fontSize={13} color="#295E5C">
+                {summaryText}
+              </Text>
             )}
           </XStack>
         ) : (
@@ -169,7 +175,9 @@ export function ReactionPickerButton({
               <ThumbsUp size={20} color="#9FB5B8" />
             )}
             {totalCount > 0 && (
-              <Text fontSize={14} fontWeight="500" color="#295E5C">{totalCount}</Text>
+              <Text fontSize={14} fontWeight="500" color="#295E5C">
+                {totalCount}
+              </Text>
             )}
           </XStack>
         )}

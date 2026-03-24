@@ -1,10 +1,10 @@
 "use client";
 
-import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { Button } from "@daodao/ui/components/button";
+import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CheckInDateButton } from "./check-in-date-button";
 import type { ICheckInDateSelectorProps } from "./types";
 
@@ -161,9 +161,7 @@ export const MobileCheckInDateSelector = ({
         <div className="w-10" />
 
         {/* 中間標題 */}
-        {title && (
-          <h1 className="text-lg font-medium text-bg-dark">{title}</h1>
-        )}
+        {title && <h1 className="text-lg font-medium text-bg-dark">{title}</h1>}
 
         {/* 右側關閉按鈕 */}
         <Button

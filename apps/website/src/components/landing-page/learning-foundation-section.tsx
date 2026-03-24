@@ -3,6 +3,7 @@
 import { type PracticeTemplateType, usePracticeTemplates } from "@daodao/api";
 import { BlueSvg, GreenSvg, PinkSvg, YellowSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
+import { ANCHOR_IDS } from "@daodao/shared";
 import { Image } from "@daodao/ui/components/image";
 import Stack from "@daodao/ui/components/stack";
 import { ChevronRight, Loader2 } from "lucide-react";
@@ -149,19 +150,15 @@ export function LearningFoundationSection() {
 
     return data.data.map((template, index) => {
       const cardData = convertTemplateToCard(template, index);
-      return (
-        <PracticeCard
-          key={cardData.id}
-          tag={tag}
-          {...cardData}
-          onClick={handleCardClick}
-        />
-      );
+      return <PracticeCard key={cardData.id} tag={tag} {...cardData} onClick={handleCardClick} />;
     });
   }, [data, tag, handleCardClick]);
 
   return (
-    <section className="relative overflow-hidden bg-white py-16 md:py-24">
+    <section
+      id={ANCHOR_IDS.LEARNING_INSPIRATION}
+      className="relative overflow-hidden bg-white py-16 md:py-24"
+    >
       {/* Background blur decorations */}
       <Image
         src="/assets/landing-page/bg-blur-1.svg"

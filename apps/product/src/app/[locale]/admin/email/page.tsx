@@ -1,6 +1,12 @@
 "use client";
 
-import { sendBulkEmail, sendCustomEmail, useEmailHealth, useEmailHistory, useEmailStats } from "@daodao/api";
+import {
+  sendBulkEmail,
+  sendCustomEmail,
+  useEmailHealth,
+  useEmailHistory,
+  useEmailStats,
+} from "@daodao/api";
 import { cn } from "@daodao/ui/lib/utils";
 import { AlertTriangle, CheckCircle, Send, XCircle } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -80,7 +86,10 @@ function EmailStatsTab() {
   const chartData = useMemo(
     () =>
       (emailStats?.byTemplate ?? []).map((item) => ({
-        name: EMAIL_TYPE_OPTIONS.find((o) => o.value === item.template)?.label ?? item.template ?? "Unknown",
+        name:
+          EMAIL_TYPE_OPTIONS.find((o) => o.value === item.template)?.label ??
+          item.template ??
+          "Unknown",
         count: item.count ?? 0,
       })),
     [emailStats]
@@ -176,13 +185,19 @@ function EmailStatsTab() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3 rounded-xl border border-border bg-white p-4 shadow-sm">
         <div>
-          <label htmlFor="tracking-opened" className="block text-xs font-medium text-basic-400 mb-1">
+          <label
+            htmlFor="tracking-opened"
+            className="block text-xs font-medium text-basic-400 mb-1"
+          >
             開啟狀態
           </label>
           <select
             id="tracking-opened"
             value={openedFilter}
-            onChange={(e) => { setOpenedFilter(e.target.value as "true" | "false" | ""); setPage(1); }}
+            onChange={(e) => {
+              setOpenedFilter(e.target.value as "true" | "false" | "");
+              setPage(1);
+            }}
             className="rounded-lg border border-border px-3 py-1.5 text-sm"
           >
             <option value="">全部</option>
@@ -192,13 +207,19 @@ function EmailStatsTab() {
         </div>
 
         <div>
-          <label htmlFor="tracking-email-type" className="block text-xs font-medium text-basic-400 mb-1">
+          <label
+            htmlFor="tracking-email-type"
+            className="block text-xs font-medium text-basic-400 mb-1"
+          >
             郵件類型
           </label>
           <select
             id="tracking-email-type"
             value={emailTypeFilter}
-            onChange={(e) => { setEmailTypeFilter(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setEmailTypeFilter(e.target.value);
+              setPage(1);
+            }}
             className="rounded-lg border border-border px-3 py-1.5 text-sm"
           >
             {EMAIL_TYPE_OPTIONS.map((opt) => (
@@ -210,27 +231,39 @@ function EmailStatsTab() {
         </div>
 
         <div>
-          <label htmlFor="tracking-start-date" className="block text-xs font-medium text-basic-400 mb-1">
+          <label
+            htmlFor="tracking-start-date"
+            className="block text-xs font-medium text-basic-400 mb-1"
+          >
             開始日期
           </label>
           <input
             id="tracking-start-date"
             type="date"
             value={startDate}
-            onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setStartDate(e.target.value);
+              setPage(1);
+            }}
             className="rounded-lg border border-border px-3 py-1.5 text-sm"
           />
         </div>
 
         <div>
-          <label htmlFor="tracking-end-date" className="block text-xs font-medium text-basic-400 mb-1">
+          <label
+            htmlFor="tracking-end-date"
+            className="block text-xs font-medium text-basic-400 mb-1"
+          >
             結束日期
           </label>
           <input
             id="tracking-end-date"
             type="date"
             value={endDate}
-            onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setEndDate(e.target.value);
+              setPage(1);
+            }}
             className="rounded-lg border border-border px-3 py-1.5 text-sm"
           />
         </div>
@@ -259,10 +292,11 @@ function EmailStatsTab() {
               </tr>
             ) : (
               records.map((record) => (
-                <tr key={record.id} className="border-b border-border last:border-0 hover:bg-basic-50/50">
-                  <td className="px-4 py-3 text-text-dark">
-                    {record.recipientEmail ?? "-"}
-                  </td>
+                <tr
+                  key={record.id}
+                  className="border-b border-border last:border-0 hover:bg-basic-50/50"
+                >
+                  <td className="px-4 py-3 text-text-dark">{record.recipientEmail ?? "-"}</td>
                   <td className="px-4 py-3">
                     <span className="inline-block rounded-full bg-primary-base/10 px-2 py-0.5 text-xs font-medium text-primary-base">
                       {getEmailTypeLabel(record.emailType ?? "")}
@@ -285,7 +319,11 @@ function EmailStatsTab() {
                             : "bg-yellow-50 text-yellow-700"
                       )}
                     >
-                      {record.status === "sent" ? "已發送" : record.status === "failed" ? "失敗" : "待發送"}
+                      {record.status === "sent"
+                        ? "已發送"
+                        : record.status === "failed"
+                          ? "失敗"
+                          : "待發送"}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-basic-400 whitespace-nowrap">
@@ -309,7 +347,8 @@ function EmailStatsTab() {
       {pagination && (pagination.totalPages ?? 0) > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-basic-400">
-            共 {pagination.totalCount ?? 0} 筆，第 {pagination.currentPage ?? 1} / {pagination.totalPages ?? 1} 頁
+            共 {pagination.totalCount ?? 0} 筆，第 {pagination.currentPage ?? 1} /{" "}
+            {pagination.totalPages ?? 1} 頁
           </p>
           <div className="flex gap-2">
             <button
@@ -619,4 +658,3 @@ function EmailSendTab() {
     </div>
   );
 }
-

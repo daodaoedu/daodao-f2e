@@ -1,9 +1,9 @@
 "use client";
 
 import { useCurrentUser, useUserMutations } from "@daodao/api";
-import { useState } from "react";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
+import { useState } from "react";
 
 function Toggle({
   checked,
@@ -66,11 +66,7 @@ export const InteractionSettings = () => {
               開啟後，你的實踐將可以被搜尋展示
             </p>
           </div>
-          <Toggle
-            checked={isOpenProfile}
-            onCheckedChange={handleToggle}
-            disabled={isLoading}
-          />
+          <Toggle checked={isOpenProfile} onCheckedChange={handleToggle} disabled={isLoading} />
         </div>
       </div>
     </div>

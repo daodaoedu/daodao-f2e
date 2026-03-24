@@ -2,9 +2,9 @@
   "common": {
     "title": "DaoDao",
     "description": "DaoDao aims to build a diverse network of learning resources, enabling self-directed learners to find suitable ways to grow and become the people they aspire to be, while fostering a spirit of mutual support. We are currently actively developing a collaborative learning resource platform.",
-    "landing_solutions": "Solutions",
-    "landing_features": "Features",
-    "landing_plans": "Plans",
+    "landing_learning_inspiration": "Learning Inspiration",
+    "landing_community": "Community",
+    "landing_learning_dna": "Learning DNA",
     "landing_persona_title": "Everyone has their own island of learning.\nThrough sharing and exchange, we connect as an archipelago.",
     "landing_persona_subtitle": "Where personal growth meets collective wisdom!",
     "landing_persona_profession": "Expertise",

@@ -131,7 +131,9 @@ export const ShareCheckInSheetContent = ({
 
           {/* 分享到社群媒體 */}
           <div>
-            <h3 className="text-base font-medium mb-3 text-text-dark text-center">分享到社群媒體</h3>
+            <h3 className="text-base font-medium mb-3 text-text-dark text-center">
+              分享到社群媒體
+            </h3>
             <div className="flex justify-center gap-4">
               <Button
                 type="button"

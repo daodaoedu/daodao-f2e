@@ -46,7 +46,11 @@ export function PostHog() {
 
 // Helper functions for PostHog
 export const posthogCapture = (event: string, properties?: Record<string, unknown>) => {
-  if (typeof window !== "undefined" && window.posthog && typeof window.posthog.capture === "function") {
+  if (
+    typeof window !== "undefined" &&
+    window.posthog &&
+    typeof window.posthog.capture === "function"
+  ) {
     try {
       window.posthog.capture(event, properties);
     } catch {

@@ -5,8 +5,8 @@ import { ChartColumnIncreasingSvg, DialogOutlineSvg, TelescopeSvg } from "@daoda
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
-import { useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 
@@ -25,7 +25,13 @@ interface BrowseActivityContentProps {
   onClose?: () => void;
 }
 
-function FollowerRow({ follower, onClose }: { follower: IBrowseActivityFollower; onClose?: () => void }) {
+function FollowerRow({
+  follower,
+  onClose,
+}: {
+  follower: IBrowseActivityFollower;
+  onClose?: () => void;
+}) {
   const { data: followStatusData } = useFollowStatus("user", follower.id);
   const [localOverride, setLocalOverride] = useState<boolean | null>(null);
   const isFollowing = localOverride ?? followStatusData?.data?.isFollowing ?? false;
@@ -100,7 +106,6 @@ export function BrowseActivityContent({
   const uniqueReactions = [...new Set(followers.map((f) => f.reaction))] as ReactionTypeType[];
   const filteredFollowers =
     reactionFilter === "all" ? followers : followers.filter((f) => f.reaction === reactionFilter);
-
 
   return (
     <div className="flex flex-col">

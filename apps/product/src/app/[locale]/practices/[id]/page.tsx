@@ -1,5 +1,6 @@
 "use client";
 
+import { posthogCapture } from "@daodao/analytics";
 import {
   createComment,
   deleteComment,
@@ -14,17 +15,16 @@ import {
   useReactionsList,
   useRecordView,
 } from "@daodao/api";
-import { posthogCapture } from "@daodao/analytics";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
 import { zhTW } from "date-fns/locale";
+import { X } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo } from "react";
 import { CheckInButton } from "@/components/check-in";
 import type { IComment, ICommentReply } from "@/components/check-in/reactions";
 import { BackgroundAnimation } from "@/components/layout";
-import Link from "next/link";
-import { X } from "lucide-react";
 import { PracticeDetailShell } from "@/components/practice";
 import {
   type DurationDays,
@@ -178,7 +178,12 @@ export default function PracticeDetailPage() {
   const params = useParams();
   const practiceId = params.id as string;
 
-  const { data: practiceData, isLoading, error, mutate: mutatePractice } = usePracticeById(practiceId);
+  const {
+    data: practiceData,
+    isLoading,
+    error,
+    mutate: mutatePractice,
+  } = usePracticeById(practiceId);
   const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
     limit: 30,
   });
@@ -215,8 +220,8 @@ export default function PracticeDetailPage() {
         platform: "web",
       });
     }
-  // recordView 是 useCallback 空 deps，referrer 取自 mount 時的 document，故意只跑一次
-  }, [practiceId]); // eslint-disable-line react-hooks/exhaustive-deps
+    // recordView 是 useCallback 空 deps，referrer 取自 mount 時的 document，故意只跑一次
+  }, [practiceId, recordView]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const practice: IPracticeDetailData | null = useMemo(() => {
     if (!practiceData?.data) {

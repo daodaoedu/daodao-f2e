@@ -35,7 +35,8 @@ export const CheckInDateButton = ({
 }: ICheckInDateButtonProps) => {
   const hasCheckIn = item.hasCheckIn ?? !!checkIns[item.id];
   // 優先使用日期比對（支援同日多筆打卡切換時仍正確高亮），否則降級為 ID 比對
-  const isActive = hasCheckIn && (activeDate ? item.date === activeDate : item.id === activeCheckInId);
+  const isActive =
+    hasCheckIn && (activeDate ? item.date === activeDate : item.id === activeCheckInId);
   // 計算打卡次數對應的透明度
   const checkInCount = item.checkInCount ?? (hasCheckIn ? 1 : 0);
   const fillOpacity = getCheckInOpacity(checkInCount);

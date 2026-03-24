@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import useSWR, { mutate as globalMutate } from "swr";
 import { api } from "@/services/api-client";
 

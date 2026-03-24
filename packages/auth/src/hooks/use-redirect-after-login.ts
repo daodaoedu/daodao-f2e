@@ -1,8 +1,8 @@
 "use client";
 
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { getStorage, StorageEnum } from "@daodao/shared";
 import { decodeOAuthState, verifyAndConsumeOAuthState } from "../lib/auth-client";
 import { DEFAULT_REDIRECT_URL, ONBOARDING_URL } from "../lib/auth-constants";
 

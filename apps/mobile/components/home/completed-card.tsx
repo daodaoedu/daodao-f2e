@@ -1,6 +1,6 @@
-import { ArrowRight, Eye, MessageSquare } from "@tamagui/lucide-icons";
+import { ArrowRight } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, View as RNView } from "react-native";
+import { Pressable, View as RNView, StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import type { ICompletedTask } from "@/hooks/usePractices";
@@ -11,26 +11,32 @@ interface CompletedCardProps {
 
 export function CompletedCard({ task }: CompletedCardProps) {
   const router = useRouter();
-  const { id, label, title, description, viewCount, commentCount, tags } = task;
+  const { id, label, title, description, tags } = task;
 
   return (
     <Pressable
       style={styles.card}
-      onPress={() => router.push(`/practices/${id}` as any)}
+      onPress={() => router.push(`/practices/${id}` as `/practices/${string}`)}
     >
       {/* Label + tags */}
       <XStack justifyContent="space-between" gap="$1">
         <View style={styles.labelBadge}>
-          <Text fontSize={12} color="#16B9B3">{label}</Text>
+          <Text fontSize={12} color="#16B9B3">
+            {label}
+          </Text>
         </View>
         <XStack gap="$2" flexWrap="wrap">
           {tags.slice(0, 2).map((tag) => (
             <View key={tag} style={styles.tagBadge}>
-              <Text fontSize={12} color="#6B7280">{tag}</Text>
+              <Text fontSize={12} color="#6B7280">
+                {tag}
+              </Text>
             </View>
           ))}
           {tags.length > 2 && (
-            <Text fontSize={12} color="#9CA3AF" paddingVertical={2}>+{tags.length - 2}</Text>
+            <Text fontSize={12} color="#9CA3AF" paddingVertical={2}>
+              +{tags.length - 2}
+            </Text>
           )}
         </XStack>
       </XStack>
@@ -41,7 +47,9 @@ export function CompletedCard({ task }: CompletedCardProps) {
           <Text fontSize={16} fontWeight="500" color={colors.text.dark} marginBottom="$1">
             {title}
           </Text>
-          <Text fontSize={12} color={colors.text.dark}>{description}</Text>
+          <Text fontSize={12} color={colors.text.dark}>
+            {description}
+          </Text>
         </YStack>
         <View style={{ alignSelf: "center" }}>
           <ArrowRight size={24} color="#9CA3AF" />

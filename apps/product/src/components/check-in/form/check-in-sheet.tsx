@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isBefore, parse, startOfDay } from "date-fns";
 import { CalendarCheck, Check, Eye } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CheckInStatus } from "@/constants/check-in-status";
 import { useCheckInPhase2Sheet } from "@/hooks/use-check-in-phase2-sheet";
@@ -68,7 +68,8 @@ export const CheckInSheetContent = ({
         tags: values.tags,
         description: values.description,
         media: values.media,
-        existingImageUrls: keptExistingImages.length > 0 || existingImages?.length ? keptExistingImages : undefined,
+        existingImageUrls:
+          keptExistingImages.length > 0 || existingImages?.length ? keptExistingImages : undefined,
       });
       form.reset();
     } finally {

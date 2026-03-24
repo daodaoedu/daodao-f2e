@@ -46,7 +46,9 @@ export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBa
     <YStack gap="$3" paddingTop="$2">
       {/* Status filter */}
       <YStack>
-        <Text fontSize={12} color="rgba(0,0,0,0.5)" marginBottom="$1.5">狀態</Text>
+        <Text fontSize={12} color="rgba(0,0,0,0.5)" marginBottom="$1.5">
+          狀態
+        </Text>
         <XStack gap="$2" flexWrap="wrap">
           {STATUS_OPTIONS.map((opt) => {
             const isSelected = filters.status === opt.value;
@@ -67,7 +69,9 @@ export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBa
 
       {/* Duration filter */}
       <YStack>
-        <Text fontSize={12} color="rgba(0,0,0,0.5)" marginBottom="$1.5">實踐週期</Text>
+        <Text fontSize={12} color="rgba(0,0,0,0.5)" marginBottom="$1.5">
+          實踐週期
+        </Text>
         <XStack gap="$2" flexWrap="wrap">
           {DURATION_OPTIONS.map((opt) => {
             const isSelected = filters.durationMin === opt.min && filters.durationMax === opt.max;

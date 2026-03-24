@@ -3,8 +3,8 @@
 import {
   type IShowcaseFeedParams,
   type IShowcasePractice,
-  useMyPractices,
   useMyPracticeStats,
+  useMyPractices,
   useShowcaseFeed,
 } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
@@ -72,7 +72,9 @@ export default function HomePage() {
       if (f.status) params.set("status", f.status);
       if (f.durationMin != null) params.set("duration_min", String(f.durationMin));
       if (f.durationMax != null) params.set("duration_max", String(f.durationMax));
-      f.tags.forEach((tag) => params.append("tags[]", tag));
+      for (const tag of f.tags) {
+        params.append("tags[]", tag);
+      }
       const qs = params.toString();
       router.replace(qs ? `?${qs}` : "?", { scroll: false });
     },
@@ -87,7 +89,7 @@ export default function HomePage() {
     [filters, updateUrlParams]
   );
 
-  const handleFiltersChange = useCallback(
+  const _handleFiltersChange = useCallback(
     (newFilters: ShowcaseFilterState) => {
       setFilters(newFilters);
       updateUrlParams(keyword, newFilters);
@@ -108,8 +110,13 @@ export default function HomePage() {
     [keyword, filters]
   );
 
-  const { practices, isLoading: isShowcaseLoading, hasMore, loadMore, isValidating } =
-    useShowcaseFeed(feedParams);
+  const {
+    practices,
+    isLoading: isShowcaseLoading,
+    hasMore,
+    loadMore,
+    isValidating,
+  } = useShowcaseFeed(feedParams);
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -203,7 +210,8 @@ export default function HomePage() {
 
   const hasPractices = inProgressTasks.length > 0 || completedTasks.length > 0;
   const showInProgress = filterStatus !== FilterStatus.completed;
-  const showCompleted = filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
+  const showCompleted =
+    filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
 
   return (
     <div className="relative min-h-screen">
@@ -273,10 +281,10 @@ export default function HomePage() {
                         user={
                           practice.user
                             ? {
-                              id: practice.user.id,
-                              name: practice.user.name,
-                              photoUrl: practice.user.photo_url,
-                            }
+                                id: practice.user.id,
+                                name: practice.user.name,
+                                photoUrl: practice.user.photo_url,
+                              }
                             : undefined
                         }
                         actionDescription={practice.practice_action}
@@ -296,10 +304,10 @@ export default function HomePage() {
                         user={
                           practice.user
                             ? {
-                              id: practice.user.id,
-                              name: practice.user.name,
-                              photoUrl: practice.user.photo_url,
-                            }
+                                id: practice.user.id,
+                                name: practice.user.name,
+                                photoUrl: practice.user.photo_url,
+                              }
                             : undefined
                         }
                         actionDescription={practice.practice_action}
@@ -322,50 +330,47 @@ export default function HomePage() {
           )}
 
           {/* 我的 Tab */}
-          {activeTab === "mine" && (
-            <>
-              {isMyLoading ? (
-                <div className="text-center text-text-dark">載入中...</div>
-              ) : (
-                <>
-                  <DashboardHeader stats={stats} />
-                  {!hasPractices && <RandomPracticesSection compact />}
-                  {hasPractices && (
-                    <>
-                      <div className="mb-4">
-                        <div
-                          role="tablist"
-                          aria-label="任務篩選"
-                          className="flex gap-2 overflow-x-auto scrollbar-hide"
-                        >
-                          {filterOptions.map((option) => (
-                            <button
-                              type="button"
-                              key={option.value}
-                              role="tab"
-                              aria-selected={filterStatus === option.value}
-                              onClick={() => setFilterStatus(option.value)}
-                              className={cn(
-                                "px-5 py-2 rounded-full text-sm whitespace-nowrap border transition-colors",
-                                filterStatus === option.value
-                                  ? "bg-primary-base border-primary-base text-white"
-                                  : "bg-white border-primary-base text-primary-base"
-                              )}
-                            >
-                              {option.label}
-                            </button>
-                          ))}
-                        </div>
+          {activeTab === "mine" &&
+            (isMyLoading ? (
+              <div className="text-center text-text-dark">載入中...</div>
+            ) : (
+              <>
+                <DashboardHeader stats={stats} />
+                {!hasPractices && <RandomPracticesSection compact />}
+                {hasPractices && (
+                  <>
+                    <div className="mb-4">
+                      <div
+                        role="tablist"
+                        aria-label="任務篩選"
+                        className="flex gap-2 overflow-x-auto scrollbar-hide"
+                      >
+                        {filterOptions.map((option) => (
+                          <button
+                            type="button"
+                            key={option.value}
+                            role="tab"
+                            aria-selected={filterStatus === option.value}
+                            onClick={() => setFilterStatus(option.value)}
+                            className={cn(
+                              "px-5 py-2 rounded-full text-sm whitespace-nowrap border transition-colors",
+                              filterStatus === option.value
+                                ? "bg-primary-base border-primary-base text-white"
+                                : "bg-white border-primary-base text-primary-base"
+                            )}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
                       </div>
+                    </div>
 
-                      {showInProgress && <InProgressSection tasks={filteredInProgressTasks} />}
-                      {showCompleted && <CompletedSection tasks={completedTasks} />}
-                    </>
-                  )}
-                </>
-              )}
-            </>
-          )}
+                    {showInProgress && <InProgressSection tasks={filteredInProgressTasks} />}
+                    {showCompleted && <CompletedSection tasks={completedTasks} />}
+                  </>
+                )}
+              </>
+            ))}
         </div>
       </main>
 

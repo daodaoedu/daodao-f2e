@@ -6,11 +6,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Spinner, Text, View, XStack, YStack } from "tamagui";
 import { CheckInList, CheckInSheet, ProgressRing, ShareCheckInSheet } from "@/components";
 import type { ICheckInData } from "@/components/CheckInSheet";
+import { PublicPracticeView } from "@/components/practice/detail/PublicPracticeView";
 import { colors } from "@/generated/design-tokens";
 import { useCheckIn, useCheckIns, usePractice } from "@/hooks/usePractices";
-import { useAuth } from "@/providers/AuthProvider";
-import { PublicPracticeView } from "@/components/practice/detail/PublicPracticeView";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
+import { useAuth } from "@/providers/AuthProvider";
 
 // 狀態標籤配置
 const statusConfig: Record<string, { label: string; backgroundColor: string; textColor: string }> =
@@ -90,7 +90,7 @@ export default function PracticeDetailScreen() {
   }, []);
 
   // Parse showcase data passed from 靈感 tab
-  const showcasePractice = showcaseData ? JSON.parse(showcaseData) as IShowcasePractice : null;
+  const showcasePractice = showcaseData ? (JSON.parse(showcaseData) as IShowcasePractice) : null;
   const isPublicView = showcasePractice != null && showcasePractice.user?.id !== currentUser?.id;
 
   // Public practice view (from 靈感 tab) — check BEFORE loading to avoid waiting for usePractice
@@ -107,11 +107,13 @@ export default function PracticeDetailScreen() {
           frequencyMinDays: showcasePractice.frequency_min_days,
           frequencyMaxDays: showcasePractice.frequency_max_days,
           sessionDurationMinutes: showcasePractice.session_duration_minutes,
-          user: showcasePractice.user ? {
-            id: showcasePractice.user.id,
-            name: showcasePractice.user.name,
-            photoUrl: showcasePractice.user.photo_url,
-          } : undefined,
+          user: showcasePractice.user
+            ? {
+                id: showcasePractice.user.id,
+                name: showcasePractice.user.name,
+                photoUrl: showcasePractice.user.photo_url,
+              }
+            : undefined,
         }}
         onRefresh={async () => {}}
       />

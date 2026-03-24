@@ -1,21 +1,21 @@
 "use client";
 
 import {
-  useConnections,
-  useIncomingConnectionRequests,
-  useOutgoingConnectionRequests,
   useConnectionMutations,
+  useConnections,
+  useCurrentUser,
   useFollowers,
   useFollowing,
   useFollowMutations,
-  useCurrentUser,
+  useIncomingConnectionRequests,
+  useOutgoingConnectionRequests,
 } from "@daodao/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { toast } from "@daodao/ui/components/sonner";
-import { cn } from "@daodao/ui/lib/utils";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
+import { cn } from "@daodao/ui/lib/utils";
 import { useState } from "react";
 
 // ─────────────────────────────────────────────
@@ -36,11 +36,7 @@ const ConnectionsTab = () => {
   const connections = connectionsData?.data ?? [];
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">
-        載入中...
-      </div>
-    );
+    return <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">載入中...</div>;
   }
 
   const handleAccept = async (requestId: string, name: string) => {
@@ -175,7 +171,10 @@ const ConnectionsTab = () => {
             {outgoingRequests.map((req) => {
               const name = req.receiverNickname ?? "用戶";
               return (
-                <div key={req.requestId} className="bg-white rounded-lg p-3 flex items-center gap-3">
+                <div
+                  key={req.requestId}
+                  className="bg-white rounded-lg p-3 flex items-center gap-3"
+                >
                   <Avatar className="size-10 shrink-0">
                     <AvatarImage src={req.receiverPhotoUrl ?? undefined} alt={name} />
                     <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
@@ -212,15 +211,16 @@ const ConnectionsTab = () => {
           我的夥伴{connections.length > 0 && ` · ${connections.length} 人`}
         </h2>
         {connections.length === 0 ? (
-          <div className="text-center py-12 text-[#9FB5B8] text-sm">
-            尚未與任何人建立連結
-          </div>
+          <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未與任何人建立連結</div>
         ) : (
           <div className="flex flex-col gap-2">
             {connections.map((conn) => {
               const name = conn.nickname ?? "用戶";
               return (
-                <div key={conn.connectionId} className="bg-white rounded-lg p-3 flex items-center gap-3">
+                <div
+                  key={conn.connectionId}
+                  className="bg-white rounded-lg p-3 flex items-center gap-3"
+                >
                   <Avatar className="size-10 shrink-0">
                     <AvatarImage src={conn.photoUrl ?? undefined} alt={name} />
                     <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
@@ -319,9 +319,7 @@ const FollowingTab = () => {
         ) : subTab === "users" ? (
           <div className="flex flex-col gap-2">
             {followedUsers.length === 0 ? (
-              <div className="text-center py-12 text-[#9FB5B8] text-sm">
-                尚未關注任何使用者
-              </div>
+              <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未關注任何使用者</div>
             ) : (
               followedUsers.map(({ user }) => {
                 if (!user) return null;
@@ -340,9 +338,7 @@ const FollowingTab = () => {
                       >
                         {user.name}
                       </CustomLink>
-                      {user.bio && (
-                        <p className="text-xs text-[#9FB5B8] truncate">{user.bio}</p>
-                      )}
+                      {user.bio && <p className="text-xs text-[#9FB5B8] truncate">{user.bio}</p>}
                     </div>
                     <Button
                       variant="outline"
@@ -360,9 +356,7 @@ const FollowingTab = () => {
         ) : (
           <div className="flex flex-col gap-2">
             {followedPractices.length === 0 ? (
-              <div className="text-center py-12 text-[#9FB5B8] text-sm">
-                尚未關注任何實踐
-              </div>
+              <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未關注任何實踐</div>
             ) : (
               followedPractices.map(({ practice }) => {
                 if (!practice) return null;
@@ -410,9 +404,7 @@ const FollowingTab = () => {
         {loadingFollowers ? (
           <div className="flex justify-center py-8 text-[#9FB5B8] text-sm">載入中...</div>
         ) : followers.length === 0 ? (
-          <div className="text-center py-12 text-[#9FB5B8] text-sm">
-            目前還沒有人關注你
-          </div>
+          <div className="text-center py-12 text-[#9FB5B8] text-sm">目前還沒有人關注你</div>
         ) : (
           <div className="flex flex-col gap-2">
             {followers.map((user) => (
@@ -430,9 +422,7 @@ const FollowingTab = () => {
                   >
                     {user.name}
                   </CustomLink>
-                  {user.bio && (
-                    <p className="text-xs text-[#9FB5B8] truncate">{user.bio}</p>
-                  )}
+                  {user.bio && <p className="text-xs text-[#9FB5B8] truncate">{user.bio}</p>}
                 </div>
               </div>
             ))}

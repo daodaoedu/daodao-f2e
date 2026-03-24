@@ -331,10 +331,7 @@ export const updateUserRole = async (userId: string, roleId: number) => {
 // Practices Stats API
 // ============================================================================
 
-export const getAdminPracticesStats = async (params?: {
-  startDate?: string;
-  endDate?: string;
-}) => {
+export const getAdminPracticesStats = async (params?: { startDate?: string; endDate?: string }) => {
   return client.GET("/api/v1/admin/practices/stats", {
     params: { query: { startDate: params?.startDate, endDate: params?.endDate } },
   });

@@ -37,11 +37,7 @@ interface PrivacyStatusSelectorProps {
   className?: string;
 }
 
-export function PrivacyStatusSelector({
-  value,
-  onChange,
-  className,
-}: PrivacyStatusSelectorProps) {
+export function PrivacyStatusSelector({ value, onChange, className }: PrivacyStatusSelectorProps) {
   return (
     <div className={cn("space-y-2", className)}>
       <p className="text-sm font-medium text-text-dark mb-3">誰可以看到你的實踐？</p>

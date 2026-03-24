@@ -96,7 +96,11 @@ export const NOTIFICATION_TYPES = [
   { type: "connect", label: "連結請求", description: "有人向你發出連結請求" },
   { type: "agree-connect", label: "連結確認", description: "對方同意了你的連結請求" },
   { type: "update-practice-checkin", label: "關注的實踐更新", description: "你關注的實踐有新打卡" },
-  { type: "practice-started", label: "關注的人開始實踐", description: "你關注的人開始了新主題實踐" },
+  {
+    type: "practice-started",
+    label: "關注的人開始實踐",
+    description: "你關注的人開始了新主題實踐",
+  },
   { type: "buddy-request", label: "Buddy 請求", description: "有人邀請你成為實踐夥伴" },
   { type: "weekly", label: "週報", description: "每週一的島嶼探索摘要" },
 ] as const;

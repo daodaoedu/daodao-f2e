@@ -5,13 +5,13 @@
 // ============================================================================
 
 import type { PracticeCheckInsResponse } from "@daodao/api";
-import Link from "next/link";
 import { X } from "lucide-react";
+import Link from "next/link";
+import type { IComment } from "@/components/check-in/reactions";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeDetailShell } from "@/components/practice";
 import { DurationDays, ExecutionTiming, Frequency } from "@/constants/practice-form";
 import { PracticeStatus } from "@/constants/practice-status";
-import type { IComment } from "@/components/check-in/reactions";
 
 const mockPractice = {
   id: "mock-001",

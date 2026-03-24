@@ -86,25 +86,51 @@ function GithubIcon({ size = 32 }: { size?: number }) {
 
 // ── Social link helpers ──
 
-type SocialPlatformType = "line" | "facebook" | "instagram" | "threads" | "linkedin" | "github" | "website" | "discord";
+type SocialPlatformType =
+  | "line"
+  | "facebook"
+  | "instagram"
+  | "threads"
+  | "linkedin"
+  | "github"
+  | "website"
+  | "discord";
 
 const SOCIAL_DISPLAY_ORDER: SocialPlatformType[] = [
-  "website", "github", "threads", "facebook", "instagram", "linkedin", "line", "discord",
+  "website",
+  "github",
+  "threads",
+  "facebook",
+  "instagram",
+  "linkedin",
+  "line",
+  "discord",
 ];
 
 const PLATFORMS_WITH_ICON: SocialPlatformType[] = [
-  "github", "facebook", "instagram", "threads", "linkedin",
+  "github",
+  "facebook",
+  "instagram",
+  "threads",
+  "linkedin",
 ];
 
 function getSocialIcon(platform: SocialPlatformType) {
   switch (platform) {
-    case "line": return <LineIcon />;
-    case "facebook": return <FacebookIcon />;
-    case "instagram": return <InstagramIcon />;
-    case "threads": return <ThreadsIcon />;
-    case "linkedin": return <LinkedInIcon />;
-    case "github": return <GithubIcon />;
-    default: return null;
+    case "line":
+      return <LineIcon />;
+    case "facebook":
+      return <FacebookIcon />;
+    case "instagram":
+      return <InstagramIcon />;
+    case "threads":
+      return <ThreadsIcon />;
+    case "linkedin":
+      return <LinkedInIcon />;
+    case "github":
+      return <GithubIcon />;
+    default:
+      return null;
   }
 }
 
@@ -131,16 +157,14 @@ export function UserInfoCard({
 
   // 將 contactList 轉成有值的 social links 陣列
   const socialLinks = contactList
-    ? SOCIAL_DISPLAY_ORDER
-        .filter((p) => {
-          const val = contactList[p as keyof IContactList];
-          return val != null && val !== "";
-        })
-        .map((p) => ({
-          platform: p,
-          value: contactList[p as keyof IContactList] as string,
-          hasIcon: PLATFORMS_WITH_ICON.includes(p),
-        }))
+    ? SOCIAL_DISPLAY_ORDER.filter((p) => {
+        const val = contactList[p as keyof IContactList];
+        return val != null && val !== "";
+      }).map((p) => ({
+        platform: p,
+        value: contactList[p as keyof IContactList] as string,
+        hasIcon: PLATFORMS_WITH_ICON.includes(p),
+      }))
     : [];
 
   const linksWithIcon = socialLinks.filter((l) => l.hasIcon);
@@ -206,11 +230,7 @@ export function UserInfoCard({
       {linksWithIcon.length > 0 && (
         <XStack gap={12} marginTop={16}>
           {linksWithIcon.map((link) => (
-            <Pressable
-              key={link.platform}
-              onPress={() => Linking.openURL(link.value)}
-              hitSlop={8}
-            >
+            <Pressable key={link.platform} onPress={() => Linking.openURL(link.value)} hitSlop={8}>
               {getSocialIcon(link.platform)}
             </Pressable>
           ))}
@@ -223,7 +243,11 @@ export function UserInfoCard({
           {linksWithoutIcon.map((link) => (
             <XStack key={link.platform} alignItems="center" gap={8}>
               <Text fontSize={12} color={colors.text.dark} fontWeight="500">
-                {link.platform === "line" ? "LINE" : link.platform === "discord" ? "Discord" : link.platform}
+                {link.platform === "line"
+                  ? "LINE"
+                  : link.platform === "discord"
+                    ? "Discord"
+                    : link.platform}
               </Text>
               <Text fontSize={12} color={colors.text.muted}>
                 {link.value}

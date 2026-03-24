@@ -37,7 +37,11 @@ export default function PracticeSummaryPageRoute() {
 
   const { data: practiceData, isLoading: isPracticeLoading } = usePracticeById(practiceId);
   const { data: currentUserData, isLoading: isUserLoading } = useCurrentUser();
-  const { summary, isLoading: isSummaryLoading, error: summaryError } = usePracticeSummary(practiceId);
+  const {
+    summary,
+    isLoading: isSummaryLoading,
+    error: summaryError,
+  } = usePracticeSummary(practiceId);
 
   // 判斷當前用戶是否為實踐的擁有者
   const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
@@ -63,8 +67,11 @@ export default function PracticeSummaryPageRoute() {
   const toastShownRef = useRef(false);
   useEffect(() => {
     if (!practiceData?.data || toastShownRef.current) return;
-    const privacyStatus = (practiceData.data as Record<string, unknown>).privacyStatus as string | undefined;
-    const isDismissed = typeof window !== "undefined" && localStorage.getItem(TOAST_DISMISSED_KEY) === "1";
+    const privacyStatus = (practiceData.data as Record<string, unknown>).privacyStatus as
+      | string
+      | undefined;
+    const isDismissed =
+      typeof window !== "undefined" && localStorage.getItem(TOAST_DISMISSED_KEY) === "1";
     if (!isDismissed && (privacyStatus === "public" || privacyStatus === "delayed")) {
       toastShownRef.current = true;
       toast("你的實踐打卡內容已公開", {

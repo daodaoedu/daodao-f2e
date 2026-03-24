@@ -1,6 +1,6 @@
 "use client";
 
-import type { MoodType, PracticeSummary } from "@daodao/api";
+import type { MoodType, PracticeSummary, UpdatePracticeRequestType } from "@daodao/api";
 import { updatePractice } from "@daodao/api";
 import {
   ArrowRightOutlineSvg,
@@ -17,11 +17,11 @@ import {
   VerifiedSvg,
   XFilledSvg,
 } from "@daodao/assets";
-import { toast } from "@daodao/ui/components/sonner";
 import { useRouter } from "@daodao/i18n/navigation";
 import { getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
+import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { Download, ExternalLink, Globe } from "lucide-react";
 import { motion } from "motion/react";
@@ -57,11 +57,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
   const [isPublishing, setIsPublishing] = useState(false);
 
   // 使用摘要圖片生成 hook
-  const {
-    summaryCardRef,
-    isGenerating,
-    downloadImage,
-  } = usePracticeSummaryImage({
+  const { summaryCardRef, isGenerating, downloadImage } = usePracticeSummaryImage({
     practiceName: summary.practiceName,
   });
 
@@ -73,7 +69,9 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
     if (isPublic || isPublishing) return;
     setIsPublishing(true);
     try {
-      await updatePractice(summary.practiceId, { privacy_status: "public" } as any);
+      await updatePractice(summary.practiceId, {
+        privacy_status: "public",
+      } as UpdatePracticeRequestType);
       setIsPublic(true);
     } catch {
       toast.error("公開失敗，請稍後再試");
@@ -166,8 +164,12 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <p className="font-inter text-sm font-normal text-text-dark text-center leading-loose">{summary.encouragementText}</p>
-            <p className="font-inter text-sm font-normal text-text-dark text-center leading-loose mt-1">以下是這趟旅程的總結</p>
+            <p className="font-inter text-sm font-normal text-text-dark text-center leading-loose">
+              {summary.encouragementText}
+            </p>
+            <p className="font-inter text-sm font-normal text-text-dark text-center leading-loose mt-1">
+              以下是這趟旅程的總結
+            </p>
           </motion.div>
         </section>
 
@@ -190,9 +192,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
         >
-          <h3 className="text-base font-medium text-text-dark text-center mb-4">
-            分享到社群媒體
-          </h3>
+          <h3 className="text-base font-medium text-text-dark text-center mb-4">分享到社群媒體</h3>
           <div className="flex justify-center gap-4 mb-4">
             <Button
               type="button"

@@ -29,24 +29,20 @@ const REFLECTION_QUESTIONS = [
 ];
 
 function pickRandom(excludeIndex: number): number {
-  const candidates = REFLECTION_QUESTIONS.map((_, i) => i).filter(
-    (i) => i !== excludeIndex
-  );
+  const candidates = REFLECTION_QUESTIONS.map((_, i) => i).filter((i) => i !== excludeIndex);
   const randomIndex = Math.floor(Math.random() * candidates.length);
-  return candidates[randomIndex]!;
+  return candidates[randomIndex] ?? 0;
 }
 
 export const useReflectionQuestion = () => {
-  const [index, setIndex] = useState(() =>
-    Math.floor(Math.random() * REFLECTION_QUESTIONS.length)
-  );
+  const [index, setIndex] = useState(() => Math.floor(Math.random() * REFLECTION_QUESTIONS.length));
 
   const nextQuestion = () => {
     setIndex((current) => pickRandom(current));
   };
 
   return {
-    question: REFLECTION_QUESTIONS[index]!,
+    question: REFLECTION_QUESTIONS[index] ?? REFLECTION_QUESTIONS[0] ?? "",
     nextQuestion,
   };
 };

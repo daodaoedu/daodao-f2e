@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import { mockQuestions, type IQuizAnswer } from "@/types/quiz";
+import { type IQuizAnswer, mockQuestions } from "@/types/quiz";
 
 export default function QuizQuestionsScreen() {
   const { quizId } = useLocalSearchParams<{ quizId: string }>();

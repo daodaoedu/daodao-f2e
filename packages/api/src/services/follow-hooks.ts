@@ -1,8 +1,14 @@
 "use client";
 
 import useSWR from "swr";
-import { getFollowers, getFollowing, followTarget, unfollowTarget, checkFollowStatus } from "./follow";
 import type { IGetFollowParams } from "./follow";
+import {
+  checkFollowStatus,
+  followTarget,
+  getFollowers,
+  getFollowing,
+  unfollowTarget,
+} from "./follow";
 
 // ============================================================================
 // Query Hooks
@@ -27,7 +33,7 @@ export const useFollowing = (params: IGetFollowParams) => {
 export const useFollowStatus = (targetType: "user" | "practice", targetId: string | undefined) => {
   return useSWR(
     targetId ? ["/api/v1/follows/check", targetType, targetId] : null,
-    () => checkFollowStatus(targetType, targetId!),
+    () => checkFollowStatus(targetType, targetId as string),
     { revalidateOnFocus: false }
   );
 };

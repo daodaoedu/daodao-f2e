@@ -4,15 +4,15 @@ import { useCallback, useEffect, useState } from "react";
 import { Alert, Modal, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Input, ScrollView, Text, XStack, YStack } from "tamagui";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { api } from "@/services/api-client";
-import { colors } from "@/generated/design-tokens";
 import {
   AVAILABLE_FIELDS,
   EDUCATION_STAGE_OPTIONS,
   INTEREST_CATEGORIES,
   POSITION_OPTIONS,
 } from "@/constants/settings";
+import { colors } from "@/generated/design-tokens";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { api } from "@/services/api-client";
 
 type FieldOptionType = { value: string; label: string };
 
@@ -53,11 +53,24 @@ function FieldSelectionModal({
         <YStack flex={1} backgroundColor="$background">
           <XStack padding="$4" alignItems="center" justifyContent="space-between">
             <Button size="$3" chromeless onPress={onClose}>
-              <Text fontSize={14} color="$color">取消</Text>
+              <Text fontSize={14} color="$color">
+                取消
+              </Text>
             </Button>
-            <Text fontSize={16} fontWeight="600" color="$color">{title}</Text>
-            <Button size="$3" chromeless onPress={() => { onConfirm(localSelected); onClose(); }}>
-              <Text fontSize={14} color={colors.primary.base} fontWeight="600">確定</Text>
+            <Text fontSize={16} fontWeight="600" color="$color">
+              {title}
+            </Text>
+            <Button
+              size="$3"
+              chromeless
+              onPress={() => {
+                onConfirm(localSelected);
+                onClose();
+              }}
+            >
+              <Text fontSize={14} color={colors.primary.base} fontWeight="600">
+                確定
+              </Text>
             </Button>
           </XStack>
           <Text fontSize={12} color="$color" opacity={0.5} paddingHorizontal="$4" marginBottom="$2">
@@ -144,9 +157,7 @@ export default function AccountSettingsScreen() {
 
       await api.put("/users/me", updateData);
       await mutate();
-      Alert.alert("成功", "帳號設定已更新", [
-        { text: "確定", onPress: () => router.back() },
-      ]);
+      Alert.alert("成功", "帳號設定已更新", [{ text: "確定", onPress: () => router.back() }]);
     } catch {
       Alert.alert("錯誤", "更新失敗，請稍後再試");
     } finally {
@@ -158,7 +169,9 @@ export default function AccountSettingsScreen() {
     return (
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center">
-          <Text fontSize={14} color="$color" opacity={0.5}>載入中...</Text>
+          <Text fontSize={14} color="$color" opacity={0.5}>
+            載入中...
+          </Text>
         </YStack>
       </SafeAreaView>
     );
@@ -168,30 +181,58 @@ export default function AccountSettingsScreen() {
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel="返回">
+          <Button
+            size="$4"
+            circular
+            chromeless
+            onPress={() => router.back()}
+            accessibilityLabel="返回"
+          >
             <ChevronLeft size={24} color="$color" />
           </Button>
-          <Text fontSize={18} fontWeight="600" color="$color" flex={1}>帳號設定</Text>
-          <Button size="$3" backgroundColor={colors.primary.base} pressStyle={{ opacity: 0.8 }} onPress={handleSave} disabled={isSubmitting}>
-            <Text color={colors.basic.white} fontWeight="600" fontSize={14}>{isSubmitting ? "儲存中..." : "儲存"}</Text>
+          <Text fontSize={18} fontWeight="600" color="$color" flex={1}>
+            帳號設定
+          </Text>
+          <Button
+            size="$3"
+            backgroundColor={colors.primary.base}
+            pressStyle={{ opacity: 0.8 }}
+            onPress={handleSave}
+            disabled={isSubmitting}
+          >
+            <Text color={colors.basic.white} fontWeight="600" fontSize={14}>
+              {isSubmitting ? "儲存中..." : "儲存"}
+            </Text>
           </Button>
         </XStack>
 
         <ScrollView flex={1} contentContainerStyle={{ padding: 16, paddingBottom: 32 }}>
           <YStack gap="$5">
             {/* Email + 生日 + 教育階段 */}
-            <Card padding="$4" backgroundColor="$background" borderRadius="$md" borderWidth={1} borderColor="$borderColor">
+            <Card
+              padding="$4"
+              backgroundColor="$background"
+              borderRadius="$md"
+              borderWidth={1}
+              borderColor="$borderColor"
+            >
               <YStack gap="$4">
                 <YStack gap="$2">
-                  <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>Email</Text>
+                  <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
+                    Email
+                  </Text>
                   <Input size="$4" value={email} disabled opacity={0.6} />
                 </YStack>
                 <YStack gap="$2">
-                  <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>生日</Text>
+                  <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
+                    生日
+                  </Text>
                   <Input size="$4" value={birthday || "尚未設定"} disabled opacity={0.6} />
                 </YStack>
                 <YStack gap="$2">
-                  <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>教育階段</Text>
+                  <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
+                    教育階段
+                  </Text>
                   <Pressable onPress={() => setShowEducationPicker(true)}>
                     <XStack
                       height={44}
@@ -203,8 +244,14 @@ export default function AccountSettingsScreen() {
                       borderRadius="$md"
                       backgroundColor="$background"
                     >
-                      <Text fontSize={14} color={educationStage ? "$color" : "$color"} opacity={educationStage ? 1 : 0.5}>
-                        {educationStage ? getLabel(EDUCATION_STAGE_OPTIONS, educationStage) : "請選擇教育階段"}
+                      <Text
+                        fontSize={14}
+                        color={educationStage ? "$color" : "$color"}
+                        opacity={educationStage ? 1 : 0.5}
+                      >
+                        {educationStage
+                          ? getLabel(EDUCATION_STAGE_OPTIONS, educationStage)
+                          : "請選擇教育階段"}
                       </Text>
                       <ChevronDown size={16} color="$color" opacity={0.5} />
                     </XStack>
@@ -214,21 +261,41 @@ export default function AccountSettingsScreen() {
             </Card>
 
             {/* 身份 */}
-            <Card padding="$4" backgroundColor="$background" borderRadius="$md" borderWidth={1} borderColor="$borderColor">
+            <Card
+              padding="$4"
+              backgroundColor="$background"
+              borderRadius="$md"
+              borderWidth={1}
+              borderColor="$borderColor"
+            >
               <YStack gap="$3">
                 <XStack alignItems="center" justifyContent="space-between">
-                  <Text fontSize={15} fontWeight="600" color="$color">身份</Text>
+                  <Text fontSize={15} fontWeight="600" color="$color">
+                    身份
+                  </Text>
                   {position.length > 0 && (
                     <Button size="$2" chromeless onPress={() => setPosition([])}>
-                      <Text fontSize={12} color="$color" opacity={0.5}>清空</Text>
+                      <Text fontSize={12} color="$color" opacity={0.5}>
+                        清空
+                      </Text>
                     </Button>
                   )}
                 </XStack>
                 {position.length > 0 && (
                   <XStack flexWrap="wrap" gap="$2">
                     {position.map((v) => (
-                      <YStack key={v} paddingHorizontal="$3" paddingVertical="$1" backgroundColor={colors.primary.palest} borderRadius="$md" borderWidth={1} borderColor={colors.primary.base}>
-                        <Text fontSize={12} color={colors.primary.base}>{getLabel(POSITION_OPTIONS, v)}</Text>
+                      <YStack
+                        key={v}
+                        paddingHorizontal="$3"
+                        paddingVertical="$1"
+                        backgroundColor={colors.primary.palest}
+                        borderRadius="$md"
+                        borderWidth={1}
+                        borderColor={colors.primary.base}
+                      >
+                        <Text fontSize={12} color={colors.primary.base}>
+                          {getLabel(POSITION_OPTIONS, v)}
+                        </Text>
                       </YStack>
                     ))}
                   </XStack>
@@ -237,35 +304,59 @@ export default function AccountSettingsScreen() {
                   size="$4"
                   backgroundColor={colors.primary.base}
                   pressStyle={{ opacity: 0.8 }}
-                  onPress={() => setActiveFieldModal({
-                    title: "身份",
-                    options: POSITION_OPTIONS,
-                    selected: position,
-                    maxSelection: 5,
-                    onConfirm: setPosition,
-                  })}
+                  onPress={() =>
+                    setActiveFieldModal({
+                      title: "身份",
+                      options: POSITION_OPTIONS,
+                      selected: position,
+                      maxSelection: 5,
+                      onConfirm: setPosition,
+                    })
+                  }
                 >
-                  <Text color={colors.basic.white} fontWeight="500">編輯</Text>
+                  <Text color={colors.basic.white} fontWeight="500">
+                    編輯
+                  </Text>
                 </Button>
               </YStack>
             </Card>
 
             {/* 專業領域 */}
-            <Card padding="$4" backgroundColor="$background" borderRadius="$md" borderWidth={1} borderColor="$borderColor">
+            <Card
+              padding="$4"
+              backgroundColor="$background"
+              borderRadius="$md"
+              borderWidth={1}
+              borderColor="$borderColor"
+            >
               <YStack gap="$3">
                 <XStack alignItems="center" justifyContent="space-between">
-                  <Text fontSize={15} fontWeight="600" color="$color">專業領域</Text>
+                  <Text fontSize={15} fontWeight="600" color="$color">
+                    專業領域
+                  </Text>
                   {professionalFields.length > 0 && (
                     <Button size="$2" chromeless onPress={() => setProfessionalFields([])}>
-                      <Text fontSize={12} color="$color" opacity={0.5}>清空</Text>
+                      <Text fontSize={12} color="$color" opacity={0.5}>
+                        清空
+                      </Text>
                     </Button>
                   )}
                 </XStack>
                 {professionalFields.length > 0 && (
                   <XStack flexWrap="wrap" gap="$2">
                     {professionalFields.map((v) => (
-                      <YStack key={v} paddingHorizontal="$3" paddingVertical="$1" backgroundColor={colors.primary.palest} borderRadius="$md" borderWidth={1} borderColor={colors.primary.base}>
-                        <Text fontSize={12} color={colors.primary.base}>{getLabel(AVAILABLE_FIELDS, v)}</Text>
+                      <YStack
+                        key={v}
+                        paddingHorizontal="$3"
+                        paddingVertical="$1"
+                        backgroundColor={colors.primary.palest}
+                        borderRadius="$md"
+                        borderWidth={1}
+                        borderColor={colors.primary.base}
+                      >
+                        <Text fontSize={12} color={colors.primary.base}>
+                          {getLabel(AVAILABLE_FIELDS, v)}
+                        </Text>
                       </YStack>
                     ))}
                   </XStack>
@@ -274,35 +365,59 @@ export default function AccountSettingsScreen() {
                   size="$4"
                   backgroundColor={colors.primary.base}
                   pressStyle={{ opacity: 0.8 }}
-                  onPress={() => setActiveFieldModal({
-                    title: "專業領域",
-                    options: AVAILABLE_FIELDS,
-                    selected: professionalFields,
-                    maxSelection: 5,
-                    onConfirm: setProfessionalFields,
-                  })}
+                  onPress={() =>
+                    setActiveFieldModal({
+                      title: "專業領域",
+                      options: AVAILABLE_FIELDS,
+                      selected: professionalFields,
+                      maxSelection: 5,
+                      onConfirm: setProfessionalFields,
+                    })
+                  }
                 >
-                  <Text color={colors.basic.white} fontWeight="500">編輯</Text>
+                  <Text color={colors.basic.white} fontWeight="500">
+                    編輯
+                  </Text>
                 </Button>
               </YStack>
             </Card>
 
             {/* 想探索的領域 */}
-            <Card padding="$4" backgroundColor="$background" borderRadius="$md" borderWidth={1} borderColor="$borderColor">
+            <Card
+              padding="$4"
+              backgroundColor="$background"
+              borderRadius="$md"
+              borderWidth={1}
+              borderColor="$borderColor"
+            >
               <YStack gap="$3">
                 <XStack alignItems="center" justifyContent="space-between">
-                  <Text fontSize={15} fontWeight="600" color="$color">想探索的領域</Text>
+                  <Text fontSize={15} fontWeight="600" color="$color">
+                    想探索的領域
+                  </Text>
                   {explorationFields.length > 0 && (
                     <Button size="$2" chromeless onPress={() => setExplorationFields([])}>
-                      <Text fontSize={12} color="$color" opacity={0.5}>清空</Text>
+                      <Text fontSize={12} color="$color" opacity={0.5}>
+                        清空
+                      </Text>
                     </Button>
                   )}
                 </XStack>
                 {explorationFields.length > 0 && (
                   <XStack flexWrap="wrap" gap="$2">
                     {explorationFields.map((v) => (
-                      <YStack key={v} paddingHorizontal="$3" paddingVertical="$1" backgroundColor={colors.primary.palest} borderRadius="$md" borderWidth={1} borderColor={colors.primary.base}>
-                        <Text fontSize={12} color={colors.primary.base}>{getLabel(INTEREST_CATEGORIES, v)}</Text>
+                      <YStack
+                        key={v}
+                        paddingHorizontal="$3"
+                        paddingVertical="$1"
+                        backgroundColor={colors.primary.palest}
+                        borderRadius="$md"
+                        borderWidth={1}
+                        borderColor={colors.primary.base}
+                      >
+                        <Text fontSize={12} color={colors.primary.base}>
+                          {getLabel(INTEREST_CATEGORIES, v)}
+                        </Text>
                       </YStack>
                     ))}
                   </XStack>
@@ -311,15 +426,19 @@ export default function AccountSettingsScreen() {
                   size="$4"
                   backgroundColor={colors.primary.base}
                   pressStyle={{ opacity: 0.8 }}
-                  onPress={() => setActiveFieldModal({
-                    title: "想探索的領域",
-                    options: INTEREST_CATEGORIES,
-                    selected: explorationFields,
-                    maxSelection: 5,
-                    onConfirm: setExplorationFields,
-                  })}
+                  onPress={() =>
+                    setActiveFieldModal({
+                      title: "想探索的領域",
+                      options: INTEREST_CATEGORIES,
+                      selected: explorationFields,
+                      maxSelection: 5,
+                      onConfirm: setExplorationFields,
+                    })
+                  }
                 >
-                  <Text color={colors.basic.white} fontWeight="500">編輯</Text>
+                  <Text color={colors.basic.white} fontWeight="500">
+                    編輯
+                  </Text>
                 </Button>
               </YStack>
             </Card>
@@ -328,19 +447,36 @@ export default function AccountSettingsScreen() {
 
         {/* 教育階段 Picker Modal */}
         <Modal visible={showEducationPicker} animationType="slide" transparent>
-          <Pressable style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.3)" }} onPress={() => setShowEducationPicker(false)}>
+          <Pressable
+            style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.3)" }}
+            onPress={() => setShowEducationPicker(false)}
+          >
             <YStack flex={1} justifyContent="flex-end">
               <Pressable>
-                <Card backgroundColor="$background" borderTopLeftRadius={20} borderTopRightRadius={20} padding="$4">
-                  <Text fontSize={16} fontWeight="600" color="$color" marginBottom="$3">教育階段</Text>
+                <Card
+                  backgroundColor="$background"
+                  borderTopLeftRadius={20}
+                  borderTopRightRadius={20}
+                  padding="$4"
+                >
+                  <Text fontSize={16} fontWeight="600" color="$color" marginBottom="$3">
+                    教育階段
+                  </Text>
                   {EDUCATION_STAGE_OPTIONS.map((opt) => (
                     <Pressable
                       key={opt.value}
-                      onPress={() => { setEducationStage(opt.value); setShowEducationPicker(false); }}
+                      onPress={() => {
+                        setEducationStage(opt.value);
+                        setShowEducationPicker(false);
+                      }}
                     >
                       <XStack padding="$3" alignItems="center" justifyContent="space-between">
-                        <Text fontSize={15} color="$color">{opt.label}</Text>
-                        {educationStage === opt.value && <Check size={18} color={colors.primary.base} />}
+                        <Text fontSize={15} color="$color">
+                          {opt.label}
+                        </Text>
+                        {educationStage === opt.value && (
+                          <Check size={18} color={colors.primary.base} />
+                        )}
                       </XStack>
                     </Pressable>
                   ))}

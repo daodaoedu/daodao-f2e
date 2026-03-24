@@ -3,10 +3,9 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import useSWR from "swr";
+import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { api } from "@/services/api-client";
-import { colors } from "@/generated/design-tokens";
 
 interface IArchivedPractice {
   id: string;
@@ -18,9 +17,17 @@ export default function ArchivedContentScreen() {
   const router = useRouter();
   const [unarchivingIds, setUnarchivingIds] = useState<Set<string>>(new Set());
 
-  const { data: practices, isLoading, error, mutate } = useSWR<IArchivedPractice[]>(
+  const {
+    data: practices,
+    isLoading,
+    error,
+    mutate,
+  } = useSWR<IArchivedPractice[]>(
     "/me/practices?status=archived",
-    () => api.get<{ data: IArchivedPractice[] }>("/me/practices?status=archived&limit=100").then((r) => r.data),
+    () =>
+      api
+        .get<{ data: IArchivedPractice[] }>("/me/practices?status=archived&limit=100")
+        .then((r) => r.data),
     { revalidateOnFocus: false }
   );
 
@@ -47,28 +54,44 @@ export default function ArchivedContentScreen() {
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel="返回">
+          <Button
+            size="$4"
+            circular
+            chromeless
+            onPress={() => router.back()}
+            accessibilityLabel="返回"
+          >
             <ChevronLeft size={24} color="$color" />
           </Button>
-          <Text fontSize={18} fontWeight="600" color="$color">已封存的內容</Text>
+          <Text fontSize={18} fontWeight="600" color="$color">
+            已封存的內容
+          </Text>
         </XStack>
 
         <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
           {isLoading ? (
             <YStack alignItems="center" paddingVertical="$8">
-              <Text fontSize={14} color="$color" opacity={0.5}>載入中...</Text>
+              <Text fontSize={14} color="$color" opacity={0.5}>
+                載入中...
+              </Text>
             </YStack>
           ) : error ? (
             <YStack alignItems="center" paddingVertical="$8">
-              <Text fontSize={14} color="$color" opacity={0.5}>載入失敗，請稍後再試</Text>
+              <Text fontSize={14} color="$color" opacity={0.5}>
+                載入失敗，請稍後再試
+              </Text>
             </YStack>
           ) : items.length === 0 ? (
             <YStack alignItems="center" paddingVertical="$8">
-              <Text fontSize={14} color="$color" opacity={0.5}>尚無已封存的內容</Text>
+              <Text fontSize={14} color="$color" opacity={0.5}>
+                尚無已封存的內容
+              </Text>
             </YStack>
           ) : (
             <YStack gap="$3">
-              <Text fontSize={15} fontWeight="600" color="$color" paddingLeft="$1">主題實踐</Text>
+              <Text fontSize={15} fontWeight="600" color="$color" paddingLeft="$1">
+                主題實踐
+              </Text>
               {items.map((practice) => (
                 <Card
                   key={practice.id}

@@ -310,10 +310,7 @@ const calculateMoodStats = (
     createdAt: string;
   }>
 ): MoodStat[] => {
-  const moodMap = new Map<
-    MoodType,
-    { count: number; lastOccurredAt: string }
-  >();
+  const moodMap = new Map<MoodType, { count: number; lastOccurredAt: string }>();
 
   for (const checkIn of checkIns) {
     if (!checkIn.mood) continue;
@@ -334,13 +331,11 @@ const calculateMoodStats = (
   }
 
   // 轉換為陣列並排序
-  const moodStats: MoodStat[] = Array.from(moodMap.entries()).map(
-    ([mood, stats]) => ({
-      mood,
-      count: stats.count,
-      lastOccurredAt: stats.lastOccurredAt,
-    })
-  );
+  const moodStats: MoodStat[] = Array.from(moodMap.entries()).map(([mood, stats]) => ({
+    mood,
+    count: stats.count,
+    lastOccurredAt: stats.lastOccurredAt,
+  }));
 
   // 排序：先按次數降序，相同次數則按最近出現時間降序
   moodStats.sort((a, b) => {
@@ -359,10 +354,7 @@ const calculateMoodStats = (
  * @param maxCount 最多取幾個標籤
  * @returns 文字最長的標籤列表
  */
-const findLongestNotes = (
-  checkIns: Array<{ note?: string }>,
-  maxCount: number = 3
-): string[] => {
+const findLongestNotes = (checkIns: Array<{ note?: string }>, maxCount: number = 3): string[] => {
   return checkIns
     .map((c) => c.note?.trim())
     .filter((note): note is string => !!note)

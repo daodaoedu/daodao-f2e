@@ -8,7 +8,7 @@ export const SOCIAL_LINKS = {
 export const ANCHOR_IDS = {
   VISION: "vision",
   MISSION: "mission",
-  SOLUTIONS: "solutions",
-  FEATURES: "features",
-  PLANS: "plans",
+  LEARNING_INSPIRATION: "learning-inspiration",
+  COMMUNITY: "community",
+  LEARNING_DNA: "learning-dna",
 } as const;

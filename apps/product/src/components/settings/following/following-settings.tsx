@@ -1,6 +1,6 @@
 "use client";
 
-import { useCurrentUser, useFollowMutations, useFollowing } from "@daodao/api";
+import { useCurrentUser, useFollowing, useFollowMutations } from "@daodao/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -18,7 +18,9 @@ export const FollowingSettings = () => {
 
   const followingItems = followingData?.data ?? [];
   const followedUsers = followingItems.filter((item) => item.targetType === "user" && item.user);
-  const followedPractices = followingItems.filter((item) => item.targetType === "practice" && item.practice);
+  const followedPractices = followingItems.filter(
+    (item) => item.targetType === "practice" && item.practice
+  );
 
   const handleUnfollowUser = async (targetId: string) => {
     try {
@@ -39,11 +41,7 @@ export const FollowingSettings = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">
-        載入中...
-      </div>
-    );
+    return <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">載入中...</div>;
   }
 
   return (
@@ -72,9 +70,7 @@ export const FollowingSettings = () => {
       {tab === "users" && (
         <div className="flex flex-col gap-2">
           {followedUsers.length === 0 ? (
-            <div className="text-center py-12 text-[#9FB5B8] text-sm">
-              尚未關注任何使用者
-            </div>
+            <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未關注任何使用者</div>
           ) : (
             followedUsers.map(({ user }) => {
               if (!user) return null;
@@ -89,12 +85,13 @@ export const FollowingSettings = () => {
                     </Avatar>
                   </CustomLink>
                   <div className="flex-1 min-w-0">
-                    <CustomLink href={`/users/${user.identifier ?? user.id}`} className="text-sm font-medium text-text-dark hover:underline">
+                    <CustomLink
+                      href={`/users/${user.identifier ?? user.id}`}
+                      className="text-sm font-medium text-text-dark hover:underline"
+                    >
                       {user.name}
                     </CustomLink>
-                    {user.bio && (
-                      <p className="text-xs text-[#9FB5B8] truncate">{user.bio}</p>
-                    )}
+                    {user.bio && <p className="text-xs text-[#9FB5B8] truncate">{user.bio}</p>}
                   </div>
                   <Button
                     variant="outline"
@@ -115,9 +112,7 @@ export const FollowingSettings = () => {
       {tab === "practices" && (
         <div className="flex flex-col gap-2">
           {followedPractices.length === 0 ? (
-            <div className="text-center py-12 text-[#9FB5B8] text-sm">
-              尚未關注任何實踐
-            </div>
+            <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未關注任何實踐</div>
           ) : (
             followedPractices.map(({ practice }) => {
               if (!practice) return null;
@@ -130,7 +125,10 @@ export const FollowingSettings = () => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <CustomLink href={`/practices/${practice.id}`} className="text-sm font-medium text-text-dark hover:underline line-clamp-1">
+                    <CustomLink
+                      href={`/practices/${practice.id}`}
+                      className="text-sm font-medium text-text-dark hover:underline line-clamp-1"
+                    >
                       {practice.title}
                     </CustomLink>
                     <p className="text-xs text-[#9FB5B8]">{practice.ownerName}</p>

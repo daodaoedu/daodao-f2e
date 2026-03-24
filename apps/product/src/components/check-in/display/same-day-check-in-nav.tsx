@@ -1,7 +1,7 @@
 "use client";
 
-import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { Button } from "@daodao/ui/components/button";
+import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback } from "react";
 

@@ -3,8 +3,8 @@ import type PostHog from "posthog-react-native";
 import { PostHogProvider } from "posthog-react-native";
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import {
-  type IAnalyticsUser,
   analyticsService,
+  type IAnalyticsUser,
   type ICheckInEventProperties,
   type ILoginEventProperties,
   type IPracticeCreatedEventProperties,

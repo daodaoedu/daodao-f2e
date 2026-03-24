@@ -32,7 +32,11 @@ interface IMediaUploadFieldProps {
  * - 可壓縮格式（JPG/PNG/WebP）超過 500KB 自動壓縮
  * - GIF 超過 500KB 直接拒絕（壓縮會丟失動畫）
  */
-export const MediaUploadField = ({ form, existingImages = [], onExistingImagesChange }: IMediaUploadFieldProps) => {
+export const MediaUploadField = ({
+  form,
+  existingImages = [],
+  onExistingImagesChange,
+}: IMediaUploadFieldProps) => {
   const [isCompressing, setIsCompressing] = useState(false);
   const [keptImages, setKeptImages] = useState<string[]>(existingImages);
 
@@ -119,12 +123,12 @@ export const MediaUploadField = ({ form, existingImages = [], onExistingImagesCh
       render={({ field }) => (
         <FormItem className="mb-16 md:mb-8">
           <div className="mb-3 flex items-center justify-between gap-2">
-            <FormLabel className="block text-base font-medium text-text-dark">
-              上傳照片
-            </FormLabel>
+            <FormLabel className="block text-base font-medium text-text-dark">上傳照片</FormLabel>
 
             <FormDescription className="text-sm text-light-gray">
-              {isCompressing ? "壓縮中..." : `已上傳 ${keptImages.length + (field.value?.length || 0)}/3 張`}
+              {isCompressing
+                ? "壓縮中..."
+                : `已上傳 ${keptImages.length + (field.value?.length || 0)}/3 張`}
             </FormDescription>
           </div>
 
@@ -134,7 +138,11 @@ export const MediaUploadField = ({ form, existingImages = [], onExistingImagesCh
               {keptImages.map((url, index) => (
                 <div key={url} className="relative">
                   <div className="size-20 rounded-lg overflow-hidden border-2 border-gray-200">
-                    <img src={url} alt={`既有圖片 ${index + 1}`} className="w-full h-full object-cover" />
+                    <img
+                      src={url}
+                      alt={`既有圖片 ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <button
                     type="button"

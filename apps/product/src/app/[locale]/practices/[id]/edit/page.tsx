@@ -1,10 +1,6 @@
 "use client";
 
 import { type UpdatePracticeRequestType, updatePractice, usePracticeById } from "@daodao/api";
-import {
-  type PrivacyStatus,
-  PrivacyStatusSelector,
-} from "@/components/practice/shared/privacy-status-selector";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
@@ -23,6 +19,10 @@ import { Step1 } from "@/components/practice/create/manual/steps/step-1";
 import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";
 import { Step4 } from "@/components/practice/create/manual/steps/step-4";
+import {
+  type PrivacyStatus,
+  PrivacyStatusSelector,
+} from "@/components/practice/shared/privacy-status-selector";
 import {
   DurationDays,
   ExecutionTiming,
@@ -212,7 +212,9 @@ export default function EditPracticePage() {
       form.reset(formValues);
     }
     if (practiceData?.data) {
-      const ps = (practiceData.data as Record<string, unknown>).privacyStatus as PrivacyStatus | undefined;
+      const ps = (practiceData.data as Record<string, unknown>).privacyStatus as
+        | PrivacyStatus
+        | undefined;
       if (ps) setPrivacyStatus(ps);
     }
   }, [formValues, form, practiceData]);
@@ -329,10 +331,7 @@ export default function EditPracticePage() {
 
             {/* Privacy Status */}
             <div className="bg-white rounded-lg p-4 shadow-sm">
-              <PrivacyStatusSelector
-                value={privacyStatus}
-                onChange={setPrivacyStatus}
-              />
+              <PrivacyStatusSelector value={privacyStatus} onChange={setPrivacyStatus} />
             </div>
 
             {/* Save Button */}

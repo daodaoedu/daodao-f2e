@@ -1,26 +1,24 @@
 "use client";
 
 import useSWR from "swr";
+import type { IPaginationParams } from "./connection";
 import {
+  disconnectUser,
   getConnections,
   getIncomingConnectionRequests,
   getOutgoingConnectionRequests,
   respondConnectionRequest,
   withdrawConnectionRequest,
-  disconnectUser,
 } from "./connection";
-import type { IPaginationParams } from "./connection";
 
 // ============================================================================
 // Query Hooks
 // ============================================================================
 
 export const useConnections = (params?: IPaginationParams) => {
-  return useSWR(
-    ["/api/v1/connections", params],
-    () => getConnections(params),
-    { revalidateOnFocus: false }
-  );
+  return useSWR(["/api/v1/connections", params], () => getConnections(params), {
+    revalidateOnFocus: false,
+  });
 };
 
 export const useIncomingConnectionRequests = (params?: IPaginationParams) => {

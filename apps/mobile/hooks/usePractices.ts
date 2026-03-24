@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
-import { api } from "@/services/api-client";
 import { PracticeStatus } from "@/constants/practice-status";
-import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 import type { TaskStatus } from "@/constants/task-status";
-import type { IPractice, ICheckIn } from "@/types/practice";
+import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
+import { api } from "@/services/api-client";
+import type { ICheckIn, IPractice } from "@/types/practice";
 
 // ============================================================================
 // Types — aligned with product's API response
@@ -71,7 +71,12 @@ const MY_PRACTICES_KEY = "/me/practices";
 const MY_PRACTICE_STATS_KEY = "/me/practice-stats";
 
 export function usePractices() {
-  const { data: practicesData, error: practicesError, isLoading: practicesLoading, mutate } = useSWR<IMyPracticesResponse>(
+  const {
+    data: practicesData,
+    error: practicesError,
+    isLoading: practicesLoading,
+    mutate,
+  } = useSWR<IMyPracticesResponse>(
     MY_PRACTICES_KEY,
     () => api.get<IMyPracticesResponse>(`${MY_PRACTICES_KEY}?limit=16`),
     {

@@ -2,11 +2,11 @@ import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
 import useSWR from "swr";
-import { api } from "@/services/api-client";
-import { colors } from "@/generated/design-tokens";
+import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
 import { NOTIFICATION_TYPES } from "@/constants/settings";
+import { colors } from "@/generated/design-tokens";
+import { api } from "@/services/api-client";
 
 interface INotificationPref {
   type: string;
@@ -77,19 +77,35 @@ export default function NotificationSettingsScreen() {
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel="返回">
+          <Button
+            size="$4"
+            circular
+            chromeless
+            onPress={() => router.back()}
+            accessibilityLabel="返回"
+          >
             <ChevronLeft size={24} color="$color" />
           </Button>
-          <Text fontSize={18} fontWeight="600" color="$color">通知設定</Text>
+          <Text fontSize={18} fontWeight="600" color="$color">
+            通知設定
+          </Text>
         </XStack>
 
         <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
           <YStack gap="$5">
             {/* 全域開關 */}
-            <Card backgroundColor="$background" borderRadius="$md" borderWidth={1} borderColor="$borderColor" overflow="hidden">
+            <Card
+              backgroundColor="$background"
+              borderRadius="$md"
+              borderWidth={1}
+              borderColor="$borderColor"
+              overflow="hidden"
+            >
               <XStack padding="$4" alignItems="center" justifyContent="space-between">
                 <YStack flex={1} gap="$1">
-                  <Text fontSize={15} color="$color">通知總開關</Text>
+                  <Text fontSize={15} color="$color">
+                    通知總開關
+                  </Text>
                   <Text fontSize={12} color="$color" opacity={0.5}>
                     關閉後將停止所有 Email 通知，通知中心仍繼續累積
                   </Text>
@@ -110,7 +126,13 @@ export default function NotificationSettingsScreen() {
               <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingLeft="$1">
                 Email 通知設定
               </Text>
-              <Card backgroundColor="$background" borderRadius="$md" borderWidth={1} borderColor="$borderColor" overflow="hidden">
+              <Card
+                backgroundColor="$background"
+                borderRadius="$md"
+                borderWidth={1}
+                borderColor="$borderColor"
+                overflow="hidden"
+              >
                 {NOTIFICATION_TYPES.map((item, index) => {
                   const isEnabled = prefs[item.type]?.emailEnabled ?? true;
                   return (
@@ -123,13 +145,19 @@ export default function NotificationSettingsScreen() {
                       borderBottomColor="$borderColor"
                     >
                       <YStack flex={1} gap="$1">
-                        <Text fontSize={14} color="$color">{item.label}</Text>
-                        <Text fontSize={12} color="$color" opacity={0.5}>{item.description}</Text>
+                        <Text fontSize={14} color="$color">
+                          {item.label}
+                        </Text>
+                        <Text fontSize={12} color="$color" opacity={0.5}>
+                          {item.description}
+                        </Text>
                       </YStack>
                       <Switch
                         checked={isEnabled && globalEnabled}
                         onCheckedChange={(v) => handleTypeToggle(item.type, v)}
-                        backgroundColor={isEnabled && globalEnabled ? colors.primary.base : colors.basic[300]}
+                        backgroundColor={
+                          isEnabled && globalEnabled ? colors.primary.base : colors.basic[300]
+                        }
                         disabled={!globalEnabled || isSaving}
                       >
                         <Switch.Thumb />
@@ -140,7 +168,13 @@ export default function NotificationSettingsScreen() {
               </Card>
             </YStack>
 
-            <Text fontSize={12} color="$color" opacity={0.5} textAlign="center" paddingHorizontal="$4">
+            <Text
+              fontSize={12}
+              color="$color"
+              opacity={0.5}
+              textAlign="center"
+              paddingHorizontal="$4"
+            >
               In-App 通知中心（島嶼上的通知鈴）永遠開啟，只有 Email 可以關閉
             </Text>
           </YStack>

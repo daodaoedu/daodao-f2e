@@ -1,4 +1,3 @@
-import { ANCHOR_IDS } from "@daodao/shared";
 import { Image } from "@daodao/ui/components/image";
 import { SectionHeader } from "@daodao/ui/components/section-header";
 
@@ -74,7 +73,7 @@ export function FeatureGrid() {
       <div className="container mx-auto">
         <div
           className="relative flex flex-col items-center justify-center overflow-x-clip pb-[60px]"
-          id={ANCHOR_IDS.SOLUTIONS}
+          id="solutions"
         >
           <SectionHeader
             title="告別三大學習困境"

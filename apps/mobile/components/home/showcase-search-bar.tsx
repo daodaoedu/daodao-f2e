@@ -1,7 +1,7 @@
 import { Search, X } from "@tamagui/lucide-icons";
 import { useCallback, useRef, useState } from "react";
 import { Keyboard, Pressable, StyleSheet, TextInput } from "react-native";
-import { Text, View, XStack, YStack } from "tamagui";
+import { Text, View, XStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useShowcaseSuggestions } from "@/hooks/useShowcaseSuggestions";
 
@@ -78,24 +78,49 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
         <View style={styles.dropdown}>
           {trendingKeywords.length > 0 && (
             <>
-              <Text fontSize={12} color="rgba(0,0,0,0.5)" fontWeight="500" paddingHorizontal="$3" paddingVertical="$1">
+              <Text
+                fontSize={12}
+                color="rgba(0,0,0,0.5)"
+                fontWeight="500"
+                paddingHorizontal="$3"
+                paddingVertical="$1"
+              >
                 近期熱門
               </Text>
               {trendingKeywords.map((kw) => (
-                <Pressable key={kw} onPress={() => handleSuggestionPress(kw)} style={styles.suggestionItem}>
-                  <Text fontSize={14} color={colors.text.dark}>{kw}</Text>
+                <Pressable
+                  key={kw}
+                  onPress={() => handleSuggestionPress(kw)}
+                  style={styles.suggestionItem}
+                >
+                  <Text fontSize={14} color={colors.text.dark}>
+                    {kw}
+                  </Text>
                 </Pressable>
               ))}
             </>
           )}
           {interestTags.length > 0 && (
             <>
-              <Text fontSize={12} color="rgba(0,0,0,0.5)" fontWeight="500" paddingHorizontal="$3" paddingVertical="$1" marginTop="$1">
+              <Text
+                fontSize={12}
+                color="rgba(0,0,0,0.5)"
+                fontWeight="500"
+                paddingHorizontal="$3"
+                paddingVertical="$1"
+                marginTop="$1"
+              >
                 你的興趣
               </Text>
               {interestTags.map((tag) => (
-                <Pressable key={tag} onPress={() => handleSuggestionPress(tag)} style={styles.suggestionItem}>
-                  <Text fontSize={14} color={colors.text.dark}>#{tag}</Text>
+                <Pressable
+                  key={tag}
+                  onPress={() => handleSuggestionPress(tag)}
+                  style={styles.suggestionItem}
+                >
+                  <Text fontSize={14} color={colors.text.dark}>
+                    #{tag}
+                  </Text>
                 </Pressable>
               ))}
             </>

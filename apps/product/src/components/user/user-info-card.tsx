@@ -1,22 +1,29 @@
 "use client";
 
+import {
+  followTarget,
+  getConnections,
+  sendConnectionRequest,
+  unfollowTarget,
+  useCurrentUser,
+  useFollowStatus,
+} from "@daodao/api";
 import FacebookSvg from "@daodao/assets/images/social-icons/facebook-filled.svg";
 import GithubSvg from "@daodao/assets/images/social-icons/github.svg";
 import InstagramSvg from "@daodao/assets/images/social-icons/instagram-filled.svg";
 import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin-filled.svg";
 import ThreadsSvg from "@daodao/assets/images/social-icons/threads-filled.svg";
-import { followTarget, unfollowTarget, sendConnectionRequest, getConnections, useCurrentUser, useFollowStatus } from "@daodao/api";
-import useSWR from "swr";
 import { useIsMobile } from "@daodao/shared";
-import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import MarkdownRenderer from "@daodao/ui/components/markdown-renderer";
 import { toast } from "@daodao/ui/components/sonner";
+import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { Globe, MapPin, Users } from "lucide-react";
 import type React from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
+import useSWR from "swr";
 import {
   SocialPlatform,
   type SocialPlatform as SocialPlatformType,
@@ -163,9 +170,7 @@ export function UserInfoCard({
   );
   const isAlreadyConnected = useMemo(() => {
     if (!connectionsData?.data || !targetUserId) return false;
-    return connectionsData.data.some(
-      (c: any) => c.externalId === targetUserId
-    );
+    return connectionsData.data.some((c: { externalId: string }) => c.externalId === targetUserId);
   }, [connectionsData, targetUserId]);
 
   // 複製文字到剪貼簿的處理函數
@@ -212,7 +217,9 @@ export function UserInfoCard({
             rows={3}
             maxLength={50}
             placeholder="請簡短說明連結原因（最多 50 字）"
-            onChange={(e) => { intentRef.current = e.target.value; }}
+            onChange={(e) => {
+              intentRef.current = e.target.value;
+            }}
           />
         </div>
       ),
@@ -350,13 +357,9 @@ export function UserInfoCard({
         <div className="flex-1">
           <div className="mb-3">
             <h2 className="text-[22px] font-medium mb-1 text-bg-dark truncate">{name}</h2>
-            {customId && (
-              <p className="text-sm text-text-dark/60 mb-1">@{customId}</p>
-            )}
+            {customId && <p className="text-sm text-text-dark/60 mb-1">@{customId}</p>}
             {/* Headline (personalSlogan) - 未填寫時不顯示 */}
-            {personalSlogan && (
-              <p className="text-sm text-text-dark mb-1">{personalSlogan}</p>
-            )}
+            {personalSlogan && <p className="text-sm text-text-dark mb-1">{personalSlogan}</p>}
             {location && (
               <div className="flex items-center gap-2">
                 <MapPin className="size-4.5 text-text-dark" />
@@ -392,18 +395,17 @@ export function UserInfoCard({
           {/* 近 7 天實踐次數 */}
           {recentPracticeCount !== undefined && (
             <p className="text-xs text-text-dark mb-3">
-              近 7 天{" "}
-              <span className="font-medium">{recentPracticeCount}</span>{" "}
-              次實踐
+              近 7 天 <span className="font-medium">{recentPracticeCount}</span> 次實踐
             </p>
           )}
 
           {/* 共同 Circle 數量 - 僅在已登入且非自己的頁面，且 commonCirclesCount > 0 */}
-          {isAuthenticated && !isOwnProfile && commonCirclesCount != null && commonCirclesCount > 0 && (
-            <p className="text-xs text-text-dark mb-3">
-              {commonCirclesCount} 個共同 Circle
-            </p>
-          )}
+          {isAuthenticated &&
+            !isOwnProfile &&
+            commonCirclesCount != null &&
+            commonCirclesCount > 0 && (
+              <p className="text-xs text-text-dark mb-3">{commonCirclesCount} 個共同 Circle</p>
+            )}
 
           {/* 編輯個人檔案按鈕 - 自己的頁面 */}
           {isOwnProfile && (
