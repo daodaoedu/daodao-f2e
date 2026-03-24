@@ -458,11 +458,6 @@ function CommentBubble({
               "text-sm"
             )}
           >
-            {isReply && (
-              <span className="mr-1 rounded-full bg-[#E8FAF9] px-2 py-0.5 text-[11px] font-medium text-[#2B6E6B]">
-                回覆
-              </span>
-            )}
             {renderContent(comment.content)}
           </p>
         )}

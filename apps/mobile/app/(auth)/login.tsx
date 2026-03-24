@@ -120,7 +120,7 @@ export default function LoginScreen() {
               ) : (
                 <XStack alignItems="center" gap="$2.5">
                   <GoogleIcon size={20} />
-                  <Text fontWeight="500" fontSize={16} color={colors.basic[800]}>
+                  <Text fontWeight="500" fontSize={16} color={colors.basic[500]}>
                     Google 帳號註冊 / 登入
                   </Text>
                 </XStack>

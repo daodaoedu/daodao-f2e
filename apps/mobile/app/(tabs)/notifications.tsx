@@ -12,7 +12,7 @@ import {
   markAllNotificationsRead,
   respondConnectionRequest,
   revalidateAllNotifications,
-  type NotificationApiItem,
+  type INotificationApiItem,
 } from "@/hooks/useNotifications";
 
 // ============================================================================
@@ -39,7 +39,7 @@ function getAvatarColor(name: string): string {
   return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length] ?? "#C8FFF2";
 }
 
-function getNotificationText(item: NotificationApiItem): string {
+function getNotificationText(item: INotificationApiItem): string {
   const type = normalizeType(item.type);
   const name = item.actor.name;
   const count = item.aggregationCount ?? 1;
@@ -77,10 +77,10 @@ function NotificationRow({
   onAcceptConnect,
   onRejectConnect,
 }: {
-  item: NotificationApiItem;
-  onPress: (item: NotificationApiItem) => void;
-  onAcceptConnect: (item: NotificationApiItem) => void;
-  onRejectConnect: (item: NotificationApiItem) => void;
+  item: INotificationApiItem;
+  onPress: (item: INotificationApiItem) => void;
+  onAcceptConnect: (item: INotificationApiItem) => void;
+  onRejectConnect: (item: INotificationApiItem) => void;
 }) {
   const type = normalizeType(item.type);
   const isConnect = type === NotificationType.connect;
@@ -92,7 +92,7 @@ function NotificationRow({
         gap="$3"
         alignItems="center"
         backgroundColor={item.isRead ? "$background" : "#F0FAFB"}
-        borderRadius="$3"
+        borderRadius="$md"
       >
         {/* 未讀橘點 */}
         {!item.isRead && (
@@ -130,7 +130,7 @@ function NotificationRow({
               color="$color"
               opacity={0.7}
               backgroundColor="#F2F7F7"
-              borderRadius="$2"
+              borderRadius="$sm"
               paddingHorizontal="$2"
               paddingVertical="$1"
               numberOfLines={2}
@@ -190,7 +190,7 @@ export default function NotificationsScreen() {
     setRefreshing(false);
   }, [mutate]);
 
-  const handlePress = useCallback(async (item: NotificationApiItem) => {
+  const handlePress = useCallback(async (item: INotificationApiItem) => {
     if (!item.isRead) {
       markNotificationRead(item.id).catch(() => {});
       revalidateAllNotifications();
@@ -209,7 +209,7 @@ export default function NotificationsScreen() {
     }
   }, [router]);
 
-  const handleAcceptConnect = useCallback(async (item: NotificationApiItem) => {
+  const handleAcceptConnect = useCallback(async (item: INotificationApiItem) => {
     if (!item.connectionRequestId) return;
     try {
       await respondConnectionRequest(String(item.connectionRequestId), "accept");
@@ -220,7 +220,7 @@ export default function NotificationsScreen() {
     }
   }, []);
 
-  const handleRejectConnect = useCallback(async (item: NotificationApiItem) => {
+  const handleRejectConnect = useCallback(async (item: INotificationApiItem) => {
     if (!item.connectionRequestId) return;
     try {
       await respondConnectionRequest(String(item.connectionRequestId), "reject");

@@ -3,7 +3,7 @@ import { Sheet, Text, View, XStack, YStack } from "tamagui";
 import { REACTION_CONFIG } from "@/constants/reaction-type";
 import { formatRelativeTime } from "@/utils/format-time";
 
-interface Reactor {
+interface IReactor {
   userId: string;
   name: string;
   photoURL?: string | null;
@@ -15,7 +15,7 @@ interface BrowseActivitySheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   commentCount: number;
-  reactors: Reactor[];
+  reactors: IReactor[];
 }
 
 export function BrowseActivitySheet({
@@ -24,6 +24,11 @@ export function BrowseActivitySheet({
   commentCount,
   reactors,
 }: BrowseActivitySheetProps) {
+  // Lazy mount: Tamagui Sheet crashes with "setValue of undefined" when mounted with open=false
+  if (!open) {
+    return null;
+  }
+
   return (
     <Sheet
       modal

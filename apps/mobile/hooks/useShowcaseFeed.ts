@@ -4,6 +4,7 @@
  * - Uses apiClient with Bearer token auth instead of cookie-based fetchAiBackend
  */
 
+import { useEffect, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
 import { apiClient } from "@/services/api-client";
 
@@ -56,7 +57,7 @@ export interface IShowcaseFeedParams {
 // Internal types
 // ============================================================================
 
-interface AIResponse<T> {
+interface IAIResponse<T> {
   success: boolean;
   data?: T;
   pagination?: {
@@ -104,7 +105,7 @@ const buildShowcaseQuery = (
 export function useShowcaseFeed(params: IShowcaseFeedParams) {
   const getKey = (
     pageIndex: number,
-    previousPageData: AIResponse<IShowcasePractice[]> | null
+    previousPageData: IAIResponse<IShowcasePractice[]> | null
   ) => {
     // Stop if previous page has no next cursor
     if (previousPageData && !previousPageData.pagination?.hasNext) return null;
@@ -119,14 +120,24 @@ export function useShowcaseFeed(params: IShowcaseFeedParams) {
   };
 
   const { data, error, isLoading, isValidating, size, setSize, mutate } =
-    useSWRInfinite<AIResponse<IShowcasePractice[]>>(
+    useSWRInfinite<IAIResponse<IShowcasePractice[]>>(
       getKey,
-      (url: string) => apiClient<AIResponse<IShowcasePractice[]>>(url),
+      (url: string) => apiClient<IAIResponse<IShowcasePractice[]>>(url),
       {
         revalidateFirstPage: false,
         revalidateOnFocus: false,
       }
     );
+
+  // Reset to page 1 when params change to avoid stale cursors
+  const paramsKey = JSON.stringify(params);
+  const prevParamsKey = useRef(paramsKey);
+  useEffect(() => {
+    if (prevParamsKey.current !== paramsKey) {
+      prevParamsKey.current = paramsKey;
+      setSize(1);
+    }
+  }, [paramsKey, setSize]);
 
   const practices: IShowcasePractice[] =
     data?.flatMap((page) => page.data ?? []) ?? [];

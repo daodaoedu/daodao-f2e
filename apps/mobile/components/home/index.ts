@@ -4,7 +4,7 @@ export type { TabType } from "./tab-switcher";
 export { ShowcaseSearchBar } from "./showcase-search-bar";
 
 export { ShowcaseFilterBar } from "./showcase-filter-bar";
-export type { ShowcaseFilterState } from "./showcase-filter-bar";
+export type { IShowcaseFilterState } from "./showcase-filter-bar";
 
 export { ShowcaseCard } from "./showcase-card";
 

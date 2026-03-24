@@ -2,14 +2,14 @@ import { Tag } from "@tamagui/lucide-icons";
 import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import type { ManualPracticeFormValues } from "../create/manual/schema";
+import type { ManualPracticeFormValuesType } from "../create/manual/schema";
 import { CircularProgress } from "./circular-progress";
 
 interface PracticeOverviewCardProps {
-  actionDescription: ManualPracticeFormValues["actionDescription"];
-  frequency: ManualPracticeFormValues["frequency"];
-  durationMinutes: ManualPracticeFormValues["durationMinutes"];
-  tags?: ManualPracticeFormValues["tags"];
+  actionDescription: ManualPracticeFormValuesType["actionDescription"];
+  frequency: ManualPracticeFormValuesType["frequency"];
+  durationMinutes: ManualPracticeFormValuesType["durationMinutes"];
+  tags?: ManualPracticeFormValuesType["tags"];
   progress?: number;
   showProgress?: boolean;
 }

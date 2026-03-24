@@ -4,12 +4,13 @@ import { api } from "@/services/api-client";
 import { PracticeStatus } from "@/constants/practice-status";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 import type { TaskStatus } from "@/constants/task-status";
+import type { IPractice, ICheckIn } from "@/types/practice";
 
 // ============================================================================
 // Types — aligned with product's API response
 // ============================================================================
 
-export interface InProgressTask {
+export interface IInProgressTask {
   id: string;
   label: string;
   title: string;
@@ -25,7 +26,7 @@ export interface InProgressTask {
   endDate?: string | null;
 }
 
-export interface CompletedTask {
+export interface ICompletedTask {
   id: string;
   label: string;
   title: string;
@@ -36,7 +37,7 @@ export interface CompletedTask {
 }
 
 // API response types (aligned with /api/v1/me/practices)
-interface ApiPractice {
+interface IApiPractice {
   id: string;
   title: string;
   practiceAction?: string;
@@ -51,11 +52,11 @@ interface ApiPractice {
   endDate?: string | null;
 }
 
-interface MyPracticesResponse {
-  data: ApiPractice[];
+interface IMyPracticesResponse {
+  data: IApiPractice[];
 }
 
-interface PracticeStatsResponse {
+interface IPracticeStatsResponse {
   data: {
     currentStreak?: number;
     totalCheckIns?: number;
@@ -70,9 +71,9 @@ const MY_PRACTICES_KEY = "/me/practices";
 const MY_PRACTICE_STATS_KEY = "/me/practice-stats";
 
 export function usePractices() {
-  const { data: practicesData, error: practicesError, isLoading: practicesLoading, mutate } = useSWR<MyPracticesResponse>(
+  const { data: practicesData, error: practicesError, isLoading: practicesLoading, mutate } = useSWR<IMyPracticesResponse>(
     MY_PRACTICES_KEY,
-    () => api.get<MyPracticesResponse>(`${MY_PRACTICES_KEY}?limit=16`),
+    () => api.get<IMyPracticesResponse>(`${MY_PRACTICES_KEY}?limit=16`),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
@@ -82,9 +83,9 @@ export function usePractices() {
     }
   );
 
-  const { data: statsData, isLoading: statsLoading } = useSWR<PracticeStatsResponse>(
+  const { data: statsData, isLoading: statsLoading } = useSWR<IPracticeStatsResponse>(
     MY_PRACTICE_STATS_KEY,
-    () => api.get<PracticeStatsResponse>(MY_PRACTICE_STATS_KEY),
+    () => api.get<IPracticeStatsResponse>(MY_PRACTICE_STATS_KEY),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
@@ -95,8 +96,8 @@ export function usePractices() {
   const practices = practicesData?.data ?? [];
 
   const { inProgressTasks, completedTasks } = useMemo(() => {
-    const inProgressTasksData: InProgressTask[] = [];
-    const completedTasksData: CompletedTask[] = [];
+    const inProgressTasksData: IInProgressTask[] = [];
+    const completedTasksData: ICompletedTask[] = [];
 
     for (const practice of practices) {
       const isInProgress =
@@ -158,9 +159,9 @@ export function usePractices() {
 }
 
 export function usePractice(id: string | undefined) {
-  const { data, error, isLoading, mutate } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR<IPractice>(
     id ? `/practices/${id}` : null,
-    () => api.get(`/practices/${id}`),
+    () => api.get<IPractice>(`/practices/${id}`),
     {
       revalidateOnFocus: false,
       errorRetryCount: 2,
@@ -175,20 +176,20 @@ export function usePractice(id: string | undefined) {
   };
 }
 
-interface CheckInParams {
+interface ICheckInParams {
   practiceId: string;
   note?: string;
 }
 
-interface CheckInResult {
+interface ICheckInResult {
   success: boolean;
   error?: string;
 }
 
 export function useCheckIns(practiceId: string | undefined) {
-  const { data, error, isLoading, mutate } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR<ICheckIn[]>(
     practiceId ? `/practices/${practiceId}/check-ins` : null,
-    () => api.get(`/practices/${practiceId}/check-ins`),
+    () => api.get<ICheckIn[]>(`/practices/${practiceId}/check-ins`),
     {
       revalidateOnFocus: false,
       errorRetryCount: 2,
@@ -215,7 +216,7 @@ export function useCheckIn() {
   const { mutate: mutatePractices } = usePractices();
 
   const checkIn = useCallback(
-    async ({ practiceId, note }: CheckInParams): Promise<CheckInResult> => {
+    async ({ practiceId, note }: ICheckInParams): Promise<ICheckInResult> => {
       if (isCheckingRef.current) {
         return { success: false, error: "正在處理中" };
       }

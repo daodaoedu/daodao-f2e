@@ -28504,17 +28504,34 @@
     "onlyAllowShorthands": false,
     "fontLanguages": [],
     "animations": {
-      "isReactNative": false,
-      "supportsCSS": true,
-      "classNameAnimation": true,
-      "isStub": true,
-      "animations": {},
-      "useAnimations": "Function",
+      "isReactNative": true,
+      "animations": {
+        "fast": {
+          "type": "spring",
+          "damping": 20,
+          "mass": 1.2,
+          "stiffness": 250
+        },
+        "medium": {
+          "type": "spring",
+          "damping": 15,
+          "mass": 0.9,
+          "stiffness": 100
+        },
+        "slow": {
+          "type": "spring",
+          "damping": 20,
+          "stiffness": 60
+        }
+      },
+      "View": "Component",
+      "Text": "Component",
+      "useAnimatedNumber": "Function",
+      "useAnimatedNumberReaction": "Function",
+      "useAnimatedNumberStyle": "Function",
       "usePresence": "Function",
       "ResetPresence": "Function",
-      "useAnimatedNumber": "Function",
-      "useAnimatedNumberStyle": "Function",
-      "useAnimatedNumberReaction": "Function"
+      "useAnimations": "Function"
     },
     "media": {},
     "tokens": {

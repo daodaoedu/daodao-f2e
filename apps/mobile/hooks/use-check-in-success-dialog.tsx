@@ -1,13 +1,13 @@
 import { useCallback, useState } from "react";
 import { Alert } from "react-native";
 
-interface UseCheckInSuccessDialogOptions {
+interface IUseCheckInSuccessDialogOptions {
   title: string;
   from?: number;
   to?: number;
 }
 
-interface UseCheckInSuccessDialogReturn {
+interface IUseCheckInSuccessDialogReturn {
   /** 是否顯示成功對話框 */
   isOpen: boolean;
   /** 當前進度百分比 */
@@ -38,7 +38,7 @@ export function useCheckInSuccessDialog({
   title,
   from = 0,
   to = 100,
-}: UseCheckInSuccessDialogOptions): UseCheckInSuccessDialogReturn {
+}: IUseCheckInSuccessDialogOptions): IUseCheckInSuccessDialogReturn {
   const [isOpen, setIsOpen] = useState(false);
   const [percentage, setPercentage] = useState(from);
 

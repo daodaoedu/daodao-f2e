@@ -8,7 +8,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { api } from "@/services/api-client";
 import { colors } from "@/generated/design-tokens";
 
-interface FollowItem {
+interface IFollowItem {
   targetType: "user" | "practice";
   user?: { id: string; name: string; photoURL?: string; bio?: string };
   practice?: { id: string; title: string; ownerName: string; ownerPhotoURL?: string };
@@ -20,9 +20,9 @@ export default function FollowingSettingsScreen() {
   const { user: currentUser } = useCurrentUser();
   const userId = currentUser?.id ?? "";
 
-  const { data: followingItems, isLoading, mutate } = useSWR<FollowItem[]>(
+  const { data: followingItems, isLoading, mutate } = useSWR<IFollowItem[]>(
     userId ? `/users/${userId}/following` : null,
-    () => api.get<{ data: FollowItem[] }>(`/users/${userId}/following`).then((r) => r.data),
+    () => api.get<{ data: IFollowItem[] }>(`/users/${userId}/following`).then((r) => r.data),
     { revalidateOnFocus: false }
   );
 

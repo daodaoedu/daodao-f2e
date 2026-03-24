@@ -1,14 +1,14 @@
 import { useCallback, useState } from "react";
-import type { CheckInData } from "@/types";
+import type { ICheckInData } from "@/types";
 
-interface UseCheckInSheetOptions {
+interface IUseCheckInSheetOptions {
   /** 打卡完成回調 */
-  onComplete: (data: CheckInData) => Promise<void> | void;
+  onComplete: (data: ICheckInData) => Promise<void> | void;
   /** 關閉時的回調 */
   onClose?: () => void;
 }
 
-interface UseCheckInSheetReturn {
+interface IUseCheckInSheetReturn {
   /** 是否顯示打卡 Sheet */
   isOpen: boolean;
   /** 打開打卡 Sheet */
@@ -16,7 +16,7 @@ interface UseCheckInSheetReturn {
   /** 關閉打卡 Sheet */
   closeCheckInSheet: () => void;
   /** 處理打卡完成 */
-  handleComplete: (data: CheckInData) => Promise<void>;
+  handleComplete: (data: ICheckInData) => Promise<void>;
 }
 
 /**
@@ -41,7 +41,7 @@ interface UseCheckInSheetReturn {
 export function useCheckInSheet({
   onComplete,
   onClose,
-}: UseCheckInSheetOptions): UseCheckInSheetReturn {
+}: IUseCheckInSheetOptions): IUseCheckInSheetReturn {
   const [isOpen, setIsOpen] = useState(false);
 
   const openCheckInSheet = useCallback(() => {
@@ -54,7 +54,7 @@ export function useCheckInSheet({
   }, [onClose]);
 
   const handleComplete = useCallback(
-    async (data: CheckInData) => {
+    async (data: ICheckInData) => {
       // 先關閉 sheet
       setIsOpen(false);
       // 然後執行 onComplete

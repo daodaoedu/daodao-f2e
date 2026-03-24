@@ -4,14 +4,14 @@ import { Linking, Pressable, StyleSheet } from "react-native";
 import { Image, Spinner, Text, View, XStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 
-export interface ResourceCardData {
+export interface IResourceCardData {
   id: string | number;
   name: string;
   url?: string;
 }
 
 export interface ResourceCardProps {
-  resource: ResourceCardData;
+  resource: IResourceCardData;
   onRemove?: () => void;
 }
 

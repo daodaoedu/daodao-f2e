@@ -3,7 +3,7 @@ import { apiClient } from "@/services/api-client";
 
 const AI_API_URL = process.env.EXPO_PUBLIC_AI_API_URL ?? "https://ai-dev.daodao.so";
 
-interface AIResponse<T> {
+interface IAIResponse<T> {
   success: boolean;
   data?: T;
 }
@@ -18,9 +18,9 @@ async function fetchAiBackend<T>(path: string): Promise<T> {
 }
 
 export function useShowcaseSuggestions(enabled: boolean) {
-  return useSWR<AIResponse<IShowcaseSuggestions>>(
+  return useSWR<IAIResponse<IShowcaseSuggestions>>(
     enabled ? "/api/v1/users/practices/suggestions" : null,
-    (path: string) => fetchAiBackend<AIResponse<IShowcaseSuggestions>>(path),
+    (path: string) => fetchAiBackend<IAIResponse<IShowcaseSuggestions>>(path),
     { revalidateOnFocus: false }
   );
 }

@@ -22,9 +22,9 @@ export const createPracticeSchema = z.object({
   icon: z.string().optional(),
 });
 
-export type CreatePracticeInput = z.infer<typeof createPracticeSchema>;
+export type CreatePracticeInputType = z.infer<typeof createPracticeSchema>;
 
-export const defaultCreatePracticeValues: CreatePracticeInput = {
+export const defaultCreatePracticeValues: CreatePracticeInputType = {
   title: "",
   description: "",
   frequency: "daily",
@@ -37,18 +37,18 @@ export const defaultCreatePracticeValues: CreatePracticeInput = {
   icon: undefined,
 };
 
-export interface PracticeTemplate {
+export interface IPracticeTemplate {
   id: string;
   title: string;
   description: string;
   icon: string;
   color: string;
   category: string;
-  defaultValues: Partial<CreatePracticeInput>;
+  defaultValues: Partial<CreatePracticeInputType>;
 }
 
 // 預設模板
-export const practiceTemplates: PracticeTemplate[] = [
+export const practiceTemplates: IPracticeTemplate[] = [
   {
     id: "reading",
     title: "每日閱讀",

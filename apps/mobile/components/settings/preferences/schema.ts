@@ -24,4 +24,4 @@ export const preferencesFormSchema = z
     }
   );
 
-export type PreferencesFormValues = z.infer<typeof preferencesFormSchema>;
+export type PreferencesFormValuesType = z.infer<typeof preferencesFormSchema>;

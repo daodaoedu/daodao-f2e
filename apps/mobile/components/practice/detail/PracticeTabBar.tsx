@@ -13,7 +13,7 @@ interface PracticeTabBarProps {
 const TABS: { key: PracticeTab; label: string }[] = [
   { key: "comments", label: "留言" },
   { key: "checkins", label: "打卡紀錄" },
-  { key: "resources", label: "資源" },
+  { key: "resources", label: "使用資源" },
 ];
 
 export function PracticeTabBar({ activeTab, onTabChange, commentCount }: PracticeTabBarProps) {

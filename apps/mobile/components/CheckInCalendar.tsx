@@ -47,7 +47,7 @@ interface CheckInCalendarProps {
   onMonthChange?: (month: DateData) => void;
 }
 
-interface MarkedDates {
+interface IMarkedDates {
   [date: string]: {
     selected?: boolean;
     selectedColor?: string;
@@ -63,8 +63,8 @@ export function CheckInCalendar({
   currentMonth,
   onMonthChange,
 }: CheckInCalendarProps) {
-  const markedDates = useMemo<MarkedDates>(() => {
-    const marks: MarkedDates = {};
+  const markedDates = useMemo<IMarkedDates>(() => {
+    const marks: IMarkedDates = {};
 
     checkInDates.forEach((date) => {
       marks[date] = {

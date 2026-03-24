@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 
-interface TemplateItem {
+interface ITemplateItem {
   id: string;
   title: string;
   description: string;
@@ -21,7 +21,7 @@ interface TemplateItem {
   color: string;
 }
 
-const templates: TemplateItem[] = [
+const templates: ITemplateItem[] = [
   {
     id: "reading",
     title: "閱讀",

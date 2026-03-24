@@ -5,7 +5,7 @@ import { Keyboard, Pressable, ScrollView as RNScrollView, StyleSheet } from "rea
 import { Button, Input, Sheet, Spinner, Text, TextArea, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { analyticsService } from "@/services/analytics";
-import type { Practice } from "@/types/practice";
+import type { IPractice } from "@/types/practice";
 
 // 心情類型定義
 export type MoodType = "hopeless" | "frustrated" | "bored" | "neutral" | "fine" | "happy";
@@ -23,7 +23,7 @@ const MOOD_OPTIONS: { id: MoodType; label: string; emoji: string }[] = [
 // 預設標籤
 const DEFAULT_TAGS = ["練習", "新概念", "實作", "有趣", "創造", "困難", "刻意練習"];
 
-export interface CheckInData {
+export interface ICheckInData {
   mood: MoodType;
   tags: string[];
   description: string;
@@ -33,8 +33,8 @@ export interface CheckInData {
 interface CheckInSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  practice: Practice | null;
-  onCheckIn: (data: CheckInData) => Promise<{ success: boolean; error?: string }>;
+  practice: IPractice | null;
+  onCheckIn: (data: ICheckInData) => Promise<{ success: boolean; error?: string }>;
   onShare?: () => void;
 }
 

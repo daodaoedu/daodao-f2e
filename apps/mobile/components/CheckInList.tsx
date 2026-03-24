@@ -1,10 +1,10 @@
 import { Check, MessageSquare } from "@tamagui/lucide-icons";
 import { Card, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import type { CheckIn } from "@/types/practice";
+import type { ICheckIn } from "@/types/practice";
 
 interface CheckInListProps {
-  checkIns: CheckIn[];
+  checkIns: ICheckIn[];
   emptyText?: string;
 }
 

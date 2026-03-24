@@ -8,7 +8,7 @@ import useSWR from "swr";
 import { api } from "@/services/api-client";
 import { colors } from "@/generated/design-tokens";
 
-interface ArchivedPractice {
+interface IArchivedPractice {
   id: string;
   title: string;
   practiceAction?: string;
@@ -18,9 +18,9 @@ export default function ArchivedContentScreen() {
   const router = useRouter();
   const [unarchivingIds, setUnarchivingIds] = useState<Set<string>>(new Set());
 
-  const { data: practices, isLoading, error, mutate } = useSWR<ArchivedPractice[]>(
+  const { data: practices, isLoading, error, mutate } = useSWR<IArchivedPractice[]>(
     "/me/practices?status=archived",
-    () => api.get<{ data: ArchivedPractice[] }>("/me/practices?status=archived&limit=100").then((r) => r.data),
+    () => api.get<{ data: IArchivedPractice[] }>("/me/practices?status=archived&limit=100").then((r) => r.data),
     { revalidateOnFocus: false }
   );
 

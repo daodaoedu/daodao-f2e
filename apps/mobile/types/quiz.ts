@@ -1,4 +1,4 @@
-export interface Quiz {
+export interface IQuiz {
   id: string;
   title: string;
   description: string;
@@ -7,34 +7,34 @@ export interface Quiz {
   estimatedTime: string; // e.g., "5 分鐘"
 }
 
-export interface QuizQuestion {
+export interface IQuizQuestion {
   id: string;
   quizId: string;
   order: number;
   question: string;
-  options: QuizOption[];
+  options: IQuizOption[];
 }
 
-export interface QuizOption {
+export interface IQuizOption {
   id: string;
   text: string;
   value: string; // Used for scoring
 }
 
-export interface QuizAnswer {
+export interface IQuizAnswer {
   questionId: string;
   optionId: string;
   value: string;
 }
 
-export interface QuizResult {
+export interface IQuizResult {
   quizId: string;
-  island: IslandResult;
-  answers: QuizAnswer[];
+  island: IIslandResult;
+  answers: IQuizAnswer[];
   completedAt: string;
 }
 
-export interface IslandResult {
+export interface IIslandResult {
   id: string;
   name: string;
   description: string;
@@ -45,7 +45,7 @@ export interface IslandResult {
 }
 
 // Mock data
-export const availableQuizzes: Quiz[] = [
+export const availableQuizzes: IQuiz[] = [
   {
     id: "learning-style",
     title: "學習風格測驗",
@@ -64,7 +64,7 @@ export const availableQuizzes: Quiz[] = [
   },
 ];
 
-export const mockQuestions: QuizQuestion[] = [
+export const mockQuestions: IQuizQuestion[] = [
   {
     id: "q1",
     quizId: "learning-style",
@@ -103,7 +103,7 @@ export const mockQuestions: QuizQuestion[] = [
   },
 ];
 
-export const mockIslandResults: IslandResult[] = [
+export const mockIslandResults: IIslandResult[] = [
   {
     id: "explorer",
     name: "探索者島",

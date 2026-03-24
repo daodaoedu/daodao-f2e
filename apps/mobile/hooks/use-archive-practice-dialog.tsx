@@ -8,7 +8,7 @@ export enum ArchivePracticeResult {
   Cancelled,
 }
 
-interface ArchiveDialogOptions {
+interface IArchiveDialogOptions {
   /** 復原回調 */
   onRestore?: () => void | Promise<void>;
 }
@@ -35,7 +35,7 @@ interface ArchiveDialogOptions {
  */
 export function useArchivePracticeDialog() {
   const openArchiveDialog = useCallback(
-    async (options?: ArchiveDialogOptions): Promise<ArchivePracticeResult> => {
+    async (options?: IArchiveDialogOptions): Promise<ArchivePracticeResult> => {
       return new Promise((resolve) => {
         Alert.alert(
           "即將封存這個實踐",

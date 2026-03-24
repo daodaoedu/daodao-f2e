@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 
-interface Stat {
+interface IStat {
   label: string;
   value: string;
   unit: string;
@@ -12,10 +12,10 @@ interface Stat {
 }
 
 interface DashboardHeaderProps {
-  stats: Stat[];
+  stats: IStat[];
 }
 
-function StatCard({ label, value, unit, icon }: Stat) {
+function StatCard({ label, value, unit, icon }: IStat) {
   return (
     <View style={styles.statCard}>
       <YStack flex={1}>

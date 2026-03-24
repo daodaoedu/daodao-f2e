@@ -7,7 +7,7 @@ import useSWR from "swr";
 import { api } from "@/services/api-client";
 import { colors } from "@/generated/design-tokens";
 
-interface ConnectionUser {
+interface IConnectionUser {
   id: string;
   name: string;
   photoURL?: string;
@@ -15,38 +15,38 @@ interface ConnectionUser {
   identifier?: string;
 }
 
-interface ConnectionRequest {
+interface IConnectionRequest {
   id: string;
   requesterId: string;
   receiverId: string;
   intent?: string;
-  requester?: ConnectionUser;
-  receiver?: ConnectionUser;
+  requester?: IConnectionUser;
+  receiver?: IConnectionUser;
 }
 
-interface Connection {
+interface IConnection {
   id: string;
   userAId: string;
   userBId: string;
-  partner?: ConnectionUser;
+  partner?: IConnectionUser;
 }
 
 export default function ConnectionsSettingsScreen() {
   const router = useRouter();
 
-  const { data: incomingRequests, isLoading: loadingIncoming, mutate: mutateIncoming } = useSWR<ConnectionRequest[]>(
+  const { data: incomingRequests, isLoading: loadingIncoming, mutate: mutateIncoming } = useSWR<IConnectionRequest[]>(
     "/connections/requests/incoming",
-    () => api.get<{ data: ConnectionRequest[] }>("/connections/requests/incoming").then((r) => r.data),
+    () => api.get<{ data: IConnectionRequest[] }>("/connections/requests/incoming").then((r) => r.data),
     { revalidateOnFocus: false }
   );
-  const { data: outgoingRequests, isLoading: loadingOutgoing, mutate: mutateOutgoing } = useSWR<ConnectionRequest[]>(
+  const { data: outgoingRequests, isLoading: loadingOutgoing, mutate: mutateOutgoing } = useSWR<IConnectionRequest[]>(
     "/connections/requests/outgoing",
-    () => api.get<{ data: ConnectionRequest[] }>("/connections/requests/outgoing").then((r) => r.data),
+    () => api.get<{ data: IConnectionRequest[] }>("/connections/requests/outgoing").then((r) => r.data),
     { revalidateOnFocus: false }
   );
-  const { data: connections, isLoading: loadingConnections, mutate: mutateConnections } = useSWR<Connection[]>(
+  const { data: connections, isLoading: loadingConnections, mutate: mutateConnections } = useSWR<IConnection[]>(
     "/connections",
-    () => api.get<{ data: Connection[] }>("/connections").then((r) => r.data),
+    () => api.get<{ data: IConnection[] }>("/connections").then((r) => r.data),
     { revalidateOnFocus: false }
   );
 

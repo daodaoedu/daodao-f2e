@@ -1,18 +1,18 @@
 import { useCallback, useState } from "react";
 
-interface TagEditData {
+interface ITagEditData {
   tags: string[];
   keyword: string;
 }
 
-interface UseTagEditSheetOptions {
+interface IUseTagEditSheetOptions {
   /** 完成回調 */
-  onComplete: (data: TagEditData) => void;
+  onComplete: (data: ITagEditData) => void;
   /** 關閉時的回調 */
   onClose?: () => void;
 }
 
-interface UseTagEditSheetReturn {
+interface IUseTagEditSheetReturn {
   /** 是否顯示編輯標籤 Sheet */
   isOpen: boolean;
   /** 打開編輯標籤 Sheet */
@@ -20,7 +20,7 @@ interface UseTagEditSheetReturn {
   /** 關閉編輯標籤 Sheet */
   closeTagEditSheet: () => void;
   /** 處理完成 */
-  handleComplete: (data: TagEditData) => void;
+  handleComplete: (data: ITagEditData) => void;
 }
 
 /**
@@ -45,7 +45,7 @@ interface UseTagEditSheetReturn {
 export function useTagEditSheet({
   onComplete,
   onClose,
-}: UseTagEditSheetOptions): UseTagEditSheetReturn {
+}: IUseTagEditSheetOptions): IUseTagEditSheetReturn {
   const [isOpen, setIsOpen] = useState(false);
 
   const openTagEditSheet = useCallback(() => {
@@ -58,7 +58,7 @@ export function useTagEditSheet({
   }, [onClose]);
 
   const handleComplete = useCallback(
-    (data: TagEditData) => {
+    (data: ITagEditData) => {
       setIsOpen(false);
       onComplete(data);
     },

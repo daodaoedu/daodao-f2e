@@ -3,10 +3,10 @@ import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, View as RNView } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import type { CompletedTask } from "@/hooks/usePractices";
+import type { ICompletedTask } from "@/hooks/usePractices";
 
 interface CompletedCardProps {
-  task: CompletedTask;
+  task: ICompletedTask;
 }
 
 export function CompletedCard({ task }: CompletedCardProps) {

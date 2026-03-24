@@ -14,7 +14,7 @@ import {
   POSITION_OPTIONS,
 } from "@/constants/settings";
 
-type FieldOption = { value: string; label: string };
+type FieldOptionType = { value: string; label: string };
 
 function FieldSelectionModal({
   visible,
@@ -27,7 +27,7 @@ function FieldSelectionModal({
 }: {
   visible: boolean;
   title: string;
-  options: readonly FieldOption[];
+  options: readonly FieldOptionType[];
   selected: string[];
   maxSelection: number;
   onClose: () => void;
@@ -110,7 +110,7 @@ export default function AccountSettingsScreen() {
   const [showEducationPicker, setShowEducationPicker] = useState(false);
   const [activeFieldModal, setActiveFieldModal] = useState<{
     title: string;
-    options: readonly FieldOption[];
+    options: readonly FieldOptionType[];
     selected: string[];
     maxSelection: number;
     onConfirm: (selected: string[]) => void;
@@ -128,7 +128,7 @@ export default function AccountSettingsScreen() {
     }
   }, [user]);
 
-  const getLabel = useCallback((options: readonly FieldOption[], value: string) => {
+  const getLabel = useCallback((options: readonly FieldOptionType[], value: string) => {
     return options.find((o) => o.value === value)?.label ?? value;
   }, []);
 

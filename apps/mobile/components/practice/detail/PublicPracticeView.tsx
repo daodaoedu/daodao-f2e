@@ -1,19 +1,40 @@
 import { useCallback, useState } from "react";
-import { Alert, Image, KeyboardAvoidingView, Linking, Platform, RefreshControl, StyleSheet } from "react-native";
 import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Linking,
+  Platform,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+} from "react-native";
+import {
+  ChevronDown,
   ChevronLeft,
+  ChevronUp,
   Flag,
+  MessageCircle,
   MoreHorizontal,
   Telescope,
   BarChart3,
   Tag,
 } from "@tamagui/lucide-icons";
-import { Button, Card, ScrollView, Text, View, XStack, YStack } from "tamagui";
+import { Button, ScrollView, Text, View, XStack, YStack } from "tamagui";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@/generated/design-tokens";
 import { getStatusConfig } from "@/constants/task-status";
-import { useReactions, useReactionsList, upsertReaction, removeReaction } from "@/hooks/useReactions";
+import {
+  REACTION_CONFIG,
+  type ReactionTypeType,
+} from "@/constants/reaction-type";
+import {
+  useReactions,
+  useReactionsList,
+  upsertReaction,
+  removeReaction,
+} from "@/hooks/useReactions";
 import { useComments } from "@/hooks/useComments";
 import { useFollowStatus, followTarget, unfollowTarget } from "@/hooks/useFollow";
 import { useCheckIns } from "@/hooks/usePractices";
@@ -22,7 +43,6 @@ import { CommentSection } from "./CommentSection";
 import { BrowseActivitySheet } from "./BrowseActivitySheet";
 import { PracticeTabBar, type PracticeTab } from "./PracticeTabBar";
 import { CheckInList } from "@/components";
-import type { ReactionTypeType } from "@/constants/reaction-type";
 
 interface PublicPracticeViewProps {
   practice: {
@@ -51,23 +71,36 @@ const TALLY_REPORT_URL = "https://tally.so/r/BzGQy4";
 export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewProps) {
   const router = useRouter();
   const {
-    id, title, status, description, practiceAction,
-    startDate, endDate, tags,
-    frequencyMinDays, frequencyMaxDays, sessionDurationMinutes,
+    id,
+    title,
+    status,
+    description,
+    practiceAction,
+    tags,
+    frequencyMinDays,
+    frequencyMaxDays,
+    sessionDurationMinutes,
     user,
   } = practice;
 
   const [activeTab, setActiveTab] = useState<PracticeTab>("comments");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [infoExpanded, setInfoExpanded] = useState(false);
   const [browseActivityOpen, setBrowseActivityOpen] = useState(false);
 
-  const { currentUserReaction, totalCount, displayReactions, mutate: mutateReactions } =
-    useReactions("practice", id);
+  // ── Data ──
+  const {
+    currentUserReaction,
+    totalCount,
+    displayReactions,
+    mutate: mutateReactions,
+  } = useReactions("practice", id);
   const { items: reactors, firstReactorName } = useReactionsList("practice", id);
   const { comments } = useComments("practice", id);
   const { isFollowing, mutate: mutateFollow } = useFollowStatus("practice", id);
   const { checkIns, error: checkInsError } = useCheckIns(id);
 
+  // ── Handlers ──
   const handleReactionToggle = useCallback(
     async (type: ReactionTypeType) => {
       const isSelected = currentUserReaction === type;
@@ -105,232 +138,504 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
     setBrowseActivityOpen(true);
   }, []);
 
+  // ── Derived ──
   const taskStatus = status === "active" ? "in-progress" : "completed";
   const statusInfo = getStatusConfig(taskStatus);
-  const formatDate = (d?: string | null) => {
-    if (!d) return null;
-    const date = new Date(d);
-    return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
-  };
-  const startFmt = formatDate(startDate);
-  const endFmt = formatDate(endDate);
+  const frequency =
+    frequencyMinDays === frequencyMaxDays
+      ? String(frequencyMinDays ?? "")
+      : `${frequencyMinDays}-${frequencyMaxDays}`;
+
+  // Browse activity text (matches product logic)
+  const browseActivityText = (() => {
+    if (reactors.length > 0) {
+      const firstName = reactors[0]?.name;
+      return reactors.length > 1
+        ? `${firstName} 與其他 ${reactors.length - 1} 人`
+        : firstName;
+    }
+    if (currentUserReaction) {
+      return totalCount > 1 ? `你 與其他 ${totalCount - 1} 人` : "你";
+    }
+    if (totalCount > 0) {
+      return firstReactorName
+        ? totalCount > 1
+          ? `${firstReactorName} 與其他 ${totalCount - 1} 人`
+          : firstReactorName
+        : `${totalCount} 人`;
+    }
+    return "觀看瀏覽活動";
+  })();
+
+  // Browse activity emoji circles
+  const browseDisplayReactions =
+    reactors.length > 0
+      ? ([...new Set(reactors.map((r) => r.reactionType))].slice(0, 2) as ReactionTypeType[])
+      : displayReactions.slice(0, 2);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <ScrollView
-        flex={1}
-        backgroundColor="$background"
-        refreshControl={
-          <RefreshControl
-            refreshing={false}
-            onRefresh={onRefresh}
-            tintColor={colors.primary.base}
-          />
-        }
-        contentContainerStyle={{ paddingBottom: 100 }}
-        keyboardShouldPersistTaps="handled"
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <XStack padding="$4" justifyContent="space-between" alignItems="center">
-          <Button size="$4" circular chromeless onPress={() => router.back()}>
-            <ChevronLeft size={24} color="$color" />
-          </Button>
-          <Text fontSize={16} fontWeight="500" color="$color">主題實踐</Text>
-          <Button size="$4" circular chromeless onPress={() => setMenuOpen(!menuOpen)}>
-            <MoreHorizontal size={20} color="$color" />
-          </Button>
-        </XStack>
+        <ScrollView
+          flex={1}
+          backgroundColor="$background"
+          refreshControl={
+            <RefreshControl
+              refreshing={false}
+              onRefresh={onRefresh}
+              tintColor={colors.primary.base}
+            />
+          }
+          contentContainerStyle={{ paddingBottom: 100 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* ── Top bar: back button ── */}
+          <XStack padding="$4" alignItems="center">
+            <Button size="$4" circular chromeless onPress={() => router.back()}>
+              <ChevronLeft size={24} color="$color" />
+            </Button>
+          </XStack>
 
-        {menuOpen && (
-          <YStack
-            position="absolute"
-            right={16}
-            top={60}
-            zIndex={20}
-            backgroundColor="white"
-            borderRadius={16}
-            paddingVertical="$2"
-            shadowColor="#000"
-            shadowOffset={{ width: 0, height: 2 }}
-            shadowOpacity={0.15}
-            shadowRadius={8}
-            elevation={5}
-            minWidth={140}
-          >
-            <Button chromeless onPress={handleReport} justifyContent="flex-start" paddingHorizontal="$4" paddingVertical="$3">
-              <XStack gap="$3" alignItems="center">
-                <Flag size={18} color="#295E5C" />
-                <Text fontSize={14} color="#295E5C">檢舉</Text>
-              </XStack>
-            </Button>
-            <Button chromeless onPress={handleToggleFollow} justifyContent="flex-start" paddingHorizontal="$4" paddingVertical="$3">
-              <XStack gap="$3" alignItems="center">
-                <Telescope size={18} color={isFollowing ? colors.primary.base : "#295E5C"} />
-                <Text fontSize={14} color={isFollowing ? colors.primary.base : "#295E5C"}>
-                  {isFollowing ? "取消關注" : "關注"}
-                </Text>
-              </XStack>
-            </Button>
-            <Button chromeless onPress={handleBrowseActivity} justifyContent="flex-start" paddingHorizontal="$4" paddingVertical="$3">
-              <XStack gap="$3" alignItems="center">
-                <BarChart3 size={18} color="#295E5C" />
-                <Text fontSize={14} color="#295E5C">瀏覽活動</Text>
-              </XStack>
-            </Button>
-          </YStack>
-        )}
+          <YStack paddingHorizontal="$4">
+            {/* ── Status badge + menu row (matches product) ── */}
+            <XStack justifyContent="space-between" alignItems="center" marginBottom="$2">
+              {statusInfo ? (
+                <View
+                  style={[
+                    styles.badge,
+                    {
+                      backgroundColor:
+                        taskStatus === "completed" ? "#6B7280" : colors.primary.base,
+                    },
+                  ]}
+                >
+                  <Text fontSize={12} color="white" fontWeight="500">
+                    {statusInfo.label}
+                  </Text>
+                </View>
+              ) : (
+                <View />
+              )}
 
-        <YStack paddingHorizontal="$5" gap="$4">
-          <YStack alignItems="center" gap="$2">
-            <XStack
-              backgroundColor={taskStatus === "completed" ? "#6B7280" : colors.primary.base}
-              paddingHorizontal="$2"
-              paddingVertical="$1"
-              borderRadius="$sm"
-            >
-              <Text fontSize={12} color="white" fontWeight="500">{statusInfo?.label}</Text>
+              <View style={{ position: "relative" }}>
+                <Button
+                  size="$3"
+                  circular
+                  chromeless
+                  onPress={() => setMenuOpen(!menuOpen)}
+                >
+                  <MoreHorizontal size={20} color="$color" />
+                </Button>
+
+                {/* Menu dropdown */}
+                {menuOpen && (
+                  <YStack
+                    position="absolute"
+                    right={0}
+                    top="100%"
+                    marginTop={4}
+                    zIndex={20}
+                    backgroundColor="white"
+                    borderRadius={16}
+                    paddingVertical="$2"
+                    shadowColor="#000"
+                    shadowOffset={{ width: 0, height: 2 }}
+                    shadowOpacity={0.15}
+                    shadowRadius={8}
+                    elevation={5}
+                    minWidth={140}
+                  >
+                    <Button
+                      chromeless
+                      onPress={handleReport}
+                      justifyContent="flex-start"
+                      paddingHorizontal="$4"
+                      paddingVertical="$3"
+                    >
+                      <XStack gap="$3" alignItems="center">
+                        <Flag size={18} color="#295E5C" />
+                        <Text fontSize={14} color="#295E5C">
+                          檢舉
+                        </Text>
+                      </XStack>
+                    </Button>
+                    <Button
+                      chromeless
+                      onPress={handleToggleFollow}
+                      justifyContent="flex-start"
+                      paddingHorizontal="$4"
+                      paddingVertical="$3"
+                    >
+                      <XStack gap="$3" alignItems="center">
+                        <Telescope
+                          size={18}
+                          color={isFollowing ? colors.primary.base : "#295E5C"}
+                        />
+                        <Text
+                          fontSize={14}
+                          color={isFollowing ? colors.primary.base : "#295E5C"}
+                        >
+                          {isFollowing ? "取消關注" : "關注"}
+                        </Text>
+                      </XStack>
+                    </Button>
+                    <Button
+                      chromeless
+                      onPress={handleBrowseActivity}
+                      justifyContent="flex-start"
+                      paddingHorizontal="$4"
+                      paddingVertical="$3"
+                    >
+                      <XStack gap="$3" alignItems="center">
+                        <BarChart3 size={18} color="#295E5C" />
+                        <Text fontSize={14} color="#295E5C">
+                          瀏覽活動
+                        </Text>
+                      </XStack>
+                    </Button>
+                  </YStack>
+                )}
+              </View>
             </XStack>
-            <Text fontSize={18} fontWeight="600" color="$color" textAlign="center" numberOfLines={2}>
+
+            {/* ── Title (left-aligned, matches product h1) ── */}
+            <Text
+              fontSize={18}
+              fontWeight="600"
+              color={colors.text.dark}
+              numberOfLines={2}
+              marginBottom="$4"
+            >
               {title}
             </Text>
-          </YStack>
 
-          <Card backgroundColor="white" borderRadius={12} padding="$4" bordered>
-            {startFmt && endFmt && (
-              <Text fontSize={12} color="rgba(0,0,0,0.5)" marginBottom="$2">
-                {startFmt} ▶ {endFmt}
-              </Text>
-            )}
-
-            <XStack gap="$3" alignItems="flex-start" marginBottom="$3">
+            {/* ── Single overview card (matches product structure) ── */}
+            <View style={styles.card}>
+              {/* Creator info */}
               {user && (
-                <View style={styles.avatar}>
-                  {user.photoUrl ? (
-                    <Image source={{ uri: user.photoUrl }} style={styles.avatarImage} />
-                  ) : (
-                    <Text fontSize={20} color="#9CA3AF">{(user.name ?? "?")[0]}</Text>
-                  )}
-                </View>
-              )}
-              <YStack flex={1}>
-                {user && (
-                  <Text fontSize={14} fontWeight="600" color="#295E5C" marginBottom="$1">
+                <XStack alignItems="center" gap="$2" marginBottom="$3">
+                  <View style={styles.creatorAvatar}>
+                    {user.photoUrl ? (
+                      <Image
+                        source={{ uri: user.photoUrl }}
+                        style={styles.creatorAvatarImage}
+                      />
+                    ) : (
+                      <Text fontSize={12} color="#9CA3AF">
+                        {(user.name ?? "?")[0]}
+                      </Text>
+                    )}
+                  </View>
+                  <Text fontSize={14} fontWeight="500" color={colors.text.dark}>
                     {user.name}
                   </Text>
-                )}
-                {(practiceAction || description) && (
-                  <Text fontSize={14} color="rgba(0,0,0,0.8)" numberOfLines={3}>
-                    {practiceAction || description}
-                  </Text>
-                )}
-              </YStack>
-            </XStack>
+                </XStack>
+              )}
 
-            {(frequencyMinDays || frequencyMaxDays || sessionDurationMinutes) && (
-              <XStack gap="$4" marginBottom="$3">
-                {(frequencyMinDays || frequencyMaxDays) && (
-                  <XStack alignItems="center">
-                    <Text fontSize={14} fontWeight="600" color="#16B9B3">
-                      {frequencyMinDays === frequencyMaxDays
-                        ? frequencyMinDays
-                        : `${frequencyMinDays}-${frequencyMaxDays}`}
+              {/* Action description */}
+              {(practiceAction || description) && (
+                <Text
+                  fontSize={15}
+                  fontWeight="500"
+                  color={colors.text.dark}
+                  marginBottom="$3"
+                >
+                  {practiceAction || description}
+                </Text>
+              )}
+
+              {/* Frequency + Duration (product-style stacked layout) */}
+              {(frequencyMinDays || frequencyMaxDays || sessionDurationMinutes) && (
+                <XStack
+                  marginBottom="$3"
+                  paddingBottom="$3"
+                  borderBottomWidth={1}
+                  borderBottomColor="#E4EAE9"
+                >
+                  {(frequencyMinDays || frequencyMaxDays) && (
+                    <YStack width={80}>
+                      <Text fontSize={12} color={colors.text.dark}>
+                        一週
+                      </Text>
+                      <XStack alignItems="baseline" gap={2}>
+                        <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
+                          {frequency}
+                        </Text>
+                        <Text fontSize={12} color={colors.text.dark}>
+                          天
+                        </Text>
+                      </XStack>
+                    </YStack>
+                  )}
+                  {sessionDurationMinutes && (
+                    <YStack width={80}>
+                      <Text fontSize={12} color={colors.text.dark}>
+                        一次
+                      </Text>
+                      <XStack alignItems="baseline" gap={2}>
+                        <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
+                          {sessionDurationMinutes}
+                        </Text>
+                        <Text fontSize={12} color={colors.text.dark}>
+                          分鐘
+                        </Text>
+                      </XStack>
+                    </YStack>
+                  )}
+                </XStack>
+              )}
+
+              {/* Tags */}
+              {tags && tags.length > 0 && (
+                <XStack flexWrap="wrap" gap="$2" marginBottom="$3">
+                  {tags.map((tag) => (
+                    <XStack
+                      key={tag}
+                      backgroundColor="#E0F4FF"
+                      paddingHorizontal="$2"
+                      paddingVertical={4}
+                      borderRadius="$sm"
+                      alignItems="center"
+                      gap="$1"
+                    >
+                      <Tag size={14} color={colors.primary.lighter} />
+                      <Text fontSize={12} color={colors.text.dark}>
+                        {tag}
+                      </Text>
+                    </XStack>
+                  ))}
+                </XStack>
+              )}
+
+              {/* ── Divider ── */}
+              <View style={styles.divider} />
+
+              {/* ── "更多資訊" expandable (matches product) ── */}
+              <Pressable
+                onPress={() => setInfoExpanded((v) => !v)}
+                style={styles.moreInfoButton}
+              >
+                <Text fontSize={14} color="#9FB5B8">
+                  更多資訊
+                </Text>
+                {infoExpanded ? (
+                  <ChevronUp size={16} color="#9FB5B8" />
+                ) : (
+                  <ChevronDown size={16} color="#9FB5B8" />
+                )}
+              </Pressable>
+
+              {infoExpanded && (
+                <XStack gap="$3" marginBottom="$3">
+                  {/* Execution Timing placeholder */}
+                  <View style={styles.infoCard}>
+                    <Text fontSize={12} color={colors.primary.darker} marginBottom="$2">
+                      執行時機
                     </Text>
-                    <Text fontSize={14} color="rgba(0,0,0,0.6)" marginLeft={2}>天/週</Text>
-                  </XStack>
-                )}
-                {sessionDurationMinutes && (
+                    <Text fontSize={12} color="rgba(0,0,0,0.4)">
+                      尚無資料
+                    </Text>
+                  </View>
+                  {/* Duration card */}
+                  <View style={styles.infoCard}>
+                    <Text fontSize={12} color={colors.primary.darker} marginBottom="$2">
+                      實踐週期
+                    </Text>
+                    <Text fontSize={12} color="rgba(0,0,0,0.4)">
+                      尚無資料
+                    </Text>
+                  </View>
+                </XStack>
+              )}
+
+              {/* ── Browse Activity button (matches product) ── */}
+              <Pressable
+                onPress={handleBrowseActivity}
+                style={styles.browseActivityButton}
+              >
+                {browseDisplayReactions.length > 0 && (
                   <XStack alignItems="center">
-                    <Text fontSize={14} fontWeight="600" color="#16B9B3">{sessionDurationMinutes}</Text>
-                    <Text fontSize={14} color="rgba(0,0,0,0.6)" marginLeft={2}>分鐘/次</Text>
+                    {browseDisplayReactions.map((type, i) => (
+                      <View
+                        key={type}
+                        style={[
+                          styles.browseEmojiCircle,
+                          i > 0 && { marginLeft: -6 },
+                        ]}
+                      >
+                        <Text fontSize={16}>
+                          {REACTION_CONFIG[type]?.emoji ?? "👍"}
+                        </Text>
+                      </View>
+                    ))}
                   </XStack>
                 )}
-              </XStack>
-            )}
+                <Text fontSize={14} color={colors.text.dark}>
+                  {browseActivityText}
+                </Text>
+              </Pressable>
 
-            {tags && tags.length > 0 && (
-              <XStack flexWrap="wrap" gap="$2">
-                {tags.map((tag) => (
-                  <XStack
-                    key={tag}
-                    backgroundColor="#E0F4FF"
-                    paddingHorizontal="$2"
-                    paddingVertical={4}
-                    borderRadius="$sm"
-                    alignItems="center"
-                    gap="$1"
-                  >
-                    <Tag size={14} color={colors.primary.lighter} />
-                    <Text fontSize={12} color="$color">{tag}</Text>
+              {/* ── Reaction bar + Comment count (matches product bottom bar) ── */}
+              <View style={styles.bottomBar}>
+                <View style={styles.bottomBarHalf}>
+                  <ReactionPickerButton
+                    selectedReaction={currentUserReaction}
+                    onToggle={handleReactionToggle}
+                    variant="card"
+                    totalCount={totalCount}
+                    displayReactions={displayReactions}
+                    firstReactorName={firstReactorName}
+                  />
+                </View>
+
+                <View style={styles.bottomBarDivider} />
+
+                <Pressable
+                  style={styles.bottomBarHalf}
+                  onPress={() => setActiveTab("comments")}
+                >
+                  <XStack alignItems="center" gap="$1.5" justifyContent="center">
+                    <MessageCircle size={20} color={colors.text.dark} />
+                    <Text fontSize={14} fontWeight="500" color={colors.text.dark}>
+                      {comments.length}
+                    </Text>
                   </XStack>
-                ))}
-              </XStack>
-            )}
-          </Card>
+                </Pressable>
+              </View>
+            </View>
 
-          <Card backgroundColor="white" borderRadius={12} padding="$3" bordered>
-            <ReactionPickerButton
-              selectedReaction={currentUserReaction}
-              onToggle={handleReactionToggle}
-              variant="card"
-              totalCount={totalCount}
-              displayReactions={displayReactions}
-              firstReactorName={firstReactorName}
+            {/* ── Tabs (matches product) ── */}
+            <PracticeTabBar
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              commentCount={comments.length}
             />
-          </Card>
 
-          <PracticeTabBar
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            commentCount={comments.length}
-          />
+            {/* ── Tab content ── */}
+            {activeTab === "comments" && (
+              <CommentSection targetType="practice" targetId={id} />
+            )}
 
-          {activeTab === "comments" && (
-            <CommentSection targetType="practice" targetId={id} />
-          )}
+            {activeTab === "checkins" &&
+              (checkInsError ? (
+                <YStack alignItems="center" paddingVertical="$8">
+                  <Text color="rgba(0,0,0,0.4)" fontSize={14}>
+                    無法載入打卡紀錄
+                  </Text>
+                </YStack>
+              ) : (
+                <CheckInList checkIns={checkIns || []} emptyText="尚無打卡紀錄" />
+              ))}
 
-          {activeTab === "checkins" && (
-            checkInsError ? (
-              <YStack alignItems="center" paddingVertical="$8">
-                <Text color="rgba(0,0,0,0.4)" fontSize={14}>無法載入打卡紀錄</Text>
+            {activeTab === "resources" && (
+              <YStack paddingVertical="$4">
+                <Text color="#9FB5B8" fontSize={14}>
+                  目前沒有使用資源
+                </Text>
               </YStack>
-            ) : (
-              <CheckInList checkIns={checkIns || []} emptyText="尚無打卡紀錄" />
-            )
-          )}
-
-          {activeTab === "resources" && (
-            <YStack alignItems="center" paddingVertical="$8">
-              <Text color="rgba(0,0,0,0.4)" fontSize={14}>尚無資源</Text>
-            </YStack>
-          )}
-        </YStack>
-      </ScrollView>
-
+            )}
+          </YStack>
+        </ScrollView>
       </KeyboardAvoidingView>
 
-      <BrowseActivitySheet
-        open={browseActivityOpen}
-        onOpenChange={setBrowseActivityOpen}
-        commentCount={comments.length}
-        reactors={reactors}
-      />
+      {/* Browse Activity Sheet — lazy mount to avoid Tamagui Sheet crash */}
+      {browseActivityOpen && (
+        <BrowseActivitySheet
+          open={browseActivityOpen}
+          onOpenChange={setBrowseActivityOpen}
+          commentCount={comments.length}
+          reactors={reactors}
+        />
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  card: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    paddingTop: 16,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+    overflow: "hidden",
+  },
+  creatorAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: "#F3F4F6",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
   },
-  avatarImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  creatorAvatarImage: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#E4EAE9",
+    marginBottom: 8,
+  },
+  moreInfoButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 4,
+    marginBottom: 8,
+  },
+  infoCard: {
+    flex: 1,
+    backgroundColor: "#E6F7F9",
+    borderRadius: 12,
+    padding: 16,
+  },
+  browseActivityButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingBottom: 12,
+  },
+  browseEmojiCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#E8FAF9",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "white",
+  },
+  bottomBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: "#E4EAE9",
+    paddingVertical: 12,
+  },
+  bottomBarHalf: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bottomBarDivider: {
+    width: 1,
+    height: 20,
+    backgroundColor: "#E4EAE9",
   },
 });

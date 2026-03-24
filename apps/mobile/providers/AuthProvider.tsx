@@ -9,23 +9,23 @@ import {
   useState,
 } from "react";
 import { analyticsService } from "@/services/analytics";
-import { type AuthTokens, authStorage, type StoredUser } from "@/services/auth-storage";
+import { type IAuthTokens, authStorage, type IStoredUser } from "@/services/auth-storage";
 
-interface AuthState {
-  user: StoredUser | null;
+interface IAuthState {
+  user: IStoredUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
 }
 
-type LoginMethod = "google" | "apple" | "email";
+type LoginMethodType = "google" | "apple" | "email";
 
-interface AuthContextValue extends AuthState {
-  signIn: (tokens: AuthTokens, user: StoredUser, loginMethod?: LoginMethod) => Promise<void>;
+interface IAuthContextValue extends IAuthState {
+  signIn: (tokens: IAuthTokens, user: IStoredUser, loginMethod?: LoginMethodType) => Promise<void>;
   signOut: () => Promise<void>;
-  updateUser: (user: StoredUser) => Promise<void>;
+  updateUser: (user: IStoredUser) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = createContext<IAuthContextValue | null>(null);
 
 function useProtectedRoute(isAuthenticated: boolean, isLoading: boolean) {
   const segments = useSegments();
@@ -57,7 +57,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [state, setState] = useState<AuthState>({
+  const [state, setState] = useState<IAuthState>({
     user: null,
     isLoading: true,
     isAuthenticated: false,
@@ -117,7 +117,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useProtectedRoute(state.isAuthenticated, state.isLoading);
 
   const signIn = useCallback(
-    async (tokens: AuthTokens, user: StoredUser, loginMethod?: LoginMethod) => {
+    async (tokens: IAuthTokens, user: IStoredUser, loginMethod?: LoginMethodType) => {
       try {
         await Promise.all([authStorage.setTokens(tokens), authStorage.setUser(user)]);
 
@@ -170,7 +170,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
-  const updateUser = useCallback(async (user: StoredUser) => {
+  const updateUser = useCallback(async (user: IStoredUser) => {
     try {
       await authStorage.setUser(user);
 

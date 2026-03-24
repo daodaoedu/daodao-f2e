@@ -17,13 +17,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 
-interface SettingItem {
+interface ISettingItem {
   icon: typeof Settings;
   label: string;
   route: string;
 }
 
-const socialItems: SettingItem[] = [
+const socialItems: ISettingItem[] = [
   {
     icon: MessagesSquare,
     label: "互動設定",
@@ -41,7 +41,7 @@ const socialItems: SettingItem[] = [
   },
 ];
 
-const settingsItems: SettingItem[] = [
+const settingsItems: ISettingItem[] = [
   {
     icon: LibraryBig,
     label: "領域偏好設定",
@@ -69,7 +69,7 @@ const settingsItems: SettingItem[] = [
   },
 ];
 
-const settingGroups: { title: string; items: SettingItem[] }[] = [
+const settingGroups: { title: string; items: ISettingItem[] }[] = [
   { title: "社交", items: socialItems },
   { title: "設定", items: settingsItems },
 ];

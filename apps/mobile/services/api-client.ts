@@ -4,7 +4,7 @@ const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so";
 const API_URL = `${API_BASE_URL}/api/v1`;
 const REQUEST_TIMEOUT = 30000; // 30 seconds
 
-interface RefreshTokenResponse {
+interface IRefreshTokenResponse {
   accessToken: string;
   refreshToken: string;
 }
@@ -48,7 +48,7 @@ async function refreshAccessToken(): Promise<string> {
         throw new Error("Token refresh failed");
       }
 
-      const data: RefreshTokenResponse = await response.json();
+      const data: IRefreshTokenResponse = await response.json();
 
       await authStorage.setTokens({
         accessToken: data.accessToken,
@@ -65,12 +65,12 @@ async function refreshAccessToken(): Promise<string> {
   return refreshPromise;
 }
 
-interface RequestOptions extends RequestInit {
+interface IRequestOptions extends RequestInit {
   skipAuth?: boolean;
   timeout?: number;
 }
 
-export async function apiClient<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+export async function apiClient<T>(endpoint: string, options: IRequestOptions = {}): Promise<T> {
   const { skipAuth = false, timeout = REQUEST_TIMEOUT, ...fetchOptions } = options;
 
   const headers: HeadersInit = {
@@ -140,30 +140,30 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
 
 // Convenience methods
 export const api = {
-  get: <T>(endpoint: string, options?: RequestOptions) =>
+  get: <T>(endpoint: string, options?: IRequestOptions) =>
     apiClient<T>(endpoint, { ...options, method: "GET" }),
 
-  post: <T>(endpoint: string, body?: unknown, options?: RequestOptions) =>
+  post: <T>(endpoint: string, body?: unknown, options?: IRequestOptions) =>
     apiClient<T>(endpoint, {
       ...options,
       method: "POST",
       body: body ? JSON.stringify(body) : undefined,
     }),
 
-  put: <T>(endpoint: string, body?: unknown, options?: RequestOptions) =>
+  put: <T>(endpoint: string, body?: unknown, options?: IRequestOptions) =>
     apiClient<T>(endpoint, {
       ...options,
       method: "PUT",
       body: body ? JSON.stringify(body) : undefined,
     }),
 
-  patch: <T>(endpoint: string, body?: unknown, options?: RequestOptions) =>
+  patch: <T>(endpoint: string, body?: unknown, options?: IRequestOptions) =>
     apiClient<T>(endpoint, {
       ...options,
       method: "PATCH",
       body: body ? JSON.stringify(body) : undefined,
     }),
 
-  delete: <T>(endpoint: string, options?: RequestOptions) =>
+  delete: <T>(endpoint: string, options?: IRequestOptions) =>
     apiClient<T>(endpoint, { ...options, method: "DELETE" }),
 };

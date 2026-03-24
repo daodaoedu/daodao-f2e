@@ -34,4 +34,4 @@ export const publicInfoFormSchema = z.object({
   threads: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
 });
 
-export type PublicInfoFormValues = z.infer<typeof publicInfoFormSchema>;
+export type PublicInfoFormValuesType = z.infer<typeof publicInfoFormSchema>;

@@ -93,17 +93,7 @@ export default function PracticeDetailScreen() {
   const showcasePractice = showcaseData ? JSON.parse(showcaseData) as IShowcasePractice : null;
   const isPublicView = showcasePractice != null && showcasePractice.user?.id !== currentUser?.id;
 
-  if (isLoading) {
-    return (
-      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-        <YStack flex={1} alignItems="center" justifyContent="center">
-          <Spinner size="large" color={colors.primary.base} />
-        </YStack>
-      </SafeAreaView>
-    );
-  }
-
-  // Public practice view (from 靈感 tab)
+  // Public practice view (from 靈感 tab) — check BEFORE loading to avoid waiting for usePractice
   if (isPublicView && showcasePractice) {
     return (
       <PublicPracticeView
@@ -125,6 +115,16 @@ export default function PracticeDetailScreen() {
         }}
         onRefresh={async () => {}}
       />
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+        <YStack flex={1} alignItems="center" justifyContent="center">
+          <Spinner size="large" color={colors.primary.base} />
+        </YStack>
+      </SafeAreaView>
     );
   }
 

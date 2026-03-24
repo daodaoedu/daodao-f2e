@@ -1,5 +1,5 @@
 export {
-  type AccountFormValues,
+  type AccountFormValuesType,
   AVAILABLE_FIELDS,
   accountFormSchema,
   EDUCATION_STAGE_OPTIONS,

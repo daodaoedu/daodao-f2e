@@ -1,17 +1,17 @@
 import { useCallback } from "react";
 import { Alert } from "react-native";
 
-interface DraftData<T> {
+interface IDraftData<T> {
   data: T;
   savedAt: string;
 }
 
-interface UseRestoreDraftDialogOptions<TFormValues> {
+interface IUseRestoreDraftDialogOptions<TFormValues> {
   /** 暫存資料 */
-  draft: DraftData<TFormValues> | null;
+  draft: IDraftData<TFormValues> | null;
 }
 
-interface DialogResult {
+interface IDialogResult {
   value: string;
   index: number;
 }
@@ -34,8 +34,8 @@ interface DialogResult {
  */
 export function useRestoreDraftDialog<TFormValues>({
   draft,
-}: UseRestoreDraftDialogOptions<TFormValues>) {
-  const openRestoreDialog = useCallback((): Promise<DialogResult> => {
+}: IUseRestoreDraftDialogOptions<TFormValues>) {
+  const openRestoreDialog = useCallback((): Promise<IDialogResult> => {
     if (!draft) {
       return Promise.resolve({ value: "skip", index: -1 });
     }
