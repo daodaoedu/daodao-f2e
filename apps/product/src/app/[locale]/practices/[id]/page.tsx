@@ -22,7 +22,9 @@ import { zhTW } from "date-fns/locale";
 import { useCallback, useEffect, useMemo } from "react";
 import { CheckInButton } from "@/components/check-in";
 import type { IComment, ICommentReply } from "@/components/check-in/reactions";
-import { BackgroundAnimation, PageHeader } from "@/components/layout";
+import { BackgroundAnimation } from "@/components/layout";
+import Link from "next/link";
+import { X } from "lucide-react";
 import { PracticeDetailShell } from "@/components/practice";
 import {
   type DurationDays,
@@ -416,7 +418,15 @@ export default function PracticeDetailPage() {
   if (isLoading) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
-        <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
+        <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
+          <Link
+            href="/"
+            className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
+            aria-label="關閉"
+          >
+            <X className="size-6" />
+          </Link>
+        </div>
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">載入中...</div>
@@ -428,7 +438,15 @@ export default function PracticeDetailPage() {
   if (error || !practice) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
-        <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
+        <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
+          <Link
+            href="/"
+            className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
+            aria-label="關閉"
+          >
+            <X className="size-6" />
+          </Link>
+        </div>
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">
@@ -449,7 +467,15 @@ export default function PracticeDetailPage() {
 
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
-      <PageHeader leftAction="back" leftLabel="" title="主題實踐" rightActionTo="/" />
+      <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
+        <Link
+          href="/"
+          className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
+          aria-label="關閉"
+        >
+          <X className="size-6" />
+        </Link>
+      </div>
       <BackgroundAnimation />
 
       <PracticeDetailShell
