@@ -210,7 +210,7 @@ export default function HomePage() {
       <Banner />
       <BackgroundAnimation />
 
-      <main className="pb-[72px]">
+      <main className="relative z-[25] pb-[72px] bg-very-light-gray">
         <div className="max-w-[640px] px-4 mx-auto pt-4">
           {/* Tab Switcher */}
           <div className="flex border-b border-[#E5E7EB] mb-4">

@@ -10,8 +10,12 @@ import {
 import { useAuth } from "@daodao/auth";
 import { resultDetailMap } from "@daodao/features-quiz";
 import { cn } from "@daodao/ui/lib/utils";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lottie from "lottie-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const resultTypeToLottiePathMap = new Map<string, () => Promise<object>>([
   ["D", () => import("@daodao/assets/images/quiz/deep-explorer-2.json").then((m) => m.default)],
@@ -88,6 +92,44 @@ export function Banner() {
     }
   }, [resultType, isLoadingResult]);
 
+  // ── 滾動漸淡（和我的小島頁面一樣） ──
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const headerElement = headerRef.current;
+    if (!headerElement) return;
+
+    const threshold = 167;
+    const minOpacity = 0.3;
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "body",
+        start: "top top",
+        end: `${threshold}px top`,
+        scrub: 0.3,
+        invalidateOnRefresh: true,
+      },
+    });
+
+    tl.to(headerElement, {
+      opacity: minOpacity,
+      ease: "none",
+    });
+
+    gsap.set(headerElement, { opacity: 1 });
+
+    return () => {
+      tl.kill();
+      ScrollTrigger.getAll().forEach((trigger) => {
+        const vars = trigger.vars as { trigger?: string };
+        if (vars.trigger === "body") {
+          trigger.kill();
+        }
+      });
+    };
+  }, []);
+
   // 獲取對應的 slogan
   const slogan = resultType
     ? resultDetailMap.get(resultType)?.slogan || DEFAULT_SLOGAN
@@ -95,6 +137,7 @@ export function Banner() {
   return (
     <>
       <header
+        ref={headerRef}
         className={cn(
           "fixed top-0 right-0 left-0 z-20 pointer-events-none mask-luminance mask-intersect"
         )}
@@ -107,15 +150,6 @@ export function Banner() {
       >
         <MobileBannerSvg className="md:hidden w-full" />
         <DesktopBannerSvg className="hidden md:block w-full" />
-        <h1
-          className={cn(
-            "absolute left-1/2 -translate-x-1/2 text-text-dark font-medium pointer-events-auto",
-            "top-[26px] text-[1.125rem] sm:text-[1.75rem]",
-            "md:top-[calc(3/13*100%)] md:-translate-y-full md:text-[1.75rem]"
-          )}
-        >
-          主頁
-        </h1>
         <h2
           className={cn(
             "absolute left-1/2 -translate-x-1/2 max-w-[540px] min-w-44 w-1/2",
