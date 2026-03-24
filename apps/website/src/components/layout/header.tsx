@@ -17,16 +17,16 @@ type NavItemType = {
 
 const landingPageNavItems: NavItemType[] = [
   {
-    label: "landing_solutions",
-    href: `/#${ANCHOR_IDS.SOLUTIONS}`,
+    label: "landing_learning_inspiration",
+    href: `/#${ANCHOR_IDS.LEARNING_INSPIRATION}`,
   },
   {
-    label: "landing_features",
-    href: `/#${ANCHOR_IDS.FEATURES}`,
+    label: "landing_community",
+    href: `/#${ANCHOR_IDS.COMMUNITY}`,
   },
   {
-    label: "landing_plans",
-    href: `/#${ANCHOR_IDS.PLANS}`,
+    label: "landing_learning_dna",
+    href: `/#${ANCHOR_IDS.LEARNING_DNA}`,
   },
 ];
 

@@ -3,6 +3,7 @@
 import { useAuth } from "@daodao/auth";
 import cooporationImg from "@daodao/assets/images/landing-page/cooporation.png";
 import { useUsers } from "@daodao/api";
+import { ANCHOR_IDS } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 
@@ -12,7 +13,7 @@ export function CommunitySection() {
   const userCount = usersData?.pagination?.totalItems ?? 0;
 
   return (
-    <section className="bg-white py-12 md:py-16">
+    <section id={ANCHOR_IDS.COMMUNITY} className="bg-white py-12 md:py-16">
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-lg rounded-2xl border-2 border-primary-base bg-primary-base/5 px-6 py-10 text-center">
           {/* 標題 */}

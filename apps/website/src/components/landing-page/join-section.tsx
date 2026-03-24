@@ -3,7 +3,6 @@
 import { CompassSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
-import { ANCHOR_IDS } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 
 interface FeatureCardProps {
@@ -41,7 +40,7 @@ export function JoinSection() {
   return (
     <section
       className="relative overflow-hidden bg-primary-base py-16 md:py-24"
-      id={ANCHOR_IDS.PLANS}
+
     >
       {/* 右上角十字星裝飾 */}
       <div className="absolute right-8 top-8 text-3xl text-primary-lighter md:right-16 md:top-12">

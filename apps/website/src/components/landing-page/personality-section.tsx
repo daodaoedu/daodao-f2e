@@ -1,3 +1,4 @@
+import { ANCHOR_IDS } from "@daodao/shared";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 
@@ -5,7 +6,7 @@ export function PersonalitySection() {
   return (
     <section
       className="relative h-[780px] w-full bg-cover bg-center bg-no-repeat md:h-[520px] lg:h-[700px] bg-[url('/assets/landing-page/bg-personality-test-mobile.png')] md:bg-[url('/assets/landing-page/bg-personality-test-desktop.png')]"
-      id="personality-test"
+      id={ANCHOR_IDS.LEARNING_DNA}
     >
       <div className="container mx-auto flex h-full flex-col justify-start lg:pt-24">
         <div className="flex w-full flex-col items-center justify-center md:flex-row">
