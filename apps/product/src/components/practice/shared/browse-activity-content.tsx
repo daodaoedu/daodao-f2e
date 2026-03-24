@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avata
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { useState } from "react";
+import Link from "next/link";
 import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 
@@ -21,9 +22,10 @@ interface BrowseActivityContentProps {
   viewCount: number;
   commentCount: number;
   followers: IBrowseActivityFollower[];
+  onClose?: () => void;
 }
 
-function FollowerRow({ follower }: { follower: IBrowseActivityFollower }) {
+function FollowerRow({ follower, onClose }: { follower: IBrowseActivityFollower; onClose?: () => void }) {
   const { data: followStatusData } = useFollowStatus("user", follower.id);
   const [localOverride, setLocalOverride] = useState<boolean | null>(null);
   const isFollowing = localOverride ?? followStatusData?.data?.isFollowing ?? false;
@@ -43,7 +45,7 @@ function FollowerRow({ follower }: { follower: IBrowseActivityFollower }) {
 
   return (
     <div className="flex items-center gap-3 py-3">
-      <div className="relative shrink-0">
+      <Link href={`/users/${follower.id}`} className="relative shrink-0" onClick={onClose}>
         <Avatar className="size-10">
           {follower.photoURL && <AvatarImage src={follower.photoURL} alt={follower.name} />}
           <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
@@ -58,9 +60,11 @@ function FollowerRow({ follower }: { follower: IBrowseActivityFollower }) {
             play={false}
           />
         </div>
-      </div>
+      </Link>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-[#295E5C]">{follower.name}</p>
+        <Link href={`/users/${follower.id}`} onClick={onClose}>
+          <p className="text-sm font-medium text-[#295E5C] hover:underline">{follower.name}</p>
+        </Link>
         <p className="text-xs text-[#9FB5B8]">{follower.time}</p>
       </div>
       <Button
@@ -84,6 +88,7 @@ export function BrowseActivityContent({
   viewCount,
   commentCount,
   followers,
+  onClose,
 }: BrowseActivityContentProps) {
   const [tab, setTab] = useState<"data" | "echo">("data");
   const [reactionFilter, setReactionFilter] = useState<"all" | ReactionTypeType>("all");
@@ -191,7 +196,7 @@ export function BrowseActivityContent({
           <div className="flex flex-col gap-1 px-4 mt-2">
             {filteredFollowers.length > 0 ? (
               filteredFollowers.map((follower) => (
-                <FollowerRow key={follower.id} follower={follower} />
+                <FollowerRow key={follower.id} follower={follower} onClose={onClose} />
               ))
             ) : (
               <div className="py-6 text-center text-sm text-[#9FB5B8]">目前還沒有互動紀錄</div>

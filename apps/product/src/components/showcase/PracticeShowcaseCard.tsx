@@ -78,7 +78,7 @@ export function PracticeShowcaseCard({
   const [isFollowing, setIsFollowing] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { open: openSheet } = useSheetManager();
+  const { open: openSheet, close: closeSheet } = useSheetManager();
   const { data: practiceData } = usePracticeById(id);
   const { data: reactionsListData } = useReactionsList({ targetType: "practice", targetId: id });
   const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
@@ -133,6 +133,7 @@ export function PracticeShowcaseCard({
           viewCount={practiceData?.data?.stats?.viewCount ?? 0}
           commentCount={commentsData?.data?.length ?? commentCount}
           followers={followers}
+          onClose={() => closeSheet()}
         />
       ),
       dismissible: true,

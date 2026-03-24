@@ -335,7 +335,7 @@ export function PracticeDetailShell({
     },
     [currentUserReaction, practiceId, mutateReactions]
   );
-  const { open: openSheet } = useSheetManager();
+  const { open: openSheet, close: closeSheet } = useSheetManager();
   const { openWarningDialog } = useDialog();
 
   const taskStatus = practice.status ? mapPracticeStatusToTaskStatus(practice.status) : undefined;
@@ -350,6 +350,7 @@ export function PracticeDetailShell({
           viewCount={browseActivity?.viewCount ?? 0}
           commentCount={commentCount ?? comments.length}
           followers={browseActivity?.followers ?? []}
+          onClose={() => closeSheet()}
         />
       ),
       dismissible: true,
