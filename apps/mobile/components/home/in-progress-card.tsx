@@ -5,10 +5,10 @@ import { Button, Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
 import { getThemeNameFromColor, practiceThemeColorMap, PracticeTheme } from "@/constants/practice-theme";
-import type { InProgressTask } from "@/hooks/usePractices";
+import type { IInProgressTask } from "@/hooks/usePractices";
 
 interface InProgressCardProps {
-  task: InProgressTask;
+  task: IInProgressTask;
 }
 
 export function InProgressCard({ task }: InProgressCardProps) {

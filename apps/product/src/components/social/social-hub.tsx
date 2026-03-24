@@ -119,7 +119,7 @@ const ConnectionsTab = () => {
             {incomingRequests.map((req) => {
               const user = req.requester;
               const name = user?.name ?? "用戶";
-              const userId = user?.id ?? req.requesterId;
+              const userId = user?.identifier || user?.id || req.requesterId;
               return (
                 <div key={req.id} className="bg-white rounded-lg p-3 flex flex-col gap-3">
                   <div className="flex items-center gap-3">
@@ -180,7 +180,7 @@ const ConnectionsTab = () => {
             {outgoingRequests.map((req) => {
               const user = req.receiver;
               const name = user?.name ?? "用戶";
-              const userId = user?.id ?? req.receiverId;
+              const userId = user?.identifier || user?.id || req.receiverId;
               return (
                 <div key={req.id} className="bg-white rounded-lg p-3 flex items-center gap-3">
                   <Avatar className="size-10 shrink-0">
@@ -227,7 +227,7 @@ const ConnectionsTab = () => {
             {connections.map((conn) => {
               const partner = conn.partner;
               const name = partner?.name ?? "用戶";
-              const partnerId = partner?.id ?? conn.userAId;
+              const partnerId = partner?.identifier || partner?.id || conn.userAId;
               return (
                 <div key={conn.id} className="bg-white rounded-lg p-3 flex items-center gap-3">
                   <Avatar className="size-10 shrink-0">

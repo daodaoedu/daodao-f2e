@@ -8,22 +8,22 @@ import useSWR from "swr";
 import { api } from "@/services/api-client";
 import { colors } from "@/generated/design-tokens";
 
-interface PreferenceOption {
+interface IPreferenceOption {
   id: number;
   name: string;
   value: string;
   description?: string | null;
 }
 
-interface PreferenceType {
+interface IPreferenceType {
   id: number;
   name: string;
   description?: string | null;
   maxSelections: number | null;
-  options: PreferenceOption[];
+  options: IPreferenceOption[];
 }
 
-interface UserPreference {
+interface IUserPreference {
   preferenceTypeId: number;
   optionId: number;
   isSelected: boolean;
@@ -33,15 +33,15 @@ export default function PreferencesSettingsScreen() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: availableTypes, isLoading: isLoadingAvailable } = useSWR<PreferenceType[]>(
+  const { data: availableTypes, isLoading: isLoadingAvailable } = useSWR<IPreferenceType[]>(
     "/users/preferences/available",
-    () => api.get<{ data: PreferenceType[] }>("/users/preferences/available").then((r) => r.data),
+    () => api.get<{ data: IPreferenceType[] }>("/users/preferences/available").then((r) => r.data),
     { revalidateOnFocus: false }
   );
 
-  const { data: userPrefs, isLoading: isLoadingPrefs } = useSWR<UserPreference[]>(
+  const { data: userPrefs, isLoading: isLoadingPrefs } = useSWR<IUserPreference[]>(
     "/users/me/preferences",
-    () => api.get<{ data: { preferences: UserPreference[] } }>("/users/me/preferences").then((r) => r.data.preferences),
+    () => api.get<{ data: { preferences: IUserPreference[] } }>("/users/me/preferences").then((r) => r.data.preferences),
     { revalidateOnFocus: false }
   );
 

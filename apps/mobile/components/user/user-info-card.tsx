@@ -3,7 +3,7 @@ import { Linking, Pressable } from "react-native";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 import { Avatar, Card, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import type { ContactList } from "@/types/user";
+import type { IContactList } from "@/types/user";
 
 // ── Social Icons ──
 
@@ -86,17 +86,17 @@ function GithubIcon({ size = 32 }: { size?: number }) {
 
 // ── Social link helpers ──
 
-type SocialPlatform = "line" | "facebook" | "instagram" | "threads" | "linkedin" | "github" | "website" | "discord";
+type SocialPlatformType = "line" | "facebook" | "instagram" | "threads" | "linkedin" | "github" | "website" | "discord";
 
-const SOCIAL_DISPLAY_ORDER: SocialPlatform[] = [
+const SOCIAL_DISPLAY_ORDER: SocialPlatformType[] = [
   "website", "github", "threads", "facebook", "instagram", "linkedin", "line", "discord",
 ];
 
-const PLATFORMS_WITH_ICON: SocialPlatform[] = [
+const PLATFORMS_WITH_ICON: SocialPlatformType[] = [
   "github", "facebook", "instagram", "threads", "linkedin",
 ];
 
-function getSocialIcon(platform: SocialPlatform) {
+function getSocialIcon(platform: SocialPlatformType) {
   switch (platform) {
     case "line": return <LineIcon />;
     case "facebook": return <FacebookIcon />;
@@ -116,7 +116,7 @@ interface UserInfoCardProps {
   selfIntroduction?: string | null;
   photoURL?: string | null;
   personalSlogan?: string | null;
-  contactList?: ContactList | null;
+  contactList?: IContactList | null;
 }
 
 export function UserInfoCard({
@@ -133,12 +133,12 @@ export function UserInfoCard({
   const socialLinks = contactList
     ? SOCIAL_DISPLAY_ORDER
         .filter((p) => {
-          const val = contactList[p as keyof ContactList];
+          const val = contactList[p as keyof IContactList];
           return val != null && val !== "";
         })
         .map((p) => ({
           platform: p,
-          value: contactList[p as keyof ContactList] as string,
+          value: contactList[p as keyof IContactList] as string,
           hasIcon: PLATFORMS_WITH_ICON.includes(p),
         }))
     : [];

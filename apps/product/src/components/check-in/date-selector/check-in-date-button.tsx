@@ -2,7 +2,6 @@
 
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
-import { MOOD_OPTIONS } from "@/constants/mood";
 import type { ICheckInDate, ICheckInDisplayData } from "../types";
 
 interface ICheckInDateButtonProps {
@@ -37,11 +36,6 @@ export const CheckInDateButton = ({
   const hasCheckIn = item.hasCheckIn ?? !!checkIns[item.id];
   // 優先使用日期比對（支援同日多筆打卡切換時仍正確高亮），否則降級為 ID 比對
   const isActive = hasCheckIn && (activeDate ? item.date === activeDate : item.id === activeCheckInId);
-  const itemCheckIn = checkIns[item.id];
-  const itemMood = itemCheckIn?.mood;
-  const itemMoodOption = itemMood ? MOOD_OPTIONS.find((option) => option.id === itemMood) : null;
-  const ItemMoodEmoji = itemMoodOption?.emoji;
-
   // 計算打卡次數對應的透明度
   const checkInCount = item.checkInCount ?? (hasCheckIn ? 1 : 0);
   const fillOpacity = getCheckInOpacity(checkInCount);
@@ -76,7 +70,6 @@ export const CheckInDateButton = ({
       }}
       aria-label={hasCheckIn ? `選擇 ${item.date} 的打卡記錄` : `${item.date} 尚未打卡`}
     >
-      {ItemMoodEmoji && <ItemMoodEmoji className="absolute top-0 right-0 size-4" />}
       <span className="relative z-10">{index + 1}</span>
     </Button>
   );

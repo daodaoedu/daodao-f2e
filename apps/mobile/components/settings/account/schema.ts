@@ -32,4 +32,4 @@ export const accountFormSchema = z.object({
   explorationFields: z.array(z.string()).max(5, "最多只能選擇5個探索領域").default([]),
 });
 
-export type AccountFormValues = z.infer<typeof accountFormSchema>;
+export type AccountFormValuesType = z.infer<typeof accountFormSchema>;

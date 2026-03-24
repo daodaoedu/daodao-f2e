@@ -6,20 +6,20 @@ import { api } from "@/services/api-client";
 // Types
 // ============================================================================
 
-export interface NotificationActor {
+export interface INotificationActor {
   id: string;
   name: string;
   photoURL?: string;
 }
 
-export interface NotificationApiItem {
+export interface INotificationApiItem {
   id: number;
   type: string;
   priority: "P1" | "P2";
   isRead: boolean;
   aggregationCount: number;
   createdAt: string;
-  actor: NotificationActor;
+  actor: INotificationActor;
   entityType: string;
   entityId: string;
   practiceTitle?: string;
@@ -29,9 +29,9 @@ export interface NotificationApiItem {
   buddyRequestId?: string;
 }
 
-interface NotificationsResponse {
+interface INotificationsResponse {
   data: {
-    notifications: NotificationApiItem[];
+    notifications: INotificationApiItem[];
     unreadCount: number;
     nextCursor?: string;
   };
@@ -46,9 +46,9 @@ const NOTIFICATIONS_KEY = "/notifications";
 export function useNotifications(params?: { limit?: number }) {
   const limit = params?.limit ?? 50;
 
-  const { data, error, isLoading, mutate } = useSWR<NotificationsResponse>(
+  const { data, error, isLoading, mutate } = useSWR<INotificationsResponse>(
     [NOTIFICATIONS_KEY, limit],
-    () => api.get<NotificationsResponse>(`/notifications?limit=${limit}`),
+    () => api.get<INotificationsResponse>(`/notifications?limit=${limit}`),
     {
       refreshInterval: 30_000,
       revalidateOnFocus: true,
@@ -56,7 +56,7 @@ export function useNotifications(params?: { limit?: number }) {
   );
 
   return {
-    notifications: (data?.data?.notifications ?? []) as NotificationApiItem[],
+    notifications: (data?.data?.notifications ?? []) as INotificationApiItem[],
     unreadCount: data?.data?.unreadCount ?? 0,
     isLoading,
     error,
@@ -77,7 +77,7 @@ export async function markAllNotificationsRead() {
 }
 
 export async function respondConnectionRequest(requestId: string, action: "accept" | "reject") {
-  return api.patch(`/connections/${requestId}`, { action });
+  return api.post(`/connections/requests/${requestId}/respond`, { action });
 }
 
 // ============================================================================

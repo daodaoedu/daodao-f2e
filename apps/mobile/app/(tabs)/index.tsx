@@ -12,7 +12,7 @@ import {
   TabSwitcher,
   type TabType,
   ShowcaseSearchBar,
-  type ShowcaseFilterState,
+  type IShowcaseFilterState,
   ShowcaseCard,
   BrewingCard,
   DashboardHeader,
@@ -29,7 +29,7 @@ export default function HomeScreen() {
   // ── Inspire tab state ──
   const [searchValue, setSearchValue] = useState("");
   const [keyword, setKeyword] = useState("");
-  const [filters, setFilters] = useState<ShowcaseFilterState>({
+  const [filters, setFilters] = useState<IShowcaseFilterState>({
     tags: [],
   });
 
@@ -58,7 +58,7 @@ export default function HomeScreen() {
     setKeyword(value);
   }, []);
 
-  const handleFiltersChange = useCallback((newFilters: ShowcaseFilterState) => {
+  const handleFiltersChange = useCallback((newFilters: IShowcaseFilterState) => {
     setFilters(newFilters);
   }, []);
 

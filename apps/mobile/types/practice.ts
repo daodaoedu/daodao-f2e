@@ -1,26 +1,26 @@
-export type PracticeStatus = "active" | "completed" | "archived";
-export type TaskStatus = "draft" | "not-started" | "in-progress" | "completed";
-export type PracticeFrequency = "daily" | "weekly" | "custom";
-export type PracticeTheme = "yellow" | "blue" | "pink" | "green";
+export type PracticeStatusType = "active" | "completed" | "archived";
+export type TaskStatusType = "draft" | "not-started" | "in-progress" | "completed";
+export type PracticeFrequencyType = "daily" | "weekly" | "custom";
+export type PracticeThemeType = "yellow" | "blue" | "pink" | "green";
 
 // 合併狀態類型以支援所有可能的狀態值
-export type CombinedStatus = PracticeStatus | TaskStatus;
+export type CombinedStatusType = PracticeStatusType | TaskStatusType;
 
-export interface Practice {
+export interface IPractice {
   id: string;
   title: string;
   description?: string;
-  frequency: PracticeFrequency;
+  frequency: PracticeFrequencyType;
   targetDays: number;
   completedDays: number;
   currentStreak: number;
   longestStreak: number;
-  status: CombinedStatus;
-  practiceStatus?: PracticeStatus;
+  status: CombinedStatusType;
+  practiceStatus?: PracticeStatusType;
   tags: string[];
   color?: string;
   icon?: string;
-  theme?: PracticeTheme;
+  theme?: PracticeThemeType;
   isCompleted?: boolean;
   createdAt: string;
   updatedAt: string;
@@ -28,14 +28,14 @@ export interface Practice {
   todayCheckedIn: boolean;
 }
 
-export interface CheckIn {
+export interface ICheckIn {
   id: string;
   practiceId: string;
   note?: string;
   createdAt: string;
 }
 
-export interface PracticeStats {
+export interface IPracticeStats {
   totalPractices: number;
   activePractices: number;
   completedToday: number;
@@ -44,7 +44,7 @@ export interface PracticeStats {
   totalCheckIns: number;
 }
 
-export interface PracticesResponse {
-  practices: Practice[];
-  stats: PracticeStats;
+export interface IPracticesResponse {
+  practices: IPractice[];
+  stats: IPracticeStats;
 }

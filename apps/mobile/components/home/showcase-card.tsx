@@ -1,10 +1,14 @@
 import { MessageCircle, MoreHorizontal } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import { Image, Pressable, StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { getStatusConfig } from "@/constants/task-status";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
+import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
+import { upsertReaction, removeReaction } from "@/hooks/useReactions";
+import type { ReactionTypeType } from "@/constants/reaction-type";
 import type { ReactNode } from "react";
 
 interface ShowcaseCardProps {
@@ -26,6 +30,32 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
     session_duration_minutes, comment_count = 0,
   } = practice;
 
+  const { reactions = [] } = practice;
+  const inlineTotalCount = reactions.reduce((sum, r) => sum + r.count, 0);
+  const inlineDisplayReactions = reactions
+    .filter((r) => r.count > 0)
+    .map((r) => r.type as ReactionTypeType);
+  const inlineFirstReactorName = reactions.find((r) => r.count > 0)?.latestActorName;
+
+  const [currentUserReaction, setCurrentUserReaction] = useState<ReactionTypeType | null>(null);
+
+  const handleReactionToggle = useCallback(
+    async (type: ReactionTypeType) => {
+      const isSelected = currentUserReaction === type;
+      setCurrentUserReaction(isSelected ? null : type);
+      try {
+        if (isSelected) {
+          await removeReaction("practice", id);
+        } else {
+          await upsertReaction("practice", id, type);
+        }
+      } catch {
+        setCurrentUserReaction(isSelected ? type : null);
+      }
+    },
+    [currentUserReaction, id]
+  );
+
   const taskStatus = status === "active" ? "in-progress" : "completed";
   const statusInfo = getStatusConfig(taskStatus);
   const startFmt = formatDate(start_date);
@@ -34,7 +64,10 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
   return (
     <Pressable
       style={styles.card}
-      onPress={() => router.push(`/practices/${id}` as any)}
+      onPress={() => router.push({
+        pathname: `/practices/${id}`,
+        params: { showcaseData: JSON.stringify(practice) },
+      } as any)}
     >
       {/* Header row */}
       <XStack alignItems="center" gap="$2" marginBottom="$2">
@@ -102,6 +135,14 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
 
       {/* Bottom bar */}
       <View style={styles.bottomBar}>
+        <ReactionPickerButton
+          selectedReaction={currentUserReaction}
+          onToggle={handleReactionToggle}
+          variant="summary"
+          totalCount={inlineTotalCount}
+          displayReactions={inlineDisplayReactions}
+          firstReactorName={inlineFirstReactorName}
+        />
         <XStack alignItems="center" gap="$1.5">
           <MessageCircle size={20} color="#9FB5B8" />
           {comment_count > 0 && (
@@ -151,6 +192,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     marginTop: 12,
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });

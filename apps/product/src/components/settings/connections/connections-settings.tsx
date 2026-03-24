@@ -107,19 +107,23 @@ export const ConnectionsSettings = () => {
           {/* 收到的 */}
           {incomingRequests.length > 0 && (
             <div className="flex flex-col gap-2">
-              {incomingRequests.map((req) => {
+              {incomingRequests.map((req, index) => {
+                const reqAny = req as any;
                 const user = req.requester;
-                const name = user?.name ?? "用戶";
-                const userId = user?.identifier ?? user?.id ?? req.requesterId;
+                const name = reqAny.requesterNickname || user?.name || "用戶";
+                const userId = reqAny.requesterExternalId || user?.identifier || user?.id || req.requesterId;
+                const requestId = reqAny.requestId || req.id;
                 return (
-                  <div key={req.id ?? `incoming-${req.requesterId}-${req.receiverId}`} className="bg-white rounded-lg p-3 flex flex-col gap-3">
+                  <div key={requestId || `incoming-${index}`} className="bg-white rounded-lg p-3 flex flex-col gap-3">
                     <div className="flex items-center gap-3">
-                      <Avatar className="size-10 shrink-0">
-                        <AvatarImage src={user?.photoURL} alt={name} />
-                        <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
-                          {name.slice(0, 1)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <CustomLink href={`/users/${userId}`} className="shrink-0">
+                        <Avatar className="size-10">
+                          <AvatarImage src={user?.photoURL} alt={name} />
+                          <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
+                            {name.slice(0, 1)}
+                          </AvatarFallback>
+                        </Avatar>
+                      </CustomLink>
                       <div className="flex-1 min-w-0">
                         <CustomLink href={`/users/${userId}`} className="text-sm font-medium text-text-dark hover:underline">
                           {name}
@@ -130,16 +134,16 @@ export const ConnectionsSettings = () => {
                       </div>
                     </div>
 
-                    {req.intent && (
+                    {reqAny.intent && (
                       <p className="text-xs text-text-dark/70 bg-[#F7FAFA] rounded-lg px-3 py-2 leading-relaxed border border-[#E4EAE9]">
-                        「{req.intent}」
+                        「{reqAny.intent}」
                       </p>
                     )}
 
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        onClick={() => handleAccept(req.id, name)}
+                        onClick={() => handleAccept(String(requestId), name)}
                         className="flex-1 h-8 text-xs cursor-pointer bg-logo-cyan hover:bg-logo-cyan/90 text-white"
                       >
                         接受
@@ -147,7 +151,7 @@ export const ConnectionsSettings = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleIgnore(req.id, name)}
+                        onClick={() => handleIgnore(String(requestId), name)}
                         className="flex-1 h-8 text-xs cursor-pointer"
                       >
                         忽略
@@ -162,18 +166,22 @@ export const ConnectionsSettings = () => {
           {/* 發出的 */}
           {outgoingRequests.length > 0 && (
             <div className="flex flex-col gap-2">
-              {outgoingRequests.map((req) => {
+              {outgoingRequests.map((req, index) => {
+                const reqAny = req as any;
                 const user = req.receiver;
-                const name = user?.name ?? "用戶";
-                const userId = user?.identifier ?? user?.id ?? req.receiverId;
+                const name = reqAny.receiverNickname || user?.name || "用戶";
+                const userId = reqAny.receiverExternalId || user?.identifier || user?.id || req.receiverId;
+                const requestId = reqAny.requestId || req.id;
                 return (
-                  <div key={req.id ?? `outgoing-${req.requesterId}-${req.receiverId}`} className="bg-white rounded-lg p-3 flex items-center gap-3">
-                    <Avatar className="size-10 shrink-0">
-                      <AvatarImage src={user?.photoURL} alt={name} />
-                      <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
-                        {name.slice(0, 1)}
-                      </AvatarFallback>
-                    </Avatar>
+                  <div key={requestId || `outgoing-${index}`} className="bg-white rounded-lg p-3 flex items-center gap-3">
+                    <CustomLink href={`/users/${userId}`} className="shrink-0">
+                      <Avatar className="size-10">
+                        <AvatarImage src={user?.photoURL} alt={name} />
+                        <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
+                          {name.slice(0, 1)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </CustomLink>
                     <div className="flex-1 min-w-0">
                       <CustomLink href={`/users/${userId}`} className="text-sm font-medium text-text-dark hover:underline">
                         {name}
@@ -183,7 +191,7 @@ export const ConnectionsSettings = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleWithdraw(req.id, name)}
+                      onClick={() => handleWithdraw(String(requestId), name)}
                       className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                     >
                       撤回
@@ -207,18 +215,21 @@ export const ConnectionsSettings = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {connections.map((conn) => {
+            {connections.map((conn, index) => {
+              const connAny = conn as any;
               const partner = conn.partner;
-              const name = partner?.name ?? "用戶";
-              const partnerId = partner?.identifier ?? partner?.id ?? conn.userAId;
+              const name = connAny.nickname || partner?.name || "用戶";
+              const partnerId = connAny.externalId || partner?.identifier || partner?.id || conn.userAId;
               return (
-                <div key={conn.id ?? `conn-${conn.userAId}-${conn.userBId}`} className="bg-white rounded-lg p-3 flex items-center gap-3">
-                  <Avatar className="size-10 shrink-0">
-                    <AvatarImage src={partner?.photoURL} alt={name} />
-                    <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
-                      {name.slice(0, 1)}
-                    </AvatarFallback>
-                  </Avatar>
+                <div key={connAny.connectionId || conn.id || partnerId || `conn-${index}`} className="bg-white rounded-lg p-3 flex items-center gap-3">
+                  <CustomLink href={`/users/${partnerId}`} className="shrink-0">
+                    <Avatar className="size-10">
+                      <AvatarImage src={partner?.photoURL} alt={name} />
+                      <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
+                        {name.slice(0, 1)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </CustomLink>
                   <div className="flex-1 min-w-0">
                     <CustomLink href={`/users/${partnerId}`} className="text-sm font-medium text-text-dark hover:underline">
                       {name}

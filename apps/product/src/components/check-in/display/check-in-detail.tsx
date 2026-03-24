@@ -38,6 +38,7 @@ export const CheckInDetail = ({ checkInData, onEditComplete, afterTitle }: IChec
       mood,
       tags,
       description: content,
+      images,
     },
     onComplete: async (data) => {
       await onEditComplete?.(data);

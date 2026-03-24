@@ -6,9 +6,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 
-type ThemeMode = "light" | "dark" | "system";
+type ThemeModeType = "light" | "dark" | "system";
 
-const themeOptions: { value: ThemeMode; label: string; icon: typeof Sun; description: string }[] = [
+const themeOptions: { value: ThemeModeType; label: string; icon: typeof Sun; description: string }[] = [
   {
     value: "light",
     label: "淺色模式",
@@ -42,7 +42,7 @@ export default function AppearanceSettingsScreen() {
   const router = useRouter();
   const systemColorScheme = useColorScheme();
 
-  const [themeMode, setThemeMode] = useState<ThemeMode>("system");
+  const [themeMode, setThemeModeType] = useState<ThemeModeType>("system");
   const [accentColor, setAccentColor] = useState("#4F46E5");
 
   const currentTheme = themeMode === "system" ? systemColorScheme : themeMode;
@@ -93,7 +93,7 @@ export default function AppearanceSettingsScreen() {
                       borderBottomColor="$borderColor"
                       backgroundColor={isSelected ? colors.primary.palest : "transparent"}
                       pressStyle={{ backgroundColor: colors.primary.palest }}
-                      onPress={() => setThemeMode(option.value)}
+                      onPress={() => setThemeModeType(option.value)}
                     >
                       <XStack alignItems="center" gap="$3" flex={1}>
                         <YStack

@@ -151,4 +151,4 @@ export const manualPracticeFormSchema = z.object({
   }
 );
 
-export type ManualPracticeFormValues = z.infer<typeof manualPracticeFormSchema>;
+export type ManualPracticeFormValuesType = z.infer<typeof manualPracticeFormSchema>;

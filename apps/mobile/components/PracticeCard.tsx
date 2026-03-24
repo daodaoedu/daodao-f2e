@@ -4,9 +4,9 @@ import { StyleSheet } from "react-native";
 import Svg, { Circle, Rect } from "react-native-svg";
 import { Button, Card, Spinner, Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import type { Practice } from "@/types/practice";
+import type { IPractice } from "@/types/practice";
 
-type CardVariant = "default" | "gradient" | "completed";
+type CardVariantType = "default" | "gradient" | "completed";
 
 // 卡片尺寸 - 對應 Product 的 w-[294px]
 const CARD_WIDTH = 294;
@@ -123,12 +123,12 @@ const statusConfig: Record<
 };
 
 interface PracticeCardProps {
-  practice: Practice;
+  practice: IPractice;
   onPress?: () => void;
   onCheckIn?: () => void;
   showCheckInButton?: boolean;
   isCheckingIn?: boolean;
-  variant?: CardVariant;
+  variant?: CardVariantType;
 }
 
 export function PracticeCard({

@@ -3,10 +3,10 @@ import { forwardRef } from "react";
 import { View } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import type { Practice } from "@/types/practice";
+import type { IPractice } from "@/types/practice";
 
 interface ShareableCheckInCardProps {
-  practice: Practice;
+  practice: IPractice;
   streakCount: number;
   date?: Date;
 }

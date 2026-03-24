@@ -99,8 +99,7 @@ export default function CheckInDetailPage() {
         date: formatCheckInDate(checkIn.checkinDate),
         mood: moodType,
         content: checkIn.note || "",
-        // @TODO: 後續再處理 tags
-        tags: [],
+        tags: checkIn.tags || [],
         images: checkIn.imageUrls || [],
         practiceTitle: practiceData.data.title,
       };
@@ -262,6 +261,7 @@ export default function CheckInDetailPage() {
         tags: data.tags,
         description: data.description,
         media: data.media,
+        existingImageUrls: data.existingImageUrls,
       });
       toast.success("打卡已更新");
     } catch (error) {

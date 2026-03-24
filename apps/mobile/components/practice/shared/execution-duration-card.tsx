@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import type { ManualPracticeFormValues } from "../create/manual/schema";
+import type { ManualPracticeFormValuesType } from "../create/manual/schema";
 
 // Date utilities
 const parseDate = (dateStr: string): Date | null => {
@@ -29,8 +29,8 @@ const formatDate = (date: Date): string => {
 };
 
 interface ExecutionDurationCardProps {
-  durationDays: ManualPracticeFormValues["durationDays"] | number;
-  startDate: ManualPracticeFormValues["startDate"] | string | null;
+  durationDays: ManualPracticeFormValuesType["durationDays"] | number;
+  startDate: ManualPracticeFormValuesType["startDate"] | string | null;
   showRemaining?: boolean;
 }
 

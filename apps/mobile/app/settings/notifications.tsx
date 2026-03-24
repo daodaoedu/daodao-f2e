@@ -8,34 +8,34 @@ import { api } from "@/services/api-client";
 import { colors } from "@/generated/design-tokens";
 import { NOTIFICATION_TYPES } from "@/constants/settings";
 
-interface NotificationPref {
+interface INotificationPref {
   type: string;
   channel: string;
   isEnabled: boolean;
 }
 
-type PreferencesMap = Record<string, { emailEnabled: boolean }>;
+type PreferencesMapType = Record<string, { emailEnabled: boolean }>;
 
-const DEFAULT_PREFS: PreferencesMap = Object.fromEntries(
+const DEFAULT_PREFS: PreferencesMapType = Object.fromEntries(
   NOTIFICATION_TYPES.map((t) => [t.type, { emailEnabled: true }])
 );
 
 export default function NotificationSettingsScreen() {
   const router = useRouter();
 
-  const { data: prefsData, mutate } = useSWR<NotificationPref[]>(
+  const { data: prefsData, mutate } = useSWR<INotificationPref[]>(
     "/notifications/preferences",
-    () => api.get<{ data: NotificationPref[] }>("/notifications/preferences").then((r) => r.data),
+    () => api.get<{ data: INotificationPref[] }>("/notifications/preferences").then((r) => r.data),
     { revalidateOnFocus: false }
   );
 
   const [globalEnabled, setGlobalEnabled] = useState(true);
-  const [prefs, setPrefs] = useState<PreferencesMap>(DEFAULT_PREFS);
+  const [prefs, setPrefs] = useState<PreferencesMapType>(DEFAULT_PREFS);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!prefsData) return;
-    const newPrefs: PreferencesMap = { ...DEFAULT_PREFS };
+    const newPrefs: PreferencesMapType = { ...DEFAULT_PREFS };
     for (const p of prefsData) {
       if (p.channel === "N01" && newPrefs[p.type]) {
         newPrefs[p.type] = { emailEnabled: p.isEnabled };

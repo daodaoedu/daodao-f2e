@@ -3,7 +3,7 @@
  */
 
 /** 聯絡方式（對應後端 contactList） */
-export interface ContactList {
+export interface IContactList {
   instagram?: string | null;
   discord?: string | null;
   line?: string | null;
@@ -15,7 +15,7 @@ export interface ContactList {
 }
 
 /** 測驗結果（對應後端 latestQuizResult） */
-export interface QuizResult {
+export interface IUserQuizResult {
   id: number;
   resultType: string; // D/A/O/L/C
   scores: Record<string, number>;
@@ -23,7 +23,7 @@ export interface QuizResult {
 }
 
 /** /users/me 回傳的用戶資料（精簡版，只保留 profile 頁面需要的欄位） */
-export interface UserProfile {
+export interface IUserProfile {
   id: string;
   name: string | null;
   email: string | null;
@@ -33,8 +33,8 @@ export interface UserProfile {
   location: string | null;
   locationNameZh: string | null;
   locationNameEn: string | null;
-  contactList: ContactList | null;
-  latestQuizResult: QuizResult | null;
+  contactList: IContactList | null;
+  latestQuizResult: IUserQuizResult | null;
   tagList: string[] | null;
   customId: string | null;
 }

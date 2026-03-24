@@ -14,19 +14,19 @@ const SHAPE_COLORS = [
   colors.logo.orange,
 ] as const;
 
-interface CheckInData {
+interface ICheckInData {
   id: number;
   checkinDate: string;
   mood?: ApiMoodType;
   note?: string;
 }
 
-interface CheckInsResponse {
-  data?: CheckInData[];
+interface ICheckInsResponse {
+  data?: ICheckInData[];
 }
 
 interface ICheckInStackProps {
-  checkInsData?: CheckInsResponse;
+  checkInsData?: ICheckInsResponse;
   onCheckInPress?: (checkInId: string) => void;
 }
 

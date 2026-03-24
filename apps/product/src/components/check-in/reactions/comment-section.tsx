@@ -458,11 +458,6 @@ function CommentBubble({
               "text-sm"
             )}
           >
-            {isReply && (
-              <span className="mr-1 rounded-full bg-[#E8FAF9] px-2 py-0.5 text-[11px] font-medium text-[#2B6E6B]">
-                回覆
-              </span>
-            )}
             {renderContent(comment.content)}
           </p>
         )}
@@ -735,10 +730,8 @@ export function CommentSection({
             <AvatarImage src={currentUserPhotoURL} alt={currentUserName || "我"} />
           )}
           <AvatarFallback
-            className={cn("text-sm font-medium text-text-dark", getAvatarColor("Me"))}
-          >
-            {(currentUserName || "我").slice(0, 1)}
-          </AvatarFallback>
+            className={cn(getAvatarColor("Me"))}
+          />
         </Avatar>
 
         {/* Input with @mention support */}
@@ -773,9 +766,13 @@ export function CommentSection({
       </div>
 
       {/* 留言列表 */}
-      {comments.length > 0 && (
+      {comments.length > 0 ? (
         <div className="flex flex-col gap-5 px-4 pt-4 pb-2">
           {previewComments.map(renderCommentBlock)}
+        </div>
+      ) : (
+        <div className="flex items-center justify-center px-4 py-8 text-sm text-[#9FB5B8]">
+          尚未有留言
         </div>
       )}
 

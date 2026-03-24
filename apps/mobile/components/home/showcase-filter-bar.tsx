@@ -13,7 +13,7 @@ const STATUS_OPTIONS = [
   { label: "已完成", value: "completed" as const },
 ];
 
-export interface ShowcaseFilterState {
+export interface IShowcaseFilterState {
   tags: string[];
   durationMin?: number;
   durationMax?: number;
@@ -21,8 +21,8 @@ export interface ShowcaseFilterState {
 }
 
 interface ShowcaseFilterBarProps {
-  filters: ShowcaseFilterState;
-  onFiltersChange: (filters: ShowcaseFilterState) => void;
+  filters: IShowcaseFilterState;
+  onFiltersChange: (filters: IShowcaseFilterState) => void;
 }
 
 export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBarProps) {

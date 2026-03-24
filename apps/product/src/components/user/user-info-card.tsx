@@ -5,7 +5,8 @@ import GithubSvg from "@daodao/assets/images/social-icons/github.svg";
 import InstagramSvg from "@daodao/assets/images/social-icons/instagram-filled.svg";
 import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin-filled.svg";
 import ThreadsSvg from "@daodao/assets/images/social-icons/threads-filled.svg";
-import { followTarget, unfollowTarget, sendConnectionRequest, useCurrentUser, useFollowStatus } from "@daodao/api";
+import { followTarget, unfollowTarget, sendConnectionRequest, getConnections, useCurrentUser, useFollowStatus } from "@daodao/api";
+import useSWR from "swr";
 import { useIsMobile } from "@daodao/shared";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
@@ -15,7 +16,7 @@ import MarkdownRenderer from "@daodao/ui/components/markdown-renderer";
 import { toast } from "@daodao/ui/components/sonner";
 import { Globe, MapPin, Users } from "lucide-react";
 import type React from "react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   SocialPlatform,
   type SocialPlatform as SocialPlatformType,
@@ -133,6 +134,7 @@ export function UserInfoCard({
   const isMobile = useIsMobile();
   const [followLoading, setFollowLoading] = useState(false);
   const [connectLoading, setConnectLoading] = useState(false);
+  const [connectSent, setConnectSent] = useState(false);
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
   const { openInfoDialog } = useDialog();
   const intentRef = useRef("");
@@ -149,6 +151,20 @@ export function UserInfoCard({
     clientIsAuthenticated && !clientIsOwnProfile ? targetUserId : undefined
   );
   const currentIsFollowing = isFollowing ?? followStatusData?.data?.isFollowing ?? false;
+
+  // 查詢是否已是夥伴（僅在已登入且非自己頁面時查詢）
+  const shouldCheckConnection = clientIsAuthenticated && !clientIsOwnProfile;
+  const { data: connectionsData } = useSWR(
+    shouldCheckConnection ? ["/api/v1/connections", "check", targetUserId] : null,
+    () => getConnections({ limit: 100 }),
+    { revalidateOnFocus: false }
+  );
+  const isAlreadyConnected = useMemo(() => {
+    if (!connectionsData?.data || !targetUserId) return false;
+    return connectionsData.data.some(
+      (c: any) => c.externalId === targetUserId
+    );
+  }, [connectionsData, targetUserId]);
 
   // 複製文字到剪貼簿的處理函數
   const handleCopy = useCallback(async (text: string) => {
@@ -212,9 +228,14 @@ export function UserInfoCard({
         receiverExternalId: targetUserId,
         intent: intentRef.current.trim() || undefined,
       });
+      setConnectSent(true);
       toast.success("已送出連結請求");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "請求失敗");
+      const msg = err instanceof Error ? err.message : "請求失敗";
+      if (msg.includes("夥伴")) {
+        setConnectSent(true);
+      }
+      toast.error(msg);
     } finally {
       setConnectLoading(false);
     }
@@ -408,11 +429,11 @@ export function UserInfoCard({
           </Button>
           <Button
             variant="outline"
-            className="flex-1 h-12 text-base rounded-full border-primary-base text-primary-base hover:bg-primary-base hover:text-white"
+            className={`flex-1 h-12 text-base rounded-full ${isAlreadyConnected || connectSent ? "border-gray-300 text-gray-400" : "border-primary-base text-primary-base hover:bg-primary-base hover:text-white"}`}
             onClick={handleConnect}
-            disabled={connectLoading}
+            disabled={connectLoading || connectSent || isAlreadyConnected}
           >
-            請求連結
+            {isAlreadyConnected || connectSent ? "已成功連結" : "請求連結"}
           </Button>
         </div>
       )}

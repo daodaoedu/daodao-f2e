@@ -3,12 +3,12 @@
  * 對齊 packages/features/quiz/src/utils/theme-map.ts 和 result-detail-map.ts
  */
 
-export interface QuizTheme {
+export interface IQuizTheme {
   title: string; // 島名
   tags: string[]; // 特質標籤
 }
 
-export const quizThemeMap: Record<string, QuizTheme> = {
+export const quizThemeMap: Record<string, IQuizTheme> = {
   D: { title: "探探島", tags: ["注重推理", "觀察"] },
   A: { title: "動動島", tags: ["實作", "行動派"] },
   O: { title: "構構島", tags: ["結構化", "規劃"] },

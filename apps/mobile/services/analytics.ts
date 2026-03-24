@@ -27,11 +27,11 @@ import PostHog from "posthog-react-native";
 
 // Firebase and Clarity require native modules - only available in development builds
 // They will be dynamically imported to avoid crashes in Expo Go
-type FirebaseAnalyticsModule = typeof import("@react-native-firebase/analytics");
-type ClarityModule = typeof import("@microsoft/react-native-clarity");
+type FirebaseAnalyticsModuleType = typeof import("@react-native-firebase/analytics");
+type ClarityModuleType = typeof import("@microsoft/react-native-clarity");
 
-let firebaseAnalytics: FirebaseAnalyticsModule["default"] | null = null;
-let Clarity: ClarityModule | null = null;
+let firebaseAnalytics: FirebaseAnalyticsModuleType["default"] | null = null;
+let Clarity: ClarityModuleType | null = null;
 
 // Check if running in Expo Go (no native modules available)
 const isExpoGo = Constants.appOwnership === "expo";
@@ -53,46 +53,46 @@ const FIREBASE_MAX_VALUE_LENGTH = 100;
 
 let posthogClient: PostHog | null = null;
 
-export interface AnalyticsUser {
+export interface IAnalyticsUser {
   id: string;
   email?: string;
   name?: string;
 }
 
-type AnalyticsProperties = Record<string, string | number | boolean | undefined>;
+type AnalyticsPropertiesType = Record<string, string | number | boolean | undefined>;
 
-export interface CheckInEventProperties {
+export interface ICheckInEventProperties {
   practice_id: string;
   streak_count: number;
   has_note: boolean;
 }
 
-export interface PracticeCreatedEventProperties {
+export interface IPracticeCreatedEventProperties {
   practice_id: string;
   template_id?: string;
 }
 
-export interface ShareCheckInEventProperties {
+export interface IShareCheckInEventProperties {
   practice_id: string;
 }
 
-export interface LoginEventProperties {
+export interface ILoginEventProperties {
   method: "google" | "apple" | "email";
 }
 
-export type AnalyticsEventName =
+export type AnalyticsEventNameType =
   | "screen_view"
   | "check_in"
   | "practice_created"
   | "login"
   | "share_check_in";
 
-export type AnalyticsEventProperties =
+export type AnalyticsEventPropertiesType =
   | { screen_name: string }
-  | CheckInEventProperties
-  | PracticeCreatedEventProperties
-  | LoginEventProperties
-  | ShareCheckInEventProperties;
+  | ICheckInEventProperties
+  | IPracticeCreatedEventProperties
+  | ILoginEventProperties
+  | IShareCheckInEventProperties;
 
 class AnalyticsService {
   private initialized = false;
@@ -200,7 +200,7 @@ class AnalyticsService {
    * Sanitize properties for Firebase Analytics limits
    */
   private sanitizePropertiesForFirebase(
-    properties?: AnalyticsProperties
+    properties?: AnalyticsPropertiesType
   ): Record<string, string | number> {
     if (!properties) return {};
 
@@ -226,7 +226,7 @@ class AnalyticsService {
     return sanitized;
   }
 
-  identify(user: AnalyticsUser): void {
+  identify(user: IAnalyticsUser): void {
     if (!this.initialized) return;
 
     try {
@@ -328,17 +328,17 @@ class AnalyticsService {
     }
   }
 
-  trackCheckIn(properties: CheckInEventProperties): void {
+  trackCheckIn(properties: ICheckInEventProperties): void {
     this.track("check_in", { ...properties });
   }
 
-  trackPracticeCreated(properties: PracticeCreatedEventProperties): void {
-    const props: AnalyticsProperties = { practice_id: properties.practice_id };
+  trackPracticeCreated(properties: IPracticeCreatedEventProperties): void {
+    const props: AnalyticsPropertiesType = { practice_id: properties.practice_id };
     if (properties.template_id) props.template_id = properties.template_id;
     this.track("practice_created", props);
   }
 
-  trackLogin(properties: LoginEventProperties): void {
+  trackLogin(properties: ILoginEventProperties): void {
     if (!this.initialized) return;
 
     try {
@@ -363,7 +363,7 @@ class AnalyticsService {
     }
   }
 
-  trackShareCheckIn(properties: ShareCheckInEventProperties): void {
+  trackShareCheckIn(properties: IShareCheckInEventProperties): void {
     if (!this.initialized) return;
 
     try {
@@ -392,7 +392,7 @@ class AnalyticsService {
     }
   }
 
-  private track(eventName: AnalyticsEventName, properties?: AnalyticsProperties): void {
+  private track(eventName: AnalyticsEventNameType, properties?: AnalyticsPropertiesType): void {
     if (!this.initialized) return;
 
     try {

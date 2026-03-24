@@ -1,18 +1,18 @@
 import { useCallback } from "react";
 import { useAnalyticsContext } from "@/providers/AnalyticsProvider";
 import type {
-  AnalyticsUser,
-  CheckInEventProperties,
-  LoginEventProperties,
-  PracticeCreatedEventProperties,
-  ShareCheckInEventProperties,
+  IAnalyticsUser,
+  ICheckInEventProperties,
+  ILoginEventProperties,
+  IPracticeCreatedEventProperties,
+  IShareCheckInEventProperties,
 } from "@/services/analytics";
 
 export function useAnalytics() {
   const analytics = useAnalyticsContext();
 
   const identify = useCallback(
-    (user: AnalyticsUser) => {
+    (user: IAnalyticsUser) => {
       analytics.identify(user);
     },
     [analytics]
@@ -30,28 +30,28 @@ export function useAnalytics() {
   );
 
   const trackCheckIn = useCallback(
-    (properties: CheckInEventProperties) => {
+    (properties: ICheckInEventProperties) => {
       analytics.trackCheckIn(properties);
     },
     [analytics]
   );
 
   const trackPracticeCreated = useCallback(
-    (properties: PracticeCreatedEventProperties) => {
+    (properties: IPracticeCreatedEventProperties) => {
       analytics.trackPracticeCreated(properties);
     },
     [analytics]
   );
 
   const trackLogin = useCallback(
-    (properties: LoginEventProperties) => {
+    (properties: ILoginEventProperties) => {
       analytics.trackLogin(properties);
     },
     [analytics]
   );
 
   const trackShareCheckIn = useCallback(
-    (properties: ShareCheckInEventProperties) => {
+    (properties: IShareCheckInEventProperties) => {
       analytics.trackShareCheckIn(properties);
     },
     [analytics]

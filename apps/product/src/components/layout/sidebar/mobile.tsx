@@ -5,16 +5,55 @@ import { usePathname } from "@daodao/i18n/navigation";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useRef } from "react";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 
+gsap.registerPlugin(ScrollTrigger);
+
 export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
+  const logoRef = useRef<HTMLDivElement>(null);
+
+  // 首頁時 logo 隨滾動漸淡（和 Banner 同步）
+  const isHomePage = pathname === "/" || pathname === "/en" || pathname === "/zh-TW";
+
+  useEffect(() => {
+    const logoElement = logoRef.current;
+    if (!logoElement || !isHomePage) return;
+
+    const threshold = 167;
+    const minOpacity = 0.3;
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "body",
+        start: "top top",
+        end: `${threshold}px top`,
+        scrub: 0.3,
+        invalidateOnRefresh: true,
+      },
+    });
+
+    tl.to(logoElement, {
+      opacity: minOpacity,
+      ease: "none",
+    });
+
+    gsap.set(logoElement, { opacity: 1 });
+
+    return () => {
+      tl.kill();
+      gsap.set(logoElement, { opacity: 1 });
+    };
+  }, [isHomePage]);
 
   return (
     <>
-      <div className="fixed top-5 left-5 z-30">
+      <div ref={logoRef} className="fixed top-5 left-5 z-20">
         <CustomLink href="/" aria-label="回到官網">
           <Image src={favicon256Png.src} alt="daodao logo" width={40} height={40} />
         </CustomLink>

@@ -31,12 +31,12 @@ export const FilterStatus = {
  */
 export type FilterStatus = (typeof FilterStatus)[keyof typeof FilterStatus];
 
-export interface StatusConfig {
+export interface IStatusConfig {
   label: string;
   variant: "default" | "outline" | "secondary";
 }
 
-const statusConfig: Record<TaskStatus, StatusConfig> = {
+const statusConfig: Record<TaskStatus, IStatusConfig> = {
   [TaskStatus.draft]: {
     label: "草稿",
     variant: "outline",
@@ -58,7 +58,7 @@ const statusConfig: Record<TaskStatus, StatusConfig> = {
 /**
  * 取得完整的 status 配置（包含 label, variant）
  */
-export const getStatusConfig = (status: TaskStatus | string): StatusConfig => {
+export const getStatusConfig = (status: TaskStatus | string): IStatusConfig => {
   return statusConfig[status as TaskStatus];
 };
 

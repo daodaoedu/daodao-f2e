@@ -1,7 +1,7 @@
 import * as AppleAuthentication from "expo-apple-authentication";
 import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
-import type { AuthTokens, StoredUser } from "./auth-storage";
+import type { IAuthTokens, IStoredUser } from "./auth-storage";
 
 // Ensure WebBrowser session is properly closed
 WebBrowser.maybeCompleteAuthSession();
@@ -9,9 +9,9 @@ WebBrowser.maybeCompleteAuthSession();
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so";
 const API_URL = `${API_BASE_URL}/api/v1`;
 
-interface OAuthResult {
-  tokens: AuthTokens;
-  user: StoredUser;
+interface IOAuthResult {
+  tokens: IAuthTokens;
+  user: IStoredUser;
 }
 
 // Email validation regex
@@ -37,7 +37,7 @@ export const oauthService = {
    *
    * This requires backend API changes to support the code exchange endpoint.
    */
-  async signInWithGoogle(): Promise<OAuthResult> {
+  async signInWithGoogle(): Promise<IOAuthResult> {
     const redirectUri = `${Constants.expoConfig?.scheme}://oauth/callback`;
 
     const result = await WebBrowser.openAuthSessionAsync(
@@ -96,12 +96,12 @@ export const oauthService = {
       throw new Error("登入失敗：無效的電子郵件格式");
     }
 
-    const tokens: AuthTokens = {
+    const tokens: IAuthTokens = {
       accessToken: data.accessToken,
       refreshToken: data.refreshToken,
     };
 
-    const user: StoredUser = {
+    const user: IStoredUser = {
       id: data.user.id,
       email: data.user.email,
       name: data.user.name,
@@ -114,7 +114,7 @@ export const oauthService = {
   /**
    * Apple Sign In
    */
-  async signInWithApple(): Promise<OAuthResult> {
+  async signInWithApple(): Promise<IOAuthResult> {
     const credential = await AppleAuthentication.signInAsync({
       requestedScopes: [
         AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
@@ -156,12 +156,12 @@ export const oauthService = {
       throw new Error("Apple 登入失敗：用戶資料不完整");
     }
 
-    const tokens: AuthTokens = {
+    const tokens: IAuthTokens = {
       accessToken: data.accessToken,
       refreshToken: data.refreshToken,
     };
 
-    const user: StoredUser = {
+    const user: IStoredUser = {
       id: data.user.id,
       email: data.user.email,
       name: data.user.name,

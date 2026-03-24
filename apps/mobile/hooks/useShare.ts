@@ -3,13 +3,13 @@ import type { View } from "react-native";
 import { analyticsService } from "@/services/analytics";
 import { shareService } from "@/services/share";
 
-interface UseShareOptions {
+interface IUseShareOptions {
   practiceId: string;
   practiceTitle: string;
   streakCount: number;
 }
 
-interface UseShareReturn {
+interface IUseShareReturn {
   viewRef: MutableRefObject<View | null>;
   isCapturing: boolean;
   isSharing: boolean;
@@ -18,7 +18,7 @@ interface UseShareReturn {
   saveToGallery: () => Promise<{ success: boolean; error?: string }>;
 }
 
-export function useShare(options: UseShareOptions): UseShareReturn {
+export function useShare(options: IUseShareOptions): IUseShareReturn {
   const { practiceId, practiceTitle, streakCount } = options;
   const viewRef = useRef<View | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
