@@ -136,6 +136,7 @@ export default async function UserProfilePage({
         {/* 用戶個人資訊卡片 */}
         <UserInfoCard
           name={userData.name || "未命名用戶"}
+          customId={userData.customId || undefined}
           location={
             (locale === "en" ? userData.locationNameEn : userData.locationNameZh) || undefined
           }
