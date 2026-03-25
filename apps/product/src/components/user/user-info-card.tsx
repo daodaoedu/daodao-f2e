@@ -20,7 +20,7 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import MarkdownRenderer from "@daodao/ui/components/markdown-renderer";
 import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
-import { Globe, MapPin, Users } from "lucide-react";
+import { Globe, MapPin, Pencil, Users } from "lucide-react";
 import type React from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
@@ -345,7 +345,18 @@ export function UserInfoCard({
   );
 
   return (
-    <div className="bg-white rounded-2xl p-6 mb-6">
+    <div className="relative bg-white rounded-2xl p-6 mb-6">
+      {/* 編輯按鈕 - 自己的頁面 */}
+      {clientIsOwnProfile && (
+        <CustomLink
+          href="/settings/public-info"
+          prefetch={false}
+          className="absolute top-5 right-5 z-10 size-10 flex items-center justify-center rounded-full bg-[#F4F6F6] text-text-dark/60 hover:text-text-dark transition-colors"
+          aria-label="編輯個人檔案"
+        >
+          <Pencil className="size-[18px]" />
+        </CustomLink>
+      )}
       {/* 頭像和基本資訊 */}
       <div className="flex items-center md:items-start gap-4">
         <Avatar className="size-24 shrink-0">
@@ -407,16 +418,6 @@ export function UserInfoCard({
               <p className="text-xs text-text-dark mb-3">{commonCirclesCount} 個共同 Circle</p>
             )}
 
-          {/* 編輯個人檔案按鈕 - 自己的頁面 */}
-          {isOwnProfile && (
-            <div className="mb-3">
-              <Button variant="outline" size="sm" className="h-8 text-xs" asChild>
-                <CustomLink href="/settings/public-info" prefetch={false}>
-                  編輯個人檔案
-                </CustomLink>
-              </Button>
-            </div>
-          )}
 
           {!isMobile && moreContent}
         </div>
@@ -432,7 +433,7 @@ export function UserInfoCard({
             onClick={handleFollow}
             disabled={followLoading}
           >
-            {currentIsFollowing ? "取消關注" : "+ 關注"}
+            {currentIsFollowing ? "關注中" : "+ 關注"}
           </Button>
           <Button
             variant="outline"

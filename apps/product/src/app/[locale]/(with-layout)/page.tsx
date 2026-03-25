@@ -3,8 +3,9 @@
 import {
   useMyPracticeStats,
   useMyPractices,
+  useShowcaseFeed,
+  type IShowcasePractice,
 } from "@daodao/api";
-import { useFeed, type FeedItem } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
@@ -26,7 +27,6 @@ import {
   type ShowcaseFilterState,
   ShowcaseSearchBar,
 } from "@/components/showcase";
-import { CheckInShowcaseCard } from "@/components/showcase/CheckInShowcaseCard";
 import { PracticeStatus } from "@/constants/practice-status";
 import {
   FilterStatus,
@@ -52,13 +52,6 @@ export default function HomePage() {
   const [searchValue, setSearchValue] = useState(searchParams.get("keyword") ?? "");
   const [filters, setFilters] = useState<ShowcaseFilterState>({
     tags: searchParams.getAll("tags[]"),
-    durationMin: searchParams.get("duration_min")
-      ? Number(searchParams.get("duration_min"))
-      : undefined,
-    durationMax: searchParams.get("duration_max")
-      ? Number(searchParams.get("duration_max"))
-      : undefined,
-    status: (searchParams.get("status") as ShowcaseFilterState["status"]) ?? undefined,
   });
   const [keyword, setKeyword] = useState(searchParams.get("keyword") ?? "");
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
@@ -68,9 +61,6 @@ export default function HomePage() {
     (kw: string, f: ShowcaseFilterState) => {
       const params = new URLSearchParams();
       if (kw) params.set("keyword", kw);
-      if (f.status) params.set("status", f.status);
-      if (f.durationMin != null) params.set("duration_min", String(f.durationMin));
-      if (f.durationMax != null) params.set("duration_max", String(f.durationMax));
       for (const tag of f.tags) {
         params.append("tags[]", tag);
       }
@@ -88,16 +78,8 @@ export default function HomePage() {
     [filters, updateUrlParams]
   );
 
-  const _handleFiltersChange = useCallback(
-    (newFilters: ShowcaseFilterState) => {
-      setFilters(newFilters);
-      updateUrlParams(keyword, newFilters);
-    },
-    [keyword, updateUrlParams]
-  );
-
-  // Unified feed (practice + checkin)
-  const feedParams = useMemo(
+  // Showcase feed (practice only)
+  const showcaseParams = useMemo(
     () => ({
       keyword: keyword || undefined,
       tags: filters.tags.length > 0 ? filters.tags : undefined,
@@ -106,12 +88,12 @@ export default function HomePage() {
   );
 
   const {
-    feedItems,
+    practices,
     isLoading: isShowcaseLoading,
     hasMore,
     loadMore,
     isValidating,
-  } = useFeed(feedParams);
+  } = useShowcaseFeed(showcaseParams);
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -254,7 +236,7 @@ export default function HomePage() {
                 />
               </div>
 
-              {isShowcaseLoading && feedItems.length === 0 ? (
+              {isShowcaseLoading && practices.length === 0 ? (
                 <div className="flex flex-col gap-3">
                   {[1, 2, 3].map((i) => (
                     <div
@@ -265,64 +247,54 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
-                  {feedItems.map((item: FeedItem) => {
-                    switch (item.type) {
-                      case "practice":
-                        return item.data.is_brewing ? (
-                          <BrewingCard
-                            key={`p-${item.data.id}`}
-                            id={item.data.id}
-                            title={item.data.title}
-                            startDate={item.data.start_date}
-                            endDate={item.data.end_date}
-                            user={
-                              item.data.user
-                                ? {
-                                    id: item.data.user.id,
-                                    name: item.data.user.name,
-                                    photoUrl: item.data.user.photo_url,
-                                  }
-                                : undefined
-                            }
-                            actionDescription={item.data.practice_action}
-                            frequencyMinDays={item.data.frequency_min_days}
-                            frequencyMaxDays={item.data.frequency_max_days}
-                            sessionDurationMinutes={item.data.session_duration_minutes}
-                            commentCount={item.data.comment_count}
-                          />
-                        ) : (
-                          <PracticeShowcaseCard
-                            key={`p-${item.data.id}`}
-                            id={item.data.id}
-                            title={item.data.title}
-                            status={item.data.status}
-                            startDate={item.data.start_date}
-                            endDate={item.data.end_date}
-                            user={
-                              item.data.user
-                                ? {
-                                    id: item.data.user.id,
-                                    name: item.data.user.name,
-                                    photoUrl: item.data.user.photo_url,
-                                  }
-                                : undefined
-                            }
-                            actionDescription={item.data.practice_action}
-                            frequencyMinDays={item.data.frequency_min_days}
-                            frequencyMaxDays={item.data.frequency_max_days}
-                            sessionDurationMinutes={item.data.session_duration_minutes}
-                            commentCount={item.data.comment_count}
-                          />
-                        );
-                      case "checkin":
-                        return (
-                          <CheckInShowcaseCard
-                            key={`c-${item.data.id}`}
-                            {...item.data}
-                          />
-                        );
-                    }
-                  })}
+                  {practices.map((practice: IShowcasePractice) =>
+                    practice.is_brewing ? (
+                      <BrewingCard
+                        key={practice.id}
+                        id={practice.id}
+                        title={practice.title}
+                        startDate={practice.start_date}
+                        endDate={practice.end_date}
+                        user={
+                          practice.user
+                            ? {
+                                id: practice.user.id,
+                                name: practice.user.name,
+                                photoUrl: practice.user.photo_url,
+                              }
+                            : undefined
+                        }
+                        actionDescription={practice.practice_action}
+                        frequencyMinDays={practice.frequency_min_days}
+                        frequencyMaxDays={practice.frequency_max_days}
+                        sessionDurationMinutes={practice.session_duration_minutes}
+                        commentCount={practice.comment_count}
+                      />
+                    ) : (
+                      <PracticeShowcaseCard
+                        key={practice.id}
+                        id={practice.id}
+                        title={practice.title}
+                        status={practice.status}
+                        startDate={practice.start_date}
+                        endDate={practice.end_date}
+                        user={
+                          practice.user
+                            ? {
+                                id: practice.user.id,
+                                name: practice.user.name,
+                                photoUrl: practice.user.photo_url,
+                              }
+                            : undefined
+                        }
+                        actionDescription={practice.practice_action}
+                        frequencyMinDays={practice.frequency_min_days}
+                        frequencyMaxDays={practice.frequency_max_days}
+                        sessionDurationMinutes={practice.session_duration_minutes}
+                        commentCount={practice.comment_count}
+                      />
+                    )
+                  )}
 
                   <div ref={sentinelRef} className="h-4" />
 

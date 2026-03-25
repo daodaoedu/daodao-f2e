@@ -59,14 +59,6 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
           .then((data) => setLottieJson(data))
           .catch((error) => console.error("Failed to load Lottie animation:", error));
       }
-    } else if (!isOwnProfile) {
-      // 沒有測驗結果且非自己的頁面，載入預設吉祥物
-      const loadDefault = resultTypeToLottiePathMap.get("L");
-      if (loadDefault) {
-        loadDefault()
-          .then((data) => setLottieJson(data))
-          .catch((error) => console.error("Failed to load default Lottie animation:", error));
-      }
     }
   }, [resultType, isEmptyResult, isOwnProfile]);
 

@@ -1,14 +1,10 @@
 "use client";
 
-import type { ReactionTypeValue } from "@daodao/api";
 import {
   followTarget,
-  removeReaction,
   unfollowTarget,
-  upsertReaction,
   useComments,
   usePracticeById,
-  useReactions,
   useReactionsList,
 } from "@daodao/api";
 import {
@@ -26,7 +22,7 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { MoreHorizontal } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import {
   BrowseActivityContent,
@@ -34,6 +30,7 @@ import {
 } from "@/components/practice/shared/browse-activity-content";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
+import { useCardReactions } from "@/hooks/use-card-reactions";
 import { formatRelativeTime } from "@/utils/format-time";
 import { formatShowcaseDate } from "./utils";
 
@@ -141,36 +138,8 @@ export function PracticeShowcaseCard({
     });
   };
 
-  const { data: reactionsData, mutate } = useReactions({ targetType: "practice", targetId: id });
-  const [, startTransition] = useTransition();
-
-  const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
-    null) as ReactionTypeType | null;
-  const selectedReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
-  const allReactions = reactionsData?.data?.reactions ?? [];
-  const totalCount = allReactions.reduce((sum, r) => sum + r.count, 0);
-  const displayReactions = allReactions
-    .filter((r) => r.count > 0)
-    .map((r) => r.type as ReactionTypeType);
-
-  const handleToggle = useCallback(
-    (type: ReactionTypeType) => {
-      const isSelected = currentUserReaction === type;
-      startTransition(async () => {
-        if (isSelected) {
-          await removeReaction({ targetType: "practice", targetId: id });
-        } else {
-          await upsertReaction({
-            targetType: "practice",
-            targetId: id,
-            reactionType: type as ReactionTypeValue,
-          });
-        }
-        await mutate();
-      });
-    },
-    [currentUserReaction, id, mutate]
-  );
+  const { selectedReactions, totalCount, displayReactions, handleToggle } =
+    useCardReactions("practice", id);
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
@@ -181,11 +150,7 @@ export function PracticeShowcaseCard({
     >
       {/* Header row */}
       <div className="flex items-center gap-2 mb-2">
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E8F8FF] text-logo-cyan text-xs font-medium">
-          <FlagOutlineSvg className="size-3" />
-          實踐
-        </span>
-        <Badge variant={statusInfo.variant} size="sm" className="w-fit">
+        <Badge variant={statusInfo.variant} size="sm" className="w-fit text-[10px]">
           {statusInfo.label}
         </Badge>
         {startFmt && endFmt && (
