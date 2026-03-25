@@ -185,7 +185,7 @@ export function PracticeShowcaseCard({
           <FlagOutlineSvg className="size-3" />
           實踐
         </span>
-        <Badge variant={statusInfo.variant} size="sm" className="w-fit text-[10px] bg-primary-lightest">
+        <Badge variant={statusInfo.variant} size="sm" className="w-fit">
           {statusInfo.label}
         </Badge>
         {startFmt && endFmt && (
