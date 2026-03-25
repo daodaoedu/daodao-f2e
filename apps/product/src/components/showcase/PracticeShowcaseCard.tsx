@@ -181,6 +181,10 @@ export function PracticeShowcaseCard({
     >
       {/* Header row */}
       <div className="flex items-center gap-2 mb-2">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E8F8FF] text-logo-cyan text-xs font-medium">
+          <FlagOutlineSvg className="size-3" />
+          實踐
+        </span>
         <Badge variant={statusInfo.variant} size="sm" className="w-fit">
           {statusInfo.label}
         </Badge>
