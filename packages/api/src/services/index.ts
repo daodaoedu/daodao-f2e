@@ -42,6 +42,8 @@ export * from "./reaction-hooks";
 // Resource Service
 export * from "./resource";
 export * from "./resource-hooks";
+// Feed Service
+export * from "./feed-hooks";
 // Showcase Service
 export * from "./showcase-hooks";
 // Tag Service
