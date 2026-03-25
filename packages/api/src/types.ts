@@ -11028,7 +11028,7 @@ export interface paths {
             parameters: {
                 query: {
                     /** @description 查詢的目標類型 */
-                    targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio";
+                    targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin";
                     /** @description 目標對象ID */
                     targetId: string;
                 };
@@ -11509,7 +11509,7 @@ export interface paths {
             parameters: {
                 query: {
                     /** @description 反應目標類型 */
-                    targetType: "practice" | "comment";
+                    targetType: "practice" | "comment" | "checkin";
                     /** @description 目標外部 ID（UUID） */
                     targetId: string;
                 };
@@ -11792,7 +11792,7 @@ export interface paths {
             parameters: {
                 query: {
                     /** @description 反應目標類型 */
-                    targetType: "practice" | "comment";
+                    targetType: "practice" | "comment" | "checkin";
                     /** @description 目標外部 ID（UUID） */
                     targetId: string;
                 };
@@ -25854,7 +25854,7 @@ export interface components {
              * @example resource
              * @enum {string}
              */
-            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio";
+            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin";
             /**
              * @description 留言內容
              * @example 這個資源非常有用，謝謝分享！
@@ -25901,7 +25901,7 @@ export interface components {
              * @example outcome
              * @enum {string}
              */
-            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio";
+            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin";
             /**
              * @description 目標對象的唯一識別碼
              * @example 123e4567-e89b-12d3-a456-426614174000
@@ -28365,7 +28365,7 @@ export interface components {
              * @example practice
              * @enum {string}
              */
-            targetType: "practice" | "comment";
+            targetType: "practice" | "comment" | "checkin";
             /**
              * @description 目標外部 ID（UUID）
              * @example 32859587-f159-43fd-93e7-fcc890661781
@@ -28389,7 +28389,7 @@ export interface components {
              * @example practice
              * @enum {string}
              */
-            targetType: "practice" | "comment";
+            targetType: "practice" | "comment" | "checkin";
             /**
              * @description 目標外部 ID（UUID）
              * @example 32859587-f159-43fd-93e7-fcc890661781

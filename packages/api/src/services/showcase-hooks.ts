@@ -59,7 +59,7 @@ export interface IShowcaseFeedParams {
 // AI backend fetcher
 // ============================================================================
 
-async function fetchAiBackend<T>(path: string): Promise<T> {
+export async function fetchAiBackend<T>(path: string): Promise<T> {
   const baseUrl = getRequiredEnv("NEXT_PUBLIC_AI_API_URL");
   const res = await fetch(`${baseUrl}${path}`, {
     credentials: "include",
