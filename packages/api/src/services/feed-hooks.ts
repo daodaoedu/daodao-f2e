@@ -110,7 +110,15 @@ export function useFeed(params: IFeedParams) {
     );
 
   const feedItems: FeedItem[] = data
-    ? data.flatMap((page) => page.data ?? [])
+    ? data.flatMap((page) =>
+        (page.data ?? []).filter((item) => {
+          if (!item?.type || !item?.data) {
+            console.warn("[useFeed] Malformed feed item (missing type/data):", item);
+            return false;
+          }
+          return true;
+        }),
+      )
     : [];
 
   const hasMore = data
