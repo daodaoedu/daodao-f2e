@@ -111,13 +111,13 @@ export function useFeed(params: IFeedParams) {
 
   const feedItems: FeedItem[] = data
     ? data.flatMap((page) =>
-        (page.data ?? []).filter((item) => {
-          if (!item?.type || !item?.data) {
-            console.warn("[useFeed] Malformed feed item (missing type/data):", item);
-            return false;
-          }
-          return true;
-        }),
+(page.data ?? []).filter((item) => {
+  const isValid = !!(item?.type && item?.data);
+  if (!isValid && process.env.NODE_ENV !== "production") {
+    console.warn("[useFeed] Malformed feed item (missing type/data):", item);
+  }
+  return isValid;
+})
       )
     : [];
 
