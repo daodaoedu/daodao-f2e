@@ -17,6 +17,7 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "clean": "pnpm dlx rimraf dist node_modules"
   },
   "dependencies": {
