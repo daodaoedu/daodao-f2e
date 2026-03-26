@@ -14,6 +14,12 @@ import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
 interface ShowcaseCardProps {
   practice: IShowcasePractice;
   extraContent?: ReactNode;
+  /** 外部控制的已選反應（傳入時啟用 controlled mode） */
+  selectedReaction?: ReactionTypeType | null;
+  /** 外部覆寫反應切換 handler */
+  onReactionToggle?: (type: ReactionTypeType) => Promise<void>;
+  /** 三點選單 callback */
+  onMenuPress?: () => void;
 }
 
 function formatDate(dateStr?: string | null): string | null {
@@ -22,7 +28,13 @@ function formatDate(dateStr?: string | null): string | null {
   return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
-export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
+export function ShowcaseCard({
+  practice,
+  extraContent,
+  selectedReaction: externalSelectedReaction,
+  onReactionToggle: externalOnReactionToggle,
+  onMenuPress,
+}: ShowcaseCardProps) {
   const router = useRouter();
   const {
     id,
@@ -45,12 +57,16 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
     .map((r) => r.type as ReactionTypeType);
   const inlineFirstReactorName = reactions.find((r) => r.count > 0)?.latestActorName;
 
-  const [currentUserReaction, setCurrentUserReaction] = useState<ReactionTypeType | null>(null);
+  const [internalReaction, setInternalReaction] = useState<ReactionTypeType | null>(null);
 
-  const handleReactionToggle = useCallback(
+  // Controlled mode（外部提供 handler）或 uncontrolled（自行管理狀態）
+  const currentUserReaction =
+    externalOnReactionToggle !== undefined ? (externalSelectedReaction ?? null) : internalReaction;
+
+  const internalHandleReactionToggle = useCallback(
     async (type: ReactionTypeType) => {
-      const isSelected = currentUserReaction === type;
-      setCurrentUserReaction(isSelected ? null : type);
+      const isSelected = internalReaction === type;
+      setInternalReaction(isSelected ? null : type);
       try {
         if (isSelected) {
           await removeReaction("practice", id);
@@ -58,11 +74,13 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
           await upsertReaction("practice", id, type);
         }
       } catch {
-        setCurrentUserReaction(isSelected ? type : null);
+        setInternalReaction(isSelected ? type : null);
       }
     },
-    [currentUserReaction, id]
+    [internalReaction, id]
   );
+
+  const handleReactionToggle = externalOnReactionToggle ?? internalHandleReactionToggle;
 
   const taskStatus = status === "active" ? "in-progress" : "completed";
   const statusInfo = getStatusConfig(taskStatus);
@@ -98,7 +116,7 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
             {startFmt} ▶ {endFmt}
           </Text>
         )}
-        <Pressable hitSlop={8}>
+        <Pressable hitSlop={8} onPress={onMenuPress}>
           <MoreHorizontal size={16} color="#9CA3AF" />
         </Pressable>
       </XStack>
