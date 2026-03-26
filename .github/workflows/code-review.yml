@@ -1,0 +1,106 @@
+name: Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    name: AI Code Review
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+      models: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get diff
+        id: diff
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
+        run: |
+          DIFF=$(git diff "origin/$BASE..origin/$HEAD" -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.json' | head -c 12000)
+          STAT=$(git diff "origin/$BASE..origin/$HEAD" --stat | tail -5)
+          echo "DIFF<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$DIFF" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "STAT<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$STAT" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Review with GitHub Models
+        id: review
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DIFF: ${{ steps.diff.outputs.DIFF }}
+          STAT: ${{ steps.diff.outputs.STAT }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
+        run: |
+          RESPONSE=$(curl -s -X POST "https://models.inference.ai.azure.com/chat/completions" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg diff "$DIFF" \
+              --arg stat "$STAT" \
+              --arg base "$BASE" \
+              --arg head "$HEAD" \
+              '{
+                model: "gpt-4o-mini",
+                messages: [
+                  {
+                    role: "system",
+                    content: "你是一個資深的 code reviewer。根據 git diff 進行 code review，使用繁體中文。\n\n只回報真正的問題，不要吹毛求疵。格式：\n\n## Code Review\n\n### 問題\n\n| 嚴重度 | 檔案 | 問題 | 建議 |\n|--------|------|------|------|\n\n嚴重度：🔴 High（bug/安全）、🟡 Medium（效能/維護）、🟢 Low（風格/優化）\n\n如果沒有發現問題，只回覆「✅ 沒有發現明顯問題」。\n\n### 總結\n\n一句話總結這次變更的品質。"
+                  },
+                  {
+                    role: "user",
+                    content: ("Review 這次 " + $head + " → " + $base + " 的變更：\n\n變更統計：\n" + $stat + "\n\nDiff：\n```\n" + $diff + "\n```")
+                  }
+                ],
+                temperature: 0.3
+              }'
+            )")
+
+          BODY=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
+
+          if [ -z "$BODY" ]; then
+            echo "❌ Failed to generate review"
+            echo "$RESPONSE"
+            exit 0
+          fi
+
+          echo "BODY<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$BODY" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "✅ Review generated"
+
+      - name: Post review comment
+        if: steps.review.outputs.BODY != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BODY: ${{ steps.review.outputs.BODY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          EXISTING=$(gh api "repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
+            --jq '[.[] | select(.body | startswith("## Code Review"))] | length')
+
+          if [ "$EXISTING" -gt "0" ]; then
+            COMMENT_ID=$(gh api "repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
+              --jq '[.[] | select(.body | startswith("## Code Review"))][0].id')
+            gh api "repos/$REPOSITORY/issues/comments/$COMMENT_ID" \
+              --method PATCH \
+              -f body="$BODY"
+            echo "✅ Updated existing review comment"
+          else
+            gh api "repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
+              --method POST \
+              -f body="$BODY"
+            echo "✅ Posted new review comment"
+          fi
