@@ -13,6 +13,7 @@
     "./providers/*": "./src/providers/*.tsx"
   },
   "scripts": {
+    "test": "vitest run",
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "biome lint .",
