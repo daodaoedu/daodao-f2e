@@ -20,7 +20,7 @@ Review 當前 branch 相對於 base branch 的所有變更。
 - **邏輯錯誤**：edge case、off-by-one、null/undefined 未處理、async 錯誤處理
 - **安全問題**：XSS、注入攻擊、硬編碼 secret、不安全的 API 呼叫
 - **效能問題**：不必要的 re-render、N+1 query、大量 DOM 操作、缺少 memo/useMemo
-- **架構一致性**：是否遵守 AGENTS.md 的規範（使用 @daodao/* packages、API 錯誤處理模式等）
+- **架構一致性**：是否遵守 .claude/skills/project-rules/SKILL.md 的規範（使用 @daodao/* packages、API 錯誤處理模式等）
 
 ## 步驟 3：回報結果
 
