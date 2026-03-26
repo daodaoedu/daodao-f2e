@@ -12,7 +12,7 @@ describe("ApiError", () => {
   });
 
   it("creates an error with data", () => {
-    const data = { code: "VALIDATION", details: "field required" } as never;
+    const data = { code: "VALIDATION", message: "field required" };
     const err = new ApiError(422, "Validation failed", data);
     expect(err.status).toBe(422);
     expect(err.data).toEqual(data);
