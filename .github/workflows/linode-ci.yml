@@ -151,9 +151,8 @@ jobs:
           echo "📝 Running linting..."
           pnpm run lint &
 
-          # 如果有測試，取消下面註解
-          # echo "🧪 Running tests..."
-          # pnpm test &
+          echo "🧪 Running tests..."
+          pnpm test &
 
           wait
 
