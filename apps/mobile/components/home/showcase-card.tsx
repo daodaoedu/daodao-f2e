@@ -18,6 +18,8 @@ interface ShowcaseCardProps {
   selectedReaction?: ReactionTypeType | null;
   /** 外部覆寫反應切換 handler */
   onReactionToggle?: (type: ReactionTypeType) => Promise<void>;
+  /** 反應按鈕被點擊時觸發（用於 haptic 等副作用，不影響內部狀態） */
+  onReactionTap?: () => void;
   /** 三點選單 callback */
   onMenuPress?: () => void;
 }
@@ -33,6 +35,7 @@ export function ShowcaseCard({
   extraContent,
   selectedReaction: externalSelectedReaction,
   onReactionToggle: externalOnReactionToggle,
+  onReactionTap,
   onMenuPress,
 }: ShowcaseCardProps) {
   const router = useRouter();
@@ -67,6 +70,7 @@ export function ShowcaseCard({
     async (type: ReactionTypeType) => {
       const isSelected = internalReaction === type;
       setInternalReaction(isSelected ? null : type);
+      onReactionTap?.();
       try {
         if (isSelected) {
           await removeReaction("practice", id);
@@ -77,7 +81,7 @@ export function ShowcaseCard({
         setInternalReaction(isSelected ? type : null);
       }
     },
-    [internalReaction, id]
+    [internalReaction, id, onReactionTap]
   );
 
   const handleReactionToggle = externalOnReactionToggle ?? internalHandleReactionToggle;

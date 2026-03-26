@@ -8,11 +8,9 @@
  */
 
 import * as Haptics from "expo-haptics";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Text, XStack } from "tamagui";
 import { ShowcaseCard } from "@/components/home";
-import type { ReactionTypeType } from "@/constants/reaction-type";
-import { removeReaction, upsertReaction } from "@/hooks/useReactions";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
 
 interface PracticeShowcaseCardProps {
@@ -41,33 +39,15 @@ const brewingOverlay = (
 );
 
 export function PracticeShowcaseCard({ practice, onMenuPress }: PracticeShowcaseCardProps) {
-  const [currentUserReaction, setCurrentUserReaction] = useState<ReactionTypeType | null>(null);
-
-  const handleReactionToggle = useCallback(
-    async (type: ReactionTypeType) => {
-      const isSelected = currentUserReaction === type;
-      setCurrentUserReaction(isSelected ? null : type);
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      try {
-        if (isSelected) {
-          await removeReaction("practice", practice.id);
-        } else {
-          await upsertReaction("practice", practice.id, type);
-          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        }
-      } catch {
-        setCurrentUserReaction(isSelected ? type : null);
-      }
-    },
-    [currentUserReaction, practice.id],
-  );
+  const handleReactionTap = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
 
   return (
     <ShowcaseCard
       practice={practice}
       extraContent={practice.is_brewing ? brewingOverlay : undefined}
-      selectedReaction={currentUserReaction}
-      onReactionToggle={handleReactionToggle}
+      onReactionTap={handleReactionTap}
       onMenuPress={onMenuPress ? () => onMenuPress(practice) : undefined}
     />
   );
