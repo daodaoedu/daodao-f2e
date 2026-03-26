@@ -63,7 +63,6 @@ describe("BrewingCard 資料合約（12.9）", () => {
       last_checkin_summary: "這週完成了 7 天打卡，感覺很充實！",
     };
     expect(completedPractice.is_brewing).toBe(false);
-    expect(completedPractice.last_checkin_summary).not.toBeNull();
     expect(completedPractice.last_checkin_summary).toBeTruthy();
   });
 
@@ -99,8 +98,12 @@ describe("BrewingCard 資料合約（12.9）", () => {
 // ============================================================================
 
 describe("reactToPractice API 呼叫（12.10）", () => {
+  let mockFetch: ReturnType<typeof vi.fn>;
+
   beforeEach(() => {
     vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.daodao.so");
+    mockFetch = vi.fn().mockResolvedValue({ ok: true });
+    vi.stubGlobal("fetch", mockFetch);
   });
 
   afterEach(() => {
@@ -109,9 +112,6 @@ describe("reactToPractice API 呼叫（12.10）", () => {
   });
 
   it("第一次反應時應呼叫 POST /api/v1/reactions", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({ ok: true });
-    vi.stubGlobal("fetch", mockFetch);
-
     await reactToPractice("practice-001", "fire", false);
 
     expect(mockFetch).toHaveBeenCalledOnce();
@@ -126,9 +126,6 @@ describe("reactToPractice API 呼叫（12.10）", () => {
   });
 
   it("取消反應時應呼叫 DELETE /api/v1/reactions", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({ ok: true });
-    vi.stubGlobal("fetch", mockFetch);
-
     await reactToPractice("practice-001", "fire", true);
 
     expect(mockFetch).toHaveBeenCalledOnce();
@@ -142,8 +139,7 @@ describe("reactToPractice API 呼叫（12.10）", () => {
   });
 
   it("API 呼叫失敗時應拋出錯誤", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({ ok: false, status: 500 });
-    vi.stubGlobal("fetch", mockFetch);
+    mockFetch.mockResolvedValue({ ok: false, status: 500 });
 
     await expect(reactToPractice("practice-001", "fire", false)).rejects.toThrow(
       "React to practice failed: 500"
@@ -151,9 +147,6 @@ describe("reactToPractice API 呼叫（12.10）", () => {
   });
 
   it("反應請求應帶 credentials: include（確保 session 傳遞）", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({ ok: true });
-    vi.stubGlobal("fetch", mockFetch);
-
     await reactToPractice("practice-002", "heart", false);
 
     const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
@@ -161,9 +154,6 @@ describe("reactToPractice API 呼叫（12.10）", () => {
   });
 
   it("POST 請求應帶 Content-Type: application/json", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({ ok: true });
-    vi.stubGlobal("fetch", mockFetch);
-
     await reactToPractice("practice-002", "heart", false);
 
     const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
@@ -172,18 +162,12 @@ describe("reactToPractice API 呼叫（12.10）", () => {
   });
 
   it("delayed 練習（is_brewing=true）仍可進行反應互動", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({ ok: true });
-    vi.stubGlobal("fetch", mockFetch);
-
     const brewingPracticeId = "practice-delayed-001";
     await expect(reactToPractice(brewingPracticeId, "fire", false)).resolves.toBeUndefined();
     expect(mockFetch).toHaveBeenCalledOnce();
   });
 
   it("regression: targetType 固定為 practice（不應傳入 checkin 等其他類型）", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({ ok: true });
-    vi.stubGlobal("fetch", mockFetch);
-
     await reactToPractice("practice-003", "fire", false);
 
     const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
