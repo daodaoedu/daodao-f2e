@@ -1,7 +1,17 @@
-import { Bell, Calendar, Check, ChevronLeft, Tag, Target } from "@tamagui/lucide-icons";
+import {
+  Bell,
+  Calendar,
+  Check,
+  ChevronLeft,
+  Eye,
+  EyeOff,
+  Lock,
+  Tag,
+  Target,
+} from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert } from "react-native";
+import { Alert, Pressable as RNPressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { StepIndicator } from "@/components";
@@ -12,7 +22,7 @@ import { api } from "@/services/api-client";
 export default function Step5Screen() {
   const router = useRouter();
   const { form, currentStep, totalSteps, prevStep, resetForm } = useCreatePractice();
-  const { watch, handleSubmit } = form;
+  const { watch, setValue, handleSubmit } = form;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -50,6 +60,32 @@ export default function Step5Screen() {
     weekly: "每週",
     custom: "自訂",
   }[values.frequency];
+
+  const privacyOptions: Array<{
+    value: "private" | "public" | "delayed";
+    label: string;
+    description: string;
+    Icon: typeof Lock;
+  }> = [
+    {
+      value: "private",
+      label: "私人",
+      description: "只有你能看到",
+      Icon: Lock,
+    },
+    {
+      value: "public",
+      label: "公開",
+      description: "所有人都能在靈感頁看到",
+      Icon: Eye,
+    },
+    {
+      value: "delayed",
+      label: "延遲分享",
+      description: "進行中不顯示打卡內容，完成後解鎖",
+      Icon: EyeOff,
+    },
+  ];
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -105,6 +141,54 @@ export default function Step5Screen() {
                   </Text>
                 )}
               </YStack>
+            </YStack>
+
+            {/* Privacy Status */}
+            <YStack gap="$3">
+              <Text fontSize={15} fontWeight="600" color="$color">
+                隱私設定
+              </Text>
+              {privacyOptions.map((opt) => {
+                const isSelected = values.privacy_status === opt.value;
+                return (
+                  <RNPressable
+                    key={opt.value}
+                    onPress={() => setValue("privacy_status", opt.value)}
+                  >
+                    <XStack
+                      padding="$3"
+                      borderRadius="$md"
+                      borderWidth={2}
+                      borderColor={isSelected ? values.color || colors.primary.base : "#E5E7EB"}
+                      backgroundColor={
+                        isSelected
+                          ? values.color
+                            ? `${values.color}10`
+                            : colors.primary.palest
+                          : "white"
+                      }
+                      alignItems="center"
+                      gap="$3"
+                    >
+                      <opt.Icon
+                        size={20}
+                        color={isSelected ? values.color || colors.primary.base : "#9CA3AF"}
+                      />
+                      <YStack flex={1}>
+                        <Text fontSize={14} fontWeight="600" color="$color">
+                          {opt.label}
+                        </Text>
+                        <Text fontSize={12} color="$color" opacity={0.6}>
+                          {opt.description}
+                        </Text>
+                      </YStack>
+                      {isSelected && (
+                        <Check size={18} color={values.color || colors.primary.base} />
+                      )}
+                    </XStack>
+                  </RNPressable>
+                );
+              })}
             </YStack>
 
             {/* Details */}
