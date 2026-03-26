@@ -50,7 +50,7 @@ export default function HomePage() {
 
   const [activeTab, setActiveTab] = useState<TabType>("inspire");
   const [searchValue, setSearchValue] = useState(searchParams.get("keyword") ?? "");
-  const [filters, setFilters] = useState<ShowcaseFilterState>({
+  const [filters, _setFilters] = useState<ShowcaseFilterState>({
     tags: searchParams.getAll("tags[]"),
   });
   const [keyword, setKeyword] = useState(searchParams.get("keyword") ?? "");
