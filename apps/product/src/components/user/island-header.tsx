@@ -156,7 +156,8 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
         className={cn(
           "relative -z-20",
           "h-[378px] md:h-[389px]",
-          !isEmptyResult && "h-[378px] md:h-[333px]"
+          !isEmptyResult && "h-[378px] md:h-[333px]",
+          isEmptyResult && !isOwnProfile && "h-[150px] md:h-[150px]"
         )}
       />
       <header ref={headerRef} className="fixed top-0 inset-x-0 h-[420px] -z-10">
