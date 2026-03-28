@@ -1,68 +1,99 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CategoryType, IAction } from "../types";
-import { getFallbackActions } from "../utils/fallback-actions";
+import { getTagActions } from "../utils/tag-actions-map";
+
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL ?? "https://worker.daodao.so";
 
 interface UseGenerateActionsInput {
-	category: CategoryType;
-	topic: string;
-	tags?: string[];
+  category: CategoryType;
+  topic: string;
+  tags?: string[];
 }
 
 interface UseGenerateActionsReturn {
-	actions: IAction[] | null;
-	isLoading: boolean;
-	error: Error | null;
-	isFallback: boolean;
+  actions: IAction[] | null;
+  isLoading: boolean;
+  error: Error | null;
+  sessionId: string | null;
 }
 
-/**
- * Hook to call the backend API to generate personalized action suggestions.
- * Falls back to static data on API failure or when backend is not available.
- */
 export function useGenerateActions(
-	input: UseGenerateActionsInput | null,
+  input: UseGenerateActionsInput | null
 ): UseGenerateActionsReturn {
-	const [actions, setActions] = useState<IAction[] | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<Error | null>(null);
-	const [isFallback, setIsFallback] = useState(false);
-	const hasRequested = useRef(false);
+  const tags = input?.tags;
+  const category = input?.category;
+  const topic = input?.topic;
 
-	useEffect(() => {
-		if (!input || hasRequested.current) return;
-		hasRequested.current = true;
+  // Fast path: tag-based static lookup
+  const tagActions = useMemo(() => {
+    if (!tags || tags.length === 0) return null;
+    return getTagActions(tags);
+  }, [tags]);
 
-		const controller = new AbortController();
+  const [aiActions, setAiActions] = useState<IAction[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
-		const generate = async () => {
-			setIsLoading(true);
-			setError(null);
-			setIsFallback(false);
+  const needsAI = input !== null && (!tags || tags.length === 0) && !!category && !!topic;
 
-			// TODO: restore API call when backend is ready
-			// Mock: simulate loading delay then use fallback data
-			await new Promise((r) => setTimeout(r, 800));
-			if (controller.signal.aborted) return;
+  useEffect(() => {
+    if (!needsAI || !category || !topic) return;
 
-			const fallback = getFallbackActions(input.category);
-			if (fallback.length > 0) {
-				setActions(fallback);
-				setIsFallback(true);
-			} else {
-				setError(new Error("No actions available for this category"));
-			}
-			setIsLoading(false);
-		};
+    const controller = new AbortController();
+    let cancelled = false;
 
-		generate();
+    setIsLoading(true);
+    setError(null);
+    setAiActions(null);
 
-		return () => {
-			controller.abort();
-			hasRequested.current = false;
-		};
-	}, [input]);
+    (async () => {
+      try {
+        const response = await fetch(`${WORKER_URL}/action-maker/generate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ category, topic }),
+          signal: controller.signal,
+        });
 
-	return { actions, isLoading, error, isFallback };
+        if (!response.ok) {
+          throw new Error(`Worker returned ${response.status}`);
+        }
+
+        const json = (await response.json()) as {
+          success: boolean;
+          data: { actions: IAction[]; session_id: string };
+        };
+
+        if (!json.success || !json.data?.actions) {
+          throw new Error("Invalid response from worker");
+        }
+
+        if (!cancelled) {
+          setAiActions(json.data.actions);
+          setSessionId(json.data.session_id);
+        }
+      } catch (err) {
+        if (!cancelled && !(err instanceof DOMException && err.name === "AbortError")) {
+          setError(err instanceof Error ? err : new Error("Failed to generate actions"));
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [needsAI, category, topic]);
+
+  // Tag lookup takes priority; AI is for custom topics only
+  const actions = tagActions ?? aiActions;
+
+  return { actions, isLoading, error, sessionId };
 }

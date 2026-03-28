@@ -2,13 +2,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createContext, type ReactNode, useCallback, useContext, useState } from "react";
 import { type UseFormReturn, useForm } from "react-hook-form";
 import {
-  type CreatePracticeInput,
+  type CreatePracticeInputType,
   createPracticeSchema,
   defaultCreatePracticeValues,
 } from "@/types/create-practice";
 
-interface CreatePracticeContextValue {
-  form: UseFormReturn<CreatePracticeInput>;
+interface ICreatePracticeContextValue {
+  form: UseFormReturn<CreatePracticeInputType>;
   currentStep: number;
   totalSteps: number;
   goToStep: (step: number) => void;
@@ -19,19 +19,19 @@ interface CreatePracticeContextValue {
   isLastStep: boolean;
 }
 
-const CreatePracticeContext = createContext<CreatePracticeContextValue | null>(null);
+const CreatePracticeContext = createContext<ICreatePracticeContextValue | null>(null);
 
 const TOTAL_STEPS = 5;
 
 interface CreatePracticeProviderProps {
   children: ReactNode;
-  initialValues?: Partial<CreatePracticeInput>;
+  initialValues?: Partial<CreatePracticeInputType>;
 }
 
 export function CreatePracticeProvider({ children, initialValues }: CreatePracticeProviderProps) {
   const [currentStep, setCurrentStep] = useState(1);
 
-  const form = useForm<CreatePracticeInput>({
+  const form = useForm<CreatePracticeInputType>({
     resolver: zodResolver(createPracticeSchema),
     defaultValues: {
       ...defaultCreatePracticeValues,

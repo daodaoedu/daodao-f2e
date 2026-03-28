@@ -57,7 +57,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
           ref: ${{ env.BRANCH_NAME }}
 
       - name: Detect file changes
@@ -163,7 +163,8 @@ jobs:
       - name: Install dependencies and build
         run: |
           pnpm install --frozen-lockfile
-          pnpm turbo build --filter=@daodao/website
+          pnpm --filter @daodao/config generate:env
+          pnpm --filter @daodao/website build
 
       - name: Set Environment Variables
         id: meta
@@ -289,7 +290,8 @@ jobs:
       - name: Install dependencies and build
         run: |
           pnpm install --frozen-lockfile
-          pnpm turbo build --filter=@daodao/product
+          pnpm --filter @daodao/config generate:env
+          pnpm --filter @daodao/product build
 
       - name: Set Environment Variables
         id: meta
@@ -604,7 +606,10 @@ jobs:
           DEPLOY_WEBSITE: ${{ needs.build-website.result == 'success' }}
           DEPLOY_PRODUCT: ${{ needs.build-product.result == 'success' }}
         run: |
-          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=3 root@$LINODE_INSTANCE_IP "
+          DEPLOY_WEBSITE=${{ env.DEPLOY_WEBSITE }}
+          DEPLOY_PRODUCT=${{ env.DEPLOY_PRODUCT }}
+          APP_ENV=${{ env.APP_ENV }}
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=3 root@$LINODE_INSTANCE_IP << ENDSSH
             set -e
             echo '=== Deployment Verification Started ==='
 
@@ -615,10 +620,10 @@ jobs:
             echo 'Memory Usage:' && free -h
             echo 'Disk Usage:' && df -h /
 
-            if [ \"${{ env.DEPLOY_WEBSITE }}\" = \"true\" ]; then
+            if [ "$DEPLOY_WEBSITE" = "true" ]; then
               echo '=== Verifying Website ==='
-              WEBSITE_CONTAINER=\$(docker ps -q -f name=${{ env.APP_ENV }}_website | head -1)
-              if [ -z \"\$WEBSITE_CONTAINER\" ]; then
+              WEBSITE_CONTAINER=\$(docker ps -q -f name=${APP_ENV}_website | head -1)
+              if [ -z "\$WEBSITE_CONTAINER" ]; then
                 WEBSITE_STATUS='not found'
                 WEBSITE_HEALTH='no health check'
               else
@@ -630,23 +635,23 @@ jobs:
 
               if [ \"\$WEBSITE_STATUS\" != \"running\" ]; then
                 echo "❌ Website container is not running"
-                [ -n \"\$WEBSITE_CONTAINER\" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
+                [ -n "\$WEBSITE_CONTAINER" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
               if [ \"\$WEBSITE_HEALTH\" = \"unhealthy\" ]; then
                 echo "❌ Website container is unhealthy"
-                [ -n \"\$WEBSITE_CONTAINER\" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
+                [ -n "\$WEBSITE_CONTAINER" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
               echo "✅ Website is running and healthy"
             fi
 
-            if [ \"${{ env.DEPLOY_PRODUCT }}\" = \"true\" ]; then
+            if [ "$DEPLOY_PRODUCT" = "true" ]; then
               echo '=== Verifying Product ==='
-              PRODUCT_CONTAINER=\$(docker ps -q -f name=${{ env.APP_ENV }}_product | head -1)
-              if [ -z \"\$PRODUCT_CONTAINER\" ]; then
+              PRODUCT_CONTAINER=\$(docker ps -q -f name=${APP_ENV}_product | head -1)
+              if [ -z "\$PRODUCT_CONTAINER" ]; then
                 PRODUCT_STATUS='not found'
                 PRODUCT_HEALTH='no health check'
               else
@@ -658,13 +663,13 @@ jobs:
 
               if [ \"\$PRODUCT_STATUS\" != \"running\" ]; then
                 echo "❌ Product container is not running"
-                [ -n \"\$PRODUCT_CONTAINER\" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
+                [ -n "\$PRODUCT_CONTAINER" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
               if [ \"\$PRODUCT_HEALTH\" = \"unhealthy\" ]; then
                 echo "❌ Product container is unhealthy"
-                [ -n \"\$PRODUCT_CONTAINER\" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
+                [ -n "\$PRODUCT_CONTAINER" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
@@ -672,7 +677,7 @@ jobs:
             fi
 
             echo '=== Deployment Verification Complete ==='
-          "
+          ENDSSH
 
   # ===== Discord 通知 =====
   notify:

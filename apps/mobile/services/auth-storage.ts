@@ -6,14 +6,14 @@ const KEYS = {
   USER: "daodao_user",
 } as const;
 
-export interface StoredUser {
+export interface IStoredUser {
   id: string;
   email: string;
   name: string;
   avatar?: string;
 }
 
-export interface AuthTokens {
+export interface IAuthTokens {
   accessToken: string;
   refreshToken: string;
 }
@@ -27,7 +27,7 @@ export const authStorage = {
     return SecureStore.getItemAsync(KEYS.REFRESH_TOKEN);
   },
 
-  async getTokens(): Promise<AuthTokens | null> {
+  async getTokens(): Promise<IAuthTokens | null> {
     const [accessToken, refreshToken] = await Promise.all([
       this.getAccessToken(),
       this.getRefreshToken(),
@@ -40,14 +40,14 @@ export const authStorage = {
     return { accessToken, refreshToken };
   },
 
-  async setTokens(tokens: AuthTokens): Promise<void> {
+  async setTokens(tokens: IAuthTokens): Promise<void> {
     await Promise.all([
       SecureStore.setItemAsync(KEYS.ACCESS_TOKEN, tokens.accessToken),
       SecureStore.setItemAsync(KEYS.REFRESH_TOKEN, tokens.refreshToken),
     ]);
   },
 
-  async getUser(): Promise<StoredUser | null> {
+  async getUser(): Promise<IStoredUser | null> {
     const userJson = await SecureStore.getItemAsync(KEYS.USER);
     if (!userJson) return null;
 
@@ -58,7 +58,7 @@ export const authStorage = {
     }
   },
 
-  async setUser(user: StoredUser): Promise<void> {
+  async setUser(user: IStoredUser): Promise<void> {
     await SecureStore.setItemAsync(KEYS.USER, JSON.stringify(user));
   },
 

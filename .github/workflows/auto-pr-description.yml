@@ -1,0 +1,98 @@
+name: Auto PR Description
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  generate_description:
+    name: Generate PR Description with GitHub Models
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+      models: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get commit log
+        id: commits
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
+        run: |
+          COMMITS=$(git log "origin/$BASE..origin/$HEAD" --pretty=format:"- %s (%h)" | head -50)
+          echo "COMMITS<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$COMMITS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Generate PR description with GitHub Models
+        id: generate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMITS: ${{ steps.commits.outputs.COMMITS }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          RESPONSE=$(curl -s -X POST "https://models.inference.ai.azure.com/chat/completions" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg commits "$COMMITS" \
+              --arg base "$BASE" \
+              --arg head "$HEAD" \
+              --arg title "$PR_TITLE" \
+              '{
+                model: "gpt-4o-mini",
+                messages: [
+                  {
+                    role: "system",
+                    content: "你是一個專業的技術文件撰寫者。根據 git commit 列表，產生繁體中文的 PR 標題和描述。\n\n重要：你必須根據 commit 列表的實際內容來撰寫，不要只看 branch name 就自行推測。commit 列表是唯一的事實來源。\n\n格式必須嚴格按照以下結構，不要加其他內容：\n\n第一行是 PR 標題，使用 conventional commit 格式：type(scope): 繁體中文描述。標題控制在 70 字以內。type 和 scope 從 commit 列表推斷（feat/fix/refactor/perf/docs/chore 等）。如果 commits 包含多種 type，以最主要的為準。\n\n第二行必須是 ---（三個減號，作為分隔符）\n\n之後是 PR description：\n\n## Why is this necessary?\n\n（根據 commit 列表的實際變更，解釋「為什麼」需要這些變更。3-5 點）\n\n## How does it address?\n\n（根據 commit 列表的實際變更，解釋「怎麼做」來解決問題。3-5 點）"
+                  },
+                  {
+                    role: "user",
+                    content: ("以下是 " + $head + " → " + $base + " 的 commit 列表：\n\n" + $commits + "\n\n請根據這些 commits 的實際內容產生 PR 標題和描述。")
+                  }
+                ],
+                temperature: 0.3
+              }'
+            )")
+
+          CONTENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
+
+          if [ -z "$CONTENT" ]; then
+            echo "❌ Failed to generate description"
+            echo "$RESPONSE"
+            exit 1
+          fi
+
+          TITLE=$(echo "$CONTENT" | head -1)
+          BODY=$(echo "$CONTENT" | sed '1d' | sed '/^---$/d' | sed '/^$/d; :a; N; $!ba; s/^\n*//')
+
+          echo "TITLE<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$TITLE" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "BODY<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$BODY" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "✅ Title: $TITLE"
+
+      - name: Update PR title and description
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TITLE: ${{ steps.generate.outputs.TITLE }}
+          BODY: ${{ steps.generate.outputs.BODY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          gh api "repos/$REPOSITORY/pulls/$PR_NUMBER" \
+            --method PATCH \
+            -f title="$TITLE" \
+            -f body="$BODY"
+
+          echo "✅ PR #$PR_NUMBER title and description updated"

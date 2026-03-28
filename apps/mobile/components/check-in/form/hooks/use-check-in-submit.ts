@@ -6,13 +6,13 @@ import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import type { ICheckInFormData } from "../../types";
 
 // React Native file-like object for FormData
-interface FormDataFile {
+interface IFormDataFile {
   uri: string;
   type: string;
   name: string;
 }
 
-interface UseCheckInSubmitOptions {
+interface IUseCheckInSubmitOptions {
   practiceId: string;
   taskTitle: string;
   progressPercentage?: number;
@@ -47,7 +47,7 @@ export const useCheckInSubmit = ({
   taskTitle,
   progressPercentage = 0,
   onComplete,
-}: UseCheckInSubmitOptions) => {
+}: IUseCheckInSubmitOptions) => {
   const mutate = useMutate();
   const { openSuccessDialog } = useCheckInSuccessDialog({
     title: taskTitle,
@@ -73,7 +73,7 @@ export const useCheckInSubmit = ({
       // 圖片檔案（多張）- React Native 使用 uri, type, name 格式
       if (data.mediaUris && data.mediaUris.length > 0) {
         data.mediaUris.forEach((uri, index) => {
-          const fileObject: FormDataFile = {
+          const fileObject: IFormDataFile = {
             uri,
             type: getMimeType(uri),
             name: `image-${index}.${uri.split(".").pop() || "jpg"}`,

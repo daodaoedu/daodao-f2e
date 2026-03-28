@@ -17,7 +17,7 @@ import {
   VectorSvg,
 } from "@daodao/assets";
 import { cn } from "@daodao/ui/lib/utils";
-import { forwardRef, type ComponentType } from "react";
+import { type ComponentType, forwardRef } from "react";
 
 interface PracticeSummaryCardProps {
   summary: PracticeSummary;
@@ -40,10 +40,10 @@ const MoodIconMap: Record<MoodType, ComponentType<{ className?: string }>> = {
  * 泡泡顏色配置（正圓形）
  */
 const BUBBLE_COLORS = {
-  yellow: "bg-[#FCDD84]",      // 黃色（足跡半圓、標籤泡泡）
-  white: "bg-white",           // 白色（標籤泡泡）
-  cyan: "bg-[#A8E0E0]",        // 淺藍色（標籤泡泡、心情分享）
-  lightBlue: "bg-[#D4EEF4]",   // 淺藍色（心情分享）
+  yellow: "bg-[#FCDD84]", // 黃色（足跡半圓、標籤泡泡）
+  white: "bg-white", // 白色（標籤泡泡）
+  cyan: "bg-[#A8E0E0]", // 淺藍色（標籤泡泡、心情分享）
+  lightBlue: "bg-[#D4EEF4]", // 淺藍色（心情分享）
 };
 
 /**
@@ -103,9 +103,7 @@ export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCar
           {/* 實踐描述 - 白色圓角框 */}
           {summary.practiceDescription && (
             <div className="bg-white rounded-lg p-2.5 mb-4 w-[262px] min-h-[68px]">
-              <p className="text-sm text-text-dark line-clamp-3">
-                {summary.practiceDescription}
-              </p>
+              <p className="text-sm text-text-dark line-clamp-3">{summary.practiceDescription}</p>
             </div>
           )}
 
@@ -117,9 +115,7 @@ export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCar
               <div className="relative pl-20 pt-6">
                 <div className="text-sm text-text-dark">你留下了</div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-5xl font-bold text-text-dark">
-                    {summary.checkInCount}
-                  </span>
+                  <span className="text-5xl font-bold text-text-dark">{summary.checkInCount}</span>
                   <span className="text-base text-text-dark">個成長足跡</span>
                 </div>
               </div>
@@ -138,7 +134,10 @@ export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCar
                     return index === 0 ? (
                       <MoodIcon key={moodStat.mood} className="w-14 h-14 relative z-10" />
                     ) : (
-                      <MoodIcon key={moodStat.mood} className="w-10 h-10 absolute -top-1 -right-4 z-0" />
+                      <MoodIcon
+                        key={moodStat.mood}
+                        className="w-10 h-10 absolute -top-1 -right-4 z-0"
+                      />
                     );
                   })}
                 </div>
@@ -192,7 +191,6 @@ export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCar
                 </span>
               </div>
             )}
-
           </div>
 
           {/* Footer */}

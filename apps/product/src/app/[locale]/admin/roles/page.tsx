@@ -92,9 +92,7 @@ function RolesTab() {
 
   return (
     <div className="space-y-4">
-      {error && (
-        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
-      )}
+      {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>}
 
       {canManage && (
         <button
@@ -313,9 +311,7 @@ function PermissionsTab() {
 
   return (
     <div className="space-y-4">
-      {error && (
-        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
-      )}
+      {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>}
 
       {canManage && (
         <button
@@ -434,7 +430,12 @@ function CreateDialog({
   }, [handleKeyDown]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-label={title}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
       <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
       <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
         <h3 className="mb-4 text-lg font-semibold">{title}</h3>
@@ -510,7 +511,12 @@ function ConfirmDialog({
   }, [handleKeyDown]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" role="alertdialog" aria-modal="true" aria-label="確認操作">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      role="alertdialog"
+      aria-modal="true"
+      aria-label="確認操作"
+    >
       <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
       <div className="relative w-full max-w-sm rounded-xl bg-white p-6 shadow-lg">
         <p className="mb-4 text-sm">{message}</p>

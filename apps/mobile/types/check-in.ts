@@ -3,7 +3,7 @@ import type { MoodType } from "@/constants/mood";
 /**
  * 打卡資料類型
  */
-export interface CheckInData {
+export interface ICheckInData {
   /** 心情 */
   mood: MoodType;
   /** 描述文字 */
@@ -17,7 +17,7 @@ export interface CheckInData {
 /**
  * 打卡記錄類型
  */
-export interface CheckInRecord extends CheckInData {
+export interface ICheckInRecord extends ICheckInData {
   /** 打卡 ID */
   id: string;
   /** 實踐 ID */

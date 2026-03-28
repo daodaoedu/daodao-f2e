@@ -1,12 +1,22 @@
 "use client";
 
-import { useCurrentUser, usePracticeById, usePracticeCheckIns, useUpdatePracticeCheckIn } from "@daodao/api";
+import {
+  useCurrentUser,
+  usePracticeById,
+  usePracticeCheckIns,
+  useUpdatePracticeCheckIn,
+} from "@daodao/api";
 import { Deco4Svg } from "@daodao/assets";
 import { useParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { addDays, format, isValid, parse } from "date-fns";
 import { useMemo } from "react";
-import { CheckInButton, CheckInDateSelector, CheckInDetail, SameDayCheckInNav } from "@/components/check-in";
+import {
+  CheckInButton,
+  CheckInDateSelector,
+  CheckInDetail,
+  SameDayCheckInNav,
+} from "@/components/check-in";
 import type { ICheckInDisplayData, ICheckInFormData } from "@/components/check-in/types";
 import { PageHeader } from "@/components/layout";
 import { mapApiMoodToMoodType, mapMoodTypeToApiMood } from "@/constants/mood";
@@ -99,8 +109,7 @@ export default function CheckInDetailPage() {
         date: formatCheckInDate(checkIn.checkinDate),
         mood: moodType,
         content: checkIn.note || "",
-        // @TODO: 後續再處理 tags
-        tags: [],
+        tags: checkIn.tags || [],
         images: checkIn.imageUrls || [],
         practiceTitle: practiceData.data.title,
       };
@@ -247,7 +256,8 @@ export default function CheckInDetailPage() {
   }
 
   // 判斷當前用戶是否為實踐的擁有者
-  const isOwner = !!practiceData?.data?.user?.id && practiceData.data.user.id === currentUserData?.data?.id;
+  const isOwner =
+    !!practiceData?.data?.user?.id && practiceData.data.user.id === currentUserData?.data?.id;
 
   const handleCheckInComplete = (data: unknown) => {
     // TODO: 處理打卡資料
@@ -262,6 +272,7 @@ export default function CheckInDetailPage() {
         tags: data.tags,
         description: data.description,
         media: data.media,
+        existingImageUrls: data.existingImageUrls,
       });
       toast.success("打卡已更新");
     } catch (error) {
@@ -288,11 +299,7 @@ export default function CheckInDetailPage() {
 
       {/* Desktop 版本的標題列 */}
       <div className="hidden md:block">
-        <PageHeader
-          title="打卡紀錄"
-          rightActionTo={`/practices/${practiceId}`}
-          variant="light"
-        />
+        <PageHeader title="打卡紀錄" rightActionTo={`/practices/${practiceId}`} variant="light" />
       </div>
 
       <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">

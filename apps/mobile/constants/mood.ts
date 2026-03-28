@@ -15,13 +15,13 @@ export const MoodType = {
  */
 export type MoodType = (typeof MoodType)[keyof typeof MoodType];
 
-export interface MoodOption {
+export interface IMoodOption {
   id: MoodType;
   label: string;
   emoji: string;
 }
 
-export const MOOD_OPTIONS: MoodOption[] = [
+export const MOOD_OPTIONS: IMoodOption[] = [
   { id: MoodType.hopeless, label: "想放棄", emoji: "😞" },
   { id: MoodType.frustrated, label: "受挫", emoji: "😤" },
   { id: MoodType.bored, label: "無聊", emoji: "😐" },

@@ -1,11 +1,11 @@
 import { useCallback, useState } from "react";
 
-interface UseShareCheckInSheetOptions {
+interface IUseShareCheckInSheetOptions {
   /** 關閉時的回調 */
   onClose?: () => void;
 }
 
-interface UseShareCheckInSheetReturn {
+interface IUseShareCheckInSheetReturn {
   /** 是否顯示分享 Sheet */
   isOpen: boolean;
   /** 打開分享 Sheet */
@@ -33,7 +33,7 @@ interface UseShareCheckInSheetReturn {
  */
 export function useShareCheckInSheet({
   onClose,
-}: UseShareCheckInSheetOptions): UseShareCheckInSheetReturn {
+}: IUseShareCheckInSheetOptions): IUseShareCheckInSheetReturn {
   const [isOpen, setIsOpen] = useState(false);
 
   const openShareSheet = useCallback(() => {

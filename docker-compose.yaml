@@ -2,7 +2,6 @@ services:
   # ===== 正式環境 - Website =====
   prod_website:
     image: ${DOCKER_HUB_USERNAME}/daodao-website:${IMAGE_TAG:-prod}${COMMIT_SHA:+-}${COMMIT_SHA}
-    container_name: prod_website
     restart: unless-stopped
     env_file:
       - .env.prod
@@ -15,7 +14,9 @@ services:
     expose:
       - "3000"
     networks:
-      - prod-daodao-network
+      prod-daodao-network:
+        aliases:
+          - prod_website
     # 健康檢查配置
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000"]
@@ -39,7 +40,6 @@ services:
   # ===== 正式環境 - Product =====
   prod_product:
     image: ${DOCKER_HUB_USERNAME}/daodao-product:${IMAGE_TAG:-prod}${COMMIT_SHA:+-}${COMMIT_SHA}
-    container_name: prod_product
     restart: unless-stopped
     env_file:
       - .env.prod
@@ -51,7 +51,9 @@ services:
     expose:
       - "3001"
     networks:
-      - prod-daodao-network
+      prod-daodao-network:
+        aliases:
+          - prod_product
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001"]
       interval: 10s
@@ -72,7 +74,6 @@ services:
   # ===== 測試環境 - Website =====
   dev_website:
     image: ${DOCKER_HUB_USERNAME}/daodao-website:${IMAGE_TAG:-dev}${COMMIT_SHA:+-}${COMMIT_SHA}
-    container_name: dev_website
     restart: unless-stopped
     env_file:
       - .env.dev
@@ -83,7 +84,9 @@ services:
     expose:
       - "3000"
     networks:
-      - dev-daodao-network
+      dev-daodao-network:
+        aliases:
+          - dev_website
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000"]
       interval: 10s
@@ -108,7 +111,6 @@ services:
   # ===== 測試環境 - Product =====
   dev_product:
     image: ${DOCKER_HUB_USERNAME}/daodao-product:${IMAGE_TAG:-dev}${COMMIT_SHA:+-}${COMMIT_SHA}
-    container_name: dev_product
     restart: unless-stopped
     env_file:
       - .env.dev
@@ -120,7 +122,9 @@ services:
     expose:
       - "3001"
     networks:
-      - dev-daodao-network
+      dev-daodao-network:
+        aliases:
+          - dev_product
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001"]
       interval: 10s
@@ -144,7 +148,6 @@ services:
   # ===== Feature 分支 - Website =====
   feat_website:
     image: ${DOCKER_HUB_USERNAME}/daodao-website:${IMAGE_TAG:-feat}${COMMIT_SHA:+-}${COMMIT_SHA}
-    container_name: feat_website
     restart: unless-stopped
     env_file:
       - .env.dev
@@ -155,7 +158,9 @@ services:
     expose:
       - "3000"
     networks:
-      - dev-daodao-network
+      dev-daodao-network:
+        aliases:
+          - feat_website
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000"]
       interval: 10s
@@ -179,7 +184,6 @@ services:
   # ===== Feature 分支 - Product =====
   feat_product:
     image: ${DOCKER_HUB_USERNAME}/daodao-product:${IMAGE_TAG:-feat}${COMMIT_SHA:+-}${COMMIT_SHA}
-    container_name: feat_product
     restart: unless-stopped
     env_file:
       - .env.dev
@@ -191,7 +195,9 @@ services:
     expose:
       - "3001"
     networks:
-      - dev-daodao-network
+      dev-daodao-network:
+        aliases:
+          - feat_product
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001"]
       interval: 10s

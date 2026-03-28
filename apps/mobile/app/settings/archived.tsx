@@ -1,55 +1,58 @@
-import { Archive, ChevronLeft, RotateCcw, Trash2 } from "@tamagui/lucide-icons";
+import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import useSWR from "swr";
 import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
-import { ProgressRing } from "@/components";
-import { colors } from "@/generated/design-tokens";
-import { usePractices } from "@/hooks/usePractices";
-import type { Practice } from "@/types/practice";
+import { api } from "@/services/api-client";
 
-export default function ArchivedPracticesScreen() {
+interface IArchivedPractice {
+  id: string;
+  title: string;
+  practiceAction?: string;
+}
+
+export default function ArchivedContentScreen() {
   const router = useRouter();
-  const { practices } = usePractices();
+  const [unarchivingIds, setUnarchivingIds] = useState<Set<string>>(new Set());
 
-  // Filter archived practices
-  const archivedPractices = useMemo(
-    () => practices.filter((p) => p.status === "archived"),
-    [practices]
+  const {
+    data: practices,
+    isLoading,
+    error,
+    mutate,
+  } = useSWR<IArchivedPractice[]>(
+    "/me/practices?status=archived",
+    () =>
+      api
+        .get<{ data: IArchivedPractice[] }>("/me/practices?status=archived&limit=100")
+        .then((r) => r.data),
+    { revalidateOnFocus: false }
   );
 
-  const handleRestore = (practice: Practice) => {
-    Alert.alert("恢復實踐", `確定要恢復「${practice.title}」嗎？`, [
-      { text: "取消", style: "cancel" },
-      {
-        text: "恢復",
-        onPress: () => {
-          // TODO: Implement API call to restore practice
-          Alert.alert("成功", "實踐已恢復");
-        },
-      },
-    ]);
-  };
+  const items = practices ?? [];
 
-  const handleDelete = (practice: Practice) => {
-    Alert.alert("永久刪除", `確定要永久刪除「${practice.title}」嗎？此操作無法復原。`, [
-      { text: "取消", style: "cancel" },
-      {
-        text: "刪除",
-        style: "destructive",
-        onPress: () => {
-          // TODO: Implement API call to delete practice
-          Alert.alert("成功", "實踐已刪除");
-        },
-      },
-    ]);
+  const handleUnarchive = async (practiceId: string) => {
+    if (unarchivingIds.has(practiceId)) return;
+    setUnarchivingIds((prev) => new Set(prev).add(practiceId));
+    try {
+      await api.post(`/practices/${practiceId}/unarchive`);
+      await mutate();
+    } catch {
+      Alert.alert("錯誤", "取消封存失敗，請稍後再試");
+    } finally {
+      setUnarchivingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(practiceId);
+        return next;
+      });
+    }
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
-        {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
           <Button
             size="$4"
@@ -61,124 +64,72 @@ export default function ArchivedPracticesScreen() {
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            已封存實踐
+            已封存的內容
           </Text>
         </XStack>
 
-        {archivedPractices.length === 0 ? (
-          <YStack flex={1} alignItems="center" justifyContent="center" padding="$4" gap="$4">
-            <YStack
-              width={80}
-              height={80}
-              backgroundColor={colors.basic[100]}
-              borderRadius={40}
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Archive size={40} color={colors.basic[300]} />
-            </YStack>
-            <YStack alignItems="center" gap="$2">
-              <Text fontSize={18} fontWeight="600" color="$color">
-                沒有封存的實踐
-              </Text>
-              <Text fontSize={14} color="$color" opacity={0.6} textAlign="center">
-                當你封存實踐時，它們會出現在這裡
+        <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
+          {isLoading ? (
+            <YStack alignItems="center" paddingVertical="$8">
+              <Text fontSize={14} color="$color" opacity={0.5}>
+                載入中...
               </Text>
             </YStack>
-          </YStack>
-        ) : (
-          <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
+          ) : error ? (
+            <YStack alignItems="center" paddingVertical="$8">
+              <Text fontSize={14} color="$color" opacity={0.5}>
+                載入失敗，請稍後再試
+              </Text>
+            </YStack>
+          ) : items.length === 0 ? (
+            <YStack alignItems="center" paddingVertical="$8">
+              <Text fontSize={14} color="$color" opacity={0.5}>
+                尚無已封存的內容
+              </Text>
+            </YStack>
+          ) : (
             <YStack gap="$3">
-              {archivedPractices.map((practice) => {
-                const progress =
-                  practice.targetDays > 0
-                    ? Math.round((practice.completedDays / practice.targetDays) * 100)
-                    : 0;
-                const cardColor = practice.color || colors.primary.base;
-
-                return (
-                  <Card
-                    key={practice.id}
-                    padding="$4"
-                    backgroundColor="$background"
-                    borderRadius="$md"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                  >
-                    <YStack gap="$3">
-                      <XStack gap="$3" alignItems="center">
-                        <ProgressRing
-                          progress={progress}
-                          size={48}
-                          strokeWidth={4}
-                          color={cardColor}
-                          showLabel={false}
-                        />
-                        <YStack flex={1} gap="$1">
-                          <Text fontSize={16} fontWeight="600" color="$color">
-                            {practice.title}
-                          </Text>
-                          <Text fontSize={12} color="$color" opacity={0.6}>
-                            {practice.completedDays} / {practice.targetDays} 天完成
-                          </Text>
-                        </YStack>
-                      </XStack>
-
-                      <XStack gap="$2">
-                        <Button
-                          flex={1}
-                          size="$3"
-                          backgroundColor={colors.primary.palest}
-                          borderWidth={1}
-                          borderColor={colors.primary.lighter}
-                          pressStyle={{ backgroundColor: colors.primary.lighter }}
-                          onPress={() => handleRestore(practice)}
-                        >
-                          <XStack alignItems="center" gap="$1">
-                            <RotateCcw size={14} color={colors.primary.base} />
-                            <Text fontSize={13} color={colors.primary.base} fontWeight="500">
-                              恢復
-                            </Text>
-                          </XStack>
-                        </Button>
-
-                        <Button
-                          flex={1}
-                          size="$3"
-                          backgroundColor={`${colors.semantic.error}10`}
-                          borderWidth={1}
-                          borderColor={`${colors.semantic.error}30`}
-                          pressStyle={{ backgroundColor: `${colors.semantic.error}20` }}
-                          onPress={() => handleDelete(practice)}
-                        >
-                          <XStack alignItems="center" gap="$1">
-                            <Trash2 size={14} color={colors.semantic.error} />
-                            <Text fontSize={13} color={colors.semantic.error} fontWeight="500">
-                              刪除
-                            </Text>
-                          </XStack>
-                        </Button>
-                      </XStack>
-                    </YStack>
-                  </Card>
-                );
-              })}
-            </YStack>
-
-            {/* Info */}
-            <YStack
-              marginTop="$4"
-              padding="$4"
-              backgroundColor={colors.basic[100]}
-              borderRadius="$md"
-              gap="$2"
-            >
-              <Text fontSize={13} color="$color" opacity={0.6}>
-                提示：封存的實踐不會計入統計，但可以隨時恢復。永久刪除後將無法復原。
+              <Text fontSize={15} fontWeight="600" color="$color" paddingLeft="$1">
+                主題實踐
               </Text>
+              {items.map((practice) => (
+                <Card
+                  key={practice.id}
+                  padding="$4"
+                  backgroundColor="$background"
+                  borderRadius="$md"
+                  borderWidth={1}
+                  borderColor="$borderColor"
+                >
+                  <XStack alignItems="center" gap="$3">
+                    <YStack flex={1}>
+                      <Text fontSize={15} fontWeight="500" color="$color" numberOfLines={1}>
+                        {practice.title}
+                      </Text>
+                      {practice.practiceAction && (
+                        <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>
+                          {practice.practiceAction}
+                        </Text>
+                      )}
+                    </YStack>
+                    <Button
+                      size="$3"
+                      backgroundColor="transparent"
+                      borderWidth={1}
+                      borderColor="$borderColor"
+                      onPress={() => handleUnarchive(practice.id)}
+                      disabled={unarchivingIds.has(practice.id)}
+                    >
+                      <Text fontSize={12} color="$color">
+                        {unarchivingIds.has(practice.id) ? "處理中..." : "取消封存"}
+                      </Text>
+                    </Button>
+                  </XStack>
+                </Card>
+              ))}
             </YStack>
-          </ScrollView>
-        )}
+          )}
+        </ScrollView>
       </YStack>
     </SafeAreaView>
   );

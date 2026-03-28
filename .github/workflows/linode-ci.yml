@@ -138,7 +138,7 @@ jobs:
           path: |
             apps/website/.next/cache
             apps/product/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('apps/**/*.ts', 'apps/**/*.tsx', 'apps/**/*.js', 'apps/**/*.jsx', 'packages/**/*.ts', 'packages/**/*.tsx') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
 
@@ -151,9 +151,8 @@ jobs:
           echo "📝 Running linting..."
           pnpm run lint &
 
-          # 如果有測試，取消下面註解
-          # echo "🧪 Running tests..."
-          # pnpm test &
+          echo "🧪 Running tests..."
+          pnpm test &
 
           wait
 

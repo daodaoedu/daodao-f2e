@@ -5,6 +5,7 @@
  * 提供用戶相關的 React Hooks（用於 Client Components）
  */
 
+import useSWR from "swr";
 import { client } from "../client";
 import { useQuery } from "../hooks";
 import type {
@@ -14,7 +15,11 @@ import type {
   UpdateUserFormDataRequest,
   UpdateUserRequest,
 } from "./user";
-import { createCurrentUserWithFormData, updateCurrentUserWithFormData } from "./user";
+import {
+  createCurrentUserWithFormData,
+  getSettingsSummary,
+  updateCurrentUserWithFormData,
+} from "./user";
 
 // ============================================================================
 // Query Hooks
@@ -216,5 +221,23 @@ export const useUserMutations = () => {
         body: preferences,
       });
     },
+  };
+};
+
+/**
+ * 獲取設定頁完整度的 Hook
+ */
+export const useSettingsCompletion = () => {
+  const { data, error, isLoading, mutate } = useSWR(
+    "/api/v1/users/settings-summary",
+    getSettingsSummary,
+    { revalidateOnFocus: false }
+  );
+
+  return {
+    data,
+    error,
+    isLoading,
+    revalidate: mutate,
   };
 };

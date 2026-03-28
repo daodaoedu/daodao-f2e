@@ -1,0 +1,19 @@
+import { forwardRef } from "react";
+import type { SVGProps, Ref } from "react";
+
+interface SvgComponentProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
+  ref?: Ref<SVGSVGElement>;
+}
+
+const TagSolidSvg = forwardRef<SVGSVGElement, Omit<SVGProps<SVGSVGElement>, "ref">>(
+  function TagSolidSvg(props, ref) {
+    return (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" ref={ref} {...props}>
+        <path d="M3.06051 11.601L11.6057 3.05575C11.9525 2.71375 12.4275 2.5 12.95 2.5H19.6C20.6498 2.5 21.5 3.35023 21.5 4.40001V11.05C21.5 11.5772 21.2863 12.0523 20.9395 12.3943L12.3895 20.9443C12.0475 21.2863 11.5725 21.5 11.05 21.5C10.5275 21.5 10.0477 21.2863 9.70573 20.9443L3.05575 14.2943C2.71375 13.9475 2.5 13.4725 2.5 12.95C2.5 12.4228 2.71375 11.9477 3.06051 11.601ZM18.175 7.25001C18.9635 7.25001 19.6 6.61353 19.6 5.82501C19.6 5.0365 18.9635 4.40001 18.175 4.40001C17.3865 4.40001 16.75 5.0365 16.75 5.82501C16.75 6.61353 17.3865 7.25001 18.175 7.25001Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+export default TagSolidSvg;
+export type { SvgComponentProps };

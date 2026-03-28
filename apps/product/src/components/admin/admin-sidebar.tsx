@@ -85,9 +85,7 @@ function NavContent({ onItemClick }: { onItemClick?: () => void }) {
           返回前台
         </Link>
         {user && (
-          <div className="mt-2 px-3 text-xs text-basic-300 truncate">
-            {user.email || user.name}
-          </div>
+          <div className="mt-2 px-3 text-xs text-basic-300 truncate">{user.email || user.name}</div>
         )}
       </div>
     </div>
@@ -127,10 +125,7 @@ export function AdminMobileHeader() {
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* biome-ignore lint/a11y/useKeyWithClickEvents: overlay click to close */}
           {/* biome-ignore lint/a11y/noStaticElementInteractions: overlay click to close */}
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setIsOpen(false)}
-          />
+          <div className="absolute inset-0 bg-black/40" onClick={() => setIsOpen(false)} />
           <div className="absolute inset-y-0 left-0 w-64 bg-white shadow-xl">
             <div className="absolute top-3 right-3">
               <button

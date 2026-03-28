@@ -4,6 +4,7 @@ import { DefaultAvatarSvg, TagSolidSvg } from "@daodao/assets";
 import { Link } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
+import { ReactionSection } from "@/components/social";
 import type { ManualPracticeFormValues } from "../create/manual/schema";
 import { CircularProgress } from "./circular-progress";
 
@@ -20,10 +21,12 @@ interface PracticeOverviewCardProps {
   durationMinutes: ManualPracticeFormValues["durationMinutes"];
   tags?: ManualPracticeFormValues["tags"];
   // 詳情頁專用屬性
-  progress?: number; // 進度值
-  showProgress?: boolean; // 是否顯示進度條
+  progress?: number;
+  showProgress?: boolean;
   // 公開頁面顯示建立者資訊
   creator?: CreatorInfo;
+  // 快速反應 + 留言（提供 practiceId 時顯示）
+  practiceId?: string;
 }
 
 export const PracticeOverviewCard = ({
@@ -34,9 +37,10 @@ export const PracticeOverviewCard = ({
   progress,
   showProgress = false,
   creator,
+  practiceId,
 }: PracticeOverviewCardProps) => {
   return (
-    <div className="relative bg-white rounded-lg p-4 mb-4 shadow-sm">
+    <div className="relative bg-white pt-4 px-4 pb-0 mb-4">
       {/* 建立者資訊 - 僅在公開頁面顯示 */}
       {creator && (
         <div className="flex items-center gap-2 mb-3">
@@ -54,9 +58,7 @@ export const PracticeOverviewCard = ({
           >
             {creator.name}
           </Link>
-          {creator.date && (
-            <span className="text-sm text-text-dark/60">{creator.date}</span>
-          )}
+          {creator.date && <span className="text-sm text-text-dark/60">{creator.date}</span>}
         </div>
       )}
       <div className="relative flex items-start gap-4">
@@ -107,6 +109,9 @@ export const PracticeOverviewCard = ({
           </div>
         )}
       </div>
+
+      {/* 反應列 */}
+      {practiceId !== undefined && <ReactionSection targetType="practice" targetId={practiceId} />}
     </div>
   );
 };

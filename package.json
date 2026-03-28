@@ -27,6 +27,7 @@
     "docker:prod": "pnpm build && docker-compose -f docker/production/docker-compose.yml up -d --build",
     "docker:prod:down": "docker-compose -f docker/production/docker-compose.yml down",
     "docker:build": "pnpm build && docker-compose -f docker/production/docker-compose.yml up -d --build",
+    "test": "turbo run test",
     "clean": "turbo run clean && pnpm dlx rimraf node_modules"
   },
   "devDependencies": {
@@ -34,7 +35,8 @@
     "husky": "^9.1.7",
     "rimraf": "^6.0.1",
     "turbo": "^2.7.2",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "^4.1.2"
   },
   "engines": {
     "node": ">=20.19.4",

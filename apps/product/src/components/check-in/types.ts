@@ -10,6 +10,8 @@ export interface ICheckInFormData {
   tags: string[];
   description: string;
   media: File[];
+  /** 編輯時要保留的既有圖片 URL */
+  existingImageUrls?: string[];
 }
 
 /**

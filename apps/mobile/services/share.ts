@@ -4,24 +4,24 @@ import type { RefObject } from "react";
 import type { View } from "react-native";
 import { type CaptureOptions, captureRef } from "react-native-view-shot";
 
-export interface ShareContent {
+export interface IShareContent {
   title: string;
   message: string;
   imageUri?: string;
 }
 
-export interface CaptureResult {
+export interface ICaptureResult {
   success: boolean;
   uri?: string;
   error?: string;
 }
 
-export interface ShareResult {
+export interface IShareResult {
   success: boolean;
   error?: string;
 }
 
-export interface SaveToGalleryResult {
+export interface ISaveToGalleryResult {
   success: boolean;
   error?: string;
 }
@@ -33,7 +33,7 @@ class ShareService {
   async captureView(
     viewRef: RefObject<View>,
     options?: Partial<CaptureOptions>
-  ): Promise<CaptureResult> {
+  ): Promise<ICaptureResult> {
     if (!viewRef.current) {
       return { success: false, error: "View reference is not available" };
     }
@@ -61,7 +61,7 @@ class ShareService {
   /**
    * Share content using the native share dialog
    */
-  async share(content: ShareContent): Promise<ShareResult> {
+  async share(content: IShareContent): Promise<IShareResult> {
     const isAvailable = await Sharing.isAvailableAsync();
     if (!isAvailable) {
       return { success: false, error: "Sharing is not available on this device" };
@@ -91,7 +91,7 @@ class ShareService {
   /**
    * Save image to device gallery
    */
-  async saveToGallery(imageUri: string): Promise<SaveToGalleryResult> {
+  async saveToGallery(imageUri: string): Promise<ISaveToGalleryResult> {
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {

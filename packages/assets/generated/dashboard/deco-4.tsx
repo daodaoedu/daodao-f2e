@@ -1,0 +1,51 @@
+import { forwardRef } from "react";
+import type { SVGProps, Ref } from "react";
+
+interface SvgComponentProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
+  ref?: Ref<SVGSVGElement>;
+}
+
+const Deco4Svg = forwardRef<SVGSVGElement, Omit<SVGProps<SVGSVGElement>, "ref">>(
+  function Deco4Svg(props, ref) {
+    return (
+      <svg viewBox="0 0 270 484" fill="none" xmlns="http://www.w3.org/2000/svg" ref={ref} {...props}>
+        <rect width="270" height="484" fill="#16B9B3"/>
+<g opacity="0.4">
+<g style={{ mixBlendMode: "screen" }}>
+<path d="M135.754 422.739C135.754 456.571 105.362 484 67.877 484C30.3921 484 0.000277198 456.57 0 422.739V268.718C0.000210407 313.499 30.392 349.807 67.877 349.807C105.362 349.807 135.754 313.499 135.754 268.718V422.739Z" fill="url(#paint0_linear_573_10799)" fillOpacity="0.5"/>
+</g>
+<g style={{ mixBlendMode: "overlay" }}>
+<path d="M0 0H136.454V269.275C136.454 314.15 105.905 350.533 68.2268 350.533C30.5486 350.533 0 314.15 0 269.275V0Z" fill="url(#paint1_linear_573_10799)" fillOpacity="0.4"/>
+</g>
+<g style={{ mixBlendMode: "screen" }}>
+<path d="M202.877 60.3115C239.946 60.3115 270 90.3852 270 127.478V280.146C270 246.173 239.946 218.629 202.877 218.629C165.808 218.629 135.754 246.173 135.754 280.146V127.478C135.754 90.3853 165.808 60.3117 202.877 60.3115Z" fill="url(#paint2_linear_573_10799)"/>
+</g>
+<g style={{ mixBlendMode: "overlay" }}>
+<path d="M269.973 484H136.454V280.072C136.454 246.087 166.345 218.533 203.213 218.533C240.081 218.533 269.973 246.087 269.973 280.072V484Z" fill="url(#paint3_linear_573_10799)" fillOpacity="0.4"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_573_10799" x1="67.877" y1="233.707" x2="67.877" y2="484" gradientUnits="userSpaceOnUse">
+<stop stopColor="#99ECFF"/>
+<stop offset="1" stopColor="#5C8E99"/>
+</linearGradient>
+<linearGradient id="paint1_linear_573_10799" x1="68.2268" y1="123.895" x2="68.2268" y2="350.533" gradientUnits="userSpaceOnUse">
+<stop stopColor="white"/>
+<stop offset="1" stopColor="#5C8E99"/>
+</linearGradient>
+<linearGradient id="paint2_linear_573_10799" x1="202.877" y1="60.3115" x2="202.877" y2="334.729" gradientUnits="userSpaceOnUse">
+<stop stopColor="#99ECFF"/>
+<stop offset="1" stopColor="#5C8E99"/>
+</linearGradient>
+<linearGradient id="paint3_linear_573_10799" x1="203.213" y1="312.362" x2="203.213" y2="484" gradientUnits="userSpaceOnUse">
+<stop stopColor="#89BAC5"/>
+<stop offset="1" stopColor="#89BAC5" stopOpacity="0"/>
+</linearGradient>
+</defs>
+      </svg>
+    );
+  }
+);
+
+export default Deco4Svg;
+export type { SvgComponentProps };

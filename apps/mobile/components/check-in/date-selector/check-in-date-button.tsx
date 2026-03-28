@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Pressable, StyleSheet, View as RNView } from "react-native";
+import { Pressable, View as RNView, StyleSheet } from "react-native";
 import { Text, View } from "tamagui";
 import { MOOD_OPTIONS } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
@@ -71,14 +71,7 @@ export const CheckInDateButton = ({
       ]}
     >
       {/* 橘色填充層（有打卡時顯示，透明度根據打卡次數） */}
-      {hasCheckIn && (
-        <RNView
-          style={[
-            styles.fillOverlay,
-            { backgroundColor: orangeFillColor },
-          ]}
-        />
-      )}
+      {hasCheckIn && <RNView style={[styles.fillOverlay, { backgroundColor: orangeFillColor }]} />}
 
       {/* 心情 emoji */}
       {moodEmoji && (
@@ -88,12 +81,7 @@ export const CheckInDateButton = ({
       )}
 
       {/* 日期數字 */}
-      <Text
-        fontSize={16}
-        fontWeight="500"
-        color={colors.primary.base}
-        zIndex={10}
-      >
+      <Text fontSize={16} fontWeight="500" color={colors.primary.base} zIndex={10}>
         {index + 1}
       </Text>
     </Pressable>

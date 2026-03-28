@@ -1,192 +1,290 @@
 "use client";
 
+import logoLargePng from "@daodao/assets/images/action-maker/logo-large.png";
+import logoSmallPng from "@daodao/assets/images/action-maker/logo-small.png";
 import { useAuth } from "@daodao/auth";
-import { captureElementAsImage, getShareAPI } from "@daodao/shared";
-import { useCallback, useEffect, useRef } from "react";
+import { captureElementAsImage } from "@daodao/shared";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useActionMaker } from "../hooks/use-action-maker";
+import { useCreatePracticeFromAction } from "../hooks/use-create-practice-from-action";
 import { categoryMap } from "../utils/category-map";
-import { NavigationButtons } from "./navigation-buttons";
 import { StarryBackground } from "./starry-background";
+import { amVarStyle } from "./styled";
 
-const DEFAULT_BADGE = { bg: "bg-[var(--am-badge-beginner)] border border-[var(--am-badge-beginner-border)] text-[var(--am-badge-beginner-border)]", label: "初學" } as const;
+const DEFAULT_BADGE = {
+  bg: "bg-[var(--am-badge-beginner)] border border-[var(--am-badge-beginner-border)] text-[var(--am-badge-beginner-border)]",
+  label: "初學",
+} as const;
 const CUSTOM_BADGE = { bg: "bg-[var(--am-gray-blue)]", label: "自訂" } as const;
 
 const BADGE_STYLES: Record<string, { bg: string; label: string }> = {
-	beginner: DEFAULT_BADGE,
-	intermediate: { bg: "bg-[var(--am-badge-intermediate)] border border-[var(--am-badge-intermediate-border)] text-[var(--am-badge-intermediate-border)]", label: "中級" },
-	advanced: { bg: "bg-[var(--am-badge-advanced)] border border-[var(--am-badge-advanced-border)] text-[var(--am-badge-advanced-border)]", label: "進階" },
-	custom: CUSTOM_BADGE,
+  beginner: DEFAULT_BADGE,
+  intermediate: {
+    bg: "bg-[var(--am-badge-intermediate)] border border-[var(--am-badge-intermediate-border)] text-[var(--am-badge-intermediate-border)]",
+    label: "中級",
+  },
+  advanced: {
+    bg: "bg-[var(--am-badge-advanced)] border border-[var(--am-badge-advanced-border)] text-[var(--am-badge-advanced-border)]",
+    label: "進階",
+  },
+  custom: CUSTOM_BADGE,
 };
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daodao.so";
+
+const CARD_CLASS = "rounded-2xl border border-[var(--am-card-border)] bg-[var(--am-card-bg)] p-5";
+
 export function ActionMakerResult() {
-	const { result, reset, navigateTo } = useActionMaker();
-	const { isAuthenticated, openLoginDialog } = useAuth();
-	const cardRef = useRef<HTMLDivElement>(null);
+  const { state, result, isHydrated, reset, navigateTo } = useActionMaker();
+  const { isAuthenticated, openLoginDialog } = useAuth();
+  const { isCreating, createError, createPracticeFromResult } = useCreatePracticeFromAction();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const pendingCreate = useRef(false);
+  const [downloading, setDownloading] = useState(false);
 
-	const handleShare = useCallback(async () => {
-		if (!result) return;
+  const handleDownloadShareImage = useCallback(async () => {
+    if (!result || !cardRef.current) return;
+    setDownloading(true);
 
-		// Try capturing the result card as image first
-		let imageFile: File | undefined;
-		if (cardRef.current) {
-			const imageData = await captureElementAsImage(cardRef.current);
-			if (imageData) {
-				const blob = await fetch(imageData.src).then((r) => r.blob());
-				imageFile = new File([blob], "action-maker-result.jpg", {
-					type: "image/jpeg",
-				});
-			}
-		}
+    try {
+      const imageData = await captureElementAsImage(cardRef.current);
+      if (!imageData) return;
 
-		const shareText = `${result.nickname}抓住了${result.categoryLabel}之星！每天${result.triggerTiming}，${result.action.title}`;
+      const blob = await fetch(imageData.src).then((r) => r.blob());
+      const imageFile = new File([blob], "action-maker-result.jpg", {
+        type: "image/jpeg",
+      });
 
-		// Try native share with image
-		if (navigator.share) {
-			try {
-				const shareData: ShareData = {
-					title: `${result.nickname}的微習慣`,
-					text: shareText,
-				};
-				if (imageFile && navigator.canShare?.({ files: [imageFile] })) {
-					shareData.files = [imageFile];
-				}
-				await navigator.share(shareData);
-				return;
-			} catch {
-				// User cancelled or not supported, fall through to social share
-			}
-		}
+      // Mobile: prefer native share with image
+      const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+      if (isMobile && navigator.share) {
+        try {
+          if (navigator.canShare?.({ files: [imageFile] })) {
+            await navigator.share({
+              title: `${result.nickname}的微習慣`,
+              files: [imageFile],
+            });
+            return;
+          }
+        } catch {
+          // User cancelled or not supported, fall through to download
+        }
+      }
 
-		// Fallback: use social share buttons via getShareAPI
-		const shareAPI = getShareAPI({
-			url: "/action-maker",
-			title: `${result.nickname}的微習慣`,
-			text: shareText,
-		});
-		shareAPI.facebookShare?.();
-	}, [result]);
+      // Desktop / fallback: trigger download
+      const a = document.createElement("a");
+      a.href = imageData.src;
+      a.download = "action-maker-result.jpg";
+      a.click();
+    } finally {
+      setDownloading(false);
+    }
+  }, [result]);
 
-	useEffect(() => {
-		if (!result) {
-			navigateTo("/action-maker", { replace: true });
-		}
-	}, [result, navigateTo]);
+  const handleStartPractice = useCallback(async () => {
+    if (!result) return;
 
-	if (!result) {
-		return null;
-	}
+    if (!isAuthenticated) {
+      pendingCreate.current = true;
+      const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL || window.location.origin;
+      openLoginDialog({
+        redirectUrl: `${websiteUrl}/action-maker/result`,
+        source: "website",
+      });
+      return;
+    }
 
-	const badge =
-		BADGE_STYLES[result.action.level] ??
-		(result.isCustomAction ? CUSTOM_BADGE : DEFAULT_BADGE);
+    const created = await createPracticeFromResult(result, state.sessionId, state.usedRefine);
+    if (created?.practiceId) {
+      window.location.href = `${APP_URL}/practices/${created.practiceId}`;
+    }
+  }, [
+    result,
+    isAuthenticated,
+    openLoginDialog,
+    createPracticeFromResult,
+    state.sessionId,
+    state.usedRefine,
+  ]);
 
-	const handlePlayAgain = () => {
-		reset();
-		navigateTo("/action-maker");
-	};
+  // Auto-create after login
+  useEffect(() => {
+    if (isAuthenticated && pendingCreate.current && result) {
+      pendingCreate.current = false;
+      handleStartPractice();
+    }
+  }, [isAuthenticated, result, handleStartPractice]);
 
-	const handleRegister = () => {
-		openLoginDialog({
-			redirectUrl: "/action-maker/result",
-			source: "website",
-		});
-	};
+  useEffect(() => {
+    if (isHydrated && !result) {
+      navigateTo("/action-maker", { replace: true });
+    }
+  }, [isHydrated, result, navigateTo]);
 
-	const CategoryIcon = categoryMap.get(result.category)?.icon;
+  if (!result) {
+    return null;
+  }
 
-	return (
-		<StarryBackground>
-			<div className="flex min-h-dvh flex-col items-center px-6 pb-8 pt-36">
-				{/* Result Card */}
-				<div className="relative w-full max-w-sm">
-					{/* Category icon – card top-left */}
-					{CategoryIcon && (
-						<div className="pointer-events-none absolute -left-10 -top-25 z-20">
-							<CategoryIcon width={180} height={180} />
-						</div>
-					)}
-					<div
-						ref={cardRef}
-						className="relative z-10 w-full rounded-2xl border border-[rgba(188,213,238,0.3)] bg-[rgba(24,33,94,0.7)] p-6"
-					>
-						<div className="flex flex-col gap-4">
-							{/* Header */}
-							<div className="text-center">
-								<p className="text-lg text-[#BCD5EE]">{result.nickname}</p>
-								<h2 className="text-xl font-bold text-white">
-									你抓住了{result.categoryLabel}之星！
-								</h2>
-							</div>
+  const badge =
+    BADGE_STYLES[result.action.level] ?? (result.isCustomAction ? CUSTOM_BADGE : DEFAULT_BADGE);
 
-							{/* Badge + Action title */}
-							<div className="flex items-center gap-3">
-								<span
-									className={`rounded-full px-3 py-1 text-xs ${badge.bg}`}
-								>
-									{badge.label}
-								</span>
-								<span className="font-bold text-white">{result.action.title}</span>
-							</div>
+  const handlePlayAgain = () => {
+    reset();
+    navigateTo("/action-maker");
+  };
 
-							{/* Action details */}
-							<div>
-								<h3 className="mb-1 text-sm font-medium text-[#7B9FC4]">
-									具體行動內容
-								</h3>
-								{result.action.duration && (
-									<p className="mb-1 text-xs text-[#7B9FC4]">
-										{result.action.duration}
-									</p>
-								)}
-								<p className="text-sm leading-relaxed text-[#BCD5EE]">
-									{result.action.description}
-								</p>
-							</div>
+  const CategoryIcon = categoryMap.get(result.category)?.icon;
 
-							{/* Trigger timing */}
-							<div>
-								<h3 className="mb-1 text-sm font-medium text-[#7B9FC4]">
-									啟動時機
-								</h3>
-								<p className="text-white">{result.triggerTiming}</p>
-							</div>
-						</div>
-					</div>
-				</div>
+  return (
+    <StarryBackground>
+      <div className="flex min-h-dvh flex-col pb-8 pt-16">
+        {/* ===== Share card area (captured by cardRef) ===== */}
+        <div ref={cardRef} className="mx-auto p-6">
+          <div
+            className="flex w-[350px] flex-col rounded-2xl px-5 pb-6 pt-12"
+            style={{
+              ...amVarStyle,
+              backgroundColor: "#181F58",
+            }}
+          >
+            {/* Header — name left, category icon right */}
+            <div className="relative mb-2">
+              {CategoryIcon && (
+                <div className="pointer-events-none absolute right-0 top-[-1rem]">
+                  <CategoryIcon width={120} height={120} />
+                </div>
+              )}
+              <h1 className="text-2xl font-bold text-white">{result.nickname}</h1>
+              <p className="mt-1 text-lg text-white">你抓住了{result.categoryLabel}之星！</p>
+            </div>
 
-				{/* Actions */}
-				<div className="mt-8 w-full max-w-sm">
-					<NavigationButtons
-						primaryLabel="分享"
-						secondaryLabel="再玩一次"
-						onPrimary={handleShare}
-						onSecondary={handlePlayAgain}
-						showRefreshIcon
-					/>
+            {/* Subtitle */}
+            <p className="mb-5 text-sm text-[var(--am-gray-blue)]">星星為你帶來的習慣是...</p>
 
-					{/* Registration CTA – only for unauthenticated users */}
-					{!isAuthenticated && (<div className="px-6 pt-4 text-center">
-						<p className="mb-4 text-sm leading-relaxed text-[#BCD5EE]">
-							加入島島阿學，記錄你的學習旅程
-							<br />
-							開啟屬於你的微習慣追蹤
-						</p>
-						<button
-							type="button"
-							onClick={handleRegister}
-							className="w-full rounded-full py-4 text-base font-medium text-white transition-all hover:brightness-110"
-							style={{
-								background:
-									"radial-gradient(40% 80% at 95% 10%, rgba(107, 173, 224, 0.56) 0%, rgba(107, 173, 224, 0) 100%), radial-gradient(40% 80% at 5% 90%, rgba(211, 90, 255, 0.56) 0%, rgba(211, 90, 255, 0) 100%), #4285F4",
-								boxShadow:
-									"6px -4px 24px -4px rgba(80, 120, 255, 0.5), -6px 6px 24px -4px rgba(211, 90, 255, 0.5)",
-							}}
-						>
-							註冊
-						</button>
-					</div>)}
-				</div>
-			</div>
-		</StarryBackground>
-	);
+            {/* Action card */}
+            <div className={CARD_CLASS}>
+              <div className="mb-3 flex items-center gap-3">
+                <span className={`shrink-0 rounded-full px-3 py-1 text-xs ${badge.bg}`}>
+                  {badge.label}
+                </span>
+                <span className="font-bold text-white">{result.action.title}</span>
+              </div>
+              <p className="text-sm leading-relaxed text-[var(--am-light-blue)]">
+                {result.action.description}
+              </p>
+            </div>
+
+            {/* Trigger timing + Duration — two columns */}
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <div className={CARD_CLASS}>
+                <h3 className="mb-2 text-sm font-medium text-white">啟動時機</h3>
+                <p className="text-sm leading-relaxed text-[var(--am-light-blue)]">
+                  {result.triggerTiming || "隨時隨地"}
+                </p>
+              </div>
+              <div className={CARD_CLASS}>
+                <h3 className="mb-2 text-sm font-medium text-white">持續時間</h3>
+                <p className="text-sm leading-relaxed text-[var(--am-light-blue)]">
+                  {result.action.duration ?? "隨時隨地"}
+                </p>
+              </div>
+            </div>
+
+            {/* Starry tip card */}
+            <div className={`mt-3 ${CARD_CLASS}`}>
+              <h3 className="mb-2 text-sm font-medium text-white">星空小啟示</h3>
+              <p className="text-sm leading-relaxed text-[var(--am-light-blue)]">
+                {result.action.tip ?? "不需要完美，先開始就是好的開始。"}
+              </p>
+            </div>
+
+            {/* DAO DAO Logo — bottom of share card (use <img> for html-to-image compatibility) */}
+            <div className="mt-6 flex justify-center pb-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={logoSmallPng.src} alt="DAO DAO 島島阿學" width={146} height={32} />
+            </div>
+          </div>
+        </div>
+        {/* ===== End share card area ===== */}
+
+        {/* CTA section */}
+        <div className="mx-auto mt-10 w-[350px]">
+          {/* Motivational copy — varies by auth state */}
+          <p className="mt-6 text-center text-lg font-bold leading-relaxed text-white">
+            {isAuthenticated ? (
+              <>
+                是否覺得躍躍欲試呢？
+                <br />
+                我們準備好了你的專屬空間
+              </>
+            ) : (
+              <>
+                加入島島阿學
+                <br />
+                探索更多美好生活提案
+              </>
+            )}
+          </p>
+
+          {/* Primary CTA */}
+          <div className="relative mt-5">
+            {!isCreating && (
+              <div
+                className="pointer-events-none absolute inset-0 rounded-full"
+                style={{
+                  boxShadow:
+                    "6px -4px 24px -4px rgba(80, 120, 255, 0.5), -6px 6px 24px -4px rgba(211, 90, 255, 0.5)",
+                }}
+              />
+            )}
+            <button
+              type="button"
+              onClick={handleStartPractice}
+              disabled={isCreating}
+              className="relative w-full rounded-full py-4 text-lg font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+              style={{
+                background:
+                  "radial-gradient(40% 80% at 95% 10%, rgba(107, 173, 224, 0.56) 0%, rgba(107, 173, 224, 0) 100%), radial-gradient(40% 80% at 5% 90%, rgba(211, 90, 255, 0.56) 0%, rgba(211, 90, 255, 0) 100%), #4285F4",
+              }}
+            >
+              {isCreating ? "建立中..." : isAuthenticated ? "立刻開始實踐" : "註冊"}
+            </button>
+          </div>
+
+          {createError && (
+            <p className="mt-2 text-center text-sm text-red-400">{createError.message}</p>
+          )}
+
+          {/* Large DAO DAO logo (includes 島島阿學 text) */}
+          <div className="my-10 flex justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logoLargePng.src} alt="DAO DAO 島島阿學" width={120} height={124} />
+          </div>
+
+          {/* 下載分享圖片 */}
+          <button
+            type="button"
+            onClick={handleDownloadShareImage}
+            disabled={downloading}
+            className="mt-10 w-full rounded-full border border-white/30 py-4 text-lg font-bold text-white backdrop-blur-sm transition-all duration-300 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(188,213,238,0.12) 100%)",
+            }}
+          >
+            {downloading ? "產生中..." : "下載分享圖片"}
+          </button>
+
+          {/* 再玩一次 */}
+          <button
+            type="button"
+            onClick={handlePlayAgain}
+            className="mt-3 w-full rounded-full border border-white/30 py-4 text-lg text-white/80 transition-all duration-300 hover:border-white/50 hover:bg-white/10"
+          >
+            再玩一次
+          </button>
+        </div>
+      </div>
+    </StarryBackground>
+  );
 }

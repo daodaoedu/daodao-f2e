@@ -13,7 +13,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export interface ScheduledReminder {
+export interface IScheduledReminder {
   id: string;
   practiceId: string;
   practiceTitle: string;

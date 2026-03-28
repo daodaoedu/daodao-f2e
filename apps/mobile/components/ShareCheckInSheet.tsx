@@ -5,13 +5,13 @@ import { Alert, type View } from "react-native";
 import { Button, Sheet, Spinner, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useShare } from "@/hooks/useShare";
-import type { Practice } from "@/types/practice";
+import type { IPractice } from "@/types/practice";
 import { ShareableCheckInCard } from "./ShareableCheckInCard";
 
 interface ShareCheckInSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  practice: Practice | null;
+  practice: IPractice | null;
   streakCount: number;
 }
 

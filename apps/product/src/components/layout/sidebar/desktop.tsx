@@ -8,6 +8,7 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { useState } from "react";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
@@ -85,12 +86,16 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
                 )}
                 aria-label={item.label}
               >
-                <Icon
-                  className={cn(
-                    "shrink-0 size-9 text-light-gray transition-colors",
-                    isActive && "text-logo-cyan"
-                  )}
-                />
+                {item.href === "/notifications" ? (
+                  <NotificationBell isActive={isActive} />
+                ) : (
+                  <Icon
+                    className={cn(
+                      "shrink-0 size-9 text-light-gray transition-colors",
+                      isActive && "text-logo-cyan"
+                    )}
+                  />
+                )}
                 <span
                   className={cn(
                     "flex-1 text-base font-normal transition-all duration-300 whitespace-nowrap",

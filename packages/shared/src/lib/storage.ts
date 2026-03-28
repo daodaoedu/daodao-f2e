@@ -15,6 +15,8 @@ export enum StorageEnum {
   ManualPracticeDraft = "ManualPracticeDraft",
   /** 用於存儲 Action Maker 流程進度的 sessionStorage */
   ActionMaker = "ActionMaker",
+  /** 用於跨 tab 通知 OAuth 完成（Android Chrome Custom Tab 場景） */
+  AuthSignal = "AuthSignal",
 }
 
 const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
@@ -24,6 +26,7 @@ const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   OAuthNonce: "sessionStorage",
   ManualPracticeDraft: "sessionStorage",
   ActionMaker: "sessionStorage",
+  AuthSignal: "localStorage",
 };
 
 export interface StorageInstance<T> {

@@ -10,6 +10,7 @@ interface IEditCheckInData {
   mood: MoodType;
   tags: string[];
   description: string;
+  images?: string[];
 }
 
 interface IUseEditCheckInSheetOptions {
@@ -48,6 +49,7 @@ export function useEditCheckInSheet({
             description: checkInData.description,
             media: [],
           }}
+          existingImages={checkInData.images}
           submitButtonText="儲存變更"
           onComplete={async (data) => {
             try {

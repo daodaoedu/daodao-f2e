@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@daodao/auth";
-import { ANCHOR_IDS } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 
@@ -10,7 +9,7 @@ export function PlanSection() {
   return (
     <section
       className="relative mt-[60px] flex flex-col items-center justify-center overflow-x-clip pb-[60px]"
-      id={ANCHOR_IDS.PLANS}
+      id="plans"
     >
       {/* Section Header */}
       <div className="px-6 pb-[60px] text-center text-primary-darker">

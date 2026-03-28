@@ -351,6 +351,13 @@ export const AuthProvider = ({
    */
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
+      // Android Chrome Custom Tab 場景：CCT 完成 OAuth 後 callback 頁面會寫入此信號
+      // CCT 與主 Chrome 共享 localStorage，主 tab 的 storage event 會觸發，然後重新驗證
+      if (e.key === getStorageKey(StorageEnum.AuthSignal)) {
+        checkAuth();
+        return;
+      }
+
       // 檢查是否是使用者資訊的變化
       if (e.key === getStorageKey(StorageEnum.UserInfo)) {
         const newUserInfo = userInfoStorage.get();
@@ -369,7 +376,24 @@ export const AuthProvider = ({
 
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
-  }, [userInfoStorage, clearAuthState]);
+  }, [checkAuth, userInfoStorage, clearAuthState]);
+
+  /**
+   * Android Chrome Custom Tab 場景補充機制
+   * storage event 在 CCT → 主 tab 之間不可靠（CCT 是獨立 renderer process）
+   * 改用 visibilitychange：CCT 關閉後主 tab 重新可見時重新驗證
+   * 僅在未登入時才重新驗證，避免正常切換 tab 時發出多餘的 API 請求
+   */
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && !isAuthenticated) {
+        checkAuth();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [checkAuth, isAuthenticated]);
 
   /**
    * 路由保護：檢查當前路徑是否需要登入
@@ -601,10 +625,7 @@ export const AuthProvider = ({
     (permission: string) => permissions.includes(permission),
     [permissions]
   );
-  const isAdmin = useMemo(
-    () => roles.some((r) => r.toLowerCase().includes("admin")),
-    [roles]
-  );
+  const isAdmin = useMemo(() => roles.some((r) => r.toLowerCase().includes("admin")), [roles]);
 
   const value: AuthContextValue = useMemo(
     () => ({

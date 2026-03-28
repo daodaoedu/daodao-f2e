@@ -1,0 +1,54 @@
+import { forwardRef } from "react";
+import type { SVGProps, Ref } from "react";
+
+interface SvgComponentProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
+  ref?: Ref<SVGSVGElement>;
+}
+
+const BlueSvg = forwardRef<SVGSVGElement, Omit<SVGProps<SVGSVGElement>, "ref">>(
+  function BlueSvg(props, ref) {
+    return (
+      <svg viewBox="0 0 294 239" fill="none" xmlns="http://www.w3.org/2000/svg" ref={ref} {...props}>
+        <g clipPath="url(#clip0_687_3997)">
+<rect width="294" height="239" fill="#C3EEFF"/>
+<g style={{ mixBlendMode: "screen" }}>
+<path d="M205 198.37C205 220.808 184.851 239 160 239C135.149 239 115 220.808 115 198.37V96.2197C115 125.92 135.149 150 160 150C184.851 150 205 125.92 205 96.2197V198.37Z" fill="url(#paint0_linear_687_3997)" fillOpacity="0.5"/>
+</g>
+<g style={{ mixBlendMode: "overlay" }}>
+<path d="M115 -82H205V96.2195C205 125.92 184.851 150 160 150C135.149 150 115 125.92 115 96.2195V-82Z" fill="url(#paint1_linear_687_3997)" fillOpacity="0.4"/>
+</g>
+<g style={{ mixBlendMode: "screen" }}>
+<path d="M249.5 -42C274.075 -42 294 -22.0546 294 2.5459V103.799C294 81.2677 274.075 63 249.5 63C224.925 63 205 81.2677 205 103.799V2.5459C205 -22.0546 224.925 -42 249.5 -42Z" fill="url(#paint2_linear_687_3997)"/>
+</g>
+<g style={{ mixBlendMode: "overlay" }}>
+<path d="M294 239H205V103.799C205 81.2677 224.925 63 249.5 63C274.075 63 294 81.2677 294 103.799V239Z" fill="url(#paint3_linear_687_3997)" fillOpacity="0.4"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_687_3997" x1="160" y1="73" x2="160" y2="239" gradientUnits="userSpaceOnUse">
+<stop stopColor="#99ECFF"/>
+<stop offset="1" stopColor="#5C8E99"/>
+</linearGradient>
+<linearGradient id="paint1_linear_687_3997" x1="160" y1="4.6245e-06" x2="160" y2="150" gradientUnits="userSpaceOnUse">
+<stop stopColor="white"/>
+<stop offset="1" stopColor="#5C8E99"/>
+</linearGradient>
+<linearGradient id="paint2_linear_687_3997" x1="249.5" y1="-42" x2="249.5" y2="140" gradientUnits="userSpaceOnUse">
+<stop stopColor="#99ECFF"/>
+<stop offset="1" stopColor="#5C8E99"/>
+</linearGradient>
+<linearGradient id="paint3_linear_687_3997" x1="249.5" y1="125.207" x2="249.5" y2="239" gradientUnits="userSpaceOnUse">
+<stop stopColor="#5C8E99"/>
+<stop offset="1" stopColor="white"/>
+</linearGradient>
+<clipPath id="clip0_687_3997">
+<rect width="294" height="239" fill="white"/>
+</clipPath>
+</defs>
+      </svg>
+    );
+  }
+);
+
+export default BlueSvg;
+export type { SvgComponentProps };

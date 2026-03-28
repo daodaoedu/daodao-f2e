@@ -3,25 +3,25 @@ import type PostHog from "posthog-react-native";
 import { PostHogProvider } from "posthog-react-native";
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import {
-  type AnalyticsUser,
   analyticsService,
-  type CheckInEventProperties,
-  type LoginEventProperties,
-  type PracticeCreatedEventProperties,
-  type ShareCheckInEventProperties,
+  type IAnalyticsUser,
+  type ICheckInEventProperties,
+  type ILoginEventProperties,
+  type IPracticeCreatedEventProperties,
+  type IShareCheckInEventProperties,
 } from "@/services/analytics";
 
-interface AnalyticsContextValue {
-  identify: (user: AnalyticsUser) => void;
+interface IAnalyticsContextValue {
+  identify: (user: IAnalyticsUser) => void;
   reset: () => void;
   trackScreenView: (screenName: string) => void;
-  trackCheckIn: (properties: CheckInEventProperties) => void;
-  trackPracticeCreated: (properties: PracticeCreatedEventProperties) => void;
-  trackLogin: (properties: LoginEventProperties) => void;
-  trackShareCheckIn: (properties: ShareCheckInEventProperties) => void;
+  trackCheckIn: (properties: ICheckInEventProperties) => void;
+  trackPracticeCreated: (properties: IPracticeCreatedEventProperties) => void;
+  trackLogin: (properties: ILoginEventProperties) => void;
+  trackShareCheckIn: (properties: IShareCheckInEventProperties) => void;
 }
 
-const AnalyticsContext = createContext<AnalyticsContextValue | null>(null);
+const AnalyticsContext = createContext<IAnalyticsContextValue | null>(null);
 
 interface AnalyticsProviderProps {
   children: ReactNode;
@@ -38,7 +38,7 @@ function AnalyticsProviderContent({ children }: AnalyticsProviderProps) {
   }, [pathname]);
 
   // Memoize context value to prevent unnecessary re-renders
-  const value: AnalyticsContextValue = useMemo(
+  const value: IAnalyticsContextValue = useMemo(
     () => ({
       identify: (user) => analyticsService.identify(user),
       reset: () => analyticsService.reset(),

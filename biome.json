@@ -21,7 +21,8 @@
       "!!**/.turbo",
       "!!**/out",
       "!!**/.vercel",
-      "!!**/packages/assets"
+      "!!**/packages/assets",
+      "!!**/packages/api/src/types.ts"
     ]
   },
   "formatter": {

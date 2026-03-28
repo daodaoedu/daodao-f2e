@@ -12,23 +12,11 @@ interface StatCardProps {
   className?: string;
 }
 
-export function StatCard({
-  title,
-  value,
-  change,
-  changeLabel,
-  icon,
-  className,
-}: StatCardProps) {
+export function StatCard({ title, value, change, changeLabel, icon, className }: StatCardProps) {
   const isPositive = change !== undefined && change >= 0;
 
   return (
-    <div
-      className={cn(
-        "rounded-xl border border-border bg-white p-5 shadow-sm",
-        className
-      )}
-    >
+    <div className={cn("rounded-xl border border-border bg-white p-5 shadow-sm", className)}>
       <div className="flex items-start justify-between">
         <p className="text-sm text-basic-400">{title}</p>
         {icon && <div className="text-basic-300">{icon}</div>}
@@ -43,17 +31,10 @@ export function StatCard({
           ) : (
             <ArrowDown className="size-4 text-red-500" />
           )}
-          <span
-            className={cn(
-              "font-medium",
-              isPositive ? "text-green-600" : "text-red-600"
-            )}
-          >
+          <span className={cn("font-medium", isPositive ? "text-green-600" : "text-red-600")}>
             {Math.abs(change).toFixed(1)}%
           </span>
-          {changeLabel && (
-            <span className="text-basic-300">{changeLabel}</span>
-          )}
+          {changeLabel && <span className="text-basic-300">{changeLabel}</span>}
         </div>
       )}
     </div>

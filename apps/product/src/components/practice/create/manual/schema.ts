@@ -107,50 +107,52 @@ export const createManualPracticeFormSchema = (options?: ManualPracticeSchemaOpt
   // 不提供預設值，讓 createStartDateSchema 在驗證時動態決定
   const minStartDate = options?.minStartDate;
 
-  return z.object({
-    // Step 1
-    name: z.string().min(1, "請輸入名稱"),
-    actionDescription: z.string().min(1, "請輸入實踐行動").max(50, "最多50字").default(""),
+  return z
+    .object({
+      // Step 1
+      name: z.string().min(1, "請輸入名稱"),
+      actionDescription: z.string().min(1, "請輸入實踐行動").max(50, "最多50字").default(""),
 
-    // Step 2
-    startDate: createStartDateSchema(minStartDate),
-    durationDays: z.nativeEnum(DurationDays, {
-      required_error: "請選擇想要持續多久",
-    }),
-    frequency: z.nativeEnum(Frequency, {
-      required_error: "請選擇每週實踐頻率",
-    }),
+      // Step 2
+      startDate: createStartDateSchema(minStartDate),
+      durationDays: z.nativeEnum(DurationDays, {
+        required_error: "請選擇想要持續多久",
+      }),
+      frequency: z.nativeEnum(Frequency, {
+        required_error: "請選擇每週實踐頻率",
+      }),
 
-    // Step 3
-    durationMinutes: z.number(),
-    executionTiming: z.array(z.nativeEnum(ExecutionTiming)),
-    customTiming: z.string(),
+      // Step 3
+      durationMinutes: z.number(),
+      executionTiming: z.array(z.nativeEnum(ExecutionTiming)),
+      customTiming: z.string(),
 
-    // Step 4
-    tags: z.array(z.string()).max(MAX_PRACTICE_TAGS, `標籤最多 ${MAX_PRACTICE_TAGS} 個`).optional(),
-    resources: z
-      .array(
-        z.object({
-          id: z.string(),
-          name: z.string().min(1, "請輸入資源名稱"),
-          url: z
-            .string()
-            .url("請輸入有效的網址")
-            .refine((val) => !val || val.startsWith("https://"), {
-              message: "網址必須使用 HTTPS",
-            })
-            .optional()
-            .or(z.literal("")),
-        })
-      )
-      .optional(),
-  }).refine(
-    (data) => data.executionTiming.length > 0 || data.customTiming.trim().length > 0,
-    {
+      // Step 4
+      tags: z
+        .array(z.string())
+        .max(MAX_PRACTICE_TAGS, `標籤最多 ${MAX_PRACTICE_TAGS} 個`)
+        .optional(),
+      resources: z
+        .array(
+          z.object({
+            id: z.string(),
+            name: z.string().min(1, "請輸入資源名稱").max(100, "最多100字"),
+            url: z
+              .string()
+              .url("請輸入有效的網址")
+              .refine((val) => !val || val.startsWith("https://"), {
+                message: "網址必須使用 HTTPS",
+              })
+              .optional()
+              .or(z.literal("")),
+          })
+        )
+        .optional(),
+    })
+    .refine((data) => data.executionTiming.length > 0 || data.customTiming.trim().length > 0, {
       message: "請至少選擇一個執行時機或填寫其他時段",
       path: ["executionTiming"],
-    }
-  );
+    });
 };
 
 // 預設 schema（用於創建模式）

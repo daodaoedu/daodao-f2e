@@ -1,15 +1,17 @@
 "use client";
 
-import { useAuth, useAuthContext } from "@daodao/auth";
+import { useCurrentUser } from "@daodao/api";
+import { useAuthContext } from "@daodao/auth";
 import { useIsMobile } from "@daodao/shared";
 import { DesktopSidebar } from "./desktop";
 import { MobileSidebar } from "./mobile";
 
 export function Sidebar() {
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated, user: authUser } = useAuthContext();
   const isMobile = useIsMobile();
-  const { user } = useAuth();
-  const identifier = user?.customId ?? user?.id ?? "";
+  const { data: currentUserData } = useCurrentUser();
+  // /api/v1/auth/me 不回傳 customId，需從 /api/v1/users/me 取得
+  const identifier = currentUserData?.data?.customId ?? authUser?.id ?? "";
 
   if (!isAuthenticated) {
     return null;

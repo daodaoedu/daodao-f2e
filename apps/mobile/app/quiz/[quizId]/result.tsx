@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import { type IslandResult, mockIslandResults } from "@/types/quiz";
+import { type IIslandResult, mockIslandResults } from "@/types/quiz";
 
 export default function QuizResultScreen() {
   const { quizId } = useLocalSearchParams<{
@@ -13,7 +13,7 @@ export default function QuizResultScreen() {
   }>();
   const router = useRouter();
 
-  const [result, setResult] = useState<IslandResult | null>(null);
+  const [result, setResult] = useState<IIslandResult | null>(null);
   const [showAnimation, setShowAnimation] = useState(true);
 
   useEffect(() => {

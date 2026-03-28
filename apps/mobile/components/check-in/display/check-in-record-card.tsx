@@ -18,12 +18,12 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
 
 const MAX_BAR_HEIGHT = 60;
 
-interface CheckInRecord {
+interface ICheckInRecord {
   mood?: ApiMoodType;
 }
 
 interface ICheckInRecordCardProps {
-  checkInsData?: { data?: CheckInRecord[] };
+  checkInsData?: { data?: ICheckInRecord[] };
   isLoading?: boolean;
 }
 

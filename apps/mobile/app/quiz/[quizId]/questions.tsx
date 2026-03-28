@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import { mockQuestions, type QuizAnswer } from "@/types/quiz";
+import { type IQuizAnswer, mockQuestions } from "@/types/quiz";
 
 export default function QuizQuestionsScreen() {
   const { quizId } = useLocalSearchParams<{ quizId: string }>();
@@ -12,7 +12,7 @@ export default function QuizQuestionsScreen() {
 
   const questions = mockQuestions.filter((q) => q.quizId === quizId);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<QuizAnswer[]>([]);
+  const [answers, setAnswers] = useState<IQuizAnswer[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const currentQuestion = questions[currentIndex];
@@ -29,7 +29,7 @@ export default function QuizQuestionsScreen() {
     const option = currentQuestion.options.find((o) => o.id === selectedOption);
     if (!option) return;
 
-    const newAnswer: QuizAnswer = {
+    const newAnswer: IQuizAnswer = {
       questionId: currentQuestion.id,
       optionId: selectedOption,
       value: option.value,

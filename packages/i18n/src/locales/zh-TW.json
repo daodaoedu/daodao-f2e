@@ -2,9 +2,9 @@
   "common": {
     "title": "島島阿學",
     "description": "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
-    "landing_solutions": "解決困境",
-    "landing_features": "功能生態",
-    "landing_plans": "方案",
+    "landing_learning_inspiration": "學習靈感",
+    "landing_community": "社群",
+    "landing_learning_dna": "學習 DNA",
     "landing_persona_title": "每個人都有自己的學習小島，\n透過交流與分享，連結成群島",
     "landing_persona_subtitle": "Where personal growth meets collective wisdom!",
     "landing_persona_profession": "專業領域",
@@ -4146,7 +4146,7 @@
       "success": {
         "verified": {
           "title": "郵件驗證成功！",
-          "description": "歡迎加入島島阿學，開始探索你的學習之旅吧！"
+          "description": "完成個人設定，獲得更精準的學習推薦。"
         },
         "alreadyVerified": {
           "title": "郵件已驗證",
@@ -4180,7 +4180,7 @@
         }
       },
       "actions": {
-        "goToHome": "前往首頁",
+        "goToHome": "前往完成個人設定",
         "backToHome": "返回首頁"
       },
       "resend": {
@@ -4201,6 +4201,32 @@
         "resendFailed": "發送失敗，請稍後再試",
         "resendCooldown": "{seconds} 秒後可重新發送",
         "logout": "使用其他帳號登入"
+      }
+    },
+    "oauthError": {
+      "stateExpired": {
+        "title": "登入連結已過期",
+        "description": "此登入連結已超過有效期，請重新點擊登入按鈕。"
+      },
+      "invalidState": {
+        "title": "無效的登入請求",
+        "description": "登入請求無效，請重新點擊登入按鈕。"
+      },
+      "invalidRedirectUri": {
+        "title": "無效的跳轉位址",
+        "description": "此登入請求的跳轉位址不被允許，請聯繫客服。"
+      },
+      "serverError": {
+        "title": "伺服器發生錯誤",
+        "description": "登入過程發生伺服器錯誤，請稍後再試。"
+      },
+      "unknown": {
+        "title": "登入失敗",
+        "description": "登入過程發生未知錯誤，請稍後再試。"
+      },
+      "actions": {
+        "retry": "重新登入",
+        "backToHome": "返回首頁"
       }
     }
   },

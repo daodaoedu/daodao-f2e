@@ -1,7 +1,7 @@
 "use client";
 
 import { type PracticeTemplateType, useRandomPracticeTemplates } from "@daodao/api";
-import { ArrowRightOutlineSvg, Deco2Svg } from "@daodao/assets";
+import { ArrowRightOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -130,11 +130,6 @@ export const RandomPracticesSection = ({
     <section className={compact ? "" : "mb-6 pt-4 px-4"}>
       {/* 標題區域 */}
       <div className="relative max-w-[640px] bg-white rounded-[12px] p-4 mx-auto flex flex-col items-center gap-3">
-        <Deco2Svg
-          width={98}
-          height={120}
-          className="absolute -left-[50px] -top-[18px] md:-left-[66px] md:-top-[34px]"
-        />
         <h2 className="relative z-10 flex justify-center text-lg font-medium text-bg-dark">
           從好奇開始, 一起小步實踐生活裡的學習靈感。
         </h2>

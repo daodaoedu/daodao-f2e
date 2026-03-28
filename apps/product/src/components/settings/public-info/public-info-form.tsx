@@ -9,9 +9,11 @@ import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { mutate as globalMutate } from "swr";
 import { AvatarUploadSection } from "./avatar-upload-section";
 import { BasicInfoSection } from "./basic-info-section";
 import { IntroductionSection } from "./introduction-section";
+import { PrivacySection } from "./privacy-section";
 import { type PublicInfoFormValues, publicInfoFormSchema } from "./schema";
 import { SocialLinksSection } from "./social-links-section";
 
@@ -48,6 +50,7 @@ export const PublicInfoForm = () => {
       discord: "",
       line: "",
       threads: "",
+      hideConnectionsCount: false,
     },
   });
 
@@ -82,6 +85,8 @@ export const PublicInfoForm = () => {
         discord: contactList?.discord || "",
         line: contactList?.line || "",
         threads: contactList?.threads || "",
+        hideConnectionsCount:
+          (user as { hideConnectionsCount?: boolean }).hideConnectionsCount ?? false,
       });
     }
   }, [userData, citiesData, form.reset]);
@@ -97,6 +102,7 @@ export const PublicInfoForm = () => {
         location?: string;
         personalSlogan?: string;
         selfIntroduction?: string;
+        hideConnectionsCount?: boolean;
         contactList?: {
           facebook?: string;
           instagram?: string;
@@ -132,6 +138,9 @@ export const PublicInfoForm = () => {
         updateData.selfIntroduction = values.selfIntroduction;
       }
 
+      // 更新隱私設定
+      updateData.hideConnectionsCount = values.hideConnectionsCount ?? false;
+
       // 更新社群連結（使用空字串以便後端清空欄位）
       updateData.contactList = {
         facebook: values.facebook,
@@ -149,6 +158,7 @@ export const PublicInfoForm = () => {
 
       // 刷新用戶資料
       await mutate(["/api/v1/users/me"] as const);
+      globalMutate("/api/v1/users/settings-summary");
 
       // 成功
       toast.success("公開資訊設定已更新");
@@ -238,6 +248,8 @@ export const PublicInfoForm = () => {
         <IntroductionSection form={form} />
 
         <SocialLinksSection form={form} />
+
+        <PrivacySection form={form} />
 
         {/* 儲存按鈕 */}
         <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray">

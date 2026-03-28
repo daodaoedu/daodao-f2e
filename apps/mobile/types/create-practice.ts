@@ -20,11 +20,14 @@ export const createPracticeSchema = z.object({
   tags: z.array(z.string()).max(5, "最多 5 個標籤").default([]),
   color: z.string().optional(),
   icon: z.string().optional(),
+
+  // Step 5: 隱私設定
+  privacy_status: z.enum(["private", "public", "delayed"]).default("private"),
 });
 
-export type CreatePracticeInput = z.infer<typeof createPracticeSchema>;
+export type CreatePracticeInputType = z.infer<typeof createPracticeSchema>;
 
-export const defaultCreatePracticeValues: CreatePracticeInput = {
+export const defaultCreatePracticeValues: CreatePracticeInputType = {
   title: "",
   description: "",
   frequency: "daily",
@@ -35,20 +38,21 @@ export const defaultCreatePracticeValues: CreatePracticeInput = {
   tags: [],
   color: undefined,
   icon: undefined,
+  privacy_status: "private",
 };
 
-export interface PracticeTemplate {
+export interface IPracticeTemplate {
   id: string;
   title: string;
   description: string;
   icon: string;
   color: string;
   category: string;
-  defaultValues: Partial<CreatePracticeInput>;
+  defaultValues: Partial<CreatePracticeInputType>;
 }
 
 // 預設模板
-export const practiceTemplates: PracticeTemplate[] = [
+export const practiceTemplates: IPracticeTemplate[] = [
   {
     id: "reading",
     title: "每日閱讀",

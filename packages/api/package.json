@@ -16,8 +16,12 @@
     "format:check": "biome format .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "clean": "pnpm dlx rimraf dist node_modules"
+    "clean": "pnpm dlx rimraf dist node_modules",
+    "gen:types": "gh api repos/daodaoedu/daodao-server/contents/generated/openapi-types.ts --method GET -f ref=dev --jq '.content' | base64 -d > src/types.ts",
+    "gen:ai-types": "openapi-typescript https://ai-dev.daodao.so/openapi.json -o src/ai-types.ts",
+    "gen": "pnpm gen:types && pnpm gen:ai-types"
   },
   "dependencies": {
     "@daodao/config": "workspace:*",

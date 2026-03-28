@@ -206,9 +206,7 @@ export default function TemplateDetailPage() {
 
       if (response.error) {
         const errorMessage =
-          response.error &&
-          typeof response.error === "object" &&
-          "message" in response.error
+          response.error && typeof response.error === "object" && "message" in response.error
             ? String(response.error.message)
             : "建立實踐失敗";
         console.error("Failed to create practice:", errorMessage);
@@ -231,8 +229,7 @@ export default function TemplateDetailPage() {
         );
       }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "建立實踐失敗，請稍後再試";
+      const errorMessage = err instanceof Error ? err.message : "建立實踐失敗，請稍後再試";
       console.error("Failed to create practice:", err);
       toast.error(errorMessage);
       setIsSubmitting(false);

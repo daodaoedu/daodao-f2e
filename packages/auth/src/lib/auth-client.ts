@@ -30,10 +30,7 @@ export const encodeOAuthState = (state: OAuthState): string => {
   const json = JSON.stringify(state);
   // 使用標準 base64 編碼後轉換為 base64url
   // base64url: + -> -, / -> _, 移除 = 填充
-  return btoa(json)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
+  return btoa(json).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 };
 
 /**

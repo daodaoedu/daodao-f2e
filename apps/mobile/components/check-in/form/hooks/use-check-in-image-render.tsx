@@ -5,7 +5,7 @@ import { captureRef } from "react-native-view-shot";
 import { CheckInCard } from "../../display/check-in-card";
 import type { ICheckInFormData } from "../../types";
 
-interface UseCheckInImageRenderOptions {
+interface IUseCheckInImageRenderOptions {
   taskTitle: string;
   onComplete: (data: ICheckInFormData & { renderedImageUri?: string }) => Promise<void> | void;
   onReset: () => void;
@@ -19,7 +19,7 @@ export const useCheckInImageRender = ({
   taskTitle,
   onComplete,
   onReset,
-}: UseCheckInImageRenderOptions) => {
+}: IUseCheckInImageRenderOptions) => {
   // 用於截圖的視圖 ref
   const viewShotRef = useRef<View>(null);
 

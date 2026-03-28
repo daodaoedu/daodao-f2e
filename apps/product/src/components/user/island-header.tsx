@@ -48,22 +48,19 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
     ? "你是哪一種島？快來測驗看看！"
     : `我是${resultDetail?.tags[0]}的${theme?.title}`;
 
-  // 動態載入主要的 lottie 動畫（當有結果時）
+  // 動態載入主要的 lottie 動畫（當有結果時，或沒結果時載入預設）
   const [lottieJson, setLottieJson] = useState<object | null>(null);
   useEffect(() => {
-    if (!isEmptyResult && typeof window !== "undefined") {
+    if (typeof window === "undefined") return;
+    if (!isEmptyResult) {
       const loadLottie = resultTypeToLottiePathMap.get(resultType);
       if (loadLottie) {
         loadLottie()
-          .then((data) => {
-            setLottieJson(data);
-          })
-          .catch((error) => {
-            console.error("Failed to load Lottie animation:", error);
-          });
+          .then((data) => setLottieJson(data))
+          .catch((error) => console.error("Failed to load Lottie animation:", error));
       }
     }
-  }, [resultType, isEmptyResult]);
+  }, [resultType, isEmptyResult, isOwnProfile]);
 
   // 動態載入所有 lottie 動畫（當沒有結果且是自己的個人頁面時，用於跑馬燈）
   const [allLotties, setAllLotties] = useState<Map<string, object>>(new Map());
@@ -103,7 +100,7 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
         rightAction: null,
       };
     }
-    return { leftAction: "back" };
+    return { leftAction: "back", leftLabel: "" };
   }, [isOwnProfile]);
 
   useLayoutEffect(() => {
@@ -158,8 +155,9 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
       <div
         className={cn(
           "relative -z-20",
-          isOwnProfile ? "h-[378px] md:h-[389px]" : "h-[92px] md:h-[152px]",
-          !isEmptyResult && "h-[378px] md:h-[333px]"
+          "h-[378px] md:h-[389px]",
+          !isEmptyResult && "h-[378px] md:h-[333px]",
+          isEmptyResult && !isOwnProfile && "h-[150px] md:h-[150px]"
         )}
       />
       <header ref={headerRef} className="fixed top-0 inset-x-0 h-[420px] -z-10">
@@ -203,9 +201,7 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
           </div>
         )}
         <div className="absolute left-1/2 top-[92px] md:top-[127px] -translate-x-1/2 w-[149px] h-[140px] md:w-[168px] md:h-[158px]">
-          {!isEmptyResult && lottieJson && (
-            <Lottie animationData={lottieJson} className="*:w-full *:h-full" />
-          )}
+          {lottieJson && <Lottie animationData={lottieJson} className="*:w-full *:h-full" />}
           {isOwnProfile && (
             <>
               <div

@@ -1,3 +1,4 @@
+import { createAnimations } from "@tamagui/animations-react-native";
 import { tokens as defaultTokens } from "@tamagui/config/v3";
 import { shorthands } from "@tamagui/shorthands";
 import { createFont, createTamagui, createTokens } from "tamagui";
@@ -145,7 +146,14 @@ const darkTheme = {
   shadowColorHover: "rgba(0,0,0,0.4)",
 };
 
+const animations = createAnimations({
+  fast: { type: "spring", damping: 20, mass: 1.2, stiffness: 250 },
+  medium: { type: "spring", damping: 15, mass: 0.9, stiffness: 100 },
+  slow: { type: "spring", damping: 20, stiffness: 60 },
+});
+
 export const config = createTamagui({
+  animations,
   tokens,
   themes: {
     light: lightTheme,

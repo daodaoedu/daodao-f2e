@@ -2,9 +2,9 @@
   "common": {
     "title": "DaoDao",
     "description": "DaoDao aims to build a diverse network of learning resources, enabling self-directed learners to find suitable ways to grow and become the people they aspire to be, while fostering a spirit of mutual support. We are currently actively developing a collaborative learning resource platform.",
-    "landing_solutions": "Solutions",
-    "landing_features": "Features",
-    "landing_plans": "Plans",
+    "landing_learning_inspiration": "Learning Inspiration",
+    "landing_community": "Community",
+    "landing_learning_dna": "Learning DNA",
     "landing_persona_title": "Everyone has their own island of learning.\nThrough sharing and exchange, we connect as an archipelago.",
     "landing_persona_subtitle": "Where personal growth meets collective wisdom!",
     "landing_persona_profession": "Expertise",
@@ -4146,7 +4146,7 @@
       "success": {
         "verified": {
           "title": "Email Verified!",
-          "description": "Welcome to DaoDao! Start exploring your learning journey."
+          "description": "Complete your profile settings for more personalized learning recommendations."
         },
         "alreadyVerified": {
           "title": "Email Already Verified",
@@ -4180,7 +4180,7 @@
         }
       },
       "actions": {
-        "goToHome": "Go to Home",
+        "goToHome": "Complete Profile Settings",
         "backToHome": "Back to Home"
       },
       "resend": {
@@ -4201,6 +4201,32 @@
         "resendFailed": "Failed to send. Please try again later.",
         "resendCooldown": "Resend available in {seconds} seconds",
         "logout": "Sign in with another account"
+      }
+    },
+    "oauthError": {
+      "stateExpired": {
+        "title": "Login Link Expired",
+        "description": "This login link has expired. Please click the login button again."
+      },
+      "invalidState": {
+        "title": "Invalid Login Request",
+        "description": "This login request is invalid. Please click the login button again."
+      },
+      "invalidRedirectUri": {
+        "title": "Invalid Redirect URL",
+        "description": "The redirect URL for this login request is not allowed. Please contact support."
+      },
+      "serverError": {
+        "title": "Server Error",
+        "description": "A server error occurred during login. Please try again later."
+      },
+      "unknown": {
+        "title": "Login Failed",
+        "description": "An unknown error occurred during login. Please try again later."
+      },
+      "actions": {
+        "retry": "Try Again",
+        "backToHome": "Back to Home"
       }
     }
   },

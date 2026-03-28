@@ -2,11 +2,14 @@
 
 import { useCurrentUser, usePracticeById, usePracticeSummary } from "@daodao/api";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
+import { toast } from "@daodao/ui/components/sonner";
 import { endOfDay, isAfter } from "date-fns";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { PracticeSummaryPage } from "@/components/practice/summary";
 import { PracticeStatus } from "@/constants/practice-status";
+
+const TOAST_DISMISSED_KEY = "showcase_public_toast_dismissed";
 
 /**
  * 頁面狀態 Shell（Loading / Error / 重新導向等共用外框）
@@ -34,7 +37,11 @@ export default function PracticeSummaryPageRoute() {
 
   const { data: practiceData, isLoading: isPracticeLoading } = usePracticeById(practiceId);
   const { data: currentUserData, isLoading: isUserLoading } = useCurrentUser();
-  const { summary, isLoading: isSummaryLoading, error: summaryError } = usePracticeSummary(practiceId);
+  const {
+    summary,
+    isLoading: isSummaryLoading,
+    error: summaryError,
+  } = usePracticeSummary(practiceId);
 
   // 判斷當前用戶是否為實踐的擁有者
   const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
@@ -54,6 +61,30 @@ export default function PracticeSummaryPageRoute() {
     }
 
     return false;
+  }, [practiceData]);
+
+  // task 10.1: 公開/延遲分享練習完成後顯示 toast
+  const toastShownRef = useRef(false);
+  useEffect(() => {
+    if (!practiceData?.data || toastShownRef.current) return;
+    const privacyStatus = (practiceData.data as Record<string, unknown>).privacyStatus as
+      | string
+      | undefined;
+    const isDismissed =
+      typeof window !== "undefined" && localStorage.getItem(TOAST_DISMISSED_KEY) === "1";
+    if (!isDismissed && (privacyStatus === "public" || privacyStatus === "delayed")) {
+      toastShownRef.current = true;
+      toast("你的實踐打卡內容已公開", {
+        description: "已顯示在靈感廣場，讓更多人看見你的成長！",
+        action: {
+          label: "不再顯示",
+          onClick: () => {
+            localStorage.setItem(TOAST_DISMISSED_KEY, "1");
+          },
+        },
+        duration: 6000,
+      });
+    }
   }, [practiceData]);
 
   // 權限檢查：非擁有者或實踐未到期時，重定向到實踐詳情頁

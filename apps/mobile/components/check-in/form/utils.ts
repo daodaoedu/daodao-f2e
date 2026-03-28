@@ -3,7 +3,7 @@
  */
 
 // expo-file-system types (for optional dependency)
-interface FileSystemModule {
+interface IFileSystemModule {
   readAsStringAsync: (uri: string, options?: { encoding: string }) => Promise<string>;
   EncodingType: { Base64: string };
 }
@@ -15,7 +15,7 @@ interface FileSystemModule {
 export const uriToBase64 = async (uri: string): Promise<string> => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const FileSystem = require("expo-file-system") as FileSystemModule;
+    const FileSystem = require("expo-file-system") as IFileSystemModule;
     const base64 = await FileSystem.readAsStringAsync(uri, {
       encoding: FileSystem.EncodingType.Base64,
     });

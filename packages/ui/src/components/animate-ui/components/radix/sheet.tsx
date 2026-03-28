@@ -62,8 +62,8 @@ function SheetContent({ className, children, side = "right", ...props }: SheetCo
           "bg-background fixed z-50 flex flex-col gap-4 shadow-lg",
           side === "right" && "h-full w-[400px] border-l rounded-l-3xl",
           side === "left" && "h-full w-[400px] border-r rounded-r-3xl",
-          side === "top" && "w-full h-[calc(100vh-64px)] border-b rounded-b-3xl",
-          side === "bottom" && "w-full h-[calc(100vh-64px)] border-t rounded-t-3xl",
+          side === "top" && "w-full h-[calc(100dvh-64px)] border-b rounded-b-3xl",
+          side === "bottom" && "w-full h-[calc(100dvh-64px)] border-t rounded-t-3xl",
           className
         )}
         side={side}
