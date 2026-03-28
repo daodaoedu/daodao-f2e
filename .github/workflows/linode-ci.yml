@@ -163,6 +163,15 @@ jobs:
           cp .env apps/website/.env
           cp .env apps/product/.env
 
+      # ===== 建置前置 packages（codegen） =====
+      - name: Build prerequisite packages
+        run: |
+          echo "⚙️ Generating config env (requires .env)..."
+          pnpm --filter @daodao/config generate:env
+
+          echo "⚙️ Building assets (SVG codegen)..."
+          pnpm --filter @daodao/assets build
+
       # ===== 構建驗證 =====
       - name: Build applications
         run: |

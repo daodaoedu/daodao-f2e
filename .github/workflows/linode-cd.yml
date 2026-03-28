@@ -633,13 +633,13 @@ jobs:
               echo "Container Status: \$WEBSITE_STATUS"
               echo "Health Status: \$WEBSITE_HEALTH"
 
-              if [ "\$WEBSITE_STATUS" != "running" ]; then
+              if [ \"\$WEBSITE_STATUS\" != \"running\" ]; then
                 echo "❌ Website container is not running"
                 [ -n "\$WEBSITE_CONTAINER" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
-              if [ "\$WEBSITE_HEALTH" = "unhealthy" ]; then
+              if [ \"\$WEBSITE_HEALTH\" = \"unhealthy\" ]; then
                 echo "❌ Website container is unhealthy"
                 [ -n "\$WEBSITE_CONTAINER" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
@@ -661,13 +661,13 @@ jobs:
               echo "Container Status: \$PRODUCT_STATUS"
               echo "Health Status: \$PRODUCT_HEALTH"
 
-              if [ "\$PRODUCT_STATUS" != "running" ]; then
+              if [ \"\$PRODUCT_STATUS\" != \"running\" ]; then
                 echo "❌ Product container is not running"
                 [ -n "\$PRODUCT_CONTAINER" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
-              if [ "\$PRODUCT_HEALTH" = "unhealthy" ]; then
+              if [ \"\$PRODUCT_HEALTH\" = \"unhealthy\" ]; then
                 echo "❌ Product container is unhealthy"
                 [ -n "\$PRODUCT_CONTAINER" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
