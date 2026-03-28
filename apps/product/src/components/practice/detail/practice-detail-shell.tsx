@@ -672,22 +672,31 @@ export function PracticeDetailShell({
       </div>
 
       <div ref={commentsRef} className="flex border-b border-[#E4EAE9] mx-4">
-        {TABS.map(({ id, label }) => (
-          <Button
-            key={id}
-            type="button"
-            variant="ghost"
-            onClick={() => setActiveTab(id)}
-            className={cn(
-              "flex-1 h-auto rounded-none py-3 text-sm font-medium transition-colors cursor-pointer",
-              activeTab === id
-                ? "text-logo-cyan border-b-2 border-logo-cyan -mb-px"
-                : "text-[#9FB5B8] hover:text-text-dark/60"
-            )}
-          >
-            {label}
-          </Button>
-        ))}
+        {TABS.map(({ id, label }) => {
+          const countMap: Record<TabType, number> = {
+            comments: commentCount ?? comments?.length ?? 0,
+            checkins: checkInsData?.data?.length ?? 0,
+            resources: practice?.resources?.length ?? 0,
+          };
+          const count = countMap[id];
+          const displayLabel = count > 0 ? `${label}(${count})` : label;
+          return (
+            <Button
+              key={id}
+              type="button"
+              variant="ghost"
+              onClick={() => setActiveTab(id)}
+              className={cn(
+                "flex-1 h-auto rounded-none py-3 text-sm font-medium transition-colors cursor-pointer",
+                activeTab === id
+                  ? "text-logo-cyan border-b-2 border-logo-cyan -mb-px"
+                  : "text-[#9FB5B8] hover:text-text-dark/60"
+              )}
+            >
+              {displayLabel}
+            </Button>
+          );
+        })}
       </div>
 
       {activeTab === "comments" && (
