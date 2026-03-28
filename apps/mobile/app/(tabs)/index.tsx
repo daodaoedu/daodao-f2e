@@ -1,15 +1,12 @@
 import { CheckCircle2, MessageSquare } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { FlatList, RefreshControl, View as RNView, StyleSheet } from "react-native";
+import { RefreshControl, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, Text, YStack } from "tamagui";
+import { Text, YStack } from "tamagui";
 import {
   BrewingCard,
-  CompletedCard,
   DashboardHeader,
-  FilterPills,
-  InProgressCard,
   type IShowcaseFilterState,
   ShowcaseCard,
   ShowcaseSearchBar,
@@ -17,6 +14,8 @@ import {
   type TabType,
 } from "@/components/home";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
+import { PracticeTasksSection } from "@/components/showcase/PracticeTasksSection";
+import { ShowcaseFeed } from "@/components/showcase/ShowcaseFeed";
 import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
 import { usePractices } from "@/hooks/usePractices";
@@ -141,122 +140,20 @@ export default function HomeScreen() {
     [activeTab, searchValue, handleSearch]
   );
 
-  const renderShowcaseFooter = useCallback(
-    () =>
-      isValidating ? (
-        <Text textAlign="center" paddingVertical="$4" color="rgba(0,0,0,0.5)" fontSize={14}>
-          載入中...
-        </Text>
-      ) : null,
-    [isValidating]
-  );
-
-  const renderShowcaseEmpty = useCallback(
-    () =>
-      !isShowcaseLoading ? (
-        <YStack alignItems="center" paddingVertical="$8">
-          <Text color="rgba(0,0,0,0.5)" fontSize={14}>
-            沒有找到相關實踐
-          </Text>
-        </YStack>
-      ) : null,
-    [isShowcaseLoading]
-  );
-
-  // ── Mine tab render ──
-  const renderMineContent = useCallback(() => {
-    if (isMyLoading) {
-      return (
-        <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical="$8">
-          <Text color={colors.text.dark}>載入中...</Text>
-        </YStack>
-      );
-    }
-
-    return (
-      <YStack paddingHorizontal="$4">
-        <DashboardHeader stats={dashboardStats} />
-
-        {!hasPractices && <RandomPracticesSection compact />}
-
-        {hasPractices && (
-          <>
-            <FilterPills activeFilter={filterStatus} onFilterChange={setFilterStatus} />
-
-            {/* In-progress cards — horizontal scroll */}
-            {showInProgress && filteredInProgressTasks.length > 0 && (
-              <FlatList
-                horizontal
-                data={filteredInProgressTasks}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => <InProgressCard task={item} />}
-                contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
-                showsHorizontalScrollIndicator={false}
-                style={{ marginBottom: 16 }}
-              />
-            )}
-
-            {/* Completed cards — vertical list */}
-            {showCompleted && completedTasks.length > 0 && (
-              <YStack gap="$3" marginBottom="$4">
-                <Text fontSize={18} fontWeight="500" color={colors.text.dark}>
-                  已完成
-                </Text>
-                {completedTasks.map((task) => (
-                  <CompletedCard key={task.id} task={task} />
-                ))}
-              </YStack>
-            )}
-          </>
-        )}
-      </YStack>
-    );
-  }, [
-    isMyLoading,
-    dashboardStats,
-    hasPractices,
-    filterStatus,
-    showInProgress,
-    filteredInProgressTasks,
-    showCompleted,
-    completedTasks,
-  ]);
-
   // ── Main render ──
   if (activeTab === "inspire") {
     return (
       <SafeAreaView style={styles.container} edges={["top"]}>
-        {isShowcaseLoading && practices.length === 0 ? (
-          <>
-            {renderShowcaseHeader()}
-            <YStack paddingHorizontal="$4" gap="$3">
-              {[1, 2, 3].map((i) => (
-                <RNView key={i} style={styles.skeleton} />
-              ))}
-            </YStack>
-          </>
-        ) : (
-          <FlatList
-            data={practices}
-            keyExtractor={(item) => item.id}
-            renderItem={renderShowcaseItem}
-            ListHeaderComponent={renderShowcaseHeader}
-            ListFooterComponent={renderShowcaseFooter}
-            ListEmptyComponent={renderShowcaseEmpty}
-            contentContainerStyle={{ paddingHorizontal: 16, gap: 12, paddingBottom: 100 }}
-            onEndReached={() => {
-              if (hasMore && !isValidating) loadMore();
-            }}
-            onEndReachedThreshold={0.3}
-            refreshControl={
-              <RefreshControl
-                refreshing={false}
-                onRefresh={() => mutateShowcase()}
-                tintColor={colors.primary.base}
-              />
-            }
-          />
-        )}
+        <ShowcaseFeed
+          practices={practices}
+          isLoading={isShowcaseLoading}
+          isValidating={isValidating}
+          hasMore={hasMore}
+          loadMore={loadMore}
+          onRefresh={mutateShowcase}
+          renderItem={renderShowcaseItem}
+          renderHeader={renderShowcaseHeader}
+        />
       </SafeAreaView>
     );
   }
@@ -277,23 +174,33 @@ export default function HomeScreen() {
         <YStack paddingHorizontal="$4" paddingTop="$4">
           <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
         </YStack>
-        {renderMineContent()}
+
+        {isMyLoading ? (
+          <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical="$8">
+            <Text color={colors.text.dark}>載入中...</Text>
+          </YStack>
+        ) : (
+          <YStack paddingHorizontal="$4">
+            <DashboardHeader stats={dashboardStats} />
+            {!hasPractices && <RandomPracticesSection compact />}
+            {hasPractices && (
+              <PracticeTasksSection
+                filterStatus={filterStatus}
+                onFilterChange={setFilterStatus}
+                filteredInProgressTasks={filteredInProgressTasks}
+                showInProgress={showInProgress}
+                showCompleted={showCompleted}
+                completedTasks={completedTasks}
+                isEmpty={false}
+              />
+            )}
+          </YStack>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F7F7F7",
-  },
-  skeleton: {
-    backgroundColor: "white",
-    borderRadius: 16,
-    height: 192,
-    borderWidth: 1,
-    borderColor: "#E8F8FF",
-    opacity: 0.6,
-  },
+  container: { flex: 1, backgroundColor: "#F7F7F7" },
 });

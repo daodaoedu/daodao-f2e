@@ -1,4 +1,4 @@
-import { Plus } from "@tamagui/lucide-icons";
+import { Compass, Plus } from "@tamagui/lucide-icons";
 import { Tabs, usePathname, useRouter } from "expo-router";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { BellIcon, HomeIcon, SettingsIcon, UserIcon } from "@/components/icons";
@@ -66,6 +66,13 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <HomeIcon size={32} color={color} filled={focused} />
             ),
+          }}
+        />
+        <Tabs.Screen
+          name="showcase"
+          options={{
+            title: "靈感頁",
+            tabBarIcon: ({ color }) => <Compass size={28} color={color} />,
           }}
         />
         <Tabs.Screen
