@@ -2,10 +2,16 @@
 
 import type {
   BatchReactionItem,
+  ReactionListItem,
   ReactionTargetType,
   ReactionTypeValue,
 } from "@daodao/api";
-import { removeReaction, upsertReaction, useReactions } from "@daodao/api";
+import {
+  removeReaction,
+  upsertReaction,
+  useReactions,
+  useReactionsList,
+} from "@daodao/api";
 import { useCallback, useTransition } from "react";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 
@@ -15,9 +21,15 @@ export function useCardReactions(
   prefetchedData?: BatchReactionItem,
   onMutate?: () => void,
 ) {
+  const hasBatch = !!prefetchedData;
+
   const { data: reactionsData, mutate } = useReactions(
     { targetType, targetId },
-    { enabled: !prefetchedData },
+    { enabled: !hasBatch },
+  );
+  const { data: reactionsListData } = useReactionsList(
+    { targetType, targetId },
+    { enabled: !hasBatch },
   );
   const [, startTransition] = useTransition();
 
@@ -33,6 +45,11 @@ export function useCardReactions(
     .filter((r) => r.count > 0)
     .map((r) => r.type as ReactionTypeType);
 
+  // Reaction list items（用於瀏覽活動等）
+  const reactionItems: ReactionListItem[] =
+    prefetchedData?.items ?? reactionsListData?.data?.items ?? [];
+  const firstReactorName = reactionItems[0]?.name ?? undefined;
+
   const handleToggle = useCallback(
     (type: ReactionTypeType) => {
       const isSelected = currentUserReaction === type;
@@ -46,7 +63,6 @@ export function useCardReactions(
             reactionType: type as ReactionTypeValue,
           });
         }
-        // 同時 revalidate 獨立 SWR cache 和 batch cache
         await mutate();
         onMutate?.();
       });
@@ -59,5 +75,7 @@ export function useCardReactions(
     totalCount,
     displayReactions,
     handleToggle,
+    reactionItems,
+    firstReactorName,
   };
 }

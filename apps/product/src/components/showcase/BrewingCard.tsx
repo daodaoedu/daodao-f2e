@@ -6,7 +6,6 @@ import {
   unfollowTarget,
   useComments,
   usePracticeById,
-  useReactionsList,
 } from "@daodao/api";
 import {
   ChartColumnIncreasingSvg,
@@ -78,10 +77,6 @@ export function BrewingCard({
   const router = useRouter();
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { data: practiceData } = usePracticeById(id);
-  const { data: reactionsListData } = useReactionsList(
-    { targetType: "practice", targetId: id },
-    { enabled: !batchReactionData },
-  );
   const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
 
   useEffect(() => {
@@ -118,7 +113,6 @@ export function BrewingCard({
 
   const handleOpenBrowseActivity = () => {
     setMenuOpen(false);
-    const reactionItems = batchReactionData?.items ?? reactionsListData?.data?.items ?? [];
     const followers: IBrowseActivityFollower[] = reactionItems.map(
       (item) => ({
         id: item.userId,
@@ -144,7 +138,7 @@ export function BrewingCard({
     });
   };
 
-  const { selectedReactions, totalCount, displayReactions, handleToggle } =
+  const { selectedReactions, totalCount, displayReactions, handleToggle, reactionItems, firstReactorName } =
     useCardReactions("practice", id, batchReactionData, onReactionMutate);
 
   return (
@@ -294,7 +288,7 @@ export function BrewingCard({
           variant="summary"
           totalCount={totalCount}
           displayReactions={displayReactions}
-          firstReactorName={batchReactionData?.items[0]?.name ?? reactionsListData?.data?.items[0]?.name}
+          firstReactorName={firstReactorName}
         />
 
         <Link

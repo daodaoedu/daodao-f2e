@@ -5,7 +5,6 @@ import {
   unfollowTarget,
   useComments,
   usePracticeById,
-  useReactionsList,
 } from "@daodao/api";
 import {
   ChartColumnIncreasingSvg,
@@ -81,10 +80,6 @@ export function PracticeShowcaseCard({
   const router = useRouter();
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { data: practiceData } = usePracticeById(id);
-  const { data: reactionsListData } = useReactionsList(
-    { targetType: "practice", targetId: id },
-    { enabled: !batchReactionData },
-  );
   const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
 
   useEffect(() => {
@@ -121,7 +116,6 @@ export function PracticeShowcaseCard({
 
   const handleOpenBrowseActivity = () => {
     setMenuOpen(false);
-    const reactionItems = batchReactionData?.items ?? reactionsListData?.data?.items ?? [];
     const followers: IBrowseActivityFollower[] = reactionItems.map(
       (item) => ({
         id: item.userId,
@@ -147,7 +141,7 @@ export function PracticeShowcaseCard({
     });
   };
 
-  const { selectedReactions, totalCount, displayReactions, handleToggle } =
+  const { selectedReactions, totalCount, displayReactions, handleToggle, reactionItems, firstReactorName } =
     useCardReactions("practice", id, batchReactionData, onReactionMutate);
 
   return (
@@ -292,7 +286,7 @@ export function PracticeShowcaseCard({
           variant="summary"
           totalCount={totalCount}
           displayReactions={displayReactions}
-          firstReactorName={batchReactionData?.items[0]?.name ?? reactionsListData?.data?.items[0]?.name}
+          firstReactorName={firstReactorName}
         />
 
         <Link
