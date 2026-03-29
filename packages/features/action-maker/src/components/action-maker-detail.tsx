@@ -102,11 +102,11 @@ export function ActionMakerDetail() {
   };
 
   return (
-    <StarryBackground>
+    <StarryBackground fullWidthDesktop>
       <div className="flex min-h-dvh flex-col">
         <ProgressBar current={3} />
 
-        <div className="flex flex-1 flex-col gap-6 px-6 pt-8">
+        <div className="w-full md:max-w-[85%] md:mx-auto flex flex-1 flex-col gap-6 px-6 pt-8">
           {/* Badge + Title */}
           <div className="flex items-center gap-3">
             <span className={`rounded-full px-3 py-1 text-xs ${badge.bg}`}>{badge.label}</span>

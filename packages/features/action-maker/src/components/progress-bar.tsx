@@ -10,7 +10,7 @@ interface ProgressBarProps {
 
 export function ProgressBar({ current, total = 3 }: ProgressBarProps) {
   return (
-    <div className="flex flex-col gap-2 px-4 pt-4">
+    <div className="w-full md:max-w-[85%] md:mx-auto flex flex-col gap-2 px-4 pt-4">
       <span className="text-sm text-[#7B9FC4]">
         {current} / {total}
       </span>
