@@ -197,7 +197,7 @@ export function ActionMakerActions() {
   // Loading state
   if (isLoading) {
     return (
-      <StarryBackground>
+      <StarryBackground fullWidthDesktop>
         <ActionLoading categoryLabel={categoryLabel} />
       </StarryBackground>
     );
@@ -206,7 +206,7 @@ export function ActionMakerActions() {
   // Error state (no actions and no fallback)
   if (!isLoading && actions.length === 0 && generateError) {
     return (
-      <StarryBackground>
+      <StarryBackground fullWidthDesktop>
         <div className="flex min-h-dvh flex-col">
           <ProgressBar current={2} />
           <div className="flex flex-1 flex-col items-center justify-center gap-6 px-6">
@@ -229,14 +229,14 @@ export function ActionMakerActions() {
   // Custom form flow
   if (showCustomForm) {
     return (
-      <StarryBackground>
+      <StarryBackground fullWidthDesktop>
         <div className="flex min-h-dvh flex-col">
           <ProgressBar current={2} />
 
           {/* View 1: Level Selection */}
           {refineState === "selecting-level" && (
             <>
-              <div className="flex flex-1 flex-col gap-5 px-6 pt-8">
+              <div className="w-full md:max-w-[85%] md:mx-auto flex flex-1 flex-col gap-5 px-6 pt-8">
                 <h2 className="text-xl font-bold text-white">選擇行動強度</h2>
                 <div className="flex flex-col gap-3">
                   {LEVEL_OPTIONS.map((opt) => (
@@ -268,7 +268,7 @@ export function ActionMakerActions() {
           {/* View 2: Form */}
           {refineState === "filling" && (
             <>
-              <div className="flex flex-1 flex-col gap-5 px-6 pt-8">
+              <div className="w-full md:max-w-[85%] md:mx-auto flex flex-1 flex-col gap-5 px-6 pt-8">
                 <h2 className="text-xl font-bold text-white">自訂你的行動</h2>
 
                 <label className="block">
@@ -378,7 +378,7 @@ export function ActionMakerActions() {
           {/* View 4: Comparison */}
           {refineState === "comparing" && (
             <>
-              <div className="flex flex-1 flex-col gap-5 px-6 pt-8">
+              <div className="w-full md:max-w-[85%] md:mx-auto flex flex-1 flex-col gap-5 px-6 pt-8">
                 {refineError ? (
                   <>
                     <h2 className="text-xl font-bold text-white">AI 完善失敗</h2>
@@ -451,11 +451,11 @@ export function ActionMakerActions() {
 
   // Loaded — action cards carousel
   return (
-    <StarryBackground>
+    <StarryBackground fullWidthDesktop>
       <div className="flex min-h-dvh flex-col">
         <ProgressBar current={2} />
 
-        <div className="flex flex-1 flex-col gap-6 pt-8">
+        <div className="w-full flex flex-1 flex-col gap-6 pt-8">
           <div className="px-6 text-center">
             <h2 className="text-xl font-bold text-white">這是你的每日具體行動</h2>
             <p className="mt-2 text-[#BCD5EE]">
@@ -467,7 +467,7 @@ export function ActionMakerActions() {
           <Carousel
             opts={{ loop: true, align: "center" }}
             setApi={setCarouselApi}
-            className="w-full"
+            className="w-full px-6 md:px-[60px] [&>div]:overflow-visible"
           >
             <CarouselContent className="-ml-8">
               {actions.map((action, i) => (
