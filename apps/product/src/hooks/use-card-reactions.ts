@@ -46,11 +46,9 @@ export function useCardReactions(
             reactionType: type as ReactionTypeValue,
           });
         }
-        if (onMutate) {
-          onMutate();
-        } else {
-          await mutate();
-        }
+        // 同時 revalidate 獨立 SWR cache 和 batch cache
+        await mutate();
+        onMutate?.();
       });
     },
     [currentUserReaction, targetType, targetId, mutate, onMutate],
