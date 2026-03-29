@@ -43,11 +43,11 @@ jobs:
       build-product: ${{ steps.changes.outputs.product }}
     steps:
       # ===== 代碼檢出 =====
-      - name: Checkout code (shallow)
+      # PR 需要完整歷史做 base/head diff；push 只需前一個 commit
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          # For PR events, checkout the actual PR branch instead of merge commit
+          fetch-depth: ${{ github.event_name == 'pull_request' && 0 || 2 }}
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       # ===== 檢測檔案變更 =====
