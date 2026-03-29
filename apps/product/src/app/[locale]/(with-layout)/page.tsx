@@ -3,6 +3,7 @@
 import {
   useMyPracticeStats,
   useMyPractices,
+  useReactionsBatch,
   useShowcaseFeed,
   type IShowcasePractice,
 } from "@daodao/api";
@@ -94,6 +95,14 @@ export default function HomePage() {
     loadMore,
     isValidating,
   } = useShowcaseFeed(showcaseParams);
+
+  // Batch fetch reactions for all visible practices
+  const practiceIds = useMemo(
+    () => practices.map((p: IShowcasePractice) => p.id),
+    [practices],
+  );
+  const { data: batchReactionsData, mutate: mutateBatchReactions } =
+    useReactionsBatch({ targetType: "practice", targetIds: practiceIds });
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -269,6 +278,8 @@ export default function HomePage() {
                         frequencyMaxDays={practice.frequency_max_days}
                         sessionDurationMinutes={practice.session_duration_minutes}
                         commentCount={practice.comment_count}
+                        batchReactionData={batchReactionsData?.data?.[practice.id]}
+                        onReactionMutate={() => mutateBatchReactions()}
                       />
                     ) : (
                       <PracticeShowcaseCard
@@ -292,6 +303,8 @@ export default function HomePage() {
                         frequencyMaxDays={practice.frequency_max_days}
                         sessionDurationMinutes={practice.session_duration_minutes}
                         commentCount={practice.comment_count}
+                        batchReactionData={batchReactionsData?.data?.[practice.id]}
+                        onReactionMutate={() => mutateBatchReactions()}
                       />
                     )
                   )}
