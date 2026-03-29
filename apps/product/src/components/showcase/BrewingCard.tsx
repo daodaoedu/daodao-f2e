@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactionTypeValue } from "@daodao/api";
+import type { BatchReactionItem, ReactionTypeValue } from "@daodao/api";
 import {
   followTarget,
   removeReaction,
@@ -52,6 +52,8 @@ interface BrewingCardProps {
   frequencyMaxDays?: number | null;
   sessionDurationMinutes?: number | null;
   commentCount?: number;
+  batchReactionData?: BatchReactionItem;
+  onReactionMutate?: () => void;
 }
 
 export function BrewingCard({
@@ -65,6 +67,8 @@ export function BrewingCard({
   frequencyMaxDays,
   sessionDurationMinutes,
   commentCount = 0,
+  batchReactionData,
+  onReactionMutate,
 }: BrewingCardProps) {
   const startFmt = formatShowcaseDate(startDate);
   const endFmt = formatShowcaseDate(endDate);
@@ -76,7 +80,10 @@ export function BrewingCard({
   const router = useRouter();
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { data: practiceData } = usePracticeById(id);
-  const { data: reactionsListData } = useReactionsList({ targetType: "practice", targetId: id });
+  const { data: reactionsListData } = useReactionsList(
+    { targetType: "practice", targetId: id },
+    { enabled: !batchReactionData },
+  );
   const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
 
   useEffect(() => {
@@ -113,7 +120,8 @@ export function BrewingCard({
 
   const handleOpenBrowseActivity = () => {
     setMenuOpen(false);
-    const followers: IBrowseActivityFollower[] = (reactionsListData?.data?.items ?? []).map(
+    const reactionItems = batchReactionData?.items ?? reactionsListData?.data?.items ?? [];
+    const followers: IBrowseActivityFollower[] = reactionItems.map(
       (item) => ({
         id: item.userId,
         name: item.name,
@@ -138,13 +146,17 @@ export function BrewingCard({
     });
   };
 
-  const { data: reactionsData, mutate } = useReactions({ targetType: "practice", targetId: id });
+  const { data: reactionsData, mutate } = useReactions(
+    { targetType: "practice", targetId: id },
+    { enabled: !batchReactionData },
+  );
   const [, startTransition] = useTransition();
 
-  const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
+  const reactionSource = batchReactionData ?? reactionsData?.data;
+  const currentUserReaction = (reactionSource?.currentUserReaction ??
     null) as ReactionTypeType | null;
   const selectedReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
-  const allReactions = reactionsData?.data?.reactions ?? [];
+  const allReactions = reactionSource?.reactions ?? [];
   const totalCount = allReactions.reduce((sum, r) => sum + r.count, 0);
   const displayReactions = allReactions
     .filter((r) => r.count > 0)
@@ -163,7 +175,11 @@ export function BrewingCard({
             reactionType: type as ReactionTypeValue,
           });
         }
-        await mutate();
+        if (onReactionMutate) {
+          onReactionMutate();
+        } else {
+          await mutate();
+        }
       });
     },
     [currentUserReaction, id, mutate]
@@ -316,7 +332,7 @@ export function BrewingCard({
           variant="summary"
           totalCount={totalCount}
           displayReactions={displayReactions}
-          firstReactorName={reactionsListData?.data?.items[0]?.name}
+          firstReactorName={batchReactionData?.items[0]?.name ?? reactionsListData?.data?.items[0]?.name}
         />
 
         <Link

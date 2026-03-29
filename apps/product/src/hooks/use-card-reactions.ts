@@ -1,23 +1,33 @@
 "use client";
 
-import type { ReactionTargetType, ReactionTypeValue } from "@daodao/api";
+import type {
+  BatchReactionItem,
+  ReactionTargetType,
+  ReactionTypeValue,
+} from "@daodao/api";
 import { removeReaction, upsertReaction, useReactions } from "@daodao/api";
 import { useCallback, useTransition } from "react";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 
-export function useCardReactions(targetType: ReactionTargetType, targetId: string) {
-  const { data: reactionsData, mutate } = useReactions({
-    targetType,
-    targetId,
-  });
+export function useCardReactions(
+  targetType: ReactionTargetType,
+  targetId: string,
+  prefetchedData?: BatchReactionItem,
+  onMutate?: () => void,
+) {
+  const { data: reactionsData, mutate } = useReactions(
+    { targetType, targetId },
+    { enabled: !prefetchedData },
+  );
   const [, startTransition] = useTransition();
 
-  const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
-    null) as ReactionTypeType | null;
+  const source = prefetchedData ?? reactionsData?.data;
+
+  const currentUserReaction = (source?.currentUserReaction ?? null) as ReactionTypeType | null;
   const selectedReactions: ReactionTypeType[] = currentUserReaction
     ? [currentUserReaction]
     : [];
-  const allReactions = reactionsData?.data?.reactions ?? [];
+  const allReactions = source?.reactions ?? [];
   const totalCount = allReactions.reduce((sum, r) => sum + r.count, 0);
   const displayReactions = allReactions
     .filter((r) => r.count > 0)
@@ -36,10 +46,14 @@ export function useCardReactions(targetType: ReactionTargetType, targetId: strin
             reactionType: type as ReactionTypeValue,
           });
         }
-        await mutate();
+        if (onMutate) {
+          onMutate();
+        } else {
+          await mutate();
+        }
       });
     },
-    [currentUserReaction, targetType, targetId, mutate],
+    [currentUserReaction, targetType, targetId, mutate, onMutate],
   );
 
   return {
