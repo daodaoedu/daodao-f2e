@@ -1,7 +1,7 @@
 "use client";
 
 import bgWebp from "@daodao/assets/images/action-maker/bg.webp";
-import LogoSvg from "@daodao/assets/images/action-maker/logo.svg";
+import { LogoSvg } from "@daodao/assets";
 import { amVarStyle } from "./styled";
 
 export function StarryBackground({ children, fullWidthDesktop, showLogo }: React.PropsWithChildren<{ fullWidthDesktop?: boolean; showLogo?: boolean }>) {
