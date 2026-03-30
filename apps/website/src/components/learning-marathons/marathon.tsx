@@ -179,7 +179,7 @@ export const Marathon = () => {
       </Section>
 
       <Section className="px-6 py-8 text-center md:py-[50px]">
-        <ApplyButton className="mx-auto inline-block rounded-full bg-[#16B9B3] px-10 text-base font-normal leading-none text-white hover:bg-[#16B9B3] hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)]">
+        <ApplyButton className="mx-auto inline-block rounded-full bg-primary-base px-10 text-base font-normal leading-none text-white hover:bg-primary-base hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)]">
           立即申請
         </ApplyButton>
       </Section>

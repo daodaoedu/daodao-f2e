@@ -1,3 +1,4 @@
+// @ts-expect-error - date-fns not hoisted in pnpm workspace, runtime works
 import { format } from "date-fns";
 import type { ReactNode } from "react";
 import { StyleSheet } from "react-native";
