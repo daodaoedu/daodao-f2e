@@ -74,7 +74,9 @@ export function ShowcaseCard({ practice, extraContent }: ShowcaseCardProps) {
       style={styles.card}
       onPress={() =>
         router.push({
-          pathname: `/practices/${id}` as `/practices/${string}`,
+          // biome-ignore lint: Expo Router dynamic route typing workaround
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          pathname: `/practices/${id}` as any,
           params: { showcaseData: JSON.stringify(practice) },
         })
       }

@@ -22,16 +22,23 @@ export const colors = {
     "white": "#FFFFFF",
     "black": "#1A2B3C"
   },
-  "mascot": {
-    "aqua": "#7DD3E3",
-    "brightBlue": "#5CC5E8"
+  "gray": {
+    "dark": "#0D3036",
+    "mid": "#9FB5B8",
+    "light": "#E4EAE9",
+    "veryLight": "#F4F6F6",
+    "white": "#FFFFFF"
   },
   "semantic": {
     "success": "#22C55E",
-    "warning": "#F59E0B",
+    "warning": "#FFA10B",
     "error": "#EF4444",
     "info": "#3B82F6",
-    "tips": "#FACC15"
+    "tips": "#FFA10B"
+  },
+  "mascot": {
+    "aqua": "#7DD3E3",
+    "brightBlue": "#5CC5E8"
   },
   "logo": {
     "gray": "#6B7280",
