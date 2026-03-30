@@ -1,6 +1,6 @@
 // 自動生成，請勿手動修改
 // 來源: packages/design-tokens
-// 生成時間: 2026-02-09T11:35:26.989Z
+// 生成時間: 2026-03-30T08:04:19.131Z
 
 export const colors = {
   "primary": {
@@ -11,30 +11,12 @@ export const colors = {
     "base": "#16B9B3",
     "darker": "#0D7A77"
   },
-  "basic": {
-    "50": "#FAFAFA",
-    "100": "#F5F5F5",
-    "200": "#E5E5E5",
-    "300": "#A3A3A3",
-    "400": "#6B7280",
-    "500": "#404040",
-    "600": "#2D3A4F",
-    "white": "#FFFFFF",
-    "black": "#1A2B3C"
-  },
   "gray": {
     "dark": "#0D3036",
     "mid": "#9FB5B8",
     "light": "#E4EAE9",
     "veryLight": "#F4F6F6",
     "white": "#FFFFFF"
-  },
-  "semantic": {
-    "success": "#22C55E",
-    "warning": "#FFA10B",
-    "error": "#EF4444",
-    "info": "#3B82F6",
-    "tips": "#FFA10B"
   },
   "mascot": {
     "aqua": "#7DD3E3",
