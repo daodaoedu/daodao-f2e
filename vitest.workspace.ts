@@ -6,4 +6,5 @@ export default defineWorkspace([
   "packages/auth",
   "packages/config",
   "packages/features/*",
+  "apps/product",
 ]);

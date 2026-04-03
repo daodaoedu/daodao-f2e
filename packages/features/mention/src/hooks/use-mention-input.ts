@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 export interface MentionCandidate {
   userId: string;
@@ -20,14 +20,14 @@ export function useMentionInput() {
   const [mentionedIds, setMentionedIds] = useState<Map<number, string>>(new Map());
 
   /** Call this when the user selects a candidate from the mention dropdown */
-  const handleMentionSelect = (candidate: MentionCandidate) => {
+  const handleMentionSelect = useCallback((candidate: MentionCandidate) => {
     if (!candidate.numericUserId) return;
     setMentionedIds((prev) => {
       const next = new Map(prev);
       next.set(candidate.numericUserId as number, candidate.name);
       return next;
     });
-  };
+  }, []);
 
   /**
    * Returns only the numeric user IDs whose @handle is still present in content.
@@ -35,19 +35,22 @@ export function useMentionInput() {
    * whitespace, or non-word character (prevents @alice matching @alicebob).
    * Call this right before submitting a comment.
    */
-  const getActiveMentionIds = (content: string): number[] => {
-    return [...mentionedIds.entries()]
-      .filter(([, handle]) => {
-        const pattern = new RegExp(
-          `@${handle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?=[\\s,!?.。、]|$)`
-        );
-        return pattern.test(content);
-      })
-      .map(([id]) => id);
-  };
+  const getActiveMentionIds = useCallback(
+    (content: string): number[] => {
+      return [...mentionedIds.entries()]
+        .filter(([, handle]) => {
+          const pattern = new RegExp(
+            `@${handle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?=[\\s,!?.。、]|$)`
+          );
+          return pattern.test(content);
+        })
+        .map(([id]) => id);
+    },
+    [mentionedIds]
+  );
 
   /** Reset state after a comment is submitted */
-  const reset = () => setMentionedIds(new Map());
+  const reset = useCallback(() => setMentionedIds(new Map()), []);
 
   return { mentionedIds, handleMentionSelect, getActiveMentionIds, reset };
 }

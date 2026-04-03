@@ -70,11 +70,14 @@ export function MentionInput({
     const lastAt = textBeforeCursor.lastIndexOf("@");
 
     if (lastAt !== -1) {
-      const afterAt = textBeforeCursor.slice(lastAt + 1);
-      if (!afterAt.includes(" ") && !afterAt.includes("\n")) {
-        setMentionStart(lastAt);
-        setMentionQuery(afterAt);
-        return;
+      const charBeforeAt = lastAt > 0 ? textBeforeCursor[lastAt - 1] : null;
+      if (charBeforeAt === null || /\s/.test(charBeforeAt)) {
+        const afterAt = textBeforeCursor.slice(lastAt + 1);
+        if (!afterAt.includes(" ") && !afterAt.includes("\n")) {
+          setMentionStart(lastAt);
+          setMentionQuery(afterAt);
+          return;
+        }
       }
     }
 
