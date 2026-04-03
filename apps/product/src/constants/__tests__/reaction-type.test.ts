@@ -8,7 +8,7 @@
  * 確保各 reactionType 對應正確 emoji。
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { REACTION_CONFIG, ReactionType } from "../reaction-type";
 
 describe("Regression: REACTION_CONFIG emoji mapping for notification display", () => {

@@ -80,11 +80,7 @@ export function ShowcaseFeed({
       }}
       onEndReachedThreshold={0.3}
       refreshControl={
-        <RefreshControl
-          refreshing={false}
-          onRefresh={onRefresh}
-          tintColor={colors.primary.base}
-        />
+        <RefreshControl refreshing={false} onRefresh={onRefresh} tintColor={colors.primary.base} />
       }
     />
   );

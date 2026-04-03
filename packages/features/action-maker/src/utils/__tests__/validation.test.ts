@@ -1,45 +1,51 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   isValidCategory,
+  isValidCustomDescription,
+  isValidCustomTitle,
   isValidLevel,
   isValidNickname,
   isValidTopic,
   isValidTriggerTiming,
-  isValidCustomTitle,
-  isValidCustomDescription,
   limits,
 } from "../validation";
 
 describe("isValidCategory", () => {
-  it.each(["interest", "social", "health", "academic", "work", "finance"])(
-    "returns true for valid category '%s'",
-    (category) => {
-      expect(isValidCategory(category)).toBe(true);
-    },
-  );
+  it.each([
+    "interest",
+    "social",
+    "health",
+    "academic",
+    "work",
+    "finance",
+  ])("returns true for valid category '%s'", (category) => {
+    expect(isValidCategory(category)).toBe(true);
+  });
 
-  it.each(["invalid", "", 123, null, undefined, {}])(
-    "returns false for invalid value %s",
-    (value) => {
-      expect(isValidCategory(value)).toBe(false);
-    },
-  );
+  it.each([
+    "invalid",
+    "",
+    123,
+    null,
+    undefined,
+    {},
+  ])("returns false for invalid value %s", (value) => {
+    expect(isValidCategory(value)).toBe(false);
+  });
 });
 
 describe("isValidLevel", () => {
-  it.each(["beginner", "intermediate", "advanced"])(
-    "returns true for valid level '%s'",
-    (level) => {
-      expect(isValidLevel(level)).toBe(true);
-    },
-  );
+  it.each([
+    "beginner",
+    "intermediate",
+    "advanced",
+  ])("returns true for valid level '%s'", (level) => {
+    expect(isValidLevel(level)).toBe(true);
+  });
 
-  it.each(["expert", "", 1, null, undefined])(
-    "returns false for invalid value %s",
-    (value) => {
-      expect(isValidLevel(value)).toBe(false);
-    },
-  );
+  it.each(["expert", "", 1, null, undefined])("returns false for invalid value %s", (value) => {
+    expect(isValidLevel(value)).toBe(false);
+  });
 });
 
 describe("isValidNickname", () => {

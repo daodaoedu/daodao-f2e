@@ -18,7 +18,13 @@ const TABS: { key: PracticeTab; label: string }[] = [
   { key: "resources", label: "使用資源" },
 ];
 
-export function PracticeTabBar({ activeTab, onTabChange, commentCount, checkinCount, resourceCount }: PracticeTabBarProps) {
+export function PracticeTabBar({
+  activeTab,
+  onTabChange,
+  commentCount,
+  checkinCount,
+  resourceCount,
+}: PracticeTabBarProps) {
   const countMap: Record<PracticeTab, number | undefined> = {
     comments: commentCount,
     checkins: checkinCount,
@@ -30,10 +36,7 @@ export function PracticeTabBar({ activeTab, onTabChange, commentCount, checkinCo
       {TABS.map((tab) => {
         const isActive = activeTab === tab.key;
         const count = countMap[tab.key];
-        const label =
-          count != null && count > 0
-            ? `${tab.label}(${count})`
-            : tab.label;
+        const label = count != null && count > 0 ? `${tab.label}(${count})` : tab.label;
         return (
           <Pressable
             key={tab.key}

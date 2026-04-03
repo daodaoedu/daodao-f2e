@@ -418,7 +418,6 @@ export function UserInfoCard({
               <p className="text-xs text-text-dark mb-3">{commonCirclesCount} 個共同 Circle</p>
             )}
 
-
           {!isMobile && moreContent}
         </div>
       </div>

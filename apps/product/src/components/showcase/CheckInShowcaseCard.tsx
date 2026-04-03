@@ -1,15 +1,15 @@
 "use client";
 
+import type { IShowcaseCheckIn } from "@daodao/api";
 import { DialogOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { MapPin, Pencil } from "lucide-react";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
-import { mapApiMoodToMoodType, MOOD_OPTIONS } from "@/constants/mood";
 import type { ApiMoodType } from "@/constants/mood";
+import { MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCardReactions } from "@/hooks/use-card-reactions";
 import { formatRelativeTime } from "@/utils/format-time";
-import type { IShowcaseCheckIn } from "@daodao/api";
 
 export function CheckInShowcaseCard(props: IShowcaseCheckIn) {
   const {
@@ -27,12 +27,12 @@ export function CheckInShowcaseCard(props: IShowcaseCheckIn) {
 
   const router = useRouter();
   const frontendMood = mapApiMoodToMoodType(mood as ApiMoodType);
-  const moodOption = frontendMood
-    ? MOOD_OPTIONS.find((m) => m.id === frontendMood)
-    : null;
+  const moodOption = frontendMood ? MOOD_OPTIONS.find((m) => m.id === frontendMood) : null;
 
-  const { selectedReactions, totalCount, displayReactions, handleToggle } =
-    useCardReactions("checkin", id);
+  const { selectedReactions, totalCount, displayReactions, handleToggle } = useCardReactions(
+    "checkin",
+    id
+  );
 
   const handleCardClick = () => {
     router.push(`/practices/${practice.id}/check-ins/${id}`);
@@ -96,10 +96,7 @@ export function CheckInShowcaseCard(props: IShowcaseCheckIn) {
       {image_urls?.length > 0 && (
         <div className="flex gap-2 mb-2">
           {image_urls.slice(0, 3).map((url, index) => (
-            <div
-              key={url}
-              className="size-16 rounded-lg bg-logo-orange/6 overflow-hidden"
-            >
+            <div key={url} className="size-16 rounded-lg bg-logo-orange/6 overflow-hidden">
               <img src={url} alt={`打卡圖片 ${index + 1}`} className="size-full object-cover" />
             </div>
           ))}
@@ -137,9 +134,7 @@ export function CheckInShowcaseCard(props: IShowcaseCheckIn) {
 
         <div className="flex items-center gap-1.5 text-light-gray">
           <DialogOutlineSvg className="size-6" />
-          {(comment_count ?? 0) > 0 && (
-            <span className="text-sm font-medium">{comment_count}</span>
-          )}
+          {(comment_count ?? 0) > 0 && <span className="text-sm font-medium">{comment_count}</span>}
         </div>
       </div>
 
@@ -165,9 +160,7 @@ export function CheckInShowcaseCard(props: IShowcaseCheckIn) {
                 <span className="text-xs font-semibold text-primary-darker mr-1.5">
                   {comment.user?.name ?? "匿名"}
                 </span>
-                <span className="text-xs text-text-dark line-clamp-1">
-                  {comment.content}
-                </span>
+                <span className="text-xs text-text-dark line-clamp-1">{comment.content}</span>
                 <span className="ml-1 text-[10px] text-light-gray">
                   {formatRelativeTime(comment.created_at)}
                 </span>

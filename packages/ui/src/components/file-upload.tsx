@@ -30,7 +30,11 @@ const FilePreviewImage = ({ file, index }: { file: File; index: number }) => {
   }, []);
 
   return (
-    <img src={urlRef.current!} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+    <img
+      src={urlRef.current!}
+      alt={`Preview ${index + 1}`}
+      className="w-full h-full object-cover"
+    />
   );
 };
 

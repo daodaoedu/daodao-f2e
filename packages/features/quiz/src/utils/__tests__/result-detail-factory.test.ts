@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-  createResultDetail,
   createPartner,
   createResourceLink,
+  createResultDetail,
   LEARNING_STRATEGIES,
 } from "../result-detail-factory";
 
@@ -35,9 +35,7 @@ describe("createResultDetail", () => {
     characteristics: "Test characteristics",
     scenery: "Test scenery",
     strategies: ["strategy1"],
-    partners: [
-      createPartner("explorer", "explorer brief", "explore context"),
-    ],
+    partners: [createPartner("explorer", "explorer brief", "explore context")],
     learningTraits: "Test learning traits",
     learningStrategies: [LEARNING_STRATEGIES.DEEP_READING],
     supportNeeded: ["support1"],
@@ -61,7 +59,9 @@ describe("createResultDetail", () => {
     expect(result.islandDining).toEqual(["dish1"]);
     expect(result.islandDiningDescription).toBe("Dining description");
     expect(result.recommendedResources).toBe("Resources text");
-    expect(result.recommendedResourceLinks).toEqual([{ text: "Link", link: "https://example.com" }]);
+    expect(result.recommendedResourceLinks).toEqual([
+      { text: "Link", link: "https://example.com" },
+    ]);
   });
 
   it("transforms partners using createPartnerDescription when roleId matches", () => {

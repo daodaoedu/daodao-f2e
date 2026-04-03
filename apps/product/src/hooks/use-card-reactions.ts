@@ -14,9 +14,7 @@ export function useCardReactions(targetType: ReactionTargetType, targetId: strin
 
   const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
     null) as ReactionTypeType | null;
-  const selectedReactions: ReactionTypeType[] = currentUserReaction
-    ? [currentUserReaction]
-    : [];
+  const selectedReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
   const allReactions = reactionsData?.data?.reactions ?? [];
   const totalCount = allReactions.reduce((sum, r) => sum + r.count, 0);
   const displayReactions = allReactions
@@ -39,7 +37,7 @@ export function useCardReactions(targetType: ReactionTargetType, targetId: strin
         await mutate();
       });
     },
-    [currentUserReaction, targetType, targetId, mutate],
+    [currentUserReaction, targetType, targetId, mutate]
   );
 
   return {

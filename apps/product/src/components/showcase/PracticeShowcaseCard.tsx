@@ -138,8 +138,10 @@ export function PracticeShowcaseCard({
     });
   };
 
-  const { selectedReactions, totalCount, displayReactions, handleToggle } =
-    useCardReactions("practice", id);
+  const { selectedReactions, totalCount, displayReactions, handleToggle } = useCardReactions(
+    "practice",
+    id
+  );
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation

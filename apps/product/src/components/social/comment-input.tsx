@@ -1,7 +1,7 @@
 "use client";
 
-import { MentionInput, useMentionInput } from "@daodao/features-mention";
 import type { MentionCandidate } from "@daodao/features-mention";
+import { MentionInput, useMentionInput } from "@daodao/features-mention";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { Send } from "lucide-react";

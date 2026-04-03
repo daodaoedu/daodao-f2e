@@ -3,14 +3,14 @@
 import type { ReactionTypeValue } from "@daodao/api";
 import { removeReaction, upsertReaction, useReactions } from "@daodao/api";
 import { DialogOutlineSvg } from "@daodao/assets";
+import type { MentionCandidate } from "@daodao/features-mention";
+import { MentionInput, useMentionInput } from "@daodao/features-mention";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
-import { MentionInput, useMentionInput } from "@daodao/features-mention";
-import type { MentionCandidate } from "@daodao/features-mention";
 import { MoreHorizontal, Pencil, Send, Trash2 } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
