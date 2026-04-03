@@ -138,14 +138,17 @@ export function ActionMakerResult() {
   return (
     <StarryBackground>
       <div className="flex min-h-dvh flex-col pb-8 pt-16">
-        <h1 className="px-6 text-center text-2xl font-bold text-white mb-6">恭喜！你建立了新的習慣</h1>
+        <h1 className="px-6 text-center text-2xl font-bold text-white mb-6">
+          恭喜！你建立了新的習慣
+        </h1>
         {/* ===== Share card area (captured by cardRef) ===== */}
         <div ref={cardRef} className="mx-auto p-6">
           <div
             className="flex w-[350px] flex-col rounded-2xl px-5 pb-6 pt-12"
             style={{
               ...amVarStyle,
-              background: "radial-gradient(ellipse 80% 50% at 110% 120%, rgba(120, 150, 210, 0.45) 0%, transparent 60%), linear-gradient(180deg, #0D1333 0%, #18215E 60%, #1A2468 100%)",
+              background:
+                "radial-gradient(ellipse 80% 50% at 110% 120%, rgba(120, 150, 210, 0.45) 0%, transparent 60%), linear-gradient(180deg, #0D1333 0%, #18215E 60%, #1A2468 100%)",
             }}
           >
             {/* Header — name left, category icon right */}

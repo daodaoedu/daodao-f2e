@@ -1,10 +1,14 @@
 "use client";
 
-import bgWebp from "@daodao/assets/images/action-maker/bg.webp";
 import { LogoSvg } from "@daodao/assets";
+import bgWebp from "@daodao/assets/images/action-maker/bg.webp";
 import { amVarStyle } from "./styled";
 
-export function StarryBackground({ children, fullWidthDesktop, showLogo }: React.PropsWithChildren<{ fullWidthDesktop?: boolean; showLogo?: boolean }>) {
+export function StarryBackground({
+  children,
+  fullWidthDesktop,
+  showLogo,
+}: React.PropsWithChildren<{ fullWidthDesktop?: boolean; showLogo?: boolean }>) {
   return (
     <div
       className="relative min-h-dvh overflow-hidden"
@@ -29,7 +33,11 @@ export function StarryBackground({ children, fullWidthDesktop, showLogo }: React
         </a>
       )}
       {/* Content – constrain width on desktop like quiz (max-w-[430px]) */}
-      <div className={`relative z-10 mx-auto max-w-[430px] ${fullWidthDesktop ? "md:max-w-none" : "md:max-w-[640px]"}`}>{children}</div>
+      <div
+        className={`relative z-10 mx-auto max-w-[430px] ${fullWidthDesktop ? "md:max-w-none" : "md:max-w-[640px]"}`}
+      >
+        {children}
+      </div>
     </div>
   );
 }

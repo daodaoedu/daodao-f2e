@@ -97,12 +97,11 @@ export default function HomePage() {
   } = useShowcaseFeed(showcaseParams);
 
   // Batch fetch reactions for all visible practices
-  const practiceIds = useMemo(
-    () => practices.map((p: IShowcasePractice) => p.id),
-    [practices],
-  );
-  const { data: batchReactionsData, mutate: mutateBatchReactions } =
-    useReactionsBatch({ targetType: "practice", targetIds: practiceIds });
+  const practiceIds = useMemo(() => practices.map((p: IShowcasePractice) => p.id), [practices]);
+  const { data: batchReactionsData, mutate: mutateBatchReactions } = useReactionsBatch({
+    targetType: "practice",
+    targetIds: practiceIds,
+  });
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);

@@ -597,7 +597,7 @@ export function CommentSection({
   return (
     <div className="flex flex-col">
       {/* 主留言輸入框（置頂） */}
-      <div className="relative z-10 bg-white border-b border-[#E4EAE9] flex gap-2 items-center px-4 py-3">
+      <div className="relative z-10 bg-white border-b border-[#E4EAE9] flex gap-2 items-center px-4 py-3 rounded-t-xl">
         {/* User avatar */}
         <Avatar className="size-9 shrink-0">
           {currentUserPhotoURL && (
@@ -632,11 +632,13 @@ export function CommentSection({
 
       {/* 留言列表 */}
       {comments.length > 0 ? (
-        <div className="flex flex-col gap-5 px-4 pt-4 pb-2">
+        <div
+          className={cn("flex flex-col gap-5 px-4 pt-4 pb-2", !hasMoreComments && "rounded-b-xl")}
+        >
           {previewComments.map(renderCommentBlock)}
         </div>
       ) : (
-        <div className="flex items-center justify-center px-4 py-8 text-sm text-[#9FB5B8]">
+        <div className="flex items-center justify-center px-4 py-8 text-sm text-[#9FB5B8] rounded-b-xl">
           尚未有留言
         </div>
       )}
@@ -675,7 +677,7 @@ export function CommentSection({
               expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
             )}
           >
-            <div className="overflow-hidden">
+            <div className="overflow-hidden rounded-b-xl">
               <div className="flex flex-col gap-5 px-4 pt-2 pb-4">
                 {hiddenComments.map(renderCommentBlock)}
               </div>

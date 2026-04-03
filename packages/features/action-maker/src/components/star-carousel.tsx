@@ -8,11 +8,18 @@ import carouselWork from "@daodao/assets/images/action-maker/carousel-work.png";
 import { useEffect, useRef, useState } from "react";
 
 const STARS = [
-  { id: "social",   label: "人際", src: carouselSocial,   x: 8,  y: 25 },
-  { id: "interest", label: "興趣", src: carouselInterest, x: 78, y: 8, leftCalc: "calc(50% + 60px)" },
+  { id: "social", label: "人際", src: carouselSocial, x: 8, y: 25 },
+  {
+    id: "interest",
+    label: "興趣",
+    src: carouselInterest,
+    x: 78,
+    y: 8,
+    leftCalc: "calc(50% + 60px)",
+  },
   { id: "academic", label: "學業", src: carouselAcademic, x: 86, y: 50 },
-  { id: "health",   label: "健康", src: carouselHealth,   x: 72, y: 80 },
-  { id: "work",     label: "工作", src: carouselWork,     x: 6,  y: 68 },
+  { id: "health", label: "健康", src: carouselHealth, x: 72, y: 80 },
+  { id: "work", label: "工作", src: carouselWork, x: 6, y: 68 },
 ] as const;
 
 export function StarCarousel() {
@@ -60,7 +67,9 @@ export function StarCarousel() {
         return (
           <div
             key={star.id}
-            ref={(el) => { starRefs.current[index] = el; }}
+            ref={(el) => {
+              starRefs.current[index] = el;
+            }}
             className={`absolute flex flex-col items-center transition-all duration-1000 ease-out star-${star.id}`}
             style={{
               left: leftStyle,

@@ -16,11 +16,11 @@ export const colors = {
 
   // 灰階 - Figma 灰階色（取代原 basic 系列）
   gray: {
-    dark: "#0D3036",       // BG Dark
-    mid: "#9FB5B8",        // Light Gray
-    light: "#E4EAE9",      // BG Gray
-    veryLight: "#F4F6F6",  // Very Light Gray
-    white: "#FFFFFF",      // White
+    dark: "#0D3036", // BG Dark
+    mid: "#9FB5B8", // Light Gray
+    light: "#E4EAE9", // BG Gray
+    veryLight: "#F4F6F6", // Very Light Gray
+    white: "#FFFFFF", // White
   },
 
   // 吉祥物色彩 - Mascot colors
