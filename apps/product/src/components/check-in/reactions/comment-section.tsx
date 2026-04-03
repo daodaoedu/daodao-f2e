@@ -597,7 +597,7 @@ export function CommentSection({
   return (
     <div className="flex flex-col">
       {/* 主留言輸入框（置頂） */}
-      <div className="bg-white border-b border-[#E4EAE9] flex gap-2 items-center px-4 py-3">
+      <div className="relative z-10 bg-white border-b border-[#E4EAE9] flex gap-2 items-center px-4 py-3">
         {/* User avatar */}
         <Avatar className="size-9 shrink-0">
           {currentUserPhotoURL && (
