@@ -4,6 +4,7 @@ export { default as CategoryHealthSvg } from "./action-maker/category-health";
 export { default as CategoryInterestSvg } from "./action-maker/category-interest";
 export { default as CategorySocialSvg } from "./action-maker/category-social";
 export { default as CategoryWorkSvg } from "./action-maker/category-work";
+export { default as LogoSvg } from "./action-maker/logo";
 export { default as StepDotSvg } from "./action-maker/step-dot";
 export { default as HorizontalFullLightSvg } from "./brand/horizontal-full-light";
 export { default as HorizontalFullWhiteSvg } from "./brand/horizontal-full-white";

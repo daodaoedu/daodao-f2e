@@ -9,7 +9,7 @@ loadEnvConfig(path.resolve(process.cwd(), "../.."));
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
-  output: "export",
+  output: process.env.NEXT_OUTPUT === "export" ? "export" : undefined,
   reactStrictMode: true,
   typedRoutes: true,
   transpilePackages: [
