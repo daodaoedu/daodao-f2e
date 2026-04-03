@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { mutate as globalMutate } from "swr";
 import { NotificationType } from "@/constants/notification-type";
+import type { ReactionTypeType } from "@/constants/reaction-type";
+import { REACTION_CONFIG } from "@/constants/reaction-type";
 import type { NotificationApiItem } from "@/hooks/use-notifications";
 import {
   acceptConnectionRequest,
@@ -33,6 +35,11 @@ function normalizeNotificationType(backendType: string): INotificationData["type
   return (BACKEND_TYPE_MAP[backendType] ?? backendType) as INotificationData["type"];
 }
 
+function getReactionEmoji(reactionType: string | undefined): string | undefined {
+  if (!reactionType) return undefined;
+  return REACTION_CONFIG[reactionType as ReactionTypeType]?.emoji;
+}
+
 function apiItemToDisplay(item: NotificationApiItem): INotificationData {
   return {
     id: String(item.id),
@@ -47,6 +54,7 @@ function apiItemToDisplay(item: NotificationApiItem): INotificationData {
       : undefined,
     content: item.content,
     connectMessage: item.connectMessage,
+    reaction: getReactionEmoji(item.reactionType),
     aggregationCount: item.aggregationCount,
     connectionRequestId:
       item.connectionRequestId != null ? String(item.connectionRequestId) : undefined,
@@ -134,7 +142,9 @@ export function NotificationList() {
   );
 
   const rawItems = data?.data?.notifications ?? [];
-  const apiItems = rawItems as unknown as NotificationApiItem[];
+  const apiItems = (rawItems as unknown as NotificationApiItem[])
+    .slice()
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const notifications: INotificationData[] = apiItems.map((item) => {
     const base = apiItemToDisplay(item);
     return { ...base, ...(localOverrides[base.id] ?? {}) };

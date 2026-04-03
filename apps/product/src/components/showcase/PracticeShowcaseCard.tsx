@@ -2,6 +2,7 @@
 
 import {
   followTarget,
+  type BatchReactionItem,
   unfollowTarget,
   useComments,
   usePracticeById,
@@ -50,6 +51,8 @@ interface PracticeShowcaseCardProps {
   frequencyMaxDays?: number | null;
   sessionDurationMinutes?: number | null;
   commentCount?: number;
+  batchReactionData?: BatchReactionItem;
+  onReactionMutate?: () => void;
 }
 
 export function PracticeShowcaseCard({
@@ -64,6 +67,8 @@ export function PracticeShowcaseCard({
   frequencyMaxDays,
   sessionDurationMinutes,
   commentCount = 0,
+  batchReactionData: _batchReactionData,
+  onReactionMutate: _onReactionMutate,
 }: PracticeShowcaseCardProps) {
   const startFmt = formatShowcaseDate(startDate);
   const endFmt = formatShowcaseDate(endDate);

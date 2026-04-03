@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { detectDeviceFromUserAgent } from "../device-detection";
 
 describe("detectDeviceFromUserAgent", () => {
@@ -63,8 +63,7 @@ describe("detectDeviceFromUserAgent", () => {
   });
 
   it("detects desktop Firefox as desktop", () => {
-    const ua =
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0";
+    const ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0";
     const result = detectDeviceFromUserAgent(ua);
     expect(result).toEqual({
       isMobile: false,

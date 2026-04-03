@@ -1,35 +1,40 @@
 "use client";
 
 import { GalleryAddSvg } from "@daodao/assets";
-import { ImageIcon, X } from "lucide-react";
+import { X } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "../lib/utils";
 
 // Component to handle image preview with proper cleanup
+// 使用 ref 同步建立 blob URL，避免 React strict mode 下 effect 雙重執行導致 URL 被提前 revoke
 const FilePreviewImage = ({ file, index }: { file: File; index: number }) => {
-  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+  const urlRef = React.useRef<string | null>(null);
+  const prevFileRef = React.useRef<File | null>(null);
 
-  React.useEffect(() => {
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-
-    return () => {
-      setPreviewUrl(null);
-      URL.revokeObjectURL(url);
-    };
-  }, [file]);
-
-  if (!previewUrl) {
-    return (
-      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-        <ImageIcon className="size-6 text-gray-400" />
-      </div>
-    );
+  if (prevFileRef.current !== file) {
+    if (urlRef.current) {
+      URL.revokeObjectURL(urlRef.current);
+    }
+    urlRef.current = URL.createObjectURL(file);
+    prevFileRef.current = file;
   }
 
+  React.useEffect(() => {
+    return () => {
+      if (urlRef.current) {
+        URL.revokeObjectURL(urlRef.current);
+        urlRef.current = null;
+      }
+    };
+  }, []);
+
   return (
-    <img src={previewUrl} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+    <img
+      src={urlRef.current!}
+      alt={`Preview ${index + 1}`}
+      className="w-full h-full object-cover"
+    />
   );
 };
 

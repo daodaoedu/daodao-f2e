@@ -3,6 +3,8 @@
 import type { ReactionTypeValue } from "@daodao/api";
 import { removeReaction, upsertReaction, useReactions } from "@daodao/api";
 import { DialogOutlineSvg } from "@daodao/assets";
+import type { MentionCandidate } from "@daodao/features-mention";
+import { MentionInput, useMentionInput } from "@daodao/features-mention";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -74,14 +76,6 @@ function getAvatarColor(name: string) {
 // @mention helpers
 // ============================================================================
 
-interface MentionCandidate {
-  userId: string;
-  numericUserId?: number;
-  name: string;
-  photoURL?: string;
-  customId?: string | null;
-}
-
 /** Renders comment content with @mention tokens highlighted */
 function renderContent(content: string) {
   const parts = content.split(/(@\S+)/g);
@@ -99,126 +93,6 @@ function renderContent(content: string) {
         )
       )}
     </>
-  );
-}
-
-// ============================================================================
-// MentionInput — textarea with @mention dropdown
-// ============================================================================
-
-interface MentionInputProps {
-  value: string;
-  onChange: (value: string) => void;
-  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
-  placeholder?: string;
-  rows?: number;
-  className?: string;
-  inputRef?: React.RefObject<HTMLTextAreaElement | null>;
-  participants: MentionCandidate[];
-  autoFocus?: boolean;
-  onMentionSelect?: (candidate: MentionCandidate) => void;
-}
-
-function MentionInput({
-  value,
-  onChange,
-  onKeyDown,
-  placeholder,
-  rows = 1,
-  className,
-  inputRef,
-  participants,
-  autoFocus,
-  onMentionSelect,
-}: MentionInputProps) {
-  const localRef = useRef<HTMLTextAreaElement>(null);
-  const ref = (inputRef ?? localRef) as React.RefObject<HTMLTextAreaElement>;
-  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
-  const [mentionStart, setMentionStart] = useState(-1);
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    onChange(newValue);
-
-    const cursor = e.target.selectionStart ?? newValue.length;
-    const textBeforeCursor = newValue.slice(0, cursor);
-    const lastAt = textBeforeCursor.lastIndexOf("@");
-
-    if (lastAt !== -1) {
-      const afterAt = textBeforeCursor.slice(lastAt + 1);
-      if (!afterAt.includes(" ") && !afterAt.includes("\n")) {
-        setMentionStart(lastAt);
-        setMentionQuery(afterAt);
-        return;
-      }
-    }
-
-    setMentionQuery(null);
-    setMentionStart(-1);
-  };
-
-  const handleSelect = (candidate: MentionCandidate) => {
-    const mention = `@${candidate.customId || candidate.name}`;
-    const before = value.slice(0, mentionStart);
-    const after = value.slice(mentionStart + 1 + (mentionQuery?.length ?? 0));
-    const next = `${before}${mention} ${after}`;
-    onChange(next);
-    onMentionSelect?.(candidate);
-    setMentionQuery(null);
-    setMentionStart(-1);
-    requestAnimationFrame(() => {
-      const el = ref.current;
-      if (!el) return;
-      el.focus();
-      const pos = before.length + mention.length + 1;
-      el.setSelectionRange(pos, pos);
-    });
-  };
-
-  const filtered =
-    mentionQuery !== null
-      ? participants.filter((p) => p.name.toLowerCase().includes(mentionQuery.toLowerCase()))
-      : [];
-
-  return (
-    <div className="relative flex-1 min-w-0">
-      <textarea
-        ref={ref}
-        value={value}
-        onChange={handleChange}
-        onKeyDown={onKeyDown}
-        placeholder={placeholder}
-        rows={rows}
-        className={className}
-        // biome-ignore lint/a11y/noAutofocus: intentional UX for inline edit
-        autoFocus={autoFocus}
-      />
-      {mentionQuery !== null && filtered.length > 0 && (
-        <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-1 z-20 min-w-[160px] max-h-44 overflow-y-auto">
-          {filtered.map((p) => (
-            <button
-              key={p.userId}
-              type="button"
-              onMouseDown={(e) => {
-                e.preventDefault(); // keep textarea focused
-                handleSelect(p);
-              }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors text-left"
-            >
-              <Avatar className="size-6 shrink-0">
-                {p.photoURL && <AvatarImage src={p.photoURL} alt={p.name} />}
-                <AvatarFallback
-                  className={cn("text-xs font-medium text-text-dark", getAvatarColor(p.name))}
-                >
-                  {p.name.slice(0, 1)}
-                </AvatarFallback>
-              </Avatar>
-              <span className="truncate">{p.name}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
   );
 }
 
@@ -540,7 +414,7 @@ export function CommentSection({
   const [inputValue, setInputValue] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyInputs, setReplyInputs] = useState<Record<string, string>>({});
-  const [mentionedIds, setMentionedIds] = useState<Map<number, string>>(new Map());
+  const { handleMentionSelect, getActiveMentionIds, reset: resetMentions } = useMentionInput();
   const [replyMentionedIds, setReplyMentionedIds] = useState<Record<string, Map<number, string>>>(
     {}
   );
@@ -614,13 +488,9 @@ export function CommentSection({
     const trimmed = inputValue.trim();
     if (!trimmed) return;
 
-    const activeMentionIds = [...mentionedIds.entries()]
-      .filter(([, handle]) => trimmed.includes(`@${handle}`))
-      .map(([id]) => id);
-
-    onSubmit(trimmed, selectedReactions, undefined, activeMentionIds);
+    onSubmit(trimmed, selectedReactions, undefined, getActiveMentionIds(trimmed));
     setInputValue("");
-    setMentionedIds(new Map());
+    resetMentions();
     setReplyTo(null);
   };
 
@@ -727,7 +597,7 @@ export function CommentSection({
   return (
     <div className="flex flex-col">
       {/* 主留言輸入框（置頂） */}
-      <div className="bg-white border-b border-[#E4EAE9] flex gap-2 items-center px-4 py-3">
+      <div className="relative z-10 bg-white border-b border-[#E4EAE9] flex gap-2 items-center px-4 py-3">
         {/* User avatar */}
         <Avatar className="size-9 shrink-0">
           {currentUserPhotoURL && (
@@ -746,14 +616,7 @@ export function CommentSection({
           inputRef={ref}
           participants={participants}
           className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10 w-full"
-          onMentionSelect={(candidate) => {
-            if (!candidate.numericUserId) return;
-            setMentionedIds((prev) => {
-              const next = new Map(prev);
-              next.set(candidate.numericUserId as number, candidate.customId || candidate.name);
-              return next;
-            });
-          }}
+          onMentionSelect={handleMentionSelect}
         />
 
         {/* Send */}
