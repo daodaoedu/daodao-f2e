@@ -70,7 +70,7 @@ export function MentionInput({
     const lastAt = textBeforeCursor.lastIndexOf("@");
 
     if (lastAt !== -1) {
-      const charBeforeAt = lastAt > 0 ? textBeforeCursor[lastAt - 1] : null;
+      const charBeforeAt = lastAt > 0 ? (textBeforeCursor[lastAt - 1] ?? null) : null;
       if (charBeforeAt === null || /\s/.test(charBeforeAt)) {
         const afterAt = textBeforeCursor.slice(lastAt + 1);
         if (!afterAt.includes(" ") && !afterAt.includes("\n")) {
