@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ApiError,
   followTarget,
   getConnections,
   getOutgoingConnectionRequests,
@@ -23,7 +24,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { Globe, MapPin, Pencil, Users } from "lucide-react";
 import type React from "react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 import {
   SocialPlatform,
@@ -148,6 +149,13 @@ export function UserInfoCard({
   const [optimisticConnectionStatus, setOptimisticConnectionStatus] =
     useState<UserConnectionStatus | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
+
+  // Reset optimistic state when viewing a different user's profile
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset state when targetUserId changes
+  useEffect(() => {
+    setOptimisticConnectionStatus(null);
+    setIsFollowing(null);
+  }, [targetUserId]);
   const { openInfoDialog } = useDialog();
   const intentRef = useRef("");
 
@@ -176,7 +184,7 @@ export function UserInfoCard({
     return connectionsData.data.some((c: { externalId: string }) => c.externalId === targetUserId);
   }, [connectionsData, targetUserId]);
   const { data: outgoingRequestsData } = useSWR(
-    shouldCheckConnection ? ["/api/v1/connections/requests/outgoing", "check", targetUserId] : null,
+    shouldCheckConnection ? "/api/v1/connections/requests/outgoing" : null,
     () => getOutgoingConnectionRequests({ limit: 100 }),
     { revalidateOnFocus: false }
   );
@@ -259,13 +267,13 @@ export function UserInfoCard({
       setOptimisticConnectionStatus("pending");
       toast.success("已送出連結請求");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "請求失敗";
-      if (msg.includes("夥伴")) {
+      // 409 表示已連結（後端回傳衝突狀態）
+      if (err instanceof ApiError && err.status === 409) {
         setOptimisticConnectionStatus("connected");
         toast.success("已連結");
         return;
       }
-      toast.error(msg);
+      toast.error(err instanceof Error ? err.message : "請求失敗");
     } finally {
       setConnectLoading(false);
     }

@@ -1,5 +1,6 @@
 import { getRequiredEnv } from "@daodao/config";
 import { unauthorizedHandler } from "../client";
+import { ApiError } from "../errors";
 
 // ============================================================================
 // Types
@@ -65,7 +66,7 @@ export const sendConnectionRequest = async (
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message ?? "發送連結請求失敗");
+    throw new ApiError(res.status, err?.error?.message ?? "發送連結請求失敗");
   }
   return res.json();
 };
