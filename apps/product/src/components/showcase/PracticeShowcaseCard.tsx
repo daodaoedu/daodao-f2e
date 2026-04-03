@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  followTarget,
   type BatchReactionItem,
+  followTarget,
   unfollowTarget,
   useComments,
   usePracticeById,
@@ -132,7 +132,9 @@ export function PracticeShowcaseCard({
       content: (
         <BrowseActivityContent
           viewCount={practiceData?.data?.stats?.viewCount ?? 0}
-          commentCount={commentsData?.data?.length ?? commentCount}
+          commentCount={
+            practiceData?.data?.stats?.commentCount ?? commentsData?.data?.length ?? commentCount
+          }
           followers={followers}
           onClose={() => closeSheet()}
         />
@@ -299,7 +301,8 @@ export function PracticeShowcaseCard({
         >
           <DialogOutlineSvg className="size-6" />
           {(() => {
-            const count = commentsData?.data?.length ?? commentCount;
+            const count =
+              practiceData?.data?.stats?.commentCount ?? commentsData?.data?.length ?? commentCount;
             return count > 0 ? <span className="text-sm font-medium">{count}</span> : null;
           })()}
         </Link>
