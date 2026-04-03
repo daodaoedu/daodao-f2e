@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { mutate as globalMutate } from "swr";
 import { NotificationType } from "@/constants/notification-type";
-import { REACTION_CONFIG } from "@/constants/reaction-type";
 import type { ReactionTypeType } from "@/constants/reaction-type";
+import { REACTION_CONFIG } from "@/constants/reaction-type";
 import type { NotificationApiItem } from "@/hooks/use-notifications";
 import {
   acceptConnectionRequest,
@@ -142,7 +142,9 @@ export function NotificationList() {
   );
 
   const rawItems = data?.data?.notifications ?? [];
-  const apiItems = rawItems as unknown as NotificationApiItem[];
+  const apiItems = (rawItems as unknown as NotificationApiItem[]).toSorted(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
   const notifications: INotificationData[] = apiItems.map((item) => {
     const base = apiItemToDisplay(item);
     return { ...base, ...(localOverrides[base.id] ?? {}) };
