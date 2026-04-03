@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  ApiError,
   followTarget,
   getConnections,
+  getOutgoingConnectionRequests,
   sendConnectionRequest,
   unfollowTarget,
   useCurrentUser,
@@ -22,12 +24,13 @@ import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { Globe, MapPin, Pencil, Users } from "lucide-react";
 import type React from "react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 import {
   SocialPlatform,
   type SocialPlatform as SocialPlatformType,
 } from "@/constants/social-platform";
+import { getUserConnectionStatus, type UserConnectionStatus } from "./connection-status";
 
 /**
  * 社群媒體連結物件
@@ -143,8 +146,16 @@ export function UserInfoCard({
   const isMobile = useIsMobile();
   const [followLoading, setFollowLoading] = useState(false);
   const [connectLoading, setConnectLoading] = useState(false);
-  const [connectSent, setConnectSent] = useState(false);
+  const [optimisticConnectionStatus, setOptimisticConnectionStatus] =
+    useState<UserConnectionStatus | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
+
+  // Reset optimistic state when viewing a different user's profile
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset state when targetUserId changes
+  useEffect(() => {
+    setOptimisticConnectionStatus(null);
+    setIsFollowing(null);
+  }, [targetUserId]);
   const { openInfoDialog } = useDialog();
   const intentRef = useRef("");
 
@@ -172,6 +183,22 @@ export function UserInfoCard({
     if (!connectionsData?.data || !targetUserId) return false;
     return connectionsData.data.some((c: { externalId: string }) => c.externalId === targetUserId);
   }, [connectionsData, targetUserId]);
+  const { data: outgoingRequestsData } = useSWR(
+    shouldCheckConnection ? "/api/v1/connections/requests/outgoing" : null,
+    () => getOutgoingConnectionRequests({ limit: 100 }),
+    { revalidateOnFocus: false }
+  );
+  const hasOutgoingPendingRequest = useMemo(() => {
+    if (!outgoingRequestsData?.data || !targetUserId) return false;
+    return outgoingRequestsData.data.some(
+      (request: { receiverExternalId: string }) => request.receiverExternalId === targetUserId
+    );
+  }, [outgoingRequestsData, targetUserId]);
+  const connectionStatus = getUserConnectionStatus({
+    isAlreadyConnected,
+    hasOutgoingPendingRequest,
+    optimisticStatus: optimisticConnectionStatus,
+  });
 
   // 複製文字到剪貼簿的處理函數
   const handleCopy = useCallback(async (text: string) => {
@@ -237,14 +264,16 @@ export function UserInfoCard({
         receiverExternalId: targetUserId,
         intent: intentRef.current.trim() || undefined,
       });
-      setConnectSent(true);
+      setOptimisticConnectionStatus("pending");
       toast.success("已送出連結請求");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "請求失敗";
-      if (msg.includes("夥伴")) {
-        setConnectSent(true);
+      // 409 表示已連結（後端回傳衝突狀態）
+      if (err instanceof ApiError && err.status === 409) {
+        setOptimisticConnectionStatus("connected");
+        toast.success("已連結");
+        return;
       }
-      toast.error(msg);
+      toast.error(err instanceof Error ? err.message : "請求失敗");
     } finally {
       setConnectLoading(false);
     }
@@ -436,11 +465,19 @@ export function UserInfoCard({
           </Button>
           <Button
             variant="outline"
-            className={`flex-1 h-12 text-base rounded-full ${isAlreadyConnected || connectSent ? "border-gray-300 text-gray-400" : "border-primary-base text-primary-base hover:bg-primary-base hover:text-white"}`}
+            className={`flex-1 h-12 text-base rounded-full ${
+              connectionStatus !== "none"
+                ? "border-gray-300 text-gray-400"
+                : "border-primary-base text-primary-base hover:bg-primary-base hover:text-white"
+            }`}
             onClick={handleConnect}
-            disabled={connectLoading || connectSent || isAlreadyConnected}
+            disabled={connectLoading || connectionStatus !== "none"}
           >
-            {isAlreadyConnected || connectSent ? "已成功連結" : "請求連結"}
+            {connectionStatus === "connected"
+              ? "已連結"
+              : connectionStatus === "pending"
+                ? "已送出連結請求"
+                : "請求連結"}
           </Button>
         </div>
       )}

@@ -104,7 +104,7 @@ export const getReactionsList = async (params: IGetReactionsParams) => {
  * 批次取得多個目標的反應計數 + 用戶反應列表
  */
 export const getReactionsBatch = async (
-  params: IGetReactionsBatchParams,
+  params: IGetReactionsBatchParams
 ): Promise<GetReactionsBatchResponse> => {
   const { getRequiredEnv } = await import("@daodao/config");
   const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");

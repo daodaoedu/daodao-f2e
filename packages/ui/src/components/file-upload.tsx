@@ -25,11 +25,7 @@ const FilePreviewImage = ({ file, index }: { file: File; index: number }) => {
   if (!objectUrl) return null;
 
   return (
-    <img
-      src={objectUrl}
-      alt={`Preview ${index + 1}`}
-      className="w-full h-full object-cover"
-    />
+    <img src={objectUrl} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
   );
 };
 

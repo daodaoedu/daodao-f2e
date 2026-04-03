@@ -702,7 +702,7 @@ export function PracticeDetailShell({
       </div>
 
       {activeTab === "comments" && (
-        <div className="mx-4 mt-4 mb-4 bg-white rounded-xl overflow-hidden shadow-sm">
+        <div className="mx-4 mt-4 mb-4 bg-white rounded-xl shadow-sm">
           {isLoadingComments ? (
             <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">留言載入中...</div>
           ) : (
