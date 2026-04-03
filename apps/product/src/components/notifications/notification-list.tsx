@@ -142,9 +142,9 @@ export function NotificationList() {
   );
 
   const rawItems = data?.data?.notifications ?? [];
-  const apiItems = (rawItems as unknown as NotificationApiItem[]).toSorted(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  const apiItems = (rawItems as unknown as NotificationApiItem[])
+    .slice()
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const notifications: INotificationData[] = apiItems.map((item) => {
     const base = apiItemToDisplay(item);
     return { ...base, ...(localOverrides[base.id] ?? {}) };
