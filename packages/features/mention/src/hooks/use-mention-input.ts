@@ -24,7 +24,7 @@ export function useMentionInput() {
     if (!candidate.numericUserId) return;
     setMentionedIds((prev) => {
       const next = new Map(prev);
-      next.set(candidate.numericUserId as number, candidate.customId || candidate.name);
+      next.set(candidate.numericUserId as number, candidate.name);
       return next;
     });
   };

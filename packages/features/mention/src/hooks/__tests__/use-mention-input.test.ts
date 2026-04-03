@@ -62,6 +62,19 @@ describe("getActiveMentionIds", () => {
     expect(result).toEqual([5]);
   });
 
+  it("[regression] 選取有 customId 的候選人，handle 應為 name 而非 customId", () => {
+    // 修復前：handleMentionSelect 儲存 customId（如 "Aaa"）作為 handle
+    // 修復後：固定儲存 name（如 "小許"），內容中插入 @小許
+    const mapWithName = new Map([[7, "小許"]]);
+    const mapWithCustomId = new Map([[7, "Aaa"]]);
+    const content = "嗨 @小許 你好";
+
+    // 修復後：用 name 當 handle，能正確比對
+    expect(getActiveMentionIds(mapWithName, content)).toEqual([7]);
+    // 修復前的行為：用 customId 當 handle，無法比對到內容中的 @小許
+    expect(getActiveMentionIds(mapWithCustomId, content)).toEqual([]);
+  });
+
   it("returns empty array when handle was deleted from content", () => {
     const map = new Map([
       [1, "alice"],

@@ -83,7 +83,7 @@ export function MentionInput({
   };
 
   const handleSelect = (candidate: MentionCandidate) => {
-    const mention = `@${candidate.customId || candidate.name}`;
+    const mention = `@${candidate.name}`;
     const before = value.slice(0, mentionStart);
     const after = value.slice(mentionStart + 1 + (mentionQuery?.length ?? 0));
     const next = `${before}${mention} ${after}`;
