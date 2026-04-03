@@ -7,20 +7,14 @@
  */
 
 import useSWRInfinite from "swr/infinite";
-import type { IShowcasePractice, IReactionCountItem } from "./showcase-hooks";
+import type { IReactionCountItem, IShowcasePractice } from "./showcase-hooks";
 import { fetchAiBackend } from "./showcase-hooks";
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type ApiMoodType =
-  | "give_up"
-  | "frustrated"
-  | "bored"
-  | "neutral"
-  | "good"
-  | "happy";
+export type ApiMoodType = "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
 
 export interface IShowcaseCheckIn {
   id: string;
@@ -102,28 +96,25 @@ export function useFeed(params: IFeedParams) {
     return `/api/v1/feed${qs ? `?${qs}` : ""}`;
   };
 
-  const { data, error, size, setSize, isLoading, isValidating } =
-    useSWRInfinite<AIFeedResponse>(
-      getKey,
-      (path: string) => fetchAiBackend<AIFeedResponse>(path),
-      { revalidateFirstPage: false },
-    );
+  const { data, error, size, setSize, isLoading, isValidating } = useSWRInfinite<AIFeedResponse>(
+    getKey,
+    (path: string) => fetchAiBackend<AIFeedResponse>(path),
+    { revalidateFirstPage: false }
+  );
 
   const feedItems: FeedItem[] = data
     ? data.flatMap((page) =>
-(page.data ?? []).filter((item) => {
-  const isValid = !!(item?.type && item?.data);
-  if (!isValid && process.env.NODE_ENV !== "production") {
-    console.warn("[useFeed] Malformed feed item (missing type/data):", item);
-  }
-  return isValid;
-})
+        (page.data ?? []).filter((item) => {
+          const isValid = !!(item?.type && item?.data);
+          if (!isValid && process.env.NODE_ENV !== "production") {
+            console.warn("[useFeed] Malformed feed item (missing type/data):", item);
+          }
+          return isValid;
+        })
       )
     : [];
 
-  const hasMore = data
-    ? (data[data.length - 1]?.pagination?.hasNext ?? false)
-    : false;
+  const hasMore = data ? (data[data.length - 1]?.pagination?.hasNext ?? false) : false;
 
   const loadMore = () => setSize(size + 1);
 

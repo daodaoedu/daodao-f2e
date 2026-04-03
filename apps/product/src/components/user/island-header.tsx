@@ -60,7 +60,7 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
           .catch((error) => console.error("Failed to load Lottie animation:", error));
       }
     }
-  }, [resultType, isEmptyResult, isOwnProfile]);
+  }, [resultType, isEmptyResult]);
 
   // 動態載入所有 lottie 動畫（當沒有結果且是自己的個人頁面時，用於跑馬燈）
   const [allLotties, setAllLotties] = useState<Map<string, object>>(new Map());

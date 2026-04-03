@@ -5,6 +5,7 @@ import {
   unfollowTarget,
   useComments,
   usePracticeById,
+  useReactionsList,
 } from "@daodao/api";
 import {
   ChartColumnIncreasingSvg,
@@ -29,7 +30,6 @@ import {
 } from "@/components/practice/shared/browse-activity-content";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
-import type { BatchReactionItem } from "@daodao/api";
 import { useCardReactions } from "@/hooks/use-card-reactions";
 import { formatRelativeTime } from "@/utils/format-time";
 import { formatShowcaseDate } from "./utils";
@@ -50,8 +50,6 @@ interface PracticeShowcaseCardProps {
   frequencyMaxDays?: number | null;
   sessionDurationMinutes?: number | null;
   commentCount?: number;
-  batchReactionData?: BatchReactionItem;
-  onReactionMutate?: () => void;
 }
 
 export function PracticeShowcaseCard({
@@ -66,8 +64,6 @@ export function PracticeShowcaseCard({
   frequencyMaxDays,
   sessionDurationMinutes,
   commentCount = 0,
-  batchReactionData,
-  onReactionMutate,
 }: PracticeShowcaseCardProps) {
   const startFmt = formatShowcaseDate(startDate);
   const endFmt = formatShowcaseDate(endDate);
@@ -80,6 +76,7 @@ export function PracticeShowcaseCard({
   const router = useRouter();
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { data: practiceData } = usePracticeById(id);
+  const { data: reactionsListData } = useReactionsList({ targetType: "practice", targetId: id });
   const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
 
   useEffect(() => {
@@ -116,7 +113,7 @@ export function PracticeShowcaseCard({
 
   const handleOpenBrowseActivity = () => {
     setMenuOpen(false);
-    const followers: IBrowseActivityFollower[] = reactionItems.map(
+    const followers: IBrowseActivityFollower[] = (reactionsListData?.data?.items ?? []).map(
       (item) => ({
         id: item.userId,
         name: item.name,
@@ -141,8 +138,10 @@ export function PracticeShowcaseCard({
     });
   };
 
-  const { selectedReactions, totalCount, displayReactions, handleToggle, reactionItems, firstReactorName } =
-    useCardReactions("practice", id, batchReactionData, onReactionMutate);
+  const { selectedReactions, totalCount, displayReactions, handleToggle } = useCardReactions(
+    "practice",
+    id
+  );
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
@@ -286,7 +285,7 @@ export function PracticeShowcaseCard({
           variant="summary"
           totalCount={totalCount}
           displayReactions={displayReactions}
-          firstReactorName={firstReactorName}
+          firstReactorName={reactionsListData?.data?.items[0]?.name}
         />
 
         <Link

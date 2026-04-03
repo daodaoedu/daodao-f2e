@@ -18,6 +18,8 @@ export * from "./connection-hooks";
 // Email Service
 export * from "./email";
 export * from "./email-hooks";
+// Feed Service
+export * from "./feed-hooks";
 // Follow Service
 export * from "./follow";
 export * from "./follow-hooks";
@@ -42,8 +44,6 @@ export * from "./reaction-hooks";
 // Resource Service
 export * from "./resource";
 export * from "./resource-hooks";
-// Feed Service
-export * from "./feed-hooks";
 // Showcase Service
 export * from "./showcase-hooks";
 // Tag Service

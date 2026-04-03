@@ -15,6 +15,7 @@ const FilePreviewImage = ({ file, index }: { file: File; index: number }) => {
     setPreviewUrl(url);
 
     return () => {
+      setPreviewUrl(null);
       URL.revokeObjectURL(url);
     };
   }, [file]);

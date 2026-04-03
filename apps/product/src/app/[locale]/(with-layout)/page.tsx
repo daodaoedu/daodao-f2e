@@ -1,11 +1,11 @@
 "use client";
 
 import {
+  type IShowcasePractice,
   useMyPracticeStats,
   useMyPractices,
   useReactionsBatch,
   useShowcaseFeed,
-  type IShowcasePractice,
 } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
