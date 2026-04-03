@@ -74,4 +74,5 @@ export interface NotificationApiItem {
   content?: string;
   connectionRequestId?: number;
   buddyRequestId?: string;
+  reactionType?: string;
 }
