@@ -123,7 +123,12 @@ export function MentionInput({
         autoFocus={autoFocus}
       />
       {mentionQuery !== null && filtered.length > 0 && (
-        <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-1 z-20 min-w-[160px] max-h-44 overflow-y-auto">
+        // biome-ignore lint/a11y/noStaticElementInteractions: prevent textarea blur when clicking anywhere in dropdown
+        // biome-ignore lint/a11y/useKeyWithClickEvents: dropdown navigation handled by keyboard in textarea
+        <div
+          className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-1 z-20 min-w-[160px] max-h-44 overflow-y-auto"
+          onMouseDown={(e) => e.preventDefault()}
+        >
           {filtered.map((p) => (
             <button
               key={p.userId}

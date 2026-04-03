@@ -1,12 +1,7 @@
 "use client";
 
 import type { BatchReactionItem } from "@daodao/api";
-import {
-  followTarget,
-  unfollowTarget,
-  useComments,
-  usePracticeById,
-} from "@daodao/api";
+import { followTarget, unfollowTarget, useComments, usePracticeById } from "@daodao/api";
 import {
   ChartColumnIncreasingSvg,
   DefaultAvatarSvg,
@@ -113,21 +108,21 @@ export function BrewingCard({
 
   const handleOpenBrowseActivity = () => {
     setMenuOpen(false);
-    const followers: IBrowseActivityFollower[] = reactionItems.map(
-      (item) => ({
-        id: item.userId,
-        name: item.name,
-        photoURL: item.photoURL ?? undefined,
-        time: formatRelativeTime(item.reactedAt),
-        reaction: item.reactionType as ReactionTypeType,
-      })
-    );
+    const followers: IBrowseActivityFollower[] = reactionItems.map((item) => ({
+      id: item.userId,
+      name: item.name,
+      photoURL: item.photoURL ?? undefined,
+      time: formatRelativeTime(item.reactedAt),
+      reaction: item.reactionType as ReactionTypeType,
+    }));
     openSheet({
       title: "瀏覽活動",
       content: (
         <BrowseActivityContent
           viewCount={practiceData?.data?.stats?.viewCount ?? 0}
-          commentCount={commentsData?.data?.length ?? commentCount}
+          commentCount={
+            practiceData?.data?.stats?.commentCount ?? commentsData?.data?.length ?? commentCount
+          }
           followers={followers}
           onClose={() => closeSheet()}
         />
@@ -138,8 +133,14 @@ export function BrewingCard({
     });
   };
 
-  const { selectedReactions, totalCount, displayReactions, handleToggle, reactionItems, firstReactorName } =
-    useCardReactions("practice", id, batchReactionData, onReactionMutate);
+  const {
+    selectedReactions,
+    totalCount,
+    displayReactions,
+    handleToggle,
+    reactionItems,
+    firstReactorName,
+  } = useCardReactions("practice", id, batchReactionData, onReactionMutate);
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
@@ -297,7 +298,8 @@ export function BrewingCard({
         >
           <DialogOutlineSvg className="size-6" />
           {(() => {
-            const count = commentsData?.data?.length ?? commentCount;
+            const count =
+              practiceData?.data?.stats?.commentCount ?? commentsData?.data?.length ?? commentCount;
             return count > 0 ? <span className="text-sm font-medium">{count}</span> : null;
           })()}
         </Link>

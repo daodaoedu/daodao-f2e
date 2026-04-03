@@ -7,31 +7,26 @@ import * as React from "react";
 import { cn } from "../lib/utils";
 
 // Component to handle image preview with proper cleanup
-// 使用 ref 同步建立 blob URL，避免 React strict mode 下 effect 雙重執行導致 URL 被提前 revoke
+// 使用 useState + effect cleanup 先清除 src 再 revoke，避免 React Strict Mode 雙重 effect
+// 導致 URL 失效後 img 仍指向已 revoked blob URL 而破圖
 const FilePreviewImage = ({ file, index }: { file: File; index: number }) => {
-  const urlRef = React.useRef<string | null>(null);
-  const prevFileRef = React.useRef<File | null>(null);
-
-  if (prevFileRef.current !== file) {
-    if (urlRef.current) {
-      URL.revokeObjectURL(urlRef.current);
-    }
-    urlRef.current = URL.createObjectURL(file);
-    prevFileRef.current = file;
-  }
+  const [objectUrl, setObjectUrl] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    const url = URL.createObjectURL(file);
+    setObjectUrl(url);
+
     return () => {
-      if (urlRef.current) {
-        URL.revokeObjectURL(urlRef.current);
-        urlRef.current = null;
-      }
+      setObjectUrl(null);
+      URL.revokeObjectURL(url);
     };
-  }, []);
+  }, [file]);
+
+  if (!objectUrl) return null;
 
   return (
     <img
-      src={urlRef.current!}
+      src={objectUrl}
       alt={`Preview ${index + 1}`}
       className="w-full h-full object-cover"
     />
