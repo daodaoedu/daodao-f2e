@@ -119,7 +119,7 @@ type SheetTitleProps = SheetTitlePrimitiveProps;
 
 function SheetTitle({ className, ...props }: SheetTitleProps) {
   return (
-    <SheetTitlePrimitive className={cn("text-center text-md font-medium", className)} {...props} />
+    <SheetTitlePrimitive className={cn("text-center text-md font-medium text-text-dark", className)} {...props} />
   );
 }
 

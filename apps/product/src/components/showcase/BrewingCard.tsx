@@ -1,12 +1,7 @@
 "use client";
 
 import type { BatchReactionItem } from "@daodao/api";
-import {
-  followTarget,
-  unfollowTarget,
-  useComments,
-  usePracticeById,
-} from "@daodao/api";
+import { followTarget, unfollowTarget, useComments, usePracticeById } from "@daodao/api";
 import {
   ChartColumnIncreasingSvg,
   DefaultAvatarSvg,
@@ -113,15 +108,13 @@ export function BrewingCard({
 
   const handleOpenBrowseActivity = () => {
     setMenuOpen(false);
-    const followers: IBrowseActivityFollower[] = reactionItems.map(
-      (item) => ({
-        id: item.userId,
-        name: item.name,
-        photoURL: item.photoURL ?? undefined,
-        time: formatRelativeTime(item.reactedAt),
-        reaction: item.reactionType as ReactionTypeType,
-      })
-    );
+    const followers: IBrowseActivityFollower[] = reactionItems.map((item) => ({
+      id: item.userId,
+      name: item.name,
+      photoURL: item.photoURL ?? undefined,
+      time: formatRelativeTime(item.reactedAt),
+      reaction: item.reactionType as ReactionTypeType,
+    }));
     openSheet({
       title: "瀏覽活動",
       content: (
@@ -138,8 +131,14 @@ export function BrewingCard({
     });
   };
 
-  const { selectedReactions, totalCount, displayReactions, handleToggle, reactionItems, firstReactorName } =
-    useCardReactions("practice", id, batchReactionData, onReactionMutate);
+  const {
+    selectedReactions,
+    totalCount,
+    displayReactions,
+    handleToggle,
+    reactionItems,
+    firstReactorName,
+  } = useCardReactions("practice", id, batchReactionData, onReactionMutate);
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation

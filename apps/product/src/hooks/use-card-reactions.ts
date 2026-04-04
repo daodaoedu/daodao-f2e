@@ -6,12 +6,7 @@ import type {
   ReactionTargetType,
   ReactionTypeValue,
 } from "@daodao/api";
-import {
-  removeReaction,
-  upsertReaction,
-  useReactions,
-  useReactionsList,
-} from "@daodao/api";
+import { removeReaction, upsertReaction, useReactions, useReactionsList } from "@daodao/api";
 import { useCallback, useTransition } from "react";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 
@@ -19,26 +14,24 @@ export function useCardReactions(
   targetType: ReactionTargetType,
   targetId: string,
   prefetchedData?: BatchReactionItem,
-  onMutate?: () => void,
+  onMutate?: () => void
 ) {
   const hasBatch = !!prefetchedData;
 
   const { data: reactionsData, mutate } = useReactions(
     { targetType, targetId },
-    { enabled: !hasBatch },
+    { enabled: !hasBatch }
   );
   const { data: reactionsListData } = useReactionsList(
     { targetType, targetId },
-    { enabled: !hasBatch },
+    { enabled: !hasBatch }
   );
   const [, startTransition] = useTransition();
 
   const source = prefetchedData ?? reactionsData?.data;
 
   const currentUserReaction = (source?.currentUserReaction ?? null) as ReactionTypeType | null;
-  const selectedReactions: ReactionTypeType[] = currentUserReaction
-    ? [currentUserReaction]
-    : [];
+  const selectedReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
   const allReactions = source?.reactions ?? [];
   const totalCount = allReactions.reduce((sum, r) => sum + r.count, 0);
   const displayReactions = allReactions
@@ -67,7 +60,7 @@ export function useCardReactions(
         onMutate?.();
       });
     },
-    [currentUserReaction, targetType, targetId, mutate, onMutate],
+    [currentUserReaction, targetType, targetId, mutate, onMutate]
   );
 
   return {

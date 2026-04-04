@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  followTarget,
-  unfollowTarget,
-  useComments,
-  usePracticeById,
-} from "@daodao/api";
+import type { BatchReactionItem } from "@daodao/api";
+import { followTarget, unfollowTarget, useComments, usePracticeById } from "@daodao/api";
 import {
   ChartColumnIncreasingSvg,
   DefaultAvatarSvg,
@@ -29,7 +25,6 @@ import {
 } from "@/components/practice/shared/browse-activity-content";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
-import type { BatchReactionItem } from "@daodao/api";
 import { useCardReactions } from "@/hooks/use-card-reactions";
 import { formatRelativeTime } from "@/utils/format-time";
 import { formatShowcaseDate } from "./utils";
@@ -116,15 +111,13 @@ export function PracticeShowcaseCard({
 
   const handleOpenBrowseActivity = () => {
     setMenuOpen(false);
-    const followers: IBrowseActivityFollower[] = reactionItems.map(
-      (item) => ({
-        id: item.userId,
-        name: item.name,
-        photoURL: item.photoURL ?? undefined,
-        time: formatRelativeTime(item.reactedAt),
-        reaction: item.reactionType as ReactionTypeType,
-      })
-    );
+    const followers: IBrowseActivityFollower[] = reactionItems.map((item) => ({
+      id: item.userId,
+      name: item.name,
+      photoURL: item.photoURL ?? undefined,
+      time: formatRelativeTime(item.reactedAt),
+      reaction: item.reactionType as ReactionTypeType,
+    }));
     openSheet({
       title: "瀏覽活動",
       content: (
@@ -141,14 +134,20 @@ export function PracticeShowcaseCard({
     });
   };
 
-  const { selectedReactions, totalCount, displayReactions, handleToggle, reactionItems, firstReactorName } =
-    useCardReactions("practice", id, batchReactionData, onReactionMutate);
+  const {
+    selectedReactions,
+    totalCount,
+    displayReactions,
+    handleToggle,
+    reactionItems,
+    firstReactorName,
+  } = useCardReactions("practice", id, batchReactionData, onReactionMutate);
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
     // biome-ignore lint/a11y/noStaticElementInteractions: card click for navigation
     <div
-      className="bg-white rounded-2xl p-4 shadow-sm border border-[#E8F8FF] cursor-pointer"
+      className="bg-white rounded-xl p-5 cursor-pointer shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200"
       onClick={() => router.push(`/practices/${id}`)}
     >
       {/* Header row */}

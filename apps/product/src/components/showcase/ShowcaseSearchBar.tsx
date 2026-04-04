@@ -44,8 +44,8 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
     <div className="relative">
       <div
         className={cn(
-          "flex items-center gap-2 bg-white border rounded-xl px-3 py-2.5 transition-all",
-          focused ? "border-gray-400 shadow-sm" : "border-gray-300"
+          "flex items-center gap-2 bg-white border rounded-[8px] px-4 h-10 transition-all",
+          focused ? "border-[#9fb5b8]" : "border-[#e4eae9]"
         )}
       >
         <Search className="size-4 text-text-dark/40 shrink-0" />
@@ -53,7 +53,7 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
           ref={inputRef}
           type="text"
           value={value}
-          placeholder=""
+          placeholder="搜尋靈感"
           className="flex-1 text-sm text-text-dark outline-none bg-transparent placeholder:text-text-dark/40"
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 150)}
