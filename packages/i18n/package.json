@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@daodao/shared": "workspace:*",
-    "next-intl": "^4.6.1"
+    "next-intl": "^4.9.1"
   },
   "devDependencies": {
     "@daodao/config": "workspace:*",
