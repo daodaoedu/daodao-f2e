@@ -14,12 +14,11 @@ import { CheckCircle2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AddTaskFAB,
-  CompletedSection,
   DashboardHeader,
   InProgressSection,
   type InProgressTask,
+  RecommendationSection,
 } from "@/components/dashboard";
-import type { CompletedTask } from "@/components/dashboard/completed-section";
 import { BackgroundAnimation, Banner } from "@/components/layout";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import {
@@ -124,10 +123,9 @@ export default function HomePage() {
   const { data: allPracticesData, isLoading: isMyLoading } = useMyPractices({ limit: 16 });
   const { data: statsData } = useMyPracticeStats();
 
-  const { inProgressTasks, completedTasks } = useMemo(() => {
+  const { inProgressTasks } = useMemo(() => {
     const practices = allPracticesData?.data || [];
     const inProgressTasksData: InProgressTask[] = [];
-    const completedTasksData: CompletedTask[] = [];
 
     practices.forEach((practice) => {
       const isInProgress =
@@ -153,20 +151,10 @@ export default function HomePage() {
           startDate: practice.startDate || null,
           endDate: practice.endDate || null,
         });
-      } else if (practice.status === PracticeStatus.completed) {
-        completedTasksData.push({
-          id: practice.id,
-          label: "主題實踐",
-          title: practice.title,
-          description: practice.practiceAction || "",
-          viewCount: 0,
-          commentCount: 0,
-          tags: practice.tags || [],
-        });
       }
     });
 
-    return { inProgressTasks: inProgressTasksData, completedTasks: completedTasksData };
+    return { inProgressTasks: inProgressTasksData };
   }, [allPracticesData]);
 
   const filteredInProgressTasks = useMemo(() => {
@@ -193,10 +181,8 @@ export default function HomePage() {
     ];
   }, [statsData]);
 
-  const hasPractices = inProgressTasks.length > 0 || completedTasks.length > 0;
+  const hasPractices = inProgressTasks.length > 0;
   const showInProgress = filterStatus !== FilterStatus.completed;
-  const showCompleted =
-    filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
 
   return (
     <div className="relative min-h-screen">
@@ -355,7 +341,7 @@ export default function HomePage() {
                     </div>
 
                     {showInProgress && <InProgressSection tasks={filteredInProgressTasks} />}
-                    {showCompleted && <CompletedSection tasks={completedTasks} />}
+                    <RecommendationSection onGoToInspire={() => setActiveTab("inspire")} />
                   </>
                 )}
               </>

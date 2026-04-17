@@ -5,5 +5,6 @@ export { CompletedTaskCard } from "./completed-task-card";
 export { DashboardHeader } from "./dashboard-header";
 export type { InProgressTask } from "./in-progress-section";
 export { InProgressSection } from "./in-progress-section";
+export { RecommendationSection } from "./recommendation-section";
 export { InProgressTaskCard } from "./in-progress-task-card";
 export { StatCard } from "./stat-card";
