@@ -151,7 +151,10 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => setMenuOpen(false)}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    window.open("https://tally.so/r/BzGQy4", "_blank");
+                  }}
                   className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
                 >
                   <FlagOutlineSvg className="size-5 shrink-0" />

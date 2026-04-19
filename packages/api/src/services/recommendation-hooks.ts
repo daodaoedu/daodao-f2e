@@ -77,6 +77,25 @@ export function useTopicRecommendations({
 }
 
 // ============================================================================
+// Direct fetch (for on-demand refill without SWR)
+// ============================================================================
+
+export async function fetchTopicCards({
+  limit = 1,
+  excludeIds = [],
+}: { limit?: number; excludeIds?: number[] } = {}): Promise<ITopicCard[]> {
+  const qs = new URLSearchParams();
+  qs.set("limit", String(limit));
+  for (const id of excludeIds) {
+    qs.append("exclude_ids", String(id));
+  }
+  const data = await fetchAiBackend<AIResponse<ITopicCard[]>>(
+    `/api/v1/recommendation/topic_cards?${qs.toString()}`
+  );
+  return data.data ?? [];
+}
+
+// ============================================================================
 // POST feedback mutation
 // ============================================================================
 

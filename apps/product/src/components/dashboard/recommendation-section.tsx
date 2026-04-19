@@ -4,6 +4,7 @@ import { posthogCapture } from "@daodao/analytics";
 import {
   type FeedbackState,
   type ITopicCard,
+  fetchTopicCards,
   submitRecommendationFeedback,
   useTopicRecommendations,
 } from "@daodao/api";
@@ -227,26 +228,18 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
   const [initialized, setInitialized] = useState(false);
   const [hidingIds, setHidingIds] = useState<Set<string>>(new Set());
   const hideTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
-
-  const excludeIds = displayedCards.map((c) => c.targetId);
-  const refillLimit = 1;
+  const hidingCardsRef = useRef<Map<string, ITopicCard>>(new Map());
 
   const { cards: fetchedCards, isLoading } = useTopicRecommendations({ limit: 3 });
 
   // 首次載入：設定 displayedCards
-  if (!initialized && !isLoading && fetchedCards.length > 0) {
-    setDisplayedCards(fetchedCards);
+  useEffect(() => {
+    if (initialized || isLoading) return;
+    if (fetchedCards.length > 0) {
+      setDisplayedCards(fetchedCards);
+    }
     setInitialized(true);
-  }
-  if (!initialized && !isLoading && fetchedCards.length === 0 && !initialized) {
-    setInitialized(true);
-  }
-
-  const { cards: refillCards, mutate: refillMutate } = useTopicRecommendations({
-    limit: refillLimit,
-    excludeIds,
-    enabled: false,
-  });
+  }, [initialized, isLoading, fetchedCards]);
 
   useEffect(() => {
     if (initialized && displayedCards.length > 0) {
@@ -255,14 +248,28 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
         platform: "web",
       });
     }
-  }, [initialized]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [initialized, displayedCards.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const timers = hideTimersRef.current;
+    return () => {
+      for (const timer of timers.values()) clearTimeout(timer);
+    };
+  }, []);
 
   const handleUndoHide = useCallback((id: string) => {
     const timer = hideTimersRef.current.get(id);
     if (timer) {
       clearTimeout(timer);
       hideTimersRef.current.delete(id);
+    } else {
+      // Timer already fired — card was removed, restore it
+      const card = hidingCardsRef.current.get(id);
+      if (card) {
+        setDisplayedCards((prev) => [card, ...prev]);
+      }
     }
+    hidingCardsRef.current.delete(id);
     setHidingIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -273,6 +280,7 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
   const handleDislike = useCallback(
     (card: ITopicCard) => {
       setHidingIds((prev) => new Set([...prev, card.practiceId]));
+      hidingCardsRef.current.set(card.practiceId, card);
 
       const timer = setTimeout(async () => {
         setDisplayedCards((prev) => prev.filter((c) => c.practiceId !== card.practiceId));
@@ -285,11 +293,14 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
 
         try {
           await submitRecommendationFeedback(card.practiceId, "dislike");
-          await refillMutate();
-          if (refillCards.length > 0) {
+          const currentExcludeIds = displayedCards
+            .filter((c) => c.practiceId !== card.practiceId)
+            .map((c) => c.targetId);
+          const newCards = await fetchTopicCards({ limit: 1, excludeIds: currentExcludeIds });
+          if (newCards.length > 0) {
             setDisplayedCards((prev) => {
               const existingIds = new Set(prev.map((c) => c.practiceId));
-              const newCard = refillCards.find((c) => !existingIds.has(c.practiceId));
+              const newCard = newCards.find((c) => !existingIds.has(c.practiceId));
               return newCard ? [...prev, newCard] : prev;
             });
           }
@@ -307,7 +318,7 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
         },
       });
     },
-    [refillCards, refillMutate, handleUndoHide]
+    [displayedCards, handleUndoHide]
   );
 
   const handleLike = useCallback((card: ITopicCard) => {

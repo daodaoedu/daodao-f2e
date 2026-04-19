@@ -27,7 +27,6 @@ import {
   type ShowcaseFilterState,
   ShowcaseSearchBar,
 } from "@/components/showcase";
-import { PracticeStatus } from "@/constants/practice-status";
 import {
   FilterStatus,
   type FilterStatus as FilterStatusType,
@@ -128,38 +127,32 @@ export default function HomePage() {
     const inProgressTasksData: InProgressTask[] = [];
 
     practices.forEach((practice) => {
-      const isInProgress =
-        practice.status === PracticeStatus.active ||
-        practice.status === PracticeStatus.draft ||
-        practice.status === PracticeStatus.notStarted;
-
       const lastCheckInDate = practice.lastCheckinAt ?? null;
-
-      if (isInProgress) {
-        inProgressTasksData.push({
-          id: practice.id,
-          label: "主題實踐",
-          title: practice.title,
-          description: practice.practiceAction || "",
-          checkInCount: practice.checkInCount,
-          progress: practice.progressPercentage ?? 0,
-          messagesCount: 0,
-          isUnreadMessages: false,
-          theme: practice.themeColor || "#FCDD84",
-          status: mapPracticeStatusToTaskStatus(practice.status),
-          lastCheckInDate,
-          startDate: practice.startDate || null,
-          endDate: practice.endDate || null,
-        });
-      }
+      inProgressTasksData.push({
+        id: practice.id,
+        label: "主題實踐",
+        title: practice.title,
+        description: practice.practiceAction || "",
+        checkInCount: practice.checkInCount,
+        progress: practice.progressPercentage ?? 0,
+        messagesCount: 0,
+        isUnreadMessages: false,
+        theme: practice.themeColor || "#FCDD84",
+        status: mapPracticeStatusToTaskStatus(practice.status),
+        lastCheckInDate,
+        startDate: practice.startDate || null,
+        endDate: practice.endDate || null,
+      });
     });
 
     return { inProgressTasks: inProgressTasksData };
   }, [allPracticesData]);
 
   const filteredInProgressTasks = useMemo(() => {
-    if (filterStatus === FilterStatus.completed) return [];
-    if (filterStatus === FilterStatus.all) return inProgressTasks;
+    if (filterStatus === FilterStatus.completed)
+      return inProgressTasks.filter((task) => task.status === FilterStatus.completed);
+    if (filterStatus === FilterStatus.all)
+      return inProgressTasks.filter((task) => task.status !== FilterStatus.completed);
     return inProgressTasks.filter((task) => task.status === filterStatus);
   }, [inProgressTasks, filterStatus]);
 
@@ -182,7 +175,7 @@ export default function HomePage() {
   }, [statsData]);
 
   const hasPractices = inProgressTasks.length > 0;
-  const showInProgress = filterStatus !== FilterStatus.completed;
+  const showInProgress = true;
 
   return (
     <div className="relative min-h-screen">
