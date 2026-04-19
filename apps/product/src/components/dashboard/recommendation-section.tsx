@@ -6,9 +6,10 @@ import {
   submitRecommendationFeedback,
   useTopicRecommendations,
 } from "@daodao/api";
+import { posthogCapture } from "@daodao/analytics";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // ── Creator Avatar ────────────────────────────────────────────
 
@@ -35,13 +36,29 @@ interface RecommendationCardProps {
 }
 
 function RecommendationCard({ card, onDislike, onLike }: RecommendationCardProps) {
+  const router = useRouter();
   const [feedbackState, setFeedbackState] = useState<FeedbackState>(card.feedbackState);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleCardClick = useCallback(() => {
+    posthogCapture("recommendation_card_clicked", {
+      entity_type: "practice",
+      entity_id: card.practiceId,
+      match_reason_code: card.matchReasonCode,
+      platform: "web",
+    });
+    router.push(`/practices/${card.practiceId}`);
+  }, [card.practiceId, card.matchReasonCode, router]);
 
   const handleFeedback = useCallback(
     async (type: "like" | "dislike") => {
       if (isSubmitting) return;
       if (type === "dislike") {
+        posthogCapture("recommendation_feedback_disliked", {
+          entity_id: card.practiceId,
+          match_reason_code: card.matchReasonCode,
+          platform: "web",
+        });
         onDislike(card);
         return;
       }
@@ -49,49 +66,62 @@ function RecommendationCard({ card, onDislike, onLike }: RecommendationCardProps
       try {
         const newState = await submitRecommendationFeedback(card.practiceId, "like");
         setFeedbackState(newState);
+        posthogCapture("recommendation_feedback_liked", {
+          entity_id: card.practiceId,
+          match_reason_code: card.matchReasonCode,
+          platform: "web",
+        });
+        onLike(card);
       } catch {
         // silent fail
       } finally {
         setIsSubmitting(false);
       }
     },
-    [card, isSubmitting, onDislike]
+    [card, isSubmitting, onDislike, onLike]
   );
 
   return (
-    <div className="bg-white rounded-2xl p-4 border border-[#E8F8FF] flex flex-col gap-3 min-w-[240px] md:min-w-0">
-      {/* Reason chip */}
-      <div className="inline-flex items-center gap-1 bg-[#F0FBF8] text-[#4CAF93] text-xs font-medium px-2 py-1 rounded-full self-start max-w-full">
-        <Sparkles size={11} className="shrink-0" />
-        <span className="truncate">{card.matchReasonText}</span>
-      </div>
-
-      {/* Title & description */}
-      <div>
-        <h3 className="font-semibold text-text-dark text-base leading-snug line-clamp-2">
-          {card.title}
-        </h3>
-        {card.description && (
-          <p className="text-text-dark/50 text-xs mt-1 line-clamp-2">{card.description}</p>
-        )}
-      </div>
-
-      {/* Tags */}
-      {card.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {card.tags.slice(0, 3).map((tag) => (
-            <span
-              key={tag}
-              className="text-xs text-text-dark/60 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100"
-            >
-              #{tag}
-            </span>
-          ))}
+    <div className="bg-white rounded-2xl border border-[#E8F8FF] flex flex-col min-w-[240px] md:min-w-0 overflow-hidden">
+      {/* Clickable body */}
+      <button
+        type="button"
+        onClick={handleCardClick}
+        className="flex flex-col gap-3 p-4 text-left w-full hover:bg-[#F9FFFE] transition-colors"
+      >
+        {/* Reason chip */}
+        <div className="inline-flex items-center gap-1 bg-[#F0FBF8] text-[#4CAF93] text-xs font-medium px-2 py-1 rounded-full self-start max-w-full">
+          <Sparkles size={11} className="shrink-0" />
+          <span className="truncate">{card.matchReasonText}</span>
         </div>
-      )}
+
+        {/* Title & description */}
+        <div>
+          <h3 className="font-semibold text-text-dark text-base leading-snug line-clamp-2">
+            {card.title}
+          </h3>
+          {card.description && (
+            <p className="text-text-dark/50 text-xs mt-1 line-clamp-2">{card.description}</p>
+          )}
+        </div>
+
+        {/* Tags */}
+        {card.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {card.tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag}
+                className="text-xs text-text-dark/60 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </button>
 
       {/* Footer: creator + feedback */}
-      <div className="flex items-center justify-between mt-auto">
+      <div className="flex items-center justify-between px-4 pb-4">
         <div className="flex items-center gap-1.5 min-w-0">
           <CreatorAvatar name={card.creator.name} />
           <span className="text-xs text-text-dark/60 truncate">{card.creator.name}</span>
@@ -200,6 +230,15 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
     excludeIds,
     enabled: false,
   });
+
+  useEffect(() => {
+    if (initialized && displayedCards.length > 0) {
+      posthogCapture("recommendation_section_viewed", {
+        card_count: displayedCards.length,
+        platform: "web",
+      });
+    }
+  }, [initialized]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDislike = useCallback(
     async (card: ITopicCard) => {

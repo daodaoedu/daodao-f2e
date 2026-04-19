@@ -80,7 +80,7 @@ export async function submitRecommendationFeedback(
   practiceId: string,
   feedbackType: FeedbackType
 ): Promise<FeedbackState> {
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_AI_API_URL");
+  const baseUrl = getRequiredEnv("NEXT_PUBLIC_AI_API_URL").replace(/\/$/, "");
   const res = await fetch(
     `${baseUrl}/api/v1/recommendation/topic_cards/${practiceId}/feedback`,
     {

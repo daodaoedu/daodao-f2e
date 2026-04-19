@@ -127,7 +127,7 @@ export interface ApiClientConfig {
  * 使用環境變數 NEXT_PUBLIC_API_URL 或預設值
  */
 export const client = createClient<paths>({
-  baseUrl: getRequiredEnv("NEXT_PUBLIC_API_URL"),
+  baseUrl: getRequiredEnv("NEXT_PUBLIC_API_URL").replace(/\/$/, ""),
   credentials: "include",
   fetch: typeof window === "undefined" ? fetch : unauthorizedHandler.wrapFetch,
 });

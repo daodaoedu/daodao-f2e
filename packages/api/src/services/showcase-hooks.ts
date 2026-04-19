@@ -60,7 +60,7 @@ export interface IShowcaseFeedParams {
 // ============================================================================
 
 export async function fetchAiBackend<T>(path: string): Promise<T> {
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_AI_API_URL");
+  const baseUrl = getRequiredEnv("NEXT_PUBLIC_AI_API_URL").replace(/\/$/, "");
   const res = await fetch(`${baseUrl}${path}`, {
     credentials: "include",
   });
