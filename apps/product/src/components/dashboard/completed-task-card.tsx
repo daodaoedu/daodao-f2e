@@ -31,7 +31,7 @@ export const CompletedTaskCard = ({
     <CustomLink
       href={`/practices/${id}`}
       className={cn(
-        "flex flex-col gap-1 rounded-[12px] border border-border bg-white px-4 py-3 transition-shadow hover:shadow-sm",
+        "flex flex-col gap-1 rounded-[12px] border border-border bg-white px-4 py-3 overflow-hidden transition-all duration-200 hover:shadow-md hover:scale-[1.02]",
         className
       )}
     >

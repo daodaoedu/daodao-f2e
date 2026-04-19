@@ -1,5 +1,6 @@
 export { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 export { AddTaskFAB } from "./add-task-fab";
+export { CommunityChallengeCard } from "./community-challenge-card";
 export { CompletedSection } from "./completed-section";
 export { CompletedTaskCard } from "./completed-task-card";
 export { DashboardHeader } from "./dashboard-header";

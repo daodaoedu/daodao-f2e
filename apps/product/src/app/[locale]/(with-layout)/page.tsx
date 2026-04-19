@@ -16,10 +16,11 @@ import {
   AddTaskFAB,
   CompletedSection,
   DashboardHeader,
-  InProgressSection,
   type InProgressTask,
+  InProgressTaskCard,
 } from "@/components/dashboard";
 import type { CompletedTask } from "@/components/dashboard/completed-section";
+import { ExploreTopicsSection } from "@/components/dashboard/explore-topics-section";
 import { BackgroundAnimation, Banner } from "@/components/layout";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import {
@@ -34,6 +35,7 @@ import {
   type FilterStatus as FilterStatusType,
   mapPracticeStatusToTaskStatus,
 } from "@/constants/task-status";
+import { useExploreTopics } from "@/hooks/use-challenges";
 
 type TabType = "inspire" | "mine";
 
@@ -123,6 +125,7 @@ export default function HomePage() {
   // My practices
   const { data: allPracticesData, isLoading: isMyLoading } = useMyPractices({ limit: 16 });
   const { data: statsData } = useMyPracticeStats();
+  const { topics } = useExploreTopics();
 
   const { inProgressTasks, completedTasks } = useMemo(() => {
     const practices = allPracticesData?.data || [];
@@ -211,10 +214,10 @@ export default function HomePage() {
               type="button"
               onClick={() => setActiveTab("inspire")}
               className={cn(
-                "flex-1 py-2 text-sm font-medium transition-all",
+                "flex-1 py-2 text-sm font-medium transition-all cursor-pointer",
                 activeTab === "inspire"
-                  ? "text-text-dark border-b-2 border-logo-cyan -mb-px"
-                  : "text-text-dark/40"
+                  ? "text-text-dark border-b-2 border-logo-cyan -mb-px hover:text-primary-base"
+                  : "text-text-dark/40 hover:text-text-dark/70"
               )}
             >
               靈感
@@ -223,10 +226,10 @@ export default function HomePage() {
               type="button"
               onClick={() => setActiveTab("mine")}
               className={cn(
-                "flex-1 py-2 text-sm font-medium transition-all",
+                "flex-1 py-2 text-sm font-medium transition-all cursor-pointer",
                 activeTab === "mine"
-                  ? "text-text-dark border-b-2 border-logo-cyan -mb-px"
-                  : "text-text-dark/40"
+                  ? "text-text-dark border-b-2 border-logo-cyan -mb-px hover:text-primary-base"
+                  : "text-text-dark/40 hover:text-text-dark/70"
               )}
             >
               我的
@@ -325,39 +328,68 @@ export default function HomePage() {
             ) : (
               <>
                 <DashboardHeader stats={stats} />
-                {!hasPractices && <RandomPracticesSection compact />}
-                {hasPractices && (
-                  <>
-                    <div className="mb-4">
-                      <div
-                        role="tablist"
-                        aria-label="任務篩選"
-                        className="flex gap-2 overflow-x-auto scrollbar-hide"
-                      >
-                        {filterOptions.map((option) => (
-                          <button
-                            type="button"
-                            key={option.value}
-                            role="tab"
-                            aria-selected={filterStatus === option.value}
-                            onClick={() => setFilterStatus(option.value)}
-                            className={cn(
-                              "px-5 py-2 rounded-full text-sm whitespace-nowrap border transition-colors",
-                              filterStatus === option.value
-                                ? "bg-primary-base border-primary-base text-white"
-                                : "bg-white border-primary-base text-primary-base"
-                            )}
-                          >
-                            {option.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
 
-                    {showInProgress && <InProgressSection tasks={filteredInProgressTasks} />}
-                    {showCompleted && <CompletedSection tasks={completedTasks} />}
-                  </>
+                {/* Filter pills — 有實踐時才顯示 */}
+                {hasPractices && (
+                  <div className="mb-4">
+                    <div
+                      role="tablist"
+                      aria-label="任務篩選"
+                      className="flex gap-2 overflow-x-auto scrollbar-hide"
+                    >
+                      {filterOptions.map((option) => (
+                        <button
+                          type="button"
+                          key={option.value}
+                          role="tab"
+                          aria-selected={filterStatus === option.value}
+                          onClick={() => setFilterStatus(option.value)}
+                          className={cn(
+                            "px-5 py-2 rounded-full text-sm whitespace-nowrap border transition-colors cursor-pointer",
+                            filterStatus === option.value
+                              ? "bg-primary-base border-primary-base text-white hover:bg-primary-darker"
+                              : "bg-white border-primary-base text-primary-base hover:bg-primary-palest"
+                          )}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
+
+                {/* 個人實踐卡 — mobile 橫向捲動，desktop 雙欄 grid */}
+                {showInProgress && filteredInProgressTasks.length > 0 && (
+                  <div className="flex overflow-auto *:shrink-0 gap-3 scrollbar-hide mb-6 md:grid md:grid-cols-2 md:overflow-visible">
+                    {filteredInProgressTasks.map((task) => (
+                      <InProgressTaskCard
+                        key={task.id}
+                        id={task.id.toString()}
+                        label={task.label}
+                        title={task.title}
+                        description={task.description}
+                        checkInCount={task.checkInCount}
+                        progress={task.progress}
+                        messagesCount={task.messagesCount}
+                        theme={task.theme}
+                        isUnreadMessages={task.isUnreadMessages}
+                        status={task.status}
+                        lastCheckInDate={task.lastCheckInDate}
+                        startDate={task.startDate}
+                        endDate={task.endDate}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* 沒有實踐時顯示隨機推薦 */}
+                {!hasPractices && <RandomPracticesSection compact />}
+
+                {/* 已完成清單 */}
+                {hasPractices && showCompleted && <CompletedSection tasks={completedTasks} />}
+
+                {/* 探索相關主題 — 無條件顯示 */}
+                <ExploreTopicsSection topics={topics} />
               </>
             ))}
         </div>
