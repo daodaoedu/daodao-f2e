@@ -50,7 +50,11 @@ export interface ITopicCardsParams {
   enabled?: boolean;
 }
 
-export function useTopicRecommendations({ limit = 3, excludeIds = [], enabled = true }: ITopicCardsParams = {}) {
+export function useTopicRecommendations({
+  limit = 3,
+  excludeIds = [],
+  enabled = true,
+}: ITopicCardsParams = {}) {
   const qs = new URLSearchParams();
   qs.set("limit", String(limit));
   for (const id of excludeIds) {
@@ -81,16 +85,16 @@ export async function submitRecommendationFeedback(
   feedbackType: FeedbackType
 ): Promise<FeedbackState> {
   const baseUrl = getRequiredEnv("NEXT_PUBLIC_AI_API_URL").replace(/\/$/, "");
-  const res = await fetch(
-    `${baseUrl}/api/v1/recommendation/topic_cards/${practiceId}/feedback`,
-    {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ feedbackType }),
-    }
-  );
+  const res = await fetch(`${baseUrl}/api/v1/recommendation/topic_cards/${practiceId}/feedback`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ feedbackType }),
+  });
   if (!res.ok) throw new Error(`Feedback failed: ${res.status}`);
-  const json = (await res.json()) as AIResponse<{ practiceId: string; feedbackState: FeedbackState }>;
+  const json = (await res.json()) as AIResponse<{
+    practiceId: string;
+    feedbackState: FeedbackState;
+  }>;
   return json.data?.feedbackState ?? "neutral";
 }

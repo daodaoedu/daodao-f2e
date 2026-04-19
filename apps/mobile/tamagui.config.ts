@@ -1,4 +1,3 @@
-// @ts-expect-error - package not hoisted in pnpm workspace, runtime works
 import { createAnimations } from "@tamagui/animations-react-native";
 import { tokens as defaultTokens } from "@tamagui/config/v3";
 import { shorthands } from "@tamagui/shorthands";

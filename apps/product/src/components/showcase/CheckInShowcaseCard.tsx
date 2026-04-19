@@ -1,17 +1,24 @@
 "use client";
 
-import type { IShowcaseCheckIn } from "@daodao/api";
-import { DialogOutlineSvg } from "@daodao/assets";
+import type { BatchReactionItem, IShowcaseCheckIn } from "@daodao/api";
+import { DefaultAvatarSvg, DialogOutlineSvg, FlagOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
-import { MapPin, Pencil } from "lucide-react";
+import { Button } from "@daodao/ui/components/button";
+import { MoreHorizontal } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { CheckInCard } from "@/components/check-in/display/check-in-card";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import type { ApiMoodType } from "@/constants/mood";
 import { MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCardReactions } from "@/hooks/use-card-reactions";
-import { formatRelativeTime } from "@/utils/format-time";
 
-export function CheckInShowcaseCard(props: IShowcaseCheckIn) {
+type CheckInShowcaseCardProps = IShowcaseCheckIn & {
+  batchReactionData?: BatchReactionItem;
+  onReactionMutate?: () => void;
+};
+
+export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
   const {
     id,
     checkin_date,
@@ -23,152 +30,191 @@ export function CheckInShowcaseCard(props: IShowcaseCheckIn) {
     user,
     comment_count,
     comment_preview,
+    batchReactionData,
+    onReactionMutate,
   } = props;
 
   const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [menuOpen]);
+
   const frontendMood = mapApiMoodToMoodType(mood as ApiMoodType);
   const moodOption = frontendMood ? MOOD_OPTIONS.find((m) => m.id === frontendMood) : null;
+  const MoodEmoji = moodOption?.emoji;
 
-  const { selectedReactions, totalCount, displayReactions, handleToggle } = useCardReactions(
-    "checkin",
-    id
-  );
+  const { selectedReactions, totalCount, displayReactions, handleToggle, firstReactorName } =
+    useCardReactions("checkin", id, batchReactionData, onReactionMutate);
 
   const handleCardClick = () => {
     router.push(`/practices/${practice.id}/check-ins/${id}`);
-  };
-
-  const handlePracticeClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    router.push(`/practices/${practice.id}`);
   };
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
     // biome-ignore lint/a11y/noStaticElementInteractions: card click for navigation
     <div
-      className="rounded-2xl bg-white p-4 shadow-sm border border-logo-orange/15 cursor-pointer"
+      className="rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200"
       onClick={handleCardClick}
     >
-      {/* 1. Header: badge + mood */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-logo-orange/10 text-logo-orange text-xs font-medium">
-            <Pencil className="size-3" />
-            打卡
-          </span>
-          <span className="text-xs text-text-dark/50">{checkin_date}</span>
+      {/* ======= 上方：封面區（teal 背景 + 底部漸層） =======
+          - 有上傳照片 → 顯示第一張照片作為封面
+          - 無照片     → 顯示筆記本風格的打卡卡片預覽（同「分享打卡」圖）
+      */}
+      <div className="relative bg-logo-cyan overflow-hidden">
+        {image_urls && image_urls.length > 0 ? (
+          /* 有照片：直接顯示第一張圖片 */
+          <div className="h-[240px] w-full overflow-hidden">
+            <img src={image_urls[0]} alt="打卡封面" className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          /* 無照片：顯示打卡卡片預覽（同分享打卡圖樣式） */
+          <div className="max-h-[240px] overflow-hidden pointer-events-none select-none pt-8">
+            <CheckInCard
+              taskTitle={practice.title}
+              date={checkin_date}
+              mood={frontendMood}
+              content={note}
+              tags={tags ?? []}
+              images={[]}
+              titleClassName="hidden"
+              showTape={false}
+            />
+          </div>
+        )}
+
+        {/* 底部漸層：透明 → logo-cyan */}
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-transparent to-logo-cyan pointer-events-none" />
+      </div>
+
+      {/* ======= 下方：社群資訊區（白色） ======= */}
+      <div className="bg-white px-5 pt-4 pb-5 flex flex-col gap-4">
+        {/* 用戶列 */}
+        <div className="relative flex gap-4 items-start">
+          {/* 頭像 */}
+          <div className="shrink-0 size-16">
+            <Avatar className="size-16">
+              {user?.photo_url && <AvatarImage src={user.photo_url} alt={user.name} />}
+              <AvatarFallback>
+                <DefaultAvatarSvg />
+              </AvatarFallback>
+            </Avatar>
+          </div>
+
+          {/* 心情 badge（疊在頭像右下角，相對於整行容器定位） */}
+          {MoodEmoji && (
+            <div className="absolute left-[45px] top-[40px] size-6 z-10">
+              <MoodEmoji className="size-6" />
+            </div>
+          )}
+
+          {/* 文字內容 */}
+          <div className="flex-1 min-w-0 flex flex-col gap-2">
+            <p className="text-sm text-light-gray whitespace-nowrap">{checkin_date}</p>
+            <p className="text-base text-text-dark line-clamp-2">{note}</p>
+          </div>
+
+          {/* 三點選單按鈕 */}
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: stop card click */}
+          <div
+            ref={menuRef}
+            className="absolute right-0 top-[-10px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="size-10 rounded-full hover:bg-bg-gray"
+            >
+              <MoreHorizontal className="size-5 text-text-dark" />
+            </Button>
+
+            {menuOpen && (
+              <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setMenuOpen(false)}
+                  className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                >
+                  <FlagOutlineSvg className="size-5 shrink-0" />
+                  <span>檢舉</span>
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
-        {moodOption && (
-          <div className="flex items-center justify-center size-7 rounded-full bg-logo-orange/10">
-            <moodOption.emoji className="size-4" />
+
+        {/* 分隔線 */}
+        <div className="border-t border-basic-200" />
+
+        {/* 互動列（Reaction + 留言） */}
+        {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: stop card click */}
+        <div className="flex items-center justify-between h-8" onClick={(e) => e.stopPropagation()}>
+          <ReactionPickerButton
+            selectedReactions={selectedReactions}
+            onToggle={handleToggle}
+            variant="summary"
+            totalCount={totalCount}
+            displayReactions={displayReactions}
+            firstReactorName={firstReactorName}
+          />
+
+          <div className="flex items-center gap-1.5 text-light-gray">
+            <DialogOutlineSvg className="size-6" />
+            {(comment_count ?? 0) > 0 && (
+              <span className="text-sm font-medium">{comment_count}</span>
+            )}
+          </div>
+        </div>
+
+        {/* 留言預覽 */}
+        {comment_preview && comment_preview.length > 0 && (
+          // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
+          // biome-ignore lint/a11y/noStaticElementInteractions: stop card click
+          <div
+            className="flex flex-col gap-2 border-t border-basic-200 pt-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {comment_preview.map((comment) => (
+              <div key={comment.id} className="flex items-start gap-2">
+                <Avatar className="size-6 shrink-0 mt-0.5">
+                  {comment.user?.photo_url && (
+                    <AvatarImage src={comment.user.photo_url} alt={comment.user.name} />
+                  )}
+                  <AvatarFallback className="text-[10px] font-medium text-text-dark bg-primary-palest">
+                    {(comment.user?.name ?? "?").slice(0, 1)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <span className="text-xs font-semibold text-primary-darker mr-1.5">
+                    {comment.user?.name ?? "匿名"}
+                  </span>
+                  <span className="text-xs text-text-dark line-clamp-1">{comment.content}</span>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
-
-      {/* 2. 實踐追溯連結 */}
-      <button
-        type="button"
-        className="flex items-center gap-1 text-sm text-logo-cyan underline mb-2"
-        onClick={handlePracticeClick}
-      >
-        <MapPin className="size-3.5" />
-        {practice.title} ›
-      </button>
-
-      {/* 3. 用戶 + 內容 */}
-      {user && (
-        <div className="flex gap-2 mb-2">
-          <Avatar className="size-8 shrink-0">
-            {user.photo_url && <AvatarImage src={user.photo_url} alt={user.name} />}
-            <AvatarFallback className="text-[10px] font-medium text-text-dark bg-primary-palest">
-              {(user.name ?? "?").slice(0, 1)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-text-dark">{user.name}</p>
-            <p className="text-sm text-text-dark line-clamp-2 whitespace-pre-wrap">{note}</p>
-          </div>
-        </div>
-      )}
-
-      {/* 4. 圖片縮圖 */}
-      {image_urls?.length > 0 && (
-        <div className="flex gap-2 mb-2">
-          {image_urls.slice(0, 3).map((url, index) => (
-            <div key={url} className="size-16 rounded-lg bg-logo-orange/6 overflow-hidden">
-              <img src={url} alt={`打卡圖片 ${index + 1}`} className="size-full object-cover" />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 5. Tags */}
-      {tags?.length > 0 && (
-        <div className="flex flex-wrap gap-1 mb-2">
-          {tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-2 py-0.5 text-xs rounded-full bg-primary-lightest text-logo-cyan"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* 6. Reaction bar */}
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: stop card click */}
-      <div
-        className="flex items-center justify-between border-t border-basic-200 pt-3 mt-3"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <ReactionPickerButton
-          selectedReactions={selectedReactions}
-          onToggle={handleToggle}
-          variant="summary"
-          totalCount={totalCount}
-          displayReactions={displayReactions}
-        />
-
-        <div className="flex items-center gap-1.5 text-light-gray">
-          <DialogOutlineSvg className="size-6" />
-          {(comment_count ?? 0) > 0 && <span className="text-sm font-medium">{comment_count}</span>}
-        </div>
-      </div>
-
-      {/* 7. 留言預覽 */}
-      {comment_preview && comment_preview.length > 0 && (
-        // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
-        // biome-ignore lint/a11y/noStaticElementInteractions: stop card click
-        <div
-          className="mt-3 flex flex-col gap-2 border-t border-basic-200 pt-3"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {comment_preview.map((comment) => (
-            <div key={comment.id} className="flex items-start gap-2">
-              <Avatar className="size-6 shrink-0 mt-0.5">
-                {comment.user?.photo_url && (
-                  <AvatarImage src={comment.user.photo_url} alt={comment.user.name} />
-                )}
-                <AvatarFallback className="text-[10px] font-medium text-text-dark bg-primary-palest">
-                  {(comment.user?.name ?? "?").slice(0, 1)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <span className="text-xs font-semibold text-primary-darker mr-1.5">
-                  {comment.user?.name ?? "匿名"}
-                </span>
-                <span className="text-xs text-text-dark line-clamp-1">{comment.content}</span>
-                <span className="ml-1 text-[10px] text-light-gray">
-                  {formatRelativeTime(comment.created_at)}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

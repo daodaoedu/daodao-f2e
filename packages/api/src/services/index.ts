@@ -41,11 +41,11 @@ export * from "./practice-hooks";
 // Reaction Service
 export * from "./reaction";
 export * from "./reaction-hooks";
+// Recommendation Service
+export * from "./recommendation-hooks";
 // Resource Service
 export * from "./resource";
 export * from "./resource-hooks";
-// Recommendation Service
-export * from "./recommendation-hooks";
 // Showcase Service
 export * from "./showcase-hooks";
 // Tag Service

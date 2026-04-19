@@ -1,15 +1,18 @@
 "use client";
 
+import { posthogCapture } from "@daodao/analytics";
 import {
   type FeedbackState,
   type ITopicCard,
   submitRecommendationFeedback,
   useTopicRecommendations,
 } from "@daodao/api";
-import { posthogCapture } from "@daodao/analytics";
-import { useRouter } from "@daodao/i18n/navigation";
-import { Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { Button } from "@daodao/ui/components/button";
+import { CustomLink } from "@daodao/ui/components/custom-link";
+import { toast } from "@daodao/ui/components/sonner";
+import { cn } from "@daodao/ui/lib/utils";
+import { ThumbsDown, ThumbsUp } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // ── Creator Avatar ────────────────────────────────────────────
 
@@ -19,7 +22,7 @@ function CreatorAvatar({ name }: { name: string }) {
   const color = colors[name.charCodeAt(0) % colors.length];
   return (
     <span
-      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-white text-xs font-medium shrink-0"
+      className="inline-flex items-center justify-center w-7 h-7 rounded-full text-white text-xs font-bold shrink-0"
       style={{ backgroundColor: color }}
     >
       {initial}
@@ -31,24 +34,16 @@ function CreatorAvatar({ name }: { name: string }) {
 
 interface RecommendationCardProps {
   card: ITopicCard;
+  isHiding: boolean;
   onDislike: (card: ITopicCard) => void;
   onLike: (card: ITopicCard) => void;
 }
 
-function RecommendationCard({ card, onDislike, onLike }: RecommendationCardProps) {
-  const router = useRouter();
+function RecommendationCard({ card, isHiding, onDislike, onLike }: RecommendationCardProps) {
   const [feedbackState, setFeedbackState] = useState<FeedbackState>(card.feedbackState);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleCardClick = useCallback(() => {
-    posthogCapture("recommendation_card_clicked", {
-      entity_type: "practice",
-      entity_id: card.practiceId,
-      match_reason_code: card.matchReasonCode,
-      platform: "web",
-    });
-    router.push(`/practices/${card.practiceId}`);
-  }, [card.practiceId, card.matchReasonCode, router]);
+  const href = `/practices/${card.practiceId}`;
 
   const handleFeedback = useCallback(
     async (type: "like" | "dislike") => {
@@ -62,6 +57,7 @@ function RecommendationCard({ card, onDislike, onLike }: RecommendationCardProps
         onDislike(card);
         return;
       }
+      const isCurrentlyLiked = feedbackState === "liked";
       setIsSubmitting(true);
       try {
         const newState = await submitRecommendationFeedback(card.practiceId, "like");
@@ -71,6 +67,9 @@ function RecommendationCard({ card, onDislike, onLike }: RecommendationCardProps
           match_reason_code: card.matchReasonCode,
           platform: "web",
         });
+        if (!isCurrentlyLiked) {
+          toast.success("收到！往後你會更容易看到類似的主題喔！");
+        }
         onLike(card);
       } catch {
         // silent fail
@@ -78,77 +77,95 @@ function RecommendationCard({ card, onDislike, onLike }: RecommendationCardProps
         setIsSubmitting(false);
       }
     },
-    [card, isSubmitting, onDislike, onLike]
+    [card, feedbackState, isSubmitting, onDislike, onLike]
   );
 
   return (
-    <div className="bg-white rounded-2xl border border-[#E8F8FF] flex flex-col min-w-[240px] md:min-w-0 overflow-hidden">
-      {/* Clickable body */}
-      <button
-        type="button"
-        onClick={handleCardClick}
-        className="flex flex-col gap-3 p-4 text-left w-full hover:bg-[#F9FFFE] transition-colors"
-      >
-        {/* Reason chip */}
-        <div className="inline-flex items-center gap-1 bg-[#F0FBF8] text-[#4CAF93] text-xs font-medium px-2 py-1 rounded-full self-start max-w-full">
-          <Sparkles size={11} className="shrink-0" />
-          <span className="truncate">{card.matchReasonText}</span>
-        </div>
+    <div
+      className={cn(
+        "w-[260px] shrink-0 relative bg-white border border-gray-200 rounded-xl flex flex-col overflow-hidden shadow-sm transition-all duration-300 ease-out",
+        isHiding ? "opacity-0 scale-95 pointer-events-none" : "hover:shadow-md hover:scale-[1.02]"
+      )}
+    >
+      {/* Navigation link overlay — z-[1] */}
+      <CustomLink
+        href={href}
+        className="absolute inset-0 z-[1] rounded-xl"
+        aria-label={card.title}
+        onClick={() =>
+          posthogCapture("recommendation_card_clicked", {
+            entity_type: "practice",
+            entity_id: card.practiceId,
+            match_reason_code: card.matchReasonCode,
+            platform: "web",
+          })
+        }
+      />
 
-        {/* Title & description */}
-        <div>
-          <h3 className="font-semibold text-text-dark text-base leading-snug line-clamp-2">
+      {/* Reason block */}
+      <div className="bg-primary-palest text-primary-base text-xs px-3 py-3 rounded-t-[11px]">
+        {card.matchReasonText}
+      </div>
+
+      {/* Card body */}
+      <div className="flex flex-col justify-between flex-1">
+        <div className="flex flex-col gap-3 p-4 pb-0">
+          <h3 className="text-[17px] font-bold text-text-dark leading-snug line-clamp-2">
             {card.title}
           </h3>
           {card.description && (
-            <p className="text-text-dark/50 text-xs mt-1 line-clamp-2">{card.description}</p>
+            <p className="text-sm text-gray-500 leading-relaxed line-clamp-3">{card.description}</p>
+          )}
+          {card.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {card.tags.slice(0, 3).map((tag) => (
+                <span key={tag} className="text-xs bg-gray-100 text-gray-500 rounded px-2 py-0.5">
+                  #{tag}
+                </span>
+              ))}
+            </div>
           )}
         </div>
 
-        {/* Tags */}
-        {card.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {card.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="text-xs text-text-dark/60 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100"
-              >
-                #{tag}
-              </span>
-            ))}
+        {/* Footer: creator + feedback — z-[2]，高於 link overlay */}
+        <div className="relative z-[2] flex items-center justify-between px-4 pb-4 mt-4">
+          <div className="flex items-center gap-2 min-w-0">
+            <CreatorAvatar name={card.creator.name} />
+            <span className="text-sm text-text-dark font-medium truncate">{card.creator.name}</span>
           </div>
-        )}
-      </button>
-
-      {/* Footer: creator + feedback */}
-      <div className="flex items-center justify-between px-4 pb-4">
-        <div className="flex items-center gap-1.5 min-w-0">
-          <CreatorAvatar name={card.creator.name} />
-          <span className="text-xs text-text-dark/60 truncate">{card.creator.name}</span>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={() => handleFeedback("like")}
-            disabled={isSubmitting}
-            className={`p-1 rounded-full transition-colors ${
-              feedbackState === "liked"
-                ? "text-[#4CAF93]"
-                : "text-text-dark/30 hover:text-text-dark/60"
-            }`}
-            aria-label="喜歡"
-          >
-            <ThumbsUp size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => handleFeedback("dislike")}
-            disabled={isSubmitting}
-            className="p-1 rounded-full text-text-dark/30 hover:text-text-dark/60 transition-colors"
-            aria-label="不喜歡"
-          >
-            <ThumbsDown size={16} />
-          </button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleFeedback("like")}
+              disabled={isSubmitting}
+              className={cn(
+                "size-8 transition-colors",
+                feedbackState === "liked"
+                  ? "text-primary-base hover:text-primary-darker"
+                  : "text-gray-400 hover:text-primary-base"
+              )}
+              aria-label="喜歡"
+            >
+              <ThumbsUp
+                className="size-4"
+                fill={feedbackState === "liked" ? "currentColor" : "none"}
+              />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.currentTarget.blur();
+                handleFeedback("dislike");
+              }}
+              disabled={isSubmitting}
+              className="size-8 text-gray-400 hover:text-red-400"
+              aria-label="不喜歡"
+            >
+              <ThumbsDown className="size-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -159,21 +176,24 @@ function RecommendationCard({ card, onDislike, onLike }: RecommendationCardProps
 
 function RecommendationSkeleton() {
   return (
-    <div className="bg-white rounded-2xl p-4 border border-[#E8F8FF] flex flex-col gap-3 min-w-[240px] md:min-w-0 animate-pulse">
-      <div className="h-5 bg-gray-100 rounded-full w-2/3" />
-      <div className="space-y-1.5">
-        <div className="h-4 bg-gray-100 rounded w-full" />
-        <div className="h-4 bg-gray-100 rounded w-4/5" />
+    <div className="w-[260px] shrink-0 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col overflow-hidden animate-pulse">
+      <div className="h-11 bg-gray-100 rounded-t-[11px]" />
+      <div className="flex flex-col gap-3 p-4 pb-0">
+        <div className="h-5 bg-gray-100 rounded w-3/4" />
+        <div className="space-y-1.5">
+          <div className="h-4 bg-gray-100 rounded w-full" />
+          <div className="h-4 bg-gray-100 rounded w-4/5" />
+        </div>
+        <div className="flex gap-1.5">
+          <div className="h-5 bg-gray-100 rounded w-12" />
+          <div className="h-5 bg-gray-100 rounded w-16" />
+        </div>
       </div>
-      <div className="flex gap-1">
-        <div className="h-5 bg-gray-100 rounded-full w-12" />
-        <div className="h-5 bg-gray-100 rounded-full w-16" />
-      </div>
-      <div className="flex items-center justify-between mt-auto">
+      <div className="flex items-center justify-between px-4 pb-4 mt-4">
         <div className="h-4 bg-gray-100 rounded w-20" />
-        <div className="flex gap-2">
-          <div className="w-6 h-6 bg-gray-100 rounded-full" />
-          <div className="w-6 h-6 bg-gray-100 rounded-full" />
+        <div className="flex gap-1">
+          <div className="size-8 bg-gray-100 rounded" />
+          <div className="size-8 bg-gray-100 rounded" />
         </div>
       </div>
     </div>
@@ -184,19 +204,14 @@ function RecommendationSkeleton() {
 
 function RecommendationEmptyState({ onGoToInspire }: { onGoToInspire: () => void }) {
   return (
-    <div className="bg-white rounded-2xl p-6 border border-[#E8F8FF] flex flex-col items-center gap-3 text-center">
-      <Sparkles size={28} className="text-[#4CAF93]" />
-      <div>
-        <p className="font-medium text-text-dark text-sm">目前沒有推薦內容</p>
-        <p className="text-text-dark/50 text-xs mt-1">去靈感頁看看大家在實踐什麼</p>
-      </div>
-      <button
-        type="button"
-        onClick={onGoToInspire}
-        className="text-[#4CAF93] text-sm font-medium underline underline-offset-2"
-      >
-        前往靈感頁
-      </button>
+    <div className="flex flex-col items-center gap-3 py-10 text-center">
+      <p className="font-bold text-text-dark">暫時沒有推薦</p>
+      <p className="text-sm text-gray-500 max-w-[280px]">
+        你可以先專注於當前的計畫，或到「靈感」分頁看看其他主題實踐
+      </p>
+      <Button variant="outline" onClick={onGoToInspire} className="mt-1">
+        去看看靈感
+      </Button>
     </div>
   );
 }
@@ -210,6 +225,8 @@ interface RecommendationSectionProps {
 export function RecommendationSection({ onGoToInspire }: RecommendationSectionProps) {
   const [displayedCards, setDisplayedCards] = useState<ITopicCard[]>([]);
   const [initialized, setInitialized] = useState(false);
+  const [hidingIds, setHidingIds] = useState<Set<string>>(new Set());
+  const hideTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   const excludeIds = displayedCards.map((c) => c.targetId);
   const refillLimit = 1;
@@ -240,27 +257,57 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
     }
   }, [initialized]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleDislike = useCallback(
-    async (card: ITopicCard) => {
-      // Optimistic remove
-      setDisplayedCards((prev) => prev.filter((c) => c.practiceId !== card.practiceId));
+  const handleUndoHide = useCallback((id: string) => {
+    const timer = hideTimersRef.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      hideTimersRef.current.delete(id);
+    }
+    setHidingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }, []);
 
-      try {
-        await submitRecommendationFeedback(card.practiceId, "dislike");
-        // 補卡
-        await refillMutate();
-        if (refillCards.length > 0) {
-          setDisplayedCards((prev) => {
-            const existingIds = new Set(prev.map((c) => c.practiceId));
-            const newCard = refillCards.find((c) => !existingIds.has(c.practiceId));
-            return newCard ? [...prev, newCard] : prev;
-          });
+  const handleDislike = useCallback(
+    (card: ITopicCard) => {
+      setHidingIds((prev) => new Set([...prev, card.practiceId]));
+
+      const timer = setTimeout(async () => {
+        setDisplayedCards((prev) => prev.filter((c) => c.practiceId !== card.practiceId));
+        setHidingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(card.practiceId);
+          return next;
+        });
+        hideTimersRef.current.delete(card.practiceId);
+
+        try {
+          await submitRecommendationFeedback(card.practiceId, "dislike");
+          await refillMutate();
+          if (refillCards.length > 0) {
+            setDisplayedCards((prev) => {
+              const existingIds = new Set(prev.map((c) => c.practiceId));
+              const newCard = refillCards.find((c) => !existingIds.has(c.practiceId));
+              return newCard ? [...prev, newCard] : prev;
+            });
+          }
+        } catch {
+          // silent fail
         }
-      } catch {
-        // silent fail — card already removed optimistically
-      }
+      }, 300);
+
+      hideTimersRef.current.set(card.practiceId, timer);
+
+      toast.success("已隱藏此推薦", {
+        action: {
+          label: "復原",
+          onClick: () => handleUndoHide(card.practiceId),
+        },
+      });
     },
-    [refillCards, refillMutate]
+    [refillCards, refillMutate, handleUndoHide]
   );
 
   const handleLike = useCallback((card: ITopicCard) => {
@@ -272,35 +319,52 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
   }, []);
 
   return (
-    <section className="mb-6">
-      <div className="max-w-[640px] px-5 mx-auto">
-        {/* Section header */}
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles size={16} className="text-[#4CAF93]" />
-          <h2 className="font-semibold text-text-dark text-sm">探索相關主題</h2>
-          <span className="text-text-dark/40 text-xs">看看其他人都在實踐什麼</span>
-        </div>
+    <section className="pt-8 flex flex-col gap-4 mb-6">
+      {/* Section header */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <h2 className="text-xl font-bold text-text-dark">✦ 探索相關主題</h2>
+        <span className="text-sm text-gray-400">看看其他人都在實踐什麼</span>
+      </div>
 
-        {/* Cards */}
-        {isLoading || !initialized ? (
-          <div className="flex overflow-x-auto gap-3 scrollbar-hide md:grid md:grid-cols-3">
-            {[1, 2, 3].map((i) => <RecommendationSkeleton key={i} />)}
-          </div>
-        ) : displayedCards.length === 0 ? (
-          <RecommendationEmptyState onGoToInspire={onGoToInspire} />
-        ) : (
-          <div className="flex overflow-x-auto gap-3 scrollbar-hide md:grid md:grid-cols-3">
+      {/* Cards */}
+      {isLoading || !initialized ? (
+        <div className="-mx-4 px-4 flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+          {[1, 2, 3].map((i) => (
+            <RecommendationSkeleton key={i} />
+          ))}
+        </div>
+      ) : displayedCards.length === 0 ? (
+        <RecommendationEmptyState onGoToInspire={onGoToInspire} />
+      ) : (
+        <>
+          <div className="-mx-4 px-4 flex gap-3 overflow-x-auto scrollbar-hide pb-2">
             {displayedCards.map((card) => (
               <RecommendationCard
                 key={card.practiceId}
                 card={card}
+                isHiding={hidingIds.has(card.practiceId)}
                 onDislike={handleDislike}
                 onLike={handleLike}
               />
             ))}
+
+            {/* 查看更多推薦 */}
+            <button
+              type="button"
+              onClick={onGoToInspire}
+              className="w-[260px] shrink-0 flex flex-col items-center justify-center gap-2 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-200 hover:text-gray-600 transition-colors cursor-pointer"
+            >
+              <span className="text-2xl">＋</span>
+              <span className="text-sm font-medium leading-snug text-center px-4">
+                查看更多推薦
+              </span>
+            </button>
+
+            <div className="shrink-0 w-4" aria-hidden="true" />
           </div>
-        )}
-      </div>
+          <span className="text-xs text-gray-400">此主題為AI生成推薦</span>
+        </>
+      )}
     </section>
   );
 }

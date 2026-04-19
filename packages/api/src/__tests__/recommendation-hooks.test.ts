@@ -20,7 +20,10 @@ describe("submitRecommendationFeedback", () => {
   });
 
   it("成功時回傳 feedbackState", async () => {
-    const mockResponse: { success: boolean; data: { practiceId: string; feedbackState: FeedbackState } } = {
+    const mockResponse: {
+      success: boolean;
+      data: { practiceId: string; feedbackState: FeedbackState };
+    } = {
       success: true,
       data: { practiceId: "ext-10", feedbackState: "liked" },
     };
