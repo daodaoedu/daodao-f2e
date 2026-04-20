@@ -154,7 +154,7 @@ export function PracticeShowcaseCard({
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
     // biome-ignore lint/a11y/noStaticElementInteractions: card click for navigation
     <div
-      className="bg-white rounded-2xl p-4 shadow-sm border border-[#E8F8FF] cursor-pointer"
+      className="bg-white rounded-xl p-5 cursor-pointer shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200"
       onClick={() => router.push(`/practices/${id}`)}
     >
       {/* Header row */}

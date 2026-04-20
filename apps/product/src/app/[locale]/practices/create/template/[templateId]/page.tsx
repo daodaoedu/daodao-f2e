@@ -300,40 +300,63 @@ export default function TemplateDetailPage() {
 
       <main className="relative max-w-[600px] mx-auto pb-8">
         {/* Category Label */}
-        <div className="px-5 py-4">
-          <Badge variant="secondary" size="sm" className="text-xs md:text-sm mb-2">
-            主題實踐
-          </Badge>
-          <div className="flex">
-            <div className="flex-1">
-              <h1 className="text-2xl leading-normal md:text-4xl font-medium text-white mb-1">
-                {template.name}
-              </h1>
-              <p className="text-sm text-white">{template.actionDescription}</p>
-            </div>
-            <div className="shrink-0">
-              <Button
-                variant="white"
-                onClick={handleRefresh}
-                disabled={!showActions || isRefreshing}
-                className="group text-sm font-normal h-[35px] transition-opacity duration-500 ease-out"
-              >
-                {isRefreshing ? (
-                  <Loader className="size-4.5 animate-spin" />
-                ) : showActions ? (
-                  <RefreshCcw className="size-4.5 group-hover:animate-spin-reverse" />
-                ) : (
-                  <Loader className="size-4.5 animate-spin" />
-                )}
-                換一個
-              </Button>
+        <div className="py-4">
+          <div className="max-w-[448px] mx-auto px-5">
+            <Badge variant="secondary" size="sm" className="text-xs md:text-sm mb-2">
+              主題實踐
+            </Badge>
+            <div className="flex md:flex-col md:gap-3">
+              <div className="flex flex-1 items-start gap-1">
+                <div className="flex-1">
+                  <h1 className="text-2xl leading-normal md:text-4xl font-medium text-white mb-1">
+                    {template.name}
+                  </h1>
+                  <p className="text-sm text-white">{template.actionDescription}</p>
+                </div>
+                {/* Mobile：右側 */}
+                <div className="shrink-0 md:hidden">
+                  <Button
+                    variant="white"
+                    onClick={handleRefresh}
+                    disabled={!showActions || isRefreshing}
+                    className="group text-sm font-normal h-[35px] px-3 transition-opacity duration-500 ease-out"
+                  >
+                    {isRefreshing ? (
+                      <Loader className="size-4.5 animate-spin" />
+                    ) : showActions ? (
+                      <RefreshCcw className="size-4.5 group-hover:animate-spin-reverse" />
+                    ) : (
+                      <Loader className="size-4.5 animate-spin" />
+                    )}
+                    換一個
+                  </Button>
+                </div>
+              </div>
+              {/* Desktop：副標題の下 */}
+              <div className="hidden md:block">
+                <Button
+                  variant="white"
+                  onClick={handleRefresh}
+                  disabled={!showActions || isRefreshing}
+                  className="group text-sm font-normal h-[35px] px-3 transition-opacity duration-500 ease-out"
+                >
+                  {isRefreshing ? (
+                    <Loader className="size-4.5 animate-spin" />
+                  ) : showActions ? (
+                    <RefreshCcw className="size-4.5 group-hover:animate-spin-reverse" />
+                  ) : (
+                    <Loader className="size-4.5 animate-spin" />
+                  )}
+                  換一個
+                </Button>
+              </div>
             </div>
           </div>
         </div>
 
         <div className="max-w-[448px] mx-auto pt-4 px-5 pb-28">
           {/* Course Overview Card */}
-          <div className="relative">
+          <div className="relative mb-3.5">
             {/* Compass Icon */}
             <div className="absolute -top-14 -right-1 z-10">
               <CompassSvg width={109} height={114} />
@@ -394,6 +417,7 @@ export default function TemplateDetailPage() {
           <Button
             onClick={handleCreate}
             disabled={isSubmitting}
+            variant="orange"
             className="w-full sm:max-w-[288px]"
           >
             {isSubmitting ? (
