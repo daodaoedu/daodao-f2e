@@ -34,7 +34,8 @@ export interface IExploreTopicRecommendation {
   authorName: string;
   authorAvatarChar: string;
   authorAvatarColor: string;
-  templateId?: string;
+  /** 連結到實踐詳情頁 */
+  practiceId?: string;
 }
 
 const MOCK_CHALLENGES: IChallenge[] = [

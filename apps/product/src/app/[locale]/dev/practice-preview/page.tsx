@@ -7,6 +7,7 @@
 import type { PracticeCheckInsResponse } from "@daodao/api";
 import { X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "@daodao/i18n/navigation";
 import type { IComment } from "@/components/check-in/reactions";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeDetailShell } from "@/components/practice";
@@ -143,6 +144,7 @@ const mockComments: IComment[] = [
 ];
 
 export default function DevPracticePreviewPage() {
+  const router = useRouter();
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
       <Link
@@ -169,6 +171,7 @@ export default function DevPracticePreviewPage() {
         onEditPractice={() => {}}
         onArchivePractice={() => {}}
         onDeletePractice={() => {}}
+        onCopyPractice={() => router.push("/dev/copy-success-preview")}
         onSubmitComment={() => {}}
         onEditComment={async () => {}}
         onDeleteComment={async () => {}}

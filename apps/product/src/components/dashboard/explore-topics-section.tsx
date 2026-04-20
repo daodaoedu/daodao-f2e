@@ -28,13 +28,13 @@ function ExploreTopicCard({ topic, isLiked, isHiding, onLike, onDislike }: Explo
     authorName,
     authorAvatarChar,
     authorAvatarColor,
-    templateId,
+    practiceId,
   } = topic;
 
-  const href = templateId
-    ? templateId === "dev-preview"
-      ? "/dev/template-preview"
-      : `/practices/create/template/${templateId}`
+  const href = practiceId
+    ? practiceId === "dev-preview"
+      ? "/dev/practice-preview"
+      : `/practices/${practiceId}`
     : null;
 
   return (

@@ -23,7 +23,7 @@ import { Image } from "@daodao/ui/components/image";
 import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
-import { Archive, ChevronDown, ChevronUp, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Archive, ChevronDown, ChevronUp, Copy, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { CheckInRecordCard, CheckInStack } from "@/components/check-in";
@@ -108,6 +108,7 @@ interface IPracticeDetailShellProps {
   onEditPractice: () => void;
   onArchivePractice: () => void;
   onDeletePractice: () => void;
+  onCopyPractice?: () => void;
   onDeleteResource?: (resourceId: string) => void;
   onSubmitComment: (content: string, parentId?: string, mentionedUserIds?: number[]) => void;
   onEditComment: (id: string, content: string) => Promise<unknown> | unknown;
@@ -283,6 +284,7 @@ export function PracticeDetailShell({
   onPrevious,
   onNext,
   onDeletePractice,
+  onCopyPractice,
   onDeleteResource,
   onSubmitComment,
   onEditComment,
@@ -539,7 +541,18 @@ export function PracticeDetailShell({
           />
 
           <div className="px-4">
-            <div className="border-t border-[#E4EAE9] mb-2" />
+            <div className="border-t border-[#E4EAE9] mb-3" />
+            {!isOwner && onCopyPractice && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCopyPractice}
+                className="w-full mb-3 gap-2"
+              >
+                <Copy className="size-4" />
+                我也想實踐
+              </Button>
+            )}
             <Button
               type="button"
               variant="ghost"

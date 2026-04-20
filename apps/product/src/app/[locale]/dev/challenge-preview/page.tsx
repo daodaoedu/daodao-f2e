@@ -40,7 +40,7 @@ const mockExploreTopics: IExploreTopicRecommendation[] = [
     authorName: "Leo Chen",
     authorAvatarChar: "L",
     authorAvatarColor: "#16B9B3",
-    templateId: "dev-preview",
+    practiceId: "dev-preview",
   },
   {
     id: "explore-2",
@@ -51,7 +51,7 @@ const mockExploreTopics: IExploreTopicRecommendation[] = [
     authorName: "Kay Wu",
     authorAvatarChar: "K",
     authorAvatarColor: "#16B9B3",
-    templateId: "dev-preview",
+    practiceId: "dev-preview",
   },
   {
     id: "explore-3",
@@ -62,7 +62,7 @@ const mockExploreTopics: IExploreTopicRecommendation[] = [
     authorName: "Vic Lin",
     authorAvatarChar: "V",
     authorAvatarColor: "#16B9B3",
-    templateId: "dev-preview",
+    practiceId: "dev-preview",
   },
   {
     id: "explore-4",
@@ -73,7 +73,7 @@ const mockExploreTopics: IExploreTopicRecommendation[] = [
     authorName: "Mia Park",
     authorAvatarChar: "M",
     authorAvatarColor: "#A78BFA",
-    templateId: "dev-preview",
+    practiceId: "dev-preview",
   },
 ];
 
