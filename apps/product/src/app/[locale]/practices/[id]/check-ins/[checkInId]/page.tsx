@@ -99,10 +99,7 @@ export default function CheckInDetailPage() {
     }
 
     checkInsData.data.forEach((checkIn) => {
-      const moodType = mapApiMoodToMoodType(checkIn.mood);
-      if (!moodType) {
-        return;
-      }
+      const moodType = mapApiMoodToMoodType(checkIn.mood) ?? null;
 
       const displayData: ICheckInDisplayData = {
         id: String(checkIn.id),
