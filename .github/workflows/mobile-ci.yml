@@ -92,4 +92,6 @@ jobs:
 
       - name: Validate EAS config
         working-directory: apps/mobile
-        run: eas config --platform all
+        run: |
+          eas config --platform android
+          eas config --platform ios

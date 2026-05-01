@@ -298,7 +298,7 @@ export default function TemplateDetailPage() {
       {/* Top Navigation */}
       <PageHeader leftAction="back" leftLabel="" rightActionTo="/" variant="light" />
 
-      <main className="relative max-w-[600px] mx-auto pb-8">
+      <main className="relative max-w-[600px] md:max-w-[680px] mx-auto pb-8">
         {/* Category Label */}
         <div className="py-4">
           <div className="max-w-[448px] mx-auto px-5">
@@ -354,6 +354,7 @@ export default function TemplateDetailPage() {
           </div>
         </div>
 
+        <div className="bg-white rounded-t-2xl">
         <div className="max-w-[448px] mx-auto pt-4 px-5 pb-28">
           {/* Course Overview Card */}
           <div className="relative mb-3.5">
@@ -405,6 +406,7 @@ export default function TemplateDetailPage() {
               </div>
             </div>
           )}
+        </div>
         </div>
 
         {/* Action Button */}

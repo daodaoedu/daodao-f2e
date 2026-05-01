@@ -55,7 +55,7 @@ export const InProgressTaskCard = ({
   return (
     <CustomLink
       href={`/practices/${id}`}
-      className="relative block w-[294px] h-[239px] rounded-[12px] overflow-hidden cursor-pointer text-left hover:scale-[1.02] hover:shadow-md transition-all duration-200"
+      className="relative block w-[294px] h-[239px] md:w-full rounded-[12px] overflow-hidden cursor-pointer text-left hover:scale-[1.02] hover:shadow-md transition-all duration-200"
     >
       <Theme
         className="absolute inset-0 w-full h-full rounded-[12px]"
