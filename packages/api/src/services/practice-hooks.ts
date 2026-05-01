@@ -19,7 +19,7 @@ import type {
   IGetUserPracticesParams,
   PracticeSummary,
 } from "./practice";
-import { getPracticeSummary } from "./practice";
+import { copyPractice, getPracticeSummary } from "./practice";
 
 // ============================================================================
 // Types
@@ -679,4 +679,16 @@ export const useDeletePractice = (practiceId: string) => {
   };
 
   return { deletePractice: deletePracticeById };
+};
+
+/**
+ * Hook 用於複製實踐（複製他人或自己的實踐）
+ * @returns copyPractice(practiceId) → 回傳新實踐 id
+ */
+export const useCopyPractice = () => {
+  const copy = async (practiceId: string): Promise<{ id: string }> => {
+    return copyPractice(practiceId);
+  };
+
+  return { copyPractice: copy };
 };

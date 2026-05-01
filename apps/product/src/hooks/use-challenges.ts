@@ -28,6 +28,7 @@ export interface IExploreTopicRecommendation {
   authorAvatarChar: string;
   authorAvatarColor: string;
   templateId?: string;
+  practiceId?: string;
 }
 
 const MOCK_CHALLENGES: IChallenge[] = [

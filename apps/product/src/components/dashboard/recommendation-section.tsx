@@ -227,6 +227,7 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
   const [displayedCards, setDisplayedCards] = useState<ITopicCard[]>([]);
   const [initialized, setInitialized] = useState(false);
   const [hidingIds, setHidingIds] = useState<Set<string>>(new Set());
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const hideTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const hidingCardsRef = useRef<Map<string, ITopicCard>>(new Map());
 
@@ -329,6 +330,27 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
     );
   }, []);
 
+  const handleLoadMore = useCallback(async () => {
+    if (isLoadingMore) return;
+    setIsLoadingMore(true);
+    try {
+      const excludeIds = displayedCards.map((c) => c.targetId);
+      const newCards = await fetchTopicCards({ limit: 3, excludeIds });
+      if (newCards.length > 0) {
+        setDisplayedCards((prev) => {
+          const existingIds = new Set(prev.map((c) => c.practiceId));
+          return [...prev, ...newCards.filter((c) => !existingIds.has(c.practiceId))];
+        });
+      } else {
+        toast.info("目前沒有更多推薦了");
+      }
+    } catch {
+      toast.error("載入失敗，請稍後再試");
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [displayedCards, isLoadingMore]);
+
   return (
     <section className="pt-8 flex flex-col gap-4 mb-6">
       {/* Section header */}
@@ -362,10 +384,11 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
             {/* 查看更多推薦 */}
             <button
               type="button"
-              onClick={onGoToInspire}
-              className="w-[260px] shrink-0 flex flex-col items-center justify-center gap-2 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-200 hover:text-gray-600 transition-colors cursor-pointer"
+              onClick={handleLoadMore}
+              disabled={isLoadingMore}
+              className="w-[260px] shrink-0 flex flex-col items-center justify-center gap-2 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-200 hover:text-gray-600 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="text-2xl">＋</span>
+              <span className="text-2xl">{isLoadingMore ? "…" : "＋"}</span>
               <span className="text-sm font-medium leading-snug text-center px-4">
                 查看更多推薦
               </span>

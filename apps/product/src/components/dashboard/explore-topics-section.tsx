@@ -16,9 +16,10 @@ interface ExploreTopicCardProps {
   isHiding: boolean;
   onLike: (id: string) => void;
   onDislike: (id: string) => void;
+  onCopyPractice?: (practiceId: string) => void;
 }
 
-function ExploreTopicCard({ topic, isLiked, isHiding, onLike, onDislike }: ExploreTopicCardProps) {
+function ExploreTopicCard({ topic, isLiked, isHiding, onLike, onDislike, onCopyPractice }: ExploreTopicCardProps) {
   const {
     id,
     title,
@@ -74,41 +75,53 @@ function ExploreTopicCard({ topic, isLiked, isHiding, onLike, onDislike }: Explo
         </div>
 
         {/* Footer: author + feedback — z-[2]，高於 link overlay，按鈕不觸發導頁 */}
-        <div className="relative z-[2] flex items-center justify-between px-4 pb-4 mt-4">
-          <div className="flex items-center gap-2">
-            <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
-              style={{ backgroundColor: authorAvatarColor }}
+        <div className="relative z-[2] flex flex-col gap-2 px-4 pb-4 mt-4">
+          {onCopyPractice && topic.practiceId && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={() => onCopyPractice(topic.practiceId as string)}
             >
-              {authorAvatarChar}
+              我也想實踐
+            </Button>
+          )}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                style={{ backgroundColor: authorAvatarColor }}
+              >
+                {authorAvatarChar}
+              </div>
+              <span className="text-sm text-text-dark font-medium">{authorName}</span>
             </div>
-            <span className="text-sm text-text-dark font-medium">{authorName}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onLike(id)}
-              className={cn(
-                "size-8 transition-colors",
-                isLiked
-                  ? "text-primary-base hover:text-primary-darker"
-                  : "text-gray-400 hover:text-primary-base"
-              )}
-            >
-              <ThumbsUp className="size-4" fill={isLiked ? "currentColor" : "none"} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.currentTarget.blur();
-                onDislike(id);
-              }}
-              className="size-8 text-gray-400 hover:text-red-400"
-            >
-              <ThumbsDown className="size-4" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onLike(id)}
+                className={cn(
+                  "size-8 transition-colors",
+                  isLiked
+                    ? "text-primary-base hover:text-primary-darker"
+                    : "text-gray-400 hover:text-primary-base"
+                )}
+              >
+                <ThumbsUp className="size-4" fill={isLiked ? "currentColor" : "none"} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.currentTarget.blur();
+                  onDislike(id);
+                }}
+                className="size-8 text-gray-400 hover:text-red-400"
+              >
+                <ThumbsDown className="size-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -119,11 +132,13 @@ function ExploreTopicCard({ topic, isLiked, isHiding, onLike, onDislike }: Explo
 interface ExploreTopicsSectionProps {
   topics: IExploreTopicRecommendation[];
   onNavigateToInspiration?: () => void;
+  onCopyPractice?: (practiceId: string) => void;
 }
 
 export function ExploreTopicsSection({
   topics,
   onNavigateToInspiration,
+  onCopyPractice,
 }: ExploreTopicsSectionProps) {
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
@@ -231,6 +246,7 @@ export function ExploreTopicsSection({
                 isHiding={hidingIds.has(topic.id)}
                 onLike={handleLike}
                 onDislike={handleDislike}
+                onCopyPractice={onCopyPractice}
               />
             ))}
 
