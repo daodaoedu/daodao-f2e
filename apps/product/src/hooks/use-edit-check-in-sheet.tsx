@@ -7,7 +7,7 @@ import { CheckInSheetContent } from "@/components/check-in";
 import type { MoodType } from "@/constants/mood";
 
 interface IEditCheckInData {
-  mood: MoodType;
+  mood: MoodType | null;
   tags: string[];
   description: string;
   images?: string[];
