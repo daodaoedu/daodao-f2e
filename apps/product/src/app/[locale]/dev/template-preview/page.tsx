@@ -36,13 +36,13 @@ const mockTemplate = {
 
 export default function TemplatePreviewPage() {
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
       <Deco4Svg className="absolute top-0 right-0" width={270} height={484} />
 
       {/* Top Navigation */}
       <PageHeader leftAction="back" leftLabel="" rightActionTo="/" variant="light" />
 
-      <main className="relative max-w-[600px] mx-auto pb-8">
+      <main className="relative max-w-[600px] md:max-w-[680px] mx-auto pb-8">
         {/* Category Label + Title */}
         <div className="py-4">
           <div className="max-w-[448px] mx-auto px-5">

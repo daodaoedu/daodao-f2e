@@ -58,7 +58,7 @@ export default function CopySuccessPage() {
         </div>
 
         {/* 角色動畫 */}
-        <div className="flex items-center justify-center w-[375px] h-[275px]">
+        <div className="flex items-center justify-center w-full max-w-[375px] h-[275px]">
           <Lottie
             animationData={featureHappyJson}
             className="*:w-full *:h-full"

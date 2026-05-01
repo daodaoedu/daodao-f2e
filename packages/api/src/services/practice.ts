@@ -471,5 +471,5 @@ export const copyPractice = async (id: string): Promise<{ id: string }> => {
     throw new Error(errorMessage);
   }
 
-  return response.data.data as { id: string };
+  return response.data?.data as { id: string };
 };

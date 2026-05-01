@@ -662,6 +662,7 @@ export function PracticeDetailShell({
                             : latestActorName
                           : `${totalReactionCount} 人`
                         : undefined;
+              if (displayReactions.length === 0 && !text) return null;
               return (
                 <button
                   type="button"
