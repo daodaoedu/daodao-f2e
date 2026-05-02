@@ -118,8 +118,10 @@ export default function HomePage() {
         .map((item) => item.data.id),
     [feedItems],
   );
-  const { data: batchCheckinReactionsData, mutate: mutateBatchCheckinReactions } =
-    useReactionsBatch({ targetType: "checkin", targetIds: checkinIds });
+  const { data: batchCheckinReactionsData } = useReactionsBatch({
+    targetType: "checkin",
+    targetIds: checkinIds,
+  });
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -274,13 +276,19 @@ export default function HomePage() {
 
                     if (feedItem.type === "checkin") {
                       const checkin = feedItem.data;
+                      const latestActorName =
+                        batchCheckinReactionsData?.data?.[checkin.id]?.items[0]?.name ??
+                        batchCheckinReactionsData?.data?.[checkin.id]?.reactions.find((r) => r.count > 0)
+                          ?.latestActorName ??
+                        checkin.reactions?.find((r) => r.latestActorName)?.latestActorName;
                       return (
-                        <div key={checkin.id}>
+                        <div key={`checkin-${checkin.id}-${feedItem.feed_reason}-${index}`}>
                           {showFeedLabel && feedItem.feed_reason && (
                             <FeedLabel
                               feedReason={feedItem.feed_reason}
                               userName={checkin.user?.name}
                               practiceTitle={checkin.practice?.title}
+                              latestActorName={latestActorName}
                             />
                           )}
                           <CheckInShowcaseCard
@@ -295,7 +303,7 @@ export default function HomePage() {
                             user={checkin.user}
                             comment_count={checkin.comment_count}
                             comment_preview={checkin.comment_preview}
-                            batchReactionData={batchReactionsData?.data?.[checkin.id]}
+                            batchReactionData={batchCheckinReactionsData?.data?.[checkin.id]}
                           />
                         </div>
                       );
@@ -303,10 +311,13 @@ export default function HomePage() {
 
                     if (feedItem.type === "practice") {
                       const practice = feedItem.data;
-                      const latestActorName = practice.reactions
-                        ?.find((r) => r.latestActorName)?.latestActorName;
+                      const latestActorName =
+                        batchReactionsData?.data?.[practice.id]?.items[0]?.name ??
+                        batchReactionsData?.data?.[practice.id]?.reactions.find((r) => r.count > 0)
+                          ?.latestActorName ??
+                        practice.reactions?.find((r) => r.latestActorName)?.latestActorName;
                       return (
-                        <div key={practice.id}>
+                        <div key={`practice-${practice.id}-${feedItem.feed_reason}-${index}`}>
                           {showFeedLabel && feedItem.feed_reason && (
                             <FeedLabel
                               feedReason={feedItem.feed_reason}
