@@ -9,9 +9,14 @@ import { mapApiMoodToMoodType, MOOD_OPTIONS } from "@/constants/mood";
 import type { ApiMoodType } from "@/constants/mood";
 import { useCardReactions } from "@/hooks/use-card-reactions";
 import { formatRelativeTime } from "@/utils/format-time";
-import type { IShowcaseCheckIn } from "@daodao/api";
+import type { BatchReactionItem, IShowcaseCheckIn } from "@daodao/api";
 
-export function CheckInShowcaseCard(props: IShowcaseCheckIn) {
+type CheckInShowcaseCardProps = IShowcaseCheckIn & {
+  batchReactionData?: BatchReactionItem;
+  onReactionMutate?: () => void;
+};
+
+export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
   const {
     id,
     checkin_date,
@@ -23,6 +28,8 @@ export function CheckInShowcaseCard(props: IShowcaseCheckIn) {
     user,
     comment_count,
     comment_preview,
+    batchReactionData,
+    onReactionMutate,
   } = props;
 
   const router = useRouter();
@@ -32,7 +39,7 @@ export function CheckInShowcaseCard(props: IShowcaseCheckIn) {
     : null;
 
   const { selectedReactions, totalCount, displayReactions, handleToggle } =
-    useCardReactions("checkin", id);
+    useCardReactions("checkin", id, batchReactionData, onReactionMutate);
 
   const handleCardClick = () => {
     router.push(`/practices/${practice.id}/check-ins/${id}`);
