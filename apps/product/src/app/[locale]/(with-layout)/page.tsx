@@ -261,7 +261,6 @@ export default function HomePage() {
                       return (
                         <div key={`activity-${feedItem.event_text.slice(0, 20)}-${index}`}>
                           <ActivityCard
-                            activity_type={feedItem.activity_type}
                             event_text={feedItem.event_text}
                             label={feedItem.label}
                           />

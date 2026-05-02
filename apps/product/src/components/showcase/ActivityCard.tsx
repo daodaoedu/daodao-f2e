@@ -2,7 +2,6 @@ import { cn } from "@daodao/ui/lib/utils";
 import { BookOpen } from "lucide-react";
 
 interface ActivityCardProps {
-  activity_type: "community_event" | "follow_summary";
   event_text: string;
   label: string;
   className?: string;
