@@ -14,12 +14,16 @@ import {
   useUpdatePracticeCheckIn,
 } from "@daodao/api";
 import type { ReactionTypeValue } from "@daodao/api";
-import { Deco4Svg } from "@daodao/assets";
+import { ChartColumnIncreasingSvg, Deco4Svg, FlagOutlineSvg } from "@daodao/assets";
 import { useParams } from "@daodao/i18n/navigation";
+import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
+import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
+import { cn } from "@daodao/ui/lib/utils";
 import { addDays, format, formatDistanceToNow, isValid, parse, parseISO } from "date-fns";
 import { zhTW } from "date-fns/locale";
-import { useCallback, useMemo, useRef, useState, useTransition } from "react";
+import { MoreHorizontal, Pencil, Share2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
   CheckInButton,
   CheckInDateSelector,
@@ -31,6 +35,9 @@ import { CommentSection, ReactionBar } from "@/components/check-in/reactions";
 import type { IReactionCount } from "@/components/check-in/reactions";
 import type { ICheckInDisplayData, ICheckInFormData } from "@/components/check-in/types";
 import { PageHeader } from "@/components/layout";
+import { BrowseActivityContent } from "@/components/showcase";
+import { useEditCheckInSheet } from "@/hooks/use-edit-check-in-sheet";
+import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
 import { mapApiMoodToMoodType, mapMoodTypeToApiMood } from "@/constants/mood";
 import { PICKER_REACTIONS } from "@/constants/reaction-type";
 import type { ReactionTypeType } from "@/constants/reaction-type";
@@ -193,6 +200,25 @@ export default function CheckInDetailPage() {
   });
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Three-dot menu state
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [menuOpen]);
+
   // 獲取所有 check-ins
   const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
     limit: 30,
@@ -338,6 +364,11 @@ export default function CheckInDetailPage() {
     (type: ReactionTypeType) => {
       const isSelected = currentUserReaction === type;
       setPendingReaction(isSelected ? null : type);
+      if (!isSelected) {
+        requestAnimationFrame(() => {
+          commentInputRef.current?.focus();
+        });
+      }
       startReactionTransition(async () => {
         if (isSelected) {
           await removeReaction({ targetType: "checkin", targetId: checkInId });
@@ -446,10 +477,7 @@ export default function CheckInDetailPage() {
   const isOwner =
     !!practiceData?.data?.user?.id && practiceData.data.user.id === currentUserData?.data?.id;
 
-  const handleCheckInComplete = (data: unknown) => {
-    // TODO: 處理打卡資料
-    console.log("打卡資料:", data);
-  };
+  const { open: openSheet, close: closeSheet } = useSheetManager();
 
   const handleEditComplete = async (data: ICheckInFormData) => {
     try {
@@ -467,6 +495,46 @@ export default function CheckInDetailPage() {
       toast.error("更新打卡失敗，請稍後再試");
       throw error;
     }
+  };
+
+  const { openEditCheckInSheet } = useEditCheckInSheet({
+    taskTitle: checkInData.practiceTitle,
+    checkInData: {
+      mood: checkInData.mood,
+      tags: checkInData.tags,
+      description: checkInData.content,
+      images: checkInData.images,
+      media: [],
+    },
+    onComplete: handleEditComplete,
+  });
+
+  const { openShareSheet } = useShareCheckInSheet({
+    taskTitle: checkInData.practiceTitle,
+    checkInData: {
+      mood: checkInData.mood,
+      tags: checkInData.tags,
+      description: checkInData.content,
+      media: [],
+      date: checkInData.date,
+      images: checkInData.images,
+    },
+  });
+
+  const handleOpenBrowseActivity = () => {
+    setMenuOpen(false);
+    openSheet({
+      title: "瀏覽活動",
+      content: <BrowseActivityContent targetId={checkInId} />,
+      dismissible: true,
+      closeOnEscape: true,
+      showCloseButton: true,
+    });
+  };
+
+  const handleCheckInComplete = (data: unknown) => {
+    // TODO: 處理打卡資料
+    console.log("打卡資料:", data);
   };
 
   return (
@@ -492,7 +560,6 @@ export default function CheckInDetailPage() {
       <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">
         <CheckInDetail
           checkInData={checkInData}
-          onEditComplete={isOwner ? handleEditComplete : undefined}
           afterTitle={
             <SameDayCheckInNav
               sameDayCheckInIds={sameDayCheckInIds}
@@ -501,13 +568,78 @@ export default function CheckInDetailPage() {
             />
           }
           bottomActions={
-            <ReactionBar
-              reactions={reactionCounts}
-              selectedReactions={selectedReactions}
-              onReactionClick={handleReactionClick}
-              types={PICKER_REACTIONS}
-              className="flex-wrap"
-            />
+            <div className="flex items-center justify-between w-full">
+              <ReactionBar
+                reactions={reactionCounts}
+                selectedReactions={selectedReactions}
+                onReactionClick={handleReactionClick}
+                types={PICKER_REACTIONS}
+                className="flex-wrap"
+              />
+              {/* Three-dot menu */}
+              <div ref={menuRef} className="relative">
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setMenuOpen((v) => !v)}
+                  className={cn(
+                    "h-8 w-8 text-white/70 hover:text-white hover:bg-white/20",
+                    menuOpen && "bg-white/20 text-white"
+                  )}
+                >
+                  <MoreHorizontal className="size-4" />
+                </Button>
+                {menuOpen && (
+                  <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
+                    {isOwner ? (
+                      <>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => { setMenuOpen(false); openEditCheckInSheet(); }}
+                          className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                        >
+                          <Pencil className="size-5 shrink-0" />
+                          <span>編輯打卡</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => { setMenuOpen(false); openShareSheet(); }}
+                          className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                        >
+                          <Share2 className="size-5 shrink-0" />
+                          <span>分享打卡</span>
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          toast.success("已檢舉");
+                        }}
+                        className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                      >
+                        <FlagOutlineSvg className="size-5 shrink-0" />
+                        <span>檢舉</span>
+                      </Button>
+                    )}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={handleOpenBrowseActivity}
+                      className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                    >
+                      <ChartColumnIncreasingSvg className="size-5 shrink-0" />
+                      <span>瀏覽活動</span>
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
           }
         />
 

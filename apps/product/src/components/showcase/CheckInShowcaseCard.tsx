@@ -1,9 +1,15 @@
 "use client";
 
+import { useCurrentUser } from "@daodao/api";
+import { FlagOutlineSvg } from "@daodao/assets";
 import { DialogOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
-import { MapPin, Pencil } from "lucide-react";
+import { Button } from "@daodao/ui/components/button";
+import { toast } from "@daodao/ui/components/sonner";
+import { cn } from "@daodao/ui/lib/utils";
+import { MapPin, MoreHorizontal, Pencil } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import { mapApiMoodToMoodType, MOOD_OPTIONS } from "@/constants/mood";
 import type { ApiMoodType } from "@/constants/mood";
@@ -41,6 +47,27 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
   const { selectedReactions, totalCount, displayReactions, handleToggle } =
     useCardReactions("checkin", id, batchReactionData, onReactionMutate);
 
+  const { data: currentUserData } = useCurrentUser();
+  const isOwnCard = !!currentUserData?.data?.id && user?.id === currentUserData.data.id;
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [menuOpen]);
+
   const handleCardClick = () => {
     router.push(`/practices/${practice.id}/check-ins/${id}`);
   };
@@ -57,7 +84,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
       className="rounded-2xl bg-white p-4 shadow-sm border border-logo-orange/15 cursor-pointer"
       onClick={handleCardClick}
     >
-      {/* 1. Header: badge + mood */}
+      {/* 1. Header: badge + mood + more menu */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-logo-orange/10 text-logo-orange text-xs font-medium">
@@ -66,11 +93,44 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
           </span>
           <span className="text-xs text-text-dark/50">{checkin_date}</span>
         </div>
-        {moodOption && (
-          <div className="flex items-center justify-center size-7 rounded-full bg-logo-orange/10">
-            <moodOption.emoji className="size-4" />
-          </div>
-        )}
+        <div className="flex items-center gap-1">
+          {moodOption && (
+            <div className="flex items-center justify-center size-7 rounded-full bg-logo-orange/10">
+              <moodOption.emoji className="size-4" />
+            </div>
+          )}
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: stop card click */}
+          {!isOwnCard && (
+            <div ref={menuRef} className="relative" onClick={(e) => e.stopPropagation()}>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={() => setMenuOpen((v) => !v)}
+                className={cn("h-7 w-7", menuOpen ? "bg-[#E4EAE9]" : "hover:bg-[#E4EAE9]")}
+              >
+                <MoreHorizontal className="size-4" />
+              </Button>
+              {menuOpen && (
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[120px]">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      toast.success("已檢舉");
+                    }}
+                    className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                  >
+                    <FlagOutlineSvg className="size-5 shrink-0" />
+                    <span>檢舉</span>
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 2. 實踐追溯連結 */}
