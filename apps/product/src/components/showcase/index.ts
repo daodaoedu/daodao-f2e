@@ -1,5 +1,6 @@
 export * from "./ActivityCard";
 export * from "./BrewingCard";
+export * from "./BrowseActivityContent";
 export * from "./CheckInShowcaseCard";
 export * from "./FeedLabel";
 export * from "./LottieEmoji";
