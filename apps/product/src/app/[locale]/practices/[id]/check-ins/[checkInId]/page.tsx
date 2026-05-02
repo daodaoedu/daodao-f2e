@@ -504,7 +504,6 @@ export default function CheckInDetailPage() {
       tags: checkInData.tags,
       description: checkInData.content,
       images: checkInData.images,
-      media: [],
     },
     onComplete: handleEditComplete,
   });

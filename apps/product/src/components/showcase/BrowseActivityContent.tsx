@@ -1,6 +1,6 @@
 "use client";
 
-import { useReactionsList } from "@daodao/api";
+import { type ReactionListItemWithPrivacy, useReactionsList } from "@daodao/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
@@ -16,9 +16,10 @@ export function BrowseActivityContent({ targetId }: BrowseActivityContentProps) 
     targetId,
   });
 
-  const items = [...(data?.data?.items ?? [])].sort(
-    (a, b) => new Date(b.reactedAt).getTime() - new Date(a.reactedAt).getTime(),
-  );
+  const items = [...(data?.data?.items ?? [])]
+    .map((item) => item as ReactionListItemWithPrivacy)
+    .filter((item) => item.isPublic === true || item.isConnection === true)
+    .sort((a, b) => new Date(b.reactedAt).getTime() - new Date(a.reactedAt).getTime());
 
   if (items.length === 0) {
     return (

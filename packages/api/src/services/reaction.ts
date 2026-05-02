@@ -24,6 +24,12 @@ export type GetReactionsListResponse =
 
 export type ReactionListItem = components["schemas"]["ReactionListItem"];
 
+/** ReactionListItem 加入隱私欄位（後端尚未納入 openapi schema，透過此型別擴充） */
+export type ReactionListItemWithPrivacy = ReactionListItem & {
+  isPublic?: boolean;
+  isConnection?: boolean;
+};
+
 export type UpsertReactionRequest = components["schemas"]["UpsertReactionRequest"];
 export type RemoveReactionRequest = components["schemas"]["RemoveReactionRequest"];
 
