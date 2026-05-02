@@ -367,26 +367,6 @@ export default function HomePage() {
                     }
 
 
-                    if (feedItem.type === "checkin") {
-                      const checkin = feedItem.data;
-                      return (
-                        <div key={checkin.id}>
-                          {showFeedLabel && (
-                            <FeedLabel
-                              feedReason={feedItem.feed_reason}
-                              userName={checkin.user?.name}
-                              practiceTitle={checkin.practice?.title}
-                              latestActorName={latestActorName}
-                            />
-                          )}
-                          <CheckInShowcaseCard
-                            {...checkin}
-                            batchReactionData={batchCheckinReactionsData?.data?.[checkin.id]}
-                            onReactionMutate={() => mutateBatchCheckinReactions()}
-                          />
-                        </div>
-                      );
-                    }
 
 
                     return null;
