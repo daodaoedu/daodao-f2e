@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  type IShowcasePractice,
+  type FeedItem,
+  useFeed,
   useMyPracticeStats,
   useMyPractices,
   useReactionsBatch,
-  useShowcaseFeed,
 } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
@@ -77,8 +77,8 @@ export default function HomePage() {
     [filters, updateUrlParams]
   );
 
-  // Showcase feed (practice only)
-  const showcaseParams = useMemo(
+  // Feed (practice + checkin)
+  const feedParams = useMemo(
     () => ({
       keyword: keyword || undefined,
       tags: filters.tags.length > 0 ? filters.tags : undefined,
@@ -87,15 +87,21 @@ export default function HomePage() {
   );
 
   const {
-    practices,
+    feedItems,
     isLoading: isShowcaseLoading,
     hasMore,
     loadMore,
     isValidating,
-  } = useShowcaseFeed(showcaseParams);
+  } = useFeed(feedParams);
 
   // Batch fetch reactions for all visible practices
-  const practiceIds = useMemo(() => practices.map((p: IShowcasePractice) => p.id), [practices]);
+  const practiceIds = useMemo(
+    () =>
+      feedItems
+        .filter((item): item is Extract<FeedItem, { type: "practice" }> => item.type === "practice")
+        .map((item) => item.data.id),
+    [feedItems]
+  );
   const { data: batchReactionsData, mutate: mutateBatchReactions } = useReactionsBatch({
     targetType: "practice",
     targetIds: practiceIds,
@@ -223,7 +229,7 @@ export default function HomePage() {
                 />
               </div>
 
-              {isShowcaseLoading && practices.length === 0 ? (
+              {isShowcaseLoading && feedItems.length === 0 ? (
                 <div className="flex flex-col gap-3">
                   {[1, 2, 3].map((i) => (
                     <div
@@ -234,8 +240,10 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
-                  {practices.map((practice: IShowcasePractice) =>
-                    practice.is_brewing ? (
+                  {feedItems.map((item) => {
+                    if (item.type !== "practice") return null;
+                    const practice = item.data;
+                    return practice.is_brewing ? (
                       <BrewingCard
                         key={practice.id}
                         id={practice.id}
@@ -284,8 +292,8 @@ export default function HomePage() {
                         batchReactionData={batchReactionsData?.data?.[practice.id]}
                         onReactionMutate={() => mutateBatchReactions()}
                       />
-                    )
-                  )}
+                    );
+                  })}
 
                   <div ref={sentinelRef} className="h-4" />
 

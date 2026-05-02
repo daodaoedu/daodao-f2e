@@ -47,9 +47,11 @@ export interface IShowcaseCheckIn {
   }[];
 }
 
+export type FeedReasonType = "new_practice" | "new_release" | "checked_in" | "cheered";
+
 export type FeedItem =
-  | { type: "practice"; data: IShowcasePractice }
-  | { type: "checkin"; data: IShowcaseCheckIn };
+  | { type: "practice"; data: IShowcasePractice; feed_reason?: FeedReasonType }
+  | { type: "checkin"; data: IShowcaseCheckIn; feed_reason?: FeedReasonType };
 
 export interface IFeedParams {
   keyword?: string;
