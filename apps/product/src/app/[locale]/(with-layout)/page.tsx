@@ -24,6 +24,8 @@ import { BackgroundAnimation, Banner } from "@/components/layout";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import {
   BrewingCard,
+  CheckInShowcaseCard,
+  FeedLabel,
   PracticeShowcaseCard,
   type ShowcaseFilterState,
   ShowcaseSearchBar,
@@ -259,60 +261,94 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
-                  {feedItems.map((feedItem) => {
+                  {feedItems.map((feedItem, index) => {
+                    const isNewRelease = feedItem.feed_reason === "new_release";
+                    const prevIsNewRelease = index > 0 && feedItems[index - 1]?.feed_reason === "new_release";
+                    const showFeedLabel = !isNewRelease || !prevIsNewRelease;
+
+                    const latestActorName = feedItem.data.reactions
+                      ?.find((r) => r.latestActorName)?.latestActorName;
+
                     if (feedItem.type === "practice") {
                       const practice = feedItem.data;
-                      return practice.is_brewing ? (
-                        <BrewingCard
-                          key={practice.id}
-                          id={practice.id}
-                          title={practice.title}
-                          startDate={practice.start_date}
-                          endDate={practice.end_date}
-                          user={
-                            practice.user
-                              ? {
-                                  id: practice.user.id,
-                                  name: practice.user.name,
-                                  photoUrl: practice.user.photo_url,
-                                }
-                              : undefined
-                          }
-                          actionDescription={practice.practice_action}
-                          frequencyMinDays={practice.frequency_min_days}
-                          frequencyMaxDays={practice.frequency_max_days}
-                          sessionDurationMinutes={practice.session_duration_minutes}
-                          commentCount={practice.comment_count}
-                          batchReactionData={batchReactionsData?.data?.[practice.id]}
-                          onReactionMutate={() => mutateBatchReactions()}
-                        />
-                      ) : (
-                        <PracticeShowcaseCard
-                          key={practice.id}
-                          id={practice.id}
-                          title={practice.title}
-                          status={practice.status}
-                          startDate={practice.start_date}
-                          endDate={practice.end_date}
-                          user={
-                            practice.user
-                              ? {
-                                  id: practice.user.id,
-                                  name: practice.user.name,
-                                  photoUrl: practice.user.photo_url,
-                                }
-                              : undefined
-                          }
-                          actionDescription={practice.practice_action}
-                          frequencyMinDays={practice.frequency_min_days}
-                          frequencyMaxDays={practice.frequency_max_days}
-                          sessionDurationMinutes={practice.session_duration_minutes}
-                          commentCount={practice.comment_count}
-                          batchReactionData={batchReactionsData?.data?.[practice.id]}
-                          onReactionMutate={() => mutateBatchReactions()}
-                        />
+                      return (
+                        <div key={practice.id}>
+                          {showFeedLabel && (
+                            <FeedLabel
+                              feedReason={feedItem.feed_reason}
+                              userName={practice.user?.name}
+                              latestActorName={latestActorName}
+                            />
+                          )}
+                          {practice.is_brewing ? (
+                            <BrewingCard
+                              id={practice.id}
+                              title={practice.title}
+                              startDate={practice.start_date}
+                              endDate={practice.end_date}
+                              user={
+                                practice.user
+                                  ? {
+                                      id: practice.user.id,
+                                      name: practice.user.name,
+                                      photoUrl: practice.user.photo_url,
+                                    }
+                                  : undefined
+                              }
+                              actionDescription={practice.practice_action}
+                              frequencyMinDays={practice.frequency_min_days}
+                              frequencyMaxDays={practice.frequency_max_days}
+                              sessionDurationMinutes={practice.session_duration_minutes}
+                              commentCount={practice.comment_count}
+                              batchReactionData={batchReactionsData?.data?.[practice.id]}
+                              onReactionMutate={() => mutateBatchReactions()}
+                            />
+                          ) : (
+                            <PracticeShowcaseCard
+                              id={practice.id}
+                              title={practice.title}
+                              status={practice.status}
+                              startDate={practice.start_date}
+                              endDate={practice.end_date}
+                              user={
+                                practice.user
+                                  ? {
+                                      id: practice.user.id,
+                                      name: practice.user.name,
+                                      photoUrl: practice.user.photo_url,
+                                    }
+                                  : undefined
+                              }
+                              actionDescription={practice.practice_action}
+                              frequencyMinDays={practice.frequency_min_days}
+                              frequencyMaxDays={practice.frequency_max_days}
+                              sessionDurationMinutes={practice.session_duration_minutes}
+                              commentCount={practice.comment_count}
+                              batchReactionData={batchReactionsData?.data?.[practice.id]}
+                              onReactionMutate={() => mutateBatchReactions()}
+                            />
+                          )}
+                        </div>
                       );
                     }
+
+                    if (feedItem.type === "checkin") {
+                      const checkin = feedItem.data;
+                      return (
+                        <div key={checkin.id}>
+                          {showFeedLabel && (
+                            <FeedLabel
+                              feedReason={feedItem.feed_reason}
+                              userName={checkin.user?.name}
+                              practiceTitle={checkin.practice?.title}
+                              latestActorName={latestActorName}
+                            />
+                          )}
+                          <CheckInShowcaseCard {...checkin} />
+                        </div>
+                      );
+                    }
+
                     return null;
                   })}
 
