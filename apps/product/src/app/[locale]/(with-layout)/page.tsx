@@ -4,8 +4,8 @@ import {
   useMyPracticeStats,
   useMyPractices,
   useReactionsBatch,
-  useShowcaseFeed,
-  type IShowcasePractice,
+  useFeed,
+  type FeedItem,
 } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
@@ -89,17 +89,20 @@ export default function HomePage() {
   );
 
   const {
-    practices,
+    feedItems,
     isLoading: isShowcaseLoading,
     hasMore,
     loadMore,
     isValidating,
-  } = useShowcaseFeed(showcaseParams);
+  } = useFeed(showcaseParams);
 
   // Batch fetch reactions for all visible practices
   const practiceIds = useMemo(
-    () => practices.map((p: IShowcasePractice) => p.id),
-    [practices],
+    () =>
+      feedItems
+        .filter((item): item is Extract<FeedItem, { type: "practice" }> => item.type === "practice")
+        .map((item) => item.data.id),
+    [feedItems],
   );
   const { data: batchReactionsData, mutate: mutateBatchReactions } =
     useReactionsBatch({ targetType: "practice", targetIds: practiceIds });
@@ -245,7 +248,7 @@ export default function HomePage() {
                 />
               </div>
 
-              {isShowcaseLoading && practices.length === 0 ? (
+              {isShowcaseLoading && feedItems.length === 0 ? (
                 <div className="flex flex-col gap-3">
                   {[1, 2, 3].map((i) => (
                     <div
@@ -256,58 +259,62 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
-                  {practices.map((practice: IShowcasePractice) =>
-                    practice.is_brewing ? (
-                      <BrewingCard
-                        key={practice.id}
-                        id={practice.id}
-                        title={practice.title}
-                        startDate={practice.start_date}
-                        endDate={practice.end_date}
-                        user={
-                          practice.user
-                            ? {
-                                id: practice.user.id,
-                                name: practice.user.name,
-                                photoUrl: practice.user.photo_url,
-                              }
-                            : undefined
-                        }
-                        actionDescription={practice.practice_action}
-                        frequencyMinDays={practice.frequency_min_days}
-                        frequencyMaxDays={practice.frequency_max_days}
-                        sessionDurationMinutes={practice.session_duration_minutes}
-                        commentCount={practice.comment_count}
-                        batchReactionData={batchReactionsData?.data?.[practice.id]}
-                        onReactionMutate={() => mutateBatchReactions()}
-                      />
-                    ) : (
-                      <PracticeShowcaseCard
-                        key={practice.id}
-                        id={practice.id}
-                        title={practice.title}
-                        status={practice.status}
-                        startDate={practice.start_date}
-                        endDate={practice.end_date}
-                        user={
-                          practice.user
-                            ? {
-                                id: practice.user.id,
-                                name: practice.user.name,
-                                photoUrl: practice.user.photo_url,
-                              }
-                            : undefined
-                        }
-                        actionDescription={practice.practice_action}
-                        frequencyMinDays={practice.frequency_min_days}
-                        frequencyMaxDays={practice.frequency_max_days}
-                        sessionDurationMinutes={practice.session_duration_minutes}
-                        commentCount={practice.comment_count}
-                        batchReactionData={batchReactionsData?.data?.[practice.id]}
-                        onReactionMutate={() => mutateBatchReactions()}
-                      />
-                    )
-                  )}
+                  {feedItems.map((feedItem) => {
+                    if (feedItem.type === "practice") {
+                      const practice = feedItem.data;
+                      return practice.is_brewing ? (
+                        <BrewingCard
+                          key={practice.id}
+                          id={practice.id}
+                          title={practice.title}
+                          startDate={practice.start_date}
+                          endDate={practice.end_date}
+                          user={
+                            practice.user
+                              ? {
+                                  id: practice.user.id,
+                                  name: practice.user.name,
+                                  photoUrl: practice.user.photo_url,
+                                }
+                              : undefined
+                          }
+                          actionDescription={practice.practice_action}
+                          frequencyMinDays={practice.frequency_min_days}
+                          frequencyMaxDays={practice.frequency_max_days}
+                          sessionDurationMinutes={practice.session_duration_minutes}
+                          commentCount={practice.comment_count}
+                          batchReactionData={batchReactionsData?.data?.[practice.id]}
+                          onReactionMutate={() => mutateBatchReactions()}
+                        />
+                      ) : (
+                        <PracticeShowcaseCard
+                          key={practice.id}
+                          id={practice.id}
+                          title={practice.title}
+                          status={practice.status}
+                          startDate={practice.start_date}
+                          endDate={practice.end_date}
+                          user={
+                            practice.user
+                              ? {
+                                  id: practice.user.id,
+                                  name: practice.user.name,
+                                  photoUrl: practice.user.photo_url,
+                                }
+                              : undefined
+                          }
+                          actionDescription={practice.practice_action}
+                          frequencyMinDays={practice.frequency_min_days}
+                          frequencyMaxDays={practice.frequency_max_days}
+                          sessionDurationMinutes={practice.session_duration_minutes}
+                          commentCount={practice.comment_count}
+                          batchReactionData={batchReactionsData?.data?.[practice.id]}
+                          onReactionMutate={() => mutateBatchReactions()}
+                        />
+                      );
+                    }
+                    return null;
+                  })}
 
                   <div ref={sentinelRef} className="h-4" />
 
