@@ -18,7 +18,7 @@ interface ICheckInCardProps {
   showTape?: boolean;
   /** 標題下方插入的額外內容（例如同日打卡切換導航） */
   afterTitle?: React.ReactNode;
-  /** 卡片底部互動區（reaction + 留言按鈕） */
+  /** 卡片底部注入的互動列（例如 Reaction 按鈕） */
   bottomActions?: React.ReactNode;
 }
 
@@ -204,6 +204,8 @@ export const CheckInCard = ({
 
         {bottomActions}
       </div>
+
+      {bottomActions}
     </div>
   );
 };
