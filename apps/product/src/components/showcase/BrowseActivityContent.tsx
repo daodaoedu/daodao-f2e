@@ -6,11 +6,11 @@ import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 import { formatRelativeTime } from "@/utils/format-time";
 
-interface BrowseActivityContentProps {
+interface CheckinReactionListProps {
   targetId: string;
 }
 
-export function BrowseActivityContent({ targetId }: BrowseActivityContentProps) {
+export function CheckinReactionList({ targetId }: CheckinReactionListProps) {
   const { data } = useReactionsList({
     targetType: "checkin",
     targetId,

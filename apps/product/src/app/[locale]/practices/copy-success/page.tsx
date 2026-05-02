@@ -3,6 +3,7 @@
 import featureHappyJson from "@daodao/assets/images/quiz/feature-happy.json";
 import { usePracticeById } from "@daodao/api";
 import { useRouter } from "@daodao/i18n/navigation";
+import { useEffect } from "react";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
@@ -19,11 +20,16 @@ export default function CopySuccessPage() {
   const searchParams = useSearchParams();
   const practiceId = searchParams.get("practiceId");
 
+  useEffect(() => {
+    if (!practiceId) {
+      router.replace("/");
+    }
+  }, [practiceId, router]);
+
   const { data: practiceResponse } = usePracticeById(practiceId ?? "");
   const practice = practiceResponse?.data;
 
   if (!practiceId) {
-    router.replace("/");
     return null;
   }
 
