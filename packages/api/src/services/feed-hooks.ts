@@ -6,6 +6,7 @@
  * - 混合 practice + checkin 卡片
  */
 
+import { getEnv } from "@daodao/config";
 import useSWRInfinite from "swr/infinite";
 import type { IReactionCountItem, IShowcasePractice } from "./showcase-hooks";
 import { fetchAiBackend } from "./showcase-hooks";
@@ -47,9 +48,19 @@ export interface IShowcaseCheckIn {
   }[];
 }
 
+export type FeedReasonType = "new_practice" | "new_release" | "checked_in" | "cheered";
+
+export interface ActivityCardItem {
+  type: "activity";
+  activity_type: "community_event" | "follow_summary";
+  event_text: string;
+  label: string;
+}
+
 export type FeedItem =
-  | { type: "practice"; data: IShowcasePractice }
-  | { type: "checkin"; data: IShowcaseCheckIn };
+  | { type: "practice"; feed_reason: FeedReasonType; data: IShowcasePractice }
+  | { type: "checkin"; feed_reason: FeedReasonType; data: IShowcaseCheckIn }
+  | ActivityCardItem;
 
 export interface IFeedParams {
   keyword?: string;
@@ -105,8 +116,8 @@ export function useFeed(params: IFeedParams) {
   const feedItems: FeedItem[] = data
     ? data.flatMap((page) =>
         (page.data ?? []).filter((item) => {
-          const isValid = !!(item?.type && item?.data);
-          if (!isValid && process.env.NODE_ENV !== "production") {
+          const isValid = !!(item?.type && (item?.type === "activity" || item?.data));
+          if (!isValid && getEnv("NODE_ENV") !== "production") {
             console.warn("[useFeed] Malformed feed item (missing type/data):", item);
           }
           return isValid;

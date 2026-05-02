@@ -100,6 +100,9 @@ export default function CheckInDetailPage() {
 
     checkInsData.data.forEach((checkIn) => {
       const moodType = mapApiMoodToMoodType(checkIn.mood);
+      if (!moodType) {
+        return;
+      }
 
       const displayData: ICheckInDisplayData = {
         id: String(checkIn.id),
@@ -223,7 +226,6 @@ export default function CheckInDetailPage() {
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
         <PageHeader
           title="打卡紀錄"
-          rightActionTo={`/practices/${practiceId}`}
           variant="light"
           disableLightOn="mobile"
         />
@@ -241,7 +243,6 @@ export default function CheckInDetailPage() {
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
         <PageHeader
           title="打卡紀錄"
-          rightActionTo={`/practices/${practiceId}`}
           variant="light"
           disableLightOn="mobile"
         />
@@ -291,12 +292,11 @@ export default function CheckInDetailPage() {
         activeDate={activeCheckInDate}
         practiceId={practiceId}
         title="打卡紀錄"
-        closeActionTo={`/practices/${practiceId}`}
       />
 
       {/* Desktop 版本的標題列 */}
       <div className="hidden md:block">
-        <PageHeader title="打卡紀錄" rightActionTo={`/practices/${practiceId}`} variant="light" />
+        <PageHeader title="打卡紀錄" variant="light" />
       </div>
 
       <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">

@@ -146,7 +146,8 @@ function NotificationText({ notification }: { notification: INotificationData })
   if (type === NotificationType.updatePracticeCheckin) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} 更新了主題實踐{practiceName}：<span className="font-semibold">{content}</span>
+        {name} 在主題實踐{practiceName}打了卡
+        {content && <>：<span className="font-semibold">{content}</span></>}
       </p>
     );
   }

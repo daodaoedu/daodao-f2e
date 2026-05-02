@@ -283,7 +283,7 @@ export default function TemplateDetailPage() {
   if (error || !template) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
-        <PageHeader leftAction="back" leftLabel="" rightActionTo="/" variant="light" />
+        <PageHeader leftAction="back" leftLabel="" variant="light" />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-5">
           <p className="text-white mb-4">載入模板時發生錯誤</p>
         </div>
@@ -296,7 +296,7 @@ export default function TemplateDetailPage() {
       <Deco4Svg className="absolute top-0 right-0" width={270} height={484} />
 
       {/* Top Navigation */}
-      <PageHeader leftAction="back" leftLabel="" rightActionTo="/" variant="light" />
+      <PageHeader leftAction="back" leftLabel="" variant="light" />
 
       <main className="relative max-w-[600px] md:max-w-[680px] mx-auto pb-8">
         {/* Category Label */}

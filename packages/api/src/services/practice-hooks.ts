@@ -687,7 +687,13 @@ export const useDeletePractice = (practiceId: string) => {
  */
 export const useCopyPractice = () => {
   const copy = async (practiceId: string): Promise<{ id: string }> => {
-    return copyPractice(practiceId);
+    const result = await copyPractice(practiceId);
+    try {
+      await updatePractice(result.id, { privacyStatus: "public" });
+    } catch {
+      console.error("[useCopyPractice] 設定公開隱私狀態失敗，複製仍成功");
+    }
+    return result;
   };
 
   return { copyPractice: copy };

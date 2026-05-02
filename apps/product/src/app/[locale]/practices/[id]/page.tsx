@@ -473,13 +473,14 @@ export default function PracticeDetailPage() {
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
-        <Link
-          href="/"
+        <button
+          type="button"
+          onClick={() => router.back()}
           className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
           aria-label="關閉"
         >
           <X className="size-6" />
-        </Link>
+        </button>
       </div>
       <BackgroundAnimation />
 

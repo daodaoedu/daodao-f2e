@@ -1,5 +1,6 @@
 "use client";
 
+import { useCurrentUser } from "@daodao/api";
 import type { BatchReactionItem, IShowcaseCheckIn } from "@daodao/api";
 import { DefaultAvatarSvg, DialogOutlineSvg, FlagOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
@@ -59,6 +60,9 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
 
   const { selectedReactions, totalCount, displayReactions, handleToggle, firstReactorName } =
     useCardReactions("checkin", id, batchReactionData, onReactionMutate);
+
+  const { data: currentUserData } = useCurrentUser();
+  const isOwnCard = !!currentUserData?.data?.id && user?.id === currentUserData.data.id;
 
   const handleCardClick = () => {
     router.push(`/practices/${practice.id}/check-ins/${id}`);
@@ -128,10 +132,10 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
             <p className="text-base text-text-dark line-clamp-2">{note}</p>
           </div>
 
-          {/* 三點選單按鈕 */}
+          {/* 三點選單按鈕：本人不顯示，他人只顯示「檢舉」 */}
           {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
           {/* biome-ignore lint/a11y/noStaticElementInteractions: stop card click */}
-          <div
+          {!isOwnCard && <div
             ref={menuRef}
             className="absolute right-0 top-[-10px]"
             onClick={(e) => e.stopPropagation()}
@@ -162,7 +166,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
                 </Button>
               </div>
             )}
-          </div>
+          </div>}
         </div>
 
         {/* 分隔線 */}

@@ -1,11 +1,12 @@
 "use client";
 
 import {
-  type IShowcasePractice,
+  type ActivityCardItem,
+  type FeedItem,
+  useFeed,
   useMyPracticeStats,
   useMyPractices,
   useReactionsBatch,
-  useShowcaseFeed,
 } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
@@ -22,7 +23,10 @@ import {
 import { BackgroundAnimation, Banner } from "@/components/layout";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import {
+  ActivityCard,
   BrewingCard,
+  CheckInShowcaseCard,
+  FeedLabel,
   PracticeShowcaseCard,
   type ShowcaseFilterState,
   ShowcaseSearchBar,
@@ -34,6 +38,40 @@ import {
 } from "@/constants/task-status";
 
 type TabType = "inspire" | "mine";
+
+// Reorder feed items into the cycle: [打卡 1] → [互動 1] → [實踐 3] → repeat
+// 互動 slot: feed_reason="cheered" 的卡片優先，不足時 fallback 到文字 ActivityCard
+function reorderFeedItems(items: FeedItem[]): FeedItem[] {
+  const checkins = items.filter(
+    (item): item is Extract<FeedItem, { type: "checkin" }> =>
+      item.type === "checkin" && item.feed_reason !== "cheered",
+  );
+  const cheered = items.filter(
+    (item): item is Extract<FeedItem, { type: "practice" | "checkin" }> =>
+      (item.type === "practice" || item.type === "checkin") && item.feed_reason === "cheered",
+  );
+  const textActivities = items.filter((item): item is ActivityCardItem => item.type === "activity");
+  // 互動 slot 來源：cheered 優先，用完再接文字 ActivityCard
+  const activitySlot: FeedItem[] = [...cheered, ...textActivities];
+  const practices = items.filter(
+    (item): item is Extract<FeedItem, { type: "practice" }> =>
+      item.type === "practice" && item.feed_reason !== "cheered",
+  );
+
+  const result: FeedItem[] = [];
+  let ci = 0;
+  let ai = 0;
+  let pi = 0;
+
+  while (ci < checkins.length || ai < activitySlot.length || pi < practices.length) {
+    if (ci < checkins.length) result.push(checkins[ci++]!);
+    if (ai < activitySlot.length) result.push(activitySlot[ai++]!);
+    for (let i = 0; i < 3 && pi < practices.length; i++) result.push(practices[pi++]!);
+    if (ci >= checkins.length && ai >= activitySlot.length && pi >= practices.length) break;
+  }
+
+  return result;
+}
 
 const filterOptions = [
   { value: FilterStatus.all, label: "全部" },
@@ -77,8 +115,8 @@ export default function HomePage() {
     [filters, updateUrlParams]
   );
 
-  // Showcase feed (practice only)
-  const showcaseParams = useMemo(
+  // Feed (practice + checkin)
+  const feedParams = useMemo(
     () => ({
       keyword: keyword || undefined,
       tags: filters.tags.length > 0 ? filters.tags : undefined,
@@ -87,18 +125,39 @@ export default function HomePage() {
   );
 
   const {
-    practices,
+    feedItems,
     isLoading: isShowcaseLoading,
     hasMore,
     loadMore,
     isValidating,
-  } = useShowcaseFeed(showcaseParams);
+  } = useFeed(feedParams);
+
+  const orderedFeedItems = useMemo(() => reorderFeedItems(feedItems), [feedItems]);
 
   // Batch fetch reactions for all visible practices
-  const practiceIds = useMemo(() => practices.map((p: IShowcasePractice) => p.id), [practices]);
-  const { data: batchReactionsData, mutate: mutateBatchReactions } = useReactionsBatch({
+  const practiceIds = useMemo(
+    () =>
+      feedItems
+        .filter((item): item is Extract<FeedItem, { type: "practice" }> => item.type === "practice")
+        .map((item) => item.data.id),
+    [feedItems]
+  );
+  const { data: batchReactionsData, isLoading: isBatchReactionsLoading, mutate: mutateBatchReactions } = useReactionsBatch({
     targetType: "practice",
     targetIds: practiceIds,
+  });
+
+  // Batch fetch reactions for all visible checkins (1 request for the whole page)
+  const checkinIds = useMemo(
+    () =>
+      feedItems
+        .filter((item): item is Extract<FeedItem, { type: "checkin" }> => item.type === "checkin")
+        .map((item) => item.data.id),
+    [feedItems],
+  );
+  const { data: batchCheckinReactionsData, isLoading: isBatchCheckinReactionsLoading } = useReactionsBatch({
+    targetType: "checkin",
+    targetIds: checkinIds,
   });
 
   // Infinite scroll observer
@@ -223,7 +282,7 @@ export default function HomePage() {
                 />
               </div>
 
-              {isShowcaseLoading && practices.length === 0 ? (
+              {isShowcaseLoading && feedItems.length === 0 ? (
                 <div className="flex flex-col gap-3">
                   {[1, 2, 3].map((i) => (
                     <div
@@ -234,58 +293,130 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
-                  {practices.map((practice: IShowcasePractice) =>
-                    practice.is_brewing ? (
-                      <BrewingCard
-                        key={practice.id}
-                        id={practice.id}
-                        title={practice.title}
-                        startDate={practice.start_date}
-                        endDate={practice.end_date}
-                        user={
-                          practice.user
-                            ? {
-                                id: practice.user.id,
-                                name: practice.user.name,
-                                photoUrl: practice.user.photo_url,
+                  {orderedFeedItems.map((feedItem, index) => {
+                    if (feedItem.type === "activity") {
+                      return (
+                        <ActivityCard
+                          key={`activity-${index}`}
+                          event_text={feedItem.event_text}
+                          label={feedItem.label}
+                        />
+                      );
+                    }
+
+                    const isNewRelease = feedItem.feed_reason === "new_release";
+                    const prevItem = index > 0 ? orderedFeedItems[index - 1] : undefined;
+                    const prevFeedReason = prevItem && prevItem.type !== "activity" ? prevItem.feed_reason : undefined;
+                    const showFeedLabel = !isNewRelease || prevFeedReason !== "new_release";
+
+                    if (feedItem.type === "checkin") {
+                      const checkin = feedItem.data;
+                      const latestActorName =
+                        batchCheckinReactionsData?.data?.[checkin.id]?.items[0]?.name ??
+                        batchCheckinReactionsData?.data?.[checkin.id]?.reactions.find((r) => r.count > 0)
+                          ?.latestActorName ??
+                        checkin.reactions?.find((r) => r.latestActorName)?.latestActorName;
+                      return (
+                        <div key={`checkin-${checkin.id}-${feedItem.feed_reason}-${index}`}>
+                          {showFeedLabel && feedItem.feed_reason && !(feedItem.feed_reason === "cheered" && isBatchCheckinReactionsLoading) && (
+                            <FeedLabel
+                              feedReason={feedItem.feed_reason}
+                              userName={checkin.user?.name}
+                              practiceTitle={checkin.practice?.title}
+                              latestActorName={latestActorName}
+                            />
+                          )}
+                          <CheckInShowcaseCard
+                            id={checkin.id}
+                            checkin_date={checkin.checkin_date}
+                            mood={checkin.mood}
+                            note={checkin.note}
+                            tags={checkin.tags}
+                            image_urls={checkin.image_urls}
+                            created_at={checkin.created_at}
+                            practice={checkin.practice}
+                            user={checkin.user}
+                            comment_count={checkin.comment_count}
+                            comment_preview={checkin.comment_preview}
+                            batchReactionData={batchCheckinReactionsData?.data?.[checkin.id]}
+                          />
+                        </div>
+                      );
+                    }
+
+                    if (feedItem.type === "practice") {
+                      const practice = feedItem.data;
+                      const latestActorName =
+                        batchReactionsData?.data?.[practice.id]?.items[0]?.name ??
+                        batchReactionsData?.data?.[practice.id]?.reactions.find((r) => r.count > 0)
+                          ?.latestActorName ??
+                        practice.reactions?.find((r) => r.latestActorName)?.latestActorName;
+                      return (
+                        <div key={`practice-${practice.id}-${feedItem.feed_reason}-${index}`}>
+                          {showFeedLabel && feedItem.feed_reason && !(feedItem.feed_reason === "cheered" && isBatchReactionsLoading) && (
+                            <FeedLabel
+                              feedReason={feedItem.feed_reason}
+                              userName={practice.user?.name}
+                              latestActorName={latestActorName}
+                            />
+                          )}
+                          {practice.is_brewing ? (
+                            <BrewingCard
+                              id={practice.id}
+                              title={practice.title}
+                              startDate={practice.start_date}
+                              endDate={practice.end_date}
+                              user={
+                                practice.user
+                                  ? {
+                                      id: practice.user.id,
+                                      name: practice.user.name,
+                                      photoUrl: practice.user.photo_url,
+                                    }
+                                  : undefined
                               }
-                            : undefined
-                        }
-                        actionDescription={practice.practice_action}
-                        frequencyMinDays={practice.frequency_min_days}
-                        frequencyMaxDays={practice.frequency_max_days}
-                        sessionDurationMinutes={practice.session_duration_minutes}
-                        commentCount={practice.comment_count}
-                        batchReactionData={batchReactionsData?.data?.[practice.id]}
-                        onReactionMutate={() => mutateBatchReactions()}
-                      />
-                    ) : (
-                      <PracticeShowcaseCard
-                        key={practice.id}
-                        id={practice.id}
-                        title={practice.title}
-                        status={practice.status}
-                        startDate={practice.start_date}
-                        endDate={practice.end_date}
-                        user={
-                          practice.user
-                            ? {
-                                id: practice.user.id,
-                                name: practice.user.name,
-                                photoUrl: practice.user.photo_url,
+                              actionDescription={practice.practice_action}
+                              frequencyMinDays={practice.frequency_min_days}
+                              frequencyMaxDays={practice.frequency_max_days}
+                              sessionDurationMinutes={practice.session_duration_minutes}
+                              commentCount={practice.comment_count}
+                              batchReactionData={batchReactionsData?.data?.[practice.id]}
+                              onReactionMutate={() => mutateBatchReactions()}
+                            />
+                          ) : (
+                            <PracticeShowcaseCard
+                              id={practice.id}
+                              title={practice.title}
+                              status={practice.status}
+                              startDate={practice.start_date}
+                              endDate={practice.end_date}
+                              user={
+                                practice.user
+                                  ? {
+                                      id: practice.user.id,
+                                      name: practice.user.name,
+                                      photoUrl: practice.user.photo_url,
+                                    }
+                                  : undefined
                               }
-                            : undefined
-                        }
-                        actionDescription={practice.practice_action}
-                        frequencyMinDays={practice.frequency_min_days}
-                        frequencyMaxDays={practice.frequency_max_days}
-                        sessionDurationMinutes={practice.session_duration_minutes}
-                        commentCount={practice.comment_count}
-                        batchReactionData={batchReactionsData?.data?.[practice.id]}
-                        onReactionMutate={() => mutateBatchReactions()}
-                      />
-                    )
-                  )}
+                              actionDescription={practice.practice_action}
+                              frequencyMinDays={practice.frequency_min_days}
+                              frequencyMaxDays={practice.frequency_max_days}
+                              sessionDurationMinutes={practice.session_duration_minutes}
+                              commentCount={practice.comment_count}
+                              batchReactionData={batchReactionsData?.data?.[practice.id]}
+                              onReactionMutate={() => mutateBatchReactions()}
+                            />
+                          )}
+                        </div>
+                      );
+                    }
+
+
+
+
+                    return null;
+                  })}
 
                   <div ref={sentinelRef} className="h-4" />
 

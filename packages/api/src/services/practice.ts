@@ -455,13 +455,20 @@ export const getPracticeSummary = async (
  * 複製實踐（複製他人或自己的實踐）
  * @param id 來源實踐 ID
  * @returns 新實踐 external_id（UUID）
- * NOTE: 需後端部署後執行 pnpm run generate:api 更新 types，屆時可移除 as any
+ * NOTE: 後端部署後執行 pnpm run generate:api 更新 types，屆時可移除此 workaround
  */
+type CopyPracticeClient = {
+  POST: (
+    path: "/api/v1/practices/{id}/copy",
+    options: { params: { path: { id: string } } }
+  ) => Promise<{ data?: { data: { id: string } }; error?: unknown }>;
+};
+
 export const copyPractice = async (id: string): Promise<{ id: string }> => {
-  // biome-ignore lint/suspicious/noExplicitAny: 後端部署後執行 pnpm run generate:api 更新 types 即可移除
-  const response = await (client as any).POST("/api/v1/practices/{id}/copy", {
-    params: { path: { id } },
-  });
+  const response = await (client as unknown as CopyPracticeClient).POST(
+    "/api/v1/practices/{id}/copy",
+    { params: { path: { id } } }
+  );
 
   if (response.error) {
     const errorMessage =
