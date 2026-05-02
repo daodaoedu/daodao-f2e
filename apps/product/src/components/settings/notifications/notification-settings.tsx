@@ -92,6 +92,9 @@ export const NotificationSettings = () => {
   // Sync from API response
   useEffect(() => {
     if (!data) return;
+    const n01Prefs = (data.data ?? []).filter((p) => p.channel === "N01");
+    // 從所有 N01 項目推導總開關狀態：至少有一個 enabled 就是開
+    setGlobalEnabled(n01Prefs.length === 0 || n01Prefs.some((p) => p.isEnabled));
     const newPrefs: PreferencesMap = { ...DEFAULT_PREFS };
     for (const p of data.data ?? []) {
       if (p.channel === "N01" && newPrefs[p.type]) {
