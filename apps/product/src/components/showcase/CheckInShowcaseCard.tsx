@@ -99,9 +99,9 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
               <moodOption.emoji className="size-4" />
             </div>
           )}
-          {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: stop card click */}
           {!isOwnCard && (
+            // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
+            // biome-ignore lint/a11y/noStaticElementInteractions: stop card click
             <div ref={menuRef} className="relative" onClick={(e) => e.stopPropagation()}>
               <Button
                 type="button"

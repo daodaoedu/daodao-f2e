@@ -297,7 +297,7 @@ export default function HomePage() {
                     if (feedItem.type === "practice") {
                       const practice = feedItem.data;
                       return (
-                        <div key={practice.id}>
+                        <div key={`practice-${practice.id}-${feedItem.feed_reason}-${index}`}>
                           {showFeedLabel && (
                             <FeedLabel
                               feedReason={feedItem.feed_reason}
@@ -360,7 +360,7 @@ export default function HomePage() {
                     if (feedItem.type === "checkin") {
                       const checkin = feedItem.data;
                       return (
-                        <div key={checkin.id}>
+                        <div key={`checkin-${checkin.id}-${feedItem.feed_reason}-${index}`}>
                           {showFeedLabel && (
                             <FeedLabel
                               feedReason={feedItem.feed_reason}
