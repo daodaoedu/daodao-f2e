@@ -28411,6 +28411,10 @@ export interface components {
             reactionType: string;
             /** @description 反應時間（ISO 8601） */
             reactedAt: string;
+            /** @description 該用戶是否公開帳號 */
+            isPublic: boolean;
+            /** @description 請求方是否與該用戶有 Connection 關係 */
+            isConnection: boolean;
         };
         /** @description 個別用戶反應列表回應 */
         GetReactionsListResponse: {

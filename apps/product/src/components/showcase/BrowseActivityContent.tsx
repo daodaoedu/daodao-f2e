@@ -16,14 +16,12 @@ export function BrowseActivityContent({ targetId }: BrowseActivityContentProps) 
     targetId,
   });
 
-  const items = [...(data?.data?.items ?? [])].sort(
-    (a, b) => new Date(b.reactedAt).getTime() - new Date(a.reactedAt).getTime(),
-  );
+  const items = [...(data?.data?.items ?? [])]
+    .filter((item) => item.isPublic || item.isConnection)
+    .sort((a, b) => new Date(b.reactedAt).getTime() - new Date(a.reactedAt).getTime());
 
   if (items.length === 0) {
-    return (
-      <div className="py-8 text-center text-sm text-[#9FB5B8]">還沒有人表達反應</div>
-    );
+    return <div className="py-8 text-center text-sm text-[#9FB5B8]">還沒有人表達反應</div>;
   }
 
   return (
@@ -31,10 +29,7 @@ export function BrowseActivityContent({ targetId }: BrowseActivityContentProps) 
       {items.map((item) => {
         const config = REACTION_CONFIG[item.reactionType as ReactionTypeType];
         return (
-          <div
-            key={`${item.userId}-${item.reactedAt}`}
-            className="flex items-center gap-3 py-2"
-          >
+          <div key={`${item.userId}-${item.reactedAt}`} className="flex items-center gap-3 py-2">
             <Avatar className="size-8 shrink-0">
               {item.photoURL && <AvatarImage src={item.photoURL} alt={item.name} />}
               <AvatarFallback className="text-[10px] font-medium text-text-dark bg-primary-palest">
@@ -46,12 +41,7 @@ export function BrowseActivityContent({ targetId }: BrowseActivityContentProps) 
               <p className="text-xs text-[#9FB5B8]">{formatRelativeTime(item.reactedAt)}</p>
             </div>
             {config && (
-              <LottieEmoji
-                url={config.lottieUrl}
-                fallback={config.emoji}
-                size={20}
-                play={false}
-              />
+              <LottieEmoji url={config.lottieUrl} fallback={config.emoji} size={20} play={false} />
             )}
           </div>
         );
