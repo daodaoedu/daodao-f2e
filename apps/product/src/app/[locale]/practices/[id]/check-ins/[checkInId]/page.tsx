@@ -1,123 +1,25 @@
 "use client";
 
 import {
-  createComment,
-  deleteComment,
-  removeReaction,
-  updateComment,
-  upsertReaction,
-  useComments,
   useCurrentUser,
   usePracticeById,
   usePracticeCheckIns,
-  useReactions,
   useUpdatePracticeCheckIn,
 } from "@daodao/api";
-import type { ReactionTypeValue } from "@daodao/api";
-import { ChartColumnIncreasingSvg, Deco4Svg, FlagOutlineSvg } from "@daodao/assets";
+import { Deco4Svg } from "@daodao/assets";
 import { useParams } from "@daodao/i18n/navigation";
-import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
-import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
-import { cn } from "@daodao/ui/lib/utils";
-import { addDays, format, formatDistanceToNow, isValid, parse, parseISO } from "date-fns";
-import { zhTW } from "date-fns/locale";
-import { MoreHorizontal, Pencil, Share2 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { addDays, format, isValid, parse } from "date-fns";
+import { useMemo } from "react";
 import {
   CheckInButton,
   CheckInDateSelector,
   CheckInDetail,
   SameDayCheckInNav,
 } from "@/components/check-in";
-import type { IComment, ICommentReply } from "@/components/check-in/reactions";
-import { CommentSection, ReactionBar } from "@/components/check-in/reactions";
-import type { IReactionCount } from "@/components/check-in/reactions";
 import type { ICheckInDisplayData, ICheckInFormData } from "@/components/check-in/types";
 import { PageHeader } from "@/components/layout";
-import { BrowseActivityContent } from "@/components/showcase";
-import { useEditCheckInSheet } from "@/hooks/use-edit-check-in-sheet";
-import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
 import { mapApiMoodToMoodType, mapMoodTypeToApiMood } from "@/constants/mood";
-import { PICKER_REACTIONS } from "@/constants/reaction-type";
-import type { ReactionTypeType } from "@/constants/reaction-type";
-
-// ============================================================================
-// Comment helpers (mirrors pattern from practices/[id]/page.tsx)
-// ============================================================================
-
-interface IApiCommentUser {
-  id?: string;
-  name?: string;
-  photoURL?: string | null;
-  customId?: string | null;
-}
-
-interface IApiCommentNode {
-  id: number | string;
-  content?: string;
-  createdAt?: string;
-  user?: IApiCommentUser;
-  userId?: number;
-  replies?: unknown[];
-}
-
-function getErrorMessage(error: unknown, fallbackMessage: string): string {
-  if (typeof error !== "object" || error === null) return fallbackMessage;
-  if ("details" in error && Array.isArray(error.details) && error.details.length > 0) {
-    const first = error.details[0];
-    if (typeof first === "object" && first !== null && "message" in first && typeof first.message === "string") {
-      return first.message;
-    }
-  }
-  if ("message" in error && typeof error.message === "string") return error.message;
-  return fallbackMessage;
-}
-
-function isApiCommentNode(comment: unknown): comment is IApiCommentNode {
-  return typeof comment === "object" && comment !== null && "id" in comment;
-}
-
-function formatCommentTime(createdAt?: string): string {
-  if (!createdAt) return "剛剛";
-  const d = parseISO(createdAt);
-  if (!isValid(d)) return "剛剛";
-  return formatDistanceToNow(d, { addSuffix: true, locale: zhTW });
-}
-
-function mapReply(reply: IApiCommentNode): ICommentReply {
-  return {
-    id: String(reply.id),
-    author: {
-      name: reply.user?.name || "匿名使用者",
-      photoURL: reply.user?.photoURL || undefined,
-      userId: reply.user?.id || undefined,
-      numericUserId: reply.userId ?? undefined,
-      customId: reply.user?.customId ?? undefined,
-    },
-    content: reply.content || "",
-    time: formatCommentTime(reply.createdAt),
-  };
-}
-
-function mapComment(comment: IApiCommentNode): IComment {
-  const rawReplies = Array.isArray(comment.replies) ? comment.replies : [];
-  return {
-    id: String(comment.id),
-    author: {
-      name: comment.user?.name || "匿名使用者",
-      photoURL: comment.user?.photoURL || undefined,
-      userId: comment.user?.id || undefined,
-      numericUserId: comment.userId ?? undefined,
-      customId: comment.user?.customId ?? undefined,
-    },
-    content: comment.content || "",
-    time: formatCommentTime(comment.createdAt),
-    replies: rawReplies.filter(isApiCommentNode).map(mapReply),
-  };
-}
-
-// ============================================================================
 
 /**
  * 將 API 的 checkinDate 格式轉換為顯示格式
@@ -183,42 +85,6 @@ export default function CheckInDetailPage() {
   // 更新打卡記錄
   const { updateCheckIn } = useUpdatePracticeCheckIn(practiceId, checkInId);
 
-  // Reactions
-  const { data: reactionsData, mutate: mutateReactions } = useReactions({
-    targetType: "checkin",
-    targetId: checkInId,
-  });
-  const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(
-    undefined
-  );
-  const [, startReactionTransition] = useTransition();
-
-  // Comments
-  const { data: commentsData, mutate: mutateComments } = useComments({
-    targetType: "checkin",
-    targetId: checkInId,
-  });
-  const commentInputRef = useRef<HTMLTextAreaElement>(null);
-
-  // Three-dot menu state
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, [menuOpen]);
-
   // 獲取所有 check-ins
   const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
     limit: 30,
@@ -234,6 +100,9 @@ export default function CheckInDetailPage() {
 
     checkInsData.data.forEach((checkIn) => {
       const moodType = mapApiMoodToMoodType(checkIn.mood);
+      if (!moodType) {
+        return;
+      }
 
       const displayData: ICheckInDisplayData = {
         id: String(checkIn.id),
@@ -350,93 +219,6 @@ export default function CheckInDetailPage() {
     return record;
   }, [checkInsMap]);
 
-  // Derived reaction state (must be before early returns — hooks below depend on these values)
-  const currentUserReaction = (reactionsData?.data?.currentUserReaction ?? null) as ReactionTypeType | null;
-  const effectiveReaction = pendingReaction !== undefined ? pendingReaction : currentUserReaction;
-  const selectedReactions: ReactionTypeType[] = effectiveReaction ? [effectiveReaction] : [];
-  const reactionCounts: IReactionCount[] = (reactionsData?.data?.reactions ?? []).map((r) => ({
-    type: r.type as ReactionTypeType,
-    count: r.count,
-    latestActorName: r.latestActorName ?? undefined,
-  }));
-
-  const handleReactionClick = useCallback(
-    (type: ReactionTypeType) => {
-      const isSelected = currentUserReaction === type;
-      setPendingReaction(isSelected ? null : type);
-      if (!isSelected) {
-        requestAnimationFrame(() => {
-          commentInputRef.current?.focus();
-        });
-      }
-      startReactionTransition(async () => {
-        if (isSelected) {
-          await removeReaction({ targetType: "checkin", targetId: checkInId });
-        } else {
-          await upsertReaction({
-            targetType: "checkin",
-            targetId: checkInId,
-            reactionType: type as ReactionTypeValue,
-          });
-        }
-        await mutateReactions();
-        setPendingReaction(undefined);
-      });
-    },
-    [currentUserReaction, checkInId, mutateReactions]
-  );
-
-  // Derived comment state
-  const comments = useMemo(() => {
-    const raw = commentsData?.data;
-    if (!Array.isArray(raw)) return [];
-    return raw.filter(isApiCommentNode).map(mapComment);
-  }, [commentsData]);
-
-  const handleCommentSubmit = useCallback(
-    async (content: string, _reactions: ReactionTypeType[], parentId?: string, mentionedUserIds?: number[]) => {
-      const response = await createComment({
-        targetType: "checkin",
-        targetId: checkInId,
-        content,
-        visibility: "public",
-        parentId: parentId ? Number(parentId) : undefined,
-        mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
-      });
-      if (response.error) {
-        toast.error(getErrorMessage(response.error, "留言失敗"));
-        return;
-      }
-      toast.success("留言成功！");
-      await mutateComments();
-    },
-    [checkInId, mutateComments]
-  );
-
-  const handleCommentEdit = useCallback(
-    async (commentId: string, content: string) => {
-      const id = Number(commentId);
-      if (!Number.isFinite(id)) { toast.error("留言 ID 無效"); return false; }
-      const response = await updateComment(id, { content });
-      if (response.error) { toast.error(getErrorMessage(response.error, "更新留言失敗")); return false; }
-      await mutateComments();
-      return true;
-    },
-    [mutateComments]
-  );
-
-  const handleCommentDelete = useCallback(
-    async (commentId: string) => {
-      const id = Number(commentId);
-      if (!Number.isFinite(id)) { toast.error("留言 ID 無效"); return false; }
-      const response = await deleteComment(id);
-      if (response.error) { toast.error(getErrorMessage(response.error, "刪除留言失敗")); return false; }
-      await mutateComments();
-      return true;
-    },
-    [mutateComments]
-  );
-
   // Loading 狀態
   if (isLoadingPractice || isLoadingCheckIns || isLoadingCurrentUser) {
     return (
@@ -477,7 +259,10 @@ export default function CheckInDetailPage() {
   const isOwner =
     !!practiceData?.data?.user?.id && practiceData.data.user.id === currentUserData?.data?.id;
 
-  const { open: openSheet, close: closeSheet } = useSheetManager();
+  const handleCheckInComplete = (data: unknown) => {
+    // TODO: 處理打卡資料
+    console.log("打卡資料:", data);
+  };
 
   const handleEditComplete = async (data: ICheckInFormData) => {
     try {
@@ -495,45 +280,6 @@ export default function CheckInDetailPage() {
       toast.error("更新打卡失敗，請稍後再試");
       throw error;
     }
-  };
-
-  const { openEditCheckInSheet } = useEditCheckInSheet({
-    taskTitle: checkInData.practiceTitle,
-    checkInData: {
-      mood: checkInData.mood,
-      tags: checkInData.tags,
-      description: checkInData.content,
-      images: checkInData.images,
-    },
-    onComplete: handleEditComplete,
-  });
-
-  const { openShareSheet } = useShareCheckInSheet({
-    taskTitle: checkInData.practiceTitle,
-    checkInData: {
-      mood: checkInData.mood,
-      tags: checkInData.tags,
-      description: checkInData.content,
-      media: [],
-      date: checkInData.date,
-      images: checkInData.images,
-    },
-  });
-
-  const handleOpenBrowseActivity = () => {
-    setMenuOpen(false);
-    openSheet({
-      title: "瀏覽活動",
-      content: <BrowseActivityContent targetId={checkInId} />,
-      dismissible: true,
-      closeOnEscape: true,
-      showCloseButton: true,
-    });
-  };
-
-  const handleCheckInComplete = (data: unknown) => {
-    // TODO: 處理打卡資料
-    console.log("打卡資料:", data);
   };
 
   return (
@@ -559,6 +305,7 @@ export default function CheckInDetailPage() {
       <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">
         <CheckInDetail
           checkInData={checkInData}
+          onEditComplete={isOwner ? handleEditComplete : undefined}
           afterTitle={
             <SameDayCheckInNav
               sameDayCheckInIds={sameDayCheckInIds}
@@ -566,101 +313,7 @@ export default function CheckInDetailPage() {
               practiceId={practiceId}
             />
           }
-          bottomActions={
-            <div className="flex items-center justify-between w-full">
-              <ReactionBar
-                reactions={reactionCounts}
-                selectedReactions={selectedReactions}
-                onReactionClick={handleReactionClick}
-                types={PICKER_REACTIONS}
-                className="flex-wrap"
-              />
-              {/* Three-dot menu */}
-              <div ref={menuRef} className="relative">
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setMenuOpen((v) => !v)}
-                  className={cn(
-                    "h-8 w-8 text-white/70 hover:text-white hover:bg-white/20",
-                    menuOpen && "bg-white/20 text-white"
-                  )}
-                >
-                  <MoreHorizontal className="size-4" />
-                </Button>
-                {menuOpen && (
-                  <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
-                    {isOwner ? (
-                      <>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => { setMenuOpen(false); openEditCheckInSheet(); }}
-                          className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-                        >
-                          <Pencil className="size-5 shrink-0" />
-                          <span>編輯打卡</span>
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => { setMenuOpen(false); openShareSheet(); }}
-                          className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-                        >
-                          <Share2 className="size-5 shrink-0" />
-                          <span>分享打卡</span>
-                        </Button>
-                      </>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => {
-                          setMenuOpen(false);
-                          toast.success("已檢舉");
-                        }}
-                        className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-                      >
-                        <FlagOutlineSvg className="size-5 shrink-0" />
-                        <span>檢舉</span>
-                      </Button>
-                    )}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={handleOpenBrowseActivity}
-                      className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-                    >
-                      <ChartColumnIncreasingSvg className="size-5 shrink-0" />
-                      <span>瀏覽活動</span>
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          }
         />
-
-        {/* 留言區 */}
-        <div className="mt-4 bg-white rounded-2xl overflow-hidden">
-          <CommentSection
-            comments={comments}
-            selectedReactions={selectedReactions}
-            inputRef={commentInputRef}
-            onSubmit={handleCommentSubmit}
-            hasMoreComments={comments.length > 2}
-            currentUserName={currentUserData?.data?.name ?? undefined}
-            currentUserId={currentUserData?.data?.id ?? undefined}
-            currentUserPhotoURL={
-              typeof currentUserData?.data?.photoURL === "string"
-                ? currentUserData.data.photoURL
-                : undefined
-            }
-            onEditComment={handleCommentEdit}
-            onDeleteComment={handleCommentDelete}
-          />
-        </div>
       </main>
 
       {isOwner && (

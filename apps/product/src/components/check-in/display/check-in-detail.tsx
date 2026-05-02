@@ -59,8 +59,6 @@ interface ICheckInDetailProps {
    * false → 顯示「檢舉」+「瀏覽活動」
    */
   isOwner?: boolean;
-  /** 卡片底部注入的互動列（Reaction 按鈕等），不含硬編碼邏輯 */
-  bottomActions?: React.ReactNode;
 }
 
 // ============================================================================
@@ -134,7 +132,6 @@ export const CheckInDetail = ({
   onEditComplete,
   afterTitle,
   isOwner = true,
-  bottomActions,
 }: ICheckInDetailProps) => {
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
   const checkInId = checkInData.id;

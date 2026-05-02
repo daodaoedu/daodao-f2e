@@ -20,7 +20,7 @@ export interface ICheckInFormData {
 export interface ICheckInDisplayData {
   id: string;
   date: string;
-  mood: MoodType | null;
+  mood: MoodType;
   content: string;
   tags: string[];
   images?: string[];
