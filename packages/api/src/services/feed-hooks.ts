@@ -55,9 +55,17 @@ export interface IShowcaseCheckIn {
 
 export type FeedReasonType = "new_practice" | "new_release" | "checked_in" | "cheered";
 
+export interface ActivityCardItem {
+  type: "activity";
+  activity_type: "community_event" | "follow_summary";
+  event_text: string;
+  label: string;
+}
+
 export type FeedItem =
   | { type: "practice"; feed_reason: FeedReasonType; data: IShowcasePractice }
-  | { type: "checkin"; feed_reason: FeedReasonType; data: IShowcaseCheckIn };
+  | { type: "checkin"; feed_reason: FeedReasonType; data: IShowcaseCheckIn }
+  | ActivityCardItem;
 
 export interface IFeedParams {
   keyword?: string;
@@ -114,7 +122,7 @@ export function useFeed(params: IFeedParams) {
   const feedItems: FeedItem[] = data
     ? data.flatMap((page) =>
 (page.data ?? []).filter((item) => {
-  const isValid = !!(item?.type && item?.data);
+  const isValid = !!(item?.type && (item?.type === "activity" || item?.data));
   if (!isValid && process.env.NODE_ENV !== "production") {
     console.warn("[useFeed] Malformed feed item (missing type/data):", item);
   }
