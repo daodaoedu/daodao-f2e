@@ -25,17 +25,17 @@ type PreferencesMap = Record<string, PreferenceState>;
 const NOTIFICATION_TYPES = [
   { type: "reaction", label: "反應", description: "有人對你的內容按了反應" },
   { type: "comment", label: "留言與 @", description: "有人留言或 @ 提及了你" },
-  { type: "follow-user", label: "關注", description: "有人關注了你" },
-  { type: "connect", label: "連結請求", description: "有人向你發出連結請求" },
-  { type: "agree-connect", label: "連結確認", description: "對方同意了你的連結請求" },
+  { type: "UserFollowed", label: "關注", description: "有人關注了你" },
+  { type: "Connect", label: "連結請求", description: "有人向你發出連結請求" },
+  { type: "ConnectAccepted", label: "連結確認", description: "對方同意了你的連結請求" },
   { type: "update-practice-checkin", label: "關注的實踐更新", description: "你關注的實踐有新打卡" },
   {
-    type: "practice-started",
+    type: "PracticeCreated",
     label: "關注的人開始實踐",
     description: "你關注的人開始了新主題實踐",
   },
-  { type: "buddy-request", label: "Buddy 請求", description: "有人邀請你成為實踐夥伴" },
-  { type: "weekly", label: "週報", description: "每週一的島嶼探索摘要" },
+  { type: "BuddyRequest", label: "Buddy 請求", description: "有人邀請你成為實踐夥伴" },
+  { type: "WeeklyDigest", label: "週報", description: "每週一的島嶼探索摘要" },
 ];
 
 const DEFAULT_PREFS: PreferencesMap = Object.fromEntries(
