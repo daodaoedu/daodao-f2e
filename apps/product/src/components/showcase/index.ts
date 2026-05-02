@@ -1,3 +1,4 @@
+export * from "./ActivityCard";
 export * from "./BrewingCard";
 export * from "./CheckInShowcaseCard";
 export * from "./FeedLabel";

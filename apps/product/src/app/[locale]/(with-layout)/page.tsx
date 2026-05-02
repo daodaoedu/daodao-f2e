@@ -22,6 +22,7 @@ import {
 import { BackgroundAnimation, Banner } from "@/components/layout";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import {
+  ActivityCard,
   BrewingCard,
   CheckInShowcaseCard,
   FeedLabel,
@@ -108,6 +109,17 @@ export default function HomePage() {
     targetType: "practice",
     targetIds: practiceIds,
   });
+
+  // Batch fetch reactions for all visible checkins (1 request for the whole page)
+  const checkinIds = useMemo(
+    () =>
+      feedItems
+        .filter((item): item is Extract<FeedItem, { type: "checkin" }> => item.type === "checkin")
+        .map((item) => item.data.id),
+    [feedItems],
+  );
+  const { data: batchCheckinReactionsData, mutate: mutateBatchCheckinReactions } =
+    useReactionsBatch({ targetType: "checkin", targetIds: checkinIds });
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -243,8 +255,21 @@ export default function HomePage() {
               ) : (
                 <div className="flex flex-col gap-3">
                   {feedItems.map((feedItem, index) => {
+                    if (feedItem.type === "activity") {
+                      return (
+                        <div key={`activity-${feedItem.event_text.slice(0, 20)}-${index}`}>
+                          <ActivityCard
+                            activity_type={feedItem.activity_type}
+                            event_text={feedItem.event_text}
+                            label={feedItem.label}
+                          />
+                        </div>
+                      );
+                    }
+
                     const isNewRelease = feedItem.feed_reason === "new_release";
-                    const prevIsNewRelease = index > 0 && feedItems[index - 1]?.feed_reason === "new_release";
+                    const prevItem = index > 0 ? feedItems[index - 1] : undefined;
+                    const prevIsNewRelease = prevItem?.type !== "activity" && prevItem?.feed_reason === "new_release";
                     const showFeedLabel = !isNewRelease || !prevIsNewRelease;
 
                     if (feedItem.type === "checkin") {
@@ -340,6 +365,29 @@ export default function HomePage() {
                         </div>
                       );
                     }
+
+
+                    if (feedItem.type === "checkin") {
+                      const checkin = feedItem.data;
+                      return (
+                        <div key={checkin.id}>
+                          {showFeedLabel && (
+                            <FeedLabel
+                              feedReason={feedItem.feed_reason}
+                              userName={checkin.user?.name}
+                              practiceTitle={checkin.practice?.title}
+                              latestActorName={latestActorName}
+                            />
+                          )}
+                          <CheckInShowcaseCard
+                            {...checkin}
+                            batchReactionData={batchCheckinReactionsData?.data?.[checkin.id]}
+                            onReactionMutate={() => mutateBatchCheckinReactions()}
+                          />
+                        </div>
+                      );
+                    }
+
 
                     return null;
                   })}
