@@ -687,7 +687,9 @@ export const useDeletePractice = (practiceId: string) => {
  */
 export const useCopyPractice = () => {
   const copy = async (practiceId: string): Promise<{ id: string }> => {
-    return copyPractice(practiceId);
+    const result = await copyPractice(practiceId);
+    await updatePractice(result.id, { privacyStatus: "public" });
+    return result;
   };
 
   return { copyPractice: copy };
