@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type ActivityCardItem,
   type FeedItem,
   useFeed,
   useMyPracticeStats,
@@ -37,6 +38,40 @@ import {
 } from "@/constants/task-status";
 
 type TabType = "inspire" | "mine";
+
+// Reorder feed items into the cycle: [打卡 1] → [互動 1] → [實踐 3] → repeat
+// 互動 slot: feed_reason="cheered" 的卡片優先，不足時 fallback 到文字 ActivityCard
+function reorderFeedItems(items: FeedItem[]): FeedItem[] {
+  const checkins = items.filter(
+    (item): item is Extract<FeedItem, { type: "checkin" }> =>
+      item.type === "checkin" && item.feed_reason !== "cheered",
+  );
+  const cheered = items.filter(
+    (item): item is Extract<FeedItem, { type: "practice" | "checkin" }> =>
+      (item.type === "practice" || item.type === "checkin") && item.feed_reason === "cheered",
+  );
+  const textActivities = items.filter((item): item is ActivityCardItem => item.type === "activity");
+  // 互動 slot 來源：cheered 優先，用完再接文字 ActivityCard
+  const activitySlot: FeedItem[] = [...cheered, ...textActivities];
+  const practices = items.filter(
+    (item): item is Extract<FeedItem, { type: "practice" }> =>
+      item.type === "practice" && item.feed_reason !== "cheered",
+  );
+
+  const result: FeedItem[] = [];
+  let ci = 0;
+  let ai = 0;
+  let pi = 0;
+
+  while (ci < checkins.length || ai < activitySlot.length || pi < practices.length) {
+    if (ci < checkins.length) result.push(checkins[ci++]!);
+    if (ai < activitySlot.length) result.push(activitySlot[ai++]!);
+    for (let i = 0; i < 3 && pi < practices.length; i++) result.push(practices[pi++]!);
+    if (ci >= checkins.length && ai >= activitySlot.length && pi >= practices.length) break;
+  }
+
+  return result;
+}
 
 const filterOptions = [
   { value: FilterStatus.all, label: "全部" },
@@ -97,6 +132,8 @@ export default function HomePage() {
     isValidating,
   } = useFeed(feedParams);
 
+  const orderedFeedItems = useMemo(() => reorderFeedItems(feedItems), [feedItems]);
+
   // Batch fetch reactions for all visible practices
   const practiceIds = useMemo(
     () =>
@@ -105,7 +142,7 @@ export default function HomePage() {
         .map((item) => item.data.id),
     [feedItems]
   );
-  const { data: batchReactionsData, mutate: mutateBatchReactions } = useReactionsBatch({
+  const { data: batchReactionsData, isLoading: isBatchReactionsLoading, mutate: mutateBatchReactions } = useReactionsBatch({
     targetType: "practice",
     targetIds: practiceIds,
   });
@@ -118,7 +155,7 @@ export default function HomePage() {
         .map((item) => item.data.id),
     [feedItems],
   );
-  const { data: batchCheckinReactionsData } = useReactionsBatch({
+  const { data: batchCheckinReactionsData, isLoading: isBatchCheckinReactionsLoading } = useReactionsBatch({
     targetType: "checkin",
     targetIds: checkinIds,
   });
@@ -256,22 +293,21 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
-                  {feedItems.map((feedItem, index) => {
+                  {orderedFeedItems.map((feedItem, index) => {
                     if (feedItem.type === "activity") {
                       return (
-                        <div key={`activity-${feedItem.event_text.slice(0, 20)}-${index}`}>
-                          <ActivityCard
-                            event_text={feedItem.event_text}
-                            label={feedItem.label}
-                          />
-                        </div>
+                        <ActivityCard
+                          key={`activity-${index}`}
+                          event_text={feedItem.event_text}
+                          label={feedItem.label}
+                        />
                       );
                     }
 
                     const isNewRelease = feedItem.feed_reason === "new_release";
-                    const prevItem = index > 0 ? feedItems[index - 1] : undefined;
-                    const prevIsNewRelease = prevItem?.type !== "activity" && prevItem?.feed_reason === "new_release";
-                    const showFeedLabel = !isNewRelease || !prevIsNewRelease;
+                    const prevItem = index > 0 ? orderedFeedItems[index - 1] : undefined;
+                    const prevFeedReason = prevItem && prevItem.type !== "activity" ? prevItem.feed_reason : undefined;
+                    const showFeedLabel = !isNewRelease || prevFeedReason !== "new_release";
 
                     if (feedItem.type === "checkin") {
                       const checkin = feedItem.data;
@@ -282,7 +318,7 @@ export default function HomePage() {
                         checkin.reactions?.find((r) => r.latestActorName)?.latestActorName;
                       return (
                         <div key={`checkin-${checkin.id}-${feedItem.feed_reason}-${index}`}>
-                          {showFeedLabel && feedItem.feed_reason && (
+                          {showFeedLabel && feedItem.feed_reason && !(feedItem.feed_reason === "cheered" && isBatchCheckinReactionsLoading) && (
                             <FeedLabel
                               feedReason={feedItem.feed_reason}
                               userName={checkin.user?.name}
@@ -317,7 +353,7 @@ export default function HomePage() {
                         practice.reactions?.find((r) => r.latestActorName)?.latestActorName;
                       return (
                         <div key={`practice-${practice.id}-${feedItem.feed_reason}-${index}`}>
-                          {showFeedLabel && feedItem.feed_reason && (
+                          {showFeedLabel && feedItem.feed_reason && !(feedItem.feed_reason === "cheered" && isBatchReactionsLoading) && (
                             <FeedLabel
                               feedReason={feedItem.feed_reason}
                               userName={practice.user?.name}
