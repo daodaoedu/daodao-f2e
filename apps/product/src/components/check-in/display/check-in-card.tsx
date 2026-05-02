@@ -18,6 +18,8 @@ interface ICheckInCardProps {
   showTape?: boolean;
   /** 標題下方插入的額外內容（例如同日打卡切換導航） */
   afterTitle?: React.ReactNode;
+  /** 卡片底部注入的互動列（例如 Reaction 按鈕） */
+  bottomActions?: React.ReactNode;
 }
 
 /**
@@ -35,6 +37,7 @@ export const CheckInCard = ({
   onImageClick,
   showTape = true,
   afterTitle,
+  bottomActions,
 }: ICheckInCardProps) => {
   const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
   const MoodEmoji = moodOption?.emoji;
@@ -173,6 +176,8 @@ export const CheckInCard = ({
           </div>
         </main>
       </div>
+
+      {bottomActions}
     </div>
   );
 };

@@ -25,6 +25,8 @@ interface ReactionBarProps {
   onReactionClick: (type: ReactionTypeType) => void;
   /** 覆蓋容器的 className，可用來控制 scroll / wrap 行為 */
   className?: string;
+  /** 限定顯示的 reaction 類型子集，預設顯示全部 */
+  types?: ReactionTypeType[];
 }
 
 // ============================================================================
@@ -36,10 +38,12 @@ export function ReactionBar({
   selectedReactions,
   onReactionClick,
   className,
+  types,
 }: ReactionBarProps) {
+  const displayTypes = types ?? REACTION_TYPE_LIST;
   return (
     <div className={cn("flex items-center gap-2 px-4 py-3", className ?? "flex-wrap")}>
-      {REACTION_TYPE_LIST.map((type) => {
+      {displayTypes.map((type) => {
         const config = REACTION_CONFIG[type];
         const reactionData = reactions.find((r) => r.type === type);
         const count = reactionData?.count ?? 0;

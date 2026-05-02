@@ -1,25 +1,116 @@
 "use client";
 
 import {
+  createComment,
+  deleteComment,
+  removeReaction,
+  updateComment,
+  upsertReaction,
+  useComments,
   useCurrentUser,
   usePracticeById,
   usePracticeCheckIns,
+  useReactions,
   useUpdatePracticeCheckIn,
 } from "@daodao/api";
+import type { ReactionTypeValue } from "@daodao/api";
 import { Deco4Svg } from "@daodao/assets";
 import { useParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
-import { addDays, format, isValid, parse } from "date-fns";
-import { useMemo } from "react";
+import { addDays, format, formatDistanceToNow, isValid, parse, parseISO } from "date-fns";
+import { zhTW } from "date-fns/locale";
+import { useCallback, useMemo, useRef, useState, useTransition } from "react";
 import {
   CheckInButton,
   CheckInDateSelector,
   CheckInDetail,
   SameDayCheckInNav,
 } from "@/components/check-in";
+import type { IComment, ICommentReply } from "@/components/check-in/reactions";
+import { CommentSection, ReactionBar } from "@/components/check-in/reactions";
+import type { IReactionCount } from "@/components/check-in/reactions";
 import type { ICheckInDisplayData, ICheckInFormData } from "@/components/check-in/types";
 import { PageHeader } from "@/components/layout";
 import { mapApiMoodToMoodType, mapMoodTypeToApiMood } from "@/constants/mood";
+import { PICKER_REACTIONS } from "@/constants/reaction-type";
+import type { ReactionTypeType } from "@/constants/reaction-type";
+
+// ============================================================================
+// Comment helpers (mirrors pattern from practices/[id]/page.tsx)
+// ============================================================================
+
+interface IApiCommentUser {
+  id?: string;
+  name?: string;
+  photoURL?: string | null;
+  customId?: string | null;
+}
+
+interface IApiCommentNode {
+  id: number | string;
+  content?: string;
+  createdAt?: string;
+  user?: IApiCommentUser;
+  userId?: number;
+  replies?: unknown[];
+}
+
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
+  if (typeof error !== "object" || error === null) return fallbackMessage;
+  if ("details" in error && Array.isArray(error.details) && error.details.length > 0) {
+    const first = error.details[0];
+    if (typeof first === "object" && first !== null && "message" in first && typeof first.message === "string") {
+      return first.message;
+    }
+  }
+  if ("message" in error && typeof error.message === "string") return error.message;
+  return fallbackMessage;
+}
+
+function isApiCommentNode(comment: unknown): comment is IApiCommentNode {
+  return typeof comment === "object" && comment !== null && "id" in comment;
+}
+
+function formatCommentTime(createdAt?: string): string {
+  if (!createdAt) return "剛剛";
+  const d = parseISO(createdAt);
+  if (!isValid(d)) return "剛剛";
+  return formatDistanceToNow(d, { addSuffix: true, locale: zhTW });
+}
+
+function mapReply(reply: IApiCommentNode): ICommentReply {
+  return {
+    id: String(reply.id),
+    author: {
+      name: reply.user?.name || "匿名使用者",
+      photoURL: reply.user?.photoURL || undefined,
+      userId: reply.user?.id || undefined,
+      numericUserId: reply.userId ?? undefined,
+      customId: reply.user?.customId ?? undefined,
+    },
+    content: reply.content || "",
+    time: formatCommentTime(reply.createdAt),
+  };
+}
+
+function mapComment(comment: IApiCommentNode): IComment {
+  const rawReplies = Array.isArray(comment.replies) ? comment.replies : [];
+  return {
+    id: String(comment.id),
+    author: {
+      name: comment.user?.name || "匿名使用者",
+      photoURL: comment.user?.photoURL || undefined,
+      userId: comment.user?.id || undefined,
+      numericUserId: comment.userId ?? undefined,
+      customId: comment.user?.customId ?? undefined,
+    },
+    content: comment.content || "",
+    time: formatCommentTime(comment.createdAt),
+    replies: rawReplies.filter(isApiCommentNode).map(mapReply),
+  };
+}
+
+// ============================================================================
 
 /**
  * 將 API 的 checkinDate 格式轉換為顯示格式
@@ -84,6 +175,23 @@ export default function CheckInDetailPage() {
 
   // 更新打卡記錄
   const { updateCheckIn } = useUpdatePracticeCheckIn(practiceId, checkInId);
+
+  // Reactions
+  const { data: reactionsData, mutate: mutateReactions } = useReactions({
+    targetType: "checkin",
+    targetId: checkInId,
+  });
+  const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(
+    undefined
+  );
+  const [, startReactionTransition] = useTransition();
+
+  // Comments
+  const { data: commentsData, mutate: mutateComments } = useComments({
+    targetType: "checkin",
+    targetId: checkInId,
+  });
+  const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
   // 獲取所有 check-ins
   const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
@@ -216,6 +324,88 @@ export default function CheckInDetailPage() {
     return record;
   }, [checkInsMap]);
 
+  // Derived reaction state (must be before early returns — hooks below depend on these values)
+  const currentUserReaction = (reactionsData?.data?.currentUserReaction ?? null) as ReactionTypeType | null;
+  const effectiveReaction = pendingReaction !== undefined ? pendingReaction : currentUserReaction;
+  const selectedReactions: ReactionTypeType[] = effectiveReaction ? [effectiveReaction] : [];
+  const reactionCounts: IReactionCount[] = (reactionsData?.data?.reactions ?? []).map((r) => ({
+    type: r.type as ReactionTypeType,
+    count: r.count,
+    latestActorName: r.latestActorName ?? undefined,
+  }));
+
+  const handleReactionClick = useCallback(
+    (type: ReactionTypeType) => {
+      const isSelected = currentUserReaction === type;
+      setPendingReaction(isSelected ? null : type);
+      startReactionTransition(async () => {
+        if (isSelected) {
+          await removeReaction({ targetType: "checkin", targetId: checkInId });
+        } else {
+          await upsertReaction({
+            targetType: "checkin",
+            targetId: checkInId,
+            reactionType: type as ReactionTypeValue,
+          });
+        }
+        await mutateReactions();
+        setPendingReaction(undefined);
+      });
+    },
+    [currentUserReaction, checkInId, mutateReactions]
+  );
+
+  // Derived comment state
+  const comments = useMemo(() => {
+    const raw = commentsData?.data;
+    if (!Array.isArray(raw)) return [];
+    return raw.filter(isApiCommentNode).map(mapComment);
+  }, [commentsData]);
+
+  const handleCommentSubmit = useCallback(
+    async (content: string, _reactions: ReactionTypeType[], parentId?: string, mentionedUserIds?: number[]) => {
+      const response = await createComment({
+        targetType: "checkin",
+        targetId: checkInId,
+        content,
+        visibility: "public",
+        parentId: parentId ? Number(parentId) : undefined,
+        mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
+      });
+      if (response.error) {
+        toast.error(getErrorMessage(response.error, "留言失敗"));
+        return;
+      }
+      toast.success("留言成功！");
+      await mutateComments();
+    },
+    [checkInId, mutateComments]
+  );
+
+  const handleCommentEdit = useCallback(
+    async (commentId: string, content: string) => {
+      const id = Number(commentId);
+      if (!Number.isFinite(id)) { toast.error("留言 ID 無效"); return false; }
+      const response = await updateComment(id, { content });
+      if (response.error) { toast.error(getErrorMessage(response.error, "更新留言失敗")); return false; }
+      await mutateComments();
+      return true;
+    },
+    [mutateComments]
+  );
+
+  const handleCommentDelete = useCallback(
+    async (commentId: string) => {
+      const id = Number(commentId);
+      if (!Number.isFinite(id)) { toast.error("留言 ID 無效"); return false; }
+      const response = await deleteComment(id);
+      if (response.error) { toast.error(getErrorMessage(response.error, "刪除留言失敗")); return false; }
+      await mutateComments();
+      return true;
+    },
+    [mutateComments]
+  );
+
   // Loading 狀態
   if (isLoadingPractice || isLoadingCheckIns || isLoadingCurrentUser) {
     return (
@@ -310,7 +500,36 @@ export default function CheckInDetailPage() {
               practiceId={practiceId}
             />
           }
+          bottomActions={
+            <ReactionBar
+              reactions={reactionCounts}
+              selectedReactions={selectedReactions}
+              onReactionClick={handleReactionClick}
+              types={PICKER_REACTIONS}
+              className="flex-wrap"
+            />
+          }
         />
+
+        {/* 留言區 */}
+        <div className="mt-4 bg-white rounded-2xl overflow-hidden">
+          <CommentSection
+            comments={comments}
+            selectedReactions={selectedReactions}
+            inputRef={commentInputRef}
+            onSubmit={handleCommentSubmit}
+            hasMoreComments={comments.length > 2}
+            currentUserName={currentUserData?.data?.name ?? undefined}
+            currentUserId={currentUserData?.data?.id ?? undefined}
+            currentUserPhotoURL={
+              typeof currentUserData?.data?.photoURL === "string"
+                ? currentUserData.data.photoURL
+                : undefined
+            }
+            onEditComment={handleCommentEdit}
+            onDeleteComment={handleCommentDelete}
+          />
+        </div>
       </main>
 
       {isOwner && (
