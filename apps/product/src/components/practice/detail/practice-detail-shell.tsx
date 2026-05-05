@@ -6,11 +6,10 @@ import {
   removeReaction,
   unfollowTarget,
   upsertReaction,
-  useExtractOgImage,
   useCopyPractice,
+  useExtractOgImage,
   useReactions,
 } from "@daodao/api";
-import { useRouter, usePathname } from "@daodao/i18n/navigation";
 import {
   BookSvg,
   ChartColumnIncreasingSvg,
@@ -18,6 +17,7 @@ import {
   FlagOutlineSvg,
   TelescopeSvg,
 } from "@daodao/assets";
+import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -25,7 +25,15 @@ import { Image } from "@daodao/ui/components/image";
 import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
-import { Archive, ChevronDown, ChevronUp, Copy, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+  Archive,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { CheckInRecordCard, CheckInStack } from "@/components/check-in";
@@ -638,20 +646,24 @@ export function PracticeDetailShell({
                 (reactionsData?.data?.reactions ?? []).find((r) => r.count > 0)?.latestActorName ??
                 null;
               // 優先用 API followers；沒有時用 aggregate reactions（所有人共享）
+              // 當 followers 為空時，加入 effectiveReaction 做樂觀更新
+              const serverActiveTypes = activeReactions.map((r) => r.type as ReactionTypeType);
               const displayReactions =
                 followers.length > 0
                   ? ([...new Set(followers.map((f) => f.reaction))].slice(
                       0,
                       PICKER_REACTIONS.length
                     ) as ReactionTypeType[])
-                  : activeReactions.map((r) => r.type as ReactionTypeType);
+                  : effectiveReaction && !serverActiveTypes.includes(effectiveReaction)
+                    ? [effectiveReaction, ...serverActiveTypes].slice(0, PICKER_REACTIONS.length)
+                    : serverActiveTypes;
               const firstName = followers[0]?.name;
               const text =
                 followers.length > 1
                   ? `${firstName} 與其他 ${followers.length - 1} 人`
                   : followers.length === 1
                     ? firstName
-                    : currentUserReaction
+                    : effectiveReaction
                       ? totalReactionCount > 1
                         ? `你 與其他 ${totalReactionCount - 1} 人`
                         : "你"

@@ -83,7 +83,10 @@ export function useTopicRecommendations({
 export async function fetchTopicCards({
   limit = 1,
   excludeIds = [],
-}: { limit?: number; excludeIds?: number[] } = {}): Promise<ITopicCard[]> {
+}: {
+  limit?: number;
+  excludeIds?: number[];
+} = {}): Promise<ITopicCard[]> {
   const qs = new URLSearchParams();
   qs.set("limit", String(limit));
   for (const id of excludeIds) {

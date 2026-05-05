@@ -124,6 +124,110 @@ function mapComment(comment: ApiCommentNode): IComment {
 }
 
 // ============================================================================
+// CheckInCommentSheetContent — owns its own SWR state so it stays live in Sheet
+// ============================================================================
+
+interface ICheckInCommentSheetContentProps {
+  checkInId: string;
+  currentUserName?: string;
+  currentUserId?: string;
+  currentUserPhotoURL?: string;
+}
+
+function CheckInCommentSheetContent({
+  checkInId,
+  currentUserName,
+  currentUserId,
+  currentUserPhotoURL,
+}: ICheckInCommentSheetContentProps) {
+  const { data: commentsData, mutate: mutateComments } = useComments({
+    targetType: "checkin",
+    targetId: checkInId,
+  });
+
+  const comments: IComment[] = React.useMemo(() => {
+    const raw = commentsData?.data;
+    if (!Array.isArray(raw)) return [];
+    return raw.filter(isApiCommentNode).map(mapComment);
+  }, [commentsData]);
+
+  const handleSubmitComment = useCallback(
+    async (
+      text: string,
+      _reactions: ReactionTypeType[],
+      parentId?: string,
+      mentionedUserIds?: number[]
+    ) => {
+      const response = await createComment({
+        targetType: "checkin",
+        targetId: checkInId,
+        content: text,
+        visibility: "public",
+        parentId: parentId ? Number(parentId) : undefined,
+        mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
+      });
+      if (response.error) {
+        toast.error("留言失敗，請稍後再試");
+        return;
+      }
+      toast.success("留言成功！");
+      await mutateComments();
+    },
+    [checkInId, mutateComments]
+  );
+
+  const handleEditComment = useCallback(
+    async (commentId: string, text: string) => {
+      const id = Number(commentId);
+      if (!Number.isFinite(id)) {
+        toast.error("留言 ID 無效");
+        return false;
+      }
+      const response = await updateComment(id, { content: text });
+      if (response.error) {
+        toast.error("更新留言失敗");
+        return false;
+      }
+      await mutateComments();
+      return true;
+    },
+    [mutateComments]
+  );
+
+  const handleDeleteComment = useCallback(
+    async (commentId: string) => {
+      const id = Number(commentId);
+      if (!Number.isFinite(id)) {
+        toast.error("留言 ID 無效");
+        return false;
+      }
+      const response = await deleteComment(id);
+      if (response.error) {
+        toast.error("刪除留言失敗");
+        return false;
+      }
+      await mutateComments();
+      return true;
+    },
+    [mutateComments]
+  );
+
+  return (
+    <CommentSection
+      comments={comments}
+      selectedReactions={[]}
+      onSubmit={handleSubmitComment}
+      hasMoreComments={comments.length > 2}
+      currentUserName={currentUserName}
+      currentUserId={currentUserId}
+      currentUserPhotoURL={currentUserPhotoURL}
+      onEditComment={handleEditComment}
+      onDeleteComment={handleDeleteComment}
+    />
+  );
+}
+
+// ============================================================================
 // CheckInDetail
 // ============================================================================
 
@@ -187,19 +291,16 @@ export const CheckInDetail = ({
   });
 
   // ── Comments ───────────────────────────────────────────────────────────────
-  const { data: commentsData, mutate: mutateComments } = useComments({
+  const { data: commentsData } = useComments({
     targetType: "checkin",
     targetId: checkInId,
   });
   const { data: currentUserData } = useCurrentUser();
 
-  const comments: IComment[] = React.useMemo(() => {
+  const commentCount = React.useMemo(() => {
     const raw = commentsData?.data;
-    if (!Array.isArray(raw)) return [];
-    return raw.filter(isApiCommentNode).map(mapComment);
+    return Array.isArray(raw) ? raw.filter(isApiCommentNode).length : 0;
   }, [commentsData]);
-
-  const commentCount = comments.length;
 
   const currentUser = currentUserData?.data;
   const currentUserId = currentUser?.id ?? undefined;
@@ -208,67 +309,6 @@ export const CheckInDetail = ({
     (currentUser as { photoURL?: string; photoUrl?: string } | undefined)?.photoURL ??
     (currentUser as { photoURL?: string; photoUrl?: string } | undefined)?.photoUrl ??
     undefined;
-
-  const handleSubmitComment = useCallback(
-    async (
-      text: string,
-      _reactions: ReactionTypeType[],
-      parentId?: string,
-      mentionedUserIds?: number[]
-    ) => {
-      const response = await createComment({
-        targetType: "checkin",
-        targetId: checkInId,
-        content: text,
-        visibility: "public",
-        parentId: parentId ? Number(parentId) : undefined,
-        mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
-      });
-      if (response.error) {
-        toast.error("留言失敗，請稍後再試");
-        return;
-      }
-      toast.success("留言成功！");
-      await mutateComments();
-    },
-    [checkInId, mutateComments]
-  );
-
-  const handleEditComment = useCallback(
-    async (commentId: string, text: string) => {
-      const id = Number(commentId);
-      if (!Number.isFinite(id)) {
-        toast.error("留言 ID 無效");
-        return false;
-      }
-      const response = await updateComment(id, { content: text });
-      if (response.error) {
-        toast.error("更新留言失敗");
-        return false;
-      }
-      await mutateComments();
-      return true;
-    },
-    [mutateComments]
-  );
-
-  const handleDeleteComment = useCallback(
-    async (commentId: string) => {
-      const id = Number(commentId);
-      if (!Number.isFinite(id)) {
-        toast.error("留言 ID 無效");
-        return false;
-      }
-      const response = await deleteComment(id);
-      if (response.error) {
-        toast.error("刪除留言失敗");
-        return false;
-      }
-      await mutateComments();
-      return true;
-    },
-    [mutateComments]
-  );
 
   // ── Browse Activity ────────────────────────────────────────────────────────
   const handleOpenBrowseActivity = useCallback(() => {
@@ -346,16 +386,11 @@ export const CheckInDetail = ({
             openSheet({
               title: "留言",
               content: (
-                <CommentSection
-                  comments={comments}
-                  selectedReactions={[]}
-                  onSubmit={handleSubmitComment}
-                  hasMoreComments={commentCount > 2}
+                <CheckInCommentSheetContent
+                  checkInId={checkInId}
                   currentUserName={currentUserName}
                   currentUserId={currentUserId}
                   currentUserPhotoURL={currentUserPhotoURL}
-                  onEditComment={handleEditComment}
-                  onDeleteComment={handleDeleteComment}
                 />
               ),
               dismissible: true,
