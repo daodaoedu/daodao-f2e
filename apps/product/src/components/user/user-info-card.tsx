@@ -174,7 +174,7 @@ export function UserInfoCard({
 
   // 查詢是否已是夥伴（僅在已登入且非自己頁面時查詢）
   const shouldCheckConnection = clientIsAuthenticated && !clientIsOwnProfile;
-  const { data: connectionsData, mutate: mutateConnections } = useSWR(
+  const { data: connectionsData, isLoading: isConnectionsLoading, mutate: mutateConnections } = useSWR(
     shouldCheckConnection ? ["/api/v1/connections", "check", targetUserId] : null,
     () => getConnections({ limit: 100 }),
     { revalidateOnFocus: false }
@@ -183,7 +183,7 @@ export function UserInfoCard({
     if (!connectionsData?.data || !targetUserId) return false;
     return connectionsData.data.some((c: { externalId: string }) => c.externalId === targetUserId);
   }, [connectionsData, targetUserId]);
-  const { data: outgoingRequestsData, mutate: mutateOutgoing } = useSWR(
+  const { data: outgoingRequestsData, isLoading: isOutgoingLoading, mutate: mutateOutgoing } = useSWR(
     shouldCheckConnection ? "/api/v1/connections/requests/outgoing" : null,
     () => getOutgoingConnectionRequests({ limit: 100 }),
     { revalidateOnFocus: false }
@@ -464,22 +464,26 @@ export function UserInfoCard({
           >
             {currentIsFollowing ? "關注中" : "+ 關注"}
           </Button>
-          <Button
-            variant="outline"
-            className={`flex-1 h-12 text-base rounded-full ${
-              connectionStatus !== "none"
-                ? "border-gray-300 text-gray-400"
-                : "border-primary-base text-primary-base hover:bg-primary-base hover:text-white"
-            }`}
-            onClick={handleConnect}
-            disabled={connectLoading || connectionStatus !== "none"}
-          >
-            {connectionStatus === "connected"
-              ? "已連結"
-              : connectionStatus === "pending"
-                ? "已送出連結請求"
-                : "請求連結"}
-          </Button>
+          {isConnectionsLoading || isOutgoingLoading ? (
+            <div className="flex-1 h-12 rounded-full bg-gray-100 animate-pulse" />
+          ) : (
+            <Button
+              variant="outline"
+              className={`flex-1 h-12 text-base rounded-full ${
+                connectionStatus !== "none"
+                  ? "border-gray-300 text-gray-400"
+                  : "border-primary-base text-primary-base hover:bg-primary-base hover:text-white"
+              }`}
+              onClick={handleConnect}
+              disabled={connectLoading || connectionStatus !== "none"}
+            >
+              {connectionStatus === "connected"
+                ? "已連結"
+                : connectionStatus === "pending"
+                  ? "已送出連結請求"
+                  : "請求連結"}
+            </Button>
+          )}
         </div>
       )}
     </div>
