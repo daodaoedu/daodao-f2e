@@ -40,7 +40,10 @@ export function Banner() {
   // 獲取用戶的測驗結果
   useEffect(() => {
     const fetchQuizResult = async () => {
-      if (!isAuthenticated || isAuthLoading) {
+      if (isAuthLoading) {
+        return;
+      }
+      if (!isAuthenticated) {
         setIsLoadingResult(false);
         return;
       }

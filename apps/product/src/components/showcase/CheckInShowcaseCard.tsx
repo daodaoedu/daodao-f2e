@@ -142,33 +142,33 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
                 className="absolute right-0 top-[-10px]"
                 onClick={(e) => e.stopPropagation()}
               >
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                onClick={() => setMenuOpen((v) => !v)}
-                className="size-10 rounded-full hover:bg-bg-gray"
-              >
-                <MoreHorizontal className="size-5 text-text-dark" />
-              </Button>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setMenuOpen((v) => !v)}
+                  className="size-10 rounded-full hover:bg-bg-gray"
+                >
+                  <MoreHorizontal className="size-5 text-text-dark" />
+                </Button>
 
-              {menuOpen && (
-                <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      window.open("https://tally.so/r/BzGQy4", "_blank");
-                    }}
-                    className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-                  >
-                    <FlagOutlineSvg className="size-5 shrink-0" />
-                    <span>檢舉</span>
-                  </Button>
-                </div>
-              )}
-            </div>
+                {menuOpen && (
+                  <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        window.open("https://tally.so/r/BzGQy4", "_blank");
+                      }}
+                      className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                    >
+                      <FlagOutlineSvg className="size-5 shrink-0" />
+                      <span>檢舉</span>
+                    </Button>
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
