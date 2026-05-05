@@ -646,20 +646,24 @@ export function PracticeDetailShell({
                 (reactionsData?.data?.reactions ?? []).find((r) => r.count > 0)?.latestActorName ??
                 null;
               // 優先用 API followers；沒有時用 aggregate reactions（所有人共享）
+              // 當 followers 為空時，加入 effectiveReaction 做樂觀更新
+              const serverActiveTypes = activeReactions.map((r) => r.type as ReactionTypeType);
               const displayReactions =
                 followers.length > 0
                   ? ([...new Set(followers.map((f) => f.reaction))].slice(
                       0,
                       PICKER_REACTIONS.length
                     ) as ReactionTypeType[])
-                  : activeReactions.map((r) => r.type as ReactionTypeType);
+                  : effectiveReaction && !serverActiveTypes.includes(effectiveReaction)
+                    ? [effectiveReaction, ...serverActiveTypes].slice(0, PICKER_REACTIONS.length)
+                    : serverActiveTypes;
               const firstName = followers[0]?.name;
               const text =
                 followers.length > 1
                   ? `${firstName} 與其他 ${followers.length - 1} 人`
                   : followers.length === 1
                     ? firstName
-                    : currentUserReaction
+                    : effectiveReaction
                       ? totalReactionCount > 1
                         ? `你 與其他 ${totalReactionCount - 1} 人`
                         : "你"
