@@ -71,6 +71,7 @@ function buildDeepLink(item: NotificationApiItem): string | null {
 
   switch (item.entityType) {
     case "comment":
+      if (extId && item.checkinId) return `/practices/${extId}/check-ins/${item.checkinId}`;
       return extId ? `/practices/${extId}` : null;
     case "practice":
       if (extId && item.checkinId) return `/practices/${extId}/check-ins/${item.checkinId}`;
