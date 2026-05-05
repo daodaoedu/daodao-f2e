@@ -6,7 +6,6 @@ import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
-import { CustomLink } from "@daodao/ui/components/custom-link";
 import { format } from "date-fns";
 import Lottie from "lottie-react";
 import { motion } from "motion/react";
@@ -43,7 +42,6 @@ export default function CopySuccessPage() {
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
       <ConfettiAnimation />
-
       <main className="relative max-w-[600px] mx-auto min-h-screen flex flex-col items-center justify-center px-5 py-12 gap-6">
         {/* 標題 */}
         <div className="text-center">
@@ -118,16 +116,12 @@ export default function CopySuccessPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.9 }}
         >
-          <CustomLink href={`/practices/${practiceId}`}>
-            <Button variant="default" className="w-full">
-              馬上開始
-            </Button>
-          </CustomLink>
-          <CustomLink href={`/practices/${practiceId}/edit`}>
-            <Button variant="outline" className="w-full">
-              編輯內容
-            </Button>
-          </CustomLink>
+          <Button variant="default" className="w-full" onClick={() => router.replace(`/practices/${practiceId}?from=copy`)}>
+            馬上開始
+          </Button>
+          <Button variant="outline" className="w-full" onClick={() => router.replace(`/practices/${practiceId}/edit`)}>
+            編輯內容
+          </Button>
         </motion.div>
       </main>
     </div>
