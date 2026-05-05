@@ -7,7 +7,7 @@ import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
 import Lottie from "lottie-react";
 import { MailIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@daodao/i18n/navigation";
 
 interface SuccessSectionProps {
   /** 用戶名稱，用於個人化歡迎訊息 */

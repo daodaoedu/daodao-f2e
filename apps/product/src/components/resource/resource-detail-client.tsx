@@ -5,7 +5,7 @@ import type { ResourceData } from "@daodao/api";
 import { useRecordView } from "@daodao/api";
 import { Separator } from "@daodao/ui/components/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { useEffect } from "react";
 import { ContributorInfo } from "./contributor-info";
 import { ResourceIntroduction } from "./introduction";
