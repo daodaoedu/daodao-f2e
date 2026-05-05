@@ -42,21 +42,27 @@ type TabType = "inspire" | "mine";
 // Reorder feed items into the cycle: [打卡 1] → [互動 1] → [實踐 3] → repeat
 // 互動 slot: feed_reason="cheered" 的卡片優先，不足時 fallback 到文字 ActivityCard
 function reorderFeedItems(items: FeedItem[]): FeedItem[] {
-  const checkins = items.filter(
-    (item): item is Extract<FeedItem, { type: "checkin" }> =>
-      item.type === "checkin" && item.feed_reason !== "cheered"
-  );
-  const cheered = items.filter(
-    (item): item is Extract<FeedItem, { type: "practice" | "checkin" }> =>
-      (item.type === "practice" || item.type === "checkin") && item.feed_reason === "cheered"
-  );
-  const textActivities = items.filter((item): item is ActivityCardItem => item.type === "activity");
+  const checkins: Extract<FeedItem, { type: "checkin" }>[] = [];
+  const cheered: Extract<FeedItem, { type: "practice" | "checkin" }>[] = [];
+  const textActivities: ActivityCardItem[] = [];
+  const practices: Extract<FeedItem, { type: "practice" }>[] = [];
+
+  for (const item of items) {
+    if (item.type === "checkin" || item.type === "practice") {
+      if (item.feed_reason === "cheered") {
+        cheered.push(item);
+      } else if (item.type === "checkin") {
+        checkins.push(item);
+      } else {
+        practices.push(item);
+      }
+    } else if (item.type === "activity") {
+      textActivities.push(item as ActivityCardItem);
+    }
+  }
+
   // 互動 slot 來源：cheered 優先，用完再接文字 ActivityCard
   const activitySlot: FeedItem[] = [...cheered, ...textActivities];
-  const practices = items.filter(
-    (item): item is Extract<FeedItem, { type: "practice" }> =>
-      item.type === "practice" && item.feed_reason !== "cheered"
-  );
 
   const result: FeedItem[] = [];
   let ci = 0;
