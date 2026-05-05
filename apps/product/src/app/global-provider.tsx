@@ -10,7 +10,7 @@ import { DialogManagerProvider } from "@daodao/ui/components/animate-ui/componen
 import { SheetManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Toaster } from "@daodao/ui/components/sonner";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@daodao/i18n/navigation";
 
 interface GlobalProviderProps {
   head?: React.ReactNode;

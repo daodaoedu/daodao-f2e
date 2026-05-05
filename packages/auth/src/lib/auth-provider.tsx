@@ -9,7 +9,7 @@ import {
 import { usePathname } from "@daodao/i18n/navigation";
 import { routing } from "@daodao/i18n/routing";
 import { getStorage, getStorageKey, StorageEnum } from "@daodao/shared";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { LoginDialog } from "../components/login-dialog";
 import type { AuthContextValue, StoredUser } from "../types";
 import { initiateOAuthLogin } from "./auth-client";
@@ -212,6 +212,7 @@ export const AuthProvider = ({
   const [loginDialogDismissible, setLoginDialogDismissible] = useState(true);
   const userInfoStorage = useMemo(() => getStorage<StoredUser>(StorageEnum.UserInfo), []);
   const pathname = usePathname();
+  const isLoggingOutRef = useRef(false);
 
   /**
    * 清除認證狀態
@@ -410,6 +411,11 @@ export const AuthProvider = ({
       return;
     }
 
+    // 如果正在登出中，不進行路由保護（避免與登出後的重定向競爭）
+    if (isLoggingOutRef.current) {
+      return;
+    }
+
     // 如果已登入，不需要檢查
     if (isAuthenticated) {
       return;
@@ -597,6 +603,8 @@ export const AuthProvider = ({
    * 使用統一的 API 服務登出
    */
   const logout = useCallback(async () => {
+    // 標記正在登出，防止 route protection effect 與登出後重定向競爭
+    isLoggingOutRef.current = true;
     try {
       await apiLogout();
     } catch (error) {
@@ -604,6 +612,10 @@ export const AuthProvider = ({
     } finally {
       // 無論 API 是否成功，都清除前端狀態
       clearAuthState();
+      // 給重定向足夠的時間完成後再重置旗標
+      setTimeout(() => {
+        isLoggingOutRef.current = false;
+      }, 500);
     }
   }, [clearAuthState]);
 
