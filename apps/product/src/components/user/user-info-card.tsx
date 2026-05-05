@@ -174,7 +174,7 @@ export function UserInfoCard({
 
   // 查詢是否已是夥伴（僅在已登入且非自己頁面時查詢）
   const shouldCheckConnection = clientIsAuthenticated && !clientIsOwnProfile;
-  const { data: connectionsData } = useSWR(
+  const { data: connectionsData, mutate: mutateConnections } = useSWR(
     shouldCheckConnection ? ["/api/v1/connections", "check", targetUserId] : null,
     () => getConnections({ limit: 100 }),
     { revalidateOnFocus: false }
@@ -183,7 +183,7 @@ export function UserInfoCard({
     if (!connectionsData?.data || !targetUserId) return false;
     return connectionsData.data.some((c: { externalId: string }) => c.externalId === targetUserId);
   }, [connectionsData, targetUserId]);
-  const { data: outgoingRequestsData } = useSWR(
+  const { data: outgoingRequestsData, mutate: mutateOutgoing } = useSWR(
     shouldCheckConnection ? "/api/v1/connections/requests/outgoing" : null,
     () => getOutgoingConnectionRequests({ limit: 100 }),
     { revalidateOnFocus: false }
@@ -266,11 +266,12 @@ export function UserInfoCard({
       });
       setOptimisticConnectionStatus("pending");
       toast.success("已送出連結請求");
+      mutateOutgoing();
     } catch (err) {
-      // 409 表示已連結（後端回傳衝突狀態）
+      // 409 表示請求已存在（pending）或已連結，重新抓資料讓 SWR 決定實際狀態
       if (err instanceof ApiError && err.status === 409) {
-        setOptimisticConnectionStatus("connected");
-        toast.success("已連結");
+        await Promise.all([mutateConnections(), mutateOutgoing()]);
+        toast.success("連結請求已送出");
         return;
       }
       toast.error(err instanceof Error ? err.message : "請求失敗");

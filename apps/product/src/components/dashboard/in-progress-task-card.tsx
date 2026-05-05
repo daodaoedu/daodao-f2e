@@ -55,9 +55,12 @@ export const InProgressTaskCard = ({
   return (
     <CustomLink
       href={`/practices/${id}`}
-      className="relative block w-[294px] cursor-pointer text-left"
+      className="relative block w-[294px] h-[239px] md:w-full rounded-[12px] overflow-hidden cursor-pointer text-left hover:scale-[1.02] hover:shadow-md transition-all duration-200"
     >
-      <Theme className="rounded-[12px]" />
+      <Theme
+        className="absolute inset-0 w-full h-full rounded-[12px]"
+        preserveAspectRatio="xMidYMid slice"
+      />
       {/* Label */}
       <div className="absolute inset-0 p-5 pb-6 z-10 flex flex-col gap-5">
         <div className="flex-1 flex flex-col gap-2">

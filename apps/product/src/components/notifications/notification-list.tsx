@@ -29,6 +29,8 @@ const BACKEND_TYPE_MAP: Record<string, INotificationData["type"]> = {
   PracticeFollowed: NotificationType.followPractice,
   Connect: NotificationType.connect,
   ConnectAccepted: NotificationType.agreeConnect,
+  PracticeCheckinActivity: NotificationType.updatePracticeCheckin,
+  PartnerCheckinActivity: NotificationType.updatePracticeCheckin,
 };
 
 function normalizeNotificationType(backendType: string): INotificationData["type"] {
@@ -69,8 +71,13 @@ function buildDeepLink(item: NotificationApiItem): string | null {
 
   switch (item.entityType) {
     case "comment":
+      if (extId && item.checkinId) return `/practices/${extId}/check-ins/${item.checkinId}`;
       return extId ? `/practices/${extId}` : null;
     case "practice":
+      if (extId && item.checkinId) return `/practices/${extId}/check-ins/${item.checkinId}`;
+      return extId ? `/practices/${extId}` : null;
+    case "checkin":
+      if (extId && item.checkinId) return `/practices/${extId}/check-ins/${item.checkinId}`;
       return extId ? `/practices/${extId}` : null;
     case "user":
       return item.actor.id ? `/users/${item.actor.id}` : null;

@@ -6,6 +6,7 @@ import {
   removeReaction,
   unfollowTarget,
   upsertReaction,
+  useCopyPractice,
   useExtractOgImage,
   useReactions,
 } from "@daodao/api";
@@ -16,6 +17,7 @@ import {
   FlagOutlineSvg,
   TelescopeSvg,
 } from "@daodao/assets";
+import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -23,7 +25,15 @@ import { Image } from "@daodao/ui/components/image";
 import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
-import { Archive, ChevronDown, ChevronUp, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+  Archive,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { CheckInRecordCard, CheckInStack } from "@/components/check-in";
@@ -290,6 +300,10 @@ export function PracticeDetailShell({
   footer,
   browseActivity,
 }: IPracticeDetailShellProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { copyPractice } = useCopyPractice();
+  const [isCopying, setIsCopying] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("comments");
   const [infoExpanded, setInfoExpanded] = useState(false);
   const [practiceMenuOpen, setPracticeMenuOpen] = useState(false);
@@ -429,6 +443,27 @@ export function PracticeDetailShell({
                 <Button
                   type="button"
                   variant="ghost"
+                  onClick={async () => {
+                    setPracticeMenuOpen(false);
+                    try {
+                      setIsCopying(true);
+                      const { id } = await copyPractice(practiceId);
+                      router.push(`/practices/copy-success?practiceId=${id}`);
+                    } catch {
+                      toast.error("複製失敗，請稍後再試");
+                    } finally {
+                      setIsCopying(false);
+                    }
+                  }}
+                  disabled={isCopying}
+                  className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                >
+                  <Copy className="size-[18px] shrink-0" />
+                  <span>建立複本</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
                   onClick={() => {
                     setPracticeMenuOpen(false);
                     onArchivePractice();
@@ -539,7 +574,33 @@ export function PracticeDetailShell({
           />
 
           <div className="px-4">
-            <div className="border-t border-[#E4EAE9] mb-2" />
+            <div className="border-t border-[#E4EAE9] mb-3" />
+            {!isOwner && (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full mb-3 gap-2 rounded-full"
+                disabled={isCopying}
+                onClick={async () => {
+                  if (!currentUserId) {
+                    router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+                    return;
+                  }
+                  try {
+                    setIsCopying(true);
+                    const { id } = await copyPractice(practiceId);
+                    router.push(`/practices/copy-success?practiceId=${id}`);
+                  } catch {
+                    toast.error("複製失敗，請稍後再試");
+                  } finally {
+                    setIsCopying(false);
+                  }
+                }}
+              >
+                <Copy className="size-4" />
+                {isCopying ? "複製中…" : "我也想實踐"}
+              </Button>
+            )}
             <Button
               type="button"
               variant="ghost"
@@ -585,20 +646,24 @@ export function PracticeDetailShell({
                 (reactionsData?.data?.reactions ?? []).find((r) => r.count > 0)?.latestActorName ??
                 null;
               // 優先用 API followers；沒有時用 aggregate reactions（所有人共享）
+              // 當 followers 為空時，加入 effectiveReaction 做樂觀更新
+              const serverActiveTypes = activeReactions.map((r) => r.type as ReactionTypeType);
               const displayReactions =
                 followers.length > 0
                   ? ([...new Set(followers.map((f) => f.reaction))].slice(
                       0,
                       PICKER_REACTIONS.length
                     ) as ReactionTypeType[])
-                  : activeReactions.map((r) => r.type as ReactionTypeType);
+                  : effectiveReaction && !serverActiveTypes.includes(effectiveReaction)
+                    ? [effectiveReaction, ...serverActiveTypes].slice(0, PICKER_REACTIONS.length)
+                    : serverActiveTypes;
               const firstName = followers[0]?.name;
               const text =
                 followers.length > 1
                   ? `${firstName} 與其他 ${followers.length - 1} 人`
                   : followers.length === 1
                     ? firstName
-                    : currentUserReaction
+                    : effectiveReaction
                       ? totalReactionCount > 1
                         ? `你 與其他 ${totalReactionCount - 1} 人`
                         : "你"
@@ -608,7 +673,8 @@ export function PracticeDetailShell({
                             ? `${latestActorName} 與其他 ${totalReactionCount - 1} 人`
                             : latestActorName
                           : `${totalReactionCount} 人`
-                        : "觀看瀏覽活動";
+                        : undefined;
+              if (displayReactions.length === 0 && !text) return null;
               return (
                 <button
                   type="button"

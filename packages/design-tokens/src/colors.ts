@@ -77,6 +77,28 @@ export const colors = {
     pink: "#EC4899",
     green: "#10B981",
   },
+
+  // 中性灰階 - 供 Mobile 使用（數字 scale）
+  basic: {
+    50: "#FAFAFA",
+    100: "#F5F5F5",
+    200: "#E5E5E5",
+    300: "#A3A3A3",
+    400: "#6B7280",
+    500: "#404040",
+    600: "#2D3A4F",
+    white: "#FFFFFF",
+    black: "#1A2B3C",
+  },
+
+  // 語意色彩 - Semantic colors
+  semantic: {
+    success: "#22C55E",
+    warning: "#F59E0B",
+    error: "#EF4444",
+    info: "#3B82F6",
+    tips: "#FACC15",
+  },
 } as const;
 
 export type Colors = typeof colors;

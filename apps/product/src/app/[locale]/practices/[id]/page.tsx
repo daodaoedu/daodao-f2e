@@ -16,6 +16,7 @@ import {
   useRecordView,
 } from "@daodao/api";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
 import { zhTW } from "date-fns/locale";
@@ -177,6 +178,8 @@ export default function PracticeDetailPage() {
   const router = useRouter();
   const params = useParams();
   const practiceId = params.id as string;
+  const searchParams = useSearchParams();
+  const fromCopy = searchParams.get("from") === "copy";
 
   const {
     data: practiceData,
@@ -473,13 +476,14 @@ export default function PracticeDetailPage() {
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
-        <Link
-          href="/"
+        <button
+          type="button"
+          onClick={() => (fromCopy ? router.push("/me") : router.back())}
           className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
           aria-label="關閉"
         >
           <X className="size-6" />
-        </Link>
+        </button>
       </div>
       <BackgroundAnimation />
 
