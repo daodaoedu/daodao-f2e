@@ -85,15 +85,14 @@ function Toggle({
 export const NotificationSettings = () => {
   const { data, mutate } = useNotificationPreferences();
 
-  const [globalEnabled, setGlobalEnabled] = useState(true);
-  const [prefs, setPrefs] = useState<PreferencesMap>(DEFAULT_PREFS);
+  const [globalEnabled, setGlobalEnabled] = useState<boolean | undefined>(undefined);
+  const [prefs, setPrefs] = useState<PreferencesMap | undefined>(undefined);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Sync from API response
+  // Sync from API response — only runs once data arrives
   useEffect(() => {
     if (!data) return;
     const n01Prefs = (data.data ?? []).filter((p) => p.channel === "N01");
-    // 從所有 N01 項目推導總開關狀態：至少有一個 enabled 就是開
     setGlobalEnabled(n01Prefs.length === 0 || n01Prefs.some((p) => p.isEnabled));
     const newPrefs: PreferencesMap = { ...DEFAULT_PREFS };
     for (const p of data.data ?? []) {
@@ -109,32 +108,63 @@ export const NotificationSettings = () => {
     setIsSaving(true);
     try {
       await updateNotificationPreferences({ globalEnabled: value });
-      mutate();
       toast.success(value ? "已開啟通知" : "已關閉通知");
     } catch {
       setGlobalEnabled(!value);
       toast.error("儲存失敗，請稍後再試");
     } finally {
       setIsSaving(false);
+      mutate();
     }
   };
 
   const handleTypeToggle = async (notificationType: string, emailEnabled: boolean) => {
-    const prev = prefs[notificationType];
-    setPrefs((p) => ({ ...p, [notificationType]: { emailEnabled } }));
+    const prev = prefs?.[notificationType];
+    setPrefs((p) => ({ ...(p ?? DEFAULT_PREFS), [notificationType]: { emailEnabled } }));
     setIsSaving(true);
     try {
       await updateNotificationPreferences({
         preferences: [{ type: notificationType, channel: "N01", isEnabled: emailEnabled }],
       });
-      mutate();
     } catch {
-      setPrefs((p) => ({ ...p, [notificationType]: prev ?? { emailEnabled: true } }));
+      setPrefs((p) => ({ ...(p ?? DEFAULT_PREFS), [notificationType]: prev ?? { emailEnabled: true } }));
       toast.error("儲存失敗，請稍後再試");
     } finally {
       setIsSaving(false);
+      mutate();
     }
   };
+
+  // 資料尚未載入時顯示 skeleton
+  if (globalEnabled === undefined || prefs === undefined) {
+    return (
+      <div className="flex flex-col gap-5 animate-pulse">
+        <div className="bg-white rounded-2xl overflow-hidden">
+          <div className="flex items-center gap-3 px-4 py-4">
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="h-4 w-24 bg-[#E4EAE9] rounded" />
+              <div className="h-3 w-48 bg-[#E4EAE9] rounded" />
+            </div>
+            <div className="h-6 w-11 bg-[#E4EAE9] rounded-full" />
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <div className="h-3 w-24 bg-[#E4EAE9] rounded mx-1" />
+          <div className="bg-white rounded-2xl overflow-hidden divide-y divide-[#E4EAE9]">
+            {NOTIFICATION_TYPES.map((item) => (
+              <div key={item.type} className="flex items-center gap-3 px-4 py-3">
+                <div className="flex-1 flex flex-col gap-2">
+                  <div className="h-4 w-20 bg-[#E4EAE9] rounded" />
+                  <div className="h-3 w-36 bg-[#E4EAE9] rounded" />
+                </div>
+                <div className="h-6 w-11 bg-[#E4EAE9] rounded-full" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">
