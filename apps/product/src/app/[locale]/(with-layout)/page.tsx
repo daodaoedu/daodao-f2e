@@ -165,11 +165,14 @@ export default function HomePage() {
         .map((item) => item.data.id),
     [feedItems]
   );
-  const { data: batchCheckinReactionsData, isLoading: isBatchCheckinReactionsLoading } =
-    useReactionsBatch({
-      targetType: "checkin",
-      targetIds: checkinIds,
-    });
+  const {
+    data: batchCheckinReactionsData,
+    isLoading: isBatchCheckinReactionsLoading,
+    mutate: mutateBatchCheckinReactions,
+  } = useReactionsBatch({
+    targetType: "checkin",
+    targetIds: checkinIds,
+  });
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -356,6 +359,7 @@ export default function HomePage() {
                             comment_count={checkin.comment_count}
                             comment_preview={checkin.comment_preview}
                             batchReactionData={batchCheckinReactionsData?.data?.[checkin.id]}
+                            onReactionMutate={() => mutateBatchCheckinReactions()}
                           />
                         </div>
                       );

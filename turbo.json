@@ -16,11 +16,11 @@
       "persistent": true
     },
     "lint": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "outputs": []
     },
     "typecheck": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["@daodao/assets#build", "@daodao/shared#build"],
       "outputs": []
     },
     "format": {
@@ -40,7 +40,7 @@
       "outputs": []
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "outputs": []
     },
     "clean": {
