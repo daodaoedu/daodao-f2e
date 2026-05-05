@@ -3,8 +3,8 @@
 import { posthogCapture } from "@daodao/analytics";
 import {
   type FeedbackState,
-  type ITopicCard,
   fetchTopicCards,
+  type ITopicCard,
   submitRecommendationFeedback,
   useTopicRecommendations,
 } from "@daodao/api";

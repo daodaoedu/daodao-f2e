@@ -147,7 +147,11 @@ function NotificationText({ notification }: { notification: INotificationData })
     return (
       <p className="text-sm leading-5 line-clamp-2">
         {name} 在主題實踐{practiceName}打了卡
-        {content && <>：<span className="font-semibold">{content}</span></>}
+        {content && (
+          <>
+            ：<span className="font-semibold">{content}</span>
+          </>
+        )}
       </p>
     );
   }

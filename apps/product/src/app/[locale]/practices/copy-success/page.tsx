@@ -1,9 +1,8 @@
 "use client";
 
-import featureHappyJson from "@daodao/assets/images/quiz/feature-happy.json";
 import { usePracticeById } from "@daodao/api";
+import featureHappyJson from "@daodao/assets/images/quiz/feature-happy.json";
 import { useRouter } from "@daodao/i18n/navigation";
-import { useEffect } from "react";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
@@ -12,6 +11,7 @@ import { format } from "date-fns";
 import Lottie from "lottie-react";
 import { motion } from "motion/react";
 import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { BackgroundAnimation } from "@/components/layout";
 import { getStatusConfig, mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 
@@ -52,7 +52,9 @@ export default function CopySuccessPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-4xl font-medium text-text-dark leading-normal">已複製到你的清單！</h1>
+            <h1 className="text-4xl font-medium text-text-dark leading-normal">
+              已複製到你的清單！
+            </h1>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: -20 }}

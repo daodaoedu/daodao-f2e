@@ -355,58 +355,58 @@ export default function TemplateDetailPage() {
         </div>
 
         <div className="bg-white rounded-t-2xl">
-        <div className="max-w-[448px] mx-auto pt-4 px-5 pb-28">
-          {/* Course Overview Card */}
-          <div className="relative mb-3.5">
-            {/* Compass Icon */}
-            <div className="absolute -top-14 -right-1 z-10">
-              <CompassSvg width={109} height={114} />
-            </div>
-
-            <PracticeOverviewCard
-              actionDescription={template.actionDescription}
-              frequency={template.frequency}
-              durationMinutes={template.durationMinutes}
-              tags={template.tags}
-            />
-          </div>
-
-          {/* Execution Timing and Duration Cards */}
-          <div className="grid grid-cols-2 gap-4 mb-3.5">
-            {/* Execution Timing Card */}
-            <ExecutionTimingCard
-              executionTiming={template.executionTiming}
-              customTiming={template.customTiming}
-            />
-
-            {/* Execution Duration Card */}
-            <ExecutionDurationCard
-              durationDays={template.durationDays}
-              startDate={template.startDate}
-            />
-          </div>
-
-          {/* Recommended Resources Section */}
-          {Array.isArray(template.resources) && template.resources.length > 0 && (
-            <div>
-              <h2 className="text-sm text-center font-medium text-white mt-4 mb-3.5">
-                推薦你使用以下資源
-              </h2>
-              <div className="grid grid-cols-2 gap-3">
-                {template.resources?.map((resource) => (
-                  <ResourceCard
-                    key={resource.id}
-                    resource={{
-                      id: resource.id,
-                      name: resource.name,
-                      url: resource.url,
-                    }}
-                  />
-                ))}
+          <div className="max-w-[448px] mx-auto pt-4 px-5 pb-28">
+            {/* Course Overview Card */}
+            <div className="relative mb-3.5">
+              {/* Compass Icon */}
+              <div className="absolute -top-14 -right-1 z-10">
+                <CompassSvg width={109} height={114} />
               </div>
+
+              <PracticeOverviewCard
+                actionDescription={template.actionDescription}
+                frequency={template.frequency}
+                durationMinutes={template.durationMinutes}
+                tags={template.tags}
+              />
             </div>
-          )}
-        </div>
+
+            {/* Execution Timing and Duration Cards */}
+            <div className="grid grid-cols-2 gap-4 mb-3.5">
+              {/* Execution Timing Card */}
+              <ExecutionTimingCard
+                executionTiming={template.executionTiming}
+                customTiming={template.customTiming}
+              />
+
+              {/* Execution Duration Card */}
+              <ExecutionDurationCard
+                durationDays={template.durationDays}
+                startDate={template.startDate}
+              />
+            </div>
+
+            {/* Recommended Resources Section */}
+            {Array.isArray(template.resources) && template.resources.length > 0 && (
+              <div>
+                <h2 className="text-sm text-center font-medium text-white mt-4 mb-3.5">
+                  推薦你使用以下資源
+                </h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {template.resources?.map((resource) => (
+                    <ResourceCard
+                      key={resource.id}
+                      resource={{
+                        id: resource.id,
+                        name: resource.name,
+                        url: resource.url,
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Action Button */}

@@ -19,7 +19,14 @@ interface ExploreTopicCardProps {
   onCopyPractice?: (practiceId: string) => void;
 }
 
-function ExploreTopicCard({ topic, isLiked, isHiding, onLike, onDislike, onCopyPractice }: ExploreTopicCardProps) {
+function ExploreTopicCard({
+  topic,
+  isLiked,
+  isHiding,
+  onLike,
+  onDislike,
+  onCopyPractice,
+}: ExploreTopicCardProps) {
   const {
     id,
     title,

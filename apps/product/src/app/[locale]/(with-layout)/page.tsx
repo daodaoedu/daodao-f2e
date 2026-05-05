@@ -44,18 +44,18 @@ type TabType = "inspire" | "mine";
 function reorderFeedItems(items: FeedItem[]): FeedItem[] {
   const checkins = items.filter(
     (item): item is Extract<FeedItem, { type: "checkin" }> =>
-      item.type === "checkin" && item.feed_reason !== "cheered",
+      item.type === "checkin" && item.feed_reason !== "cheered"
   );
   const cheered = items.filter(
     (item): item is Extract<FeedItem, { type: "practice" | "checkin" }> =>
-      (item.type === "practice" || item.type === "checkin") && item.feed_reason === "cheered",
+      (item.type === "practice" || item.type === "checkin") && item.feed_reason === "cheered"
   );
   const textActivities = items.filter((item): item is ActivityCardItem => item.type === "activity");
   // 互動 slot 來源：cheered 優先，用完再接文字 ActivityCard
   const activitySlot: FeedItem[] = [...cheered, ...textActivities];
   const practices = items.filter(
     (item): item is Extract<FeedItem, { type: "practice" }> =>
-      item.type === "practice" && item.feed_reason !== "cheered",
+      item.type === "practice" && item.feed_reason !== "cheered"
   );
 
   const result: FeedItem[] = [];
@@ -142,7 +142,11 @@ export default function HomePage() {
         .map((item) => item.data.id),
     [feedItems]
   );
-  const { data: batchReactionsData, isLoading: isBatchReactionsLoading, mutate: mutateBatchReactions } = useReactionsBatch({
+  const {
+    data: batchReactionsData,
+    isLoading: isBatchReactionsLoading,
+    mutate: mutateBatchReactions,
+  } = useReactionsBatch({
     targetType: "practice",
     targetIds: practiceIds,
   });
@@ -153,12 +157,13 @@ export default function HomePage() {
       feedItems
         .filter((item): item is Extract<FeedItem, { type: "checkin" }> => item.type === "checkin")
         .map((item) => item.data.id),
-    [feedItems],
+    [feedItems]
   );
-  const { data: batchCheckinReactionsData, isLoading: isBatchCheckinReactionsLoading } = useReactionsBatch({
-    targetType: "checkin",
-    targetIds: checkinIds,
-  });
+  const { data: batchCheckinReactionsData, isLoading: isBatchCheckinReactionsLoading } =
+    useReactionsBatch({
+      targetType: "checkin",
+      targetIds: checkinIds,
+    });
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -306,26 +311,32 @@ export default function HomePage() {
 
                     const isNewRelease = feedItem.feed_reason === "new_release";
                     const prevItem = index > 0 ? orderedFeedItems[index - 1] : undefined;
-                    const prevFeedReason = prevItem && prevItem.type !== "activity" ? prevItem.feed_reason : undefined;
+                    const prevFeedReason =
+                      prevItem && prevItem.type !== "activity" ? prevItem.feed_reason : undefined;
                     const showFeedLabel = !isNewRelease || prevFeedReason !== "new_release";
 
                     if (feedItem.type === "checkin") {
                       const checkin = feedItem.data;
                       const latestActorName =
                         batchCheckinReactionsData?.data?.[checkin.id]?.items[0]?.name ??
-                        batchCheckinReactionsData?.data?.[checkin.id]?.reactions.find((r) => r.count > 0)
-                          ?.latestActorName ??
+                        batchCheckinReactionsData?.data?.[checkin.id]?.reactions.find(
+                          (r) => r.count > 0
+                        )?.latestActorName ??
                         checkin.reactions?.find((r) => r.latestActorName)?.latestActorName;
                       return (
                         <div key={`checkin-${checkin.id}-${feedItem.feed_reason}-${index}`}>
-                          {showFeedLabel && feedItem.feed_reason && !(feedItem.feed_reason === "cheered" && isBatchCheckinReactionsLoading) && (
-                            <FeedLabel
-                              feedReason={feedItem.feed_reason}
-                              userName={checkin.user?.name}
-                              practiceTitle={checkin.practice?.title}
-                              latestActorName={latestActorName}
-                            />
-                          )}
+                          {showFeedLabel &&
+                            feedItem.feed_reason &&
+                            !(
+                              feedItem.feed_reason === "cheered" && isBatchCheckinReactionsLoading
+                            ) && (
+                              <FeedLabel
+                                feedReason={feedItem.feed_reason}
+                                userName={checkin.user?.name}
+                                practiceTitle={checkin.practice?.title}
+                                latestActorName={latestActorName}
+                              />
+                            )}
                           <CheckInShowcaseCard
                             id={checkin.id}
                             checkin_date={checkin.checkin_date}
@@ -353,13 +364,15 @@ export default function HomePage() {
                         practice.reactions?.find((r) => r.latestActorName)?.latestActorName;
                       return (
                         <div key={`practice-${practice.id}-${feedItem.feed_reason}-${index}`}>
-                          {showFeedLabel && feedItem.feed_reason && !(feedItem.feed_reason === "cheered" && isBatchReactionsLoading) && (
-                            <FeedLabel
-                              feedReason={feedItem.feed_reason}
-                              userName={practice.user?.name}
-                              latestActorName={latestActorName}
-                            />
-                          )}
+                          {showFeedLabel &&
+                            feedItem.feed_reason &&
+                            !(feedItem.feed_reason === "cheered" && isBatchReactionsLoading) && (
+                              <FeedLabel
+                                feedReason={feedItem.feed_reason}
+                                userName={practice.user?.name}
+                                latestActorName={latestActorName}
+                              />
+                            )}
                           {practice.is_brewing ? (
                             <BrewingCard
                               id={practice.id}
@@ -411,9 +424,6 @@ export default function HomePage() {
                         </div>
                       );
                     }
-
-
-
 
                     return null;
                   })}

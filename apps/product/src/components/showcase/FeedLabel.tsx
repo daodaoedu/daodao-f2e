@@ -1,5 +1,5 @@
-import { CalendarCheck, Rss, ThumbsUp } from "lucide-react";
 import type { FeedReasonType } from "@daodao/api";
+import { CalendarCheck, Rss, ThumbsUp } from "lucide-react";
 
 interface FeedLabelProps {
   feedReason: FeedReasonType;
@@ -8,7 +8,12 @@ interface FeedLabelProps {
   latestActorName?: string;
 }
 
-export function FeedLabel({ feedReason, userName, practiceTitle, latestActorName }: FeedLabelProps) {
+export function FeedLabel({
+  feedReason,
+  userName,
+  practiceTitle,
+  latestActorName,
+}: FeedLabelProps) {
   if (feedReason === "new_practice") {
     return (
       <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mb-1.5 px-1">

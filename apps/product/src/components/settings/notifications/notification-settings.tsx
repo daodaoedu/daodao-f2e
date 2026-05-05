@@ -127,7 +127,10 @@ export const NotificationSettings = () => {
         preferences: [{ type: notificationType, channel: "N01", isEnabled: emailEnabled }],
       });
     } catch {
-      setPrefs((p) => ({ ...(p ?? DEFAULT_PREFS), [notificationType]: prev ?? { emailEnabled: true } }));
+      setPrefs((p) => ({
+        ...(p ?? DEFAULT_PREFS),
+        [notificationType]: prev ?? { emailEnabled: true },
+      }));
       toast.error("儲存失敗，請稍後再試");
     } finally {
       setIsSaving(false);

@@ -29,7 +29,7 @@ export function StarryBackground({
           rel="noopener noreferrer"
           className="absolute left-4 top-4 z-20 md:left-8 md:top-6"
         >
-          <LogoSvg aria-label="DaoDao" className="h-auto w-[180px]" />
+          <LogoSvg aria-label="Dao Dao" className="h-auto w-[180px]" />
         </a>
       )}
       {/* Content – constrain width on desktop like quiz (max-w-[430px]) */}
