@@ -1,7 +1,7 @@
 "use client";
 
 import { getStorage, StorageEnum } from "@daodao/shared";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { decodeOAuthState, verifyAndConsumeOAuthState } from "../lib/auth-client";
 import { DEFAULT_REDIRECT_URL, ONBOARDING_URL } from "../lib/auth-constants";
@@ -24,8 +24,11 @@ import { DEFAULT_REDIRECT_URL, ONBOARDING_URL } from "../lib/auth-constants";
  * }
  * ```
  */
+const hardNavigate = (url: string) => {
+  window.location.href = url;
+};
+
 export const useRedirectAfterLogin = () => {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -39,9 +42,9 @@ export const useRedirectAfterLogin = () => {
     if (!stateParam) {
       // 沒有 state 參數，根據是否為新用戶決定跳轉
       if (isNewUser) {
-        router.push(ONBOARDING_URL);
+        hardNavigate(ONBOARDING_URL);
       } else {
-        router.push(DEFAULT_REDIRECT_URL);
+        hardNavigate(DEFAULT_REDIRECT_URL);
       }
       return;
     }
@@ -51,9 +54,9 @@ export const useRedirectAfterLogin = () => {
     if (!state) {
       // State 格式錯誤，根據是否為新用戶決定跳轉
       if (isNewUser) {
-        router.push(ONBOARDING_URL);
+        hardNavigate(ONBOARDING_URL);
       } else {
-        router.push(DEFAULT_REDIRECT_URL);
+        hardNavigate(DEFAULT_REDIRECT_URL);
       }
       return;
     }
@@ -62,9 +65,9 @@ export const useRedirectAfterLogin = () => {
     if (!verifyAndConsumeOAuthState(state)) {
       // State 無效、過期或 nonce 不匹配，根據是否為新用戶決定跳轉
       if (isNewUser) {
-        router.push(ONBOARDING_URL);
+        hardNavigate(ONBOARDING_URL);
       } else {
-        router.push(DEFAULT_REDIRECT_URL);
+        hardNavigate(DEFAULT_REDIRECT_URL);
       }
       return;
     }
@@ -72,12 +75,12 @@ export const useRedirectAfterLogin = () => {
     // 驗證成功
     if (isNewUser) {
       // 新用戶跳轉到 onboarding 流程
-      router.push(ONBOARDING_URL);
+      hardNavigate(ONBOARDING_URL);
     } else {
       // 舊用戶跳轉到原目標頁面
       // 過濾掉 /auth/error 路徑，避免成功登入後仍被導向錯誤頁面
       const isSafeRedirect = !state.redirectUrl.includes("/auth/error");
-      router.push(isSafeRedirect ? state.redirectUrl : DEFAULT_REDIRECT_URL);
+      hardNavigate(isSafeRedirect ? state.redirectUrl : DEFAULT_REDIRECT_URL);
     }
-  }, [searchParams, router]);
+  }, [searchParams]);
 };
