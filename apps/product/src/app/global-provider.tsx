@@ -34,7 +34,6 @@ function AuthNavigator({ children }: { children: React.ReactNode }) {
         "^/auth/error",
         "^/auth/onboarding",
         "^/auth/verify-email(/.*)?$",
-        "^/auth/error",
         "^/users/",
         "^/practices/[^/]+$",
         "^/dev/",
