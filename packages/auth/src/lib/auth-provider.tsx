@@ -9,7 +9,7 @@ import {
 import { usePathname } from "@daodao/i18n/navigation";
 import { routing } from "@daodao/i18n/routing";
 import { getStorage, getStorageKey, StorageEnum } from "@daodao/shared";
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { LoginDialog } from "../components/login-dialog";
 import type { AuthContextValue, StoredUser } from "../types";
 import { initiateOAuthLogin } from "./auth-client";
@@ -212,7 +212,6 @@ export const AuthProvider = ({
   const [loginDialogDismissible, setLoginDialogDismissible] = useState(true);
   const userInfoStorage = useMemo(() => getStorage<StoredUser>(StorageEnum.UserInfo), []);
   const pathname = usePathname();
-  const isLoggingOutRef = useRef(false);
 
   /**
    * 清除認證狀態
@@ -411,11 +410,6 @@ export const AuthProvider = ({
       return;
     }
 
-    // 如果正在登出中，不進行路由保護（避免與登出後的重定向競爭）
-    if (isLoggingOutRef.current) {
-      return;
-    }
-
     // 如果已登入，不需要檢查
     if (isAuthenticated) {
       return;
@@ -444,16 +438,6 @@ export const AuthProvider = ({
     enableRouteProtection,
     onAuthRequired,
   ]);
-
-  /**
-   * 登出後重置 isLoggingOutRef
-   * pathname 變化代表導航已完成，此時可以安全地重新啟用路由保護
-   */
-  useEffect(() => {
-    if (isLoggingOutRef.current) {
-      isLoggingOutRef.current = false;
-    }
-  }, [pathname]);
 
   /**
    * 臨時用戶處理：如果用戶是臨時用戶，跳轉到 onboarding 頁面
@@ -613,8 +597,6 @@ export const AuthProvider = ({
    * 使用統一的 API 服務登出
    */
   const logout = useCallback(async () => {
-    // 標記正在登出，防止 route protection effect 與登出後重定向競爭
-    isLoggingOutRef.current = true;
     try {
       await apiLogout();
     } catch (error) {
