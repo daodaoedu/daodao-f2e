@@ -63,8 +63,7 @@ export function useLogoutDialog() {
         cache.clear();
       }
 
-      // 重定向到首頁
-      router.push("/");
+      router.push("/auth/login");
 
       return LogoutResult.LoggedOut;
     } finally {
