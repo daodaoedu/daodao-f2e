@@ -2,7 +2,7 @@
 
 import { useCurrentUser } from "@daodao/api";
 import type { BatchReactionItem, IShowcaseCheckIn } from "@daodao/api";
-import { DefaultAvatarSvg, DialogOutlineSvg, FlagOutlineSvg } from "@daodao/assets";
+import { DefaultAvatarSvg, DialogOutlineSvg, FlagOutlineSvg, StampSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
@@ -58,6 +58,13 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
   const moodOption = frontendMood ? MOOD_OPTIONS.find((m) => m.id === frontendMood) : null;
   const MoodEmoji = moodOption?.emoji;
 
+  const hasContent = !!(note || (image_urls && image_urls.length > 0) || tags?.length);
+
+  const dateStr = checkin_date.replace(/\./g, "-");
+  const dateParts = dateStr.split("-");
+  const stampYear = dateParts[0] ?? "";
+  const stampMonthDay = dateParts.slice(1).join("/");
+
   const { selectedReactions, totalCount, displayReactions, handleToggle, firstReactorName } =
     useCardReactions("checkin", id, batchReactionData, onReactionMutate);
 
@@ -76,8 +83,9 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
       onClick={handleCardClick}
     >
       {/* ======= 上方：封面區（teal 背景 + 底部漸層） =======
-          - 有上傳照片 → 顯示第一張照片作為封面
-          - 無照片     → 顯示筆記本風格的打卡卡片預覽（同「分享打卡」圖）
+          - 有照片         → 顯示第一張照片作為封面
+          - 有進階內容     → 顯示筆記本風格的打卡卡片預覽
+          - 無任何內容     → 縮短封面，心情 Emoji 為主角
       */}
       <div className="relative bg-logo-cyan overflow-hidden">
         {image_urls && image_urls.length > 0 ? (
@@ -85,8 +93,8 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
           <div className="h-[240px] w-full overflow-hidden">
             <img src={image_urls[0]} alt="打卡封面" className="w-full h-full object-cover" />
           </div>
-        ) : (
-          /* 無照片：顯示打卡卡片預覽（同分享打卡圖樣式） */
+        ) : hasContent ? (
+          /* 有內容：顯示打卡卡片預覽（同分享打卡圖樣式） */
           <div className="max-h-[240px] overflow-hidden pointer-events-none select-none pt-8">
             <CheckInCard
               taskTitle={practice.title}
@@ -95,9 +103,28 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
               content={note}
               tags={tags ?? []}
               images={[]}
-              titleClassName="hidden"
               showTape={false}
             />
+          </div>
+        ) : (
+          /* 無內容：縮短封面，心情 Emoji 為主角 + 時間戳印章 */
+          <div className="relative flex flex-col items-center justify-center gap-3 py-8 pointer-events-none select-none">
+            <p className="text-white font-semibold text-base px-6 text-center line-clamp-2">{practice.title}</p>
+            {MoodEmoji ? (
+              <MoodEmoji className="size-16" />
+            ) : (
+              <div className="size-16" />
+            )}
+            {moodOption && (
+              <p className="text-white/70 text-xs">{moodOption.label}</p>
+            )}
+            <div className="absolute right-3 bottom-3 anonymous-pro animate-stamp opacity-80" style={{ filter: "brightness(0) invert(1)" }}>
+              <StampSvg width={100} height={100} />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-xs font-bold text-white rotate-15 size-10 flex flex-col items-center justify-center">
+                <div>{stampYear}</div>
+                <div>{stampMonthDay}</div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -129,7 +156,11 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
           {/* 文字內容 */}
           <div className="flex-1 min-w-0 flex flex-col gap-2">
             <p className="text-sm text-light-gray whitespace-nowrap">{checkin_date}</p>
-            <p className="text-base text-text-dark line-clamp-2">{note}</p>
+            {note ? (
+              <p className="text-base text-text-dark line-clamp-2">{note}</p>
+            ) : (
+              <p className="text-sm text-light-gray">完成了一次打卡</p>
+            )}
           </div>
 
           {/* 三點選單按鈕：本人不顯示，他人只顯示「檢舉」 */}
