@@ -446,6 +446,16 @@ export const AuthProvider = ({
   ]);
 
   /**
+   * 登出後重置 isLoggingOutRef
+   * pathname 變化代表導航已完成，此時可以安全地重新啟用路由保護
+   */
+  useEffect(() => {
+    if (isLoggingOutRef.current) {
+      isLoggingOutRef.current = false;
+    }
+  }, [pathname]);
+
+  /**
    * 臨時用戶處理：如果用戶是臨時用戶，跳轉到 onboarding 頁面
    */
   useEffect(() => {
@@ -612,10 +622,6 @@ export const AuthProvider = ({
     } finally {
       // 無論 API 是否成功，都清除前端狀態
       clearAuthState();
-      // 給重定向足夠的時間完成後再重置旗標
-      setTimeout(() => {
-        isLoggingOutRef.current = false;
-      }, 500);
     }
   }, [clearAuthState]);
 
