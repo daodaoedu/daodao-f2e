@@ -9,7 +9,8 @@ export const checkInFormSchema = z.object({
   mood: z
     .enum(MOOD_OPTIONS.map((option) => option.id) as [MoodType, ...MoodType[]])
     .nullable()
-    .default(null),
+    .default(null)
+    .refine((val) => val !== null, { message: "請選擇心情" }),
   tags: z.array(z.string()).default([]),
   description: z.string().max(300, "最多300字").default(""),
   media: z.array(z.instanceof(File)).max(3, "最多只能上傳3張圖片").default([]),
