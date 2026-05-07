@@ -79,6 +79,7 @@ interface ICheckInFeedCommentSheetProps {
   currentUserName?: string;
   currentUserId?: string;
   currentUserPhotoURL?: string;
+  onMutate?: () => void;
 }
 
 function CheckInFeedCommentSheet({
