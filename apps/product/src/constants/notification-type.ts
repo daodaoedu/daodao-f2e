@@ -9,6 +9,7 @@ export const NotificationType = {
   connectRejected: "connect-rejected",
   updatePracticeCheckin: "update-practice-checkin",
   updatePracticeFinish: "update-practice-finish",
+  practiceCreated: "practice-created",
 } as const;
 
 export type NotificationTypeType = (typeof NotificationType)[keyof typeof NotificationType];

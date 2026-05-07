@@ -164,6 +164,14 @@ function NotificationText({ notification }: { notification: INotificationData })
     );
   }
 
+  if (type === NotificationType.practiceCreated) {
+    return (
+      <p className="text-sm leading-5 line-clamp-2">
+        {name} 發起了新的主題實踐{practiceName}
+      </p>
+    );
+  }
+
   return null;
 }
 
