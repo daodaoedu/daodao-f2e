@@ -1,159 +1,21 @@
 "use client";
 
 import type { BatchReactionItem, IShowcaseCheckIn } from "@daodao/api";
-import { createComment, deleteComment, updateComment, useComments, useCurrentUser } from "@daodao/api";
+import { useCurrentUser } from "@daodao/api";
 import { DefaultAvatarSvg, DialogOutlineSvg, FlagOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
-import { toast } from "@daodao/ui/components/sonner";
-import { formatDistanceToNow, isValid, parseISO } from "date-fns";
-import { zhTW } from "date-fns/locale";
 import { MoreHorizontal } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
 import { CheckInCard } from "@/components/check-in/display/check-in-card";
-import { CommentSection, type IComment, type ICommentReply, ReactionPickerButton } from "@/components/check-in/reactions";
+import { ReactionPickerButton } from "@/components/check-in/reactions";
 import type { ApiMoodType } from "@/constants/mood";
 import { MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCardReactions } from "@/hooks/use-card-reactions";
 
-// ============================================================================
-// Comment sheet helpers
-// ============================================================================
-
-type ApiCommentNode = {
-  id: number | string;
-  userId?: number | null;
-  content?: string | null;
-  createdAt?: string;
-  replies?: unknown[];
-  user?: { id?: string | null; name?: string | null; photoURL?: string | null; customId?: string | null } | null;
-};
-
-function isApiCommentNode(v: unknown): v is ApiCommentNode {
-  return typeof v === "object" && v !== null && "id" in v;
-}
-
-function formatCommentTime(createdAt?: string): string {
-  if (!createdAt) return "剛剛";
-  const parsed = parseISO(createdAt);
-  if (!isValid(parsed)) return "剛剛";
-  return formatDistanceToNow(parsed, { addSuffix: true, locale: zhTW });
-}
-
-function mapReply(reply: ApiCommentNode): ICommentReply {
-  return {
-    id: String(reply.id),
-    author: {
-      name: reply.user?.name || "匿名使用者",
-      photoURL: reply.user?.photoURL || undefined,
-      userId: reply.user?.id || undefined,
-      numericUserId: reply.userId ?? undefined,
-      customId: reply.user?.customId ?? undefined,
-    },
-    content: reply.content || "",
-    time: formatCommentTime(reply.createdAt),
-  };
-}
-
-function mapComment(comment: ApiCommentNode): IComment {
-  const rawReplies = Array.isArray(comment.replies) ? comment.replies : [];
-  return {
-    id: String(comment.id),
-    author: {
-      name: comment.user?.name || "匿名使用者",
-      photoURL: comment.user?.photoURL || undefined,
-      userId: comment.user?.id || undefined,
-      numericUserId: comment.userId ?? undefined,
-      customId: comment.user?.customId ?? undefined,
-    },
-    content: comment.content || "",
-    time: formatCommentTime(comment.createdAt),
-    replies: rawReplies.filter(isApiCommentNode).map(mapReply),
-  };
-}
-
-interface ICheckInFeedCommentSheetProps {
-  checkInId: string;
-  currentUserName?: string;
-  currentUserId?: string;
-  currentUserPhotoURL?: string;
-  onMutate?: () => void;
-}
-
-function CheckInFeedCommentSheet({
-  checkInId,
-  currentUserName,
-  currentUserId,
-  currentUserPhotoURL,
-}: ICheckInFeedCommentSheetProps) {
-  const { data: commentsData, mutate: mutateComments } = useComments({
-    targetType: "checkin",
-    targetId: checkInId,
-  });
-
-  const comments: IComment[] = useMemo(() => {
-    const raw = commentsData?.data;
-    if (!Array.isArray(raw)) return [];
-    return raw.filter(isApiCommentNode).map(mapComment);
-  }, [commentsData]);
-
-  const handleSubmit = useCallback(
-    async (text: string, _reactions: string[], parentId?: string, mentionedUserIds?: number[]) => {
-      const response = await createComment({
-        targetType: "checkin",
-        targetId: checkInId,
-        content: text,
-        visibility: "public",
-        parentId: parentId ? Number(parentId) : undefined,
-        mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
-      });
-      if (response.error) { toast.error("留言失敗，請稍後再試"); return; }
-      toast.success("留言成功！");
-      await mutateComments();
-    },
-    [checkInId, mutateComments]
-  );
-
-  const handleEdit = useCallback(
-    async (commentId: string, text: string) => {
-      const numId = Number(commentId);
-      if (!Number.isFinite(numId)) { toast.error("留言 ID 無效"); return false; }
-      const response = await updateComment(numId, { content: text });
-      if (response.error) { toast.error("更新留言失敗"); return false; }
-      await mutateComments();
-      return true;
-    },
-    [mutateComments]
-  );
-
-  const handleDelete = useCallback(
-    async (commentId: string) => {
-      const numId = Number(commentId);
-      if (!Number.isFinite(numId)) { toast.error("留言 ID 無效"); return false; }
-      const response = await deleteComment(numId);
-      if (response.error) { toast.error("刪除留言失敗"); return false; }
-      await mutateComments();
-      return true;
-    },
-    [mutateComments]
-  );
-
-  return (
-    <CommentSection
-      comments={comments}
-      selectedReactions={[]}
-      onSubmit={handleSubmit}
-      hasMoreComments={comments.length > 2}
-      currentUserName={currentUserName}
-      currentUserId={currentUserId}
-      currentUserPhotoURL={currentUserPhotoURL}
-      onEditComment={handleEdit}
-      onDeleteComment={handleDelete}
-    />
-  );
-}
 
 type CheckInShowcaseCardProps = IShowcaseCheckIn & {
   batchReactionData?: BatchReactionItem;
@@ -214,7 +76,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
     openSheet({
       title: "留言",
       content: (
-        <CheckInFeedCommentSheet
+        <CheckInCommentSheetContent
           checkInId={id}
           currentUserName={currentUserData?.data?.name ?? undefined}
           currentUserId={currentUserData?.data?.id ?? undefined}
