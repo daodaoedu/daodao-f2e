@@ -567,7 +567,7 @@ export function CommentSection({
                 handleReplySubmit(comment.id);
               }
             }}
-            placeholder={`${comment.author.name}...`}
+            placeholder="寫下你的留言…"
             rows={1}
             participants={participants}
             className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
