@@ -3,7 +3,7 @@
 import type { BatchReactionItem, IShowcaseCheckIn } from "@daodao/api";
 import { useCurrentUser } from "@daodao/api";
 import { DefaultAvatarSvg, DialogOutlineSvg, FlagOutlineSvg } from "@daodao/assets";
-import { useRouter } from "@daodao/i18n/navigation";
+import { Link, useRouter } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { MoreHorizontal } from "lucide-react";
@@ -110,13 +110,25 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
         {/* 用戶列 */}
         <div className="relative flex gap-4 items-start">
           {/* 頭像 */}
-          <div className="shrink-0 size-16">
-            <Avatar className="size-16">
-              {user?.photo_url && <AvatarImage src={user.photo_url} alt={user.name} />}
-              <AvatarFallback>
-                <DefaultAvatarSvg />
-              </AvatarFallback>
-            </Avatar>
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: stop card click */}
+          <div className="shrink-0 size-16" onClick={(e) => e.stopPropagation()}>
+            {user ? (
+              <Link href={`/users/${user.id}`} className="shrink-0">
+                <Avatar className="size-16">
+                  {user.photo_url && <AvatarImage src={user.photo_url} alt={user.name} />}
+                  <AvatarFallback>
+                    <DefaultAvatarSvg />
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            ) : (
+              <Avatar className="size-16">
+                <AvatarFallback>
+                  <DefaultAvatarSvg />
+                </AvatarFallback>
+              </Avatar>
+            )}
           </div>
 
           {/* 心情 badge（疊在頭像右下角，相對於整行容器定位） */}
