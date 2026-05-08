@@ -250,6 +250,26 @@ export default function HomePage() {
   const hasPractices = inProgressTasks.length > 0;
   const showInProgress = true;
 
+  const filterCounts = useMemo(() => {
+    const counts = {
+      [FilterStatus.all]: 0,
+      [FilterStatus.draft]: 0,
+      [FilterStatus.notStarted]: 0,
+      [FilterStatus.inProgress]: 0,
+      [FilterStatus.completed]: 0,
+    };
+    for (const task of inProgressTasks) {
+      // 與 filteredInProgressTasks 在 'all' 時的篩選邏輯保持一致：排除 completed
+      if (task.status !== FilterStatus.completed) {
+        counts[FilterStatus.all]++;
+      }
+      if (task.status in counts) {
+        counts[task.status as keyof typeof counts]++;
+      }
+    }
+    return counts;
+  }, [inProgressTasks]);
+
   return (
     <div className="relative min-h-screen">
       <Banner />
@@ -478,7 +498,7 @@ export default function HomePage() {
                                 : "bg-white border-primary-base text-primary-base"
                             )}
                           >
-                            {option.label}
+                            {option.label} {filterCounts[option.value]}
                           </button>
                         ))}
                       </div>

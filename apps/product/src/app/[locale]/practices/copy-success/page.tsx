@@ -116,10 +116,18 @@ export default function CopySuccessPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.9 }}
         >
-          <Button variant="default" className="w-full" onClick={() => router.replace(`/practices/${practiceId}?from=copy`)}>
+          <Button
+            variant="default"
+            className="w-full"
+            onClick={() => router.replace(`/practices/${practiceId}?from=copy`)}
+          >
             馬上開始
           </Button>
-          <Button variant="outline" className="w-full" onClick={() => router.replace(`/practices/${practiceId}/edit`)}>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => router.replace(`/practices/${practiceId}/edit`)}
+          >
             編輯內容
           </Button>
         </motion.div>

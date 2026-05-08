@@ -174,7 +174,11 @@ export function UserInfoCard({
 
   // 查詢是否已是夥伴（僅在已登入且非自己頁面時查詢）
   const shouldCheckConnection = clientIsAuthenticated && !clientIsOwnProfile;
-  const { data: connectionsData, isLoading: isConnectionsLoading, mutate: mutateConnections } = useSWR(
+  const {
+    data: connectionsData,
+    isLoading: isConnectionsLoading,
+    mutate: mutateConnections,
+  } = useSWR(
     shouldCheckConnection ? ["/api/v1/connections", "check", targetUserId] : null,
     () => getConnections({ limit: 100 }),
     { revalidateOnFocus: false }
@@ -183,7 +187,11 @@ export function UserInfoCard({
     if (!connectionsData?.data || !targetUserId) return false;
     return connectionsData.data.some((c: { externalId: string }) => c.externalId === targetUserId);
   }, [connectionsData, targetUserId]);
-  const { data: outgoingRequestsData, isLoading: isOutgoingLoading, mutate: mutateOutgoing } = useSWR(
+  const {
+    data: outgoingRequestsData,
+    isLoading: isOutgoingLoading,
+    mutate: mutateOutgoing,
+  } = useSWR(
     shouldCheckConnection ? "/api/v1/connections/requests/outgoing" : null,
     () => getOutgoingConnectionRequests({ limit: 100 }),
     { revalidateOnFocus: false }
