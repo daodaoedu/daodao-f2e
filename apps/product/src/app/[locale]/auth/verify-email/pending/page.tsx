@@ -19,17 +19,20 @@ const RESEND_COOLDOWN_SECONDS = 60;
 export default function VerifyEmailPendingPage() {
   const t = useTranslations("auth.verifyEmail.pending");
   const router = useRouter();
-  const { user, isAuthenticated, isEmailVerified, logout, refreshAuth } = useAuth();
+  const { user, isAuthenticated, isEmailVerified, isLoading, logout, refreshAuth } = useAuth();
   const [isResending, setIsResending] = useState(false);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
 
   // 只有當用戶已登入且 email 已驗證時，才跳轉到首頁
   // 未認證用戶可以直接瀏覽此公開頁面
+  // 必須等 isLoading=false（checkAuth 回來過）才能判斷，避免 AuthProvider 預設
+  // isEmailVerified=true 與 cached isAuthenticated=true 在 API 回來前誤觸發跳轉，
+  // 造成與 / 頁來回切換
   useEffect(() => {
-    if (isAuthenticated && isEmailVerified) {
+    if (!isLoading && isAuthenticated && isEmailVerified) {
       router.replace("/");
     }
-  }, [isAuthenticated, isEmailVerified, router]);
+  }, [isLoading, isAuthenticated, isEmailVerified, router]);
 
   // 定期檢查 email 驗證狀態
   useEffect(() => {
