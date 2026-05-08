@@ -250,6 +250,20 @@ export default function HomePage() {
   const hasPractices = inProgressTasks.length > 0;
   const showInProgress = true;
 
+  const filterCounts = useMemo(
+    () => ({
+      [FilterStatus.all]: inProgressTasks.length,
+      [FilterStatus.draft]: inProgressTasks.filter((t) => t.status === FilterStatus.draft).length,
+      [FilterStatus.notStarted]: inProgressTasks.filter((t) => t.status === FilterStatus.notStarted)
+        .length,
+      [FilterStatus.inProgress]: inProgressTasks.filter((t) => t.status === FilterStatus.inProgress)
+        .length,
+      [FilterStatus.completed]: inProgressTasks.filter((t) => t.status === FilterStatus.completed)
+        .length,
+    }),
+    [inProgressTasks]
+  );
+
   return (
     <div className="relative min-h-screen">
       <Banner />
@@ -478,7 +492,7 @@ export default function HomePage() {
                                 : "bg-white border-primary-base text-primary-base"
                             )}
                           >
-                            {option.label}
+                            {option.label} {filterCounts[option.value]}
                           </button>
                         ))}
                       </div>

@@ -86,6 +86,19 @@ export default function HomeScreen() {
   const showCompleted =
     filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
 
+  const filterCounts = useMemo(
+    () => ({
+      [FilterStatus.all]: inProgressTasks.length + completedTasks.length,
+      [FilterStatus.draft]: inProgressTasks.filter((t) => t.status === FilterStatus.draft).length,
+      [FilterStatus.notStarted]: inProgressTasks.filter((t) => t.status === FilterStatus.notStarted)
+        .length,
+      [FilterStatus.inProgress]: inProgressTasks.filter((t) => t.status === FilterStatus.inProgress)
+        .length,
+      [FilterStatus.completed]: completedTasks.length,
+    }),
+    [inProgressTasks, completedTasks]
+  );
+
   const dashboardStats = useMemo(
     () => [
       {
@@ -192,6 +205,7 @@ export default function HomeScreen() {
                 showCompleted={showCompleted}
                 completedTasks={completedTasks}
                 isEmpty={false}
+                counts={filterCounts}
               />
             )}
           </YStack>

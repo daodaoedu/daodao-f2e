@@ -1,8 +1,8 @@
 "use client";
 
+import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
-import { useRouter } from "@daodao/i18n/navigation";
 import { useState } from "react";
 import { mutate as globalMutate } from "swr";
 import { NotificationType } from "@/constants/notification-type";
