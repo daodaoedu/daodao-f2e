@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import {
   AddTaskFAB,
   DashboardHeader,
@@ -173,6 +174,31 @@ export default function HomePage() {
     targetType: "checkin",
     targetIds: checkinIds,
   });
+
+  // Scroll position save/restore
+  const scrollYStorageRef = useRef(getStorage<number>(StorageEnum.HomeScrollY));
+  const scrollRestoredRef = useRef(false);
+
+  // Save scroll position when leaving this page
+  useEffect(() => {
+    const storage = scrollYStorageRef.current;
+    return () => {
+      storage.set(window.scrollY);
+    };
+  }, []);
+
+  // Restore scroll position after feed items load (handles back navigation)
+  useEffect(() => {
+    if (scrollRestoredRef.current || orderedFeedItems.length === 0) return;
+    const storage = scrollYStorageRef.current;
+    const savedY = storage.get();
+    if (!savedY) return;
+    storage.remove();
+    scrollRestoredRef.current = true;
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: savedY, behavior: "instant" });
+    });
+  }, [orderedFeedItems]);
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
