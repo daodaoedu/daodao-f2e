@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import {
   AddTaskFAB,
   DashboardHeader,
@@ -173,6 +174,39 @@ export default function HomePage() {
     targetType: "checkin",
     targetIds: checkinIds,
   });
+
+  // Scroll position save/restore
+  const scrollYStorageRef = useRef(getStorage<number>(StorageEnum.HomeScrollY));
+  const scrollRestoredRef = useRef(false);
+
+  // Save scroll position when leaving this page
+  useEffect(() => {
+    const storage = scrollYStorageRef.current;
+    return () => {
+      storage.set(window.scrollY);
+    };
+  }, []);
+
+  // Restore scroll position after feed items load (handles back navigation).
+  // Infinite scroll: if saved Y is past current content height, scrollTo clamps short.
+  // Keep re-attempting on each items batch until target reached or no more pages.
+  useEffect(() => {
+    if (scrollRestoredRef.current || orderedFeedItems.length === 0) return;
+    const storage = scrollYStorageRef.current;
+    const savedY = storage.get();
+    if (savedY === undefined) {
+      scrollRestoredRef.current = true;
+      return;
+    }
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: savedY, behavior: "instant" });
+      const reachedTarget = Math.abs(window.scrollY - savedY) < 5;
+      if (reachedTarget || !hasMore) {
+        storage.remove();
+        scrollRestoredRef.current = true;
+      }
+    });
+  }, [orderedFeedItems, hasMore]);
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
