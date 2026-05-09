@@ -19,7 +19,10 @@ export default async function middleware(request: NextRequest) {
   const response = await i18nMiddleware(request);
 
   const location = response.headers.get("location");
-  if (location?.includes(":3001")) {
+  // Local dev runs on :3001 directly, so :3001 in Location is legitimate there.
+  // Only strip when the request host is not :3001 (i.e., behind a proxy in prod).
+  const isLocalDevPort = (request.headers.get("host") ?? "").endsWith(":3001");
+  if (location?.includes(":3001") && !isLocalDevPort) {
     const cleaned = location.replace(INTERNAL_PORT_RE, "");
     response.headers.set("location", cleaned);
 
