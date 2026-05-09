@@ -175,38 +175,45 @@ export default function HomePage() {
     targetIds: checkinIds,
   });
 
-  // Scroll position save/restore
-  const scrollYStorageRef = useRef(getStorage<number>(StorageEnum.HomeScrollY));
-  const scrollRestoredRef = useRef(false);
+  // Feed anchor save/restore.
+  // Why ID instead of scrollY: Next.js App Router keeps the page in Router Cache,
+  // so unmount cleanup is unreliable; image-induced layout shifts also break pixel
+  // restore. Anchor by clicked card id is robust to both.
+  const feedAnchorStorageRef = useRef(getStorage<string>(StorageEnum.HomeFeedAnchor));
+  const feedRestoredRef = useRef(false);
 
-  // Save scroll position when leaving this page
-  useEffect(() => {
-    const storage = scrollYStorageRef.current;
-    return () => {
-      storage.set(window.scrollY);
-    };
-  }, []);
+  // Capture-phase delegation: parent fires before any child stopPropagation,
+  // so reactions/comment buttons that nest inside cards still record the card id.
+  const handleFeedClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = (e.target as HTMLElement).closest("[data-feed-id]");
+    const id = card?.getAttribute("data-feed-id");
+    if (id) feedAnchorStorageRef.current.set(id);
+  };
 
-  // Restore scroll position after feed items load (handles back navigation).
-  // Infinite scroll: if saved Y is past current content height, scrollTo clamps short.
-  // Keep re-attempting on each items batch until target reached or no more pages.
+  // Restore: find the clicked card and scrollIntoView. If not yet loaded,
+  // pull next page and retry on the next items batch.
   useEffect(() => {
-    if (scrollRestoredRef.current || orderedFeedItems.length === 0) return;
-    const storage = scrollYStorageRef.current;
-    const savedY = storage.get();
-    if (savedY === undefined) {
-      scrollRestoredRef.current = true;
+    if (feedRestoredRef.current || orderedFeedItems.length === 0) return;
+    const storage = feedAnchorStorageRef.current;
+    const anchor = storage.get();
+    if (!anchor) {
+      feedRestoredRef.current = true;
       return;
     }
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: savedY, behavior: "instant" });
-      const reachedTarget = Math.abs(window.scrollY - savedY) < 5;
-      if (reachedTarget || !hasMore) {
-        storage.remove();
-        scrollRestoredRef.current = true;
-      }
-    });
-  }, [orderedFeedItems, hasMore]);
+    const element = document.querySelector(`[data-feed-id="${CSS.escape(anchor)}"]`);
+    if (element) {
+      element.scrollIntoView({ block: "center", behavior: "instant" });
+      storage.remove();
+      feedRestoredRef.current = true;
+      return;
+    }
+    if (!hasMore) {
+      storage.remove();
+      feedRestoredRef.current = true;
+      return;
+    }
+    loadMore();
+  }, [orderedFeedItems, hasMore, loadMore]);
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -360,7 +367,7 @@ export default function HomePage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3" onClickCapture={handleFeedClickCapture}>
                   {orderedFeedItems.map((feedItem, index) => {
                     if (feedItem.type === "activity") {
                       return (
@@ -387,7 +394,10 @@ export default function HomePage() {
                         )?.latestActorName ??
                         checkin.reactions?.find((r) => r.latestActorName)?.latestActorName;
                       return (
-                        <div key={`checkin-${checkin.id}-${feedItem.feed_reason}-${index}`}>
+                        <div
+                          key={`checkin-${checkin.id}-${feedItem.feed_reason}-${index}`}
+                          data-feed-id={`checkin-${checkin.id}`}
+                        >
                           {showFeedLabel &&
                             feedItem.feed_reason &&
                             !(
@@ -427,7 +437,10 @@ export default function HomePage() {
                           ?.latestActorName ??
                         practice.reactions?.find((r) => r.latestActorName)?.latestActorName;
                       return (
-                        <div key={`practice-${practice.id}-${feedItem.feed_reason}-${index}`}>
+                        <div
+                          key={`practice-${practice.id}-${feedItem.feed_reason}-${index}`}
+                          data-feed-id={`practice-${practice.id}`}
+                        >
                           {showFeedLabel &&
                             feedItem.feed_reason &&
                             !(feedItem.feed_reason === "cheered" && isBatchReactionsLoading) && (
