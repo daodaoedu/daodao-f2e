@@ -187,18 +187,26 @@ export default function HomePage() {
     };
   }, []);
 
-  // Restore scroll position after feed items load (handles back navigation)
+  // Restore scroll position after feed items load (handles back navigation).
+  // Infinite scroll: if saved Y is past current content height, scrollTo clamps short.
+  // Keep re-attempting on each items batch until target reached or no more pages.
   useEffect(() => {
     if (scrollRestoredRef.current || orderedFeedItems.length === 0) return;
     const storage = scrollYStorageRef.current;
     const savedY = storage.get();
-    if (!savedY) return;
-    storage.remove();
-    scrollRestoredRef.current = true;
+    if (savedY === undefined) {
+      scrollRestoredRef.current = true;
+      return;
+    }
     requestAnimationFrame(() => {
       window.scrollTo({ top: savedY, behavior: "instant" });
+      const reachedTarget = Math.abs(window.scrollY - savedY) < 5;
+      if (reachedTarget || !hasMore) {
+        storage.remove();
+        scrollRestoredRef.current = true;
+      }
     });
-  }, [orderedFeedItems]);
+  }, [orderedFeedItems, hasMore]);
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
