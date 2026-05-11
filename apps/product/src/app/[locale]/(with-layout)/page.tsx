@@ -49,7 +49,24 @@ export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<TabType>("inspire");
+  const [activeTab, setActiveTab] = useState<TabType>(
+    (searchParams.get("tab") as TabType) === "mine" ? "mine" : "inspire"
+  );
+
+  const handleTabChange = useCallback(
+    (tab: TabType) => {
+      setActiveTab(tab);
+      const params = new URLSearchParams(searchParams.toString());
+      if (tab === "inspire") {
+        params.delete("tab");
+      } else {
+        params.set("tab", tab);
+      }
+      const qs = params.toString();
+      router.replace(qs ? `?${qs}` : "?", { scroll: false });
+    },
+    [router, searchParams]
+  );
   const [searchValue, setSearchValue] = useState(searchParams.get("keyword") ?? "");
   const [filters, setFilters] = useState<ShowcaseFilterState>({
     tags: searchParams.getAll("tags[]"),
@@ -224,7 +241,7 @@ export default function HomePage() {
           <div className="flex border-b border-[#E5E7EB] mb-4">
             <button
               type="button"
-              onClick={() => setActiveTab("inspire")}
+              onClick={() => handleTabChange("inspire")}
               className={cn(
                 "flex-1 py-2 text-sm font-medium transition-all",
                 activeTab === "inspire"
@@ -236,7 +253,7 @@ export default function HomePage() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab("mine")}
+              onClick={() => handleTabChange("mine")}
               className={cn(
                 "flex-1 py-2 text-sm font-medium transition-all",
                 activeTab === "mine"
