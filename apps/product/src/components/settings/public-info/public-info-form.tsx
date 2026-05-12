@@ -27,7 +27,7 @@ export const PublicInfoForm = () => {
 
   // 使用 search 參數精確搜尋用戶的城市，以獲取 countryCode
   const userLocation = userData?.data?.location;
-  const { data: citiesData } = useCities({
+  const { data: citiesData, isLoading: isCitiesLoading } = useCities({
     search: userLocation || undefined,
     locale: locale === "en" ? "en" : "zh-TW",
   });
@@ -62,7 +62,8 @@ export const PublicInfoForm = () => {
 
       // 若 user 有設定 location，需等 citiesData 載入後才能解出 countryCode
       // 避免先以 country:"" 重置，導致城市 select 顯示空白
-      if (user.location && !citiesData?.data) return;
+      if (user.location && isCitiesLoading) return;
+      
 
       // 根據 location 找到對應的 countryCode
       let countryCode = "";
