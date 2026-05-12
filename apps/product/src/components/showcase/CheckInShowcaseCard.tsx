@@ -6,6 +6,7 @@ import { DefaultAvatarSvg, DialogOutlineSvg, FlagOutlineSvg } from "@daodao/asse
 import { Link, useRouter } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
+import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { MoreHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
