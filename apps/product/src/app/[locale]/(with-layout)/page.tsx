@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import {
   AddTaskFAB,
   DashboardHeader,
@@ -174,6 +175,46 @@ export default function HomePage() {
     targetIds: checkinIds,
   });
 
+  // Feed anchor save/restore.
+  // Why ID instead of scrollY: Next.js App Router keeps the page in Router Cache,
+  // so unmount cleanup is unreliable; image-induced layout shifts also break pixel
+  // restore. Anchor by clicked card id is robust to both.
+  const feedAnchorStorageRef = useRef(getStorage<string>(StorageEnum.HomeFeedAnchor));
+  const feedRestoredRef = useRef(false);
+
+  // Capture-phase delegation: parent fires before any child stopPropagation,
+  // so reactions/comment buttons that nest inside cards still record the card id.
+  const handleFeedClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = (e.target as HTMLElement).closest("[data-feed-id]");
+    const id = card?.getAttribute("data-feed-id");
+    if (id) feedAnchorStorageRef.current.set(id);
+  };
+
+  // Restore: find the clicked card and scrollIntoView. If not yet loaded,
+  // pull next page and retry on the next items batch.
+  useEffect(() => {
+    if (feedRestoredRef.current || orderedFeedItems.length === 0) return;
+    const storage = feedAnchorStorageRef.current;
+    const anchor = storage.get();
+    if (!anchor) {
+      feedRestoredRef.current = true;
+      return;
+    }
+    const element = document.querySelector(`[data-feed-id="${CSS.escape(anchor)}"]`);
+    if (element) {
+      element.scrollIntoView({ block: "center", behavior: "instant" });
+      storage.remove();
+      feedRestoredRef.current = true;
+      return;
+    }
+    if (!hasMore) {
+      storage.remove();
+      feedRestoredRef.current = true;
+      return;
+    }
+    loadMore();
+  }, [orderedFeedItems, hasMore, loadMore]);
+
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -250,6 +291,26 @@ export default function HomePage() {
   const hasPractices = inProgressTasks.length > 0;
   const showInProgress = true;
 
+  const filterCounts = useMemo(() => {
+    const counts = {
+      [FilterStatus.all]: 0,
+      [FilterStatus.draft]: 0,
+      [FilterStatus.notStarted]: 0,
+      [FilterStatus.inProgress]: 0,
+      [FilterStatus.completed]: 0,
+    };
+    for (const task of inProgressTasks) {
+      // 與 filteredInProgressTasks 在 'all' 時的篩選邏輯保持一致：排除 completed
+      if (task.status !== FilterStatus.completed) {
+        counts[FilterStatus.all]++;
+      }
+      if (task.status in counts) {
+        counts[task.status as keyof typeof counts]++;
+      }
+    }
+    return counts;
+  }, [inProgressTasks]);
+
   return (
     <div className="relative min-h-screen">
       <Banner />
@@ -306,7 +367,7 @@ export default function HomePage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3" onClickCapture={handleFeedClickCapture}>
                   {orderedFeedItems.map((feedItem, index) => {
                     if (feedItem.type === "activity") {
                       return (
@@ -333,7 +394,10 @@ export default function HomePage() {
                         )?.latestActorName ??
                         checkin.reactions?.find((r) => r.latestActorName)?.latestActorName;
                       return (
-                        <div key={`checkin-${checkin.id}-${feedItem.feed_reason}-${index}`}>
+                        <div
+                          key={`checkin-${checkin.id}-${feedItem.feed_reason}-${index}`}
+                          data-feed-id={`checkin-${checkin.id}`}
+                        >
                           {showFeedLabel &&
                             feedItem.feed_reason &&
                             !(
@@ -373,7 +437,10 @@ export default function HomePage() {
                           ?.latestActorName ??
                         practice.reactions?.find((r) => r.latestActorName)?.latestActorName;
                       return (
-                        <div key={`practice-${practice.id}-${feedItem.feed_reason}-${index}`}>
+                        <div
+                          key={`practice-${practice.id}-${feedItem.feed_reason}-${index}`}
+                          data-feed-id={`practice-${practice.id}`}
+                        >
                           {showFeedLabel &&
                             feedItem.feed_reason &&
                             !(feedItem.feed_reason === "cheered" && isBatchReactionsLoading) && (
@@ -478,7 +545,7 @@ export default function HomePage() {
                                 : "bg-white border-primary-base text-primary-base"
                             )}
                           >
-                            {option.label}
+                            {option.label} {filterCounts[option.value]}
                           </button>
                         ))}
                       </div>
