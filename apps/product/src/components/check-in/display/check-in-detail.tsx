@@ -65,14 +65,14 @@ interface ICheckInDetailProps {
 // Helpers
 // ============================================================================
 
-function formatCommentTime(createdAt?: string): string {
+export function formatCommentTime(createdAt?: string): string {
   if (!createdAt) return "剛剛";
   const parsed = parseISO(createdAt);
   if (!isValid(parsed)) return "剛剛";
   return formatDistanceToNow(parsed, { addSuffix: true, locale: zhTW });
 }
 
-type ApiCommentNode = {
+export type ApiCommentNode = {
   id: number | string;
   userId?: number | null;
   content?: string | null;
@@ -86,11 +86,11 @@ type ApiCommentNode = {
   } | null;
 };
 
-function isApiCommentNode(v: unknown): v is ApiCommentNode {
+export function isApiCommentNode(v: unknown): v is ApiCommentNode {
   return typeof v === "object" && v !== null && "id" in v;
 }
 
-function mapReply(reply: ApiCommentNode): ICommentReply {
+export function mapReply(reply: ApiCommentNode): ICommentReply {
   return {
     id: String(reply.id),
     author: {
@@ -105,7 +105,7 @@ function mapReply(reply: ApiCommentNode): ICommentReply {
   };
 }
 
-function mapComment(comment: ApiCommentNode): IComment {
+export function mapComment(comment: ApiCommentNode): IComment {
   const rawReplies = Array.isArray(comment.replies) ? comment.replies : [];
   const mappedReplies = rawReplies.filter(isApiCommentNode).map(mapReply);
   return {
@@ -127,14 +127,14 @@ function mapComment(comment: ApiCommentNode): IComment {
 // CheckInCommentSheetContent — owns its own SWR state so it stays live in Sheet
 // ============================================================================
 
-interface ICheckInCommentSheetContentProps {
-  checkInId: string;
-  currentUserName?: string;
-  currentUserId?: string;
-  currentUserPhotoURL?: string;
+export interface ICheckInCommentSheetContentProps {
+  readonly checkInId: string;
+  readonly currentUserName?: string;
+  readonly currentUserId?: string;
+  readonly currentUserPhotoURL?: string;
 }
 
-function CheckInCommentSheetContent({
+export function CheckInCommentSheetContent({
   checkInId,
   currentUserName,
   currentUserId,

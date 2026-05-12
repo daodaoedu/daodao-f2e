@@ -8,11 +8,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avata
 import { Button } from "@daodao/ui/components/button";
 import { MoreHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
 import { CheckInCard } from "@/components/check-in/display/check-in-card";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import type { ApiMoodType } from "@/constants/mood";
 import { MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCardReactions } from "@/hooks/use-card-reactions";
+
 
 type CheckInShowcaseCardProps = IShowcaseCheckIn & {
   batchReactionData?: BatchReactionItem;
@@ -36,6 +38,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
   } = props;
 
   const router = useRouter();
+  const { open: openSheet } = useSheetManager();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +69,27 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
 
   const handleCardClick = () => {
     router.push(`/practices/${practice.id}/check-ins/${id}`);
+  };
+
+  const handleOpenComments = () => {
+    openSheet({
+      title: "留言",
+      content: (
+        <CheckInCommentSheetContent
+          checkInId={id}
+          currentUserName={currentUserData?.data?.name ?? undefined}
+          currentUserId={currentUserData?.data?.id ?? undefined}
+          currentUserPhotoURL={
+            (currentUserData?.data as { photoURL?: string; photoUrl?: string } | undefined)?.photoURL ??
+            (currentUserData?.data as { photoURL?: string; photoUrl?: string } | undefined)?.photoUrl ??
+            undefined
+          }
+        />
+      ),
+      dismissible: true,
+      closeOnEscape: true,
+      showCloseButton: true,
+    });
   };
 
   return (
@@ -201,12 +225,16 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
             firstReactorName={firstReactorName}
           />
 
-          <div className="flex items-center gap-1.5 text-light-gray">
+          <button
+            type="button"
+            onClick={handleOpenComments}
+            className="flex items-center gap-1.5 text-light-gray hover:text-text-dark transition-colors cursor-pointer"
+          >
             <DialogOutlineSvg className="size-6" />
             {(comment_count ?? 0) > 0 && (
               <span className="text-sm font-medium">{comment_count}</span>
             )}
-          </div>
+          </button>
         </div>
 
         {/* 留言預覽 */}
