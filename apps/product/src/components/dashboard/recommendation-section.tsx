@@ -103,11 +103,6 @@ function RecommendationCard({ card, isHiding, onDislike, onLike }: Recommendatio
         }
       />
 
-      {/* Reason block */}
-      <div className="bg-primary-palest text-primary-base text-xs px-3 py-3 rounded-t-[11px]">
-        {card.matchReasonText}
-      </div>
-
       {/* Card body */}
       <div className="flex flex-col justify-between flex-1">
         <div className="flex flex-col gap-3 p-4 pb-0">
