@@ -22,7 +22,12 @@ const isNativeShareOptions = (value: unknown): value is NativeShareOptions => {
 export function dataUrlToFile(dataUrl: string, filename: string): File | null {
   try {
     const [metadata = "", content = ""] = dataUrl.split(",");
-    const mimeType = metadata.match(/:(.*?);/)?.[1] || "image/png";
+    const mimeTypeStart = metadata.indexOf(":");
+    const mimeTypeEnd = metadata.indexOf(";");
+    const mimeType =
+      mimeTypeStart >= 0 && mimeTypeEnd > mimeTypeStart
+        ? metadata.slice(mimeTypeStart + 1, mimeTypeEnd)
+        : "image/png";
     const byteString = atob(content);
     const bytes = new Uint8Array(byteString.length);
 

@@ -109,6 +109,21 @@ function isApiCommentNode(comment: unknown): comment is IApiCommentNode {
   return true;
 }
 
+function isMentionCandidateWithNumericId(
+  candidate: unknown
+): candidate is MentionCandidate & { numericUserId: number } {
+  return (
+    typeof candidate === "object" &&
+    candidate !== null &&
+    "userId" in candidate &&
+    "numericUserId" in candidate &&
+    "name" in candidate &&
+    typeof candidate.userId === "string" &&
+    typeof candidate.numericUserId === "number" &&
+    typeof candidate.name === "string"
+  );
+}
+
 function formatCommentTime(createdAt?: string): string {
   if (!createdAt) {
     return "剛剛";
@@ -299,18 +314,7 @@ export default function PracticeDetailPage() {
     }
 
     return rawCandidates
-      .filter((candidate): candidate is MentionCandidate & { numericUserId: number } => {
-        return (
-          typeof candidate === "object" &&
-          candidate !== null &&
-          "userId" in candidate &&
-          "numericUserId" in candidate &&
-          "name" in candidate &&
-          typeof candidate.userId === "string" &&
-          typeof candidate.numericUserId === "number" &&
-          typeof candidate.name === "string"
-        );
-      })
+      .filter(isMentionCandidateWithNumericId)
       .map((candidate) => ({
         userId: candidate.userId,
         numericUserId: candidate.numericUserId,

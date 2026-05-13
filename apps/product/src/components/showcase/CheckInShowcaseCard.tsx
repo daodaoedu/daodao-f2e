@@ -27,6 +27,11 @@ type ShowcaseUserProfile = {
   custom_id?: string | null;
 };
 
+type CurrentUserProfile = {
+  photoURL?: string;
+  photoUrl?: string;
+};
+
 function getUserIslandHref(user?: ShowcaseUserProfile | null) {
   const identifier = user?.customId || user?.custom_id || user?.id;
   return identifier ? `/users/${identifier}` : null;
@@ -84,6 +89,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
     });
 
   const { data: currentUserData } = useCurrentUser();
+  const currentUserProfile = currentUserData?.data as CurrentUserProfile | undefined;
   const isOwnCard = !!currentUserData?.data?.id && user?.id === currentUserData.data.id;
 
   const handleCardClick = () => {
@@ -98,13 +104,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
           checkInId={id}
           currentUserName={currentUserData?.data?.name ?? undefined}
           currentUserId={currentUserData?.data?.id ?? undefined}
-          currentUserPhotoURL={
-            (currentUserData?.data as { photoURL?: string; photoUrl?: string } | undefined)
-              ?.photoURL ??
-            (currentUserData?.data as { photoURL?: string; photoUrl?: string } | undefined)
-              ?.photoUrl ??
-            undefined
-          }
+          currentUserPhotoURL={currentUserProfile?.photoURL ?? currentUserProfile?.photoUrl}
         />
       ),
       dismissible: true,
