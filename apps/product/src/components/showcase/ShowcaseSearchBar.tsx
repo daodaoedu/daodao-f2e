@@ -1,6 +1,7 @@
 "use client";
 
 import { useShowcaseSuggestions } from "@daodao/api";
+import { Input } from "@daodao/ui/components/input";
 import { cn } from "@daodao/ui/lib/utils";
 import { Search, X } from "lucide-react";
 import { useRef, useState } from "react";
@@ -28,10 +29,11 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      onSearch(value);
-      inputRef.current?.blur();
-    }
+    if (e.key !== "Enter" || e.nativeEvent.isComposing) return;
+
+    e.preventDefault();
+    onSearch(value);
+    inputRef.current?.blur();
   };
 
   const handleSuggestionClick = (keyword: string) => {
@@ -49,12 +51,12 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
         )}
       >
         <Search className="size-4 text-text-dark/40 shrink-0" />
-        <input
+        <Input
           ref={inputRef}
           type="text"
           value={value}
           placeholder="搜尋靈感"
-          className="flex-1 text-sm text-text-dark outline-none bg-transparent placeholder:text-text-dark/40"
+          className="h-auto flex-1 rounded-none border-0 bg-transparent px-0 py-0 text-sm text-text-dark outline-none placeholder:text-text-dark/40 hover:border-0 focus-visible:border-0 focus-visible:px-0 focus-visible:py-0 focus-visible:ring-0"
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 150)}
           onChange={(e) => onChange(e.target.value)}

@@ -6,7 +6,6 @@ import {
   unfollowTarget,
   useComments,
   usePracticeById,
-  useReactionsList,
 } from "@daodao/api";
 import {
   ChartColumnIncreasingSvg,
@@ -67,8 +66,8 @@ export function PracticeShowcaseCard({
   frequencyMaxDays,
   sessionDurationMinutes,
   commentCount = 0,
-  batchReactionData: _batchReactionData,
-  onReactionMutate: _onReactionMutate,
+  batchReactionData,
+  onReactionMutate,
 }: PracticeShowcaseCardProps) {
   const startFmt = formatShowcaseDate(startDate);
   const endFmt = formatShowcaseDate(endDate);
@@ -81,7 +80,6 @@ export function PracticeShowcaseCard({
   const router = useRouter();
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { data: practiceData } = usePracticeById(id);
-  const { data: reactionsListData } = useReactionsList({ targetType: "practice", targetId: id });
   const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
 
   useEffect(() => {
@@ -118,15 +116,13 @@ export function PracticeShowcaseCard({
 
   const handleOpenBrowseActivity = () => {
     setMenuOpen(false);
-    const followers: IBrowseActivityFollower[] = (reactionsListData?.data?.items ?? []).map(
-      (item) => ({
-        id: item.userId,
-        name: item.name,
-        photoURL: item.photoURL ?? undefined,
-        time: formatRelativeTime(item.reactedAt),
-        reaction: item.reactionType as ReactionTypeType,
-      })
-    );
+    const followers: IBrowseActivityFollower[] = reactionItems.map((item) => ({
+      id: item.userId,
+      name: item.name,
+      photoURL: item.photoURL ?? undefined,
+      time: formatRelativeTime(item.reactedAt),
+      reaction: item.reactionType as ReactionTypeType,
+    }));
     openSheet({
       title: "瀏覽活動",
       content: (
@@ -145,10 +141,16 @@ export function PracticeShowcaseCard({
     });
   };
 
-  const { selectedReactions, totalCount, displayReactions, handleToggle } = useCardReactions(
-    "practice",
-    id
-  );
+  const {
+    selectedReactions,
+    totalCount,
+    displayReactions,
+    handleToggle,
+    reactionItems,
+    firstReactorName,
+  } = useCardReactions("practice", id, batchReactionData, onReactionMutate, {
+    disableIndividualFetch: true,
+  });
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
@@ -292,7 +294,7 @@ export function PracticeShowcaseCard({
           variant="summary"
           totalCount={totalCount}
           displayReactions={displayReactions}
-          firstReactorName={reactionsListData?.data?.items[0]?.name}
+          firstReactorName={firstReactorName}
         />
 
         <Link

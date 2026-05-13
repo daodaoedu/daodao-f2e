@@ -19,6 +19,7 @@ import {
   REACTION_CONFIG,
   type ReactionTypeType,
 } from "@/constants/reaction-type";
+import { tokenizeMentionContent } from "./comment-mentions";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
 const PREVIEW_COUNT = 2;
@@ -81,22 +82,39 @@ function getAuthorIslandHref(author: ICommentAuthor) {
 // @mention helpers
 // ============================================================================
 
-/** Renders comment content with @mention tokens highlighted */
-function renderContent(content: string) {
-  const parts = content.split(/(@\S+)/g);
+/** Renders comment content with @mention tokens highlighted and linked */
+function renderContent(content: string, participants: MentionCandidate[]) {
+  const segments = tokenizeMentionContent(content, participants);
   return (
     <>
-      {parts.map((part, i) =>
-        part.startsWith("@") ? (
-          // biome-ignore lint/suspicious/noArrayIndexKey: static split segments
+      {segments.map((segment, i) => {
+        if (segment.type === "text") {
+          // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
+          return <span key={i}>{segment.text}</span>;
+        }
+
+        const className = "text-logo-cyan font-medium hover:underline";
+        if (segment.href) {
+          return (
+            <CustomLink
+              // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
+              key={i}
+              href={segment.href}
+              className={className}
+              aria-label={`前往 ${segment.text.slice(1)} 的小島`}
+            >
+              {segment.text}
+            </CustomLink>
+          );
+        }
+
+        return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
           <span key={i} className="text-logo-cyan font-medium">
-            {part}
+            {segment.text}
           </span>
-        ) : (
-          // biome-ignore lint/suspicious/noArrayIndexKey: static split segments
-          <span key={i}>{part}</span>
-        )
-      )}
+        );
+      })}
     </>
   );
 }
@@ -359,7 +377,7 @@ function CommentBubble({
           </div>
         ) : (
           <p className={cn("text-[#295E5C] leading-5 whitespace-pre-wrap", "text-sm")}>
-            {renderContent(comment.content)}
+            {renderContent(comment.content, participants)}
           </p>
         )}
 

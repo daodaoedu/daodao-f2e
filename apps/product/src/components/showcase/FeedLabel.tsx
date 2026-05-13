@@ -16,7 +16,7 @@ export function FeedLabel({
 }: FeedLabelProps) {
   if (feedReason === "new_practice") {
     return (
-      <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mb-1.5 px-1">
+      <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mt-4 mb-4 px-1">
         <ThumbsUp className="size-3.5 shrink-0" />
         <span>{userName ?? "某人"} 發布了新實踐</span>
       </div>
@@ -25,7 +25,7 @@ export function FeedLabel({
 
   if (feedReason === "new_release") {
     return (
-      <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mb-1.5 px-1">
+      <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mt-4 mb-4 px-1">
         <Rss className="size-3.5 shrink-0" />
         <span>最新發布</span>
       </div>
@@ -34,7 +34,7 @@ export function FeedLabel({
 
   if (feedReason === "checked_in") {
     return (
-      <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mb-1.5 px-1">
+      <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mt-4 mb-4 px-1">
         <CalendarCheck className="size-3.5 shrink-0" />
         <span>
           {userName ?? "某人"} 在 {practiceTitle ?? "實踐"} 打卡
@@ -45,7 +45,7 @@ export function FeedLabel({
 
   if (feedReason === "cheered") {
     return (
-      <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mb-1.5 px-1">
+      <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mt-4 mb-4 px-1">
         <ThumbsUp className="size-3.5 shrink-0" />
         <span>{latestActorName ?? "某人"} 表達了加油</span>
       </div>

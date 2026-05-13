@@ -14,16 +14,17 @@ export function useCardReactions(
   targetType: ReactionTargetType,
   targetId: string,
   prefetchedData?: BatchReactionItem,
-  onMutate?: () => void
+  onMutate?: () => void,
+  options?: { disableIndividualFetch?: boolean }
 ) {
-  const hasBatch = !!prefetchedData;
+  const shouldFetchIndividual = !prefetchedData && !options?.disableIndividualFetch;
   const { data: reactionsData, mutate } = useReactions(
     { targetType, targetId },
-    { enabled: !hasBatch }
+    { enabled: shouldFetchIndividual }
   );
   const { data: reactionsListData } = useReactionsList(
     { targetType, targetId },
-    { enabled: !hasBatch }
+    { enabled: shouldFetchIndividual }
   );
   const [, startTransition] = useTransition();
 
