@@ -10,10 +10,10 @@ import {
 } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getStorage, StorageEnum } from "@daodao/shared";
 import {
   AddTaskFAB,
   DashboardHeader,
@@ -106,7 +106,7 @@ export default function HomePage() {
         params.set("tab", tab);
       }
       const qs = params.toString();
-      router.replace(qs ? `?${qs}` : "?", { scroll: false });
+      router.replace(qs ? `?${qs}` : "/", { scroll: false });
     },
     [router, searchParams]
   );
@@ -126,7 +126,7 @@ export default function HomePage() {
         params.append("tags[]", tag);
       }
       const qs = params.toString();
-      router.replace(qs ? `?${qs}` : "?", { scroll: false });
+      router.replace(qs ? `?${qs}` : "/", { scroll: false });
     },
     [router]
   );
