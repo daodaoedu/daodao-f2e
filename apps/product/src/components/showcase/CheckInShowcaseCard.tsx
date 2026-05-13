@@ -4,18 +4,17 @@ import type { BatchReactionItem, IShowcaseCheckIn } from "@daodao/api";
 import { useCurrentUser } from "@daodao/api";
 import { DefaultAvatarSvg, DialogOutlineSvg, FlagOutlineSvg } from "@daodao/assets";
 import { Link, useRouter } from "@daodao/i18n/navigation";
+import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
-import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { MoreHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
 import { CheckInCard } from "@/components/check-in/display/check-in-card";
+import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import type { ApiMoodType } from "@/constants/mood";
 import { MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCardReactions } from "@/hooks/use-card-reactions";
-
 
 type CheckInShowcaseCardProps = IShowcaseCheckIn & {
   batchReactionData?: BatchReactionItem;
@@ -81,8 +80,10 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
           currentUserName={currentUserData?.data?.name ?? undefined}
           currentUserId={currentUserData?.data?.id ?? undefined}
           currentUserPhotoURL={
-            (currentUserData?.data as { photoURL?: string; photoUrl?: string } | undefined)?.photoURL ??
-            (currentUserData?.data as { photoURL?: string; photoUrl?: string } | undefined)?.photoUrl ??
+            (currentUserData?.data as { photoURL?: string; photoUrl?: string } | undefined)
+              ?.photoURL ??
+            (currentUserData?.data as { photoURL?: string; photoUrl?: string } | undefined)
+              ?.photoUrl ??
             undefined
           }
         />
@@ -240,12 +241,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
 
         {/* 留言預覽 */}
         {comment_preview && comment_preview.length > 0 && (
-          // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
-          // biome-ignore lint/a11y/noStaticElementInteractions: stop card click
-          <div
-            className="flex flex-col gap-2 border-t border-basic-200 pt-3"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="flex flex-col gap-2 border-t border-basic-200 pt-3">
             {comment_preview.map((comment) => (
               <div key={comment.id} className="flex items-start gap-2">
                 <Avatar className="size-6 shrink-0 mt-0.5">

@@ -6,6 +6,34 @@ interface ShareAPIProps {
   text?: string;
   nativeText?: string;
   hashtag?: string;
+  files?: File[];
+}
+
+interface NativeShareOptions {
+  files?: File[];
+  nativeText?: string;
+}
+
+const isNativeShareOptions = (value: unknown): value is NativeShareOptions => {
+  if (typeof value !== "object" || value === null) return false;
+  return "files" in value || "nativeText" in value;
+};
+
+export function dataUrlToFile(dataUrl: string, filename: string): File | null {
+  try {
+    const [metadata = "", content = ""] = dataUrl.split(",");
+    const mimeType = metadata.match(/:(.*?);/)?.[1] || "image/png";
+    const byteString = atob(content);
+    const bytes = new Uint8Array(byteString.length);
+
+    for (let i = 0; i < byteString.length; i++) {
+      bytes[i] = byteString.charCodeAt(i);
+    }
+
+    return new File([bytes], filename, { type: mimeType });
+  } catch {
+    return null;
+  }
 }
 
 export function getShareAPI({
@@ -14,17 +42,40 @@ export function getShareAPI({
   text = "",
   nativeText = text,
   hashtag = "",
+  files = [],
 }: ShareAPIProps) {
   if (typeof window === "undefined") return {};
 
-  const formattedUrl = url.startsWith("https://") ? url : `${window.location.origin}${url}`;
+  const formattedUrl = new URL(url, window.location.origin).toString();
 
   const openInNewTab = (_url: string) => () => {
     window.open(_url, "_blank", "noopener,noreferrer");
   };
 
-  const nativeShare = () => {
-    navigator.share({ title, text: nativeText, url: formattedUrl });
+  const nativeShare = async (options?: unknown) => {
+    if (!navigator.share) return false;
+
+    const shareOptions = isNativeShareOptions(options) ? options : {};
+    const shareFiles = shareOptions.files ?? files;
+    const shareText = shareOptions.nativeText ?? nativeText;
+    const fileShareData: ShareData = {
+      title,
+      text: shareText,
+      url: formattedUrl,
+      files: shareFiles,
+    };
+
+    if (
+      shareFiles.length > 0 &&
+      navigator.canShare?.({ files: shareFiles }) &&
+      navigator.canShare(fileShareData)
+    ) {
+      await navigator.share(fileShareData);
+      return true;
+    }
+
+    await navigator.share({ title, text: shareText, url: formattedUrl });
+    return true;
   };
 
   const facebookShare = openInNewTab(
@@ -32,7 +83,7 @@ export function getShareAPI({
   );
 
   const lineShare = openInNewTab(
-    `https://line.me/R/msg/text/?${encodeURIComponent(`${text}\n${formattedUrl}`)}`
+    `https://line.me/R/share?text=${encodeURIComponent(`${text}\n${formattedUrl}`)}`
   );
 
   const linkedinShare = openInNewTab(

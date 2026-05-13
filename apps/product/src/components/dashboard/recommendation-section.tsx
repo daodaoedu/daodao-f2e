@@ -337,7 +337,7 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
           return [...prev, ...newCards.filter((c) => !existingIds.has(c.practiceId))];
         });
       } else {
-        toast.info("目前沒有更多推薦了");
+        toast.info("努力產出中，可以先到「靈感」看看哦！");
       }
     } catch {
       toast.error("載入失敗，請稍後再試");

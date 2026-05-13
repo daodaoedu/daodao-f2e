@@ -16,6 +16,21 @@ type CommentListResponse =
 type CommentDetailResponse =
   paths["/api/v1/comments/{commentId}"]["get"]["responses"]["200"]["content"]["application/json"];
 
+export interface MentionCandidateResponse {
+  userId: string;
+  numericUserId: number;
+  name: string;
+  photoURL: string | null;
+  customId: string | null;
+}
+
+export interface MentionCandidatesResponse {
+  success: true;
+  data: MentionCandidateResponse[];
+  timestamp: string;
+  meta?: Record<string, unknown>;
+}
+
 export type IGetCommentsQuery = NonNullable<
   paths["/api/v1/comments"]["get"]["parameters"]["query"]
 >;
@@ -49,6 +64,21 @@ export const getComments = async (params: IGetCommentsParams) => {
       query: {
         targetType: params.targetType,
         targetId: params.targetId,
+      },
+    },
+  });
+};
+
+/**
+ * 取得 @mention 候選人
+ */
+export const getMentionCandidates = async (params: IGetCommentsParams & { limit?: number }) => {
+  return client.GET("/api/v1/comments/mention-candidates", {
+    params: {
+      query: {
+        targetType: params.targetType,
+        targetId: params.targetId,
+        limit: params.limit,
       },
     },
   });

@@ -44,7 +44,7 @@ export const LandingPageFloatButtons = () => {
           aria-label="點擊進入心理測驗"
           asChild
         >
-          <CustomLink href="/#personality-test">
+          <CustomLink href="/quiz">
             <Image
               src="/assets/landing-page/badge.svg"
               alt="點擊進入心理測驗"
