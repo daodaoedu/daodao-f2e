@@ -1,6 +1,6 @@
 // 自動生成，請勿手動修改
 // 來源: packages/design-tokens
-// 生成時間: 2026-04-20T08:02:17.689Z
+// 生成時間: 2026-05-13T14:28:11.215Z
 
 export const colors = {
   "primary": {
