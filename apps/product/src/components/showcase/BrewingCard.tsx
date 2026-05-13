@@ -48,6 +48,16 @@ interface BrewingCardProps {
   onReactionMutate?: () => void;
 }
 
+type ShowcaseCommentUser = {
+  id?: string;
+  customId?: string | null;
+};
+
+function getUserIslandHref(user?: ShowcaseCommentUser | null) {
+  const identifier = user?.customId || user?.id;
+  return identifier ? `/users/${identifier}` : null;
+}
+
 export function BrewingCard({
   id,
   title,
@@ -320,27 +330,54 @@ export function BrewingCard({
             className="mt-3 flex flex-col gap-2 border-t border-[#E4EAE9] pt-3"
             onClick={(e) => e.stopPropagation()}
           >
-            {preview.map((comment) => (
-              <div key={comment.id} className="flex items-start gap-2">
+            {preview.map((comment) => {
+              const commentUserName = comment.user?.name ?? "匿名";
+              const commentUserIslandHref = getUserIslandHref(comment.user);
+              const commentAvatar = (
                 <Avatar className="size-6 shrink-0 mt-0.5">
                   {comment.user?.photoURL && (
-                    <AvatarImage src={comment.user.photoURL} alt={comment.user.name} />
+                    <AvatarImage src={comment.user.photoURL} alt={commentUserName} />
                   )}
                   <AvatarFallback className="text-[10px] font-medium text-text-dark bg-[#E8FAF9]">
-                    {(comment.user?.name ?? "?").slice(0, 1)}
+                    {commentUserName.slice(0, 1)}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1 min-w-0">
-                  <span className="text-xs font-semibold text-[#295E5C] mr-1.5">
-                    {comment.user?.name ?? "匿名"}
+              );
+
+              return (
+                <div key={comment.id} className="flex items-start gap-2">
+                  {commentUserIslandHref ? (
+                    <Link
+                      href={commentUserIslandHref}
+                      aria-label={`前往 ${commentUserName} 的小島`}
+                      className="shrink-0"
+                    >
+                      {commentAvatar}
+                    </Link>
+                  ) : (
+                    commentAvatar
+                  )}
+                  <div className="flex-1 min-w-0">
+                    {commentUserIslandHref ? (
+                      <Link
+                        href={commentUserIslandHref}
+                        className="text-xs font-semibold text-[#295E5C] mr-1.5 hover:underline"
+                      >
+                        {commentUserName}
+                      </Link>
+                    ) : (
+                      <span className="text-xs font-semibold text-[#295E5C] mr-1.5">
+                        {commentUserName}
+                      </span>
+                    )}
+                    <span className="text-xs text-text-dark line-clamp-1">{comment.content}</span>
+                  </div>
+                  <span className="shrink-0 text-[11px] text-[#9FB5B8]">
+                    {formatRelativeTime(comment.createdAt)}
                   </span>
-                  <span className="text-xs text-text-dark line-clamp-1">{comment.content}</span>
                 </div>
-                <span className="shrink-0 text-[11px] text-[#9FB5B8]">
-                  {formatRelativeTime(comment.createdAt)}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         );
       })()}

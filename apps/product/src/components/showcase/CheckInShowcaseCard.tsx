@@ -8,6 +8,7 @@ import { useSheetManager } from "@daodao/ui/components/animate-ui/components/rad
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { MoreHorizontal } from "lucide-react";
+import type { MouseEvent as ReactMouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { CheckInCard } from "@/components/check-in/display/check-in-card";
 import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
@@ -57,6 +58,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
   const { open: openSheet } = useSheetManager();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const suppressNextCardClickRef = useRef(false);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -92,7 +94,17 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
   const currentUserProfile = currentUserData?.data as CurrentUserProfile | undefined;
   const isOwnCard = !!currentUserData?.data?.id && user?.id === currentUserData.data.id;
 
-  const handleCardClick = () => {
+  const handleCardClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+    if (suppressNextCardClickRef.current) {
+      suppressNextCardClickRef.current = false;
+      return;
+    }
+
+    const target = event.target;
+    if (target instanceof Element && target.closest("a, button")) {
+      return;
+    }
+
     router.push(`/practices/${practice.id}/check-ins/${id}`);
   };
 
@@ -111,6 +123,14 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
       closeOnEscape: true,
       showCloseButton: true,
     });
+  };
+
+  const handleIslandLinkPointerDown = () => {
+    suppressNextCardClickRef.current = true;
+  };
+
+  const handleIslandLinkClick = (event: ReactMouseEvent) => {
+    event.stopPropagation();
   };
 
   const userIslandHref = getUserIslandHref(user);
@@ -180,7 +200,12 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
           {/* biome-ignore lint/a11y/noStaticElementInteractions: stop card click */}
           <div className="shrink-0 size-16" onClick={(e) => e.stopPropagation()}>
             {user && userIslandHref ? (
-              <Link href={userIslandHref} className="shrink-0">
+              <Link
+                href={userIslandHref}
+                className="shrink-0"
+                onPointerDown={handleIslandLinkPointerDown}
+                onClick={handleIslandLinkClick}
+              >
                 <Avatar className="size-16">
                   {user.photo_url && <AvatarImage src={user.photo_url} alt={user.name} />}
                   <AvatarFallback>
@@ -307,7 +332,8 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
                       href={commentUserIslandHref}
                       aria-label={`前往 ${commentUserName} 的小島`}
                       className="shrink-0"
-                      onClick={(e) => e.stopPropagation()}
+                      onPointerDown={handleIslandLinkPointerDown}
+                      onClick={handleIslandLinkClick}
                     >
                       {commentAvatar}
                     </Link>
@@ -319,7 +345,8 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
                       <Link
                         href={commentUserIslandHref}
                         className="text-xs font-semibold text-primary-darker mr-1.5 hover:underline"
-                        onClick={(e) => e.stopPropagation()}
+                        onPointerDown={handleIslandLinkPointerDown}
+                        onClick={handleIslandLinkClick}
                       >
                         {commentUserName}
                       </Link>
