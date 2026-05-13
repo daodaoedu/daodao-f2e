@@ -10,10 +10,10 @@ import {
 } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getStorage, StorageEnum } from "@daodao/shared";
 import {
   AddTaskFAB,
   DashboardHeader,
@@ -92,7 +92,24 @@ export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<TabType>("inspire");
+  const [activeTab, setActiveTab] = useState<TabType>(
+    (searchParams.get("tab") as TabType) === "mine" ? "mine" : "inspire"
+  );
+
+  const handleTabChange = useCallback(
+    (tab: TabType) => {
+      setActiveTab(tab);
+      const params = new URLSearchParams(searchParams.toString());
+      if (tab === "inspire") {
+        params.delete("tab");
+      } else {
+        params.set("tab", tab);
+      }
+      const qs = params.toString();
+      router.replace(qs ? `?${qs}` : "/", { scroll: false });
+    },
+    [router, searchParams]
+  );
   const [searchValue, setSearchValue] = useState(searchParams.get("keyword") ?? "");
   const [filters, _setFilters] = useState<ShowcaseFilterState>({
     tags: searchParams.getAll("tags[]"),
@@ -109,7 +126,7 @@ export default function HomePage() {
         params.append("tags[]", tag);
       }
       const qs = params.toString();
-      router.replace(qs ? `?${qs}` : "?", { scroll: false });
+      router.replace(qs ? `?${qs}` : "/", { scroll: false });
     },
     [router]
   );
@@ -322,7 +339,7 @@ export default function HomePage() {
           <div className="flex border-b border-[#E5E7EB] mb-4">
             <button
               type="button"
-              onClick={() => setActiveTab("inspire")}
+              onClick={() => handleTabChange("inspire")}
               className={cn(
                 "flex-1 py-2 text-sm font-medium transition-all",
                 activeTab === "inspire"
@@ -334,7 +351,7 @@ export default function HomePage() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab("mine")}
+              onClick={() => handleTabChange("mine")}
               className={cn(
                 "flex-1 py-2 text-sm font-medium transition-all",
                 activeTab === "mine"

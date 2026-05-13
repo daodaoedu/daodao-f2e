@@ -84,7 +84,7 @@ export function CommentInput({
   };
 
   return (
-    <div className={cn("flex gap-2 items-center", className)}>
+    <div className={cn("flex gap-2 items-end", className)}>
       <MentionInput
         inputRef={textareaRef}
         value={value}
@@ -94,8 +94,8 @@ export function CommentInput({
         rows={1}
         participants={participants}
         disabled={disabled}
+        className="flex-1 resize-none overflow-hidden rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] disabled:opacity-50"
         onMentionSelect={handleMentionSelect}
-        className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10 disabled:opacity-50"
       />
       <Button
         type="button"

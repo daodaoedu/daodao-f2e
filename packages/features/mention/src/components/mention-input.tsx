@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { cn } from "@daodao/ui/lib/utils";
 import type React from "react";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { MentionCandidate } from "../hooks/use-mention-input";
 
 const AVATAR_COLORS = [
@@ -61,8 +61,20 @@ export function MentionInput({
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionStart, setMentionStart] = useState(-1);
 
+  const resizeTextarea = useCallback((textarea: HTMLTextAreaElement) => {
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, []);
+
+  useEffect(() => {
+    const textarea = ref.current;
+    if (!textarea) return;
+    resizeTextarea(textarea);
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
+    resizeTextarea(e.currentTarget);
     onChange(newValue);
 
     const cursor = e.target.selectionStart ?? newValue.length;
@@ -124,7 +136,6 @@ export function MentionInput({
       />
       {mentionQuery !== null && filtered.length > 0 && (
         // biome-ignore lint/a11y/noStaticElementInteractions: prevent textarea blur when clicking anywhere in dropdown
-        // biome-ignore lint/a11y/useKeyWithClickEvents: dropdown navigation handled by keyboard in textarea
         <div
           className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-1 z-20 min-w-[160px] max-h-44 overflow-y-auto"
           onMouseDown={(e) => e.preventDefault()}

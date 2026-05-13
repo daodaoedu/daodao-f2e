@@ -62,6 +62,7 @@ export const ShareCheckInSheetContent = ({
   const shareAPI = getShareAPI({
     title: taskTitle,
     text: shareText,
+    nativeText: "",
     url: shareUrl,
     hashtag: "#島島阿學",
   });

@@ -96,7 +96,6 @@ function renderContent(content: string) {
   );
 }
 
-// ============================================================================
 // CommentBubble (single comment or reply)
 // ============================================================================
 
@@ -557,7 +556,7 @@ export function CommentSection({
       ))}
       {/* Inline reply input */}
       {replyTo === comment.id && (
-        <div className="pl-[40px] flex gap-2 items-center mt-3">
+        <div className="pl-[40px] flex gap-2 items-end mt-3">
           <MentionInput
             value={replyInputs[comment.id] ?? ""}
             onChange={(v) => setReplyInputs((prev) => ({ ...prev, [comment.id]: v }))}
@@ -570,7 +569,7 @@ export function CommentSection({
             placeholder="寫下你的留言…"
             rows={1}
             participants={participants}
-            className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
+            className="flex-1 resize-none overflow-hidden rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
             onMentionSelect={(candidate) => {
               if (!candidate.numericUserId) return;
               const pid = String(comment.id);
@@ -597,7 +596,7 @@ export function CommentSection({
   return (
     <div className="flex flex-col">
       {/* 主留言輸入框（置頂） */}
-      <div className="relative z-10 bg-white border-b border-[#E4EAE9] flex gap-2 items-center px-4 py-3 rounded-t-xl">
+      <div className="relative z-10 bg-white border-b border-[#E4EAE9] flex gap-2 items-end px-4 py-3 rounded-t-xl">
         {/* User avatar */}
         <Avatar className="size-9 shrink-0">
           {currentUserPhotoURL && (
@@ -615,7 +614,7 @@ export function CommentSection({
           rows={1}
           inputRef={ref}
           participants={participants}
-          className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10 w-full"
+          className="flex-1 resize-none overflow-hidden rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
           onMentionSelect={handleMentionSelect}
         />
 

@@ -4,10 +4,17 @@ interface ShareAPIProps {
   url: string;
   title?: string;
   text?: string;
+  nativeText?: string;
   hashtag?: string;
 }
 
-export function getShareAPI({ url, title = "", text = "", hashtag = "" }: ShareAPIProps) {
+export function getShareAPI({
+  url,
+  title = "",
+  text = "",
+  nativeText = text,
+  hashtag = "",
+}: ShareAPIProps) {
   if (typeof window === "undefined") return {};
 
   const formattedUrl = url.startsWith("https://") ? url : `${window.location.origin}${url}`;
@@ -17,7 +24,7 @@ export function getShareAPI({ url, title = "", text = "", hashtag = "" }: ShareA
   };
 
   const nativeShare = () => {
-    navigator.share({ title, text, url: formattedUrl });
+    navigator.share({ title, text: nativeText, url: formattedUrl });
   };
 
   const facebookShare = openInNewTab(
