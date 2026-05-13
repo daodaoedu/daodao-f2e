@@ -19,6 +19,7 @@ import {
   REACTION_CONFIG,
   type ReactionTypeType,
 } from "@/constants/reaction-type";
+import { tokenizeMentionContent } from "./comment-mentions";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
 const PREVIEW_COUNT = 2;
@@ -72,26 +73,48 @@ function getAvatarColor(name: string) {
   return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length] ?? "bg-[#C8FFF2]";
 }
 
+function getAuthorIslandHref(author: ICommentAuthor) {
+  const identifier = author.customId || author.userId;
+  return identifier ? `/users/${identifier}` : null;
+}
+
 // ============================================================================
 // @mention helpers
 // ============================================================================
 
-/** Renders comment content with @mention tokens highlighted */
-function renderContent(content: string) {
-  const parts = content.split(/(@\S+)/g);
+/** Renders comment content with @mention tokens highlighted and linked */
+function renderContent(content: string, participants: MentionCandidate[]) {
+  const segments = tokenizeMentionContent(content, participants);
   return (
     <>
-      {parts.map((part, i) =>
-        part.startsWith("@") ? (
-          // biome-ignore lint/suspicious/noArrayIndexKey: static split segments
+      {segments.map((segment, i) => {
+        if (segment.type === "text") {
+          // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
+          return <span key={i}>{segment.text}</span>;
+        }
+
+        const className = "text-logo-cyan font-medium hover:underline";
+        if (segment.href) {
+          return (
+            <CustomLink
+              // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
+              key={i}
+              href={segment.href}
+              className={className}
+              aria-label={`前往 ${segment.text.slice(1)} 的小島`}
+            >
+              {segment.text}
+            </CustomLink>
+          );
+        }
+
+        return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
           <span key={i} className="text-logo-cyan font-medium">
-            {part}
+            {segment.text}
           </span>
-        ) : (
-          // biome-ignore lint/suspicious/noArrayIndexKey: static split segments
-          <span key={i}>{part}</span>
-        )
-      )}
+        );
+      })}
     </>
   );
 }
@@ -104,7 +127,7 @@ interface CommentBubbleProps {
   isReply?: boolean;
   onReply?: () => void;
   isOwn?: boolean;
-  onEdit?: (id: string, content: string) => Promise<unknown> | unknown;
+  onEdit?: (id: string, content: string, mentionedUserIds?: number[]) => Promise<unknown> | unknown;
   onDelete?: (id: string) => Promise<unknown> | unknown;
   participants: MentionCandidate[];
 }
@@ -122,6 +145,11 @@ function CommentBubble({
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
   const menuRef = useRef<HTMLDivElement>(null);
+  const {
+    handleMentionSelect: handleEditMentionSelect,
+    getActiveMentionIds: getActiveEditMentionIds,
+    reset: resetEditMentions,
+  } = useMentionInput();
 
   const { data: reactionsData, mutate: mutateReactions } = useReactions({
     targetType: "comment",
@@ -187,42 +215,54 @@ function CommentBubble({
   const handleSaveEdit = async () => {
     const trimmed = editValue.trim();
     if (!trimmed) return;
-    const result = await onEdit?.(comment.id, trimmed);
+    const result = await onEdit?.(comment.id, trimmed, getActiveEditMentionIds(trimmed));
     if (result === false) return; // page-level handler already shows the error toast
     toast.success("已更新留言");
+    resetEditMentions();
     setEditing(false);
   };
 
   const avatarSizeClass = isReply ? "size-8" : "size-10";
   const authorTextClass = "text-sm";
   const timeTextClass = isReply ? "text-[11px]" : "text-xs";
+  const authorIslandHref = getAuthorIslandHref(comment.author);
+  const avatar = (
+    <Avatar className={avatarSizeClass}>
+      {comment.author.photoURL && (
+        <AvatarImage src={comment.author.photoURL} alt={comment.author.name} />
+      )}
+      <AvatarFallback
+        className={cn("text-sm font-medium text-text-dark", getAvatarColor(comment.author.name))}
+      >
+        {comment.author.name.slice(0, 1)}
+      </AvatarFallback>
+    </Avatar>
+  );
 
   return (
     <div className={cn("flex gap-[11px] items-start", isReply && "py-1")}>
       {/* Avatar */}
       <div className="shrink-0">
-        <Avatar className={avatarSizeClass}>
-          {comment.author.photoURL && (
-            <AvatarImage src={comment.author.photoURL} alt={comment.author.name} />
-          )}
-          <AvatarFallback
-            className={cn(
-              "text-sm font-medium text-text-dark",
-              getAvatarColor(comment.author.name)
-            )}
+        {authorIslandHref ? (
+          <CustomLink
+            href={authorIslandHref}
+            aria-label={`前往 ${comment.author.name} 的小島`}
+            className="block"
           >
-            {comment.author.name.slice(0, 1)}
-          </AvatarFallback>
-        </Avatar>
+            {avatar}
+          </CustomLink>
+        ) : (
+          avatar
+        )}
       </div>
 
       {/* Text content */}
       <div className="flex-1 min-w-0">
         {/* Author + time + own-comment menu */}
         <div className="flex items-center gap-2 mb-0.5">
-          {comment.author.userId ? (
+          {authorIslandHref ? (
             <CustomLink
-              href={`/users/${comment.author.userId}`}
+              href={authorIslandHref}
               className={cn("font-semibold text-[#295E5C] hover:underline", authorTextClass)}
             >
               {comment.author.name}
@@ -308,6 +348,7 @@ function CommentBubble({
               rows={3}
               autoFocus
               participants={participants}
+              onMentionSelect={handleEditMentionSelect}
               className="w-full resize-none rounded-lg border border-logo-cyan bg-white px-3 py-2 text-sm text-[#295E5C] focus:outline-none"
             />
             <div className="flex gap-2 justify-end">
@@ -317,6 +358,7 @@ function CommentBubble({
                 onClick={() => {
                   setEditing(false);
                   setEditValue(comment.content);
+                  resetEditMentions();
                 }}
                 className="text-xs px-3 py-1 rounded-full border-[#E4EAE9] text-[#9FB5B8] hover:bg-[#F0F9F8] transition-colors"
               >
@@ -335,7 +377,7 @@ function CommentBubble({
           </div>
         ) : (
           <p className={cn("text-[#295E5C] leading-5 whitespace-pre-wrap", "text-sm")}>
-            {renderContent(comment.content)}
+            {renderContent(comment.content, participants)}
           </p>
         )}
 
@@ -394,7 +436,12 @@ interface CommentSectionProps {
   currentUserId?: string;
   /** 當前登入用戶的頭像 URL */
   currentUserPhotoURL?: string;
-  onEditComment?: (id: string, content: string) => Promise<unknown> | unknown;
+  mentionCandidates?: MentionCandidate[];
+  onEditComment?: (
+    id: string,
+    content: string,
+    mentionedUserIds?: number[]
+  ) => Promise<unknown> | unknown;
   onDeleteComment?: (id: string) => Promise<unknown> | unknown;
 }
 
@@ -407,6 +454,7 @@ export function CommentSection({
   currentUserName,
   currentUserId,
   currentUserPhotoURL,
+  mentionCandidates,
   onEditComment,
   onDeleteComment,
 }: CommentSectionProps) {
@@ -424,8 +472,7 @@ export function CommentSection({
   const internalRef = useRef<HTMLTextAreaElement>(null);
   const ref = externalRef ?? internalRef;
 
-  // Derive participants list from all comment authors for @mention dropdown
-  const participants = useMemo<MentionCandidate[]>(() => {
+  const fallbackParticipants = useMemo<MentionCandidate[]>(() => {
     const seen = new Set<string>();
     const result: MentionCandidate[] = [];
     for (const comment of comments) {
@@ -454,6 +501,7 @@ export function CommentSection({
     }
     return result.filter((p) => p.numericUserId !== undefined);
   }, [comments]);
+  const participants = mentionCandidates?.length ? mentionCandidates : fallbackParticipants;
 
   // Track the previous set to detect newly added reactions
   const prevSelectedRef = useRef<ReactionTypeType[]>([]);

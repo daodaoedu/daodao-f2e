@@ -9,10 +9,13 @@ import {
   upsertReaction,
   useComments,
   useCurrentUser,
+  useMentionCandidates,
   useReactions,
   useReactionsList,
 } from "@daodao/api";
 import { ChartColumnIncreasingSvg, DialogOutlineSvg, FlagOutlineSvg } from "@daodao/assets";
+import type { MentionCandidate } from "@daodao/features-mention";
+import { Link } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Button } from "@daodao/ui/components/button";
 import {
@@ -25,7 +28,7 @@ import { ImageLightbox } from "@daodao/ui/components/image-lightbox";
 import { toast } from "@daodao/ui/components/sonner";
 import { formatDistanceToNow, isValid, parseISO } from "date-fns";
 import { zhTW } from "date-fns/locale";
-import { Ellipsis, Pencil, Share2 } from "lucide-react";
+import { ArrowLeft, Ellipsis, Pencil, Share2 } from "lucide-react";
 import * as React from "react";
 import { useCallback, useTransition } from "react";
 import {
@@ -53,6 +56,8 @@ interface ICheckInDetailProps {
   onEditComplete?: (data: ICheckInFormData) => Promise<void> | void;
   /** 標題下方額外內容（如同日打卡切換導航） */
   afterTitle?: React.ReactNode;
+  /** 所屬實踐頁路徑 */
+  parentPracticeHref?: string;
   /**
    * 是否為本人的打卡（控制選單內容）
    * true（預設）→ 顯示「編輯打卡」+「瀏覽活動」
@@ -144,12 +149,42 @@ export function CheckInCommentSheetContent({
     targetType: "checkin",
     targetId: checkInId,
   });
+  const { data: mentionCandidatesData } = useMentionCandidates({
+    targetType: "checkin",
+    targetId: checkInId,
+  });
 
   const comments: IComment[] = React.useMemo(() => {
     const raw = commentsData?.data;
     if (!Array.isArray(raw)) return [];
     return raw.filter(isApiCommentNode).map(mapComment);
   }, [commentsData]);
+
+  const mentionCandidates = React.useMemo<MentionCandidate[]>(() => {
+    const rawCandidates = (mentionCandidatesData as { data?: unknown[] } | undefined)?.data;
+    if (!Array.isArray(rawCandidates)) return [];
+
+    return rawCandidates
+      .filter((candidate): candidate is MentionCandidate & { numericUserId: number } => {
+        return (
+          typeof candidate === "object" &&
+          candidate !== null &&
+          "userId" in candidate &&
+          "numericUserId" in candidate &&
+          "name" in candidate &&
+          typeof candidate.userId === "string" &&
+          typeof candidate.numericUserId === "number" &&
+          typeof candidate.name === "string"
+        );
+      })
+      .map((candidate) => ({
+        userId: candidate.userId,
+        numericUserId: candidate.numericUserId,
+        name: candidate.name,
+        photoURL: candidate.photoURL ?? undefined,
+        customId: candidate.customId ?? undefined,
+      }));
+  }, [mentionCandidatesData]);
 
   const handleSubmitComment = useCallback(
     async (
@@ -221,6 +256,7 @@ export function CheckInCommentSheetContent({
       currentUserName={currentUserName}
       currentUserId={currentUserId}
       currentUserPhotoURL={currentUserPhotoURL}
+      mentionCandidates={mentionCandidates}
       onEditComment={handleEditComment}
       onDeleteComment={handleDeleteComment}
     />
@@ -235,6 +271,7 @@ export const CheckInDetail = ({
   checkInData,
   onEditComplete,
   afterTitle,
+  parentPracticeHref,
   isOwner = true,
 }: ICheckInDetailProps) => {
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
@@ -474,6 +511,15 @@ export const CheckInDetail = ({
       />
 
       <div className="flex flex-col w-fit gap-4 mx-auto">
+        {parentPracticeHref && (
+          <Button variant="white" className="px-8" asChild>
+            <Link href={parentPracticeHref}>
+              <ArrowLeft className="size-4 mr-2" />
+              查看所屬實踐
+            </Link>
+          </Button>
+        )}
+
         {/* 分享按鈕 */}
         <Button variant="white" className="px-8" onClick={openShareSheet}>
           <Share2 className="size-4 mr-2" />

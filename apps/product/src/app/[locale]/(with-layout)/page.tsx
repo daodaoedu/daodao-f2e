@@ -71,9 +71,21 @@ function reorderFeedItems(items: FeedItem[]): FeedItem[] {
   let pi = 0;
 
   while (ci < checkins.length || ai < activitySlot.length || pi < practices.length) {
-    if (ci < checkins.length) result.push(checkins[ci++]!);
-    if (ai < activitySlot.length) result.push(activitySlot[ai++]!);
-    for (let i = 0; i < 3 && pi < practices.length; i++) result.push(practices[pi++]!);
+    if (ci < checkins.length) {
+      const checkin = checkins[ci];
+      if (checkin) result.push(checkin);
+      ci++;
+    }
+    if (ai < activitySlot.length) {
+      const activity = activitySlot[ai];
+      if (activity) result.push(activity);
+      ai++;
+    }
+    for (let i = 0; i < 3 && pi < practices.length; i++) {
+      const practice = practices[pi];
+      if (practice) result.push(practice);
+      pi++;
+    }
     if (ci >= checkins.length && ai >= activitySlot.length && pi >= practices.length) break;
   }
 
@@ -210,6 +222,7 @@ export default function HomePage() {
   // Restore: find the clicked card and scrollIntoView. If not yet loaded,
   // pull next page and retry on the next items batch.
   useEffect(() => {
+    if (activeTab !== "inspire") return;
     if (feedRestoredRef.current || orderedFeedItems.length === 0) return;
     const storage = feedAnchorStorageRef.current;
     const anchor = storage.get();
@@ -230,7 +243,7 @@ export default function HomePage() {
       return;
     }
     loadMore();
-  }, [orderedFeedItems, hasMore, loadMore]);
+  }, [activeTab, orderedFeedItems, hasMore, loadMore]);
 
   // Infinite scroll observer
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -366,7 +379,7 @@ export default function HomePage() {
           {/* 靈感 Tab */}
           {activeTab === "inspire" && (
             <>
-              <div className="mb-3">
+              <div className="mt-[60px] mb-[48px]">
                 <ShowcaseSearchBar
                   value={searchValue}
                   onChange={setSearchValue}
@@ -387,12 +400,23 @@ export default function HomePage() {
                 <div className="flex flex-col gap-3" onClickCapture={handleFeedClickCapture}>
                   {orderedFeedItems.map((feedItem, index) => {
                     if (feedItem.type === "activity") {
+                      const canOpenActivity = !!feedItem.practice_id && !!feedItem.checkin_id;
+                      const activityKey = `activity-${feedItem.event_type ?? "event"}-${feedItem.event_id || index}`;
                       return (
-                        <ActivityCard
-                          key={`activity-${index}`}
-                          event_text={feedItem.event_text}
-                          label={feedItem.label}
-                        />
+                        <div key={activityKey} data-feed-id={activityKey}>
+                          <ActivityCard
+                            event_text={feedItem.event_text}
+                            label={feedItem.label}
+                            onClick={
+                              canOpenActivity
+                                ? () =>
+                                    router.push(
+                                      `/practices/${feedItem.practice_id}/check-ins/${feedItem.checkin_id}`
+                                    )
+                                : undefined
+                            }
+                          />
+                        </div>
                       );
                     }
 

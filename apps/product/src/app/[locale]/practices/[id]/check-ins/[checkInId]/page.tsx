@@ -76,6 +76,7 @@ export default function CheckInDetailPage() {
   const params = useParams();
   const practiceId = params.id as string;
   const checkInId = params.checkInId as string;
+  const practiceDetailPath = `/practices/${practiceId}`;
 
   // 獲取 practice 資料
   const { data: practiceData, isLoading: isLoadingPractice } = usePracticeById(practiceId);
@@ -224,7 +225,12 @@ export default function CheckInDetailPage() {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
-        <PageHeader title="打卡紀錄" variant="light" disableLightOn="mobile" />
+        <PageHeader
+          title="打卡紀錄"
+          variant="light"
+          disableLightOn="mobile"
+          rightActionTo={practiceDetailPath}
+        />
         <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
           <div className="text-center text-white">載入中...</div>
         </main>
@@ -237,7 +243,12 @@ export default function CheckInDetailPage() {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
-        <PageHeader title="打卡紀錄" variant="light" disableLightOn="mobile" />
+        <PageHeader
+          title="打卡紀錄"
+          variant="light"
+          disableLightOn="mobile"
+          rightActionTo={practiceDetailPath}
+        />
         <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
           <div className="text-center text-white">找不到打卡記錄</div>
         </main>
@@ -284,11 +295,12 @@ export default function CheckInDetailPage() {
         activeDate={activeCheckInDate}
         practiceId={practiceId}
         title="打卡紀錄"
+        closeActionTo={practiceDetailPath}
       />
 
       {/* Desktop 版本的標題列 */}
       <div className="hidden md:block">
-        <PageHeader title="打卡紀錄" variant="light" />
+        <PageHeader title="打卡紀錄" variant="light" rightActionTo={practiceDetailPath} />
       </div>
 
       <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">
@@ -302,6 +314,7 @@ export default function CheckInDetailPage() {
               practiceId={practiceId}
             />
           }
+          parentPracticeHref={practiceDetailPath}
         />
       </main>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactionTypeValue } from "@daodao/api";
+import type { MentionCandidate } from "@daodao/features-mention";
 import {
   followTarget,
   removeReaction,
@@ -110,6 +111,7 @@ interface IPracticeDetailShellProps {
   currentUserName?: string;
   currentUserId?: string;
   currentUserPhotoURL?: string;
+  mentionCandidates?: MentionCandidate[];
   commentCount?: number;
   hasPrevious?: boolean;
   hasNext?: boolean;
@@ -120,7 +122,11 @@ interface IPracticeDetailShellProps {
   onDeletePractice: () => void;
   onDeleteResource?: (resourceId: string) => void;
   onSubmitComment: (content: string, parentId?: string, mentionedUserIds?: number[]) => void;
-  onEditComment: (id: string, content: string) => Promise<unknown> | unknown;
+  onEditComment: (
+    id: string,
+    content: string,
+    mentionedUserIds?: number[]
+  ) => Promise<unknown> | unknown;
   onDeleteComment: (id: string) => Promise<unknown> | unknown;
   footer?: React.ReactNode;
   browseActivity?: IBrowseActivityData;
@@ -285,6 +291,7 @@ export function PracticeDetailShell({
   currentUserName,
   currentUserId,
   currentUserPhotoURL,
+  mentionCandidates,
   commentCount,
   onEditPractice,
   onArchivePractice,
@@ -782,6 +789,7 @@ export function PracticeDetailShell({
               currentUserName={currentUserName}
               currentUserId={currentUserId}
               currentUserPhotoURL={currentUserPhotoURL}
+              mentionCandidates={mentionCandidates}
               onEditComment={onEditComment}
               onDeleteComment={onDeleteComment}
             />

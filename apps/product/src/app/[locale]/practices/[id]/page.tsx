@@ -9,13 +9,14 @@ import {
   useComments,
   useCurrentUser,
   useDeletePractice,
+  useMentionCandidates,
   useMyPractices,
   usePracticeById,
   usePracticeCheckIns,
   useReactionsList,
   useRecordView,
 } from "@daodao/api";
-import { useAuthContext } from "@daodao/auth";
+import type { MentionCandidate } from "@daodao/features-mention";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
@@ -108,6 +109,21 @@ function isApiCommentNode(comment: unknown): comment is IApiCommentNode {
   return true;
 }
 
+function isMentionCandidateWithNumericId(
+  candidate: unknown
+): candidate is MentionCandidate & { numericUserId: number } {
+  return (
+    typeof candidate === "object" &&
+    candidate !== null &&
+    "userId" in candidate &&
+    "numericUserId" in candidate &&
+    "name" in candidate &&
+    typeof candidate.userId === "string" &&
+    typeof candidate.numericUserId === "number" &&
+    typeof candidate.name === "string"
+  );
+}
+
 function formatCommentTime(createdAt?: string): string {
   if (!createdAt) {
     return "剛剛";
@@ -178,7 +194,6 @@ export default function PracticeDetailPage() {
   const router = useRouter();
   const params = useParams();
   const practiceId = params.id as string;
-  const { user: authUser } = useAuthContext();
   const searchParams = useSearchParams();
   const fromCopy = searchParams.get("from") === "copy";
   const {
@@ -198,6 +213,11 @@ export default function PracticeDetailPage() {
     targetType: "practice",
     targetId: practiceId,
   });
+  const { data: mentionCandidatesData } = useMentionCandidates({
+    targetType: "practice",
+    targetId: practiceId,
+    limit: 50,
+  });
   const { data: practicesListData } = useMyPractices({ limit: 100 });
   const { data: currentUserData } = useCurrentUser();
   const { data: reactionsListData } = useReactionsList({
@@ -205,7 +225,6 @@ export default function PracticeDetailPage() {
     targetId: practiceId,
   });
 
-  const myIslandIdentifier = currentUserData?.data?.customId ?? authUser?.id ?? "";
   const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
   const { openArchiveDialog } = useArchivePracticeDialog();
   const { openDeleteDialog } = useDeletePracticeDialog();
@@ -287,6 +306,23 @@ export default function PracticeDetailPage() {
 
     return rawComments.filter(isApiCommentNode).map((comment) => mapComment(comment));
   }, [commentsData]);
+
+  const mentionCandidates = useMemo<MentionCandidate[]>(() => {
+    const rawCandidates = (mentionCandidatesData as { data?: unknown[] } | undefined)?.data;
+    if (!Array.isArray(rawCandidates)) {
+      return [];
+    }
+
+    return rawCandidates
+      .filter(isMentionCandidateWithNumericId)
+      .map((candidate) => ({
+        userId: candidate.userId,
+        numericUserId: candidate.numericUserId,
+        name: candidate.name,
+        photoURL: candidate.photoURL ?? undefined,
+        customId: candidate.customId ?? undefined,
+      }));
+  }, [mentionCandidatesData]);
 
   const { previousPracticeId, nextPracticeId, hasPrevious, hasNext } = useMemo(() => {
     const practices = practicesListData?.data || [];
@@ -381,14 +417,17 @@ export default function PracticeDetailPage() {
   );
 
   const handleCommentEdit = useCallback(
-    async (commentId: string, content: string) => {
+    async (commentId: string, content: string, mentionedUserIds?: number[]) => {
       const parsedCommentId = Number(commentId);
       if (!Number.isFinite(parsedCommentId)) {
         toast.error("留言 ID 無效");
         return false;
       }
 
-      const response = await updateComment(parsedCommentId, { content });
+      const response = await updateComment(parsedCommentId, {
+        content,
+        mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
+      });
       if (response.error) {
         const errorMessage = getErrorMessage(response.error, "更新留言失敗");
         console.error("Failed to update comment:", errorMessage);
@@ -481,7 +520,7 @@ export default function PracticeDetailPage() {
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
         <button
           type="button"
-          onClick={() => (fromCopy ? router.push(`/users/${myIslandIdentifier}`) : router.back())}
+          onClick={() => (fromCopy ? router.push("/?tab=mine") : router.back())}
           className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
           aria-label="關閉"
         >
@@ -524,6 +563,7 @@ export default function PracticeDetailPage() {
         currentUserName={currentUserData?.data?.name || undefined}
         currentUserId={currentUserData?.data?.id || undefined}
         currentUserPhotoURL={getCurrentUserPhotoURL(currentUserData?.data)}
+        mentionCandidates={mentionCandidates}
         commentCount={practiceData?.data?.stats?.commentCount}
         hasPrevious={hasPrevious}
         hasNext={hasNext}

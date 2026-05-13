@@ -25,3 +25,15 @@ export const useComments = (params: IGetCommentsParams) => {
     },
   });
 };
+
+export const useMentionCandidates = (params: IGetCommentsParams & { limit?: number }) => {
+  return useQuery("/api/v1/comments/mention-candidates", {
+    params: {
+      query: {
+        targetType: params.targetType,
+        targetId: params.targetId,
+        limit: params.limit,
+      },
+    },
+  });
+};

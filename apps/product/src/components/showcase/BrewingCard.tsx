@@ -140,7 +140,9 @@ export function BrewingCard({
     handleToggle,
     reactionItems,
     firstReactorName,
-  } = useCardReactions("practice", id, batchReactionData, onReactionMutate);
+  } = useCardReactions("practice", id, batchReactionData, onReactionMutate, {
+    disableIndividualFetch: true,
+  });
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
