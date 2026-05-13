@@ -34,6 +34,8 @@ export const onboardingFormSchema = z.object({
   name: z.string().min(1, "請輸入名字").max(50, "名字最多 50 字"),
   customId: z
     .string()
+    .trim()
+    .min(1, "請輸入使用者 ID")
     .min(3, "帳號最少需要 3 個字符")
     .max(15, "帳號最多 15 個字符")
     .refine((val) => customIdRegex.test(val), "僅限使用英文字母和數字"),

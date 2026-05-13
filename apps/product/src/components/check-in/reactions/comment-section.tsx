@@ -136,8 +136,20 @@ function MentionInput({
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionStart, setMentionStart] = useState(-1);
 
+  const resizeTextarea = useCallback((textarea: HTMLTextAreaElement) => {
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, []);
+
+  useEffect(() => {
+    const textarea = ref.current;
+    if (!textarea) return;
+    resizeTextarea(textarea);
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
+    resizeTextarea(e.currentTarget);
     onChange(newValue);
 
     const cursor = e.target.selectionStart ?? newValue.length;
@@ -687,7 +699,7 @@ export function CommentSection({
       ))}
       {/* Inline reply input */}
       {replyTo === comment.id && (
-        <div className="pl-[40px] flex gap-2 items-center mt-3">
+        <div className="pl-[40px] flex gap-2 items-end mt-3">
           <MentionInput
             value={replyInputs[comment.id] ?? ""}
             onChange={(v) => setReplyInputs((prev) => ({ ...prev, [comment.id]: v }))}
@@ -700,7 +712,7 @@ export function CommentSection({
             placeholder={`${comment.author.name}...`}
             rows={1}
             participants={participants}
-            className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
+            className="flex-1 resize-none overflow-hidden rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
             onMentionSelect={(candidate) => {
               if (!candidate.numericUserId) return;
               const pid = String(comment.id);
@@ -727,7 +739,7 @@ export function CommentSection({
   return (
     <div className="flex flex-col">
       {/* 主留言輸入框（置頂） */}
-      <div className="bg-white border-b border-[#E4EAE9] flex gap-2 items-center px-4 py-3">
+      <div className="bg-white border-b border-[#E4EAE9] flex gap-2 items-end px-4 py-3">
         {/* User avatar */}
         <Avatar className="size-9 shrink-0">
           {currentUserPhotoURL && (
@@ -745,7 +757,7 @@ export function CommentSection({
           rows={1}
           inputRef={ref}
           participants={participants}
-          className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10 w-full"
+          className="flex-1 resize-none overflow-hidden rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
           onMentionSelect={(candidate) => {
             if (!candidate.numericUserId) return;
             setMentionedIds((prev) => {

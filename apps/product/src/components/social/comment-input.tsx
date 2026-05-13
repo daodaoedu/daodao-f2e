@@ -32,6 +32,17 @@ export function CommentInput({ reactionType, onSubmit, disabled, className }: Co
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const prevReactionTypeRef = useRef<ReactionTypeType | null | undefined>(undefined);
 
+  const resizeTextarea = useCallback((textarea: HTMLTextAreaElement) => {
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, []);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    resizeTextarea(textarea);
+  });
+
   // reactionType 改變時聚焦輸入框
   useEffect(() => {
     if (reactionType && reactionType !== prevReactionTypeRef.current) {
@@ -64,16 +75,19 @@ export function CommentInput({ reactionType, onSubmit, disabled, className }: Co
   };
 
   return (
-    <div className={cn("flex gap-2 items-center", className)}>
+    <div className={cn("flex gap-2 items-end", className)}>
       <textarea
         ref={textareaRef}
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          resizeTextarea(e.currentTarget);
+          setValue(e.target.value);
+        }}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         rows={1}
         disabled={disabled}
-        className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10 disabled:opacity-50"
+        className="flex-1 resize-none overflow-hidden rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] disabled:opacity-50"
       />
       <Button
         type="button"

@@ -15,7 +15,7 @@ import {
   useReactionsList,
   useRecordView,
 } from "@daodao/api";
-import { useParams, useRouter } from "@daodao/i18n/navigation";
+import { Link, useParams, useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
 import { zhTW } from "date-fns/locale";
