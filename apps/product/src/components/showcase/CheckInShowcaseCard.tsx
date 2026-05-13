@@ -204,7 +204,6 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
                 href={userIslandHref}
                 className="shrink-0"
                 onPointerDown={handleIslandLinkPointerDown}
-                onClick={handleIslandLinkClick}
               >
                 <Avatar className="size-16">
                   {user.photo_url && <AvatarImage src={user.photo_url} alt={user.name} />}
