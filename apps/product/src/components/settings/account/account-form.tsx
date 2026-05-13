@@ -1,13 +1,13 @@
 "use client";
 
 import { type UpdateUserRequest, useCurrentUser, useUserMutations } from "@daodao/api";
+import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parse } from "date-fns";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";

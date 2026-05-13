@@ -59,16 +59,8 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
           .then((data) => setLottieJson(data))
           .catch((error) => console.error("Failed to load Lottie animation:", error));
       }
-    } else if (!isOwnProfile) {
-      // 沒有測驗結果且非自己的頁面，載入預設吉祥物
-      const loadDefault = resultTypeToLottiePathMap.get("L");
-      if (loadDefault) {
-        loadDefault()
-          .then((data) => setLottieJson(data))
-          .catch((error) => console.error("Failed to load default Lottie animation:", error));
-      }
     }
-  }, [resultType, isEmptyResult, isOwnProfile]);
+  }, [resultType, isEmptyResult]);
 
   // 動態載入所有 lottie 動畫（當沒有結果且是自己的個人頁面時，用於跑馬燈）
   const [allLotties, setAllLotties] = useState<Map<string, object>>(new Map());
@@ -164,7 +156,8 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
         className={cn(
           "relative -z-20",
           "h-[378px] md:h-[389px]",
-          !isEmptyResult && "h-[378px] md:h-[333px]"
+          !isEmptyResult && "h-[378px] md:h-[333px]",
+          isEmptyResult && !isOwnProfile && "h-[150px] md:h-[150px]"
         )}
       />
       <header ref={headerRef} className="fixed top-0 inset-x-0 h-[420px] -z-10">

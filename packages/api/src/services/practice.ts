@@ -450,3 +450,33 @@ export const getPracticeSummary = async (
     return { data: null, error: message };
   }
 };
+
+/**
+ * 複製實踐（複製他人或自己的實踐）
+ * @param id 來源實踐 ID
+ * @returns 新實踐 external_id（UUID）
+ * NOTE: 後端部署後執行 pnpm run generate:api 更新 types，屆時可移除此 workaround
+ */
+type CopyPracticeClient = {
+  POST: (
+    path: "/api/v1/practices/{id}/copy",
+    options: { params: { path: { id: string } } }
+  ) => Promise<{ data?: { data: { id: string } }; error?: unknown }>;
+};
+
+export const copyPractice = async (id: string): Promise<{ id: string }> => {
+  const response = await (client as unknown as CopyPracticeClient).POST(
+    "/api/v1/practices/{id}/copy",
+    { params: { path: { id } } }
+  );
+
+  if (response.error) {
+    const errorMessage =
+      response.error && typeof response.error === "object" && "message" in response.error
+        ? String(response.error.message)
+        : "複製失敗";
+    throw new Error(errorMessage);
+  }
+
+  return response.data?.data as { id: string };
+};

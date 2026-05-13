@@ -15,6 +15,7 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "clean": "pnpm dlx rimraf .next out node_modules"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "@daodao/api": "workspace:*",
     "@daodao/assets": "workspace:*",
     "@daodao/auth": "workspace:*",
+    "@daodao/features-mention": "workspace:*",
     "@daodao/features-quiz": "workspace:*",
     "@daodao/i18n": "workspace:*",
     "@daodao/shared": "workspace:*",
@@ -54,6 +56,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "^4.1.2"
   }
 }

@@ -1,16 +1,7 @@
 "use client";
 
-import type { ReactionTypeValue } from "@daodao/api";
-import {
-  followTarget,
-  removeReaction,
-  unfollowTarget,
-  upsertReaction,
-  useComments,
-  usePracticeById,
-  useReactions,
-  useReactionsList,
-} from "@daodao/api";
+import type { BatchReactionItem } from "@daodao/api";
+import { followTarget, unfollowTarget, useComments, usePracticeById } from "@daodao/api";
 import {
   ChartColumnIncreasingSvg,
   DefaultAvatarSvg,
@@ -26,7 +17,7 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { MoreHorizontal } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import {
   BrowseActivityContent,
@@ -34,6 +25,7 @@ import {
 } from "@/components/practice/shared/browse-activity-content";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
+import { useCardReactions } from "@/hooks/use-card-reactions";
 import { formatRelativeTime } from "@/utils/format-time";
 import { formatShowcaseDate } from "./utils";
 
@@ -52,6 +44,8 @@ interface BrewingCardProps {
   frequencyMaxDays?: number | null;
   sessionDurationMinutes?: number | null;
   commentCount?: number;
+  batchReactionData?: BatchReactionItem;
+  onReactionMutate?: () => void;
 }
 
 export function BrewingCard({
@@ -65,6 +59,8 @@ export function BrewingCard({
   frequencyMaxDays,
   sessionDurationMinutes,
   commentCount = 0,
+  batchReactionData,
+  onReactionMutate,
 }: BrewingCardProps) {
   const startFmt = formatShowcaseDate(startDate);
   const endFmt = formatShowcaseDate(endDate);
@@ -76,7 +72,6 @@ export function BrewingCard({
   const router = useRouter();
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { data: practiceData } = usePracticeById(id);
-  const { data: reactionsListData } = useReactionsList({ targetType: "practice", targetId: id });
   const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
 
   useEffect(() => {
@@ -113,21 +108,21 @@ export function BrewingCard({
 
   const handleOpenBrowseActivity = () => {
     setMenuOpen(false);
-    const followers: IBrowseActivityFollower[] = (reactionsListData?.data?.items ?? []).map(
-      (item) => ({
-        id: item.userId,
-        name: item.name,
-        photoURL: item.photoURL ?? undefined,
-        time: formatRelativeTime(item.reactedAt),
-        reaction: item.reactionType as ReactionTypeType,
-      })
-    );
+    const followers: IBrowseActivityFollower[] = reactionItems.map((item) => ({
+      id: item.userId,
+      name: item.name,
+      photoURL: item.photoURL ?? undefined,
+      time: formatRelativeTime(item.reactedAt),
+      reaction: item.reactionType as ReactionTypeType,
+    }));
     openSheet({
       title: "瀏覽活動",
       content: (
         <BrowseActivityContent
           viewCount={practiceData?.data?.stats?.viewCount ?? 0}
-          commentCount={commentsData?.data?.length ?? commentCount}
+          commentCount={
+            practiceData?.data?.stats?.commentCount ?? commentsData?.data?.length ?? commentCount
+          }
           followers={followers}
           onClose={() => closeSheet()}
         />
@@ -138,36 +133,14 @@ export function BrewingCard({
     });
   };
 
-  const { data: reactionsData, mutate } = useReactions({ targetType: "practice", targetId: id });
-  const [, startTransition] = useTransition();
-
-  const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
-    null) as ReactionTypeType | null;
-  const selectedReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
-  const allReactions = reactionsData?.data?.reactions ?? [];
-  const totalCount = allReactions.reduce((sum, r) => sum + r.count, 0);
-  const displayReactions = allReactions
-    .filter((r) => r.count > 0)
-    .map((r) => r.type as ReactionTypeType);
-
-  const handleToggle = useCallback(
-    (type: ReactionTypeType) => {
-      const isSelected = currentUserReaction === type;
-      startTransition(async () => {
-        if (isSelected) {
-          await removeReaction({ targetType: "practice", targetId: id });
-        } else {
-          await upsertReaction({
-            targetType: "practice",
-            targetId: id,
-            reactionType: type as ReactionTypeValue,
-          });
-        }
-        await mutate();
-      });
-    },
-    [currentUserReaction, id, mutate]
-  );
+  const {
+    selectedReactions,
+    totalCount,
+    displayReactions,
+    handleToggle,
+    reactionItems,
+    firstReactorName,
+  } = useCardReactions("practice", id, batchReactionData, onReactionMutate);
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
@@ -316,7 +289,7 @@ export function BrewingCard({
           variant="summary"
           totalCount={totalCount}
           displayReactions={displayReactions}
-          firstReactorName={reactionsListData?.data?.items[0]?.name}
+          firstReactorName={firstReactorName}
         />
 
         <Link
@@ -325,7 +298,8 @@ export function BrewingCard({
         >
           <DialogOutlineSvg className="size-6" />
           {(() => {
-            const count = commentsData?.data?.length ?? commentCount;
+            const count =
+              practiceData?.data?.stats?.commentCount ?? commentsData?.data?.length ?? commentCount;
             return count > 0 ? <span className="text-sm font-medium">{count}</span> : null;
           })()}
         </Link>

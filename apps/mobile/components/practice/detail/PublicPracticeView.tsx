@@ -483,6 +483,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
               activeTab={activeTab}
               onTabChange={setActiveTab}
               commentCount={comments.length}
+              checkinCount={checkIns?.length}
             />
 
             {/* ── Tab content ── */}

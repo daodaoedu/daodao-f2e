@@ -20,6 +20,9 @@ export const createPracticeSchema = z.object({
   tags: z.array(z.string()).max(5, "最多 5 個標籤").default([]),
   color: z.string().optional(),
   icon: z.string().optional(),
+
+  // Step 5: 隱私設定
+  privacy_status: z.enum(["private", "public", "delayed"]).default("private"),
 });
 
 export type CreatePracticeInputType = z.infer<typeof createPracticeSchema>;
@@ -35,6 +38,7 @@ export const defaultCreatePracticeValues: CreatePracticeInputType = {
   tags: [],
   color: undefined,
   icon: undefined,
+  privacy_status: "private",
 };
 
 export interface IPracticeTemplate {

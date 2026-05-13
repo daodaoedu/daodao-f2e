@@ -70,7 +70,7 @@ export function ActionMakerCategory() {
   };
 
   return (
-    <StarryBackground>
+    <StarryBackground fullWidthDesktop>
       <div className="flex min-h-dvh flex-col">
         <ProgressBar current={1} />
 
@@ -83,9 +83,9 @@ export function ActionMakerCategory() {
             setApi={setApi}
             className={`w-full transition-opacity duration-300 ${carouselReady ? "opacity-100" : "opacity-0"}`}
           >
-            <CarouselContent>
+            <CarouselContent className="!-ml-2">
               {categories.map((cat) => (
-                <CarouselItem key={cat.id} className="basis-1/3 flex justify-center">
+                <CarouselItem key={cat.id} className="basis-1/3 flex justify-center !pl-2">
                   <CategoryStar
                     category={cat}
                     isSelected={selected === cat.id}
@@ -98,7 +98,7 @@ export function ActionMakerCategory() {
 
           {/* Tag suggestions */}
           {currentCategory && (
-            <div className="flex flex-wrap justify-center gap-2 px-6">
+            <div className="mt-4 md:mt-9 flex flex-wrap justify-center gap-2 px-6">
               {currentCategory.tags.map((tag) => (
                 <button
                   key={tag}
@@ -107,7 +107,7 @@ export function ActionMakerCategory() {
                   className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
                     selectedTags.includes(tag)
                       ? "bg-white/20 text-white"
-                      : "text-[#7B9FC4] hover:text-white"
+                      : "border border-[#7B9FC4] text-[#7B9FC4] hover:text-white hover:border-white"
                   }`}
                 >
                   {tag}

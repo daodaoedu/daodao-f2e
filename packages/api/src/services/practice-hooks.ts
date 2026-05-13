@@ -19,7 +19,7 @@ import type {
   IGetUserPracticesParams,
   PracticeSummary,
 } from "./practice";
-import { getPracticeSummary } from "./practice";
+import { copyPractice, getPracticeSummary } from "./practice";
 
 // ============================================================================
 // Types
@@ -679,4 +679,22 @@ export const useDeletePractice = (practiceId: string) => {
   };
 
   return { deletePractice: deletePracticeById };
+};
+
+/**
+ * Hook 用於複製實踐（複製他人或自己的實踐）
+ * @returns copyPractice(practiceId) → 回傳新實踐 id
+ */
+export const useCopyPractice = () => {
+  const copy = async (practiceId: string): Promise<{ id: string }> => {
+    const result = await copyPractice(practiceId);
+    try {
+      await updatePractice(result.id, { privacyStatus: "public" });
+    } catch {
+      console.error("[useCopyPractice] 設定公開隱私狀態失敗，複製仍成功");
+    }
+    return result;
+  };
+
+  return { copyPractice: copy };
 };

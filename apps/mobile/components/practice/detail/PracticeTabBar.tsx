@@ -8,6 +8,8 @@ interface PracticeTabBarProps {
   activeTab: PracticeTab;
   onTabChange: (tab: PracticeTab) => void;
   commentCount?: number;
+  checkinCount?: number;
+  resourceCount?: number;
 }
 
 const TABS: { key: PracticeTab; label: string }[] = [
@@ -16,15 +18,25 @@ const TABS: { key: PracticeTab; label: string }[] = [
   { key: "resources", label: "使用資源" },
 ];
 
-export function PracticeTabBar({ activeTab, onTabChange, commentCount }: PracticeTabBarProps) {
+export function PracticeTabBar({
+  activeTab,
+  onTabChange,
+  commentCount,
+  checkinCount,
+  resourceCount,
+}: PracticeTabBarProps) {
+  const countMap: Record<PracticeTab, number | undefined> = {
+    comments: commentCount,
+    checkins: checkinCount,
+    resources: resourceCount,
+  };
+
   return (
     <XStack borderBottomWidth={1} borderBottomColor="#E5E7EB">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.key;
-        const label =
-          tab.key === "comments" && commentCount != null && commentCount > 0
-            ? `${tab.label} (${commentCount})`
-            : tab.label;
+        const count = countMap[tab.key];
+        const label = count != null && count > 0 ? `${tab.label}(${count})` : tab.label;
         return (
           <Pressable
             key={tab.key}

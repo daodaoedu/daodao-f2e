@@ -224,12 +224,7 @@ export default function CheckInDetailPage() {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
-        <PageHeader
-          title="打卡紀錄"
-          rightActionTo={`/practices/${practiceId}`}
-          variant="light"
-          disableLightOn="mobile"
-        />
+        <PageHeader title="打卡紀錄" variant="light" disableLightOn="mobile" />
         <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
           <div className="text-center text-white">載入中...</div>
         </main>
@@ -242,12 +237,7 @@ export default function CheckInDetailPage() {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
-        <PageHeader
-          title="打卡紀錄"
-          rightActionTo={`/practices/${practiceId}`}
-          variant="light"
-          disableLightOn="mobile"
-        />
+        <PageHeader title="打卡紀錄" variant="light" disableLightOn="mobile" />
         <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
           <div className="text-center text-white">找不到打卡記錄</div>
         </main>
@@ -294,12 +284,11 @@ export default function CheckInDetailPage() {
         activeDate={activeCheckInDate}
         practiceId={practiceId}
         title="打卡紀錄"
-        closeActionTo={`/practices/${practiceId}`}
       />
 
       {/* Desktop 版本的標題列 */}
       <div className="hidden md:block">
-        <PageHeader title="打卡紀錄" rightActionTo={`/practices/${practiceId}`} variant="light" />
+        <PageHeader title="打卡紀錄" variant="light" />
       </div>
 
       <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">

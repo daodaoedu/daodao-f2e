@@ -46,7 +46,7 @@ const spotlightItems: SpotlightItem[] = [
     id: "ai-community",
     title: "AI 個人化學習工具Ｘ社群支持",
     description: "有 AI 推薦與引導外，也重視人與人真實地互動！",
-    backgroundColor: "bg-[#16B9B3]",
+    backgroundColor: "bg-primary-base",
     features: [
       {
         id: "ai-recommendation",

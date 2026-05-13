@@ -15,11 +15,13 @@ import {
   useReactionsList,
   useRecordView,
 } from "@daodao/api";
-import { Link, useParams, useRouter } from "@daodao/i18n/navigation";
+import { useAuthContext } from "@daodao/auth";
+import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
 import { zhTW } from "date-fns/locale";
 import { X } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { CheckInButton } from "@/components/check-in";
 import type { IComment, ICommentReply } from "@/components/check-in/reactions";
@@ -176,7 +178,9 @@ export default function PracticeDetailPage() {
   const router = useRouter();
   const params = useParams();
   const practiceId = params.id as string;
-
+  const { user: authUser } = useAuthContext();
+  const searchParams = useSearchParams();
+  const fromCopy = searchParams.get("from") === "copy";
   const {
     data: practiceData,
     isLoading,
@@ -201,6 +205,7 @@ export default function PracticeDetailPage() {
     targetId: practiceId,
   });
 
+  const myIslandIdentifier = currentUserData?.data?.customId ?? authUser?.id ?? "";
   const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
   const { openArchiveDialog } = useArchivePracticeDialog();
   const { openDeleteDialog } = useDeletePracticeDialog();
@@ -474,13 +479,14 @@ export default function PracticeDetailPage() {
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
-        <Link
-          href="/"
+        <button
+          type="button"
+          onClick={() => (fromCopy ? router.push(`/users/${myIslandIdentifier}`) : router.back())}
           className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
           aria-label="關閉"
         >
           <X className="size-6" />
-        </Link>
+        </button>
       </div>
       <BackgroundAnimation />
 

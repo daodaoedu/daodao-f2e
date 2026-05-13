@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@daodao/auth";
-import { useRouter } from "@daodao/i18n/navigation";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { useCallback, useState } from "react";
 import { useSWRConfig } from "swr";
@@ -32,7 +31,6 @@ export function useLogoutDialog() {
   const { openWarningDialog } = useDialog();
   const { logout } = useAuth();
   const { cache } = useSWRConfig();
-  const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const openLogoutDialog = useCallback(async (): Promise<LogoutResult> => {
@@ -63,14 +61,14 @@ export function useLogoutDialog() {
         cache.clear();
       }
 
-      // 重定向到首頁
-      router.push("/");
+      // 重定向到登入頁（用 hard navigation 切斷 route protection 的競態 redirect）
+      window.location.href = "/auth/login";
 
       return LogoutResult.LoggedOut;
     } finally {
       setIsLoggingOut(false);
     }
-  }, [openWarningDialog, logout, cache, router]);
+  }, [openWarningDialog, logout, cache]);
 
   return { openLogoutDialog, isLoggingOut };
 }

@@ -65,7 +65,7 @@
   --basic-white: oklch(1 0 89.9);
   --basic-black: oklch(0.175 0.028 203.4);
   /* Semantic colors */
-  --tips: oklch(0.766 0.169 60);
+  --tips: var(--logo-orange);
   --success: oklch(0.763 0.172 132.6);
   /* Logo colors */
   --logo-gray: oklch(0.483 0.019 221.3);

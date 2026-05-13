@@ -1,14 +1,11 @@
 "use client";
 
-import type { ReactionTypeValue } from "@daodao/api";
 import {
+  type BatchReactionItem,
   followTarget,
-  removeReaction,
   unfollowTarget,
-  upsertReaction,
   useComments,
   usePracticeById,
-  useReactions,
   useReactionsList,
 } from "@daodao/api";
 import {
@@ -26,7 +23,7 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { MoreHorizontal } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import {
   BrowseActivityContent,
@@ -34,6 +31,7 @@ import {
 } from "@/components/practice/shared/browse-activity-content";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
+import { useCardReactions } from "@/hooks/use-card-reactions";
 import { formatRelativeTime } from "@/utils/format-time";
 import { formatShowcaseDate } from "./utils";
 
@@ -53,6 +51,8 @@ interface PracticeShowcaseCardProps {
   frequencyMaxDays?: number | null;
   sessionDurationMinutes?: number | null;
   commentCount?: number;
+  batchReactionData?: BatchReactionItem;
+  onReactionMutate?: () => void;
 }
 
 export function PracticeShowcaseCard({
@@ -67,6 +67,8 @@ export function PracticeShowcaseCard({
   frequencyMaxDays,
   sessionDurationMinutes,
   commentCount = 0,
+  batchReactionData: _batchReactionData,
+  onReactionMutate: _onReactionMutate,
 }: PracticeShowcaseCardProps) {
   const startFmt = formatShowcaseDate(startDate);
   const endFmt = formatShowcaseDate(endDate);
@@ -130,7 +132,9 @@ export function PracticeShowcaseCard({
       content: (
         <BrowseActivityContent
           viewCount={practiceData?.data?.stats?.viewCount ?? 0}
-          commentCount={commentsData?.data?.length ?? commentCount}
+          commentCount={
+            practiceData?.data?.stats?.commentCount ?? commentsData?.data?.length ?? commentCount
+          }
           followers={followers}
           onClose={() => closeSheet()}
         />
@@ -141,47 +145,21 @@ export function PracticeShowcaseCard({
     });
   };
 
-  const { data: reactionsData, mutate } = useReactions({ targetType: "practice", targetId: id });
-  const [, startTransition] = useTransition();
-
-  const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
-    null) as ReactionTypeType | null;
-  const selectedReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
-  const allReactions = reactionsData?.data?.reactions ?? [];
-  const totalCount = allReactions.reduce((sum, r) => sum + r.count, 0);
-  const displayReactions = allReactions
-    .filter((r) => r.count > 0)
-    .map((r) => r.type as ReactionTypeType);
-
-  const handleToggle = useCallback(
-    (type: ReactionTypeType) => {
-      const isSelected = currentUserReaction === type;
-      startTransition(async () => {
-        if (isSelected) {
-          await removeReaction({ targetType: "practice", targetId: id });
-        } else {
-          await upsertReaction({
-            targetType: "practice",
-            targetId: id,
-            reactionType: type as ReactionTypeValue,
-          });
-        }
-        await mutate();
-      });
-    },
-    [currentUserReaction, id, mutate]
+  const { selectedReactions, totalCount, displayReactions, handleToggle } = useCardReactions(
+    "practice",
+    id
   );
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: card click for navigation
     // biome-ignore lint/a11y/noStaticElementInteractions: card click for navigation
     <div
-      className="bg-white rounded-2xl p-4 shadow-sm border border-[#E8F8FF] cursor-pointer"
+      className="bg-white rounded-xl p-5 cursor-pointer shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200"
       onClick={() => router.push(`/practices/${id}`)}
     >
       {/* Header row */}
       <div className="flex items-center gap-2 mb-2">
-        <Badge variant={statusInfo.variant} size="sm" className="w-fit">
+        <Badge variant={statusInfo.variant} size="sm" className="w-fit text-[10px]">
           {statusInfo.label}
         </Badge>
         {startFmt && endFmt && (
@@ -323,7 +301,8 @@ export function PracticeShowcaseCard({
         >
           <DialogOutlineSvg className="size-6" />
           {(() => {
-            const count = commentsData?.data?.length ?? commentCount;
+            const count =
+              practiceData?.data?.stats?.commentCount ?? commentsData?.data?.length ?? commentCount;
             return count > 0 ? <span className="text-sm font-medium">{count}</span> : null;
           })()}
         </Link>

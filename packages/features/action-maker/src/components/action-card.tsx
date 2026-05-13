@@ -67,7 +67,7 @@ export function ActionCard({ action, isSelected, onSelect }: ActionCardProps) {
       className={`flex min-h-[200px] w-[280px] flex-shrink-0 cursor-pointer flex-col gap-3 rounded-2xl border p-5 text-left transition-all snap-center ${
         isSelected
           ? "border-white/60 bg-[rgba(24,33,94,0.8)] ring-2 ring-white/30"
-          : "border-[var(--am-card-border)] bg-[var(--am-card-bg)] hover:border-white/40"
+          : "border-[var(--am-card-border)] bg-[var(--am-card-bg)] hover:border-white/40 opacity-50 hover:opacity-100"
       }`}
     >
       {/* Header */}

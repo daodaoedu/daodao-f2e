@@ -28,18 +28,24 @@ export function getShareAPI({
   };
 
   const facebookShare = openInNewTab(
-    `https://www.facebook.com/sharer/sharer.php?u=${formattedUrl}&source_surface=external_reshare&display=popup&hashtag=${hashtag}`
+    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(formattedUrl)}&source_surface=external_reshare&display=popup&hashtag=${encodeURIComponent(hashtag)}`
   );
 
-  const lineShare = openInNewTab(`https://social-plugins.line.me/lineit/share?url=${formattedUrl}`);
+  const lineShare = openInNewTab(
+    `https://line.me/R/msg/text/?${encodeURIComponent(`${text}\n${formattedUrl}`)}`
+  );
 
   const linkedinShare = openInNewTab(
-    `https://www.linkedin.com/sharing/share-offsite/?url=${formattedUrl}&text=${text}`
+    `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(formattedUrl)}`
   );
 
-  const threadsShare = openInNewTab(`https://threads.net/intent/post?text=${formattedUrl}`);
+  const threadsShare = openInNewTab(
+    `https://threads.net/intent/post?text=${encodeURIComponent(`${text}\n${formattedUrl}`)}`
+  );
 
-  const xShare = openInNewTab(`https://x.com/intent/tweet?text=${formattedUrl}`);
+  const xShare = openInNewTab(
+    `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(formattedUrl)}${hashtag ? `&hashtags=${encodeURIComponent(hashtag.replace("#", ""))}` : ""}`
+  );
 
   return {
     facebookShare,

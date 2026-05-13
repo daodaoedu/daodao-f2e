@@ -25,17 +25,17 @@ type PreferencesMap = Record<string, PreferenceState>;
 const NOTIFICATION_TYPES = [
   { type: "reaction", label: "反應", description: "有人對你的內容按了反應" },
   { type: "comment", label: "留言與 @", description: "有人留言或 @ 提及了你" },
-  { type: "follow-user", label: "關注", description: "有人關注了你" },
-  { type: "connect", label: "連結請求", description: "有人向你發出連結請求" },
-  { type: "agree-connect", label: "連結確認", description: "對方同意了你的連結請求" },
+  { type: "UserFollowed", label: "關注", description: "有人關注了你" },
+  { type: "Connect", label: "連結請求", description: "有人向你發出連結請求" },
+  { type: "ConnectAccepted", label: "連結確認", description: "對方同意了你的連結請求" },
   { type: "update-practice-checkin", label: "關注的實踐更新", description: "你關注的實踐有新打卡" },
   {
-    type: "practice-started",
+    type: "PracticeCreated",
     label: "關注的人開始實踐",
     description: "你關注的人開始了新主題實踐",
   },
-  { type: "buddy-request", label: "Buddy 請求", description: "有人邀請你成為實踐夥伴" },
-  { type: "weekly", label: "週報", description: "每週一的島嶼探索摘要" },
+  { type: "BuddyRequest", label: "Buddy 請求", description: "有人邀請你成為實踐夥伴" },
+  { type: "WeeklyDigest", label: "週報", description: "每週一的島嶼探索摘要" },
 ];
 
 const DEFAULT_PREFS: PreferencesMap = Object.fromEntries(
@@ -85,13 +85,15 @@ function Toggle({
 export const NotificationSettings = () => {
   const { data, mutate } = useNotificationPreferences();
 
-  const [globalEnabled, setGlobalEnabled] = useState(true);
-  const [prefs, setPrefs] = useState<PreferencesMap>(DEFAULT_PREFS);
+  const [globalEnabled, setGlobalEnabled] = useState<boolean | undefined>(undefined);
+  const [prefs, setPrefs] = useState<PreferencesMap | undefined>(undefined);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Sync from API response
+  // Sync from API response — only runs once data arrives
   useEffect(() => {
     if (!data) return;
+    const n01Prefs = (data.data ?? []).filter((p) => p.channel === "N01");
+    setGlobalEnabled(n01Prefs.length === 0 || n01Prefs.some((p) => p.isEnabled));
     const newPrefs: PreferencesMap = { ...DEFAULT_PREFS };
     for (const p of data.data ?? []) {
       if (p.channel === "N01" && newPrefs[p.type]) {
@@ -106,32 +108,66 @@ export const NotificationSettings = () => {
     setIsSaving(true);
     try {
       await updateNotificationPreferences({ globalEnabled: value });
-      mutate();
       toast.success(value ? "已開啟通知" : "已關閉通知");
     } catch {
       setGlobalEnabled(!value);
       toast.error("儲存失敗，請稍後再試");
     } finally {
       setIsSaving(false);
+      mutate();
     }
   };
 
   const handleTypeToggle = async (notificationType: string, emailEnabled: boolean) => {
-    const prev = prefs[notificationType];
-    setPrefs((p) => ({ ...p, [notificationType]: { emailEnabled } }));
+    const prev = prefs?.[notificationType];
+    setPrefs((p) => ({ ...(p ?? DEFAULT_PREFS), [notificationType]: { emailEnabled } }));
     setIsSaving(true);
     try {
       await updateNotificationPreferences({
         preferences: [{ type: notificationType, channel: "N01", isEnabled: emailEnabled }],
       });
-      mutate();
     } catch {
-      setPrefs((p) => ({ ...p, [notificationType]: prev ?? { emailEnabled: true } }));
+      setPrefs((p) => ({
+        ...(p ?? DEFAULT_PREFS),
+        [notificationType]: prev ?? { emailEnabled: true },
+      }));
       toast.error("儲存失敗，請稍後再試");
     } finally {
       setIsSaving(false);
+      mutate();
     }
   };
+
+  // 資料尚未載入時顯示 skeleton
+  if (globalEnabled === undefined || prefs === undefined) {
+    return (
+      <div className="flex flex-col gap-5 animate-pulse">
+        <div className="bg-white rounded-2xl overflow-hidden">
+          <div className="flex items-center gap-3 px-4 py-4">
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="h-4 w-24 bg-[#E4EAE9] rounded" />
+              <div className="h-3 w-48 bg-[#E4EAE9] rounded" />
+            </div>
+            <div className="h-6 w-11 bg-[#E4EAE9] rounded-full" />
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <div className="h-3 w-24 bg-[#E4EAE9] rounded mx-1" />
+          <div className="bg-white rounded-2xl overflow-hidden divide-y divide-[#E4EAE9]">
+            {NOTIFICATION_TYPES.map((item) => (
+              <div key={item.type} className="flex items-center gap-3 px-4 py-3">
+                <div className="flex-1 flex flex-col gap-2">
+                  <div className="h-4 w-20 bg-[#E4EAE9] rounded" />
+                  <div className="h-3 w-36 bg-[#E4EAE9] rounded" />
+                </div>
+                <div className="h-6 w-11 bg-[#E4EAE9] rounded-full" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">

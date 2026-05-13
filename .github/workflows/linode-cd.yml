@@ -144,6 +144,30 @@ jobs:
         with:
           run_install: false
 
+      # ===== pnpm 依賴快取 =====
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      # ===== Next.js 構建快取 =====
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: apps/website/.next/cache
+          key: ${{ runner.os }}-nextjs-website-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('apps/website/**/*.ts', 'apps/website/**/*.tsx', 'packages/**/*.ts', 'packages/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-website-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-nextjs-website-
+
       - name: Create environment files
         run: |
           BRANCH="${{ env.BRANCH_NAME }}"
@@ -169,7 +193,6 @@ jobs:
       - name: Set Environment Variables
         id: meta
         run: |
-          # 使用全域 BRANCH_NAME 環境變數（對於 workflow_run 是觸發 CI 的分支）
           BRANCH="${{ env.BRANCH_NAME }}"
           echo "Building for branch: $BRANCH"
 
@@ -182,7 +205,6 @@ jobs:
             echo "NODE_ENV=production" >> $GITHUB_ENV
             echo "image-tag=dev" >> $GITHUB_OUTPUT
           else
-            # Feature branch: feat/v3 → v3
             FEAT_NAME="${BRANCH#feat/}"
             echo "IMAGE_TAG=feat" >> $GITHUB_ENV
             echo "NODE_ENV=production" >> $GITHUB_ENV
@@ -224,6 +246,7 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
           platforms: linux/amd64
 
+      # ===== Docker 驗證：輪詢取代 sleep 15 =====
       - name: Verify Website Docker image
         run: |
           echo "🧪 Verifying Website Docker image..."
@@ -233,15 +256,19 @@ jobs:
             -e NODE_ENV=${{ env.NODE_ENV }} \
             ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website:${{ env.IMAGE_TAG }}-${{ env.COMMIT_SHA }}
 
-          sleep 15
-
-          if docker ps | grep test-website; then
-            echo "✅ Website container started successfully"
-          else
-            echo "❌ Website container failed to start"
-            docker logs test-website
-            exit 1
-          fi
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3010 > /dev/null 2>&1; then
+              echo "✅ Website container ready in ${i}s"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "❌ Website container failed to start within 30s"
+              docker logs test-website
+              docker stop test-website || true
+              exit 1
+            fi
+            sleep 1
+          done
 
           docker stop test-website || true
 
@@ -271,6 +298,30 @@ jobs:
         with:
           run_install: false
 
+      # ===== pnpm 依賴快取 =====
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      # ===== Next.js 構建快取 =====
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: apps/product/.next/cache
+          key: ${{ runner.os }}-nextjs-product-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('apps/product/**/*.ts', 'apps/product/**/*.tsx', 'packages/**/*.ts', 'packages/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-product-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-nextjs-product-
+
       - name: Create environment files
         run: |
           BRANCH="${{ env.BRANCH_NAME }}"
@@ -296,7 +347,6 @@ jobs:
       - name: Set Environment Variables
         id: meta
         run: |
-          # 使用全域 BRANCH_NAME 環境變數（對於 workflow_run 是觸發 CI 的分支）
           BRANCH="${{ env.BRANCH_NAME }}"
           echo "Building for branch: $BRANCH"
 
@@ -309,7 +359,6 @@ jobs:
             echo "NODE_ENV=production" >> $GITHUB_ENV
             echo "image-tag=dev" >> $GITHUB_OUTPUT
           else
-            # Feature branch: feat/v3 → v3
             FEAT_NAME="${BRANCH#feat/}"
             echo "IMAGE_TAG=feat" >> $GITHUB_ENV
             echo "NODE_ENV=production" >> $GITHUB_ENV
@@ -351,6 +400,7 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
           platforms: linux/amd64
 
+      # ===== Docker 驗證：輪詢取代 sleep 15 =====
       - name: Verify Product Docker image
         run: |
           echo "🧪 Verifying Product Docker image..."
@@ -361,15 +411,20 @@ jobs:
             -e HOSTNAME=0.0.0.0 \
             ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-product:${{ env.IMAGE_TAG }}-${{ env.COMMIT_SHA }}
 
-          sleep 15
-
-          if docker ps | grep test-product; then
-            echo "✅ Product container started successfully"
-          else
-            echo "❌ Product container failed to start"
-            docker logs test-product || true
-            exit 1
-          fi
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3011 > /dev/null 2>&1; then
+              echo "✅ Product container ready in ${i}s"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "❌ Product container failed to start within 30s"
+              docker logs test-product || true
+              docker stop test-product || true
+              docker rm test-product || true
+              exit 1
+            fi
+            sleep 1
+          done
 
           docker stop test-product || true
           docker rm test-product || true
@@ -633,13 +688,13 @@ jobs:
               echo "Container Status: \$WEBSITE_STATUS"
               echo "Health Status: \$WEBSITE_HEALTH"
 
-              if [ "\$WEBSITE_STATUS" != "running" ]; then
+              if [ \"\$WEBSITE_STATUS\" != \"running\" ]; then
                 echo "❌ Website container is not running"
                 [ -n "\$WEBSITE_CONTAINER" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
-              if [ "\$WEBSITE_HEALTH" = "unhealthy" ]; then
+              if [ \"\$WEBSITE_HEALTH\" = \"unhealthy\" ]; then
                 echo "❌ Website container is unhealthy"
                 [ -n "\$WEBSITE_CONTAINER" ] && docker logs \$WEBSITE_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
@@ -661,13 +716,13 @@ jobs:
               echo "Container Status: \$PRODUCT_STATUS"
               echo "Health Status: \$PRODUCT_HEALTH"
 
-              if [ "\$PRODUCT_STATUS" != "running" ]; then
+              if [ \"\$PRODUCT_STATUS\" != \"running\" ]; then
                 echo "❌ Product container is not running"
                 [ -n "\$PRODUCT_CONTAINER" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1
               fi
 
-              if [ "\$PRODUCT_HEALTH" = "unhealthy" ]; then
+              if [ \"\$PRODUCT_HEALTH\" = \"unhealthy\" ]; then
                 echo "❌ Product container is unhealthy"
                 [ -n "\$PRODUCT_CONTAINER" ] && docker logs \$PRODUCT_CONTAINER --tail=20 2>/dev/null || echo 'Logs not available'
                 exit 1

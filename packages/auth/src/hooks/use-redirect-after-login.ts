@@ -1,7 +1,7 @@
 "use client";
 
 import { getStorage, StorageEnum } from "@daodao/shared";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { decodeOAuthState, verifyAndConsumeOAuthState } from "../lib/auth-client";
 import { DEFAULT_REDIRECT_URL, ONBOARDING_URL } from "../lib/auth-constants";
@@ -24,8 +24,16 @@ import { DEFAULT_REDIRECT_URL, ONBOARDING_URL } from "../lib/auth-constants";
  * }
  * ```
  */
+
+// 整頁重新載入而非 client-side router.push：
+// - 確保 AuthProvider 重 mount，checkAuth 在新 session cookie 就緒後重跑，
+//   避免 isAuthenticated 還是上一頁的 false 就觸發路由保護把使用者踢回登入頁
+// - 避開 next/navigation 的 router.push 不帶 locale prefix 在 next-intl 路由下的不一致行為
+const hardNavigate = (url: string) => {
+  window.location.href = url;
+};
+
 export const useRedirectAfterLogin = () => {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -39,9 +47,9 @@ export const useRedirectAfterLogin = () => {
     if (!stateParam) {
       // 沒有 state 參數，根據是否為新用戶決定跳轉
       if (isNewUser) {
-        router.push(ONBOARDING_URL);
+        hardNavigate(ONBOARDING_URL);
       } else {
-        router.push(DEFAULT_REDIRECT_URL);
+        hardNavigate(DEFAULT_REDIRECT_URL);
       }
       return;
     }
@@ -51,9 +59,9 @@ export const useRedirectAfterLogin = () => {
     if (!state) {
       // State 格式錯誤，根據是否為新用戶決定跳轉
       if (isNewUser) {
-        router.push(ONBOARDING_URL);
+        hardNavigate(ONBOARDING_URL);
       } else {
-        router.push(DEFAULT_REDIRECT_URL);
+        hardNavigate(DEFAULT_REDIRECT_URL);
       }
       return;
     }
@@ -62,9 +70,9 @@ export const useRedirectAfterLogin = () => {
     if (!verifyAndConsumeOAuthState(state)) {
       // State 無效、過期或 nonce 不匹配，根據是否為新用戶決定跳轉
       if (isNewUser) {
-        router.push(ONBOARDING_URL);
+        hardNavigate(ONBOARDING_URL);
       } else {
-        router.push(DEFAULT_REDIRECT_URL);
+        hardNavigate(DEFAULT_REDIRECT_URL);
       }
       return;
     }
@@ -72,10 +80,12 @@ export const useRedirectAfterLogin = () => {
     // 驗證成功
     if (isNewUser) {
       // 新用戶跳轉到 onboarding 流程
-      router.push(ONBOARDING_URL);
+      hardNavigate(ONBOARDING_URL);
     } else {
       // 舊用戶跳轉到原目標頁面
-      router.push(state.redirectUrl);
+      // 過濾掉 /auth/error 路徑，避免成功登入後仍被導向錯誤頁面
+      const isSafeRedirect = !state.redirectUrl.includes("/auth/error");
+      hardNavigate(isSafeRedirect ? state.redirectUrl : DEFAULT_REDIRECT_URL);
     }
-  }, [searchParams, router]);
+  }, [searchParams]);
 };
