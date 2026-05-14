@@ -8,6 +8,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { CheckInDateButton } from "./check-in-date-button";
 import type { ICheckInDateSelectorProps } from "./types";
 
+
 export const MobileCheckInDateSelector = ({
   checkInDates,
   checkIns,
@@ -136,10 +137,11 @@ export const MobileCheckInDateSelector = ({
   // 處理關閉按鈕點擊
   const handleClose = () => {
     if (closeActionTo) {
-      router.push(closeActionTo);
-    } else {
-      router.back();
+      router.replace(closeActionTo);
+      return;
     }
+
+    router.replace("/");
   };
 
   return (
