@@ -64,9 +64,14 @@ export const PageHeader = ({
     if (onRightAction) {
       onRightAction();
     } else if (rightActionTo) {
-      router.push(rightActionTo);
+      router.replace(rightActionTo);
     } else {
-      router.back();
+      if (window.history.length > 1) {
+        router.back();
+        return;
+      }
+
+      router.replace("/");
     }
   };
 
