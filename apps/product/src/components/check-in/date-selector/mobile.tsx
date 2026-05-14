@@ -8,10 +8,6 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { CheckInDateButton } from "./check-in-date-button";
 import type { ICheckInDateSelectorProps } from "./types";
 
-const canNavigateBack = () => {
-  if (typeof window === "undefined") return false;
-  return window.history.length > 1 && document.referrer.startsWith(window.location.origin);
-};
 
 export const MobileCheckInDateSelector = ({
   checkInDates,
@@ -142,11 +138,6 @@ export const MobileCheckInDateSelector = ({
   const handleClose = () => {
     if (closeActionTo) {
       router.replace(closeActionTo);
-      return;
-    }
-
-    if (canNavigateBack()) {
-      router.back();
       return;
     }
 
