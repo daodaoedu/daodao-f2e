@@ -18,7 +18,7 @@ import {
   FlagOutlineSvg,
   TelescopeSvg,
 } from "@daodao/assets";
-import { usePathname, useRouter } from "@daodao/i18n/navigation";
+import { usePathname, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -309,6 +309,7 @@ export function PracticeDetailShell({
 }: IPracticeDetailShellProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { copyPractice } = useCopyPractice();
   const [isCopying, setIsCopying] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("comments");
@@ -342,6 +343,16 @@ export function PracticeDetailShell({
   const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(
     undefined
   );
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam !== "comments") return;
+
+    setActiveTab("comments");
+    requestAnimationFrame(() => {
+      commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [searchParams]);
 
   const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
     null) as ReactionTypeType | null;

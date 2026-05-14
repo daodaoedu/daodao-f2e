@@ -253,7 +253,7 @@ export function PracticeShowcaseCard({
             // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
             // biome-ignore lint/a11y/noStaticElementInteractions: stop card click
             <span onClick={(e) => e.stopPropagation()}>
-              <Link href={`/users/${user.id}`} className="shrink-0">
+              <Link href={`/users/${user.id}`} prefetch className="shrink-0">
                 <Avatar className="size-16">
                   {user.photoUrl && <AvatarImage src={user.photoUrl} />}
                   <AvatarFallback>
@@ -308,7 +308,7 @@ export function PracticeShowcaseCard({
         />
 
         <Link
-          href={`/practices/${id}`}
+          href={`/practices/${id}?tab=comments`}
           className="flex items-center gap-1.5 text-[#9FB5B8] hover:text-text-dark transition-colors"
         >
           <DialogOutlineSvg className="size-6" />
@@ -352,6 +352,7 @@ export function PracticeShowcaseCard({
                   {commentUserIslandHref ? (
                     <Link
                       href={commentUserIslandHref}
+                      prefetch
                       aria-label={`前往 ${commentUserName} 的小島`}
                       className="shrink-0"
                     >
@@ -364,6 +365,7 @@ export function PracticeShowcaseCard({
                     {commentUserIslandHref ? (
                       <Link
                         href={commentUserIslandHref}
+                        prefetch
                         className="text-xs font-semibold text-[#295E5C] mr-1.5 hover:underline"
                       >
                         {commentUserName}
