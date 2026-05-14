@@ -56,22 +56,21 @@ const tokens = createTokens({
   ...defaultTokens,
   color: {
     ...defaultTokens.color,
-    // Primary
+    // Base palettes
     primaryPalest: colors.primary.palest,
     primaryPale: colors.primary.pale,
     primaryLightest: colors.primary.lightest,
     primaryLighter: colors.primary.lighter,
     primaryBase: colors.primary.base,
     primaryDarker: colors.primary.darker,
-    // Gray
     grayDark: colors.gray.dark,
     grayMid: colors.gray.mid,
     grayLight: colors.gray.light,
     grayVeryLight: colors.gray.veryLight,
     grayWhite: colors.gray.white,
-    // Tips
-    tips: "#FFA10B",
-    // Mascot
+
+    // Semantic colors
+    accentTips: "#FFA10B",
     mascotAqua: colors.mascot.aqua,
     mascotBrightBlue: colors.mascot.brightBlue,
   },

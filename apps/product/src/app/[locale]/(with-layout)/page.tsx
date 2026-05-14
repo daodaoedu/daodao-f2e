@@ -108,6 +108,10 @@ export default function HomePage() {
     (searchParams.get("tab") as TabType) === "mine" ? "mine" : "inspire"
   );
 
+  useEffect(() => {
+    setActiveTab((searchParams.get("tab") as TabType) === "mine" ? "mine" : "inspire");
+  }, [searchParams]);
+
   const handleTabChange = useCallback(
     (tab: TabType) => {
       setActiveTab(tab);
