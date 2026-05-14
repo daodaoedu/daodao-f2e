@@ -22,7 +22,6 @@ import { toast } from "@daodao/ui/components/sonner";
 import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
 import { zhTW } from "date-fns/locale";
 import { X } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { CheckInButton } from "@/components/check-in";
 import type { IComment, ICommentReply } from "@/components/check-in/reactions";
@@ -194,8 +193,6 @@ export default function PracticeDetailPage() {
   const router = useRouter();
   const params = useParams();
   const practiceId = params.id as string;
-  const searchParams = useSearchParams();
-  const fromCopy = searchParams.get("from") === "copy";
   const {
     data: practiceData,
     isLoading,
@@ -469,7 +466,7 @@ export default function PracticeDetailPage() {
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.replace("/")}
+            onClick={() => router.replace("/?tab=mine")}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label="關閉"
           >
@@ -490,7 +487,7 @@ export default function PracticeDetailPage() {
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.replace("/")}
+            onClick={() => router.replace("/?tab=mine")}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label="關閉"
           >
@@ -520,7 +517,7 @@ export default function PracticeDetailPage() {
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
         <button
           type="button"
-          onClick={() => (fromCopy ? router.replace("/?tab=mine") : router.replace("/"))}
+          onClick={() => router.replace("/?tab=mine")}
           className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
           aria-label="關閉"
         >
