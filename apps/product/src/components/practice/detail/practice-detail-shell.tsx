@@ -343,16 +343,30 @@ export function PracticeDetailShell({
   const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(
     undefined
   );
+  const tabParam = searchParams.get("tab");
+
+  const isValidTab = useCallback((tab: string | null): tab is TabType => {
+    if (!tab) {
+      return false;
+    }
+
+    return TABS.some((item) => item.id === tab);
+  }, []);
 
   useEffect(() => {
-    const tabParam = searchParams.get("tab");
-    if (tabParam !== "comments") return;
+    if (!isValidTab(tabParam)) {
+      return;
+    }
 
-    setActiveTab("comments");
+    setActiveTab(tabParam);
+    if (tabParam !== "comments") {
+      return;
+    }
+
     requestAnimationFrame(() => {
       commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-  }, [searchParams]);
+  }, [isValidTab, tabParam]);
 
   const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
     null) as ReactionTypeType | null;
