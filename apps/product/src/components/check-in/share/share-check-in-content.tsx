@@ -5,7 +5,7 @@ import LineSvg from "@daodao/assets/images/social-icons/line-filled.svg";
 import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin-filled.svg";
 import ThreadsSvg from "@daodao/assets/images/social-icons/threads-filled.svg";
 import XSvg from "@daodao/assets/images/social-icons/x-filled.svg";
-import { captureElementAsImage, getShareAPI } from "@daodao/shared";
+import { captureElementAsImage, dataUrlToFile, getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { Download, ExternalLink } from "lucide-react";
@@ -62,27 +62,49 @@ export const ShareCheckInSheetContent = ({
   const shareAPI = getShareAPI({
     title: taskTitle,
     text: shareText,
+    nativeText: shareText,
     url: shareUrl,
     hashtag: "#島島阿學",
   });
+
+  const handleNativeShare = async () => {
+    const imageFile = cardImageUrl
+      ? dataUrlToFile(cardImageUrl, `check-in-${checkInData.date || "card"}.png`)
+      : null;
+
+    try {
+      const didShare = await shareAPI.nativeShare?.({
+        files: imageFile ? [imageFile] : [],
+        nativeText: shareText,
+      });
+
+      if (!didShare) {
+        toast.error("此瀏覽器不支援系統分享");
+      }
+    } catch (error) {
+      const isCancelled = error instanceof DOMException && error.name === "AbortError";
+      if (!isCancelled) {
+        toast.error("分享失敗，請稍後再試");
+      }
+    }
+  };
 
   // 處理下載打卡圖片
   const handleDownloadImage = () => {
     if (!cardImageUrl) return;
     try {
-      const byteString = atob(cardImageUrl.split(",")[1] || "");
-      const mimeType = cardImageUrl.split(",")[0]?.match(/:(.*?);/)?.[1] || "image/png";
-      const ab = new ArrayBuffer(byteString.length);
-      const ia = new Uint8Array(ab);
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
+      const imageFile = dataUrlToFile(cardImageUrl, `check-in-${checkInData.date || "card"}.png`);
+      if (!imageFile) {
+        toast.error("下載失敗");
+        return;
       }
-      const blob = new Blob([ab], { type: mimeType });
+
+      const blob = new Blob([imageFile], { type: imageFile.type });
       const blobUrl = URL.createObjectURL(blob);
 
       const link = document.createElement("a");
       link.href = blobUrl;
-      link.download = `check-in-${checkInData.date || Date.now()}.jpg`;
+      link.download = imageFile.name;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -185,7 +207,7 @@ export const ShareCheckInSheetContent = ({
                 variant="link"
                 size="icon"
                 className="bg-light-blue rounded-lg"
-                onClick={shareAPI.nativeShare}
+                onClick={handleNativeShare}
                 aria-label="分享到其他平台"
               >
                 <ExternalLink className="size-7" />

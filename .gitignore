@@ -67,3 +67,5 @@ pnpm-debug.log*
 
 # Git worktrees
 .worktrees/
+
+.omc

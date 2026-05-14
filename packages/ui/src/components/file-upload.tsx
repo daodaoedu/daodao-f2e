@@ -1,34 +1,31 @@
 "use client";
 
 import { GalleryAddSvg } from "@daodao/assets";
-import { ImageIcon, X } from "lucide-react";
+import { X } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "../lib/utils";
 
 // Component to handle image preview with proper cleanup
+// 使用 useState + effect cleanup 先清除 src 再 revoke，避免 React Strict Mode 雙重 effect
+// 導致 URL 失效後 img 仍指向已 revoked blob URL 而破圖
 const FilePreviewImage = ({ file, index }: { file: File; index: number }) => {
-  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+  const [objectUrl, setObjectUrl] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
+    setObjectUrl(url);
 
     return () => {
+      setObjectUrl(null);
       URL.revokeObjectURL(url);
     };
   }, [file]);
 
-  if (!previewUrl) {
-    return (
-      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-        <ImageIcon className="size-6 text-gray-400" />
-      </div>
-    );
-  }
+  if (!objectUrl) return null;
 
   return (
-    <img src={previewUrl} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+    <img src={objectUrl} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
   );
 };
 

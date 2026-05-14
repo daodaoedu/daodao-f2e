@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserMutations } from "@daodao/api";
+import { checkCustomIdAvailability, useUserMutations } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
@@ -64,6 +64,26 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
     mode: "onChange",
   });
 
+  const validateCustomIdAvailability = async (customId: string): Promise<boolean> => {
+    const response = await checkCustomIdAvailability(customId.trim());
+
+    if (response.error) {
+      console.error("Failed to check customId availability:", response.error);
+      toast.error(t("errors.submitFailed"));
+      return false;
+    }
+
+    if (!response.data?.data?.available) {
+      form.setError("customId", {
+        type: "server",
+        message: t("steps.profile.usernameUnavailable"),
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   /**
    * 驗證當前步驟的欄位
    */
@@ -73,7 +93,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
     try {
       switch (currentStep) {
         case 1:
-          // Profile 步驟：所有欄位都是選填的，但如果有填寫則需驗證格式
+          // Profile 步驟：確認必填欄位與 customId 可用性
           await profileStepSchema.parseAsync({
             email: values.email,
             birthDate: values.birthDate,
@@ -81,7 +101,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
             customId: values.customId,
             personalSlogan: values.personalSlogan,
           });
-          return true;
+          return validateCustomIdAvailability(values.customId);
 
         case 2:
           // Interests 步驟：interests 是必填
@@ -129,9 +149,9 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
       // 組裝 API 請求資料（所有欄位都是必填）
       const updateData: Parameters<typeof updateCurrentUserWithFormData>[0] = {
         birthDay: format(values.birthDate, "yyyy-MM-dd"),
-        name: values.name,
-        customId: values.customId,
-        personalSlogan: values.personalSlogan,
+        name: values.name.trim(),
+        customId: values.customId.trim(),
+        personalSlogan: values.personalSlogan.trim(),
         professionalField: values.professionalFields,
         interestList: values.interests,
         referralSource: values.referralSource,

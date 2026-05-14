@@ -18,7 +18,7 @@ import {
   XFilledSvg,
 } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
-import { getShareAPI } from "@daodao/shared";
+import { dataUrlToFile, getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
 import { toast } from "@daodao/ui/components/sonner";
@@ -57,7 +57,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
   const [isPublishing, setIsPublishing] = useState(false);
 
   // 使用摘要圖片生成 hook
-  const { summaryCardRef, isGenerating, downloadImage } = usePracticeSummaryImage({
+  const { summaryCardRef, isGenerating, downloadImage, generateImage } = usePracticeSummaryImage({
     practiceName: summary.practiceName,
   });
 
@@ -94,6 +94,29 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
   // 處理下載圖片
   const handleDownloadImage = async () => {
     await downloadImage();
+  };
+
+  const handleNativeShare = async () => {
+    const imageData = await generateImage();
+    const imageFile = imageData
+      ? dataUrlToFile(imageData.src, `${summary.practiceName || "practice"}-summary.png`)
+      : null;
+
+    try {
+      const didShare = await shareAPI.nativeShare?.({
+        files: imageFile ? [imageFile] : [],
+        nativeText: shareText,
+      });
+
+      if (!didShare) {
+        toast.error("此瀏覽器不支援系統分享");
+      }
+    } catch (error) {
+      const isCancelled = error instanceof DOMException && error.name === "AbortError";
+      if (!isCancelled) {
+        toast.error("分享失敗，請稍後再試");
+      }
+    }
   };
 
   return (
@@ -244,7 +267,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
               variant="link"
               size="icon"
               className="bg-light-blue rounded-lg"
-              onClick={shareAPI.nativeShare}
+              onClick={handleNativeShare}
               aria-label="分享到其他平台"
             >
               <ExternalLink className="size-7" />

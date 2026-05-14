@@ -1,5 +1,5 @@
 import { MessageCircle, MoreHorizontal } from "@tamagui/lucide-icons";
-import { useRouter } from "expo-router";
+import { type Href, useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
 import { Image, Pressable, StyleSheet } from "react-native";
@@ -96,7 +96,7 @@ export function ShowcaseCard({
       style={styles.card}
       onPress={() =>
         router.push({
-          pathname: `/practices/${id}` as `/practices/${string}`,
+          pathname: `/practices/${id}` as Href,
           params: { showcaseData: JSON.stringify(practice) },
         })
       }

@@ -40,7 +40,7 @@ export const PracticeOverviewCard = ({
   practiceId,
 }: PracticeOverviewCardProps) => {
   return (
-    <div className="relative bg-white pt-4 px-4 pb-0 mb-4">
+    <div className="relative bg-white pt-4 px-4 pb-4 mb-4 rounded-xl">
       {/* 建立者資訊 - 僅在公開頁面顯示 */}
       {creator && (
         <div className="flex items-center gap-2 mb-3">

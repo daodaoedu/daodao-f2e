@@ -20,6 +20,7 @@ interface PracticeTasksSectionProps {
   completedTasks: ICompletedTask[];
   isEmpty: boolean;
   emptyMessage?: string;
+  counts?: Partial<Record<FilterStatusType, number>>;
 }
 
 export function PracticeTasksSection({
@@ -31,10 +32,11 @@ export function PracticeTasksSection({
   completedTasks,
   isEmpty,
   emptyMessage = "還沒有任何實踐，快去建立第一個吧！",
+  counts,
 }: PracticeTasksSectionProps) {
   return (
     <YStack paddingHorizontal="$4">
-      <FilterPills activeFilter={filterStatus} onFilterChange={onFilterChange} />
+      <FilterPills activeFilter={filterStatus} onFilterChange={onFilterChange} counts={counts} />
 
       {showInProgress && filteredInProgressTasks.length > 0 && (
         <FlatList

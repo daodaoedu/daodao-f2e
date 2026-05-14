@@ -37,68 +37,13 @@ jobs:
   # ===== 主要測試與品質檢查階段 =====
   test:
     runs-on: ubuntu-latest
-    outputs:
-      artifact-name: build-files-${{ github.sha }}
-      build-website: ${{ steps.changes.outputs.website }}
-      build-product: ${{ steps.changes.outputs.product }}
     steps:
       # ===== 代碼檢出 =====
-      - name: Checkout code (shallow)
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          # For PR events, checkout the actual PR branch instead of merge commit
+          fetch-depth: 1
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
-      # ===== 檢測檔案變更 =====
-      - name: Detect file changes
-        id: changes
-        run: |
-          # 如果是 PR，比較 PR 的 base 和 head
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE_SHA="${{ github.event.pull_request.base.sha }}"
-            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
-          else
-            # 如果是 push，比較前一個 commit
-            if git rev-parse HEAD~1 >/dev/null 2>&1; then
-              BASE_SHA="HEAD~1"
-              HEAD_SHA="HEAD"
-            else
-              # 第一個 commit，檢查所有檔案
-              BASE_SHA=""
-              HEAD_SHA="HEAD"
-            fi
-          fi
-
-          echo "Comparing changes between $BASE_SHA and $HEAD_SHA"
-
-          # 獲取變更的檔案列表
-          if [ -z "$BASE_SHA" ]; then
-            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $HEAD_SHA)
-          else
-            CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
-          fi
-
-          echo "Changed files:"
-          echo "$CHANGED_FILES"
-
-          # 檢查是否需要 build website
-          if echo "$CHANGED_FILES" | grep -qE '^(apps/website/|packages/|turbo.json|package.json|pnpm-lock.yaml|pnpm-workspace.yaml)'; then
-            echo "website=true" >> $GITHUB_OUTPUT
-            echo "✅ Website needs rebuild"
-          else
-            echo "website=false" >> $GITHUB_OUTPUT
-            echo "⏭️  Website skipped (no changes)"
-          fi
-
-          # 檢查是否需要 build product
-          if echo "$CHANGED_FILES" | grep -qE '^(apps/product/|packages/|turbo.json|package.json|pnpm-lock.yaml|pnpm-workspace.yaml)'; then
-            echo "product=true" >> $GITHUB_OUTPUT
-            echo "✅ Product needs rebuild"
-          else
-            echo "product=false" >> $GITHUB_OUTPUT
-            echo "⏭️  Product skipped (no changes)"
-          fi
 
       # ===== Node.js 環境設定 =====
       - name: Set up Node.js
@@ -131,17 +76,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # ===== Next.js 構建快取 =====
-      - name: Cache Next.js builds
-        uses: actions/cache@v4
-        with:
-          path: |
-            apps/website/.next/cache
-            apps/product/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('apps/**/*.ts', 'apps/**/*.tsx', 'apps/**/*.js', 'apps/**/*.jsx', 'packages/**/*.ts', 'packages/**/*.tsx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
-
       # ===== 並行品質檢查 =====
       - name: Run checks in parallel
         run: |
@@ -156,57 +90,6 @@ jobs:
 
           wait
 
-      # ===== 設定環境變數 =====
-      - name: Create environment files
-        run: |
-          echo "${{ secrets.ENV_DEV }}" > .env
-          cp .env apps/website/.env
-          cp .env apps/product/.env
-
-      # ===== 建置前置 packages（codegen） =====
-      - name: Build prerequisite packages
-        run: |
-          echo "⚙️ Generating config env (requires .env)..."
-          pnpm --filter @daodao/config generate:env
-
-          echo "⚙️ Building assets (SVG codegen)..."
-          pnpm --filter @daodao/assets build
-
-      # ===== 構建驗證 =====
-      - name: Build applications
-        run: |
-          echo "🏗️ Building applications based on changes..."
-
-          BUILD_WEBSITE="${{ steps.changes.outputs.website }}"
-          BUILD_PRODUCT="${{ steps.changes.outputs.product }}"
-
-          if [ "$BUILD_WEBSITE" = "true" ] && [ "$BUILD_PRODUCT" = "true" ]; then
-            echo "Building both website and product..."
-            pnpm run build
-          elif [ "$BUILD_WEBSITE" = "true" ]; then
-            echo "Building website only..."
-            pnpm --filter @daodao/website build
-          elif [ "$BUILD_PRODUCT" = "true" ]; then
-            echo "Building product only..."
-            pnpm --filter @daodao/product build
-          else
-            echo "⏭️  No applications need to be built"
-          fi
-
-      # ===== 上傳構建產物 =====
-      - name: Upload build artifacts
-        if: steps.changes.outputs.website == 'true' || steps.changes.outputs.product == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-files-${{ github.sha }}
-          path: |
-            ${{ steps.changes.outputs.website == 'true' && 'apps/website/.next' || '' }}
-            ${{ steps.changes.outputs.product == 'true' && 'apps/product/.next' || '' }}
-            package.json
-            pnpm-lock.yaml
-            pnpm-workspace.yaml
-            turbo.json
-          retention-days: 1
 
   # ===== CI 成功通知 =====
   notify-success:

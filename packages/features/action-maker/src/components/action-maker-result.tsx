@@ -32,7 +32,7 @@ const BADGE_STYLES: Record<string, { bg: string; label: string }> = {
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daodao.so";
 
-const CARD_CLASS = "rounded-2xl border border-[var(--am-card-border)] bg-[var(--am-card-bg)] p-5";
+const CARD_CLASS = "rounded-2xl border border-[var(--am-card-border)] bg-white/20 p-5";
 
 export function ActionMakerResult() {
   const { state, result, isHydrated, reset, navigateTo } = useActionMaker();
@@ -138,13 +138,17 @@ export function ActionMakerResult() {
   return (
     <StarryBackground>
       <div className="flex min-h-dvh flex-col pb-8 pt-16">
+        <h1 className="px-6 text-center text-2xl font-bold text-white mb-6">
+          恭喜！你建立了新的習慣
+        </h1>
         {/* ===== Share card area (captured by cardRef) ===== */}
         <div ref={cardRef} className="mx-auto p-6">
           <div
             className="flex w-[350px] flex-col rounded-2xl px-5 pb-6 pt-12"
             style={{
               ...amVarStyle,
-              backgroundColor: "#181F58",
+              background:
+                "radial-gradient(ellipse 80% 50% at 110% 120%, rgba(120, 150, 210, 0.45) 0%, transparent 60%), linear-gradient(180deg, #0D1333 0%, #18215E 60%, #1A2468 100%)",
             }}
           >
             {/* Header — name left, category icon right */}
@@ -266,10 +270,10 @@ export function ActionMakerResult() {
             type="button"
             onClick={handleDownloadShareImage}
             disabled={downloading}
-            className="mt-10 w-full rounded-full border border-white/30 py-4 text-lg font-bold text-white backdrop-blur-sm transition-all duration-300 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-10 w-full rounded-full border border-[#7B8DB8] py-4 text-lg font-medium text-[#18215E] transition-all duration-300 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
             style={{
               background:
-                "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(188,213,238,0.12) 100%)",
+                "radial-gradient(60% 100% at 90% 30%, rgba(107, 173, 224, 0.45) 0%, rgba(107, 173, 224, 0) 100%), radial-gradient(50% 100% at 10% 100%, rgba(211, 160, 255, 0.45) 0%, rgba(211, 160, 255, 0) 100%), white",
             }}
           >
             {downloading ? "產生中..." : "下載分享圖片"}

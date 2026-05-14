@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { isAnswerValue, isQuestionId, parseQuizResult } from "../validation";
+import { describe, expect, it } from "vitest";
 import type { IQuestion } from "../../types";
+import { isAnswerValue, isQuestionId, parseQuizResult } from "../validation";
 
 // Minimal mock question map for testing
 const mockQuestionMap = new Map<string, IQuestion>([
@@ -13,12 +13,20 @@ describe("isAnswerValue", () => {
     expect(isAnswerValue(key)).toBe(true);
   });
 
-  it.each(["X", "Z", "", "l", "a", 1, null, undefined, {}, []])(
-    "returns false for invalid value %s",
-    (value) => {
-      expect(isAnswerValue(value)).toBe(false);
-    },
-  );
+  it.each([
+    "X",
+    "Z",
+    "",
+    "l",
+    "a",
+    1,
+    null,
+    undefined,
+    {},
+    [],
+  ])("returns false for invalid value %s", (value) => {
+    expect(isAnswerValue(value)).toBe(false);
+  });
 });
 
 describe("isQuestionId", () => {

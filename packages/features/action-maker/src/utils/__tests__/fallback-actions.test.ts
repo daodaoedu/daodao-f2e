@@ -1,8 +1,15 @@
-import { describe, it, expect } from "vitest";
-import { getFallbackActions, fallbackActionsMap } from "../fallback-actions";
+import { describe, expect, it } from "vitest";
 import type { CategoryType } from "../../types";
+import { fallbackActionsMap, getFallbackActions } from "../fallback-actions";
 
-const ALL_CATEGORIES: CategoryType[] = ["interest", "social", "health", "academic", "work", "finance"];
+const ALL_CATEGORIES: CategoryType[] = [
+  "interest",
+  "social",
+  "health",
+  "academic",
+  "work",
+  "finance",
+];
 
 describe("getFallbackActions", () => {
   it.each(ALL_CATEGORIES)("returns actions array for category '%s'", (category) => {

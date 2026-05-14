@@ -6,12 +6,7 @@ import type {
   ReactionTargetType,
   ReactionTypeValue,
 } from "@daodao/api";
-import {
-  removeReaction,
-  upsertReaction,
-  useReactions,
-  useReactionsList,
-} from "@daodao/api";
+import { removeReaction, upsertReaction, useReactions, useReactionsList } from "@daodao/api";
 import { useCallback, useTransition } from "react";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 
@@ -20,32 +15,29 @@ export function useCardReactions(
   targetId: string,
   prefetchedData?: BatchReactionItem,
   onMutate?: () => void,
+  options?: { disableIndividualFetch?: boolean }
 ) {
-  const hasBatch = !!prefetchedData;
-
+  const shouldFetchIndividual = !prefetchedData && !options?.disableIndividualFetch;
   const { data: reactionsData, mutate } = useReactions(
     { targetType, targetId },
-    { enabled: !hasBatch },
+    { enabled: shouldFetchIndividual }
   );
   const { data: reactionsListData } = useReactionsList(
     { targetType, targetId },
-    { enabled: !hasBatch },
+    { enabled: shouldFetchIndividual }
   );
   const [, startTransition] = useTransition();
 
   const source = prefetchedData ?? reactionsData?.data;
 
   const currentUserReaction = (source?.currentUserReaction ?? null) as ReactionTypeType | null;
-  const selectedReactions: ReactionTypeType[] = currentUserReaction
-    ? [currentUserReaction]
-    : [];
+  const selectedReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
   const allReactions = source?.reactions ?? [];
   const totalCount = allReactions.reduce((sum, r) => sum + r.count, 0);
   const displayReactions = allReactions
     .filter((r) => r.count > 0)
     .map((r) => r.type as ReactionTypeType);
 
-  // Reaction list items（用於瀏覽活動等）
   const reactionItems: ReactionListItem[] =
     prefetchedData?.items ?? reactionsListData?.data?.items ?? [];
   const firstReactorName = reactionItems[0]?.name ?? undefined;
@@ -67,7 +59,7 @@ export function useCardReactions(
         onMutate?.();
       });
     },
-    [currentUserReaction, targetType, targetId, mutate, onMutate],
+    [currentUserReaction, targetType, targetId, mutate, onMutate]
   );
 
   return {

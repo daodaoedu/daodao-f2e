@@ -3,6 +3,8 @@
 import type { ReactionTypeValue } from "@daodao/api";
 import { removeReaction, upsertReaction, useReactions } from "@daodao/api";
 import { DialogOutlineSvg } from "@daodao/assets";
+import type { MentionCandidate } from "@daodao/features-mention";
+import { MentionInput, useMentionInput } from "@daodao/features-mention";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -17,6 +19,7 @@ import {
   REACTION_CONFIG,
   type ReactionTypeType,
 } from "@/constants/reaction-type";
+import { tokenizeMentionContent } from "./comment-mentions";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
 const PREVIEW_COUNT = 2;
@@ -70,159 +73,52 @@ function getAvatarColor(name: string) {
   return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length] ?? "bg-[#C8FFF2]";
 }
 
+function getAuthorIslandHref(author: ICommentAuthor) {
+  const identifier = author.customId || author.userId;
+  return identifier ? `/users/${identifier}` : null;
+}
+
 // ============================================================================
 // @mention helpers
 // ============================================================================
 
-interface MentionCandidate {
-  userId: string;
-  numericUserId?: number;
-  name: string;
-  photoURL?: string;
-  customId?: string | null;
-}
-
-/** Renders comment content with @mention tokens highlighted */
-function renderContent(content: string) {
-  const parts = content.split(/(@\S+)/g);
+/** Renders comment content with @mention tokens highlighted and linked */
+function renderContent(content: string, participants: MentionCandidate[]) {
+  const segments = tokenizeMentionContent(content, participants);
   return (
     <>
-      {parts.map((part, i) =>
-        part.startsWith("@") ? (
-          // biome-ignore lint/suspicious/noArrayIndexKey: static split segments
+      {segments.map((segment, i) => {
+        if (segment.type === "text") {
+          // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
+          return <span key={i}>{segment.text}</span>;
+        }
+
+        const className = "text-logo-cyan font-medium hover:underline";
+        if (segment.href) {
+          return (
+            <CustomLink
+              // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
+              key={i}
+              href={segment.href}
+              className={className}
+              aria-label={`前往 ${segment.text.slice(1)} 的小島`}
+            >
+              {segment.text}
+            </CustomLink>
+          );
+        }
+
+        return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
           <span key={i} className="text-logo-cyan font-medium">
-            {part}
+            {segment.text}
           </span>
-        ) : (
-          // biome-ignore lint/suspicious/noArrayIndexKey: static split segments
-          <span key={i}>{part}</span>
-        )
-      )}
+        );
+      })}
     </>
   );
 }
 
-// ============================================================================
-// MentionInput — textarea with @mention dropdown
-// ============================================================================
-
-interface MentionInputProps {
-  value: string;
-  onChange: (value: string) => void;
-  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
-  placeholder?: string;
-  rows?: number;
-  className?: string;
-  inputRef?: React.RefObject<HTMLTextAreaElement | null>;
-  participants: MentionCandidate[];
-  autoFocus?: boolean;
-  onMentionSelect?: (candidate: MentionCandidate) => void;
-}
-
-function MentionInput({
-  value,
-  onChange,
-  onKeyDown,
-  placeholder,
-  rows = 1,
-  className,
-  inputRef,
-  participants,
-  autoFocus,
-  onMentionSelect,
-}: MentionInputProps) {
-  const localRef = useRef<HTMLTextAreaElement>(null);
-  const ref = (inputRef ?? localRef) as React.RefObject<HTMLTextAreaElement>;
-  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
-  const [mentionStart, setMentionStart] = useState(-1);
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    onChange(newValue);
-
-    const cursor = e.target.selectionStart ?? newValue.length;
-    const textBeforeCursor = newValue.slice(0, cursor);
-    const lastAt = textBeforeCursor.lastIndexOf("@");
-
-    if (lastAt !== -1) {
-      const afterAt = textBeforeCursor.slice(lastAt + 1);
-      if (!afterAt.includes(" ") && !afterAt.includes("\n")) {
-        setMentionStart(lastAt);
-        setMentionQuery(afterAt);
-        return;
-      }
-    }
-
-    setMentionQuery(null);
-    setMentionStart(-1);
-  };
-
-  const handleSelect = (candidate: MentionCandidate) => {
-    const mention = `@${candidate.customId || candidate.name}`;
-    const before = value.slice(0, mentionStart);
-    const after = value.slice(mentionStart + 1 + (mentionQuery?.length ?? 0));
-    const next = `${before}${mention} ${after}`;
-    onChange(next);
-    onMentionSelect?.(candidate);
-    setMentionQuery(null);
-    setMentionStart(-1);
-    requestAnimationFrame(() => {
-      const el = ref.current;
-      if (!el) return;
-      el.focus();
-      const pos = before.length + mention.length + 1;
-      el.setSelectionRange(pos, pos);
-    });
-  };
-
-  const filtered =
-    mentionQuery !== null
-      ? participants.filter((p) => p.name.toLowerCase().includes(mentionQuery.toLowerCase()))
-      : [];
-
-  return (
-    <div className="relative flex-1 min-w-0">
-      <textarea
-        ref={ref}
-        value={value}
-        onChange={handleChange}
-        onKeyDown={onKeyDown}
-        placeholder={placeholder}
-        rows={rows}
-        className={className}
-        // biome-ignore lint/a11y/noAutofocus: intentional UX for inline edit
-        autoFocus={autoFocus}
-      />
-      {mentionQuery !== null && filtered.length > 0 && (
-        <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-1 z-20 min-w-[160px] max-h-44 overflow-y-auto">
-          {filtered.map((p) => (
-            <button
-              key={p.userId}
-              type="button"
-              onMouseDown={(e) => {
-                e.preventDefault(); // keep textarea focused
-                handleSelect(p);
-              }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors text-left"
-            >
-              <Avatar className="size-6 shrink-0">
-                {p.photoURL && <AvatarImage src={p.photoURL} alt={p.name} />}
-                <AvatarFallback
-                  className={cn("text-xs font-medium text-text-dark", getAvatarColor(p.name))}
-                >
-                  {p.name.slice(0, 1)}
-                </AvatarFallback>
-              </Avatar>
-              <span className="truncate">{p.name}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ============================================================================
 // CommentBubble (single comment or reply)
 // ============================================================================
 
@@ -231,7 +127,7 @@ interface CommentBubbleProps {
   isReply?: boolean;
   onReply?: () => void;
   isOwn?: boolean;
-  onEdit?: (id: string, content: string) => Promise<unknown> | unknown;
+  onEdit?: (id: string, content: string, mentionedUserIds?: number[]) => Promise<unknown> | unknown;
   onDelete?: (id: string) => Promise<unknown> | unknown;
   participants: MentionCandidate[];
 }
@@ -249,6 +145,11 @@ function CommentBubble({
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
   const menuRef = useRef<HTMLDivElement>(null);
+  const {
+    handleMentionSelect: handleEditMentionSelect,
+    getActiveMentionIds: getActiveEditMentionIds,
+    reset: resetEditMentions,
+  } = useMentionInput();
 
   const { data: reactionsData, mutate: mutateReactions } = useReactions({
     targetType: "comment",
@@ -314,42 +215,54 @@ function CommentBubble({
   const handleSaveEdit = async () => {
     const trimmed = editValue.trim();
     if (!trimmed) return;
-    const result = await onEdit?.(comment.id, trimmed);
+    const result = await onEdit?.(comment.id, trimmed, getActiveEditMentionIds(trimmed));
     if (result === false) return; // page-level handler already shows the error toast
     toast.success("已更新留言");
+    resetEditMentions();
     setEditing(false);
   };
 
   const avatarSizeClass = isReply ? "size-8" : "size-10";
   const authorTextClass = "text-sm";
   const timeTextClass = isReply ? "text-[11px]" : "text-xs";
+  const authorIslandHref = getAuthorIslandHref(comment.author);
+  const avatar = (
+    <Avatar className={avatarSizeClass}>
+      {comment.author.photoURL && (
+        <AvatarImage src={comment.author.photoURL} alt={comment.author.name} />
+      )}
+      <AvatarFallback
+        className={cn("text-sm font-medium text-text-dark", getAvatarColor(comment.author.name))}
+      >
+        {comment.author.name.slice(0, 1)}
+      </AvatarFallback>
+    </Avatar>
+  );
 
   return (
     <div className={cn("flex gap-[11px] items-start", isReply && "py-1")}>
       {/* Avatar */}
       <div className="shrink-0">
-        <Avatar className={avatarSizeClass}>
-          {comment.author.photoURL && (
-            <AvatarImage src={comment.author.photoURL} alt={comment.author.name} />
-          )}
-          <AvatarFallback
-            className={cn(
-              "text-sm font-medium text-text-dark",
-              getAvatarColor(comment.author.name)
-            )}
+        {authorIslandHref ? (
+          <CustomLink
+            href={authorIslandHref}
+            aria-label={`前往 ${comment.author.name} 的小島`}
+            className="block"
           >
-            {comment.author.name.slice(0, 1)}
-          </AvatarFallback>
-        </Avatar>
+            {avatar}
+          </CustomLink>
+        ) : (
+          avatar
+        )}
       </div>
 
       {/* Text content */}
       <div className="flex-1 min-w-0">
         {/* Author + time + own-comment menu */}
         <div className="flex items-center gap-2 mb-0.5">
-          {comment.author.userId ? (
+          {authorIslandHref ? (
             <CustomLink
-              href={`/users/${comment.author.userId}`}
+              href={authorIslandHref}
               className={cn("font-semibold text-[#295E5C] hover:underline", authorTextClass)}
             >
               {comment.author.name}
@@ -435,6 +348,7 @@ function CommentBubble({
               rows={3}
               autoFocus
               participants={participants}
+              onMentionSelect={handleEditMentionSelect}
               className="w-full resize-none rounded-lg border border-logo-cyan bg-white px-3 py-2 text-sm text-[#295E5C] focus:outline-none"
             />
             <div className="flex gap-2 justify-end">
@@ -444,6 +358,7 @@ function CommentBubble({
                 onClick={() => {
                   setEditing(false);
                   setEditValue(comment.content);
+                  resetEditMentions();
                 }}
                 className="text-xs px-3 py-1 rounded-full border-[#E4EAE9] text-[#9FB5B8] hover:bg-[#F0F9F8] transition-colors"
               >
@@ -462,7 +377,7 @@ function CommentBubble({
           </div>
         ) : (
           <p className={cn("text-[#295E5C] leading-5 whitespace-pre-wrap", "text-sm")}>
-            {renderContent(comment.content)}
+            {renderContent(comment.content, participants)}
           </p>
         )}
 
@@ -521,7 +436,12 @@ interface CommentSectionProps {
   currentUserId?: string;
   /** 當前登入用戶的頭像 URL */
   currentUserPhotoURL?: string;
-  onEditComment?: (id: string, content: string) => Promise<unknown> | unknown;
+  mentionCandidates?: MentionCandidate[];
+  onEditComment?: (
+    id: string,
+    content: string,
+    mentionedUserIds?: number[]
+  ) => Promise<unknown> | unknown;
   onDeleteComment?: (id: string) => Promise<unknown> | unknown;
 }
 
@@ -534,13 +454,14 @@ export function CommentSection({
   currentUserName,
   currentUserId,
   currentUserPhotoURL,
+  mentionCandidates,
   onEditComment,
   onDeleteComment,
 }: CommentSectionProps) {
   const [inputValue, setInputValue] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyInputs, setReplyInputs] = useState<Record<string, string>>({});
-  const [mentionedIds, setMentionedIds] = useState<Map<number, string>>(new Map());
+  const { handleMentionSelect, getActiveMentionIds, reset: resetMentions } = useMentionInput();
   const [replyMentionedIds, setReplyMentionedIds] = useState<Record<string, Map<number, string>>>(
     {}
   );
@@ -551,8 +472,7 @@ export function CommentSection({
   const internalRef = useRef<HTMLTextAreaElement>(null);
   const ref = externalRef ?? internalRef;
 
-  // Derive participants list from all comment authors for @mention dropdown
-  const participants = useMemo<MentionCandidate[]>(() => {
+  const fallbackParticipants = useMemo<MentionCandidate[]>(() => {
     const seen = new Set<string>();
     const result: MentionCandidate[] = [];
     for (const comment of comments) {
@@ -581,6 +501,7 @@ export function CommentSection({
     }
     return result.filter((p) => p.numericUserId !== undefined);
   }, [comments]);
+  const participants = mentionCandidates?.length ? mentionCandidates : fallbackParticipants;
 
   // Track the previous set to detect newly added reactions
   const prevSelectedRef = useRef<ReactionTypeType[]>([]);
@@ -614,13 +535,9 @@ export function CommentSection({
     const trimmed = inputValue.trim();
     if (!trimmed) return;
 
-    const activeMentionIds = [...mentionedIds.entries()]
-      .filter(([, handle]) => trimmed.includes(`@${handle}`))
-      .map(([id]) => id);
-
-    onSubmit(trimmed, selectedReactions, undefined, activeMentionIds);
+    onSubmit(trimmed, selectedReactions, undefined, getActiveMentionIds(trimmed));
     setInputValue("");
-    setMentionedIds(new Map());
+    resetMentions();
     setReplyTo(null);
   };
 
@@ -687,7 +604,7 @@ export function CommentSection({
       ))}
       {/* Inline reply input */}
       {replyTo === comment.id && (
-        <div className="pl-[40px] flex gap-2 items-center mt-3">
+        <div className="pl-[40px] flex gap-2 items-end mt-3">
           <MentionInput
             value={replyInputs[comment.id] ?? ""}
             onChange={(v) => setReplyInputs((prev) => ({ ...prev, [comment.id]: v }))}
@@ -697,10 +614,10 @@ export function CommentSection({
                 handleReplySubmit(comment.id);
               }
             }}
-            placeholder={`${comment.author.name}...`}
+            placeholder="寫下你的留言…"
             rows={1}
             participants={participants}
-            className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
+            className="flex-1 resize-none overflow-hidden rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
             onMentionSelect={(candidate) => {
               if (!candidate.numericUserId) return;
               const pid = String(comment.id);
@@ -727,7 +644,7 @@ export function CommentSection({
   return (
     <div className="flex flex-col">
       {/* 主留言輸入框（置頂） */}
-      <div className="bg-white border-b border-[#E4EAE9] flex gap-2 items-center px-4 py-3">
+      <div className="relative z-10 bg-white border-b border-[#E4EAE9] flex gap-2 items-end px-4 py-3 rounded-t-xl">
         {/* User avatar */}
         <Avatar className="size-9 shrink-0">
           {currentUserPhotoURL && (
@@ -745,15 +662,8 @@ export function CommentSection({
           rows={1}
           inputRef={ref}
           participants={participants}
-          className="flex-1 resize-none rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors h-10 w-full"
-          onMentionSelect={(candidate) => {
-            if (!candidate.numericUserId) return;
-            setMentionedIds((prev) => {
-              const next = new Map(prev);
-              next.set(candidate.numericUserId as number, candidate.customId || candidate.name);
-              return next;
-            });
-          }}
+          className="flex-1 resize-none overflow-hidden rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
+          onMentionSelect={handleMentionSelect}
         />
 
         {/* Send */}
@@ -769,11 +679,13 @@ export function CommentSection({
 
       {/* 留言列表 */}
       {comments.length > 0 ? (
-        <div className="flex flex-col gap-5 px-4 pt-4 pb-2">
+        <div
+          className={cn("flex flex-col gap-5 px-4 pt-4 pb-2", !hasMoreComments && "rounded-b-xl")}
+        >
           {previewComments.map(renderCommentBlock)}
         </div>
       ) : (
-        <div className="flex items-center justify-center px-4 py-8 text-sm text-[#9FB5B8]">
+        <div className="flex items-center justify-center px-4 py-8 text-sm text-[#9FB5B8] rounded-b-xl">
           尚未有留言
         </div>
       )}
@@ -812,7 +724,7 @@ export function CommentSection({
               expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
             )}
           >
-            <div className="overflow-hidden">
+            <div className="overflow-hidden rounded-b-xl">
               <div className="flex flex-col gap-5 px-4 pt-2 pb-4">
                 {hiddenComments.map(renderCommentBlock)}
               </div>

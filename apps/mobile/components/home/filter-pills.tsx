@@ -13,9 +13,11 @@ const filterOptions = [
 interface FilterPillsProps {
   activeFilter: FilterStatusType;
   onFilterChange: (filter: FilterStatusType) => void;
+  counts?: Partial<Record<FilterStatusType, number>>;
 }
 
-export function FilterPills({ activeFilter, onFilterChange }: FilterPillsProps) {
+export function FilterPills({ activeFilter, onFilterChange, counts }: FilterPillsProps) {
+  const safeCounts = counts ?? {};
   return (
     <ScrollView
       horizontal
@@ -25,6 +27,7 @@ export function FilterPills({ activeFilter, onFilterChange }: FilterPillsProps) 
     >
       {filterOptions.map((option) => {
         const isActive = activeFilter === option.value;
+        const count = safeCounts[option.value];
         return (
           <Pressable
             key={option.value}
@@ -33,6 +36,7 @@ export function FilterPills({ activeFilter, onFilterChange }: FilterPillsProps) 
           >
             <Text fontSize={14} color={isActive ? "white" : "#16B9B3"}>
               {option.label}
+              {count !== undefined ? ` ${count}` : ""}
             </Text>
           </Pressable>
         );

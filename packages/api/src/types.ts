@@ -11208,6 +11208,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/comments/mention-candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 獲取 @mention 候選人 */
+        get: {
+            parameters: {
+                query: {
+                    /** @description 查詢的目標類型 */
+                    targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin";
+                    /** @description 目標對象ID */
+                    targetId: string;
+                    /** @description 候選人數量上限 */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功獲取 @mention 候選人 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: true;
+                            data: components["schemas"]["MentionCandidate"][];
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/comments/{commentId}": {
         parameters: {
             query?: never;
@@ -25832,6 +25884,35 @@ export interface components {
              */
             customId: string | null;
         };
+        /** @description @mention 候選人 */
+        MentionCandidate: {
+            /**
+             * @description 用戶外部 ID
+             * @example user_123e4567
+             */
+            userId: string;
+            /**
+             * @description 用戶內部 ID，用於 mentionedUserIds
+             * @example 1
+             */
+            numericUserId: number;
+            /**
+             * @description 顯示名稱
+             * @example 王小明
+             */
+            name: string;
+            /**
+             * Format: uri
+             * @description 用戶頭像 URL
+             * @example https://example.com/avatar.jpg
+             */
+            photoURL: string | null;
+            /**
+             * @description 用戶自訂 ID
+             * @example my_custom_id
+             */
+            customId: string | null;
+        };
         /** @description 留言基本資料 */
         CommentBase: {
             /**
@@ -25958,6 +26039,11 @@ export interface components {
              * @enum {string}
              */
             visibility?: "public" | "private";
+            /**
+             * @description 編輯後留言中提及的使用者 ID 陣列
+             * @example [1, 2, 3]
+             */
+            mentionedUserIds?: number[];
         };
         /** @description 刪除留言回應 */
         DeleteCommentResponse: {
@@ -28411,6 +28497,10 @@ export interface components {
             reactionType: string;
             /** @description 反應時間（ISO 8601） */
             reactedAt: string;
+            /** @description 該用戶是否公開帳號 */
+            isPublic: boolean;
+            /** @description 請求方是否與該用戶有 Connection 關係 */
+            isConnection: boolean;
         };
         /** @description 個別用戶反應列表回應 */
         GetReactionsListResponse: {

@@ -1,0 +1,39 @@
+{
+  "name": "@daodao/features-mention",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Mention feature module for DaoDao monorepo",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "pnpm dlx rimraf dist node_modules"
+  },
+  "dependencies": {
+    "@daodao/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@daodao/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "react": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "^4.1.2"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
+}

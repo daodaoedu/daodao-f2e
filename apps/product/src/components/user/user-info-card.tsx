@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  ApiError,
   followTarget,
   getConnections,
+  getOutgoingConnectionRequests,
   sendConnectionRequest,
   unfollowTarget,
   useCurrentUser,
@@ -22,12 +24,13 @@ import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { Globe, MapPin, Pencil, Users } from "lucide-react";
 import type React from "react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 import {
   SocialPlatform,
   type SocialPlatform as SocialPlatformType,
 } from "@/constants/social-platform";
+import { getUserConnectionStatus, type UserConnectionStatus } from "./connection-status";
 
 /**
  * 社群媒體連結物件
@@ -143,8 +146,16 @@ export function UserInfoCard({
   const isMobile = useIsMobile();
   const [followLoading, setFollowLoading] = useState(false);
   const [connectLoading, setConnectLoading] = useState(false);
-  const [connectSent, setConnectSent] = useState(false);
+  const [optimisticConnectionStatus, setOptimisticConnectionStatus] =
+    useState<UserConnectionStatus | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
+
+  // Reset optimistic state when viewing a different user's profile
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset state when targetUserId changes
+  useEffect(() => {
+    setOptimisticConnectionStatus(null);
+    setIsFollowing(null);
+  }, [targetUserId]);
   const { openInfoDialog } = useDialog();
   const intentRef = useRef("");
 
@@ -163,7 +174,11 @@ export function UserInfoCard({
 
   // 查詢是否已是夥伴（僅在已登入且非自己頁面時查詢）
   const shouldCheckConnection = clientIsAuthenticated && !clientIsOwnProfile;
-  const { data: connectionsData } = useSWR(
+  const {
+    data: connectionsData,
+    isLoading: isConnectionsLoading,
+    mutate: mutateConnections,
+  } = useSWR(
     shouldCheckConnection ? ["/api/v1/connections", "check", targetUserId] : null,
     () => getConnections({ limit: 100 }),
     { revalidateOnFocus: false }
@@ -172,6 +187,26 @@ export function UserInfoCard({
     if (!connectionsData?.data || !targetUserId) return false;
     return connectionsData.data.some((c: { externalId: string }) => c.externalId === targetUserId);
   }, [connectionsData, targetUserId]);
+  const {
+    data: outgoingRequestsData,
+    isLoading: isOutgoingLoading,
+    mutate: mutateOutgoing,
+  } = useSWR(
+    shouldCheckConnection ? "/api/v1/connections/requests/outgoing" : null,
+    () => getOutgoingConnectionRequests({ limit: 100 }),
+    { revalidateOnFocus: false }
+  );
+  const hasOutgoingPendingRequest = useMemo(() => {
+    if (!outgoingRequestsData?.data || !targetUserId) return false;
+    return outgoingRequestsData.data.some(
+      (request: { receiverExternalId: string }) => request.receiverExternalId === targetUserId
+    );
+  }, [outgoingRequestsData, targetUserId]);
+  const connectionStatus = getUserConnectionStatus({
+    isAlreadyConnected,
+    hasOutgoingPendingRequest,
+    optimisticStatus: optimisticConnectionStatus,
+  });
 
   // 複製文字到剪貼簿的處理函數
   const handleCopy = useCallback(async (text: string) => {
@@ -237,14 +272,17 @@ export function UserInfoCard({
         receiverExternalId: targetUserId,
         intent: intentRef.current.trim() || undefined,
       });
-      setConnectSent(true);
+      setOptimisticConnectionStatus("pending");
       toast.success("已送出連結請求");
+      mutateOutgoing();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "請求失敗";
-      if (msg.includes("夥伴")) {
-        setConnectSent(true);
+      // 409 表示請求已存在（pending）或已連結，重新抓資料讓 SWR 決定實際狀態
+      if (err instanceof ApiError && err.status === 409) {
+        await Promise.all([mutateConnections(), mutateOutgoing()]);
+        toast.success("連結請求已送出");
+        return;
       }
-      toast.error(msg);
+      toast.error(err instanceof Error ? err.message : "請求失敗");
     } finally {
       setConnectLoading(false);
     }
@@ -418,7 +456,6 @@ export function UserInfoCard({
               <p className="text-xs text-text-dark mb-3">{commonCirclesCount} 個共同 Circle</p>
             )}
 
-
           {!isMobile && moreContent}
         </div>
       </div>
@@ -435,14 +472,26 @@ export function UserInfoCard({
           >
             {currentIsFollowing ? "關注中" : "+ 關注"}
           </Button>
-          <Button
-            variant="outline"
-            className={`flex-1 h-12 text-base rounded-full ${isAlreadyConnected || connectSent ? "border-gray-300 text-gray-400" : "border-primary-base text-primary-base hover:bg-primary-base hover:text-white"}`}
-            onClick={handleConnect}
-            disabled={connectLoading || connectSent || isAlreadyConnected}
-          >
-            {isAlreadyConnected || connectSent ? "已成功連結" : "請求連結"}
-          </Button>
+          {isConnectionsLoading || isOutgoingLoading ? (
+            <div className="flex-1 h-12 rounded-full bg-gray-100 animate-pulse" />
+          ) : (
+            <Button
+              variant="outline"
+              className={`flex-1 h-12 text-base rounded-full ${
+                connectionStatus !== "none"
+                  ? "border-gray-300 text-gray-400"
+                  : "border-primary-base text-primary-base hover:bg-primary-base hover:text-white"
+              }`}
+              onClick={handleConnect}
+              disabled={connectLoading || connectionStatus !== "none"}
+            >
+              {connectionStatus === "connected"
+                ? "已連結"
+                : connectionStatus === "pending"
+                  ? "已送出連結請求"
+                  : "請求連結"}
+            </Button>
+          )}
         </div>
       )}
     </div>

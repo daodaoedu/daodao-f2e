@@ -283,7 +283,7 @@ export default function TemplateDetailPage() {
   if (error || !template) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
-        <PageHeader leftAction="back" leftLabel="" rightActionTo="/" variant="light" />
+        <PageHeader leftAction="back" leftLabel="" variant="light" />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-5">
           <p className="text-white mb-4">載入模板時發生錯誤</p>
         </div>
@@ -296,92 +296,117 @@ export default function TemplateDetailPage() {
       <Deco4Svg className="absolute top-0 right-0" width={270} height={484} />
 
       {/* Top Navigation */}
-      <PageHeader leftAction="back" leftLabel="" rightActionTo="/" variant="light" />
+      <PageHeader leftAction="back" leftLabel="" variant="light" />
 
-      <main className="relative max-w-[600px] mx-auto pb-8">
+      <main className="relative max-w-[600px] md:max-w-[680px] mx-auto pb-8">
         {/* Category Label */}
-        <div className="px-5 py-4">
-          <Badge variant="secondary" size="sm" className="text-xs md:text-sm mb-2">
-            主題實踐
-          </Badge>
-          <div className="flex">
-            <div className="flex-1">
-              <h1 className="text-2xl leading-normal md:text-4xl font-medium text-white mb-1">
-                {template.name}
-              </h1>
-              <p className="text-sm text-white">{template.actionDescription}</p>
-            </div>
-            <div className="shrink-0">
-              <Button
-                variant="white"
-                onClick={handleRefresh}
-                disabled={!showActions || isRefreshing}
-                className="group text-sm font-normal h-[35px] transition-opacity duration-500 ease-out"
-              >
-                {isRefreshing ? (
-                  <Loader className="size-4.5 animate-spin" />
-                ) : showActions ? (
-                  <RefreshCcw className="size-4.5 group-hover:animate-spin-reverse" />
-                ) : (
-                  <Loader className="size-4.5 animate-spin" />
-                )}
-                換一個
-              </Button>
+        <div className="py-4">
+          <div className="max-w-[448px] mx-auto px-5">
+            <Badge variant="secondary" size="sm" className="text-xs md:text-sm mb-2">
+              主題實踐
+            </Badge>
+            <div className="flex md:flex-col md:gap-3">
+              <div className="flex flex-1 items-start gap-1">
+                <div className="flex-1">
+                  <h1 className="text-2xl leading-normal md:text-4xl font-medium text-white mb-1">
+                    {template.name}
+                  </h1>
+                  <p className="text-sm text-white">{template.actionDescription}</p>
+                </div>
+                {/* Mobile：右側 */}
+                <div className="shrink-0 md:hidden">
+                  <Button
+                    variant="white"
+                    onClick={handleRefresh}
+                    disabled={!showActions || isRefreshing}
+                    className="group text-sm font-normal h-[35px] px-3 transition-opacity duration-500 ease-out"
+                  >
+                    {isRefreshing ? (
+                      <Loader className="size-4.5 animate-spin" />
+                    ) : showActions ? (
+                      <RefreshCcw className="size-4.5 group-hover:animate-spin-reverse" />
+                    ) : (
+                      <Loader className="size-4.5 animate-spin" />
+                    )}
+                    換一個
+                  </Button>
+                </div>
+              </div>
+              {/* Desktop：副標題の下 */}
+              <div className="hidden md:block">
+                <Button
+                  variant="white"
+                  onClick={handleRefresh}
+                  disabled={!showActions || isRefreshing}
+                  className="group text-sm font-normal h-[35px] px-3 transition-opacity duration-500 ease-out"
+                >
+                  {isRefreshing ? (
+                    <Loader className="size-4.5 animate-spin" />
+                  ) : showActions ? (
+                    <RefreshCcw className="size-4.5 group-hover:animate-spin-reverse" />
+                  ) : (
+                    <Loader className="size-4.5 animate-spin" />
+                  )}
+                  換一個
+                </Button>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="max-w-[448px] mx-auto pt-4 px-5 pb-28">
-          {/* Course Overview Card */}
-          <div className="relative">
-            {/* Compass Icon */}
-            <div className="absolute -top-14 -right-1 z-10">
-              <CompassSvg width={109} height={114} />
-            </div>
-
-            <PracticeOverviewCard
-              actionDescription={template.actionDescription}
-              frequency={template.frequency}
-              durationMinutes={template.durationMinutes}
-              tags={template.tags}
-            />
-          </div>
-
-          {/* Execution Timing and Duration Cards */}
-          <div className="grid grid-cols-2 gap-4 mb-3.5">
-            {/* Execution Timing Card */}
-            <ExecutionTimingCard
-              executionTiming={template.executionTiming}
-              customTiming={template.customTiming}
-            />
-
-            {/* Execution Duration Card */}
-            <ExecutionDurationCard
-              durationDays={template.durationDays}
-              startDate={template.startDate}
-            />
-          </div>
-
-          {/* Recommended Resources Section */}
-          {Array.isArray(template.resources) && template.resources.length > 0 && (
-            <div>
-              <h2 className="text-sm text-center font-medium text-white mt-4 mb-3.5">
-                推薦你使用以下資源
-              </h2>
-              <div className="grid grid-cols-2 gap-3">
-                {template.resources?.map((resource) => (
-                  <ResourceCard
-                    key={resource.id}
-                    resource={{
-                      id: resource.id,
-                      name: resource.name,
-                      url: resource.url,
-                    }}
-                  />
-                ))}
+        <div className="bg-white rounded-t-2xl">
+          <div className="max-w-[448px] mx-auto pt-4 px-5 pb-28">
+            {/* Course Overview Card */}
+            <div className="relative mb-3.5">
+              {/* Compass Icon */}
+              <div className="absolute -top-14 -right-1 z-10">
+                <CompassSvg width={109} height={114} />
               </div>
+
+              <PracticeOverviewCard
+                actionDescription={template.actionDescription}
+                frequency={template.frequency}
+                durationMinutes={template.durationMinutes}
+                tags={template.tags}
+              />
             </div>
-          )}
+
+            {/* Execution Timing and Duration Cards */}
+            <div className="grid grid-cols-2 gap-4 mb-3.5">
+              {/* Execution Timing Card */}
+              <ExecutionTimingCard
+                executionTiming={template.executionTiming}
+                customTiming={template.customTiming}
+              />
+
+              {/* Execution Duration Card */}
+              <ExecutionDurationCard
+                durationDays={template.durationDays}
+                startDate={template.startDate}
+              />
+            </div>
+
+            {/* Recommended Resources Section */}
+            {Array.isArray(template.resources) && template.resources.length > 0 && (
+              <div>
+                <h2 className="text-sm text-center font-medium text-white mt-4 mb-3.5">
+                  推薦你使用以下資源
+                </h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {template.resources?.map((resource) => (
+                    <ResourceCard
+                      key={resource.id}
+                      resource={{
+                        id: resource.id,
+                        name: resource.name,
+                        url: resource.url,
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Action Button */}
@@ -394,6 +419,7 @@ export default function TemplateDetailPage() {
           <Button
             onClick={handleCreate}
             disabled={isSubmitting}
+            variant="orange"
             className="w-full sm:max-w-[288px]"
           >
             {isSubmitting ? (

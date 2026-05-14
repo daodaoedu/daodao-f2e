@@ -14,32 +14,19 @@ export const colors = {
     darker: "#0D7A77",
   },
 
-  // 灰階 - Basic colors
-  basic: {
-    50: "#FAFAFA",
-    100: "#F5F5F5",
-    200: "#E5E5E5",
-    300: "#A3A3A3",
-    400: "#6B7280",
-    500: "#404040",
-    600: "#2D3A4F",
-    white: "#FFFFFF",
-    black: "#1A2B3C",
+  // 灰階 - Figma 灰階色（取代原 basic 系列）
+  gray: {
+    dark: "#0D3036", // BG Dark
+    mid: "#9FB5B8", // Light Gray
+    light: "#E4EAE9", // BG Gray
+    veryLight: "#F4F6F6", // Very Light Gray
+    white: "#FFFFFF", // White
   },
 
   // 吉祥物色彩 - Mascot colors
   mascot: {
     aqua: "#7DD3E3",
     brightBlue: "#5CC5E8",
-  },
-
-  // 語意色彩 - Semantic colors
-  semantic: {
-    success: "#22C55E",
-    warning: "#F59E0B",
-    error: "#EF4444",
-    info: "#3B82F6",
-    tips: "#FACC15",
   },
 
   // Logo 色彩
@@ -89,6 +76,28 @@ export const colors = {
     blue: "#3B82F6",
     pink: "#EC4899",
     green: "#10B981",
+  },
+
+  // 中性灰階 - 供 Mobile 使用（數字 scale）
+  basic: {
+    50: "#FAFAFA",
+    100: "#F5F5F5",
+    200: "#E5E5E5",
+    300: "#A3A3A3",
+    400: "#6B7280",
+    500: "#404040",
+    600: "#2D3A4F",
+    white: "#FFFFFF",
+    black: "#1A2B3C",
+  },
+
+  // 語意色彩 - Semantic colors
+  semantic: {
+    success: "#22C55E",
+    warning: "#F59E0B",
+    error: "#EF4444",
+    info: "#3B82F6",
+    tips: "#FACC15",
   },
 } as const;
 

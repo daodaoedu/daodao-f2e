@@ -146,7 +146,7 @@ export const MobileCheckInDateSelector = ({
     <nav
       ref={navRef}
       className={cn(
-        "fixed top-0 left-0 right-0 z-30 bg-[#E9FEFFB2]/70 border-b-2 border-[#E9FEFFB2] rounded-b-3xl backdrop-blur-lg transition-transform duration-300 ease-in-out",
+        "fixed top-0 left-0 right-0 z-30 bg-[#E9FEFFB2]/70 border-b-2 border-[#E9FEFFB2] rounded-b-3xl backdrop-blur-lg transition-transform duration-300 ease-in-out md:left-1/2 md:right-auto md:w-[720px] md:max-w-[calc(100vw-40px)] md:-translate-x-1/2",
         !isVisible && "-translate-y-full"
       )}
       onMouseDown={handleMouseDown}

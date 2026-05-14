@@ -34,7 +34,7 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
       <div
         className={cn(
           "max-w-[640px] px-5 mx-auto",
-          "flex overflow-auto *:shrink-0 gap-3 md:grid md:grid-cols-2 scrollbar-hide"
+          "flex overflow-auto *:shrink-0 gap-4 md:grid md:grid-cols-2 scrollbar-hide"
         )}
       >
         {tasks.map((task) => (

@@ -6,21 +6,17 @@
  * - 混合 practice + checkin 卡片
  */
 
+import { getEnv } from "@daodao/config";
+import { useCallback, useMemo } from "react";
 import useSWRInfinite from "swr/infinite";
-import type { IShowcasePractice, IReactionCountItem } from "./showcase-hooks";
+import type { IReactionCountItem, IShowcasePractice } from "./showcase-hooks";
 import { fetchAiBackend } from "./showcase-hooks";
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type ApiMoodType =
-  | "give_up"
-  | "frustrated"
-  | "bored"
-  | "neutral"
-  | "good"
-  | "happy";
+export type ApiMoodType = "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
 
 export interface IShowcaseCheckIn {
   id: string;
@@ -38,6 +34,8 @@ export interface IShowcaseCheckIn {
     id: string;
     name: string;
     photo_url?: string | null;
+    customId?: string | null;
+    custom_id?: string | null;
   };
   reactions?: IReactionCountItem[];
   comment_count?: number;
@@ -49,13 +47,29 @@ export interface IShowcaseCheckIn {
       id: string;
       name: string;
       photo_url?: string | null;
+      customId?: string | null;
+      custom_id?: string | null;
     };
   }[];
 }
 
+export type FeedReasonType = "new_practice" | "new_release" | "checked_in" | "cheered";
+
+export interface ActivityCardItem {
+  type: "activity";
+  activity_type: "community_event" | "follow_summary";
+  event_type?: "reaction" | "comment";
+  event_id?: string;
+  event_text: string;
+  label: string;
+  practice_id?: string;
+  checkin_id?: string;
+}
+
 export type FeedItem =
-  | { type: "practice"; data: IShowcasePractice }
-  | { type: "checkin"; data: IShowcaseCheckIn };
+  | { type: "practice"; feed_reason: FeedReasonType; data: IShowcasePractice }
+  | { type: "checkin"; feed_reason: FeedReasonType; data: IShowcaseCheckIn }
+  | ActivityCardItem;
 
 export interface IFeedParams {
   keyword?: string;
@@ -102,30 +116,31 @@ export function useFeed(params: IFeedParams) {
     return `/api/v1/feed${qs ? `?${qs}` : ""}`;
   };
 
-  const { data, error, size, setSize, isLoading, isValidating } =
-    useSWRInfinite<AIFeedResponse>(
-      getKey,
-      (path: string) => fetchAiBackend<AIFeedResponse>(path),
-      { revalidateFirstPage: false },
-    );
+  const { data, error, size, setSize, isLoading, isValidating } = useSWRInfinite<AIFeedResponse>(
+    getKey,
+    (path: string) => fetchAiBackend<AIFeedResponse>(path),
+    { revalidateFirstPage: false }
+  );
 
-  const feedItems: FeedItem[] = data
-    ? data.flatMap((page) =>
-(page.data ?? []).filter((item) => {
-  const isValid = !!(item?.type && item?.data);
-  if (!isValid && process.env.NODE_ENV !== "production") {
-    console.warn("[useFeed] Malformed feed item (missing type/data):", item);
-  }
-  return isValid;
-})
-      )
-    : [];
+  const feedItems: FeedItem[] = useMemo(
+    () =>
+      data
+        ? data.flatMap((page) =>
+            (page.data ?? []).filter((item) => {
+              const isValid = !!(item?.type && (item?.type === "activity" || item?.data));
+              if (!isValid && getEnv("NODE_ENV") !== "production") {
+                console.warn("[useFeed] Malformed feed item (missing type/data):", item);
+              }
+              return isValid;
+            })
+          )
+        : [],
+    [data]
+  );
 
-  const hasMore = data
-    ? (data[data.length - 1]?.pagination?.hasNext ?? false)
-    : false;
+  const hasMore = data ? (data[data.length - 1]?.pagination?.hasNext ?? false) : false;
 
-  const loadMore = () => setSize(size + 1);
+  const loadMore = useCallback(() => setSize((currentSize) => currentSize + 1), [setSize]);
 
   return {
     feedItems,

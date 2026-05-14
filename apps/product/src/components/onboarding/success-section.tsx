@@ -2,12 +2,12 @@
 
 import featureHappyJson from "@daodao/assets/images/quiz/feature-happy.json";
 import { useTranslations } from "@daodao/i18n";
+import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
 import Lottie from "lottie-react";
 import { MailIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
 
 interface SuccessSectionProps {
   /** 用戶名稱，用於個人化歡迎訊息 */

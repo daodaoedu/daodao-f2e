@@ -17,6 +17,8 @@ export enum StorageEnum {
   ActionMaker = "ActionMaker",
   /** 用於跨 tab 通知 OAuth 完成（Android Chrome Custom Tab 場景） */
   AuthSignal = "AuthSignal",
+  /** 用於還原主頁 feed 位置：點擊卡片時存卡片 ID，回到主頁時 scrollIntoView */
+  HomeFeedAnchor = "HomeFeedAnchor",
 }
 
 const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
@@ -27,6 +29,7 @@ const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   ManualPracticeDraft: "sessionStorage",
   ActionMaker: "sessionStorage",
   AuthSignal: "localStorage",
+  HomeFeedAnchor: "sessionStorage",
 };
 
 export interface StorageInstance<T> {

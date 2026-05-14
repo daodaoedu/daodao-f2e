@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
   transpilePackages: [
     "@daodao/api",
     "@daodao/assets",
+    "@daodao/features-mention",
     "@daodao/features-quiz",
     "@daodao/i18n",
     "@daodao/shared",
