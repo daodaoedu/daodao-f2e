@@ -17,6 +17,7 @@ interface FilterPillsProps {
 }
 
 export function FilterPills({ activeFilter, onFilterChange, counts }: FilterPillsProps) {
+  const safeCounts = counts ?? {};
   return (
     <ScrollView
       horizontal
@@ -26,7 +27,7 @@ export function FilterPills({ activeFilter, onFilterChange, counts }: FilterPill
     >
       {filterOptions.map((option) => {
         const isActive = activeFilter === option.value;
-        const count = counts?.[option.value];
+        const count = safeCounts[option.value];
         return (
           <Pressable
             key={option.value}

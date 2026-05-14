@@ -1,5 +1,5 @@
 import { MessageCircle, MoreHorizontal } from "@tamagui/lucide-icons";
-import { useRouter } from "expo-router";
+import { type Href, useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
 import { Image, Pressable, StyleSheet } from "react-native";
@@ -96,9 +96,7 @@ export function ShowcaseCard({
       style={styles.card}
       onPress={() =>
         router.push({
-          // biome-ignore lint: Expo Router dynamic route typing workaround
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          pathname: `/practices/${id}` as any,
+          pathname: `/practices/${id}` as Href,
           params: { showcaseData: JSON.stringify(practice) },
         })
       }

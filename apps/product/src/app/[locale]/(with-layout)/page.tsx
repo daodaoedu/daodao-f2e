@@ -104,13 +104,10 @@ export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<TabType>(
-    (searchParams.get("tab") as TabType) === "mine" ? "mine" : "inspire"
-  );
+  const activeTab = (searchParams.get("tab") as TabType) === "mine" ? "mine" : "inspire";
 
   const handleTabChange = useCallback(
     (tab: TabType) => {
-      setActiveTab(tab);
       const params = new URLSearchParams(searchParams.toString());
       if (tab === "inspire") {
         params.delete("tab");
