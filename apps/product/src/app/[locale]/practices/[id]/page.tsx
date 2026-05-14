@@ -469,7 +469,7 @@ export default function PracticeDetailPage() {
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => router.replace("/")}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label="關閉"
           >
@@ -490,7 +490,7 @@ export default function PracticeDetailPage() {
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => router.replace("/")}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label="關閉"
           >
@@ -520,7 +520,7 @@ export default function PracticeDetailPage() {
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
         <button
           type="button"
-          onClick={() => (fromCopy ? router.push("/?tab=mine") : router.back())}
+          onClick={() => (fromCopy ? router.replace("/?tab=mine") : router.replace("/"))}
           className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
           aria-label="關閉"
         >

@@ -136,9 +136,9 @@ export const MobileCheckInDateSelector = ({
   // 處理關閉按鈕點擊
   const handleClose = () => {
     if (closeActionTo) {
-      router.push(closeActionTo);
+      router.replace(closeActionTo);
     } else {
-      router.back();
+      router.replace("/");
     }
   };
 
