@@ -3,7 +3,7 @@
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { mutate as globalMutate } from "swr";
 import { NotificationType } from "@/constants/notification-type";
 import type { ReactionTypeType } from "@/constants/reaction-type";
@@ -149,10 +149,13 @@ export function NotificationList() {
     {}
   );
 
-  const rawItems = data?.data?.notifications ?? [];
-  const apiItems = (rawItems as unknown as NotificationApiItem[])
-    .slice()
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const apiItems = useMemo(
+    () =>
+      ((data?.data?.notifications ?? []) as unknown as NotificationApiItem[])
+        .slice()
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [data?.data?.notifications]
+  );
   const notifications: INotificationData[] = apiItems.map((item) => {
     const base = apiItemToDisplay(item);
     return { ...base, ...(localOverrides[base.id] ?? {}) };

@@ -70,7 +70,8 @@ export function MentionInput({
     const textarea = ref.current;
     if (!textarea) return;
     resizeTextarea(textarea);
-  }, [resizeTextarea]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: include value for external prop updates
+  }, [resizeTextarea, value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
