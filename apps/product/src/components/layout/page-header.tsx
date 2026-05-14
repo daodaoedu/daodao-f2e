@@ -66,11 +66,6 @@ export const PageHeader = ({
     } else if (rightActionTo) {
       router.replace(rightActionTo);
     } else {
-      if (window.history.length > 1) {
-        router.back();
-        return;
-      }
-
       router.replace("/");
     }
   };
