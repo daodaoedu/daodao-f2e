@@ -4267,7 +4267,7 @@
       "success": {
         "title": "Welcome to Dao Dao!",
         "titleWithName": "{name}, Welcome to Dao Dao!",
-        "primaryButton": "Set up preferences for personalized recommendations",
+        "primaryButton": "Explore Dao Dao",
         "secondaryButton": "Set up later",
         "emailReminder": "Don't forget to check your inbox for our welcome email!"
       }
