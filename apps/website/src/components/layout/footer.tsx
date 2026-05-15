@@ -236,7 +236,7 @@ export const Footer = () => {
           </div>
           <a
             href={`mailto:${SOCIAL_LINKS.CONTACT_EMAIL}`}
-            className="text-white/70 transition-colors hover:text-primary-base"
+            className="block w-fit text-white/70 transition-colors hover:text-primary-base"
           >
             {SOCIAL_LINKS.CONTACT_EMAIL}
           </a>
