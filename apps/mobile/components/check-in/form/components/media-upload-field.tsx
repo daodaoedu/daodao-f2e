@@ -20,7 +20,7 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
     if (value.length >= MAX_FILES) return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
       selectionLimit: MAX_FILES - value.length,
       quality: 0.8,
@@ -43,7 +43,7 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
     <YStack marginBottom="$8">
       <XStack justifyContent="space-between" alignItems="center" marginBottom="$3">
         <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
-          上傳照片或影片
+          上傳照片
         </Text>
         <Text fontSize={14} color={colors.basic["400"]}>
           已上傳 {value.length}/{MAX_FILES} 張
@@ -61,7 +61,7 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
               overflow="hidden"
               backgroundColor={colors.basic["200"]}
             >
-              <Image source={{ uri }} width="100%" height="100%" resizeMode="cover" />
+              <Image source={{ uri }} width={80} height={80} resizeMode="cover" />
             </View>
             <Pressable
               style={styles.removeButton}
