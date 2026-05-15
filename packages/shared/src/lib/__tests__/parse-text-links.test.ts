@@ -45,4 +45,12 @@ describe("parseTextLinks", () => {
       { type: "text", value: "visit example.com today" },
     ]);
   });
+
+  it("strips trailing punctuation from URL", () => {
+    expect(parseTextLinks("visit https://daodao.co.")).toEqual([
+      { type: "text", value: "visit " },
+      { type: "url", value: "https://daodao.co" },
+      { type: "text", value: "." },
+    ]);
+  });
 });

@@ -1,6 +1,6 @@
 export type TextSegment = { type: "text"; value: string } | { type: "url"; value: string };
 
-const URL_PATTERN = /https?:\/\/[^\s]+/g;
+const URL_PATTERN = /https?:\/\/\S+(?<![.?!,;:])/g;
 
 export function parseTextLinks(text: string): TextSegment[] {
   const segments: TextSegment[] = [];
