@@ -52,16 +52,13 @@ export const CheckInCard = ({
     setIsScrolledToBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 2);
   }, []);
 
-  // 初始檢查（內容不足以滚動時，直接隱藏遠罩）
   React.useEffect(() => {
     handleScroll();
   }, [handleScroll]);
 
-  // 格式化日期（將 "2026-01-01" 或 "2026.01.01" 轉換為 Date 物件）
   const dateStr = date.replace(/\./g, "-");
   const dateObj = new Date(dateStr);
 
-  // 拆分日期為年份和月/日，用於印章中心顯示
   const dateYear = isValid(dateObj) ? format(dateObj, "yyyy") : date.split(/[.-]/)[0] || "";
   const dateMonthDay = isValid(dateObj)
     ? format(dateObj, "MM/dd")
@@ -74,15 +71,12 @@ export const CheckInCard = ({
         <h2 className="text-lg font-semibold line-clamp-2">{taskTitle}</h2>
       </div>
 
-      {/* 標題下方額外內容（如同日打卡切換） */}
       {afterTitle}
 
       {/* 筆記本風格內容區 */}
       <div className={cn("relative bg-white mb-5 mt-5 rounded-b", bottomActions ? "" : "pb-9")}>
-        {/* 筆記本裝訂線（頂部） */}
         <NotebookHoleSvg className="absolute -top-7 left-0" />
 
-        {/* 可滚動內容區 + 底部漸層遠罩 */}
         <div className="relative">
           <main
             ref={mainRef}
@@ -211,7 +205,7 @@ export const CheckInCard = ({
             </div>
           </main>
 
-          {/* 底部漸層遠罩（滚動到底時消失） */}
+          {/* 底部漸層逸罩（滚動到底時消失） */}
           {!isScrolledToBottom && (
             <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-white/0 to-white pointer-events-none z-10" />
           )}
