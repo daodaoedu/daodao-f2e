@@ -14,12 +14,26 @@ jobs:
       models: read
 
     steps:
+      - name: Check if auto PR
+        id: check_auto
+        env:
+          HEAD: ${{ github.event.pull_request.head.ref }}
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if [[ "$HEAD" == auto/* ]] || [[ "$TITLE" == \[auto\]* ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout
+        if: steps.check_auto.outputs.skip == 'false'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Get commit log
+        if: steps.check_auto.outputs.skip == 'false'
         id: commits
         env:
           BASE: ${{ github.event.pull_request.base.ref }}
@@ -31,6 +45,7 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Generate PR description with GitHub Models
+        if: steps.check_auto.outputs.skip == 'false'
         id: generate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -83,6 +98,7 @@ jobs:
           echo "✅ Title: $TITLE"
 
       - name: Update PR title and description
+        if: steps.check_auto.outputs.skip == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TITLE: ${{ steps.generate.outputs.TITLE }}
