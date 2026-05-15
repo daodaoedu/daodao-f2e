@@ -25,7 +25,7 @@ jobs:
           BASE: ${{ github.event.pull_request.base.ref }}
           HEAD: ${{ github.event.pull_request.head.ref }}
         run: |
-          DIFF=$(git diff "origin/$BASE..origin/$HEAD" -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.json' | head -c 12000)
+          DIFF=$(git diff "origin/$BASE..origin/$HEAD" -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.py' '*.sql' '*.sh' '*.yml' '*.yaml' '*.json' '*.toml' '*.conf' | head -c 12000)
           STAT=$(git diff "origin/$BASE..origin/$HEAD" --stat | tail -5)
           echo "DIFF<<EOF" >> "$GITHUB_OUTPUT"
           echo "$DIFF" >> "$GITHUB_OUTPUT"
