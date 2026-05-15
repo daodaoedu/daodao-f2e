@@ -22,7 +22,7 @@ export const SuccessSection = ({ userName }: SuccessSectionProps) => {
   const t = useTranslations("onboarding");
   const router = useRouter();
 
-  const handleGoToPreferences = () => {
+  const handleGoToHome = () => {
     router.push("/");
   };
 
@@ -77,7 +77,7 @@ export const SuccessSection = ({ userName }: SuccessSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <Button variant="ctaPrimary" className="w-full" onClick={handleGoToPreferences}>
+          <Button variant="ctaPrimary" className="w-full" onClick={handleGoToHome}>
             {t("steps.success.primaryButton")}
           </Button>
         </motion.div>
