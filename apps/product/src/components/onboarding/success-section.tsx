@@ -26,10 +26,6 @@ export const SuccessSection = ({ userName }: SuccessSectionProps) => {
     router.push("/");
   };
 
-  const handleSkip = () => {
-    router.push("/");
-  };
-
   return (
     <>
       {/* Confetti 彩帶動畫 */}
@@ -76,16 +72,13 @@ export const SuccessSection = ({ userName }: SuccessSectionProps) => {
 
         {/* CTA 按鈕 */}
         <motion.div
-          className="w-full max-w-sm space-y-3"
+          className="w-full max-w-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
           <Button variant="ctaPrimary" className="w-full" onClick={handleGoToPreferences}>
             {t("steps.success.primaryButton")}
-          </Button>
-          <Button variant="ghost" className="w-full" onClick={handleSkip}>
-            {t("steps.success.secondaryButton")}
           </Button>
         </motion.div>
       </div>
