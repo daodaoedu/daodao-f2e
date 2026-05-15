@@ -76,6 +76,7 @@
     "footer_social_title": "追蹤島島",
     "footer_instagram_alt": "Instagram",
     "footer_facebook_alt": "Facebook",
+    "footer_discord_alt": "Discord",
     "footer_copyright": "島島阿學 © 2022 - {year}",
     "city_selector_loading": "載入城市資料中...",
     "city_selector_load_error": "載入失敗: {error}",
