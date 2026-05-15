@@ -22,7 +22,10 @@ import {
   RecommendationSection,
 } from "@/components/dashboard";
 import { BackgroundAnimation, Banner } from "@/components/layout";
-import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
+import {
+  type IFeedPracticeItem,
+  RandomPracticesSection,
+} from "@/components/practice/shared/random-practices-section";
 import {
   ActivityCard,
   BrewingCard,
@@ -325,6 +328,18 @@ export default function HomePage() {
   const hasPractices = inProgressTasks.length > 0;
   const showInProgress = true;
 
+  const feedPractices = useMemo((): IFeedPracticeItem[] => {
+    return feedItems
+      .filter((item): item is Extract<FeedItem, { type: "practice" }> => item.type === "practice")
+      .slice(0, 3)
+      .map((item) => ({
+        id: item.data.id,
+        title: item.data.title,
+        description: item.data.practice_action ?? "",
+        userName: item.data.user?.name,
+      }));
+  }, [feedItems]);
+
   const filterCounts = useMemo(() => {
     const counts = {
       [FilterStatus.all]: 0,
@@ -567,7 +582,7 @@ export default function HomePage() {
             ) : (
               <>
                 <DashboardHeader stats={stats} />
-                {!hasPractices && <RandomPracticesSection compact />}
+                {!hasPractices && <RandomPracticesSection compact feedPractices={feedPractices} />}
                 {hasPractices && (
                   <>
                     <div className="mb-4">

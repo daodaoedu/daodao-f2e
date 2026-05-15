@@ -16,6 +16,13 @@ interface IRandomPractice {
   templateId: string;
 }
 
+export interface IFeedPracticeItem {
+  id: string;
+  title: string;
+  description: string;
+  userName?: string;
+}
+
 // 將 API 的 PracticeTemplate 轉換成 IRandomPractice
 const convertTemplateToRandomPractice = (template: PracticeTemplateType): IRandomPractice => {
   return {
@@ -24,6 +31,44 @@ const convertTemplateToRandomPractice = (template: PracticeTemplateType): IRando
     description: template.practiceAction || template.suggestedTags.join("、") || template.title,
     templateId: template.id,
   };
+};
+
+interface IFeedPracticeCardProps {
+  practice: IFeedPracticeItem;
+  theme: PracticeTheme;
+  onView: () => void;
+}
+
+const FeedPracticeCard = ({ practice, theme, onView }: IFeedPracticeCardProps) => {
+  const ThemeSvg = practiceThemeSvgMap[theme] ?? practiceThemeSvgMap[PracticeTheme.yellow];
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    onView();
+  };
+
+  return (
+    <div className="absolute inset-0 rounded-[12px] overflow-hidden">
+      <ThemeSvg className="absolute inset-0" />
+      <div className="relative p-4 pb-6 flex flex-col h-full justify-between z-10">
+        <div className="flex flex-col gap-2">
+          <Badge variant="secondary" size="sm" className="w-fit">
+            主題實踐
+          </Badge>
+          <div className="flex flex-col gap-2">
+            <h3 className="text-xl font-medium text-bg-dark line-clamp-2">{practice.title}</h3>
+            <p className="text-xs text-text-dark line-clamp-2">{practice.description}</p>
+          </div>
+          {practice.userName && (
+            <p className="text-xs text-text-dark/60">{practice.userName} 正在實踐</p>
+          )}
+        </div>
+        <Button variant="secondary" className="w-full" onClick={handleClick}>
+          查看實踐
+        </Button>
+      </div>
+    </div>
+  );
 };
 
 interface IRandomPracticeCardProps {
@@ -63,6 +108,7 @@ const RandomPracticeCard = ({ practice, theme, onAction }: IRandomPracticeCardPr
 
 interface IRandomPracticesSectionProps {
   practices?: IRandomPractice[];
+  feedPractices?: IFeedPracticeItem[];
   /**
    * 是否使用緊湊模式（移除外層 padding，適用於放在其他容器內）
    */
@@ -71,38 +117,50 @@ interface IRandomPracticesSectionProps {
 
 export const RandomPracticesSection = ({
   practices: propPractices,
+  feedPractices,
   compact = false,
 }: IRandomPracticesSectionProps) => {
   const router = useRouter();
 
-  // 取得 3 個隨機模板
-  const { data: randomTemplatesData } = useRandomPracticeTemplates({
-    count: 3,
-  });
+  const hasFeedPractices = feedPractices && feedPractices.length > 0;
+
+  // 取得 3 個隨機模板（只在沒有 feed 真實資料時使用）
+  const { data: randomTemplatesData } = useRandomPracticeTemplates(
+    hasFeedPractices ? undefined : { count: 3 }
+  );
 
   // 從 API 取得隨機模板，或使用傳入的 practices
-  const practices = useMemo(() => {
-    // 如果傳入了 practices，直接使用
+  const templatePractices = useMemo(() => {
     if (propPractices && propPractices.length > 0) {
       return propPractices;
     }
-
-    // 否則使用隨機模板 API 的結果
     if (!randomTemplatesData?.data || randomTemplatesData.data.length === 0) {
       return [];
     }
-
     return randomTemplatesData.data.map(convertTemplateToRandomPractice);
   }, [propPractices, randomTemplatesData]);
 
   // 為每個實踐分配主題顏色
-  const practicesWithTheme = useMemo(() => {
-    return practices.map((practice, index) => {
+  const feedPracticesWithTheme = useMemo(() => {
+    if (!feedPractices) return [];
+    return feedPractices.map((practice, index) => {
       const themeIndex = index % PRACTICE_THEMES.length;
       const theme = PRACTICE_THEMES[themeIndex] ?? PracticeTheme.yellow;
       return { ...practice, theme };
     });
-  }, [practices]);
+  }, [feedPractices]);
+
+  const templatePracticesWithTheme = useMemo(() => {
+    return templatePractices.map((practice, index) => {
+      const themeIndex = index % PRACTICE_THEMES.length;
+      const theme = PRACTICE_THEMES[themeIndex] ?? PracticeTheme.yellow;
+      return { ...practice, theme };
+    });
+  }, [templatePractices]);
+
+  const handleViewPractice = (id: string) => {
+    router.push(`/practices/${id}`);
+  };
 
   const handleAction = (templateId: string) => {
     router.push(`/practices/create/template/${templateId}`);
@@ -113,25 +171,40 @@ export const RandomPracticesSection = ({
   };
 
   // Stack 元件會讓陣列最後一個元素顯示在最上層，所以需要反轉順序
-  // 讓黃色（第一個）顯示在最上層
-  const stackCards = practicesWithTheme
-    .slice()
-    .reverse()
-    .map((practice) => (
-      <RandomPracticeCard
-        key={practice.id}
-        practice={practice}
-        theme={practice.theme}
-        onAction={() => handleAction(practice.templateId)}
-      />
-    ));
+  const stackCards = hasFeedPractices
+    ? feedPracticesWithTheme
+        .slice()
+        .reverse()
+        .map((practice) => (
+          <FeedPracticeCard
+            key={practice.id}
+            practice={practice}
+            theme={practice.theme}
+            onView={() => handleViewPractice(practice.id)}
+          />
+        ))
+    : templatePracticesWithTheme
+        .slice()
+        .reverse()
+        .map((practice) => (
+          <RandomPracticeCard
+            key={practice.id}
+            practice={practice}
+            theme={practice.theme}
+            onAction={() => handleAction(practice.templateId)}
+          />
+        ));
+
+  const heading = hasFeedPractices
+    ? "看看大家都在實踐什麼，一起小步前行！"
+    : "從好奇開始, 一起小步實踐生活裡的學習靈感。";
 
   return (
     <section className={compact ? "" : "mb-6 pt-4 px-4"}>
       {/* 標題區域 */}
       <div className="relative max-w-[640px] bg-white rounded-[12px] p-4 mx-auto flex flex-col items-center gap-3">
         <h2 className="relative z-10 flex justify-center text-lg font-medium text-bg-dark">
-          從好奇開始, 一起小步實踐生活裡的學習靈感。
+          {heading}
         </h2>
         <div className="w-[296px] h-[239px] pt-6">
           <div className="w-[240px] h-[200px]">
