@@ -48,7 +48,7 @@ function getUserProfileBasePath(user: UserInfo): string {
 
 ### 2.4 Profile page — UUID 訪問無 canonical redirect
 
-`/users/[identifier]/page.tsx` 以 UUID 訪問時，即使後端 profile API 回傳了 `canonical`（customId），頁面不會 redirect 到 `/users/<customId>`。
+`/users/[identifier]/page.tsx` 以 UUID 訪問時，即使後端 profile API 回傳了 `customId`，頁面不會 redirect 到 `/users/<customId>`。
 
 ---
 
@@ -129,10 +129,35 @@ function getUserProfileBasePath(user: UserInfo): string {
 }
 ```
 
-### 3.4 Profile page — canonical redirect
+### 3.4 舊路徑對映轉到新路徑（Breaking Change 處理）
+
+將 `/user/` 變更為 `/users/` 是 Breaking Change，會導致已書簽存檔或外部連結失效。必須在 `next.config.js` 的 `redirects` 設定中加入永久重導，保留 SEO 權重並維持使用者體驗：
+
+```javascript
+// next.config.js
+module.exports = {
+  async redirects() {
+    return [
+      // 舊路徑 /user/:id 永久重導到新路徑 /users/:id
+      {
+        source: '/user/:id',
+        destination: '/users/:id',
+        permanent: true,  // HTTP 308 Permanent Redirect
+      },
+    ];
+  },
+};
+```
+
+| 檔案 | 變更說明 |
+|------|----------|
+| `next.config.js` 或 `apps/product/next.config.js` | 加入 `redirects` 規則：`/user/:id` → `/users/:id`（permanent: true） |
+
+### 3.5 Profile page — canonical redirect（SEO-friendly）
 
 ```tsx
 // apps/product/src/app/[locale]/(with-layout)/users/[identifier]/page.tsx
+import { permanentRedirect } from 'next/navigation';
 
 export default async function UserProfilePage({
   params,
@@ -149,18 +174,18 @@ export default async function UserProfilePage({
     notFound();
   }
 
-  // 新增：canonical redirect
-  // 若以 UUID 訪問且使用者有 customId，則 redirect 到 customId URL
+  // 新增：canonical permanent redirect（HTTP 308）
+  // 使用 toLowerCase() 避免大小寫差異導致多餘重導
   const canonical = profileResponse?.data?.customId;
-  if (canonical && canonical !== identifier) {
-    redirect(`/${locale}/users/${canonical}`);
+  if (canonical && canonical.toLowerCase() !== identifier.toLowerCase()) {
+    permanentRedirect(`/${locale}/users/${canonical}`);
   }
 
   // ... 其餘邏輯不變
 }
 ```
 
-> 使用 Next.js `redirect()` 做 server-side 302 redirect，不需要 client-side router.replace。
+> **為何用 `permanentRedirect` 而非 `redirect`：** 308 Permanent Redirect 可合併連結權重（link equity），搜尋引擎會將舊 URL 的 SEO 权重傳遞到新 URL。`toLowerCase()` 比較避免 `alice` 和 `Alice` 導致不必要的循環重導。
 
 ---
 
@@ -172,14 +197,15 @@ export default async function UserProfilePage({
 |------|----------|
 | `apps/product/src/components/showcase/PracticeShowcaseCard.tsx` | user prop 加 `customId`，連結改用 `getUserIslandHref` |
 | `apps/product/src/components/resource/contributor-info.tsx` | 修正路徑 `/user/` → `/users/`，加入 `customId` |
-| `apps/product/src/app/[locale]/(with-layout)/users/[identifier]/page.tsx` | 加入 canonical redirect 邏輯 |
+| `apps/product/src/app/[locale]/(with-layout)/users/[identifier]/page.tsx` | 加入 canonical `permanentRedirect` 邏輯 |
+| `apps/product/next.config.js`（或根層 `next.config.js`） | 新增 `/user/:id` → `/users/:id` 的 permanent redirect 規則 |
 | 含有 Feed/Showcase adapter 的 page 元件 | 傳遞 `customId` 給 `PracticeShowcaseCard` |
 
 ### 4.2 不變動的部分
 
 - `CheckInShowcaseCard.tsx`：已正確使用 `getUserIslandHref()`，不需修改
 - `Sidebar`：已正確使用 `currentUserData.customId ?? authUser.id`，不需修改
-- i18n 鍵值：無需新增
+- i18n 鍵値：無需新增
 - API service layer：無需修改（`getUserProfileByIdentifier` 已含 `customId`）
 
 ---
@@ -193,7 +219,7 @@ export default async function UserProfilePage({
 
 ## 6. 測試計畫
 
-### 6.1 Unit Tests（packages/api）
+### 6.1 Unit Tests
 
 - [ ] `getUserIslandHref()` — 有 `customId` 時回傳 `/users/<customId>`
 - [ ] `getUserIslandHref()` — 無 `customId` 時回傳 `/users/<id>`
@@ -204,8 +230,9 @@ export default async function UserProfilePage({
 
 - [ ] Feed 頁點擊他人打卡卡片頭像 → URL 為 `/users/<customId>`
 - [ ] Feed 頁點擊他人實踐卡片頭像 → URL 為 `/users/<customId>`
-- [ ] 直接訪問 `/users/<uuid>` → 若使用者有 customId 則 redirect 到 `/users/<customId>`
+- [ ] 直接訪問 `/users/<uuid>` → 若使用者有 customId 則 308 redirect 到 `/users/<customId>`
 - [ ] 直接訪問 `/users/<customId>` → 正常顯示，不 redirect
+- [ ] 舊路徑 `/user/<id>` → 308 permanent redirect 到 `/users/<id>`
 - [ ] 無 customId 的使用者 → URL 使用 UUID，不 redirect
 
 ---
@@ -213,6 +240,7 @@ export default async function UserProfilePage({
 ## 7. Acceptance Criteria
 
 - [ ] 從 Feed 點擊任何使用者頭像/名稱，皆前往 `/users/<customId>`（若有設定）
-- [ ] 直接訪問 `/users/<uuid>` 且使用者有 customId → server-side redirect 到 `/users/<customId>`
+- [ ] 直接訪問 `/users/<uuid>` 且使用者有 customId → 308 permanent redirect 到 `/users/<customId>`
 - [ ] `ContributorInfo` 連結正確使用 `/users/<customId>`
+- [ ] 舊 URL `/user/<id>` → 308 permanent redirect 到 `/users/<id>`（保留 SEO 權重）
 - [ ] 無 customId 的使用者行為不受影響（退回 UUID）
