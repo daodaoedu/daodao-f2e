@@ -53,15 +53,15 @@ export function ActionMakerResult() {
 
       // Convert data URL to Blob without fetch() to avoid CSP connect-src blocking data: URIs
       const [header, base64] = imageData.src.split(",");
-      const mime = header?.match(/:(.*?);/)?.[1] ?? "image/png";
+      const mime = header?.split(":")[1]?.split(";")[0] ?? "image/png";
       const binary = atob(base64 ?? "");
       const bytes = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) {
         bytes[i] = binary.charCodeAt(i);
       }
       const blob = new Blob([bytes], { type: mime });
-      const imageFile = new File([blob], "action-maker-result.jpg", {
-        type: "image/jpeg",
+      const imageFile = new File([blob], "action-maker-result.png", {
+        type: mime,
       });
 
       // Mobile: prefer native share with image
@@ -84,9 +84,10 @@ export function ActionMakerResult() {
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = blobUrl;
-      a.download = "action-maker-result.jpg";
+      a.download = "action-maker-result.png";
       a.click();
-      URL.revokeObjectURL(blobUrl);
+      // Delay revoke so browsers (esp. Safari) can complete the download
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
     } finally {
       setDownloading(false);
     }
@@ -126,9 +127,11 @@ export function ActionMakerResult() {
     }
   }, [isAuthenticated, result, handleStartPractice]);
 
-  if (result) {
-    hasHadResult.current = true;
-  }
+  useEffect(() => {
+    if (result) {
+      hasHadResult.current = true;
+    }
+  }, [result]);
 
   useEffect(() => {
     if (isHydrated && !result && !hasHadResult.current) {
