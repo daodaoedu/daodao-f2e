@@ -83,7 +83,7 @@ export interface SurveyResponse {
 
 export interface Answer {
   questionId: string
-  value: string | string[] | number | boolean | null
+  value: string | string[] | number | number[] | boolean | null
   answeredAt?: string
 }
 

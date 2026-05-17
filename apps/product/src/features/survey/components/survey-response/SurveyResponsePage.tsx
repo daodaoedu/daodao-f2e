@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react"
 import { useSurveyResponse } from "../../hooks/use-survey-response"
 import { QuestionRenderer } from "./QuestionRenderer"
 import { ThankYouPage } from "./ThankYouPage"
-import { trackPartial } from "../../services/survey"
+import { trackPartial, trackView } from "../../services/survey"
 import type { Answer } from "../../types"
 
 function getSessionKey(shareId: string): string {
@@ -29,6 +29,7 @@ export function SurveyResponsePage() {
   const { survey, loading, error, submitResponse } = useSurveyResponse(shareId)
   const startedAtRef = useRef<string | null>(null)
   const sessionKeyRef = useRef<string | null>(null)
+  const lastTrackedPositionRef = useRef<number | null>(null)
 
   // Record start time + session key once survey is loaded
   useEffect(() => {
@@ -39,9 +40,7 @@ export function SurveyResponsePage() {
 
   // Track page view once survey is loaded
   useEffect(() => {
-    if (shareId) {
-      import('../../services/survey').then(({ trackView }) => trackView(shareId))
-    }
+    if (shareId) trackView(shareId)
   }, [shareId])
   const [answers, setAnswers] = useState<Record<string, Answer>>({})
   const [submitted, setSubmitted] = useState(false)
@@ -61,20 +60,29 @@ export function SurveyResponsePage() {
     } catch { /* ignore */ }
   }, [survey, shareId])
 
-  // Auto-save answers
+  // Auto-save answers (debounced)
   useEffect(() => {
     if (Object.keys(answers).length === 0) return
-    try {
-      localStorage.setItem(`survey-answers-${shareId}`, JSON.stringify(answers))
-    } catch { /* ignore */ }
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem(`survey-answers-${shareId}`, JSON.stringify(answers))
+      } catch { /* ignore */ }
+    }, 500)
+    return () => clearTimeout(timer)
   }, [answers, shareId])
 
   const handleAnswer = useCallback((questionId: string, value: Answer["value"]) => {
     setAnswers((prev) => {
       const next = { ...prev, [questionId]: { questionId, value, answeredAt: new Date().toISOString() } }
-      // Track partial drop-off: use question position as last_position
+      // Track partial drop-off: only when moving to a new (further) position
       const position = questions.findIndex((q) => q.id === questionId)
-      if (position >= 0 && shareId && sessionKeyRef.current) {
+      if (
+        position >= 0 &&
+        shareId &&
+        sessionKeyRef.current &&
+        position !== lastTrackedPositionRef.current
+      ) {
+        lastTrackedPositionRef.current = position
         trackPartial(shareId, sessionKeyRef.current, position)
       }
       return next
@@ -201,7 +209,6 @@ export function SurveyResponsePage() {
 
         <div className="pt-2 pb-16">
           <Button
-            size="lg"
             className="w-full sm:w-auto"
             onClick={handleSubmit}
             disabled={submitting}

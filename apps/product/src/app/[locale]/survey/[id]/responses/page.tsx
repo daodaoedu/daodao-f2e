@@ -5,40 +5,32 @@ import { useParams, useRouter } from "next/navigation"
 import { Button } from "@daodao/ui/components/button"
 import { Card, CardContent } from "@daodao/ui/components/card"
 import { Loader2, ArrowLeft } from "lucide-react"
-import { listResponses, deleteResponse } from "@/features/survey/services/survey"
+import { listResponses, deleteResponse, type ResponseListItem } from "@/features/survey/services/survey"
 import { Trash2 } from "lucide-react"
-
-type ResponseItem = {
-  id: string
-  survey_id: string | number
-  user_id: string | number | null
-  completed_at: string
-  answer_count: number
-}
 
 export default function SurveyResponsesPage() {
   const params = useParams()
   const router = useRouter()
   const surveyId = params?.id as string
 
-  const [responses, setResponses] = useState<ResponseItem[]>([])
+  const [responses, setResponses] = useState<ResponseListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
 
   useEffect(() => {
     listResponses(surveyId)
-      .then((r) => setResponses(r.data as unknown as ResponseItem[]))
+      .then((r) => setResponses(r.data))
       .catch(() => setError("載入失敗"))
       .finally(() => setLoading(false))
   }, [surveyId])
 
-  const handleDelete = async (e: React.MouseEvent, responseId: string) => {
+  const handleDelete = async (e: React.MouseEvent, responseId: number) => {
     e.stopPropagation()
     if (!confirm("確定要刪除這筆回應嗎？")) return
     setDeletingId(responseId)
     try {
-      await deleteResponse(surveyId, responseId)
+      await deleteResponse(surveyId, String(responseId))
       setResponses((prev) => prev.filter((r) => r.id !== responseId))
     } catch {
       alert("刪除失敗，請再試一次")

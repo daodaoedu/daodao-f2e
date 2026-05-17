@@ -38,7 +38,7 @@ export const SubmitResponseSchema = z.object({
   sessionId: z.string().optional(),
   answers: z.array(z.object({
     questionId: z.string(),
-    value: z.union([z.string(), z.array(z.string()), z.number(), z.boolean(), z.null()]),
+    value: z.union([z.string(), z.array(z.string()), z.array(z.number()), z.number(), z.boolean(), z.null()]),
     answeredAt: z.string().optional(),
   })),
   startedAt: z.string().optional(),

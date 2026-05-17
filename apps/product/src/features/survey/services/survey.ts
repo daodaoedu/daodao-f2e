@@ -243,18 +243,27 @@ export async function submitResponse(input: SubmitResponseInput): Promise<{ resp
   return res.data
 }
 
+export type ResponseListItem = {
+  id: number
+  survey_id: number
+  user_id: number | null
+  completed_at: string
+  answer_count: number
+}
+
 export async function listResponses(
   surveyId: string,
   params?: { page?: number; limit?: number },
 ): Promise<{
-  data: SurveyResponse[]
+  data: ResponseListItem[]
   pagination: { currentPage: number; totalPages: number; hasNext: boolean; total: number }
 }> {
   const q = new URLSearchParams()
   if (params?.page) q.set('page', String(params.page))
   if (params?.limit) q.set('limit', String(params.limit))
-  const res = await api<{ success: true; data: SurveyResponse[] }>(
-    `/surveys/${surveyId}/responses?${q.toString()}`,
+  const qs = q.toString()
+  const res = await api<{ success: true; data: ResponseListItem[] }>(
+    `/surveys/${surveyId}/responses${qs ? `?${qs}` : ''}`,
   )
   return {
     data: res.data,
@@ -299,12 +308,14 @@ export async function getAnalytics(surveyId: string): Promise<SurveyAnalytics> {
       questionText: q.question_text,
       stats: {
         responseCount: q.answer_count,
-        distribution: (
-          q.stats.option_counts as Array<{ option_text: string; count: number }> | undefined
-        )?.map((o, _i, arr) => {
-          const total = arr.reduce((s, x) => s + x.count, 0) || 1
-          return { label: o.option_text, count: o.count, percentage: (o.count / total) * 100 }
-        }),
+        distribution: (() => {
+          const counts = Array.isArray(q.stats.option_counts)
+            ? (q.stats.option_counts as Array<{ option_text: string; count: number }>)
+            : undefined
+          if (!counts) return undefined
+          const total = counts.reduce((s, x) => s + x.count, 0) || 1
+          return counts.map((o) => ({ label: o.option_text, count: o.count, percentage: (o.count / total) * 100 }))
+        })(),
         averageScore: q.stats.avg as number | undefined,
       },
     })),

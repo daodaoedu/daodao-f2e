@@ -28,8 +28,12 @@ export default function SurveyManagePage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("確定要刪除此問卷？")) return
-    await deleteSurvey(id)
-    setSurveys((prev) => prev.filter((s) => s.id !== id))
+    try {
+      await deleteSurvey(id)
+      setSurveys((prev) => prev.filter((s) => s.id !== id))
+    } catch {
+      alert("刪除失敗，請再試一次")
+    }
   }
 
   const handleToggleStatus = async (s: Survey) => {
@@ -38,6 +42,8 @@ export default function SurveyManagePage() {
     try {
       await updateSurveyStatus(s.id, nextStatus)
       setSurveys((prev) => prev.map((x) => x.id === s.id ? { ...x, status: nextStatus } : x))
+    } catch {
+      alert("操作失敗，請再試一次")
     } finally {
       setTogglingId(null)
     }
