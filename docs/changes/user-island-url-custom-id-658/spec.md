@@ -19,12 +19,12 @@ Depends on: daodaoedu/daodao-server#234
 
 ### 1.2 根本原因（前端）
 
-多個卡片元件定義了 `getIdentifier` helper，但在 JSX 的 `<Link>` 中未使用該 helper，硬編碼 `user.id`（UUID）：
+多個卡片元件定義了 `getUserIslandHref` helper，但在 JSX 的 `<Link>` 中未使用該 helper，硬編碼 `user.id`（UUID）：
 
 | 元件 | 問題行 | 說明 |
 |------|--------|------|
-| `PracticeShowcaseCard.tsx` | line 256 | `<Link href={/users/${user.id}>` 未使用第 63 行的 helper |
-| `BrewingCard.tsx` | line 247 | `<Link href={/users/${user.id}>` 未使用第 57 行的 helper |
+| `PracticeShowcaseCard.tsx` | line 256 | `<Link href={/users/${user.id}>` 未使用第 62 行的 `getUserIslandHref` helper |
+| `BrewingCard.tsx` | line 247 | `<Link href={/users/${user.id}>` 未使用第 56 行的 `getUserIslandHref` helper |
 | `practice-overview-card.tsx` | lines 47, 56 | `<Link href={/users/${creator.id}>` 無 customId fallback |
 | `browse-activity-content.tsx` | lines 54, 71 | `<Link href={/users/${follower.id}>` 無 customId fallback |
 
@@ -44,35 +44,37 @@ Depends on: daodaoedu/daodao-server#234
 
 #### 2.1.1 `PracticeShowcaseCard.tsx`
 
-將 `line 256` 的 `<Link href={/users/${user.id}>` 改為使用已有的 `getUserProfileUrl(user)` helper：
+將 `line 256` 的 `<Link href={/users/${user.id}>` 改為使用已有的 `getUserIslandHref(user)` helper，同時在 props 型別加入 `customId`：
 
 ```tsx
 // Before
 <Link href={`/users/${user.id}`} prefetch className="shrink-0">
 
 // After
-<Link href={getUserProfileUrl(user) ?? `/users/${user.id}`} prefetch className="shrink-0">
+<Link href={getUserIslandHref(user) ?? `/users/${user.id}`} prefetch className="shrink-0">
 ```
+
+> Note: `ShowcaseCommentUser`（或對應的 user prop 型別）需加入 `customId?: string | null`，否則 helper 永遠回傳 UUID。
 
 #### 2.1.2 `BrewingCard.tsx`
 
-將 `line 247` 的 `<Link href={/users/${user.id}>` 改為使用已有的 `getUserProfileUrl(user)` helper：
+將 `line 247` 的 `<Link href={/users/${user.id}>` 改為使用已有的 `getUserIslandHref(user)` helper：
 
 ```tsx
 // Before
 <Link href={`/users/${user.id}`} className="shrink-0">
 
 // After
-<Link href={getUserProfileUrl(user) ?? `/users/${user.id}`} className="shrink-0">
+<Link href={getUserIslandHref(user) ?? `/users/${user.id}`} className="shrink-0">
 ```
 
 #### 2.1.3 `practice-overview-card.tsx`
 
-`creator` 物件需加入 `customId` 型別定義，並修正 links：
+現有介面為 `CreatorInfo`，在其中加入 `customId` 型別定義，並修正 links：
 
 ```tsx
 // Type 更新
-interface PracticeCreator {
+interface CreatorInfo {
   id: string;
   name: string;
   photoURL: string | null;
@@ -99,9 +101,10 @@ href={`/users/${follower.customId || follower.id}`}
 ```tsx
 import { permanentRedirect } from 'next/navigation';
 
-// 在 UserProfilePage 的 profileData 取得後
-if (profileData?.data?.canonical && profileData.data.canonical !== identifier) {
-  permanentRedirect(`/${locale}/users/${profileData.data.canonical}`);
+// profileData = profileResponse?.data（已解開 UserProfileResponse.data）
+// 在 UserProfilePage 的 profileData 取得後直接存取 canonical
+if (profileData?.canonical && profileData.canonical !== identifier) {
+  permanentRedirect(`/${locale}/users/${profileData.canonical}`);
 }
 ```
 
@@ -109,17 +112,22 @@ if (profileData?.data?.canonical && profileData.data.canonical !== identifier) {
 
 ### 2.3 API 型別更新
 
-`packages/api/src/services/user.ts` 中的 Practice/CheckIn user 型別需加入 `customId`：
+`packages/api/src/services/user.ts` 中：
+
+1. `UserProfileData` interface 加入 `canonical` 欄位（供 redirect 邏輯使用）：
 
 ```typescript
-// Practice user embed type
-interface PracticeUser {
-  id: string;
-  name: string;
-  photoURL: string | null;
-  roleList: string[];
-  customId?: string | null;  // 新增（server#234 後才有）
+export interface UserProfileData {
+  // ... existing fields
+  canonical?: string | null;  // 新增（server#234 後才有）
 }
+```
+
+2. Practice/CheckIn user embed 型別加入 `customId`：
+
+```typescript
+// Practice user embed type（加在對應的 PracticeUser 或 inline type）
+customId?: string | null;  // 新增（server#234 後才有）
 ```
 
 ---
@@ -130,12 +138,12 @@ interface PracticeUser {
 
 | 檔案 | 變更說明 |
 |------|----------|
-| `apps/product/src/components/showcase/PracticeShowcaseCard.tsx` | line 256 改用 `getUserProfileUrl` helper |
-| `apps/product/src/components/showcase/BrewingCard.tsx` | line 247 改用 `getUserProfileUrl` helper |
+| `apps/product/src/components/showcase/PracticeShowcaseCard.tsx` | line 256 改用 `getUserIslandHref` helper，user 型別加入 `customId` |
+| `apps/product/src/components/showcase/BrewingCard.tsx` | line 247 改用 `getUserIslandHref` helper |
 | `apps/product/src/components/practice/shared/practice-overview-card.tsx` | 加入 `customId` 型別，lines 47/56 改用 `customId \|\| id` |
 | `apps/product/src/components/practice/shared/browse-activity-content.tsx` | lines 54/71 改用 `customId \|\| id` |
 | `apps/product/src/app/[locale]/(with-layout)/users/[identifier]/page.tsx` | 加入 canonical redirect 邏輯 |
-| `packages/api/src/services/user.ts` | Practice user embed 型別加入 `customId` |
+| `packages/api/src/services/user.ts` | `UserProfileData` 加入 `canonical`；Practice user embed 型別加入 `customId` |
 
 ### 3.2 不變動的部分
 
