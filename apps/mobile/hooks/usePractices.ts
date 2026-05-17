@@ -1,9 +1,16 @@
+import {
+  createPracticeCheckIn,
+  getPracticeById,
+  getPracticeCheckIns,
+  useMutate,
+  useMyPracticeStats,
+  useMyPractices,
+} from "@daodao/api";
 import { useCallback, useMemo, useRef, useState } from "react";
-import useSWR from "swr";
+import useSWR, { mutate as globalMutate } from "swr";
 import { PracticeStatus } from "@/constants/practice-status";
 import type { TaskStatus } from "@/constants/task-status";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
-import { api } from "@/services/api-client";
 import type { ICheckIn, IPractice } from "@/types/practice";
 
 // ============================================================================
@@ -52,23 +59,81 @@ interface IApiPractice {
   endDate?: string | null;
 }
 
-interface IMyPracticesResponse {
-  data: IApiPractice[];
-}
-
-interface IPracticeStatsResponse {
-  data: {
-    currentStreak?: number;
-    totalCheckIns?: number;
-  };
-}
-
 // ============================================================================
 // Hooks
 // ============================================================================
 
-const MY_PRACTICES_KEY = "/me/practices";
-const MY_PRACTICE_STATS_KEY = "/me/practice-stats";
+type ApiPracticeDetail = IApiPractice & {
+  durationDays?: number;
+  frequencyMinDays?: number;
+  frequencyMaxDays?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+type ApiCheckIn = {
+  id: string | number;
+  practiceId: string | number;
+  note?: string;
+  createdAt: string;
+};
+
+type ApiMutationResult = {
+  error?: unknown;
+};
+
+const mapPracticeDetail = (practice: ApiPracticeDetail | undefined): IPractice | undefined => {
+  if (!practice) return undefined;
+
+  const targetDays = practice.durationDays ?? 0;
+  const completedDays = practice.checkInCount ?? 0;
+
+  return {
+    id: practice.id,
+    title: practice.title,
+    description: practice.description ?? practice.practiceAction,
+    frequency:
+      practice.frequencyMinDays === 1 && practice.frequencyMaxDays === 1 ? "daily" : "custom",
+    targetDays,
+    completedDays,
+    currentStreak: 0,
+    longestStreak: 0,
+    status: mapPracticeStatusToTaskStatus(practice.status as PracticeStatus),
+    practiceStatus:
+      practice.status === PracticeStatus.active ||
+      practice.status === PracticeStatus.completed ||
+      practice.status === PracticeStatus.archived
+        ? practice.status
+        : undefined,
+    tags: practice.tags ?? [],
+    color: practice.themeColor,
+    createdAt: practice.createdAt ?? "",
+    updatedAt: practice.updatedAt ?? practice.createdAt ?? "",
+    lastCheckInAt: practice.lastCheckinAt ?? undefined,
+    todayCheckedIn:
+      practice.lastCheckinAt?.split("T")[0] === new Date().toISOString().split("T")[0],
+  };
+};
+
+const mapCheckIn = (checkIn: ApiCheckIn): ICheckIn => ({
+  id: String(checkIn.id),
+  practiceId: String(checkIn.practiceId),
+  note: checkIn.note,
+  createdAt: checkIn.createdAt,
+});
+
+const getMutationErrorMessage = (response: ApiMutationResult): string | null => {
+  if (!response.error) return null;
+
+  if (response.error instanceof Error) return response.error.message;
+  if (typeof response.error === "string") return response.error;
+  if (typeof response.error === "object" && "message" in response.error) {
+    const message = response.error.message;
+    if (typeof message === "string") return message;
+  }
+
+  return "打卡失敗，請稍後再試";
+};
 
 export function usePractices() {
   const {
@@ -76,27 +141,9 @@ export function usePractices() {
     error: practicesError,
     isLoading: practicesLoading,
     mutate,
-  } = useSWR<IMyPracticesResponse>(
-    MY_PRACTICES_KEY,
-    () => api.get<IMyPracticesResponse>(`${MY_PRACTICES_KEY}?limit=16`),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: true,
-      dedupingInterval: 10000,
-      errorRetryCount: 3,
-      errorRetryInterval: 1000,
-    }
-  );
+  } = useMyPractices({ limit: 16 });
 
-  const { data: statsData, isLoading: statsLoading } = useSWR<IPracticeStatsResponse>(
-    MY_PRACTICE_STATS_KEY,
-    () => api.get<IPracticeStatsResponse>(MY_PRACTICE_STATS_KEY),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: true,
-      dedupingInterval: 10000,
-    }
-  );
+  const { data: statsData, isLoading: statsLoading } = useMyPracticeStats();
 
   const practices = practicesData?.data ?? [];
 
@@ -164,17 +211,18 @@ export function usePractices() {
 }
 
 export function usePractice(id: string | undefined) {
-  const { data, error, isLoading, mutate } = useSWR<IPractice>(
-    id ? `/practices/${id}` : null,
-    () => api.get<IPractice>(`/practices/${id}`),
+  const { data, error, isLoading, mutate } = useSWR(
+    id ? `/api/v1/practices/${id}` : null,
+    () => getPracticeById(id as string),
     {
       revalidateOnFocus: false,
       errorRetryCount: 2,
     }
   );
+  const practice = useMemo(() => mapPracticeDetail(data?.data?.data), [data]);
 
   return {
-    practice: data,
+    practice,
     isLoading,
     error,
     mutate,
@@ -192,22 +240,23 @@ interface ICheckInResult {
 }
 
 export function useCheckIns(practiceId: string | undefined) {
-  const { data, error, isLoading, mutate } = useSWR<ICheckIn[]>(
-    practiceId ? `/practices/${practiceId}/check-ins` : null,
-    () => api.get<ICheckIn[]>(`/practices/${practiceId}/check-ins`),
+  const { data, error, isLoading, mutate } = useSWR(
+    practiceId ? `/api/v1/practices/${practiceId}/checkins` : null,
+    () => getPracticeCheckIns(practiceId as string),
     {
       revalidateOnFocus: false,
       errorRetryCount: 2,
     }
   );
 
+  const checkIns = useMemo(() => (data?.data?.data ?? []).map(mapCheckIn), [data]);
+
   const checkInDates = useMemo(() => {
-    if (!data || !Array.isArray(data)) return [];
-    return data.map((checkIn: { createdAt: string }) => checkIn.createdAt.split("T")[0]);
-  }, [data]);
+    return checkIns.map((checkIn) => checkIn.createdAt.split("T")[0]);
+  }, [checkIns]);
 
   return {
-    checkIns: data ?? [],
+    checkIns,
     checkInDates,
     isLoading,
     error,
@@ -218,7 +267,7 @@ export function useCheckIns(practiceId: string | undefined) {
 export function useCheckIn() {
   const [isChecking, setIsChecking] = useState(false);
   const isCheckingRef = useRef(false);
-  const { mutate: mutatePractices } = usePractices();
+  const mutate = useMutate();
 
   const checkIn = useCallback(
     async ({ practiceId, note }: ICheckInParams): Promise<ICheckInResult> => {
@@ -230,8 +279,53 @@ export function useCheckIn() {
       setIsChecking(true);
 
       try {
-        await api.post(`/practices/${practiceId}/check-in`, { note });
-        await mutatePractices();
+        const response = await createPracticeCheckIn(practiceId, {
+          note,
+          imageUrls: [],
+          tags: [],
+        });
+        const errorMessage = getMutationErrorMessage(response);
+        if (errorMessage) {
+          throw new Error(errorMessage);
+        }
+
+        await Promise.all([
+          mutate([
+            "/api/v1/practices/{id}/checkins",
+            {
+              params: {
+                path: { id: practiceId },
+                query: {},
+              },
+            },
+          ] as const),
+          mutate([
+            "/api/v1/practices/{id}",
+            {
+              params: {
+                path: { id: practiceId },
+              },
+            },
+          ] as const),
+          mutate([
+            "/api/v1/me/practices",
+            {
+              params: {
+                query: {},
+              },
+            },
+          ] as const),
+          mutate([
+            "/api/v1/me/practice-stats",
+            {
+              params: {
+                query: {},
+              },
+            },
+          ] as const),
+          globalMutate(`/api/v1/practices/${practiceId}`),
+          globalMutate(`/api/v1/practices/${practiceId}/checkins`),
+        ]);
         return { success: true };
       } catch (error) {
         const message = error instanceof Error ? error.message : "打卡失敗，請稍後再試";
@@ -241,7 +335,7 @@ export function useCheckIn() {
         setIsChecking(false);
       }
     },
-    [mutatePractices]
+    [mutate]
   );
 
   return { checkIn, isChecking };

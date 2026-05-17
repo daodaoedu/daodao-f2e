@@ -74,6 +74,26 @@ function getNotificationText(item: INotificationApiItem): string {
   }
 }
 
+function getNotificationHref(item: INotificationApiItem): string | null {
+  const practiceId = item.practiceId ?? (item.entityType === "checkin" ? undefined : item.entityId);
+
+  switch (item.entityType) {
+    case "practice":
+    case "comment":
+    case "checkin":
+    case "buddy_request":
+      if (practiceId && item.checkinId) {
+        return `/practices/${practiceId}/check-ins/${item.checkinId}`;
+      }
+      return practiceId ? `/practices/${practiceId}` : null;
+    case "user":
+    case "connection":
+      return item.actor.id ? `/users/${item.actor.id}` : null;
+    default:
+      return null;
+  }
+}
+
 // ============================================================================
 // Notification Item
 // ============================================================================
@@ -212,16 +232,9 @@ export default function NotificationsScreen() {
         revalidateAllNotifications();
       }
 
-      // Deep link based on entity type
-      switch (item.entityType) {
-        case "practice":
-        case "comment":
-          if (item.entityId) router.push(`/practices/${item.entityId}` as never);
-          break;
-        case "user":
-        case "connection":
-          if (item.actor.id) router.push(`/users/${item.actor.id}` as never);
-          break;
+      const href = getNotificationHref(item);
+      if (href) {
+        router.push(href as never);
       }
     },
     [router]

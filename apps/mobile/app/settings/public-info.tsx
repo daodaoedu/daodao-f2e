@@ -1,3 +1,4 @@
+import { useUserMutations } from "@daodao/api";
 import { Camera, ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -17,11 +18,11 @@ import {
 } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { api } from "@/services/api-client";
 
 export default function PublicInfoSettingsScreen() {
   const router = useRouter();
   const { user, isLoading, mutate } = useCurrentUser();
+  const { updateCurrentUser } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [name, setName] = useState("");
@@ -68,7 +69,7 @@ export default function PublicInfoSettingsScreen() {
     try {
       const currentCustomId =
         ((user as unknown as Record<string, unknown>)?.customId as string) || "";
-      await api.put("/users/me", {
+      await updateCurrentUser({
         name,
         ...(customId !== currentCustomId ? { customId } : {}),
         personalSlogan,

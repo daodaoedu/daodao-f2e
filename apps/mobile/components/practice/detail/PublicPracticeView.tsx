@@ -497,7 +497,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
                   </Text>
                 </YStack>
               ) : (
-                <CheckInList checkIns={checkIns || []} emptyText="尚無打卡紀錄" />
+                <CheckInList checkIns={checkIns || []} emptyText="尚無打卡紀錄" practiceId={id} />
               ))}
 
             {activeTab === "resources" && (

@@ -1,5 +1,13 @@
 // Export API client
-export { getSwrKey, getSwrKeyWithResponse, unauthorizedHandler } from "./client";
+export {
+  clearMobileClient,
+  clearMobileTokenProvider,
+  getSwrKey,
+  getSwrKeyWithResponse,
+  initMobileClient,
+  setMobileTokenProvider,
+  unauthorizedHandler,
+} from "./client";
 export * from "./errors";
 
 // Export hooks

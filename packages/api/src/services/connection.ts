@@ -1,5 +1,4 @@
-import { getRequiredEnv } from "@daodao/config";
-import { unauthorizedHandler } from "../client";
+import { getApiBaseUrl, unauthorizedHandler } from "../client";
 import { ApiError } from "../errors";
 
 // ============================================================================
@@ -53,7 +52,7 @@ export interface IPaginationParams {
 // API Functions
 // ============================================================================
 
-const getBaseUrl = () => getRequiredEnv("NEXT_PUBLIC_API_URL");
+const getBaseUrl = () => getApiBaseUrl();
 
 export const sendConnectionRequest = async (
   body: ISendConnectionRequestBody

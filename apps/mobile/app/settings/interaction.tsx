@@ -1,3 +1,4 @@
+import { useUserMutations } from "@daodao/api";
 import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -5,11 +6,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { api } from "@/services/api-client";
 
 export default function InteractionSettingsScreen() {
   const router = useRouter();
   const { user, isLoading } = useCurrentUser();
+  const { updateCurrentUser } = useUserMutations();
 
   const serverIsOpenProfile = (user as { isOpenProfile?: boolean })?.isOpenProfile ?? true;
   const [localIsOpenProfile, setLocalIsOpenProfile] = useState<boolean | null>(null);
@@ -20,7 +21,7 @@ export default function InteractionSettingsScreen() {
     setLocalIsOpenProfile(value);
     setIsSaving(true);
     try {
-      await api.put("/users/me", { isOpenProfile: value });
+      await updateCurrentUser({ isOpenProfile: value });
     } catch {
       setLocalIsOpenProfile(null);
     } finally {

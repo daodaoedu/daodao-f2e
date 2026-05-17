@@ -1,3 +1,4 @@
+import { useUserMutations } from "@daodao/api";
 import { Check, ChevronDown, ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -12,7 +13,6 @@ import {
 } from "@/constants/settings";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { api } from "@/services/api-client";
 
 type FieldOptionType = { value: string; label: string };
 
@@ -110,6 +110,7 @@ function FieldSelectionModal({
 export default function AccountSettingsScreen() {
   const router = useRouter();
   const { user, isLoading, mutate } = useCurrentUser();
+  const { updateCurrentUser } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [email, setEmail] = useState("");
@@ -155,7 +156,7 @@ export default function AccountSettingsScreen() {
       };
       if (educationStage) updateData.educationStage = educationStage;
 
-      await api.put("/users/me", updateData);
+      await updateCurrentUser(updateData);
       await mutate();
       Alert.alert("成功", "帳號設定已更新", [{ text: "確定", onPress: () => router.back() }]);
     } catch {

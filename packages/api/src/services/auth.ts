@@ -3,11 +3,8 @@
  * 提供認證相關的 API 調用函數
  */
 
-import { getRequiredEnv } from "@daodao/config";
-import { client } from "../client";
+import { client, getApiBaseUrl } from "../client";
 import type { paths } from "../types";
-
-const API_URL = getRequiredEnv("NEXT_PUBLIC_API_URL");
 
 // ============================================================================
 // Types
@@ -130,9 +127,10 @@ export const getAuthMe = async () => {
  * 注意：這會觸發瀏覽器重定向，不返回 Response
  */
 export const initiateGoogleOAuth = (state?: string) => {
+  const apiUrl = getApiBaseUrl();
   const url = state
-    ? `${API_URL}/api/v1/auth/google?state=${encodeURIComponent(state)}`
-    : `${API_URL}/api/v1/auth/google`;
+    ? `${apiUrl}/api/v1/auth/google?state=${encodeURIComponent(state)}`
+    : `${apiUrl}/api/v1/auth/google`;
   // 這會由瀏覽器處理重定向，不需要返回 Response
   if (typeof window !== "undefined") {
     window.location.href = url;

@@ -96,9 +96,9 @@ export function ShowcaseCard({
       style={styles.card}
       onPress={() =>
         router.push({
-          pathname: `/practices/${id}` as Href,
+          pathname: `/practices/${id}`,
           params: { showcaseData: JSON.stringify(practice) },
-        })
+        } as Href)
       }
     >
       {/* Header row */}

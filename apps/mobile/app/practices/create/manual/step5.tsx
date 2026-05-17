@@ -1,3 +1,4 @@
+import { type CreatePracticeRequestType, createPractice } from "@daodao/api";
 import {
   Bell,
   Calendar,
@@ -17,7 +18,60 @@ import { Button, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { StepIndicator } from "@/components";
 import { colors } from "@/generated/design-tokens";
 import { useCreatePractice } from "@/providers/CreatePracticeProvider";
-import { api } from "@/services/api-client";
+import type { CreatePracticeInputType } from "@/types/create-practice";
+
+type PracticeTimePeriod = CreatePracticeRequestType["practiceTimePeriods"][number];
+
+function getFrequencyRange(values: CreatePracticeInputType) {
+  if (values.frequency === "daily") {
+    return { frequencyMinDays: 7, frequencyMaxDays: 7 };
+  }
+
+  if (values.frequency === "weekly") {
+    return { frequencyMinDays: 1, frequencyMaxDays: 1 };
+  }
+
+  const selectedDays = values.customDays?.length ?? 0;
+  const days = selectedDays > 0 ? selectedDays : 1;
+  return { frequencyMinDays: days, frequencyMaxDays: days };
+}
+
+function getPracticeTimePeriods(values: CreatePracticeInputType): PracticeTimePeriod[] {
+  if (!values.reminderEnabled || !values.reminderTime) {
+    return [];
+  }
+
+  const hour = Number.parseInt(values.reminderTime.split(":")[0] ?? "", 10);
+
+  if (Number.isNaN(hour)) {
+    return [];
+  }
+
+  if (hour < 12) return ["morning"];
+  if (hour < 17) return ["afternoon"];
+  if (hour < 21) return ["evening"];
+  return ["night"];
+}
+
+function toCreatePracticeRequest(values: CreatePracticeInputType): CreatePracticeRequestType {
+  const request: CreatePracticeRequestType = {
+    title: values.title,
+    durationDays: values.targetDays,
+    ...getFrequencyRange(values),
+    practiceTimePeriods: getPracticeTimePeriods(values),
+    tags: values.tags ?? [],
+    isDraft: false,
+  };
+
+  if (values.description) {
+    request.practiceAction = values.description;
+  }
+
+  return {
+    ...request,
+    privacy_status: values.privacy_status,
+  } as CreatePracticeRequestType;
+}
 
 export default function Step5Screen() {
   const router = useRouter();
@@ -37,7 +91,15 @@ export default function Step5Screen() {
     setIsSubmitting(true);
 
     try {
-      await api.post("/practices", data);
+      const response = await createPractice(toCreatePracticeRequest(data));
+
+      if (response.error) {
+        const errorResponse = response.error as {
+          error?: { message?: string };
+          message?: string;
+        };
+        throw new Error(errorResponse.error?.message ?? errorResponse.message ?? "建立實踐失敗");
+      }
 
       Alert.alert("建立成功", "你的實踐已建立，開始你的旅程吧！", [
         {

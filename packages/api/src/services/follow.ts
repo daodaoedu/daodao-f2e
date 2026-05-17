@@ -1,5 +1,4 @@
-import { getRequiredEnv } from "@daodao/config";
-import { unauthorizedHandler } from "../client";
+import { getApiBaseUrl, unauthorizedHandler } from "../client";
 
 // ============================================================================
 // Types
@@ -56,7 +55,7 @@ export interface IGetFollowParams {
 // API Functions
 // ============================================================================
 
-const getBaseUrl = () => getRequiredEnv("NEXT_PUBLIC_API_URL");
+const getBaseUrl = () => getApiBaseUrl();
 
 export const followTarget = async (body: IFollowTarget): Promise<void> => {
   const res = await unauthorizedHandler.wrapFetch(`${getBaseUrl()}/api/v1/follows`, {

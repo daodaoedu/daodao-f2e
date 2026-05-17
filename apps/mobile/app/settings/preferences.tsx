@@ -1,12 +1,11 @@
+import { useAvailablePreferences, useCurrentUserPreferences, useUserMutations } from "@daodao/api";
 import { Check, ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useSWR from "swr";
 import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import { api } from "@/services/api-client";
 
 interface IPreferenceOption {
   id: number;
@@ -32,23 +31,13 @@ interface IUserPreference {
 export default function PreferencesSettingsScreen() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { updateCurrentUserPreferences } = useUserMutations();
 
-  const { data: availableTypes, isLoading: isLoadingAvailable } = useSWR<IPreferenceType[]>(
-    "/users/preferences/available",
-    () => api.get<{ data: IPreferenceType[] }>("/users/preferences/available").then((r) => r.data),
-    { revalidateOnFocus: false }
-  );
+  const { data: availablePrefsData, isLoading: isLoadingAvailable } = useAvailablePreferences();
+  const { data: userPrefsData, isLoading: isLoadingPrefs } = useCurrentUserPreferences();
 
-  const { data: userPrefs, isLoading: isLoadingPrefs } = useSWR<IUserPreference[]>(
-    "/users/me/preferences",
-    () =>
-      api
-        .get<{ data: { preferences: IUserPreference[] } }>("/users/me/preferences")
-        .then((r) => r.data.preferences),
-    { revalidateOnFocus: false }
-  );
-
-  const preferenceTypes = availableTypes ?? [];
+  const preferenceTypes = (availablePrefsData?.data ?? []) as IPreferenceType[];
+  const userPrefs = (userPrefsData?.data?.preferences ?? []) as IUserPreference[];
 
   const initialSelections = useMemo(() => {
     const selections: Record<string, number[]> = {};
@@ -112,7 +101,7 @@ export default function PreferencesSettingsScreen() {
         });
       });
 
-      await api.put("/users/me/preferences", { preferences: preferenceItems });
+      await updateCurrentUserPreferences({ preferences: preferenceItems });
 
       Alert.alert("成功", "偏好設定已更新", [{ text: "確定", onPress: () => router.back() }]);
     } catch {

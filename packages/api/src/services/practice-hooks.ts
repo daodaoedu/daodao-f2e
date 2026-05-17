@@ -5,9 +5,8 @@
  * 提供實踐相關的 React Hooks（用於 Client Components）
  */
 
-import { getRequiredEnv } from "@daodao/config";
 import useSWR from "swr";
-import { client, unauthorizedHandler } from "../client";
+import { client, getApiBaseUrl, unauthorizedHandler } from "../client";
 import { useMutate, useQuery } from "../hooks";
 import type { components, paths } from "../types";
 import type {
@@ -350,7 +349,7 @@ export const createPracticeCheckInWithFormData = async (
     });
   }
 
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const baseUrl = getApiBaseUrl();
   const response = await unauthorizedHandler.wrapFetch(
     `${baseUrl}/api/v1/practices/${practiceId}/checkins`,
     {
@@ -405,7 +404,7 @@ export const updatePracticeCheckInWithFormData = async (
     });
   }
 
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const baseUrl = getApiBaseUrl();
   const response = await unauthorizedHandler.wrapFetch(
     `${baseUrl}/api/v1/practices/${practiceId}/checkins/${checkInId}`,
     {

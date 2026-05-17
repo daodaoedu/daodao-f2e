@@ -1,0 +1,745 @@
+import {
+  ApiError,
+  disconnectUser,
+  getConnections,
+  getIncomingConnectionRequests,
+  getOutgoingConnectionRequests,
+  getUserPractices,
+  getUserProfileByIdentifier,
+  respondConnectionRequest,
+  sendConnectionRequest,
+  type UserProfileData,
+  withdrawConnectionRequest,
+} from "@daodao/api";
+import {
+  ArrowLeft,
+  Check,
+  Clock,
+  Link,
+  MapPin,
+  RefreshCw,
+  UserPlus,
+  UserRoundCheck,
+  X,
+} from "@tamagui/lucide-icons";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
+import {
+  Alert,
+  Pressable,
+  RefreshControl,
+  View as RNView,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import useSWR from "swr";
+import { Avatar, Button, Card, Separator, Text, XStack, YStack } from "tamagui";
+import { UserInfoCard } from "@/components/user";
+import { colors } from "@/generated/design-tokens";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { followTarget, unfollowTarget, useFollowStatus } from "@/hooks/useFollow";
+
+type ConnectionStatus = "none" | "outgoing" | "incoming" | "connected";
+
+function getIdentifierParam(param: string | string[] | undefined) {
+  return Array.isArray(param) ? param[0] : param;
+}
+
+function getDisplayLocation(profile: UserProfileData) {
+  return profile.locationNameZh ?? profile.locationNameEn ?? profile.location;
+}
+
+function formatCount(value: number | null | undefined) {
+  return String(value ?? 0);
+}
+
+function getPracticeStatusLabel(status: string) {
+  switch (status) {
+    case "draft":
+      return "草稿";
+    case "not_started":
+      return "未開始";
+    case "active":
+      return "進行中";
+    case "completed":
+      return "已完成";
+    case "archived":
+      return "已封存";
+    default:
+      return "未知";
+  }
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
+export default function UserProfileRoute() {
+  const router = useRouter();
+  const params = useLocalSearchParams<{ identifier?: string | string[] }>();
+  const identifier = getIdentifierParam(params.identifier);
+  const [isMutatingFollow, setIsMutatingFollow] = useState(false);
+  const [isMutatingConnection, setIsMutatingConnection] = useState(false);
+  const { user: currentUser, isLoading: isCurrentUserLoading } = useCurrentUser();
+
+  const {
+    data,
+    error,
+    isLoading,
+    mutate: mutateProfile,
+  } = useSWR(
+    identifier ? ["/api/v1/users/profile/{identifier}", identifier] : null,
+    ([, userIdentifier]) => getUserProfileByIdentifier(userIdentifier),
+    { revalidateOnFocus: false }
+  );
+
+  const profile = data?.data;
+  const targetUserId = profile?.id ?? "";
+  const isOwnProfile = Boolean(currentUser?.id && targetUserId && currentUser.id === targetUserId);
+  const canUseConnectionActions = Boolean(currentUser?.id && targetUserId && !isOwnProfile);
+  const {
+    isFollowing,
+    isLoading: isFollowStatusLoading,
+    mutate: mutateFollowStatus,
+  } = useFollowStatus("user", targetUserId);
+
+  const {
+    data: practicesResponse,
+    error: practicesError,
+    isLoading: isPracticesLoading,
+    mutate: mutatePractices,
+  } = useSWR(
+    targetUserId ? ["/api/v1/practices/user/{userId}", targetUserId] : null,
+    ([, userId]) => getUserPractices(userId, { status: "all", limit: 10 }),
+    { revalidateOnFocus: false }
+  );
+
+  const {
+    data: connectionsResponse,
+    isLoading: isConnectionsLoading,
+    mutate: mutateConnections,
+  } = useSWR(
+    canUseConnectionActions ? ["/api/v1/connections", "profile", targetUserId] : null,
+    () => getConnections({ limit: 100 }),
+    { revalidateOnFocus: false }
+  );
+  const {
+    data: outgoingRequestsResponse,
+    isLoading: isOutgoingLoading,
+    mutate: mutateOutgoingRequests,
+  } = useSWR(
+    canUseConnectionActions
+      ? ["/api/v1/connections/requests/outgoing", "profile", targetUserId]
+      : null,
+    () => getOutgoingConnectionRequests({ limit: 100 }),
+    { revalidateOnFocus: false }
+  );
+  const {
+    data: incomingRequestsResponse,
+    isLoading: isIncomingLoading,
+    mutate: mutateIncomingRequests,
+  } = useSWR(
+    canUseConnectionActions
+      ? ["/api/v1/connections/requests/incoming", "profile", targetUserId]
+      : null,
+    () => getIncomingConnectionRequests({ limit: 100 }),
+    { revalidateOnFocus: false }
+  );
+
+  const isRefreshing = isLoading || isCurrentUserLoading;
+  const canFollow = Boolean(targetUserId) && !isOwnProfile;
+  const displayName = profile?.name || "未命名用戶";
+  const displayLocation = profile ? getDisplayLocation(profile) : null;
+  const practices = practicesResponse?.data?.data ?? [];
+
+  const matchedConnection = useMemo(
+    () => connectionsResponse?.data.find((connection) => connection.externalId === targetUserId),
+    [connectionsResponse, targetUserId]
+  );
+  const matchedOutgoingRequest = useMemo(
+    () =>
+      outgoingRequestsResponse?.data.find((request) => request.receiverExternalId === targetUserId),
+    [outgoingRequestsResponse, targetUserId]
+  );
+  const matchedIncomingRequest = useMemo(
+    () =>
+      incomingRequestsResponse?.data.find(
+        (request) => request.requesterExternalId === targetUserId
+      ),
+    [incomingRequestsResponse, targetUserId]
+  );
+  const connectionStatus: ConnectionStatus = matchedConnection
+    ? "connected"
+    : matchedIncomingRequest
+      ? "incoming"
+      : matchedOutgoingRequest
+        ? "outgoing"
+        : "none";
+  const isConnectionStatusLoading = isConnectionsLoading || isOutgoingLoading || isIncomingLoading;
+
+  const stats = useMemo(
+    () =>
+      profile
+        ? [
+            { label: "追蹤者", value: formatCount(profile.followersCount), hidden: false },
+            {
+              label: "連結",
+              value: profile.hideConnectionsCount ? "隱藏" : formatCount(profile.connectionsCount),
+              hidden: profile.hideConnectionsCount,
+            },
+            { label: "近期實踐", value: formatCount(profile.recentPracticeCount), hidden: false },
+            {
+              label: "共同圈子",
+              value: formatCount(profile.commonCirclesCount),
+              hidden: profile.commonCirclesCount == null,
+            },
+          ]
+        : [],
+    [profile]
+  );
+
+  const handleRefresh = useCallback(() => {
+    mutateProfile();
+    mutateFollowStatus();
+    mutatePractices();
+    mutateConnections();
+    mutateOutgoingRequests();
+    mutateIncomingRequests();
+  }, [
+    mutateConnections,
+    mutateFollowStatus,
+    mutateIncomingRequests,
+    mutateOutgoingRequests,
+    mutatePractices,
+    mutateProfile,
+  ]);
+
+  const handleToggleFollow = useCallback(async () => {
+    if (!targetUserId || isMutatingFollow) return;
+
+    setIsMutatingFollow(true);
+    try {
+      if (isFollowing) {
+        await unfollowTarget("user", targetUserId);
+      } else {
+        await followTarget("user", targetUserId);
+      }
+      await Promise.all([mutateFollowStatus(), mutateProfile()]);
+    } catch (followError) {
+      Alert.alert(
+        isFollowing ? "取消追蹤失敗" : "追蹤失敗",
+        followError instanceof Error ? followError.message : "請稍後再試"
+      );
+    } finally {
+      setIsMutatingFollow(false);
+    }
+  }, [isFollowing, isMutatingFollow, mutateFollowStatus, mutateProfile, targetUserId]);
+
+  const refreshConnectionState = useCallback(
+    () => Promise.all([mutateConnections(), mutateOutgoingRequests(), mutateIncomingRequests()]),
+    [mutateConnections, mutateIncomingRequests, mutateOutgoingRequests]
+  );
+
+  const handleSendConnectionRequest = useCallback(async () => {
+    if (!targetUserId || isMutatingConnection) return;
+
+    setIsMutatingConnection(true);
+    try {
+      await sendConnectionRequest({ receiverExternalId: targetUserId });
+      await refreshConnectionState();
+    } catch (connectionError) {
+      if (connectionError instanceof ApiError && connectionError.status === 409) {
+        await refreshConnectionState();
+        return;
+      }
+      Alert.alert("送出連結請求失敗", getErrorMessage(connectionError, "請稍後再試"));
+    } finally {
+      setIsMutatingConnection(false);
+    }
+  }, [isMutatingConnection, refreshConnectionState, targetUserId]);
+
+  const handleWithdrawConnectionRequest = useCallback(async () => {
+    if (!matchedOutgoingRequest || isMutatingConnection) return;
+
+    setIsMutatingConnection(true);
+    try {
+      await withdrawConnectionRequest(String(matchedOutgoingRequest.requestId));
+      await refreshConnectionState();
+    } catch (connectionError) {
+      Alert.alert("撤回連結請求失敗", getErrorMessage(connectionError, "請稍後再試"));
+    } finally {
+      setIsMutatingConnection(false);
+    }
+  }, [isMutatingConnection, matchedOutgoingRequest, refreshConnectionState]);
+
+  const handleRespondConnectionRequest = useCallback(
+    async (action: "accept" | "reject") => {
+      if (!matchedIncomingRequest || isMutatingConnection) return;
+
+      setIsMutatingConnection(true);
+      try {
+        await respondConnectionRequest(String(matchedIncomingRequest.requestId), action);
+        await refreshConnectionState();
+      } catch (connectionError) {
+        Alert.alert("處理連結請求失敗", getErrorMessage(connectionError, "請稍後再試"));
+      } finally {
+        setIsMutatingConnection(false);
+      }
+    },
+    [isMutatingConnection, matchedIncomingRequest, refreshConnectionState]
+  );
+
+  const handleDisconnect = useCallback(() => {
+    if ((!matchedConnection && connectionStatus !== "connected") || isMutatingConnection) return;
+
+    Alert.alert("解除連結？", `解除連結後，你與 ${displayName} 將失去對彼此非公開內容的存取權。`, [
+      { text: "先不要", style: "cancel" },
+      {
+        text: "解除連結",
+        style: "destructive",
+        onPress: async () => {
+          setIsMutatingConnection(true);
+          try {
+            await disconnectUser(targetUserId);
+            await refreshConnectionState();
+            await mutateProfile();
+          } catch (connectionError) {
+            Alert.alert("解除連結失敗", getErrorMessage(connectionError, "請稍後再試"));
+          } finally {
+            setIsMutatingConnection(false);
+          }
+        },
+      },
+    ]);
+  }, [
+    connectionStatus,
+    displayName,
+    isMutatingConnection,
+    matchedConnection,
+    mutateProfile,
+    refreshConnectionState,
+    targetUserId,
+  ]);
+
+  return (
+    <RNView style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+        <XStack paddingHorizontal="$4" paddingVertical="$3" alignItems="center" gap="$3">
+          <Pressable onPress={() => router.back()} hitSlop={12}>
+            <ArrowLeft size={24} color={colors.text.dark} />
+          </Pressable>
+          <YStack flex={1}>
+            <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
+              個人頁面
+            </Text>
+            {profile?.customId ? (
+              <Text fontSize={12} color={colors.text.muted}>
+                @{profile.customId}
+              </Text>
+            ) : null}
+          </YStack>
+        </XStack>
+
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              tintColor={colors.primary.base}
+            />
+          }
+        >
+          {isLoading || isCurrentUserLoading ? (
+            <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical="$10">
+              <RefreshCw size={24} color={colors.logo.cyan} />
+              <Text marginTop="$3" color={colors.text.dark}>
+                載入中...
+              </Text>
+            </YStack>
+          ) : error || !profile ? (
+            <YStack
+              flex={1}
+              alignItems="center"
+              justifyContent="center"
+              paddingVertical="$10"
+              gap="$3"
+            >
+              <Text fontSize={18} fontWeight="500" color={colors.text.dark}>
+                找不到這個使用者
+              </Text>
+              <Text textAlign="center" color={colors.text.muted}>
+                這個個人頁面可能不存在，或暫時無法讀取。
+              </Text>
+              <Button
+                borderRadius="$md"
+                backgroundColor={colors.logo.cyan}
+                pressStyle={{ opacity: 0.8 }}
+                onPress={() => mutateProfile()}
+              >
+                <Text color={colors.text.light} fontWeight="500">
+                  重新整理
+                </Text>
+              </Button>
+            </YStack>
+          ) : (
+            <YStack gap="$4">
+              <Card
+                backgroundColor={colors.background.light}
+                borderRadius={16}
+                padding="$5"
+                borderWidth={1}
+                borderColor={colors.border.light}
+                elevate
+                elevation={2}
+              >
+                <XStack gap="$4" alignItems="center">
+                  <Avatar circular size={88}>
+                    {profile.photoURL ? (
+                      <Avatar.Image source={{ uri: profile.photoURL }} />
+                    ) : (
+                      <Avatar.Fallback
+                        backgroundColor={colors.background.veryLightGray}
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Text fontSize={24} fontWeight="500" color={colors.text.dark}>
+                          {displayName.charAt(0)}
+                        </Text>
+                      </Avatar.Fallback>
+                    )}
+                  </Avatar>
+
+                  <YStack flex={1} gap="$1">
+                    <Text
+                      fontSize={22}
+                      fontWeight="500"
+                      color={colors.basic.black}
+                      numberOfLines={1}
+                    >
+                      {displayName}
+                    </Text>
+                    {profile.customId ? (
+                      <Text fontSize={13} color={colors.text.muted}>
+                        @{profile.customId}
+                      </Text>
+                    ) : null}
+                    {displayLocation ? (
+                      <XStack alignItems="center" gap="$1">
+                        <MapPin size={16} color={colors.logo.cyan} />
+                        <Text fontSize={12} color={colors.logo.cyan} numberOfLines={1}>
+                          {displayLocation}
+                        </Text>
+                      </XStack>
+                    ) : null}
+                  </YStack>
+                </XStack>
+
+                {profile.personalSlogan ? (
+                  <Text marginTop="$4" fontSize={15} color={colors.text.dark}>
+                    {profile.personalSlogan}
+                  </Text>
+                ) : null}
+
+                {canFollow ? (
+                  <YStack marginTop="$4" gap="$2">
+                    <Button
+                      height={44}
+                      borderRadius="$md"
+                      backgroundColor={isFollowing ? colors.background.light : colors.logo.orange}
+                      borderWidth={isFollowing ? 1 : 0}
+                      borderColor={colors.border.light}
+                      disabled={isFollowStatusLoading || isMutatingFollow}
+                      pressStyle={{ opacity: 0.8 }}
+                      onPress={handleToggleFollow}
+                    >
+                      <XStack alignItems="center" gap="$2">
+                        {isFollowing ? (
+                          <UserRoundCheck size={18} color={colors.text.dark} />
+                        ) : (
+                          <UserPlus size={18} color={colors.text.light} />
+                        )}
+                        <Text
+                          color={isFollowing ? colors.text.dark : colors.text.light}
+                          fontWeight="500"
+                        >
+                          {isMutatingFollow ? "處理中..." : isFollowing ? "已追蹤" : "追蹤"}
+                        </Text>
+                      </XStack>
+                    </Button>
+
+                    {isConnectionStatusLoading ? (
+                      <Button
+                        height={44}
+                        borderRadius="$md"
+                        backgroundColor={colors.background.light}
+                        borderWidth={1}
+                        borderColor={colors.border.light}
+                        disabled
+                      >
+                        <Text color={colors.text.muted} fontWeight="500">
+                          讀取連結狀態...
+                        </Text>
+                      </Button>
+                    ) : connectionStatus === "incoming" ? (
+                      <XStack gap="$2">
+                        <Button
+                          flex={1}
+                          height={44}
+                          borderRadius="$md"
+                          backgroundColor={colors.logo.cyan}
+                          disabled={isMutatingConnection}
+                          pressStyle={{ opacity: 0.8 }}
+                          onPress={() => handleRespondConnectionRequest("accept")}
+                        >
+                          <XStack alignItems="center" gap="$2">
+                            <Check size={18} color={colors.text.light} />
+                            <Text color={colors.text.light} fontWeight="500">
+                              同意連結
+                            </Text>
+                          </XStack>
+                        </Button>
+                        <Button
+                          flex={1}
+                          height={44}
+                          borderRadius="$md"
+                          backgroundColor={colors.background.light}
+                          borderWidth={1}
+                          borderColor={colors.border.light}
+                          disabled={isMutatingConnection}
+                          pressStyle={{ opacity: 0.8 }}
+                          onPress={() => handleRespondConnectionRequest("reject")}
+                        >
+                          <XStack alignItems="center" gap="$2">
+                            <X size={18} color={colors.text.dark} />
+                            <Text color={colors.text.dark} fontWeight="500">
+                              忽略
+                            </Text>
+                          </XStack>
+                        </Button>
+                      </XStack>
+                    ) : (
+                      <Button
+                        height={44}
+                        borderRadius="$md"
+                        backgroundColor={
+                          connectionStatus === "none" ? colors.logo.cyan : colors.background.light
+                        }
+                        borderWidth={connectionStatus === "none" ? 0 : 1}
+                        borderColor={colors.border.light}
+                        disabled={isMutatingConnection}
+                        pressStyle={{ opacity: 0.8 }}
+                        onPress={
+                          connectionStatus === "connected"
+                            ? handleDisconnect
+                            : connectionStatus === "outgoing"
+                              ? handleWithdrawConnectionRequest
+                              : handleSendConnectionRequest
+                        }
+                      >
+                        <XStack alignItems="center" gap="$2">
+                          {connectionStatus === "connected" ? (
+                            <Link size={18} color={colors.text.dark} />
+                          ) : connectionStatus === "outgoing" ? (
+                            <Clock size={18} color={colors.text.dark} />
+                          ) : (
+                            <UserPlus size={18} color={colors.text.light} />
+                          )}
+                          <Text
+                            color={
+                              connectionStatus === "none" ? colors.text.light : colors.text.dark
+                            }
+                            fontWeight="500"
+                          >
+                            {isMutatingConnection
+                              ? "處理中..."
+                              : connectionStatus === "connected"
+                                ? "解除連結"
+                                : connectionStatus === "outgoing"
+                                  ? "撤回連結請求"
+                                  : "請求連結"}
+                          </Text>
+                        </XStack>
+                      </Button>
+                    )}
+                  </YStack>
+                ) : null}
+              </Card>
+
+              <XStack gap="$3" flexWrap="wrap">
+                {stats.map((item) => (
+                  <Card
+                    key={item.label}
+                    flexBasis="47%"
+                    flexGrow={1}
+                    backgroundColor={colors.background.light}
+                    borderRadius={12}
+                    padding="$4"
+                    borderWidth={1}
+                    borderColor={colors.border.light}
+                  >
+                    <Text
+                      fontSize={20}
+                      fontWeight="600"
+                      color={item.hidden ? colors.text.muted : colors.text.dark}
+                    >
+                      {item.value}
+                    </Text>
+                    <Text marginTop="$1" fontSize={12} color={colors.text.muted}>
+                      {item.label}
+                    </Text>
+                  </Card>
+                ))}
+              </XStack>
+
+              <UserInfoCard
+                name={profile.name}
+                location={displayLocation}
+                selfIntroduction={profile.selfIntroduction}
+                photoURL={profile.photoURL}
+                personalSlogan={profile.personalSlogan}
+                contactList={profile.contactList}
+              />
+
+              <Card
+                backgroundColor={colors.background.light}
+                borderRadius={16}
+                padding="$5"
+                borderWidth={1}
+                borderColor={colors.border.light}
+              >
+                <Text fontSize={18} fontWeight="500" color={colors.text.dark}>
+                  主題實踐
+                </Text>
+                <Separator marginVertical="$3" borderColor={colors.border.light} />
+                {isPracticesLoading ? (
+                  <YStack paddingVertical="$4" alignItems="center">
+                    <Text fontSize={14} color={colors.text.muted}>
+                      載入實踐中...
+                    </Text>
+                  </YStack>
+                ) : practicesError ? (
+                  <YStack gap="$3">
+                    <Text fontSize={14} color={colors.text.muted}>
+                      暫時無法讀取公開實踐。
+                    </Text>
+                    <Button
+                      alignSelf="flex-start"
+                      size="$3"
+                      borderRadius="$md"
+                      backgroundColor={colors.background.light}
+                      borderWidth={1}
+                      borderColor={colors.border.light}
+                      onPress={() => mutatePractices()}
+                    >
+                      <Text fontSize={13} color={colors.text.dark}>
+                        重新整理
+                      </Text>
+                    </Button>
+                  </YStack>
+                ) : practices.length === 0 ? (
+                  <Text fontSize={14} color={colors.text.muted}>
+                    目前沒有公開實踐。
+                  </Text>
+                ) : (
+                  <YStack gap="$3">
+                    {practices.map((practice) => (
+                      <Pressable
+                        key={practice.id}
+                        onPress={() => router.push(`/practices/${practice.id}` as never)}
+                      >
+                        <Card
+                          padding="$4"
+                          backgroundColor={colors.background.veryLightGray}
+                          borderRadius={12}
+                          borderWidth={1}
+                          borderColor={colors.border.light}
+                          pressStyle={{ opacity: 0.85 }}
+                        >
+                          <YStack gap="$2">
+                            <XStack alignItems="center" gap="$2">
+                              <Text
+                                flex={1}
+                                fontSize={15}
+                                fontWeight="500"
+                                color={colors.text.dark}
+                                numberOfLines={1}
+                              >
+                                {practice.title}
+                              </Text>
+                              <Text
+                                fontSize={11}
+                                color={colors.logo.cyan}
+                                backgroundColor={colors.background.light}
+                                paddingHorizontal="$2"
+                                paddingVertical="$1"
+                                borderRadius="$sm"
+                              >
+                                {getPracticeStatusLabel(practice.status)}
+                              </Text>
+                            </XStack>
+                            {practice.practiceAction ? (
+                              <Text fontSize={13} color={colors.text.muted} numberOfLines={2}>
+                                {practice.practiceAction}
+                              </Text>
+                            ) : null}
+                            <XStack gap="$3" flexWrap="wrap">
+                              <Text fontSize={12} color={colors.text.muted}>
+                                打卡 {practice.checkInCount} 次
+                              </Text>
+                              <Text fontSize={12} color={colors.text.muted}>
+                                進度 {practice.progressPercentage ?? 0}%
+                              </Text>
+                            </XStack>
+                            {practice.tags.length > 0 ? (
+                              <XStack gap="$2" flexWrap="wrap">
+                                {practice.tags.slice(0, 3).map((tag) => (
+                                  <Text
+                                    key={tag}
+                                    fontSize={11}
+                                    color={colors.text.muted}
+                                    backgroundColor={colors.background.light}
+                                    paddingHorizontal="$2"
+                                    paddingVertical="$1"
+                                    borderRadius="$sm"
+                                  >
+                                    #{tag}
+                                  </Text>
+                                ))}
+                              </XStack>
+                            ) : null}
+                          </YStack>
+                        </Card>
+                      </Pressable>
+                    ))}
+                  </YStack>
+                )}
+              </Card>
+            </YStack>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </RNView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#B8E8FD",
+  },
+  safeArea: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 16,
+    paddingBottom: 40,
+  },
+});
