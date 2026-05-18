@@ -5,6 +5,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
 import * as React from "react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { isBlankContent } from "@/utils/check-in-content";
 
 interface ICheckInCardProps {
   taskTitle: string;
@@ -119,9 +120,13 @@ export const CheckInCard = ({
                 )}
 
                 {/* 文字內容 */}
-                <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">
-                  {content}
-                </p>
+                {isBlankContent(content) ? (
+                  <p className="text-light-gray text-sm italic">歡迎隨時追加內容</p>
+                ) : (
+                  <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">
+                    {content}
+                  </p>
+                )}
 
                 {/* 標籤 */}
                 {tags && tags.length > 0 && (
