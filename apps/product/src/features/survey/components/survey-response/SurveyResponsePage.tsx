@@ -101,10 +101,11 @@ export function SurveyResponsePage() {
       const depAnswer = answers[c.dependsOn]
       if (!depAnswer) return false
       const v = depAnswer.value
-      const strValue = Array.isArray(v) ? (v as (string | number)[]).map(String).join(',') : String(v ?? '')
+      const asArray = Array.isArray(v) ? (v as (string | number)[]).map(String) : null
+      const strValue = asArray ? asArray.join(',') : String(v ?? '')
       switch (c.operator) {
-        case 'equals': return strValue === String(c.value)
-        case 'not_equals': return strValue !== String(c.value)
+        case 'equals': return asArray ? asArray.includes(String(c.value)) : strValue === String(c.value)
+        case 'not_equals': return asArray ? !asArray.includes(String(c.value)) : strValue !== String(c.value)
         case 'contains': return strValue.includes(String(c.value))
         default: return true
       }

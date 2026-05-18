@@ -124,7 +124,7 @@ export function ConditionEditor({
       <div className="space-y-1.5">
         <p className="text-xs text-muted-foreground">值</p>
         <Input
-          value={Array.isArray(condition.value) ? condition.value.join(', ') : condition.value}
+          value={Array.isArray(condition.value) ? condition.value.join(',') : condition.value}
           onChange={(e) => handleUpdate({ value: e.target.value })}
           placeholder="輸入條件值"
           className="h-7 text-xs"

@@ -145,7 +145,10 @@ function mapListItem(raw: RawListItem): Survey {
 
 export async function createSurvey(input: CreateSurveyInput): Promise<SurveyWithQuestions> {
   // Build a map from local question ID → position index for condition conversion
-  const localIdToPosition = new Map(input.questions.map((q, i) => [q.id, i]))
+  const localIdToPosition = new Map(
+    (input.questions as Array<typeof input.questions[number] & { id?: string }>)
+      .map((q, i) => [q.id ?? String(i), i])
+  )
 
   const body = {
     title: input.title,
