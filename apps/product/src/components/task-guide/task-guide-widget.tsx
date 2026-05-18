@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@daodao/auth";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
 import {
@@ -15,20 +16,12 @@ import {
 
 const SESSION_KEY = "task-guide-collapsed";
 
-const TASK_LABELS: Record<OnboardingTaskKey, string> = {
-  A: "完成學習風格測驗",
-  B: "完善帳號設定",
-  C: "建立第一個實踐",
-  D: "完成第一次打卡",
-  E: "在靈感頁留下留言",
-};
-
 const TASK_PATHS: Record<OnboardingTaskKey, string> = {
-  A: "/quiz",
-  B: "/settings/profile",
-  C: "/practices/new",
+  A: `${process.env.NEXT_PUBLIC_WEBSITE_URL ?? ""}/quiz`,
+  B: "/settings/public-info",
+  C: "/practices/create/manual",
   D: "/practices",
-  E: "/inspirations",
+  E: "/",
 };
 
 // ── Widget Component ──────────────────────────────────────────────────────────
@@ -36,6 +29,7 @@ const TASK_PATHS: Record<OnboardingTaskKey, string> = {
 export function TaskGuideWidget() {
   const { isAuthenticated, isTemporary } = useAuth();
   const { taskList, completedTasks, badgeGranted, isLoading } = useOnboardingProgress();
+  const t = useTranslations("onboarding.taskGuide");
   const router = useRouter();
 
   const [expanded, setExpanded] = useState(false);
@@ -72,14 +66,14 @@ export function TaskGuideWidget() {
     return (
       <div className="fixed bottom-20 right-4 z-40 w-72 rounded-2xl bg-white shadow-xl ring-1 ring-gray-200">
         <div className="flex items-center justify-between rounded-t-2xl bg-primary px-4 py-3 text-white">
-          <span className="text-sm font-semibold">恭喜完成！</span>
-          <button onClick={handleCollapse} className="text-white/80 hover:text-white" aria-label="關閉">✕</button>
+          <span className="text-sm font-semibold">{t("celebration.title")}</span>
+          <button onClick={handleCollapse} className="text-white/80 hover:text-white" aria-label={t("ariaClose")}>✕</button>
         </div>
         <div className="flex flex-col items-center gap-3 px-4 py-6 text-center">
           {/* Badge icon placeholder — 待設計師提供正式資產 */}
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100 text-4xl">🏅</div>
-          <p className="text-base font-semibold text-gray-800">恭喜獲得 Early User Badge！</p>
-          <p className="text-xs text-gray-500">感謝你完成所有新手任務，你是島島阿學的早期用戶之一！</p>
+          <p className="text-base font-semibold text-gray-800">{t("celebration.badgeTitle")}</p>
+          <p className="text-xs text-gray-500">{t("celebration.badgeDescription")}</p>
         </div>
       </div>
     );
@@ -90,8 +84,8 @@ export function TaskGuideWidget() {
       <button
         onClick={() => setExpanded(true)}
         className="fixed bottom-20 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lg transition hover:scale-105"
-        aria-label="展開 Onboarding 任務清單"
-        title={`Onboarding 進度 ${completedTasks}/${total}`}
+        aria-label={t("ariaOpen")}
+        title={t("progress", { completed: completedTasks, total })}
       >
         <span className="text-lg">🎯</span>
       </button>
@@ -102,11 +96,11 @@ export function TaskGuideWidget() {
     <div className="fixed bottom-20 right-4 z-40 w-72 rounded-2xl bg-white shadow-xl ring-1 ring-gray-200">
       {/* Header */}
       <div className="flex items-center justify-between rounded-t-2xl bg-primary px-4 py-3 text-white">
-        <span className="text-sm font-semibold">新手入門任務</span>
+        <span className="text-sm font-semibold">{t("title")}</span>
         <button
           onClick={handleCollapse}
           className="text-white/80 hover:text-white"
-          aria-label="收合"
+          aria-label={t("ariaCollapse")}
         >
           ✕
         </button>
@@ -115,7 +109,7 @@ export function TaskGuideWidget() {
       {/* Progress bar */}
       <div className="px-4 pt-3">
         <div className="mb-1 flex justify-between text-xs text-gray-500">
-          <span>{completedTasks}/{total} 完成</span>
+          <span>{t("progress", { completed: completedTasks, total })}</span>
           <span>{progressPct}%</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-gray-100">
@@ -140,16 +134,21 @@ export function TaskGuideWidget() {
               {done ? "✓" : ""}
             </span>
             {done ? (
-              <span className="text-sm text-gray-400 line-through">{TASK_LABELS[taskKey]}</span>
+              <span className="text-sm text-gray-400 line-through">{t(`tasks.${taskKey}`)}</span>
             ) : (
               <button
                 onClick={() => {
-                  router.push(TASK_PATHS[taskKey]);
+                  const path = TASK_PATHS[taskKey];
+                  if (path.startsWith("http")) {
+                    window.location.href = path;
+                  } else {
+                    router.push(path);
+                  }
                   handleCollapse();
                 }}
                 className="text-left text-sm text-gray-700 hover:text-primary hover:underline"
               >
-                {TASK_LABELS[taskKey]}
+                {t(`tasks.${taskKey}`)}
               </button>
             )}
           </li>
@@ -158,7 +157,7 @@ export function TaskGuideWidget() {
 
       {/* Footer */}
       <div className="rounded-b-2xl px-4 pb-3 text-center text-xs text-gray-400">
-        完成所有任務即可獲得 Early User Badge 🏅
+        {t("footer")}
       </div>
     </div>
   );
@@ -170,26 +169,22 @@ export function TaskGuideWidget() {
  * 從 API mutation 回應的 meta.onboardingUpdate 觸發樂觀更新。
  * 在各業務 mutation hook 的 onSuccess 中呼叫。
  */
-export function applyOnboardingOptimisticUpdate(
-  taskKey: OnboardingTaskKey,
-  currentData?: { success: boolean; data: OnboardingStatusData }
-) {
-  if (!currentData?.data) return;
-
-  const updatedTaskList = currentData.data.taskList.map((item) =>
-    item.taskKey === taskKey ? { ...item, done: true } : item
-  );
-  const completedTasks = updatedTaskList.filter((t) => t.done).length;
-
+export function applyOnboardingOptimisticUpdate(taskKey: OnboardingTaskKey) {
   mutate(
     ONBOARDING_STATUS_KEY,
-    {
-      ...currentData,
-      data: {
-        ...currentData.data,
-        taskList: updatedTaskList,
-        completedTasks,
-      },
+    (prev?: { success: boolean; data: OnboardingStatusData }) => {
+      if (!prev?.data) return prev;
+      const updatedTaskList = prev.data.taskList.map((item) =>
+        item.taskKey === taskKey ? { ...item, done: true } : item
+      );
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          taskList: updatedTaskList,
+          completedTasks: updatedTaskList.filter((t) => t.done).length,
+        },
+      };
     },
     { revalidate: false }
   );

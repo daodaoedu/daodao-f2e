@@ -27,6 +27,8 @@ import {
   parseFrequency,
 } from "@/constants/practice-form";
 import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
+import { mutate } from "swr";
+import { ONBOARDING_STATUS_KEY } from "@/components/task-guide/onboarding-progress-context";
 
 const TOTAL_STEPS = 5;
 
@@ -250,6 +252,7 @@ export default function CreateManualPracticePage() {
 
       // 提交成功後清除暫存資料
       clearDraft();
+      mutate(ONBOARDING_STATUS_KEY).catch(() => {});
 
       // 取得新建立的實踐 ID
       const practiceId = response.data?.data?.id;
