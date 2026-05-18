@@ -4295,10 +4295,13 @@
       "ariaClose": "Close",
       "tasks": {
         "A": "Complete the learning style quiz",
-        "B": "Set up your profile",
+        "B": "Complete public info, account, and preferences",
         "C": "Create your first practice",
         "D": "Complete your first check-in",
         "E": "Leave a comment on inspirations"
+      },
+      "taskDescriptions": {
+        "B": "Complete all three sections: public info, account settings, and preferences"
       }
     }
   }

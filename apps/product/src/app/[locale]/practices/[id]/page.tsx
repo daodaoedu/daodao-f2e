@@ -27,6 +27,7 @@ import { CheckInButton } from "@/components/check-in";
 import type { IComment, ICommentReply } from "@/components/check-in/reactions";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeDetailShell } from "@/components/practice";
+import { applyOnboardingUpdateFromResponse } from "@/components/task-guide/onboarding-progress-context";
 import {
   type DurationDays,
   DurationDays as DurationDaysConst,
@@ -408,6 +409,7 @@ export default function PracticeDetailPage() {
         return;
       }
 
+      applyOnboardingUpdateFromResponse(response.data);
       toast.success("留言成功！");
       await Promise.all([mutateComments(), mutatePractice()]);
     },

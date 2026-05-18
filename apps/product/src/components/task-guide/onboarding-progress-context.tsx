@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import useSWR, { type KeyedMutator } from "swr";
+import useSWR, { mutate as globalMutate, type KeyedMutator } from "swr";
 import { useAuth } from "@daodao/auth";
 import { getRequiredEnv } from "@daodao/config";
 
@@ -83,4 +83,49 @@ export function useOnboardingProgress(): OnboardingProgressContextValue {
   const ctx = useContext(OnboardingProgressContext);
   if (!ctx) throw new Error("useOnboardingProgress must be used within OnboardingProgressProvider");
   return ctx;
+}
+
+export function refreshOnboardingStatus() {
+  void globalMutate(ONBOARDING_STATUS_KEY);
+}
+
+export function applyOnboardingUpdateFromResponse(response: unknown): boolean {
+  if (!response || typeof response !== "object") return false;
+
+  const meta = (response as { meta?: unknown }).meta;
+  if (!meta || typeof meta !== "object") return false;
+
+  const update = (meta as { onboardingUpdate?: unknown }).onboardingUpdate;
+  if (!update || typeof update !== "object") return false;
+
+  const { taskKey, allCompleted } = update as {
+    taskKey?: OnboardingTaskKey;
+    allCompleted?: boolean;
+  };
+  if (!taskKey) return false;
+
+  void globalMutate(
+    ONBOARDING_STATUS_KEY,
+    (prev?: OnboardingStatusResponse) => {
+      if (!prev?.data) return prev;
+      const updatedTaskList = prev.data.taskList.map((item) =>
+        item.taskKey === taskKey ? { ...item, done: true } : item
+      );
+
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          taskList: updatedTaskList,
+          completedTasks: updatedTaskList.filter((task) => task.done).length,
+          badgeGranted: prev.data.badgeGranted,
+        },
+      };
+    },
+    { revalidate: false }
+  );
+  if (allCompleted) {
+    setTimeout(() => refreshOnboardingStatus(), 3000);
+  }
+  return true;
 }

@@ -27,6 +27,10 @@ import {
   ResourceCard,
 } from "@/components/practice";
 import {
+  applyOnboardingUpdateFromResponse,
+  refreshOnboardingStatus,
+} from "@/components/task-guide/onboarding-progress-context";
+import {
   DURATION_DAYS_NUMBER_OPTIONS,
   DurationDays,
   DurationDaysNumberToStringMap,
@@ -213,6 +217,10 @@ export default function TemplateDetailPage() {
         toast.error(errorMessage);
         setIsSubmitting(false);
         return;
+      }
+
+      if (!applyOnboardingUpdateFromResponse(response.data)) {
+        refreshOnboardingStatus();
       }
 
       // 取得新建立的實踐 ID
