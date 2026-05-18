@@ -12,6 +12,10 @@ import { format, parse } from "date-fns";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
+import {
+  applyOnboardingUpdateFromResponse,
+  refreshOnboardingStatus,
+} from "@/components/task-guide/onboarding-progress-context";
 import { FieldSelectionSection } from "./field-selection-section";
 import { PersonalInfoSection } from "./personal-info-section";
 import {
@@ -144,6 +148,9 @@ export const AccountForm = () => {
       toast.success(t("save_success"));
       form.reset(form.getValues()); // 重置 dirty 狀態
       mutate("/api/v1/users/settings-summary");
+      if (!applyOnboardingUpdateFromResponse(response.data)) {
+        refreshOnboardingStatus();
+      }
 
       // 延遲後返回設定首頁，讓使用者看到成功訊息
       setTimeout(() => {
@@ -207,7 +214,7 @@ export const AccountForm = () => {
         />
 
         {/* 儲存按鈕 */}
-        <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray">
+        <footer className="fixed bottom-20 left-0 right-0 z-20 flex justify-center gap-6 border-t border-light-gray bg-very-light-gray p-6 md:bottom-0">
           <Button
             type="submit"
             variant="orange"

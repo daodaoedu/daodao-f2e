@@ -55,6 +55,7 @@ import {
   BrowseActivityContent,
   type IBrowseActivityFollower,
 } from "@/components/practice/shared/browse-activity-content";
+import { refreshOnboardingStatus } from "@/components/task-guide/onboarding-progress-context";
 import type { DurationDays, ExecutionTiming, Frequency } from "@/constants/practice-form";
 import type { PracticeStatus } from "@/constants/practice-status";
 import {
@@ -483,6 +484,7 @@ export function PracticeDetailShell({
                     try {
                       setIsCopying(true);
                       const { id } = await copyPractice(practiceId);
+                      refreshOnboardingStatus();
                       router.push(`/practices/copy-success?practiceId=${id}`);
                     } catch {
                       toast.error(t("copy_failed"));
@@ -624,6 +626,7 @@ export function PracticeDetailShell({
                   try {
                     setIsCopying(true);
                     const { id } = await copyPractice(practiceId);
+                    refreshOnboardingStatus();
                     router.push(`/practices/copy-success?practiceId=${id}`);
                   } catch {
                     toast.error(t("copy_failed"));

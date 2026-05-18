@@ -28,6 +28,10 @@ import {
   parseFrequency,
 } from "@/constants/practice-form";
 import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
+import {
+  applyOnboardingUpdateFromResponse,
+  refreshOnboardingStatus,
+} from "@/components/task-guide/onboarding-progress-context";
 
 const TOTAL_STEPS = 5;
 
@@ -94,7 +98,7 @@ export default function CreateManualPracticePage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus>("private");
+  const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus>("public");
   const isRestoreDialogOpenRef = useRef(false);
 
   const form = useForm<ManualPracticeFormValues>({
@@ -171,7 +175,7 @@ export default function CreateManualPracticePage() {
     try {
       const apiRequest = {
         ...convertFormValuesToApiRequest(values),
-        privacy_status: privacyStatus,
+        privacyStatus,
       } as CreatePracticeRequestType;
 
       const response = await createPractice(apiRequest);
@@ -252,6 +256,9 @@ export default function CreateManualPracticePage() {
 
       // 提交成功後清除暫存資料
       clearDraft();
+      if (!applyOnboardingUpdateFromResponse(response.data)) {
+        refreshOnboardingStatus();
+      }
 
       // 取得新建立的實踐 ID
       const practiceId = response.data?.data?.id;
