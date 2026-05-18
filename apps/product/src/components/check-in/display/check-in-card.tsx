@@ -21,6 +21,8 @@ interface ICheckInCardProps {
   afterTitle?: React.ReactNode;
   /** 卡片底部互動區（reaction + 留言按鈕） */
   bottomActions?: React.ReactNode;
+  /** 是否為本人的打卡（true 才顯示空白提示） */
+  showEmptyHint?: boolean;
 }
 
 /**
@@ -39,6 +41,7 @@ export const CheckInCard = ({
   showTape = true,
   afterTitle,
   bottomActions,
+  showEmptyHint = false,
 }: ICheckInCardProps) => {
   const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
   const MoodEmoji = moodOption?.emoji;
@@ -120,7 +123,7 @@ export const CheckInCard = ({
                 )}
 
                 {/* 文字內容 */}
-                {isBlankContent(content) ? (
+                {isBlankContent(content) && showEmptyHint ? (
                   <p className="text-light-gray text-sm italic">歡迎隨時追加內容</p>
                 ) : (
                   <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">
