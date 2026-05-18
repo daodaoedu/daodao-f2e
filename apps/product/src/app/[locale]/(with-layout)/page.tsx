@@ -223,7 +223,7 @@ export default function HomePage() {
             </button>
             <button
               type="button"
-              onClick={() => router.push(HOME_TAB_PATHS.mine)}
+              onClick={() => router.replace(HOME_TAB_PATHS.mine)}
               className={cn(
                 "flex-1 py-2 text-sm font-medium transition-all",
                 "text-text-dark/40"

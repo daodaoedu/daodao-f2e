@@ -121,7 +121,7 @@ export default function MyPage() {
           <div className="flex border-b border-[#E5E7EB] mb-4">
             <button
               type="button"
-              onClick={() => router.push(HOME_TAB_PATHS.inspire)}
+              onClick={() => router.replace(HOME_TAB_PATHS.inspire)}
               className={cn(
                 "flex-1 py-2 text-sm font-medium transition-all",
                 "text-text-dark/40"
@@ -175,7 +175,7 @@ export default function MyPage() {
                   </div>
 
                   <InProgressSection tasks={filteredInProgressTasks} />
-                  <RecommendationSection onGoToInspire={() => router.push(HOME_TAB_PATHS.inspire)} />
+                  <RecommendationSection onGoToInspire={() => router.replace(HOME_TAB_PATHS.inspire)} />
                 </>
               )}
             </>
