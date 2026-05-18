@@ -7,6 +7,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 
+function assertSuccessfulResponse(response: { error?: unknown }) {
+  if (!response.error) return;
+
+  const error = response.error as { error?: { message?: string }; message?: string };
+  throw new Error(error.error?.message ?? error.message ?? "更新失敗，請稍後再試");
+}
+
 interface IPreferenceOption {
   id: number;
   name: string;
@@ -117,11 +124,12 @@ export default function PreferencesSettingsScreen() {
         });
       });
 
-      await updateCurrentUserPreferences({ preferences: preferenceItems });
+      const response = await updateCurrentUserPreferences({ preferences: preferenceItems });
+      assertSuccessfulResponse(response);
 
       Alert.alert("成功", "偏好設定已更新", [{ text: "確定", onPress: () => router.back() }]);
-    } catch {
-      Alert.alert("錯誤", "更新失敗，請稍後再試");
+    } catch (error) {
+      Alert.alert("錯誤", error instanceof Error ? error.message : "更新失敗，請稍後再試");
     } finally {
       setIsSubmitting(false);
     }

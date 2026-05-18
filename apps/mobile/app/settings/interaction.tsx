@@ -8,6 +8,13 @@ import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui"
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
+function assertSuccessfulResponse(response: { error?: unknown }) {
+  if (!response.error) return;
+
+  const error = response.error as { error?: { message?: string }; message?: string };
+  throw new Error(error.error?.message ?? error.message ?? "更新失敗，請稍後再試");
+}
+
 export default function InteractionSettingsScreen() {
   const router = useRouter();
   const { user, isLoading } = useCurrentUser();
@@ -22,10 +29,14 @@ export default function InteractionSettingsScreen() {
     setLocalIsOpenProfile(value);
     setIsSaving(true);
     try {
-      await updateCurrentUser({ isOpenProfile: value });
-    } catch {
+      const response = await updateCurrentUser({ isOpenProfile: value });
+      assertSuccessfulResponse(response);
+    } catch (error) {
       setLocalIsOpenProfile(null);
-      Alert.alert("更新失敗", "無法更新互動設定，請稍後再試。");
+      Alert.alert(
+        "更新失敗",
+        error instanceof Error ? error.message : "無法更新互動設定，請稍後再試。"
+      );
     } finally {
       setIsSaving(false);
     }

@@ -16,6 +16,13 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 type FieldOptionType = { value: string; label: string };
 
+function assertSuccessfulResponse(response: { error?: unknown }) {
+  if (!response.error) return;
+
+  const error = response.error as { error?: { message?: string }; message?: string };
+  throw new Error(error.error?.message ?? error.message ?? "更新失敗，請稍後再試");
+}
+
 function FieldSelectionModal({
   visible,
   title,
@@ -156,11 +163,12 @@ export default function AccountSettingsScreen() {
       };
       if (educationStage) updateData.educationStage = educationStage;
 
-      await updateCurrentUser(updateData);
+      const response = await updateCurrentUser(updateData);
+      assertSuccessfulResponse(response);
       await mutate();
       Alert.alert("成功", "帳號設定已更新", [{ text: "確定", onPress: () => router.back() }]);
-    } catch {
-      Alert.alert("錯誤", "更新失敗，請稍後再試");
+    } catch (error) {
+      Alert.alert("錯誤", error instanceof Error ? error.message : "更新失敗，請稍後再試");
     } finally {
       setIsSubmitting(false);
     }
