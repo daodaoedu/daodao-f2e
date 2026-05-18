@@ -1,6 +1,7 @@
 import { useResourceById } from "@daodao/api";
 import {
   BookOpen,
+  Calendar,
   ChevronLeft,
   ExternalLink,
   Eye,
@@ -12,6 +13,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Linking, Share } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Image, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { getResourceCategory, getResourceSubcategory } from "@/constants/resource";
 import { colors } from "@/generated/design-tokens";
 
 const levelLabels = new Map([
@@ -39,12 +41,25 @@ const costLabels = new Map([
   ["partial_free", "部分免費"],
 ]);
 
+const formatDate = (value?: string | null) => {
+  if (!value) return "未知日期";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+};
+
 export default function ResourceDetailRoute() {
   const router = useRouter();
   const { resourceId } = useLocalSearchParams<{ resourceId?: string | string[] }>();
   const id = Array.isArray(resourceId) ? resourceId[0] : resourceId;
   const { data, error, isLoading, mutate } = useResourceById(id ?? "");
   const resource = data?.data;
+  const majorCategory = getResourceCategory(resource?.majorCategory);
+  const subCategory = getResourceSubcategory(resource?.majorCategory, resource?.subCategory);
 
   const openResource = async () => {
     if (!resource?.url) return;
@@ -191,6 +206,51 @@ export default function ResourceDetailRoute() {
               </XStack>
             </YStack>
 
+            {(majorCategory || subCategory) && (
+              <Card
+                backgroundColor="$background"
+                borderRadius="$md"
+                borderWidth={1}
+                borderColor="$borderColor"
+                padding="$4"
+                gap="$3"
+              >
+                <Text fontSize={16} fontWeight="700" color="$color">
+                  分類
+                </Text>
+                <XStack gap="$2" flexWrap="wrap" alignItems="center">
+                  {majorCategory && (
+                    <Button
+                      size="$3"
+                      borderRadius="$lg"
+                      backgroundColor={colors.primary.palest}
+                      onPress={() => router.push(`/resource/categories/${majorCategory.value}` as never)}
+                    >
+                      <Text fontSize={13} color={colors.primary.base} fontWeight="600">
+                        {majorCategory.label}
+                      </Text>
+                    </Button>
+                  )}
+                  {subCategory && (
+                    <Button
+                      size="$3"
+                      borderRadius="$lg"
+                      backgroundColor={colors.primary.palest}
+                      onPress={() =>
+                        router.push(
+                          `/resource/categories/${majorCategory?.value}/${subCategory.value}` as never
+                        )
+                      }
+                    >
+                      <Text fontSize={13} color={colors.primary.base} fontWeight="600">
+                        {subCategory.label}
+                      </Text>
+                    </Button>
+                  )}
+                </XStack>
+              </Card>
+            )}
+
             <XStack gap="$2">
               <Button flex={1} backgroundColor={colors.primary.base} borderRadius="$md" onPress={openResource}>
                 <XStack gap="$2" alignItems="center">
@@ -218,6 +278,33 @@ export default function ResourceDetailRoute() {
               </Text>
               <Text fontSize={14} color="$color" opacity={0.72} lineHeight={22}>
                 {resource.description}
+              </Text>
+              <XStack justifyContent="flex-end" gap="$2" alignItems="center">
+                <Calendar size={14} color={colors.text.light} />
+                <Text fontSize={12} color="$color" opacity={0.55}>
+                  更新於 {formatDate(resource.updatedAt ?? resource.createdAt)}
+                </Text>
+              </XStack>
+            </Card>
+
+            <Card
+              backgroundColor="$background"
+              borderRadius="$md"
+              borderWidth={1}
+              borderColor="$borderColor"
+              padding="$4"
+              gap="$3"
+            >
+              <XStack alignItems="center" justifyContent="space-between">
+                <Text fontSize={16} fontWeight="700" color="$color">
+                  心得
+                </Text>
+                <Text fontSize={13} color="$color" opacity={0.55}>
+                  {resource.reviewCount || 0} 則
+                </Text>
+              </XStack>
+              <Text fontSize={14} color="$color" opacity={0.65} textAlign="center" paddingVertical="$5">
+                心得分享功能尚未開放
               </Text>
             </Card>
 
