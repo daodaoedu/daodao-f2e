@@ -15,6 +15,7 @@ import {
 } from "@daodao/api";
 import { ChartColumnIncreasingSvg, DialogOutlineSvg, FlagOutlineSvg } from "@daodao/assets";
 import type { MentionCandidate } from "@daodao/features-mention";
+import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Button } from "@daodao/ui/components/button";
@@ -70,10 +71,10 @@ interface ICheckInDetailProps {
 // Helpers
 // ============================================================================
 
-export function formatCommentTime(createdAt?: string): string {
-  if (!createdAt) return "剛剛";
+export function formatCommentTime(createdAt?: string, justNowLabel = "剛剛"): string {
+  if (!createdAt) return justNowLabel;
   const parsed = parseISO(createdAt);
-  if (!isValid(parsed)) return "剛剛";
+  if (!isValid(parsed)) return justNowLabel;
   return formatDistanceToNow(parsed, { addSuffix: true, locale: zhTW });
 }
 
@@ -95,11 +96,11 @@ export function isApiCommentNode(v: unknown): v is ApiCommentNode {
   return typeof v === "object" && v !== null && "id" in v;
 }
 
-export function mapReply(reply: ApiCommentNode): ICommentReply {
+export function mapReply(reply: ApiCommentNode, anonymousLabel = "匿名使用者"): ICommentReply {
   return {
     id: String(reply.id),
     author: {
-      name: reply.user?.name || "匿名使用者",
+      name: reply.user?.name || anonymousLabel,
       photoURL: reply.user?.photoURL || undefined,
       userId: reply.user?.id || undefined,
       numericUserId: reply.userId ?? undefined,
@@ -110,13 +111,13 @@ export function mapReply(reply: ApiCommentNode): ICommentReply {
   };
 }
 
-export function mapComment(comment: ApiCommentNode): IComment {
+export function mapComment(comment: ApiCommentNode, anonymousLabel = "匿名使用者"): IComment {
   const rawReplies = Array.isArray(comment.replies) ? comment.replies : [];
-  const mappedReplies = rawReplies.filter(isApiCommentNode).map(mapReply);
+  const mappedReplies = rawReplies.filter(isApiCommentNode).map((r) => mapReply(r, anonymousLabel));
   return {
     id: String(comment.id),
     author: {
-      name: comment.user?.name || "匿名使用者",
+      name: comment.user?.name || anonymousLabel,
       photoURL: comment.user?.photoURL || undefined,
       userId: comment.user?.id || undefined,
       numericUserId: comment.userId ?? undefined,
@@ -145,6 +146,7 @@ export function CheckInCommentSheetContent({
   currentUserId,
   currentUserPhotoURL,
 }: ICheckInCommentSheetContentProps) {
+  const t = useTranslations("check_in");
   const { data: commentsData, mutate: mutateComments } = useComments({
     targetType: "checkin",
     targetId: checkInId,
@@ -157,8 +159,8 @@ export function CheckInCommentSheetContent({
   const comments: IComment[] = React.useMemo(() => {
     const raw = commentsData?.data;
     if (!Array.isArray(raw)) return [];
-    return raw.filter(isApiCommentNode).map(mapComment);
-  }, [commentsData]);
+    return raw.filter(isApiCommentNode).map((c) => mapComment(c, t("anonymous_user")));
+  }, [commentsData, t]);
 
   const mentionCandidates = React.useMemo<MentionCandidate[]>(() => {
     const rawCandidates = (mentionCandidatesData as { data?: unknown[] } | undefined)?.data;
@@ -202,10 +204,10 @@ export function CheckInCommentSheetContent({
         mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
       });
       if (response.error) {
-        toast.error("留言失敗，請稍後再試");
+        toast.error(t("comment_failed"));
         return;
       }
-      toast.success("留言成功！");
+      toast.success(t("comment_success"));
       await mutateComments();
     },
     [checkInId, mutateComments]
@@ -215,36 +217,36 @@ export function CheckInCommentSheetContent({
     async (commentId: string, text: string) => {
       const id = Number(commentId);
       if (!Number.isFinite(id)) {
-        toast.error("留言 ID 無效");
+        toast.error(t("comment_id_invalid"));
         return false;
       }
       const response = await updateComment(id, { content: text });
       if (response.error) {
-        toast.error("更新留言失敗");
+        toast.error(t("comment_update_failed"));
         return false;
       }
       await mutateComments();
       return true;
     },
-    [mutateComments]
+    [mutateComments, t]
   );
 
   const handleDeleteComment = useCallback(
     async (commentId: string) => {
       const id = Number(commentId);
       if (!Number.isFinite(id)) {
-        toast.error("留言 ID 無效");
+        toast.error(t("comment_id_invalid"));
         return false;
       }
       const response = await deleteComment(id);
       if (response.error) {
-        toast.error("刪除留言失敗");
+        toast.error(t("comment_delete_failed"));
         return false;
       }
       await mutateComments();
       return true;
     },
-    [mutateComments]
+    [mutateComments, t]
   );
 
   return (
@@ -274,6 +276,7 @@ export const CheckInDetail = ({
   parentPracticeHref,
   isOwner = true,
 }: ICheckInDetailProps) => {
+  const t = useTranslations("check_in");
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
   const checkInId = checkInData.id;
 
@@ -358,7 +361,7 @@ export const CheckInDetail = ({
       reaction: item.reactionType as ReactionTypeType,
     }));
     openSheet({
-      title: "瀏覽活動",
+      title: t("browse_activity"),
       content: (
         <BrowseActivityContent
           viewCount={0}
@@ -421,7 +424,7 @@ export const CheckInDetail = ({
           type="button"
           onClick={() =>
             openSheet({
-              title: "留言",
+              title: t("sheet_comment"),
               content: (
                 <CheckInCommentSheetContent
                   checkInId={checkInId}
@@ -464,7 +467,7 @@ export const CheckInDetail = ({
                 {onEditComplete && (
                   <DropdownMenuItem onClick={openEditCheckInSheet} className="gap-2 text-text-dark">
                     <Pencil className="size-4 shrink-0" />
-                    編輯打卡
+                    {t("edit_check_in")}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem
@@ -472,7 +475,7 @@ export const CheckInDetail = ({
                   className="gap-2 text-text-dark"
                 >
                   <ChartColumnIncreasingSvg className="size-4 shrink-0" />
-                  瀏覽活動
+                  {t("browse_activity")}
                 </DropdownMenuItem>
               </>
             ) : (
@@ -482,14 +485,14 @@ export const CheckInDetail = ({
                   className="gap-2 text-text-dark"
                 >
                   <FlagOutlineSvg className="size-4 shrink-0" />
-                  檢舉
+                  {t("report")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleOpenBrowseActivity}
                   className="gap-2 text-text-dark"
                 >
                   <ChartColumnIncreasingSvg className="size-4 shrink-0" />
-                  瀏覽活動
+                  {t("browse_activity")}
                 </DropdownMenuItem>
               </>
             )}
@@ -515,7 +518,7 @@ export const CheckInDetail = ({
           <Button variant="white" className="px-8" asChild>
             <Link href={parentPracticeHref}>
               <ArrowLeft className="size-4 mr-2" />
-              查看所屬實踐
+              {t("view_practice")}
             </Link>
           </Button>
         )}
@@ -523,7 +526,7 @@ export const CheckInDetail = ({
         {/* 分享按鈕 */}
         <Button variant="white" className="px-8" onClick={openShareSheet}>
           <Share2 className="size-4 mr-2" />
-          分享這篇打卡
+          {t("share_check_in")}
         </Button>
       </div>
 

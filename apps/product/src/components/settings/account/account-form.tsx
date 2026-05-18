@@ -1,6 +1,7 @@
 "use client";
 
 import { type UpdateUserRequest, useCurrentUser, useUserMutations } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
@@ -23,6 +24,7 @@ import {
 } from "./schema";
 
 export const AccountForm = () => {
+  const t = useTranslations("account_settings");
   const router = useRouter();
   const { data: userData, isLoading, error: userError } = useCurrentUser();
   const { updateCurrentUser } = useUserMutations();
@@ -92,7 +94,7 @@ export const AccountForm = () => {
       // 檢查錯誤
       if (response.error) {
         const error = response.error;
-        let errorMessage = "更新失敗，請稍後再試";
+        let errorMessage = t("save_error");
 
         if (typeof error === "object" && error !== null) {
           // 檢查是否有 details 陣列
@@ -139,7 +141,7 @@ export const AccountForm = () => {
       }
 
       // 成功
-      toast.success("帳號設定已更新");
+      toast.success(t("save_success"));
       form.reset(form.getValues()); // 重置 dirty 狀態
       mutate("/api/v1/users/settings-summary");
 
@@ -149,7 +151,7 @@ export const AccountForm = () => {
       }, 500);
     } catch (error) {
       console.error("Unexpected error:", error);
-      toast.error("更新失敗，請稍後再試");
+      toast.error(t("save_error"));
     } finally {
       setIsSubmitting(false);
     }
@@ -161,7 +163,7 @@ export const AccountForm = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-text-dark">載入中...</p>
+        <p className="text-text-dark">{t("loading")}</p>
       </div>
     );
   }
@@ -170,7 +172,7 @@ export const AccountForm = () => {
   if (userError) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-red">載入用戶資料失敗，請稍後再試</p>
+        <p className="text-red">{t("load_error")}</p>
       </div>
     );
   }
@@ -183,7 +185,7 @@ export const AccountForm = () => {
         <FieldSelectionSection
           form={form}
           fieldName="position"
-          label="身份"
+          label={t("role_label")}
           availableFields={POSITION_OPTIONS}
           maxSelection={5}
         />
@@ -191,7 +193,7 @@ export const AccountForm = () => {
         <FieldSelectionSection
           form={form}
           fieldName="professionalFields"
-          label="專業領域"
+          label={t("professional_field_label")}
           availableFields={AVAILABLE_FIELDS}
           maxSelection={5}
         />
@@ -199,7 +201,7 @@ export const AccountForm = () => {
         <FieldSelectionSection
           form={form}
           fieldName="explorationFields"
-          label="想探索的領域"
+          label={t("exploration_field_label")}
           availableFields={INTEREST_CATEGORIES}
           maxSelection={5}
         />
@@ -212,7 +214,7 @@ export const AccountForm = () => {
             className="w-full sm:max-w-[288px]"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "儲存中..." : "儲存"}
+            {isSubmitting ? t("saving") : t("save")}
           </Button>
         </footer>
       </form>

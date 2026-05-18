@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
+import { useTranslations } from "@daodao/i18n";
 import { type ManualPracticeFormValues, manualPracticeFormSchema } from "@/components/practice";
 import { Step1 } from "@/components/practice/create/manual/steps/step-1";
 import { Step2 } from "@/components/practice/create/manual/steps/step-2";
@@ -89,6 +90,7 @@ const convertFormValuesToApiRequest = (
 };
 
 export default function CreateManualPracticePage() {
+  const t = useTranslations("practice");
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -185,7 +187,7 @@ export default function CreateManualPracticePage() {
         };
 
         const error = errorResponse.error || errorResponse;
-        let errorMessage = "建立實踐失敗";
+        let errorMessage = t("practice.create_failed");
         let shouldNavigateToStep: number | null = null;
 
         // 處理錯誤訊息
@@ -265,7 +267,7 @@ export default function CreateManualPracticePage() {
         );
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "建立實踐失敗，請稍後再試";
+      const errorMessage = error instanceof Error ? error.message : t("practice.create_failed_retry");
       console.error("Failed to create practice:", error);
       toast.error(errorMessage);
       setIsSubmitting(false);
@@ -307,7 +309,7 @@ export default function CreateManualPracticePage() {
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <PageHeader title={currentStep === 5 ? "預覽" : "建立實踐"} rightActionTo="/" />
+      <PageHeader title={currentStep === 5 ? t("practice.manual_preview_title") : t("practice.manual_create_title")} rightActionTo="/" />
 
       <main className="relative px-5 max-w-[448px] mx-auto pb-20">
         {/* Progress Bar */}
@@ -363,7 +365,7 @@ export default function CreateManualPracticePage() {
                 disabled={isCheckingDraft}
               >
                 <ArrowLeftOutlineSvg className="size-4.5 text-logo-cyan group-hover:text-white" />
-                上一步
+                {t("practice.manual_prev_step")}
               </Button>
 
               <Button
@@ -372,7 +374,7 @@ export default function CreateManualPracticePage() {
                 className="w-full sm:max-w-[288px]"
                 disabled={isCheckingDraft || isSubmitting}
               >
-                {currentStep === TOTAL_STEPS ? "完成新增" : "下一步"}
+                {currentStep === TOTAL_STEPS ? t("practice.manual_finish") : t("practice.manual_next_step")}
                 {currentStep !== TOTAL_STEPS && <ArrowRightOutlineSvg className="size-4.5" />}
               </Button>
             </footer>

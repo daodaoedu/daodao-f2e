@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { BookSvg, ClockSolidSvg } from "@daodao/assets";
 import { Badge } from "@daodao/ui/components/badge";
 import { EXECUTION_TIMING_OPTIONS, type ManualPracticeFormValues } from "../create/manual/schema";
@@ -13,6 +14,7 @@ export const ExecutionTimingCard = ({
   executionTiming,
   customTiming,
 }: ExecutionTimingCardProps) => {
+  const t = useTranslations("practice");
   return (
     <div className="relative bg-light-cyan rounded-lg px-4 pt-4 pb-3 md:pb-12">
       {/* Book Illustration Background */}
@@ -21,7 +23,7 @@ export const ExecutionTimingCard = ({
       </div>
 
       <div className="relative">
-        <h3 className="text-xs text-text-dark mb-2">執行時機</h3>
+        <h3 className="text-xs text-text-dark mb-2">{t("practice.form_execution_timing")}</h3>
         <div className="flex flex-wrap gap-2">
           {executionTiming.map((timing) => {
             const option = EXECUTION_TIMING_OPTIONS.find((opt) => opt.value === timing);
@@ -34,7 +36,7 @@ export const ExecutionTimingCard = ({
                 className="text-sm py-[3px] rounded gap-1"
               >
                 <ClockSolidSvg width={18} height={18} className="text-light-cyan shrink-0" />
-                {option.label}
+                {t(`practice.${option.labelKey}`)}
               </Badge>
             );
           })}

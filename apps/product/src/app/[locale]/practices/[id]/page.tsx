@@ -17,6 +17,7 @@ import {
   useRecordView,
 } from "@daodao/api";
 import type { MentionCandidate } from "@daodao/features-mention";
+import { useTranslations } from "@daodao/i18n";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
@@ -126,12 +127,12 @@ function isMentionCandidateWithNumericId(
 
 function formatCommentTime(createdAt?: string): string {
   if (!createdAt) {
-    return "剛剛";
+    return "";
   }
 
   const parsedDate = parseISO(createdAt);
   if (!isValid(parsedDate)) {
-    return "剛剛";
+    return "";
   }
 
   return formatDistanceToNow(parsedDate, {
@@ -144,7 +145,7 @@ function mapReply(reply: IApiCommentNode): ICommentReply {
   return {
     id: String(reply.id),
     author: {
-      name: reply.user?.name || "匿名使用者",
+      name: reply.user?.name || "",
       photoURL: reply.user?.photoURL || undefined,
       userId: reply.user?.id || undefined,
       numericUserId: reply.userId ?? undefined,
@@ -162,7 +163,7 @@ function mapComment(comment: IApiCommentNode): IComment {
   return {
     id: String(comment.id),
     author: {
-      name: comment.user?.name || "匿名使用者",
+      name: comment.user?.name || "",
       photoURL: comment.user?.photoURL || undefined,
       userId: comment.user?.id || undefined,
       numericUserId: comment.userId ?? undefined,
@@ -191,6 +192,7 @@ function getCurrentUserPhotoURL(currentUser: unknown): string | undefined {
 }
 
 export default function PracticeDetailPage() {
+  const t = useTranslations("practice");
   const router = useRouter();
   const params = useParams();
   const practiceId = params.id as string;
@@ -355,9 +357,9 @@ export default function PracticeDetailPage() {
       onRestore: async () => {
         try {
           await restorePractice();
-          toast.success("實踐已成功復原");
+          toast.success(t("practice.restore_success"));
         } catch (restoreError) {
-          const errorMessage = restoreError instanceof Error ? restoreError.message : "復原失敗";
+          const errorMessage = restoreError instanceof Error ? restoreError.message : t("practice.restore_failed");
           console.error("Failed to restore practice:", errorMessage);
           toast.error(errorMessage);
         }
@@ -369,7 +371,7 @@ export default function PracticeDetailPage() {
         await archivePractice();
         router.push("/settings/archived");
       } catch (archiveError) {
-        const errorMessage = archiveError instanceof Error ? archiveError.message : "封存失敗";
+        const errorMessage = archiveError instanceof Error ? archiveError.message : t("practice.archive_failed");
         console.error("Failed to archive practice:", errorMessage);
         toast.error(errorMessage);
       }
@@ -383,7 +385,7 @@ export default function PracticeDetailPage() {
         await deletePracticeById();
         router.push("/");
       } catch (deleteError) {
-        const errorMessage = deleteError instanceof Error ? deleteError.message : "刪除失敗";
+        const errorMessage = deleteError instanceof Error ? deleteError.message : t("practice.delete_failed");
         console.error("Failed to delete practice:", errorMessage);
         toast.error(errorMessage);
       }
@@ -402,13 +404,13 @@ export default function PracticeDetailPage() {
       });
 
       if (response.error) {
-        const errorMessage = getErrorMessage(response.error, "留言失敗");
+        const errorMessage = getErrorMessage(response.error, t("practice.comment_failed"));
         console.error("Failed to create comment:", errorMessage);
         toast.error(errorMessage);
         return;
       }
 
-      toast.success("留言成功！");
+      toast.success(t("practice.comment_success"));
       await Promise.all([mutateComments(), mutatePractice()]);
     },
     [mutateComments, mutatePractice, practiceId]
@@ -418,7 +420,7 @@ export default function PracticeDetailPage() {
     async (commentId: string, content: string, mentionedUserIds?: number[]) => {
       const parsedCommentId = Number(commentId);
       if (!Number.isFinite(parsedCommentId)) {
-        toast.error("留言 ID 無效");
+        toast.error(t("practice.comment_id_invalid"));
         return false;
       }
 
@@ -427,7 +429,7 @@ export default function PracticeDetailPage() {
         mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
       });
       if (response.error) {
-        const errorMessage = getErrorMessage(response.error, "更新留言失敗");
+        const errorMessage = getErrorMessage(response.error, t("practice.update_comment_failed"));
         console.error("Failed to update comment:", errorMessage);
         toast.error(errorMessage);
         return false;
@@ -443,13 +445,13 @@ export default function PracticeDetailPage() {
     async (commentId: string) => {
       const parsedCommentId = Number(commentId);
       if (!Number.isFinite(parsedCommentId)) {
-        toast.error("留言 ID 無效");
+        toast.error(t("practice.comment_id_invalid"));
         return false;
       }
 
       const response = await deleteComment(parsedCommentId);
       if (response.error) {
-        const errorMessage = getErrorMessage(response.error, "刪除留言失敗");
+        const errorMessage = getErrorMessage(response.error, t("practice.delete_comment_failed"));
         console.error("Failed to delete comment:", errorMessage);
         toast.error(errorMessage);
         return false;
@@ -469,14 +471,14 @@ export default function PracticeDetailPage() {
             type="button"
             onClick={() => router.replace("/?tab=mine")}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
-            aria-label="關閉"
+            aria-label={t("practice.close")}
           >
             <X className="size-6" />
           </button>
         </div>
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
-          <div className="text-center text-text-dark">載入中...</div>
+          <div className="text-center text-text-dark">{t("practice.loading")}</div>
         </main>
       </div>
     );
@@ -490,7 +492,7 @@ export default function PracticeDetailPage() {
             type="button"
             onClick={() => router.replace("/?tab=mine")}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
-            aria-label="關閉"
+            aria-label={t("practice.close")}
           >
             <X className="size-6" />
           </button>
@@ -498,7 +500,7 @@ export default function PracticeDetailPage() {
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">
-            {error ? "載入失敗，請稍後再試" : "找不到此實踐"}
+            {error ? t("practice.load_failed") : t("practice.not_found")}
           </div>
         </main>
       </div>
@@ -520,7 +522,7 @@ export default function PracticeDetailPage() {
           type="button"
           onClick={() => router.replace("/?tab=mine")}
           className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
-          aria-label="關閉"
+          aria-label={t("practice.close")}
         >
           <X className="size-6" />
         </button>

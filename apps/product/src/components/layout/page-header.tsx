@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeftOutlineSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { useIsDesktop, useIsMobile } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
@@ -36,19 +37,22 @@ export type PageHeaderProps = {
 
 export const PageHeader = ({
   leftAction = null,
-  leftLabel = "返回",
+  leftLabel,
   onLeftAction,
   title,
   rightAction = "close",
   onRightAction,
   rightActionIcon = null,
   rightActionTo,
-  rightLabel = "關閉",
+  rightLabel,
   variant = "default",
   disableLightOn,
   className,
 }: PageHeaderProps) => {
+  const t = useTranslations("common");
   const router = useSafeRouter();
+  const resolvedLeftLabel = leftLabel ?? t("back");
+  const resolvedRightLabel = rightLabel ?? t("close");
   const isMobile = useIsMobile();
   const isDesktop = useIsDesktop();
 
@@ -93,7 +97,7 @@ export const PageHeader = ({
             className={cn("px-0 font-normal", isLight && "text-white hover:text-white")}
           >
             <ArrowLeftOutlineSvg className="size-6" />
-            {leftLabel}
+            {resolvedLeftLabel}
           </Button>
         )}
       </div>
@@ -114,7 +118,7 @@ export const PageHeader = ({
             variant="ghost"
             size="icon"
             onClick={handleRightAction}
-            aria-label={rightLabel}
+            aria-label={resolvedRightLabel}
             animation="none"
             className={cn(
               isLight

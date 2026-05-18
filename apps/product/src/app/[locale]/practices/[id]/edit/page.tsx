@@ -1,6 +1,7 @@
 "use client";
 
 import { type UpdatePracticeRequestType, updatePractice, usePracticeById } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
@@ -86,6 +87,7 @@ const convertFormValuesToApiRequest = (
 };
 
 export default function EditPracticePage() {
+  const t = useTranslations("practice");
   const router = useRouter();
   const params = useParams();
   const practiceId = params.id as string;
@@ -238,7 +240,7 @@ export default function EditPracticePage() {
       if (response.error) {
         const errorResponse = response.error as ApiErrorResponse;
         const error = errorResponse.error || errorResponse;
-        let errorMessage = "儲存失敗，請稍後再試";
+        let errorMessage = t("practice.edit_save_failed");
 
         // 處理錯誤訊息
         if (typeof error === "object" && error !== null) {
@@ -275,11 +277,11 @@ export default function EditPracticePage() {
       }
 
       // 提交成功後顯示成功訊息並導航回詳情頁面
-      toast.success("實踐已成功更新");
+      toast.success(t("practice.edit_save_success"));
       router.push(`/practices/${practiceId}`);
     } catch (error) {
       console.error("Failed to update practice:", error);
-      toast.error("儲存失敗，請稍後再試");
+      toast.error(t("practice.edit_save_failed"));
       setIsSubmitting(false);
     }
   };
@@ -290,10 +292,10 @@ export default function EditPracticePage() {
   if (isLoading) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" leftLabel="" title="編輯實踐" rightActionTo="/" />
+        <PageHeader leftAction="back" leftLabel="" title={t("practice.edit_title")} rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
-          <div className="text-center text-text-dark">載入中...</div>
+          <div className="text-center text-text-dark">{t("practice.loading")}</div>
         </main>
       </div>
     );
@@ -303,11 +305,11 @@ export default function EditPracticePage() {
   if (error || !practiceData?.data) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" leftLabel="" title="編輯實踐" rightActionTo="/" />
+        <PageHeader leftAction="back" leftLabel="" title={t("practice.edit_title")} rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">
-            {error ? "載入失敗，請稍後再試" : "找不到此實踐"}
+            {error ? t("practice.load_failed") : t("practice.not_found")}
           </div>
         </main>
       </div>
@@ -318,7 +320,7 @@ export default function EditPracticePage() {
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <PageHeader title="編輯實踐" rightActionTo={`/practices/${practiceId}`} />
+      <PageHeader title={t("practice.edit_title")} rightActionTo={`/practices/${practiceId}`} />
 
       <main className="relative px-5 max-w-[448px] mx-auto pb-20">
         {/* Form */}
@@ -343,7 +345,7 @@ export default function EditPracticePage() {
                 disabled={isSubmitting}
                 onClick={() => router.push(`/practices/${practiceId}`)}
               >
-                取消
+                {t("practice.edit_cancel")}
               </Button>
               <Button
                 type="submit"
@@ -351,7 +353,7 @@ export default function EditPracticePage() {
                 className="w-full sm:max-w-[288px]"
                 disabled={isSubmitting}
               >
-                儲存
+                {t("practice.edit_save")}
               </Button>
             </footer>
           </form>

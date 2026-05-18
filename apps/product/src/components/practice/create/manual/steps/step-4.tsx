@@ -2,6 +2,7 @@
 
 import { extractOgImage } from "@daodao/api";
 import { ArrowRightOutlineSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import {
@@ -24,6 +25,7 @@ interface Step4Props {
 }
 
 export const Step4 = ({ form }: Step4Props) => {
+  const t = useTranslations("practice");
   const [resourceName, setResourceName] = useState("");
   const [resourceUrl, setResourceUrl] = useState("");
   const [isFetchingTitle, setIsFetchingTitle] = useState(false);
@@ -51,13 +53,13 @@ export const Step4 = ({ form }: Step4Props) => {
       } else {
         form.setError("resources", {
           type: "manual",
-          message: "找不到網頁標題，請手動輸入",
+          message: t("practice.step4_fetch_not_found"),
         });
       }
     } catch {
       form.setError("resources", {
         type: "manual",
-        message: "擷取網頁標題失敗，請手動輸入",
+        message: t("practice.step4_fetch_failed"),
       });
     } finally {
       setIsFetchingTitle(false);
@@ -78,7 +80,7 @@ export const Step4 = ({ form }: Step4Props) => {
         name="tags"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block text-base font-normal text-text-dark mb-3">標籤</FormLabel>
+            <FormLabel className="block text-base font-normal text-text-dark mb-3">{t("practice.step4_tags_label")}</FormLabel>
             <FormControl>
               <div>
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -89,7 +91,7 @@ export const Step4 = ({ form }: Step4Props) => {
                   ))}
                 </div>
                 <Button type="button" onClick={openTagEditSheet} className="w-full">
-                  編輯
+                  {t("practice.step4_tags_edit")}
                   <ArrowRightOutlineSvg className="size-4.5" />
                 </Button>
               </div>
@@ -120,14 +122,14 @@ export const Step4 = ({ form }: Step4Props) => {
                 if (url.protocol !== "https:") {
                   form.setError("resources", {
                     type: "manual",
-                    message: "網址必須使用 HTTPS",
+                    message: t("practice.step4_url_https_required"),
                   });
                   return;
                 }
               } catch {
                 form.setError("resources", {
                   type: "manual",
-                  message: "請輸入有效的網址",
+                  message: t("practice.step4_url_invalid"),
                 });
                 return;
               }
@@ -152,7 +154,9 @@ export const Step4 = ({ form }: Step4Props) => {
             if (isDuplicate) {
               form.setError("resources", {
                 type: "manual",
-                message: trimmedUrl ? "此網址的資源已經添加過了" : "此名稱的資源已經添加過了",
+                message: trimmedUrl
+                  ? t("practice.step4_resource_duplicate_url")
+                  : t("practice.step4_resource_duplicate_name"),
               });
               return;
             }
@@ -176,17 +180,15 @@ export const Step4 = ({ form }: Step4Props) => {
           return (
             <FormItem>
               <FormLabel className="block text-base font-normal text-text-dark mb-3">
-                使用的資源
+                {t("practice.step4_resources_label")}
               </FormLabel>
               <FormDescription className="border border-blue bg-light-blue text-sm text-text-dark p-3 rounded-lg mb-4">
-                你的練習會用到什麼參考資料、課程或教學呢？
-                <br />
-                歡迎分享出來，讓更多人在旅途中不迷路✨
+                {t("practice.step4_resources_description")}
               </FormDescription>
               <FormControl>
                 <div>
                   <Input
-                    placeholder="資源名稱"
+                    placeholder={t("practice.step4_resource_name_placeholder")}
                     className="w-full mb-3"
                     value={resourceName}
                     maxLength={100}
@@ -201,7 +203,7 @@ export const Step4 = ({ form }: Step4Props) => {
                   <div className="flex gap-2 mb-3">
                     <Input
                       type="url"
-                      placeholder="網址（選填），例如 https://www.google.com/"
+                      placeholder={t("practice.step4_resource_url_placeholder")}
                       className="flex-1"
                       value={resourceUrl}
                       onChange={(e) => setResourceUrl(e.target.value)}
@@ -220,7 +222,7 @@ export const Step4 = ({ form }: Step4Props) => {
                         disabled={isFetchingTitle}
                         className="shrink-0"
                       >
-                        {isFetchingTitle ? "擷取中..." : "擷取名稱"}
+                        {isFetchingTitle ? t("practice.step4_fetching") : t("practice.step4_fetch_title")}
                       </Button>
                     )}
                   </div>
@@ -231,7 +233,7 @@ export const Step4 = ({ form }: Step4Props) => {
                     className="w-full mb-5"
                     disabled={!resourceName.trim()}
                   >
-                    新增
+                    {t("practice.step4_add_resource")}
                     <ArrowRightOutlineSvg className="size-4.5" />
                   </Button>
                   {resources.length > 0 && (

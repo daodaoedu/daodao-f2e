@@ -2,6 +2,7 @@
 
 import type { PreferenceOption, PreferenceType, UpdatePreferencesRequest } from "@daodao/api";
 import { useAvailablePreferences, useCurrentUserPreferences, useUserMutations } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
@@ -15,6 +16,7 @@ import { PreferenceSection } from "./preference-section";
 import { type PreferencesFormValues, preferencesFormSchema } from "./schema";
 
 export const PreferencesForm = () => {
+  const t = useTranslations("preferences_settings");
   const router = useRouter();
   const {
     data: preferencesData,
@@ -126,7 +128,7 @@ export const PreferencesForm = () => {
       // 檢查錯誤
       if (response.error) {
         const error = response.error;
-        let errorMessage = "更新失敗，請稍後再試";
+        let errorMessage = t("save_error");
 
         if (typeof error === "object" && error !== null) {
           // 檢查是否有 details（可能是陣列或物件）
@@ -191,7 +193,7 @@ export const PreferencesForm = () => {
       }
 
       // 成功
-      toast.success("偏好設定已更新");
+      toast.success(t("save_success"));
       form.reset(form.getValues()); // 重置 dirty 狀態
       mutate("/api/v1/users/settings-summary");
 
@@ -201,7 +203,7 @@ export const PreferencesForm = () => {
       }, 500);
     } catch (error) {
       console.error("Unexpected error:", error);
-      toast.error("更新失敗，請稍後再試");
+      toast.error(t("save_error"));
     } finally {
       setIsSubmitting(false);
     }
@@ -213,7 +215,7 @@ export const PreferencesForm = () => {
   if (isLoadingPreferences || isLoadingAvailable) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-text-dark">載入中...</p>
+        <p className="text-text-dark">{t("loading")}</p>
       </div>
     );
   }
@@ -222,7 +224,7 @@ export const PreferencesForm = () => {
   if (preferencesError || availableError) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-red">載入偏好設定失敗，請稍後再試</p>
+        <p className="text-red">{t("load_error")}</p>
       </div>
     );
   }
@@ -231,7 +233,7 @@ export const PreferencesForm = () => {
   if (preferenceTypes.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-text-dark">目前沒有可用的偏好設定</p>
+        <p className="text-text-dark">{t("no_preferences")}</p>
       </div>
     );
   }
@@ -283,7 +285,7 @@ export const PreferencesForm = () => {
     if (errorMessages.length > 0) {
       toast.error(errorMessages[0]);
     } else {
-      toast.error("請檢查表單欄位");
+      toast.error(t("form_check_error"));
     }
   };
 
@@ -310,7 +312,7 @@ export const PreferencesForm = () => {
             className="w-full sm:max-w-[288px]"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "儲存中..." : "儲存"}
+            {isSubmitting ? t("saving") : t("save")}
           </Button>
         </footer>
       </form>
