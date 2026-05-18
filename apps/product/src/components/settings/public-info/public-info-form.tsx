@@ -257,7 +257,7 @@ export const PublicInfoForm = () => {
         <PrivacySection form={form} />
 
         {/* 儲存按鈕 */}
-        <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray">
+        <footer className="fixed bottom-20 left-0 right-0 z-20 flex justify-center gap-6 border-t border-light-gray bg-very-light-gray p-6 md:bottom-0">
           <Button
             type="submit"
             variant="orange"
