@@ -8387,8 +8387,8 @@ export interface paths {
                 };
                 header?: never;
                 path: {
-                    /** @description 目標使用者 ID */
-                    userId: number;
+                    /** @description 目標使用者 UUID */
+                    userId: string;
                 };
                 cookie?: never;
             };

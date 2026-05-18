@@ -4307,8 +4307,10 @@
       "error": "Failed to resonate, please try again"
     },
     "carousel": {
+      "title": "Learning Persona",
       "dismiss": "Don't show today",
-      "switchQuestion": "Try another"
+      "switchQuestion": "Try another",
+      "error": "Operation failed, please try again"
     }
   }
 }

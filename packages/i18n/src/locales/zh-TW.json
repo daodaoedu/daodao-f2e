@@ -4307,8 +4307,10 @@
       "error": "共鳴操作失敗，請稍後再試"
     },
     "carousel": {
+      "title": "學習人物誌",
       "dismiss": "今天不再顯示",
-      "switchQuestion": "換一題"
+      "switchQuestion": "換一題",
+      "error": "操作失敗，請稍後再試"
     }
   }
 }

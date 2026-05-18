@@ -2,7 +2,6 @@
 
 import {
   addPersonaResonance,
-  removePersonaResonance,
   useMutate,
   usePersonaProfileUser,
 } from "@daodao/api";
@@ -13,11 +12,10 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 interface PersonaProfileUserProps {
-  targetUserId: number;
-  viewerUserId?: number;
+  targetUserId: string;
 }
 
-export function PersonaProfileUser({ targetUserId, viewerUserId }: PersonaProfileUserProps) {
+export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
   const t = useTranslations("persona");
   const mutate = useMutate();
   const [excludeId, setExcludeId] = useState<number | undefined>(undefined);
@@ -51,6 +49,11 @@ export function PersonaProfileUser({ targetUserId, viewerUserId }: PersonaProfil
         });
         return;
       }
+      setResonatingIds((prev) => {
+        const s = new Set(prev);
+        s.delete(answerId);
+        return s;
+      });
       await mutate(["/api/v1/persona/profile/{userId}"] as const);
     } catch {
       toast.error(t("resonance.error"));
@@ -75,7 +78,7 @@ export function PersonaProfileUser({ targetUserId, viewerUserId }: PersonaProfil
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <p className="text-sm text-gray-500 mb-1">{currentQuestion.prompt}</p>
 
-        {viewerIsLocked && viewerUserId != null ? (
+        {viewerIsLocked ? (
           <div className="mt-2 rounded-lg bg-gray-50 p-3 text-center">
             <p className="text-sm text-gray-500">
               {t("userProfile.lockedMessage", { count: answersNeeded })}

@@ -71,7 +71,7 @@ export const getPersonaProfileMe = async () => {
   return client.GET("/api/v1/persona/profile/me");
 };
 
-export const getPersonaProfileUser = async (userId: number, exclude?: number) => {
+export const getPersonaProfileUser = async (userId: string, exclude?: number) => {
   return client.GET("/api/v1/persona/profile/{userId}", {
     params: {
       path: { userId },

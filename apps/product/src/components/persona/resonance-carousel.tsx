@@ -24,7 +24,6 @@ interface CarouselQuestionCardProps {
   prompt: string;
   questionType: "choice" | "sentence_completion" | "scenario";
   options: string[] | null;
-  isLocked: boolean;
   onAnswered: () => void;
   onSwitch: (questionId: number) => void;
 }
@@ -34,7 +33,6 @@ function CarouselQuestionCard({
   prompt,
   questionType,
   options,
-  isLocked,
   onAnswered,
   onSwitch,
 }: CarouselQuestionCardProps) {
@@ -61,6 +59,8 @@ function CarouselQuestionCard({
         toast.error(tProfile("submitError"));
         return;
       }
+      setSelected("");
+      setTextValue("");
       onAnswered();
     } catch {
       toast.error(tProfile("submitError"));
@@ -70,17 +70,7 @@ function CarouselQuestionCard({
   };
 
   return (
-    <div
-      className={cn(
-        "rounded-xl border bg-white p-4 shadow-sm relative",
-        isLocked && "opacity-50 pointer-events-none select-none"
-      )}
-    >
-      {isLocked && (
-        <div className="absolute inset-0 rounded-xl bg-white/70 backdrop-blur-sm flex items-center justify-center">
-          <p className="text-sm text-gray-500 text-center px-4">{tProfile("textPlaceholder")}</p>
-        </div>
-      )}
+    <div className="rounded-xl border bg-white p-4 shadow-sm">
       <p className="text-sm font-medium text-gray-700 mb-3">{prompt}</p>
 
       {isChoice ? (
@@ -157,7 +147,7 @@ export function ResonanceCarousel() {
       await dismissPersonaCarousel();
       await mutate(["/api/v1/persona/carousel-state"] as const);
     } catch {
-      toast.error("操作失敗，請稍後再試");
+      toast.error(t("error"));
     } finally {
       setDismissing(false);
     }
@@ -177,7 +167,7 @@ export function ResonanceCarousel() {
   return (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-2">
-        <p className="text-sm font-semibold text-gray-700">學習人物誌</p>
+        <p className="text-sm font-semibold text-gray-700">{t("title")}</p>
         <button
           type="button"
           onClick={handleDismiss}
@@ -197,7 +187,6 @@ export function ResonanceCarousel() {
                 prompt={q.prompt}
                 questionType={q.questionType}
                 options={q.options}
-                isLocked={false}
                 onAnswered={handleAnswered}
                 onSwitch={handleSwitch}
               />

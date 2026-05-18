@@ -25,7 +25,7 @@ export const usePersonaProfileMe = () => {
   return useQuery("/api/v1/persona/profile/me", {});
 };
 
-export const usePersonaProfileUser = (userId: number, options?: { exclude?: number; enabled?: boolean }) => {
+export const usePersonaProfileUser = (userId: string, options?: { exclude?: number; enabled?: boolean }) => {
   const enabled = options?.enabled ?? true;
   return useQuery(
     "/api/v1/persona/profile/{userId}",

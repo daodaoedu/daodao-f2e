@@ -156,7 +156,6 @@ export default async function UserProfilePage({
         <UserProfileTabs
           targetUserId={userId}
           isOwnProfile={isOwnProfile}
-          viewerUserId={currentUserId ?? undefined}
         />
       </main>
     </div>

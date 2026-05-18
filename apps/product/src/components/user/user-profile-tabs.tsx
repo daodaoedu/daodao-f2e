@@ -13,15 +13,13 @@ enum TabEnum {
 }
 
 interface UserProfileTabsProps {
-  targetUserId: number;
+  targetUserId: string;
   isOwnProfile: boolean;
-  viewerUserId?: number;
 }
 
 export function UserProfileTabs({
   targetUserId,
   isOwnProfile,
-  viewerUserId,
 }: UserProfileTabsProps) {
   const t = useTranslations("persona");
   const tUser = useTranslations("user_profile");
@@ -29,7 +27,10 @@ export function UserProfileTabs({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const currentTab = (searchParams.get("tab") as TabEnum) ?? TabEnum.Practice;
+  const tabValue = searchParams.get("tab");
+  const currentTab = Object.values(TabEnum).includes(tabValue as TabEnum)
+    ? (tabValue as TabEnum)
+    : TabEnum.Practice;
 
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -56,7 +57,7 @@ export function UserProfileTabs({
         {isOwnProfile ? (
           <PersonaProfileMe />
         ) : (
-          <PersonaProfileUser targetUserId={targetUserId} viewerUserId={viewerUserId} />
+          <PersonaProfileUser targetUserId={targetUserId} />
         )}
       </TabsContent>
     </Tabs>
