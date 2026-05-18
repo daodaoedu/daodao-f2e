@@ -3,7 +3,8 @@ import { computeBodyDisplayLeft } from "../check-in-stack-utils";
 
 describe("computeBodyDisplayLeft", () => {
   it("returns x minus half width minus wall thickness", () => {
-    expect(computeBodyDisplayLeft(200, 80, 20)).toBe(120);
+    // 200 - (80/2) - 20 = 140
+    expect(computeBodyDisplayLeft(200, 80, 20)).toBe(140);
   });
 
   it("handles body at right edge of physics world", () => {

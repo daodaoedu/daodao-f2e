@@ -827,7 +827,7 @@ export function PracticeDetailShell({
           <div className="px-4">
             <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
           </div>
-          <div className="pt-10">
+          <div className="pt-10 overflow-x-hidden">
             <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
           </div>
         </div>

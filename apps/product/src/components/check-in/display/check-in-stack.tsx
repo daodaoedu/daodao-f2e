@@ -18,6 +18,7 @@ import {
   mapApiMoodToMoodType,
 } from "@/constants/mood";
 import type { IBodyPosition, ICheckInItem, ISvgGeometry } from "../types";
+import { computeBodyDisplayLeft } from "./check-in-stack-utils";
 
 const { Engine, World, Bodies, Vertices, Runner, Body } = Matter;
 Matter.Common.setDecomp(decomp);
@@ -601,7 +602,7 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
         const h = Number.isFinite(height) ? height : 0;
         const id = position.id;
 
-        const left = x - w / 2 - WALL_THICKNESS;
+        const left = computeBodyDisplayLeft(x, w, WALL_THICKNESS);
         const top = y - h / 2;
 
         // 如果計算結果無效，不渲染
