@@ -4280,6 +4280,29 @@
     },
     "errors": {
       "submitFailed": "Submission failed, please try again later"
+    },
+    "taskGuide": {
+      "title": "Beginner Tasks",
+      "celebration": {
+        "title": "All done!",
+        "badgeTitle": "You earned the Early User Badge!",
+        "badgeDescription": "Thanks for completing all onboarding tasks — you're one of Dao Dao's earliest users!"
+      },
+      "progress": "{completed}/{total} done",
+      "footer": "Complete all tasks to earn the Early User Badge",
+      "ariaOpen": "Expand onboarding task list",
+      "ariaCollapse": "Collapse",
+      "ariaClose": "Close",
+      "tasks": {
+        "A": "Complete the learning style quiz",
+        "B": "Complete public info, account, and preferences",
+        "C": "Create your first practice",
+        "D": "Complete your first check-in",
+        "E": "Leave a comment on inspirations"
+      },
+      "taskDescriptions": {
+        "B": "Complete all three sections: public info, account settings, and preferences"
+      }
     }
   }
 }

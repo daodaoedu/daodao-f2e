@@ -11,6 +11,8 @@ import { SheetManagerProvider } from "@daodao/ui/components/animate-ui/component
 import { Toaster } from "@daodao/ui/components/sonner";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
 import { useRouter } from "next/navigation";
+import { OnboardingProgressProvider } from "@/components/task-guide/onboarding-progress-context";
+import { TaskGuideWidget } from "@/components/task-guide/task-guide-widget";
 
 interface GlobalProviderProps {
   head?: React.ReactNode;
@@ -70,8 +72,11 @@ function GlobalProvider({
                         router.push("/auth/verify-email/pending");
                       }}
                     >
-                      <Toaster />
-                      {children}
+                      <OnboardingProgressProvider>
+                        <TaskGuideWidget />
+                        <Toaster />
+                        {children}
+                      </OnboardingProgressProvider>
                     </AuthProvider>
                   </SheetManagerProvider>
                 </DialogManagerProvider>

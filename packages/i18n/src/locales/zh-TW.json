@@ -4280,6 +4280,29 @@
     },
     "errors": {
       "submitFailed": "提交失敗，請稍後再試"
+    },
+    "taskGuide": {
+      "title": "新手入門任務",
+      "celebration": {
+        "title": "恭喜完成！",
+        "badgeTitle": "恭喜獲得 Early User Badge！",
+        "badgeDescription": "感謝你完成所有新手任務，你是島島阿學的早期用戶之一！"
+      },
+      "progress": "{completed}/{total} 完成",
+      "footer": "完成所有任務即可獲得 Early User Badge",
+      "ariaOpen": "展開 Onboarding 任務清單",
+      "ariaCollapse": "收合",
+      "ariaClose": "關閉",
+      "tasks": {
+        "A": "完成學習風格測驗",
+        "B": "完成公開資訊、帳號與領域偏好",
+        "C": "建立第一個實踐",
+        "D": "完成第一次打卡",
+        "E": "在靈感頁留下留言"
+      },
+      "taskDescriptions": {
+        "B": "需完成公開資訊、帳號設定與領域偏好三個區塊"
+      }
     }
   }
 }

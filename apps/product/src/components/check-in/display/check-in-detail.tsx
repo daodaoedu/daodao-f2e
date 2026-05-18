@@ -41,6 +41,7 @@ import {
   BrowseActivityContent,
   type IBrowseActivityFollower,
 } from "@/components/practice/shared/browse-activity-content";
+import { applyOnboardingUpdateFromResponse } from "@/components/task-guide/onboarding-progress-context";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { useEditCheckInSheet } from "@/hooks/use-edit-check-in-sheet";
 import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
@@ -205,6 +206,7 @@ export function CheckInCommentSheetContent({
         toast.error("留言失敗，請稍後再試");
         return;
       }
+      applyOnboardingUpdateFromResponse(response.data);
       toast.success("留言成功！");
       await mutateComments();
     },
