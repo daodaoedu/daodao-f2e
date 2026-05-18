@@ -4,6 +4,7 @@ import useSWR from "swr";
 import type { IPaginationParams } from "./connection";
 import {
   disconnectUser,
+  getConnectionStatus,
   getConnections,
   getIncomingConnectionRequests,
   getOutgoingConnectionRequests,
@@ -33,6 +34,14 @@ export const useOutgoingConnectionRequests = (params?: IPaginationParams) => {
   return useSWR(
     ["/api/v1/connections/requests/outgoing", params],
     () => getOutgoingConnectionRequests(params),
+    { revalidateOnFocus: false }
+  );
+};
+
+export const useConnectionStatus = (userId?: string | null) => {
+  return useSWR(
+    userId ? ["/api/v1/connections/status/{userId}", userId] : null,
+    ([, targetUserId]) => getConnectionStatus(targetUserId),
     { revalidateOnFocus: false }
   );
 };

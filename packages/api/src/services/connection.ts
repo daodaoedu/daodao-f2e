@@ -28,6 +28,14 @@ export interface IConnectionItem {
   connectedAt: string;
 }
 
+export interface IConnectionStatus {
+  status: "none" | "incoming" | "outgoing" | "connected";
+  isConnected: boolean;
+  requestId: number | null;
+  interactionCount: number;
+  hasBypass: boolean;
+}
+
 export interface IApiResponse<T> {
   success: boolean;
   data: T;
@@ -36,6 +44,7 @@ export interface IApiResponse<T> {
 
 export type IPaginatedConnectionRequests = IApiResponse<IConnectionRequest[]>;
 export type IPaginatedConnections = IApiResponse<IConnectionItem[]>;
+export type IConnectionStatusResponse = IApiResponse<IConnectionStatus>;
 
 export interface ISendConnectionRequestBody {
   receiverExternalId: string;
@@ -109,6 +118,15 @@ export const disconnectUser = async (userId: string): Promise<void> => {
     const err = await res.json().catch(() => ({}));
     throw new Error(err?.error?.message ?? "解除連結失敗");
   }
+};
+
+export const getConnectionStatus = async (userId: string): Promise<IConnectionStatusResponse> => {
+  const res = await unauthorizedHandler.wrapFetch(
+    `${getBaseUrl()}/api/v1/connections/status/${userId}`,
+    { credentials: "include" }
+  );
+  if (!res.ok) throw new Error("載入連結狀態失敗");
+  return res.json();
 };
 
 export const getConnections = async (

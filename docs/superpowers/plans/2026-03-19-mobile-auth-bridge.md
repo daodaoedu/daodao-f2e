@@ -34,6 +34,7 @@
 - [x] Resource detail category breadcrumb-like navigation, updated date, and disabled reviews placeholder aligned with web.
 - [x] Check-in detail date selector and same-day navigation.
 - [x] Check-in detail edit/update mutation for mood, note, and tags while preserving existing images.
+- [x] Connection-status robustness: backend `GET /api/v1/connections/status/{userId}` now returns single-user status/request metadata, and mobile user profile uses it instead of inferring from the first 100 connection/request rows.
 - [x] Plan progress updated to distinguish implemented scope from runtime/product-polish residuals.
 
 **Not finished yet:**
@@ -45,7 +46,6 @@
 - [ ] Practice runtime pass: verify check-in card navigation, check-in detail behavior, completed-practice summary entry, native share, and save-to-gallery on device/simulator.
 - [ ] Social runtime pass: verify requests/connections/following/followers lists and follow/connect/disconnect actions with authenticated data.
 - [ ] Footprints runtime pass: verify learning-footprint list, deleted-practice state, date formatting, and practice links with authenticated data.
-- [ ] Connection-status robustness: user profile still infers connection status from the first 100 connection/request rows; a backend single-user connection-status endpoint would be more reliable.
 
 **Completed:**
 - [x] Created isolated worktree for `daodao-f2e`.
@@ -237,7 +237,7 @@ Local inspection only; no runtime verification performed. Product references are
 | Area | Current mobile status | Product reference path | Gap | Suggested priority / parallelization |
 |---|---|---|---|---|
 | Notifications | `app/(tabs)/notifications.tsx` now reads through `@daodao/api`, supports read/read-all, connection response actions, local response state, reaction emoji display, created-practice notifications, and deep links to user / practice / comment / check-in / buddy request targets. | `app/[locale]/(with-layout)/notifications/page.tsx`, `components/notifications/notification-list.tsx`, `components/notifications/notification-item.tsx` | Still needs authenticated runtime verification and a product-behavior pass for recency sections and edge-case targets. | P0 route dependency is complete. Remaining work is runtime verification plus non-P0 UI polish. |
-| `users/[identifier]` | Mobile route exists with identifier lookup, public profile fields, stats/social links, public practices, follow/unfollow, and connection actions. | `app/[locale]/(with-layout)/users/[identifier]/page.tsx`, `components/user`, `components/practice` | Connection status is inferred from first 100 connections/incoming/outgoing results; needs runtime verification and ideally a backend single-user connection status endpoint. | P0 implemented. Residual is data robustness and UI parity polish. |
+| `users/[identifier]` | Mobile route exists with identifier lookup, public profile fields, stats/social links, public practices, follow/unfollow, and connection actions. Connection state now reads from backend single-user `GET /api/v1/connections/status/{userId}` instead of inferring from paginated list samples. | `app/[locale]/(with-layout)/users/[identifier]/page.tsx`, `components/user`, `components/practice` | Needs authenticated runtime verification. | P0/product parity implemented. Remaining work is runtime verification. |
 | `practices/[id]/summary` | Mobile route exists with `usePracticeSummary`, summary card, native image share, save-to-gallery, and fallback text share. | `app/[locale]/practices/[id]/summary/page.tsx`, `components/practice/summary` | Needs authenticated runtime verification for owner/eligibility states and actual native share/gallery behavior. | P0 implemented. Residual is runtime verification. |
 | `practices/[id]/check-ins/[checkInId]` | Mobile route exists, `CheckInList` navigates to detail when `practiceId` is available, and detail now includes a date selector, same-day previous/next navigation, and edit/update mutation for mood, note, and tags while preserving existing images. | `app/[locale]/practices/[id]/check-ins/[checkInId]/page.tsx`, `components/check-in` | Needs authenticated runtime verification. | P0/product parity implemented. Remaining work is runtime verification. |
 | Social | Mobile `app/(tabs)/social.tsx` route/tab now exists and consolidates connection requests, connections, following, and followers with profile navigation and follow/connection actions. | `app/[locale]/(with-layout)/social/page.tsx`, `components/social/social-hub.tsx` | Needs authenticated runtime verification and product-level visual polish. | P1 implemented. Remaining work is runtime verification. |

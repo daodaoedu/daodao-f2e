@@ -1,13 +1,11 @@
 import {
   ApiError,
   disconnectUser,
-  getConnections,
-  getIncomingConnectionRequests,
-  getOutgoingConnectionRequests,
   getUserPractices,
   getUserProfileByIdentifier,
   respondConnectionRequest,
   sendConnectionRequest,
+  useConnectionStatus,
   type UserProfileData,
   withdrawConnectionRequest,
 } from "@daodao/api";
@@ -116,36 +114,10 @@ export default function UserProfileRoute() {
   );
 
   const {
-    data: connectionsResponse,
-    isLoading: isConnectionsLoading,
-    mutate: mutateConnections,
-  } = useSWR(
-    canUseConnectionActions ? ["/api/v1/connections", "profile", targetUserId] : null,
-    () => getConnections({ limit: 100 }),
-    { revalidateOnFocus: false }
-  );
-  const {
-    data: outgoingRequestsResponse,
-    isLoading: isOutgoingLoading,
-    mutate: mutateOutgoingRequests,
-  } = useSWR(
-    canUseConnectionActions
-      ? ["/api/v1/connections/requests/outgoing", "profile", targetUserId]
-      : null,
-    () => getOutgoingConnectionRequests({ limit: 100 }),
-    { revalidateOnFocus: false }
-  );
-  const {
-    data: incomingRequestsResponse,
-    isLoading: isIncomingLoading,
-    mutate: mutateIncomingRequests,
-  } = useSWR(
-    canUseConnectionActions
-      ? ["/api/v1/connections/requests/incoming", "profile", targetUserId]
-      : null,
-    () => getIncomingConnectionRequests({ limit: 100 }),
-    { revalidateOnFocus: false }
-  );
+    data: connectionStatusResponse,
+    isLoading: isConnectionStatusLoading,
+    mutate: mutateConnectionStatus,
+  } = useConnectionStatus(canUseConnectionActions ? targetUserId : null);
 
   const isRefreshing = isLoading || isCurrentUserLoading;
   const canFollow = Boolean(targetUserId) && !isOwnProfile;
@@ -153,30 +125,8 @@ export default function UserProfileRoute() {
   const displayLocation = profile ? getDisplayLocation(profile) : null;
   const practices = practicesResponse?.data?.data ?? [];
 
-  const matchedConnection = useMemo(
-    () => connectionsResponse?.data.find((connection) => connection.externalId === targetUserId),
-    [connectionsResponse, targetUserId]
-  );
-  const matchedOutgoingRequest = useMemo(
-    () =>
-      outgoingRequestsResponse?.data.find((request) => request.receiverExternalId === targetUserId),
-    [outgoingRequestsResponse, targetUserId]
-  );
-  const matchedIncomingRequest = useMemo(
-    () =>
-      incomingRequestsResponse?.data.find(
-        (request) => request.requesterExternalId === targetUserId
-      ),
-    [incomingRequestsResponse, targetUserId]
-  );
-  const connectionStatus: ConnectionStatus = matchedConnection
-    ? "connected"
-    : matchedIncomingRequest
-      ? "incoming"
-      : matchedOutgoingRequest
-        ? "outgoing"
-        : "none";
-  const isConnectionStatusLoading = isConnectionsLoading || isOutgoingLoading || isIncomingLoading;
+  const connectionStatus: ConnectionStatus = connectionStatusResponse?.data.status ?? "none";
+  const connectionRequestId = connectionStatusResponse?.data.requestId ?? null;
 
   const stats = useMemo(
     () =>
@@ -203,17 +153,8 @@ export default function UserProfileRoute() {
     mutateProfile();
     mutateFollowStatus();
     mutatePractices();
-    mutateConnections();
-    mutateOutgoingRequests();
-    mutateIncomingRequests();
-  }, [
-    mutateConnections,
-    mutateFollowStatus,
-    mutateIncomingRequests,
-    mutateOutgoingRequests,
-    mutatePractices,
-    mutateProfile,
-  ]);
+    mutateConnectionStatus();
+  }, [mutateConnectionStatus, mutateFollowStatus, mutatePractices, mutateProfile]);
 
   const handleToggleFollow = useCallback(async () => {
     if (!targetUserId || isMutatingFollow) return;
@@ -237,8 +178,8 @@ export default function UserProfileRoute() {
   }, [isFollowing, isMutatingFollow, mutateFollowStatus, mutateProfile, targetUserId]);
 
   const refreshConnectionState = useCallback(
-    () => Promise.all([mutateConnections(), mutateOutgoingRequests(), mutateIncomingRequests()]),
-    [mutateConnections, mutateIncomingRequests, mutateOutgoingRequests]
+    () => Promise.all([mutateConnectionStatus(), mutateProfile()]),
+    [mutateConnectionStatus, mutateProfile]
   );
 
   const handleSendConnectionRequest = useCallback(async () => {
@@ -260,26 +201,26 @@ export default function UserProfileRoute() {
   }, [isMutatingConnection, refreshConnectionState, targetUserId]);
 
   const handleWithdrawConnectionRequest = useCallback(async () => {
-    if (!matchedOutgoingRequest || isMutatingConnection) return;
+    if (!connectionRequestId || isMutatingConnection) return;
 
     setIsMutatingConnection(true);
     try {
-      await withdrawConnectionRequest(String(matchedOutgoingRequest.requestId));
+      await withdrawConnectionRequest(String(connectionRequestId));
       await refreshConnectionState();
     } catch (connectionError) {
       Alert.alert("撤回連結請求失敗", getErrorMessage(connectionError, "請稍後再試"));
     } finally {
       setIsMutatingConnection(false);
     }
-  }, [isMutatingConnection, matchedOutgoingRequest, refreshConnectionState]);
+  }, [connectionRequestId, isMutatingConnection, refreshConnectionState]);
 
   const handleRespondConnectionRequest = useCallback(
     async (action: "accept" | "reject") => {
-      if (!matchedIncomingRequest || isMutatingConnection) return;
+      if (!connectionRequestId || isMutatingConnection) return;
 
       setIsMutatingConnection(true);
       try {
-        await respondConnectionRequest(String(matchedIncomingRequest.requestId), action);
+        await respondConnectionRequest(String(connectionRequestId), action);
         await refreshConnectionState();
       } catch (connectionError) {
         Alert.alert("處理連結請求失敗", getErrorMessage(connectionError, "請稍後再試"));
@@ -287,11 +228,11 @@ export default function UserProfileRoute() {
         setIsMutatingConnection(false);
       }
     },
-    [isMutatingConnection, matchedIncomingRequest, refreshConnectionState]
+    [connectionRequestId, isMutatingConnection, refreshConnectionState]
   );
 
   const handleDisconnect = useCallback(() => {
-    if ((!matchedConnection && connectionStatus !== "connected") || isMutatingConnection) return;
+    if (connectionStatus !== "connected" || isMutatingConnection) return;
 
     Alert.alert("解除連結？", `解除連結後，你與 ${displayName} 將失去對彼此非公開內容的存取權。`, [
       { text: "先不要", style: "cancel" },
@@ -316,7 +257,6 @@ export default function UserProfileRoute() {
     connectionStatus,
     displayName,
     isMutatingConnection,
-    matchedConnection,
     mutateProfile,
     refreshConnectionState,
     targetUserId,
