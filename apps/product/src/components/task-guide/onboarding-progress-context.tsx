@@ -3,6 +3,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import useSWR, { type KeyedMutator } from "swr";
 import { useAuth } from "@daodao/auth";
+import { getRequiredEnv } from "@daodao/config";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -11,6 +12,7 @@ export type OnboardingTaskKey = "A" | "B" | "C" | "D" | "E";
 export interface OnboardingTaskItem {
   taskKey: OnboardingTaskKey;
   done: boolean;
+  ctaHref?: string;
 }
 
 export interface OnboardingStatusData {
@@ -39,7 +41,8 @@ const OnboardingProgressContext = createContext<OnboardingProgressContextValue |
 export const ONBOARDING_STATUS_KEY = "/api/v1/onboarding/status";
 
 const fetcher = async (url: string): Promise<OnboardingStatusResponse> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
+  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL").replace(/\/$/, "");
+  const res = await fetch(`${baseUrl}${url}`, {
     credentials: "include",
   });
   if (!res.ok) throw new Error("Failed to fetch onboarding status");

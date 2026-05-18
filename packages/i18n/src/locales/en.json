@@ -4289,7 +4289,7 @@
         "badgeDescription": "Thanks for completing all onboarding tasks — you're one of Dao Dao's earliest users!"
       },
       "progress": "{completed}/{total} done",
-      "footer": "Complete all tasks to earn the Early User Badge 🏅",
+      "footer": "Complete all tasks to earn the Early User Badge",
       "ariaOpen": "Expand onboarding task list",
       "ariaCollapse": "Collapse",
       "ariaClose": "Close",
