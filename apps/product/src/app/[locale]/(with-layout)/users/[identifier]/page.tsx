@@ -2,8 +2,7 @@ import { getCurrentUser, getUserByIdentifier, getUserProfileByIdentifier } from 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { PracticeSection } from "@/components/practice";
-import { IslandHeader, UserInfoCard } from "@/components/user";
+import { IslandHeader, UserInfoCard, UserProfileTabs } from "@/components/user";
 
 /**
  * 個人頁面
@@ -154,8 +153,11 @@ export default async function UserProfilePage({
           targetUserId={userId}
         />
 
-        {/* 「主題實踐」區塊 */}
-        <PracticeSection userId={userId} />
+        <UserProfileTabs
+          targetUserId={userId}
+          isOwnProfile={isOwnProfile}
+          viewerUserId={currentUserId ?? undefined}
+        />
       </main>
     </div>
   );

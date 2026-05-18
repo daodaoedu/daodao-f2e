@@ -32,6 +32,9 @@ export * from "./location-hooks";
 // Notification Service
 export * from "./notification";
 export * from "./notification-hooks";
+// Persona Service
+export * from "./persona";
+export * from "./persona-hooks";
 // OG Image Service
 export * from "./og-image";
 export * from "./og-image-hooks";

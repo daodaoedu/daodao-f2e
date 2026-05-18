@@ -8,7 +8,6 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { CheckInDateButton } from "./check-in-date-button";
 import type { ICheckInDateSelectorProps } from "./types";
 
-
 export const MobileCheckInDateSelector = ({
   checkInDates,
   checkIns,

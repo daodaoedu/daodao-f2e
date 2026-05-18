@@ -4281,5 +4281,34 @@
     "errors": {
       "submitFailed": "Submission failed, please try again later"
     }
+  },
+  "persona": {
+    "tabLabel": "Learning Persona",
+    "myProfile": {
+      "loading": "Loading...",
+      "empty": "No questions yet",
+      "clickToAnswer": "Click to answer",
+      "submit": "Submit",
+      "submitting": "Submitting...",
+      "submitSuccess": "Answer submitted!",
+      "submitError": "Submission failed, please try again",
+      "selectRequired": "Please select an option",
+      "textRequired": "Please fill in your answer",
+      "textPlaceholder": "Enter your answer...",
+      "resonances": "resonances"
+    },
+    "userProfile": {
+      "loading": "Loading...",
+      "noAnswer": "This user has not answered any questions yet",
+      "switchQuestion": "Try another",
+      "lockedMessage": "Answer {count} more questions to unlock"
+    },
+    "resonance": {
+      "error": "Failed to resonate, please try again"
+    },
+    "carousel": {
+      "dismiss": "Don't show today",
+      "switchQuestion": "Try another"
+    }
   }
 }
