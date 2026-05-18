@@ -2,6 +2,7 @@ import { useUserMutations } from "@daodao/api";
 import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
@@ -24,6 +25,7 @@ export default function InteractionSettingsScreen() {
       await updateCurrentUser({ isOpenProfile: value });
     } catch {
       setLocalIsOpenProfile(null);
+      Alert.alert("更新失敗", "無法更新互動設定，請稍後再試。");
     } finally {
       setIsSaving(false);
     }

@@ -4,6 +4,7 @@ import { Alert, Pressable, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { NotificationType } from "@/constants/notification-type";
+import { type ReactionTypeType, REACTION_CONFIG } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
 import {
   type INotificationApiItem,
@@ -24,6 +25,9 @@ const BACKEND_TYPE_MAP: Record<string, string> = {
   PracticeFollowed: NotificationType.followPractice,
   Connect: NotificationType.connect,
   ConnectAccepted: NotificationType.agreeConnect,
+  PracticeCheckinActivity: NotificationType.updatePracticeCheckin,
+  PartnerCheckinActivity: NotificationType.updatePracticeCheckin,
+  PracticeCreated: NotificationType.practiceCreated,
 };
 
 function normalizeType(backendType: string): string {
@@ -46,6 +50,11 @@ function getAvatarColor(name: string): string {
   return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length] ?? "#C8FFF2";
 }
 
+function getReactionEmoji(reactionType: string | undefined): string {
+  if (!reactionType) return "🙌";
+  return REACTION_CONFIG[reactionType as ReactionTypeType]?.emoji ?? "🙌";
+}
+
 function getNotificationText(item: INotificationApiItem): string {
   const type = normalizeType(item.type);
   const name = item.actor.name;
@@ -54,7 +63,7 @@ function getNotificationText(item: INotificationApiItem): string {
 
   switch (type) {
     case NotificationType.reaction:
-      return `${name}${suffix} 對你的主題實踐「${item.practiceTitle ?? ""}」給了反應`;
+      return `${name}${suffix} 對你的主題實踐「${item.practiceTitle ?? ""}」給了反應：${getReactionEmoji(item.reactionType)}`;
     case NotificationType.comment:
       return `${name} 回覆了你的主題實踐「${item.practiceTitle ?? ""}」：${item.content ?? ""}`;
     case NotificationType.followUser:
@@ -65,10 +74,16 @@ function getNotificationText(item: INotificationApiItem): string {
       return `${name} 對你發出了連結請求`;
     case NotificationType.agreeConnect:
       return `恭喜！${name} 同意了你的連結請求`;
+    case NotificationType.connectAgree:
+      return `已同意 ${name} 的連結請求`;
+    case NotificationType.connectRejected:
+      return `已忽略 ${name} 的連結請求`;
     case NotificationType.updatePracticeCheckin:
-      return `${name} 更新了主題實踐「${item.practiceTitle ?? ""}」`;
+      return `${name} 在主題實踐「${item.practiceTitle ?? ""}」打了卡${item.content ? `：${item.content}` : ""}`;
     case NotificationType.updatePracticeFinish:
       return `${name} 完成了主題實踐「${item.practiceTitle ?? ""}」`;
+    case NotificationType.practiceCreated:
+      return `${name} 發起了新的主題實踐「${item.practiceTitle ?? ""}」`;
     default:
       return `${name} 發出了一則通知`;
   }
@@ -218,6 +233,9 @@ export default function NotificationsScreen() {
   const router = useRouter();
   const { notifications, unreadCount, isLoading, mutate } = useNotifications();
   const [refreshing, setRefreshing] = useState(false);
+  const [localOverrides, setLocalOverrides] = useState<Record<number, Partial<INotificationApiItem>>>(
+    {}
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -228,6 +246,10 @@ export default function NotificationsScreen() {
   const handlePress = useCallback(
     async (item: INotificationApiItem) => {
       if (!item.isRead) {
+        setLocalOverrides((prev) => ({
+          ...prev,
+          [item.id]: { ...(prev[item.id] ?? {}), isRead: true },
+        }));
         markNotificationRead(item.id).catch(() => {});
         revalidateAllNotifications();
       }
@@ -242,21 +264,39 @@ export default function NotificationsScreen() {
 
   const handleAcceptConnect = useCallback(async (item: INotificationApiItem) => {
     if (!item.connectionRequestId) return;
+    setLocalOverrides((prev) => ({
+      ...prev,
+      [item.id]: { ...(prev[item.id] ?? {}), type: NotificationType.connectAgree, isRead: true },
+    }));
     try {
       await respondConnectionRequest(String(item.connectionRequestId), "accept");
       Alert.alert("", `你同意了 ${item.actor.name} 的連結請求！`);
       revalidateAllNotifications();
     } catch {
+      setLocalOverrides((prev) => {
+        const next = { ...prev };
+        delete next[item.id];
+        return next;
+      });
       Alert.alert("錯誤", "操作失敗，請稍後再試");
     }
   }, []);
 
   const handleRejectConnect = useCallback(async (item: INotificationApiItem) => {
     if (!item.connectionRequestId) return;
+    setLocalOverrides((prev) => ({
+      ...prev,
+      [item.id]: { ...(prev[item.id] ?? {}), type: NotificationType.connectRejected, isRead: true },
+    }));
     try {
       await respondConnectionRequest(String(item.connectionRequestId), "reject");
       revalidateAllNotifications();
     } catch {
+      setLocalOverrides((prev) => {
+        const next = { ...prev };
+        delete next[item.id];
+        return next;
+      });
       Alert.alert("錯誤", "操作失敗，請稍後再試");
     }
   }, []);
@@ -266,8 +306,12 @@ export default function NotificationsScreen() {
     revalidateAllNotifications();
   }, []);
 
-  const unread = notifications.filter((n) => !n.isRead);
-  const read = notifications.filter((n) => n.isRead);
+  const displayNotifications = notifications.map((notification) => ({
+    ...notification,
+    ...(localOverrides[notification.id] ?? {}),
+  }));
+  const unread = displayNotifications.filter((n) => !n.isRead);
+  const read = displayNotifications.filter((n) => n.isRead);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>

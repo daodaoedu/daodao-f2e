@@ -55,8 +55,15 @@ export default function ShowcaseScreen() {
 
   // ── Inspire tab render ──
   const renderShowcaseItem = useCallback(
-    ({ item }: { item: IShowcasePractice }) => <PracticeShowcaseCard practice={item} />,
-    []
+    ({ item }: { item: IShowcasePractice }) => (
+      <PracticeShowcaseCard
+        practice={item}
+        onReactionUpdated={async () => {
+          await mutate();
+        }}
+      />
+    ),
+    [mutate]
   );
 
   const renderShowcaseHeader = useCallback(

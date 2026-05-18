@@ -57,12 +57,28 @@ export default function PreferencesSettingsScreen() {
   }, [userPrefs, preferenceTypes]);
 
   const [selections, setSelections] = useState<Record<string, number[]>>({});
+  const isDirty = useMemo(
+    () => JSON.stringify(selections) !== JSON.stringify(initialSelections),
+    [initialSelections, selections]
+  );
 
   useEffect(() => {
     if (Object.keys(initialSelections).length > 0) {
       setSelections(initialSelections);
     }
   }, [initialSelections]);
+
+  const handleBack = () => {
+    if (!isDirty) {
+      router.back();
+      return;
+    }
+
+    Alert.alert("尚未儲存變更", "離開後會失去這次修改，確定要離開嗎？", [
+      { text: "繼續編輯", style: "cancel" },
+      { text: "離開", style: "destructive", onPress: () => router.back() },
+    ]);
+  };
 
   const toggleOption = useCallback(
     (typeId: string, optionId: number, maxSelections: number | null) => {
@@ -121,7 +137,7 @@ export default function PreferencesSettingsScreen() {
             size="$4"
             circular
             chromeless
-            onPress={() => router.back()}
+            onPress={handleBack}
             accessibilityLabel="返回"
           >
             <ChevronLeft size={24} color="$color" />
@@ -134,7 +150,8 @@ export default function PreferencesSettingsScreen() {
             backgroundColor={colors.primary.base}
             pressStyle={{ opacity: 0.8 }}
             onPress={handleSave}
-            disabled={isSubmitting || isLoading}
+            disabled={isSubmitting || isLoading || !isDirty}
+            opacity={isDirty ? 1 : 0.55}
           >
             <Text color={colors.basic.white} fontWeight="600" fontSize={14}>
               {isSubmitting ? "儲存中..." : "儲存"}

@@ -1,4 +1,4 @@
-import { Compass, Plus } from "@tamagui/lucide-icons";
+import { Compass, Plus, UsersRound } from "@tamagui/lucide-icons";
 import { Tabs, usePathname, useRouter } from "expo-router";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { BellIcon, HomeIcon, SettingsIcon, UserIcon } from "@/components/icons";
@@ -82,6 +82,13 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <BellIcon size={32} color={color} filled={focused} />
             ),
+          }}
+        />
+        <Tabs.Screen
+          name="social"
+          options={{
+            title: "社交",
+            tabBarIcon: ({ color }) => <UsersRound size={28} color={color} />,
           }}
         />
         <Tabs.Screen

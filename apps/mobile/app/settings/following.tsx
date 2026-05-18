@@ -10,7 +10,7 @@ import { unfollowTarget } from "@/hooks/useFollow";
 
 interface IFollowItem {
   targetType: "user" | "practice";
-  user?: { id: string; name: string; photoURL?: string; bio?: string };
+  user?: { id: string; identifier?: string; name: string; photoURL?: string; bio?: string };
   practice?: { id: string; title: string; ownerName: string; ownerPhotoURL?: string };
 }
 
@@ -119,7 +119,14 @@ export default function FollowingSettingsScreen() {
                         </Avatar>
                         <YStack flex={1}>
                           <Text fontSize={14} fontWeight="500" color="$color">
-                            {user.name}
+                            <Text
+                              fontSize={14}
+                              fontWeight="500"
+                              color="$color"
+                              onPress={() => router.push(`/users/${user.identifier ?? user.id}`)}
+                            >
+                              {user.name}
+                            </Text>
                           </Text>
                           {user.bio && (
                             <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>
@@ -177,7 +184,13 @@ export default function FollowingSettingsScreen() {
                           )}
                         </Avatar>
                         <YStack flex={1}>
-                          <Text fontSize={14} fontWeight="500" color="$color" numberOfLines={1}>
+                          <Text
+                            fontSize={14}
+                            fontWeight="500"
+                            color="$color"
+                            numberOfLines={1}
+                            onPress={() => router.push(`/practices/${practice.id}`)}
+                          >
                             {practice.title}
                           </Text>
                           <Text fontSize={12} color="$color" opacity={0.5}>

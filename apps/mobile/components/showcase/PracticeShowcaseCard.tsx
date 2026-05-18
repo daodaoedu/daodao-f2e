@@ -16,6 +16,7 @@ import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
 interface PracticeShowcaseCardProps {
   practice: IShowcasePractice;
   onMenuPress?: (practice: IShowcasePractice) => void;
+  onReactionUpdated?: () => void | Promise<void>;
 }
 
 const brewingOverlay = (
@@ -38,7 +39,11 @@ const brewingOverlay = (
   </XStack>
 );
 
-export function PracticeShowcaseCard({ practice, onMenuPress }: PracticeShowcaseCardProps) {
+export function PracticeShowcaseCard({
+  practice,
+  onMenuPress,
+  onReactionUpdated,
+}: PracticeShowcaseCardProps) {
   const handleReactionTap = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   }, []);
@@ -48,6 +53,7 @@ export function PracticeShowcaseCard({ practice, onMenuPress }: PracticeShowcase
       practice={practice}
       extraContent={practice.is_brewing ? brewingOverlay : undefined}
       onReactionTap={handleReactionTap}
+      onReactionUpdated={onReactionUpdated}
       onMenuPress={onMenuPress ? () => onMenuPress(practice) : undefined}
     />
   );

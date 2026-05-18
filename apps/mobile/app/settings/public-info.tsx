@@ -1,7 +1,8 @@
 import { useUserMutations } from "@daodao/api";
 import { Camera, ChevronLeft } from "@tamagui/lucide-icons";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -22,8 +23,10 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 export default function PublicInfoSettingsScreen() {
   const router = useRouter();
   const { user, isLoading, mutate } = useCurrentUser();
-  const { updateCurrentUser } = useUserMutations();
+  const { updateCurrentUser, updateCurrentUserWithFormData } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedPhotoUri, setSelectedPhotoUri] = useState<string | null>(null);
+  const [selectedPhotoFile, setSelectedPhotoFile] = useState<File | null>(null);
 
   const [name, setName] = useState("");
   const [customId, setCustomId] = useState("");
@@ -39,6 +42,64 @@ export default function PublicInfoSettingsScreen() {
   const [line, setLine] = useState("");
   const [threads, setThreads] = useState("");
   const [personalUrl, setPersonalUrl] = useState("");
+
+  const initialSnapshot = useMemo(() => {
+    if (!user) return null;
+    const u = user as unknown as Record<string, unknown>;
+    const contactList = (u.contactList ?? {}) as Record<string, string>;
+    return {
+      name: (u.name as string) || "",
+      customId: (u.customId as string) || "",
+      personalSlogan: (u.personalSlogan as string) || "",
+      selfIntroduction: (u.selfIntroduction as string) || "",
+      hideConnectionsCount: (u.hideConnectionsCount as boolean) ?? false,
+      facebook: contactList.facebook || "",
+      instagram: contactList.instagram || "",
+      linkedin: contactList.linkedin || "",
+      github: contactList.github || "",
+      discord: contactList.discord || "",
+      line: contactList.line || "",
+      threads: contactList.threads || "",
+      personalUrl: contactList.website || "",
+    };
+  }, [user]);
+
+  const currentSnapshot = useMemo(
+    () => ({
+      name,
+      customId,
+      personalSlogan,
+      selfIntroduction,
+      hideConnectionsCount,
+      facebook,
+      instagram,
+      linkedin,
+      github,
+      discord,
+      line,
+      threads,
+      personalUrl,
+    }),
+    [
+      customId,
+      discord,
+      facebook,
+      github,
+      hideConnectionsCount,
+      instagram,
+      line,
+      linkedin,
+      name,
+      personalSlogan,
+      personalUrl,
+      selfIntroduction,
+      threads,
+    ]
+  );
+
+  const isDirty =
+    Boolean(selectedPhotoUri) ||
+    (initialSnapshot ? JSON.stringify(initialSnapshot) !== JSON.stringify(currentSnapshot) : false);
 
   useEffect(() => {
     if (user) {
@@ -57,8 +118,51 @@ export default function PublicInfoSettingsScreen() {
       setLine(contactList.line || "");
       setThreads(contactList.threads || "");
       setPersonalUrl(contactList.website || "");
+      setSelectedPhotoUri(null);
+      setSelectedPhotoFile(null);
     }
   }, [user]);
+
+  const handleBack = () => {
+    if (!isDirty) {
+      router.back();
+      return;
+    }
+
+    Alert.alert("尚未儲存變更", "離開後會失去這次修改，確定要離開嗎？", [
+      { text: "繼續編輯", style: "cancel" },
+      { text: "離開", style: "destructive", onPress: () => router.back() },
+    ]);
+  };
+
+  const handlePickPhoto = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("需要相簿權限", "請允許存取相簿後再選擇頭像。");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.85,
+    });
+
+    if (result.canceled || !result.assets[0]) return;
+
+    const asset = result.assets[0];
+    const fileName = asset.fileName ?? `avatar-${Date.now()}.jpg`;
+    const mimeType = asset.mimeType ?? "image/jpeg";
+    const file = {
+      uri: asset.uri,
+      name: fileName,
+      type: mimeType,
+    } as unknown as File;
+
+    setSelectedPhotoUri(asset.uri);
+    setSelectedPhotoFile(file);
+  };
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -69,7 +173,7 @@ export default function PublicInfoSettingsScreen() {
     try {
       const currentCustomId =
         ((user as unknown as Record<string, unknown>)?.customId as string) || "";
-      await updateCurrentUser({
+      const jsonUpdate = {
         name,
         ...(customId !== currentCustomId ? { customId } : {}),
         personalSlogan,
@@ -85,8 +189,25 @@ export default function PublicInfoSettingsScreen() {
           threads,
           website: personalUrl,
         },
-      });
+      };
+
+      if (selectedPhotoFile) {
+        await updateCurrentUserWithFormData(
+          {
+            name,
+            ...(customId !== currentCustomId ? { customId } : {}),
+            personalSlogan,
+            selfIntroduction,
+            contactList: jsonUpdate.contactList,
+          },
+          selectedPhotoFile
+        );
+      }
+
+      await updateCurrentUser(jsonUpdate);
       await mutate();
+      setSelectedPhotoUri(null);
+      setSelectedPhotoFile(null);
       Alert.alert("成功", "公開資訊已更新", [{ text: "確定", onPress: () => router.back() }]);
     } catch {
       Alert.alert("錯誤", "更新失敗，請稍後再試");
@@ -115,7 +236,7 @@ export default function PublicInfoSettingsScreen() {
             size="$4"
             circular
             chromeless
-            onPress={() => router.back()}
+            onPress={handleBack}
             accessibilityLabel="返回"
           >
             <ChevronLeft size={24} color="$color" />
@@ -128,7 +249,8 @@ export default function PublicInfoSettingsScreen() {
             backgroundColor={colors.primary.base}
             pressStyle={{ opacity: 0.8 }}
             onPress={handleSave}
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isDirty}
+            opacity={isDirty ? 1 : 0.55}
           >
             <Text color={colors.basic.white} fontWeight="600" fontSize={14}>
               {isSubmitting ? "儲存中..." : "儲存"}
@@ -142,8 +264,8 @@ export default function PublicInfoSettingsScreen() {
             <YStack alignItems="center" gap="$3">
               <YStack position="relative">
                 <Avatar circular size="$8">
-                  {user?.photoURL ? (
-                    <Avatar.Image source={{ uri: user.photoURL }} />
+                  {selectedPhotoUri || user?.photoURL ? (
+                    <Avatar.Image source={{ uri: selectedPhotoUri ?? user?.photoURL ?? "" }} />
                   ) : (
                     <Avatar.Fallback backgroundColor={colors.primary.lighter}>
                       <Text fontSize={32} fontWeight="600" color={colors.primary.darker}>
@@ -159,6 +281,8 @@ export default function PublicInfoSettingsScreen() {
                   size="$3"
                   circular
                   backgroundColor={colors.primary.base}
+                  onPress={handlePickPhoto}
+                  accessibilityLabel="選擇頭像"
                 >
                   <Camera size={16} color={colors.basic.white} />
                 </Button>

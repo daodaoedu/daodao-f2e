@@ -234,7 +234,16 @@ export default function ConnectionsSettingsScreen() {
                             </Avatar>
                             <YStack flex={1}>
                               <Text fontSize={14} fontWeight="500" color="$color">
-                                {name}
+                                <Text
+                                  fontSize={14}
+                                  fontWeight="500"
+                                  color="$color"
+                                  onPress={() =>
+                                    router.push(`/users/${user?.identifier ?? user?.id}`)
+                                  }
+                                >
+                                  {name}
+                                </Text>
                               </Text>
                               {user?.bio && (
                                 <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>
@@ -308,7 +317,14 @@ export default function ConnectionsSettingsScreen() {
                           </Avatar>
                           <YStack flex={1}>
                             <Text fontSize={14} fontWeight="500" color="$color">
-                              {name}
+                              <Text
+                                fontSize={14}
+                                fontWeight="500"
+                                color="$color"
+                                onPress={() => router.push(`/users/${user?.identifier ?? user?.id}`)}
+                              >
+                                {name}
+                              </Text>
                             </Text>
                             <Text fontSize={12} color="$color" opacity={0.5}>
                               等待對方回應
@@ -370,7 +386,14 @@ export default function ConnectionsSettingsScreen() {
                           </Avatar>
                           <YStack flex={1}>
                             <Text fontSize={14} fontWeight="500" color="$color">
-                              {name}
+                              <Text
+                                fontSize={14}
+                                fontWeight="500"
+                                color="$color"
+                                onPress={() => router.push(`/users/${partnerId}`)}
+                              >
+                                {name}
+                              </Text>
                             </Text>
                             {partner?.bio && (
                               <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>
