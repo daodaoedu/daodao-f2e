@@ -65,7 +65,7 @@ export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
           else s.add(answerId);
           return s;
         });
-        await mutate(["/api/v1/persona/profile/{userId}"] as const);
+        await mutate(["/api/v1/persona/profile/{userId}", { params: { path: { userId: targetUserId } } }] as const);
       }
     } catch {
       toast.error(t("resonance.error"));
