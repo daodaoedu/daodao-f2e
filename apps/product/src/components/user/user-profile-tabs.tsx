@@ -24,7 +24,7 @@ export function UserProfileTabs({
 }: UserProfileTabsProps) {
   const t = useTranslations("persona");
   const tUser = useTranslations("user_profile");
-  const { data: currentUserData } = useCurrentUser();
+  const { data: currentUserData, isLoading: isCurrentUserLoading } = useCurrentUser();
   // SSR 無法可靠取得 auth cookie，改用 client-side hook 判斷是否為本人 profile
   const isOwnProfile = currentUserData?.data?.id
     ? currentUserData.data.id === targetUserId
@@ -60,7 +60,13 @@ export function UserProfileTabs({
       </TabsContent>
 
       <TabsContent value={TabEnum.Persona} className="px-0 md:px-0 lg:px-0 pt-4 md:pt-4 lg:pt-4">
-        {isOwnProfile ? (
+        {isCurrentUserLoading ? (
+          <div className="flex flex-col gap-3 py-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-xl bg-white/60 h-16 animate-pulse" />
+            ))}
+          </div>
+        ) : isOwnProfile ? (
           <PersonaProfileMe />
         ) : (
           <PersonaProfileUser targetUserId={targetUserId} />
