@@ -1,4 +1,4 @@
-import { getCurrentUser, getUserByIdentifier, getUserProfileByIdentifier } from "@daodao/api";
+import { getUserByIdentifier, getUserProfileByIdentifier } from "@daodao/api";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -17,13 +17,9 @@ import { IslandHeader, UserInfoCard, UserProfileTabs } from "@/components/user";
 // 使用 React.cache() 避免在 generateMetadata 和 page 中重複請求
 const getCachedUserByIdentifier = cache(getUserByIdentifier);
 
-// 取得當前登入使用者（用 cache 避免重複請求）
 // SSR 需手動轉發 auth_token cookie，否則 fetch 不會帶入認證資訊
-const getCachedCurrentUser = cache(async () => {
+const fetchCurrentUserSSR = cache(async (authToken: string) => {
   try {
-    const cookieStore = await cookies();
-    const authToken = cookieStore.get("auth_token")?.value;
-    if (!authToken) return null;
     const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
     const response = await fetch(`${baseUrl}/api/v1/users/me`, {
       headers: { Cookie: `auth_token=${authToken}` },
@@ -101,11 +97,15 @@ export default async function UserProfilePage({
 }: PageProps<"/[locale]/users/[identifier]">) {
   const { identifier, locale } = await params;
 
+  // 取得 auth_token cookie（需在 Server Component 內呼叫，不可放在 module-level cache 內）
+  const cookieStore = await cookies();
+  const authToken = cookieStore.get("auth_token")?.value ?? "";
+
   // 並行取得：個人檔案資料、舊版用戶資料（用於 metadata / fallback）、當前登入用戶
   const [userResponse, profileResponse, currentUserResponse] = await Promise.all([
     getCachedUserByIdentifier(identifier),
     getCachedUserProfile(identifier),
-    getCachedCurrentUser(),
+    authToken ? fetchCurrentUserSSR(authToken) : Promise.resolve(null),
   ]);
 
   // 如果請求失敗或沒有資料，顯示 404
