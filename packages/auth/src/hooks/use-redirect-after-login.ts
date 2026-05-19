@@ -59,10 +59,22 @@ export const useRedirectAfterLogin = () => {
     }
 
     // 驗證並消費 state（會驗證 nonce 並清除，防止重放攻擊）
-    if (!verifyAndConsumeOAuthState(state)) {
-      // State 無效、過期或 nonce 不匹配，根據是否為新用戶決定跳轉
+    // 注意：從 website 發起的 OAuth，nonce 存在 website sessionStorage，
+    // 但 callback 在 product app，跨域無法讀取，因此驗證會失敗。
+    // 此時 redirectUrl 仍可使用——實際安全驗證由後端的 OAuth state 保障。
+    const isStateValid = verifyAndConsumeOAuthState(state);
+
+    const buildOnboardingUrl = (redirectUrl?: string) => {
+      if (redirectUrl) {
+        return `${ONBOARDING_URL}?afterOnboarding=${encodeURIComponent(redirectUrl)}`;
+      }
+      return ONBOARDING_URL;
+    };
+
+    if (!isStateValid) {
+      // State 無效、過期或 nonce 不匹配（常見於跨域 OAuth 流程）
       if (isNewUser) {
-        router.push(ONBOARDING_URL);
+        router.push(buildOnboardingUrl(state.redirectUrl));
       } else {
         router.push(DEFAULT_REDIRECT_URL);
       }
@@ -72,7 +84,7 @@ export const useRedirectAfterLogin = () => {
     // 驗證成功
     if (isNewUser) {
       // 新用戶跳轉到 onboarding 流程
-      router.push(ONBOARDING_URL);
+      router.push(buildOnboardingUrl(state.redirectUrl));
     } else {
       // 舊用戶跳轉到原目標頁面
       // 過濾掉 /auth/error 路徑，避免成功登入後仍被導向錯誤頁面

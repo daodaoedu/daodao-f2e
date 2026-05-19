@@ -7,7 +7,7 @@ import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
 import Lottie from "lottie-react";
 import { MailIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface SuccessSectionProps {
   /** 用戶名稱，用於個人化歡迎訊息 */
@@ -21,13 +21,30 @@ interface SuccessSectionProps {
 export const SuccessSection = ({ userName }: SuccessSectionProps) => {
   const t = useTranslations("onboarding");
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL;
+  const rawAfterOnboarding = searchParams.get("afterOnboarding");
+  // 驗證 afterOnboarding 必須是自家 website 網域，防止 open redirect
+  const afterOnboarding =
+    rawAfterOnboarding && websiteUrl && rawAfterOnboarding.startsWith(websiteUrl)
+      ? rawAfterOnboarding
+      : null;
+
+  const redirectAfter = () => {
+    if (afterOnboarding) {
+      window.location.href = afterOnboarding;
+    } else {
+      router.push("/");
+    }
+  };
 
   const handleGoToPreferences = () => {
-    router.push("/");
+    redirectAfter();
   };
 
   const handleSkip = () => {
-    router.push("/");
+    redirectAfter();
   };
 
   return (
