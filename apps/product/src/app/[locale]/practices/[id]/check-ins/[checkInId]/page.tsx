@@ -7,6 +7,7 @@ import {
   useUpdatePracticeCheckIn,
 } from "@daodao/api";
 import { Deco4Svg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { useParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { addDays, format, isValid, parse } from "date-fns";
@@ -73,6 +74,7 @@ const generateFullDateRange = (
 };
 
 export default function CheckInDetailPage() {
+  const t = useTranslations("practice");
   const params = useParams();
   const practiceId = params.id as string;
   const checkInId = params.checkInId as string;
@@ -226,13 +228,13 @@ export default function CheckInDetailPage() {
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
         <PageHeader
-          title="打卡紀錄"
+          title={t("checkin_title")}
           variant="light"
           disableLightOn="mobile"
           rightActionTo={practiceDetailPath}
         />
         <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
-          <div className="text-center text-white">載入中...</div>
+          <div className="text-center text-white">{t("checkin_loading")}</div>
         </main>
       </div>
     );
@@ -244,13 +246,13 @@ export default function CheckInDetailPage() {
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
         <PageHeader
-          title="打卡紀錄"
+          title={t("checkin_title")}
           variant="light"
           disableLightOn="mobile"
           rightActionTo={practiceDetailPath}
         />
         <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
-          <div className="text-center text-white">找不到打卡記錄</div>
+          <div className="text-center text-white">{t("checkin_not_found")}</div>
         </main>
       </div>
     );
@@ -275,10 +277,10 @@ export default function CheckInDetailPage() {
         media: data.media,
         existingImageUrls: data.existingImageUrls,
       });
-      toast.success("打卡已更新");
+      toast.success(t("checkin_updated"));
     } catch (error) {
       console.error("更新打卡失敗:", error);
-      toast.error("更新打卡失敗，請稍後再試");
+      toast.error(t("checkin_update_failed"));
       throw error;
     }
   };
@@ -294,13 +296,13 @@ export default function CheckInDetailPage() {
         activeCheckInId={checkInId}
         activeDate={activeCheckInDate}
         practiceId={practiceId}
-        title="打卡紀錄"
+        title={t("checkin_title")}
         closeActionTo={practiceDetailPath}
       />
 
       {/* Desktop 版本的標題列 */}
       <div className="hidden md:block">
-        <PageHeader title="打卡紀錄" variant="light" rightActionTo={practiceDetailPath} />
+        <PageHeader title={t("checkin_title")} variant="light" rightActionTo={practiceDetailPath} />
       </div>
 
       <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">

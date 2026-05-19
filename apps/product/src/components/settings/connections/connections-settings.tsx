@@ -6,6 +6,7 @@ import {
   useIncomingConnectionRequests,
   useOutgoingConnectionRequests,
 } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -13,6 +14,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 
 export const ConnectionsSettings = () => {
+  const t = useTranslations("account_settings");
   const { data: incomingData, isLoading: loadingIncoming } = useIncomingConnectionRequests();
   const { data: outgoingData, isLoading: loadingOutgoing } = useOutgoingConnectionRequests();
   const { data: connectionsData, isLoading: loadingConnections } = useConnections();
@@ -26,72 +28,72 @@ export const ConnectionsSettings = () => {
   const connections = connectionsData?.data ?? [];
 
   if (isLoading) {
-    return <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">載入中...</div>;
+    return <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">{t("loading")}</div>;
   }
 
   const handleAccept = async (requestId: string, name: string) => {
     try {
       await accept(requestId);
-      toast.success(`已與 ${name} 成為夥伴`);
+      toast.success(t("conn_accept_success", { name }));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "操作失敗，請稍後再試");
+      toast.error(err instanceof Error ? err.message : t("operation_failed"));
     }
   };
 
   const handleIgnore = async (requestId: string, name: string) => {
     const result = await openWarningDialog({
-      title: "忽略連結請求？",
-      message: `確定要忽略來自 ${name} 的連結請求嗎？`,
+      title: t("conn_ignore_title"),
+      message: t("conn_ignore_message", { name }),
       textAlign: "left",
       buttons: [
-        { label: "忽略", value: "confirm", variant: "outline" },
-        { label: "先不要", value: "cancel", variant: "orange" },
+        { label: t("conn_ignore_confirm"), value: "confirm", variant: "outline" },
+        { label: t("conn_cancel_btn"), value: "cancel", variant: "orange" },
       ],
     });
     if (result.value !== "confirm") return;
     try {
       await ignore(requestId);
-      toast.success("已忽略連結請求");
+      toast.success(t("conn_ignore_success"));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "操作失敗，請稍後再試");
+      toast.error(err instanceof Error ? err.message : t("operation_failed"));
     }
   };
 
   const handleWithdraw = async (requestId: string, name: string) => {
     const result = await openWarningDialog({
-      title: "撤回連結請求？",
-      message: `確定要撤回發給 ${name} 的連結請求嗎？`,
+      title: t("conn_withdraw_title"),
+      message: t("conn_withdraw_message", { name }),
       textAlign: "left",
       buttons: [
-        { label: "撤回", value: "confirm", variant: "outline" },
-        { label: "先不要", value: "cancel", variant: "orange" },
+        { label: t("conn_withdraw_confirm"), value: "confirm", variant: "outline" },
+        { label: t("conn_cancel_btn"), value: "cancel", variant: "orange" },
       ],
     });
     if (result.value !== "confirm") return;
     try {
       await withdraw(requestId);
-      toast.success("已撤回連結請求");
+      toast.success(t("conn_withdraw_success"));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "操作失敗，請稍後再試");
+      toast.error(err instanceof Error ? err.message : t("operation_failed"));
     }
   };
 
   const handleDisconnect = async (userId: string, name: string) => {
     const result = await openWarningDialog({
-      title: "解除連結？",
-      message: `解除連結後，你與 ${name} 將失去對彼此非公開內容的存取權。`,
+      title: t("conn_disconnect_title"),
+      message: t("conn_disconnect_message", { name }),
       textAlign: "left",
       buttons: [
-        { label: "解除連結", value: "confirm", variant: "outline" },
-        { label: "先不要", value: "cancel", variant: "orange" },
+        { label: t("conn_disconnect_confirm"), value: "confirm", variant: "outline" },
+        { label: t("conn_cancel_btn"), value: "cancel", variant: "orange" },
       ],
     });
     if (result.value !== "confirm") return;
     try {
       await disconnect(userId);
-      toast.success(`已解除與 ${name} 的連結`);
+      toast.success(t("conn_disconnect_success", { name }));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "操作失敗，請稍後再試");
+      toast.error(err instanceof Error ? err.message : t("operation_failed"));
     }
   };
 
@@ -102,13 +104,13 @@ export const ConnectionsSettings = () => {
       {/* ── 待處理請求 ── */}
       {hasPending && (
         <section className="flex flex-col gap-2">
-          <h2 className="text-xs font-medium text-[#9FB5B8] px-1">待處理請求</h2>
+          <h2 className="text-xs font-medium text-[#9FB5B8] px-1">{t("conn_pending_section")}</h2>
 
           {/* 收到的 */}
           {incomingRequests.length > 0 && (
             <div className="flex flex-col gap-2">
               {incomingRequests.map((req) => {
-                const name = req.requesterNickname || "用戶";
+                const name = req.requesterNickname || t("default_user");
                 return (
                   <div key={req.requestId} className="bg-white rounded-lg p-3 flex flex-col gap-3">
                     <div className="flex items-center gap-3">
@@ -142,7 +144,7 @@ export const ConnectionsSettings = () => {
                         onClick={() => handleAccept(String(req.requestId), name)}
                         className="flex-1 h-8 text-xs cursor-pointer bg-logo-cyan hover:bg-logo-cyan/90 text-white"
                       >
-                        接受
+                        {t("conn_accept_btn")}
                       </Button>
                       <Button
                         variant="outline"
@@ -150,7 +152,7 @@ export const ConnectionsSettings = () => {
                         onClick={() => handleIgnore(String(req.requestId), name)}
                         className="flex-1 h-8 text-xs cursor-pointer"
                       >
-                        忽略
+                        {t("conn_ignore_confirm")}
                       </Button>
                     </div>
                   </div>
@@ -163,7 +165,7 @@ export const ConnectionsSettings = () => {
           {outgoingRequests.length > 0 && (
             <div className="flex flex-col gap-2">
               {outgoingRequests.map((req) => {
-                const name = req.receiverNickname || "用戶";
+                const name = req.receiverNickname || t("default_user");
                 return (
                   <div
                     key={req.requestId}
@@ -184,7 +186,7 @@ export const ConnectionsSettings = () => {
                       >
                         {name}
                       </CustomLink>
-                      <p className="text-xs text-[#9FB5B8]">等待對方回應</p>
+                      <p className="text-xs text-[#9FB5B8]">{t("conn_waiting_response")}</p>
                     </div>
                     <Button
                       variant="outline"
@@ -192,7 +194,7 @@ export const ConnectionsSettings = () => {
                       onClick={() => handleWithdraw(String(req.requestId), name)}
                       className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                     >
-                      撤回
+                      {t("conn_withdraw_confirm")}
                     </Button>
                   </div>
                 );
@@ -205,14 +207,14 @@ export const ConnectionsSettings = () => {
       {/* ── 已連結的夥伴 ── */}
       <section className="flex flex-col gap-2">
         <h2 className="text-xs font-medium text-[#9FB5B8] px-1">
-          已連結的夥伴 {connections.length > 0 && `· ${connections.length} 人`}
+          {t("conn_connected_section")} {connections.length > 0 && `· ${connections.length} ${t("conn_people_count")}`}
         </h2>
         {connections.length === 0 ? (
-          <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未與任何人建立連結</div>
+          <div className="text-center py-12 text-[#9FB5B8] text-sm">{t("conn_empty")}</div>
         ) : (
           <div className="flex flex-col gap-2">
             {connections.map((conn) => {
-              const name = conn.nickname || "用戶";
+              const name = conn.nickname || t("default_user");
               return (
                 <div
                   key={conn.connectionId}
@@ -240,7 +242,7 @@ export const ConnectionsSettings = () => {
                     onClick={() => handleDisconnect(conn.externalId, name)}
                     className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                   >
-                    解除連結
+                    {t("conn_disconnect_confirm")}
                   </Button>
                 </div>
               );
