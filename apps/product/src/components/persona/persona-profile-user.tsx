@@ -9,7 +9,7 @@ import {
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { useEffect, useState } from "react";
 
 function getResonanceClass(isResonating: boolean, hasResonated: boolean): string {
@@ -24,12 +24,13 @@ interface PersonaProfileUserProps {
 
 export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
   const t = useTranslations("persona");
+  const locale = useLocale();
   const mutate = useMutate();
   const [excludeId, setExcludeId] = useState<number | undefined>(undefined);
   const [resonatingIds, setResonatingIds] = useState<Set<number>>(new Set());
   const [resonatedIds, setResonatedIds] = useState<Set<number>>(new Set());
 
-  const { data, isLoading } = usePersonaProfileUser(targetUserId, { exclude: excludeId });
+  const { data, isLoading } = usePersonaProfileUser(targetUserId, { exclude: excludeId, locale });
 
   const questions = data?.data?.questions ?? [];
   const viewerIsLocked = data?.data?.viewerIsLocked ?? true;

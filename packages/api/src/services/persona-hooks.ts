@@ -11,21 +11,30 @@ import { useQuery } from "../hooks";
 // Query Hooks
 // ============================================================================
 
-export const usePersonaQuestions = () => {
-  return useQuery("/api/v1/persona/questions", {});
-};
-
-export const usePersonaCarouselState = (replace?: number) => {
-  return useQuery("/api/v1/persona/carousel-state", {
-    params: { query: replace != null ? { replace } : undefined },
+export const usePersonaQuestions = (locale?: string) => {
+  return useQuery("/api/v1/persona/questions", {
+    params: { query: locale ? { locale } : undefined },
   });
 };
 
-export const usePersonaProfileMe = () => {
-  return useQuery("/api/v1/persona/profile/me", {});
+export const usePersonaCarouselState = (replace?: number, locale?: string) => {
+  return useQuery("/api/v1/persona/carousel-state", {
+    params: {
+      query: {
+        ...(replace != null ? { replace } : {}),
+        ...(locale ? { locale } : {}),
+      },
+    },
+  });
 };
 
-export const usePersonaProfileUser = (userId: string, options?: { exclude?: number; enabled?: boolean }) => {
+export const usePersonaProfileMe = (locale?: string) => {
+  return useQuery("/api/v1/persona/profile/me", {
+    params: { query: locale ? { locale } : undefined },
+  });
+};
+
+export const usePersonaProfileUser = (userId: string, options?: { exclude?: number; enabled?: boolean; locale?: string }) => {
   const enabled = options?.enabled ?? true;
   return useQuery(
     "/api/v1/persona/profile/{userId}",
@@ -33,7 +42,10 @@ export const usePersonaProfileUser = (userId: string, options?: { exclude?: numb
       ? {
           params: {
             path: { userId },
-            query: options?.exclude != null ? { exclude: options.exclude } : undefined,
+            query: {
+              ...(options?.exclude != null ? { exclude: options.exclude } : {}),
+              ...(options?.locale ? { locale: options.locale } : {}),
+            },
           },
         }
       : null,

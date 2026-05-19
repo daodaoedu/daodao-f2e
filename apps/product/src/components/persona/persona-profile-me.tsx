@@ -5,7 +5,7 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { useState } from "react";
 
 interface InlineAnswerFormProps {
@@ -99,7 +99,8 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
 
 export function PersonaProfileMe() {
   const t = useTranslations("persona");
-  const { data, isLoading } = usePersonaProfileMe();
+  const locale = useLocale();
+  const { data, isLoading } = usePersonaProfileMe(locale);
   const mutate = useMutate();
   const [expandedId, setExpandedId] = useState<number | null>(null);
 

@@ -35,8 +35,10 @@ export type GetProfileUserResponse =
 // Client Functions
 // ============================================================================
 
-export const getPersonaQuestions = async () => {
-  return client.GET("/api/v1/persona/questions");
+export const getPersonaQuestions = async (locale?: string) => {
+  return client.GET("/api/v1/persona/questions", {
+    params: { query: locale ? { locale } : undefined },
+  });
 };
 
 export const submitPersonaAnswer = async (body: SubmitPersonaAnswerBody) => {
@@ -57,9 +59,14 @@ export const removePersonaResonance = async (answerId: number) => {
   });
 };
 
-export const getPersonaCarouselState = async (replace?: number) => {
+export const getPersonaCarouselState = async (replace?: number, locale?: string) => {
   return client.GET("/api/v1/persona/carousel-state", {
-    params: { query: replace != null ? { replace } : undefined },
+    params: {
+      query: {
+        ...(replace != null ? { replace } : {}),
+        ...(locale ? { locale } : {}),
+      },
+    },
   });
 };
 
@@ -67,15 +74,20 @@ export const dismissPersonaCarousel = async () => {
   return client.POST("/api/v1/persona/carousel-dismiss");
 };
 
-export const getPersonaProfileMe = async () => {
-  return client.GET("/api/v1/persona/profile/me");
+export const getPersonaProfileMe = async (locale?: string) => {
+  return client.GET("/api/v1/persona/profile/me", {
+    params: { query: locale ? { locale } : undefined },
+  });
 };
 
-export const getPersonaProfileUser = async (userId: string, exclude?: number) => {
+export const getPersonaProfileUser = async (userId: string, exclude?: number, locale?: string) => {
   return client.GET("/api/v1/persona/profile/{userId}", {
     params: {
       path: { userId },
-      query: exclude != null ? { exclude } : undefined,
+      query: {
+        ...(exclude != null ? { exclude } : {}),
+        ...(locale ? { locale } : {}),
+      },
     },
   });
 };

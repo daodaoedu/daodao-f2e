@@ -15,7 +15,7 @@ import {
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { useState } from "react";
 
 interface CarouselQuestionCardProps {
@@ -128,11 +128,12 @@ function CarouselQuestionCard({
 export function ResonanceCarousel() {
   const t = useTranslations("persona.carousel");
   const tProfile = useTranslations("persona.myProfile");
+  const locale = useLocale();
   const mutate = useMutate();
   const [replaceId, setReplaceId] = useState<number | undefined>(undefined);
   const [dismissing, setDismissing] = useState(false);
 
-  const { data, isLoading } = usePersonaCarouselState(replaceId);
+  const { data, isLoading } = usePersonaCarouselState(replaceId, locale);
 
   const shouldShow = data?.data?.shouldShow;
   const questions = data?.data?.questions ?? [];
