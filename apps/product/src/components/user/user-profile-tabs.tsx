@@ -41,19 +41,19 @@ export function UserProfileTabs({
   return (
     <Tabs value={currentTab} onValueChange={handleTabChange} className="mt-4">
       <TabsList className="w-full">
-        <TabsTrigger value={TabEnum.Practice} className="flex-1">
+        <TabsTrigger value={TabEnum.Practice} className="flex-1 data-[state=inactive]:text-basic-400">
           {tUser("tab_practices")}
         </TabsTrigger>
-        <TabsTrigger value={TabEnum.Persona} className="flex-1">
+        <TabsTrigger value={TabEnum.Persona} className="flex-1 data-[state=inactive]:text-basic-400">
           {t("tabLabel")}
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value={TabEnum.Practice}>
+      <TabsContent value={TabEnum.Practice} className="px-0 md:px-0 lg:px-0 pt-4 md:pt-4 lg:pt-4">
         <PracticeSection userId={targetUserId} />
       </TabsContent>
 
-      <TabsContent value={TabEnum.Persona}>
+      <TabsContent value={TabEnum.Persona} className="px-0 md:px-0 lg:px-0 pt-4 md:pt-4 lg:pt-4">
         {isOwnProfile ? (
           <PersonaProfileMe />
         ) : (
