@@ -1,5 +1,6 @@
 "use client";
 
+import { useCurrentUser } from "@daodao/api";
 import { usePathname, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
 import { useTranslations } from "@daodao/i18n";
@@ -19,10 +20,15 @@ interface UserProfileTabsProps {
 
 export function UserProfileTabs({
   targetUserId,
-  isOwnProfile,
+  isOwnProfile: isOwnProfileFromServer,
 }: UserProfileTabsProps) {
   const t = useTranslations("persona");
   const tUser = useTranslations("user_profile");
+  const { data: currentUserData } = useCurrentUser();
+  // SSR 無法可靠取得 auth cookie，改用 client-side hook 判斷是否為本人 profile
+  const isOwnProfile = currentUserData?.data?.id
+    ? currentUserData.data.id === targetUserId
+    : isOwnProfileFromServer;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
