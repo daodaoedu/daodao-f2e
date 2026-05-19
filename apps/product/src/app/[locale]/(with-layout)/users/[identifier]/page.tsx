@@ -1,5 +1,6 @@
 import { getCurrentUser, getUserByIdentifier, getUserProfileByIdentifier } from "@daodao/api";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { IslandHeader, UserInfoCard, UserProfileTabs } from "@/components/user";
@@ -17,9 +18,20 @@ import { IslandHeader, UserInfoCard, UserProfileTabs } from "@/components/user";
 const getCachedUserByIdentifier = cache(getUserByIdentifier);
 
 // 取得當前登入使用者（用 cache 避免重複請求）
+// SSR 需手動轉發 auth_token cookie，否則 fetch 不會帶入認證資訊
 const getCachedCurrentUser = cache(async () => {
   try {
-    return await getCurrentUser();
+    const cookieStore = await cookies();
+    const authToken = cookieStore.get("auth_token")?.value;
+    if (!authToken) return null;
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
+    const response = await fetch(`${baseUrl}/api/v1/users/me`, {
+      headers: { Cookie: `auth_token=${authToken}` },
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    const body = await response.json();
+    return { data: body };
   } catch {
     return null;
   }
