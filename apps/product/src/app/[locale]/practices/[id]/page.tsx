@@ -59,7 +59,6 @@ interface IApiCommentNode {
   replies?: unknown[];
 }
 
-
 interface IPracticeDetailData {
   title: string;
   actionDescription: string;
@@ -312,15 +311,13 @@ export default function PracticeDetailPage() {
       return [];
     }
 
-    return rawCandidates
-      .filter(isMentionCandidateWithNumericId)
-      .map((candidate) => ({
-        userId: candidate.userId,
-        numericUserId: candidate.numericUserId,
-        name: candidate.name,
-        photoURL: candidate.photoURL ?? undefined,
-        customId: candidate.customId ?? undefined,
-      }));
+    return rawCandidates.filter(isMentionCandidateWithNumericId).map((candidate) => ({
+      userId: candidate.userId,
+      numericUserId: candidate.numericUserId,
+      name: candidate.name,
+      photoURL: candidate.photoURL ?? undefined,
+      customId: candidate.customId ?? undefined,
+    }));
   }, [mentionCandidatesData]);
 
   const { previousPracticeId, nextPracticeId, hasPrevious, hasNext } = useMemo(() => {

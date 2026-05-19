@@ -4304,5 +4304,40 @@
         "B": "Complete all three sections: public info, account settings, and preferences"
       }
     }
+  },
+  "persona": {
+    "tabLabel": "Learning Persona",
+    "myProfile": {
+      "loading": "Loading...",
+      "empty": "No questions yet",
+      "clickToAnswer": "Answer",
+      "progress": "Answered {answered}/{total}",
+      "startPrompt": "Click any question to start building your learner persona",
+      "showMore": "Show {count} more",
+      "showLess": "Show less",
+      "submit": "Submit",
+      "submitting": "Submitting...",
+      "submitSuccess": "Answer submitted!",
+      "submitError": "Submission failed, please try again",
+      "selectRequired": "Please select an option",
+      "textRequired": "Please fill in your answer",
+      "textPlaceholder": "Enter your answer...",
+      "resonances": "resonances"
+    },
+    "userProfile": {
+      "loading": "Loading...",
+      "noAnswer": "This user has not answered any questions yet",
+      "switchQuestion": "Try another",
+      "lockedMessage": "Answer {count} more questions to unlock"
+    },
+    "resonance": {
+      "error": "Failed to resonate, please try again"
+    },
+    "carousel": {
+      "title": "Learning Persona",
+      "dismiss": "Don't show today",
+      "switchQuestion": "Try another",
+      "error": "Operation failed, please try again"
+    }
   }
 }
