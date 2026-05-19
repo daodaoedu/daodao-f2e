@@ -16,7 +16,7 @@ export function ActionMakerTopic() {
     dispatch({ type: "SET_TOPIC", payload: topic.trim() });
     dispatch({ type: "SET_SELECTED_TAGS", payload: [] });
     dispatch({ type: "SET_ACTIONS", payload: [] });
-    navigateTo("/action-maker/actions");
+    navigateTo("/action-maker/nickname");
   };
 
   const handleInspiration = () => {
