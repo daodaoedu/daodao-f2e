@@ -214,7 +214,7 @@ export default function TemplateDetailPage() {
         const errorMessage =
           response.error && typeof response.error === "object" && "message" in response.error
             ? String(response.error.message)
-            : t("practice.create_failed");
+            : t("create_failed");
         console.error("Failed to create practice:", errorMessage);
         toast.error(errorMessage);
         setIsSubmitting(false);
@@ -239,7 +239,7 @@ export default function TemplateDetailPage() {
         );
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t("practice.create_failed_retry");
+      const errorMessage = err instanceof Error ? err.message : t("create_failed_retry");
       console.error("Failed to create practice:", err);
       toast.error(errorMessage);
       setIsSubmitting(false);
@@ -295,7 +295,7 @@ export default function TemplateDetailPage() {
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <PageHeader leftAction="back" leftLabel="" variant="light" />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-5">
-          <p className="text-white mb-4">{t("practice.template_load_error")}</p>
+          <p className="text-white mb-4">{t("template_load_error")}</p>
         </div>
       </div>
     );
@@ -313,7 +313,7 @@ export default function TemplateDetailPage() {
         <div className="py-4">
           <div className="max-w-[448px] mx-auto px-5">
             <Badge variant="secondary" size="sm" className="text-xs md:text-sm mb-2">
-              {t("practice.create_title")}
+              {t("create_title")}
             </Badge>
             <div className="flex md:flex-col md:gap-3">
               <div className="flex flex-1 items-start gap-1">
@@ -338,7 +338,7 @@ export default function TemplateDetailPage() {
                     ) : (
                       <Loader className="size-4.5 animate-spin" />
                     )}
-                    {t("practice.template_swap")}
+                    {t("template_swap")}
                   </Button>
                 </div>
               </div>
@@ -357,7 +357,7 @@ export default function TemplateDetailPage() {
                   ) : (
                     <Loader className="size-4.5 animate-spin" />
                   )}
-                  {t("practice.template_swap")}
+                  {t("template_swap")}
                 </Button>
               </div>
             </div>
@@ -400,7 +400,7 @@ export default function TemplateDetailPage() {
             {Array.isArray(template.resources) && template.resources.length > 0 && (
               <div>
                 <h2 className="text-sm text-center font-medium text-white mt-4 mb-3.5">
-                  {t("practice.template_resources_title")}
+                  {t("template_resources_title")}
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
                   {template.resources?.map((resource) => (
@@ -435,11 +435,11 @@ export default function TemplateDetailPage() {
             {isSubmitting ? (
               <>
                 <Loader className="size-4.5 animate-spin" />
-                {t("practice.template_creating")}
+                {t("template_creating")}
               </>
             ) : (
               <>
-                {t("practice.template_looks_good")}
+                {t("template_looks_good")}
                 <ArrowRightOutlineSvg className="size-4.5" />
               </>
             )}

@@ -228,13 +228,13 @@ export default function CheckInDetailPage() {
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
         <PageHeader
-          title={t("practice.checkin_title")}
+          title={t("checkin_title")}
           variant="light"
           disableLightOn="mobile"
           rightActionTo={practiceDetailPath}
         />
         <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
-          <div className="text-center text-white">{t("practice.checkin_loading")}</div>
+          <div className="text-center text-white">{t("checkin_loading")}</div>
         </main>
       </div>
     );
@@ -246,13 +246,13 @@ export default function CheckInDetailPage() {
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
         <PageHeader
-          title={t("practice.checkin_title")}
+          title={t("checkin_title")}
           variant="light"
           disableLightOn="mobile"
           rightActionTo={practiceDetailPath}
         />
         <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
-          <div className="text-center text-white">{t("practice.checkin_not_found")}</div>
+          <div className="text-center text-white">{t("checkin_not_found")}</div>
         </main>
       </div>
     );
@@ -277,10 +277,10 @@ export default function CheckInDetailPage() {
         media: data.media,
         existingImageUrls: data.existingImageUrls,
       });
-      toast.success(t("practice.checkin_updated"));
+      toast.success(t("checkin_updated"));
     } catch (error) {
       console.error("更新打卡失敗:", error);
-      toast.error(t("practice.checkin_update_failed"));
+      toast.error(t("checkin_update_failed"));
       throw error;
     }
   };
@@ -296,13 +296,13 @@ export default function CheckInDetailPage() {
         activeCheckInId={checkInId}
         activeDate={activeCheckInDate}
         practiceId={practiceId}
-        title={t("practice.checkin_title")}
+        title={t("checkin_title")}
         closeActionTo={practiceDetailPath}
       />
 
       {/* Desktop 版本的標題列 */}
       <div className="hidden md:block">
-        <PageHeader title={t("practice.checkin_title")} variant="light" rightActionTo={practiceDetailPath} />
+        <PageHeader title={t("checkin_title")} variant="light" rightActionTo={practiceDetailPath} />
       </div>
 
       <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">

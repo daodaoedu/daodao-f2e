@@ -17,15 +17,21 @@ import {
   useRecordView,
 } from "@daodao/api";
 import type { MentionCandidate } from "@daodao/features-mention";
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
-import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
-import { zhTW } from "date-fns/locale";
+import { format, isValid, parseISO } from "date-fns";
 import { X } from "lucide-react";
 import { useCallback, useEffect, useMemo } from "react";
 import { CheckInButton } from "@/components/check-in";
-import type { IComment, ICommentReply } from "@/components/check-in/reactions";
+import {
+  type CommentFormatOptions,
+  formatCommentTime,
+  getDateFnsLocale,
+  isApiCommentNode,
+  mapComment,
+} from "@/components/check-in/display/check-in-detail";
+import type { IComment } from "@/components/check-in/reactions";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeDetailShell } from "@/components/practice";
 import { applyOnboardingUpdateFromResponse } from "@/components/task-guide/onboarding-progress-context";
@@ -43,23 +49,6 @@ import {
   useArchivePracticeDialog,
 } from "@/hooks/use-archive-practice-dialog";
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
-
-interface IApiCommentUser {
-  id?: string;
-  name?: string;
-  photoURL?: string | null;
-  customId?: string | null;
-}
-
-interface IApiCommentNode {
-  id: number | string;
-  content?: string;
-  createdAt?: string;
-  user?: IApiCommentUser;
-  userId?: number;
-  replies?: unknown[];
-}
-
 
 interface IPracticeDetailData {
   title: string;
@@ -99,18 +88,6 @@ function getErrorMessage(error: unknown, fallbackMessage: string): string {
   return fallbackMessage;
 }
 
-function isApiCommentNode(comment: unknown): comment is IApiCommentNode {
-  if (typeof comment !== "object" || comment === null) {
-    return false;
-  }
-
-  if (!("id" in comment)) {
-    return false;
-  }
-
-  return true;
-}
-
 function isMentionCandidateWithNumericId(
   candidate: unknown
 ): candidate is MentionCandidate & { numericUserId: number } {
@@ -124,56 +101,6 @@ function isMentionCandidateWithNumericId(
     typeof candidate.numericUserId === "number" &&
     typeof candidate.name === "string"
   );
-}
-
-function formatCommentTime(createdAt?: string): string {
-  if (!createdAt) {
-    return "";
-  }
-
-  const parsedDate = parseISO(createdAt);
-  if (!isValid(parsedDate)) {
-    return "";
-  }
-
-  return formatDistanceToNow(parsedDate, {
-    addSuffix: true,
-    locale: zhTW,
-  });
-}
-
-function mapReply(reply: IApiCommentNode): ICommentReply {
-  return {
-    id: String(reply.id),
-    author: {
-      name: reply.user?.name || "",
-      photoURL: reply.user?.photoURL || undefined,
-      userId: reply.user?.id || undefined,
-      numericUserId: reply.userId ?? undefined,
-      customId: reply.user?.customId ?? undefined,
-    },
-    content: reply.content || "",
-    time: formatCommentTime(reply.createdAt),
-  };
-}
-
-function mapComment(comment: IApiCommentNode): IComment {
-  const rawReplies = Array.isArray(comment.replies) ? comment.replies : [];
-  const mappedReplies = rawReplies.filter(isApiCommentNode).map(mapReply);
-
-  return {
-    id: String(comment.id),
-    author: {
-      name: comment.user?.name || "",
-      photoURL: comment.user?.photoURL || undefined,
-      userId: comment.user?.id || undefined,
-      numericUserId: comment.userId ?? undefined,
-      customId: comment.user?.customId ?? undefined,
-    },
-    content: comment.content || "",
-    time: formatCommentTime(comment.createdAt),
-    replies: mappedReplies,
-  };
 }
 
 function getCurrentUserPhotoURL(currentUser: unknown): string | undefined {
@@ -194,6 +121,15 @@ function getCurrentUserPhotoURL(currentUser: unknown): string | undefined {
 
 export default function PracticeDetailPage() {
   const t = useTranslations("practice");
+  const locale = useLocale();
+  const commentOptions = useMemo<CommentFormatOptions>(
+    () => ({
+      anonymousLabel: t("anonymous_user"),
+      justNowLabel: t("just_now"),
+      locale: getDateFnsLocale(locale),
+    }),
+    [t, locale]
+  );
   const router = useRouter();
   const params = useParams();
   const practiceId = params.id as string;
@@ -305,8 +241,10 @@ export default function PracticeDetailPage() {
       return [];
     }
 
-    return rawComments.filter(isApiCommentNode).map((comment) => mapComment(comment));
-  }, [commentsData]);
+    return rawComments.filter(isApiCommentNode).map((comment) =>
+      mapComment(comment, commentOptions)
+    );
+  }, [commentsData, commentOptions]);
 
   const mentionCandidates = useMemo<MentionCandidate[]>(() => {
     const rawCandidates = (mentionCandidatesData as { data?: unknown[] } | undefined)?.data;
@@ -358,9 +296,9 @@ export default function PracticeDetailPage() {
       onRestore: async () => {
         try {
           await restorePractice();
-          toast.success(t("practice.restore_success"));
+          toast.success(t("restore_success"));
         } catch (restoreError) {
-          const errorMessage = restoreError instanceof Error ? restoreError.message : t("practice.restore_failed");
+          const errorMessage = restoreError instanceof Error ? restoreError.message : t("restore_failed");
           console.error("Failed to restore practice:", errorMessage);
           toast.error(errorMessage);
         }
@@ -372,7 +310,7 @@ export default function PracticeDetailPage() {
         await archivePractice();
         router.push("/settings/archived");
       } catch (archiveError) {
-        const errorMessage = archiveError instanceof Error ? archiveError.message : t("practice.archive_failed");
+        const errorMessage = archiveError instanceof Error ? archiveError.message : t("archive_failed");
         console.error("Failed to archive practice:", errorMessage);
         toast.error(errorMessage);
       }
@@ -386,7 +324,7 @@ export default function PracticeDetailPage() {
         await deletePracticeById();
         router.push("/");
       } catch (deleteError) {
-        const errorMessage = deleteError instanceof Error ? deleteError.message : t("practice.delete_failed");
+        const errorMessage = deleteError instanceof Error ? deleteError.message : t("delete_failed");
         console.error("Failed to delete practice:", errorMessage);
         toast.error(errorMessage);
       }
@@ -405,13 +343,13 @@ export default function PracticeDetailPage() {
       });
 
       if (response.error) {
-        const errorMessage = getErrorMessage(response.error, t("practice.comment_failed"));
+        const errorMessage = getErrorMessage(response.error, t("comment_failed"));
         console.error("Failed to create comment:", errorMessage);
         toast.error(errorMessage);
         return;
       }
 
-      toast.success(t("practice.comment_success"));
+      toast.success(t("comment_success"));
       await Promise.all([mutateComments(), mutatePractice()]);
     },
     [mutateComments, mutatePractice, practiceId]
@@ -421,7 +359,7 @@ export default function PracticeDetailPage() {
     async (commentId: string, content: string, mentionedUserIds?: number[]) => {
       const parsedCommentId = Number(commentId);
       if (!Number.isFinite(parsedCommentId)) {
-        toast.error(t("practice.comment_id_invalid"));
+        toast.error(t("comment_id_invalid"));
         return false;
       }
 
@@ -430,7 +368,7 @@ export default function PracticeDetailPage() {
         mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
       });
       if (response.error) {
-        const errorMessage = getErrorMessage(response.error, t("practice.update_comment_failed"));
+        const errorMessage = getErrorMessage(response.error, t("update_comment_failed"));
         console.error("Failed to update comment:", errorMessage);
         toast.error(errorMessage);
         return false;
@@ -446,13 +384,13 @@ export default function PracticeDetailPage() {
     async (commentId: string) => {
       const parsedCommentId = Number(commentId);
       if (!Number.isFinite(parsedCommentId)) {
-        toast.error(t("practice.comment_id_invalid"));
+        toast.error(t("comment_id_invalid"));
         return false;
       }
 
       const response = await deleteComment(parsedCommentId);
       if (response.error) {
-        const errorMessage = getErrorMessage(response.error, t("practice.delete_comment_failed"));
+        const errorMessage = getErrorMessage(response.error, t("delete_comment_failed"));
         console.error("Failed to delete comment:", errorMessage);
         toast.error(errorMessage);
         return false;
@@ -472,14 +410,14 @@ export default function PracticeDetailPage() {
             type="button"
             onClick={() => router.replace("/?tab=mine")}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
-            aria-label={t("practice.close")}
+            aria-label={t("close")}
           >
             <X className="size-6" />
           </button>
         </div>
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
-          <div className="text-center text-text-dark">{t("practice.loading")}</div>
+          <div className="text-center text-text-dark">{t("loading")}</div>
         </main>
       </div>
     );
@@ -493,7 +431,7 @@ export default function PracticeDetailPage() {
             type="button"
             onClick={() => router.replace("/?tab=mine")}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
-            aria-label={t("practice.close")}
+            aria-label={t("close")}
           >
             <X className="size-6" />
           </button>
@@ -501,7 +439,7 @@ export default function PracticeDetailPage() {
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">
-            {error ? t("practice.load_failed") : t("practice.not_found")}
+            {error ? t("load_failed") : t("not_found")}
           </div>
         </main>
       </div>
@@ -523,7 +461,7 @@ export default function PracticeDetailPage() {
           type="button"
           onClick={() => router.replace("/?tab=mine")}
           className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
-          aria-label={t("practice.close")}
+          aria-label={t("close")}
         >
           <X className="size-6" />
         </button>
@@ -588,7 +526,7 @@ export default function PracticeDetailPage() {
             id: item.userId,
             name: item.name,
             photoURL: item.photoURL ?? undefined,
-            time: formatCommentTime(item.reactedAt),
+            time: formatCommentTime(item.reactedAt, commentOptions),
             following: false,
             reaction: item.reactionType as "useful" | "fire" | "touched" | "curious",
           })),

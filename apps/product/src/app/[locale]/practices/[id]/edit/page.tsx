@@ -240,7 +240,7 @@ export default function EditPracticePage() {
       if (response.error) {
         const errorResponse = response.error as ApiErrorResponse;
         const error = errorResponse.error || errorResponse;
-        let errorMessage = t("practice.edit_save_failed");
+        let errorMessage = t("edit_save_failed");
 
         // 處理錯誤訊息
         if (typeof error === "object" && error !== null) {
@@ -277,11 +277,11 @@ export default function EditPracticePage() {
       }
 
       // 提交成功後顯示成功訊息並導航回詳情頁面
-      toast.success(t("practice.edit_save_success"));
+      toast.success(t("edit_save_success"));
       router.push(`/practices/${practiceId}`);
     } catch (error) {
       console.error("Failed to update practice:", error);
-      toast.error(t("practice.edit_save_failed"));
+      toast.error(t("edit_save_failed"));
       setIsSubmitting(false);
     }
   };
@@ -292,10 +292,10 @@ export default function EditPracticePage() {
   if (isLoading) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" leftLabel="" title={t("practice.edit_title")} rightActionTo="/" />
+        <PageHeader leftAction="back" leftLabel="" title={t("edit_title")} rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
-          <div className="text-center text-text-dark">{t("practice.loading")}</div>
+          <div className="text-center text-text-dark">{t("loading")}</div>
         </main>
       </div>
     );
@@ -305,11 +305,11 @@ export default function EditPracticePage() {
   if (error || !practiceData?.data) {
     return (
       <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-        <PageHeader leftAction="back" leftLabel="" title={t("practice.edit_title")} rightActionTo="/" />
+        <PageHeader leftAction="back" leftLabel="" title={t("edit_title")} rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
           <div className="text-center text-text-dark">
-            {error ? t("practice.load_failed") : t("practice.not_found")}
+            {error ? t("load_failed") : t("not_found")}
           </div>
         </main>
       </div>
@@ -320,7 +320,7 @@ export default function EditPracticePage() {
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <PageHeader title={t("practice.edit_title")} rightActionTo={`/practices/${practiceId}`} />
+      <PageHeader title={t("edit_title")} rightActionTo={`/practices/${practiceId}`} />
 
       <main className="relative px-5 max-w-[448px] mx-auto pb-20">
         {/* Form */}
@@ -345,7 +345,7 @@ export default function EditPracticePage() {
                 disabled={isSubmitting}
                 onClick={() => router.push(`/practices/${practiceId}`)}
               >
-                {t("practice.edit_cancel")}
+                {t("edit_cancel")}
               </Button>
               <Button
                 type="submit"
@@ -353,7 +353,7 @@ export default function EditPracticePage() {
                 className="w-full sm:max-w-[288px]"
                 disabled={isSubmitting}
               >
-                {t("practice.edit_save")}
+                {t("edit_save")}
               </Button>
             </footer>
           </form>

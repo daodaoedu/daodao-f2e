@@ -124,19 +124,19 @@ export default function CreatePracticePage() {
         {/* Header */}
         <div className="text-center pt-5 md:pt-12">
           <Badge size="sm" variant="secondary" className="text-xs md:text-sm text-text-dark mb-3">
-            {t("practice.create_title")}
+            {t("create_title")}
           </Badge>
           <h1 className="text-2xl md:text-4xl font-semibold text-text-dark mb-3 relative">
-            {t("practice.create_subtitle")}
+            {t("create_subtitle")}
             <BgRadialAnimation
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[calc(50%-64px)] md:-translate-y-[calc(50%-24px)] -z-10"
               variant="deco"
             />
           </h1>
           <p className="md:text-lg text-text-dark/70 text-center">
-            {t("practice.create_no_perfect")}
+            {t("create_no_perfect")}
             <br />
-            {t("practice.create_just_start")}
+            {t("create_just_start")}
           </p>
         </div>
 
@@ -151,7 +151,7 @@ export default function CreatePracticePage() {
                   key={category.id}
                   variant={isSelected ? "default" : "white"}
                   onClick={() => handleCategoryClick(category.id)}
-                  aria-label={t("practice.create_select_category_label", { label: category.label })}
+                  aria-label={t("create_select_category_label", { label: category.label })}
                   className={cn(
                     "h-12 rounded-lg shrink-0 whitespace-nowrap",
                     isSelected && "pointer-events-none"
@@ -178,18 +178,18 @@ export default function CreatePracticePage() {
             </div>
           ) : hasError ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-text-dark/70 mb-4">{t("practice.create_load_error")}</p>
+              <p className="text-text-dark/70 mb-4">{t("create_load_error")}</p>
               <Button
                 variant="outline"
                 onClick={() => {
                   // SWR 會自動重新驗證
                   window.location.reload();
                 }}
-              >{t("practice.create_reload")}</Button>
+              >{t("create_reload")}</Button>
             </div>
           ) : currentPractices.length === 0 ? (
             <div className="flex items-center justify-center py-12">
-              <p className="text-text-dark/70">{t("practice.create_no_templates")}</p>
+              <p className="text-text-dark/70">{t("create_no_templates")}</p>
             </div>
           ) : (
             <Carousel
@@ -212,7 +212,7 @@ export default function CreatePracticePage() {
                               handleTemplateSelect(practice.id);
                             }
                           }}
-                          aria-label={t("practice.create_select_practice_label", { title: practice.title })}
+                          aria-label={t("create_select_practice_label", { title: practice.title })}
                           className={cn(
                             "w-full bg-[#E9FEFFB2]/70 rounded-lg px-6 py-4 border-2 border-[#C1ECFF] cursor-pointer",
                             "text-left focus-visible:outline-2 focus-visible:outline-logo-cyan focus-visible:outline-offset-2",
@@ -240,13 +240,13 @@ export default function CreatePracticePage() {
                 variant="ghost"
                 size="icon"
                 className="absolute -left-16 top-1/2 -translate-y-1/2 z-20 hidden md:flex size-10 text-text-dark/70 hover:text-text-dark hover:opacity-100 bg-white/80 hover:bg-white shadow-md"
-                aria-label={t("practice.create_prev")}
+                aria-label={t("create_prev")}
               />
               <CarouselNext
                 variant="ghost"
                 size="icon"
                 className="absolute -right-16 top-1/2 -translate-y-1/2 z-20 hidden md:flex size-10 text-text-dark/70 hover:text-text-dark hover:opacity-100 bg-white/80 hover:bg-white shadow-md"
-                aria-label={t("practice.create_next")}
+                aria-label={t("create_next")}
               />
             </Carousel>
           )}
@@ -255,7 +255,7 @@ export default function CreatePracticePage() {
         {/* Create Manual Practice Button */}
         <div className="flex justify-center mt-8 mb-4">
           <Button variant="white" onClick={() => router.push("/practices/create/manual")}>
-            {t("practice.create_manual")}
+            {t("create_manual")}
             <ChevronRight className="size-4" />
           </Button>
         </div>

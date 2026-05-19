@@ -47,14 +47,14 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
           return (
             <FormItem>
               <FormLabel required className="block text-base font-medium text-text-dark mb-3">
-                {t("practice.form_start_date")}
+                {t("form_start_date")}
               </FormLabel>
               <FormControl>
                 <DatePicker
                   ref={field.ref}
                   value={date}
                   invalid={!!form.formState.errors.startDate}
-                  placeholder={t("practice.form_start_date_placeholder")}
+                  placeholder={t("form_start_date_placeholder")}
                   disabled={disabled}
                   onBlur={field.onBlur}
                   minDate={minStartDate ?? new Date()}
@@ -85,7 +85,7 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel required className="block text-base font-medium text-text-dark mb-3">
-              {t("practice.form_duration")}
+              {t("form_duration")}
             </FormLabel>
             <FormControl>
               <RadioGroup
@@ -102,7 +102,7 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
                 {DURATION_DAYS_OPTIONS.map((option) => {
                   const isSelected = field.value === option.value;
                   const inputId = `duration-${option.value}`;
-                  const label = t(`practice.${option.labelKey}`);
+                  const label = t(`${option.labelKey}`);
                   return (
                     <label
                       key={option.value}
@@ -129,7 +129,7 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
               </RadioGroup>
             </FormControl>
             {startDate && durationDays && endDate && (
-              <p className="text-sm text-text-dark mt-2">{t("practice.form_end_date", { date: endDate })}</p>
+              <p className="text-sm text-text-dark mt-2">{t("form_end_date", { date: endDate })}</p>
             )}
             <FormMessage />
           </FormItem>
@@ -142,7 +142,7 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel required className="block text-base font-medium text-text-dark mb-3">
-              {t("practice.form_frequency")}
+              {t("form_frequency")}
             </FormLabel>
             <FormControl>
               <RadioGroup
@@ -159,8 +159,8 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
                 {FREQUENCY_OPTIONS.map((option) => {
                   const isSelected = field.value === option.value;
                   const inputId = `frequency-${option.value}`;
-                  const unit = t(`practice.${option.unitKey}`);
-                  const description = t(`practice.${option.descriptionKey}`);
+                  const unit = t(`${option.unitKey}`);
+                  const description = t(`${option.descriptionKey}`);
                   return (
                     <label
                       key={option.value}

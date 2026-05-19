@@ -23,7 +23,7 @@ export const ExecutionTimingCard = ({
       </div>
 
       <div className="relative">
-        <h3 className="text-xs text-text-dark mb-2">{t("practice.form_execution_timing")}</h3>
+        <h3 className="text-xs text-text-dark mb-2">{t("form_execution_timing")}</h3>
         <div className="flex flex-wrap gap-2">
           {executionTiming.map((timing) => {
             const option = EXECUTION_TIMING_OPTIONS.find((opt) => opt.value === timing);
@@ -36,7 +36,7 @@ export const ExecutionTimingCard = ({
                 className="text-sm py-[3px] rounded gap-1"
               >
                 <ClockSolidSvg width={18} height={18} className="text-light-cyan shrink-0" />
-                {t(`practice.${option.labelKey}`)}
+                {t(`${option.labelKey}`)}
               </Badge>
             );
           })}

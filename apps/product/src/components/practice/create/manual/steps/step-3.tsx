@@ -34,7 +34,7 @@ export const Step3 = ({ form }: Step3Props) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel required className="block text-base font-medium text-text-dark mb-3">
-              {t("practice.form_session_duration")}
+              {t("form_session_duration")}
             </FormLabel>
             <FormControl>
               <div className="space-y-4">
@@ -48,7 +48,7 @@ export const Step3 = ({ form }: Step3Props) => {
                   max={60}
                   step={15}
                   className="w-full"
-                  renderTooltip={(value) => <div>{value}{t("practice.minutes_unit")}</div>}
+                  renderTooltip={(value) => <div>{value}{t("minutes_unit")}</div>}
                 />
                 {/* Labels */}
                 <div className="flex justify-between">
@@ -64,7 +64,7 @@ export const Step3 = ({ form }: Step3Props) => {
                           : "text-light-gray hover:text-text-dark"
                       )}
                     >
-                      {t(`practice.${option.labelKey}`)}
+                      {t(`${option.labelKey}`)}
                     </button>
                   ))}
                 </div>
@@ -81,15 +81,15 @@ export const Step3 = ({ form }: Step3Props) => {
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between mb-3">
-              <FormLabel className="text-base font-medium text-text-dark">{t("practice.form_execution_timing")}</FormLabel>
-              <FormDescription className="text-sm text-light-gray">{t("practice.form_execution_timing_multi")}</FormDescription>
+              <FormLabel className="text-base font-medium text-text-dark">{t("form_execution_timing")}</FormLabel>
+              <FormDescription className="text-sm text-light-gray">{t("form_execution_timing_multi")}</FormDescription>
             </div>
             <FormControl>
               <div className="grid grid-cols-3 gap-3">
                 {EXECUTION_TIMING_OPTIONS.map((option) => {
                   const isSelected = field.value?.includes(option.value);
                   const inputId = `execution-timing-${option.value}`;
-                  const label = t(`practice.${option.labelKey}`);
+                  const label = t(`${option.labelKey}`);
                   return (
                     <label
                       key={option.value}
@@ -132,12 +132,12 @@ export const Step3 = ({ form }: Step3Props) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel className="block text-sm font-normal text-text-dark mb-3">
-              {t("practice.form_custom_timing")}
+              {t("form_custom_timing")}
             </FormLabel>
             <FormControl>
               <Input
                 {...field}
-                placeholder={t("practice.form_custom_timing_placeholder")}
+                placeholder={t("form_custom_timing_placeholder")}
                 className="w-full"
                 maxLength={20}
               />

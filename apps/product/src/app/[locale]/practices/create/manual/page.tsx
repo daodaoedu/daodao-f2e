@@ -191,7 +191,7 @@ export default function CreateManualPracticePage() {
         };
 
         const error = errorResponse.error || errorResponse;
-        let errorMessage = t("practice.create_failed");
+        let errorMessage = t("create_failed");
         let shouldNavigateToStep: number | null = null;
 
         // 處理錯誤訊息
@@ -274,7 +274,7 @@ export default function CreateManualPracticePage() {
         );
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : t("practice.create_failed_retry");
+      const errorMessage = error instanceof Error ? error.message : t("create_failed_retry");
       console.error("Failed to create practice:", error);
       toast.error(errorMessage);
       setIsSubmitting(false);
@@ -316,7 +316,7 @@ export default function CreateManualPracticePage() {
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <PageHeader title={currentStep === 5 ? t("practice.manual_preview_title") : t("practice.manual_create_title")} rightActionTo="/" />
+      <PageHeader title={currentStep === 5 ? t("manual_preview_title") : t("manual_create_title")} rightActionTo="/" />
 
       <main className="relative px-5 max-w-[448px] mx-auto pb-20">
         {/* Progress Bar */}
@@ -372,7 +372,7 @@ export default function CreateManualPracticePage() {
                 disabled={isCheckingDraft}
               >
                 <ArrowLeftOutlineSvg className="size-4.5 text-logo-cyan group-hover:text-white" />
-                {t("practice.manual_prev_step")}
+                {t("manual_prev_step")}
               </Button>
 
               <Button
@@ -381,7 +381,7 @@ export default function CreateManualPracticePage() {
                 className="w-full sm:max-w-[288px]"
                 disabled={isCheckingDraft || isSubmitting}
               >
-                {currentStep === TOTAL_STEPS ? t("practice.manual_finish") : t("practice.manual_next_step")}
+                {currentStep === TOTAL_STEPS ? t("manual_finish") : t("manual_next_step")}
                 {currentStep !== TOTAL_STEPS && <ArrowRightOutlineSvg className="size-4.5" />}
               </Button>
             </footer>

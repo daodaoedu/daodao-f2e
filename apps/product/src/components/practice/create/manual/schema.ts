@@ -66,7 +66,7 @@ export interface ManualPracticeSchemaOptions {
 // minDate 為可選參數，若未提供則在驗證時使用當前日期（確保跨午夜時仍正確）
 const createStartDateSchema = (minDate?: Date, t?: TFunction) => {
   const msg = (key: string, params?: Record<string, string>) => {
-    if (t) return t(`practice.${key}` as Parameters<TFunction>[0], params as never);
+    if (t) return t(key as Parameters<TFunction>[0], params as never);
     return key;
   };
 
@@ -115,7 +115,7 @@ export const createManualPracticeFormSchema = (options?: ManualPracticeSchemaOpt
   const minStartDate = options?.minStartDate;
 
   const msg = (key: string, params?: Record<string, string | number>) => {
-    if (t) return t(`practice.${key}` as Parameters<TFunction>[0], params as never);
+    if (t) return t(key as Parameters<TFunction>[0], params as never);
     return key;
   };
 

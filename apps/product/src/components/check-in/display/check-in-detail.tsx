@@ -15,7 +15,7 @@ import {
 } from "@daodao/api";
 import { ChartColumnIncreasingSvg, DialogOutlineSvg, FlagOutlineSvg } from "@daodao/assets";
 import type { MentionCandidate } from "@daodao/features-mention";
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Button } from "@daodao/ui/components/button";
@@ -27,8 +27,8 @@ import {
 } from "@daodao/ui/components/dropdown-menu";
 import { ImageLightbox } from "@daodao/ui/components/image-lightbox";
 import { toast } from "@daodao/ui/components/sonner";
-import { formatDistanceToNow, isValid, parseISO } from "date-fns";
-import { zhTW } from "date-fns/locale";
+import { type Locale as DateFnsLocale, formatDistanceToNow, isValid, parseISO } from "date-fns";
+import { enUS, zhTW } from "date-fns/locale";
 import { ArrowLeft, Ellipsis, Pencil, Share2 } from "lucide-react";
 import * as React from "react";
 import { useCallback, useTransition } from "react";
@@ -72,11 +72,26 @@ interface ICheckInDetailProps {
 // Helpers
 // ============================================================================
 
-export function formatCommentTime(createdAt?: string, justNowLabel = "剛剛"): string {
+export function getDateFnsLocale(locale: string): DateFnsLocale {
+  return locale === "en" ? enUS : zhTW;
+}
+
+export interface CommentFormatOptions {
+  anonymousLabel?: string;
+  justNowLabel?: string;
+  locale?: DateFnsLocale;
+}
+
+export function formatCommentTime(
+  createdAt?: string,
+  options: CommentFormatOptions = {}
+): string {
+  const justNowLabel = options.justNowLabel ?? "剛剛";
+  const locale = options.locale ?? zhTW;
   if (!createdAt) return justNowLabel;
   const parsed = parseISO(createdAt);
   if (!isValid(parsed)) return justNowLabel;
-  return formatDistanceToNow(parsed, { addSuffix: true, locale: zhTW });
+  return formatDistanceToNow(parsed, { addSuffix: true, locale });
 }
 
 export type ApiCommentNode = {
@@ -97,7 +112,11 @@ export function isApiCommentNode(v: unknown): v is ApiCommentNode {
   return typeof v === "object" && v !== null && "id" in v;
 }
 
-export function mapReply(reply: ApiCommentNode, anonymousLabel = "匿名使用者"): ICommentReply {
+export function mapReply(
+  reply: ApiCommentNode,
+  options: CommentFormatOptions = {}
+): ICommentReply {
+  const anonymousLabel = options.anonymousLabel ?? "匿名使用者";
   return {
     id: String(reply.id),
     author: {
@@ -108,13 +127,17 @@ export function mapReply(reply: ApiCommentNode, anonymousLabel = "匿名使用�
       customId: reply.user?.customId ?? undefined,
     },
     content: reply.content || "",
-    time: formatCommentTime(reply.createdAt),
+    time: formatCommentTime(reply.createdAt, options),
   };
 }
 
-export function mapComment(comment: ApiCommentNode, anonymousLabel = "匿名使用者"): IComment {
+export function mapComment(
+  comment: ApiCommentNode,
+  options: CommentFormatOptions = {}
+): IComment {
+  const anonymousLabel = options.anonymousLabel ?? "匿名使用者";
   const rawReplies = Array.isArray(comment.replies) ? comment.replies : [];
-  const mappedReplies = rawReplies.filter(isApiCommentNode).map((r) => mapReply(r, anonymousLabel));
+  const mappedReplies = rawReplies.filter(isApiCommentNode).map((r) => mapReply(r, options));
   return {
     id: String(comment.id),
     author: {
@@ -125,7 +148,7 @@ export function mapComment(comment: ApiCommentNode, anonymousLabel = "匿名使�
       customId: comment.user?.customId ?? undefined,
     },
     content: comment.content || "",
-    time: formatCommentTime(comment.createdAt),
+    time: formatCommentTime(comment.createdAt, options),
     replies: mappedReplies,
   };
 }
@@ -148,6 +171,8 @@ export function CheckInCommentSheetContent({
   currentUserPhotoURL,
 }: ICheckInCommentSheetContentProps) {
   const t = useTranslations("check_in");
+  const locale = useLocale();
+  const dateFnsLocale = React.useMemo(() => getDateFnsLocale(locale), [locale]);
   const { data: commentsData, mutate: mutateComments } = useComments({
     targetType: "checkin",
     targetId: checkInId,
@@ -160,8 +185,14 @@ export function CheckInCommentSheetContent({
   const comments: IComment[] = React.useMemo(() => {
     const raw = commentsData?.data;
     if (!Array.isArray(raw)) return [];
-    return raw.filter(isApiCommentNode).map((c) => mapComment(c, t("anonymous_user")));
-  }, [commentsData, t]);
+    return raw.filter(isApiCommentNode).map((c) =>
+      mapComment(c, {
+        anonymousLabel: t("anonymous_user"),
+        justNowLabel: t("just_now"),
+        locale: dateFnsLocale,
+      })
+    );
+  }, [commentsData, t, dateFnsLocale]);
 
   const mentionCandidates = React.useMemo<MentionCandidate[]>(() => {
     const rawCandidates = (mentionCandidatesData as { data?: unknown[] } | undefined)?.data;

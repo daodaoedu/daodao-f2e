@@ -53,13 +53,13 @@ export const Step4 = ({ form }: Step4Props) => {
       } else {
         form.setError("resources", {
           type: "manual",
-          message: t("practice.step4_fetch_not_found"),
+          message: t("step4_fetch_not_found"),
         });
       }
     } catch {
       form.setError("resources", {
         type: "manual",
-        message: t("practice.step4_fetch_failed"),
+        message: t("step4_fetch_failed"),
       });
     } finally {
       setIsFetchingTitle(false);
@@ -80,7 +80,7 @@ export const Step4 = ({ form }: Step4Props) => {
         name="tags"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block text-base font-normal text-text-dark mb-3">{t("practice.step4_tags_label")}</FormLabel>
+            <FormLabel className="block text-base font-normal text-text-dark mb-3">{t("step4_tags_label")}</FormLabel>
             <FormControl>
               <div>
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -91,7 +91,7 @@ export const Step4 = ({ form }: Step4Props) => {
                   ))}
                 </div>
                 <Button type="button" onClick={openTagEditSheet} className="w-full">
-                  {t("practice.step4_tags_edit")}
+                  {t("step4_tags_edit")}
                   <ArrowRightOutlineSvg className="size-4.5" />
                 </Button>
               </div>
@@ -122,14 +122,14 @@ export const Step4 = ({ form }: Step4Props) => {
                 if (url.protocol !== "https:") {
                   form.setError("resources", {
                     type: "manual",
-                    message: t("practice.step4_url_https_required"),
+                    message: t("step4_url_https_required"),
                   });
                   return;
                 }
               } catch {
                 form.setError("resources", {
                   type: "manual",
-                  message: t("practice.step4_url_invalid"),
+                  message: t("step4_url_invalid"),
                 });
                 return;
               }
@@ -155,8 +155,8 @@ export const Step4 = ({ form }: Step4Props) => {
               form.setError("resources", {
                 type: "manual",
                 message: trimmedUrl
-                  ? t("practice.step4_resource_duplicate_url")
-                  : t("practice.step4_resource_duplicate_name"),
+                  ? t("step4_resource_duplicate_url")
+                  : t("step4_resource_duplicate_name"),
               });
               return;
             }
@@ -180,15 +180,15 @@ export const Step4 = ({ form }: Step4Props) => {
           return (
             <FormItem>
               <FormLabel className="block text-base font-normal text-text-dark mb-3">
-                {t("practice.step4_resources_label")}
+                {t("step4_resources_label")}
               </FormLabel>
               <FormDescription className="border border-blue bg-light-blue text-sm text-text-dark p-3 rounded-lg mb-4">
-                {t("practice.step4_resources_description")}
+                {t("step4_resources_description")}
               </FormDescription>
               <FormControl>
                 <div>
                   <Input
-                    placeholder={t("practice.step4_resource_name_placeholder")}
+                    placeholder={t("step4_resource_name_placeholder")}
                     className="w-full mb-3"
                     value={resourceName}
                     maxLength={100}
@@ -203,7 +203,7 @@ export const Step4 = ({ form }: Step4Props) => {
                   <div className="flex gap-2 mb-3">
                     <Input
                       type="url"
-                      placeholder={t("practice.step4_resource_url_placeholder")}
+                      placeholder={t("step4_resource_url_placeholder")}
                       className="flex-1"
                       value={resourceUrl}
                       onChange={(e) => setResourceUrl(e.target.value)}
@@ -222,7 +222,7 @@ export const Step4 = ({ form }: Step4Props) => {
                         disabled={isFetchingTitle}
                         className="shrink-0"
                       >
-                        {isFetchingTitle ? t("practice.step4_fetching") : t("practice.step4_fetch_title")}
+                        {isFetchingTitle ? t("step4_fetching") : t("step4_fetch_title")}
                       </Button>
                     )}
                   </div>
@@ -233,7 +233,7 @@ export const Step4 = ({ form }: Step4Props) => {
                     className="w-full mb-5"
                     disabled={!resourceName.trim()}
                   >
-                    {t("practice.step4_add_resource")}
+                    {t("step4_add_resource")}
                     <ArrowRightOutlineSvg className="size-4.5" />
                   </Button>
                   {resources.length > 0 && (

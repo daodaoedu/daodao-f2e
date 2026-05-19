@@ -76,10 +76,10 @@ export default function PracticeSummaryPageRoute() {
       typeof window !== "undefined" && localStorage.getItem(TOAST_DISMISSED_KEY) === "1";
     if (!isDismissed && (privacyStatus === "public" || privacyStatus === "delayed")) {
       toastShownRef.current = true;
-      toast(t("practice.summary_public_toast"), {
-        description: t("practice.summary_public_toast_description"),
+      toast(t("summary_public_toast"), {
+        description: t("summary_public_toast_description"),
         action: {
-          label: t("practice.summary_public_toast_dismiss"),
+          label: t("summary_public_toast_dismiss"),
           onClick: () => {
             localStorage.setItem(TOAST_DISMISSED_KEY, "1");
           },
@@ -109,22 +109,22 @@ export default function PracticeSummaryPageRoute() {
 
   // Loading 狀態
   if (isPracticeLoading || isUserLoading) {
-    return <PageShell message={t("practice.loading")} />;
+    return <PageShell message={t("loading")} />;
   }
 
   // 權限不足或實踐未到期（等待重定向）
   if (!isOwner || !isExpired) {
-    return <PageShell message={t("practice.summary_redirecting")} />;
+    return <PageShell message={t("summary_redirecting")} />;
   }
 
   // 摘要載入中
   if (isSummaryLoading) {
-    return <PageShell message={t("practice.summary_generating")} />;
+    return <PageShell message={t("summary_generating")} />;
   }
 
   // 摘要載入錯誤
   if (summaryError || !summary) {
-    return <PageShell message={summaryError ? t("practice.summary_load_failed") : t("practice.summary_no_data")} />;
+    return <PageShell message={summaryError ? t("summary_load_failed") : t("summary_no_data")} />;
   }
 
   return <PracticeSummaryPage summary={summary} />;
