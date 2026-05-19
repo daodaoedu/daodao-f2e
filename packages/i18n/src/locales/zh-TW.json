@@ -4287,7 +4287,11 @@
     "myProfile": {
       "loading": "載入中...",
       "empty": "尚無問題",
-      "clickToAnswer": "點擊填寫答案",
+      "clickToAnswer": "填寫",
+      "progress": "已回答 {answered}/{total} 題",
+      "startPrompt": "點擊任一題開始填寫你的學習人物誌",
+      "showMore": "顯示更多 {count} 題",
+      "showLess": "收起",
       "submit": "送出",
       "submitting": "送出中...",
       "submitSuccess": "回答成功！",

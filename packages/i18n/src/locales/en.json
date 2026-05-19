@@ -4287,7 +4287,11 @@
     "myProfile": {
       "loading": "Loading...",
       "empty": "No questions yet",
-      "clickToAnswer": "Click to answer",
+      "clickToAnswer": "Answer",
+      "progress": "Answered {answered}/{total}",
+      "startPrompt": "Click any question to start building your learner persona",
+      "showMore": "Show {count} more",
+      "showLess": "Show less",
       "submit": "Submit",
       "submitting": "Submitting...",
       "submitSuccess": "Answer submitted!",

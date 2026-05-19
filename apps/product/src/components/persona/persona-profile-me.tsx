@@ -103,6 +103,7 @@ export function PersonaProfileMe() {
   const { data, isLoading } = usePersonaProfileMe(locale);
   const mutate = useMutate();
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [showAllUnanswered, setShowAllUnanswered] = useState(false);
 
   const handleAnswerSuccess = async () => {
     await mutate(["/api/v1/persona/profile/me"] as const);
@@ -115,62 +116,96 @@ export function PersonaProfileMe() {
   }
 
   const questions = data?.data?.questions ?? [];
+  const answered = questions.filter((q) => !q.isPlaceholder);
+  const unanswered = questions.filter((q) => q.isPlaceholder);
+  const unansweredVisible = showAllUnanswered ? unanswered : unanswered.slice(0, 3);
 
   return (
-    <div className="flex flex-col gap-4 py-4">
-      {questions.map((q) => {
-        const isExpanded = expandedId === q.id;
+    <div className="flex flex-col gap-3 py-4">
+      {/* 進度提示 */}
+      {questions.length > 0 && (
+        <p className="text-xs text-gray-400 text-right">
+          {t("myProfile.progress", { answered: answered.length, total: questions.length })}
+        </p>
+      )}
 
-        if (q.isPlaceholder) {
-          return (
-            <div
-              key={q.id}
-              className={cn(
-                "rounded-xl border-2 border-dashed border-gray-300 transition-colors",
-                isExpanded ? "border-blue-400 bg-blue-50" : "hover:border-blue-300"
-              )}
-            >
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full text-left justify-start h-auto p-4 rounded-xl hover:bg-transparent"
-                onClick={() => setExpandedId(isExpanded ? null : q.id)}
-              >
-                <span className="flex flex-col items-start gap-1">
-                  <span className="text-sm text-gray-500 font-medium">{q.prompt}</span>
-                  {!isExpanded && (
-                    <span className="text-xs text-blue-400">{t("myProfile.clickToAnswer")}</span>
-                  )}
-                </span>
-              </Button>
-              {isExpanded && (
-                <div className="px-4 pb-4">
-                  <InlineAnswerForm
-                    questionId={q.id}
-                    questionType={q.questionType}
-                    options={q.options}
-                    onSuccess={() => handleAnswerSuccess()}
-                  />
-                </div>
-              )}
-            </div>
-          );
-        }
-
-        return (
-          <div key={q.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <p className="text-sm text-gray-500 mb-1">{q.prompt}</p>
-            <p className="text-base font-medium text-gray-800">
-              {q.answer?.selectedValue ?? q.answer?.textAnswer ?? ""}
+      {/* 已答題目 */}
+      {answered.map((q) => (
+        <div key={q.id} className="rounded-xl bg-white/80 backdrop-blur-sm p-4 shadow-sm">
+          <p className="text-xs text-gray-400 mb-1">{q.prompt}</p>
+          <p className="text-sm font-medium text-gray-800">
+            {q.answer?.selectedValue ?? q.answer?.textAnswer ?? ""}
+          </p>
+          {(q.answer?.resonanceCount ?? 0) > 0 && (
+            <p className="text-xs text-gray-400 mt-2">
+              ✦ {q.answer?.resonanceCount} {t("myProfile.resonances")}
             </p>
-            {(q.answer?.resonanceCount ?? 0) > 0 && (
-              <p className="text-xs text-gray-400 mt-2">
-                ✦ {q.answer?.resonanceCount} {t("myProfile.resonances")}
-              </p>
-            )}
-          </div>
-        );
-      })}
+          )}
+        </div>
+      ))}
+
+      {/* 未答題目 */}
+      {unanswered.length > 0 && (
+        <div className="flex flex-col gap-2 mt-1">
+          {answered.length === 0 && (
+            <p className="text-xs text-gray-400 mb-1">{t("myProfile.startPrompt")}</p>
+          )}
+          {unansweredVisible.map((q) => {
+            const isExpanded = expandedId === q.id;
+            return (
+              <div
+                key={q.id}
+                className={cn(
+                  "rounded-xl border border-dashed transition-all",
+                  isExpanded
+                    ? "border-primary-base bg-white/60"
+                    : "border-basic-200 bg-white/30 hover:border-primary-base/50 hover:bg-white/40"
+                )}
+              >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full text-left justify-start h-auto p-3 rounded-xl hover:bg-transparent"
+                  onClick={() => setExpandedId(isExpanded ? null : q.id)}
+                >
+                  <span className="flex items-center justify-between w-full gap-2">
+                    <span className="text-sm text-gray-500">{q.prompt}</span>
+                    {!isExpanded && (
+                      <span className="text-xs text-primary-base shrink-0">
+                        {t("myProfile.clickToAnswer")}
+                      </span>
+                    )}
+                  </span>
+                </Button>
+                {isExpanded && (
+                  <div className="px-3 pb-3">
+                    <InlineAnswerForm
+                      questionId={q.id}
+                      questionType={q.questionType}
+                      options={q.options}
+                      onSuccess={() => handleAnswerSuccess()}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {unanswered.length > 3 && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="self-center text-xs text-gray-400 hover:text-gray-600 h-auto py-1"
+              onClick={() => setShowAllUnanswered((v) => !v)}
+            >
+              {showAllUnanswered
+                ? t("myProfile.showLess")
+                : t("myProfile.showMore", { count: unanswered.length - 3 })}
+            </Button>
+          )}
+        </div>
+      )}
 
       {questions.length === 0 && (
         <div className="py-8 text-center text-gray-400">{t("myProfile.empty")}</div>
