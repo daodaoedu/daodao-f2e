@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactionTypeValue } from "@daodao/api";
-import type { MentionCandidate } from "@daodao/features-mention";
 import {
   followTarget,
   removeReaction,
@@ -18,6 +17,8 @@ import {
   FlagOutlineSvg,
   TelescopeSvg,
 } from "@daodao/assets";
+import type { MentionCandidate } from "@daodao/features-mention";
+import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Badge } from "@daodao/ui/components/badge";
@@ -133,10 +134,10 @@ interface IPracticeDetailShellProps {
   browseActivity?: IBrowseActivityData;
 }
 
-const TABS: { id: TabType; label: string }[] = [
-  { id: "comments", label: "留言" },
-  { id: "checkins", label: "打卡紀錄" },
-  { id: "resources", label: "使用資源" },
+const TABS: { id: TabType; labelKey: "tab_comments" | "tab_checkins" | "tab_resources" }[] = [
+  { id: "comments", labelKey: "tab_comments" },
+  { id: "checkins", labelKey: "tab_checkins" },
+  { id: "resources", labelKey: "tab_resources" },
 ];
 
 interface IPracticeResourceListCardProps {
@@ -152,6 +153,7 @@ function PracticeResourceListCard({
   onEditPractice,
   onDeleteResource,
 }: IPracticeResourceListCardProps) {
+  const t = useTranslations("practice");
   const [imageError, setImageError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -178,12 +180,12 @@ function PracticeResourceListCard({
   const handleDeleteResource = async () => {
     setMenuOpen(false);
     const result = await openWarningDialog({
-      title: "確定刪除這個資源？",
-      message: "刪除後無法復原。",
+      title: t("delete_resource_title"),
+      message: t("delete_resource_message"),
       textAlign: "left",
       buttons: [
-        { label: "確定刪除", value: "confirm", variant: "outline" },
-        { label: "先不要", value: "cancel", variant: "orange" },
+        { label: t("delete_confirm"), value: "confirm", variant: "outline" },
+        { label: t("cancel_action"), value: "cancel", variant: "orange" },
       ],
     });
     if (result.value === "confirm") {
@@ -261,7 +263,7 @@ function PracticeResourceListCard({
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
               >
-                編輯實踐
+                {t("edit_practice")}
               </button>
             )}
             {isOwner && onDeleteResource && (
@@ -271,7 +273,7 @@ function PracticeResourceListCard({
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
               >
                 <Trash2 className="size-[18px] shrink-0" />
-                <span>刪除</span>
+                <span>{t("action_delete")}</span>
               </button>
             )}
           </div>
@@ -308,6 +310,7 @@ export function PracticeDetailShell({
   footer,
   browseActivity,
 }: IPracticeDetailShellProps) {
+  const t = useTranslations("practice");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -404,7 +407,7 @@ export function PracticeDetailShell({
   const openBrowseActivity = () => {
     setPracticeMenuOpen(false);
     openSheet({
-      title: "瀏覽活動",
+      title: t("action_browse_activity"),
       content: (
         <BrowseActivityContent
           viewCount={browseActivity?.viewCount ?? 0}
@@ -425,14 +428,14 @@ export function PracticeDetailShell({
     try {
       if (wasFollowing) {
         await unfollowTarget("practice", practiceId);
-        toast.success("已取消關注");
+        toast.success(t("unfollow_success"));
       } else {
         await followTarget({ targetType: "practice", targetId: practiceId });
-        toast.success("已關注此實踐");
+        toast.success(t("follow_success"));
       }
     } catch {
       setIsFollowingPractice(wasFollowing);
-      toast.error("操作失敗，請稍後再試");
+      toast.error(t("operation_failed"));
     }
   };
 
@@ -471,7 +474,7 @@ export function PracticeDetailShell({
                   className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
                 >
                   <Pencil className="size-[18px] shrink-0" />
-                  <span>編輯</span>
+                  <span>{t("action_edit")}</span>
                 </Button>
                 <Button
                   type="button"
@@ -484,7 +487,7 @@ export function PracticeDetailShell({
                       refreshOnboardingStatus();
                       router.push(`/practices/copy-success?practiceId=${id}`);
                     } catch {
-                      toast.error("複製失敗，請稍後再試");
+                      toast.error(t("copy_failed"));
                     } finally {
                       setIsCopying(false);
                     }
@@ -493,7 +496,7 @@ export function PracticeDetailShell({
                   className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
                 >
                   <Copy className="size-[18px] shrink-0" />
-                  <span>建立複本</span>
+                  <span>{t("action_copy")}</span>
                 </Button>
                 <Button
                   type="button"
@@ -505,7 +508,7 @@ export function PracticeDetailShell({
                   className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
                 >
                   <Archive className="size-[18px] shrink-0" />
-                  <span>封存</span>
+                  <span>{t("action_archive")}</span>
                 </Button>
                 <Button
                   type="button"
@@ -514,7 +517,7 @@ export function PracticeDetailShell({
                   className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
                 >
                   <ChartColumnIncreasingSvg className="size-[18px] shrink-0" />
-                  <span>瀏覽活動</span>
+                  <span>{t("action_browse_activity")}</span>
                 </Button>
                 <Button
                   type="button"
@@ -522,12 +525,12 @@ export function PracticeDetailShell({
                   onClick={async () => {
                     setPracticeMenuOpen(false);
                     const result = await openWarningDialog({
-                      title: "確定刪除這個實踐？",
-                      message: "一旦刪除就無法復原，所有打卡紀錄也會一併消失。",
+                      title: t("delete_practice_title"),
+                      message: t("delete_practice_message"),
                       textAlign: "left",
                       buttons: [
-                        { label: "確定刪除", value: "confirm", variant: "outline" },
-                        { label: "先不要", value: "cancel", variant: "orange" },
+                        { label: t("delete_confirm"), value: "confirm", variant: "outline" },
+                        { label: t("cancel_action"), value: "cancel", variant: "orange" },
                       ],
                     });
                     if (result.value === "confirm") {
@@ -537,7 +540,7 @@ export function PracticeDetailShell({
                   className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
                 >
                   <Trash2 className="size-[18px] shrink-0" />
-                  <span>刪除</span>
+                  <span>{t("action_delete")}</span>
                 </Button>
               </div>
             )}
@@ -554,7 +557,7 @@ export function PracticeDetailShell({
                   className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
                 >
                   <FlagOutlineSvg className="size-5 shrink-0" />
-                  <span>檢舉</span>
+                  <span>{t("action_report")}</span>
                 </Button>
                 <Button
                   type="button"
@@ -571,7 +574,7 @@ export function PracticeDetailShell({
                   )}
                 >
                   <TelescopeSvg className="size-5 shrink-0" />
-                  <span>{isFollowingPractice ? "取消關注" : "關注"}</span>
+                  <span>{isFollowingPractice ? t("action_unfollow") : t("action_follow")}</span>
                 </Button>
                 <Button
                   type="button"
@@ -580,7 +583,7 @@ export function PracticeDetailShell({
                   className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
                 >
                   <ChartColumnIncreasingSvg className="size-5 shrink-0" />
-                  <span>瀏覽活動</span>
+                  <span>{t("action_browse_activity")}</span>
                 </Button>
               </div>
             )}
@@ -626,14 +629,14 @@ export function PracticeDetailShell({
                     refreshOnboardingStatus();
                     router.push(`/practices/copy-success?practiceId=${id}`);
                   } catch {
-                    toast.error("複製失敗，請稍後再試");
+                    toast.error(t("copy_failed"));
                   } finally {
                     setIsCopying(false);
                   }
                 }}
               >
                 <Copy className="size-4" />
-                {isCopying ? "複製中…" : "我也想實踐"}
+                {isCopying ? t("action_copying") : t("action_also_practice")}
               </Button>
             )}
             <Button
@@ -642,7 +645,7 @@ export function PracticeDetailShell({
               onClick={() => setInfoExpanded((value) => !value)}
               className="w-full h-auto justify-between px-0 text-sm text-[#9FB5B8] py-1 mb-2 cursor-pointer hover:bg-transparent"
             >
-              更多資訊
+              {t("more_info")}
               {infoExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
             </Button>
 
@@ -695,19 +698,19 @@ export function PracticeDetailShell({
               const firstName = followers[0]?.name;
               const text =
                 followers.length > 1
-                  ? `${firstName} 與其他 ${followers.length - 1} 人`
+                  ? t("followers_with_others", { firstName: firstName ?? "", count: String(followers.length - 1) })
                   : followers.length === 1
                     ? firstName
                     : effectiveReaction
                       ? totalReactionCount > 1
-                        ? `你 與其他 ${totalReactionCount - 1} 人`
-                        : "你"
+                        ? t("you_with_others", { count: String(totalReactionCount - 1) })
+                        : t("you")
                       : totalReactionCount > 0
                         ? latestActorName
                           ? totalReactionCount > 1
-                            ? `${latestActorName} 與其他 ${totalReactionCount - 1} 人`
+                            ? t("others_with_count", { name: latestActorName, count: String(totalReactionCount - 1) })
                             : latestActorName
-                          : `${totalReactionCount} 人`
+                          : t("count_people", { count: String(totalReactionCount) })
                         : undefined;
               if (displayReactions.length === 0 && !text) return null;
               return (
@@ -779,8 +782,9 @@ export function PracticeDetailShell({
             checkins: checkInsData?.data?.length ?? 0,
             resources: practice?.resources?.length ?? 0,
           };
-          return TABS.map(({ id, label }) => {
+          return TABS.map(({ id, labelKey }) => {
             const count = countMap[id];
+            const label = t(labelKey);
             const displayLabel = count > 0 ? `${label}(${count})` : label;
             return (
               <Button
@@ -805,7 +809,7 @@ export function PracticeDetailShell({
       {activeTab === "comments" && (
         <div className="mx-4 mt-4 mb-4 bg-white rounded-xl shadow-sm">
           {isLoadingComments ? (
-            <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">留言載入中...</div>
+            <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">{t("comments_loading")}</div>
           ) : (
             <CommentSection
               comments={comments}
@@ -849,7 +853,7 @@ export function PracticeDetailShell({
               />
             ))
           ) : (
-            <div className="text-sm text-[#9FB5B8] py-4">目前沒有使用資源</div>
+            <div className="text-sm text-[#9FB5B8] py-4">{t("no_resources")}</div>
           )}
         </div>
       )}

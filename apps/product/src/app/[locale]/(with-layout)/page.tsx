@@ -12,6 +12,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AddTaskFAB } from "@/components/dashboard";
 import { BackgroundAnimation, Banner } from "@/components/layout";
+import { ResonanceCarousel } from "@/components/persona";
 import {
   ActivityCard,
   BrewingCard,
@@ -241,6 +242,8 @@ export default function HomePage() {
               onSearch={handleSearch}
             />
           </div>
+
+          <ResonanceCarousel />
 
           {isShowcaseLoading && feedItems.length === 0 ? (
             <div className="flex flex-col gap-3">

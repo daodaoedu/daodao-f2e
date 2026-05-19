@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import { useMemo } from "react";
 import { CheckInStatus, type CheckInStatusType } from "@/constants/check-in-status";
 import type { ICheckInStatusOptions } from "../../types";
@@ -27,6 +28,7 @@ const checkIsExpired = (endDate?: string | null, practiceStatus?: string): boole
  */
 export const useCheckInStatus = (options: ICheckInStatusOptions) => {
   const { practiceStatus, endDate } = options;
+  const t = useTranslations("check_in");
 
   return useMemo(() => {
     // 檢查實踐是否已完成（包含封存）
@@ -57,15 +59,15 @@ export const useCheckInStatus = (options: ICheckInStatusOptions) => {
     const getButtonLabel = (): string => {
       switch (status) {
         case CheckInStatus.viewSummary:
-          return "觀看總結";
+          return t("button_view_summary");
         case CheckInStatus.practiceCompleted:
-          return "實踐已完成";
+          return t("button_practice_completed");
         case CheckInStatus.alreadyCheckedIn:
-          return "24 小時內已打過卡囉！";
+          return t("button_already_checked_in");
         case CheckInStatus.available:
-          return "打卡";
+          return t("button_check_in");
         default:
-          return "打卡";
+          return t("button_check_in");
       }
     };
 
@@ -84,5 +86,5 @@ export const useCheckInStatus = (options: ICheckInStatusOptions) => {
       canClick,
       getButtonLabel,
     };
-  }, [practiceStatus, endDate]);
+  }, [practiceStatus, endDate, t]);
 };

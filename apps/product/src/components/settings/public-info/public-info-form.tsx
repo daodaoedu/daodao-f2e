@@ -67,7 +67,6 @@ export const PublicInfoForm = () => {
       // 若 user 有設定 location，需等 citiesData 載入後才能解出 countryCode
       // 避免先以 country:"" 重置，導致城市 select 顯示空白
       if (user.location && isCitiesLoading) return;
-      
 
       // 根據 location 找到對應的 countryCode
       let countryCode = "";

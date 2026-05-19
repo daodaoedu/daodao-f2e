@@ -1,6 +1,7 @@
 "use client";
 
 import { useCurrentUser, usePracticeById, usePracticeSummary } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { endOfDay, isAfter } from "date-fns";
@@ -31,6 +32,7 @@ function PageShell({ message }: { message: string }) {
  * 僅實踐擁有者且實踐已到期時可訪問
  */
 export default function PracticeSummaryPageRoute() {
+  const t = useTranslations("practice");
   const router = useRouter();
   const params = useParams();
   const practiceId = params.id as string;
@@ -74,10 +76,10 @@ export default function PracticeSummaryPageRoute() {
       typeof window !== "undefined" && localStorage.getItem(TOAST_DISMISSED_KEY) === "1";
     if (!isDismissed && (privacyStatus === "public" || privacyStatus === "delayed")) {
       toastShownRef.current = true;
-      toast("你的實踐打卡內容已公開", {
-        description: "已顯示在靈感廣場，讓更多人看見你的成長！",
+      toast(t("summary_public_toast"), {
+        description: t("summary_public_toast_description"),
         action: {
-          label: "不再顯示",
+          label: t("summary_public_toast_dismiss"),
           onClick: () => {
             localStorage.setItem(TOAST_DISMISSED_KEY, "1");
           },
@@ -107,22 +109,22 @@ export default function PracticeSummaryPageRoute() {
 
   // Loading 狀態
   if (isPracticeLoading || isUserLoading) {
-    return <PageShell message="載入中..." />;
+    return <PageShell message={t("loading")} />;
   }
 
   // 權限不足或實踐未到期（等待重定向）
   if (!isOwner || !isExpired) {
-    return <PageShell message="重新導向中..." />;
+    return <PageShell message={t("summary_redirecting")} />;
   }
 
   // 摘要載入中
   if (isSummaryLoading) {
-    return <PageShell message="正在生成總結..." />;
+    return <PageShell message={t("summary_generating")} />;
   }
 
   // 摘要載入錯誤
   if (summaryError || !summary) {
-    return <PageShell message={summaryError ? "載入失敗，請稍後再試" : "無法載入總結資料"} />;
+    return <PageShell message={summaryError ? t("summary_load_failed") : t("summary_no_data")} />;
   }
 
   return <PracticeSummaryPage summary={summary} />;

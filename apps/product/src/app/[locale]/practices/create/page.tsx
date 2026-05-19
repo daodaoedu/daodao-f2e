@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
+
 import {
   type PracticeTemplateType,
   usePracticeTemplateCategories,
@@ -24,6 +26,7 @@ import { BgRadialAnimation } from "@/components/layout/bg-radial-animation";
 import { practiceCategoryMetadataMap } from "@/constants/practice-category";
 
 export default function CreatePracticePage() {
+  const t = useTranslations("practice");
   const router = useRouter();
 
   // 取得分類列表
@@ -121,19 +124,19 @@ export default function CreatePracticePage() {
         {/* Header */}
         <div className="text-center pt-5 md:pt-12">
           <Badge size="sm" variant="secondary" className="text-xs md:text-sm text-text-dark mb-3">
-            主題實踐
+            {t("create_title")}
           </Badge>
           <h1 className="text-2xl md:text-4xl font-semibold text-text-dark mb-3 relative">
-            小而美的學習生活提案
+            {t("create_subtitle")}
             <BgRadialAnimation
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[calc(50%-64px)] md:-translate-y-[calc(50%-24px)] -z-10"
               variant="deco"
             />
           </h1>
           <p className="md:text-lg text-text-dark/70 text-center">
-            不需要完美
+            {t("create_no_perfect")}
             <br />
-            只要開始探索就有收穫
+            {t("create_just_start")}
           </p>
         </div>
 
@@ -148,7 +151,7 @@ export default function CreatePracticePage() {
                   key={category.id}
                   variant={isSelected ? "default" : "white"}
                   onClick={() => handleCategoryClick(category.id)}
-                  aria-label={`選擇類別：${category.label}`}
+                  aria-label={t("create_select_category_label", { label: category.label })}
                   className={cn(
                     "h-12 rounded-lg shrink-0 whitespace-nowrap",
                     isSelected && "pointer-events-none"
@@ -175,20 +178,18 @@ export default function CreatePracticePage() {
             </div>
           ) : hasError ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-text-dark/70 mb-4">載入資料時發生錯誤</p>
+              <p className="text-text-dark/70 mb-4">{t("create_load_error")}</p>
               <Button
                 variant="outline"
                 onClick={() => {
                   // SWR 會自動重新驗證
                   window.location.reload();
                 }}
-              >
-                重新載入
-              </Button>
+              >{t("create_reload")}</Button>
             </div>
           ) : currentPractices.length === 0 ? (
             <div className="flex items-center justify-center py-12">
-              <p className="text-text-dark/70">目前沒有可用的模板</p>
+              <p className="text-text-dark/70">{t("create_no_templates")}</p>
             </div>
           ) : (
             <Carousel
@@ -211,7 +212,7 @@ export default function CreatePracticePage() {
                               handleTemplateSelect(practice.id);
                             }
                           }}
-                          aria-label={`選擇提案：${practice.title}`}
+                          aria-label={t("create_select_practice_label", { title: practice.title })}
                           className={cn(
                             "w-full bg-[#E9FEFFB2]/70 rounded-lg px-6 py-4 border-2 border-[#C1ECFF] cursor-pointer",
                             "text-left focus-visible:outline-2 focus-visible:outline-logo-cyan focus-visible:outline-offset-2",
@@ -239,13 +240,13 @@ export default function CreatePracticePage() {
                 variant="ghost"
                 size="icon"
                 className="absolute -left-16 top-1/2 -translate-y-1/2 z-20 hidden md:flex size-10 text-text-dark/70 hover:text-text-dark hover:opacity-100 bg-white/80 hover:bg-white shadow-md"
-                aria-label="上一個"
+                aria-label={t("create_prev")}
               />
               <CarouselNext
                 variant="ghost"
                 size="icon"
                 className="absolute -right-16 top-1/2 -translate-y-1/2 z-20 hidden md:flex size-10 text-text-dark/70 hover:text-text-dark hover:opacity-100 bg-white/80 hover:bg-white shadow-md"
-                aria-label="下一個"
+                aria-label={t("create_next")}
               />
             </Carousel>
           )}
@@ -254,7 +255,7 @@ export default function CreatePracticePage() {
         {/* Create Manual Practice Button */}
         <div className="flex justify-center mt-8 mb-4">
           <Button variant="white" onClick={() => router.push("/practices/create/manual")}>
-            我想自己建立
+            {t("create_manual")}
             <ChevronRight className="size-4" />
           </Button>
         </div>

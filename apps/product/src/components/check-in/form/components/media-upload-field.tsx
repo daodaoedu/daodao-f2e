@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import { FileUpload } from "@daodao/ui/components/file-upload";
 import {
   FormControl,
@@ -37,6 +38,7 @@ export const MediaUploadField = ({
   existingImages = [],
   onExistingImagesChange,
 }: IMediaUploadFieldProps) => {
+  const t = useTranslations("check_in");
   const [isCompressing, setIsCompressing] = useState(false);
   const [keptImages, setKeptImages] = useState<string[]>(existingImages);
 
@@ -56,7 +58,7 @@ export const MediaUploadField = ({
       if (invalidFormat.length > 0) {
         form.setError("media", {
           type: "manual",
-          message: `不支援的格式（${invalidFormat.map((f) => f.name).join("、")}），請上傳 JPG、PNG、WebP 或 GIF`,
+          message: t("upload_format_error", { names: invalidFormat.map((f) => f.name).join("、") }),
         });
         fieldOnChange(newFiles.filter((f) => ALLOWED_TYPES.includes(f.type)));
         return;
@@ -69,7 +71,7 @@ export const MediaUploadField = ({
       if (oversizedGifs.length > 0) {
         form.setError("media", {
           type: "manual",
-          message: `GIF 大小不能超過 500KB（${oversizedGifs.map((f) => f.name).join("、")} 超過限制）`,
+          message: t("upload_gif_size_error", { names: oversizedGifs.map((f) => f.name).join("、") }),
         });
         fieldOnChange(newFiles.filter((f) => !(f.type === "image/gif" && f.size > MAX_MEDIA_SIZE)));
         return;
@@ -107,7 +109,7 @@ export const MediaUploadField = ({
       } catch {
         form.setError("media", {
           type: "manual",
-          message: "圖片壓縮失敗，請重試",
+          message: t("upload_compress_error"),
         });
       } finally {
         setIsCompressing(false);
@@ -123,12 +125,12 @@ export const MediaUploadField = ({
       render={({ field }) => (
         <FormItem className="mb-16 md:mb-8">
           <div className="mb-3 flex items-center justify-between gap-2">
-            <FormLabel className="block text-base font-medium text-text-dark">上傳照片</FormLabel>
+            <FormLabel className="block text-base font-medium text-text-dark">{t("upload_photo")}</FormLabel>
 
             <FormDescription className="text-sm text-light-gray">
               {isCompressing
-                ? "壓縮中..."
-                : `已上傳 ${keptImages.length + (field.value?.length || 0)}/3 張`}
+                ? t("compressing")
+                : t("upload_count", { count: keptImages.length + (field.value?.length || 0), max: 3 })}
             </FormDescription>
           </div>
 
@@ -140,7 +142,7 @@ export const MediaUploadField = ({
                   <div className="size-20 rounded-lg overflow-hidden border-2 border-gray-200">
                     <img
                       src={url}
-                      alt={`既有圖片 ${index + 1}`}
+                      alt={t("existing_image_alt", { n: index + 1 })}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -148,7 +150,7 @@ export const MediaUploadField = ({
                     type="button"
                     onClick={() => handleRemoveExistingImage(index)}
                     className="absolute top-2 right-2 size-5 bg-[#295E5C66]/40 text-white rounded-full flex items-center justify-center"
-                    aria-label="移除圖片"
+                    aria-label={t("remove_image")}
                   >
                     <X className="size-3" />
                   </button>
