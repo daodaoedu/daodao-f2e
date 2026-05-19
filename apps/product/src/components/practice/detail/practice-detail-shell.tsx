@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactionTypeValue } from "@daodao/api";
-import type { MentionCandidate } from "@daodao/features-mention";
 import {
   followTarget,
   removeReaction,
@@ -18,6 +17,7 @@ import {
   FlagOutlineSvg,
   TelescopeSvg,
 } from "@daodao/assets";
+import type { MentionCandidate } from "@daodao/features-mention";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";

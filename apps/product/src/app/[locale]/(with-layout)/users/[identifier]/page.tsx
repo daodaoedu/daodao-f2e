@@ -1,10 +1,10 @@
-import { getCurrentUser, getUserByIdentifier, getUserProfileByIdentifier } from "@daodao/api";
+import { getUserByIdentifier, getUserProfileByIdentifier } from "@daodao/api";
 import { getTranslations } from "@daodao/i18n/server";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { PracticeSection } from "@/components/practice";
-import { IslandHeader, UserInfoCard } from "@/components/user";
+import { IslandHeader, UserInfoCard, UserProfileTabs } from "@/components/user";
 
 /**
  * 個人頁面
@@ -18,10 +18,17 @@ import { IslandHeader, UserInfoCard } from "@/components/user";
 // 使用 React.cache() 避免在 generateMetadata 和 page 中重複請求
 const getCachedUserByIdentifier = cache(getUserByIdentifier);
 
-// 取得當前登入使用者（用 cache 避免重複請求）
-const getCachedCurrentUser = cache(async () => {
+// SSR 需手動轉發 auth_token cookie，否則 fetch 不會帶入認證資訊
+const fetchCurrentUserSSR = cache(async (authToken: string) => {
   try {
-    return await getCurrentUser();
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
+    const response = await fetch(`${baseUrl}/api/v1/users/me`, {
+      headers: { Cookie: `auth_token=${authToken}` },
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    const body = await response.json();
+    return { data: body };
   } catch {
     return null;
   }
@@ -93,11 +100,15 @@ export default async function UserProfilePage({
   const { identifier, locale } = await params;
   const t = await getTranslations({ locale, namespace: "user_profile" });
 
+  // 取得 auth_token cookie（需在 Server Component 內呼叫，不可放在 module-level cache 內）
+  const cookieStore = await cookies();
+  const authToken = cookieStore.get("auth_token")?.value ?? "";
+
   // 並行取得：個人檔案資料、舊版用戶資料（用於 metadata / fallback）、當前登入用戶
   const [userResponse, profileResponse, currentUserResponse] = await Promise.all([
     getCachedUserByIdentifier(identifier),
     getCachedUserProfile(identifier),
-    getCachedCurrentUser(),
+    authToken ? fetchCurrentUserSSR(authToken) : Promise.resolve(null),
   ]);
 
   // 如果請求失敗或沒有資料，顯示 404
@@ -157,8 +168,10 @@ export default async function UserProfilePage({
           targetUserId={userId}
         />
 
-        {/* 「主題實踐」區塊 */}
-        <PracticeSection userId={userId} />
+        <UserProfileTabs
+          targetUserId={userId}
+          isOwnProfile={isOwnProfile}
+        />
       </main>
     </div>
   );

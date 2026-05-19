@@ -4678,5 +4678,40 @@
     "testimonial_8_name": "Mei",
     "testimonial_8_role": "插畫學習者",
     "testimonial_8_content": "自學一陣子插畫，一直畫畫停停。這次挑戰 21 天上傳圖文日誌，也從島島阿學的學習資源挖到了很多寶藏，飛速前進中！！🚀"
+  },
+  "persona": {
+    "tabLabel": "學習人物誌",
+    "myProfile": {
+      "loading": "載入中...",
+      "empty": "尚無問題",
+      "clickToAnswer": "填寫",
+      "progress": "已回答 {answered}/{total} 題",
+      "startPrompt": "點擊任一題開始填寫你的學習人物誌",
+      "showMore": "顯示更多 {count} 題",
+      "showLess": "收起",
+      "submit": "送出",
+      "submitting": "送出中...",
+      "submitSuccess": "回答成功！",
+      "submitError": "送出失敗，請稍後再試",
+      "selectRequired": "請選擇一個選項",
+      "textRequired": "請填寫答案",
+      "textPlaceholder": "請輸入你的答案...",
+      "resonances": "共鳴"
+    },
+    "userProfile": {
+      "loading": "載入中...",
+      "noAnswer": "此用戶尚未回答任何問題",
+      "switchQuestion": "換一題",
+      "lockedMessage": "再回答 {count} 題才能查看"
+    },
+    "resonance": {
+      "error": "共鳴操作失敗，請稍後再試"
+    },
+    "carousel": {
+      "title": "學習人物誌",
+      "dismiss": "今天不再顯示",
+      "switchQuestion": "換一題",
+      "error": "操作失敗，請稍後再試"
+    }
   }
 }
