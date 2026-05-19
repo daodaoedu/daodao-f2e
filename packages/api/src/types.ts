@@ -7855,6 +7855,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 健康檢查
+         * @description 檢查 API 服務是否正常運行
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 服務正常運行 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            status: string;
+                            uptime: number;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/monitor": {
         parameters: {
             query?: never;
@@ -29325,6 +29368,10 @@ export interface components {
             reactionType: string;
             /** @description 反應時間（ISO 8601） */
             reactedAt: string;
+            /** @description 該用戶是否公開帳號 */
+            isPublic: boolean;
+            /** @description 請求方是否與該用戶有 Connection 關係 */
+            isConnection: boolean;
         };
         /** @description 個別用戶反應列表回應 */
         GetReactionsListResponse: {
