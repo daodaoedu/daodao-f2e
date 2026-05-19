@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@daodao/i18n";
 import { PersonaProfileMe } from "@/components/persona/persona-profile-me";
 import { PersonaProfileUser } from "@/components/persona/persona-profile-user";
 import { PracticeSection } from "@/components/practice";

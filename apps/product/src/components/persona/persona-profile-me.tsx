@@ -5,7 +5,7 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@daodao/i18n";
 import { useState } from "react";
 
 interface InlineAnswerFormProps {
@@ -57,19 +57,21 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
       <div className="flex flex-col gap-3 mt-3">
         <div className="flex flex-wrap gap-2">
           {options.map((opt) => (
-            <button
+            <Button
               key={opt}
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => setSelectedValue(opt)}
               className={cn(
-                "px-3 py-1.5 rounded-full border text-sm transition-colors",
+                "rounded-full border text-sm h-auto py-1.5 px-3",
                 selectedValue === opt
-                  ? "bg-blue-500 text-white border-blue-500"
-                  : "border-gray-300 text-gray-700 hover:border-blue-400"
+                  ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-500 hover:text-white"
+                  : "border-gray-300 text-gray-700 hover:border-blue-400 hover:text-gray-700"
               )}
             >
               {opt}
-            </button>
+            </Button>
           ))}
         </div>
         <Button size="sm" onClick={handleSubmit} disabled={submitting || !selectedValue}>
@@ -120,28 +122,37 @@ export function PersonaProfileMe() {
 
         if (q.isPlaceholder) {
           return (
-            <button
-              type="button"
+            <div
               key={q.id}
               className={cn(
-                "w-full text-left rounded-xl border-2 border-dashed border-gray-300 p-4 cursor-pointer transition-colors",
-                isExpanded ? "border-blue-400 bg-blue-50" : "hover:border-blue-300 hover:bg-gray-50"
+                "rounded-xl border-2 border-dashed border-gray-300 transition-colors",
+                isExpanded ? "border-blue-400 bg-blue-50" : "hover:border-blue-300"
               )}
-              onClick={() => setExpandedId(isExpanded ? null : q.id)}
             >
-              <p className="text-sm text-gray-500 font-medium">{q.prompt}</p>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full text-left justify-start h-auto p-4 rounded-xl hover:bg-transparent"
+                onClick={() => setExpandedId(isExpanded ? null : q.id)}
+              >
+                <span className="flex flex-col items-start gap-1">
+                  <span className="text-sm text-gray-500 font-medium">{q.prompt}</span>
+                  {!isExpanded && (
+                    <span className="text-xs text-blue-400">{t("myProfile.clickToAnswer")}</span>
+                  )}
+                </span>
+              </Button>
               {isExpanded && (
-                <InlineAnswerForm
-                  questionId={q.id}
-                  questionType={q.questionType}
-                  options={q.options}
-                  onSuccess={() => handleAnswerSuccess()}
-                />
+                <div className="px-4 pb-4">
+                  <InlineAnswerForm
+                    questionId={q.id}
+                    questionType={q.questionType}
+                    options={q.options}
+                    onSuccess={() => handleAnswerSuccess()}
+                  />
+                </div>
               )}
-              {!isExpanded && (
-                <p className="text-xs text-blue-400 mt-2">{t("myProfile.clickToAnswer")}</p>
-              )}
-            </button>
+            </div>
           );
         }
 

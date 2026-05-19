@@ -2,14 +2,21 @@
 
 import {
   addPersonaResonance,
+  removePersonaResonance,
   useMutate,
   usePersonaProfileUser,
 } from "@daodao/api";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
-import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useTranslations } from "@daodao/i18n";
+import { useEffect, useState } from "react";
+
+function getResonanceClass(isResonating: boolean, hasResonated: boolean): string {
+  if (isResonating) return "text-blue-300";
+  if (hasResonated) return "text-blue-500 hover:text-blue-400";
+  return "text-gray-400 hover:text-blue-400";
+}
 
 interface PersonaProfileUserProps {
   targetUserId: string;
@@ -20,14 +27,20 @@ export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
   const mutate = useMutate();
   const [excludeId, setExcludeId] = useState<number | undefined>(undefined);
   const [resonatingIds, setResonatingIds] = useState<Set<number>>(new Set());
+  const [resonatedIds, setResonatedIds] = useState<Set<number>>(new Set());
 
   const { data, isLoading } = usePersonaProfileUser(targetUserId, { exclude: excludeId });
 
   const questions = data?.data?.questions ?? [];
-  const viewerIsLocked = data?.data?.viewerIsLocked;
+  const viewerIsLocked = data?.data?.viewerIsLocked ?? true;
   const answersNeeded = data?.data?.answersNeeded ?? 0;
 
   const currentQuestion = questions[0] ?? null;
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset resonated state when displayed question changes
+  useEffect(() => {
+    setResonatedIds(new Set());
+  }, [currentQuestion?.id]);
 
   const handleSwitchQuestion = () => {
     if (currentQuestion) {
@@ -37,26 +50,26 @@ export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
 
   const handleResonance = async (answerId: number) => {
     if (resonatingIds.has(answerId)) return;
+    const hasResonated = resonatedIds.has(answerId);
     setResonatingIds((prev) => new Set(prev).add(answerId));
     try {
-      const res = await addPersonaResonance({ answerId });
+      const res = hasResonated
+        ? await removePersonaResonance(answerId)
+        : await addPersonaResonance({ answerId });
       if (res.error) {
         toast.error(t("resonance.error"));
-        setResonatingIds((prev) => {
+      } else {
+        setResonatedIds((prev) => {
           const s = new Set(prev);
-          s.delete(answerId);
+          if (hasResonated) s.delete(answerId);
+          else s.add(answerId);
           return s;
         });
-        return;
+        await mutate(["/api/v1/persona/profile/{userId}"] as const);
       }
-      setResonatingIds((prev) => {
-        const s = new Set(prev);
-        s.delete(answerId);
-        return s;
-      });
-      await mutate(["/api/v1/persona/profile/{userId}"] as const);
     } catch {
       toast.error(t("resonance.error"));
+    } finally {
       setResonatingIds((prev) => {
         const s = new Set(prev);
         s.delete(answerId);
@@ -92,23 +105,23 @@ export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
 
             {currentQuestion.answer && (
               <div className="flex items-center justify-between mt-3">
-                <button
+                <Button
                   type="button"
-                  onClick={() =>
-                    currentQuestion.answer && handleResonance(currentQuestion.answer.id)
-                  }
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => currentQuestion.answer && handleResonance(currentQuestion.answer.id)}
                   disabled={resonatingIds.has(currentQuestion.answer.id)}
                   className={cn(
-                    "text-xs flex items-center gap-1 transition-colors",
-                    resonatingIds.has(currentQuestion.answer.id)
-                      ? "text-blue-400 cursor-default"
-                      : "text-gray-400 hover:text-blue-400"
+                    "text-xs flex items-center gap-1 h-auto p-0",
+                    getResonanceClass(
+                      resonatingIds.has(currentQuestion.answer.id),
+                      resonatedIds.has(currentQuestion.answer.id)
+                    )
                   )}
                 >
                   ✦{" "}
-                  {currentQuestion.answer.resonanceCount +
-                    (resonatingIds.has(currentQuestion.answer.id) ? 1 : 0)}
-                </button>
+                  {currentQuestion.answer.resonanceCount}
+                </Button>
               </div>
             )}
           </>

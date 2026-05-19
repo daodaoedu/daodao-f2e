@@ -11,12 +11,11 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@daodao/ui/components/carousel";
 import { toast } from "@daodao/ui/components/sonner";
+import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@daodao/i18n";
 import { useState } from "react";
 
 interface CarouselQuestionCardProps {
@@ -76,40 +75,44 @@ function CarouselQuestionCard({
       {isChoice ? (
         <div className="flex flex-wrap gap-2 mb-3">
           {options.map((opt) => (
-            <button
+            <Button
               key={opt}
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => setSelected(opt)}
               className={cn(
-                "px-3 py-1.5 rounded-full border text-sm transition-colors",
+                "rounded-full border text-sm h-auto py-1.5 px-3",
                 selected === opt
-                  ? "bg-blue-500 text-white border-blue-500"
-                  : "border-gray-300 text-gray-700 hover:border-blue-400"
+                  ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-500 hover:text-white"
+                  : "border-gray-300 text-gray-700 hover:border-blue-400 hover:text-gray-700"
               )}
             >
               {opt}
-            </button>
+            </Button>
           ))}
         </div>
       ) : (
-        <textarea
+        <Textarea
           value={textValue}
           onChange={(e) => setTextValue(e.target.value)}
           placeholder={tProfile("textPlaceholder")}
           rows={2}
           maxLength={300}
-          className="w-full text-sm border rounded-lg p-2 resize-none focus:outline-none focus:ring-1 focus:ring-blue-400 mb-3"
+          className="mb-3 resize-none"
         />
       )}
 
       <div className="flex justify-between items-center">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => onSwitch(questionId)}
           className="text-xs text-gray-400 hover:text-gray-600"
         >
           {t("switchQuestion")}
-        </button>
+        </Button>
         <Button
           size="sm"
           onClick={handleSubmit}
@@ -134,17 +137,16 @@ export function ResonanceCarousel() {
   const shouldShow = data?.data?.shouldShow;
   const questions = data?.data?.questions ?? [];
 
-  // answeredCount is not directly available, use questions.length as proxy for lock check
-  // viewerIsLocked based on how many questions the user has answered
-  // The carousel shows the user's own unanswered questions, so no lock concept here
-  // Lock (task 7.2) would apply if showing others' resonances — skip for this implementation
-
   if (isLoading || !shouldShow) return null;
 
   const handleDismiss = async () => {
     setDismissing(true);
     try {
-      await dismissPersonaCarousel();
+      const res = await dismissPersonaCarousel();
+      if (res.error) {
+        toast.error(t("error"));
+        return;
+      }
       await mutate(["/api/v1/persona/carousel-state"] as const);
     } catch {
       toast.error(t("error"));
@@ -168,14 +170,16 @@ export function ResonanceCarousel() {
     <div className="mb-4">
       <div className="flex justify-between items-center mb-2">
         <p className="text-sm font-semibold text-gray-700">{t("title")}</p>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={handleDismiss}
           disabled={dismissing}
-          className="text-xs text-gray-400 hover:text-gray-600"
+          className="text-xs text-gray-400 hover:text-gray-600 h-auto p-0"
         >
           {t("dismiss")}
-        </button>
+        </Button>
       </div>
 
       <Carousel opts={{ align: "start" }} className="w-full">
@@ -193,8 +197,6 @@ export function ResonanceCarousel() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="left-0" />
-        <CarouselNext className="right-0" />
       </Carousel>
     </div>
   );
