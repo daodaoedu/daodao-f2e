@@ -9,6 +9,7 @@ import { Form } from "@daodao/ui/components/form";
 import { Progress } from "@daodao/ui/components/progress";
 import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
+import { useLeaveWithDraftConfirm } from "@daodao/ui/hooks/use-leave-with-draft-confirm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -28,6 +29,10 @@ import {
   parseFrequency,
 } from "@/constants/practice-form";
 import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
+import {
+  shouldNavigateOnLeave,
+  shouldSaveDraftOnLeave,
+} from "@/hooks/leave-with-draft-utils";
 import {
   applyOnboardingUpdateFromResponse,
   refreshOnboardingStatus,
@@ -108,7 +113,7 @@ export default function CreateManualPracticePage() {
   });
 
   // 使用共用 Hook 處理暫存邏輯
-  const { draft, showRestoreDialog, isCheckingDraft, restoreDraft, clearDraft } =
+  const { draft, showRestoreDialog, isCheckingDraft, restoreDraft, clearDraft, saveDraft } =
     useFormDraft<ManualPracticeFormValues>({
       storageKey: StorageEnum.ManualPracticeDraft,
       form,
@@ -124,6 +129,27 @@ export default function CreateManualPracticePage() {
       setCurrentStep(draft.currentStep);
     }
   }, [draft, restoreDraft]);
+
+  const confirmLeaveWithDraft = useLeaveWithDraftConfirm();
+
+  const handleClose = useCallback(async () => {
+    if (!form.formState.isDirty) {
+      router.replace("/");
+      return;
+    }
+    try {
+      const choice = await confirmLeaveWithDraft();
+      if (shouldSaveDraftOnLeave(choice)) {
+        saveDraft();
+      }
+      if (shouldNavigateOnLeave(choice)) {
+        form.reset(form.getValues());
+        router.replace("/");
+      }
+    } catch {
+      // dialog dismissed or unexpected error — stay on page
+    }
+  }, [form.formState.isDirty, form.reset, form.getValues, confirmLeaveWithDraft, saveDraft, router]);
 
   const name = form.watch("name");
   const actionDescription = form.watch("actionDescription");
@@ -316,7 +342,7 @@ export default function CreateManualPracticePage() {
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <PageHeader title={currentStep === 5 ? t("manual_preview_title") : t("manual_create_title")} rightActionTo="/" />
+      <PageHeader title={currentStep === 5 ? t("manual_preview_title") : t("manual_create_title")} onRightAction={handleClose} />
 
       <main className="relative px-5 max-w-[448px] mx-auto pb-20">
         {/* Progress Bar */}
