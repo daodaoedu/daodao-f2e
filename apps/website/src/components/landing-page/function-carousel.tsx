@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 
 interface FunctionCardProps {
@@ -84,6 +85,7 @@ const _functions = [
 ];
 
 export function FunctionCarousel() {
+  const t = useTranslations("landing_page");
   return (
     <section className="relative flex flex-col items-center justify-center overflow-x-clip bg-basic-white pt-16 pb-16">
       {/* 底部裝飾圖片 */}
@@ -91,7 +93,7 @@ export function FunctionCarousel() {
         <source media="(max-width: 767px)" srcSet="/assets/landing-page/ribbon-mobile.svg" />
         <Image
           src="/assets/landing-page/ribbon-desktop.svg"
-          alt="更多功能持續進化為你帶來美好的學習生活"
+          alt={t("function_carousel_ribbon_alt")}
           fill
         />
       </picture>

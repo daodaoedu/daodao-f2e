@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { cn } from "@daodao/ui/lib/utils";
@@ -7,7 +8,6 @@ import { X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CheckInDateButton } from "./check-in-date-button";
 import type { ICheckInDateSelectorProps } from "./types";
-
 
 export const MobileCheckInDateSelector = ({
   checkInDates,
@@ -18,6 +18,7 @@ export const MobileCheckInDateSelector = ({
   title,
   closeActionTo,
 }: ICheckInDateSelectorProps) => {
+  const t = useTranslations("check_in");
   const router = useSafeRouter();
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
@@ -170,7 +171,7 @@ export const MobileCheckInDateSelector = ({
           variant="ghost"
           size="icon"
           onClick={handleClose}
-          aria-label="關閉"
+          aria-label={t("close")}
           animation="none"
           className="text-light-gray bg-very-light-gray/50"
         >

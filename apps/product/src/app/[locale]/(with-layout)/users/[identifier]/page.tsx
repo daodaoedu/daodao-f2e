@@ -1,9 +1,10 @@
-import { getCurrentUser, getUserByIdentifier, getUserProfileByIdentifier } from "@daodao/api";
+import { getUserByIdentifier, getUserProfileByIdentifier } from "@daodao/api";
+import { getTranslations } from "@daodao/i18n/server";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { PracticeSection } from "@/components/practice";
-import { IslandHeader, UserInfoCard } from "@/components/user";
+import { IslandHeader, UserInfoCard, UserProfileTabs } from "@/components/user";
 
 /**
  * 個人頁面
@@ -17,10 +18,17 @@ import { IslandHeader, UserInfoCard } from "@/components/user";
 // 使用 React.cache() 避免在 generateMetadata 和 page 中重複請求
 const getCachedUserByIdentifier = cache(getUserByIdentifier);
 
-// 取得當前登入使用者（用 cache 避免重複請求）
-const getCachedCurrentUser = cache(async () => {
+// SSR 需手動轉發 auth_token cookie，否則 fetch 不會帶入認證資訊
+const fetchCurrentUserSSR = cache(async (authToken: string) => {
   try {
-    return await getCurrentUser();
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
+    const response = await fetch(`${baseUrl}/api/v1/users/me`, {
+      headers: { Cookie: `auth_token=${authToken}` },
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    const body = await response.json();
+    return { data: body };
   } catch {
     return null;
   }
@@ -38,7 +46,8 @@ const getCachedUserProfile = cache(async (identifier: string) => {
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/users/[identifier]">): Promise<Metadata> {
-  const { identifier } = await params;
+  const { identifier, locale } = await params;
+  const t = await getTranslations({ locale, namespace: "user_profile" });
 
   // 獲取用戶資料以生成 metadata（使用緩存版本）
   const userResponse = await getCachedUserByIdentifier(identifier);
@@ -46,21 +55,21 @@ export async function generateMetadata({
   // 如果請求失敗或沒有資料，返回預設 metadata
   if (!userResponse.data || !userResponse.response.ok) {
     return {
-      title: "用戶個人頁面",
-      description: "查看用戶的個人資訊和實踐記錄",
+      title: t("meta_page_title_default"),
+      description: t("meta_page_description"),
     };
   }
 
   const userData = userResponse.data?.data ?? userResponse.data;
-  const userName = userData?.name || "未命名用戶";
-  const userDescription = userData?.selfIntroduction || "查看用戶的個人資訊和實踐記錄";
+  const userName = userData?.name || t("unnamed_user");
+  const userDescription = userData?.selfIntroduction || t("meta_page_description");
   const userPhotoURL = userData?.photoURL;
 
   return {
-    title: `${userName} 的個人頁面`,
+    title: t("meta_page_title", { name: userName }),
     description: userDescription,
     openGraph: {
-      title: `${userName} 的個人頁面`,
+      title: t("meta_page_title", { name: userName }),
       description: userDescription,
       ...(userPhotoURL && {
         images: [
@@ -68,7 +77,7 @@ export async function generateMetadata({
             url: userPhotoURL,
             width: 1200,
             height: 630,
-            alt: `${userName} 的頭像`,
+            alt: t("meta_avatar_alt", { name: userName }),
           },
         ],
       }),
@@ -76,7 +85,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary",
-      title: `${userName} 的個人頁面`,
+      title: t("meta_page_title", { name: userName }),
       description: userDescription,
       ...(userPhotoURL && {
         images: [userPhotoURL],
@@ -89,12 +98,17 @@ export default async function UserProfilePage({
   params,
 }: PageProps<"/[locale]/users/[identifier]">) {
   const { identifier, locale } = await params;
+  const t = await getTranslations({ locale, namespace: "user_profile" });
+
+  // 取得 auth_token cookie（需在 Server Component 內呼叫，不可放在 module-level cache 內）
+  const cookieStore = await cookies();
+  const authToken = cookieStore.get("auth_token")?.value ?? "";
 
   // 並行取得：個人檔案資料、舊版用戶資料（用於 metadata / fallback）、當前登入用戶
   const [userResponse, profileResponse, currentUserResponse] = await Promise.all([
     getCachedUserByIdentifier(identifier),
     getCachedUserProfile(identifier),
-    getCachedCurrentUser(),
+    authToken ? fetchCurrentUserSSR(authToken) : Promise.resolve(null),
   ]);
 
   // 如果請求失敗或沒有資料，顯示 404
@@ -135,7 +149,7 @@ export default async function UserProfilePage({
       <main className="max-w-[640px] mx-auto px-5 pb-[64px]">
         {/* 用戶個人資訊卡片 */}
         <UserInfoCard
-          name={userData.name || "未命名用戶"}
+          name={userData.name || t("unnamed_user")}
           customId={userData.customId || undefined}
           location={
             (locale === "en" ? userData.locationNameEn : userData.locationNameZh) || undefined
@@ -154,8 +168,10 @@ export default async function UserProfilePage({
           targetUserId={userId}
         />
 
-        {/* 「主題實踐」區塊 */}
-        <PracticeSection userId={userId} />
+        <UserProfileTabs
+          targetUserId={userId}
+          isOwnProfile={isOwnProfile}
+        />
       </main>
     </div>
   );

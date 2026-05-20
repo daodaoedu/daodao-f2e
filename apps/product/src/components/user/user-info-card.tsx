@@ -10,6 +10,7 @@ import {
   useCurrentUser,
   useFollowStatus,
 } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import FacebookSvg from "@daodao/assets/images/social-icons/facebook-filled.svg";
 import GithubSvg from "@daodao/assets/images/social-icons/github.svg";
 import InstagramSvg from "@daodao/assets/images/social-icons/instagram-filled.svg";
@@ -143,6 +144,7 @@ export function UserInfoCard({
   isAuthenticated = false,
   targetUserId,
 }: UserInfoCardProps) {
+  const t = useTranslations("user_profile");
   const isMobile = useIsMobile();
   const [followLoading, setFollowLoading] = useState(false);
   const [connectLoading, setConnectLoading] = useState(false);
@@ -212,9 +214,9 @@ export function UserInfoCard({
   const handleCopy = useCallback(async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success("已複製到剪貼簿");
+      toast.success(t("contact_copied_clipboard"));
     } catch {
-      toast.error("複製失敗");
+      toast.error(t("copy_failed"));
     }
   }, []);
 
@@ -225,14 +227,14 @@ export function UserInfoCard({
       if (currentIsFollowing) {
         await unfollowTarget("user", targetUserId);
         setIsFollowing(false);
-        toast.success("已取消關注");
+        toast.success(t("unfollow_success"));
       } else {
         await followTarget({ targetType: "user", targetId: targetUserId });
         setIsFollowing(true);
-        toast.success("已關注");
+        toast.success(t("follow_success"));
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "操作失敗");
+      toast.error(err instanceof Error ? err.message : t("operation_failed"));
     } finally {
       setFollowLoading(false);
     }
@@ -243,15 +245,15 @@ export function UserInfoCard({
 
     intentRef.current = "";
     const result = await openInfoDialog({
-      title: "請求連結",
+      title: t("conn_request_title"),
       content: (
         <div className="p-4">
-          <p className="text-sm text-gray-600 mb-3">填寫連結原因，讓對方更了解你的請求動機。</p>
+          <p className="text-sm text-gray-600 mb-3">{t("conn_request_hint")}</p>
           <textarea
             className="w-full border border-gray-300 rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
             rows={3}
             maxLength={50}
-            placeholder="請簡短說明連結原因（最多 50 字）"
+            placeholder={t("conn_request_placeholder")}
             onChange={(e) => {
               intentRef.current = e.target.value;
             }}
@@ -259,8 +261,8 @@ export function UserInfoCard({
         </div>
       ),
       buttons: [
-        { label: "取消", value: "cancel", variant: "outline" },
-        { label: "送出", value: "confirm", variant: "default" },
+        { label: t("cancel"), value: "cancel", variant: "outline" },
+        { label: t("conn_request_submit"), value: "confirm", variant: "default" },
       ],
     });
 
@@ -273,16 +275,16 @@ export function UserInfoCard({
         intent: intentRef.current.trim() || undefined,
       });
       setOptimisticConnectionStatus("pending");
-      toast.success("已送出連結請求");
+      toast.success(t("conn_request_sent"));
       mutateOutgoing();
     } catch (err) {
       // 409 表示請求已存在（pending）或已連結，重新抓資料讓 SWR 決定實際狀態
       if (err instanceof ApiError && err.status === 409) {
         await Promise.all([mutateConnections(), mutateOutgoing()]);
-        toast.success("連結請求已送出");
+        toast.success(t("conn_request_sent"));
         return;
       }
-      toast.error(err instanceof Error ? err.message : "請求失敗");
+      toast.error(err instanceof Error ? err.message : t("conn_request_failed"));
     } finally {
       setConnectLoading(false);
     }
@@ -390,7 +392,7 @@ export function UserInfoCard({
           href="/settings/public-info"
           prefetch={false}
           className="absolute top-5 right-5 z-10 size-10 flex items-center justify-center rounded-full bg-[#F4F6F6] text-text-dark/60 hover:text-text-dark transition-colors"
-          aria-label="編輯個人檔案"
+          aria-label={t("edit_profile_title")}
         >
           <Pencil className="size-[18px]" />
         </CustomLink>
@@ -444,7 +446,7 @@ export function UserInfoCard({
           {/* 近 7 天實踐次數 */}
           {recentPracticeCount !== undefined && (
             <p className="text-xs text-text-dark mb-3">
-              近 7 天 <span className="font-medium">{recentPracticeCount}</span> 次實踐
+              {t("recent_practice_count", { count: recentPracticeCount })}
             </p>
           )}
 
@@ -453,7 +455,7 @@ export function UserInfoCard({
             !isOwnProfile &&
             commonCirclesCount != null &&
             commonCirclesCount > 0 && (
-              <p className="text-xs text-text-dark mb-3">{commonCirclesCount} 個共同 Circle</p>
+              <p className="text-xs text-text-dark mb-3">{t("common_circles_count", { count: commonCirclesCount })}</p>
             )}
 
           {!isMobile && moreContent}
@@ -470,7 +472,7 @@ export function UserInfoCard({
             onClick={handleFollow}
             disabled={followLoading}
           >
-            {currentIsFollowing ? "關注中" : "+ 關注"}
+            {currentIsFollowing ? t("following_btn") : t("follow_btn")}
           </Button>
           {isConnectionsLoading || isOutgoingLoading ? (
             <div className="flex-1 h-12 rounded-full bg-gray-100 animate-pulse" />
@@ -486,10 +488,10 @@ export function UserInfoCard({
               disabled={connectLoading || connectionStatus !== "none"}
             >
               {connectionStatus === "connected"
-                ? "已連結"
+                ? t("conn_status_connected")
                 : connectionStatus === "pending"
-                  ? "已送出連結請求"
-                  : "請求連結"}
+                  ? t("conn_status_pending")
+                  : t("conn_request_title")}
             </Button>
           )}
         </div>
