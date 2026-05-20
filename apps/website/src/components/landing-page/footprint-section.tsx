@@ -26,6 +26,7 @@ const PHASE_ORDER: AnimationPhase[] = ["card", "blank", "block", "block-card"];
 
 export function FootprintSection() {
   const t = useTranslations("common");
+  const tLanding = useTranslations("landing_page");
   const [phaseIndex, setPhaseIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
 
@@ -85,7 +86,7 @@ export function FootprintSection() {
               >
                 <Image
                   src="/assets/landing-page/animation-1.svg"
-                  alt="卡片動畫"
+                  alt={tLanding("footprint_animation_card_alt")}
                   fill
                   className="object-contain object-bottom"
                 />
@@ -106,7 +107,7 @@ export function FootprintSection() {
               >
                 <Image
                   src="/assets/landing-page/animation-2.svg"
-                  alt="色塊"
+                  alt={tLanding("footprint_animation_block_alt")}
                   fill
                   className="object-contain object-bottom"
                 />
@@ -127,7 +128,7 @@ export function FootprintSection() {
               >
                 <Image
                   src="/assets/landing-page/animation-3.svg"
-                  alt="卡片"
+                  alt={tLanding("footprint_animation_card_overlay_alt")}
                   fill
                   className="object-contain object-bottom"
                 />

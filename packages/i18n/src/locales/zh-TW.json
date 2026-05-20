@@ -4865,7 +4865,11 @@
     "stats_streak_unit": "天",
     "stats_responses_label": "獲得迴響",
     "stats_responses_unit": "次",
-    "task_label_practice": "主題實踐"
+    "task_label_practice": "主題實踐",
+    "start_date_prefix": "開始 {date}",
+    "days_remaining": "剩 {days} 天",
+    "due_today": "今天到期",
+    "overdue_days": "已逾期 {days} 天"
   },
   "notification": {
     "and_others": "與其他 {count} 人",
@@ -5300,7 +5304,10 @@
     "persona_allen_quote": "很想嘗試一個月挑戰，看看自己在專注做一件事時，能長出什麼樣的成果 🙌",
     "persona_yuki_profession": "研究所學生",
     "persona_yuki_exploration": "社會議題、手寫筆記",
-    "persona_yuki_quote": "有時候學習讓我很焦慮，但我想試試看用更溫柔的方式陪自己走過探索的路。"
+    "persona_yuki_quote": "有時候學習讓我很焦慮，但我想試試看用更溫柔的方式陪自己走過探索的路。",
+    "footprint_animation_card_alt": "卡片動畫",
+    "footprint_animation_block_alt": "色塊",
+    "footprint_animation_card_overlay_alt": "卡片"
   },
   "persona": {
     "tabLabel": "學習人物誌",
@@ -5526,7 +5533,8 @@
     "back_to_website": "回到官網",
     "back_to_home": "回到首頁",
     "join_now": "立即加入",
-    "default_slogan": "先做再說，做中學最快！"
+    "default_slogan": "先做再說，做中學最快！",
+    "logo_alt": "島島阿學 Logo"
   },
   "social": {
     "page_title": "社交",
@@ -5578,5 +5586,11 @@
     "not_exist_title": "這座島已經搬新家囉",
     "not_exist_desc": "近期網站改版，可能有部分頁面無法使用，可以參觀其他地方唷～",
     "not_exist_cta": "要不要試試我們新版的資源搜尋或是參觀其他地方呢？"
+  },
+  "error_page": {
+    "error_title": "發生錯誤",
+    "error_message": "請稍後再試或聯繫客服",
+    "not_found_title": "找不到頁面",
+    "not_found_message": "您要尋找的頁面不存在"
   }
 }

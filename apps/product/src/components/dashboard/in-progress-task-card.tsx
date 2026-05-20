@@ -102,15 +102,15 @@ export const InProgressTaskCard = ({
         {(formattedStartDate !== null || remainingDays !== null) && (
           <div className="flex items-center gap-2 text-xs text-text-dark">
             {formattedStartDate !== null && (
-              <span>開始 {formattedStartDate}</span>
+              <span>{t("start_date_prefix", { date: formattedStartDate })}</span>
             )}
             {remainingDays !== null && (
               <span className={remainingDays < 0 ? "text-red-500" : ""}>
                 {remainingDays > 0
-                  ? `剩 ${remainingDays} 天`
+                  ? t("days_remaining", { days: remainingDays })
                   : remainingDays === 0
-                    ? "今天到期"
-                    : `已逾期 ${Math.abs(remainingDays)} 天`}
+                    ? t("due_today")
+                    : t("overdue_days", { days: Math.abs(remainingDays) })}
               </span>
             )}
           </div>

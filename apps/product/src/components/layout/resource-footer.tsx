@@ -10,6 +10,7 @@ import { ChevronRight } from "lucide-react";
 
 export const ResourceFooter = () => {
   const t = useTranslations("common");
+  const tLayout = useTranslations("layout");
 
   const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL || "";
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
@@ -21,7 +22,7 @@ export const ResourceFooter = () => {
           <div>
             <Image
               src="/assets/landing-page/logo-simple-white.svg"
-              alt="島島阿學 Logo"
+              alt={tLayout("logo_alt")}
               width={142}
               height={24}
               className="mb-2"

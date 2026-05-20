@@ -2,9 +2,22 @@
 
 import faviconPng from "@daodao/assets/images/brand/favicon.png";
 import { getMessagesFromPathname } from "@daodao/i18n";
+import { useTranslations } from "@daodao/i18n";
 import { usePathname } from "next/navigation";
 import "@daodao/ui/globals.css";
 import GlobalProvider from "./global-provider";
+
+function GlobalErrorContent() {
+  const t = useTranslations("error_page");
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold">{t("error_title")}</h1>
+        <p className="mt-4 text-muted-foreground">{t("error_message")}</p>
+      </div>
+    </div>
+  );
+}
 
 function GlobalErrorPage() {
   const pathname = usePathname();
@@ -19,12 +32,7 @@ function GlobalErrorPage() {
 
   return (
     <GlobalProvider head={head} locale={locale} messages={messages}>
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">發生錯誤</h1>
-          <p className="mt-4 text-muted-foreground">請稍後再試或聯繫客服</p>
-        </div>
-      </div>
+      <GlobalErrorContent />
     </GlobalProvider>
   );
 }

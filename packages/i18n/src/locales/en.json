@@ -4865,7 +4865,11 @@
     "stats_streak_unit": "days",
     "stats_responses_label": "Responses",
     "stats_responses_unit": "times",
-    "task_label_practice": "Topic Practice"
+    "task_label_practice": "Topic Practice",
+    "start_date_prefix": "Started {date}",
+    "days_remaining": "{days} days left",
+    "due_today": "Due today",
+    "overdue_days": "Overdue by {days} days"
   },
   "notification": {
     "and_others": "and {count} others",
@@ -5300,7 +5304,10 @@
     "persona_allen_quote": "I'd love to try a one-month challenge and see what I can grow when I focus on one thing 🙌",
     "persona_yuki_profession": "Graduate Student",
     "persona_yuki_exploration": "Social Issues, Handwritten Notes",
-    "persona_yuki_quote": "Learning sometimes makes me anxious, but I want to try a gentler way of accompanying myself through this path of exploration."
+    "persona_yuki_quote": "Learning sometimes makes me anxious, but I want to try a gentler way of accompanying myself through this path of exploration.",
+    "footprint_animation_card_alt": "Card animation",
+    "footprint_animation_block_alt": "Color block",
+    "footprint_animation_card_overlay_alt": "Card"
   },
   "persona": {
     "tabLabel": "Learning Persona",
@@ -5526,7 +5533,8 @@
     "back_to_website": "Back to website",
     "back_to_home": "Back to home",
     "join_now": "Join Now",
-    "default_slogan": "Act first, learn by doing!"
+    "default_slogan": "Act first, learn by doing!",
+    "logo_alt": "DaoDao Learning Logo"
   },
   "social": {
     "page_title": "Social",
@@ -5578,5 +5586,11 @@
     "not_exist_title": "This island has moved to a new home",
     "not_exist_desc": "The site was recently redesigned. Some pages may be unavailable — feel free to explore other areas!",
     "not_exist_cta": "Would you like to try our new resource search or visit somewhere else?"
+  },
+  "error_page": {
+    "error_title": "Something went wrong",
+    "error_message": "Please try again later or contact support",
+    "not_found_title": "Page not found",
+    "not_found_message": "The page you are looking for does not exist"
   }
 }
