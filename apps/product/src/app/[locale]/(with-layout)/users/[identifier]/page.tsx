@@ -1,5 +1,5 @@
 import { getUserByIdentifier, getUserProfileByIdentifier } from "@daodao/api";
-import { getTranslations } from "@daodao/i18n/server";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -98,6 +98,7 @@ export default async function UserProfilePage({
   params,
 }: PageProps<"/[locale]/users/[identifier]">) {
   const { identifier, locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "user_profile" });
 
   // 取得 auth_token cookie（需在 Server Component 內呼叫，不可放在 module-level cache 內）

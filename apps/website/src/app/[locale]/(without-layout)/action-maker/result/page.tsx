@@ -1,4 +1,5 @@
 import { ActionMakerResult } from "@daodao/features-action-maker";
+import { setRequestLocale } from "@daodao/i18n/server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,6 +7,8 @@ export const metadata: Metadata = {
   robots: "noindex",
 };
 
-export default function ResultPage() {
+export default async function ResultPage({ params }: PageProps<"/[locale]/action-maker/result">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return <ActionMakerResult />;
 }

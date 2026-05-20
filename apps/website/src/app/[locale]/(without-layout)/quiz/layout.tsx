@@ -1,6 +1,9 @@
 import { QuizProvider } from "@daodao/features-quiz";
+import { setRequestLocale } from "@daodao/i18n/server";
 
-export default async function QuizLayout({ children }: LayoutProps<"/[locale]">) {
+export default async function QuizLayout({ children, params }: LayoutProps<"/[locale]/quiz">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <QuizProvider>
       <style>
