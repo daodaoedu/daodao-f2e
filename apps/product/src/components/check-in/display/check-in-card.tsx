@@ -1,6 +1,7 @@
 "use client";
 
 import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
+import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
 import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
@@ -122,7 +123,22 @@ export const CheckInCard = ({
 
                 {/* 文字內容 */}
                 <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">
-                  {content}
+                  {parseTextLinks(content).map((seg, i) =>
+                    seg.type === "url" &&
+                    (seg.value.startsWith("https://") || seg.value.startsWith("http://")) ? (
+                      <a
+                        key={`${i}-url`}
+                        href={seg.value}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-logo-cyan underline break-all"
+                      >
+                        {seg.value}
+                      </a>
+                    ) : (
+                      <React.Fragment key={`${i}-text`}>{seg.value}</React.Fragment>
+                    )
+                  )}
                 </p>
 
                 {/* 標籤 */}
