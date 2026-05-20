@@ -4546,7 +4546,15 @@
     "ai_disclaimer": "Topics are AI-generated recommendations",
     "empty_title": "No recommendations yet",
     "empty_description": "You can focus on your current plan, or browse other practices in the Inspire tab",
-    "empty_cta": "Go to Inspire"
+    "empty_cta": "Go to Inspire",
+    "completed_title": "Completed",
+    "fab_add_task": "Add task",
+    "fab_create_practice": "Create a themed practice",
+    "checked_in_count": "Checked in <bold>{count}</bold> times",
+    "header_month_unit": "",
+    "header_day_unit": "",
+    "want_to_practice": "I want to try this too",
+    "continue_editing": "Continue editing"
   },
   "notification": {
     "and_others": "and {count} others",

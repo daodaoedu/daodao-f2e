@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRightOutlineSvg, MessagesSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -47,6 +48,7 @@ export const InProgressTaskCard = ({
   endDate,
   onEdit,
 }: InProgressTaskCardProps) => {
+  const t = useTranslations("dashboard");
   const themeName = getThemeNameFromColor(theme);
   const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
   const statusInfo = getStatusConfig(status);
@@ -95,10 +97,11 @@ export const InProgressTaskCard = ({
 
         {/* Progress */}
         <div className="flex items-center justify-between">
-          <span className="text-xs flex gap-1">
-            <span className="text-text-dark">已打卡</span>
-            <span className="text-text-dark font-semibold">{checkInCount}</span>
-            <span className="text-text-dark">次</span>
+          <span className="text-xs text-text-dark">
+            {t.rich("checked_in_count", {
+              count: checkInCount,
+              bold: (chunks) => <span className="font-semibold">{chunks}</span>,
+            })}
           </span>
           {/* TODO: MVP 先不開放 */}
           <div className="hidden items-center gap-1">
@@ -127,7 +130,7 @@ export const InProgressTaskCard = ({
           {isDraft ? (
             <Button variant="secondary" onClick={onEdit}>
               <PenLine className="size-4.5 text-logo-cyan" />
-              繼續編輯
+              {t("continue_editing")}
             </Button>
           ) : (
             <CheckInButton

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { CompletedTaskCard } from "./completed-task-card";
 
 export interface CompletedTask {
@@ -17,13 +18,15 @@ interface CompletedSectionProps {
 }
 
 export const CompletedSection = ({ tasks }: CompletedSectionProps) => {
+  const t = useTranslations("dashboard");
+
   if (tasks.length === 0) {
     return null;
   }
 
   return (
     <section className="max-w-[640px] pt-4 px-5 mx-auto">
-      <h2 className="mb-3 text-[1.125rem] font-medium text-bg-dark">已完成</h2>
+      <h2 className="mb-3 text-[1.125rem] font-medium text-bg-dark">{t("completed_title")}</h2>
       <div className="flex flex-col gap-3">
         {tasks.map((task) => (
           <CompletedTaskCard
