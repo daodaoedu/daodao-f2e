@@ -2,6 +2,7 @@
 
 import { useMyPracticeStats, useMyPractices } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2 } from "lucide-react";
@@ -15,23 +16,24 @@ import {
 } from "@/components/dashboard";
 import { BackgroundAnimation, Banner } from "@/components/layout";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
+import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 import {
   FilterStatus,
   type FilterStatus as FilterStatusType,
   mapPracticeStatusToTaskStatus,
 } from "@/constants/task-status";
-import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 
 const filterOptions = [
-  { value: FilterStatus.all, label: "全部" },
-  { value: FilterStatus.draft, label: "草稿" },
-  { value: FilterStatus.notStarted, label: "未開始" },
-  { value: FilterStatus.inProgress, label: "進行中" },
-  { value: FilterStatus.completed, label: "已完成" },
-];
+  { value: FilterStatus.all, labelKey: "filter_all" },
+  { value: FilterStatus.draft, labelKey: "filter_draft" },
+  { value: FilterStatus.notStarted, labelKey: "filter_not_started" },
+  { value: FilterStatus.inProgress, labelKey: "filter_in_progress" },
+  { value: FilterStatus.completed, labelKey: "filter_completed" },
+] as const;
 
 export default function MyPage() {
   const router = useRouter();
+  const t = useTranslations("dashboard");
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
 
   const { data: allPracticesData, isLoading: isMyLoading } = useMyPractices({ limit: 16 });
@@ -45,7 +47,7 @@ export default function MyPage() {
       const lastCheckInDate = practice.lastCheckinAt ?? null;
       inProgressTasksData.push({
         id: practice.id,
-        label: "主題實踐",
+        label: t("task_label_practice"),
         title: practice.title,
         description: practice.practiceAction || "",
         checkInCount: practice.checkInCount,
@@ -61,7 +63,7 @@ export default function MyPage() {
     });
 
     return { inProgressTasks: inProgressTasksData };
-  }, [allPracticesData]);
+  }, [allPracticesData, t]);
 
   const filteredInProgressTasks = useMemo(() => {
     if (filterStatus === FilterStatus.completed)
@@ -75,19 +77,19 @@ export default function MyPage() {
     const statsDataValue = statsData?.data;
     return [
       {
-        label: "連續登入",
+        label: t("stats_streak_label"),
         value: String(statsDataValue?.currentStreak || 0),
-        unit: "天",
+        unit: t("stats_streak_unit"),
         icon: CheckCircle2,
       },
       {
-        label: "獲得迴響",
+        label: t("stats_responses_label"),
         value: String(statsDataValue?.totalCheckIns || 0),
-        unit: "次",
+        unit: t("stats_responses_unit"),
         icon: MessagesSvg,
       },
     ];
-  }, [statsData]);
+  }, [statsData, t]);
 
   const hasPractices = inProgressTasks.length > 0;
 
@@ -122,12 +124,9 @@ export default function MyPage() {
             <button
               type="button"
               onClick={() => router.replace(HOME_TAB_PATHS.inspire)}
-              className={cn(
-                "flex-1 py-2 text-sm font-medium transition-all",
-                "text-text-dark/40"
-              )}
+              className={cn("flex-1 py-2 text-sm font-medium transition-all", "text-text-dark/40")}
             >
-              靈感
+              {t("tab_inspire")}
             </button>
             <button
               type="button"
@@ -136,12 +135,12 @@ export default function MyPage() {
                 "text-text-dark border-b-2 border-logo-cyan -mb-px"
               )}
             >
-              我的
+              {t("tab_mine")}
             </button>
           </div>
 
           {isMyLoading ? (
-            <div className="text-center text-text-dark">載入中...</div>
+            <div className="text-center text-text-dark">{t("loading")}</div>
           ) : (
             <>
               <DashboardHeader stats={stats} />
@@ -151,7 +150,7 @@ export default function MyPage() {
                   <div className="mb-4">
                     <div
                       role="tablist"
-                      aria-label="任務篩選"
+                      aria-label={t("filter_aria_label")}
                       className="flex gap-2 overflow-x-auto scrollbar-hide"
                     >
                       {filterOptions.map((option) => (
@@ -168,14 +167,16 @@ export default function MyPage() {
                               : "bg-white border-primary-base text-primary-base"
                           )}
                         >
-                          {option.label} {filterCounts[option.value]}
+                          {t(option.labelKey)} {filterCounts[option.value]}
                         </button>
                       ))}
                     </div>
                   </div>
 
                   <InProgressSection tasks={filteredInProgressTasks} />
-                  <RecommendationSection onGoToInspire={() => router.replace(HOME_TAB_PATHS.inspire)} />
+                  <RecommendationSection
+                    onGoToInspire={() => router.replace(HOME_TAB_PATHS.inspire)}
+                  />
                 </>
               )}
             </>

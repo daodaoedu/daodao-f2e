@@ -4546,7 +4546,21 @@
     "ai_disclaimer": "Topics are AI-generated recommendations",
     "empty_title": "No recommendations yet",
     "empty_description": "You can focus on your current plan, or browse other practices in the Inspire tab",
-    "empty_cta": "Go to Inspire"
+    "empty_cta": "Go to Inspire",
+    "tab_inspire": "Inspire",
+    "tab_mine": "Mine",
+    "loading": "Loading...",
+    "filter_aria_label": "Filter tasks",
+    "filter_all": "All",
+    "filter_draft": "Draft",
+    "filter_not_started": "Not Started",
+    "filter_in_progress": "In Progress",
+    "filter_completed": "Completed",
+    "stats_streak_label": "Login Streak",
+    "stats_streak_unit": "days",
+    "stats_responses_label": "Responses",
+    "stats_responses_unit": "times",
+    "task_label_practice": "Topic Practice"
   },
   "notification": {
     "and_others": "and {count} others",

@@ -1,6 +1,7 @@
 "use client";
 
 import { type ActivityCardItem, type FeedItem, useFeed, useReactionsBatch } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { getStorage, StorageEnum } from "@daodao/shared";
 import { cn } from "@daodao/ui/lib/utils";
@@ -73,6 +74,7 @@ function reorderFeedItems(items: FeedItem[]): FeedItem[] {
 export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("dashboard");
 
   const [searchValue, setSearchValue] = useState(searchParams.get("keyword") ?? "");
   const [filters, _setFilters] = useState<ShowcaseFilterState>({
@@ -224,14 +226,14 @@ export default function HomePage() {
                 "text-text-dark border-b-2 border-logo-cyan -mb-px"
               )}
             >
-              靈感
+              {t("tab_inspire")}
             </button>
             <button
               type="button"
               onClick={() => router.replace(HOME_TAB_PATHS.mine)}
               className={cn("flex-1 py-2 text-sm font-medium transition-all", "text-text-dark/40")}
             >
-              我的
+              {t("tab_mine")}
             </button>
           </div>
 

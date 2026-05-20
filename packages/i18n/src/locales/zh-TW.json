@@ -4546,7 +4546,21 @@
     "ai_disclaimer": "此主題為AI生成推薦",
     "empty_title": "暫時沒有推薦",
     "empty_description": "你可以先專注於當前的計畫，或到「靈感」分頁看看其他主題實踐",
-    "empty_cta": "去看看靈感"
+    "empty_cta": "去看看靈感",
+    "tab_inspire": "靈感",
+    "tab_mine": "我的",
+    "loading": "載入中...",
+    "filter_aria_label": "任務篩選",
+    "filter_all": "全部",
+    "filter_draft": "草稿",
+    "filter_not_started": "未開始",
+    "filter_in_progress": "進行中",
+    "filter_completed": "已完成",
+    "stats_streak_label": "連續登入",
+    "stats_streak_unit": "天",
+    "stats_responses_label": "獲得迴響",
+    "stats_responses_unit": "次",
+    "task_label_practice": "主題實踐"
   },
   "notification": {
     "and_others": "與其他 {count} 人",
