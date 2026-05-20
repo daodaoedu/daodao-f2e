@@ -17,6 +17,10 @@ describe("formatShowcaseDate", () => {
   it("formats a date-only ISO string", () => {
     expect(formatShowcaseDate("2024-12-01")).toBe("2024/12/01");
   });
+
+  it("returns null for an invalid date string", () => {
+    expect(formatShowcaseDate("invalid-date")).toBeNull();
+  });
 });
 
 describe("buildCheerDisplay", () => {
