@@ -1,4 +1,6 @@
-export type LeaveWithDraftChoice = "save-draft" | "leave" | "continue";
+import type { LeaveWithDraftChoice } from "@daodao/ui/hooks/use-leave-with-draft-confirm";
+
+export type { LeaveWithDraftChoice };
 
 export function shouldNavigateOnLeave(choice: LeaveWithDraftChoice): boolean {
   return choice === "save-draft" || choice === "leave";

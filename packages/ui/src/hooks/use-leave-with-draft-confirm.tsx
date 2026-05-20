@@ -29,7 +29,7 @@ export function useLeaveWithDraftConfirm() {
   return useCallback((): Promise<LeaveWithDraftChoice> => {
     return openWarningDialog<"continue" | "save-draft" | "leave">({
       title: "尚未儲存你的資料",
-      message: "確定要先離開這裡嗎？已經編輯的資料將無法被儲存。",
+      message: "您有尚未儲存的變更，確定要離開嗎？",
       textAlign: "left",
       buttons: [
         { label: "繼續編輯", value: "continue", variant: "outline" },

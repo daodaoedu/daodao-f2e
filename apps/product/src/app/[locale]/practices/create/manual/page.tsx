@@ -143,12 +143,13 @@ export default function CreateManualPracticePage() {
         saveDraft();
       }
       if (shouldNavigateOnLeave(choice)) {
+        form.reset(form.getValues());
         router.replace("/");
       }
     } catch {
       // dialog dismissed or unexpected error — stay on page
     }
-  }, [form.formState.isDirty, confirmLeaveWithDraft, saveDraft, router]);
+  }, [form.formState.isDirty, form.reset, form.getValues, confirmLeaveWithDraft, saveDraft, router]);
 
   const name = form.watch("name");
   const actionDescription = form.watch("actionDescription");
