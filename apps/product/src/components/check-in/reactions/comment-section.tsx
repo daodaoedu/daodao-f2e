@@ -102,7 +102,7 @@ function renderContent(content: string, participants: MentionCandidate[]) {
                     href={urlSeg.value}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-logo-cyan underline break-all"
+                    className="text-logo-cyan underline"
                   >
                     {urlSeg.value}
                   </a>
@@ -167,6 +167,10 @@ function CommentBubble({
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
   const menuRef = useRef<HTMLDivElement>(null);
+  const renderedContent = useMemo(
+    () => renderContent(comment.content, participants),
+    [comment.content, participants]
+  );
   const {
     handleMentionSelect: handleEditMentionSelect,
     getActiveMentionIds: getActiveEditMentionIds,
@@ -399,7 +403,7 @@ function CommentBubble({
           </div>
         ) : (
           <p className={cn("text-[#295E5C] leading-5 whitespace-pre-wrap break-words", "text-sm")}>
-            {renderContent(comment.content, participants)}
+            {renderedContent}
           </p>
         )}
 
