@@ -1,6 +1,7 @@
 "use client";
 
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
+import { useTranslations } from "@daodao/i18n";
 import { usePathname } from "@daodao/i18n/navigation";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
@@ -9,13 +10,15 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
-import { menuItems } from "./constant";
+import { getMenuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
+  const t = useTranslations("layout");
+  const menuItems = getMenuItems(t);
   const logoRef = useRef<HTMLDivElement>(null);
 
   // 首頁時 logo 隨滾動漸淡（和 Banner 同步）
@@ -54,7 +57,7 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
   return (
     <>
       <div ref={logoRef} className="fixed top-5 left-5 z-20">
-        <CustomLink href="/" aria-label="回到官網">
+        <CustomLink href="/" aria-label={t("back_to_website")}>
           <Image src={favicon256Png.src} alt="daodao logo" width={40} height={40} />
         </CustomLink>
       </div>

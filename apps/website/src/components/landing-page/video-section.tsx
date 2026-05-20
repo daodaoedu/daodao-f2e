@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { SectionHeader } from "@daodao/ui/components/section-header";
 import { cn } from "@daodao/ui/lib/utils";
@@ -6,14 +7,15 @@ interface VideoItemProps {
   title: string;
   subtitle: string;
   tags: string[];
+  captionLabel: string;
 }
 
-function VideoItem({ title, subtitle, tags }: VideoItemProps) {
+function VideoItem({ title, subtitle, tags, captionLabel }: VideoItemProps) {
   return (
     <div className="mb-6 w-full py-6 md:w-1/2">
       <video controls className="aspect-video w-full rounded-[20px]">
         <source />
-        <track kind="captions" srcLang="zh-TW" label="繁體中文" />
+        <track kind="captions" srcLang="zh-TW" label={captionLabel} />
       </video>
 
       <div className="mb-5 mt-2 rounded-[20px] bg-mascot-aqua px-4 py-2 text-center text-primary-darker">
@@ -45,16 +47,18 @@ interface VideoSectionProps {
 }
 
 export function VideoSection({ className }: VideoSectionProps) {
+  const t = useTranslations("landing_page");
+
   const videos = [
     {
-      title: "分享學習想法",
-      subtitle: "記錄、討論、影響",
-      tags: ["記錄學習瞬間", "獲得社群回饋", "建立影響力"],
+      title: t("video_item_0_title"),
+      subtitle: t("video_item_0_subtitle"),
+      tags: [t("video_item_0_tag_0"), t("video_item_0_tag_1"), t("video_item_0_tag_2")],
     },
     {
-      title: "開始主題實踐",
-      subtitle: "探索、記錄、成長",
-      tags: ["探索新領域", "追蹤進度", "保持動力"],
+      title: t("video_item_1_title"),
+      subtitle: t("video_item_1_subtitle"),
+      tags: [t("video_item_1_tag_0"), t("video_item_1_tag_1"), t("video_item_1_tag_2")],
     },
   ];
 
@@ -77,8 +81,8 @@ export function VideoSection({ className }: VideoSectionProps) {
 
       <div className="py-15 -mb-16 px-6">
         <SectionHeader
-          title="兩種起點開始你的學習之旅"
-          subtitle="分享想法開始討論，嘗試實踐記錄成長"
+          title={t("video_section_title")}
+          subtitle={t("video_section_subtitle")}
           variant="light"
           size="lg"
           alignment="center"
@@ -94,6 +98,7 @@ export function VideoSection({ className }: VideoSectionProps) {
               title={video.title}
               subtitle={video.subtitle}
               tags={video.tags}
+              captionLabel={t("video_caption_label")}
             />
           ))}
         </div>
@@ -101,7 +106,7 @@ export function VideoSection({ className }: VideoSectionProps) {
 
       <div className="flex w-full justify-center">
         <Button variant="ctaOrange" size="huge">
-          開始分享想法
+          {t("video_cta_button")}
         </Button>
       </div>
     </section>

@@ -5,6 +5,7 @@ import { Image } from "@daodao/ui/components/image";
 
 export function TransitionBanner() {
   const t = useTranslations("common");
+  const tLanding = useTranslations("landing_page");
 
   return (
     <section className="relative overflow-hidden bg-primary-palest py-12 md:py-16">
@@ -13,7 +14,7 @@ export function TransitionBanner() {
           {/* Character illustration placeholder */}
           <div className="flex size-24 items-center justify-center rounded-2xl bg-mascot-aqua/30 md:size-32">
             {/* TODO: Replace with peeking mascot illustration */}
-            <Image src="/assets/landing-page/deco-mascot.svg" alt="吉祥物" width={80} height={80} />
+            <Image src="/assets/landing-page/deco-mascot.svg" alt={tLanding("mascot_alt")} width={80} height={80} />
           </div>
 
           {/* Banner text */}

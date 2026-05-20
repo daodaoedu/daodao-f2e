@@ -51,6 +51,7 @@ export const Header = () => {
   const { alwaysShow, navItems } = useHeaderConfig();
   const isVisible = useScrollVisibility({ threshold: 200 });
   const t = useTranslations("common");
+  const tLayout = useTranslations("web_layout");
   const { openLoginDialog } = useAuth();
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export const Header = () => {
           <CustomLink href="/">
             <Image
               src="/assets/landing-page/logo-simple.svg"
-              alt="回到首頁"
+              alt={tLayout("logo_home_alt")}
               width={142}
               height={24}
             />
@@ -101,7 +102,7 @@ export const Header = () => {
         ))}
         <li>
           <Button variant="ctaOrangeSmall" onClick={() => openLoginDialog({ redirectUrl: "/" })}>
-            立即加入
+            {tLayout("join_now")}
           </Button>
         </li>
       </ul>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { useCallback, useRef } from "react";
 import type { CheckInData } from "@/components/check-in";
@@ -32,11 +33,12 @@ interface IUseCheckInSheetOptions {
 export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInSheetOptions) {
   const { open } = useSheetManager();
   const closeRef = useRef<(() => void) | null>(null);
+  const t = useTranslations("check_in");
 
   const openCheckInSheet = useCallback(() => {
     const { close } = open({
-      title: "打卡",
-      description: "記錄你的學習進度和心情",
+      title: t("sheet_title"),
+      description: t("sheet_description"),
       content: (
         <CheckInSheetContent
           taskTitle={taskTitle}
@@ -54,7 +56,7 @@ export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInS
       onClose: onClose,
     });
     closeRef.current = close;
-  }, [taskTitle, onComplete, onClose, open]);
+  }, [taskTitle, onComplete, onClose, open, t]);
 
   return { openCheckInSheet };
 }

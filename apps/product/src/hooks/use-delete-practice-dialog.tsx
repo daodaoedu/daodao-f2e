@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { useCallback } from "react";
@@ -33,16 +34,17 @@ export enum DeletePracticeResult {
  */
 export function useDeletePracticeDialog() {
   const { openWarningDialog } = useDialog();
+  const t = useTranslations("practice");
 
   const openDeleteDialog = useCallback(async (): Promise<DeletePracticeResult> => {
     // 先顯示確認對話框
     const result = await openWarningDialog({
-      title: "確定刪除這個實踐？",
-      message: "確定要跟這個主題說再見了嗎？一旦刪除，就無法復原囉。",
+      title: t("delete_practice_title"),
+      message: t("delete_practice_confirm_message"),
       textAlign: "left",
       buttons: [
-        { label: "確定刪除", value: "confirm", variant: "outline" },
-        { label: "先不要", value: "cancel", variant: "orange" },
+        { label: t("delete_confirm"), value: "confirm", variant: "outline" },
+        { label: t("cancel_action"), value: "cancel", variant: "orange" },
       ],
     });
 
@@ -52,11 +54,11 @@ export function useDeletePracticeDialog() {
     }
 
     // 用戶確認刪除，立即返回並顯示 toast
-    toast.success("實踐已成功刪除");
+    toast.success(t("delete_practice_success"));
 
     // 立即返回，讓調用方可以立即執行動作
     return DeletePracticeResult.Deleted;
-  }, [openWarningDialog]);
+  }, [openWarningDialog, t]);
 
   return { openDeleteDialog };
 }

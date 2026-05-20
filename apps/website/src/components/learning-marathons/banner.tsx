@@ -1,15 +1,17 @@
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { ApplyButton } from "./apply-button";
 
 export const Banner = () => {
+  const t = useTranslations("learning_marathon");
   return (
     <div className={cn("relative aspect-9/14 overflow-hidden md:aspect-16/10")}>
       <div className="hidden md:block">
         <div className="absolute inset-0 bg-linear-to-b from-[#fcfefe] via-[#e0f1f2] to-[#e0f1f2]">
           <Image
             src="/assets/learning-marathon/2025S1-desktop-bg.png"
-            alt="島島盃 - 學習馬拉松 2025 春季賽"
+            alt={t("banner_alt_main")}
             fill
             className="object-cover"
           />
@@ -23,7 +25,7 @@ export const Banner = () => {
           <div className="relative size-full">
             <Image
               src="/assets/learning-marathon/2025S1-desktop-group.png"
-              alt="揪團"
+              alt={t("banner_alt_group")}
               fill
               className="object-contain"
             />
@@ -38,7 +40,7 @@ export const Banner = () => {
           <div className="relative size-full">
             <Image
               src="/assets/learning-marathon/2025S1-desktop-boy-1.png"
-              alt="男角色"
+              alt={t("banner_alt_boy")}
               fill
               className="object-contain"
             />
@@ -53,7 +55,7 @@ export const Banner = () => {
           <div className="relative size-full">
             <Image
               src="/assets/learning-marathon/2025S1-desktop-girl-1.png"
-              alt="女角色"
+              alt={t("banner_alt_girl")}
               fill
               className="object-contain"
             />
@@ -166,14 +168,14 @@ export const Banner = () => {
         <div className="relative size-full bg-linear-to-b from-[#fcfefe] via-[#e0f1f2] to-[#e0f1f2]">
           <Image
             src="/assets/learning-marathon/2025S1-mobile@2x.png"
-            alt="島島盃 - 學習馬拉松 2025 春季賽"
+            alt={t("banner_alt_main")}
             fill
             className="object-cover"
           />
         </div>
       </div>
       <ApplyButton className="absolute left-1/2 top-[calc(100vw/3.6)] flex h-[50px] w-[124px] shrink-0 -translate-x-1/2 items-center justify-center gap-2.5 rounded-[40px] bg-[#FFA10B] px-5 py-1.5 text-center text-lg font-normal leading-[140%] text-white hover:bg-[#FFA10B] hover:shadow-[0px_4px_10px_0px_rgba(255,161,11,0.50)] max-md:top-[calc(100vw/1.25)]">
-        立即申請
+        {t("marathon_apply_button")}
       </ApplyButton>
     </div>
   );

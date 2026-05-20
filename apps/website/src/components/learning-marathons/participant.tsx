@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 
@@ -9,32 +12,12 @@ type ParticipantType = {
   backgroundColor: string;
 };
 
-// 參與者資料
-const participants: ParticipantType[] = [
-  {
-    id: "career-preparation",
-    image: "/assets/learning-marathon/marathon-persona-1.png",
-    title: "有模糊的職涯／生涯方向，\n想開始做準備與鋪路",
-    backgroundColor: "bg-white",
-  },
-  {
-    id: "experience-based-education",
-    image: "/assets/learning-marathon/marathon-persona-2.png",
-    title: "考試不適合我，\n更想用個人經歷上大學",
-    backgroundColor: "bg-[#DEEDF5]",
-  },
-  {
-    id: "interest-driven-learning",
-    image: "/assets/learning-marathon/marathon-persona-3.png",
-    title: "學校課程好無聊，希望可以用\n自己的方式學有興趣的事情",
-    backgroundColor: "bg-[#DEF5E7]",
-  },
-  {
-    id: "self-directed-learning",
-    image: "/assets/learning-marathon/marathon-persona-4.png",
-    title: "想自主學習，\n有方向但不確定可以怎麼開始",
-    backgroundColor: "bg-white",
-  },
+// 靜態資料（無中文）
+const participantData = [
+  { id: "career-preparation", image: "/assets/learning-marathon/marathon-persona-1.png", backgroundColor: "bg-white", titleKey: "participant_career_preparation" as const },
+  { id: "experience-based-education", image: "/assets/learning-marathon/marathon-persona-2.png", backgroundColor: "bg-[#DEEDF5]", titleKey: "participant_experience_education" as const },
+  { id: "interest-driven-learning", image: "/assets/learning-marathon/marathon-persona-3.png", backgroundColor: "bg-[#DEF5E7]", titleKey: "participant_interest_learning" as const },
+  { id: "self-directed-learning", image: "/assets/learning-marathon/marathon-persona-4.png", backgroundColor: "bg-white", titleKey: "participant_self_directed" as const },
 ];
 
 // 參與者卡片組件
@@ -63,6 +46,15 @@ const ParticipantCard = ({ participant }: { participant: ParticipantType }) => {
  * 學習馬拉松參與者類型展示組件
  */
 export const Participant = () => {
+  const t = useTranslations("learning_marathon");
+
+  const participants: ParticipantType[] = participantData.map((d) => ({
+    id: d.id,
+    image: d.image,
+    backgroundColor: d.backgroundColor,
+    title: t(d.titleKey),
+  }));
+
   return (
     <div className="grid w-full max-w-full grid-cols-2 grid-rows-2 gap-5 max-md:grid-cols-1 max-md:grid-rows-none">
       {participants.map((participant) => (

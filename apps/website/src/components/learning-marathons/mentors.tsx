@@ -30,6 +30,9 @@ interface Mentor {
   introduction: string;
 }
 
+// NOTE: mentor names, tags, experiences, and introduction bios are biographical
+// content data (not UI strings) and are intentionally left in their original
+// language here. They would typically come from a CMS/database.
 const mentors: Mentor[] = [
   {
     title: "引導師",

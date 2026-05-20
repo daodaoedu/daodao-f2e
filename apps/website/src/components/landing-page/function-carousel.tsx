@@ -10,6 +10,7 @@ interface FunctionCardProps {
 }
 
 export function FunctionCard({ tag, title, description, imageUrl, action }: FunctionCardProps) {
+  const t = useTranslations("landing_page");
   return (
     <div className="relative box-border flex flex-col gap-4 rounded-2xl bg-white p-4 aspect-9/7 w-[280px] min-w-[280px] shrink-0">
       {/* 標籤 */}
@@ -41,7 +42,7 @@ export function FunctionCard({ tag, title, description, imageUrl, action }: Func
 
         <Image
           src="/assets/landing-page/icon-arrow-right.svg"
-          alt="前往"
+          alt={t("arrow_right_alt")}
           width={16}
           height={16}
           className="pointer-events-none select-none"

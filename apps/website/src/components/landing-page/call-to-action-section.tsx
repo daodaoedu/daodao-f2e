@@ -1,11 +1,13 @@
 "use client";
 
 import { useAuth } from "@daodao/auth";
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 
 export function CallToActionSection() {
   const { openLoginDialog } = useAuth();
+  const t = useTranslations("landing_page");
 
   return (
     <section className="relative my-20 flex min-h-[366px] flex-col items-center justify-center px-6 overflow-hidden">
@@ -17,9 +19,9 @@ export function CallToActionSection() {
         aria-hidden="true"
       />
       <h2 className="relative z-10 my-4 text-center text-[20px] font-semibold leading-tight text-primary-darker md:text-[24px]">
-        準備好重新打造
+        {t("cta_heading_line1")}
         <br />
-        你喜歡的學習生活了嗎？
+        {t("cta_heading_line2")}
       </h2>
       <div className="relative z-10">
         <Button
@@ -27,7 +29,7 @@ export function CallToActionSection() {
           size="huge"
           onClick={() => openLoginDialog({ redirectUrl: "/" })}
         >
-          立即加入
+          {t("cta_join_button")}
         </Button>
       </div>
     </section>

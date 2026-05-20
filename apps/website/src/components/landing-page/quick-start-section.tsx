@@ -1,12 +1,15 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 
 export function QuickStartSection() {
+  const t = useTranslations("landing_page");
+
   const stats = [
-    { label: "總共持續", value: "14", unit: "天" },
-    { label: "每週頻率", value: "3-5", unit: "天" },
-    { label: "每次執行", value: "30", unit: "分鐘" },
+    { label: t("quick_start_stat_total_label"), value: "14", unit: t("quick_start_stat_day_unit") },
+    { label: t("quick_start_stat_weekly_label"), value: "3-5", unit: t("quick_start_stat_day_unit") },
+    { label: t("quick_start_stat_each_label"), value: "30", unit: t("quick_start_stat_minute_unit") },
   ];
 
   return (
@@ -15,15 +18,15 @@ export function QuickStartSection() {
         <div className="flex flex-col items-center">
           {/* 標題 */}
           <h2 className="mb-4 text-center text-[1.75rem] font-bold leading-tight md:text-3xl">
-            <span className="text-primary-base">快速啟動</span>
-            <span className="text-primary-darker">你的學習旅程</span>
+            <span className="text-primary-base">{t("quick_start_title_highlight")}</span>
+            <span className="text-primary-darker">{t("quick_start_title_rest")}</span>
           </h2>
 
           {/* 副標題 */}
           <p className="mb-10 text-center text-sm leading-relaxed text-basic-400">
-            給馬上想要行動的你
+            {t("quick_start_subtitle_line1")}
             <br />
-            一個最沒有負擔的開始
+            {t("quick_start_subtitle_line2")}
           </p>
 
           {/* 統計卡片 */}
@@ -48,7 +51,7 @@ export function QuickStartSection() {
             <div className="relative">
               <Image
                 src="/assets/landing-page/joyride.svg"
-                alt="吉祥物"
+                alt={t("quick_start_mascot_alt")}
                 width={160}
                 height={160}
                 className="object-contain"
@@ -59,7 +62,7 @@ export function QuickStartSection() {
             <div className="relative">
               <Image
                 src="/assets/landing-page/timing.svg"
-                alt="執行時機"
+                alt={t("quick_start_timing_alt")}
                 width={200}
                 height={200}
                 className="object-contain"
@@ -70,7 +73,7 @@ export function QuickStartSection() {
           {/* 底部訊息 */}
           <div className="rounded-full border border-primary-base bg-primary-pale px-6 py-3">
             <p className="text-center text-sm font-medium text-primary-darker">
-              隨時修改沒有壓力，節奏由你決定
+              {t("quick_start_bottom_message")}
             </p>
           </div>
         </div>

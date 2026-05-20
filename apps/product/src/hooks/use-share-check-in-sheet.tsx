@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { useCallback } from "react";
 import type { CheckInData } from "@/components/check-in";
@@ -38,18 +39,19 @@ export function useShareCheckInSheet({
   onClose,
 }: IUseShareCheckInSheetOptions) {
   const { open } = useSheetManager();
+  const t = useTranslations("check_in");
 
   const openShareSheet = useCallback(() => {
     open({
-      title: "分享",
-      description: "分享你的打卡記錄",
+      title: t("share_sheet_title"),
+      description: t("share_sheet_description"),
       content: <ShareCheckInSheetContent taskTitle={taskTitle} checkInData={checkInData} />,
       dismissible: true,
       closeOnEscape: true,
       showCloseButton: true,
       onClose,
     });
-  }, [taskTitle, checkInData, onClose, open]);
+  }, [taskTitle, checkInData, onClose, open, t]);
 
   return { openShareSheet };
 }

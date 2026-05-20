@@ -1,6 +1,7 @@
 "use client";
 
 import { updatePracticeCheckInWithFormData, useMutate } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { toast } from "@daodao/ui/components/sonner";
 import { useCallback, useRef } from "react";
@@ -26,18 +27,19 @@ export function useCheckInPhase2Sheet({
   const { open } = useSheetManager();
   const mutate = useMutate();
   const closeRef = useRef<(() => void) | null>(null);
+  const t = useTranslations("check_in");
 
   const openPhase2Sheet = useCallback(
     (checkInId: string, mood: MoodType | null) => {
       const { close } = open({
-        title: "分享心得",
-        description: "補充你的標籤、心得與照片",
+        title: t("phase2_sheet_title"),
+        description: t("phase2_sheet_description"),
         content: (
           <CheckInPhase2SheetContent
             taskTitle={taskTitle}
             mood={mood}
             onComplete={async (data) => {
-              const loadingToast = toast.loading("儲存中...");
+              const loadingToast = toast.loading(t("saving"));
               try {
                 const apiMood = data.mood ? mapMoodTypeToApiMood(data.mood) : undefined;
                 await updatePracticeCheckInWithFormData(practiceId, checkInId, {
@@ -53,11 +55,11 @@ export function useCheckInPhase2Sheet({
                   { params: { path: { id: practiceId }, query: {} } },
                 ] as const);
                 toast.dismiss(loadingToast);
-                toast.success("心得已儲存！");
+                toast.success(t("phase2_save_success"));
                 onComplete?.();
               } catch (error) {
                 toast.dismiss(loadingToast);
-                const message = error instanceof Error ? error.message : "儲存失敗，請稍後再試";
+                const message = error instanceof Error ? error.message : t("phase2_save_failed");
                 toast.error(message);
               }
             }}
@@ -69,7 +71,7 @@ export function useCheckInPhase2Sheet({
       });
       closeRef.current = close;
     },
-    [practiceId, taskTitle, onComplete, open, mutate]
+    [practiceId, taskTitle, onComplete, open, mutate, t]
   );
 
   return { openPhase2Sheet };

@@ -1,14 +1,16 @@
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 import { SectionHeader } from "@daodao/ui/components/section-header";
 
 export function SloganSection() {
+  const t = useTranslations("landing_page");
   return (
     <section className="slogan-section relative min-h-[195px] bg-primary-palest px-6 text-basic-400 md:min-h-[200px]">
       {/* 背景島嶼裝飾圖片 */}
       <div className="absolute left-1/2 top-16 z-10 -translate-x-1/2 md:-top-4">
         <Image
           src="/assets/landing-page/deco-island.svg"
-          alt="島嶼裝飾"
+          alt={t("slogan_island_deco_alt")}
           width={429}
           height={208}
           data-preload
@@ -20,9 +22,9 @@ export function SloganSection() {
         <SectionHeader
           title={
             <>
-              每個人都有自己的學習小島，
+              {t("slogan_title_line1")}
               <br />
-              透過交流與分享，連結成群島
+              {t("slogan_title_line2")}
             </>
           }
           subtitle="Where personal growth meets collective wisdom!"

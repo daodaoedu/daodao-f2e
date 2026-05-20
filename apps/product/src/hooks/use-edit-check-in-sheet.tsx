@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { useCallback, useRef } from "react";
 import type { CheckInData } from "@/components/check-in";
@@ -35,11 +36,12 @@ export function useEditCheckInSheet({
 }: IUseEditCheckInSheetOptions) {
   const { open } = useSheetManager();
   const closeRef = useRef<(() => void) | null>(null);
+  const t = useTranslations("check_in");
 
   const openEditCheckInSheet = useCallback(() => {
     const { close } = open({
-      title: "編輯打卡",
-      description: "修改你的打卡內容",
+      title: t("edit_check_in"),
+      description: t("edit_sheet_description"),
       content: (
         <CheckInSheetContent
           taskTitle={taskTitle}
@@ -50,7 +52,7 @@ export function useEditCheckInSheet({
             media: [],
           }}
           existingImages={checkInData.images}
-          submitButtonText="儲存變更"
+          submitButtonText={t("save_changes_btn")}
           onComplete={async (data) => {
             try {
               await onComplete(data);
@@ -68,7 +70,7 @@ export function useEditCheckInSheet({
       onClose: onClose,
     });
     closeRef.current = close;
-  }, [taskTitle, checkInData, onComplete, onClose, open]);
+  }, [taskTitle, checkInData, onComplete, onClose, open, t]);
 
   return { openEditCheckInSheet };
 }

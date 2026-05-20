@@ -74,20 +74,22 @@ const PLATFORMS_WITH_ICON: SocialPlatformType[] = [
 ];
 
 /**
- * 取得平台顯示名稱
+ * 取得平台顯示名稱（非 CJK 平台名不需要翻譯）
  */
-const getPlatformDisplayName = (platform: SocialPlatformType): string => {
-  const displayNames: Record<SocialPlatformType, string> = {
-    [SocialPlatform.line]: "LINE",
-    [SocialPlatform.facebook]: "Facebook",
-    [SocialPlatform.instagram]: "Instagram",
-    [SocialPlatform.threads]: "Threads",
-    [SocialPlatform.linkedin]: "LinkedIn",
-    [SocialPlatform.discord]: "Discord",
-    [SocialPlatform.website]: "個人網站",
-    [SocialPlatform.github]: "GitHub",
-  };
-  return displayNames[platform] || platform;
+const PLATFORM_DISPLAY_NAMES: Record<SocialPlatformType, string> = {
+  [SocialPlatform.line]: "LINE",
+  [SocialPlatform.facebook]: "Facebook",
+  [SocialPlatform.instagram]: "Instagram",
+  [SocialPlatform.threads]: "Threads",
+  [SocialPlatform.linkedin]: "LinkedIn",
+  [SocialPlatform.discord]: "Discord",
+  [SocialPlatform.website]: "website",
+  [SocialPlatform.github]: "GitHub",
+};
+
+const getPlatformDisplayName = (platform: SocialPlatformType, websiteLabel: string): string => {
+  if (platform === SocialPlatform.website) return websiteLabel;
+  return PLATFORM_DISPLAY_NAMES[platform] || platform;
 };
 
 const getSocialIcon = (platform: SocialPlatformType) => {
@@ -340,7 +342,7 @@ export function UserInfoCard({
                     size="icon"
                     asChild
                     className="size-8 md:size-4"
-                    aria-label={`前往 ${getPlatformDisplayName(platform)}`}
+                    aria-label={t("visit_platform", { platform: getPlatformDisplayName(platform, t("website_label")) })}
                   >
                     <CustomLink
                       href={value}
@@ -360,7 +362,7 @@ export function UserInfoCard({
           {linksWithoutIcon.length > 0 && (
             <div className="flex flex-col gap-2">
               {linksWithoutIcon.map(({ platform, value }) => {
-                const platformName = getPlatformDisplayName(platform);
+                const platformName = getPlatformDisplayName(platform, t("website_label"));
                 if (!value) return null;
 
                 return (

@@ -1,23 +1,29 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronUp } from "lucide-react";
-import { type CSSProperties, useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import { ApplyButton } from "./apply-button";
 
-const sidebarItems = [
-  { label: "活動介紹", href: "#marathon-intro" },
-  { label: "馬拉松進行方式", href: "#marathon-how" },
-  { label: "引導師介紹", href: "#marathon-mentor" },
-  { label: "你可以預期的收穫", href: "#marathon-benefit" },
-  { label: "成果發表與獎勵", href: "#marathon-reward" },
-  { label: "如何申請", href: "#marathon-apply" },
-  { label: "本計畫價值", href: "#marathon-price" },
-  { label: "FAQ", href: "#marathon-faq" },
-];
-
 export const Sidebar = () => {
+  const t = useTranslations("learning_marathon");
+
+  const sidebarItems: Array<{ label: string; href: string }> = useMemo(
+    () => [
+      { label: t("marathon_section_intro_title"), href: "#marathon-intro" },
+      { label: t("marathon_section_how_title"), href: "#marathon-how" },
+      { label: t("mentors_section_title"), href: "#marathon-mentor" },
+      { label: t("marathon_section_benefit_title"), href: "#marathon-benefit" },
+      { label: t("marathon_section_reward_title"), href: "#marathon-reward" },
+      { label: t("marathon_section_apply_title"), href: "#marathon-apply" },
+      { label: t("sidebar_plan_value_label"), href: "#marathon-price" },
+      { label: t("marathon_section_faq_title"), href: "#marathon-faq" },
+    ],
+    [t]
+  );
+
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [isShow, setIsShow] = useState(false);
   const [isOpenSidebar, setIsOpenSidebar] = useState(false);
@@ -57,7 +63,7 @@ export const Sidebar = () => {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [sidebarItems]);
 
   useEffect(() => {
     const bannerElement = document.querySelector("main")?.children?.[0] as HTMLElement;
@@ -107,7 +113,7 @@ export const Sidebar = () => {
           ))}
         </ul>
         <ApplyButton className="mx-auto inline-block h-10 w-full rounded-full bg-primary-base text-base font-normal leading-none text-white hover:bg-primary-base hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)]">
-          立即申請
+          {t("marathon_apply_button")}
         </ApplyButton>
       </aside>
       <div

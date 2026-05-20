@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { useScrollVisibility } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -8,6 +9,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { ArrowUp } from "lucide-react";
 
 export const LandingPageFloatButtons = () => {
+  const t = useTranslations("web_layout");
   const isVisible = useScrollVisibility({ threshold: 300 });
 
   const handleScrollToTop = () => {
@@ -31,7 +33,7 @@ export const LandingPageFloatButtons = () => {
           variant="ctaPrimary"
           size="icon"
           className="size-12 shadow-none"
-          aria-label="回到頂端"
+          aria-label={t("scroll_to_top")}
         >
           <ArrowUp className="size-5" />
         </Button>
@@ -41,13 +43,13 @@ export const LandingPageFloatButtons = () => {
           variant="ghost"
           size="icon"
           className="size-[90px] bg-transparent p-0 hover:bg-transparent"
-          aria-label="點擊進入心理測驗"
+          aria-label={t("quiz_float_button")}
           asChild
         >
           <CustomLink href="/quiz">
             <Image
               src="/assets/landing-page/badge.svg"
-              alt="點擊進入心理測驗"
+              alt={t("quiz_float_button")}
               width={90}
               height={91}
               className="animate-spin-slow object-contain"

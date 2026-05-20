@@ -2,6 +2,7 @@
 
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg, VerticalFullSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
+import { useTranslations } from "@daodao/i18n";
 import { usePathname } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -9,11 +10,13 @@ import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { useState } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
-import { menuItems } from "./constant";
+import { getMenuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
 export const DesktopSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
+  const t = useTranslations("layout");
+  const menuItems = getMenuItems(t);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleToggleSidebar = () => {
@@ -35,7 +38,7 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
           isCollapsed ? "top-4 left-1/2 -translate-x-1/2" : "top-4 right-3"
         )}
         onClick={handleToggleSidebar}
-        aria-label={isCollapsed ? "展開側邊欄" : "收合側邊欄"}
+        aria-label={isCollapsed ? t("sidebar_expand") : t("sidebar_collapse")}
       >
         {isCollapsed ? (
           <ArrowRightOutlineSvg className="size-6 text-gray-500" />
@@ -45,7 +48,7 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
       </Button>
 
       <div className="flex-1 relative">
-        <CustomLink href="/" aria-label="回到官網">
+        <CustomLink href="/" aria-label={t("back_to_website")}>
           <div
             className={cn(
               "ml-10 mr-12 transition-all duration-300 relative z-10",

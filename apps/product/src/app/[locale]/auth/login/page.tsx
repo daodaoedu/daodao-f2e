@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@daodao/auth";
+import { useTranslations } from "@daodao/i18n";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
@@ -10,6 +11,7 @@ import { useEffect } from "react";
  */
 export default function LoginPage() {
   const { openLoginDialog, isAuthenticated, isLoading } = useAuth();
+  const t = useTranslations("auth");
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -36,8 +38,8 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
-        <div className="mb-4 text-lg">正在開啟登入...</div>
-        <div className="text-sm text-gray-500">請稍候</div>
+        <div className="mb-4 text-lg">{t("login_processing")}</div>
+        <div className="text-sm text-gray-500">{t("please_wait")}</div>
       </div>
     </div>
   );

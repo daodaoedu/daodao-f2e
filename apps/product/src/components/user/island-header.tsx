@@ -5,6 +5,7 @@ import userMobileBannerPng from "@daodao/assets/images/users/user-mobile-banner.
 import { useAuth } from "@daodao/auth";
 import { getEnv } from "@daodao/config";
 import { resultDetailMap, themeMap } from "@daodao/features-quiz";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
@@ -38,6 +39,7 @@ const resultTypeToLottiePathMap = new Map<string, () => Promise<object>>([
  */
 export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
   const { user } = useAuth();
+  const t = useTranslations("user_profile");
   const isOwnProfile = userId !== undefined && user?.id === userId;
   const router = useRouter();
   const headerRef = useRef<HTMLDivElement>(null);
@@ -45,8 +47,8 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
   const theme = themeMap.get(resultType);
   const isEmptyResult = !resultDetail || !theme;
   const message = isEmptyResult
-    ? "你是哪一種島？快來測驗看看！"
-    : `我是${resultDetail?.tags[0]}的${theme?.title}`;
+    ? t("island_quiz_prompt")
+    : t("island_result_label", { tag: resultDetail?.tags[0] ?? "", title: theme?.title ?? "" });
 
   // 動態載入主要的 lottie 動畫（當有結果時，或沒結果時載入預設）
   const [lottieJson, setLottieJson] = useState<object | null>(null);
@@ -96,12 +98,12 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
   const pageHeaderProps = useMemo<PageHeaderProps>(() => {
     if (isOwnProfile) {
       return {
-        title: "我的小島",
+        title: t("my_island_title"),
         rightAction: null,
       };
     }
     return { leftAction: "back", leftLabel: "" };
-  }, [isOwnProfile]);
+  }, [isOwnProfile, t]);
 
   useLayoutEffect(() => {
     const originalBackgroundColor = document.body.style.backgroundColor;
@@ -223,7 +225,7 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
                 )}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-logo-cyan font-medium">學習類型</p>
+                  <p className="text-sm text-logo-cyan font-medium">{t("learning_type_label")}</p>
                   {!isEmptyResult && (
                     <Button
                       variant="ghost"
@@ -231,7 +233,7 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
                       onClick={handleGoToQuiz}
                     >
                       <RefreshCcw className="size-4.5 text-light-gray group-hover:animate-spin-reverse" />
-                      重新測驗
+                      {t("retake_quiz_btn")}
                     </Button>
                   )}
                 </div>
@@ -241,7 +243,7 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
                   className="w-full"
                   onClick={isEmptyResult ? handleGoToQuiz : handleGoToQuizDetail}
                 >
-                  {isEmptyResult ? "立即測驗" : "觀看詳細說明"}
+                  {isEmptyResult ? t("take_quiz_btn") : t("view_quiz_detail_btn")}
                   <ChevronRight className="size-4" />
                 </Button>
               </div>

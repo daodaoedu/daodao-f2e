@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
@@ -144,6 +145,7 @@ const revalidateAllNotifications = () =>
 
 export function NotificationList() {
   const router = useRouter();
+  const t = useTranslations("notification");
   const { data, isLoading } = useNotifications();
   const [localOverrides, setLocalOverrides] = useState<Record<string, Partial<INotificationData>>>(
     {}
@@ -176,7 +178,7 @@ export function NotificationList() {
       }
       const n = notifications.find((n) => n.id === id);
       if (n) {
-        toast.success(`你同意了 ${n.actor.name} 的連結請求，你們現在可以有更多互動了！`);
+        toast.success(t("conn_accept_toast", { name: n.actor.name }));
       }
       revalidateAllNotifications();
     } catch (err) {
@@ -185,7 +187,7 @@ export function NotificationList() {
         delete next[id];
         return next;
       });
-      toast.error(err instanceof Error ? err.message : "操作失敗，請稍後再試");
+      toast.error(err instanceof Error ? err.message : t("operation_failed"));
     }
   };
 
@@ -203,7 +205,7 @@ export function NotificationList() {
       if (connectionRequestId) {
         await ignoreConnectionRequest(connectionRequestId);
       }
-      toast.success(`已忽略 ${n?.actor.name ?? ""} 的連結請求`);
+      toast.success(t("conn_ignore_toast", { name: n?.actor.name ?? "" }));
       revalidateAllNotifications();
     } catch (err) {
       setLocalOverrides((prev) => {
@@ -211,7 +213,7 @@ export function NotificationList() {
         delete next[id];
         return next;
       });
-      toast.error(err instanceof Error ? err.message : "操作失敗，請稍後再試");
+      toast.error(err instanceof Error ? err.message : t("operation_failed"));
     }
   };
 
@@ -254,7 +256,7 @@ export function NotificationList() {
   if (notifications.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-text-dark/50">
-        <p className="text-base">目前沒有通知</p>
+        <p className="text-base">{t("empty_state")}</p>
       </div>
     );
   }
@@ -273,20 +275,20 @@ export function NotificationList() {
             className="text-xs text-text-dark/60 hover:text-text-dark"
             onClick={handleMarkAllRead}
           >
-            全部標為已讀
+            {t("mark_all_read")}
           </Button>
         </div>
       )}
 
       <NotificationSection
-        title="最新"
+        title={t("section_latest")}
         notifications={latest}
         onConnectAgree={handleConnectAgree}
         onConnectReject={handleConnectReject}
         onClick={handleClick}
       />
       <NotificationSection
-        title="稍早"
+        title={t("section_earlier")}
         notifications={earlier}
         onConnectAgree={handleConnectAgree}
         onConnectReject={handleConnectReject}

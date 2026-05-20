@@ -22,83 +22,84 @@ const DESKTOP_POSITIONS = [
 ];
 
 // 3 positions × 3 cards each (based on CSV data: A, B, C positions)
-const PERSONA_POSITIONS: PersonaCard[][] = [
-  // Position A (左側) - Mia, Emma, Sophia
-  [
-    {
-      name: "Mia",
-      avatar: "/assets/landing-page/avatar-girl.svg",
-      professionKey: "內容創作",
-      explorationKey: "影片剪輯與後製",
-      quote: "每個故事都值得被好好說出來，讓世界看見不同的聲音",
-    },
-    {
-      name: "Emma",
-      avatar: "/assets/landing-page/avatar-girl.svg",
-      professionKey: "潛水教練",
-      explorationKey: "閱讀、商管與理財",
-      quote: "深深著迷於海底的世界，希望能認識更多上山下海愛好者 ❤️",
-    },
-    {
-      name: "Sophia",
-      avatar: "/assets/landing-page/avatar-girl.svg",
-      professionKey: "數據分析",
-      explorationKey: "攝影、視覺設計",
-      quote: "用數據說故事，用鏡頭記錄生活的美好瞬間",
-    },
-  ],
-  // Position B (上方偏右) - Ryan, Lily, Kevin
-  [
-    {
-      name: "Ryan",
-      avatar: "/assets/landing-page/avatar-boy.svg",
-      professionKey: "軟體工程師",
-      explorationKey: "跨領域學習、身心探索",
-      quote: "下班後的我只想切換頻道，學習如果能夠像玩遊戲一樣就太好了",
-    },
-    {
-      name: "Lily",
-      avatar: "/assets/landing-page/avatar-girl.svg",
-      professionKey: "行銷企劃",
-      explorationKey: "插畫、內容寫作",
-      quote: "總是有很多靈感閃過，但沒記下來就忘了。想練習好好保留每個創作的想法！！",
-    },
-    {
-      name: "Kevin",
-      avatar: "/assets/landing-page/avatar-boy.svg",
-      professionKey: "高中老師",
-      explorationKey: "教育議題、Podcast",
-      quote: "教學之外，我也想多花一點時間探索自己、書寫自己",
-    },
-  ],
-  // Position C (右側) - Zoe, Allen, Yuki
-  [
-    {
-      name: "Zoe",
-      avatar: "/assets/landing-page/avatar-girl.svg",
-      professionKey: "設計接案者",
-      explorationKey: "烹飪、日記書寫",
-      quote: "想在生活的忙碌縫隙中，留下一點時間給自己，慢慢重拾創造的感覺。",
-    },
-    {
-      name: "Allen",
-      avatar: "/assets/landing-page/avatar-boy.svg",
-      professionKey: "新創營運經理",
-      explorationKey: "行動研究、斜槓人生設計",
-      quote: "很想嘗試一個月挑戰，看看自己在專注做一件事時，能長出什麼樣的成果 🙌",
-    },
-    {
-      name: "Yuki",
-      avatar: "/assets/landing-page/avatar-girl.svg",
-      professionKey: "研究所學生",
-      explorationKey: "社會議題、手寫筆記",
-      quote: "有時候學習讓我很焦慮，但我想試試看用更溫柔的方式陪自己走過探索的路。",
-    },
-  ],
-];
+type TFunc = ReturnType<typeof useTranslations>;
 
-// Flattened for mobile single-card carousel
-const ALL_PERSONA_CARDS = PERSONA_POSITIONS.flat();
+function getPersonaPositions(t: TFunc): PersonaCard[][] {
+  return [
+    // Position A (左側) - Mia, Emma, Sophia
+    [
+      {
+        name: "Mia",
+        avatar: "/assets/landing-page/avatar-girl.svg",
+        professionKey: t("persona_mia_profession"),
+        explorationKey: t("persona_mia_exploration"),
+        quote: t("persona_mia_quote"),
+      },
+      {
+        name: "Emma",
+        avatar: "/assets/landing-page/avatar-girl.svg",
+        professionKey: t("persona_emma_profession"),
+        explorationKey: t("persona_emma_exploration"),
+        quote: t("persona_emma_quote"),
+      },
+      {
+        name: "Sophia",
+        avatar: "/assets/landing-page/avatar-girl.svg",
+        professionKey: t("persona_sophia_profession"),
+        explorationKey: t("persona_sophia_exploration"),
+        quote: t("persona_sophia_quote"),
+      },
+    ],
+    // Position B (上方偏右) - Ryan, Lily, Kevin
+    [
+      {
+        name: "Ryan",
+        avatar: "/assets/landing-page/avatar-boy.svg",
+        professionKey: t("persona_ryan_profession"),
+        explorationKey: t("persona_ryan_exploration"),
+        quote: t("persona_ryan_quote"),
+      },
+      {
+        name: "Lily",
+        avatar: "/assets/landing-page/avatar-girl.svg",
+        professionKey: t("persona_lily_profession"),
+        explorationKey: t("persona_lily_exploration"),
+        quote: t("persona_lily_quote"),
+      },
+      {
+        name: "Kevin",
+        avatar: "/assets/landing-page/avatar-boy.svg",
+        professionKey: t("persona_kevin_profession"),
+        explorationKey: t("persona_kevin_exploration"),
+        quote: t("persona_kevin_quote"),
+      },
+    ],
+    // Position C (右側) - Zoe, Allen, Yuki
+    [
+      {
+        name: "Zoe",
+        avatar: "/assets/landing-page/avatar-girl.svg",
+        professionKey: t("persona_zoe_profession"),
+        explorationKey: t("persona_zoe_exploration"),
+        quote: t("persona_zoe_quote"),
+      },
+      {
+        name: "Allen",
+        avatar: "/assets/landing-page/avatar-boy.svg",
+        professionKey: t("persona_allen_profession"),
+        explorationKey: t("persona_allen_exploration"),
+        quote: t("persona_allen_quote"),
+      },
+      {
+        name: "Yuki",
+        avatar: "/assets/landing-page/avatar-girl.svg",
+        professionKey: t("persona_yuki_profession"),
+        explorationKey: t("persona_yuki_exploration"),
+        quote: t("persona_yuki_quote"),
+      },
+    ],
+  ];
+}
 
 function PersonaCardComponent({
   card,
@@ -150,9 +151,11 @@ function PersonaCardComponent({
 function DesktopPersonaCarousel({
   professionLabel,
   explorationLabel,
+  personaPositions,
 }: {
   professionLabel: string;
   explorationLabel: string;
+  personaPositions: PersonaCard[][];
 }) {
   const [indices, setIndices] = useState([0, 0, 0]);
   const [isPaused, setIsPaused] = useState(false);
@@ -160,12 +163,12 @@ function DesktopPersonaCarousel({
   const rotateCards = useCallback(() => {
     setIndices((prev) =>
       prev.map((idx, posIdx) => {
-        const cards = PERSONA_POSITIONS[posIdx];
+        const cards = personaPositions[posIdx];
         if (!cards || cards.length <= 1) return idx;
         return (idx + 1) % cards.length;
       })
     );
-  }, []);
+  }, [personaPositions]);
 
   useEffect(() => {
     if (isPaused) return;
@@ -182,7 +185,7 @@ function DesktopPersonaCarousel({
       onFocus={() => setIsPaused(true)}
       onBlur={() => setIsPaused(false)}
     >
-      {PERSONA_POSITIONS.map((cards, posIdx) => {
+      {personaPositions.map((cards, posIdx) => {
         const cardIndex = indices[posIdx] ?? 0;
         const card = cards[cardIndex];
         if (!card) return null;
@@ -216,9 +219,11 @@ function DesktopPersonaCarousel({
 function MobilePersonaCarousel({
   professionLabel,
   explorationLabel,
+  allPersonaCards,
 }: {
   professionLabel: string;
   explorationLabel: string;
+  allPersonaCards: PersonaCard[];
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -226,12 +231,12 @@ function MobilePersonaCarousel({
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % ALL_PERSONA_CARDS.length);
+      setCurrentIndex((prev) => (prev + 1) % allPersonaCards.length);
     }, 3500);
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [isPaused, allPersonaCards.length]);
 
-  const currentCard = ALL_PERSONA_CARDS[currentIndex];
+  const currentCard = allPersonaCards[currentIndex];
   if (!currentCard) return null;
 
   return (
@@ -264,6 +269,9 @@ function MobilePersonaCarousel({
 
 export function PersonaSection() {
   const t = useTranslations("common");
+  const tLanding = useTranslations("landing_page");
+  const personaPositions = getPersonaPositions(tLanding);
+  const allPersonaCards = personaPositions.flat();
 
   return (
     <section className="relative overflow-hidden bg-primary-palest px-6 py-16 text-basic-400 md:py-20">
@@ -282,18 +290,18 @@ export function PersonaSection() {
           <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 text-center">
             <Image
               src="/assets/landing-page/island.svg"
-              alt="學習小島"
+              alt={t("landing_persona_title").split("，")[0] ?? ""}
               width={280}
               height={50}
               className="mx-auto mb-4"
             />
             <h2 className="text-xl font-bold leading-relaxed text-primary-darker">
-              每個人都有自己的學習小島，
+              {t("landing_persona_title").split("\n")[0]}
               <br />
-              透過交流與分享，連結成群島
+              {t("landing_persona_title").split("\n")[1]}
             </h2>
             <p className="mt-2 text-sm italic text-basic-400">
-              Where personal growth meets collective wisdom!
+              {t("landing_persona_subtitle")}
             </p>
           </div>
 
@@ -301,6 +309,7 @@ export function PersonaSection() {
           <DesktopPersonaCarousel
             professionLabel={t("landing_persona_profession")}
             explorationLabel={t("landing_persona_exploration")}
+            personaPositions={personaPositions}
           />
         </div>
       </div>
@@ -318,6 +327,7 @@ export function PersonaSection() {
         <MobilePersonaCarousel
           professionLabel={t("landing_persona_profession")}
           explorationLabel={t("landing_persona_exploration")}
+          allPersonaCards={allPersonaCards}
         />
         {/* Island decoration */}
         <div className="mt-6 flex justify-center">

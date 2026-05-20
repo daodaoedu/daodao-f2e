@@ -36,6 +36,7 @@ function FeatureCard({ title, description, bgColor, badge, className = "" }: Fea
 export function JoinSection() {
   const { openLoginDialog } = useAuth();
   const t = useTranslations("common");
+  const tLanding = useTranslations("landing_page");
 
   return (
     <section className="relative overflow-hidden bg-primary-base py-16 md:py-24">
@@ -52,9 +53,9 @@ export function JoinSection() {
               {t("landing_join_title")}
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-white/80 md:text-base">
-              成為 Beta 使用者
+              {tLanding("landing_join_beta_line1")}
               <br />
-              與我們一起打造更好的學習體驗
+              {tLanding("landing_join_beta_line2")}
             </p>
           </div>
 
@@ -104,9 +105,9 @@ export function JoinSection() {
               {t("landing_join_title")}
             </h2>
             <p className="mt-3 hidden text-sm leading-relaxed text-white/80 md:text-base lg:block">
-              成為 Beta 使用者
+              {tLanding("landing_join_beta_line1")}
               <br />
-              與我們一起打造更好的學習體驗
+              {tLanding("landing_join_beta_line2")}
             </p>
 
             <Button

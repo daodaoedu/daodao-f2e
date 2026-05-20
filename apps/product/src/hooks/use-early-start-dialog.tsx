@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { differenceInDays, format, parse } from "date-fns";
 import { zhTW } from "date-fns/locale";
@@ -35,6 +36,7 @@ interface UseEarlyStartDialogOptions {
  */
 export function useEarlyStartDialog({ startDate }: UseEarlyStartDialogOptions) {
   const { openWarningDialog } = useDialog();
+  const t = useTranslations("dialog");
 
   const openEarlyStartDialog = useCallback(async (): Promise<EarlyStartResult> => {
     const today = new Date();
@@ -47,20 +49,21 @@ export function useEarlyStartDialog({ startDate }: UseEarlyStartDialogOptions) {
     const formattedStartDate = format(practiceStartDate, "M月d日 (EEEE)", { locale: zhTW });
 
     const result = await openWarningDialog({
-      title: "確定要提早開始嗎？",
+      title: t("early_start_title"),
       message: (
         <div className="space-y-2">
           <p>
-            這個實踐原定於 <span className="font-medium text-logo-cyan">{formattedStartDate}</span>{" "}
-            開始，目前還有 {daysEarly} 天。
+            {t("early_start_body_before")}{" "}
+            <span className="font-medium text-logo-cyan">{formattedStartDate}</span>{" "}
+            {t("early_start_body_remaining", { daysEarly })}
           </p>
-          <p>如果現在打卡，實踐的起迄日會自動調整，結束日也會相應提前。</p>
+          <p>{t("early_start_body_adjust")}</p>
         </div>
       ),
       textAlign: "left",
       buttons: [
-        { label: "先不要", value: "cancel", variant: "outline" },
-        { label: "確定開始", value: "confirm", variant: "orange" },
+        { label: t("early_start_cancel_btn"), value: "cancel", variant: "outline" },
+        { label: t("early_start_confirm_btn"), value: "confirm", variant: "orange" },
       ],
     });
 
@@ -69,7 +72,7 @@ export function useEarlyStartDialog({ startDate }: UseEarlyStartDialogOptions) {
     }
 
     return EarlyStartResult.Cancelled;
-  }, [openWarningDialog, startDate]);
+  }, [openWarningDialog, startDate, t]);
 
   return { openEarlyStartDialog };
 }

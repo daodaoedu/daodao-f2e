@@ -9,6 +9,7 @@ import {
 } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
 import { resultDetailMap } from "@daodao/features-quiz";
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -28,11 +29,9 @@ const resultTypeToLottiePathMap = new Map<string, () => Promise<object>>([
   ],
 ]);
 
-// 預設的 slogan（當無測驗結果時使用）
-const DEFAULT_SLOGAN = "先做再說，做中學最快！";
-
 export function Banner() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const t = useTranslations("layout");
   const [resultType, setResultType] = useState<string | null>(null);
   const [lottieJson, setLottieJson] = useState<object | null>(null);
   const [isLoadingResult, setIsLoadingResult] = useState(true);
@@ -135,8 +134,8 @@ export function Banner() {
 
   // 獲取對應的 slogan
   const slogan = resultType
-    ? resultDetailMap.get(resultType)?.slogan || DEFAULT_SLOGAN
-    : DEFAULT_SLOGAN;
+    ? resultDetailMap.get(resultType)?.slogan || t("default_slogan")
+    : t("default_slogan");
   return (
     <>
       <header

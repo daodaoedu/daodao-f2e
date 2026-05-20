@@ -13,6 +13,7 @@ type SubscribeStatus = "idle" | "loading" | "success" | "error";
 
 export const Footer = () => {
   const t = useTranslations("common");
+  const tLayout = useTranslations("web_layout");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<SubscribeStatus>("idle");
@@ -54,7 +55,7 @@ export const Footer = () => {
           <div>
             <Image
               src="/assets/landing-page/logo-simple-white.svg"
-              alt="島島阿學 Logo"
+              alt={tLayout("logo_alt")}
               width={142}
               height={24}
               className="mb-2"

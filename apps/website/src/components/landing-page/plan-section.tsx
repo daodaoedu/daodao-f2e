@@ -1,11 +1,13 @@
 "use client";
 
 import { useAuth } from "@daodao/auth";
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 
 export function PlanSection() {
   const { openLoginDialog } = useAuth();
+  const t = useTranslations("landing_page");
   return (
     <section
       className="relative mt-[60px] flex flex-col items-center justify-center overflow-x-clip pb-[60px]"
@@ -13,8 +15,8 @@ export function PlanSection() {
     >
       {/* Section Header */}
       <div className="px-6 pb-[60px] text-center text-primary-darker">
-        <h2 className="mb-2 text-[28px] font-semibold">加入島島阿學</h2>
-        <h3 className="text-sm">搶先體驗完整學習平台，與我們一起打造更好的學習體驗</h3>
+        <h2 className="mb-2 text-[28px] font-semibold">{t("plan_section_title")}</h2>
+        <h3 className="text-sm">{t("plan_section_subtitle")}</h3>
       </div>
 
       <div className="container mx-auto">
@@ -24,7 +26,7 @@ export function PlanSection() {
             {/* 裝飾元素 - 半圓 */}
             <Image
               src="/assets/landing-page/deco-semicircle.svg"
-              alt="裝飾半圓"
+              alt={t("plan_deco_semicircle_alt")}
               width={127}
               height={84}
               className="absolute -left-16 -top-10 z-0"
@@ -32,26 +34,26 @@ export function PlanSection() {
 
             {/* 內容區塊 */}
             <div className="relative z-10 flex max-w-[400px] flex-col items-center justify-center rounded-[20px] border-2 border-primary-base bg-primary-palest p-6 text-primary-darker">
-              <h2 className="text-center text-lg font-semibold">探索所有功能，完全免費！</h2>
+              <h2 className="text-center text-lg font-semibold">{t("plan_card_title")}</h2>
               <p className="mb-6 mt-2 text-center text-[13px]">
-                作為早期使用者，你將可以免費使用所有功能
+                {t("plan_card_desc")}
               </p>
 
               <ul className="mb-3 w-full list-none p-0">
                 <li className="text-primary-500 relative border-b border-gray-200 py-2 pl-10 before:absolute before:left-0 before:top-2 before:size-6 before:bg-[url('/assets/landing-page/icon-bulb.svg')] before:bg-contain before:bg-center before:bg-no-repeat">
-                  建立學習計劃和主題實踐
+                  {t("plan_feature_1")}
                 </li>
                 <li className="text-primary-500 relative border-b border-gray-200 py-2 pl-10 before:absolute before:left-0 before:top-2 before:size-6 before:bg-[url('/assets/landing-page/icon-bulb.svg')] before:bg-contain before:bg-center before:bg-no-repeat">
-                  分享學習想法和資源
+                  {t("plan_feature_2")}
                 </li>
                 <li className="text-primary-500 relative border-b border-gray-200 py-2 pl-10 before:absolute before:left-0 before:top-2 before:size-6 before:bg-[url('/assets/landing-page/icon-bulb.svg')] before:bg-contain before:bg-center before:bg-no-repeat">
-                  AI 學習建議和分析
+                  {t("plan_feature_3")}
                 </li>
                 <li className="text-primary-500 relative border-b border-gray-200 py-2 pl-10 before:absolute before:left-0 before:top-2 before:size-6 before:bg-[url('/assets/landing-page/icon-bulb.svg')] before:bg-contain before:bg-center before:bg-no-repeat">
-                  成長地圖看見自己的進步和機會
+                  {t("plan_feature_4")}
                 </li>
                 <li className="text-primary-500 relative py-2 pl-10 before:absolute before:left-0 before:top-2 before:size-6 before:bg-[url('/assets/landing-page/icon-bulb.svg')] before:bg-contain before:bg-center before:bg-no-repeat">
-                  優先獲得新功能體驗
+                  {t("plan_feature_5")}
                 </li>
               </ul>
 
@@ -61,15 +63,15 @@ export function PlanSection() {
                 className="mt-6"
                 onClick={() => openLoginDialog({ redirectUrl: "/" })}
               >
-                立即免費註冊
+                {t("plan_cta_button")}
               </Button>
-              <p className="mt-2 text-center text-[13px]">Beta 期間完全免費 • 無需信用卡</p>
+              <p className="mt-2 text-center text-[13px]">{t("plan_cta_note")}</p>
             </div>
 
             {/* 裝飾元素 - 幾何圖形 */}
             <Image
               src="/assets/landing-page/deco-geometries.svg"
-              alt="裝飾幾何圖形"
+              alt={t("plan_deco_geometries_alt")}
               width={107}
               height={91}
               className="absolute -right-8 bottom-[-44px] z-20"

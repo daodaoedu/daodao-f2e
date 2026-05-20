@@ -13,18 +13,18 @@ import {
   UserSolidSvg,
 } from "@daodao/assets";
 
-export const menuItems = [
+export const getMenuItems = (t: (key: string) => string) => [
   {
     activeIcon: HomeSolidSvg,
     icon: HomeOutlineSvg,
-    label: "主頁",
+    label: t("nav_home"),
     href: "/",
     isMatch: (pathname: string) => pathname === "/",
   },
   {
     activeIcon: SearchSolidSvg,
     icon: SearchOutlineSvg,
-    label: "探索社群",
+    label: t("nav_explore"),
     href: "/explore",
     hidden: true,
     isMatch: (pathname: string) => pathname === "/explore",
@@ -32,7 +32,7 @@ export const menuItems = [
   {
     activeIcon: MedalSolidSvg,
     icon: MedalOutlineSvg,
-    label: "成長地圖",
+    label: t("nav_growth_map"),
     href: "/growth-map",
     hidden: true,
     isMatch: (pathname: string) => pathname === "/growth-map",
@@ -40,21 +40,21 @@ export const menuItems = [
   {
     activeIcon: BellSolidSvg,
     icon: BellOutlineSvg,
-    label: "最新通知",
+    label: t("nav_notifications"),
     href: "/notifications",
     isMatch: (pathname: string) => pathname === "/notifications",
   },
   {
     activeIcon: UserSolidSvg,
     icon: UserOutlineSvg,
-    label: "我的小島",
+    label: t("nav_my_island"),
     href: (identifier: string) => `/users/${identifier}`,
     isMatch: (pathname: string, identifier: string) => pathname.startsWith(`/users/${identifier}`),
   },
   {
     activeIcon: SettingSolidSvg,
     icon: SettingOutlineSvg,
-    label: "設定",
+    label: t("nav_settings"),
     href: "/settings",
     isMatch: (pathname: string) => pathname.startsWith("/settings"),
   },

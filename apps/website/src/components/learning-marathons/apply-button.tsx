@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import blockedIsland from "@daodao/assets/images/island/blocked-island.png";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
@@ -11,6 +12,7 @@ interface ApplyButtonProps {
 }
 
 export const ApplyButton = ({ className, children }: ApplyButtonProps) => {
+  const t = useTranslations("learning_marathon");
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClickSignupButton = () => {
@@ -38,9 +40,9 @@ export const ApplyButton = ({ className, children }: ApplyButtonProps) => {
               ✕
             </button>
             <div className="body-sm space-y-4">
-              <p className="text-gray-600">本次活動申請已截止，但您仍可以加入排隊名單</p>
+              <p className="text-gray-600">{t("apply_closed_notice")}</p>
               <p className="text-gray-600">
-                預計7月初開放申請，8月底申請截止。加入排隊清單後，我們會在下次開放申請時第一時間通知您。同時也歡迎追蹤社群媒體，接收最新活動訊息。
+                {t("apply_closed_detail")}
               </p>
             </div>
 
@@ -50,9 +52,9 @@ export const ApplyButton = ({ className, children }: ApplyButtonProps) => {
 
             <div className="mt-4 flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setIsOpen(false)}>
-                稍後再說
+                {t("apply_closed_later_button")}
               </Button>
-              <Button onClick={handleConfirm}>加入排隊清單</Button>
+              <Button onClick={handleConfirm}>{t("apply_closed_join_button")}</Button>
             </div>
           </div>
         </div>

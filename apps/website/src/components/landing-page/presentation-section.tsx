@@ -1,22 +1,24 @@
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 import { SectionHeader } from "@daodao/ui/components/section-header";
 
 export function PresentationSection() {
+  const t = useTranslations("landing_page");
   return (
     <section className="relative bg-basic-600 pt-16 md:py-24">
       {/* 裝飾元素 - 黃色花朵 */}
       <Image
         className="absolute left-[12%] top-0 animate-spin-slow"
         src="/assets/landing-page/deco-flower-yellow.svg"
-        alt="裝飾花朵"
+        alt={t("presentation_deco_flower_alt")}
         width={100}
         height={90}
       />
 
       <div className="container mx-auto flex flex-col items-center justify-end text-center">
         <SectionHeader
-          title="展示你的學習成果"
-          subtitle="在實踐中與眾人一同成長"
+          title={t("presentation_title")}
+          subtitle={t("presentation_subtitle")}
           variant="light"
           alignment="center"
           titleClassName=""
@@ -30,13 +32,13 @@ export function PresentationSection() {
           <Image
             src="/assets/landing-page/learning-progress-desktop.png"
             className="hidden md:block"
-            alt="學習進度展示"
+            alt={t("presentation_progress_image_alt")}
             fill
           />
           <Image
             src="/assets/landing-page/learning-progress-mobile.png"
             className="block md:hidden"
-            alt="學習進度展示"
+            alt={t("presentation_progress_image_alt")}
             fill
           />
         </div>
@@ -46,7 +48,7 @@ export function PresentationSection() {
       <Image
         className="absolute bottom-0 right-[10%]"
         src="/assets/landing-page/deco-mascot-2.svg"
-        alt="吉祥物裝飾"
+        alt={t("presentation_mascot_alt")}
         width={143}
         height={132}
       />

@@ -32,14 +32,19 @@ const formatFrequency = (minDays: number | null, maxDays: number | null): string
 };
 
 // 將模板資料轉換為卡片格式
-const convertTemplateToCard = (template: PracticeTemplateType, index: number) => ({
+const convertTemplateToCard = (
+  template: PracticeTemplateType,
+  index: number,
+  frequencyUnit: string,
+  durationUnit: string,
+) => ({
   id: template.id,
   title: template.title,
   description: template.practiceAction || template.suggestedTags?.join("、") || template.title,
   frequency: formatFrequency(template.frequencyMinDays, template.frequencyMaxDays),
-  frequencyUnit: "天/週",
+  frequencyUnit,
   duration: String(template.sessionDurationMinutes ?? 30),
-  durationUnit: "分/次",
+  durationUnit,
   theme: themeOrder[index % themeOrder.length] as PracticeTheme,
   templateId: template.id,
 });
@@ -56,6 +61,7 @@ function PracticeCard({
   templateId,
   isActive = false,
   onClick,
+  speechBubbleText,
 }: {
   tag: string;
   title: string;
@@ -68,6 +74,7 @@ function PracticeCard({
   templateId: string;
   isActive?: boolean;
   onClick?: (templateId: string) => void;
+  speechBubbleText: string;
 }) {
   const ThemeSvg = themeSvgMap[theme];
 
@@ -96,7 +103,7 @@ function PracticeCard({
           <div className="mt-4 flex justify-end">
             <div className="relative">
               <div className="rounded-lg bg-basic-500 px-4 py-2 text-sm text-white">
-                喜歡嗎？馬上開始！
+                {speechBubbleText}
               </div>
               <div className="absolute -bottom-2 right-8 size-0 border-x-8 border-t-8 border-x-transparent border-t-basic-500" />
             </div>
@@ -132,7 +139,12 @@ function PracticeCard({
 
 export function LearningFoundationSection() {
   const t = useTranslations("common");
+  const tLanding = useTranslations("landing_page");
   const tag = t("landing_foundation_tag");
+  const frequencyUnit = tLanding("foundation_frequency_unit");
+  const durationUnit = tLanding("foundation_duration_unit");
+  const speechBubbleText = tLanding("foundation_speech_bubble");
+  const emptyText = tLanding("foundation_empty_state");
 
   // 從 API 取得模板資料
   const { data, isLoading } = usePracticeTemplates({ limit: 3 });
@@ -149,10 +161,10 @@ export function LearningFoundationSection() {
     }
 
     return data.data.map((template, index) => {
-      const cardData = convertTemplateToCard(template, index);
-      return <PracticeCard key={cardData.id} tag={tag} {...cardData} onClick={handleCardClick} />;
+      const cardData = convertTemplateToCard(template, index, frequencyUnit, durationUnit);
+      return <PracticeCard key={cardData.id} tag={tag} {...cardData} onClick={handleCardClick} speechBubbleText={speechBubbleText} />;
     });
-  }, [data, tag, handleCardClick]);
+  }, [data, tag, handleCardClick, frequencyUnit, durationUnit, speechBubbleText]);
 
   return (
     <section
@@ -203,7 +215,7 @@ export function LearningFoundationSection() {
             />
           ) : (
             <div className="flex h-full items-center justify-center text-basic-400">
-              暫無推薦模板
+              {emptyText}
             </div>
           )}
         </div>
