@@ -4279,8 +4279,7 @@
       "success": {
         "title": "歡迎加入島島阿學！",
         "titleWithName": "{name}，歡迎加入島島阿學！",
-        "primaryButton": "前往完成偏好設定獲得個人化推薦",
-        "secondaryButton": "稍後設定",
+        "primaryButton": "前往島島阿學",
         "emailReminder": "記得到信箱收我們的歡迎信哦!"
       }
     },
