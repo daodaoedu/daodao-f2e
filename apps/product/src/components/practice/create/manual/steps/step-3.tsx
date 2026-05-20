@@ -115,7 +115,9 @@ export const Step3 = ({ form }: Step3Props) => {
                         className="sr-only"
                         aria-label={label}
                       />
-                      <span className="text-base font-medium">{label}</span>
+                      <span className="text-sm sm:text-base font-medium whitespace-nowrap">
+                        {label}
+                      </span>
                     </label>
                   );
                 })}

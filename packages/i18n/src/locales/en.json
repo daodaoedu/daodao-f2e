@@ -76,6 +76,7 @@
     "footer_social_title": "Follow Dao Dao",
     "footer_instagram_alt": "Instagram",
     "footer_facebook_alt": "Facebook",
+    "footer_discord_alt": "Discord",
     "footer_copyright": "Dao Dao Learning Co., Ltd. © 2022 - {year}",
     "city_selector_loading": "Loading cities...",
     "city_selector_load_error": "Failed to load: {error}",
@@ -4192,7 +4193,7 @@
         }
       },
       "actions": {
-        "goToHome": "Complete Profile Settings",
+        "goToHome": "Explore Dao Dao",
         "backToHome": "Back to Home"
       },
       "resend": {
@@ -4279,8 +4280,7 @@
       "success": {
         "title": "Welcome to Dao Dao!",
         "titleWithName": "{name}, Welcome to Dao Dao!",
-        "primaryButton": "Set up preferences for personalized recommendations",
-        "secondaryButton": "Set up later",
+        "primaryButton": "Explore Dao Dao",
         "emailReminder": "Don't forget to check your inbox for our welcome email!"
       }
     },
@@ -4554,7 +4554,21 @@
     "header_month_unit": "",
     "header_day_unit": "",
     "want_to_practice": "I want to try this too",
-    "continue_editing": "Continue editing"
+    "continue_editing": "Continue editing",
+    "tab_inspire": "Inspire",
+    "tab_mine": "Mine",
+    "loading": "Loading...",
+    "filter_aria_label": "Filter tasks",
+    "filter_all": "All",
+    "filter_draft": "Draft",
+    "filter_not_started": "Not Started",
+    "filter_in_progress": "In Progress",
+    "filter_completed": "Completed",
+    "stats_streak_label": "Login Streak",
+    "stats_streak_unit": "days",
+    "stats_responses_label": "Responses",
+    "stats_responses_unit": "times",
+    "task_label_practice": "Topic Practice"
   },
   "notification": {
     "and_others": "and {count} others",
@@ -4721,5 +4735,9 @@
       "switchQuestion": "Try another",
       "error": "Operation failed, please try again"
     }
+  },
+  "resource": {
+    "hot_tags": "Hot Tags",
+    "resource_count": "<bold>{count}</bold> resources"
   }
 }

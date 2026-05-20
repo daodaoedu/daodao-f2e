@@ -76,6 +76,7 @@
     "footer_social_title": "追蹤島島",
     "footer_instagram_alt": "Instagram",
     "footer_facebook_alt": "Facebook",
+    "footer_discord_alt": "Discord",
     "footer_copyright": "島島阿學 © 2022 - {year}",
     "city_selector_loading": "載入城市資料中...",
     "city_selector_load_error": "載入失敗: {error}",
@@ -4192,7 +4193,7 @@
         }
       },
       "actions": {
-        "goToHome": "前往完成個人設定",
+        "goToHome": "前往島島阿學",
         "backToHome": "返回首頁"
       },
       "resend": {
@@ -4279,8 +4280,7 @@
       "success": {
         "title": "歡迎加入島島阿學！",
         "titleWithName": "{name}，歡迎加入島島阿學！",
-        "primaryButton": "前往完成偏好設定獲得個人化推薦",
-        "secondaryButton": "稍後設定",
+        "primaryButton": "前往島島阿學",
         "emailReminder": "記得到信箱收我們的歡迎信哦!"
       }
     },
@@ -4554,7 +4554,21 @@
     "header_month_unit": "月",
     "header_day_unit": "日",
     "want_to_practice": "我也想實踐",
-    "continue_editing": "繼續編輯"
+    "continue_editing": "繼續編輯",
+    "tab_inspire": "靈感",
+    "tab_mine": "我的",
+    "loading": "載入中...",
+    "filter_aria_label": "任務篩選",
+    "filter_all": "全部",
+    "filter_draft": "草稿",
+    "filter_not_started": "未開始",
+    "filter_in_progress": "進行中",
+    "filter_completed": "已完成",
+    "stats_streak_label": "連續登入",
+    "stats_streak_unit": "天",
+    "stats_responses_label": "獲得迴響",
+    "stats_responses_unit": "次",
+    "task_label_practice": "主題實踐"
   },
   "notification": {
     "and_others": "與其他 {count} 人",
@@ -4721,5 +4735,9 @@
       "switchQuestion": "換一題",
       "error": "操作失敗，請稍後再試"
     }
+  },
+  "resource": {
+    "hot_tags": "熱門標籤",
+    "resource_count": "共 <bold>{count}</bold> 筆資源"
   }
 }
