@@ -4547,6 +4547,14 @@
     "empty_title": "No recommendations yet",
     "empty_description": "You can focus on your current plan, or browse other practices in the Inspire tab",
     "empty_cta": "Go to Inspire",
+    "completed_title": "Completed",
+    "fab_add_task": "Add task",
+    "fab_create_practice": "Create a themed practice",
+    "checked_in_count": "Checked in <bold>{count}</bold> times",
+    "header_month_unit": "",
+    "header_day_unit": "",
+    "want_to_practice": "I want to try this too",
+    "continue_editing": "Continue editing",
     "tab_inspire": "Inspire",
     "tab_mine": "Mine",
     "loading": "Loading...",
@@ -4727,5 +4735,9 @@
       "switchQuestion": "Try another",
       "error": "Operation failed, please try again"
     }
+  },
+  "resource": {
+    "hot_tags": "Hot Tags",
+    "resource_count": "<bold>{count}</bold> resources"
   }
 }

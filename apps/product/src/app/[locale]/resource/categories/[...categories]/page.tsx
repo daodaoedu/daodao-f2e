@@ -1,4 +1,5 @@
 import bannerImage from "@daodao/assets/images/resource/banner.webp";
+import { setRequestLocale } from "@daodao/i18n/server";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -45,9 +46,10 @@ export async function generateMetadata({
 export default async function ResourceCategoriesDetailPage({
   params,
 }: {
-  params: Promise<{ categories?: string[] }>;
+  params: Promise<{ locale: string; categories?: string[] }>;
 }) {
-  const { categories } = await params;
+  const { locale, categories } = await params;
+  setRequestLocale(locale);
   const categoryHierarchy = parseCategoryHierarchy(parseToArray(categories));
   const [majorCategory, subCategory = null] = categoryHierarchy;
 

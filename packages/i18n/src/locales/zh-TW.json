@@ -4547,6 +4547,14 @@
     "empty_title": "暫時沒有推薦",
     "empty_description": "你可以先專注於當前的計畫，或到「靈感」分頁看看其他主題實踐",
     "empty_cta": "去看看靈感",
+    "completed_title": "已完成",
+    "fab_add_task": "新增任務",
+    "fab_create_practice": "建立主題實踐",
+    "checked_in_count": "已打卡 <bold>{count}</bold> 次",
+    "header_month_unit": "月",
+    "header_day_unit": "日",
+    "want_to_practice": "我也想實踐",
+    "continue_editing": "繼續編輯",
     "tab_inspire": "靈感",
     "tab_mine": "我的",
     "loading": "載入中...",
@@ -4727,5 +4735,9 @@
       "switchQuestion": "換一題",
       "error": "操作失敗，請稍後再試"
     }
+  },
+  "resource": {
+    "hot_tags": "熱門標籤",
+    "resource_count": "共 <bold>{count}</bold> 筆資源"
   }
 }

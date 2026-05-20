@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
@@ -27,6 +30,7 @@ export function ResourceBanner({
   hotTags,
   length,
 }: ResourceBannerProps) {
+  const t = useTranslations("resource");
   const isMediumSize = size === "md";
   const isLargeSize = size === "lg";
 
@@ -66,7 +70,7 @@ export function ResourceBanner({
             {isLargeSize && Array.isArray(hotTags) && hotTags.length > 0 && (
               <div className="mb-5 flex flex-col gap-2 md:mb-6 md:flex-row md:items-center md:gap-3">
                 <div className="h-[1.875rem] min-w-[4.5rem] text-nowrap text-xl font-bold md:h-[1.6875rem] md:text-lg md:leading-[1.6875rem]">
-                  熱門標籤
+                  {t("hot_tags")}
                 </div>
                 <div className="flex flex-wrap gap-1 md:gap-2">
                   {hotTags.map(({ label, value }) => (
@@ -89,7 +93,10 @@ export function ResourceBanner({
             {isMediumSize && typeof length === "number" && (
               <div className="mb-6 flex flex-col md:flex-row md:items-center">
                 <div className="body-lg">
-                  共 <span className="font-bold">{length}</span> 筆資源
+                  {t.rich("resource_count", {
+                    count: length,
+                    bold: (chunks) => <span className="font-bold">{chunks}</span>,
+                  })}
                 </div>
               </div>
             )}
