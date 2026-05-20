@@ -1,0 +1,94 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(which:*)",
+      "Bash(pwd:*)",
+      "Bash(echo:*)",
+      "Bash(date:*)",
+      "Bash(tree:*)",
+      "Bash(file:*)",
+      "Bash(diff:*)",
+      "Bash(sort:*)",
+      "Bash(jq:*)",
+      "Bash(curl:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git blame:*)",
+      "Bash(git remote:*)",
+      "Bash(git stash list:*)",
+      "Bash(git tag:*)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm list:*)",
+      "Bash(pnpm --filter:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm build:*)",
+      "Bash(npx:*)",
+      "Bash(make:*)",
+      "Bash(python3:*)",
+      "Bash(pytest:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker compose ps:*)",
+      "Bash(docker compose logs:*)",
+      "Bash(openspec:*)",
+      "Bash(wrangler:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git push origin:*)",
+      "Bash(git checkout -b:*)",
+      "Bash(git checkout:*)",
+      "Bash(git switch:*)",
+      "Bash(git add:*)",
+      "Bash(git merge:*)",
+      "Bash(git stash:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(rm:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git checkout .:*)",
+      "Bash(git clean -f:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-write-guard.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-write-format.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

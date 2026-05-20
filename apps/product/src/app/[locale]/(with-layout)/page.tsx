@@ -22,6 +22,7 @@ import {
   RecommendationSection,
 } from "@/components/dashboard";
 import { BackgroundAnimation, Banner } from "@/components/layout";
+import { ResonanceCarousel } from "@/components/persona";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import {
   ActivityCard,
@@ -390,6 +391,8 @@ export default function HomePage() {
                   onSearch={handleSearch}
                 />
               </div>
+
+              <ResonanceCarousel />
 
               {isShowcaseLoading && feedItems.length === 0 ? (
                 <div className="flex flex-col gap-3">

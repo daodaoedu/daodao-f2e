@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Checkbox } from "@daodao/ui/components/checkbox";
 import {
   FormControl,
@@ -24,6 +25,7 @@ interface Step3Props {
 }
 
 export const Step3 = ({ form }: Step3Props) => {
+  const t = useTranslations("practice");
   return (
     <div className="space-y-4">
       <FormField
@@ -32,7 +34,7 @@ export const Step3 = ({ form }: Step3Props) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel required className="block text-base font-medium text-text-dark mb-3">
-              每次執行時間
+              {t("form_session_duration")}
             </FormLabel>
             <FormControl>
               <div className="space-y-4">
@@ -46,7 +48,7 @@ export const Step3 = ({ form }: Step3Props) => {
                   max={60}
                   step={15}
                   className="w-full"
-                  renderTooltip={(value) => <div>{value}分鐘</div>}
+                  renderTooltip={(value) => <div>{value}{t("minutes_unit")}</div>}
                 />
                 {/* Labels */}
                 <div className="flex justify-between">
@@ -62,7 +64,7 @@ export const Step3 = ({ form }: Step3Props) => {
                           : "text-light-gray hover:text-text-dark"
                       )}
                     >
-                      {option.label}
+                      {t(`${option.labelKey}`)}
                     </button>
                   ))}
                 </div>
@@ -79,14 +81,15 @@ export const Step3 = ({ form }: Step3Props) => {
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between mb-3">
-              <FormLabel className="text-base font-medium text-text-dark">執行時機</FormLabel>
-              <FormDescription className="text-sm text-light-gray">多選</FormDescription>
+              <FormLabel className="text-base font-medium text-text-dark">{t("form_execution_timing")}</FormLabel>
+              <FormDescription className="text-sm text-light-gray">{t("form_execution_timing_multi")}</FormDescription>
             </div>
             <FormControl>
               <div className="grid grid-cols-3 gap-3">
                 {EXECUTION_TIMING_OPTIONS.map((option) => {
                   const isSelected = field.value?.includes(option.value);
                   const inputId = `execution-timing-${option.value}`;
+                  const label = t(`${option.labelKey}`);
                   return (
                     <label
                       key={option.value}
@@ -110,10 +113,10 @@ export const Step3 = ({ form }: Step3Props) => {
                         }}
                         onBlur={field.onBlur}
                         className="sr-only"
-                        aria-label={option.label}
+                        aria-label={label}
                       />
                       <span className="text-sm sm:text-base font-medium whitespace-nowrap">
-                        {option.label}
+                        {label}
                       </span>
                     </label>
                   );
@@ -131,12 +134,12 @@ export const Step3 = ({ form }: Step3Props) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel className="block text-sm font-normal text-text-dark mb-3">
-              其他時段
+              {t("form_custom_timing")}
             </FormLabel>
             <FormControl>
               <Input
                 {...field}
-                placeholder="你特別想在什麼時候執行呢？"
+                placeholder={t("form_custom_timing_placeholder")}
                 className="w-full"
                 maxLength={20}
               />

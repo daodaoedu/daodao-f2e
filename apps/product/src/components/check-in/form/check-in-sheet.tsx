@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
@@ -45,8 +46,10 @@ export const CheckInSheetContent = ({
   onComplete,
   initialValues,
   existingImages,
-  submitButtonText = "完成打卡",
+  submitButtonText,
 }: ICheckInSheetContentProps) => {
+  const t = useTranslations("check_in");
+  const resolvedSubmitButtonText = submitButtonText ?? t("submit_check_in");
   const form = useForm<CheckInFormValuesType>({
     resolver: zodResolver(checkInFormSchema),
     defaultValues: {
@@ -91,7 +94,7 @@ export const CheckInSheetContent = ({
         {/* Thought Sharing (tags, description, media) */}
         {initialValues && (
           <div className="mb-8">
-            <h3 className="text-base font-medium mb-3 text-text-dark">想法分享</h3>
+            <h3 className="text-base font-medium mb-3 text-text-dark">{t("thought_sharing")}</h3>
             <TagSelector form={form} />
             <DescriptionField form={form} beforeTextarea={<ReflectionQuestion />} />
             <MediaUploadField
@@ -106,7 +109,7 @@ export const CheckInSheetContent = ({
         <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
           <Button type="submit" variant="orange" className="w-full" disabled={isSubmitting}>
             <Check className="size-4.5" />
-            {isSubmitting ? "儲存中..." : submitButtonText}
+            {isSubmitting ? t("saving") : resolvedSubmitButtonText}
           </Button>
         </div>
       </form>
@@ -270,6 +273,7 @@ export const CheckInPhase2SheetContent = ({
   onComplete,
   suggestedTags,
 }: ICheckInPhase2SheetContentProps) => {
+  const t = useTranslations("check_in");
   const form = useForm<CheckInFormValuesType>({
     resolver: zodResolver(checkInFormSchema),
     defaultValues: {
@@ -307,7 +311,7 @@ export const CheckInPhase2SheetContent = ({
 
         {/* Thought Sharing */}
         <div className="mb-8">
-          <h3 className="text-base font-medium mb-3 text-text-dark">想法分享</h3>
+          <h3 className="text-base font-medium mb-3 text-text-dark">{t("thought_sharing")}</h3>
           <TagSelector form={form} fallbackTags={suggestedTags} />
           <DescriptionField form={form} beforeTextarea={<ReflectionQuestion />} />
         </div>
@@ -319,7 +323,7 @@ export const CheckInPhase2SheetContent = ({
         <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
           <Button type="submit" variant="orange" className="w-full" disabled={isSubmitting}>
             <Check className="size-4.5" />
-            {isSubmitting ? "儲存中..." : "儲存心得"}
+            {isSubmitting ? t("saving") : t("save_notes")}
           </Button>
         </div>
       </form>

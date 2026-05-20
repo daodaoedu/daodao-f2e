@@ -40,6 +40,7 @@ export function ActionMakerResult() {
   const { isCreating, createError, createPracticeFromResult } = useCreatePracticeFromAction();
   const cardRef = useRef<HTMLDivElement>(null);
   const pendingCreate = useRef(false);
+  const hasHadResult = useRef(false);
   const [downloading, setDownloading] = useState(false);
 
   const handleDownloadShareImage = useCallback(async () => {
@@ -50,9 +51,17 @@ export function ActionMakerResult() {
       const imageData = await captureElementAsImage(cardRef.current);
       if (!imageData) return;
 
-      const blob = await fetch(imageData.src).then((r) => r.blob());
-      const imageFile = new File([blob], "action-maker-result.jpg", {
-        type: "image/jpeg",
+      // Convert data URL to Blob without fetch() to avoid CSP connect-src blocking data: URIs
+      const [header, base64] = imageData.src.split(",");
+      const mime = header?.split(":")[1]?.split(";")[0] ?? "image/png";
+      const binary = atob(base64 ?? "");
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: mime });
+      const imageFile = new File([blob], "action-maker-result.png", {
+        type: mime,
       });
 
       // Mobile: prefer native share with image
@@ -72,10 +81,13 @@ export function ActionMakerResult() {
       }
 
       // Desktop / fallback: trigger download
+      const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = imageData.src;
-      a.download = "action-maker-result.jpg";
+      a.href = blobUrl;
+      a.download = "action-maker-result.png";
       a.click();
+      // Delay revoke so browsers (esp. Safari) can complete the download
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
     } finally {
       setDownloading(false);
     }
@@ -116,7 +128,13 @@ export function ActionMakerResult() {
   }, [isAuthenticated, result, handleStartPractice]);
 
   useEffect(() => {
-    if (isHydrated && !result) {
+    if (result) {
+      hasHadResult.current = true;
+    }
+  }, [result]);
+
+  useEffect(() => {
+    if (isHydrated && !result && !hasHadResult.current) {
       navigateTo("/action-maker", { replace: true });
     }
   }, [isHydrated, result, navigateTo]);
