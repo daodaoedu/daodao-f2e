@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -18,6 +19,7 @@ export const SameDayCheckInNav = ({
   currentIndex,
   practiceId,
 }: ISameDayCheckInNavProps) => {
+  const t = useTranslations("check_in");
   const router = useSafeRouter();
   const total = sameDayCheckInIds.length;
 
@@ -47,7 +49,7 @@ export const SameDayCheckInNav = ({
         onClick={handlePrev}
         disabled={!hasPrev}
         className="size-12 rounded-full bg-white text-logo-cyan shadow-md hover:bg-white/90 disabled:bg-white/20 disabled:text-logo-cyan/40 disabled:shadow-none"
-        aria-label="上一筆打卡"
+        aria-label={t("prev_check_in")}
         animation="none"
       >
         <ChevronLeft className="size-6" />
@@ -65,7 +67,7 @@ export const SameDayCheckInNav = ({
         onClick={handleNext}
         disabled={!hasNext}
         className="size-12 rounded-full bg-white text-logo-cyan shadow-md hover:bg-white/90 disabled:bg-white/20 disabled:text-logo-cyan/40 disabled:shadow-none"
-        aria-label="下一筆打卡"
+        aria-label={t("next_check_in")}
         animation="none"
       >
         <ChevronRight className="size-6" />

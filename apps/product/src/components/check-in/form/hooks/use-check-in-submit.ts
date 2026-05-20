@@ -1,4 +1,5 @@
 import { useCreatePracticeCheckIn } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
 import { mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
@@ -27,6 +28,7 @@ export const useCheckInSubmit = ({
   onComplete,
   onOpenPhase2,
 }: UseCheckInSubmitOptions) => {
+  const t = useTranslations("check_in");
   const { createCheckIn } = useCreatePracticeCheckIn(practiceId);
   const { openSuccessDialog } = useCheckInSuccessDialog({
     title: taskTitle,
@@ -34,7 +36,7 @@ export const useCheckInSubmit = ({
 
   const submitCheckIn = async (data: ICheckInFormData) => {
     // 顯示 loading toast
-    const loadingToast = toast.loading("打卡中...");
+    const loadingToast = toast.loading(t("checking_in"));
 
     try {
       // 將前端的 MoodType 映射到 API 的 ApiMoodType
@@ -95,7 +97,7 @@ export const useCheckInSubmit = ({
       toast.dismiss(loadingToast);
 
       // 顯示錯誤提示
-      const errorMessage = error instanceof Error ? error.message : "打卡失敗，請稍後再試";
+      const errorMessage = error instanceof Error ? error.message : t("check_in_failed");
       console.error("打卡失敗:", error);
       toast.error(errorMessage);
       throw error;

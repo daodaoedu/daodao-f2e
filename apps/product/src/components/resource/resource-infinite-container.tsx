@@ -1,6 +1,7 @@
 "use client";
 
 import { type IGetResourceListParams, useInfiniteResources } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useRef } from "react";
 import { ResourceCard, ResourceCardSkeleton } from "./card";
@@ -17,6 +18,7 @@ export function ResourceInfiniteContainer({
   className,
   totalCount: serverTotalCount,
 }: ResourceInfiniteContainerProps) {
+  const t = useTranslations("resource");
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const { data, isLoading, isValidating, hasMore, totalCount, loadMore } =
     useInfiniteResources(params);
@@ -50,7 +52,10 @@ export function ResourceInfiniteContainer({
     <div className={cn("flex flex-col", className)}>
       {/* 總數顯示 */}
       <div className="mb-6 text-basic-500">
-        共 <span className="font-bold text-primary-base">{displayTotalCount}</span> 筆資源
+        {t.rich("resource_count", {
+          count: displayTotalCount,
+          bold: (chunks) => <span className="font-bold text-primary-base">{chunks}</span>,
+        })}
       </div>
 
       {/* 資源列表 */}
@@ -84,7 +89,7 @@ export function ResourceInfiniteContainer({
         {/* 空狀態 */}
         {!isLoading && data.length === 0 && (
           <div className="flex flex-col items-center rounded-xl bg-primary-palest p-10">
-            <p className="text-basic-500">這個分類目前沒有學習資源</p>
+            <p className="text-basic-500">{t("category_no_resources")}</p>
           </div>
         )}
       </div>
@@ -94,7 +99,7 @@ export function ResourceInfiniteContainer({
 
       {/* 已載入全部 */}
       {!hasMore && data.length > 0 && !isLoading && (
-        <div className="mt-8 text-center text-basic-400">已顯示全部資源</div>
+        <div className="mt-8 text-center text-basic-400">{t("all_resources_loaded")}</div>
       )}
     </div>
   );

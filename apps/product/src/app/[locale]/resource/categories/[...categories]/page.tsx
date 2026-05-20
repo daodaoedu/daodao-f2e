@@ -1,5 +1,5 @@
 import bannerImage from "@daodao/assets/images/resource/banner.webp";
-import { setRequestLocale } from "@daodao/i18n/server";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -50,6 +50,7 @@ export default async function ResourceCategoriesDetailPage({
 }) {
   const { locale, categories } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "resource" });
   const categoryHierarchy = parseCategoryHierarchy(parseToArray(categories));
   const [majorCategory, subCategory = null] = categoryHierarchy;
 
@@ -66,7 +67,7 @@ export default async function ResourceCategoriesDetailPage({
       <ResourceBanner
         size="md"
         title={title}
-        content={`探索 ${title} 相關的學習資源`}
+        content={t("category_banner_content", { title })}
         image={bannerImage}
       />
 
@@ -74,7 +75,7 @@ export default async function ResourceCategoriesDetailPage({
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/resource">找資源</BreadcrumbLink>
+              <BreadcrumbLink href="/resource">{t("find_resources")}</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             {subCategory ? (

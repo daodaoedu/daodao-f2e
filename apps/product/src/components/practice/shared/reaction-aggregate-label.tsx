@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 
 interface ReactionAggregateLabelProps {
@@ -15,6 +16,7 @@ export function ReactionAggregateLabel({
   count,
   latestActorName,
 }: ReactionAggregateLabelProps) {
+  const t = useTranslations("practice");
   if (count === 0) return null;
 
   const config = REACTION_CONFIG[type];
@@ -30,14 +32,14 @@ export function ReactionAggregateLabel({
   if (latestActorName) {
     return (
       <span className="text-xs text-text-dark/60">
-        {latestActorName} 與其他 {count - 1} 人{config.label}
+        {t("reaction_with_others", { name: latestActorName, count: count - 1 })}{config.label}
       </span>
     );
   }
 
   return (
     <span className="text-xs text-text-dark/60">
-      {count} 人{config.label}
+      {t("reaction_count_people", { count })}{config.label}
     </span>
   );
 }

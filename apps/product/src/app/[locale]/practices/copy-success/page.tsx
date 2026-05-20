@@ -2,6 +2,7 @@
 
 import { usePracticeById } from "@daodao/api";
 import featureHappyJson from "@daodao/assets/images/quiz/feature-happy.json";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -15,6 +16,7 @@ import { BackgroundAnimation } from "@/components/layout";
 import { getStatusConfig, mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 
 export default function CopySuccessPage() {
+  const t = useTranslations("practice");
   const router = useRouter();
   const searchParams = useSearchParams();
   const practiceId = searchParams.get("practiceId");
@@ -51,7 +53,7 @@ export default function CopySuccessPage() {
             transition={{ duration: 0.6 }}
           >
             <h1 className="text-4xl font-medium text-text-dark leading-normal">
-              已複製到你的清單！
+              {t("copy_success_title")}
             </h1>
           </motion.div>
           <motion.div
@@ -59,7 +61,7 @@ export default function CopySuccessPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <p className="text-sm text-text-dark">你可以依照自己的需求調整內容，或直接開始進行。</p>
+            <p className="text-sm text-text-dark">{t("copy_success_desc")}</p>
           </motion.div>
         </div>
 
@@ -92,7 +94,7 @@ export default function CopySuccessPage() {
 
             {startDate && (
               <div className="flex gap-2 text-sm">
-                <span className="text-gray-400">開始日期</span>
+                <span className="text-gray-400">{t("copy_success_start_date")}</span>
                 <span className="text-text-dark font-medium">{startDate}</span>
               </div>
             )}
@@ -121,14 +123,14 @@ export default function CopySuccessPage() {
             className="w-full"
             onClick={() => router.replace(`/practices/${practiceId}?from=copy`)}
           >
-            馬上開始
+            {t("copy_success_start_now")}
           </Button>
           <Button
             variant="outline"
             className="w-full"
             onClick={() => router.replace(`/practices/${practiceId}/edit`)}
           >
-            編輯內容
+            {t("copy_success_edit")}
           </Button>
         </motion.div>
       </main>

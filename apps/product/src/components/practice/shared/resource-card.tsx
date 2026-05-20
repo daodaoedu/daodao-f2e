@@ -2,6 +2,7 @@
 
 import { useExtractOgImage } from "@daodao/api";
 import { BookSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { Link2Icon, X } from "lucide-react";
@@ -21,6 +22,7 @@ export interface ResourceCardProps {
 }
 
 const ResourceCardComponent = ({ resource, className, onClick, onRemove }: ResourceCardProps) => {
+  const t = useTranslations("practice");
   const [imageError, setImageError] = React.useState(false);
   const { data: ogImageData, isLoading } = useExtractOgImage(resource.url);
 
@@ -63,7 +65,7 @@ const ResourceCardComponent = ({ resource, className, onClick, onRemove }: Resou
               onRemove();
             }}
             className="absolute top-2 right-2 size-5 bg-[#295E5C66]/40 text-white rounded-full flex items-center justify-center hover:bg-[#295E5C66]/60 transition-colors"
-            aria-label="移除資源"
+            aria-label={t("resource_remove_aria")}
           >
             <X className="size-3" />
           </button>
@@ -82,7 +84,7 @@ const ResourceCardComponent = ({ resource, className, onClick, onRemove }: Resou
         type="button"
         onClick={onClick}
         onKeyDown={handleKeyDown}
-        aria-label={`開啟資源：${resource.name}`}
+        aria-label={t("resource_open_aria", { name: resource.name })}
         className={cn(
           "rounded-lg border border-logo-cyan bg-white cursor-pointer transition-shadow hover:shadow-md",
           className

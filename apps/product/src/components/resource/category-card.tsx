@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { usePathname } from "@daodao/i18n/navigation";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
@@ -15,6 +16,7 @@ type CategoryCardProps = {
 const CATEGORIES_BASE_PATH = "/resource/categories";
 
 export function CategoryCard(props: CategoryCardProps) {
+  const t = useTranslations("resource");
   const { category, size = "md", count } = props;
   const { value, label, image } = category;
   const pathname = usePathname();
@@ -46,7 +48,7 @@ export function CategoryCard(props: CategoryCardProps) {
         )}
       >
         <span className="text-xl font-bold">{label}</span>
-        {typeof count === "number" && <span className="text-sm opacity-90">{count} 筆資源</span>}
+        {typeof count === "number" && <span className="text-sm opacity-90">{t("resource_count_simple", { count })}</span>}
       </div>
     </CustomLink>
   );

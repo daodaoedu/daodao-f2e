@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Input } from "@daodao/ui/components/input";
 import { Check, ChevronRight, Plus, X } from "lucide-react";
@@ -22,10 +23,11 @@ export const FieldSelectionSheetContent = ({
   initialFields = [],
   availableFields,
   maxSelection,
-  customFieldLabel = "其他領域",
+  customFieldLabel,
   onComplete,
   onClose,
 }: FieldSelectionSheetContentProps) => {
+  const t = useTranslations("account_settings");
   // selectedFields 存儲的是 value（英文）
   const [selectedFields, setSelectedFields] = useState<string[]>(initialFields);
   const [customFieldInput, setCustomFieldInput] = useState("");
@@ -100,7 +102,7 @@ export const FieldSelectionSheetContent = ({
         {/* 可選擇區塊 */}
         {unselectedFields.length > 0 && (
           <div className="space-y-3">
-            <h3 className="text-sm text-text-dark">可選擇</h3>
+            <h3 className="text-sm text-text-dark">{t("selectable_section")}</h3>
             <div className="flex flex-wrap gap-3">
               {unselectedFields.map((field) => (
                 <Button
@@ -110,7 +112,7 @@ export const FieldSelectionSheetContent = ({
                   onClick={() => handleAddField(field.value)}
                   disabled={!canAddMore}
                   className="rounded-lg bg-very-light-blue border border-blue px-4 py-2"
-                  aria-label={`新增 ${field.label}`}
+                  aria-label={t("add_custom_field_btn") + " " + field.label}
                 >
                   <span className="text-sm">{field.label}</span>
                   <Plus className="size-4.5 shrink-0" />
@@ -122,16 +124,16 @@ export const FieldSelectionSheetContent = ({
 
         {/* 其他領域區塊 */}
         <div className="space-y-3">
-          <h3 className="text-sm text-text-dark">{customFieldLabel}</h3>
+          <h3 className="text-sm text-text-dark">{customFieldLabel ?? t("custom_field_other_domain")}</h3>
           <div className="flex gap-2">
             <Input
               value={customFieldInput}
               onChange={(e) => setCustomFieldInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="請輸入名稱"
+              placeholder={t("add_field_placeholder")}
               disabled={!canAddMore}
               className="flex-1"
-              aria-label={`輸入${customFieldLabel}`}
+              aria-label={t("add_custom_field_btn") + " " + (customFieldLabel ?? t("custom_field_other_domain"))}
             />
             <Button
               type="button"
@@ -139,9 +141,9 @@ export const FieldSelectionSheetContent = ({
               onClick={handleAddCustomField}
               disabled={!canAddMore || !customFieldInput.trim()}
               className="shrink-0 border-logo-cyan bg-white"
-              aria-label="新增自訂領域"
+              aria-label={t("add_custom_field_btn")}
             >
-              新增
+              {t("add_custom_field_btn")}
               <ChevronRight className="size-4" />
             </Button>
           </div>
@@ -150,7 +152,7 @@ export const FieldSelectionSheetContent = ({
         {/* 已選擇區塊 */}
         {selectedFields.length > 0 && (
           <div className="space-y-3">
-            <h3 className="text-sm text-text-dark">已選擇</h3>
+            <h3 className="text-sm text-text-dark">{t("selected_section")}</h3>
             <div className="flex flex-col gap-2.5 p-3 bg-light-blue border border-blue rounded-lg">
               {selectedFields.map((value) => (
                 <Button
@@ -159,7 +161,7 @@ export const FieldSelectionSheetContent = ({
                   variant="ghost"
                   onClick={() => handleRemoveField(value)}
                   className="px-4 py-2 rounded-lg bg-white border border-blue transition-colors"
-                  aria-label={`移除 ${getLabelByValue(value)}`}
+                  aria-label={"remove " + getLabelByValue(value)}
                 >
                   <span className="text-left flex-1">{getLabelByValue(value)}</span>
                   <X className="size-4.5 shrink-0" />
@@ -174,7 +176,7 @@ export const FieldSelectionSheetContent = ({
       <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6">
         <Button type="button" variant="orange" className="w-full" onClick={handleSubmit}>
           <Check className="size-4.5" />
-          完成
+          {t("done_btn")}
         </Button>
       </div>
     </div>

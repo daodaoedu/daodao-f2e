@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import {
   FormControl,
   FormField,
@@ -17,9 +18,10 @@ interface ISocialLinksSectionProps {
 }
 
 export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
+  const t = useTranslations("public_info_settings");
   return (
     <div className="bg-white rounded-xl p-4 space-y-4">
-      <h3 className="text-base font-medium text-text-dark mb-4">其他社群</h3>
+      <h3 className="text-base font-medium text-text-dark mb-4">{t("social_links_title")}</h3>
 
       {/* 個人網址 */}
       <FormField
@@ -27,11 +29,11 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
         name="personalUrl"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block font-medium text-text-dark mb-3">個人網址</FormLabel>
+            <FormLabel className="block font-medium text-text-dark mb-3">{t("personal_url_label")}</FormLabel>
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入個人網址"
+                placeholder={t("personal_url_placeholder")}
                 type="url"
                 className={cn(
                   form.formState.errors.personalUrl && "border-red focus-visible:border-red"
@@ -53,7 +55,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 Facebook 網址"
+                placeholder={t("facebook_placeholder")}
                 type="url"
                 className={cn(
                   form.formState.errors.facebook && "border-red focus-visible:border-red"
@@ -75,7 +77,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 Instagram 網址"
+                placeholder={t("instagram_placeholder")}
                 type="url"
                 className={cn(
                   form.formState.errors.instagram && "border-red focus-visible:border-red"
@@ -97,7 +99,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 LinkedIn 網址"
+                placeholder={t("linkedin_placeholder")}
                 type="url"
                 className={cn(
                   form.formState.errors.linkedin && "border-red focus-visible:border-red"
@@ -119,7 +121,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 Github 網址"
+                placeholder={t("github_placeholder")}
                 type="url"
                 className={cn(
                   form.formState.errors.github && "border-red focus-visible:border-red"
@@ -141,7 +143,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 Discord User ID"
+                placeholder={t("discord_placeholder")}
                 className={cn(
                   form.formState.errors.discord && "border-red focus-visible:border-red"
                 )}
@@ -162,7 +164,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 LINE ID"
+                placeholder={t("line_placeholder")}
                 className={cn(form.formState.errors.line && "border-red focus-visible:border-red")}
               />
             </FormControl>
@@ -181,7 +183,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 Threads 網址"
+                placeholder={t("threads_placeholder")}
                 type="url"
                 className={cn(
                   form.formState.errors.threads && "border-red focus-visible:border-red"

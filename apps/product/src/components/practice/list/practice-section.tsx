@@ -3,6 +3,7 @@
 import { useUserPractices } from "@daodao/api";
 import { ArrowRightOutlineSvg, ExperimentSvg, FlagSvg, NoteSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
+import { useTranslations } from "@daodao/i18n";
 import { useIsMobile, useScrollVisibility } from "@daodao/shared";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -48,6 +49,7 @@ interface Tab {
  * 「主題實踐」區塊組件
  */
 export function PracticeSection({ userId }: PracticeSectionProps) {
+  const t = useTranslations("practice");
   const [activeTab, setActiveTab] = useState<TabType>("practices");
   const [includeCompleted, setIncludeCompleted] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
@@ -88,9 +90,9 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
   }, []);
 
   const tabs: Tab[] = [
-    { id: "practices", label: "主題實踐", Icon: ExperimentSvg },
-    { id: "plans", label: "學習計劃", disabled: true, Icon: FlagSvg },
-    { id: "ideas", label: "想法", disabled: true, Icon: NoteSvg },
+    { id: "practices", label: t("section_tab_practices"), Icon: ExperimentSvg },
+    { id: "plans", label: t("section_tab_plans"), disabled: true, Icon: FlagSvg },
+    { id: "ideas", label: t("section_tab_ideas"), disabled: true, Icon: NoteSvg },
   ];
 
   const getStatusBadge = (status: PracticeItem["status"]) => {
@@ -98,31 +100,31 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
       case TaskStatus.draft:
         return (
           <Badge variant="gray" size="sm">
-            草稿
+            {t("section_status_draft")}
           </Badge>
         );
       case TaskStatus.notStarted:
         return (
           <Badge variant="gray" size="sm">
-            未開始
+            {t("section_status_not_started")}
           </Badge>
         );
       case TaskStatus.inProgress:
         return (
           <Badge variant="outline-logo" size="sm">
-            進行中
+            {t("section_status_in_progress")}
           </Badge>
         );
       case TaskStatus.completed:
         return (
           <Badge variant="default" size="sm">
-            已完成
+            {t("section_status_completed")}
           </Badge>
         );
       default:
         return (
           <Badge variant="gray" size="sm">
-            未知
+            {t("section_status_unknown")}
           </Badge>
         );
     }
@@ -199,7 +201,7 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
     <div className="relative bg-white rounded-2xl p-6">
       {/* 標題和篩選 */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-medium text-bg-dark">主題實踐</h2>
+        <h2 className="text-lg font-medium text-bg-dark">{t("section_heading")}</h2>
         {practices.length > 0 && (
           <div className="flex items-center gap-2">
             <Checkbox
@@ -211,7 +213,7 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
               htmlFor="include-completed"
               className="text-sm text-text-dark cursor-pointer select-none"
             >
-              包含已完成
+              {t("section_include_completed")}
             </label>
           </div>
         )}
@@ -223,17 +225,17 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
       {/* 實踐列表 */}
       <div className="space-y-2.5">
         {isLoading ? (
-          <div className="text-center py-8 text-basic-400">載入中...</div>
+          <div className="text-center py-8 text-basic-400">{t("loading")}</div>
         ) : error ? (
-          <div className="text-center py-8 text-basic-400">載入失敗，請稍後再試</div>
+          <div className="text-center py-8 text-basic-400">{t("load_failed")}</div>
         ) : filteredPractices.length === 0 ? (
           isOwnData ? (
             <RandomPracticesSection compact />
           ) : (
             <div className="text-center py-8 text-basic-400">
-              {activeTab === "practices" && "尚無主題實踐"}
-              {activeTab === "plans" && "尚無學習計劃"}
-              {activeTab === "ideas" && "尚無想法"}
+              {activeTab === "practices" && t("section_empty_practices")}
+              {activeTab === "plans" && t("section_empty_plans")}
+              {activeTab === "ideas" && t("section_empty_ideas")}
             </div>
           )
         ) : (

@@ -2,6 +2,7 @@
 
 import { useSettingsCompletion } from "@daodao/api";
 import { ArrowRightOutlineSvg, TelescopeSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import {
   AlertCircle,
@@ -26,63 +27,6 @@ type SettingsItem = {
   completionKey?: "preferences" | "account" | "publicInfo";
 };
 
-const socialItems: SettingsItem[] = [
-  {
-    id: "interaction",
-    label: "互動設定",
-    icon: MessagesSquare,
-    href: "/settings/interaction",
-  },
-  {
-    id: "following",
-    label: "關注設定",
-    icon: TelescopeSvg,
-    href: "/settings/following",
-  },
-  {
-    id: "connections",
-    label: "連結的夥伴",
-    icon: HeartHandshake,
-    href: "/settings/connections",
-  },
-];
-
-const settingsItems: SettingsItem[] = [
-  {
-    id: "preferences",
-    label: "領域偏好設定",
-    icon: LibraryBig,
-    href: "/settings/preferences",
-    completionKey: "preferences",
-  },
-  {
-    id: "account",
-    label: "帳號設定",
-    icon: Settings,
-    href: "/settings/account",
-    completionKey: "account",
-  },
-  {
-    id: "public-info",
-    label: "公開資訊設定",
-    icon: SquareUser,
-    href: "/settings/public-info",
-    completionKey: "publicInfo",
-  },
-  {
-    id: "notifications",
-    label: "通知設定",
-    icon: Bell,
-    href: "/settings/notifications",
-  },
-  {
-    id: "archived",
-    label: "已封存的內容",
-    icon: Archive,
-    href: "/settings/archived",
-  },
-];
-
 function SettingsItemLink({ item, isIncomplete }: { item: SettingsItem; isIncomplete?: boolean }) {
   const Icon = item.icon;
   return (
@@ -100,11 +44,69 @@ function SettingsItemLink({ item, isIncomplete }: { item: SettingsItem; isIncomp
 }
 
 export const SettingsList = () => {
+  const t = useTranslations("account_settings");
   const { openLogoutDialog, isLoggingOut } = useLogoutDialog();
   const { data } = useSettingsCompletion();
   const { taskList, completedTasks, badgeGranted } = useOnboardingProgress();
   const hasEarlyUserBadge =
     badgeGranted || (taskList.length > 0 && completedTasks >= taskList.length);
+
+  const socialItems: SettingsItem[] = [
+    {
+      id: "interaction",
+      label: t("settings_interaction"),
+      icon: MessagesSquare,
+      href: "/settings/interaction",
+    },
+    {
+      id: "following",
+      label: t("settings_following"),
+      icon: TelescopeSvg,
+      href: "/settings/following",
+    },
+    {
+      id: "connections",
+      label: t("settings_connections"),
+      icon: HeartHandshake,
+      href: "/settings/connections",
+    },
+  ];
+
+  const settingsItems: SettingsItem[] = [
+    {
+      id: "preferences",
+      label: t("settings_preferences"),
+      icon: LibraryBig,
+      href: "/settings/preferences",
+      completionKey: "preferences",
+    },
+    {
+      id: "account",
+      label: t("settings_account"),
+      icon: Settings,
+      href: "/settings/account",
+      completionKey: "account",
+    },
+    {
+      id: "public-info",
+      label: t("settings_public_info"),
+      icon: SquareUser,
+      href: "/settings/public-info",
+      completionKey: "publicInfo",
+    },
+    {
+      id: "notifications",
+      label: t("settings_notifications"),
+      icon: Bell,
+      href: "/settings/notifications",
+    },
+    {
+      id: "archived",
+      label: t("settings_archived"),
+      icon: Archive,
+      href: "/settings/archived",
+    },
+  ];
 
   const handleLogout = async () => {
     await openLogoutDialog();
@@ -114,12 +116,12 @@ export const SettingsList = () => {
     <div className="flex flex-col gap-4">
       {data && data.completed < data.total && (
         <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-orange/10 border border-orange/20">
-          <span className="text-sm text-orange">完成個人資訊設定，獲得更精準的學習推薦</span>
+          <span className="text-sm text-orange">{t("settings_completion_prompt")}</span>
         </div>
       )}
       {data && (
         <div className="flex items-center gap-2 px-3 py-2 rounded bg-white">
-          <span className="text-sm text-text-gray">個人設定完整度</span>
+          <span className="text-sm text-text-gray">{t("profile_completeness")}</span>
           <span className="ml-auto text-sm font-medium text-text-dark">
             {data.completed}/{data.total}
           </span>
@@ -132,7 +134,7 @@ export const SettingsList = () => {
           </div>
           <div className="min-w-0">
             <p className="text-sm font-semibold text-text-dark">Early User Badge</p>
-            <p className="text-xs leading-4 text-text-gray">已完成新手入門任務</p>
+            <p className="text-xs leading-4 text-text-gray">{t("early_user_badge_desc")}</p>
           </div>
         </div>
       )}
@@ -159,10 +161,10 @@ export const SettingsList = () => {
         onClick={handleLogout}
         disabled={isLoggingOut}
         className="flex items-center gap-2 p-3 rounded bg-white hover:bg-red/10 transition-colors text-red disabled:opacity-50 disabled:cursor-not-allowed"
-        aria-label="登出"
+        aria-label={t("logout")}
       >
         <LogOut className="size-4.5 shrink-0" />
-        <span className="flex-1 text-base text-left">{isLoggingOut ? "登出中..." : "登出"}</span>
+        <span className="flex-1 text-base text-left">{isLoggingOut ? t("logout_loading") : t("logout")}</span>
       </button>
     </div>
   );

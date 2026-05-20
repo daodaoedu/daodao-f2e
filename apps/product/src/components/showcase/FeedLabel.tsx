@@ -1,4 +1,7 @@
+"use client";
+
 import type { FeedReasonType } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { CalendarCheck, Rss, ThumbsUp } from "lucide-react";
 
 interface FeedLabelProps {
@@ -14,11 +17,13 @@ export function FeedLabel({
   practiceTitle,
   latestActorName,
 }: FeedLabelProps) {
+  const t = useTranslations("showcase");
+
   if (feedReason === "new_practice") {
     return (
       <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mt-4 mb-4 px-1">
         <ThumbsUp className="size-3.5 shrink-0" />
-        <span>{userName ?? "某人"} 發布了新實踐</span>
+        <span>{t("feed_new_practice", { userName: userName ?? t("unknown_person") })}</span>
       </div>
     );
   }
@@ -27,7 +32,7 @@ export function FeedLabel({
     return (
       <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mt-4 mb-4 px-1">
         <Rss className="size-3.5 shrink-0" />
-        <span>最新發布</span>
+        <span>{t("feed_new_release")}</span>
       </div>
     );
   }
@@ -37,7 +42,10 @@ export function FeedLabel({
       <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mt-4 mb-4 px-1">
         <CalendarCheck className="size-3.5 shrink-0" />
         <span>
-          {userName ?? "某人"} 在 {practiceTitle ?? "實踐"} 打卡
+          {t("feed_checked_in", {
+            userName: userName ?? t("unknown_person"),
+            practiceTitle: practiceTitle ?? t("practice_fallback"),
+          })}
         </span>
       </div>
     );
@@ -47,7 +55,7 @@ export function FeedLabel({
     return (
       <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mt-4 mb-4 px-1">
         <ThumbsUp className="size-3.5 shrink-0" />
-        <span>{latestActorName ?? "某人"} 表達了加油</span>
+        <span>{t("feed_cheered", { actorName: latestActorName ?? t("unknown_person") })}</span>
       </div>
     );
   }

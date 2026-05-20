@@ -127,7 +127,7 @@ export const CheckInCard = ({
 
                 {/* 文字內容 */}
                 {isBlankContent(content) && showEmptyHint ? (
-                  <p className="text-light-gray text-sm italic">歡迎隨時追加內容</p>
+                  <p className="text-light-gray text-sm italic">{t("welcome_add_content")}</p>
                 ) : (
                   <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">
                     {parseTextLinks(content).map((seg, i) =>

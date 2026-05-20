@@ -1,4 +1,7 @@
+"use client";
+
 import { DefaultAvatarSvg, ShareSvg, StarSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 
 type ReflectionCardProps = {
@@ -11,13 +14,14 @@ type ReflectionCardProps = {
 };
 
 export function ReflectionCard(props: ReflectionCardProps) {
+  const t = useTranslations("resource");
   const {
     className,
-    userName = "小許",
+    userName = t("reflection_card_default_username"),
     userAvatar = <DefaultAvatarSvg className="origin-top-left scale-150" />,
     stars = 4,
-    content = "學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得",
-    buttonContent = " 自然語言處理 Naturalewqeqwe",
+    content = t("reflection_card_default_content"),
+    buttonContent = t("reflection_card_default_button"),
   } = props;
 
   return (

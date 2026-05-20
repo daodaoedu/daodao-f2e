@@ -7,7 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@daodao/ui/components/breadcrumb";
-import { setRequestLocale } from "@daodao/i18n/server";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import {
@@ -26,6 +26,7 @@ interface ResourceDetailPageProps {
 export default async function ResourceDetailPage({ params }: ResourceDetailPageProps) {
   const { locale, resourceId } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "resource" });
 
   const { data: response, error } = await getResourceById(resourceId);
 
@@ -48,7 +49,7 @@ export default async function ResourceDetailPage({ params }: ResourceDetailPageP
         <Breadcrumb className="mb-5 md:mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/resource">找資源</BreadcrumbLink>
+              <BreadcrumbLink href="/resource">{t("find_resources")}</BreadcrumbLink>
             </BreadcrumbItem>
             {majorCategory && (
               <>

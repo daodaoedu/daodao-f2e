@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -13,6 +14,7 @@ export const DesktopCheckInDateSelector = ({
   practiceId,
   activeCheckInId,
 }: ICheckInDateSelectorProps) => {
+  const t = useTranslations("check_in");
   const router = useRouter();
   const [canScrollUp, setCanScrollUp] = useState(false);
   const [canScrollDown, setCanScrollDown] = useState(false);
@@ -109,7 +111,7 @@ export const DesktopCheckInDateSelector = ({
               onClick={handleScrollUp}
               disabled={!canScrollUp}
               className="text-white hover:text-white"
-              aria-label="向上滾動"
+              aria-label={t("scroll_up")}
             >
               <ChevronUp className="size-6" />
             </Button>
@@ -136,7 +138,7 @@ export const DesktopCheckInDateSelector = ({
               onClick={handleScrollDown}
               disabled={!canScrollDown}
               className="text-white hover:text-white"
-              aria-label="向下滾動"
+              aria-label={t("scroll_down")}
             >
               <ChevronDown className="size-6" />
             </Button>

@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { RefreshCw } from "lucide-react";
 import { useState } from "react";
@@ -8,6 +9,7 @@ import { useReflectionQuestion } from "../hooks/use-reflection-question";
  * 含開關（預設關閉）、問題顯示、換一題按鈕
  */
 export const ReflectionQuestion = () => {
+  const t = useTranslations("check_in");
   const [enabled, setEnabled] = useState(false);
   const { question, nextQuestion } = useReflectionQuestion();
 
@@ -19,7 +21,7 @@ export const ReflectionQuestion = () => {
           type="button"
           role="switch"
           aria-checked={enabled}
-          aria-label="靈感開關"
+          aria-label={t("inspiration_toggle")}
           onClick={() => setEnabled((v) => !v)}
           className={cn(
             "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
@@ -33,7 +35,7 @@ export const ReflectionQuestion = () => {
             )}
           />
         </button>
-        <span className="text-sm text-gray-500">靈感開關</span>
+        <span className="text-sm text-gray-500">{t("inspiration_toggle")}</span>
       </div>
 
       {/* 問題卡片 */}
@@ -46,7 +48,7 @@ export const ReflectionQuestion = () => {
             className="flex shrink-0 items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors"
           >
             <RefreshCw className="size-3.5" />
-            換一題
+            {t("next_question")}
           </button>
         </div>
       )}

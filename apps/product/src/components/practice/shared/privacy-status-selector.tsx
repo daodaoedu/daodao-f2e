@@ -1,35 +1,10 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { Globe, Lock, Timer } from "lucide-react";
 
 export type PrivacyStatus = "private" | "public" | "delayed";
-
-const PRIVACY_OPTIONS: {
-  value: PrivacyStatus;
-  label: string;
-  description: string;
-  icon: typeof Lock;
-}[] = [
-  {
-    value: "private",
-    label: "私人",
-    description: "只有自己可以看到",
-    icon: Lock,
-  },
-  {
-    value: "public",
-    label: "即時公開",
-    description: "立即顯示在靈感廣場",
-    icon: Globe,
-  },
-  {
-    value: "delayed",
-    label: "完成後分享",
-    description: "完成後公開打卡內容",
-    icon: Timer,
-  },
-];
 
 interface PrivacyStatusSelectorProps {
   value: PrivacyStatus;
@@ -38,9 +13,37 @@ interface PrivacyStatusSelectorProps {
 }
 
 export function PrivacyStatusSelector({ value, onChange, className }: PrivacyStatusSelectorProps) {
+  const t = useTranslations("practice");
+
+  const PRIVACY_OPTIONS: {
+    value: PrivacyStatus;
+    label: string;
+    description: string;
+    icon: typeof Lock;
+  }[] = [
+    {
+      value: "private",
+      label: t("privacy_private_label"),
+      description: t("privacy_private_desc"),
+      icon: Lock,
+    },
+    {
+      value: "public",
+      label: t("privacy_public_label"),
+      description: t("privacy_public_desc"),
+      icon: Globe,
+    },
+    {
+      value: "delayed",
+      label: t("privacy_delayed_label"),
+      description: t("privacy_delayed_desc"),
+      icon: Timer,
+    },
+  ];
+
   return (
     <div className={cn("space-y-2", className)}>
-      <p className="text-sm font-medium text-text-dark mb-3">誰可以看到你的實踐？</p>
+      <p className="text-sm font-medium text-text-dark mb-3">{t("privacy_who_can_see")}</p>
       <div className="flex flex-col gap-2">
         {PRIVACY_OPTIONS.map((option) => {
           const Icon = option.icon;

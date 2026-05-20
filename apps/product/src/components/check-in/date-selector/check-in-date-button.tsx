@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import type { ICheckInDate, ICheckInDisplayData } from "../types";
@@ -33,6 +34,7 @@ export const CheckInDateButton = ({
   onSelect,
   className,
 }: ICheckInDateButtonProps) => {
+  const t = useTranslations("check_in");
   const hasCheckIn = item.hasCheckIn ?? !!checkIns[item.id];
   // 優先使用日期比對（支援同日多筆打卡切換時仍正確高亮），否則降級為 ID 比對
   const isActive =
@@ -69,7 +71,7 @@ export const CheckInDateButton = ({
           ? `linear-gradient(to bottom, rgba(255, 157, 0, ${fillOpacity}), rgba(255, 157, 0, ${fillOpacity})), white`
           : "white",
       }}
-      aria-label={hasCheckIn ? `選擇 ${item.date} 的打卡記錄` : `${item.date} 尚未打卡`}
+      aria-label={hasCheckIn ? t("date_select_aria", { date: item.date }) : t("date_no_checkin_aria", { date: item.date })}
     >
       <span className="relative z-10">{index + 1}</span>
     </Button>

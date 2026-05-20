@@ -1,6 +1,7 @@
 "use client";
 
 import { LikeOutlineSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -91,6 +92,7 @@ export function ReactionPickerButton({
   displayReactions,
   firstReactorName,
 }: ReactionPickerButtonProps) {
+  const t = useTranslations("check_in");
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -238,9 +240,9 @@ export function ReactionPickerButton({
               <span className="text-sm text-[#295E5C]">
                 {firstReactorName
                   ? totalCount > 1
-                    ? `${firstReactorName} 與其他 ${totalCount - 1} 人`
+                    ? t("reactor_and_others", { name: firstReactorName, count: totalCount - 1 })
                     : firstReactorName
-                  : `${totalCount} 人`}
+                  : t("reactor_count", { count: totalCount })}
               </span>
             )}
           </button>

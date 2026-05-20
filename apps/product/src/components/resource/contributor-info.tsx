@@ -1,6 +1,7 @@
 "use client";
 
 import { DefaultAvatarSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -26,9 +27,10 @@ function getUserProfileBasePath(user: UserInfo): string {
 }
 
 export function ContributorInfo({ user }: ContributorInfoProps) {
+  const t = useTranslations("resource");
   return (
     <div className="rounded-lg bg-primary-palest p-10">
-      <h2 className="heading-md mb-10">關於分享者</h2>
+      <h2 className="heading-md mb-10">{t("about_contributor")}</h2>
 
       <div className="mb-6 flex items-center justify-between">
         <div className="flex">
@@ -53,9 +55,9 @@ export function ContributorInfo({ user }: ContributorInfoProps) {
           </div>
         </div>
 
-        <Button size="default" onClick={() => alert("功能尚未開放")}>
+        <Button size="default" onClick={() => alert(t("feature_not_available"))}>
           <Mail size={15} />
-          聯繫分享者
+          {t("contact_contributor")}
         </Button>
       </div>
 
@@ -73,10 +75,10 @@ export function ContributorInfo({ user }: ContributorInfoProps) {
         )}
         {user.selfIntroduction && (
           <div>
-            <h3 className="body-lg mb-2 font-bold text-basic-500">簡介</h3>
+            <h3 className="body-lg mb-2 font-bold text-basic-500">{t("introduction")}</h3>
             <p className="mb-2 text-basic-500">{user.selfIntroduction}</p>
             <Button type="button" variant="link" className="-mx-2 px-2" asChild>
-              <CustomLink href={getUserProfileBasePath(user)}>了解更多</CustomLink>
+              <CustomLink href={getUserProfileBasePath(user)}>{t("learn_more")}</CustomLink>
             </Button>
           </div>
         )}

@@ -5,6 +5,7 @@ import LineSvg from "@daodao/assets/images/social-icons/line-filled.svg";
 import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin-filled.svg";
 import ThreadsSvg from "@daodao/assets/images/social-icons/threads-filled.svg";
 import XSvg from "@daodao/assets/images/social-icons/x-filled.svg";
+import { useTranslations } from "@daodao/i18n";
 import { captureElementAsImage, dataUrlToFile, getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
@@ -26,6 +27,7 @@ export const ShareCheckInSheetContent = ({
   taskTitle,
   checkInData,
 }: IShareCheckInSheetContentProps) => {
+  const t = useTranslations("check_in");
   const { description, images } = checkInData;
 
   const captureRef = useRef<HTMLDivElement>(null);
@@ -79,12 +81,12 @@ export const ShareCheckInSheetContent = ({
       });
 
       if (!didShare) {
-        toast.error("此瀏覽器不支援系統分享");
+        toast.error(t("share_not_supported"));
       }
     } catch (error) {
       const isCancelled = error instanceof DOMException && error.name === "AbortError";
       if (!isCancelled) {
-        toast.error("分享失敗，請稍後再試");
+        toast.error(t("share_failed"));
       }
     }
   };
@@ -95,7 +97,7 @@ export const ShareCheckInSheetContent = ({
     try {
       const imageFile = dataUrlToFile(cardImageUrl, `check-in-${checkInData.date || "card"}.png`);
       if (!imageFile) {
-        toast.error("下載失敗");
+        toast.error(t("download_failed"));
         return;
       }
 
@@ -109,9 +111,9 @@ export const ShareCheckInSheetContent = ({
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(blobUrl);
-      toast.success("圖片已下載");
+      toast.success(t("download_success"));
     } catch {
-      toast.error("下載失敗");
+      toast.error(t("download_failed"));
     }
   };
 
@@ -140,13 +142,13 @@ export const ShareCheckInSheetContent = ({
           <div className="relative overflow-hidden w-[350px] min-h-[192px]">
             {isCapturing ? (
               <div className="flex items-center justify-center h-[192px] text-sm text-light-gray">
-                生成分享圖片中...
+                {t("generating_image")}
               </div>
             ) : cardImageUrl ? (
-              <img src={cardImageUrl} alt="打卡圖片" className="w-full object-contain bg-white" />
+              <img src={cardImageUrl} alt={t("check_in_image_alt")} className="w-full object-contain bg-white" />
             ) : (
               <div className="flex items-center justify-center h-[192px] text-sm text-light-gray">
-                無法生成圖片
+                {t("image_failed")}
               </div>
             )}
           </div>
@@ -154,7 +156,7 @@ export const ShareCheckInSheetContent = ({
           {/* 分享到社群媒體 */}
           <div>
             <h3 className="text-base font-medium mb-3 text-text-dark text-center">
-              分享到社群媒體
+              {t("share_to_social")}
             </h3>
             <div className="flex justify-center gap-4">
               <Button
@@ -162,7 +164,7 @@ export const ShareCheckInSheetContent = ({
                 variant="link"
                 size="icon"
                 onClick={shareAPI.lineShare}
-                aria-label="分享到 LINE"
+                aria-label={t("share_to_line")}
               >
                 <LineSvg className="size-10" />
               </Button>
@@ -171,7 +173,7 @@ export const ShareCheckInSheetContent = ({
                 variant="link"
                 size="icon"
                 onClick={shareAPI.threadsShare}
-                aria-label="分享到 Threads"
+                aria-label={t("share_to_threads")}
               >
                 <ThreadsSvg className="size-10 text-logo-purple" />
               </Button>
@@ -180,7 +182,7 @@ export const ShareCheckInSheetContent = ({
                 variant="link"
                 size="icon"
                 onClick={shareAPI.facebookShare}
-                aria-label="分享到 Facebook"
+                aria-label={t("share_to_facebook")}
               >
                 <FacebookSvg className="size-10 text-logo-blue" />
               </Button>
@@ -189,7 +191,7 @@ export const ShareCheckInSheetContent = ({
                 variant="link"
                 size="icon"
                 onClick={shareAPI.xShare}
-                aria-label="分享到 X (Twitter)"
+                aria-label={t("share_to_x")}
               >
                 <XSvg className="size-10" />
               </Button>
@@ -198,7 +200,7 @@ export const ShareCheckInSheetContent = ({
                 variant="link"
                 size="icon"
                 onClick={shareAPI.linkedinShare}
-                aria-label="分享到 LinkedIn"
+                aria-label={t("share_to_linkedin")}
               >
                 <LinkedInSvg className="size-10" />
               </Button>
@@ -208,7 +210,7 @@ export const ShareCheckInSheetContent = ({
                 size="icon"
                 className="bg-light-blue rounded-lg"
                 onClick={handleNativeShare}
-                aria-label="分享到其他平台"
+                aria-label={t("share_to_other")}
               >
                 <ExternalLink className="size-7" />
               </Button>
@@ -226,7 +228,7 @@ export const ShareCheckInSheetContent = ({
             disabled={isCapturing || !cardImageUrl}
           >
             <Download className="size-4.5" />
-            {isCapturing ? "生成中..." : "下載打卡圖片"}
+            {isCapturing ? t("generating") : t("download_image")}
           </Button>
         </div>
       </div>

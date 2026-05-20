@@ -185,7 +185,7 @@ export const PreferencesForm = () => {
           }
 
           // 如果沒有 details 或處理後沒有錯誤訊息，使用頂層 message
-          if (errorMessage === "更新失敗，請稍後再試" && "message" in error && error.message) {
+          if (errorMessage === t("save_error") && "message" in error && error.message) {
             errorMessage = String(error.message);
           }
         }

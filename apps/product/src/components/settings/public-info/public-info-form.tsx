@@ -1,7 +1,7 @@
 "use client";
 
 import { useCities, useCurrentUser, useMutate, useUserMutations } from "@daodao/api";
-import { useLocale } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
@@ -22,6 +22,7 @@ import { type PublicInfoFormValues, publicInfoFormSchema } from "./schema";
 import { SocialLinksSection } from "./social-links-section";
 
 export const PublicInfoForm = () => {
+  const t = useTranslations("public_info_settings");
   const locale = useLocale();
   const { data: userData, isLoading, error: userError } = useCurrentUser();
   const { updateCurrentUserWithFormData } = useUserMutations();
@@ -172,14 +173,14 @@ export const PublicInfoForm = () => {
       }
 
       // 成功
-      toast.success("公開資訊設定已更新");
+      toast.success(t("save_success"));
       form.reset(form.getValues()); // 重置 dirty 狀態
       setAvatarFile(null); // 清除頭像檔案
     } catch (error) {
       console.error("Failed to update user:", error);
 
       // 處理錯誤
-      let errorMessage = "更新失敗，請稍後再試";
+      let errorMessage = t("save_error");
 
       if (error instanceof Error) {
         errorMessage = error.message;
@@ -231,7 +232,7 @@ export const PublicInfoForm = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-text-dark">載入中...</p>
+        <p className="text-text-dark">{t("loading")}</p>
       </div>
     );
   }
@@ -240,7 +241,7 @@ export const PublicInfoForm = () => {
   if (userError) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-red">載入用戶資料失敗，請稍後再試</p>
+        <p className="text-red">{t("load_error")}</p>
       </div>
     );
   }
@@ -270,7 +271,7 @@ export const PublicInfoForm = () => {
             className="w-full sm:max-w-[288px]"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "儲存中..." : "儲存"}
+            {isSubmitting ? t("saving") : t("save")}
           </Button>
         </footer>
       </form>

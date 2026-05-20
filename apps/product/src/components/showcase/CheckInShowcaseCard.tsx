@@ -56,6 +56,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
   } = props;
 
   const t = useTranslations("common");
+  const tShowcase = useTranslations("showcase");
   const router = useRouter();
   const { open: openSheet } = useSheetManager();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -331,7 +332,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
                   {commentUserIslandHref ? (
                     <Link
                       href={commentUserIslandHref}
-                      aria-label={`前往 ${commentUserName} 的小島`}
+                      aria-label={tShowcase("go_to_island", { name: commentUserName })}
                       className="shrink-0"
                       onPointerDown={handleIslandLinkPointerDown}
                       onClick={handleIslandLinkClick}

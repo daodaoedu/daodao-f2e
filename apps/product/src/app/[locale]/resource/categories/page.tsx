@@ -1,5 +1,5 @@
 import { getResources } from "@daodao/api";
-import { setRequestLocale } from "@daodao/i18n/server";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import type { Metadata } from "next";
 import { CategoriesContainer, ResourceContainer, SectionTitle } from "@/components/resource";
 
@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 export default async function ResourceCategoriesPage({ params }: PageProps<"/[locale]/resource/categories">) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "resource" });
   const { data: resourceData } = await getResources({ limit: "10" });
 
   const resources =
@@ -28,14 +29,14 @@ export default async function ResourceCategoriesPage({ params }: PageProps<"/[lo
 
   return (
     <div className="container py-8">
-      <SectionTitle as="h1" title="所有分類" />
+      <SectionTitle as="h1" title={t("all_categories")} />
 
       <section className="mb-12">
         <CategoriesContainer size="md" />
       </section>
 
       <section>
-        <SectionTitle title="最新資源" />
+        <SectionTitle title={t("latest_resources")} />
         <ResourceContainer data={resources} />
       </section>
     </div>

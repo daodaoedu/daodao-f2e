@@ -2,11 +2,13 @@
 
 import type { UpdatePracticeRequestType } from "@daodao/api";
 import { updatePractice, useMyPractices, useUnarchivePractice } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { useCallback, useState } from "react";
 
 export const ArchivedContentList = () => {
+  const t = useTranslations("archived_settings");
   const [unarchivingIds, setUnarchivingIds] = useState<Set<string>>(new Set());
   const { unarchivePractice } = useUnarchivePractice();
 
@@ -35,9 +37,9 @@ export const ArchivedContentList = () => {
         await mutate();
 
         // 顯示成功 toast，帶有復原按鈕
-        toast.success("實踐已成功取消封存", {
+        toast.success(t("unarchive_success"), {
           action: {
-            label: "復原",
+            label: t("restore_btn"),
             onClick: async () => {
               // 用戶點擊復原，重新封存
               try {
@@ -51,7 +53,7 @@ export const ArchivedContentList = () => {
                     typeof restoreResponse.error === "object" &&
                     "message" in restoreResponse.error
                       ? String(restoreResponse.error.message)
-                      : "復原失敗";
+                      : t("restore_failed");
                   console.error("Failed to restore archive:", errorMessage);
                   toast.error(errorMessage);
                   return;
@@ -60,9 +62,9 @@ export const ArchivedContentList = () => {
                 // 刷新已封存實踐列表的 cache
                 await mutate();
 
-                toast.success("已復原封存");
+                toast.success(t("restore_success"));
               } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : "復原失敗";
+                const errorMessage = error instanceof Error ? error.message : t("restore_failed");
                 console.error("Failed to restore archive:", errorMessage);
                 toast.error(errorMessage);
               }
@@ -76,7 +78,7 @@ export const ArchivedContentList = () => {
           return next;
         });
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "取消封存失敗";
+        const errorMessage = error instanceof Error ? error.message : t("unarchive_failed");
         console.error("Failed to unarchive practice:", errorMessage);
         toast.error(errorMessage);
         setUnarchivingIds((prev) => {
@@ -86,15 +88,15 @@ export const ArchivedContentList = () => {
         });
       }
     },
-    [unarchivePractice, mutate, unarchivingIds]
+    [unarchivePractice, mutate, unarchivingIds, t]
   );
 
   if (isLoading) {
     return (
       <div className="bg-white rounded-2xl p-6">
-        <h2 className="text-lg font-medium text-bg-dark mb-6">主題實踐</h2>
+        <h2 className="text-lg font-medium text-bg-dark mb-6">{t("section_title")}</h2>
         <div className="text-center py-8 text-basic-400">
-          <p>載入中...</p>
+          <p>{t("loading")}</p>
         </div>
       </div>
     );
@@ -103,9 +105,9 @@ export const ArchivedContentList = () => {
   if (error) {
     return (
       <div className="bg-white rounded-2xl p-6">
-        <h2 className="text-lg font-medium text-bg-dark mb-6">主題實踐</h2>
+        <h2 className="text-lg font-medium text-bg-dark mb-6">{t("section_title")}</h2>
         <div className="text-center py-8 text-basic-400">
-          <p>載入失敗，請稍後再試</p>
+          <p>{t("load_error")}</p>
         </div>
       </div>
     );
@@ -114,9 +116,9 @@ export const ArchivedContentList = () => {
   if (practices.length === 0) {
     return (
       <div className="bg-white rounded-2xl p-6">
-        <h2 className="text-lg font-medium text-bg-dark mb-6">主題實踐</h2>
+        <h2 className="text-lg font-medium text-bg-dark mb-6">{t("section_title")}</h2>
         <div className="text-center py-8 text-basic-400">
-          <p>尚無已封存的內容</p>
+          <p>{t("empty")}</p>
         </div>
       </div>
     );
@@ -124,7 +126,7 @@ export const ArchivedContentList = () => {
 
   return (
     <>
-      <h2 className="font-medium text-text-dark mb-3">主題實踐</h2>
+      <h2 className="font-medium text-text-dark mb-3">{t("section_title")}</h2>
 
       <div className="space-y-2">
         {practices.map((practice) => (
@@ -146,7 +148,7 @@ export const ArchivedContentList = () => {
                 disabled={unarchivingIds.has(practice.id)}
                 className="h-9 px-5"
               >
-                {unarchivingIds.has(practice.id) ? "處理中..." : "取消封存"}
+                {unarchivingIds.has(practice.id) ? t("processing_btn") : t("unarchive_btn")}
               </Button>
             </div>
           </div>

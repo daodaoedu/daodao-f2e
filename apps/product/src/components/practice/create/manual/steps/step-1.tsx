@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import {
   FormControl,
   FormDescription,
@@ -18,6 +19,7 @@ interface Step1Props {
 }
 
 export const Step1 = ({ form }: Step1Props) => {
+  const t = useTranslations("practice");
   const descriptionLength = form.watch("actionDescription")?.length || 0;
 
   return (
@@ -28,12 +30,12 @@ export const Step1 = ({ form }: Step1Props) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel required className="block text-base font-medium text-text-dark mb-3">
-              名稱
+              {t("step1_name_label")}
             </FormLabel>
             <FormControl>
               <Input
                 {...field}
-                placeholder="例如：閱讀《原子習慣》"
+                placeholder={t("step1_name_placeholder")}
                 className="w-full"
                 maxLength={20}
                 invalid={!!form.formState.errors.name}
@@ -51,7 +53,7 @@ export const Step1 = ({ form }: Step1Props) => {
           <FormItem>
             <div className="flex items-center justify-between mb-3">
               <FormLabel required className="text-base font-medium text-text-dark">
-                實踐行動
+                {t("step1_action_label")}
               </FormLabel>
               <FormDescription className="text-sm text-light-gray">
                 {descriptionLength}/50
@@ -60,7 +62,7 @@ export const Step1 = ({ form }: Step1Props) => {
             <FormControl>
               <Textarea
                 {...field}
-                placeholder="例如：圖書館借閱，每天閱讀 30 頁"
+                placeholder={t("step1_action_placeholder")}
                 className="w-full"
                 maxLength={50}
                 invalid={!!form.formState.errors.actionDescription}

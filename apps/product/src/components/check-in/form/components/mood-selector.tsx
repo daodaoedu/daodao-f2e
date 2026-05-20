@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import {
   FormControl,
   FormField,
@@ -19,6 +20,7 @@ interface IMoodSelectorProps {
  * 心情選擇器組件
  */
 export const MoodSelector = ({ form }: IMoodSelectorProps) => {
+  const t = useTranslations("check_in");
   return (
     <FormField
       control={form.control}
@@ -26,7 +28,7 @@ export const MoodSelector = ({ form }: IMoodSelectorProps) => {
       render={({ field }) => (
         <FormItem className="mb-8">
           <FormLabel className="block text-base font-medium mb-3 text-text-dark">
-            心情如何?
+            {t("mood_question")}
           </FormLabel>
           <FormControl>
             <RadioGroup

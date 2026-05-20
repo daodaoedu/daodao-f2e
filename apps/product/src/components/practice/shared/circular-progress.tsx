@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 
 interface CircularProgressProps {
@@ -19,6 +20,7 @@ export const CircularProgress = ({
   showText = true,
   textClassName,
 }: CircularProgressProps) => {
+  const t = useTranslations("practice");
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const clampedValue = Math.min(100, Math.max(0, value));
@@ -31,7 +33,7 @@ export const CircularProgress = ({
         height={size}
         className="transform -rotate-90"
         role="img"
-        aria-label={`進度 ${Math.round(value)}%`}
+        aria-label={t("circular_progress_aria", { value: Math.round(value) })}
       >
         {/* Background circle */}
         <circle

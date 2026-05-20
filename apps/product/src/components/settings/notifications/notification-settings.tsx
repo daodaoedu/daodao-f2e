@@ -23,20 +23,28 @@ type PreferencesMap = Record<string, PreferenceState>;
 // Constants
 // ============================================================================
 
+const NOTIFICATION_TYPE_KEYS: Record<string, { labelKey: string; descKey: string }> = {
+  reaction: { labelKey: "type_reaction_label", descKey: "type_reaction_desc" },
+  comment: { labelKey: "type_comment_label", descKey: "type_comment_desc" },
+  UserFollowed: { labelKey: "type_user_followed_label", descKey: "type_user_followed_desc" },
+  Connect: { labelKey: "type_connect_label", descKey: "type_connect_desc" },
+  ConnectAccepted: { labelKey: "type_connect_accepted_label", descKey: "type_connect_accepted_desc" },
+  "update-practice-checkin": { labelKey: "type_practice_checkin_label", descKey: "type_practice_checkin_desc" },
+  PracticeCreated: { labelKey: "type_practice_created_label", descKey: "type_practice_created_desc" },
+  BuddyRequest: { labelKey: "type_buddy_request_label", descKey: "type_buddy_request_desc" },
+  WeeklyDigest: { labelKey: "type_weekly_digest_label", descKey: "type_weekly_digest_desc" },
+};
+
 const NOTIFICATION_TYPES = [
-  { type: "reaction", label: "反應", description: "有人對你的內容按了反應" },
-  { type: "comment", label: "留言與 @", description: "有人留言或 @ 提及了你" },
-  { type: "UserFollowed", label: "關注", description: "有人關注了你" },
-  { type: "Connect", label: "連結請求", description: "有人向你發出連結請求" },
-  { type: "ConnectAccepted", label: "連結確認", description: "對方同意了你的連結請求" },
-  { type: "update-practice-checkin", label: "關注的實踐更新", description: "你關注的實踐有新打卡" },
-  {
-    type: "PracticeCreated",
-    label: "關注的人開始實踐",
-    description: "你關注的人開始了新主題實踐",
-  },
-  { type: "BuddyRequest", label: "Buddy 請求", description: "有人邀請你成為實踐夥伴" },
-  { type: "WeeklyDigest", label: "週報", description: "每週一的島嶼探索摘要" },
+  { type: "reaction" },
+  { type: "comment" },
+  { type: "UserFollowed" },
+  { type: "Connect" },
+  { type: "ConnectAccepted" },
+  { type: "update-practice-checkin" },
+  { type: "PracticeCreated" },
+  { type: "BuddyRequest" },
+  { type: "WeeklyDigest" },
 ];
 
 const DEFAULT_PREFS: PreferencesMap = Object.fromEntries(
@@ -85,6 +93,7 @@ function Toggle({
 
 export const NotificationSettings = () => {
   const t = useTranslations("account_settings");
+  const tn = useTranslations("notification_settings");
   const { data, mutate } = useNotificationPreferences();
 
   const [globalEnabled, setGlobalEnabled] = useState<boolean | undefined>(undefined);
@@ -196,12 +205,13 @@ export const NotificationSettings = () => {
         <div className="bg-white rounded-2xl overflow-hidden divide-y divide-[#E4EAE9]">
           {NOTIFICATION_TYPES.map((item) => {
             const isEnabled = prefs[item.type]?.emailEnabled ?? true;
+            const keys = NOTIFICATION_TYPE_KEYS[item.type];
             return (
               <div key={item.type} className="flex items-center gap-3 px-4 py-3">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-text-dark">{item.label}</p>
+                  <p className="text-sm font-medium text-text-dark">{keys ? tn(keys.labelKey as never) : item.type}</p>
                   <p className="text-xs text-[#9FB5B8] mt-0.5 leading-relaxed">
-                    {item.description}
+                    {keys ? tn(keys.descKey as never) : ""}
                   </p>
                 </div>
                 <Toggle

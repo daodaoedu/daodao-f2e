@@ -1,6 +1,7 @@
 "use client";
 
 import { useReactionsList } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
@@ -11,6 +12,7 @@ interface CheckinReactionListProps {
 }
 
 export function CheckinReactionList({ targetId }: CheckinReactionListProps) {
+  const t = useTranslations("showcase");
   const { data } = useReactionsList({
     targetType: "checkin",
     targetId,
@@ -21,7 +23,7 @@ export function CheckinReactionList({ targetId }: CheckinReactionListProps) {
     .sort((a, b) => new Date(b.reactedAt).getTime() - new Date(a.reactedAt).getTime());
 
   if (items.length === 0) {
-    return <div className="py-8 text-center text-sm text-[#9FB5B8]">還沒有人表達反應</div>;
+    return <div className="py-8 text-center text-sm text-[#9FB5B8]">{t("no_reactions")}</div>;
   }
 
   return (

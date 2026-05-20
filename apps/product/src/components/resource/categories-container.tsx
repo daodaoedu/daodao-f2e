@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { useMemo, useState } from "react";
@@ -26,6 +27,7 @@ export function CategoriesContainer({
   disabledCollapse = false,
   categoryStats: _categoryStats,
 }: CategoriesContainerProps) {
+  const t = useTranslations("resource");
   const [isShowAll, setIsShowAll] = useState(false);
   const isMedium = useMediaQuery("isMedium");
   const isLarge = useMediaQuery("isLarge");
@@ -67,7 +69,7 @@ export function CategoriesContainer({
   return (
     Array.isArray(categories) && (
       <div>
-        {hasSubCategories && <SectionTitle title="子分類" />}
+        {hasSubCategories && <SectionTitle title={t("sub_categories")} />}
         <div
           className={cn(
             "grid gap-x-2 gap-y-4 md:gap-6",
@@ -87,7 +89,7 @@ export function CategoriesContainer({
             className="mt-3 w-full"
             onClick={() => setIsShowAll(!isShowAll)}
           >
-            {isShowAll ? "收合" : "展開更多"}
+            {isShowAll ? t("collapse") : t("expand_more")}
           </Button>
         )}
       </div>

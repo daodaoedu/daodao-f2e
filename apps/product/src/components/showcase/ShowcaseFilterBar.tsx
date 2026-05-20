@@ -1,17 +1,18 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 
 const DURATION_OPTIONS = [
-  { label: "7 天", min: 1, max: 7 },
-  { label: "14 天", min: 8, max: 14 },
-  { label: "21 天", min: 15, max: 21 },
-  { label: "30 天", min: 22, max: 30 },
+  { days: "7", min: 1, max: 7 },
+  { days: "14", min: 8, max: 14 },
+  { days: "21", min: 15, max: 21 },
+  { days: "30", min: 22, max: 30 },
 ];
 
-const STATUS_OPTIONS = [
-  { label: "進行中", value: "active" as const },
-  { label: "已完成", value: "completed" as const },
+const STATUS_VALUES = [
+  { value: "active" as const },
+  { value: "completed" as const },
 ];
 
 export interface ShowcaseFilterState {
@@ -27,6 +28,8 @@ interface ShowcaseFilterBarProps {
 }
 
 export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBarProps) {
+  const t = useTranslations("showcase");
+
   const toggleStatus = (value: "active" | "completed") => {
     onFiltersChange({
       ...filters,
@@ -47,9 +50,9 @@ export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBa
     <div className="flex flex-col gap-3 pt-2">
       {/* Status filter */}
       <div>
-        <p className="text-xs text-text-dark/50 mb-1.5">狀態</p>
+        <p className="text-xs text-text-dark/50 mb-1.5">{t("status_label")}</p>
         <div className="flex gap-2 flex-wrap">
-          {STATUS_OPTIONS.map((opt) => (
+          {STATUS_VALUES.map((opt) => (
             <button
               key={opt.value}
               type="button"
@@ -61,7 +64,7 @@ export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBa
                   : "bg-white border-[#C1ECFF] text-text-dark"
               )}
             >
-              {opt.label}
+              {opt.value === "active" ? t("status_active") : t("status_completed")}
             </button>
           ))}
         </div>
@@ -69,13 +72,13 @@ export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBa
 
       {/* Duration filter */}
       <div>
-        <p className="text-xs text-text-dark/50 mb-1.5">實踐週期</p>
+        <p className="text-xs text-text-dark/50 mb-1.5">{t("duration_label")}</p>
         <div className="flex gap-2 flex-wrap">
           {DURATION_OPTIONS.map((opt) => {
             const isSelected = filters.durationMin === opt.min && filters.durationMax === opt.max;
             return (
               <button
-                key={opt.label}
+                key={opt.days}
                 type="button"
                 onClick={() => toggleDuration(opt.min, opt.max)}
                 className={cn(
@@ -85,7 +88,7 @@ export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBa
                     : "bg-white border-[#C1ECFF] text-text-dark"
                 )}
               >
-                {opt.label}
+                {t("duration_days", { days: opt.days })}
               </button>
             );
           })}

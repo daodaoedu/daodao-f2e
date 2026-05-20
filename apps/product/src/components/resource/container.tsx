@@ -1,6 +1,7 @@
 "use client";
 
 import emptyPng from "@daodao/assets/images/common/empty.png";
+import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -33,32 +34,34 @@ interface EmptyDataProps {
 }
 
 function EmptyData({ parentCategoryHasData, parentCategory, parentDataCount }: EmptyDataProps) {
+  const t = useTranslations("resource");
   return (
     <div className="flex flex-col items-center rounded-xl bg-primary-palest p-10">
       {parentCategoryHasData ? (
         <>
-          <p>這邊沒有符合篩選條件的學習資源！</p>
+          <p>{t("no_matching_resources")}</p>
           <p>
-            但我們在
-            <b className="px-0.5 font-bold">{parentCategory?.[parentCategory.length - 1]?.label}</b>
-            內發現了
-            <b className="px-0.5 font-bold">{parentDataCount}</b>筆 有趣的學習資源~
+            {t.rich("found_in_parent_category", {
+              categoryName: parentCategory?.[parentCategory.length - 1]?.label ?? "",
+              count: parentDataCount,
+              bold: (chunks) => <b className="px-0.5 font-bold">{chunks}</b>,
+            })}
           </p>
         </>
       ) : (
-        <p>這邊沒有符合的學習資源！ 試試看其他關鍵字!</p>
+        <p>{t("no_resources_try_other_keywords")}</p>
       )}
       <Image className="mb-6 mt-4" src={emptyPng} alt="empty" width={210} height={210} />
       {parentCategoryHasData ? (
         <Button asChild size="default">
           <CustomLink href={`/resource/categories/${parentCategory.map((c) => c.value).join("/")}`}>
             <ArrowRightIcon size={15} />
-            馬上去探索
+            {t("explore_now")}
           </CustomLink>
         </Button>
       ) : (
         <>
-          <div className="mb-3 font-bold text-basic-500">熱門標籤</div>
+          <div className="mb-3 font-bold text-basic-500">{t("hot_tags")}</div>
           <div className="flex gap-2">
             {HOT_TAGS &&
               Array.isArray(HOT_TAGS) &&

@@ -9,6 +9,7 @@ import {
   MoreSvg,
   ViewSvg,
 } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -58,6 +59,7 @@ type ResourceCardProps = {
 };
 
 export function ResourceCard(props: ResourceCardProps) {
+  const t = useTranslations("resource");
   const {
     id,
     userName,
@@ -68,10 +70,12 @@ export function ResourceCard(props: ResourceCardProps) {
     coverImageUrl = "",
     tags = [],
     label = [],
-    level = "初級",
-    viewCount = "尚未計算",
+    level,
+    viewCount,
     commentCount = 0,
   } = props;
+  const resolvedLevel = level ?? t("level_beginner");
+  const resolvedViewCount = viewCount ?? t("view_count_not_calculated");
 
   const isNewResource = time
     ? isWithinInterval(new Date(time), {
@@ -80,7 +84,7 @@ export function ResourceCard(props: ResourceCardProps) {
       })
     : false;
 
-  const labels = isNewResource ? ["近期新增", ...label] : label;
+  const labels = isNewResource ? [t("recently_added"), ...label] : label;
 
   return (
     <CustomLink
@@ -155,16 +159,16 @@ export function ResourceCard(props: ResourceCardProps) {
           <div className="flex">
             <div className="mr-2 flex border-r border-solid border-basic-200">
               <GroupSvg />
-              <div className="ml-2 mr-1">適合</div>
+              <div className="ml-2 mr-1">{t("suitable_for")}</div>
             </div>
-            <span className="text-primary-base">{targetAudienceTypeMap.get(level) ?? level}</span>
+            <span className="text-primary-base">{targetAudienceTypeMap.get(resolvedLevel) ?? resolvedLevel}</span>
           </div>
 
           <div className="body-md flex items-center justify-between gap-3 md:justify-center">
             <div className="flex items-center justify-center gap-3">
               <div className="flex items-center justify-center gap-1">
                 <ViewSvg />
-                <div>{viewCount}</div>
+                <div>{resolvedViewCount}</div>
               </div>
               <div className="flex items-center justify-center gap-1">
                 <CommentSvg />
@@ -186,7 +190,7 @@ export function ResourceCard(props: ResourceCardProps) {
                     className="block p-2"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    檢舉
+                    {t("report")}
                   </CustomLink>
                 </DropdownMenuItem>
               </DropdownMenuContent>

@@ -1,5 +1,5 @@
 import { useTagPrompts } from "@daodao/api";
-import { useLocale } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Checkbox } from "@daodao/ui/components/checkbox";
 import { FormControl, FormField, FormItem, FormMessage } from "@daodao/ui/components/form";
@@ -21,6 +21,7 @@ interface ITagSelectorProps {
  * 標籤選擇器組件
  */
 export const TagSelector = ({ form, fallbackTags }: ITagSelectorProps) => {
+  const t = useTranslations("check_in");
   const [customTagInput, setCustomTagInput] = useState("");
   const [promptEnabled, setPromptEnabled] = useState(false);
   const locale = useLocale();
@@ -113,7 +114,7 @@ export const TagSelector = ({ form, fallbackTags }: ITagSelectorProps) => {
                       )}
                     />
                   </button>
-                  <span className="text-sm text-gray-500">自動填入文字</span>
+                  <span className="text-sm text-gray-500">{t("auto_fill_text")}</span>
                 </div>
                 <div className="flex flex-wrap gap-x-2 gap-y-3 mb-3">
                   {availableTags.map((tag) => {
@@ -158,12 +159,12 @@ export const TagSelector = ({ form, fallbackTags }: ITagSelectorProps) => {
                 <div className="flex items-center gap-2">
                   <Input
                     type="text"
-                    placeholder="輸入自訂標籤"
+                    placeholder={t("custom_tag_placeholder")}
                     value={customTagInput}
                     onChange={(e) => setCustomTagInput(e.target.value)}
                     onKeyDown={handleInputKeyDown}
                     className="flex-1"
-                    aria-label="輸入自訂標籤"
+                    aria-label={t("custom_tag_placeholder")}
                   />
                   <Button
                     type="button"
@@ -171,11 +172,11 @@ export const TagSelector = ({ form, fallbackTags }: ITagSelectorProps) => {
                     variant="blue"
                     onClick={handleAddCustomTag}
                     disabled={!customTagInput.trim()}
-                    aria-label="加入標籤"
+                    aria-label={t("add_tag_aria")}
                     className="h-8"
                   >
                     <Plus className="size-4" />
-                    加入
+                    {t("add_tag_button")}
                   </Button>
                 </div>
               </div>

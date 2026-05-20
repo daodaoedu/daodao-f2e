@@ -9,6 +9,7 @@ import {
   FlagOutlineSvg,
   TelescopeSvg,
 } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Link, useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
@@ -72,6 +73,7 @@ export function BrewingCard({
   batchReactionData,
   onReactionMutate,
 }: BrewingCardProps) {
+  const t = useTranslations("showcase");
   const startFmt = formatShowcaseDate(startDate);
   const endFmt = formatShowcaseDate(endDate);
   const statusInfo = getStatusConfig(TaskStatus.inProgress);
@@ -105,14 +107,14 @@ export function BrewingCard({
     try {
       if (wasFollowing) {
         await unfollowTarget("practice", id);
-        toast.success("已取消關注");
+        toast.success(t("unfollow_success"));
       } else {
         await followTarget({ targetType: "practice", targetId: id });
-        toast.success("已關注此實踐");
+        toast.success(t("follow_success"));
       }
     } catch {
       setIsFollowing(wasFollowing);
-      toast.error("操作失敗，請稍後再試");
+      toast.error(t("operation_failed"));
     }
   };
 
@@ -126,7 +128,7 @@ export function BrewingCard({
       reaction: item.reactionType as ReactionTypeType,
     }));
     openSheet({
-      title: "瀏覽活動",
+      title: t("browse_activity"),
       content: (
         <BrowseActivityContent
           viewCount={practiceData?.data?.stats?.viewCount ?? 0}
@@ -197,7 +199,7 @@ export function BrewingCard({
                 className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
               >
                 <FlagOutlineSvg className="size-5 shrink-0" />
-                <span>檢舉</span>
+                <span>{t("report")}</span>
               </Button>
               <Button
                 type="button"
@@ -214,7 +216,7 @@ export function BrewingCard({
                 )}
               >
                 <TelescopeSvg className="size-5 shrink-0" />
-                <span>{isFollowing ? "取消關注" : "關注"}</span>
+                <span>{isFollowing ? t("unfollow") : t("follow")}</span>
               </Button>
               <Button
                 type="button"
@@ -223,7 +225,7 @@ export function BrewingCard({
                 className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
               >
                 <ChartColumnIncreasingSvg className="size-5 shrink-0" />
-                <span>瀏覽活動</span>
+                <span>{t("browse_activity")}</span>
               </Button>
             </div>
           )}
@@ -267,13 +269,13 @@ export function BrewingCard({
                         ? frequencyMinDays
                         : `${frequencyMinDays}-${frequencyMaxDays}`}
                     </span>
-                    <span className="text-text-dark/60 ml-0.5">天/週</span>
+                    <span className="text-text-dark/60 ml-0.5">{t("days_per_week")}</span>
                   </span>
                 )}
                 {sessionDurationMinutes && (
                   <span className="text-sm">
                     <span className="font-semibold text-logo-cyan">{sessionDurationMinutes}</span>
-                    <span className="text-text-dark/60 ml-0.5">分鐘/次</span>
+                    <span className="text-text-dark/60 ml-0.5">{t("minutes_per_session")}</span>
                   </span>
                 )}
               </div>
@@ -285,7 +287,7 @@ export function BrewingCard({
       {/* Brewing overlay placeholder */}
       <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-xl bg-[#F8F9FA] border border-dashed border-[#C1D0D8]">
         <span className="text-base">🍵</span>
-        <p className="text-xs text-text-dark/60">內容醞釀中，完成後解鎖！</p>
+        <p className="text-xs text-text-dark/60">{t("brewing_placeholder")}</p>
       </div>
 
       {/* Bottom bar: summary layout */}
@@ -331,7 +333,7 @@ export function BrewingCard({
             onClick={(e) => e.stopPropagation()}
           >
             {preview.map((comment) => {
-              const commentUserName = comment.user?.name ?? "匿名";
+              const commentUserName = comment.user?.name ?? t("anonymous");
               const commentUserIslandHref = getUserIslandHref(comment.user);
               const commentAvatar = (
                 <Avatar className="size-6 shrink-0 mt-0.5">
@@ -349,7 +351,7 @@ export function BrewingCard({
                   {commentUserIslandHref ? (
                     <Link
                       href={commentUserIslandHref}
-                      aria-label={`前往 ${commentUserName} 的小島`}
+                      aria-label={t("go_to_island", { name: commentUserName })}
                       className="shrink-0"
                     >
                       {commentAvatar}

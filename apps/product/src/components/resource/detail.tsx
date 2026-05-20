@@ -2,6 +2,7 @@
 
 import type { ResourceData } from "@daodao/api";
 import { BoxSvg, GroupSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -26,12 +27,13 @@ export function ResourceDetail({
   onEditClick,
   isOwnResource = false,
 }: ResourceDetailProps) {
+  const t = useTranslations("resource");
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `我要分享「${resource.name}」資源`,
-          text: `我要分享「${resource.name}」資源`,
+          title: t("share_resource_title", { name: resource.name }),
+          text: t("share_resource_title", { name: resource.name }),
           url: window.location.href,
         });
       } catch {
@@ -58,7 +60,7 @@ export function ResourceDetail({
             <div className="flex items-center gap-2">
               <span className="flex items-center gap-2 font-medium">
                 <GroupSvg />
-                適合
+                {t("suitable_for")}
               </span>
               <span className="h-4 w-px bg-gray-300" />
               <span className="text-primary">
@@ -68,7 +70,7 @@ export function ResourceDetail({
             <div className="flex items-center gap-2">
               <span className="flex items-center gap-2 font-medium">
                 <BoxSvg />
-                資源類型
+                {t("resource_type")}
               </span>
               <span className="h-4 w-px bg-gray-300" />
               <span className="text-primary">
@@ -82,7 +84,7 @@ export function ResourceDetail({
           <Button size="default" asChild>
             <CustomLink href={resource.url} target="_blank">
               <Globe size={16} />
-              查看資源
+              {t("view_resource")}
             </CustomLink>
           </Button>
           <Button size="default" onClick={handleShare}>
@@ -102,7 +104,7 @@ export function ResourceDetail({
                     onClick={onEditClick}
                     className="block w-full p-2 text-left"
                   >
-                    編輯
+                    {t("edit")}
                   </button>
                 </DropdownMenuItem>
               ) : (
@@ -113,7 +115,7 @@ export function ResourceDetail({
                     className="block p-2"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    檢舉
+                    {t("report")}
                   </CustomLink>
                 </DropdownMenuItem>
               )}

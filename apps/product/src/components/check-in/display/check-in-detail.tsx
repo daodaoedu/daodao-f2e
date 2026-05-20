@@ -86,7 +86,7 @@ export function formatCommentTime(
   createdAt?: string,
   options: CommentFormatOptions = {}
 ): string {
-  const justNowLabel = options.justNowLabel ?? "剛剛";
+  const justNowLabel = options.justNowLabel ?? "";
   const locale = options.locale ?? zhTW;
   if (!createdAt) return justNowLabel;
   const parsed = parseISO(createdAt);
@@ -116,7 +116,7 @@ export function mapReply(
   reply: ApiCommentNode,
   options: CommentFormatOptions = {}
 ): ICommentReply {
-  const anonymousLabel = options.anonymousLabel ?? "匿名使用者";
+  const anonymousLabel = options.anonymousLabel ?? "";
   return {
     id: String(reply.id),
     author: {
@@ -135,7 +135,7 @@ export function mapComment(
   comment: ApiCommentNode,
   options: CommentFormatOptions = {}
 ): IComment {
-  const anonymousLabel = options.anonymousLabel ?? "匿名使用者";
+  const anonymousLabel = options.anonymousLabel ?? "";
   const rawReplies = Array.isArray(comment.replies) ? comment.replies : [];
   const mappedReplies = rawReplies.filter(isApiCommentNode).map((r) => mapReply(r, options));
   return {
@@ -242,7 +242,7 @@ export function CheckInCommentSheetContent({
       toast.success(t("comment_success"));
       await mutateComments();
     },
-    [checkInId, mutateComments]
+    [checkInId, mutateComments, t]
   );
 
   const handleEditComment = useCallback(
@@ -406,7 +406,7 @@ export const CheckInDetail = ({
       closeOnEscape: true,
       showCloseButton: true,
     });
-  }, [reactionsListData, commentCount, openSheet]);
+  }, [reactionsListData, commentCount, openSheet, t]);
 
   // ── Edit / Share ───────────────────────────────────────────────────────────
   const { openEditCheckInSheet } = useEditCheckInSheet({

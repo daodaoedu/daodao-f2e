@@ -2,6 +2,7 @@
 
 import { type PracticeTemplateType, useRandomPracticeTemplates } from "@daodao/api";
 import { ArrowRightOutlineSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -33,6 +34,7 @@ interface IRandomPracticeCardProps {
 }
 
 const RandomPracticeCard = ({ practice, theme, onAction }: IRandomPracticeCardProps) => {
+  const t = useTranslations("practice");
   const ThemeSvg = practiceThemeSvgMap[theme] ?? practiceThemeSvgMap[PracticeTheme.yellow];
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -46,7 +48,7 @@ const RandomPracticeCard = ({ practice, theme, onAction }: IRandomPracticeCardPr
       <div className="relative p-4 pb-6 flex flex-col h-full justify-between z-10">
         <div className="flex flex-col gap-2">
           <Badge variant="secondary" size="sm" className="w-fit">
-            主題實踐
+            {t("create_title")}
           </Badge>
           <div className="flex flex-col gap-2">
             <h3 className="text-xl font-medium text-bg-dark line-clamp-2">{practice.title}</h3>
@@ -54,7 +56,7 @@ const RandomPracticeCard = ({ practice, theme, onAction }: IRandomPracticeCardPr
           </div>
         </div>
         <Button variant="secondary" className="w-full" onClick={handleClick}>
-          馬上行動
+          {t("random_action_now")}
         </Button>
       </div>
     </div>
@@ -73,6 +75,7 @@ export const RandomPracticesSection = ({
   practices: propPractices,
   compact = false,
 }: IRandomPracticesSectionProps) => {
+  const t = useTranslations("practice");
   const router = useRouter();
 
   // 取得 3 個隨機模板
@@ -131,7 +134,7 @@ export const RandomPracticesSection = ({
       {/* 標題區域 */}
       <div className="relative max-w-[640px] bg-white rounded-[12px] p-4 mx-auto flex flex-col items-center gap-3">
         <h2 className="relative z-10 flex justify-center text-lg font-medium text-bg-dark">
-          從好奇開始, 一起小步實踐生活裡的學習靈感。
+          {t("random_section_tagline")}
         </h2>
         <div className="w-[296px] h-[239px] pt-6">
           <div className="w-[240px] h-[200px]">
@@ -139,7 +142,7 @@ export const RandomPracticesSection = ({
           </div>
         </div>
         <Button variant="default" onClick={handleMoreThemes} className="max-w-60 w-full">
-          更多主題
+          {t("random_more_themes")}
           <ArrowRightOutlineSvg className="size-4.5" />
         </Button>
       </div>
