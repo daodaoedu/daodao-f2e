@@ -1,7 +1,8 @@
 export const SOCIAL_LINKS = {
   FACEBOOK: "https://www.facebook.com/daodaoedu",
   INSTAGRAM: "https://www.instagram.com/daodao_learn/",
-  EMAIL: "contact@daoedu.tw",
+  DISCORD: "https://discord.gg/FdFCxUwg83",
+  EMAIL: "contact@daodao.so",
 } as const;
 
 // 錨點 ID 常數 - 用於頁面內元素的 id 屬性

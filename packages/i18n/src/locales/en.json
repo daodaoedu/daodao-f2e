@@ -76,6 +76,7 @@
     "footer_social_title": "Follow Dao Dao",
     "footer_instagram_alt": "Instagram",
     "footer_facebook_alt": "Facebook",
+    "footer_discord_alt": "Discord",
     "footer_copyright": "Dao Dao Learning Co., Ltd. © 2022 - {year}",
     "city_selector_loading": "Loading cities...",
     "city_selector_load_error": "Failed to load: {error}",

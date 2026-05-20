@@ -193,7 +193,6 @@ export const Footer = () => {
           </div>
         </div>
         <div className="mb-8 space-y-4">
-          <p className="text-lg text-primary-lighter">{t("footer_social_title")}</p>
           <div className="flex gap-4">
             <CustomLink
               href={SOCIAL_LINKS.INSTAGRAM}
@@ -221,7 +220,26 @@ export const Footer = () => {
                 height={35}
               />
             </CustomLink>
+            <CustomLink
+              href={SOCIAL_LINKS.DISCORD}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-opacity hover:opacity-80"
+            >
+              <Image
+                src="/assets/landing-page/icon-Discord.svg"
+                alt={t("footer_discord_alt")}
+                width={36}
+                height={35}
+              />
+            </CustomLink>
           </div>
+          <a
+            href={`mailto:${SOCIAL_LINKS.EMAIL}`}
+            className="block w-fit text-white/70 transition-colors hover:text-primary-base"
+          >
+            {SOCIAL_LINKS.EMAIL}
+          </a>
         </div>
         <p className="text-center text-basic-300">
           {t("footer_copyright", {
