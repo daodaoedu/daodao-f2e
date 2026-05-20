@@ -10,7 +10,7 @@ export default function PreferencesSettingsPage() {
 
       <BackgroundAnimation />
 
-      <main className="max-w-[448px] mx-auto px-5 pb-[128px] pt-3 md:pt-12">
+      <main className="max-w-[448px] mx-auto px-5 pb-[224px] pt-3 md:pb-[128px] md:pt-12">
         <PreferencesForm />
       </main>
     </div>

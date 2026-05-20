@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 
@@ -12,12 +13,13 @@ interface TestimonialCardProps {
 }
 
 export function TestimonialCard({ name, role, content, avatar }: TestimonialCardProps) {
+  const t = useTranslations("landing_page");
   return (
     <article className="min-h-[120px] w-80 rounded-[20px] bg-[#F3FDFF] p-4 grid grid-cols-[72px_1fr] items-start gap-3 sm:w-[260px] sm:grid-cols-[60px_1fr]">
       <figure className="m-0 grid justify-items-center">
         <Image
           src={avatar}
-          alt={`${name} 的頭像`}
+          alt={t("testimonial_avatar_alt", { name })}
           width={64}
           height={64}
           className="block size-16 rounded-full sm:size-[52px]"

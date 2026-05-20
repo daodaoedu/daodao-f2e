@@ -3,6 +3,7 @@
 import type { BatchReactionItem, IShowcaseCheckIn } from "@daodao/api";
 import { useCurrentUser } from "@daodao/api";
 import { DefaultAvatarSvg, DialogOutlineSvg, FlagOutlineSvg, StampSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Link, useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
@@ -54,6 +55,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
     onReactionMutate,
   } = props;
 
+  const t = useTranslations("common");
   const router = useRouter();
   const { open: openSheet } = useSheetManager();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -110,7 +112,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
 
   const handleOpenComments = () => {
     openSheet({
-      title: "留言",
+      title: t("comments"),
       content: (
         <CheckInCommentSheetContent
           checkInId={id}
@@ -151,7 +153,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
         {image_urls && image_urls.length > 0 ? (
           /* 有照片：直接顯示第一張圖片 */
           <div className="h-[240px] w-full overflow-hidden">
-            <img src={image_urls[0]} alt="打卡封面" className="w-full h-full object-cover" />
+            <img src={image_urls[0]} alt={t("checkin_cover")} className="w-full h-full object-cover" />
           </div>
         ) : hasContent ? (
           /* 有內容：顯示打卡卡片預覽（同分享打卡圖樣式） */
@@ -234,7 +236,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
             {note ? (
               <p className="text-base text-text-dark line-clamp-2">{note}</p>
             ) : (
-              <p className="text-sm text-light-gray">完成了一次打卡</p>
+              <p className="text-sm text-light-gray">{t("completed_checkin")}</p>
             )}
           </div>
 
@@ -270,7 +272,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
                       className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
                     >
                       <FlagOutlineSvg className="size-5 shrink-0" />
-                      <span>檢舉</span>
+                      <span>{t("report")}</span>
                     </Button>
                   </div>
                 )}
@@ -311,7 +313,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
         {comment_preview && comment_preview.length > 0 && (
           <div className="flex flex-col gap-2 border-t border-basic-200 pt-3">
             {comment_preview.map((comment) => {
-              const commentUserName = comment.user?.name ?? "匿名";
+              const commentUserName = comment.user?.name ?? t("anonymous");
               const commentUserIslandHref = getUserIslandHref(comment.user);
               const commentAvatar = (
                 <Avatar className="size-6 shrink-0 mt-0.5">
