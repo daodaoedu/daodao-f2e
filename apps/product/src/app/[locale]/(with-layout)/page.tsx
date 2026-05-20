@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  type ActivityCardItem,
-  type FeedItem,
-  useFeed,
-  useReactionsBatch,
-} from "@daodao/api";
+import { type ActivityCardItem, type FeedItem, useFeed, useReactionsBatch } from "@daodao/api";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { getStorage, StorageEnum } from "@daodao/shared";
 import { cn } from "@daodao/ui/lib/utils";
@@ -84,6 +79,15 @@ export default function HomePage() {
     tags: searchParams.getAll("tags[]"),
   });
   const [keyword, setKeyword] = useState(searchParams.get("keyword") ?? "");
+
+  // Redirect legacy `/?tab=mine` URLs (old bookmarks/history) to the dedicated /my route.
+  useEffect(() => {
+    if (searchParams.get("tab") !== "mine") return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("tab");
+    const qs = params.toString();
+    router.replace(qs ? `${HOME_TAB_PATHS.mine}?${qs}` : HOME_TAB_PATHS.mine);
+  }, [searchParams, router]);
 
   const updateUrlParams = useCallback(
     (kw: string, f: ShowcaseFilterState) => {
@@ -225,10 +229,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => router.replace(HOME_TAB_PATHS.mine)}
-              className={cn(
-                "flex-1 py-2 text-sm font-medium transition-all",
-                "text-text-dark/40"
-              )}
+              className={cn("flex-1 py-2 text-sm font-medium transition-all", "text-text-dark/40")}
             >
               我的
             </button>
@@ -299,9 +300,7 @@ export default function HomePage() {
                     >
                       {showFeedLabel &&
                         feedItem.feed_reason &&
-                        !(
-                          feedItem.feed_reason === "cheered" && isBatchCheckinReactionsLoading
-                        ) && (
+                        !(feedItem.feed_reason === "cheered" && isBatchCheckinReactionsLoading) && (
                           <FeedLabel
                             feedReason={feedItem.feed_reason}
                             userName={checkin.user?.name}
