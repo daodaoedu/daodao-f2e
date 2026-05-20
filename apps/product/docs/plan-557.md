@@ -23,7 +23,7 @@ Issue #557 要求補充以下測試：
 
 1. 建立 `apps/product/src/components/showcase/__tests__/utils.test.ts`
 2. 測試 `formatShowcaseDate`：null/undefined 輸入、正常 ISO 字串
-3. 測試 `buildCheerDisplay`：空陣列、單一反應（有 actorName）、多反應（topTwo emojis）
+3. 測試 `buildCheerDisplay`：空陣列、單一反應（有 actorName）、多反應（最多 `PICKER_REACTIONS.length` = 4 個 emojis）
 4. commit: `test(s): #557 showcase utility unit tests`
 
 ## 檔案異動（≤3 檔，scope: XS）

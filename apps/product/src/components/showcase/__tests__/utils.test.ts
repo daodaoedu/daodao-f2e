@@ -11,7 +11,8 @@ describe("formatShowcaseDate", () => {
   });
 
   it("formats a valid ISO date string to yyyy/MM/dd", () => {
-    expect(formatShowcaseDate("2025-03-15T00:00:00.000Z")).toBe("2025/03/15");
+    // Use date-only string (no time zone) to avoid CI timezone sensitivity
+    expect(formatShowcaseDate("2025-03-15")).toBe("2025/03/15");
   });
 
   it("formats a date-only ISO string", () => {
@@ -72,7 +73,7 @@ describe("buildCheerDisplay", () => {
       { type: "encourage", count: 2, latestActorName: "E" },
     ]);
     expect(result).not.toBeNull();
-    expect(result?.emojis.length).toBeLessThanOrEqual(4);
+    expect(result?.emojis.length).toBe(4);
   });
 
   it("returns correct emoji for known reaction type", () => {
