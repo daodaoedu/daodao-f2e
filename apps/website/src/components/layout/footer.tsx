@@ -235,10 +235,10 @@ export const Footer = () => {
             </CustomLink>
           </div>
           <a
-            href={`mailto:${SOCIAL_LINKS.CONTACT_EMAIL}`}
+            href={`mailto:${SOCIAL_LINKS.EMAIL}`}
             className="block w-fit text-white/70 transition-colors hover:text-primary-base"
           >
-            {SOCIAL_LINKS.CONTACT_EMAIL}
+            {SOCIAL_LINKS.EMAIL}
           </a>
         </div>
         <p className="text-center text-basic-300">
