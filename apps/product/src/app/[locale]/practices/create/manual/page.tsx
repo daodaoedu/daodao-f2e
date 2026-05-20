@@ -137,12 +137,16 @@ export default function CreateManualPracticePage() {
       router.replace("/");
       return;
     }
-    const choice = await confirmLeaveWithDraft();
-    if (shouldSaveDraftOnLeave(choice)) {
-      saveDraft();
-    }
-    if (shouldNavigateOnLeave(choice)) {
-      router.replace("/");
+    try {
+      const choice = await confirmLeaveWithDraft();
+      if (shouldSaveDraftOnLeave(choice)) {
+        saveDraft();
+      }
+      if (shouldNavigateOnLeave(choice)) {
+        router.replace("/");
+      }
+    } catch {
+      // dialog dismissed or unexpected error — stay on page
     }
   }, [form.formState.isDirty, confirmLeaveWithDraft, saveDraft, router]);
 
