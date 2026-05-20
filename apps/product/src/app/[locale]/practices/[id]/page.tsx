@@ -35,6 +35,7 @@ import type { IComment } from "@/components/check-in/reactions";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeDetailShell } from "@/components/practice";
 import { applyOnboardingUpdateFromResponse } from "@/components/task-guide/onboarding-progress-context";
+import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 import {
   type DurationDays,
   DurationDays as DurationDaysConst,
@@ -406,7 +407,7 @@ export default function PracticeDetailPage() {
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.replace("/?tab=mine")}
+            onClick={() => router.replace(HOME_TAB_PATHS.mine)}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label={t("close")}
           >
@@ -427,7 +428,7 @@ export default function PracticeDetailPage() {
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.replace("/?tab=mine")}
+            onClick={() => router.replace(HOME_TAB_PATHS.mine)}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label={t("close")}
           >
@@ -457,7 +458,7 @@ export default function PracticeDetailPage() {
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
         <button
           type="button"
-          onClick={() => router.replace("/?tab=mine")}
+          onClick={() => router.replace(HOME_TAB_PATHS.mine)}
           className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
           aria-label={t("close")}
         >

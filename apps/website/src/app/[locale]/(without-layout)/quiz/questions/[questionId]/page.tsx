@@ -1,4 +1,5 @@
 import { QuizQuestion, questionMap } from "@daodao/features-quiz";
+import { setRequestLocale } from "@daodao/i18n/server";
 import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
@@ -25,6 +26,7 @@ export async function generateMetadata({
 export default async function QuizQuestionPage({
   params,
 }: PageProps<"/[locale]/quiz/questions/[questionId]">) {
-  const { questionId } = await params;
+  const { locale, questionId } = await params;
+  setRequestLocale(locale);
   return <QuizQuestion questionId={questionId} />;
 }

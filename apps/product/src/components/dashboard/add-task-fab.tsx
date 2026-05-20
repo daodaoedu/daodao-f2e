@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import {
   Tooltip,
   TooltipPanel,
@@ -13,6 +14,8 @@ interface AddTaskFABProps {
 }
 
 export const AddTaskFAB = ({ onAddTask }: AddTaskFABProps) => {
+  const t = useTranslations("dashboard");
+
   const handleClick = () => {
     onAddTask?.();
   };
@@ -26,14 +29,14 @@ export const AddTaskFAB = ({ onAddTask }: AddTaskFABProps) => {
             size="icon"
             className="fixed bottom-20 right-5 md:bottom-15 md:right-15 size-15 z-40"
             onClick={handleClick}
-            aria-label="新增任務"
+            aria-label={t("fab_add_task")}
           >
             <Plus className="size-6" />
           </Button>
         }
       />
       <TooltipPanel>
-        <p>建立主題實踐</p>
+        <p>{t("fab_create_practice")}</p>
       </TooltipPanel>
     </Tooltip>
   );

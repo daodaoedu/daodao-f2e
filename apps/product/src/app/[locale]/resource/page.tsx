@@ -1,5 +1,6 @@
 import { getResources } from "@daodao/api";
 import bannerImage from "@daodao/assets/images/resource/banner.webp";
+import { setRequestLocale } from "@daodao/i18n/server";
 import type { Metadata } from "next";
 import { CategoriesContainer, ResourceBanner, ResourceContainer } from "@/components/resource";
 import { HOT_TAGS } from "@/constants/resource";
@@ -8,7 +9,9 @@ export const metadata: Metadata = {
   title: "多元學習資源列表｜島島阿學",
 };
 
-export default async function ResourcePage() {
+export default async function ResourcePage({ params }: PageProps<"/[locale]/resource">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const { data: resourceData } = await getResources({ limit: "10" });
 
   const resources =

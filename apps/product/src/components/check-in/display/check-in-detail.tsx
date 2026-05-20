@@ -543,6 +543,7 @@ export const CheckInDetail = ({
         showTape={true}
         afterTitle={afterTitle}
         bottomActions={bottomActions}
+        showEmptyHint={isOwner}
       />
 
       <div className="flex flex-col w-fit gap-4 mx-auto">

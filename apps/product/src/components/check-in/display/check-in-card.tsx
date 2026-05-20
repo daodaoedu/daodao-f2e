@@ -1,11 +1,13 @@
 "use client";
 
 import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
+import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
 import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
 import * as React from "react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { isBlankContent } from "@/utils/check-in-content";
 
 interface ICheckInCardProps {
   taskTitle: string;
@@ -21,6 +23,8 @@ interface ICheckInCardProps {
   afterTitle?: React.ReactNode;
   /** 卡片底部互動區（reaction + 留言按鈕） */
   bottomActions?: React.ReactNode;
+  /** 是否為本人的打卡（true 才顯示空白提示） */
+  showEmptyHint?: boolean;
 }
 
 /**
@@ -39,6 +43,7 @@ export const CheckInCard = ({
   showTape = true,
   afterTitle,
   bottomActions,
+  showEmptyHint = false,
 }: ICheckInCardProps) => {
   const t = useTranslations("check_in");
   const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
@@ -121,9 +126,28 @@ export const CheckInCard = ({
                 )}
 
                 {/* 文字內容 */}
-                <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">
-                  {content}
-                </p>
+                {isBlankContent(content) && showEmptyHint ? (
+                  <p className="text-light-gray text-sm italic">歡迎隨時追加內容</p>
+                ) : (
+                  <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">
+                    {parseTextLinks(content).map((seg, i) =>
+                      seg.type === "url" &&
+                      (seg.value.startsWith("https://") || seg.value.startsWith("http://")) ? (
+                        <a
+                          key={`${i}-url`}
+                          href={seg.value}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-logo-cyan underline break-all"
+                        >
+                          {seg.value}
+                        </a>
+                      ) : (
+                        <React.Fragment key={`${i}-text`}>{seg.value}</React.Fragment>
+                      )
+                    )}
+                  </p>
+                )}
 
                 {/* 標籤 */}
                 {tags && tags.length > 0 && (
