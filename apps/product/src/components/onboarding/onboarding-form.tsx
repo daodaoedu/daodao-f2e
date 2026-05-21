@@ -1,8 +1,9 @@
 "use client";
 
-import { checkCustomIdAvailability, useUserMutations } from "@daodao/api";
+import { checkCustomIdAvailability, saveQuizResult, useUserMutations } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
@@ -10,6 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { refreshOnboardingStatus } from "@/components/task-guide/onboarding-progress-context";
+import { buildQuizSaveRequest } from "@/utils/save-pending-quiz";
 import { InterestsSection } from "./interests-section";
 import { OnboardingStepper } from "./onboarding-stepper";
 import { ProfileSection } from "./profile-section";
@@ -163,6 +166,20 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
         // 臨時用戶完成 onboarding 後，後端會發新的 token
         // 需要先刷新 token 再檢查認證狀態
         await refreshToken();
+
+        // 若用戶從測驗流程來，儲存 sessionStorage 中待存的測驗結果。
+        // 在 refreshAuth() 之前呼叫，確保後端在 onboarding status 首次 fetch 前已有資料。
+        const pendingQuiz = getStorage(StorageEnum.Quiz).get();
+        const quizPayload = buildQuizSaveRequest(pendingQuiz);
+        if (quizPayload) {
+          try {
+            await saveQuizResult(quizPayload);
+            getStorage(StorageEnum.Quiz).remove();
+            refreshOnboardingStatus();
+          } catch {
+            // silent — task A will remain unchecked until user revisits quiz page
+          }
+        }
       } else {
         await updateCurrentUserWithFormData(updateData);
       }
