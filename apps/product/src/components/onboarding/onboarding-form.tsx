@@ -176,8 +176,9 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
             await saveQuizResult(quizPayload);
             getStorage(StorageEnum.Quiz).remove();
             refreshOnboardingStatus();
-          } catch {
-            // silent — task A will remain unchecked until user revisits quiz page
+          } catch (quizError) {
+            // Non-fatal: task A stays unchecked until user revisits the quiz page.
+            console.error("Failed to save pending quiz result after registration:", quizError);
           }
         }
       } else {
