@@ -1,6 +1,7 @@
 "use client";
 
 import { useShowcaseSuggestions } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { Input } from "@daodao/ui/components/input";
 import { cn } from "@daodao/ui/lib/utils";
 import { Search, X } from "lucide-react";
@@ -13,6 +14,7 @@ interface ShowcaseSearchBarProps {
 }
 
 export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchBarProps) {
+  const t = useTranslations("app_product");
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -55,7 +57,7 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
           ref={inputRef}
           type="text"
           value={value}
-          placeholder="搜尋靈感"
+          placeholder={t("showcase_search_placeholder")}
           className="h-auto flex-1 rounded-none border-0 bg-transparent px-0 py-0 text-sm text-text-dark outline-none placeholder:text-text-dark/40 hover:border-0 focus-visible:border-0 focus-visible:px-0 focus-visible:py-0 focus-visible:ring-0"
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 150)}
@@ -78,7 +80,9 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#C1ECFF] rounded-xl shadow-md z-20 py-2 max-h-60 overflow-y-auto">
           {trendingKeywords.length > 0 && (
             <>
-              <div className="px-3 py-1 text-xs text-text-dark/50 font-medium">近期熱門</div>
+              <div className="px-3 py-1 text-xs text-text-dark/50 font-medium">
+                {t("showcase_recent_hot")}
+              </div>
               {trendingKeywords.map((kw) => (
                 <button
                   key={kw}
@@ -93,7 +97,9 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
           )}
           {interestTags.length > 0 && (
             <>
-              <div className="px-3 py-1 text-xs text-text-dark/50 font-medium mt-1">你的興趣</div>
+              <div className="px-3 py-1 text-xs text-text-dark/50 font-medium mt-1">
+                {t("showcase_your_interests")}
+              </div>
               {interestTags.map((tag) => (
                 <button
                   key={tag}

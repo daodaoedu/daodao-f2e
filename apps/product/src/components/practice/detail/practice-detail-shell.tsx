@@ -445,7 +445,7 @@ export function PracticeDetailShell({
         <div className="flex items-center justify-between mb-2">
           {statusInfo ? (
             <Badge variant={statusInfo.variant} size="sm">
-              {statusInfo.label}
+              {t(statusInfo.label)}
             </Badge>
           ) : (
             <div />
@@ -698,7 +698,10 @@ export function PracticeDetailShell({
               const firstName = followers[0]?.name;
               const text =
                 followers.length > 1
-                  ? t("followers_with_others", { firstName: firstName ?? "", count: String(followers.length - 1) })
+                  ? t("followers_with_others", {
+                      firstName: firstName ?? "",
+                      count: String(followers.length - 1),
+                    })
                   : followers.length === 1
                     ? firstName
                     : effectiveReaction
@@ -708,7 +711,10 @@ export function PracticeDetailShell({
                       : totalReactionCount > 0
                         ? latestActorName
                           ? totalReactionCount > 1
-                            ? t("others_with_count", { name: latestActorName, count: String(totalReactionCount - 1) })
+                            ? t("others_with_count", {
+                                name: latestActorName,
+                                count: String(totalReactionCount - 1),
+                              })
                             : latestActorName
                           : t("count_people", { count: String(totalReactionCount) })
                         : undefined;
@@ -809,7 +815,9 @@ export function PracticeDetailShell({
       {activeTab === "comments" && (
         <div className="mx-4 mt-4 mb-4 bg-white rounded-xl shadow-sm">
           {isLoadingComments ? (
-            <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">{t("comments_loading")}</div>
+            <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">
+              {t("comments_loading")}
+            </div>
           ) : (
             <CommentSection
               comments={comments}

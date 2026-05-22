@@ -18,96 +18,96 @@ const createOptionMap = (options: OptionProps[]): Map<string, string> => {
 export const resourceTypeOptions: OptionWithDescriptionProps[] = [
   {
     value: "learning_platform_app",
-    label: "學習平台/APP",
-    description: "如 Coursera、Udemy、edX",
+    label: "learning_platform_app",
+    description: "learning_platform_app",
   },
   {
     value: "learning_tools",
-    label: "學習工具",
-    description: "如 Google 翻譯、Notion、Grammarly",
+    label: "learning_tools",
+    description: "learning_tools",
   },
   {
     value: "books_articles",
-    label: "書籍/文章",
-    description: "如 《原子習慣》、哈佛商業評論文章",
+    label: "books_articles",
+    description: "books_articles",
   },
   {
     value: "video_content",
-    label: "影片",
-    description: "如 YouTube 教育頻道「CrashCourse」、TED Talks 演講",
+    label: "video_content",
+    description: "video_content",
   },
   {
     value: "podcast_content",
-    label: "Podcast",
-    description: "如 《有聲書評》、《經濟學人》Podcast",
+    label: "podcast_content",
+    description: "podcast_content",
   },
   {
     value: "workshops_courses",
-    label: "工作坊與課程",
-    description: "如 Design Thinking 工作坊、本地社區的公開學習活動",
+    label: "workshops_courses",
+    description: "workshops_courses",
   },
   {
     value: "professional_certificates",
-    label: "專業證書與認證課程",
-    description: "如 AWS Certification、PMP 課程",
+    label: "professional_certificates",
+    description: "professional_certificates",
   },
   {
     value: "community_organization",
-    label: "社群/組織",
-    description: "如 Meetup 的技術社群、LinkedIn 的專業小組",
+    label: "community_organization",
+    description: "community_organization",
   },
 ];
 
 export const costTypeOptions: OptionProps[] = [
-  { value: "free", label: "免費" },
-  { value: "partial_free", label: "部分免費" },
-  { value: "paid", label: "付費" },
+  { value: "free", label: "free" },
+  { value: "partial_free", label: "partial_free" },
+  { value: "paid", label: "paid" },
 ];
 
 export const targetAudienceTypeOptions: OptionWithDescriptionProps[] = [
   {
     value: "beginner",
-    label: "初學",
-    description: "剛開始學習某個領域的人，正在打基礎，掌握基本概念和技能。",
+    label: "beginner",
+    description: "beginner",
   },
   {
     value: "intermediate",
-    label: "進階",
-    description: "已有一定基礎，能獨立處理較複雜的問題，正在深化專業知識。",
+    label: "intermediate",
+    description: "intermediate",
   },
   {
     value: "expert",
-    label: "專家",
-    description: "在該領域有豐富經驗和深厚知識，能解決困難問題，並能指導他人。",
+    label: "expert",
+    description: "expert",
   },
 ];
 
 export const contentFeaturesOptions: OptionProps[] = [
-  { value: "wellStructured", label: "結構清晰" },
-  { value: "practiceFocused", label: "實用導向" },
-  { value: "wellRoundedConcepts", label: "觀念完整" },
-  { value: "thoughtProvoking", label: "靈感啟發" },
-  { value: "progressiveLearning", label: "循序漸進" },
-  { value: "problemBased", label: "問題導向" },
-  { value: "realWorldExamples", label: "具體案例" },
-  { value: "interactive", label: "具互動性" },
-  { value: "visuallyRich", label: "圖文並茂" },
+  { value: "wellStructured", label: "wellStructured" },
+  { value: "practiceFocused", label: "practiceFocused" },
+  { value: "wellRoundedConcepts", label: "wellRoundedConcepts" },
+  { value: "thoughtProvoking", label: "thoughtProvoking" },
+  { value: "progressiveLearning", label: "progressiveLearning" },
+  { value: "problemBased", label: "problemBased" },
+  { value: "realWorldExamples", label: "realWorldExamples" },
+  { value: "interactive", label: "interactive" },
+  { value: "visuallyRich", label: "visuallyRich" },
 ];
 
 export const timeUsageOptions: OptionProps[] = [
-  { value: "daily", label: "每天學習 1-2 小時" },
-  { value: "weekly", label: "每週集中學習幾天" },
-  { value: "fragmented", label: "利用碎片時間學習" },
-  { value: "notApplicable", label: "不適用" },
+  { value: "daily", label: "daily" },
+  { value: "weekly", label: "weekly" },
+  { value: "fragmented", label: "fragmented" },
+  { value: "notApplicable", label: "notApplicable" },
 ];
 
 export const resourceUsageOptions: OptionProps[] = [
-  { value: "withOnlineCourses", label: "是，搭配線上課程" },
-  { value: "withBooks", label: "是，搭配相關書籍" },
-  { value: "withOtherTools", label: "是，搭配相關工具" },
-  { value: "withCommunity", label: "是，參與了社群或討論" },
-  { value: "onlyThisResource", label: "否，僅使用該資源" },
-  { value: "notApplicableResource", label: "不適用" },
+  { value: "withOnlineCourses", label: "withOnlineCourses" },
+  { value: "withBooks", label: "withBooks" },
+  { value: "withOtherTools", label: "withOtherTools" },
+  { value: "withCommunity", label: "withCommunity" },
+  { value: "onlyThisResource", label: "onlyThisResource" },
+  { value: "notApplicableResource", label: "notApplicableResource" },
 ];
 
 export const resourceTypeMap = createOptionMap(resourceTypeOptions);
@@ -116,3 +116,9 @@ export const targetAudienceTypeMap = createOptionMap(targetAudienceTypeOptions);
 export const contentFeaturesMap = createOptionMap(contentFeaturesOptions);
 export const timeUsageMap = createOptionMap(timeUsageOptions);
 export const resourceUsageMap = createOptionMap(resourceUsageOptions);
+
+export const getResourceOptionLabelKey = (value: string) =>
+  `resource_option_${value.replace(/[^a-zA-Z0-9]/g, "_")}`;
+
+export const getResourceOptionDescriptionKey = (value: string) =>
+  `resource_option_desc_${value.replace(/[^a-zA-Z0-9]/g, "_")}`;

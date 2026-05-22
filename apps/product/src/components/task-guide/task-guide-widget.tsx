@@ -3,16 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@daodao/auth";
 import { getRequiredEnv } from "@daodao/config";
-import { useLocale, useTranslations } from "@daodao/i18n";
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Progress } from "@daodao/ui/components/progress";
 import { cn } from "@daodao/ui/lib/utils";
 import { BadgeCheck, Check, ListChecks, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  useOnboardingProgress,
-  type OnboardingTaskKey,
-} from "./onboarding-progress-context";
+import { useOnboardingProgress, type OnboardingTaskKey } from "./onboarding-progress-context";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -20,11 +17,6 @@ const SESSION_KEY = "task-guide-collapsed";
 const CELEBRATION_DISMISSED_KEY = "task-guide-celebration-dismissed";
 const PANEL_POSITION = "fixed bottom-39 right-5 md:bottom-34 md:right-15 z-40";
 const TRIGGER_POSITION = "fixed bottom-[152px] right-[26px] md:bottom-[132px] md:right-[66px] z-40";
-const PROFILE_TASK_DESCRIPTION_FALLBACK = {
-  en: "Complete all three sections: public info, account settings, and preferences",
-  "zh-TW": "需完成公開資訊、帳號設定與領域偏好三個區塊",
-};
-
 function getQuizUrl() {
   const websiteUrl = getRequiredEnv("NEXT_PUBLIC_WEBSITE_URL").replace(/\/$/, "");
 
@@ -57,7 +49,6 @@ export function TaskGuideWidget() {
   const { isAuthenticated, isTemporary } = useAuth();
   const { taskList, completedTasks, badgeGranted, isLoading } = useOnboardingProgress();
   const t = useTranslations("onboarding.taskGuide");
-  const locale = useLocale();
   const router = useRouter();
 
   const [expanded, setExpanded] = useState(false);
@@ -188,62 +179,56 @@ export function TaskGuideWidget() {
           <span>{t("progress", { completed: completedTasks, total })}</span>
           <span>{progressPct}%</span>
         </div>
-        <Progress value={progressPct} className="h-2 bg-very-light-gray [--active-color:var(--logo-cyan)]" />
+        <Progress
+          value={progressPct}
+          className="h-2 bg-very-light-gray [--active-color:var(--logo-cyan)]"
+        />
       </div>
 
       <ul className="divide-y divide-very-light-gray px-4 py-2">
         {taskList.map(({ taskKey, done, ctaHref }) => {
-          const hasDescription =
-            typeof (t as { has?: (key: string) => boolean }).has === "function" &&
-            (t as { has: (key: string) => boolean }).has("taskDescriptions.B");
-          const taskDescription =
-            taskKey === "B" && !done
-              ? hasDescription
-                ? t("taskDescriptions.B")
-                : PROFILE_TASK_DESCRIPTION_FALLBACK[
-                    locale as keyof typeof PROFILE_TASK_DESCRIPTION_FALLBACK
-                  ] ?? PROFILE_TASK_DESCRIPTION_FALLBACK.en
-              : null;
+          const taskDescription = taskKey === "B" && !done ? t("taskDescriptions.B") : null;
 
           return (
             <li key={taskKey} className="flex items-start gap-3 py-2.5">
-            <span
-              className={cn(
-                "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors",
-                done
-                  ? "border-logo-cyan bg-logo-cyan text-white"
-                  : "border-light-gray bg-white text-transparent"
-              )}
-            >
-              <Check className="size-3.5" />
-            </span>
-            <div className="min-w-0 flex-1">
-              {done ? (
-                <span className="text-sm leading-5 text-light-gray line-through">
-                  {t(`tasks.${taskKey}`)}
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const path = ctaHref ?? (taskKey === "A" ? getQuizUrl() : TASK_PATHS[taskKey]);
-                    if (path.startsWith("http")) {
-                      window.location.href = path;
-                    } else {
-                      router.push(path);
-                    }
-                    handleCollapse();
-                  }}
-                  className="text-left text-sm leading-5 text-text-dark transition-colors hover:text-logo-cyan"
-                >
-                  {t(`tasks.${taskKey}`)}
-                </button>
-              )}
-              {taskDescription ? (
-                <p className="mt-1 text-xs leading-4 text-text-dark/55">{taskDescription}</p>
-              ) : null}
-            </div>
-          </li>
+              <span
+                className={cn(
+                  "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors",
+                  done
+                    ? "border-logo-cyan bg-logo-cyan text-white"
+                    : "border-light-gray bg-white text-transparent"
+                )}
+              >
+                <Check className="size-3.5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                {done ? (
+                  <span className="text-sm leading-5 text-light-gray line-through">
+                    {t(`tasks.${taskKey}`)}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const path =
+                        ctaHref ?? (taskKey === "A" ? getQuizUrl() : TASK_PATHS[taskKey]);
+                      if (path.startsWith("http")) {
+                        window.location.href = path;
+                      } else {
+                        router.push(path);
+                      }
+                      handleCollapse();
+                    }}
+                    className="text-left text-sm leading-5 text-text-dark transition-colors hover:text-logo-cyan"
+                  >
+                    {t(`tasks.${taskKey}`)}
+                  </button>
+                )}
+                {taskDescription ? (
+                  <p className="mt-1 text-xs leading-4 text-text-dark/55">{taskDescription}</p>
+                ) : null}
+              </div>
+            </li>
           );
         })}
       </ul>

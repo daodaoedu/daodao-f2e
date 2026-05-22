@@ -1,6 +1,7 @@
 "use client";
 
 import type { PracticeCheckInsResponse } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronUp } from "lucide-react";
@@ -14,6 +15,7 @@ interface ICheckInRecordCardProps {
 }
 
 export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInRecordCardProps) => {
+  const t = useTranslations("check_in");
   const [isExpanded, setIsExpanded] = useState(true);
   const contentRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(0);
@@ -74,9 +76,11 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
   if (isLoading) {
     return (
       <div>
-        <h3 className="font-medium text-text-dark mb-3">打卡紀錄</h3>
+        <h3 className="font-medium text-text-dark mb-3">{t("record_title")}</h3>
         <div className="bg-white rounded-lg px-4 py-2">
-          <div className="text-xs text-text-dark font-medium text-center py-4">載入中...</div>
+          <div className="text-xs text-text-dark font-medium text-center py-4">
+            {t("loading")}
+          </div>
         </div>
       </div>
     );
@@ -84,10 +88,10 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
 
   return (
     <div>
-      <h3 className="font-medium text-text-dark mb-3">打卡紀錄</h3>
+      <h3 className="font-medium text-text-dark mb-3">{t("record_title")}</h3>
       <div className="bg-white rounded-lg px-4 py-2">
         <div className="flex items-center justify-between mb-3">
-          <div className="text-xs text-text-dark font-medium">心情排行</div>
+          <div className="text-xs text-text-dark font-medium">{t("mood_ranking")}</div>
           <Button
             variant="ghost"
             size="icon"
@@ -95,7 +99,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
             onKeyDown={handleKeyDown}
             className="size-4.5"
             animation="none"
-            aria-label={isExpanded ? "收合" : "展開"}
+            aria-label={isExpanded ? t("collapse") : t("expand")}
             aria-expanded={isExpanded}
             aria-controls="mood-ranking-content"
           >

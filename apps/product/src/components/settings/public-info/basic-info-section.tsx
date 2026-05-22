@@ -1,7 +1,7 @@
 "use client";
 
 import { checkCustomIdAvailability, useCities, useCountries } from "@daodao/api";
-import { useLocale } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import {
   FormControl,
   FormDescription,
@@ -31,6 +31,7 @@ interface IBasicInfoSectionProps {
 
 export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionProps) => {
   const locale = useLocale();
+  const t = useTranslations("app_product");
   const selectedCountry = form.watch("country");
 
   // customId 即時檢查狀態
@@ -98,7 +99,7 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
             setCustomIdStatus("unavailable");
             form.setError("customId", {
               type: "server",
-              message: "此使用者 ID 已被使用",
+              message: t("public_info_custom_id_taken"),
             });
           }
         } catch (err) {
@@ -107,7 +108,7 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
         }
       }, 500);
     },
-    [initialCustomId, form]
+    [initialCustomId, form, t]
   );
 
   // 清理 timeout
@@ -128,12 +129,13 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
         render={({ field }) => (
           <FormItem>
             <FormLabel className="block font-medium text-text-dark mb-3">
-              名稱<span className="text-red ml-1">*</span>
+              {t("public_info_name_label")}
+              <span className="text-red ml-1">*</span>
             </FormLabel>
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入公開顯示的名稱"
+                placeholder={t("public_info_name_placeholder")}
                 className={cn(form.formState.errors.name && "border-red focus-visible:border-red")}
               />
             </FormControl>
@@ -149,13 +151,14 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
         render={({ field }) => (
           <FormItem>
             <FormLabel className="block font-medium text-text-dark mb-3">
-              使用者 ID<span className="text-red ml-1">*</span>
+              {t("public_info_custom_id_label")}
+              <span className="text-red ml-1">*</span>
             </FormLabel>
             <FormControl>
               <div className="relative">
                 <Input
                   {...field}
-                  placeholder="請輸入使用者 ID"
+                  placeholder={t("public_info_custom_id_placeholder")}
                   className={cn(
                     "pr-10",
                     form.formState.errors.customId && "border-red focus-visible:border-red",
@@ -185,10 +188,9 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
               </div>
             </FormControl>
             <FormDescription className="text-xs text-light-gray mt-1">
-              ID 開頭及結尾僅可使用字符英文字母 (a-z) 與數字。中間可包含底線 (_) 與連字符 (-), 最少
-              3 個字符, 最多 50 個字符。
+              {t("public_info_custom_id_rule")}
               {customIdStatus === "available" && (
-                <span className="text-green ml-1">✓ 此 ID 可以使用</span>
+                <span className="text-green ml-1">{t("public_info_custom_id_available")}</span>
               )}
             </FormDescription>
             <FormMessage />
@@ -202,7 +204,9 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
         name="country"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block font-medium text-text-dark mb-3">居住地</FormLabel>
+            <FormLabel className="block font-medium text-text-dark mb-3">
+              {t("public_info_location_label")}
+            </FormLabel>
             <FormControl>
               <div className="relative">
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-light-gray z-10" />
@@ -222,7 +226,11 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
                     )}
                     aria-invalid={!!form.formState.errors.country}
                   >
-                    <SelectValue placeholder={isLoadingCountries ? "載入中..." : "請選擇國家"} />
+                    <SelectValue
+                      placeholder={
+                        isLoadingCountries ? t("loading") : t("public_info_country_placeholder")
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {countries.map((country) => (
@@ -270,10 +278,10 @@ export const BasicInfoSection = ({ form, initialCustomId }: IBasicInfoSectionPro
                     <SelectValue
                       placeholder={
                         !selectedCountry
-                          ? "請先選擇國家"
+                          ? t("public_info_city_select_country_first")
                           : isLoadingCities
-                            ? "載入中..."
-                            : "請選擇城市"
+                            ? t("loading")
+                            : t("public_info_city_placeholder")
                       }
                     />
                   </SelectTrigger>

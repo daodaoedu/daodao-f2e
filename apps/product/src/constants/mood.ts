@@ -32,12 +32,12 @@ export interface MoodOption {
 }
 
 export const MOOD_OPTIONS: MoodOption[] = [
-  { id: MoodType.hopeless, label: "想放棄", emoji: HopelessSvg },
-  { id: MoodType.frustrated, label: "受挫", emoji: FrustratedSvg },
-  { id: MoodType.bored, label: "無聊", emoji: BoredSvg },
-  { id: MoodType.neutral, label: "普通", emoji: NeutralSvg },
-  { id: MoodType.fine, label: "還不錯", emoji: FineSvg },
-  { id: MoodType.happy, label: "開心", emoji: HappySvg },
+  { id: MoodType.hopeless, label: "hopeless", emoji: HopelessSvg },
+  { id: MoodType.frustrated, label: "frustrated", emoji: FrustratedSvg },
+  { id: MoodType.bored, label: "bored", emoji: BoredSvg },
+  { id: MoodType.neutral, label: "neutral", emoji: NeutralSvg },
+  { id: MoodType.fine, label: "fine", emoji: FineSvg },
+  { id: MoodType.happy, label: "happy", emoji: HappySvg },
 ];
 
 /**

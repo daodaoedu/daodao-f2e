@@ -56,6 +56,8 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
   } = props;
 
   const t = useTranslations("common");
+  const productT = useTranslations("app_product");
+  const checkInT = useTranslations("check_in");
   const router = useRouter();
   const { open: openSheet } = useSheetManager();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -153,7 +155,11 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
         {image_urls && image_urls.length > 0 ? (
           /* 有照片：直接顯示第一張圖片 */
           <div className="h-[240px] w-full overflow-hidden">
-            <img src={image_urls[0]} alt={t("checkin_cover")} className="w-full h-full object-cover" />
+            <img
+              src={image_urls[0]}
+              alt={t("checkin_cover")}
+              className="w-full h-full object-cover"
+            />
           </div>
         ) : hasContent ? (
           /* 有內容：顯示打卡卡片預覽（同分享打卡圖樣式） */
@@ -175,7 +181,9 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
               {practice.title}
             </p>
             {MoodEmoji ? <MoodEmoji className="size-16" /> : <div className="size-16" />}
-            {moodOption && <p className="text-white/70 text-xs">{moodOption.label}</p>}
+            {frontendMood && (
+              <p className="text-white/70 text-xs">{checkInT(`moods.${frontendMood}`)}</p>
+            )}
             <div
               className="absolute right-3 bottom-3 anonymous-pro animate-stamp opacity-80"
               style={{ filter: "brightness(0) invert(1)" }}
@@ -331,7 +339,9 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
                   {commentUserIslandHref ? (
                     <Link
                       href={commentUserIslandHref}
-                      aria-label={`前往 ${commentUserName} 的小島`}
+                      aria-label={productT("showcase_user_island_aria", {
+                        userName: commentUserName,
+                      })}
                       className="shrink-0"
                       onPointerDown={handleIslandLinkPointerDown}
                       onClick={handleIslandLinkClick}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { FormControl, FormField, FormItem } from "@daodao/ui/components/form";
 import { cn } from "@daodao/ui/lib/utils";
 import type { UseFormReturn } from "react-hook-form";
@@ -42,6 +43,8 @@ function Toggle({
 }
 
 export const PrivacySection = ({ form }: IPrivacySectionProps) => {
+  const t = useTranslations("app_product");
+
   return (
     <div className="bg-white rounded-xl overflow-hidden divide-y divide-[#E4EAE9]">
       <FormField
@@ -51,9 +54,11 @@ export const PrivacySection = ({ form }: IPrivacySectionProps) => {
           <FormItem>
             <div className="flex items-center gap-3 px-4 py-4">
               <div className="flex-1">
-                <p className="text-sm font-medium text-text-dark">隱藏連結數</p>
+                <p className="text-sm font-medium text-text-dark">
+                  {t("public_info_hide_connections")}
+                </p>
                 <p className="text-xs text-[#9FB5B8] mt-0.5 leading-relaxed">
-                  開啟後，其他人瀏覽你的個人檔案時將看不到你的連結數量
+                  {t("public_info_hide_connections_desc")}
                 </p>
               </div>
               <FormControl>

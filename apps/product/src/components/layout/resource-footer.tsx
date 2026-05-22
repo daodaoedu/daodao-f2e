@@ -21,7 +21,7 @@ export const ResourceFooter = () => {
           <div>
             <Image
               src="/assets/landing-page/logo-simple-white.svg"
-              alt="島島阿學 Logo"
+              alt={t("logo_alt")}
               width={142}
               height={24}
               className="mb-2"

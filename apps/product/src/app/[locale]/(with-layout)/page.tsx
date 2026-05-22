@@ -408,7 +408,9 @@ export default function HomePage() {
               <div ref={sentinelRef} className="h-4" />
 
               {isValidating && (
-                <div className="text-center py-4 text-text-dark/50 text-sm">載入中...</div>
+                <div className="text-center py-4 text-text-dark/50 text-sm">
+                  {t("loading")}
+                </div>
               )}
             </div>
           )}

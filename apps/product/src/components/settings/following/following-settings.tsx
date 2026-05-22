@@ -1,6 +1,7 @@
 "use client";
 
 import { useCurrentUser, useFollowing, useFollowMutations } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -9,6 +10,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { useState } from "react";
 
 export const FollowingSettings = () => {
+  const t = useTranslations("app_product");
   const [tab, setTab] = useState<"users" | "practices">("users");
   const { data: currentUserData } = useCurrentUser();
   const userId = currentUserData?.data?.id ?? "";
@@ -25,41 +27,41 @@ export const FollowingSettings = () => {
   const handleUnfollowUser = async (targetId: string) => {
     try {
       await unfollow("user", targetId);
-      toast.success("已取消關注");
+      toast.success(t("following_unfollowed"));
     } catch {
-      toast.error("操作失敗，請稍後再試");
+      toast.error(t("operation_failed_retry"));
     }
   };
 
   const handleUnfollowPractice = async (targetId: string) => {
     try {
       await unfollow("practice", targetId);
-      toast.success("已取消關注");
+      toast.success(t("following_unfollowed"));
     } catch {
-      toast.error("操作失敗，請稍後再試");
+      toast.error(t("operation_failed_retry"));
     }
   };
 
   if (isLoading) {
-    return <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">載入中...</div>;
+    return <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">{t("loading")}</div>;
   }
 
   return (
     <div className="flex flex-col gap-4">
       {/* Tab Bar */}
       <div className="flex border-b border-[#E4EAE9]">
-        {(["users", "practices"] as const).map((t) => (
+        {(["users", "practices"] as const).map((tabKey) => (
           <button
-            key={t}
+            key={tabKey}
             type="button"
-            onClick={() => setTab(t)}
+            onClick={() => setTab(tabKey)}
             className={cn(
               "flex-1 py-3 text-sm font-medium transition-colors cursor-pointer relative",
-              tab === t ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-text-dark/60"
+              tab === tabKey ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-text-dark/60"
             )}
           >
-            {t === "users" ? "關注的使用者" : "關注的實踐"}
-            {tab === t && (
+            {tabKey === "users" ? t("following_users_tab") : t("following_practices_tab")}
+            {tab === tabKey && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-logo-cyan rounded-full" />
             )}
           </button>
@@ -70,7 +72,9 @@ export const FollowingSettings = () => {
       {tab === "users" && (
         <div className="flex flex-col gap-2">
           {followedUsers.length === 0 ? (
-            <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未關注任何使用者</div>
+            <div className="text-center py-12 text-[#9FB5B8] text-sm">
+              {t("following_empty_users")}
+            </div>
           ) : (
             followedUsers.map(({ user }) => {
               if (!user) return null;
@@ -99,7 +103,7 @@ export const FollowingSettings = () => {
                     onClick={() => handleUnfollowUser(user.id)}
                     className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                   >
-                    取消關注
+                    {t("following_unfollow")}
                   </Button>
                 </div>
               );
@@ -112,7 +116,9 @@ export const FollowingSettings = () => {
       {tab === "practices" && (
         <div className="flex flex-col gap-2">
           {followedPractices.length === 0 ? (
-            <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未關注任何實踐</div>
+            <div className="text-center py-12 text-[#9FB5B8] text-sm">
+              {t("following_empty_practices")}
+            </div>
           ) : (
             followedPractices.map(({ practice }) => {
               if (!practice) return null;
@@ -139,7 +145,7 @@ export const FollowingSettings = () => {
                     onClick={() => handleUnfollowPractice(practice.id)}
                     className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                   >
-                    取消關注
+                    {t("following_unfollow")}
                   </Button>
                 </div>
               );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { useCallback } from "react";
@@ -34,18 +35,19 @@ export enum DeleteCheckInResult {
  * ```
  */
 export function useDeleteCheckInDialog() {
+  const t = useTranslations("check_in");
   const { openWarningDialog } = useDialog();
 
   const openDeleteDialog = useCallback(
     async (checkInId: string): Promise<DeleteCheckInResult> => {
       // 先顯示確認對話框
       const result = await openWarningDialog({
-        title: "確定刪除這個打卡?",
-        message: "確定要跟這個打卡說再見了嗎？一旦刪除，就無法復原囉。",
+        title: t("delete_dialog_title"),
+        message: t("delete_dialog_message"),
         textAlign: "left",
         buttons: [
-          { label: "確定刪除", value: "confirm", variant: "outline" },
-          { label: "先不要", value: "cancel", variant: "orange" },
+          { label: t("delete_confirm"), value: "confirm", variant: "outline" },
+          { label: t("cancel_action"), value: "cancel", variant: "orange" },
         ],
       });
 
@@ -62,9 +64,9 @@ export function useDeleteCheckInDialog() {
         };
 
         // 顯示 toast，帶有復原按鈕
-        toast.success("打卡已成功刪除", {
+        toast.success(t("delete_success"), {
           action: {
-            label: "復原",
+            label: t("restore"),
             onClick: () => {
               // 用戶點擊復原，取消刪除
               resolve(DeleteCheckInResult.Restored);
@@ -75,7 +77,7 @@ export function useDeleteCheckInDialog() {
         });
       });
     },
-    [openWarningDialog]
+    [openWarningDialog, t]
   );
 
   return { openDeleteDialog };
