@@ -15,6 +15,7 @@ import {
 } from "@daodao/api";
 import { ChartColumnIncreasingSvg, DialogOutlineSvg, FlagOutlineSvg } from "@daodao/assets";
 import type { MentionCandidate } from "@daodao/features-mention";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Button } from "@daodao/ui/components/button";
@@ -26,8 +27,8 @@ import {
 } from "@daodao/ui/components/dropdown-menu";
 import { ImageLightbox } from "@daodao/ui/components/image-lightbox";
 import { toast } from "@daodao/ui/components/sonner";
-import { formatDistanceToNow, isValid, parseISO } from "date-fns";
-import { zhTW } from "date-fns/locale";
+import { type Locale as DateFnsLocale, formatDistanceToNow, isValid, parseISO } from "date-fns";
+import { enUS, zhTW } from "date-fns/locale";
 import { ArrowLeft, Ellipsis, Pencil, Share2 } from "lucide-react";
 import * as React from "react";
 import { useCallback, useTransition } from "react";
@@ -41,6 +42,7 @@ import {
   BrowseActivityContent,
   type IBrowseActivityFollower,
 } from "@/components/practice/shared/browse-activity-content";
+import { applyOnboardingUpdateFromResponse } from "@/components/task-guide/onboarding-progress-context";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { useEditCheckInSheet } from "@/hooks/use-edit-check-in-sheet";
 import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
@@ -70,11 +72,26 @@ interface ICheckInDetailProps {
 // Helpers
 // ============================================================================
 
-export function formatCommentTime(createdAt?: string): string {
-  if (!createdAt) return "剛剛";
+export function getDateFnsLocale(locale: string): DateFnsLocale {
+  return locale === "en" ? enUS : zhTW;
+}
+
+export interface CommentFormatOptions {
+  anonymousLabel?: string;
+  justNowLabel?: string;
+  locale?: DateFnsLocale;
+}
+
+export function formatCommentTime(
+  createdAt?: string,
+  options: CommentFormatOptions = {}
+): string {
+  const justNowLabel = options.justNowLabel ?? "剛剛";
+  const locale = options.locale ?? zhTW;
+  if (!createdAt) return justNowLabel;
   const parsed = parseISO(createdAt);
-  if (!isValid(parsed)) return "剛剛";
-  return formatDistanceToNow(parsed, { addSuffix: true, locale: zhTW });
+  if (!isValid(parsed)) return justNowLabel;
+  return formatDistanceToNow(parsed, { addSuffix: true, locale });
 }
 
 export type ApiCommentNode = {
@@ -95,35 +112,43 @@ export function isApiCommentNode(v: unknown): v is ApiCommentNode {
   return typeof v === "object" && v !== null && "id" in v;
 }
 
-export function mapReply(reply: ApiCommentNode): ICommentReply {
+export function mapReply(
+  reply: ApiCommentNode,
+  options: CommentFormatOptions = {}
+): ICommentReply {
+  const anonymousLabel = options.anonymousLabel ?? "匿名使用者";
   return {
     id: String(reply.id),
     author: {
-      name: reply.user?.name || "匿名使用者",
+      name: reply.user?.name || anonymousLabel,
       photoURL: reply.user?.photoURL || undefined,
       userId: reply.user?.id || undefined,
       numericUserId: reply.userId ?? undefined,
       customId: reply.user?.customId ?? undefined,
     },
     content: reply.content || "",
-    time: formatCommentTime(reply.createdAt),
+    time: formatCommentTime(reply.createdAt, options),
   };
 }
 
-export function mapComment(comment: ApiCommentNode): IComment {
+export function mapComment(
+  comment: ApiCommentNode,
+  options: CommentFormatOptions = {}
+): IComment {
+  const anonymousLabel = options.anonymousLabel ?? "匿名使用者";
   const rawReplies = Array.isArray(comment.replies) ? comment.replies : [];
-  const mappedReplies = rawReplies.filter(isApiCommentNode).map(mapReply);
+  const mappedReplies = rawReplies.filter(isApiCommentNode).map((r) => mapReply(r, options));
   return {
     id: String(comment.id),
     author: {
-      name: comment.user?.name || "匿名使用者",
+      name: comment.user?.name || anonymousLabel,
       photoURL: comment.user?.photoURL || undefined,
       userId: comment.user?.id || undefined,
       numericUserId: comment.userId ?? undefined,
       customId: comment.user?.customId ?? undefined,
     },
     content: comment.content || "",
-    time: formatCommentTime(comment.createdAt),
+    time: formatCommentTime(comment.createdAt, options),
     replies: mappedReplies,
   };
 }
@@ -145,6 +170,9 @@ export function CheckInCommentSheetContent({
   currentUserId,
   currentUserPhotoURL,
 }: ICheckInCommentSheetContentProps) {
+  const t = useTranslations("check_in");
+  const locale = useLocale();
+  const dateFnsLocale = React.useMemo(() => getDateFnsLocale(locale), [locale]);
   const { data: commentsData, mutate: mutateComments } = useComments({
     targetType: "checkin",
     targetId: checkInId,
@@ -157,8 +185,14 @@ export function CheckInCommentSheetContent({
   const comments: IComment[] = React.useMemo(() => {
     const raw = commentsData?.data;
     if (!Array.isArray(raw)) return [];
-    return raw.filter(isApiCommentNode).map(mapComment);
-  }, [commentsData]);
+    return raw.filter(isApiCommentNode).map((c) =>
+      mapComment(c, {
+        anonymousLabel: t("anonymous_user"),
+        justNowLabel: t("just_now"),
+        locale: dateFnsLocale,
+      })
+    );
+  }, [commentsData, t, dateFnsLocale]);
 
   const mentionCandidates = React.useMemo<MentionCandidate[]>(() => {
     const rawCandidates = (mentionCandidatesData as { data?: unknown[] } | undefined)?.data;
@@ -202,10 +236,10 @@ export function CheckInCommentSheetContent({
         mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
       });
       if (response.error) {
-        toast.error("留言失敗，請稍後再試");
+        toast.error(t("comment_failed"));
         return;
       }
-      toast.success("留言成功！");
+      toast.success(t("comment_success"));
       await mutateComments();
     },
     [checkInId, mutateComments]
@@ -215,36 +249,36 @@ export function CheckInCommentSheetContent({
     async (commentId: string, text: string) => {
       const id = Number(commentId);
       if (!Number.isFinite(id)) {
-        toast.error("留言 ID 無效");
+        toast.error(t("comment_id_invalid"));
         return false;
       }
       const response = await updateComment(id, { content: text });
       if (response.error) {
-        toast.error("更新留言失敗");
+        toast.error(t("comment_update_failed"));
         return false;
       }
       await mutateComments();
       return true;
     },
-    [mutateComments]
+    [mutateComments, t]
   );
 
   const handleDeleteComment = useCallback(
     async (commentId: string) => {
       const id = Number(commentId);
       if (!Number.isFinite(id)) {
-        toast.error("留言 ID 無效");
+        toast.error(t("comment_id_invalid"));
         return false;
       }
       const response = await deleteComment(id);
       if (response.error) {
-        toast.error("刪除留言失敗");
+        toast.error(t("comment_delete_failed"));
         return false;
       }
       await mutateComments();
       return true;
     },
-    [mutateComments]
+    [mutateComments, t]
   );
 
   return (
@@ -274,6 +308,7 @@ export const CheckInDetail = ({
   parentPracticeHref,
   isOwner = true,
 }: ICheckInDetailProps) => {
+  const t = useTranslations("check_in");
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
   const checkInId = checkInData.id;
 
@@ -358,7 +393,7 @@ export const CheckInDetail = ({
       reaction: item.reactionType as ReactionTypeType,
     }));
     openSheet({
-      title: "瀏覽活動",
+      title: t("browse_activity"),
       content: (
         <BrowseActivityContent
           viewCount={0}
@@ -421,7 +456,7 @@ export const CheckInDetail = ({
           type="button"
           onClick={() =>
             openSheet({
-              title: "留言",
+              title: t("sheet_comment"),
               content: (
                 <CheckInCommentSheetContent
                   checkInId={checkInId}
@@ -464,7 +499,7 @@ export const CheckInDetail = ({
                 {onEditComplete && (
                   <DropdownMenuItem onClick={openEditCheckInSheet} className="gap-2 text-text-dark">
                     <Pencil className="size-4 shrink-0" />
-                    編輯打卡
+                    {t("edit_check_in")}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem
@@ -472,7 +507,7 @@ export const CheckInDetail = ({
                   className="gap-2 text-text-dark"
                 >
                   <ChartColumnIncreasingSvg className="size-4 shrink-0" />
-                  瀏覽活動
+                  {t("browse_activity")}
                 </DropdownMenuItem>
               </>
             ) : (
@@ -482,14 +517,14 @@ export const CheckInDetail = ({
                   className="gap-2 text-text-dark"
                 >
                   <FlagOutlineSvg className="size-4 shrink-0" />
-                  檢舉
+                  {t("report")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleOpenBrowseActivity}
                   className="gap-2 text-text-dark"
                 >
                   <ChartColumnIncreasingSvg className="size-4 shrink-0" />
-                  瀏覽活動
+                  {t("browse_activity")}
                 </DropdownMenuItem>
               </>
             )}
@@ -508,6 +543,7 @@ export const CheckInDetail = ({
         showTape={true}
         afterTitle={afterTitle}
         bottomActions={bottomActions}
+        showEmptyHint={isOwner}
       />
 
       <div className="flex flex-col w-fit gap-4 mx-auto">
@@ -515,7 +551,7 @@ export const CheckInDetail = ({
           <Button variant="white" className="px-8" asChild>
             <Link href={parentPracticeHref}>
               <ArrowLeft className="size-4 mr-2" />
-              查看所屬實踐
+              {t("view_practice")}
             </Link>
           </Button>
         )}
@@ -523,7 +559,7 @@ export const CheckInDetail = ({
         {/* 分享按鈕 */}
         <Button variant="white" className="px-8" onClick={openShareSheet}>
           <Share2 className="size-4 mr-2" />
-          分享這篇打卡
+          {t("share_check_in")}
         </Button>
       </div>
 

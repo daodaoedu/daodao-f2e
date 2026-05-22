@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRightOutlineSvg, MessagesSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -13,6 +14,7 @@ import {
   practiceThemeSvgMap,
 } from "@/constants/practice-theme";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
+import { calculateRemainingDays, formatCardDate } from "@/utils/practice-card";
 
 interface InProgressTaskCardProps {
   label: string;
@@ -47,10 +49,13 @@ export const InProgressTaskCard = ({
   endDate,
   onEdit,
 }: InProgressTaskCardProps) => {
+  const t = useTranslations("dashboard");
   const themeName = getThemeNameFromColor(theme);
   const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
   const statusInfo = getStatusConfig(status);
   const isDraft = status === TaskStatus.draft;
+  const formattedStartDate = formatCardDate(startDate);
+  const remainingDays = calculateRemainingDays(endDate);
 
   return (
     <CustomLink
@@ -93,12 +98,31 @@ export const InProgressTaskCard = ({
           </div>
         </div>
 
+        {/* Start date + remaining days */}
+        {(formattedStartDate !== null || remainingDays !== null) && (
+          <div className="flex items-center gap-2 text-xs text-text-dark">
+            {formattedStartDate !== null && (
+              <span>開始 {formattedStartDate}</span>
+            )}
+            {remainingDays !== null && (
+              <span className={remainingDays < 0 ? "text-red-500" : ""}>
+                {remainingDays > 0
+                  ? `剩 ${remainingDays} 天`
+                  : remainingDays === 0
+                    ? "今天到期"
+                    : `已逾期 ${Math.abs(remainingDays)} 天`}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Progress */}
         <div className="flex items-center justify-between">
-          <span className="text-xs flex gap-1">
-            <span className="text-text-dark">已打卡</span>
-            <span className="text-text-dark font-semibold">{checkInCount}</span>
-            <span className="text-text-dark">次</span>
+          <span className="text-xs text-text-dark">
+            {t.rich("checked_in_count", {
+              count: checkInCount,
+              bold: (chunks) => <span className="font-semibold">{chunks}</span>,
+            })}
           </span>
           {/* TODO: MVP 先不開放 */}
           <div className="hidden items-center gap-1">
@@ -127,7 +151,7 @@ export const InProgressTaskCard = ({
           {isDraft ? (
             <Button variant="secondary" onClick={onEdit}>
               <PenLine className="size-4.5 text-logo-cyan" />
-              繼續編輯
+              {t("continue_editing")}
             </Button>
           ) : (
             <CheckInButton

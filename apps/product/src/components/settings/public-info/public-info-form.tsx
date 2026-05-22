@@ -10,6 +10,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate as globalMutate } from "swr";
+import {
+  applyOnboardingUpdateFromResponse,
+  refreshOnboardingStatus,
+} from "@/components/task-guide/onboarding-progress-context";
 import { AvatarUploadSection } from "./avatar-upload-section";
 import { BasicInfoSection } from "./basic-info-section";
 import { IntroductionSection } from "./introduction-section";
@@ -63,7 +67,6 @@ export const PublicInfoForm = () => {
       // 若 user 有設定 location，需等 citiesData 載入後才能解出 countryCode
       // 避免先以 country:"" 重置，導致城市 select 顯示空白
       if (user.location && isCitiesLoading) return;
-      
 
       // 根據 location 找到對應的 countryCode
       let countryCode = "";
@@ -159,11 +162,14 @@ export const PublicInfoForm = () => {
       };
 
       // 調用 FormData API 更新用戶資訊（包含圖片上傳）
-      await updateCurrentUserWithFormData(updateData, avatarFile || undefined);
+      const response = await updateCurrentUserWithFormData(updateData, avatarFile || undefined);
 
       // 刷新用戶資料
       await mutate(["/api/v1/users/me"] as const);
       globalMutate("/api/v1/users/settings-summary");
+      if (!applyOnboardingUpdateFromResponse(response)) {
+        refreshOnboardingStatus();
+      }
 
       // 成功
       toast.success("公開資訊設定已更新");
@@ -257,7 +263,7 @@ export const PublicInfoForm = () => {
         <PrivacySection form={form} />
 
         {/* 儲存按鈕 */}
-        <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray">
+        <footer className="fixed bottom-20 left-0 right-0 z-20 flex justify-center gap-6 border-t border-light-gray bg-very-light-gray p-6 md:bottom-0">
           <Button
             type="submit"
             variant="orange"

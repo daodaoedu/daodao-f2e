@@ -1,10 +1,13 @@
 "use client";
 
 import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
+import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
 import * as React from "react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { isBlankContent } from "@/utils/check-in-content";
 
 interface ICheckInCardProps {
   taskTitle: string;
@@ -20,6 +23,8 @@ interface ICheckInCardProps {
   afterTitle?: React.ReactNode;
   /** 卡片底部互動區（reaction + 留言按鈕） */
   bottomActions?: React.ReactNode;
+  /** 是否為本人的打卡（true 才顯示空白提示） */
+  showEmptyHint?: boolean;
 }
 
 /**
@@ -38,7 +43,9 @@ export const CheckInCard = ({
   showTape = true,
   afterTitle,
   bottomActions,
+  showEmptyHint = false,
 }: ICheckInCardProps) => {
+  const t = useTranslations("check_in");
   const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
   const MoodEmoji = moodOption?.emoji;
 
@@ -114,14 +121,33 @@ export const CheckInCard = ({
                 {MoodEmoji && (
                   <div className="flex items-center gap-2">
                     <MoodEmoji className="size-6" />
-                    <span className="text-sm text-text-dark">心情{moodOption?.label}</span>
+                    <span className="text-sm text-text-dark">{t("mood_label", { label: moodOption?.label ?? "" })}</span>
                   </div>
                 )}
 
                 {/* 文字內容 */}
-                <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">
-                  {content}
-                </p>
+                {isBlankContent(content) && showEmptyHint ? (
+                  <p className="text-light-gray text-sm italic">歡迎隨時追加內容</p>
+                ) : (
+                  <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">
+                    {parseTextLinks(content).map((seg, i) =>
+                      seg.type === "url" &&
+                      (seg.value.startsWith("https://") || seg.value.startsWith("http://")) ? (
+                        <a
+                          key={`${i}-url`}
+                          href={seg.value}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-logo-cyan underline break-all"
+                        >
+                          {seg.value}
+                        </a>
+                      ) : (
+                        <React.Fragment key={`${i}-text`}>{seg.value}</React.Fragment>
+                      )
+                    )}
+                  </p>
+                )}
 
                 {/* 標籤 */}
                 {tags && tags.length > 0 && (
@@ -151,7 +177,7 @@ export const CheckInCard = ({
                             )}
                             <img
                               src={imageUrl}
-                              alt={`打卡圖片 ${actualIndex + 1}`}
+                              alt={t("image_alt", { n: actualIndex + 1 })}
                               className="absolute inset-0 w-full h-full object-contain bg-white"
                             />
                           </>
@@ -169,7 +195,7 @@ export const CheckInCard = ({
                                 displayIndex === 1 && "ml-auto right-4 rotate-12 z-1",
                                 displayIndex === 2 && "mx-auto bottom-5"
                               )}
-                              aria-label={`查看圖片 ${actualIndex + 1}`}
+                              aria-label={t("view_image_label", { n: actualIndex + 1 })}
                             >
                               {imageElement}
                             </button>

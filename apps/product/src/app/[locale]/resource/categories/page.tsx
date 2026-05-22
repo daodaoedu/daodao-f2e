@@ -1,4 +1,5 @@
 import { getResources } from "@daodao/api";
+import { setRequestLocale } from "@daodao/i18n/server";
 import type { Metadata } from "next";
 import { CategoriesContainer, ResourceContainer, SectionTitle } from "@/components/resource";
 
@@ -6,7 +7,9 @@ export const metadata: Metadata = {
   title: "所有分類｜島島阿學",
 };
 
-export default async function ResourceCategoriesPage() {
+export default async function ResourceCategoriesPage({ params }: PageProps<"/[locale]/resource/categories">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const { data: resourceData } = await getResources({ limit: "10" });
 
   const resources =

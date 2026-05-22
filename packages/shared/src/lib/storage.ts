@@ -9,7 +9,13 @@ export enum StorageEnum {
   UserInfo = "UserInfo",
   /** 用於存儲外連結受信任網站列表的 localStorage */
   Whitelist = "Whitelist",
-  /** 用於存儲 OAuth nonce 的 sessionStorage（防止偽造和重放攻擊） */
+  /**
+   * 用於存儲 OAuth nonce（防止偽造和重放攻擊）
+   * 使用 localStorage 而非 sessionStorage：iOS Safari ITP / Android Chrome Custom Tab
+   * 場景下 sessionStorage 在 OAuth 跨域 redirect 後可能被清空或不共享，
+   * 導致 callback 端 state 驗證失敗、redirectUrl 被丟掉、使用者被踢回登入頁。
+   * 安全性仍由 timestamp（10 分鐘 TTL）+ 一次性消費保障。
+   */
   OAuthNonce = "OAuthNonce",
   /** 用於存儲手動建立實踐表單草稿的 sessionStorage */
   ManualPracticeDraft = "ManualPracticeDraft",
@@ -25,7 +31,7 @@ const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   Quiz: "sessionStorage",
   UserInfo: "localStorage",
   Whitelist: "localStorage",
-  OAuthNonce: "sessionStorage",
+  OAuthNonce: "localStorage",
   ManualPracticeDraft: "sessionStorage",
   ActionMaker: "sessionStorage",
   AuthSignal: "localStorage",

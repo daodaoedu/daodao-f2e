@@ -7,6 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@daodao/ui/components/breadcrumb";
+import { setRequestLocale } from "@daodao/i18n/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import {
@@ -23,7 +24,8 @@ interface ResourceDetailPageProps {
 }
 
 export default async function ResourceDetailPage({ params }: ResourceDetailPageProps) {
-  const { resourceId } = await params;
+  const { locale, resourceId } = await params;
+  setRequestLocale(locale);
 
   const { data: response, error } = await getResourceById(resourceId);
 

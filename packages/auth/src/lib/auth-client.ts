@@ -96,7 +96,7 @@ export const createOAuthState = (
 ): OAuthState => {
   const nonce = generateNonce();
 
-  // 存儲 nonce 到 sessionStorage（用於後續驗證）
+  // 存儲 nonce（用於後續 callback 驗證；用 localStorage 以容忍手機跨域 redirect）
   getStorage<string>(StorageEnum.OAuthNonce).set(nonce);
 
   return {

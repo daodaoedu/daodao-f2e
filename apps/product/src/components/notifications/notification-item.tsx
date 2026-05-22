@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { ArrowRightOutlineSvg, MoreSvg } from "@daodao/assets";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
@@ -85,19 +86,20 @@ function getAvatarColor(name: string): string {
 // ============================================================================
 
 function NotificationText({ notification }: { notification: INotificationData }) {
+  const t = useTranslations("notification");
   const { type, actor, practice, content, reaction, connectMessage, aggregationCount } =
     notification;
   const count = aggregationCount ?? 1;
   const name = <span className="font-semibold">{actor.name}</span>;
   const suffix =
-    count > 1 ? <span className="text-text-dark/60">與其他 {count - 1} 人</span> : null;
+    count > 1 ? <span className="text-text-dark/60">{t("and_others", { count: count - 1 })}</span> : null;
   const practiceName = practice ? <span className="font-semibold">「{practice.name}」</span> : null;
 
   if (type === NotificationType.reaction) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
         {name}
-        {suffix && <> {suffix}</>} 對你的主題實踐{practiceName}給了反應：{reaction ?? "🙌"}
+        {suffix && <> {suffix}</>} {t("reaction_text")}{practiceName}{t("reaction_gave")}：{reaction ?? "🙌"}
       </p>
     );
   }
@@ -105,19 +107,19 @@ function NotificationText({ notification }: { notification: INotificationData })
   if (type === NotificationType.comment) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} 回覆了你的主題實踐{practiceName}：<span className="font-semibold">{content}</span>
+        {name} {t("comment_text")}{practiceName}：<span className="font-semibold">{content}</span>
       </p>
     );
   }
 
   if (type === NotificationType.followUser) {
-    return <p className="text-sm leading-5 truncate">{name} 關注了你</p>;
+    return <p className="text-sm leading-5 truncate">{name} {t("follow_user_text")}</p>;
   }
 
   if (type === NotificationType.followPractice) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} 關注了你的主題實踐{practiceName}
+        {name} {t("follow_practice_text")}{practiceName}
       </p>
     );
   }
@@ -125,7 +127,7 @@ function NotificationText({ notification }: { notification: INotificationData })
   if (type === NotificationType.connect) {
     return (
       <div className="flex flex-col gap-1">
-        <p className="text-sm leading-5">{name} 對你發出了連結請求</p>
+        <p className="text-sm leading-5">{name} {t("connect_request_text")}</p>
         {connectMessage && (
           <p className="text-sm leading-5 text-text-dark/70 bg-[#F2F7F7] rounded px-2 py-1 line-clamp-2">
             「{connectMessage}」
@@ -136,17 +138,17 @@ function NotificationText({ notification }: { notification: INotificationData })
   }
 
   if (type === NotificationType.agreeConnect) {
-    return <p className="text-sm leading-5 truncate">恭喜！{name} 同意了你的連結請求</p>;
+    return <p className="text-sm leading-5 truncate">{t("agree_connect_prefix")}{name} {t("agree_connect_text")}</p>;
   }
 
   if (type === NotificationType.connectAgree || type === NotificationType.connectRejected) {
-    return <p className="text-sm leading-5 truncate">{name} 對你發出了連結請求</p>;
+    return <p className="text-sm leading-5 truncate">{name} {t("connect_request_text")}</p>;
   }
 
   if (type === NotificationType.updatePracticeCheckin) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} 在主題實踐{practiceName}打了卡
+        {name} {t("checkin_text")}{practiceName}{t("checkin_action")}
         {content && (
           <>
             ：<span className="font-semibold">{content}</span>
@@ -159,7 +161,7 @@ function NotificationText({ notification }: { notification: INotificationData })
   if (type === NotificationType.updatePracticeFinish) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} 完成了主題實踐{practiceName}
+        {name} {t("finish_text")}{practiceName}
       </p>
     );
   }
@@ -167,7 +169,7 @@ function NotificationText({ notification }: { notification: INotificationData })
   if (type === NotificationType.practiceCreated) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} 發起了新的主題實踐{practiceName}
+        {name} {t("practice_created_text")}{practiceName}
       </p>
     );
   }
@@ -188,6 +190,7 @@ function NotificationRightAction({
   onConnectAgree?: (id: string) => void;
   onConnectReject?: (id: string) => void;
 }) {
+  const t = useTranslations("notification");
   const { type, id } = notification;
 
   if (type === NotificationType.connect) {
@@ -198,14 +201,14 @@ function NotificationRightAction({
             variant="ghost"
             size="icon"
             className="shrink-0 rounded-full size-10 bg-[#E4EAE9] hover:bg-[#d0d8d7]"
-            aria-label="更多選項"
+            aria-label={t("more_options")}
           >
             <MoreSvg className="size-6" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => onConnectAgree?.(id)}>同意連結</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onConnectReject?.(id)}>忽略</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onConnectAgree?.(id)}>{t("agree_connect")}</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onConnectReject?.(id)}>{t("ignore")}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     );
@@ -214,7 +217,7 @@ function NotificationRightAction({
   if (type === NotificationType.connectAgree) {
     return (
       <div className="flex items-center gap-1 shrink-0 text-sm text-text-dark px-2">
-        <span>已同意</span>
+        <span>{t("agreed")}</span>
         <Check className="size-5" />
       </div>
     );
@@ -223,7 +226,7 @@ function NotificationRightAction({
   if (type === NotificationType.connectRejected) {
     return (
       <div className="flex items-center gap-1 shrink-0 text-sm text-text-dark px-2">
-        <span>已忽略</span>
+        <span>{t("ignored")}</span>
         <X className="size-5" />
       </div>
     );
