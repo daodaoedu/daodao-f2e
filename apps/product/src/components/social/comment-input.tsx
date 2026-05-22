@@ -2,6 +2,7 @@
 
 import type { MentionCandidate } from "@daodao/features-mention";
 import { MentionInput, useMentionInput } from "@daodao/features-mention";
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { Send } from "lucide-react";
@@ -46,6 +47,7 @@ export function CommentInput({
   className,
   participants = [],
 }: CommentInputProps) {
+  const t = useTranslations("app_product");
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const prevReactionTypeRef = useRef<ReactionTypeType | null | undefined>(undefined);
@@ -66,7 +68,9 @@ export function CommentInput({
     prevReactionTypeRef.current = reactionType;
   }, [reactionType]);
 
-  const placeholder = reactionType ? REACTION_CONFIG[reactionType].placeholder : "寫下你的留言...";
+  const placeholder = reactionType
+    ? t(REACTION_CONFIG[reactionType].placeholder)
+    : t("comments_placeholder");
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();

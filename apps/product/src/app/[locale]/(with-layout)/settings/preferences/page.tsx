@@ -1,12 +1,15 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { PreferencesForm } from "@/components/settings/preferences";
 
 export default function PreferencesSettingsPage() {
+  const t = useTranslations("app_product");
+
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto">
-      <PageHeader leftAction="back" leftLabel="" title="領域偏好設定" />
+      <PageHeader leftAction="back" leftLabel="" title={t("settings_preferences")} />
 
       <BackgroundAnimation />
 

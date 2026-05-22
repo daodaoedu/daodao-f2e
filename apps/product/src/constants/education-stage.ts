@@ -5,12 +5,12 @@
  * label: 中文顯示名稱（前端顯示）
  */
 export const EDUCATION_STAGE_OPTIONS = [
-  { value: "high", label: "高中/職" },
-  { value: "associate", label: "專科" },
-  { value: "university", label: "大學" },
-  { value: "master", label: "碩士" },
-  { value: "doctorate", label: "博士" },
-  { value: "other", label: "其他" },
+  { value: "high", label: "high" },
+  { value: "associate", label: "associate" },
+  { value: "university", label: "university" },
+  { value: "master", label: "master" },
+  { value: "doctorate", label: "doctorate" },
+  { value: "other", label: "other" },
 ] as const;
 
 export type EducationStageValue = (typeof EDUCATION_STAGE_OPTIONS)[number]["value"];

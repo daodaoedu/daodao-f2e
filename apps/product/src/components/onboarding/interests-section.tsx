@@ -24,6 +24,7 @@ interface InterestsSectionProps {
  */
 export const InterestsSection = ({ form }: InterestsSectionProps) => {
   const t = useTranslations("onboarding");
+  const productT = useTranslations("app_product");
 
   const selectedProfessional = form.watch("professionalFields") || [];
   const selectedInterests = form.watch("interests") || [];
@@ -87,7 +88,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
                         }
                       }}
                     >
-                      {field.label}
+                      {productT(`option_${field.value.replace(/[^a-zA-Z0-9]/g, "_")}`)}
                     </Badge>
                   );
                 })}
@@ -132,7 +133,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
                         }
                       }}
                     >
-                      {category.label}
+                      {productT(`option_${category.value.replace(/[^a-zA-Z0-9]/g, "_")}`)}
                     </Badge>
                   );
                 })}

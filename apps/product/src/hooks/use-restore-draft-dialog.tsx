@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import type { DraftData } from "@daodao/shared";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { useCallback } from "react";
@@ -29,6 +30,7 @@ interface UseRestoreDraftDialogOptions<TFormValues extends FieldValues> {
 export function useRestoreDraftDialog<TFormValues extends FieldValues>({
   draft,
 }: UseRestoreDraftDialogOptions<TFormValues>) {
+  const t = useTranslations("common");
   const { openInfoDialog } = useDialog();
 
   const openRestoreDialog = useCallback(() => {
@@ -37,17 +39,17 @@ export function useRestoreDraftDialog<TFormValues extends FieldValues>({
     }
 
     return openInfoDialog({
-      title: "恢復暫存資料",
-      message: "偵測到您有未完成的資料，是否要恢復？",
+      title: t("restore_draft_title"),
+      message: t("restore_draft_message"),
       textAlign: "center",
       containerClassName: "pt-4 pb-16",
       buttons: [
-        { label: "重新開始", value: "discard", variant: "outline" },
-        { label: "恢復資料", value: "restore", variant: "orange" },
+        { label: t("restore_draft_discard"), value: "discard", variant: "outline" },
+        { label: t("restore_draft_restore"), value: "restore", variant: "orange" },
       ],
       strict: true,
     });
-  }, [draft, openInfoDialog]);
+  }, [draft, openInfoDialog, t]);
 
   return { openRestoreDialog };
 }

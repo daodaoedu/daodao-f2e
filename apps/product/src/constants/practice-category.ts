@@ -19,9 +19,9 @@ export const practiceCategoryMetadataMap: Record<
   string,
   { label: string; icon: React.ComponentType<{ className?: string }> }
 > = {
-  digital_skill: { label: "數位技能", icon: TechSvg },
-  lifestyle: { label: "生活品味", icon: LifeSvg },
-  art_design: { label: "藝術與設計", icon: ArtSvg },
-  language: { label: "語言", icon: LanguageSvg },
-  wellness: { label: "身心健康", icon: HealthSvg },
+  digital_skill: { label: "practice_category_digital_skill", icon: TechSvg },
+  lifestyle: { label: "practice_category_lifestyle", icon: LifeSvg },
+  art_design: { label: "practice_category_art_design", icon: ArtSvg },
+  language: { label: "practice_category_language", icon: LanguageSvg },
+  wellness: { label: "practice_category_wellness", icon: HealthSvg },
 } as const;

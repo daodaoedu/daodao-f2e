@@ -2,6 +2,7 @@
 
 import { followTarget, unfollowTarget, useFollowStatus } from "@daodao/api";
 import { ChartColumnIncreasingSvg, DialogOutlineSvg, TelescopeSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
@@ -32,6 +33,7 @@ function FollowerRow({
   follower: IBrowseActivityFollower;
   onClose?: () => void;
 }) {
+  const t = useTranslations("app_product");
   const { data: followStatusData } = useFollowStatus("user", follower.id);
   const [localOverride, setLocalOverride] = useState<boolean | null>(null);
   const isFollowing = localOverride ?? followStatusData?.data?.isFollowing ?? false;
@@ -84,7 +86,7 @@ function FollowerRow({
             : "bg-logo-cyan text-white hover:bg-logo-cyan/80"
         )}
       >
-        {isFollowing ? "取消關注" : "+ 關注"}
+        {isFollowing ? t("following_unfollow") : t("following_follow_with_plus")}
       </Button>
     </div>
   );
@@ -96,6 +98,8 @@ export function BrowseActivityContent({
   followers,
   onClose,
 }: BrowseActivityContentProps) {
+  const t = useTranslations("app_product");
+  const commonT = useTranslations("common");
   const [tab, setTab] = useState<"data" | "echo">("data");
   const [reactionFilter, setReactionFilter] = useState<"all" | ReactionTypeType>("all");
 
@@ -121,7 +125,7 @@ export function BrowseActivityContent({
               tab === currentTab ? "text-logo-cyan" : "text-[#9FB5B8]"
             )}
           >
-            {currentTab === "data" ? "數據" : "迴響"}
+            {currentTab === "data" ? t("showcase_data") : t("showcase_echo")}
             {tab === currentTab && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-logo-cyan rounded-full" />
             )}
@@ -132,11 +136,11 @@ export function BrowseActivityContent({
       {tab === "data" && (
         <div className="flex flex-col divide-y divide-[#E4EAE9] px-4 mt-2">
           {[
-            { icon: <TelescopeSvg className="size-5" />, label: "瀏覽", count: viewCount },
-            { icon: <DialogOutlineSvg className="size-5" />, label: "留言", count: commentCount },
+            { icon: <TelescopeSvg className="size-5" />, label: t("showcase_views"), count: viewCount },
+            { icon: <DialogOutlineSvg className="size-5" />, label: commonT("comments"), count: commentCount },
             {
               icon: <ChartColumnIncreasingSvg className="size-5" />,
-              label: "迴響",
+              label: t("showcase_echo"),
               count: followers.length,
             },
           ].map(({ icon, label, count }) => (
@@ -162,7 +166,7 @@ export function BrowseActivityContent({
                   reactionFilter === "all" ? "text-logo-cyan" : "text-[#9FB5B8]"
                 )}
               >
-                全部 {followers.length}
+                {t("showcase_all")} {followers.length}
                 {reactionFilter === "all" && (
                   <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-logo-cyan rounded-full" />
                 )}
@@ -204,7 +208,9 @@ export function BrowseActivityContent({
                 <FollowerRow key={follower.id} follower={follower} onClose={onClose} />
               ))
             ) : (
-              <div className="py-6 text-center text-sm text-[#9FB5B8]">目前還沒有互動紀錄</div>
+              <div className="py-6 text-center text-sm text-[#9FB5B8]">
+                {t("practice_no_activity")}
+              </div>
             )}
           </div>
         </div>

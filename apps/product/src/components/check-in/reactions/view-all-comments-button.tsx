@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 
 interface ViewAllCommentsButtonProps {
@@ -13,6 +14,8 @@ export function ViewAllCommentsButton({
   onClick,
   className,
 }: ViewAllCommentsButtonProps) {
+  const t = useTranslations("check_in");
+
   return (
     <button
       type="button"
@@ -24,7 +27,7 @@ export function ViewAllCommentsButton({
         className
       )}
     >
-      全部留言
+      {t("view_all_comments")}
       {commentCount != null && commentCount > 0 && <span>({commentCount})</span>}
     </button>
   );

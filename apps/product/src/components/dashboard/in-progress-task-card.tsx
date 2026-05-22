@@ -56,6 +56,16 @@ export const InProgressTaskCard = ({
   const isDraft = status === TaskStatus.draft;
   const formattedStartDate = formatCardDate(startDate);
   const remainingDays = calculateRemainingDays(endDate);
+  const statusLabel =
+    status === TaskStatus.draft
+      ? t("filter_draft")
+      : status === TaskStatus.notStarted
+        ? t("filter_not_started")
+        : status === TaskStatus.inProgress
+          ? t("filter_in_progress")
+          : status === TaskStatus.completed
+            ? t("filter_completed")
+            : statusInfo?.label;
 
   return (
     <CustomLink
@@ -75,7 +85,7 @@ export const InProgressTaskCard = ({
             </Badge>
             {statusInfo && (
               <Badge variant={statusInfo.variant} size="sm" className="w-fit">
-                {statusInfo.label}
+                {statusLabel}
               </Badge>
             )}
           </div>
@@ -102,15 +112,15 @@ export const InProgressTaskCard = ({
         {(formattedStartDate !== null || remainingDays !== null) && (
           <div className="flex items-center gap-2 text-xs text-text-dark">
             {formattedStartDate !== null && (
-              <span>開始 {formattedStartDate}</span>
+              <span>{t("card_start_date", { date: formattedStartDate })}</span>
             )}
             {remainingDays !== null && (
               <span className={remainingDays < 0 ? "text-red-500" : ""}>
                 {remainingDays > 0
-                  ? `剩 ${remainingDays} 天`
+                  ? t("card_remaining_days", { count: remainingDays })
                   : remainingDays === 0
-                    ? "今天到期"
-                    : `已逾期 ${Math.abs(remainingDays)} 天`}
+                    ? t("card_due_today")
+                    : t("card_overdue_days", { count: Math.abs(remainingDays) })}
               </span>
             )}
           </div>

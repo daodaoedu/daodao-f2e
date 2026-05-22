@@ -21,7 +21,7 @@ import { PersonalInfoSection } from "./personal-info-section";
 import {
   type AccountFormValues,
   AVAILABLE_FIELDS,
-  accountFormSchema,
+  createAccountFormSchema,
   EDUCATION_STAGE_OPTIONS,
   INTEREST_CATEGORIES,
   POSITION_OPTIONS,
@@ -29,13 +29,14 @@ import {
 
 export const AccountForm = () => {
   const t = useTranslations("account_settings");
+  const productT = useTranslations("app_product");
   const router = useRouter();
   const { data: userData, isLoading, error: userError } = useCurrentUser();
   const { updateCurrentUser } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<AccountFormValues>({
-    resolver: zodResolver(accountFormSchema),
+    resolver: zodResolver(createAccountFormSchema(t)),
     defaultValues: {
       email: "",
       birthday: undefined,
@@ -187,13 +188,22 @@ export const AccountForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <PersonalInfoSection form={form} educationStageOptions={EDUCATION_STAGE_OPTIONS} />
+        <PersonalInfoSection
+          form={form}
+          educationStageOptions={EDUCATION_STAGE_OPTIONS.map((option) => ({
+            ...option,
+            label: productT(`option_${option.value.replace(/[^a-zA-Z0-9]/g, "_")}`),
+          }))}
+        />
 
         <FieldSelectionSection
           form={form}
           fieldName="position"
           label={t("role_label")}
-          availableFields={POSITION_OPTIONS}
+          availableFields={POSITION_OPTIONS.map((option) => ({
+            ...option,
+            label: productT(`option_${option.value.replace(/[^a-zA-Z0-9]/g, "_")}`),
+          }))}
           maxSelection={5}
         />
 
@@ -201,7 +211,10 @@ export const AccountForm = () => {
           form={form}
           fieldName="professionalFields"
           label={t("professional_field_label")}
-          availableFields={AVAILABLE_FIELDS}
+          availableFields={AVAILABLE_FIELDS.map((option) => ({
+            ...option,
+            label: productT(`option_${option.value.replace(/[^a-zA-Z0-9]/g, "_")}`),
+          }))}
           maxSelection={5}
         />
 
@@ -209,7 +222,10 @@ export const AccountForm = () => {
           form={form}
           fieldName="explorationFields"
           label={t("exploration_field_label")}
-          availableFields={INTEREST_CATEGORIES}
+          availableFields={INTEREST_CATEGORIES.map((option) => ({
+            ...option,
+            label: productT(`option_${option.value.replace(/[^a-zA-Z0-9]/g, "_")}`),
+          }))}
           maxSelection={5}
         />
 

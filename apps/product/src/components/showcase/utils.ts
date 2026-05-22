@@ -11,7 +11,20 @@ export interface CheerDisplay {
   displayText: string;
 }
 
-export const buildCheerDisplay = (reactions?: IReactionCountItem[]): CheerDisplay | null => {
+interface CheerDisplayFormatters {
+  withOthers: (actorName: string, count: number) => string;
+  countPeople: (count: number) => string;
+}
+
+const defaultCheerDisplayFormatters: CheerDisplayFormatters = {
+  withOthers: (actorName, count) => `${actorName} + ${count}`,
+  countPeople: (count) => String(count),
+};
+
+export const buildCheerDisplay = (
+  reactions?: IReactionCountItem[],
+  formatters: CheerDisplayFormatters = defaultCheerDisplayFormatters
+): CheerDisplay | null => {
   if (!reactions || reactions.length === 0) return null;
 
   const sorted = [...reactions].filter((r) => r.count > 0).sort((a, b) => b.count - a.count);
@@ -29,10 +42,10 @@ export const buildCheerDisplay = (reactions?: IReactionCountItem[]): CheerDispla
 
   let displayText: string;
   if (actorName) {
-    displayText = totalOthers > 0 ? `${actorName} 與其他 ${totalOthers} 人` : actorName;
+    displayText = totalOthers > 0 ? formatters.withOthers(actorName, totalOthers) : actorName;
   } else {
     const total = sorted.reduce((sum, r) => sum + r.count, 0);
-    displayText = `${total} 人`;
+    displayText = formatters.countPeople(total);
   }
 
   return { emojis, displayText };

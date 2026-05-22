@@ -31,66 +31,71 @@ export interface IExploreTopicRecommendation {
   practiceId?: string;
 }
 
-const MOCK_CHALLENGES: IChallenge[] = [
-  {
-    id: "challenge-1",
-    title: "21 天原子習慣建立挑戰",
-    description: "從小習慣開始，建立微小但長期的改變。每天只需 5 分鐘，社群陪伴讓你不再半途而廢。",
-    status: "draft",
-    statusLabel: "草稿（熱烈報名中）",
-    period: { start: "5/1", end: "5/21" },
-    participantCount: 142,
-    participants: [
-      { id: "p1", avatarColor: "#93C5FD", name: "小明" },
-      { id: "p2", avatarColor: "#86EFAC", name: "小花" },
-      { id: "p3", avatarColor: "#C4B5FD", name: "小強" },
-    ],
-  },
-];
-
-const MOCK_EXPLORE_TOPICS: IExploreTopicRecommendation[] = [
-  {
-    id: "explore-1",
-    title: "多益 860 分衝刺計畫",
-    description: "每天聽寫一篇 TED Talk，週末做一回模擬考題。",
-    tags: ["英文", "檢定", "聽力"],
-    reason: "因為您正在「練習日文」",
-    authorName: "學習狂人",
-    authorAvatarChar: "學",
-    authorAvatarColor: "#16B9B3",
-  },
-  {
-    id: "explore-2",
-    title: "每週讀透一本書",
-    description: "涵蓋歷史、科技與心理學，並產出心智圖筆記。",
-    tags: ["閱讀", "自我成長"],
-    reason: "與您「閱讀少年臺灣史」的興趣相近",
-    authorName: "知識游牧民",
-    authorAvatarChar: "知",
-    authorAvatarColor: "#16B9B3",
-  },
-  {
-    id: "explore-3",
-    title: "30 天 Podcast 企劃挑戰",
-    description: "從零開始構思、錄音到上架，完成自己的第一個節目。",
-    tags: ["Podcast", "創作"],
-    reason: "基於您的標籤「Podcast」",
-    authorName: "聲音說書人",
-    authorAvatarChar: "聲",
-    authorAvatarColor: "#16B9B3",
-  },
-];
-
 export function useChallenges() {
+  const t = useTranslations("app_product");
+
   return {
-    challenges: MOCK_CHALLENGES,
+    challenges: [
+      {
+        id: "challenge-1",
+        title: t("mock_challenge_title"),
+        description: t("mock_challenge_description"),
+        status: "draft",
+        statusLabel: t("mock_challenge_status"),
+        period: { start: "5/1", end: "5/21" },
+        participantCount: 142,
+        participants: [
+          { id: "p1", avatarColor: "#93C5FD", name: t("mock_participant_1") },
+          { id: "p2", avatarColor: "#86EFAC", name: t("mock_participant_2") },
+          { id: "p3", avatarColor: "#C4B5FD", name: t("mock_participant_3") },
+        ],
+      },
+    ] satisfies IChallenge[],
     isLoading: false,
   };
 }
 
 export function useExploreTopics() {
+  const t = useTranslations("app_product");
+
   return {
-    topics: MOCK_EXPLORE_TOPICS,
+    topics: [
+      {
+        id: "explore-1",
+        title: t("mock_explore_1_title"),
+        description: t("mock_explore_1_description"),
+        tags: [
+          t("mock_explore_tag_english"),
+          t("mock_explore_tag_exam"),
+          t("mock_explore_tag_listening"),
+        ],
+        reason: t("mock_explore_1_reason"),
+        authorName: t("mock_explore_1_author"),
+        authorAvatarChar: t("mock_explore_1_avatar"),
+        authorAvatarColor: "#16B9B3",
+      },
+      {
+        id: "explore-2",
+        title: t("mock_explore_2_title"),
+        description: t("mock_explore_2_description"),
+        tags: [t("mock_explore_tag_reading"), t("mock_explore_tag_growth")],
+        reason: t("mock_explore_2_reason"),
+        authorName: t("mock_explore_2_author"),
+        authorAvatarChar: t("mock_explore_2_avatar"),
+        authorAvatarColor: "#16B9B3",
+      },
+      {
+        id: "explore-3",
+        title: t("mock_explore_3_title"),
+        description: t("mock_explore_3_description"),
+        tags: ["Podcast", t("mock_explore_tag_creation")],
+        reason: t("mock_explore_3_reason"),
+        authorName: t("mock_explore_3_author"),
+        authorAvatarChar: t("mock_explore_3_avatar"),
+        authorAvatarColor: "#16B9B3",
+      },
+    ] satisfies IExploreTopicRecommendation[],
     isLoading: false,
   };
 }
+import { useTranslations } from "@daodao/i18n";

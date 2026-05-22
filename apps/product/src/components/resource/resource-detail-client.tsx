@@ -3,6 +3,7 @@
 import { posthogCapture } from "@daodao/analytics";
 import type { ResourceData } from "@daodao/api";
 import { useRecordView } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { Separator } from "@daodao/ui/components/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
@@ -25,6 +26,7 @@ export function ResourceDetailClient({
   resource,
   defaultTab = TabEnum.Introduction,
 }: ResourceDetailClientProps) {
+  const t = useTranslations("app_product");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -56,17 +58,17 @@ export function ResourceDetailClient({
     <Tabs value={currentTab} onValueChange={handleTabChange}>
       <TabsList>
         <TabsTrigger value={TabEnum.Introduction} className="basis-1/3">
-          介紹
+          {t("resource_tab_introduction")}
         </TabsTrigger>
         <TabsTrigger value={TabEnum.Reviews} className="basis-1/3" disabled>
-          心得 ({resource.reviewCount || 0})
+          {t("resource_tab_reviews", { count: resource.reviewCount || 0 })}
         </TabsTrigger>
         <TabsTrigger
           value={TabEnum.Contributor}
           className="basis-1/3"
           disabled={!resource.user?.id}
         >
-          分享者資訊
+          {t("resource_tab_contributor")}
         </TabsTrigger>
       </TabsList>
 
@@ -77,7 +79,9 @@ export function ResourceDetailClient({
       </TabsContent>
 
       <TabsContent value={TabEnum.Reviews}>
-        <div className="text-center text-gray-500 py-10">心得分享功能尚未開放</div>
+        <div className="text-center text-gray-500 py-10">
+          {t("resource_reflections_unavailable")}
+        </div>
       </TabsContent>
 
       <TabsContent value={TabEnum.Contributor}>

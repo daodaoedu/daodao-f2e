@@ -8,18 +8,16 @@ import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { InterestsSection } from "./interests-section";
 import { OnboardingStepper } from "./onboarding-stepper";
 import { ProfileSection } from "./profile-section";
 import { ReferralSection } from "./referral-section";
 import {
-  interestsStepSchema,
+  createOnboardingFormSchema,
+  createOnboardingStepSchemas,
   type OnboardingFormValues,
-  onboardingFormSchema,
-  profileStepSchema,
-  referralStepSchema,
 } from "./schema";
 import { SuccessSection } from "./success-section";
 import { useOnboardingStep } from "./use-onboarding-step";
@@ -35,6 +33,7 @@ interface OnboardingFormProps {
  */
 export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
   const t = useTranslations("onboarding");
+  const schemas = useMemo(() => createOnboardingStepSchemas(t), [t]);
   const { isTemporary, refreshAuth, refreshToken } = useAuth();
   const { updateCurrentUserWithFormData, createCurrentUserWithFormData } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,7 +48,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
   } = useOnboardingStep();
 
   const form = useForm<OnboardingFormValues>({
-    resolver: zodResolver(onboardingFormSchema),
+    resolver: zodResolver(createOnboardingFormSchema(t)),
     defaultValues: {
       email: initialEmail || "",
       birthDate: undefined,
@@ -94,7 +93,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
       switch (currentStep) {
         case 1:
           // Profile 步驟：確認必填欄位與 customId 可用性
-          await profileStepSchema.parseAsync({
+          await schemas.profileStepSchema.parseAsync({
             email: values.email,
             birthDate: values.birthDate,
             name: values.name,
@@ -105,7 +104,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
 
         case 2:
           // Interests 步驟：interests 是必填
-          await interestsStepSchema.parseAsync({
+          await schemas.interestsStepSchema.parseAsync({
             professionalFields: values.professionalFields,
             interests: values.interests,
           });
@@ -113,7 +112,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
 
         case 3:
           // Referral 步驟：referralSource 是必填
-          await referralStepSchema.parseAsync({
+          await schemas.referralStepSchema.parseAsync({
             referralSource: values.referralSource,
             otherReferralText: values.otherReferralText,
           });
