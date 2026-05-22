@@ -1,4 +1,13 @@
-import { Archive, Check, ChevronLeft, ChevronRight, Tag, Trash2, X } from "@tamagui/lucide-icons";
+import {
+  Archive,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Tag,
+  Trash2,
+  X,
+} from "@tamagui/lucide-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, RefreshControl } from "react-native";
@@ -150,6 +159,7 @@ export default function PracticeDetailScreen() {
 
   const status = practice.status || "in-progress";
   const statusInfo = statusConfig[status] || statusConfig["in-progress"];
+  const canViewSummary = status === "completed" || practice.targetDays <= practice.completedDays;
 
   // 模擬執行時機數據
   const executionTiming = ["holiday", "commute", "beforeSleep"];
@@ -361,11 +371,27 @@ export default function PracticeDetailScreen() {
             <Text fontSize={16} fontWeight="600" color="$color">
               打卡紀錄
             </Text>
-            <CheckInList checkIns={checkIns || []} />
+            <CheckInList checkIns={checkIns || []} practiceId={id} />
           </YStack>
 
           {/* Action Buttons */}
           <YStack alignItems="center" gap="$3" marginTop="$4">
+            {canViewSummary ? (
+              <Button
+                backgroundColor={colors.primary.base}
+                borderRadius="$md"
+                paddingHorizontal="$6"
+                onPress={() => router.push(`/practices/${id}/summary` as never)}
+              >
+                <XStack alignItems="center" gap="$2">
+                  <FileText size={18} color="white" />
+                  <Text color="white" fontWeight="600">
+                    查看實踐總結
+                  </Text>
+                </XStack>
+              </Button>
+            ) : null}
+
             <Button
               backgroundColor="white"
               borderRadius="$md"

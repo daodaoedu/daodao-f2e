@@ -3,10 +3,50 @@ import createClient, {
   type ClientPathsWithMethod,
   type FetchResponse,
   type MaybeOptionalInit,
+  type Middleware,
 } from "openapi-fetch";
 import type { paths } from "./types";
 
 export const PREFIX = "dao-dao-server-api" as const;
+
+let mobileTokenProvider: (() => Promise<string | null>) | null = null;
+let baseUrlMiddleware: Middleware | null = null;
+let mobileApiBaseUrl: string | null = null;
+
+function getDefaultApiBaseUrl(): string {
+  const expoApiUrl = process.env.EXPO_PUBLIC_API_URL;
+  if (expoApiUrl) {
+    return expoApiUrl.replace(/\/$/, "");
+  }
+
+  try {
+    return getRequiredEnv("NEXT_PUBLIC_API_URL").replace(/\/$/, "");
+  } catch {
+    if (process.env.NODE_ENV === "test") {
+      return "http://localhost";
+    }
+
+    return "https://api.daodao.so";
+  }
+}
+
+export function getApiBaseUrl(): string {
+  return mobileApiBaseUrl ?? getDefaultApiBaseUrl();
+}
+
+export function setMobileTokenProvider(fn: () => Promise<string | null>): void {
+  mobileTokenProvider = fn;
+}
+
+export function clearMobileTokenProvider(): void {
+  mobileTokenProvider = null;
+}
+
+const withHeader = (headers: HeadersInit | undefined, key: string, value: string): Headers => {
+  const nextHeaders = new Headers(headers);
+  nextHeaders.set(key, value);
+  return nextHeaders;
+};
 
 /**
  * 401 錯誤處理器類別
@@ -48,11 +88,7 @@ class UnauthorizedHandler {
    * @returns Response 物件
    */
   wrapFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    // 確保 credentials 被設置，以支援跨域 cookie
-    const fetchInit: RequestInit = {
-      ...init,
-      credentials: "include",
-    };
+    const fetchInit = await this.createFetchInit(init);
 
     let url: string;
     if (typeof input === "string") {
@@ -79,8 +115,7 @@ class UnauthorizedHandler {
     if (this.isRefreshing && this.refreshPromise) {
       const refreshSuccess = await this.refreshPromise;
       if (refreshSuccess) {
-        // 刷新成功，重試原請求（確保 credentials 被傳遞）
-        return fetch(input, fetchInit);
+        return this.retryWithFreshToken(input, fetchInit);
       }
       // 刷新失敗，返回原始 401 響應
       return response;
@@ -93,8 +128,7 @@ class UnauthorizedHandler {
     try {
       const refreshSuccess = await this.refreshPromise;
       if (refreshSuccess) {
-        // 刷新成功，重試原請求（確保 credentials 被傳遞）
-        return fetch(input, fetchInit);
+        return this.retryWithFreshToken(input, fetchInit);
       }
       // 刷新失敗，返回原始 401 響應
       return response;
@@ -104,6 +138,40 @@ class UnauthorizedHandler {
       this.refreshPromise = null;
     }
   };
+
+  private async createFetchInit(init?: RequestInit): Promise<RequestInit> {
+    if (!mobileTokenProvider) {
+      return {
+        ...init,
+        credentials: "include",
+      };
+    }
+
+    const token = await mobileTokenProvider();
+    return {
+      ...init,
+      headers: token
+        ? withHeader(init?.headers, "Authorization", `Bearer ${token}`)
+        : init?.headers,
+    };
+  }
+
+  private async retryWithFreshToken(
+    input: RequestInfo | URL,
+    fetchInit: RequestInit
+  ): Promise<Response> {
+    if (!mobileTokenProvider) {
+      return fetch(input, fetchInit);
+    }
+
+    const token = await mobileTokenProvider();
+    return fetch(input, {
+      ...fetchInit,
+      headers: token
+        ? withHeader(fetchInit.headers, "Authorization", `Bearer ${token}`)
+        : fetchInit.headers,
+    });
+  }
 }
 
 /**
@@ -127,10 +195,44 @@ export interface ApiClientConfig {
  * 使用環境變數 NEXT_PUBLIC_API_URL 或預設值
  */
 export const client = createClient<paths>({
-  baseUrl: getRequiredEnv("NEXT_PUBLIC_API_URL").replace(/\/$/, ""),
-  credentials: "include",
+  baseUrl: getDefaultApiBaseUrl(),
   fetch: typeof window === "undefined" ? fetch : unauthorizedHandler.wrapFetch,
 });
+
+export function initMobileClient(config: {
+  baseUrl: string;
+  getToken: () => Promise<string | null>;
+}): void {
+  setMobileTokenProvider(config.getToken);
+  mobileApiBaseUrl = config.baseUrl.replace(/\/$/, "");
+
+  if (baseUrlMiddleware) {
+    client.eject(baseUrlMiddleware);
+  }
+
+  baseUrlMiddleware = {
+    onRequest({ request }) {
+      const url = new URL(request.url);
+      const baseUrl = new URL(config.baseUrl);
+      url.protocol = baseUrl.protocol;
+      url.host = baseUrl.host;
+      url.port = baseUrl.port;
+      return new Request(url.toString(), request);
+    },
+  };
+
+  client.use(baseUrlMiddleware);
+}
+
+export function clearMobileClient(): void {
+  clearMobileTokenProvider();
+  mobileApiBaseUrl = null;
+
+  if (baseUrlMiddleware) {
+    client.eject(baseUrlMiddleware);
+    baseUrlMiddleware = null;
+  }
+}
 
 type InitParam<Init> = Init extends undefined ? never : Init;
 

@@ -1,4 +1,11 @@
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import type { ExpoConfig } from "expo/config";
+
+const iosGoogleServicesFile = "./GoogleService-Info.plist";
+const androidGoogleServicesFile = "./google-services.json";
+const hasIosGoogleServicesFile = existsSync(resolve(process.cwd(), iosGoogleServicesFile));
+const hasAndroidGoogleServicesFile = existsSync(resolve(process.cwd(), androidGoogleServicesFile));
 
 const config: ExpoConfig = {
   name: "Dao Dao",
@@ -19,8 +26,9 @@ const config: ExpoConfig = {
     supportsTablet: true,
     bundleIdentifier: "com.daodao.app",
     usesAppleSignIn: true,
-    googleServicesFile: "./GoogleService-Info.plist",
+    ...(hasIosGoogleServicesFile ? { googleServicesFile: iosGoogleServicesFile } : {}),
     infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
       NSCameraUsageDescription: "用於上傳打卡照片",
       NSPhotoLibraryUsageDescription: "用於選擇打卡照片",
       NSPhotoLibraryAddUsageDescription: "用於儲存打卡分享圖片",
@@ -32,7 +40,7 @@ const config: ExpoConfig = {
       backgroundColor: "#16B9B3",
     },
     package: "com.daodao.app",
-    googleServicesFile: "./google-services.json",
+    ...(hasAndroidGoogleServicesFile ? { googleServicesFile: androidGoogleServicesFile } : {}),
   },
   web: {
     bundler: "metro",
@@ -59,8 +67,23 @@ const config: ExpoConfig = {
         isAccessMediaLocationEnabled: true,
       },
     ],
+    [
+      "expo-build-properties",
+      {
+        ios: {
+          extraPods: [
+            {
+              name: "GoogleUtilities",
+              modular_headers: true,
+            },
+          ],
+        },
+      },
+    ],
     // Firebase Analytics - native configuration via google-services files
-    "@react-native-firebase/app",
+    ...(hasIosGoogleServicesFile || hasAndroidGoogleServicesFile
+      ? ["@react-native-firebase/app"]
+      : []),
   ],
   experiments: {
     typedRoutes: true,

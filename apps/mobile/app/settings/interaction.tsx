@@ -1,15 +1,24 @@
+import { useUserMutations } from "@daodao/api";
 import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { api } from "@/services/api-client";
+
+function assertSuccessfulResponse(response: { error?: unknown }) {
+  if (!response.error) return;
+
+  const error = response.error as { error?: { message?: string }; message?: string };
+  throw new Error(error.error?.message ?? error.message ?? "更新失敗，請稍後再試");
+}
 
 export default function InteractionSettingsScreen() {
   const router = useRouter();
   const { user, isLoading } = useCurrentUser();
+  const { updateCurrentUser } = useUserMutations();
 
   const serverIsOpenProfile = (user as { isOpenProfile?: boolean })?.isOpenProfile ?? true;
   const [localIsOpenProfile, setLocalIsOpenProfile] = useState<boolean | null>(null);
@@ -20,9 +29,14 @@ export default function InteractionSettingsScreen() {
     setLocalIsOpenProfile(value);
     setIsSaving(true);
     try {
-      await api.put("/users/me", { isOpenProfile: value });
-    } catch {
+      const response = await updateCurrentUser({ isOpenProfile: value });
+      assertSuccessfulResponse(response);
+    } catch (error) {
       setLocalIsOpenProfile(null);
+      Alert.alert(
+        "更新失敗",
+        error instanceof Error ? error.message : "無法更新互動設定，請稍後再試。"
+      );
     } finally {
       setIsSaving(false);
     }

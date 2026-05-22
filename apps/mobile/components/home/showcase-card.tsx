@@ -20,6 +20,8 @@ interface ShowcaseCardProps {
   onReactionToggle?: (type: ReactionTypeType) => Promise<void>;
   /** 反應按鈕被點擊時觸發（用於 haptic 等副作用，不影響內部狀態） */
   onReactionTap?: () => void;
+  /** 反應 mutation 成功後觸發，用於刷新 feed cache */
+  onReactionUpdated?: () => void | Promise<void>;
   /** 三點選單 callback */
   onMenuPress?: () => void;
 }
@@ -36,6 +38,7 @@ export function ShowcaseCard({
   selectedReaction: externalSelectedReaction,
   onReactionToggle: externalOnReactionToggle,
   onReactionTap,
+  onReactionUpdated,
   onMenuPress,
 }: ShowcaseCardProps) {
   const router = useRouter();
@@ -77,11 +80,12 @@ export function ShowcaseCard({
         } else {
           await upsertReaction("practice", id, type);
         }
+        await onReactionUpdated?.();
       } catch {
         setInternalReaction(isSelected ? type : null);
       }
     },
-    [internalReaction, id, onReactionTap]
+    [internalReaction, id, onReactionTap, onReactionUpdated]
   );
 
   const handleReactionToggle = externalOnReactionToggle ?? internalHandleReactionToggle;
@@ -96,9 +100,9 @@ export function ShowcaseCard({
       style={styles.card}
       onPress={() =>
         router.push({
-          pathname: "/practices/[id]",
-          params: { id, showcaseData: JSON.stringify(practice) },
-        })
+          pathname: `/practices/${id}`,
+          params: { showcaseData: JSON.stringify(practice) },
+        } as Href)
       }
     >
       {/* Header row */}

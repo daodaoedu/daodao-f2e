@@ -1,16 +1,16 @@
+import { useFollowing } from "@daodao/api";
 import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useSWR from "swr";
 import { Avatar, Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { api } from "@/services/api-client";
+import { unfollowTarget } from "@/hooks/useFollow";
 
 interface IFollowItem {
   targetType: "user" | "practice";
-  user?: { id: string; name: string; photoURL?: string; bio?: string };
+  user?: { id: string; identifier?: string; name: string; photoURL?: string; bio?: string };
   practice?: { id: string; title: string; ownerName: string; ownerPhotoURL?: string };
 }
 
@@ -20,23 +20,15 @@ export default function FollowingSettingsScreen() {
   const { user: currentUser } = useCurrentUser();
   const userId = currentUser?.id ?? "";
 
-  const {
-    data: followingItems,
-    isLoading,
-    mutate,
-  } = useSWR<IFollowItem[]>(
-    userId ? `/users/${userId}/following` : null,
-    () => api.get<{ data: IFollowItem[] }>(`/users/${userId}/following`).then((r) => r.data),
-    { revalidateOnFocus: false }
-  );
+  const { data: followingData, isLoading, mutate } = useFollowing({ userId, limit: 100 });
 
-  const items = followingItems ?? [];
+  const items = (followingData?.data ?? []) as IFollowItem[];
   const followedUsers = items.filter((item) => item.targetType === "user" && item.user);
   const followedPractices = items.filter((item) => item.targetType === "practice" && item.practice);
 
   const handleUnfollow = async (targetType: "user" | "practice", targetId: string) => {
     try {
-      await api.delete(`/follows/${targetType}/${targetId}`);
+      await unfollowTarget(targetType, targetId);
       await mutate();
     } catch {
       // silently fail
@@ -127,7 +119,14 @@ export default function FollowingSettingsScreen() {
                         </Avatar>
                         <YStack flex={1}>
                           <Text fontSize={14} fontWeight="500" color="$color">
-                            {user.name}
+                            <Text
+                              fontSize={14}
+                              fontWeight="500"
+                              color="$color"
+                              onPress={() => router.push(`/users/${user.identifier ?? user.id}`)}
+                            >
+                              {user.name}
+                            </Text>
                           </Text>
                           {user.bio && (
                             <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>
@@ -185,7 +184,13 @@ export default function FollowingSettingsScreen() {
                           )}
                         </Avatar>
                         <YStack flex={1}>
-                          <Text fontSize={14} fontWeight="500" color="$color" numberOfLines={1}>
+                          <Text
+                            fontSize={14}
+                            fontWeight="500"
+                            color="$color"
+                            numberOfLines={1}
+                            onPress={() => router.push(`/practices/${practice.id}`)}
+                          >
                             {practice.title}
                           </Text>
                           <Text fontSize={12} color="$color" opacity={0.5}>

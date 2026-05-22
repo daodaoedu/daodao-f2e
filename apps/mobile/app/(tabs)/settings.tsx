@@ -2,6 +2,7 @@ import {
   Archive,
   Bell,
   ChevronRight,
+  Footprints,
   HeartHandshake,
   LibraryBig,
   LogOut,
@@ -9,6 +10,7 @@ import {
   Settings,
   SquareUser,
   Telescope,
+  BookOpen,
 } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
@@ -24,6 +26,11 @@ interface ISettingItem {
 }
 
 const socialItems: ISettingItem[] = [
+  {
+    icon: Footprints,
+    label: "我的足跡",
+    route: "/me/footprints",
+  },
   {
     icon: MessagesSquare,
     label: "互動設定",
@@ -42,6 +49,11 @@ const socialItems: ISettingItem[] = [
 ];
 
 const settingsItems: ISettingItem[] = [
+  {
+    icon: BookOpen,
+    label: "學習資源",
+    route: "/resource",
+  },
   {
     icon: LibraryBig,
     label: "領域偏好設定",

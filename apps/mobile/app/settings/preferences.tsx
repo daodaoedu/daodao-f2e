@@ -1,12 +1,18 @@
+import { useAvailablePreferences, useCurrentUserPreferences, useUserMutations } from "@daodao/api";
 import { Check, ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useSWR from "swr";
 import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import { api } from "@/services/api-client";
+
+function assertSuccessfulResponse(response: { error?: unknown }) {
+  if (!response.error) return;
+
+  const error = response.error as { error?: { message?: string }; message?: string };
+  throw new Error(error.error?.message ?? error.message ?? "更新失敗，請稍後再試");
+}
 
 interface IPreferenceOption {
   id: number;
@@ -32,23 +38,13 @@ interface IUserPreference {
 export default function PreferencesSettingsScreen() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { updateCurrentUserPreferences } = useUserMutations();
 
-  const { data: availableTypes, isLoading: isLoadingAvailable } = useSWR<IPreferenceType[]>(
-    "/users/preferences/available",
-    () => api.get<{ data: IPreferenceType[] }>("/users/preferences/available").then((r) => r.data),
-    { revalidateOnFocus: false }
-  );
+  const { data: availablePrefsData, isLoading: isLoadingAvailable } = useAvailablePreferences();
+  const { data: userPrefsData, isLoading: isLoadingPrefs } = useCurrentUserPreferences();
 
-  const { data: userPrefs, isLoading: isLoadingPrefs } = useSWR<IUserPreference[]>(
-    "/users/me/preferences",
-    () =>
-      api
-        .get<{ data: { preferences: IUserPreference[] } }>("/users/me/preferences")
-        .then((r) => r.data.preferences),
-    { revalidateOnFocus: false }
-  );
-
-  const preferenceTypes = availableTypes ?? [];
+  const preferenceTypes = (availablePrefsData?.data ?? []) as IPreferenceType[];
+  const userPrefs = (userPrefsData?.data?.preferences ?? []) as IUserPreference[];
 
   const initialSelections = useMemo(() => {
     const selections: Record<string, number[]> = {};
@@ -68,12 +64,28 @@ export default function PreferencesSettingsScreen() {
   }, [userPrefs, preferenceTypes]);
 
   const [selections, setSelections] = useState<Record<string, number[]>>({});
+  const isDirty = useMemo(
+    () => JSON.stringify(selections) !== JSON.stringify(initialSelections),
+    [initialSelections, selections]
+  );
 
   useEffect(() => {
     if (Object.keys(initialSelections).length > 0) {
       setSelections(initialSelections);
     }
   }, [initialSelections]);
+
+  const handleBack = () => {
+    if (!isDirty) {
+      router.back();
+      return;
+    }
+
+    Alert.alert("尚未儲存變更", "離開後會失去這次修改，確定要離開嗎？", [
+      { text: "繼續編輯", style: "cancel" },
+      { text: "離開", style: "destructive", onPress: () => router.back() },
+    ]);
+  };
 
   const toggleOption = useCallback(
     (typeId: string, optionId: number, maxSelections: number | null) => {
@@ -112,11 +124,12 @@ export default function PreferencesSettingsScreen() {
         });
       });
 
-      await api.put("/users/me/preferences", { preferences: preferenceItems });
+      const response = await updateCurrentUserPreferences({ preferences: preferenceItems });
+      assertSuccessfulResponse(response);
 
       Alert.alert("成功", "偏好設定已更新", [{ text: "確定", onPress: () => router.back() }]);
-    } catch {
-      Alert.alert("錯誤", "更新失敗，請稍後再試");
+    } catch (error) {
+      Alert.alert("錯誤", error instanceof Error ? error.message : "更新失敗，請稍後再試");
     } finally {
       setIsSubmitting(false);
     }
@@ -132,7 +145,7 @@ export default function PreferencesSettingsScreen() {
             size="$4"
             circular
             chromeless
-            onPress={() => router.back()}
+            onPress={handleBack}
             accessibilityLabel="返回"
           >
             <ChevronLeft size={24} color="$color" />
@@ -145,7 +158,8 @@ export default function PreferencesSettingsScreen() {
             backgroundColor={colors.primary.base}
             pressStyle={{ opacity: 0.8 }}
             onPress={handleSave}
-            disabled={isSubmitting || isLoading}
+            disabled={isSubmitting || isLoading || !isDirty}
+            opacity={isDirty ? 1 : 0.55}
           >
             <Text color={colors.basic.white} fontWeight="600" fontSize={14}>
               {isSubmitting ? "儲存中..." : "儲存"}

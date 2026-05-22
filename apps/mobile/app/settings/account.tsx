@@ -1,3 +1,4 @@
+import { useUserMutations } from "@daodao/api";
 import { Check, ChevronDown, ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -12,9 +13,15 @@ import {
 } from "@/constants/settings";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { api } from "@/services/api-client";
 
 type FieldOptionType = { value: string; label: string };
+
+function assertSuccessfulResponse(response: { error?: unknown }) {
+  if (!response.error) return;
+
+  const error = response.error as { error?: { message?: string }; message?: string };
+  throw new Error(error.error?.message ?? error.message ?? "更新失敗，請稍後再試");
+}
 
 function FieldSelectionModal({
   visible,
@@ -110,6 +117,7 @@ function FieldSelectionModal({
 export default function AccountSettingsScreen() {
   const router = useRouter();
   const { user, isLoading, mutate } = useCurrentUser();
+  const { updateCurrentUser } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [email, setEmail] = useState("");
@@ -155,11 +163,12 @@ export default function AccountSettingsScreen() {
       };
       if (educationStage) updateData.educationStage = educationStage;
 
-      await api.put("/users/me", updateData);
+      const response = await updateCurrentUser(updateData);
+      assertSuccessfulResponse(response);
       await mutate();
       Alert.alert("成功", "帳號設定已更新", [{ text: "確定", onPress: () => router.back() }]);
-    } catch {
-      Alert.alert("錯誤", "更新失敗，請稍後再試");
+    } catch (error) {
+      Alert.alert("錯誤", error instanceof Error ? error.message : "更新失敗，請稍後再試");
     } finally {
       setIsSubmitting(false);
     }

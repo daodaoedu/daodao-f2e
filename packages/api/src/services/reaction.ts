@@ -3,7 +3,7 @@
  * 提供快速反應相關的 API 調用函數
  */
 
-import { client } from "../client";
+import { client, getApiBaseUrl, unauthorizedHandler } from "../client";
 import type { components, paths } from "../types";
 
 // ============================================================================
@@ -106,14 +106,13 @@ export const getReactionsList = async (params: IGetReactionsParams) => {
 export const getReactionsBatch = async (
   params: IGetReactionsBatchParams
 ): Promise<GetReactionsBatchResponse> => {
-  const { getRequiredEnv } = await import("@daodao/config");
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const baseUrl = getApiBaseUrl();
   const qs = new URLSearchParams({
     targetType: params.targetType,
     targetIds: params.targetIds.join(","),
   });
 
-  const res = await fetch(`${baseUrl}/api/v1/reactions/batch?${qs}`, {
+  const res = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/reactions/batch?${qs}`, {
     credentials: "include",
   });
 

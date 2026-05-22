@@ -1,11 +1,10 @@
+import { useMyPractices, useUnarchivePractice } from "@daodao/api";
 import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useSWR from "swr";
 import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
-import { api } from "@/services/api-client";
 
 interface IArchivedPractice {
   id: string;
@@ -16,28 +15,22 @@ interface IArchivedPractice {
 export default function ArchivedContentScreen() {
   const router = useRouter();
   const [unarchivingIds, setUnarchivingIds] = useState<Set<string>>(new Set());
+  const { unarchivePractice } = useUnarchivePractice();
 
   const {
-    data: practices,
+    data: practicesData,
     isLoading,
     error,
     mutate,
-  } = useSWR<IArchivedPractice[]>(
-    "/me/practices?status=archived",
-    () =>
-      api
-        .get<{ data: IArchivedPractice[] }>("/me/practices?status=archived&limit=100")
-        .then((r) => r.data),
-    { revalidateOnFocus: false }
-  );
+  } = useMyPractices({ status: "archived", limit: 100 });
 
-  const items = practices ?? [];
+  const items = (practicesData?.data ?? []) as IArchivedPractice[];
 
   const handleUnarchive = async (practiceId: string) => {
     if (unarchivingIds.has(practiceId)) return;
     setUnarchivingIds((prev) => new Set(prev).add(practiceId));
     try {
-      await api.post(`/practices/${practiceId}/unarchive`);
+      await unarchivePractice(practiceId);
       await mutate();
     } catch {
       Alert.alert("錯誤", "取消封存失敗，請稍後再試");

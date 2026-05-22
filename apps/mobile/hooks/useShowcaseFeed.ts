@@ -1,14 +1,12 @@
 /**
  * Showcase (靈感頁) Feed Hook — Mobile (Bearer Auth)
  * - AI backend GET /api/v1/users/practices (infinite scroll)
- * - Uses apiClient with Bearer token auth instead of cookie-based fetchAiBackend
+ * - Uses the mobile daodao-ai-backend client with Bearer token auth
  */
 
 import { useEffect, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
-import { apiClient } from "@/services/api-client";
-
-const AI_API_URL = process.env.EXPO_PUBLIC_AI_API_URL ?? "https://ai-dev.daodao.so";
+import { aiApiClient } from "@/services/ai-api-client";
 
 // ============================================================================
 // Types
@@ -106,12 +104,12 @@ export function useShowcaseFeed(params: IShowcaseFeedParams) {
     const afterId = pageIndex === 0 ? null : (previousPageData?.pagination?.cursors?.end ?? null);
 
     const qs = buildShowcaseQuery(params, afterId);
-    return `${AI_API_URL}/api/v1/users/practices?${qs}`;
+    return `/api/v1/users/practices?${qs}`;
   };
 
   const { data, error, isLoading, isValidating, size, setSize, mutate } = useSWRInfinite<
     IAIResponse<IShowcasePractice[]>
-  >(getKey, (url: string) => apiClient<IAIResponse<IShowcasePractice[]>>(url), {
+  >(getKey, (path: string) => aiApiClient<IAIResponse<IShowcasePractice[]>>(path), {
     revalidateFirstPage: false,
     revalidateOnFocus: false,
   });

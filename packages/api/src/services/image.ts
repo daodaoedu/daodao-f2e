@@ -6,8 +6,7 @@
  * 刪除使用 client.DELETE，因為是標準的 JSON API
  */
 
-import { getRequiredEnv } from "@daodao/config";
-import { client, unauthorizedHandler } from "../client";
+import { client, getApiBaseUrl, unauthorizedHandler } from "../client";
 import type { paths } from "../types";
 
 // ============================================================================
@@ -36,7 +35,7 @@ export const uploadImage = async (file: File): Promise<UploadImageResponse> => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const baseUrl = getApiBaseUrl();
   const response = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/images`, {
     method: "POST",
     body: formData,
@@ -78,7 +77,7 @@ export const uploadMultipleImages = async (
     formData.append("files", file);
   });
 
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const baseUrl = getApiBaseUrl();
   const response = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/images/multiple`, {
     method: "POST",
     body: formData,

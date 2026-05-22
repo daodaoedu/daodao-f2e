@@ -1,19 +1,11 @@
+import { useCurrentUser as useApiCurrentUser } from "@daodao/api";
 import { useMemo } from "react";
-import useSWR from "swr";
 import { useAuth } from "@/providers/AuthProvider";
-import { api } from "@/services/api-client";
 import type { IUserProfile } from "@/types/user";
-
-/**
- * 後端 /users/me 回傳格式：{ success: true, data: FormattedUserResponse }
- */
-interface IUsersMeResponse {
-  success: boolean;
-  data: IUserProfile;
-}
 
 export function useCurrentUser() {
   const { user: authUser, isAuthenticated } = useAuth();
+  const { data, error, isLoading, mutate } = useApiCurrentUser({ enabled: isAuthenticated });
 
   const fallbackData = useMemo<IUserProfile | undefined>(() => {
     if (!authUser) return undefined;
@@ -34,23 +26,14 @@ export function useCurrentUser() {
     };
   }, [authUser]);
 
-  const { data, error, isLoading, mutate } = useSWR<IUserProfile>(
-    isAuthenticated ? "/users/me" : null,
-    async () => {
-      const res = await api.get<IUsersMeResponse>("/users/me");
-      return res.data;
-    },
-    {
-      revalidateOnFocus: false,
-      errorRetryCount: 2,
-      fallbackData,
-    }
-  );
+  const user = isAuthenticated
+    ? ((data?.data as IUserProfile | undefined) ?? fallbackData)
+    : undefined;
 
   return {
-    user: data,
-    isLoading,
-    error,
+    user,
+    isLoading: isAuthenticated ? isLoading : false,
+    error: isAuthenticated ? error : undefined,
     mutate,
   };
 }

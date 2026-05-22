@@ -1,12 +1,11 @@
+import { updateNotificationPreferences, useNotificationPreferences } from "@daodao/api";
 import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useSWR from "swr";
 import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
 import { NOTIFICATION_TYPES } from "@/constants/settings";
 import { colors } from "@/generated/design-tokens";
-import { api } from "@/services/api-client";
 
 interface INotificationPref {
   type: string;
@@ -20,14 +19,30 @@ const DEFAULT_PREFS: PreferencesMapType = Object.fromEntries(
   NOTIFICATION_TYPES.map((t) => [t.type, { emailEnabled: true }])
 );
 
+function mapNotificationPreferences(prefsData?: { data?: INotificationPref[] }) {
+  const newPrefs: PreferencesMapType = { ...DEFAULT_PREFS };
+
+  for (const p of prefsData?.data ?? []) {
+    if (p.channel === "N01" && newPrefs[p.type]) {
+      newPrefs[p.type] = { emailEnabled: p.isEnabled };
+    }
+  }
+
+  return newPrefs;
+}
+
+function assertPreferenceUpdateSucceeded(
+  response: Awaited<ReturnType<typeof updateNotificationPreferences>>
+) {
+  if (response.error) {
+    throw new Error("Failed to update notification preferences");
+  }
+}
+
 export default function NotificationSettingsScreen() {
   const router = useRouter();
 
-  const { data: prefsData, mutate } = useSWR<INotificationPref[]>(
-    "/notifications/preferences",
-    () => api.get<{ data: INotificationPref[] }>("/notifications/preferences").then((r) => r.data),
-    { revalidateOnFocus: false }
-  );
+  const { data: prefsData, mutate } = useNotificationPreferences();
 
   const [globalEnabled, setGlobalEnabled] = useState(true);
   const [prefs, setPrefs] = useState<PreferencesMapType>(DEFAULT_PREFS);
@@ -35,20 +50,15 @@ export default function NotificationSettingsScreen() {
 
   useEffect(() => {
     if (!prefsData) return;
-    const newPrefs: PreferencesMapType = { ...DEFAULT_PREFS };
-    for (const p of prefsData) {
-      if (p.channel === "N01" && newPrefs[p.type]) {
-        newPrefs[p.type] = { emailEnabled: p.isEnabled };
-      }
-    }
-    setPrefs(newPrefs);
+    setPrefs(mapNotificationPreferences(prefsData));
   }, [prefsData]);
 
   const handleGlobalToggle = async (value: boolean) => {
     setGlobalEnabled(value);
     setIsSaving(true);
     try {
-      await api.put("/notifications/preferences", { globalEnabled: value });
+      const response = await updateNotificationPreferences({ globalEnabled: value });
+      assertPreferenceUpdateSucceeded(response);
       mutate();
     } catch {
       setGlobalEnabled(!value);
@@ -62,9 +72,10 @@ export default function NotificationSettingsScreen() {
     setPrefs((p) => ({ ...p, [notificationType]: { emailEnabled } }));
     setIsSaving(true);
     try {
-      await api.put("/notifications/preferences", {
-        preferences: [{ type: notificationType, channel: "N01", isEnabled: emailEnabled }],
+      const response = await updateNotificationPreferences({
+        preferences: [{ type: notificationType, channel: "N01" as const, isEnabled: emailEnabled }],
       });
+      assertPreferenceUpdateSucceeded(response);
       mutate();
     } catch {
       setPrefs((p) => ({ ...p, [notificationType]: prev ?? { emailEnabled: true } }));

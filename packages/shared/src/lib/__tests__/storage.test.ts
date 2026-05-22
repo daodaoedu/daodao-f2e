@@ -10,6 +10,7 @@ describe("getStorageKey", () => {
     expect(getStorageKey(StorageEnum.ManualPracticeDraft)).toBe("_manualpracticedraft");
     expect(getStorageKey(StorageEnum.ActionMaker)).toBe("_actionmaker");
     expect(getStorageKey(StorageEnum.AuthSignal)).toBe("_authsignal");
+    expect(getStorageKey(StorageEnum.HomeFeedAnchor)).toBe("_homefeedanchor");
   });
 });
 
@@ -23,6 +24,7 @@ describe("StorageEnum", () => {
     expect(keys).toContain("ManualPracticeDraft");
     expect(keys).toContain("ActionMaker");
     expect(keys).toContain("AuthSignal");
-    expect(keys).toHaveLength(7);
+    expect(keys).toContain("HomeFeedAnchor");
+    expect(keys).toHaveLength(8);
   });
 });

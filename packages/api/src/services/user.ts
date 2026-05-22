@@ -3,8 +3,7 @@
  * 提供用戶相關的 API 調用函數和 Hooks
  */
 
-import { getRequiredEnv } from "@daodao/config";
-import { client, unauthorizedHandler } from "../client";
+import { client, getApiBaseUrl, unauthorizedHandler } from "../client";
 import type { components, paths } from "../types";
 
 // ============================================================================
@@ -62,11 +61,12 @@ type CreateUserRequest = paths["/api/v1/users"]["post"]["requestBody"] extends {
 }
   ? T
   : never;
-type UpdateUserRequest = paths["/api/v1/users/{id}"]["put"]["requestBody"] extends {
-  content: { "application/json": infer T };
-}
-  ? T
-  : never;
+type UpdateUserRequest =
+  NonNullable<paths["/api/v1/users/{id}"]["put"]["requestBody"]> extends {
+    content: { "application/json": infer T };
+  }
+    ? T
+    : never;
 type UpdatePreferencesRequest = components["schemas"]["UpdatePreferencesRequest"];
 type UserPreferencesResponse =
   paths["/api/v1/users/me/preferences"]["get"]["responses"]["200"]["content"]["application/json"];
@@ -163,7 +163,7 @@ export const getUserProfileByIdentifier = async (
   identifier: string,
   token?: string
 ): Promise<UserProfileResponse> => {
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const baseUrl = getApiBaseUrl();
   const headers: Record<string, string> = {};
   if (token) {
     headers.Authorization = `Bearer ${token}`;
@@ -299,7 +299,7 @@ const sendUserFormDataRequest = async <T>(
   formData: FormData,
   errorMessage: string
 ): Promise<T> => {
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const baseUrl = getApiBaseUrl();
   const response = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/users/me`, {
     method,
     body: formData,
@@ -492,7 +492,7 @@ export interface SettingsSummary {
  * 獲取設定頁完整度摘要
  */
 export const getSettingsSummary = async (): Promise<SettingsSummary> => {
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const baseUrl = getApiBaseUrl();
   const response = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/users/settings-summary`, {
     method: "GET",
     credentials: "include",

@@ -12,6 +12,245 @@
 
 ---
 
+## Progress Update - 2026-05-17
+
+**Current status:** Phase 1 implementation is complete in branch `fix/mobile-align-desktop`.
+
+**Task status source of truth:** use the checklists in **Dependency and Parallelization Map**, **Roadmap After Phase 1**, and **2026-05-17 Progress Update**. Older step-by-step task blocks below are retained as implementation notes and may include historical unchecked steps.
+
+## Web Parity Status - 2026-05-18
+
+**Current status:** implementation coverage for the planned mobile P0/P1/P2 parity work is complete, but mobile is **not yet 100% aligned with web/product behavior**. The remaining work is primarily authenticated runtime verification plus smaller product-polish gaps called out below.
+
+**Completed implementation coverage:**
+- [x] P0 route parity: notifications, `users/[identifier]`, practice summary, and check-in detail deep-link targets.
+- [x] P1 route/settings parity: social tab, `me/footprints`, `settings/following`, and `settings/connections`.
+- [x] P2 settings/resource parity: `settings/interaction`, `settings/preferences`, `settings/public-info`, resource list, and resource detail.
+- [x] Notification parity additions: reaction emoji display, `PracticeCreated`, connection response local state, and deep links.
+- [x] Showcase reaction cache invalidation after successful reaction updates.
+- [x] Settings public-info country/city selector parity using `useCountries` / `useCities`.
+- [x] Settings public-info structured server-field validation for backend error details.
+- [x] Resource category routes: `/resource/categories` and `/resource/categories/[...categories]`.
+- [x] Resource detail category breadcrumb-like navigation, updated date, and disabled reviews placeholder aligned with web.
+- [x] Check-in detail date selector and same-day navigation.
+- [x] Check-in detail edit/update mutation for mood, note, and tags while preserving existing images.
+- [x] Connection-status robustness: backend `GET /api/v1/connections/status/{userId}` now returns single-user status/request metadata, and mobile user profile uses it instead of inferring from the first 100 connection/request rows.
+- [x] Plan progress updated to distinguish implemented scope from runtime/product-polish residuals.
+
+**Not finished yet:**
+- [ ] Authenticated iOS runtime verification: confirm login, authenticated `@daodao/api` requests, no unexpected 401, and `Authorization: Bearer ...` on mobile requests.
+- [ ] Auth refresh runtime verification: confirm 401 refresh re-reads the latest token and retries successfully.
+- [ ] Android runtime smoke: blocked because `adb` is not installed in the current environment.
+- [ ] iOS local native runtime smoke: blocked because `com.daodao.app` is not installed locally and `expo run:ios` fails during CocoaPods/Ruby encoding plus signing-certificate setup.
+- [ ] Notification runtime pass: verify read/read-all, connection accept/reject, and deep links to user / practice / comment / check-in / buddy request after login.
+- [ ] Practice runtime pass: verify check-in card navigation, check-in detail behavior, completed-practice summary entry, native share, and save-to-gallery on device/simulator.
+- [ ] Social runtime pass: verify requests/connections/following/followers lists and follow/connect/disconnect actions with authenticated data.
+- [ ] Footprints runtime pass: verify learning-footprint list, deleted-practice state, date formatting, and practice links with authenticated data.
+
+**Completed:**
+- [x] Created isolated worktree for `daodao-f2e`.
+- [x] Initialized `projects/daodao-f2e` submodule and created branch `fix/mobile-align-desktop`.
+- [x] Moved `next` from `@daodao/api` dependencies to optional peer dependency.
+- [x] Added mobile token provider and mobile baseUrl override to `packages/api/src/client.ts`.
+- [x] Kept web/product auth on cookie credentials while mobile uses `Authorization: Bearer ...`.
+- [x] Added 401 refresh retry path that re-reads the latest mobile token before retrying.
+- [x] Exported `initMobileClient`, `clearMobileClient`, `setMobileTokenProvider`, and `clearMobileTokenProvider`.
+- [x] Added `refreshTokens()` to `apps/mobile/services/auth-storage.ts`.
+- [x] Initialized the shared API client from `apps/mobile/providers/AuthProvider.tsx`.
+- [x] Added regression tests for web cookie auth, mobile bearer auth, refresh retry, and mobile baseUrl override.
+- [x] Fixed the mobile typed-route typecheck blocker in `ShowcaseCard`.
+- [x] Fixed stale shared storage tests for `HomeFeedAnchor` and limited shared Vitest to `src` tests.
+
+**Automated verification:**
+- [x] `pnpm --filter @daodao/api test`
+- [x] `pnpm --filter @daodao/api typecheck`
+- [x] `pnpm --filter @daodao/mobile typecheck`
+- [x] `pnpm run lint` (passes with existing warnings)
+- [x] `pnpm run typecheck`
+- [x] `pnpm test`
+- [x] `pnpm --filter @daodao/mobile exec expo export --platform ios --output-dir /private/tmp/daodao-mobile-ios-export`
+
+**Still pending before declaring Phase 1 fully accepted:**
+- [x] iOS dev-client runtime smoke: EAS build installs, Metro connects, app reaches login screen.
+- [ ] Login runtime verification: call an authenticated `@daodao/api` hook, confirm no 401.
+- [ ] Confirm network requests include `Authorization: Bearer ...` on mobile.
+- [x] Commit using the repository commit flow after user confirmation.
+
+## Dependency and Parallelization Map
+
+**Sequential gates:**
+- [x] Phase 1 iOS dev-client smoke must pass before large-scale hooks migration.
+- [x] Phase 2 hooks migration must finish for each domain before P0 screens in that domain are fully wired to data.
+- [x] Removing `apps/mobile/services/api-client.ts` must wait until all mobile callers have migrated to `@daodao/api`.
+- [ ] Login/authenticated API runtime verification remains required before declaring the auth bridge fully accepted.
+
+**Can run in parallel now:**
+- [ ] Login/authenticated runtime verification on iOS.
+- [ ] Android runtime smoke.
+- [x] Phase 2 hook caller inventory: list every caller of `useCurrentUser`, `usePractices`, practice detail/check-in hooks, and `api-client.ts`.
+- [x] Product vs mobile parity audit for notifications, users, practice summary, check-in detail, social, settings, and resource screens.
+- [x] UI route scaffolds for missing P0 pages, as long as data wiring waits for the relevant hooks.
+- [x] P1/P2 implementation tracks: social hub, footprints, resource screens, and remaining settings parity.
+
+**Runtime verification blockers - 2026-05-18:**
+- iOS runtime login verification is blocked locally: iPhone 16 Pro simulator booted, but `com.daodao.app` is not installed. `expo run:ios --device 2CEE9ED2-B95E-4DA6-AF21-CCE0F0F2C18A` generated the native iOS project and then failed during CocoaPods/code-signing setup (`Unicode Normalization not appropriate for ASCII-8BIT` plus no available signing certificates). The generated `apps/mobile/ios` directory was removed after the failed run.
+- Android runtime smoke still needs Android platform tools/device access. `adb` is not installed in the current environment.
+
+**Recommended tracks:**
+- **Track A - Verification and API foundation:** manual runtime verification, auth bridge runtime fixes, confirm web cookie auth remains unchanged.
+- **Track B - Hooks migration:** inventory first, then migrate one hook group at a time; depends on Track A passing.
+- **Track C - Parity audit and UI scaffolds:** can proceed during Track A/B; avoid committing data-flow assumptions before hooks stabilize.
+- **Track D - P0 page implementation:** can be split by page after the page's required hooks are stable.
+
+**Hook migration dependency order:**
+- [x] `useCurrentUser` -> `@daodao/api` user hook.
+- [x] `usePractices` -> `useMyPractices()` plus mobile derived-state wrapper.
+- [x] Practice detail hooks -> `usePracticeById()`.
+- [x] Check-in list/create hooks -> `usePracticeCheckIns()` and `useCreateCheckIn()`.
+- [x] Delete retired mobile `api-client.ts` only after caller count is zero.
+
+## Phase 2 Caller Inventory - 2026-05-17
+
+**Batch 1 - Current user and settings profile data**
+
+| Current mobile API | Callers | Target replacement | Notes |
+|---|---|---|---|
+| `apps/mobile/hooks/useCurrentUser.ts` | `(tabs)/profile.tsx`, `settings/account.tsx`, `settings/public-info.tsx`, `settings/interaction.tsx`, `settings/following.tsx` | `@daodao/api` `useCurrentUser()` | Keep mobile wrapper return shape `{ user, isLoading, error, mutate }` first to minimize UI churn. |
+| `api.put("/users/me")` | `settings/account.tsx`, `settings/public-info.tsx`, `settings/interaction.tsx` | `@daodao/api` `useUserMutations().updateCurrentUser()` | Can migrate after read hook is stable. |
+| `api.get("/users/preferences/available")`, `api.put("/users/me/preferences")` | `settings/preferences.tsx` | `useAvailablePreferences()`, `useUserMutations().updateCurrentUserPreferences()` or `updateCurrentUserPreferences()` | Independent of practice migration. |
+
+**Batch 2 - Practices dashboard and detail**
+
+| Current mobile API | Callers | Target replacement | Notes |
+|---|---|---|---|
+| `apps/mobile/hooks/usePractices()` | `(tabs)/index.tsx`, `(tabs)/showcase.tsx`, `(tabs)/profile.tsx`, internal `useCheckIn()` | `useMyPractices()` + `useMyPracticeStats()` + mobile derived-state wrapper | Preserve `inProgressTasks`, `completedTasks`, `stats` shape for existing cards. |
+| `usePractice(id)` | `practices/[id]/index.tsx`, `practices/[id]/calendar.tsx` | `usePracticeById(id)` wrapper | Keep `{ practice, isLoading, error, mutate }` shape during transition. |
+| `useCheckIns(id)` | `practices/[id]/index.tsx`, `practices/[id]/calendar.tsx`, `PublicPracticeView.tsx` | `usePracticeCheckIns(id)` wrapper | Preserve `checkIns` and `checkInDates`. |
+| `useCheckIn()` | `practices/[id]/index.tsx` | `useCreateCheckIn()` if available; otherwise add missing mutation wrapper in `@daodao/api` | Verify actual API path: mobile currently calls `/practices/{id}/check-in`, API package uses `/api/v1/practices/{id}/checkins`. |
+| `api.post("/practices")` | `practices/create/manual/step5.tsx` | `@daodao/api` create practice mutation | Can run after dashboard wrapper is stable. |
+| `api.post("/practices/{id}/unarchive")` | `settings/archived.tsx` | `useUnarchivePractice()` | Independent small migration. |
+
+**Batch 3 - Social interactions**
+
+| Current mobile API | Callers | Target replacement | Notes |
+|---|---|---|---|
+| `apps/mobile/hooks/useFollow.ts` | `PublicPracticeView.tsx`, `settings/following.tsx` direct follow APIs | `@daodao/api` `useFollowStatus()`, `useFollowMutations()`, `useFollowing()` | Current API package follow helpers use `unauthorizedHandler.wrapFetch`; verify they work with mobile token provider. |
+| `apps/mobile/hooks/useComments.ts` | `CommentSection.tsx`, `PublicPracticeView.tsx` | `@daodao/api` `useComments()` plus mutation functions from `comments.ts` | Comment mutations are service functions, not a combined hook today. |
+| `apps/mobile/hooks/useReactions.ts` | `PublicPracticeView.tsx`, `ShowcaseCard` reaction mutations | `@daodao/api` `useReactions()`, `useReactionsList()`, `upsertReaction()`, `removeReaction()` | Preserve mobile derived fields `totalCount`, `displayReactions`, `firstReactorName`. |
+
+**Batch 4 - Notifications and connections**
+
+| Current mobile API | Callers | Target replacement | Notes |
+|---|---|---|---|
+| `apps/mobile/hooks/useNotifications.ts` | `(tabs)/notifications.tsx` | `@daodao/api` `useNotifications()`, notification service mutations | Existing mobile hook also exposes `unreadCount`; keep wrapper while migrating screen. |
+| Direct `api.get/post/delete` connection calls | `settings/connections.tsx`, notifications response action | `useConnections()`, `useIncomingConnectionRequests()`, `useOutgoingConnectionRequests()`, `useConnectionMutations()` | API service currently uses `/connections/request...` in places; compare with mobile `/connections/requests...` before replacing. |
+| Direct notification preference calls | `settings/notifications.tsx` | `useNotificationPreferences()`, `updateNotificationPreferences()` | Independent settings migration. |
+
+**Batch 5 - AI backend / showcase feed**
+
+| Current mobile API | Callers | Target replacement | Notes |
+|---|---|---|---|
+| `useShowcaseFeed()` via `apiClient` absolute AI URL | `(tabs)/index.tsx`, `(tabs)/showcase.tsx` | Shared AI API client for `daodao-ai-backend` | Project has two shared backends: `daodao-server` and `daodao-ai-backend`. This belongs to the AI backend boundary, not the `@daodao/api` client for `daodao-server`. |
+| `useShowcaseSuggestions()` via `apiClient` absolute AI URL | `showcase-search-bar.tsx` | Shared AI API client for `daodao-ai-backend` | Align mobile and product/web AI API usage through an AI client/wrapper instead of treating this as mobile-only. |
+
+**Suggested execution order:**
+- [x] Batch 1 read-only `useCurrentUser` wrapper migration.
+- [x] Batch 2 `usePractices` derived wrapper migration.
+- [x] Batch 2 practice detail/check-ins migration.
+- [x] Batch 3 social wrappers, preserving current mobile return shapes.
+- [x] Batch 4 notifications/settings/connections.
+- [x] Batch 2 create/check-in/archive mutations.
+- [x] Re-scan `api-client.ts` callers; both `daodao-server` and `daodao-ai-backend` mobile callers have migrated away from `apps/mobile/services/api-client.ts`.
+
+**Batch 2 progress notes - 2026-05-17:**
+- [x] `usePractices()` now reads `useMyPractices({ limit: 16 })` and `useMyPracticeStats()`.
+- [x] `usePractice(id)` now reads `getPracticeById(id)` and maps the API envelope into the existing mobile `IPractice` shape.
+- [x] `useCheckIns(id)` now reads `getPracticeCheckIns(id)` and maps API check-in entities into existing mobile `ICheckIn` strings.
+- [x] `useCheckIn()` now posts through `createPracticeCheckIn()` and refreshes both OpenAPI cache keys and mobile wrapper SWR keys.
+- [x] `practices/create/manual/step5.tsx` now posts through `createPractice()` with a mobile-form-to-OpenAPI mapping step.
+- [x] `settings/archived.tsx` now uses `useMyPractices({ status: "archived", limit: 100 })` and `useUnarchivePractice()`.
+- [ ] Practice detail streak fields (`currentStreak`, `longestStreak`) are defaulted because current API detail response does not expose them in the mobile shape.
+  - Blocked on API contract: frontend cannot display accurate streak values until the practice detail response includes these fields or exposes an equivalent stats endpoint.
+
+**Batch 3 progress notes - 2026-05-17:**
+- [x] `useFollowStatus()`, `followTarget()`, and `unfollowTarget()` now delegate to `@daodao/api` while preserving the mobile wrapper API.
+- [x] `useComments()` now reads comments through `@daodao/api` and maps numeric API comment ids back to mobile string ids.
+- [x] `createComment()`, `updateComment()`, and `deleteComment()` now use `@daodao/api` service functions; update/delete validate numeric comment ids before calling the API.
+- [x] `useReactions()` and `useReactionsList()` now delegate to `@daodao/api` while preserving `totalCount`, `displayReactions`, and `firstReactorName`.
+- [x] `upsertReaction()` and `removeReaction()` now follow the generated API contract; `removeReaction()` sends `targetType` and `targetId` in the DELETE body instead of query params.
+- [x] Confirm follow runtime env alignment: shared raw-fetch services now resolve through `getApiBaseUrl()`, while mobile initialization uses `EXPO_PUBLIC_API_URL`.
+- [x] Confirm comment/reaction mutation cache invalidation behavior in the screens that call these wrappers.
+
+**Batch 4 progress notes - 2026-05-17:**
+- [x] `useNotifications()` now reads through `@daodao/api` `getNotifications()` while preserving the mobile return shape and SWR key matcher.
+- [x] Notification read/read-all mutations now delegate to `@daodao/api` service functions.
+- [x] Notification connection response action now delegates to shared connection service endpoint `/api/v1/connections/request/{requestId}`.
+- [x] `settings/notifications.tsx` now uses `useNotificationPreferences()` and `updateNotificationPreferences()` with local mapping for response envelopes.
+- [x] `settings/connections.tsx` now uses shared connection hooks/services and maps the API envelope into the existing mobile display shape.
+- [x] Notification deep-link route targets are no longer blocked by missing mobile `users/[identifier]` and check-in detail routes.
+- [x] Connection/profile row navigation should be rechecked now that mobile `users/[identifier]` exists.
+
+**Final `api-client.ts` caller scan - 2026-05-17:**
+- [x] `rg` found no remaining `@/services/api-client` imports or direct `api.get/post/put/delete/patch` calls in `apps/mobile`.
+- [x] AI/showcase feed now uses `apps/mobile/services/ai-api-client.ts`, a `daodao-ai-backend` client wrapper around `EXPO_PUBLIC_AI_API_URL`.
+- [x] User/settings writes now use `@daodao/api` user hooks/services.
+- [x] Follow settings screen now uses shared follow query/mutation wrappers.
+- [x] Practice create/archive now use shared practice services/hooks.
+- [x] `@daodao/api` `UpdateUserRequest` type source was fixed with `NonNullable<requestBody>` so mobile screens no longer need local mutation casts.
+- [x] Retired `apps/mobile/services/api-client.ts`; `ai-api-client.ts` now owns AI backend Bearer auth, 401 refresh retry, timeout, and JSON response parsing.
+- [x] Raw-fetch services in `@daodao/api` now resolve base URL through `getApiBaseUrl()`, so mobile uses `initMobileClient({ baseUrl })` instead of requiring `NEXT_PUBLIC_API_URL`.
+
+## Roadmap After Phase 1
+
+**Phase 2 - Hooks Migration**
+- [x] Replace `apps/mobile/hooks/useCurrentUser.ts` with `@daodao/api` user hook.
+- [x] Replace `apps/mobile/hooks/usePractices.ts` with `useMyPractices()` plus a mobile wrapper for derived groups.
+- [x] Replace practice detail/check-in hooks with `usePracticeById()`, `usePracticeCheckIns()`, and `useCreateCheckIn()`.
+- [x] Replace social follow/comment/reaction wrappers with `@daodao/api` services/hooks.
+- [x] Replace notifications and connection settings calls with `@daodao/api` services/hooks.
+- [x] Remove retired calls to `apps/mobile/services/api-client.ts`.
+- [x] Delete `apps/mobile/services/api-client.ts` after confirming no remaining mobile imports depend on it.
+- [x] Align raw-fetch services (`follow`, `connection`, profile/FormData, image, reactions, footprints) with the mobile base URL override.
+
+**Phase 3 - P0 Screen Parity**
+- [x] Add mobile `users/[identifier]`.
+- [x] Add mobile `practices/[id]/summary`.
+- [x] Add mobile `practices/[id]/check-ins/[checkInId]`.
+- [x] Wire notification deep links to user / practice / comment / check-in / buddy request targets.
+- [x] Compare mobile notifications with product `/notifications` and fill remaining non-P0 behavior.
+
+**Phase 4 - Social and Navigation**
+- [x] Add mobile social tab aligned with product `/social`.
+- [x] Add `me/footprints`.
+- [x] Migrate `settings/following` and `settings/connections` API calls off mobile `api-client`.
+- [x] Review `settings/following` and `settings/connections` UI/navigation parity after `users/[identifier]`.
+
+**Phase 5 - P2 Parity**
+- [x] Migrate settings `interaction`, `preferences`, and `public-info` writes to `@daodao/api`.
+- [x] Review and align settings `interaction`, `preferences`, and `public-info` UI parity.
+- [x] Port resource screens needed on mobile.
+
+## Phase 3-5 Product vs Mobile Parity Audit - 2026-05-17
+
+Local inspection only; no runtime verification performed. Product references are under `apps/product/src`, mobile references are under `apps/mobile`.
+
+| Area | Current mobile status | Product reference path | Gap | Suggested priority / parallelization |
+|---|---|---|---|---|
+| Notifications | `app/(tabs)/notifications.tsx` now reads through `@daodao/api`, supports read/read-all, connection response actions, local response state, reaction emoji display, created-practice notifications, and deep links to user / practice / comment / check-in / buddy request targets. | `app/[locale]/(with-layout)/notifications/page.tsx`, `components/notifications/notification-list.tsx`, `components/notifications/notification-item.tsx` | Still needs authenticated runtime verification and a product-behavior pass for recency sections and edge-case targets. | P0 route dependency is complete. Remaining work is runtime verification plus non-P0 UI polish. |
+| `users/[identifier]` | Mobile route exists with identifier lookup, public profile fields, stats/social links, public practices, follow/unfollow, and connection actions. Connection state now reads from backend single-user `GET /api/v1/connections/status/{userId}` instead of inferring from paginated list samples. | `app/[locale]/(with-layout)/users/[identifier]/page.tsx`, `components/user`, `components/practice` | Needs authenticated runtime verification. | P0/product parity implemented. Remaining work is runtime verification. |
+| `practices/[id]/summary` | Mobile route exists with `usePracticeSummary`, summary card, native image share, save-to-gallery, and fallback text share. | `app/[locale]/practices/[id]/summary/page.tsx`, `components/practice/summary` | Needs authenticated runtime verification for owner/eligibility states and actual native share/gallery behavior. | P0 implemented. Residual is runtime verification. |
+| `practices/[id]/check-ins/[checkInId]` | Mobile route exists, `CheckInList` navigates to detail when `practiceId` is available, and detail now includes a date selector, same-day previous/next navigation, and edit/update mutation for mood, note, and tags while preserving existing images. | `app/[locale]/practices/[id]/check-ins/[checkInId]/page.tsx`, `components/check-in` | Needs authenticated runtime verification. | P0/product parity implemented. Remaining work is runtime verification. |
+| Social | Mobile `app/(tabs)/social.tsx` route/tab now exists and consolidates connection requests, connections, following, and followers with profile navigation and follow/connection actions. | `app/[locale]/(with-layout)/social/page.tsx`, `components/social/social-hub.tsx` | Needs authenticated runtime verification and product-level visual polish. | P1 implemented. Remaining work is runtime verification. |
+| `me/footprints` | Mobile `app/me/footprints.tsx` route now exists with learning-footprint list, loading/empty states, deleted-practice handling, date formatting, and practice links. | `app/[locale]/(with-layout)/me/footprints/page.tsx`, `components/me/footprints-list.tsx`, `@daodao/api` `useMyFootprints` | Needs authenticated runtime verification. | P1 implemented. Remaining work is runtime verification. |
+| `settings/following` | `app/settings/following.tsx` now uses shared follow query/mutation wrappers and navigates user/practice text to the relevant detail routes. | `app/[locale]/(with-layout)/settings/following/page.tsx`, `components/settings/following/following-settings.tsx` | Needs authenticated runtime verification. | P1 implemented. Remaining work is runtime verification. |
+| `settings/connections` | `app/settings/connections.tsx` now uses shared connection hooks/services, maps API envelopes to the mobile display shape, and navigates user rows to `users/[identifier]`. | `app/[locale]/(with-layout)/settings/connections/page.tsx`, `components/settings/connections/connections-settings.tsx` | Needs authenticated runtime verification. | P1 implemented. Remaining work is runtime verification. |
+| `settings/interaction` | `app/settings/interaction.tsx` now writes through `@daodao/api` user mutation and surfaces update failures. | `app/[locale]/(with-layout)/settings/interaction/page.tsx`, `components/settings/interaction/interaction-settings.tsx` | Needs authenticated runtime verification and optional optimistic rollback polish. | P2 implemented. Remaining work is runtime verification/polish. |
+| `settings/preferences` | `app/settings/preferences.tsx` now reads/writes preferences through `@daodao/api`, disables unchanged saves, and guards dirty back navigation. | `app/[locale]/(with-layout)/settings/preferences/page.tsx`, `components/settings/preferences` | Needs authenticated runtime verification and server-field validation parity if backend returns structured errors. | P2 implemented. Remaining work is runtime verification/polish. |
+| `settings/public-info` | `app/settings/public-info.tsx` now writes profile fields through `@daodao/api`, supports avatar picking/preview, uploads avatar through FormData, guards dirty back navigation, provides country/city selectors via `useCountries` / `useCities`, and maps backend validation details to fields. | `app/[locale]/(with-layout)/settings/public-info/page.tsx`, `components/settings/public-info` | Needs authenticated runtime verification. | P2 implemented. Remaining work is runtime verification. |
+| Resource screens | Mobile `app/resource/index.tsx`, `app/resource/[resourceId].tsx`, `app/resource/categories/index.tsx`, and `app/resource/categories/[...categories].tsx` now provide resource list/search/load-more, category filters, detail display, category breadcrumb-like navigation, disabled reviews placeholder, open/share actions, tags, metrics, updated date, and contributor info. | `app/[locale]/resource/page.tsx`, `app/[locale]/resource/[resourceId]/page.tsx`, `app/[locale]/resource/categories/page.tsx`, `app/[locale]/resource/categories/[...categories]/page.tsx`, `components/resource` | Needs runtime verification. | P2/product parity implemented. Remaining work is runtime verification. |
+
+---
+
 ## File Map
 
 | 檔案 | 動作 | 責任 |
@@ -686,14 +925,110 @@
 
 ## 完成標準
 
-- [ ] `pnpm --filter @daodao/api typecheck` 通過
-- [ ] `pnpm --filter @daodao/mobile typecheck` 通過
+- [x] `pnpm --filter @daodao/api typecheck` 通過
+- [x] `pnpm --filter @daodao/mobile typecheck` 通過
 - [ ] Mobile app 登入後，`useCurrentUser()` 回傳正確的用戶資料（非 401 錯誤）
 - [ ] Network request 帶有 `Authorization: Bearer xxx` header（可用 Proxyman/Charles 確認）
-- [ ] `apps/product` 行為不受任何影響（web app 仍用 cookie auth）
+- [x] `apps/product` 行為不受任何影響（web app 仍用 cookie auth）
 - [ ] 所有改動已 commit
 
 ## 後續計畫
 
 - **Plan 2**：Hooks 遷移（Phase 2）— 以 `@daodao/api` hooks 取代 mobile 自建的 `usePractices.ts`、`useCurrentUser.ts` 等，並刪除 `services/api-client.ts`
 - **Plan 3**：P0 新頁面（Phase 3）— notifications、users/[identifier]、practices/[id]/summary、check-ins/[checkInId]
+
+---
+
+## 2026-05-17 Progress Update
+
+### 已完成
+
+- Phase 1 auth bridge 已完成：
+  - `@daodao/api` 支援 mobile Bearer token provider。
+  - `AuthProvider` 初始化 shared API client。
+  - Web/product cookie auth 保持原行為。
+- Phase 2 hooks/client 遷移已完成：
+  - Mobile 移除 `apps/mobile/services/api-client.ts`。
+  - `daodao-server` 呼叫統一走 `@daodao/api`。
+  - `daodao-ai-backend` 呼叫保留獨立 `apps/mobile/services/ai-api-client.ts`，因專案本來就有兩個後端。
+  - raw fetch services 改用 `getApiBaseUrl()`，避免 Expo runtime 直接依賴 `NEXT_PUBLIC_API_URL`。
+- P0 route parity 已補上並接入入口：
+  - `apps/mobile/app/users/[identifier].tsx`
+  - `apps/mobile/app/practices/[id]/summary.tsx`
+  - `apps/mobile/app/practices/[id]/check-ins/[checkInId].tsx`
+  - `CheckInList` 支援點擊打卡紀錄進入 check-in detail。
+  - practice detail 完成狀態顯示「查看實踐總結」入口。
+  - notifications deeplink 支援 user / practice / comment / checkin / buddy_request。
+- P1 parity gaps 已補上：
+  - user profile 顯示公開實踐列表，點擊可進 practice detail。
+  - user profile 支援送出、撤回、同意、忽略、解除連結操作。
+  - summary 支援 capture 圖片、native image share、保存到相簿；失敗時 fallback 純文字分享。
+  - connection 狀態目前以 `getConnections` / incoming / outgoing 前 100 筆保守推導，後端若補單一 user connection status endpoint 可再替換。
+
+### 驗證狀態
+
+- 已通過：
+  - `pnpm --filter @daodao/api test`
+  - `pnpm --filter @daodao/api typecheck`
+  - `pnpm --filter @daodao/mobile typecheck`
+  - `pnpm --filter @daodao/mobile lint`
+  - `pnpm run lint`
+  - `pnpm run typecheck`
+  - `pnpm test`
+- 2026-05-17 P1 parity 接入後再次通過：
+  - `pnpm --filter @daodao/mobile typecheck`
+  - `pnpm --filter @daodao/mobile lint`
+  - `pnpm run typecheck`
+  - `pnpm run lint`
+  - `pnpm test`
+- 2026-05-18 P1/P2 parity 接入後通過：
+  - `pnpm --filter @daodao/mobile typecheck`
+  - `pnpm --filter @daodao/mobile lint`
+  - `pnpm --filter @daodao/api typecheck`
+  - `pnpm --filter @daodao/product typecheck`
+  - `pnpm run lint`
+  - `pnpm run typecheck`
+  - `pnpm test`
+  - `pnpm --filter @daodao/mobile exec expo export --platform ios --output-dir /private/tmp/daodao-mobile-ios-export`
+  - `git diff --check`
+- 2026-05-18 runtime 啟動嘗試：
+  - `adb devices` 無法執行；目前環境沒有 Android platform tools。
+  - iPhone 16 Pro simulator (`2CEE9ED2-B95E-4DA6-AF21-CCE0F0F2C18A`) 可 boot，但沒有安裝 `com.daodao.app`。
+  - `pnpm --filter @daodao/mobile exec expo run:ios --device 2CEE9ED2-B95E-4DA6-AF21-CCE0F0F2C18A` 未能完成 native run；CocoaPods/Ruby encoding 報 `Unicode Normalization not appropriate for ASCII-8BIT`，並且本機缺少可用 iOS signing certificates。該指令生成的 `apps/mobile/ios` 目錄已移除。
+- 2026-05-17 runtime 啟動嘗試：
+  - `pnpm --filter @daodao/mobile dev:ios` 未能進入 app；本機 simulator 沒有安裝 development build（`com.daodao.app`）。
+  - `pnpm --filter @daodao/mobile dev` 可啟動 Metro，等待 development build 連線。
+  - `pnpm --filter @daodao/mobile dev:web` 不能作為替代 smoke test；web bundle 卡在既有依賴缺口 `@lottiefiles/dotlottie-react`（由 `lottie-react-native` web entry 引入）。
+- 2026-05-17 EAS / iOS runtime smoke：
+  - EAS iOS development build 成功：`36099648-154f-4a57-87e4-9c49bb10a9ac`。
+  - Build URL: `https://expo.dev/accounts/vincentxu/projects/daodao/builds/36099648-154f-4a57-87e4-9c49bb10a9ac`
+  - Artifact URL: `https://expo.dev/artifacts/eas/7F2dpjdwF3639auki5cxFA.tar.gz`
+  - 已安裝到本機 iPhone 16 simulator，透過 dev-client 連 Metro，app 可進入登入畫面。
+  - Smoke screenshot: `/tmp/daodao-ios-smoke4.png`
+  - 為通過 build/runtime，已補：
+    - `app.config.ts` 條件式 Firebase google-services 設定與 `ITSAppUsesNonExemptEncryption: false`。
+    - `expo-build-properties` + iOS `GoogleUtilities` modular headers，修正 Firebase pods static library module issue。
+    - Expo SDK 54 相容 native deps：`react-native-gesture-handler`、`react-native-reanimated`、`react-native-screens`、`react-native-safe-area-context`、`react-native-worklets`。
+    - `@lottiefiles/dotlottie-react`，修正 `lottie-react-native` web entry missing peer。
+    - `@daodao/api` base URL fallback，避免 Expo runtime import 時直接依賴 `NEXT_PUBLIC_API_URL`。
+    - Metro resolver alias `react` / JSX runtimes / `swr` 到 mobile app node_modules，避免 workspace package duplicate React 造成 invalid hook。
+
+### 仍未完成
+
+詳見上方 **Web Parity Status - 2026-05-18**。目前尚未完成的項目分為四類：
+
+- Runtime verification：
+  - 登入後 `@daodao/api` requests 帶 Bearer token。
+  - 401 refresh 後會以新 token retry。
+  - notifications 能正確跳到 user / practice / comment / check-in / buddy request。
+  - practice detail 的 check-in card 能跳 detail。
+  - completed practice 能進 summary。
+  - summary native share / save-to-gallery 能在裝置或 simulator 正常運作。
+- Environment blockers：
+  - iOS local native run 目前卡在 CocoaPods/Ruby encoding 與 signing certificates。
+  - Android runtime smoke 目前卡在缺少 `adb`。
+  - 本機 dev build 因沒有 google-services config，Firebase Analytics 會出現 non-blocking initialization warning。
+  - Tamagui 仍有既有 font-size warning。
+  - `expo install --check` 仍回報較廣的 SDK 54 dependency drift；本次只調整 build/runtime blocking 的套件。
+- Data/API robustness：
+  - connection 狀態仍依賴列表推導；大量連結/請求超過 100 筆時，目標用戶可能不在本次查詢結果。
