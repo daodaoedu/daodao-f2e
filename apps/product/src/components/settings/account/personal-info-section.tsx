@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import {
   FormControl,
   FormField,
@@ -32,6 +33,8 @@ interface PersonalInfoSectionProps {
 }
 
 export const PersonalInfoSection = ({ form, educationStageOptions }: PersonalInfoSectionProps) => {
+  const t = useTranslations("app_product");
+
   return (
     <div className="bg-white rounded-xl p-4 space-y-4">
       {/* Email */}
@@ -66,7 +69,9 @@ export const PersonalInfoSection = ({ form, educationStageOptions }: PersonalInf
 
           return (
             <FormItem>
-              <FormLabel className="block font-medium text-text-dark mb-3">生日</FormLabel>
+              <FormLabel className="block font-medium text-text-dark mb-3">
+                {t("account_birthday")}
+              </FormLabel>
               <FormControl>
                 <div className="relative">
                   <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-light-gray" />
@@ -75,7 +80,7 @@ export const PersonalInfoSection = ({ form, educationStageOptions }: PersonalInf
                     value={date ? format(date, "yyyy/MM/dd") : ""}
                     disabled
                     className="pl-11 bg-very-light-gray"
-                    placeholder="尚未設定"
+                    placeholder={t("account_not_set")}
                   />
                 </div>
               </FormControl>
@@ -91,7 +96,9 @@ export const PersonalInfoSection = ({ form, educationStageOptions }: PersonalInf
         name="educationStage"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block font-medium text-text-dark mb-3">教育階段</FormLabel>
+            <FormLabel className="block font-medium text-text-dark mb-3">
+              {t("account_education_stage")}
+            </FormLabel>
             <FormControl>
               <Select
                 value={field.value}
@@ -112,7 +119,7 @@ export const PersonalInfoSection = ({ form, educationStageOptions }: PersonalInf
                   )}
                   aria-invalid={!!form.formState.errors.educationStage}
                 >
-                  <SelectValue placeholder="請選擇教育階段" />
+                  <SelectValue placeholder={t("account_education_stage_placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {educationStageOptions.map((option) => (

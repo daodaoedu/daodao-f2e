@@ -21,7 +21,7 @@ import { ReflectionQuestion } from "./components/reflection-question";
 import { TagSelector } from "./components/tag-selector";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
 import { useCheckInSubmit } from "./hooks/use-check-in-submit";
-import { type CheckInFormValuesType, checkInFormSchema } from "./schema";
+import { createCheckInFormSchema, type CheckInFormValuesType } from "./schema";
 
 export type { ICheckInFormData as CheckInData, ICheckInStatusOptions as CheckInStatusOptions };
 export type { CheckInStatusType as CheckInStatus } from "@/constants/check-in-status";
@@ -51,7 +51,7 @@ export const CheckInSheetContent = ({
   const t = useTranslations("check_in");
   const resolvedSubmitButtonText = submitButtonText ?? t("submit_check_in");
   const form = useForm<CheckInFormValuesType>({
-    resolver: zodResolver(checkInFormSchema),
+    resolver: zodResolver(createCheckInFormSchema(t)),
     defaultValues: {
       mood: initialValues?.mood ?? null,
       tags: initialValues?.tags ?? [],
@@ -275,7 +275,7 @@ export const CheckInPhase2SheetContent = ({
 }: ICheckInPhase2SheetContentProps) => {
   const t = useTranslations("check_in");
   const form = useForm<CheckInFormValuesType>({
-    resolver: zodResolver(checkInFormSchema),
+    resolver: zodResolver(createCheckInFormSchema(t)),
     defaultValues: {
       mood,
       tags: [],

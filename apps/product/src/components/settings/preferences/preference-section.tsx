@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRightOutlineSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import {
@@ -36,6 +37,7 @@ export const PreferenceSection = ({
   availableOptions,
   maxSelection,
 }: PreferenceSectionProps) => {
+  const t = useTranslations("app_product");
   const selectedOptionIds = form.watch(`preferences.${preferenceTypeId}`) || [];
 
   // 獲取已選選項的名稱
@@ -80,7 +82,7 @@ export const PreferenceSection = ({
         </div>
         {selectedOptionIds.length > 0 && (
           <Button type="button" variant="outline" size="sm" onClick={handleClear} className="h-9">
-            清空選項
+            {t("selection_clear")}
           </Button>
         )}
       </div>
@@ -110,7 +112,7 @@ export const PreferenceSection = ({
                   onClick={openPreferenceSelectionSheet}
                   className="w-full bg-logo-cyan text-white hover:bg-logo-cyan/90"
                 >
-                  編輯
+                  {t("edit")}
                   <ArrowRightOutlineSvg className="size-4.5" />
                 </Button>
               </div>

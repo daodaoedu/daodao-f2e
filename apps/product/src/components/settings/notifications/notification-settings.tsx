@@ -24,20 +24,36 @@ type PreferencesMap = Record<string, PreferenceState>;
 // ============================================================================
 
 const NOTIFICATION_TYPES = [
-  { type: "reaction", label: "反應", description: "有人對你的內容按了反應" },
-  { type: "comment", label: "留言與 @", description: "有人留言或 @ 提及了你" },
-  { type: "UserFollowed", label: "關注", description: "有人關注了你" },
-  { type: "Connect", label: "連結請求", description: "有人向你發出連結請求" },
-  { type: "ConnectAccepted", label: "連結確認", description: "對方同意了你的連結請求" },
-  { type: "update-practice-checkin", label: "關注的實踐更新", description: "你關注的實踐有新打卡" },
+  { type: "reaction", labelKey: "notif_type_reaction", descriptionKey: "notif_type_reaction_desc" },
+  { type: "comment", labelKey: "notif_type_comment", descriptionKey: "notif_type_comment_desc" },
+  { type: "UserFollowed", labelKey: "notif_type_follow", descriptionKey: "notif_type_follow_desc" },
+  { type: "Connect", labelKey: "notif_type_connect", descriptionKey: "notif_type_connect_desc" },
+  {
+    type: "ConnectAccepted",
+    labelKey: "notif_type_connect_accepted",
+    descriptionKey: "notif_type_connect_accepted_desc",
+  },
+  {
+    type: "update-practice-checkin",
+    labelKey: "notif_type_practice_checkin",
+    descriptionKey: "notif_type_practice_checkin_desc",
+  },
   {
     type: "PracticeCreated",
-    label: "關注的人開始實踐",
-    description: "你關注的人開始了新主題實踐",
+    labelKey: "notif_type_practice_created",
+    descriptionKey: "notif_type_practice_created_desc",
   },
-  { type: "BuddyRequest", label: "Buddy 請求", description: "有人邀請你成為實踐夥伴" },
-  { type: "WeeklyDigest", label: "週報", description: "每週一的島嶼探索摘要" },
-];
+  {
+    type: "BuddyRequest",
+    labelKey: "notif_type_buddy_request",
+    descriptionKey: "notif_type_buddy_request_desc",
+  },
+  {
+    type: "WeeklyDigest",
+    labelKey: "notif_type_weekly_digest",
+    descriptionKey: "notif_type_weekly_digest_desc",
+  },
+] as const;
 
 const DEFAULT_PREFS: PreferencesMap = Object.fromEntries(
   NOTIFICATION_TYPES.map((t) => [t.type, { emailEnabled: true }])
@@ -199,9 +215,9 @@ export const NotificationSettings = () => {
             return (
               <div key={item.type} className="flex items-center gap-3 px-4 py-3">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-text-dark">{item.label}</p>
+                  <p className="text-sm font-medium text-text-dark">{t(item.labelKey)}</p>
                   <p className="text-xs text-[#9FB5B8] mt-0.5 leading-relaxed">
-                    {item.description}
+                    {t(item.descriptionKey)}
                   </p>
                 </div>
                 <Toggle

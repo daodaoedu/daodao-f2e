@@ -1,6 +1,7 @@
 "use client";
 
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
+import { useTranslations } from "@daodao/i18n";
 import { usePathname } from "@daodao/i18n/navigation";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
@@ -16,6 +17,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
+  const t = useTranslations("app_product");
   const logoRef = useRef<HTMLDivElement>(null);
 
   // 首頁時 logo 隨滾動漸淡（和 Banner 同步）
@@ -54,7 +56,7 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
   return (
     <>
       <div ref={logoRef} className="fixed top-5 left-5 z-20">
-        <CustomLink href="/" aria-label="回到官網">
+        <CustomLink href="/" aria-label={t("back_to_website")}>
           <Image src={favicon256Png.src} alt="daodao logo" width={40} height={40} />
         </CustomLink>
       </div>
@@ -69,11 +71,11 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
             const isActive = item.isMatch(pathname, identifier);
             const Icon = isActive ? item.activeIcon : item.icon;
             return (
-              <li key={item.label} className={cn(item.hidden && "hidden")}>
+              <li key={item.labelKey} className={cn(item.hidden && "hidden")}>
                 <CustomLink
                   href={typeof item.href === "function" ? item.href(identifier) : item.href}
                   className="flex items-center text-text-dark"
-                  aria-label={item.label}
+                  aria-label={t(item.labelKey)}
                 >
                   {item.href === "/notifications" ? (
                     <NotificationBell isActive={isActive} />

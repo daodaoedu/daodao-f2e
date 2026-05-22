@@ -5,6 +5,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@daodao/ui/components/form";
+import { useTranslations } from "@daodao/i18n";
 import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
 import { cn } from "@daodao/ui/lib/utils";
 import type { UseFormReturn } from "react-hook-form";
@@ -19,6 +20,8 @@ interface IMoodSelectorProps {
  * 心情選擇器組件
  */
 export const MoodSelector = ({ form }: IMoodSelectorProps) => {
+  const t = useTranslations("check_in");
+
   return (
     <FormField
       control={form.control}
@@ -26,7 +29,7 @@ export const MoodSelector = ({ form }: IMoodSelectorProps) => {
       render={({ field }) => (
         <FormItem className="mb-8">
           <FormLabel className="block text-base font-medium mb-3 text-text-dark">
-            心情如何?
+            {t("mood_question")}
           </FormLabel>
           <FormControl>
             <RadioGroup
@@ -36,6 +39,7 @@ export const MoodSelector = ({ form }: IMoodSelectorProps) => {
               className="flex justify-between"
             >
               {MOOD_OPTIONS.map(({ id, label, emoji: Emoji }) => {
+                const translatedLabel = t(`moods.${id}`);
                 const isSelected = field.value === id;
                 const inputId = `mood-${id}`;
                 return (
@@ -51,10 +55,10 @@ export const MoodSelector = ({ form }: IMoodSelectorProps) => {
                       value={id}
                       id={inputId}
                       className="sr-only"
-                      aria-label={label}
+                      aria-label={translatedLabel}
                     />
                     <Emoji className="size-12" />
-                    <span className="text-xs text-gray-700">{label}</span>
+                    <span className="text-xs text-gray-700">{translatedLabel || label}</span>
                   </label>
                 );
               })}

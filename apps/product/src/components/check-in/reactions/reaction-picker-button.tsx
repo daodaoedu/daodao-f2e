@@ -1,6 +1,7 @@
 "use client";
 
 import { LikeOutlineSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -91,6 +92,7 @@ export function ReactionPickerButton({
   displayReactions,
   firstReactorName,
 }: ReactionPickerButtonProps) {
+  const t = useTranslations("app_product");
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -181,7 +183,7 @@ export function ReactionPickerButton({
                   return (
                     <div key={type} className="group/emoji relative flex flex-col items-center">
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 bg-[#295E5C] text-white text-xs rounded-full whitespace-nowrap opacity-0 group-hover/emoji:opacity-100 transition-opacity pointer-events-none">
-                        {config.label}
+                        {t(config.label)}
                       </div>
                       <button
                         type="button"
@@ -238,9 +240,9 @@ export function ReactionPickerButton({
               <span className="text-sm text-[#295E5C]">
                 {firstReactorName
                   ? totalCount > 1
-                    ? `${firstReactorName} 與其他 ${totalCount - 1} 人`
+                    ? t("others_with_count", { name: firstReactorName, count: totalCount - 1 })
                     : firstReactorName
-                  : `${totalCount} 人`}
+                  : t("count_people", { count: totalCount })}
               </span>
             )}
           </button>
@@ -262,7 +264,7 @@ export function ReactionPickerButton({
                 <div key={type} className="group/emoji relative flex flex-col items-center">
                   {/* Tooltip — desktop hover only */}
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 bg-[#295E5C] text-white text-xs rounded-full whitespace-nowrap opacity-0 group-hover/emoji:opacity-100 transition-opacity pointer-events-none">
-                    {config.label}
+                    {t(config.label)}
                   </div>
                   <button
                     type="button"

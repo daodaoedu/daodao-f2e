@@ -76,7 +76,7 @@ const PLATFORMS_WITH_ICON: SocialPlatformType[] = [
 /**
  * 取得平台顯示名稱
  */
-const getPlatformDisplayName = (platform: SocialPlatformType): string => {
+const getPlatformDisplayName = (platform: SocialPlatformType, websiteLabel: string): string => {
   const displayNames: Record<SocialPlatformType, string> = {
     [SocialPlatform.line]: "LINE",
     [SocialPlatform.facebook]: "Facebook",
@@ -84,7 +84,7 @@ const getPlatformDisplayName = (platform: SocialPlatformType): string => {
     [SocialPlatform.threads]: "Threads",
     [SocialPlatform.linkedin]: "LinkedIn",
     [SocialPlatform.discord]: "Discord",
-    [SocialPlatform.website]: "個人網站",
+    [SocialPlatform.website]: websiteLabel,
     [SocialPlatform.github]: "GitHub",
   };
   return displayNames[platform] || platform;
@@ -340,7 +340,9 @@ export function UserInfoCard({
                     size="icon"
                     asChild
                     className="size-8 md:size-4"
-                    aria-label={`前往 ${getPlatformDisplayName(platform)}`}
+                    aria-label={t("social_link_aria", {
+                      platform: getPlatformDisplayName(platform, t("platform_website")),
+                    })}
                   >
                     <CustomLink
                       href={value}
@@ -360,7 +362,7 @@ export function UserInfoCard({
           {linksWithoutIcon.length > 0 && (
             <div className="flex flex-col gap-2">
               {linksWithoutIcon.map(({ platform, value }) => {
-                const platformName = getPlatformDisplayName(platform);
+                const platformName = getPlatformDisplayName(platform, t("platform_website"));
                 if (!value) return null;
 
                 return (
@@ -455,7 +457,9 @@ export function UserInfoCard({
             !isOwnProfile &&
             commonCirclesCount != null &&
             commonCirclesCount > 0 && (
-              <p className="text-xs text-text-dark mb-3">{t("common_circles_count", { count: commonCirclesCount })}</p>
+              <p className="text-xs text-text-dark mb-3">
+                {t("common_circles_count", { count: commonCirclesCount })}
+              </p>
             )}
 
           {!isMobile && moreContent}

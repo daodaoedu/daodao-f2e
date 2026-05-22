@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import {
   FormControl,
   FormField,
@@ -17,9 +18,13 @@ interface ISocialLinksSectionProps {
 }
 
 export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
+  const t = useTranslations("app_product");
+
   return (
     <div className="bg-white rounded-xl p-4 space-y-4">
-      <h3 className="text-base font-medium text-text-dark mb-4">其他社群</h3>
+      <h3 className="text-base font-medium text-text-dark mb-4">
+        {t("public_info_social_title")}
+      </h3>
 
       {/* 個人網址 */}
       <FormField
@@ -27,11 +32,13 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
         name="personalUrl"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block font-medium text-text-dark mb-3">個人網址</FormLabel>
+            <FormLabel className="block font-medium text-text-dark mb-3">
+              {t("public_info_personal_url")}
+            </FormLabel>
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入個人網址"
+                placeholder={t("public_info_personal_url_placeholder")}
                 type="url"
                 className={cn(
                   form.formState.errors.personalUrl && "border-red focus-visible:border-red"
@@ -53,7 +60,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 Facebook 網址"
+                placeholder={t("public_info_social_url_placeholder", { platform: "Facebook" })}
                 type="url"
                 className={cn(
                   form.formState.errors.facebook && "border-red focus-visible:border-red"
@@ -75,7 +82,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 Instagram 網址"
+                placeholder={t("public_info_social_url_placeholder", { platform: "Instagram" })}
                 type="url"
                 className={cn(
                   form.formState.errors.instagram && "border-red focus-visible:border-red"
@@ -97,7 +104,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 LinkedIn 網址"
+                placeholder={t("public_info_social_url_placeholder", { platform: "LinkedIn" })}
                 type="url"
                 className={cn(
                   form.formState.errors.linkedin && "border-red focus-visible:border-red"
@@ -119,7 +126,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 Github 網址"
+                placeholder={t("public_info_social_url_placeholder", { platform: "Github" })}
                 type="url"
                 className={cn(
                   form.formState.errors.github && "border-red focus-visible:border-red"
@@ -141,7 +148,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 Discord User ID"
+                placeholder={t("public_info_discord_placeholder")}
                 className={cn(
                   form.formState.errors.discord && "border-red focus-visible:border-red"
                 )}
@@ -162,7 +169,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 LINE ID"
+                placeholder={t("public_info_line_placeholder")}
                 className={cn(form.formState.errors.line && "border-red focus-visible:border-red")}
               />
             </FormControl>
@@ -181,7 +188,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="請輸入 Threads 網址"
+                placeholder={t("public_info_social_url_placeholder", { platform: "Threads" })}
                 type="url"
                 className={cn(
                   form.formState.errors.threads && "border-red focus-visible:border-red"

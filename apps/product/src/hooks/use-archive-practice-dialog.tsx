@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
@@ -35,18 +36,19 @@ export enum ArchivePracticeResult {
  * ```
  */
 export function useArchivePracticeDialog() {
+  const t = useTranslations("practice");
   const { openInfoDialog } = useDialog();
 
   const openArchiveDialog = useCallback(
     async (options: { onRestore?: () => void | Promise<void> }): Promise<ArchivePracticeResult> => {
       // 先顯示確認對話框
       const result = await openInfoDialog({
-        title: "即將封存這個實踐",
-        message: "我們會幫你把實踐收在「封存」裡面，你會暫時看不到它，除非取消封存喔！",
+        title: t("archive_dialog_title"),
+        message: t("archive_dialog_message"),
         textAlign: "left",
         buttons: [
-          { label: "先不要", value: "cancel", variant: "outline" },
-          { label: "確定封存", value: "confirm", variant: "orange" },
+          { label: t("cancel_action"), value: "cancel", variant: "outline" },
+          { label: t("archive_confirm"), value: "confirm", variant: "orange" },
         ],
       });
 
@@ -59,14 +61,14 @@ export function useArchivePracticeDialog() {
       // 顯示 toast，帶有復原按鈕
       toast.success(
         <>
-          實踐已成功封存，你可以在設定中觀看
+          {t("archive_success_prefix")}
           <Link href="/settings/archived" className="underline">
-            已封存的內容
+            {t("archive_success_link")}
           </Link>
         </>,
         {
           action: {
-            label: "復原",
+            label: t("restore"),
             onClick: () => {
               // 執行復原邏輯
               if (options?.onRestore) {
@@ -80,7 +82,7 @@ export function useArchivePracticeDialog() {
       // 立即返回，讓調用方可以立即執行動作
       return ArchivePracticeResult.Archived;
     },
-    [openInfoDialog]
+    [openInfoDialog, t]
   );
 
   return { openArchiveDialog };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { FileUpload } from "@daodao/ui/components/file-upload";
 import { Camera } from "lucide-react";
@@ -18,6 +19,7 @@ export const AvatarUploadSection = ({
   avatarFile,
   onAvatarFileChange,
 }: IAvatarUploadSectionProps) => {
+  const t = useTranslations("app_product");
   const fileUploadRef = useRef<HTMLDivElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const photoURL = form.watch("photoURL");
@@ -66,10 +68,14 @@ export const AvatarUploadSection = ({
         type="button"
         onClick={handleAvatarClick}
         className="relative group cursor-pointer mb-4"
-        aria-label="上傳頭像"
+        aria-label={t("avatar_upload")}
       >
         <Avatar className="size-24">
-          <AvatarImage src={displayUrl || undefined} alt="頭像" className="bg-very-light-gray" />
+          <AvatarImage
+            src={displayUrl || undefined}
+            alt={t("avatar_alt")}
+            className="bg-very-light-gray"
+          />
           <AvatarFallback className="bg-very-light-gray text-text-dark text-xl">
             {form.watch("name")?.charAt(0) || "?"}
           </AvatarFallback>
