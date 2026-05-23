@@ -157,12 +157,19 @@ function LearningPersonaCard({
 
   if (submitted) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-[#E8F8FF] h-[280px] flex flex-col items-center justify-center gap-3 px-6">
-        <CheckCircle2 className="size-10 text-logo-cyan" />
+      <div className="bg-white rounded-2xl shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 h-[280px] flex flex-col items-center justify-center gap-2 px-6">
+        <CheckCircle2 className="size-10 text-logo-cyan mb-1" />
         <p className="text-base font-medium text-text-dark">感謝你的分享！</p>
         <p className="text-sm text-text-dark/50 text-center leading-relaxed">
-          你的回答幫助我們更了解你的學習方式。
+          你可以隨時查看你的回答，並繼續探索更多問題。
         </p>
+        <a
+          href="/zh-TW/users/me"
+          className="mt-2 flex items-center gap-1.5 text-sm font-medium text-primary-darker hover:opacity-80 transition-opacity"
+        >
+          前往我的小島查看
+          <ArrowCircleSvg className="size-6 shrink-0" />
+        </a>
       </div>
     );
   }
@@ -180,15 +187,15 @@ function LearningPersonaCard({
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: card flip interaction */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction */}
         <div
-          className="absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm border border-[#E8F8FF] flex flex-col cursor-pointer select-none"
+          className="group absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm border border-[#E8F8FF] flex flex-col cursor-pointer select-none"
           style={{ backfaceVisibility: "hidden" }}
           onClick={() => setIsFlipped(true)}
         >
-          <QuoteSvg className="mb-4 self-center shrink-0" />
+          <QuoteSvg className="mt-4 mb-4 self-center shrink-0" />
           <p className="text-[24px] font-semibold text-text-dark text-center leading-snug flex-1 flex items-center justify-center">
             {item.question}
           </p>
-          <div className="flex items-center gap-2 self-end mt-3 transition-transform duration-200 hover:translate-x-1.5">
+          <div className="flex items-center gap-2 self-end mt-3 transition-transform duration-200 group-hover:translate-x-1.5">
             <span className="text-sm text-primary-darker">分享我的想法</span>
             <ArrowCircleSvg className="size-8 shrink-0" />
           </div>
@@ -276,7 +283,7 @@ function LearningPersonaSection() {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-1.5 text-xs text-text-dark/60">
           <Laugh className="size-3.5 shrink-0" />
-          <span>人物誌</span>
+          <span>讓我們更認識你！</span>
         </div>
         <button
           type="button"
@@ -338,7 +345,7 @@ function LearningPersonaMCCard({
 
   if (submitted) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-[#E8F8FF] h-[300px] flex flex-col items-center justify-center gap-3 px-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-[#E8F8FF] h-[280px] flex flex-col items-center justify-center gap-3 px-6">
         <CheckCircle2 className="size-10 text-logo-cyan" />
         <p className="text-base font-medium text-text-dark">感謝你的分享！</p>
         <p className="text-sm text-text-dark/50 text-center leading-relaxed">
@@ -349,7 +356,7 @@ function LearningPersonaMCCard({
   }
 
   return (
-    <div style={{ perspective: "1000px" }} className="w-full h-[300px]">
+    <div style={{ perspective: "1000px" }} className="w-full h-[280px]">
       <div
         className="relative w-full h-full transition-transform duration-500 ease-in-out"
         style={{
@@ -361,15 +368,15 @@ function LearningPersonaMCCard({
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: card flip interaction */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction */}
         <div
-          className="absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm border border-[#E8F8FF] flex flex-col cursor-pointer select-none"
+          className="group absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm border border-[#E8F8FF] flex flex-col cursor-pointer select-none"
           style={{ backfaceVisibility: "hidden" }}
           onClick={() => setIsFlipped(true)}
         >
-          <QuoteSvg className="mb-4 self-center shrink-0" />
+          <QuoteSvg className="mt-4 mb-4 self-center shrink-0" />
           <p className="text-[24px] font-semibold text-text-dark text-center leading-snug flex-1 flex items-center justify-center">
             {item.question}
           </p>
-          <div className="flex items-center gap-2 self-end mt-3 transition-transform duration-200 hover:translate-x-1.5">
+          <div className="flex items-center gap-2 self-end mt-3 transition-transform duration-200 group-hover:translate-x-1.5">
             <span className="text-sm text-primary-darker">選擇我的答案</span>
             <ArrowCircleSvg className="size-8 shrink-0" />
           </div>
@@ -791,7 +798,7 @@ function FeedLabelStatic({
 
 function ActivityCardStatic({ label, text }: { label: string; text: string }) {
   return (
-    <div className="bg-white rounded-2xl p-4 border border-[#E8F8FF] flex items-start gap-3">
+    <div className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex items-start gap-3">
       <div className="flex-shrink-0 w-9 h-9 rounded-full bg-logo-cyan/10 flex items-center justify-center">
         <ThumbsUp className="w-4 h-4 text-logo-cyan" />
       </div>
