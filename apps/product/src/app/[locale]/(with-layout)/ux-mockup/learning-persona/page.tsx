@@ -187,7 +187,7 @@ function LearningPersonaCard({
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: card flip interaction */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction */}
         <div
-          className="group absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm border border-[#E8F8FF] flex flex-col cursor-pointer select-none"
+          className="group absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex flex-col cursor-pointer select-none"
           style={{ backfaceVisibility: "hidden" }}
           onClick={() => setIsFlipped(true)}
         >
@@ -345,7 +345,7 @@ function LearningPersonaMCCard({
 
   if (submitted) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-[#E8F8FF] h-[280px] flex flex-col items-center justify-center gap-3 px-6">
+      <div className="bg-white rounded-2xl shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 h-[280px] flex flex-col items-center justify-center gap-3 px-6">
         <CheckCircle2 className="size-10 text-logo-cyan" />
         <p className="text-base font-medium text-text-dark">感謝你的分享！</p>
         <p className="text-sm text-text-dark/50 text-center leading-relaxed">
@@ -368,7 +368,7 @@ function LearningPersonaMCCard({
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: card flip interaction */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction */}
         <div
-          className="group absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm border border-[#E8F8FF] flex flex-col cursor-pointer select-none"
+          className="group absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex flex-col cursor-pointer select-none"
           style={{ backfaceVisibility: "hidden" }}
           onClick={() => setIsFlipped(true)}
         >
@@ -798,7 +798,7 @@ function FeedLabelStatic({
 
 function ActivityCardStatic({ label, text }: { label: string; text: string }) {
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex items-start gap-3">
+    <div className="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex items-center gap-3 cursor-pointer">
       <div className="flex-shrink-0 w-9 h-9 rounded-full bg-logo-cyan/10 flex items-center justify-center">
         <ThumbsUp className="w-4 h-4 text-logo-cyan" />
       </div>
@@ -808,6 +808,7 @@ function ActivityCardStatic({ label, text }: { label: string; text: string }) {
         </span>
         <p className="text-sm text-text-dark leading-snug">{text}</p>
       </div>
+      <ArrowCircleSvg className="size-8 shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
     </div>
   );
 }
