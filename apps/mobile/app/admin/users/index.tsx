@@ -1,11 +1,13 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
-import { Button, Input, Text, XStack, YStack } from "tamagui";
+import { Button, Text, XStack, YStack } from "tamagui";
 import {
   AdminScreen,
   EmptyState,
   LoadingState,
+  PaginationRow,
+  SearchRow,
   SectionCard,
   StatGrid,
   asArray,
@@ -15,7 +17,6 @@ import {
   formatNumber,
   stringValue,
 } from "@/components/admin/admin-components";
-import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 import { api } from "@/services/api-client";
 
@@ -76,28 +77,16 @@ export default function AdminUsersScreen() {
       />
 
       <SectionCard title={t("user_list")}>
-        <XStack gap="$2">
-          <Input
-            flex={1}
-            value={query}
-            onChangeText={setQuery}
-            placeholder={t("search_users")}
-            returnKeyType="search"
-            onSubmitEditing={() => {
-              setPage(1);
-              setSubmittedQuery(query);
-            }}
-          />
-          <Button
-            backgroundColor={colors.primary.base}
-            onPress={() => {
-              setPage(1);
-              setSubmittedQuery(query);
-            }}
-          >
-            <Text color={colors.basic.white}>{t("search")}</Text>
-          </Button>
-        </XStack>
+        <SearchRow
+          value={query}
+          onChange={setQuery}
+          placeholder={t("search_users")}
+          searchLabel={t("search")}
+          onSubmit={() => {
+            setPage(1);
+            setSubmittedQuery(query);
+          }}
+        />
 
         {users.isLoading ? (
           <LoadingState label={t("loading")} />
@@ -135,21 +124,14 @@ export default function AdminUsersScreen() {
           </YStack>
         )}
 
-        <XStack justifyContent="center" alignItems="center" gap="$3">
-          <Button size="$3" disabled={page <= 1} onPress={() => setPage((p) => Math.max(1, p - 1))}>
-            {t("previous_page")}
-          </Button>
-          <Text color="$color" opacity={0.65}>
-            {page} / {totalPages}
-          </Text>
-          <Button
-            size="$3"
-            disabled={page >= totalPages}
-            onPress={() => setPage((p) => p + 1)}
-          >
-            {t("next_page")}
-          </Button>
-        </XStack>
+        <PaginationRow
+          page={page}
+          totalPages={totalPages}
+          previousLabel={t("previous_page")}
+          nextLabel={t("next_page")}
+          onPrevious={() => setPage((p) => Math.max(1, p - 1))}
+          onNext={() => setPage((p) => p + 1)}
+        />
       </SectionCard>
     </AdminScreen>
   );

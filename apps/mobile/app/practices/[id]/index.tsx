@@ -27,21 +27,21 @@ import { api } from "@/services/api-client";
 // 狀態標籤配置
 const statusConfig: Record<string, { labelKey: string; backgroundColor: string; textColor: string }> =
   {
-    draft: { labelKey: "mobile_status_draft", backgroundColor: "rgba(255, 255, 255, 0.8)", textColor: "#666666" },
-    "not-started": { labelKey: "mobile_status_not_started", backgroundColor: "#E0F4FF", textColor: "#0088CC" },
-    "in-progress": { labelKey: "mobile_status_in_progress", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
-    active: { labelKey: "mobile_status_in_progress", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
-    completed: { labelKey: "mobile_status_completed", backgroundColor: "#10B981", textColor: "#FFFFFF" },
+    draft: { labelKey: "status_draft", backgroundColor: "rgba(255, 255, 255, 0.8)", textColor: "#666666" },
+    "not-started": { labelKey: "status_not_started", backgroundColor: "#E0F4FF", textColor: "#0088CC" },
+    "in-progress": { labelKey: "status_in_progress", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
+    active: { labelKey: "status_in_progress", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
+    completed: { labelKey: "status_completed", backgroundColor: "#10B981", textColor: "#FFFFFF" },
   };
 
 // 執行時機標籤
 const timingLabels: Record<string, string> = {
-  holiday: "mobile_timing_holiday",
-  commute: "mobile_timing_commute",
-  beforeSleep: "mobile_timing_before_sleep",
-  morning: "mobile_timing_morning",
-  lunch: "mobile_timing_lunch",
-  evening: "mobile_timing_evening",
+  holiday: "timing_holiday",
+  commute: "timing_commute",
+  beforeSleep: "timing_before_sleep",
+  morning: "timing_morning",
+  lunch: "timing_lunch",
+  evening: "timing_evening",
 };
 
 export default function PracticeDetailScreen() {

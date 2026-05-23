@@ -9,11 +9,11 @@ import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useMobileTranslation } from "@/i18n";
 
-function assertSuccessfulResponse(response: { error?: unknown }) {
+function assertSuccessfulResponse(response: { error?: unknown }, fallbackMessage: string) {
   if (!response.error) return;
 
   const error = response.error as { error?: { message?: string }; message?: string };
-  throw new Error(error.error?.message ?? error.message ?? "Update failed. Please try again later.");
+  throw new Error(error.error?.message ?? error.message ?? fallbackMessage);
 }
 
 export default function InteractionSettingsScreen() {
@@ -33,7 +33,7 @@ export default function InteractionSettingsScreen() {
     setIsSaving(true);
     try {
       const response = await updateCurrentUser({ isOpenProfile: value });
-      assertSuccessfulResponse(response);
+      assertSuccessfulResponse(response, t("saveError"));
     } catch (error) {
       setLocalIsOpenProfile(null);
       Alert.alert(

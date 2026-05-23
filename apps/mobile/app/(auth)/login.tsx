@@ -11,22 +11,26 @@ import { oauthService } from "@/services/oauth";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const mobileLoginImage = require("@/assets/images/mobile-login.png");
 
-function mapOAuthErrorMessage(message: string, t: (key: string) => string) {
-  const errorMap: Record<string, string> = {
-    "oauth.cancelled": "cancelled",
-    "oauth.google_failed": "google_failed",
-    "oauth.missing_auth_code": "missing_auth_code",
-    "oauth.invalid_server_response": "invalid_server_response",
-    "oauth.incomplete_user_data": "incomplete_user_data",
-    "oauth.invalid_token": "invalid_token",
-    "oauth.invalid_email": "invalid_email",
-    "oauth.apple_failed": "apple_failed",
-    "oauth.apple_missing_identity_token": "apple_missing_identity_token",
-    "oauth.apple_invalid_server_response": "apple_invalid_server_response",
-    "oauth.apple_incomplete_user_data": "apple_incomplete_user_data",
-  };
+const OAUTH_ERROR_KEYS: Record<string, string> = {
+  "oauth.cancelled": "cancelled",
+  "oauth.google_failed": "google_failed",
+  "oauth.missing_auth_code": "missing_auth_code",
+  "oauth.invalid_server_response": "invalid_server_response",
+  "oauth.incomplete_user_data": "incomplete_user_data",
+  "oauth.invalid_token": "invalid_token",
+  "oauth.invalid_email": "invalid_email",
+  "oauth.apple_failed": "apple_failed",
+  "oauth.apple_missing_identity_token": "apple_missing_identity_token",
+  "oauth.apple_invalid_server_response": "apple_invalid_server_response",
+  "oauth.apple_incomplete_user_data": "apple_incomplete_user_data",
+};
 
-  const key = errorMap[message];
+function isOAuthCancelled(message: string) {
+  return message === "oauth.cancelled" || message === "The user canceled the authorization attempt";
+}
+
+function mapOAuthErrorMessage(message: string, t: (key: string) => string) {
+  const key = OAUTH_ERROR_KEYS[message];
   return key ? t(key) : message;
 }
 
@@ -49,9 +53,10 @@ export default function LoginScreen() {
       const { tokens, user } = await oauthService.signInWithGoogle();
       await signIn(tokens, user, "google");
     } catch (err) {
-      const message =
-        err instanceof Error ? mapOAuthErrorMessage(err.message, t) : t("google_failed");
-      Alert.alert(t("login_failed"), message);
+      const rawMessage = err instanceof Error ? err.message : "oauth.google_failed";
+      if (!isOAuthCancelled(rawMessage)) {
+        Alert.alert(t("login_failed"), mapOAuthErrorMessage(rawMessage, t));
+      }
     } finally {
       setIsLoading(false);
       setLoadingProvider(null);
@@ -66,10 +71,9 @@ export default function LoginScreen() {
       const { tokens, user } = await oauthService.signInWithApple();
       await signIn(tokens, user, "apple");
     } catch (err) {
-      const rawMessage = err instanceof Error ? err.message : t("apple_failed");
-      const message = mapOAuthErrorMessage(rawMessage, t);
-      if (message !== "The user canceled the authorization attempt") {
-        Alert.alert(t("login_failed"), message);
+      const rawMessage = err instanceof Error ? err.message : "oauth.apple_failed";
+      if (!isOAuthCancelled(rawMessage)) {
+        Alert.alert(t("login_failed"), mapOAuthErrorMessage(rawMessage, t));
       }
     } finally {
       setIsLoading(false);

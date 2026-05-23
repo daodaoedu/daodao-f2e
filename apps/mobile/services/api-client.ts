@@ -44,7 +44,7 @@ export async function apiClient<T>(endpoint: string, options: IRequestOptions = 
     if (response.status === 401 && !skipAuth) {
       await refreshTokens();
       const retryHeaders = await createHeaders(fetchOptions.headers, skipAuth);
-      response = await fetch(url, { ...fetchOptions, headers: retryHeaders });
+      response = await fetch(url, { ...fetchOptions, headers: retryHeaders, signal: controller.signal });
     }
 
     if (!response.ok) {

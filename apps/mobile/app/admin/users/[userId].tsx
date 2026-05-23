@@ -48,7 +48,7 @@ export default function AdminUserDetailScreen() {
   const roleItems = asArray(roles.data?.data);
 
   const updateRole = async (roleId: unknown) => {
-    if (!userId || typeof roleId !== "number") return;
+    if (!userId || roleId == null || roleId === "") return;
     setSavingRoleId(String(roleId));
     try {
       await api.put(`/admin/users/${userId}/role`, { roleId });

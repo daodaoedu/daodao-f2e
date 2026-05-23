@@ -17,11 +17,11 @@ import { useMobileTranslation } from "@/i18n";
 
 type FieldOptionType = { value: string; label: string };
 
-function assertSuccessfulResponse(response: { error?: unknown }) {
+function assertSuccessfulResponse(response: { error?: unknown }, fallbackMessage: string) {
   if (!response.error) return;
 
   const error = response.error as { error?: { message?: string }; message?: string };
-  throw new Error(error.error?.message ?? error.message ?? "Update failed. Please try again later.");
+  throw new Error(error.error?.message ?? error.message ?? fallbackMessage);
 }
 
 function FieldSelectionModal({
@@ -168,7 +168,7 @@ export default function AccountSettingsScreen() {
       if (educationStage) updateData.educationStage = educationStage;
 
       const response = await updateCurrentUser(updateData);
-      assertSuccessfulResponse(response);
+      assertSuccessfulResponse(response, t("saveError"));
       await mutate();
       Alert.alert(t("successTitle"), t("saveSuccess"), [
         { text: t("confirm"), onPress: () => router.back() },

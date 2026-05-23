@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { Button, Card, Input, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 
@@ -172,6 +172,66 @@ export function SectionCard({
         {children}
       </YStack>
     </Card>
+  );
+}
+
+export function SearchRow({
+  value,
+  placeholder,
+  searchLabel,
+  onChange,
+  onSubmit,
+}: {
+  value: string;
+  placeholder: string;
+  searchLabel: string;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <XStack gap="$2">
+      <Input
+        flex={1}
+        value={value}
+        onChangeText={onChange}
+        placeholder={placeholder}
+        returnKeyType="search"
+        onSubmitEditing={onSubmit}
+      />
+      <Button backgroundColor={colors.primary.base} onPress={onSubmit}>
+        <Text color={colors.basic.white}>{searchLabel}</Text>
+      </Button>
+    </XStack>
+  );
+}
+
+export function PaginationRow({
+  page,
+  totalPages,
+  previousLabel,
+  nextLabel,
+  onPrevious,
+  onNext,
+}: {
+  page: number;
+  totalPages: number;
+  previousLabel: string;
+  nextLabel: string;
+  onPrevious: () => void;
+  onNext: () => void;
+}) {
+  return (
+    <XStack justifyContent="center" alignItems="center" gap="$3">
+      <Button size="$3" disabled={page <= 1} onPress={onPrevious}>
+        {previousLabel}
+      </Button>
+      <Text color="$color" opacity={0.65}>
+        {page} / {totalPages}
+      </Text>
+      <Button size="$3" disabled={page >= totalPages} onPress={onNext}>
+        {nextLabel}
+      </Button>
+    </XStack>
   );
 }
 
