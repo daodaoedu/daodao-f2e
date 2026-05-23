@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileI18n, useMobileTranslation } from "@/i18n";
 import type { ManualPracticeFormValuesType } from "../create/manual/schema";
 
 // Date utilities
@@ -21,13 +22,6 @@ const differenceInDays = (later: Date, earlier: Date): number => {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
-const formatDate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}/${month}/${day}`;
-};
-
 interface ExecutionDurationCardProps {
   durationDays: ManualPracticeFormValuesType["durationDays"] | number;
   startDate: ManualPracticeFormValuesType["startDate"] | string | null;
@@ -42,6 +36,8 @@ export const ExecutionDurationCard = ({
   startDate,
   showRemaining = false,
 }: ExecutionDurationCardProps) => {
+  const { locale } = useMobileI18n();
+  const t = useMobileTranslation("practice");
   const { days, start, end, remainingDays } = useMemo(() => {
     const d = typeof durationDays === "string" ? Number.parseInt(durationDays, 10) : durationDays;
     const today = new Date();
@@ -52,42 +48,52 @@ export const ExecutionDurationCard = ({
     return { days: d, start: s, end: e, remainingDays: r };
   }, [durationDays, startDate, showRemaining]);
 
+  const formatDate = useCallback(
+    (date: Date): string =>
+      date.toLocaleDateString(locale, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }),
+    [locale]
+  );
+
   return (
     <View style={styles.card}>
       {showRemaining ? (
         <YStack>
           <Text fontSize={12} color={colors.text.dark}>
-            剩餘
+            {t("remaining_label")}
           </Text>
           <XStack alignItems="baseline" gap="$0.5">
             <Text fontSize={18} fontWeight="500" color={colors.logo.orange}>
               {remainingDays}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              天
+              {t("frequency_unit")}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              / 總共
+              {t("total_prefix")}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
               {days}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              天
+              {t("frequency_unit")}
             </Text>
           </XStack>
         </YStack>
       ) : (
         <YStack>
           <Text fontSize={12} color={colors.text.dark}>
-            執行時長
+            {t("execution_duration_label")}
           </Text>
           <XStack alignItems="baseline" gap="$0.5">
             <Text fontSize={18} fontWeight="500" color={colors.logo.orange}>
               {durationDays}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              天
+              {t("frequency_unit")}
             </Text>
           </XStack>
         </YStack>
@@ -95,7 +101,7 @@ export const ExecutionDurationCard = ({
       {start && (
         <YStack marginTop="$2">
           <Text fontSize={12} color={colors.text.dark}>
-            開始日
+            {t("start_date_label")}
           </Text>
           <Text fontSize={14} color={colors.primary.base}>
             {formatDate(start)}
@@ -105,7 +111,7 @@ export const ExecutionDurationCard = ({
       {end && (
         <YStack marginTop="$2">
           <Text fontSize={12} color={colors.text.dark}>
-            結束日
+            {t("end_date_label")}
           </Text>
           <Text fontSize={14} color={colors.primary.base}>
             {formatDate(end)}

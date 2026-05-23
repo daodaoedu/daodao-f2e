@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { PracticeSummaryCard } from "@/components/practice/summary";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { useAuth } from "@/providers/AuthProvider";
 import { shareService } from "@/services/share";
 
@@ -25,6 +26,8 @@ const isCompletedOrExpired = (practice?: { status?: string; endDate?: string | n
 export default function PracticeSummaryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const t = useMobileTranslation("mobile.practiceSummary");
+  const tCommon = useMobileTranslation("common");
   const { user } = useAuth();
   const summaryCardRef = useRef<View | null>(null);
   const [isSharing, setIsSharing] = useState(false);
@@ -48,8 +51,11 @@ export default function PracticeSummaryScreen() {
     if (!summary) return;
 
     return {
-      title: `${summary.userName} 完成了主題實踐`,
-      message: `我完成了「${summary.practiceName}」的實踐旅程！\n留下了 ${summary.checkInCount} 個成長足跡\n#島島阿學 #主題實踐`,
+      title: t("share_title_completed", { name: summary.userName }),
+      message: t("share_completed_message", {
+        title: summary.practiceName,
+        count: summary.checkInCount,
+      }),
     };
   };
 
@@ -92,7 +98,7 @@ export default function PracticeSummaryScreen() {
         await shareTextFallback();
       }
     } catch {
-      Alert.alert("分享失敗", "請稍後再試一次");
+      Alert.alert(t("share_failed_title"), t("retry_later"));
     } finally {
       setIsSharing(false);
     }
@@ -105,19 +111,19 @@ export default function PracticeSummaryScreen() {
     try {
       const imageUri = await captureSummaryCard();
       if (!imageUri) {
-        Alert.alert("儲存失敗", "無法擷取總結圖片，請稍後再試一次");
+        Alert.alert(t("save_failed_title"), t("capture_failed"));
         return;
       }
 
       const result = await shareService.saveToGallery(imageUri);
       if (!result.success) {
-        Alert.alert("儲存失敗", result.error ?? "無法儲存圖片到相簿");
+        Alert.alert(t("save_failed_title"), result.error ?? t("save_failed_message"));
         return;
       }
 
-      Alert.alert("儲存成功", "總結圖片已儲存到相簿");
+      Alert.alert(t("save_success_title"), t("save_success_message"));
     } catch {
-      Alert.alert("儲存失敗", "無法儲存圖片到相簿");
+      Alert.alert(t("save_failed_title"), t("save_failed_message"));
     } finally {
       setIsSaving(false);
     }
@@ -125,15 +131,15 @@ export default function PracticeSummaryScreen() {
 
   const renderHeader = () => (
     <XStack padding="$4" alignItems="center" gap="$3">
-      <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel="返回">
+      <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel={tCommon("back")}>
         <ChevronLeft size={24} color="$color" />
       </Button>
       <YStack flex={1}>
         <Text fontSize={18} fontWeight="600" color="$color">
-          實踐總結
+          {t("title")}
         </Text>
         <Text fontSize={13} color="$color" opacity={0.6} numberOfLines={1}>
-          {practice?.title ?? summary?.practiceName ?? "主題實踐"}
+          {practice?.title ?? summary?.practiceName ?? t("fallback_practice_title")}
         </Text>
       </YStack>
     </XStack>
@@ -147,7 +153,7 @@ export default function PracticeSummaryScreen() {
           <YStack flex={1} alignItems="center" justifyContent="center" gap="$3">
             <Spinner size="large" color={colors.primary.base} />
             <Text fontSize={14} color="$color" opacity={0.65}>
-              正在生成總結...
+              {t("loading_summary")}
             </Text>
           </YStack>
         </YStack>
@@ -162,10 +168,10 @@ export default function PracticeSummaryScreen() {
           {renderHeader()}
           <YStack flex={1} alignItems="center" justifyContent="center" gap="$4" padding="$6">
             <Text fontSize={16} fontWeight="600" color="$color" textAlign="center">
-              目前無法查看實踐總結
+              {t("unavailable_title")}
             </Text>
             <Text fontSize={14} color="$color" opacity={0.65} textAlign="center" lineHeight={21}>
-              實踐完成或到期後，擁有者即可查看這趟旅程的總結。
+              {t("unavailable_description")}
             </Text>
             <Button
               backgroundColor={colors.primary.base}
@@ -173,7 +179,7 @@ export default function PracticeSummaryScreen() {
               onPress={() => router.back()}
             >
               <Text color="white" fontWeight="600">
-                返回實踐
+                {t("back_to_practice")}
               </Text>
             </Button>
           </YStack>
@@ -189,10 +195,10 @@ export default function PracticeSummaryScreen() {
           {renderHeader()}
           <YStack flex={1} alignItems="center" justifyContent="center" gap="$4" padding="$6">
             <Text fontSize={16} fontWeight="600" color="$color" textAlign="center">
-              載入失敗
+              {t("load_failed_title")}
             </Text>
             <Text fontSize={14} color="$color" opacity={0.65} textAlign="center" lineHeight={21}>
-              {summaryError || "無法載入總結資料，請稍後再試。"}
+              {summaryError || t("load_failed_description")}
             </Text>
             <Button
               backgroundColor={colors.primary.base}
@@ -200,7 +206,7 @@ export default function PracticeSummaryScreen() {
               onPress={() => refetch()}
             >
               <Text color="white" fontWeight="600">
-                重新整理
+                {t("refresh")}
               </Text>
             </Button>
           </YStack>
@@ -223,7 +229,7 @@ export default function PracticeSummaryScreen() {
                 color="$color"
                 textAlign="center"
               >
-                實踐完成
+                {t("completed_title")}
               </Text>
               <Text fontSize={14} color="$color" opacity={0.72} textAlign="center" lineHeight={22}>
                 {summary.encouragementText}
@@ -251,7 +257,7 @@ export default function PracticeSummaryScreen() {
                     <Share2 size={18} color="white" />
                   )}
                   <Text color="white" fontWeight="600" fontSize={16}>
-                    {isSharing ? "準備分享..." : "分享總結"}
+                    {isSharing ? t("preparing_share") : t("share_summary")}
                   </Text>
                 </XStack>
               </Button>
@@ -274,7 +280,7 @@ export default function PracticeSummaryScreen() {
                     <Download size={18} color={colors.primary.darker} />
                   )}
                   <Text color={colors.primary.darker} fontWeight="600" fontSize={16}>
-                    {isSaving ? "儲存中..." : "保存到相簿"}
+                    {isSaving ? t("saving") : t("save_to_gallery")}
                   </Text>
                 </XStack>
               </Button>
@@ -290,7 +296,7 @@ export default function PracticeSummaryScreen() {
                 <XStack alignItems="center" gap="$2">
                   <Home size={18} color="$color" />
                   <Text color="$color" fontWeight="500">
-                    回到主頁
+                    {t("back_home")}
                   </Text>
                 </XStack>
               </Button>

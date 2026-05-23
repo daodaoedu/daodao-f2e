@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
 import { NOTIFICATION_TYPES } from "@/constants/settings";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 interface INotificationPref {
   type: string;
@@ -41,6 +42,8 @@ function assertPreferenceUpdateSucceeded(
 
 export default function NotificationSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.notificationSettings");
+  const tCommon = useMobileTranslation("common");
 
   const { data: prefsData, mutate } = useNotificationPreferences();
 
@@ -93,12 +96,12 @@ export default function NotificationSettingsScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            通知設定
+            {t("title")}
           </Text>
         </XStack>
 
@@ -115,10 +118,10 @@ export default function NotificationSettingsScreen() {
               <XStack padding="$4" alignItems="center" justifyContent="space-between">
                 <YStack flex={1} gap="$1">
                   <Text fontSize={15} color="$color">
-                    通知總開關
+                    {t("globalTitle")}
                   </Text>
                   <Text fontSize={12} color="$color" opacity={0.5}>
-                    關閉後將停止所有 Email 通知，通知中心仍繼續累積
+                    {t("globalDescription")}
                   </Text>
                 </YStack>
                 <Switch
@@ -135,7 +138,7 @@ export default function NotificationSettingsScreen() {
             {/* Email 通知設定 */}
             <YStack gap="$3">
               <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingLeft="$1">
-                Email 通知設定
+                {t("emailSection")}
               </Text>
               <Card
                 backgroundColor="$background"
@@ -157,10 +160,10 @@ export default function NotificationSettingsScreen() {
                     >
                       <YStack flex={1} gap="$1">
                         <Text fontSize={14} color="$color">
-                          {item.label}
+                          {t(item.labelKey)}
                         </Text>
                         <Text fontSize={12} color="$color" opacity={0.5}>
-                          {item.description}
+                          {t(item.descriptionKey)}
                         </Text>
                       </YStack>
                       <Switch
@@ -186,7 +189,7 @@ export default function NotificationSettingsScreen() {
               textAlign="center"
               paddingHorizontal="$4"
             >
-              In-App 通知中心（島嶼上的通知鈴）永遠開啟，只有 Email 可以關閉
+              {t("inAppAlwaysOn")}
             </Text>
           </YStack>
         </ScrollView>

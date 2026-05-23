@@ -5,21 +5,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Input, ScrollView, Text, XStack, YStack } from "tamagui";
 import { StepIndicator } from "@/components";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { useCreatePractice } from "@/providers/CreatePracticeProvider";
 
-const suggestedTags = [
-  "學習",
-  "健康",
-  "運動",
-  "閱讀",
-  "冥想",
-  "寫作",
-  "程式",
-  "語言",
-  "音樂",
-  "藝術",
-  "理財",
-  "社交",
+const suggestedTagKeys = [
+  "mobile_tag_learning",
+  "mobile_tag_health",
+  "mobile_tag_exercise",
+  "mobile_tag_reading",
+  "mobile_tag_meditation",
+  "mobile_tag_writing",
+  "mobile_tag_coding",
+  "mobile_tag_language",
+  "mobile_tag_music",
+  "mobile_tag_art",
+  "mobile_tag_finance",
+  "mobile_tag_social",
 ];
 
 const colorOptions = [
@@ -35,6 +36,8 @@ const colorOptions = [
 
 export default function Step4Screen() {
   const router = useRouter();
+  const t = useMobileTranslation("practice");
+  const commonT = useMobileTranslation("common");
   const { form, currentStep, totalSteps, nextStep, prevStep } = useCreatePractice();
   const {
     watch,
@@ -80,15 +83,15 @@ export default function Step4Screen() {
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel="返回">
+          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel={commonT("back")}>
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>
             <Text fontSize={18} fontWeight="600" color="$color">
-              標籤與外觀
+              {t("mobile_step4_title")}
             </Text>
             <Text fontSize={12} color="$color" opacity={0.6}>
-              步驟 {currentStep} / {totalSteps}
+              {t("mobile_step_progress", { current: currentStep, total: totalSteps })}
             </Text>
           </YStack>
         </XStack>
@@ -102,7 +105,7 @@ export default function Step4Screen() {
               <XStack alignItems="center" gap="$2">
                 <Tag size={18} color="$color" />
                 <Text fontSize={14} fontWeight="500" color="$color">
-                  標籤（最多 5 個）
+                  {t("mobile_tags_limit_label")}
                 </Text>
               </XStack>
 
@@ -138,7 +141,7 @@ export default function Step4Screen() {
                     size="$4"
                     value={newTag}
                     onChangeText={setNewTag}
-                    placeholder="輸入自訂標籤"
+                    placeholder={t("mobile_tag_placeholder")}
                     onSubmitEditing={() => addTag(newTag)}
                     maxLength={10}
                   />
@@ -156,10 +159,11 @@ export default function Step4Screen() {
               {/* Suggested Tags */}
               <YStack gap="$2">
                 <Text fontSize={12} color="$color" opacity={0.6}>
-                  建議標籤
+                  {t("mobile_suggested_tags")}
                 </Text>
                 <XStack gap="$2" flexWrap="wrap">
-                  {suggestedTags
+                  {suggestedTagKeys
+                    .map((key) => t(key))
                     .filter((t) => !tags.includes(t))
                     .slice(0, 8)
                     .map((tag) => (
@@ -191,7 +195,7 @@ export default function Step4Screen() {
             {/* Color */}
             <YStack gap="$3">
               <Text fontSize={14} fontWeight="500" color="$color">
-                主題顏色
+                {t("mobile_theme_color_label")}
               </Text>
               <XStack gap="$3" flexWrap="wrap">
                 {colorOptions.map((color) => (
@@ -222,7 +226,7 @@ export default function Step4Screen() {
           >
             <XStack alignItems="center" gap="$2">
               <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                下一步
+                {t("manual_next_step")}
               </Text>
               <ChevronRight size={20} color={colors.basic.white} />
             </XStack>

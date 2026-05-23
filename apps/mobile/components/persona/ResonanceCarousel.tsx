@@ -2,6 +2,7 @@ import { dismissPersonaCarousel, submitPersonaAnswer, usePersonaCarouselState, u
 import { useState } from "react";
 import { Alert, ScrollView, TextInput } from "react-native";
 import { Button, Card, Text, XStack, YStack } from "tamagui";
+import { useMobileTranslation } from "@/i18n";
 
 interface QuestionCardProps {
   questionId: number;
@@ -13,6 +14,8 @@ interface QuestionCardProps {
 }
 
 function QuestionCard({ questionId, prompt, questionType, options, onAnswered, onSwitch }: QuestionCardProps) {
+  const t = useMobileTranslation("persona.myProfile");
+  const carouselT = useMobileTranslation("persona.carousel");
   const [selected, setSelected] = useState("");
   const [textAnswer, setTextAnswer] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -28,12 +31,12 @@ function QuestionCard({ questionId, prompt, questionType, options, onAnswered, o
         isChoice ? { questionId, selectedValue: selected } : { questionId, textAnswer: textAnswer.trim() }
       );
       if (res.error) {
-        Alert.alert("送出失敗，請稍後再試");
+        Alert.alert(t("submitError"));
         return;
       }
       onAnswered();
     } catch {
-      Alert.alert("送出失敗，請稍後再試");
+      Alert.alert(t("submitError"));
     } finally {
       setSubmitting(false);
     }
@@ -60,7 +63,7 @@ function QuestionCard({ questionId, prompt, questionType, options, onAnswered, o
         <TextInput
           value={textAnswer}
           onChangeText={setTextAnswer}
-          placeholder="請輸入你的答案..."
+          placeholder={t("textPlaceholder")}
           multiline
           numberOfLines={3}
           maxLength={300}
@@ -70,14 +73,14 @@ function QuestionCard({ questionId, prompt, questionType, options, onAnswered, o
 
       <XStack jc="space-between" ai="center">
         <Button size="$2" variant="outlined" onPress={() => onSwitch(questionId)}>
-          換一題
+          {carouselT("switchQuestion")}
         </Button>
         <Button
           size="$2"
           onPress={handleSubmit}
           disabled={submitting || (isChoice ? !selected : !textAnswer.trim())}
         >
-          {submitting ? "送出中..." : "送出"}
+          {submitting ? t("submitting") : t("submit")}
         </Button>
       </XStack>
     </Card>
@@ -85,6 +88,7 @@ function QuestionCard({ questionId, prompt, questionType, options, onAnswered, o
 }
 
 export function ResonanceCarousel() {
+  const carouselT = useMobileTranslation("persona.carousel");
   const mutate = useMutate();
   const [replaceId, setReplaceId] = useState<number | undefined>(undefined);
   const [dismissing, setDismissing] = useState(false);
@@ -102,7 +106,7 @@ export function ResonanceCarousel() {
       await dismissPersonaCarousel();
       await mutate(["/api/v1/persona/carousel-state"] as const);
     } catch {
-      Alert.alert("操作失敗，請稍後再試");
+      Alert.alert(carouselT("error"));
     } finally {
       setDismissing(false);
     }
@@ -115,9 +119,9 @@ export function ResonanceCarousel() {
   return (
     <YStack mb="$3">
       <XStack jc="space-between" ai="center" mb="$2" px="$1">
-        <Text fontSize="$4" fontWeight="600">學習人物誌</Text>
+        <Text fontSize="$4" fontWeight="600">{carouselT("title")}</Text>
         <Button size="$2" variant="outlined" onPress={handleDismiss} disabled={dismissing}>
-          今天不再顯示
+          {carouselT("dismiss")}
         </Button>
       </XStack>
 

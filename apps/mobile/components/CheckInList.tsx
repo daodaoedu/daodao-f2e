@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { Pressable } from "react-native";
 import { Card, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileI18n, useMobileTranslation } from "@/i18n";
 import type { ICheckIn } from "@/types/practice";
 
 interface CheckInListProps {
@@ -12,7 +13,11 @@ interface CheckInListProps {
   practiceId?: string;
 }
 
-function formatDate(dateString: string): string {
+function formatDate(
+  dateString: string,
+  locale: string,
+  t: (key: string, values?: Record<string, string | number>) => string
+): string {
   const date = new Date(dateString);
   const now = new Date();
 
@@ -22,22 +27,29 @@ function formatDate(dateString: string): string {
   const diffDays = Math.round((nowOnly.getTime() - dateOnly.getTime()) / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) {
-    return `今天 ${date.toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })}`;
+    return t("today_time", {
+      time: date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }),
+    });
   } else if (diffDays === 1) {
-    return `昨天 ${date.toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })}`;
+    return t("yesterday_time", {
+      time: date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }),
+    });
   } else if (diffDays < 7) {
-    return `${diffDays} 天前`;
+    return t("days_ago", { count: diffDays });
   } else {
-    return date.toLocaleDateString("zh-TW", { month: "short", day: "numeric" });
+    return date.toLocaleDateString(locale, { month: "short", day: "numeric" });
   }
 }
 
 export function CheckInList({
   checkIns,
-  emptyText = "還沒有打卡紀錄",
+  emptyText,
   practiceId,
 }: CheckInListProps) {
   const router = useRouter();
+  const { locale } = useMobileI18n();
+  const t = useMobileTranslation("mobile.checkInList");
+  const effectiveEmptyText = emptyText ?? t("empty");
 
   const handlePress = useCallback(
     (checkInId: string) => {
@@ -52,7 +64,7 @@ export function CheckInList({
       <YStack padding="$6" alignItems="center" justifyContent="center" gap="$2">
         <Check size={32} color={colors.basic[300]} />
         <Text fontSize={14} color="$color" opacity={0.5}>
-          {emptyText}
+          {effectiveEmptyText}
         </Text>
       </YStack>
     );
@@ -90,7 +102,7 @@ export function CheckInList({
                     第 {checkIns.length - index} 次打卡
                   </Text>
                   <Text fontSize={12} color="$color" opacity={0.5}>
-                    {formatDate(checkIn.createdAt)}
+                  {formatDate(checkIn.createdAt, locale, t)}
                   </Text>
                 </XStack>
 

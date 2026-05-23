@@ -19,6 +19,7 @@ import {
 } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useMobileTranslation } from "@/i18n";
 
 type LocationOptionType = {
   value: string;
@@ -99,6 +100,8 @@ function LocationSelectionModal({
   onClose: () => void;
   onSelect: (value: string) => void;
 }) {
+  const t = useMobileTranslation("mobile.publicInfoSettings");
+
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -106,7 +109,7 @@ function LocationSelectionModal({
           <XStack padding="$4" alignItems="center" justifyContent="space-between">
             <Button size="$3" chromeless onPress={onClose}>
               <Text fontSize={14} color="$color">
-                取消
+                {t("cancel")}
               </Text>
             </Button>
             <Text fontSize={16} fontWeight="600" color="$color">
@@ -155,6 +158,8 @@ function LocationSelectionModal({
 
 export default function PublicInfoSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.publicInfoSettings");
+  const tCommon = useMobileTranslation("common");
   const { user, isLoading, mutate } = useCurrentUser();
   const { updateCurrentUser, updateCurrentUserWithFormData } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -326,16 +331,16 @@ export default function PublicInfoSettingsScreen() {
       return;
     }
 
-    Alert.alert("尚未儲存變更", "離開後會失去這次修改，確定要離開嗎？", [
-      { text: "繼續編輯", style: "cancel" },
-      { text: "離開", style: "destructive", onPress: () => router.back() },
+    Alert.alert(t("unsavedTitle"), t("unsavedMessage"), [
+      { text: t("keepEditing"), style: "cancel" },
+      { text: t("leave"), style: "destructive", onPress: () => router.back() },
     ]);
   };
 
   const handlePickPhoto = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert("需要相簿權限", "請允許存取相簿後再選擇頭像。");
+      Alert.alert(t("photoPermissionTitle"), t("photoPermissionMessage"));
       return;
     }
 
@@ -364,8 +369,8 @@ export default function PublicInfoSettingsScreen() {
   const handleSave = async () => {
     setFieldErrors({});
     if (!name.trim()) {
-      setFieldErrors({ name: "姓名不可為空" });
-      Alert.alert("錯誤", "姓名不可為空");
+      setFieldErrors({ name: t("nameRequired") });
+      Alert.alert(t("errorTitle"), t("nameRequired"));
       return;
     }
     setIsSubmitting(true);
@@ -412,12 +417,14 @@ export default function PublicInfoSettingsScreen() {
       await mutate();
       setSelectedPhotoUri(null);
       setSelectedPhotoFile(null);
-      Alert.alert("成功", "公開資訊已更新", [{ text: "確定", onPress: () => router.back() }]);
+      Alert.alert(t("successTitle"), t("saveSuccess"), [
+        { text: t("confirm"), onPress: () => router.back() },
+      ]);
     } catch (error) {
       const nextFieldErrors = mapFieldErrors(error);
       setFieldErrors(nextFieldErrors);
       const firstFieldError = Object.values(nextFieldErrors)[0];
-      Alert.alert("錯誤", firstFieldError ?? getErrorMessage(error, "更新失敗，請稍後再試"));
+      Alert.alert(t("errorTitle"), firstFieldError ?? getErrorMessage(error, t("saveError")));
     } finally {
       setIsSubmitting(false);
     }
@@ -428,7 +435,7 @@ export default function PublicInfoSettingsScreen() {
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center">
           <Text fontSize={14} color="$color" opacity={0.5}>
-            載入中...
+            {t("loading")}
           </Text>
         </YStack>
       </SafeAreaView>
@@ -444,12 +451,12 @@ export default function PublicInfoSettingsScreen() {
             circular
             chromeless
             onPress={handleBack}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color" flex={1}>
-            公開資訊設定
+            {t("title")}
           </Text>
           <Button
             size="$3"
@@ -460,7 +467,7 @@ export default function PublicInfoSettingsScreen() {
             opacity={isDirty ? 1 : 0.55}
           >
             <Text color={colors.basic.white} fontWeight="600" fontSize={14}>
-              {isSubmitting ? "儲存中..." : "儲存"}
+              {isSubmitting ? t("saving") : t("save")}
             </Text>
           </Button>
         </XStack>
@@ -489,7 +496,7 @@ export default function PublicInfoSettingsScreen() {
                   circular
                   backgroundColor={colors.primary.base}
                   onPress={handlePickPhoto}
-                  accessibilityLabel="選擇頭像"
+                  accessibilityLabel={t("chooseAvatar")}
                 >
                   <Camera size={16} color={colors.basic.white} />
                 </Button>
@@ -507,7 +514,7 @@ export default function PublicInfoSettingsScreen() {
               <YStack gap="$4">
                 <YStack gap="$2">
                   <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
-                    姓名
+                    {t("name")}
                   </Text>
                   <Input
                     size="$4"
@@ -516,7 +523,7 @@ export default function PublicInfoSettingsScreen() {
                       setName(value);
                       clearFieldError("name");
                     }}
-                    placeholder="輸入你的姓名"
+                    placeholder={t("namePlaceholder")}
                     borderColor={fieldErrors.name ? colors.semantic.error : undefined}
                   />
                   {fieldErrors.name ? (
@@ -527,7 +534,7 @@ export default function PublicInfoSettingsScreen() {
                 </YStack>
                 <YStack gap="$2">
                   <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
-                    自訂 ID
+                    {t("customId")}
                   </Text>
                   <Input
                     size="$4"
@@ -536,7 +543,7 @@ export default function PublicInfoSettingsScreen() {
                       setCustomId(value);
                       clearFieldError("customId");
                     }}
-                    placeholder="自訂你的 ID"
+                    placeholder={t("customIdPlaceholder")}
                     autoCapitalize="none"
                     borderColor={fieldErrors.customId ? colors.semantic.error : undefined}
                   />
@@ -548,7 +555,7 @@ export default function PublicInfoSettingsScreen() {
                 </YStack>
                 <YStack gap="$2">
                   <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
-                    居住地
+                    {t("location")}
                   </Text>
                   <Button
                     size="$4"
@@ -560,7 +567,7 @@ export default function PublicInfoSettingsScreen() {
                     disabled={isCountriesLoading}
                   >
                     <Text fontSize={14} color={countryLabel ? "$color" : "$color"} opacity={countryLabel ? 1 : 0.5}>
-                      {isCountriesLoading ? "載入國家中..." : countryLabel || "請選擇國家"}
+                      {isCountriesLoading ? t("loadingCountries") : countryLabel || t("selectCountry")}
                     </Text>
                     <ChevronDown size={16} color="$color" opacity={0.5} />
                   </Button>
@@ -576,10 +583,10 @@ export default function PublicInfoSettingsScreen() {
                   >
                     <Text fontSize={14} color={cityLabel ? "$color" : "$color"} opacity={cityLabel ? 1 : 0.5}>
                       {!country
-                        ? "請先選擇國家"
+                        ? t("selectCountryFirst")
                         : isCitiesLoading
-                          ? "載入城市中..."
-                          : cityLabel || "請選擇城市"}
+                          ? t("loadingCities")
+                          : cityLabel || t("selectCity")}
                     </Text>
                     <ChevronDown size={16} color="$color" opacity={0.5} />
                   </Button>
@@ -603,7 +610,7 @@ export default function PublicInfoSettingsScreen() {
               <YStack gap="$4">
                 <YStack gap="$2">
                   <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
-                    個人標語
+                    {t("personalSlogan")}
                   </Text>
                   <Input
                     size="$4"
@@ -612,7 +619,7 @@ export default function PublicInfoSettingsScreen() {
                       setPersonalSlogan(value);
                       clearFieldError("personalSlogan");
                     }}
-                    placeholder="一句話介紹自己"
+                    placeholder={t("personalSloganPlaceholder")}
                     borderColor={fieldErrors.personalSlogan ? colors.semantic.error : undefined}
                   />
                   {fieldErrors.personalSlogan ? (
@@ -623,7 +630,7 @@ export default function PublicInfoSettingsScreen() {
                 </YStack>
                 <YStack gap="$2">
                   <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
-                    自我介紹
+                    {t("selfIntroduction")}
                   </Text>
                   <TextArea
                     size="$4"
@@ -632,7 +639,7 @@ export default function PublicInfoSettingsScreen() {
                       setSelfIntroduction(value);
                       clearFieldError("selfIntroduction");
                     }}
-                    placeholder="詳細介紹自己"
+                    placeholder={t("selfIntroductionPlaceholder")}
                     numberOfLines={4}
                     borderColor={fieldErrors.selfIntroduction ? colors.semantic.error : undefined}
                   />
@@ -655,10 +662,10 @@ export default function PublicInfoSettingsScreen() {
             >
               <YStack gap="$4">
                 <Text fontSize={15} fontWeight="600" color="$color">
-                  社群連結
+                  {t("socialLinks")}
                 </Text>
                 {[
-                  { label: "個人網站", value: personalUrl, setter: setPersonalUrl },
+                  { label: t("personalWebsite"), value: personalUrl, setter: setPersonalUrl },
                   { label: "Facebook", value: facebook, setter: setFacebook },
                   { label: "Instagram", value: instagram, setter: setInstagram },
                   { label: "LinkedIn", value: linkedin, setter: setLinkedin },
@@ -695,10 +702,10 @@ export default function PublicInfoSettingsScreen() {
               <XStack alignItems="center" justifyContent="space-between">
                 <YStack flex={1} gap="$1">
                   <Text fontSize={15} color="$color">
-                    隱藏連結數量
+                    {t("hideConnectionsTitle")}
                   </Text>
                   <Text fontSize={12} color="$color" opacity={0.5}>
-                    開啟後，其他人將看不到你的連結夥伴數量
+                    {t("hideConnectionsDescription")}
                   </Text>
                 </YStack>
                 <Switch
@@ -714,10 +721,10 @@ export default function PublicInfoSettingsScreen() {
         </ScrollView>
         <LocationSelectionModal
           visible={showCountryPicker}
-          title="選擇國家"
+          title={t("selectCountryTitle")}
           options={countries}
           selected={country}
-          emptyText="目前沒有可選擇的國家"
+          emptyText={t("emptyCountries")}
           onClose={() => setShowCountryPicker(false)}
           onSelect={(value) => {
             setCountry(value);
@@ -726,10 +733,10 @@ export default function PublicInfoSettingsScreen() {
         />
         <LocationSelectionModal
           visible={showCityPicker}
-          title="選擇城市"
+          title={t("selectCityTitle")}
           options={cities}
           selected={location}
-          emptyText={country ? "目前沒有可選擇的城市" : "請先選擇國家"}
+          emptyText={country ? t("emptyCities") : t("selectCountryFirst")}
           onClose={() => setShowCityPicker(false)}
           onSelect={(value) => {
             setLocation(value);

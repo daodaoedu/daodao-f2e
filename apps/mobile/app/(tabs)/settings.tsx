@@ -1,5 +1,6 @@
 import {
   Archive,
+  AlertCircle,
   Bell,
   ChevronRight,
   Footprints,
@@ -17,33 +18,36 @@ import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useSettingsCompletion } from "@/hooks/useSettingsCompletion";
+import { useMobileTranslation } from "@/i18n";
 import { useAuth } from "@/providers/AuthProvider";
 
 interface ISettingItem {
   icon: typeof Settings;
-  label: string;
+  labelKey: string;
   route: string;
+  completionKey?: "preferences" | "account" | "publicInfo";
 }
 
 const socialItems: ISettingItem[] = [
   {
     icon: Footprints,
-    label: "我的足跡",
+    labelKey: "items.footprints",
     route: "/me/footprints",
   },
   {
     icon: MessagesSquare,
-    label: "互動設定",
+    labelKey: "items.interaction",
     route: "/settings/interaction",
   },
   {
     icon: Telescope,
-    label: "關注設定",
+    labelKey: "items.following",
     route: "/settings/following",
   },
   {
     icon: HeartHandshake,
-    label: "連結的夥伴",
+    labelKey: "items.connections",
     route: "/settings/connections",
   },
 ];
@@ -51,60 +55,98 @@ const socialItems: ISettingItem[] = [
 const settingsItems: ISettingItem[] = [
   {
     icon: BookOpen,
-    label: "學習資源",
+    labelKey: "items.resources",
     route: "/resource",
   },
   {
     icon: LibraryBig,
-    label: "領域偏好設定",
+    labelKey: "items.preferences",
     route: "/settings/preferences",
+    completionKey: "preferences",
   },
   {
     icon: Settings,
-    label: "帳號設定",
+    labelKey: "items.account",
     route: "/settings/account",
+    completionKey: "account",
   },
   {
     icon: SquareUser,
-    label: "公開資訊設定",
+    labelKey: "items.publicInfo",
     route: "/settings/public-info",
+    completionKey: "publicInfo",
   },
   {
     icon: Bell,
-    label: "通知設定",
+    labelKey: "items.notifications",
     route: "/settings/notifications",
   },
   {
     icon: Archive,
-    label: "已封存的內容",
+    labelKey: "items.archived",
     route: "/settings/archived",
   },
 ];
 
-const settingGroups: { title: string; items: ISettingItem[] }[] = [
-  { title: "社交", items: socialItems },
-  { title: "設定", items: settingsItems },
+const settingGroups: { titleKey: string; items: ISettingItem[] }[] = [
+  { titleKey: "groups.social", items: socialItems },
+  { titleKey: "groups.settings", items: settingsItems },
 ];
 
 export default function SettingsTab() {
   const router = useRouter();
   const { signOut } = useAuth();
+  const t = useMobileTranslation("mobile.settings");
+  const { data: settingsCompletion } = useSettingsCompletion();
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         <XStack padding="$4" alignItems="center">
           <Text fontSize={18} fontWeight="600" color="$color">
-            設定
+            {t("title")}
           </Text>
         </XStack>
 
         <ScrollView flex={1} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
           <YStack gap="$5">
+            {settingsCompletion && settingsCompletion.completed < settingsCompletion.total && (
+              <Card
+                backgroundColor="#FFF7ED"
+                borderRadius="$md"
+                borderWidth={1}
+                borderColor="#FED7AA"
+                padding="$3"
+              >
+                <Text fontSize={14} color="#C2410C">
+                  {t("completion.prompt")}
+                </Text>
+              </Card>
+            )}
+
+            {settingsCompletion && (
+              <Card
+                backgroundColor="$background"
+                borderRadius="$md"
+                borderWidth={1}
+                borderColor="$borderColor"
+                padding="$3"
+              >
+                <XStack alignItems="center" gap="$2">
+                  <Text fontSize={14} color="$color" opacity={0.7}>
+                    {t("completion.label")}
+                  </Text>
+                  <Text fontSize={14} fontWeight="600" color="$color" marginLeft="auto">
+                    {settingsCompletion.completed}/{settingsCompletion.total}
+                  </Text>
+                </XStack>
+              </Card>
+            )}
+
             {settingGroups.map((group) => (
-              <YStack key={group.title} gap="$3">
+              <YStack key={group.titleKey} gap="$3">
                 <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingLeft="$1">
-                  {group.title}
+                  {t(group.titleKey)}
                 </Text>
                 <Card
                   backgroundColor="$background"
@@ -115,6 +157,10 @@ export default function SettingsTab() {
                 >
                   {group.items.map((item, index) => {
                     const Icon = item.icon;
+                    const isIncomplete =
+                      item.completionKey !== undefined &&
+                      settingsCompletion?.sections[item.completionKey] === false;
+
                     return (
                       <XStack
                         key={item.route}
@@ -138,9 +184,10 @@ export default function SettingsTab() {
                             <Icon size={18} color={colors.primary.base} />
                           </YStack>
                           <Text fontSize={15} color="$color" flex={1}>
-                            {item.label}
+                            {t(item.labelKey)}
                           </Text>
                         </XStack>
+                        {isIncomplete && <AlertCircle size={18} color={colors.logo.orange} />}
                         <ChevronRight size={18} color="$color" opacity={0.4} />
                       </XStack>
                     );
@@ -163,10 +210,10 @@ export default function SettingsTab() {
                 gap="$3"
                 pressStyle={{ backgroundColor: "$backgroundHover" }}
                 onPress={() => {
-                  Alert.alert("登出", "確定要登出嗎？", [
-                    { text: "取消", style: "cancel" },
+                  Alert.alert(t("logout.title"), t("logout.message"), [
+                    { text: t("logout.cancel"), style: "cancel" },
                     {
-                      text: "登出",
+                      text: t("logout.confirm"),
                       style: "destructive",
                       onPress: () => {
                         signOut();
@@ -186,7 +233,7 @@ export default function SettingsTab() {
                   <LogOut size={18} color={colors.semantic.error} />
                 </YStack>
                 <Text fontSize={15} color={colors.semantic.error}>
-                  登出
+                  {t("logout.title")}
                 </Text>
               </XStack>
             </Card>

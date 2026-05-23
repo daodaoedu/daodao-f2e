@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { Alert } from "react-native";
+import { useMobileTranslation } from "@/i18n";
 
 interface IDraftData<T> {
   data: T;
@@ -35,22 +36,23 @@ interface IDialogResult {
 export function useRestoreDraftDialog<TFormValues>({
   draft,
 }: IUseRestoreDraftDialogOptions<TFormValues>) {
+  const t = useMobileTranslation("mobile.dialogs");
   const openRestoreDialog = useCallback((): Promise<IDialogResult> => {
     if (!draft) {
       return Promise.resolve({ value: "skip", index: -1 });
     }
 
     return new Promise((resolve) => {
-      Alert.alert("恢復暫存資料", "偵測到您有未完成的資料，是否要恢復？", [
+      Alert.alert(t("restore_draft_title"), t("restore_draft_message"), [
         {
-          text: "重新開始",
+          text: t("restart"),
           style: "cancel",
           onPress: () => {
             resolve({ value: "discard", index: 0 });
           },
         },
         {
-          text: "恢復資料",
+          text: t("restore_draft_confirm"),
           style: "default",
           onPress: () => {
             resolve({ value: "restore", index: 1 });
@@ -58,7 +60,7 @@ export function useRestoreDraftDialog<TFormValues>({
         },
       ]);
     });
-  }, [draft]);
+  }, [draft, t]);
 
   return { openRestoreDialog };
 }

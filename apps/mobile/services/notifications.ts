@@ -2,6 +2,62 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
+type NotificationLocale = "zh-TW" | "en";
+
+function getNotificationLocale(): NotificationLocale {
+  const locale = Intl.DateTimeFormat().resolvedOptions().locale;
+  return locale.toLowerCase().startsWith("en") ? "en" : "zh-TW";
+}
+
+const notificationMessages = {
+  "zh-TW": {
+    dailyChannelName: "每日提醒",
+    dailyChannelDescription: "實踐打卡提醒通知",
+    achievementsChannelName: "成就通知",
+    achievementsChannelDescription: "成就解鎖和里程碑通知",
+    dailyReminderTitle: "打卡提醒 ⏰",
+    dailyReminderBody: (practiceTitle: string) => `記得完成今天的「${practiceTitle}」`,
+    streakTitle: "🔥 連續打卡里程碑",
+    streakMilestones: {
+      3: "連續 3 天打卡！繼續保持！",
+      7: "連續一週打卡！你太棒了！",
+      14: "連續兩週！習慣正在養成中！",
+      21: "21 天！恭喜你養成了新習慣！",
+      30: "連續一個月！你是真正的實踐者！",
+      60: "連續 60 天！令人敬佩的毅力！",
+      100: "100 天連續打卡！你是傳奇！",
+    },
+    practiceCompletedTitle: "🎉 實踐完成！",
+    practiceCompletedBody: (practiceTitle: string, totalDays: number) =>
+      `恭喜完成「${practiceTitle}」${totalDays} 天的目標！`,
+    firstCheckInTitle: "🌟 第一次打卡",
+    firstCheckInBody: "恭喜完成你的第一次打卡！這是偉大旅程的開始！",
+  },
+  en: {
+    dailyChannelName: "Daily reminders",
+    dailyChannelDescription: "Practice check-in reminders",
+    achievementsChannelName: "Achievements",
+    achievementsChannelDescription: "Achievement unlocks and milestone notifications",
+    dailyReminderTitle: "Check-in reminder ⏰",
+    dailyReminderBody: (practiceTitle: string) => `Remember to complete "${practiceTitle}" today`,
+    streakTitle: "🔥 Check-in streak milestone",
+    streakMilestones: {
+      3: "3-day check-in streak! Keep going!",
+      7: "One-week check-in streak! Great work!",
+      14: "Two weeks in a row! Your habit is taking shape!",
+      21: "21 days! You are building a new habit!",
+      30: "One month in a row! You are a true practitioner!",
+      60: "60-day streak! Impressive persistence!",
+      100: "100-day check-in streak! Legendary!",
+    },
+    practiceCompletedTitle: "🎉 Practice completed!",
+    practiceCompletedBody: (practiceTitle: string, totalDays: number) =>
+      `Congratulations on completing ${totalDays} days of "${practiceTitle}"!`,
+    firstCheckInTitle: "🌟 First check-in",
+    firstCheckInBody: "Congratulations on your first check-in! This is the start of a great journey!",
+  },
+} as const;
+
 // Configure notification handling
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -55,9 +111,10 @@ export const notificationService = {
    * Set up Android notification channel
    */
   async setupAndroidChannel(): Promise<void> {
+    const messages = notificationMessages[getNotificationLocale()];
     await Notifications.setNotificationChannelAsync("daily-reminders", {
-      name: "每日提醒",
-      description: "實踐打卡提醒通知",
+      name: messages.dailyChannelName,
+      description: messages.dailyChannelDescription,
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: "#4F46E5",
@@ -65,8 +122,8 @@ export const notificationService = {
     });
 
     await Notifications.setNotificationChannelAsync("achievements", {
-      name: "成就通知",
-      description: "成就解鎖和里程碑通知",
+      name: messages.achievementsChannelName,
+      description: messages.achievementsChannelDescription,
       importance: Notifications.AndroidImportance.DEFAULT,
       sound: "default",
     });
@@ -106,8 +163,8 @@ export const notificationService = {
 
     const id = await Notifications.scheduleNotificationAsync({
       content: {
-        title: "打卡提醒 ⏰",
-        body: `記得完成今天的「${practiceTitle}」`,
+        title: notificationMessages[getNotificationLocale()].dailyReminderTitle,
+        body: notificationMessages[getNotificationLocale()].dailyReminderBody(practiceTitle),
         data: {
           type: "daily-reminder",
           practiceId,
@@ -204,36 +261,30 @@ export const notificationService = {
 // Achievement notification helpers
 export const achievementNotifications = {
   async streakMilestone(streak: number): Promise<void> {
-    const milestones: Record<number, string> = {
-      3: "連續 3 天打卡！繼續保持！",
-      7: "連續一週打卡！你太棒了！",
-      14: "連續兩週！習慣正在養成中！",
-      21: "21 天！恭喜你養成了新習慣！",
-      30: "連續一個月！你是真正的實踐者！",
-      60: "連續 60 天！令人敬佩的毅力！",
-      100: "100 天連續打卡！你是傳奇！",
-    };
-
+    const messages = notificationMessages[getNotificationLocale()];
+    const milestones: Partial<Record<number, string>> = messages.streakMilestones;
     const message = milestones[streak];
     if (message) {
-      await notificationService.sendAchievementNotification("🔥 連續打卡里程碑", message, {
+      await notificationService.sendAchievementNotification(messages.streakTitle, message, {
         streak,
       });
     }
   },
 
   async practiceCompleted(practiceTitle: string, totalDays: number): Promise<void> {
+    const messages = notificationMessages[getNotificationLocale()];
     await notificationService.sendAchievementNotification(
-      "🎉 實踐完成！",
-      `恭喜完成「${practiceTitle}」${totalDays} 天的目標！`,
+      messages.practiceCompletedTitle,
+      messages.practiceCompletedBody(practiceTitle, totalDays),
       { practiceTitle, totalDays }
     );
   },
 
   async firstCheckIn(): Promise<void> {
+    const messages = notificationMessages[getNotificationLocale()];
     await notificationService.sendAchievementNotification(
-      "🌟 第一次打卡",
-      "恭喜完成你的第一次打卡！這是偉大旅程的開始！"
+      messages.firstCheckInTitle,
+      messages.firstCheckInBody
     );
   },
 };

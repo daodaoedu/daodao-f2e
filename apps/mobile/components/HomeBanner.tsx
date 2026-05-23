@@ -3,6 +3,7 @@ import { Dimensions, Image, View as RNView, StyleSheet } from "react-native";
 import Svg, { ClipPath, Defs, G, Path, RadialGradient, Stop } from "react-native-svg";
 import { Text, XStack } from "tamagui";
 import activeShaper2Json from "@/assets/animations/active-shaper-2.json";
+import { useMobileTranslation } from "@/i18n";
 
 const { width: screenWidth } = Dimensions.get("window");
 // Banner 高度 - 調整為更短
@@ -12,6 +13,7 @@ const BANNER_HEIGHT = Math.round(screenWidth / (195 / 60));
 const logoImage = require("@/assets/images/logo.png");
 
 export function HomeBanner() {
+  const t = useMobileTranslation("mobile.homeBanner");
   // 根據 Product mobile-banner.svg (390x420) 的比例計算位置
   const scale = screenWidth / 390;
 
@@ -85,7 +87,7 @@ export function HomeBanner() {
       <RNView style={styles.contentContainer}>
         {/* Title - Product: text-[1.125rem] = 18px */}
         <Text fontSize={18} fontWeight="500" color="#333333">
-          我的小島
+          {t("title")}
         </Text>
 
         {/* Subtitle bubble */}
@@ -99,7 +101,7 @@ export function HomeBanner() {
           marginTop={8}
         >
           <Text fontSize={14} color="#333333">
-            先做再說，做中學最快！
+            {t("subtitle")}
           </Text>
         </XStack>
       </RNView>

@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createContext, type ReactNode, useCallback, useContext, useState } from "react";
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
 import { type UseFormReturn, useForm } from "react-hook-form";
+import { useMobileTranslation } from "@/i18n";
 import {
   type CreatePracticeInputType,
-  createPracticeSchema,
+  createCreatePracticeSchema,
   defaultCreatePracticeValues,
 } from "@/types/create-practice";
 
@@ -29,7 +30,9 @@ interface CreatePracticeProviderProps {
 }
 
 export function CreatePracticeProvider({ children, initialValues }: CreatePracticeProviderProps) {
+  const t = useMobileTranslation("practice");
   const [currentStep, setCurrentStep] = useState(1);
+  const createPracticeSchema = useMemo(() => createCreatePracticeSchema(t), [t]);
 
   const form = useForm<CreatePracticeInputType>({
     resolver: zodResolver(createPracticeSchema),

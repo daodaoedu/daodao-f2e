@@ -41,7 +41,7 @@ function useProtectedRoute(isAuthenticated: boolean, isLoading: boolean) {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === "(auth)";
+    const inAuthGroup = segments[0] === "(auth)" || segments[0] === "auth";
     let targetRoute: string | null = null;
 
     if (!isAuthenticated && !inAuthGroup) {

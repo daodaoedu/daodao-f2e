@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 interface IStat {
   label: string;
@@ -37,6 +38,7 @@ function StatCard({ label, value, unit, icon }: IStat) {
 }
 
 export function DashboardHeader({ stats }: DashboardHeaderProps) {
+  const t = useMobileTranslation("mobile.home");
   const today = new Date();
 
   return (
@@ -52,7 +54,7 @@ export function DashboardHeader({ stats }: DashboardHeaderProps) {
               {format(today, "M")}
             </Text>
             <Text fontSize={22} fontWeight="500" color={colors.text.dark}>
-              月
+              {t("month_unit")}
             </Text>
           </XStack>
           <XStack alignItems="center" gap="$1">
@@ -60,7 +62,7 @@ export function DashboardHeader({ stats }: DashboardHeaderProps) {
               {format(today, "d")}
             </Text>
             <Text fontSize={22} fontWeight="500" color={colors.text.dark}>
-              日
+              {t("day_unit")}
             </Text>
           </XStack>
         </XStack>

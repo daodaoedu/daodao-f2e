@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
+import { useMobileTranslation } from "@/i18n";
 
 interface IArchivedPractice {
   id: string;
@@ -14,6 +15,8 @@ interface IArchivedPractice {
 
 export default function ArchivedContentScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.archivedSettings");
+  const tCommon = useMobileTranslation("common");
   const [unarchivingIds, setUnarchivingIds] = useState<Set<string>>(new Set());
   const { unarchivePractice } = useUnarchivePractice();
 
@@ -33,7 +36,7 @@ export default function ArchivedContentScreen() {
       await unarchivePractice(practiceId);
       await mutate();
     } catch {
-      Alert.alert("錯誤", "取消封存失敗，請稍後再試");
+      Alert.alert(t("errorTitle"), t("unarchiveError"));
     } finally {
       setUnarchivingIds((prev) => {
         const next = new Set(prev);
@@ -52,12 +55,12 @@ export default function ArchivedContentScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            已封存的內容
+            {t("title")}
           </Text>
         </XStack>
 
@@ -65,25 +68,25 @@ export default function ArchivedContentScreen() {
           {isLoading ? (
             <YStack alignItems="center" paddingVertical="$8">
               <Text fontSize={14} color="$color" opacity={0.5}>
-                載入中...
+                {t("loading")}
               </Text>
             </YStack>
           ) : error ? (
             <YStack alignItems="center" paddingVertical="$8">
               <Text fontSize={14} color="$color" opacity={0.5}>
-                載入失敗，請稍後再試
+                {t("loadError")}
               </Text>
             </YStack>
           ) : items.length === 0 ? (
             <YStack alignItems="center" paddingVertical="$8">
               <Text fontSize={14} color="$color" opacity={0.5}>
-                尚無已封存的內容
+                {t("empty")}
               </Text>
             </YStack>
           ) : (
             <YStack gap="$3">
               <Text fontSize={15} fontWeight="600" color="$color" paddingLeft="$1">
-                主題實踐
+                {t("practiceSection")}
               </Text>
               {items.map((practice) => (
                 <Card
@@ -114,7 +117,7 @@ export default function ArchivedContentScreen() {
                       disabled={unarchivingIds.has(practice.id)}
                     >
                       <Text fontSize={12} color="$color">
-                        {unarchivingIds.has(practice.id) ? "處理中..." : "取消封存"}
+                        {unarchivingIds.has(practice.id) ? t("processing") : t("unarchive")}
                       </Text>
                     </Button>
                   </XStack>

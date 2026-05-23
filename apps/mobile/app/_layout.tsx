@@ -7,6 +7,7 @@ import { useColorScheme } from "react-native";
 import { TamaguiProvider, Theme } from "tamagui";
 import { AnalyticsProvider } from "@/providers/AnalyticsProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
+import { MobileI18nProvider } from "../i18n";
 import config from "../tamagui.config";
 
 // 防止 splash screen 自動隱藏
@@ -37,15 +38,17 @@ export default function RootLayout() {
     <TamaguiProvider config={config}>
       <PortalProvider>
         <Theme name={colorScheme === "dark" ? "dark" : "light"}>
-          <AnalyticsProvider>
-            <AuthProvider>
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                }}
-              />
-            </AuthProvider>
-          </AnalyticsProvider>
+          <MobileI18nProvider>
+            <AnalyticsProvider>
+              <AuthProvider>
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                  }}
+                />
+              </AuthProvider>
+            </AnalyticsProvider>
+          </MobileI18nProvider>
         </Theme>
       </PortalProvider>
     </TamaguiProvider>

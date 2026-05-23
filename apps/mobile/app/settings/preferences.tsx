@@ -6,12 +6,13 @@ import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
-function assertSuccessfulResponse(response: { error?: unknown }) {
+function assertSuccessfulResponse(response: { error?: unknown }, fallbackMessage: string) {
   if (!response.error) return;
 
   const error = response.error as { error?: { message?: string }; message?: string };
-  throw new Error(error.error?.message ?? error.message ?? "更新失敗，請稍後再試");
+  throw new Error(error.error?.message ?? error.message ?? fallbackMessage);
 }
 
 interface IPreferenceOption {
@@ -37,6 +38,8 @@ interface IUserPreference {
 
 export default function PreferencesSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.preferencesSettings");
+  const tCommon = useMobileTranslation("common");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { updateCurrentUserPreferences } = useUserMutations();
 
@@ -81,9 +84,9 @@ export default function PreferencesSettingsScreen() {
       return;
     }
 
-    Alert.alert("尚未儲存變更", "離開後會失去這次修改，確定要離開嗎？", [
-      { text: "繼續編輯", style: "cancel" },
-      { text: "離開", style: "destructive", onPress: () => router.back() },
+    Alert.alert(t("unsavedTitle"), t("unsavedMessage"), [
+      { text: t("keepEditing"), style: "cancel" },
+      { text: t("leave"), style: "destructive", onPress: () => router.back() },
     ]);
   };
 
@@ -125,11 +128,13 @@ export default function PreferencesSettingsScreen() {
       });
 
       const response = await updateCurrentUserPreferences({ preferences: preferenceItems });
-      assertSuccessfulResponse(response);
+      assertSuccessfulResponse(response, t("saveError"));
 
-      Alert.alert("成功", "偏好設定已更新", [{ text: "確定", onPress: () => router.back() }]);
+      Alert.alert(t("successTitle"), t("saveSuccess"), [
+        { text: t("confirm"), onPress: () => router.back() },
+      ]);
     } catch (error) {
-      Alert.alert("錯誤", error instanceof Error ? error.message : "更新失敗，請稍後再試");
+      Alert.alert(t("errorTitle"), error instanceof Error ? error.message : t("saveError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -146,12 +151,12 @@ export default function PreferencesSettingsScreen() {
             circular
             chromeless
             onPress={handleBack}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color" flex={1}>
-            領域偏好設定
+            {t("title")}
           </Text>
           <Button
             size="$3"
@@ -162,7 +167,7 @@ export default function PreferencesSettingsScreen() {
             opacity={isDirty ? 1 : 0.55}
           >
             <Text color={colors.basic.white} fontWeight="600" fontSize={14}>
-              {isSubmitting ? "儲存中..." : "儲存"}
+              {isSubmitting ? t("saving") : t("save")}
             </Text>
           </Button>
         </XStack>
@@ -170,13 +175,13 @@ export default function PreferencesSettingsScreen() {
         {isLoading ? (
           <YStack flex={1} alignItems="center" justifyContent="center">
             <Text fontSize={14} color="$color" opacity={0.5}>
-              載入中...
+              {t("loading")}
             </Text>
           </YStack>
         ) : preferenceTypes.length === 0 ? (
           <YStack flex={1} alignItems="center" justifyContent="center">
             <Text fontSize={14} color="$color" opacity={0.5}>
-              目前沒有可用的偏好設定
+              {t("empty")}
             </Text>
           </YStack>
         ) : (
@@ -198,7 +203,10 @@ export default function PreferencesSettingsScreen() {
                       )}
                       {preferenceType.maxSelections && (
                         <Text fontSize={12} color="$color" opacity={0.5}>
-                          最多選 {preferenceType.maxSelections} 項（已選 {selectedIds.length} 項）
+                          {t("selection_count", {
+                            max: preferenceType.maxSelections,
+                            count: selectedIds.length,
+                          })}
                         </Text>
                       )}
                     </YStack>

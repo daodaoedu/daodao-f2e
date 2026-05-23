@@ -2,6 +2,7 @@ import { Tag } from "@tamagui/lucide-icons";
 import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import type { ManualPracticeFormValuesType } from "../create/manual/schema";
 import { CircularProgress } from "./circular-progress";
 
@@ -25,6 +26,8 @@ export const PracticeOverviewCard = ({
   progress,
   showProgress = false,
 }: PracticeOverviewCardProps) => {
+  const t = useMobileTranslation("practice");
+
   return (
     <View style={styles.card}>
       <YStack flex={1}>
@@ -48,27 +51,27 @@ export const PracticeOverviewCard = ({
         >
           <YStack width={80}>
             <Text fontSize={12} color={colors.text.dark}>
-              一週
+              {t("mobile_frequency_week_label")}
             </Text>
             <XStack alignItems="baseline" gap="$0.5">
               <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
                 {frequency}
               </Text>
               <Text fontSize={12} color={colors.text.dark}>
-                天
+                {t("frequency_unit")}
               </Text>
             </XStack>
           </YStack>
           <YStack width={80}>
             <Text fontSize={12} color={colors.text.dark}>
-              一次
+              {t("once_label")}
             </Text>
             <XStack alignItems="baseline" gap="$0.5">
               <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
                 {durationMinutes}
               </Text>
               <Text fontSize={12} color={colors.text.dark}>
-                分鐘
+                {t("minutes_unit")}
               </Text>
             </XStack>
           </YStack>

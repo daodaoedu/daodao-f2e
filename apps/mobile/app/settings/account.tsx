@@ -13,14 +13,15 @@ import {
 } from "@/constants/settings";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useMobileTranslation } from "@/i18n";
 
 type FieldOptionType = { value: string; label: string };
 
-function assertSuccessfulResponse(response: { error?: unknown }) {
+function assertSuccessfulResponse(response: { error?: unknown }, fallbackMessage: string) {
   if (!response.error) return;
 
   const error = response.error as { error?: { message?: string }; message?: string };
-  throw new Error(error.error?.message ?? error.message ?? "更新失敗，請稍後再試");
+  throw new Error(error.error?.message ?? error.message ?? fallbackMessage);
 }
 
 function FieldSelectionModal({
@@ -40,6 +41,7 @@ function FieldSelectionModal({
   onClose: () => void;
   onConfirm: (selected: string[]) => void;
 }) {
+  const t = useMobileTranslation("mobile.accountSettings");
   const [localSelected, setLocalSelected] = useState<string[]>(selected);
 
   useEffect(() => {
@@ -61,7 +63,7 @@ function FieldSelectionModal({
           <XStack padding="$4" alignItems="center" justifyContent="space-between">
             <Button size="$3" chromeless onPress={onClose}>
               <Text fontSize={14} color="$color">
-                取消
+                {t("cancel")}
               </Text>
             </Button>
             <Text fontSize={16} fontWeight="600" color="$color">
@@ -76,12 +78,12 @@ function FieldSelectionModal({
               }}
             >
               <Text fontSize={14} color={colors.primary.base} fontWeight="600">
-                確定
+                {t("confirm")}
               </Text>
             </Button>
           </XStack>
           <Text fontSize={12} color="$color" opacity={0.5} paddingHorizontal="$4" marginBottom="$2">
-            最多選 {maxSelection} 項（已選 {localSelected.length} 項）
+            {t("selection_count", { max: maxSelection, count: localSelected.length })}
           </Text>
           <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
             <XStack flexWrap="wrap" gap="$2">
@@ -116,6 +118,8 @@ function FieldSelectionModal({
 
 export default function AccountSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.accountSettings");
+  const tCommon = useMobileTranslation("common");
   const { user, isLoading, mutate } = useCurrentUser();
   const { updateCurrentUser } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -164,11 +168,13 @@ export default function AccountSettingsScreen() {
       if (educationStage) updateData.educationStage = educationStage;
 
       const response = await updateCurrentUser(updateData);
-      assertSuccessfulResponse(response);
+      assertSuccessfulResponse(response, t("saveError"));
       await mutate();
-      Alert.alert("成功", "帳號設定已更新", [{ text: "確定", onPress: () => router.back() }]);
+      Alert.alert(t("successTitle"), t("saveSuccess"), [
+        { text: t("confirm"), onPress: () => router.back() },
+      ]);
     } catch (error) {
-      Alert.alert("錯誤", error instanceof Error ? error.message : "更新失敗，請稍後再試");
+      Alert.alert(t("errorTitle"), error instanceof Error ? error.message : t("saveError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -179,7 +185,7 @@ export default function AccountSettingsScreen() {
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center">
           <Text fontSize={14} color="$color" opacity={0.5}>
-            載入中...
+            {t("loading")}
           </Text>
         </YStack>
       </SafeAreaView>
@@ -195,12 +201,12 @@ export default function AccountSettingsScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color" flex={1}>
-            帳號設定
+            {t("title")}
           </Text>
           <Button
             size="$3"
@@ -210,7 +216,7 @@ export default function AccountSettingsScreen() {
             disabled={isSubmitting}
           >
             <Text color={colors.basic.white} fontWeight="600" fontSize={14}>
-              {isSubmitting ? "儲存中..." : "儲存"}
+              {isSubmitting ? t("saving") : t("save")}
             </Text>
           </Button>
         </XStack>
@@ -234,13 +240,13 @@ export default function AccountSettingsScreen() {
                 </YStack>
                 <YStack gap="$2">
                   <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
-                    生日
+                    {t("birthday")}
                   </Text>
-                  <Input size="$4" value={birthday || "尚未設定"} disabled opacity={0.6} />
+                  <Input size="$4" value={birthday || t("not_set")} disabled opacity={0.6} />
                 </YStack>
                 <YStack gap="$2">
                   <Text fontSize={13} fontWeight="500" color="$color" opacity={0.6}>
-                    教育階段
+                    {t("educationStage")}
                   </Text>
                   <Pressable onPress={() => setShowEducationPicker(true)}>
                     <XStack
@@ -260,7 +266,7 @@ export default function AccountSettingsScreen() {
                       >
                         {educationStage
                           ? getLabel(EDUCATION_STAGE_OPTIONS, educationStage)
-                          : "請選擇教育階段"}
+                          : t("educationStagePlaceholder")}
                       </Text>
                       <ChevronDown size={16} color="$color" opacity={0.5} />
                     </XStack>
@@ -280,12 +286,12 @@ export default function AccountSettingsScreen() {
               <YStack gap="$3">
                 <XStack alignItems="center" justifyContent="space-between">
                   <Text fontSize={15} fontWeight="600" color="$color">
-                    身份
+                    {t("position")}
                   </Text>
                   {position.length > 0 && (
                     <Button size="$2" chromeless onPress={() => setPosition([])}>
                       <Text fontSize={12} color="$color" opacity={0.5}>
-                        清空
+                        {t("clear")}
                       </Text>
                     </Button>
                   )}
@@ -315,7 +321,7 @@ export default function AccountSettingsScreen() {
                   pressStyle={{ opacity: 0.8 }}
                   onPress={() =>
                     setActiveFieldModal({
-                      title: "身份",
+                      title: t("position"),
                       options: POSITION_OPTIONS,
                       selected: position,
                       maxSelection: 5,
@@ -324,7 +330,7 @@ export default function AccountSettingsScreen() {
                   }
                 >
                   <Text color={colors.basic.white} fontWeight="500">
-                    編輯
+                    {t("edit")}
                   </Text>
                 </Button>
               </YStack>
@@ -341,12 +347,12 @@ export default function AccountSettingsScreen() {
               <YStack gap="$3">
                 <XStack alignItems="center" justifyContent="space-between">
                   <Text fontSize={15} fontWeight="600" color="$color">
-                    專業領域
+                    {t("professionalFields")}
                   </Text>
                   {professionalFields.length > 0 && (
                     <Button size="$2" chromeless onPress={() => setProfessionalFields([])}>
                       <Text fontSize={12} color="$color" opacity={0.5}>
-                        清空
+                        {t("clear")}
                       </Text>
                     </Button>
                   )}
@@ -376,7 +382,7 @@ export default function AccountSettingsScreen() {
                   pressStyle={{ opacity: 0.8 }}
                   onPress={() =>
                     setActiveFieldModal({
-                      title: "專業領域",
+                      title: t("professionalFields"),
                       options: AVAILABLE_FIELDS,
                       selected: professionalFields,
                       maxSelection: 5,
@@ -385,7 +391,7 @@ export default function AccountSettingsScreen() {
                   }
                 >
                   <Text color={colors.basic.white} fontWeight="500">
-                    編輯
+                    {t("edit")}
                   </Text>
                 </Button>
               </YStack>
@@ -402,12 +408,12 @@ export default function AccountSettingsScreen() {
               <YStack gap="$3">
                 <XStack alignItems="center" justifyContent="space-between">
                   <Text fontSize={15} fontWeight="600" color="$color">
-                    想探索的領域
+                    {t("explorationFields")}
                   </Text>
                   {explorationFields.length > 0 && (
                     <Button size="$2" chromeless onPress={() => setExplorationFields([])}>
                       <Text fontSize={12} color="$color" opacity={0.5}>
-                        清空
+                        {t("clear")}
                       </Text>
                     </Button>
                   )}
@@ -437,7 +443,7 @@ export default function AccountSettingsScreen() {
                   pressStyle={{ opacity: 0.8 }}
                   onPress={() =>
                     setActiveFieldModal({
-                      title: "想探索的領域",
+                      title: t("explorationFields"),
                       options: INTEREST_CATEGORIES,
                       selected: explorationFields,
                       maxSelection: 5,
@@ -446,7 +452,7 @@ export default function AccountSettingsScreen() {
                   }
                 >
                   <Text color={colors.basic.white} fontWeight="500">
-                    編輯
+                    {t("edit")}
                   </Text>
                 </Button>
               </YStack>
@@ -469,7 +475,7 @@ export default function AccountSettingsScreen() {
                   padding="$4"
                 >
                   <Text fontSize={16} fontWeight="600" color="$color" marginBottom="$3">
-                    教育階段
+                    {t("educationStage")}
                   </Text>
                   {EDUCATION_STAGE_OPTIONS.map((opt) => (
                     <Pressable

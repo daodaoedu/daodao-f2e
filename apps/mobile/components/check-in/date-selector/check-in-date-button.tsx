@@ -3,6 +3,7 @@ import { Pressable, View as RNView, StyleSheet } from "react-native";
 import { Text, View } from "tamagui";
 import { MOOD_OPTIONS } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import type { ICheckInDate, ICheckInDisplayData } from "../types";
 
 interface ICheckInDateButtonProps {
@@ -32,6 +33,7 @@ export const CheckInDateButton = ({
   activeCheckInId,
   onSelect,
 }: ICheckInDateButtonProps) => {
+  const t = useMobileTranslation("mobile.checkInList");
   const hasCheckIn = item.hasCheckIn ?? !!checkIns[item.id];
   const isActive = hasCheckIn && item.id === activeCheckInId;
   const itemCheckIn = checkIns[item.id];
@@ -58,7 +60,11 @@ export const CheckInDateButton = ({
     <Pressable
       onPress={handlePress}
       disabled={!hasCheckIn}
-      accessibilityLabel={hasCheckIn ? `選擇 ${item.date} 的打卡記錄` : `${item.date} 尚未打卡`}
+      accessibilityLabel={
+        hasCheckIn
+          ? t("select_date_accessibility", { date: item.date })
+          : t("no_checkin_date_accessibility", { date: item.date })
+      }
       accessibilityRole="button"
       accessibilityState={{ selected: isActive, disabled: !hasCheckIn }}
       style={({ pressed }) => [

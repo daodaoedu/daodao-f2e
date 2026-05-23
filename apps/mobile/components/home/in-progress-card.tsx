@@ -10,13 +10,22 @@ import {
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
 import type { IInProgressTask } from "@/hooks/usePractices";
+import { useMobileTranslation } from "@/i18n";
 
 interface InProgressCardProps {
   task: IInProgressTask;
 }
 
+const statusLabelKey: Record<TaskStatus, string> = {
+  [TaskStatus.draft]: "filter_draft",
+  [TaskStatus.notStarted]: "filter_not_started",
+  [TaskStatus.inProgress]: "filter_in_progress",
+  [TaskStatus.completed]: "filter_completed",
+};
+
 export function InProgressCard({ task }: InProgressCardProps) {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.home");
   const { id, label, title, description, checkInCount, progress, theme, status } = task;
 
   const themeName = getThemeNameFromColor(theme);
@@ -58,7 +67,7 @@ export function InProgressCard({ task }: InProgressCardProps) {
                   fontSize={12}
                   color={status === TaskStatus.inProgress ? "white" : colors.text.dark}
                 >
-                  {statusInfo.label}
+                  {t(statusLabelKey[status] ?? "filter_in_progress")}
                 </Text>
               </View>
             )}
@@ -86,13 +95,13 @@ export function InProgressCard({ task }: InProgressCardProps) {
         <XStack alignItems="center" justifyContent="space-between">
           <XStack alignItems="center" gap="$1">
             <Text fontSize={12} color={colors.text.dark}>
-              已打卡
+              {t("checked_in")}
             </Text>
             <Text fontSize={12} fontWeight="600" color={colors.text.dark}>
               {checkInCount}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              次
+              {t("stats_times_unit")}
             </Text>
           </XStack>
           {/* TODO: MVP 先不開放 — aligned with product */}
@@ -114,12 +123,12 @@ export function InProgressCard({ task }: InProgressCardProps) {
             <XStack alignItems="center" justifyContent="center" gap="$2">
               <PenLine size={18} color="#16B9B3" />
               <Text fontSize={14} fontWeight="600" color={colors.text.dark}>
-                繼續編輯
+                {t("continue_editing")}
               </Text>
             </XStack>
           ) : (
             <Text fontSize={14} fontWeight="600" color={colors.text.dark} textAlign="center">
-              打卡
+              {t("check_in")}
             </Text>
           )}
         </Pressable>

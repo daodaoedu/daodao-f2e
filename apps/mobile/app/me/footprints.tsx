@@ -6,14 +6,15 @@ import { RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileI18n, useMobileTranslation } from "@/i18n";
 
 const PAGE_SIZE = 20;
 
-const formatDate = (dateString: string) => {
+const formatDate = (dateString: string, locale: string) => {
   const date = new Date(dateString);
   if (Number.isNaN(date.getTime())) return "";
 
-  return date.toLocaleDateString("zh-TW", {
+  return date.toLocaleDateString(locale, {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -22,6 +23,9 @@ const formatDate = (dateString: string) => {
 
 export default function FootprintsRoute() {
   const router = useRouter();
+  const { locale } = useMobileI18n();
+  const t = useMobileTranslation("mobile.footprints");
+  const tCommon = useMobileTranslation("common");
   const [page, setPage] = useState(1);
   const { data, error, isLoading, mutate } = useMyFootprints(page);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -31,9 +35,12 @@ export default function FootprintsRoute() {
   const hasNextPage = Boolean(pagination?.hasNextPage);
   const hasPreviousPage = page > 1;
   const pageLabel = useMemo(() => {
-    if (!pagination?.totalPages) return `第 ${page} 頁`;
-    return `第 ${pagination.currentPage} / ${pagination.totalPages} 頁`;
-  }, [page, pagination]);
+    if (!pagination?.totalPages) return t("page_label", { page });
+    return t("page_total_label", {
+      page: pagination.currentPage,
+      total: pagination.totalPages,
+    });
+  }, [page, pagination, t]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -46,15 +53,21 @@ export default function FootprintsRoute() {
 
   const renderHeader = () => (
     <XStack padding="$4" alignItems="center" gap="$3">
-      <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel="返回">
+      <Button
+        size="$4"
+        circular
+        chromeless
+        onPress={() => router.back()}
+        accessibilityLabel={tCommon("back")}
+      >
         <ChevronLeft size={24} color="$color" />
       </Button>
       <YStack flex={1}>
         <Text fontSize={18} fontWeight="600" color="$color">
-          我的足跡
+          {t("title")}
         </Text>
         <Text fontSize={13} color="$color" opacity={0.6}>
-          回顧你留下的學習紀錄
+          {t("subtitle")}
         </Text>
       </YStack>
       <Button
@@ -63,7 +76,7 @@ export default function FootprintsRoute() {
         chromeless
         onPress={handleRefresh}
         disabled={isRefreshing}
-        accessibilityLabel="重新整理"
+        accessibilityLabel={t("refresh")}
       >
         <RefreshCw size={20} color="$color" />
       </Button>
@@ -84,10 +97,10 @@ export default function FootprintsRoute() {
       </YStack>
       <YStack gap="$2" alignItems="center">
         <Text fontSize={17} fontWeight="600" color="$color">
-          尚未有任何足跡
+          {t("empty")}
         </Text>
         <Text fontSize={14} color="$color" opacity={0.65} textAlign="center" lineHeight={21}>
-          完成打卡或留下學習紀錄後，足跡會出現在這裡。
+          {t("empty_description")}
         </Text>
       </YStack>
     </YStack>
@@ -96,14 +109,14 @@ export default function FootprintsRoute() {
   const renderError = () => (
     <YStack flex={1} alignItems="center" justifyContent="center" gap="$4" padding="$8">
       <Text fontSize={17} fontWeight="600" color="$color">
-        載入失敗
+        {t("load_failed")}
       </Text>
       <Text fontSize={14} color="$color" opacity={0.65} textAlign="center" lineHeight={21}>
-        {error instanceof Error ? error.message : "無法載入足跡，請稍後再試。"}
+        {error instanceof Error ? error.message : t("load_failed_description")}
       </Text>
       <Button backgroundColor={colors.primary.base} borderRadius="$md" onPress={() => mutate()}>
         <Text color="white" fontWeight="600">
-          重新整理
+          {t("refresh")}
         </Text>
       </Button>
     </YStack>
@@ -123,7 +136,7 @@ export default function FootprintsRoute() {
           onPress={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
         >
           <Text color="$color" fontWeight="600">
-            上一頁
+            {t("previous_page")}
           </Text>
         </Button>
         <Text fontSize={13} color="$color" opacity={0.55}>
@@ -138,7 +151,7 @@ export default function FootprintsRoute() {
           onPress={() => setPage((currentPage) => currentPage + 1)}
         >
           <Text color="$color" fontWeight="600">
-            下一頁
+            {t("next_page")}
           </Text>
         </Button>
       </XStack>
@@ -154,7 +167,7 @@ export default function FootprintsRoute() {
           <YStack flex={1} alignItems="center" justifyContent="center" gap="$3">
             <Spinner size="large" color={colors.primary.base} />
             <Text fontSize={14} color="$color" opacity={0.65}>
-              正在載入足跡...
+              {t("loading")}
             </Text>
           </YStack>
         ) : error ? (
@@ -193,10 +206,10 @@ export default function FootprintsRoute() {
                         if (!item.practiceDeleted) router.push(`/practices/${item.practiceId}`);
                       }}
                     >
-                      {item.practiceDeleted ? "內容已刪除" : item.practiceTitle}
+                      {item.practiceDeleted ? t("deleted_practice") : item.practiceTitle}
                     </Text>
                     <Text fontSize={12} color="$color" opacity={0.5}>
-                      {formatDate(item.createdAt)}
+                      {formatDate(item.createdAt, locale)}
                     </Text>
                   </XStack>
 

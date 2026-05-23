@@ -37,6 +37,7 @@ import { UserInfoCard } from "@/components/user";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { followTarget, unfollowTarget, useFollowStatus } from "@/hooks/useFollow";
+import { useMobileTranslation } from "@/i18n";
 
 type ConnectionStatus = "none" | "outgoing" | "incoming" | "connected";
 
@@ -52,20 +53,20 @@ function formatCount(value: number | null | undefined) {
   return String(value ?? 0);
 }
 
-function getPracticeStatusLabel(status: string) {
+function getPracticeStatusLabel(status: string, t: (key: string) => string) {
   switch (status) {
     case "draft":
-      return "草稿";
+      return t("status_draft");
     case "not_started":
-      return "未開始";
+      return t("status_not_started");
     case "active":
-      return "進行中";
+      return t("status_active");
     case "completed":
-      return "已完成";
+      return t("status_completed");
     case "archived":
-      return "已封存";
+      return t("status_archived");
     default:
-      return "未知";
+      return t("status_unknown");
   }
 }
 
@@ -75,6 +76,7 @@ function getErrorMessage(error: unknown, fallback: string) {
 
 export default function UserProfileRoute() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.userProfile");
   const params = useLocalSearchParams<{ identifier?: string | string[] }>();
   const identifier = getIdentifierParam(params.identifier);
   const [isMutatingFollow, setIsMutatingFollow] = useState(false);
@@ -121,7 +123,7 @@ export default function UserProfileRoute() {
 
   const isRefreshing = isLoading || isCurrentUserLoading;
   const canFollow = Boolean(targetUserId) && !isOwnProfile;
-  const displayName = profile?.name || "未命名用戶";
+  const displayName = profile?.name || t("unnamed_user");
   const displayLocation = profile ? getDisplayLocation(profile) : null;
   const practices = practicesResponse?.data?.data ?? [];
 
@@ -132,21 +134,27 @@ export default function UserProfileRoute() {
     () =>
       profile
         ? [
-            { label: "追蹤者", value: formatCount(profile.followersCount), hidden: false },
+            { label: t("followers"), value: formatCount(profile.followersCount), hidden: false },
             {
-              label: "連結",
-              value: profile.hideConnectionsCount ? "隱藏" : formatCount(profile.connectionsCount),
+              label: t("connections"),
+              value: profile.hideConnectionsCount
+                ? t("hidden_count")
+                : formatCount(profile.connectionsCount),
               hidden: profile.hideConnectionsCount,
             },
-            { label: "近期實踐", value: formatCount(profile.recentPracticeCount), hidden: false },
             {
-              label: "共同圈子",
+              label: t("recent_practices"),
+              value: formatCount(profile.recentPracticeCount),
+              hidden: false,
+            },
+            {
+              label: t("common_circles"),
               value: formatCount(profile.commonCirclesCount),
               hidden: profile.commonCirclesCount == null,
             },
           ]
         : [],
-    [profile]
+    [profile, t]
   );
 
   const handleRefresh = useCallback(() => {
@@ -169,13 +177,13 @@ export default function UserProfileRoute() {
       await Promise.all([mutateFollowStatus(), mutateProfile()]);
     } catch (followError) {
       Alert.alert(
-        isFollowing ? "取消追蹤失敗" : "追蹤失敗",
-        followError instanceof Error ? followError.message : "請稍後再試"
+        isFollowing ? t("unfollow_failed") : t("follow_failed"),
+        followError instanceof Error ? followError.message : t("retry_later")
       );
     } finally {
       setIsMutatingFollow(false);
     }
-  }, [isFollowing, isMutatingFollow, mutateFollowStatus, mutateProfile, targetUserId]);
+  }, [isFollowing, isMutatingFollow, mutateFollowStatus, mutateProfile, t, targetUserId]);
 
   const refreshConnectionState = useCallback(
     () => Promise.all([mutateConnectionStatus(), mutateProfile()]),
@@ -194,11 +202,11 @@ export default function UserProfileRoute() {
         await refreshConnectionState();
         return;
       }
-      Alert.alert("送出連結請求失敗", getErrorMessage(connectionError, "請稍後再試"));
+      Alert.alert(t("send_connection_failed"), getErrorMessage(connectionError, t("retry_later")));
     } finally {
       setIsMutatingConnection(false);
     }
-  }, [isMutatingConnection, refreshConnectionState, targetUserId]);
+  }, [isMutatingConnection, refreshConnectionState, t, targetUserId]);
 
   const handleWithdrawConnectionRequest = useCallback(async () => {
     if (!connectionRequestId || isMutatingConnection) return;
@@ -208,11 +216,11 @@ export default function UserProfileRoute() {
       await withdrawConnectionRequest(String(connectionRequestId));
       await refreshConnectionState();
     } catch (connectionError) {
-      Alert.alert("撤回連結請求失敗", getErrorMessage(connectionError, "請稍後再試"));
+      Alert.alert(t("withdraw_connection_failed"), getErrorMessage(connectionError, t("retry_later")));
     } finally {
       setIsMutatingConnection(false);
     }
-  }, [connectionRequestId, isMutatingConnection, refreshConnectionState]);
+  }, [connectionRequestId, isMutatingConnection, refreshConnectionState, t]);
 
   const handleRespondConnectionRequest = useCallback(
     async (action: "accept" | "reject") => {
@@ -223,21 +231,21 @@ export default function UserProfileRoute() {
         await respondConnectionRequest(String(connectionRequestId), action);
         await refreshConnectionState();
       } catch (connectionError) {
-        Alert.alert("處理連結請求失敗", getErrorMessage(connectionError, "請稍後再試"));
+        Alert.alert(t("respond_connection_failed"), getErrorMessage(connectionError, t("retry_later")));
       } finally {
         setIsMutatingConnection(false);
       }
     },
-    [connectionRequestId, isMutatingConnection, refreshConnectionState]
+    [connectionRequestId, isMutatingConnection, refreshConnectionState, t]
   );
 
   const handleDisconnect = useCallback(() => {
     if (connectionStatus !== "connected" || isMutatingConnection) return;
 
-    Alert.alert("解除連結？", `解除連結後，你與 ${displayName} 將失去對彼此非公開內容的存取權。`, [
-      { text: "先不要", style: "cancel" },
+    Alert.alert(t("disconnect_title"), t("disconnect_message", { name: displayName }), [
+      { text: t("keep_connection"), style: "cancel" },
       {
-        text: "解除連結",
+        text: t("disconnect"),
         style: "destructive",
         onPress: async () => {
           setIsMutatingConnection(true);
@@ -246,7 +254,7 @@ export default function UserProfileRoute() {
             await refreshConnectionState();
             await mutateProfile();
           } catch (connectionError) {
-            Alert.alert("解除連結失敗", getErrorMessage(connectionError, "請稍後再試"));
+            Alert.alert(t("disconnect_failed"), getErrorMessage(connectionError, t("retry_later")));
           } finally {
             setIsMutatingConnection(false);
           }
@@ -259,6 +267,7 @@ export default function UserProfileRoute() {
     isMutatingConnection,
     mutateProfile,
     refreshConnectionState,
+    t,
     targetUserId,
   ]);
 
@@ -272,7 +281,7 @@ export default function UserProfileRoute() {
           </Pressable>
           <YStack flex={1}>
             <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
-              個人頁面
+              {t("title")}
             </Text>
             {profile?.customId ? (
               <Text fontSize={12} color={colors.text.muted}>
@@ -297,7 +306,7 @@ export default function UserProfileRoute() {
             <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical="$10">
               <RefreshCw size={24} color={colors.logo.cyan} />
               <Text marginTop="$3" color={colors.text.dark}>
-                載入中...
+                {t("loading")}
               </Text>
             </YStack>
           ) : error || !profile ? (
@@ -309,10 +318,10 @@ export default function UserProfileRoute() {
               gap="$3"
             >
               <Text fontSize={18} fontWeight="500" color={colors.text.dark}>
-                找不到這個使用者
+                {t("not_found")}
               </Text>
               <Text textAlign="center" color={colors.text.muted}>
-                這個個人頁面可能不存在，或暫時無法讀取。
+                {t("not_found_description")}
               </Text>
               <Button
                 borderRadius="$md"
@@ -321,7 +330,7 @@ export default function UserProfileRoute() {
                 onPress={() => mutateProfile()}
               >
                 <Text color={colors.text.light} fontWeight="500">
-                  重新整理
+                  {t("refresh")}
                 </Text>
               </Button>
             </YStack>
@@ -406,7 +415,11 @@ export default function UserProfileRoute() {
                           color={isFollowing ? colors.text.dark : colors.text.light}
                           fontWeight="500"
                         >
-                          {isMutatingFollow ? "處理中..." : isFollowing ? "已追蹤" : "追蹤"}
+                          {isMutatingFollow
+                            ? t("processing")
+                            : isFollowing
+                              ? t("following")
+                              : t("follow")}
                         </Text>
                       </XStack>
                     </Button>
@@ -421,7 +434,7 @@ export default function UserProfileRoute() {
                         disabled
                       >
                         <Text color={colors.text.muted} fontWeight="500">
-                          讀取連結狀態...
+                          {t("loading_connection_status")}
                         </Text>
                       </Button>
                     ) : connectionStatus === "incoming" ? (
@@ -438,7 +451,7 @@ export default function UserProfileRoute() {
                           <XStack alignItems="center" gap="$2">
                             <Check size={18} color={colors.text.light} />
                             <Text color={colors.text.light} fontWeight="500">
-                              同意連結
+                              {t("accept_connection")}
                             </Text>
                           </XStack>
                         </Button>
@@ -456,7 +469,7 @@ export default function UserProfileRoute() {
                           <XStack alignItems="center" gap="$2">
                             <X size={18} color={colors.text.dark} />
                             <Text color={colors.text.dark} fontWeight="500">
-                              忽略
+                              {t("ignore")}
                             </Text>
                           </XStack>
                         </Button>
@@ -495,12 +508,12 @@ export default function UserProfileRoute() {
                             fontWeight="500"
                           >
                             {isMutatingConnection
-                              ? "處理中..."
+                              ? t("processing")
                               : connectionStatus === "connected"
-                                ? "解除連結"
+                                ? t("disconnect")
                                 : connectionStatus === "outgoing"
-                                  ? "撤回連結請求"
-                                  : "請求連結"}
+                                  ? t("withdraw_connection")
+                                  : t("request_connection")}
                           </Text>
                         </XStack>
                       </Button>
@@ -552,19 +565,19 @@ export default function UserProfileRoute() {
                 borderColor={colors.border.light}
               >
                 <Text fontSize={18} fontWeight="500" color={colors.text.dark}>
-                  主題實踐
+                  {t("public_practices")}
                 </Text>
                 <Separator marginVertical="$3" borderColor={colors.border.light} />
                 {isPracticesLoading ? (
                   <YStack paddingVertical="$4" alignItems="center">
                     <Text fontSize={14} color={colors.text.muted}>
-                      載入實踐中...
+                      {t("loading_practices")}
                     </Text>
                   </YStack>
                 ) : practicesError ? (
                   <YStack gap="$3">
                     <Text fontSize={14} color={colors.text.muted}>
-                      暫時無法讀取公開實踐。
+                      {t("public_practices_error")}
                     </Text>
                     <Button
                       alignSelf="flex-start"
@@ -576,13 +589,13 @@ export default function UserProfileRoute() {
                       onPress={() => mutatePractices()}
                     >
                       <Text fontSize={13} color={colors.text.dark}>
-                        重新整理
+                        {t("refresh")}
                       </Text>
                     </Button>
                   </YStack>
                 ) : practices.length === 0 ? (
                   <Text fontSize={14} color={colors.text.muted}>
-                    目前沒有公開實踐。
+                    {t("empty_public_practices")}
                   </Text>
                 ) : (
                   <YStack gap="$3">
@@ -618,7 +631,7 @@ export default function UserProfileRoute() {
                                 paddingVertical="$1"
                                 borderRadius="$sm"
                               >
-                                {getPracticeStatusLabel(practice.status)}
+                                {getPracticeStatusLabel(practice.status, t)}
                               </Text>
                             </XStack>
                             {practice.practiceAction ? (
@@ -628,10 +641,12 @@ export default function UserProfileRoute() {
                             ) : null}
                             <XStack gap="$3" flexWrap="wrap">
                               <Text fontSize={12} color={colors.text.muted}>
-                                打卡 {practice.checkInCount} 次
+                                {t("check_in_count", { count: practice.checkInCount })}
                               </Text>
                               <Text fontSize={12} color={colors.text.muted}>
-                                進度 {practice.progressPercentage ?? 0}%
+                                {t("progress_percent", {
+                                  progress: practice.progressPercentage ?? 0,
+                                })}
                               </Text>
                             </XStack>
                             {practice.tags.length > 0 ? (
