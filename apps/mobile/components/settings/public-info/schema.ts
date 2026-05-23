@@ -12,26 +12,29 @@ import { z } from "zod";
 // 注意：由於有 .min(3) 驗證，單個或兩個字符的情況會被拒絕
 const customIdRegex = /^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$/;
 
-export const publicInfoFormSchema = z.object({
-  photoURL: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
-  name: z.string().min(1, "此為必填欄位"),
-  customId: z
-    .string()
-    .min(1, "此為必填欄位")
-    .min(3, "ID 最少需要 3 個字符")
-    .max(50, "ID 最多 50 個字符")
-    .refine((val) => customIdRegex.test(val), "請依照 ID 的格式規則輸入"),
-  location: z.string().optional(),
-  personalSlogan: z.string().min(1, "此為必填欄位").max(150, "個人標語最多 150 字"),
-  selfIntroduction: z.string().max(350, "關於我最多 350 字").optional(),
-  personalUrl: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
-  facebook: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
-  instagram: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
-  linkedin: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
-  github: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
-  discord: z.string().optional(),
-  line: z.string().optional(),
-  threads: z.string().url("請輸入有效的網址").optional().or(z.literal("")),
-});
+export const createPublicInfoFormSchema = (t: (key: string) => string) =>
+  z.object({
+    photoURL: z.string().url(t("validationUrl")).optional().or(z.literal("")),
+    name: z.string().min(1, t("validationRequired")),
+    customId: z
+      .string()
+      .min(1, t("validationRequired"))
+      .min(3, t("validationCustomIdMin"))
+      .max(50, t("validationCustomIdMax"))
+      .refine((val) => customIdRegex.test(val), t("validationCustomIdFormat")),
+    location: z.string().optional(),
+    personalSlogan: z.string().min(1, t("validationRequired")).max(150, t("validationSloganMax")),
+    selfIntroduction: z.string().max(350, t("validationIntroductionMax")).optional(),
+    personalUrl: z.string().url(t("validationUrl")).optional().or(z.literal("")),
+    facebook: z.string().url(t("validationUrl")).optional().or(z.literal("")),
+    instagram: z.string().url(t("validationUrl")).optional().or(z.literal("")),
+    linkedin: z.string().url(t("validationUrl")).optional().or(z.literal("")),
+    github: z.string().url(t("validationUrl")).optional().or(z.literal("")),
+    discord: z.string().optional(),
+    line: z.string().optional(),
+    threads: z.string().url(t("validationUrl")).optional().or(z.literal("")),
+  });
+
+export const publicInfoFormSchema = createPublicInfoFormSchema((key) => key);
 
 export type PublicInfoFormValuesType = z.infer<typeof publicInfoFormSchema>;

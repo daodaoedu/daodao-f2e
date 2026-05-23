@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { StepIndicator } from "@/components";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { useCreatePractice } from "@/providers/CreatePracticeProvider";
 import type { CreatePracticeInputType } from "@/types/create-practice";
 
@@ -75,6 +76,8 @@ function toCreatePracticeRequest(values: CreatePracticeInputType): CreatePractic
 
 export default function Step5Screen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.createManual");
+  const tCommon = useMobileTranslation("common");
   const { form, currentStep, totalSteps, prevStep, resetForm } = useCreatePractice();
   const { watch, setValue, handleSubmit } = form;
 
@@ -98,12 +101,12 @@ export default function Step5Screen() {
           error?: { message?: string };
           message?: string;
         };
-        throw new Error(errorResponse.error?.message ?? errorResponse.message ?? "建立實踐失敗");
+        throw new Error(errorResponse.error?.message ?? errorResponse.message ?? t("create_failed"));
       }
 
-      Alert.alert("建立成功", "你的實踐已建立，開始你的旅程吧！", [
+      Alert.alert(t("create_success_title"), t("create_success_message"), [
         {
-          text: "確定",
+          text: t("confirm"),
           onPress: () => {
             resetForm();
             router.replace("/(tabs)");
@@ -111,16 +114,16 @@ export default function Step5Screen() {
         },
       ]);
     } catch (error) {
-      Alert.alert("建立失敗", error instanceof Error ? error.message : "請稍後再試");
+      Alert.alert(t("create_failed_title"), error instanceof Error ? error.message : t("retry_later"));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const frequencyLabel = {
-    daily: "每日",
-    weekly: "每週",
-    custom: "自訂",
+    daily: t("frequency_daily"),
+    weekly: t("frequency_weekly"),
+    custom: t("frequency_custom"),
   }[values.frequency];
 
   const privacyOptions: Array<{
@@ -131,20 +134,20 @@ export default function Step5Screen() {
   }> = [
     {
       value: "private",
-      label: "私人",
-      description: "只有你能看到",
+      label: t("privacy_private"),
+      description: t("privacy_private_description"),
       Icon: Lock,
     },
     {
       value: "public",
-      label: "公開",
-      description: "所有人都能在靈感頁看到",
+      label: t("privacy_public"),
+      description: t("privacy_public_description"),
       Icon: Eye,
     },
     {
       value: "delayed",
-      label: "延遲分享",
-      description: "進行中不顯示打卡內容，完成後解鎖",
+      label: t("privacy_delayed"),
+      description: t("privacy_delayed_description"),
       Icon: EyeOff,
     },
   ];
@@ -154,15 +157,15 @@ export default function Step5Screen() {
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel="返回">
+          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel={tCommon("back")}>
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>
             <Text fontSize={18} fontWeight="600" color="$color">
-              確認送出
+              {t("step5_title")}
             </Text>
             <Text fontSize={12} color="$color" opacity={0.6}>
-              步驟 {currentStep} / {totalSteps}
+              {t("step_progress", { current: currentStep, total: totalSteps })}
             </Text>
           </YStack>
         </XStack>
@@ -195,7 +198,7 @@ export default function Step5Screen() {
               </YStack>
               <YStack alignItems="center" gap="$1">
                 <Text fontSize={20} fontWeight="700" color="$color">
-                  {values.title || "未命名實踐"}
+                  {values.title || t("untitled_practice")}
                 </Text>
                 {values.description && (
                   <Text fontSize={13} color="$color" opacity={0.6} textAlign="center">
@@ -208,7 +211,7 @@ export default function Step5Screen() {
             {/* Privacy Status */}
             <YStack gap="$3">
               <Text fontSize={15} fontWeight="600" color="$color">
-                隱私設定
+                {t("privacy_label")}
               </Text>
               {privacyOptions.map((opt) => {
                 const isSelected = values.privacy_status === opt.value;
@@ -259,7 +262,7 @@ export default function Step5Screen() {
                 <Calendar size={20} color={values.color || colors.primary.base} />
                 <YStack flex={1}>
                   <Text fontSize={12} color="$color" opacity={0.6}>
-                    執行頻率
+                    {t("frequency_label")}
                   </Text>
                   <Text fontSize={15} fontWeight="500" color="$color">
                     {frequencyLabel}
@@ -271,10 +274,10 @@ export default function Step5Screen() {
                 <Target size={20} color={values.color || colors.primary.base} />
                 <YStack flex={1}>
                   <Text fontSize={12} color="$color" opacity={0.6}>
-                    目標天數
+                    {t("duration_days_label")}
                   </Text>
                   <Text fontSize={15} fontWeight="500" color="$color">
-                    {values.targetDays} 天
+                    {t("days", { count: values.targetDays })}
                   </Text>
                 </YStack>
               </XStack>
@@ -283,10 +286,12 @@ export default function Step5Screen() {
                 <Bell size={20} color={values.color || colors.primary.base} />
                 <YStack flex={1}>
                   <Text fontSize={12} color="$color" opacity={0.6}>
-                    每日提醒
+                    {t("reminder_label")}
                   </Text>
                   <Text fontSize={15} fontWeight="500" color="$color">
-                    {values.reminderEnabled ? `已開啟（${values.reminderTime}）` : "未開啟"}
+                    {values.reminderEnabled
+                      ? t("reminder_on", { time: values.reminderTime ?? "" })
+                      : t("reminder_off")}
                   </Text>
                 </YStack>
               </XStack>
@@ -296,7 +301,7 @@ export default function Step5Screen() {
                   <Tag size={20} color={values.color || colors.primary.base} />
                   <YStack flex={1} gap="$2">
                     <Text fontSize={12} color="$color" opacity={0.6}>
-                      標籤
+                      {t("tags_label")}
                     </Text>
                     <XStack gap="$2" flexWrap="wrap">
                       {values.tags.map((tag) => (
@@ -337,7 +342,7 @@ export default function Step5Screen() {
               <XStack alignItems="center" gap="$2">
                 <Check size={20} color={colors.basic.white} />
                 <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                  建立實踐
+                  {t("create_practice")}
                 </Text>
               </XStack>
             )}

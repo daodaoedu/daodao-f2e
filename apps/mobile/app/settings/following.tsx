@@ -7,6 +7,7 @@ import { Avatar, Button, Card, ScrollView, Text, XStack, YStack } from "tamagui"
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { unfollowTarget } from "@/hooks/useFollow";
+import { useMobileTranslation } from "@/i18n";
 
 interface IFollowItem {
   targetType: "user" | "practice";
@@ -16,6 +17,8 @@ interface IFollowItem {
 
 export default function FollowingSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.followingSettings");
+  const tCommon = useMobileTranslation("common");
   const [tab, setTab] = useState<"users" | "practices">("users");
   const { user: currentUser } = useCurrentUser();
   const userId = currentUser?.id ?? "";
@@ -44,35 +47,35 @@ export default function FollowingSettingsScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            關注設定
+            {t("title")}
           </Text>
         </XStack>
 
         {/* Tab Bar */}
         <XStack borderBottomWidth={1} borderBottomColor="$borderColor">
-          {(["users", "practices"] as const).map((t) => (
+          {(["users", "practices"] as const).map((tabValue) => (
             <YStack
-              key={t}
+              key={tabValue}
               flex={1}
               alignItems="center"
               paddingVertical="$3"
               borderBottomWidth={2}
-              borderBottomColor={tab === t ? colors.primary.base : "transparent"}
+              borderBottomColor={tab === tabValue ? colors.primary.base : "transparent"}
               pressStyle={{ opacity: 0.7 }}
-              onPress={() => setTab(t)}
+              onPress={() => setTab(tabValue)}
             >
               <Text
                 fontSize={14}
                 fontWeight="500"
-                color={tab === t ? colors.primary.base : "$color"}
-                opacity={tab === t ? 1 : 0.5}
+                color={tab === tabValue ? colors.primary.base : "$color"}
+                opacity={tab === tabValue ? 1 : 0.5}
               >
-                {t === "users" ? "關注的使用者" : "關注的實踐"}
+                {tabValue === "users" ? t("usersTab") : t("practicesTab")}
               </Text>
             </YStack>
           ))}
@@ -82,7 +85,7 @@ export default function FollowingSettingsScreen() {
           {isLoading ? (
             <YStack alignItems="center" paddingVertical="$8">
               <Text fontSize={14} color="$color" opacity={0.5}>
-                載入中...
+                {t("loading")}
               </Text>
             </YStack>
           ) : tab === "users" ? (
@@ -90,7 +93,7 @@ export default function FollowingSettingsScreen() {
               {followedUsers.length === 0 ? (
                 <YStack alignItems="center" paddingVertical="$8">
                   <Text fontSize={14} color="$color" opacity={0.5}>
-                    尚未關注任何使用者
+                    {t("emptyUsers")}
                   </Text>
                 </YStack>
               ) : (
@@ -142,7 +145,7 @@ export default function FollowingSettingsScreen() {
                           onPress={() => handleUnfollow("user", user.id)}
                         >
                           <Text fontSize={12} color="$color">
-                            取消關注
+                            {t("unfollow")}
                           </Text>
                         </Button>
                       </XStack>
@@ -156,7 +159,7 @@ export default function FollowingSettingsScreen() {
               {followedPractices.length === 0 ? (
                 <YStack alignItems="center" paddingVertical="$8">
                   <Text fontSize={14} color="$color" opacity={0.5}>
-                    尚未關注任何實踐
+                    {t("emptyPractices")}
                   </Text>
                 </YStack>
               ) : (
@@ -205,7 +208,7 @@ export default function FollowingSettingsScreen() {
                           onPress={() => handleUnfollow("practice", practice.id)}
                         >
                           <Text fontSize={12} color="$color">
-                            取消關注
+                            {t("unfollow")}
                           </Text>
                         </Button>
                       </XStack>

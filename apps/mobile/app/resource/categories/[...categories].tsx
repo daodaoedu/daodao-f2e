@@ -5,6 +5,7 @@ import {
   getResourceSubcategory,
   RESOURCE_SUBCATEGORIES,
 } from "@/constants/resource";
+import { useMobileTranslation } from "@/i18n";
 
 function normalizeCategories(value?: string | string[]) {
   if (!value) return [];
@@ -12,16 +13,28 @@ function normalizeCategories(value?: string | string[]) {
 }
 
 export default function ResourceCategoryDetailRoute() {
+  const t = useMobileTranslation("mobile.resources");
   const { categories } = useLocalSearchParams<{ categories?: string | string[] }>();
   const [majorCategoryValue, subCategoryValue] = normalizeCategories(categories);
   const majorCategory = getResourceCategory(majorCategoryValue);
   const subCategory = getResourceSubcategory(majorCategoryValue, subCategoryValue);
-  const title = subCategory?.label ?? majorCategory?.label ?? "資源分類";
+  const translateValue = (key: string | undefined, fallback: string | undefined) => {
+    if (!key) return fallback;
+    const translated = t(key);
+    return translated === `mobile.resources.${key}` ? fallback : translated;
+  };
+  const title =
+    translateValue(
+      subCategory ? `subcategory_${subCategory.value}` : undefined,
+      subCategory?.label
+    ) ??
+    translateValue(majorCategory ? `category_${majorCategory.value}` : undefined, majorCategory?.label) ??
+    t("category_detail_fallback_title");
 
   return (
     <ResourceListScreen
       title={title}
-      subtitle={`探索 ${title} 相關的學習資源`}
+      subtitle={t("category_detail_subtitle", { title })}
       params={{
         majorCategory: majorCategory?.value,
         subCategory: subCategory?.value,

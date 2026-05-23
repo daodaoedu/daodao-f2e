@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { Alert } from "react-native";
+import { useMobileTranslation } from "@/i18n";
 
 export enum ArchivePracticeResult {
   /** 實踐已成功封存 */
@@ -34,34 +35,35 @@ interface IArchiveDialogOptions {
  * ```
  */
 export function useArchivePracticeDialog() {
+  const t = useMobileTranslation("mobile.dialogs");
   const openArchiveDialog = useCallback(
     async (options?: IArchiveDialogOptions): Promise<ArchivePracticeResult> => {
       return new Promise((resolve) => {
         Alert.alert(
-          "即將封存這個實踐",
-          "我們會幫你把實踐收在「封存」裡面，你會暫時看不到它，除非取消封存喔！",
+          t("archive_practice_title"),
+          t("archive_practice_message"),
           [
             {
-              text: "先不要",
+              text: t("not_now"),
               style: "cancel",
               onPress: () => {
                 resolve(ArchivePracticeResult.Cancelled);
               },
             },
             {
-              text: "確定封存",
+              text: t("archive_confirm"),
               style: "destructive",
               onPress: () => {
                 // 顯示成功訊息並提供復原選項
-                Alert.alert("實踐已成功封存", "你可以在設定中觀看已封存的內容", [
+                Alert.alert(t("archive_success_title"), t("archive_success_message"), [
                   {
-                    text: "復原",
+                    text: t("restore"),
                     onPress: () => {
                       options?.onRestore?.();
                     },
                   },
                   {
-                    text: "確定",
+                    text: t("confirm"),
                     style: "default",
                     onPress: () => {
                       resolve(ArchivePracticeResult.Archived);
@@ -74,7 +76,7 @@ export function useArchivePracticeDialog() {
         );
       });
     },
-    []
+    [t]
   );
 
   return { openArchiveDialog };

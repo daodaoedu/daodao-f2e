@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet } from "react-native";
 import { Text, View, XStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 export type TabType = "inspire" | "mine";
 
@@ -10,6 +11,8 @@ interface TabSwitcherProps {
 }
 
 export function TabSwitcher({ activeTab, onTabChange }: TabSwitcherProps) {
+  const t = useMobileTranslation("mobile.home");
+
   return (
     <XStack borderBottomWidth={1} borderBottomColor="#E5E7EB" marginBottom="$3">
       <Pressable style={styles.tab} onPress={() => onTabChange("inspire")}>
@@ -19,7 +22,7 @@ export function TabSwitcher({ activeTab, onTabChange }: TabSwitcherProps) {
           color={activeTab === "inspire" ? colors.text.dark : "rgba(0,0,0,0.4)"}
           paddingVertical="$2"
         >
-          靈感
+          {t("tab_inspire")}
         </Text>
         {activeTab === "inspire" && <View style={styles.activeIndicator} />}
       </Pressable>
@@ -30,7 +33,7 @@ export function TabSwitcher({ activeTab, onTabChange }: TabSwitcherProps) {
           color={activeTab === "mine" ? colors.text.dark : "rgba(0,0,0,0.4)"}
           paddingVertical="$2"
         >
-          我的
+          {t("tab_mine")}
         </Text>
         {activeTab === "mine" && <View style={styles.activeIndicator} />}
       </Pressable>

@@ -2,22 +2,23 @@ import type { MoodType, PracticeSummary } from "@daodao/api";
 import { CalendarDays, Footprints, MessageCircle, Smile } from "@tamagui/lucide-icons";
 import { Card, Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 interface PracticeSummaryCardProps {
   summary: PracticeSummary;
 }
 
-const moodLabels: Record<MoodType, { label: string; emoji: string }> = {
-  give_up: { label: "想放棄", emoji: "😞" },
-  frustrated: { label: "挫折", emoji: "😣" },
-  bored: { label: "無聊", emoji: "😐" },
-  neutral: { label: "普通", emoji: "🙂" },
-  good: { label: "不錯", emoji: "😊" },
-  happy: { label: "開心", emoji: "😄" },
+const moodLabels: Record<MoodType, { labelKey: string; emoji: string }> = {
+  give_up: { labelKey: "mood_give_up", emoji: "😞" },
+  frustrated: { labelKey: "mood_frustrated", emoji: "😣" },
+  bored: { labelKey: "mood_bored", emoji: "😐" },
+  neutral: { labelKey: "mood_neutral", emoji: "🙂" },
+  good: { labelKey: "mood_good", emoji: "😊" },
+  happy: { labelKey: "mood_happy", emoji: "😄" },
 };
 
-const formatDate = (date: string) => {
-  if (!date) return "未設定";
+const formatDate = (date: string, fallback: string) => {
+  if (!date) return fallback;
 
   const parsed = new Date(date);
   if (Number.isNaN(parsed.getTime())) return date;
@@ -30,6 +31,7 @@ const formatDate = (date: string) => {
 };
 
 export function PracticeSummaryCard({ summary }: PracticeSummaryCardProps) {
+  const t = useMobileTranslation("mobile.practiceSummaryCard");
   const themeColor = summary.themeColor || colors.primary.base;
   const topNotes = summary.topNotes.filter(Boolean);
 
@@ -71,7 +73,8 @@ export function PracticeSummaryCard({ summary }: PracticeSummaryCardProps) {
         <XStack alignItems="center" gap="$2">
           <CalendarDays size={15} color={colors.basic[500]} />
           <Text fontSize={13} color="$color" opacity={0.7}>
-            {formatDate(summary.startDate)} - {formatDate(summary.endDate)}
+            {formatDate(summary.startDate, t("not_set"))} -{" "}
+            {formatDate(summary.endDate, t("not_set"))}
           </Text>
         </XStack>
       </YStack>
@@ -102,7 +105,7 @@ export function PracticeSummaryCard({ summary }: PracticeSummaryCardProps) {
           <XStack alignItems="center" gap="$2">
             <Footprints size={18} color={colors.text.dark} />
             <Text fontSize={13} color={colors.text.dark}>
-              成長足跡
+              {t("footprints")}
             </Text>
           </XStack>
           <XStack alignItems="baseline" gap="$1">
@@ -110,7 +113,7 @@ export function PracticeSummaryCard({ summary }: PracticeSummaryCardProps) {
               {summary.checkInCount}
             </Text>
             <Text fontSize={14} color={colors.text.dark}>
-              次
+              {t("times")}
             </Text>
           </XStack>
         </YStack>
@@ -126,7 +129,7 @@ export function PracticeSummaryCard({ summary }: PracticeSummaryCardProps) {
           <XStack alignItems="center" gap="$2">
             <Smile size={18} color={colors.primary.darker} />
             <Text fontSize={13} color={colors.primary.darker}>
-              過程心情
+              {t("mood")}
             </Text>
           </XStack>
           <XStack flexWrap="wrap" gap="$2">
@@ -143,13 +146,15 @@ export function PracticeSummaryCard({ summary }: PracticeSummaryCardProps) {
                 >
                   <Text fontSize={16}>{moodLabels[mood.mood]?.emoji}</Text>
                   <Text fontSize={12} color={colors.primary.darker}>
-                    {moodLabels[mood.mood]?.label ?? mood.mood}
+                    {moodLabels[mood.mood]?.labelKey
+                      ? t(moodLabels[mood.mood].labelKey)
+                      : mood.mood}
                   </Text>
                 </XStack>
               ))
             ) : (
               <Text fontSize={13} color="$color" opacity={0.55}>
-                尚無心情紀錄
+                {t("empty_mood")}
               </Text>
             )}
           </XStack>
@@ -160,7 +165,7 @@ export function PracticeSummaryCard({ summary }: PracticeSummaryCardProps) {
         <XStack alignItems="center" gap="$2">
           <MessageCircle size={18} color={colors.primary.darker} />
           <Text fontSize={16} fontWeight="600" color="$color">
-            旅程筆記
+            {t("journey_notes")}
           </Text>
         </XStack>
         {topNotes.length > 0 ? (
@@ -179,7 +184,7 @@ export function PracticeSummaryCard({ summary }: PracticeSummaryCardProps) {
         ) : (
           <YStack backgroundColor="white" borderRadius="$md" padding="$3">
             <Text fontSize={14} color="$color" opacity={0.55}>
-              尚無可顯示的筆記
+              {t("empty_notes")}
             </Text>
           </YStack>
         )}
@@ -187,7 +192,7 @@ export function PracticeSummaryCard({ summary }: PracticeSummaryCardProps) {
 
       <YStack borderTopWidth={1} borderTopColor="rgba(0,0,0,0.06)" paddingTop="$4">
         <Text fontSize={12} color="$color" opacity={0.55}>
-          daodao.so | 我的島島 | 主題實踐
+          {t("brand_footer")}
         </Text>
       </YStack>
     </Card>

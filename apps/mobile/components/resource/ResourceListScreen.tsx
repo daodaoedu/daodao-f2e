@@ -11,15 +11,9 @@ import {
   type ResourceCategory,
 } from "@/constants/resource";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 const RESOURCE_LIMIT = "10";
-
-const levelLabels = new Map([
-  ["beginner", "初級"],
-  ["intermediate", "中級"],
-  ["expert", "進階"],
-  ["all_levels", "不限程度"],
-]);
 
 type ResourceListScreenProps = {
   title?: string;
@@ -92,13 +86,21 @@ function CategoryCard({
 }
 
 export function ResourceListScreen({
-  title = "學習資源",
-  subtitle = "探索多元學習資源",
+  title,
+  subtitle,
   params,
   showMajorCategories = true,
   subcategories,
 }: ResourceListScreenProps) {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.resources");
+  const tCommon = useMobileTranslation("common");
+  const tOrValue = (key: string, fallback: string) => {
+    const translated = t(key);
+    return translated === `mobile.resources.${key}` ? fallback : translated;
+  };
+  const effectiveTitle = title ?? t("title");
+  const effectiveSubtitle = subtitle ?? t("description");
   const [keyword, setKeyword] = useState("");
   const [submittedKeyword, setSubmittedKeyword] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -139,15 +141,15 @@ export function ResourceListScreen({
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel="返回">
+          <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel={tCommon("back")}>
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>
             <Text fontSize={18} fontWeight="600" color="$color">
-              {title}
+              {effectiveTitle}
             </Text>
             <Text fontSize={13} color="$color" opacity={0.6}>
-              {subtitle}
+              {effectiveSubtitle}
             </Text>
           </YStack>
           <Button
@@ -156,7 +158,7 @@ export function ResourceListScreen({
             chromeless
             onPress={handleRefresh}
             disabled={isRefreshing}
-            accessibilityLabel="重新整理"
+            accessibilityLabel={t("refresh")}
           >
             <RefreshCw size={20} color="$color" />
           </Button>
@@ -171,7 +173,7 @@ export function ResourceListScreen({
             {showMajorCategories && (
               <YStack gap="$3">
                 <Text fontSize={15} fontWeight="700" color="$color">
-                  分類
+                  {t("categories")}
                 </Text>
                 <XStack flexWrap="wrap" gap="$3" justifyContent="space-between">
                   {RESOURCE_CATEGORIES.map((category) => (
@@ -188,7 +190,7 @@ export function ResourceListScreen({
             {visibleSubcategories.length > 0 && (
               <YStack gap="$3">
                 <Text fontSize={15} fontWeight="700" color="$color">
-                  子分類
+                  {t("subcategories")}
                 </Text>
                 <XStack flexWrap="wrap" gap="$2">
                   {visibleSubcategories.map((category) => {
@@ -225,7 +227,7 @@ export function ResourceListScreen({
                 flex={1}
                 value={keyword}
                 onChangeText={setKeyword}
-                placeholder="搜尋資源名稱、描述或標籤"
+                placeholder={t("search_full_placeholder")}
                 returnKeyType="search"
                 onSubmitEditing={handleSearch}
                 borderRadius="$md"
@@ -236,7 +238,7 @@ export function ResourceListScreen({
                 borderRadius="$md"
                 backgroundColor={colors.primary.base}
                 onPress={handleSearch}
-                accessibilityLabel="搜尋"
+                accessibilityLabel={t("search")}
               >
                 <Search size={20} color={colors.basic.white} />
               </Button>
@@ -244,7 +246,7 @@ export function ResourceListScreen({
 
             {typeof totalCount === "number" && (
               <Text fontSize={13} color="$color" opacity={0.55}>
-                共 {totalCount} 筆資源
+                {t("total_count", { count: totalCount })}
               </Text>
             )}
 
@@ -252,20 +254,20 @@ export function ResourceListScreen({
               <YStack alignItems="center" justifyContent="center" paddingVertical="$10" gap="$3">
                 <Spinner size="large" color={colors.primary.base} />
                 <Text fontSize={14} color="$color" opacity={0.55}>
-                  載入中...
+                  {t("loading")}
                 </Text>
               </YStack>
             ) : error ? (
               <YStack alignItems="center" paddingVertical="$10" gap="$3">
                 <Text fontSize={16} fontWeight="600" color="$color">
-                  載入失敗
+                  {t("load_failed")}
                 </Text>
                 <Text fontSize={14} color="$color" opacity={0.6}>
-                  請稍後再試。
+                  {t("retry_later")}
                 </Text>
                 <Button backgroundColor={colors.primary.base} borderRadius="$md" onPress={() => mutate()}>
                   <Text color="white" fontWeight="600">
-                    重新整理
+                    {t("refresh")}
                   </Text>
                 </Button>
               </YStack>
@@ -273,7 +275,7 @@ export function ResourceListScreen({
               <YStack alignItems="center" paddingVertical="$10" gap="$3">
                 <BookOpen size={40} color={colors.primary.base} />
                 <Text fontSize={14} color="$color" opacity={0.55}>
-                  這裡目前沒有符合條件的學習資源
+                  {t("empty_filtered")}
                 </Text>
               </YStack>
             ) : (
@@ -297,7 +299,7 @@ export function ResourceListScreen({
                           {resource.name}
                         </Text>
                         <Text fontSize={12} color={colors.primary.base} fontWeight="600">
-                          {levelLabels.get(resource.level) ?? resource.level}
+                          {tOrValue(`level_${resource.level}`, resource.level)}
                         </Text>
                       </XStack>
                       <Text fontSize={14} color="$color" opacity={0.68} lineHeight={20} numberOfLines={2}>
@@ -346,7 +348,7 @@ export function ResourceListScreen({
                     onPress={() => loadMore()}
                   >
                     <Text color="$color" fontWeight="600">
-                      {isValidating ? "載入中..." : "載入更多"}
+                      {isValidating ? t("loading") : t("load_more")}
                     </Text>
                   </Button>
                 )}

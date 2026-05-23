@@ -1,5 +1,6 @@
 import { Text, XStack } from "tamagui";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
+import { useMobileTranslation } from "@/i18n";
 import { ShowcaseCard } from "./showcase-card";
 
 interface BrewingCardProps {
@@ -7,6 +8,8 @@ interface BrewingCardProps {
 }
 
 export function BrewingCard({ practice }: BrewingCardProps) {
+  const t = useMobileTranslation("mobile.home");
+
   return (
     <ShowcaseCard
       practice={practice}
@@ -25,7 +28,7 @@ export function BrewingCard({ practice }: BrewingCardProps) {
         >
           <Text fontSize={16}>🍵</Text>
           <Text fontSize={12} color="rgba(0,0,0,0.6)">
-            內容醞釀中，完成後解鎖！
+            {t("brewing_locked")}
           </Text>
         </XStack>
       }

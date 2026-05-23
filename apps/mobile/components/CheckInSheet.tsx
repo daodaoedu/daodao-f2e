@@ -4,24 +4,31 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Keyboard, Pressable, ScrollView as RNScrollView, StyleSheet } from "react-native";
 import { Button, Input, Sheet, Spinner, Text, TextArea, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { analyticsService } from "@/services/analytics";
 import type { IPractice } from "@/types/practice";
 
 // 心情類型定義
 export type MoodType = "hopeless" | "frustrated" | "bored" | "neutral" | "fine" | "happy";
 
-// 心情選項 - 使用 emoji 文字
-const MOOD_OPTIONS: { id: MoodType; label: string; emoji: string }[] = [
-  { id: "hopeless", label: "想放棄", emoji: "😩" },
-  { id: "frustrated", label: "受挫", emoji: "😤" },
-  { id: "bored", label: "無聊", emoji: "😐" },
-  { id: "neutral", label: "普通", emoji: "🙂" },
-  { id: "fine", label: "還不錯", emoji: "😊" },
-  { id: "happy", label: "開心", emoji: "🥳" },
+const MOOD_OPTIONS: { id: MoodType; labelKey: string; emoji: string }[] = [
+  { id: "hopeless", labelKey: "mood_hopeless", emoji: "😩" },
+  { id: "frustrated", labelKey: "mood_frustrated", emoji: "😤" },
+  { id: "bored", labelKey: "mood_bored", emoji: "😐" },
+  { id: "neutral", labelKey: "mood_neutral", emoji: "🙂" },
+  { id: "fine", labelKey: "mood_fine", emoji: "😊" },
+  { id: "happy", labelKey: "mood_happy", emoji: "🥳" },
 ];
 
-// 預設標籤
-const DEFAULT_TAGS = ["練習", "新概念", "實作", "有趣", "創造", "困難", "刻意練習"];
+const DEFAULT_TAG_KEYS = [
+  "tag_practice",
+  "tag_new_concept",
+  "tag_hands_on",
+  "tag_interesting",
+  "tag_creative",
+  "tag_difficult",
+  "tag_deliberate_practice",
+];
 
 export interface ICheckInData {
   mood: MoodType;
@@ -45,6 +52,7 @@ export function CheckInSheet({
   onCheckIn,
   onShare,
 }: CheckInSheetProps) {
+  const t = useMobileTranslation("mobile.checkIn");
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [customTags, setCustomTags] = useState<string[]>([]);
@@ -55,7 +63,8 @@ export function CheckInSheet({
   const [showSuccess, setShowSuccess] = useState(false);
 
   // 合併預設標籤和自訂標籤
-  const allTags = useMemo(() => [...DEFAULT_TAGS, ...customTags], [customTags]);
+  const defaultTags = useMemo(() => DEFAULT_TAG_KEYS.map((key) => t(key)), [t]);
+  const allTags = useMemo(() => [...defaultTags, ...customTags], [defaultTags, customTags]);
 
   // Reset state when sheet closes
   useEffect(() => {
@@ -181,12 +190,12 @@ export function CheckInSheet({
             </YStack>
             <YStack alignItems="center" gap="$2">
               <Text fontSize={24} fontWeight="700" color="$color">
-                打卡成功！
+                {t("success_title")}
               </Text>
               <XStack alignItems="center" gap="$1">
                 <Sparkles size={16} color={colors.semantic.warning} />
                 <Text fontSize={16} color={colors.semantic.warning}>
-                  連續 {practice.currentStreak + 1} 天
+                  {t("streak_days", { count: practice.currentStreak + 1 })}
                 </Text>
               </XStack>
             </YStack>
@@ -198,12 +207,12 @@ export function CheckInSheet({
                   backgroundColor={colors.primary.base}
                   pressStyle={{ backgroundColor: colors.primary.darker }}
                   onPress={onShare}
-                  accessibilityLabel="分享打卡成果"
+                  accessibilityLabel={t("share_result")}
                 >
                   <XStack alignItems="center" gap="$2">
                     <Share2 size={18} color={colors.basic.white} />
                     <Text color={colors.basic.white} fontWeight="600">
-                      分享
+                      {t("share")}
                     </Text>
                   </XStack>
                 </Button>
@@ -217,7 +226,7 @@ export function CheckInSheet({
                 onPress={() => onOpenChange(false)}
               >
                 <Text color="$color" fontWeight="600">
-                  完成
+                  {t("done")}
                 </Text>
               </Button>
             </XStack>
@@ -234,7 +243,7 @@ export function CheckInSheet({
               borderBottomColor="$borderColor"
             >
               <Text fontSize={20} fontWeight="700" color="$color">
-                打卡
+                {t("title")}
               </Text>
               <Button size="$3" circular chromeless onPress={() => onOpenChange(false)}>
                 <X size={20} color="$color" />
@@ -250,7 +259,7 @@ export function CheckInSheet({
               {/* Mood Selection */}
               <YStack marginBottom="$6">
                 <Text fontSize={16} fontWeight="500" color="$color" marginBottom="$3">
-                  心情如何?
+                  {t("mood_question")}
                 </Text>
                 <XStack justifyContent="space-between">
                   {MOOD_OPTIONS.map((mood) => {
@@ -263,7 +272,7 @@ export function CheckInSheet({
                       >
                         <Text fontSize={36}>{mood.emoji}</Text>
                         <Text fontSize={12} color={isSelected ? "#333333" : "#999999"}>
-                          {mood.label}
+                          {t(mood.labelKey)}
                         </Text>
                       </Pressable>
                     );
@@ -274,7 +283,7 @@ export function CheckInSheet({
               {/* Tags Selection */}
               <YStack marginBottom="$6">
                 <Text fontSize={16} fontWeight="500" color="$color" marginBottom="$3">
-                  想法分享
+                  {t("thoughts")}
                 </Text>
                 <XStack flexWrap="wrap" gap="$2" marginBottom="$3">
                   {allTags.map((tag) => {
@@ -299,7 +308,7 @@ export function CheckInSheet({
                   <Input
                     flex={1}
                     size="$3"
-                    placeholder="輸入自訂標籤"
+                    placeholder={t("custom_tag_placeholder")}
                     value={customTagInput}
                     onChangeText={setCustomTagInput}
                     onSubmitEditing={handleAddCustomTag}
@@ -313,7 +322,7 @@ export function CheckInSheet({
                     <XStack alignItems="center" gap="$1">
                       <Plus size={16} color="white" />
                       <Text color="white" fontSize={14}>
-                        加入
+                        {t("add")}
                       </Text>
                     </XStack>
                   </Button>
@@ -324,7 +333,7 @@ export function CheckInSheet({
               <YStack marginBottom="$6">
                 <XStack justifyContent="space-between" alignItems="center" marginBottom="$2">
                   <Text fontSize={14} color="$color">
-                    詳細描述
+                    {t("description_label")}
                   </Text>
                   <Text fontSize={14} color={colors.basic[400]}>
                     {description.length}/300
@@ -332,7 +341,7 @@ export function CheckInSheet({
                 </XStack>
                 <TextArea
                   size="$4"
-                  placeholder="簡單紀錄今天的發現，或卡關的地方"
+                  placeholder={t("description_placeholder")}
                   value={description}
                   onChangeText={(text) => setDescription(text.slice(0, 300))}
                   numberOfLines={4}
@@ -345,10 +354,10 @@ export function CheckInSheet({
               <YStack marginBottom="$8">
                 <XStack justifyContent="space-between" alignItems="center" marginBottom="$3">
                   <Text fontSize={16} fontWeight="500" color="$color">
-                    上傳照片或影片
+                    {t("upload_media")}
                   </Text>
                   <Text fontSize={14} color={colors.basic[400]}>
-                    已上傳 {media.length}/3 張
+                    {t("uploaded_count", { count: media.length, total: 3 })}
                   </Text>
                 </XStack>
 
@@ -373,7 +382,7 @@ export function CheckInSheet({
                     <Pressable style={styles.uploadButton} onPress={handlePickImage}>
                       <Camera size={24} color={colors.basic[400]} />
                       <Text fontSize={12} color={colors.basic[400]}>
-                        點擊上傳
+                        {t("tap_upload")}
                       </Text>
                     </Pressable>
                   )}
@@ -401,7 +410,7 @@ export function CheckInSheet({
                   <XStack alignItems="center" gap="$2">
                     <Check size={18} color="white" />
                     <Text color="white" fontWeight="600" fontSize={16}>
-                      完成打卡
+                      {t("submit")}
                     </Text>
                   </XStack>
                 )}

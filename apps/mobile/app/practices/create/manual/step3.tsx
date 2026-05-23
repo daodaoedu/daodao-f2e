@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
 import { StepIndicator } from "@/components";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { useCreatePractice } from "@/providers/CreatePracticeProvider";
 
 const timeOptions = [
@@ -24,6 +25,8 @@ const timeOptions = [
 
 export default function Step3Screen() {
   const router = useRouter();
+  const t = useMobileTranslation("practice");
+  const commonT = useMobileTranslation("common");
   const { form, currentStep, totalSteps, nextStep, prevStep } = useCreatePractice();
   const { control, watch, setValue, trigger } = form;
 
@@ -48,15 +51,15 @@ export default function Step3Screen() {
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel="返回">
+          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel={commonT("back")}>
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>
             <Text fontSize={18} fontWeight="600" color="$color">
-              執行時機
+              {t("mobile_step3_title")}
             </Text>
             <Text fontSize={12} color="$color" opacity={0.6}>
-              步驟 {currentStep} / {totalSteps}
+              {t("mobile_step_progress", { current: currentStep, total: totalSteps })}
             </Text>
           </YStack>
         </XStack>
@@ -87,10 +90,10 @@ export default function Step3Screen() {
                   </YStack>
                   <YStack>
                     <Text fontSize={15} fontWeight="500" color="$color">
-                      每日提醒
+                      {t("mobile_reminder_label")}
                     </Text>
                     <Text fontSize={12} color="$color" opacity={0.6}>
-                      在設定的時間收到提醒通知
+                      {t("mobile_reminder_description")}
                     </Text>
                   </YStack>
                 </XStack>
@@ -116,7 +119,7 @@ export default function Step3Screen() {
                 <XStack alignItems="center" gap="$2">
                   <Clock size={18} color="$color" />
                   <Text fontSize={14} fontWeight="500" color="$color">
-                    提醒時間
+                    {t("mobile_reminder_time_label")}
                   </Text>
                 </XStack>
                 <XStack gap="$2" flexWrap="wrap">
@@ -146,10 +149,10 @@ export default function Step3Screen() {
             {/* Info */}
             <YStack padding="$4" backgroundColor={colors.basic[100]} borderRadius="$md" gap="$2">
               <Text fontSize={13} color="$color" opacity={0.8}>
-                提示
+                {t("mobile_tip_title")}
               </Text>
               <Text fontSize={13} color="$color" opacity={0.6}>
-                設定每日提醒可以幫助你養成習慣。你也可以稍後在設定中調整。
+                {t("mobile_reminder_tip")}
               </Text>
             </YStack>
           </YStack>
@@ -165,7 +168,7 @@ export default function Step3Screen() {
           >
             <XStack alignItems="center" gap="$2">
               <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                下一步
+                {t("manual_next_step")}
               </Text>
               <ChevronRight size={20} color={colors.basic.white} />
             </XStack>

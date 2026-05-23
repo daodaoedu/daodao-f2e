@@ -5,9 +5,8 @@ import { useCallback } from "react";
 import { Alert, Linking, Share } from "react-native";
 import { Button, Image, Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import type { ICheckInFormData } from "../types";
-
-const SHARE_HASHTAG = "#島島阿學";
 
 interface IShareCheckInContentProps {
   taskTitle: string;
@@ -26,11 +25,12 @@ export const ShareCheckInContent = ({
   onDownloadSuccess,
   onShareSuccess,
 }: IShareCheckInContentProps) => {
+  const t = useMobileTranslation("mobile.shareCheckIn");
   const { description, images } = checkInData;
   const imageUrl = images?.[0];
 
   // 準備分享內容
-  const shareText = `${taskTitle}\n${description || ""}\n\n${SHARE_HASHTAG}`;
+  const shareText = `${taskTitle}\n${description || ""}\n\n${t("share_hashtag")}`;
 
   // 處理分享
   const handleShare = useCallback(async () => {
@@ -44,14 +44,14 @@ export const ShareCheckInContent = ({
         onShareSuccess?.();
       }
     } catch (_error) {
-      Alert.alert("分享失敗", "無法開啟分享功能");
+      Alert.alert(t("share_failed_title"), t("share_failed_message"));
     }
-  }, [shareText, taskTitle, onShareSuccess]);
+  }, [shareText, taskTitle, onShareSuccess, t]);
 
   // 處理下載打卡圖片到相簿
   const handleDownloadImage = useCallback(async () => {
     if (!imageUrl) {
-      Alert.alert("無法下載", "沒有可下載的圖片");
+      Alert.alert(t("download_unavailable_title"), t("download_unavailable_message"));
       return;
     }
 
@@ -59,9 +59,9 @@ export const ShareCheckInContent = ({
       // 請求相簿權限
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("權限不足", "需要相簿存取權限才能儲存圖片", [
-          { text: "取消", style: "cancel" },
-          { text: "前往設定", onPress: () => Linking.openSettings() },
+        Alert.alert(t("permission_title"), t("permission_message"), [
+          { text: t("cancel"), style: "cancel" },
+          { text: t("open_settings"), onPress: () => Linking.openSettings() },
         ]);
         return;
       }
@@ -79,12 +79,12 @@ export const ShareCheckInContent = ({
 
       // 儲存到相簿
       await MediaLibrary.saveToLibraryAsync(localUri);
-      Alert.alert("儲存成功", "圖片已儲存到相簿");
+      Alert.alert(t("save_success_title"), t("save_success_message"));
       onDownloadSuccess?.();
     } catch (_error) {
-      Alert.alert("儲存失敗", "無法儲存圖片到相簿");
+      Alert.alert(t("save_failed_title"), t("save_failed_message"));
     }
-  }, [imageUrl, onDownloadSuccess]);
+  }, [imageUrl, onDownloadSuccess, t]);
 
   return (
     <YStack paddingHorizontal="$6" flex={1}>
@@ -111,7 +111,7 @@ export const ShareCheckInContent = ({
         {/* 分享按鈕 */}
         <YStack gap="$4" alignItems="center">
           <Text fontSize={16} fontWeight="500" color={colors.text.dark} textAlign="center">
-            分享到社群媒體
+            {t("share_to_social")}
           </Text>
 
           <Button
@@ -124,7 +124,7 @@ export const ShareCheckInContent = ({
             <XStack alignItems="center" gap="$2">
               <Share2 size={20} color={colors.basic.white} />
               <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                分享
+                {t("share")}
               </Text>
             </XStack>
           </Button>
@@ -150,7 +150,7 @@ export const ShareCheckInContent = ({
           <XStack alignItems="center" gap="$2">
             <Download size={18} color={colors.text.dark} />
             <Text color={colors.text.dark} fontWeight="500">
-              下載打卡圖片
+              {t("download_image")}
             </Text>
           </XStack>
         </Button>

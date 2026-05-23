@@ -6,10 +6,13 @@ import { Button, Spinner, Text, XStack, YStack } from "tamagui";
 import { CheckInCalendar } from "@/components";
 import { colors } from "@/generated/design-tokens";
 import { useCheckIns, usePractice } from "@/hooks/usePractices";
+import { useMobileTranslation } from "@/i18n";
 
 export default function PracticeCalendarScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const t = useMobileTranslation("practice");
+  const commonT = useMobileTranslation("common");
   const { practice, isLoading: isPracticeLoading } = usePractice(id);
   const { checkInDates, isLoading: isCheckInsLoading } = useCheckIns(id);
 
@@ -48,10 +51,10 @@ export default function PracticeCalendarScreen() {
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" gap="$4">
           <Text fontSize={16} color="$color" opacity={0.6}>
-            找不到此實踐
+            {t("mobile_practice_not_found")}
           </Text>
           <Button onPress={() => router.back()}>
-            <Text>返回</Text>
+            <Text>{commonT("back")}</Text>
           </Button>
         </YStack>
       </SafeAreaView>
@@ -70,13 +73,13 @@ export default function PracticeCalendarScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={commonT("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>
             <Text fontSize={18} fontWeight="600" color="$color">
-              日曆視圖
+              {t("mobile_calendar_title")}
             </Text>
             <Text fontSize={13} color="$color" opacity={0.6}>
               {practice.title}
@@ -93,7 +96,7 @@ export default function PracticeCalendarScreen() {
         {stats && (
           <YStack padding="$4" gap="$3">
             <Text fontSize={16} fontWeight="600" color="$color">
-              統計數據
+              {t("mobile_stats_title")}
             </Text>
 
             <XStack gap="$3">
@@ -113,7 +116,7 @@ export default function PracticeCalendarScreen() {
                   </Text>
                 </XStack>
                 <Text fontSize={11} color={colors.primary.darker} opacity={0.8}>
-                  完成率
+                  {t("mobile_completion_rate")}
                 </Text>
               </YStack>
 
@@ -133,7 +136,7 @@ export default function PracticeCalendarScreen() {
                   </Text>
                 </XStack>
                 <Text fontSize={11} color={colors.semantic.warning}>
-                  連續天數
+                  {t("mobile_current_streak")}
                 </Text>
               </YStack>
 
@@ -153,7 +156,7 @@ export default function PracticeCalendarScreen() {
                   </Text>
                 </XStack>
                 <Text fontSize={11} color={colors.semantic.success}>
-                  最長連續
+                  {t("mobile_longest_streak")}
                 </Text>
               </YStack>
             </XStack>
@@ -162,10 +165,13 @@ export default function PracticeCalendarScreen() {
             <YStack backgroundColor={colors.basic[100]} padding="$4" borderRadius="$md" gap="$2">
               <XStack justifyContent="space-between" alignItems="center">
                 <Text fontSize={14} color="$color">
-                  進度
+                  {t("mobile_progress")}
                 </Text>
                 <Text fontSize={14} fontWeight="600" color="$color">
-                  {stats.completedDays} / {stats.targetDays} 天
+                  {t("mobile_days_progress", {
+                    completed: stats.completedDays,
+                    total: stats.targetDays,
+                  })}
                 </Text>
               </XStack>
               <YStack

@@ -9,6 +9,7 @@ import { ShowcaseFeed } from "@/components/showcase/ShowcaseFeed";
 import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
 import { usePractices } from "@/hooks/usePractices";
+import { useMobileTranslation } from "@/i18n";
 import {
   type IShowcaseFeedParams,
   type IShowcasePractice,
@@ -16,6 +17,7 @@ import {
 } from "@/hooks/useShowcaseFeed";
 
 export default function ShowcaseScreen() {
+  const t = useMobileTranslation("mobile.home");
   const [activeTab, setActiveTab] = useState<TabType>("inspire");
 
   // ── Inspire tab state ──
@@ -113,7 +115,7 @@ export default function ShowcaseScreen() {
             </YStack>
             {isMyLoading ? (
               <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical="$8">
-                <Text color={colors.text.dark}>載入中...</Text>
+                <Text color={colors.text.dark}>{t("loading")}</Text>
               </YStack>
             ) : (
               <PracticeTasksSection

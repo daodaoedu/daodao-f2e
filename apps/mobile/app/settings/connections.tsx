@@ -14,6 +14,7 @@ import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar, Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 interface IConnectionUser {
   id: string;
@@ -46,7 +47,7 @@ const mapConnectionUser = (
 ): IConnectionUser => ({
   id,
   identifier: id,
-  name: nickname ?? "用戶",
+  name: nickname ?? "User",
   photoURL: photoURL ?? undefined,
 });
 
@@ -83,6 +84,8 @@ const mapConnection = (connection: ApiConnectionItem): IConnection => ({
 
 export default function ConnectionsSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.connectionsSettings");
+  const tCommon = useMobileTranslation("common");
 
   const {
     data: incomingRequests,
@@ -113,21 +116,21 @@ export default function ConnectionsSettingsScreen() {
       await respondConnectionRequest(requestId, "accept");
       await refreshAll();
     } catch {
-      Alert.alert("錯誤", "操作失敗，請稍後再試");
+      Alert.alert(t("errorTitle"), t("operationFailed"));
     }
   };
 
   const handleIgnore = (requestId: string, name: string) => {
-    Alert.alert("忽略連結請求？", `確定要忽略來自 ${name} 的連結請求嗎？`, [
-      { text: "先不要", style: "cancel" },
+    Alert.alert(t("ignoreTitle"), t("ignoreMessage", { name }), [
+      { text: t("keep"), style: "cancel" },
       {
-        text: "忽略",
+        text: t("ignore"),
         onPress: async () => {
           try {
             await respondConnectionRequest(requestId, "reject");
             await mutateIncoming();
           } catch {
-            Alert.alert("錯誤", "操作失敗，請稍後再試");
+            Alert.alert(t("errorTitle"), t("operationFailed"));
           }
         },
       },
@@ -135,16 +138,16 @@ export default function ConnectionsSettingsScreen() {
   };
 
   const handleWithdraw = (requestId: string, name: string) => {
-    Alert.alert("撤回連結請求？", `確定要撤回發給 ${name} 的連結請求嗎？`, [
-      { text: "先不要", style: "cancel" },
+    Alert.alert(t("withdrawTitle"), t("withdrawMessage", { name }), [
+      { text: t("keep"), style: "cancel" },
       {
-        text: "撤回",
+        text: t("withdraw"),
         onPress: async () => {
           try {
             await withdrawConnectionRequest(requestId);
             await mutateOutgoing();
           } catch {
-            Alert.alert("錯誤", "操作失敗，請稍後再試");
+            Alert.alert(t("errorTitle"), t("operationFailed"));
           }
         },
       },
@@ -152,17 +155,17 @@ export default function ConnectionsSettingsScreen() {
   };
 
   const handleDisconnect = (userId: string, name: string) => {
-    Alert.alert("解除連結？", `解除連結後，你與 ${name} 將失去對彼此非公開內容的存取權。`, [
-      { text: "先不要", style: "cancel" },
+    Alert.alert(t("disconnectTitle"), t("disconnectMessage", { name }), [
+      { text: t("keep"), style: "cancel" },
       {
-        text: "解除連結",
+        text: t("disconnect"),
         style: "destructive",
         onPress: async () => {
           try {
             await disconnectUser(userId);
             await mutateConnections();
           } catch {
-            Alert.alert("錯誤", "操作失敗，請稍後再試");
+            Alert.alert(t("errorTitle"), t("operationFailed"));
           }
         },
       },
@@ -178,12 +181,12 @@ export default function ConnectionsSettingsScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            連結的夥伴
+            {t("title")}
           </Text>
         </XStack>
 
@@ -191,7 +194,7 @@ export default function ConnectionsSettingsScreen() {
           {isLoading ? (
             <YStack alignItems="center" paddingVertical="$8">
               <Text fontSize={14} color="$color" opacity={0.5}>
-                載入中...
+                {t("loading")}
               </Text>
             </YStack>
           ) : (
@@ -205,11 +208,11 @@ export default function ConnectionsSettingsScreen() {
                     opacity={0.5}
                     paddingLeft="$1"
                   >
-                    待處理請求
+                    {t("pendingRequests")}
                   </Text>
                   {incoming.map((req) => {
                     const user = req.requester;
-                    const name = user?.name ?? "用戶";
+                    const name = user?.name ?? t("fallbackUser");
                     return (
                       <Card
                         key={req.id ?? `in-${req.requesterId}`}
@@ -271,7 +274,7 @@ export default function ConnectionsSettingsScreen() {
                               onPress={() => handleAccept(req.id)}
                             >
                               <Text fontSize={13} color={colors.basic.white} fontWeight="500">
-                                接受
+                                {t("accept")}
                               </Text>
                             </Button>
                             <Button
@@ -283,7 +286,7 @@ export default function ConnectionsSettingsScreen() {
                               onPress={() => handleIgnore(req.id, name)}
                             >
                               <Text fontSize={13} color="$color">
-                                忽略
+                                {t("ignore")}
                               </Text>
                             </Button>
                           </XStack>
@@ -293,7 +296,7 @@ export default function ConnectionsSettingsScreen() {
                   })}
                   {outgoing.map((req) => {
                     const user = req.receiver;
-                    const name = user?.name ?? "用戶";
+                    const name = user?.name ?? t("fallbackUser");
                     return (
                       <Card
                         key={req.id ?? `out-${req.receiverId}`}
@@ -327,7 +330,7 @@ export default function ConnectionsSettingsScreen() {
                               </Text>
                             </Text>
                             <Text fontSize={12} color="$color" opacity={0.5}>
-                              等待對方回應
+                              {t("waitingResponse")}
                             </Text>
                           </YStack>
                           <Button
@@ -338,7 +341,7 @@ export default function ConnectionsSettingsScreen() {
                             onPress={() => handleWithdraw(req.id, name)}
                           >
                             <Text fontSize={12} color="$color">
-                              撤回
+                              {t("withdraw")}
                             </Text>
                           </Button>
                         </XStack>
@@ -350,18 +353,18 @@ export default function ConnectionsSettingsScreen() {
 
               <YStack gap="$3">
                 <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingLeft="$1">
-                  已連結的夥伴{conns.length > 0 ? ` · ${conns.length} 人` : ""}
+                  {t("connectedPartnersCount", { count: conns.length })}
                 </Text>
                 {conns.length === 0 ? (
                   <YStack alignItems="center" paddingVertical="$8">
                     <Text fontSize={14} color="$color" opacity={0.5}>
-                      尚未與任何人建立連結
+                      {t("empty")}
                     </Text>
                   </YStack>
                 ) : (
                   conns.map((conn) => {
                     const partner = conn.partner;
-                    const name = partner?.name ?? "用戶";
+                    const name = partner?.name ?? t("fallbackUser");
                     const partnerId = partner?.identifier ?? partner?.id ?? conn.userAId;
                     return (
                       <Card
@@ -409,7 +412,7 @@ export default function ConnectionsSettingsScreen() {
                             onPress={() => handleDisconnect(partnerId, name)}
                           >
                             <Text fontSize={12} color="$color">
-                              解除連結
+                              {t("disconnect")}
                             </Text>
                           </Button>
                         </XStack>

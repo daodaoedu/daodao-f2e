@@ -5,6 +5,7 @@ import { Alert, type View } from "react-native";
 import { Button, Sheet, Spinner, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useShare } from "@/hooks/useShare";
+import { useMobileTranslation } from "@/i18n";
 import type { IPractice } from "@/types/practice";
 import { ShareableCheckInCard } from "./ShareableCheckInCard";
 
@@ -21,6 +22,7 @@ export function ShareCheckInSheet({
   practice,
   streakCount,
 }: ShareCheckInSheetProps) {
+  const t = useMobileTranslation("mobile.shareCheckIn");
   const cardRef = useRef<View>(null);
 
   const { viewRef, isCapturing, isSharing, isSaving, share, saveToGallery } = useShare({
@@ -41,18 +43,18 @@ export function ShareCheckInSheet({
   const handleShare = useCallback(async () => {
     const result = await share();
     if (!result.success && result.error) {
-      Alert.alert("分享失敗", result.error);
+      Alert.alert(t("share_failed_title"), result.error);
     }
-  }, [share]);
+  }, [share, t]);
 
   const handleSave = useCallback(async () => {
     const result = await saveToGallery();
     if (result.success) {
-      Alert.alert("儲存成功", "圖片已儲存到相簿");
+      Alert.alert(t("save_success_title"), t("save_success_message"));
     } else if (result.error) {
-      Alert.alert("儲存失敗", result.error);
+      Alert.alert(t("save_failed_title"), result.error);
     }
-  }, [saveToGallery]);
+  }, [saveToGallery, t]);
 
   if (!practice) return null;
 
@@ -80,14 +82,14 @@ export function ShareCheckInSheet({
           {/* Header */}
           <XStack justifyContent="space-between" alignItems="center">
             <Text fontSize={20} fontWeight="700" color="$color">
-              分享打卡成果
+              {t("share_result")}
             </Text>
             <Button
               size="$3"
               circular
               chromeless
               onPress={() => onOpenChange(false)}
-              accessibilityLabel="關閉"
+              accessibilityLabel={t("close")}
             >
               <X size={20} color="$color" />
             </Button>
@@ -110,7 +112,7 @@ export function ShareCheckInSheet({
               pressStyle={{ backgroundColor: colors.primary.darker }}
               onPress={handleShare}
               disabled={isLoading}
-              accessibilityLabel="分享到社群"
+              accessibilityLabel={t("share_to_social")}
             >
               {isSharing || isCapturing ? (
                 <Spinner color={colors.basic.white} />
@@ -118,7 +120,7 @@ export function ShareCheckInSheet({
                 <XStack alignItems="center" gap="$2">
                   <Share2 size={20} color={colors.basic.white} />
                   <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                    分享到社群
+                    {t("share_to_social")}
                   </Text>
                 </XStack>
               )}
@@ -132,7 +134,7 @@ export function ShareCheckInSheet({
               pressStyle={{ backgroundColor: colors.primary.palest }}
               onPress={handleSave}
               disabled={isLoading}
-              accessibilityLabel="儲存到相簿"
+              accessibilityLabel={t("save_to_gallery")}
             >
               {isSaving ? (
                 <Spinner color={colors.primary.base} />
@@ -140,7 +142,7 @@ export function ShareCheckInSheet({
                 <XStack alignItems="center" gap="$2">
                   <Download size={18} color={colors.primary.base} />
                   <Text color={colors.primary.base} fontWeight="600">
-                    儲存到相簿
+                    {t("save_to_gallery")}
                   </Text>
                 </XStack>
               )}

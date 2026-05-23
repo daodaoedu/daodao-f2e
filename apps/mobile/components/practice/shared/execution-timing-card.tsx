@@ -2,6 +2,7 @@ import { Clock } from "@tamagui/lucide-icons";
 import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import {
   EXECUTION_TIMING_OPTIONS,
   type ManualPracticeFormValuesType,
@@ -19,11 +20,13 @@ export const ExecutionTimingCard = ({
   executionTiming,
   customTiming,
 }: ExecutionTimingCardProps) => {
+  const t = useMobileTranslation("practice");
+
   return (
     <View style={styles.card}>
       <YStack>
         <Text fontSize={12} color={colors.text.dark} marginBottom="$2">
-          執行時機
+          {t("form_execution_timing")}
         </Text>
         <XStack flexWrap="wrap" gap="$2">
           {executionTiming.map((timing) => {
@@ -33,7 +36,7 @@ export const ExecutionTimingCard = ({
               <View key={timing} style={styles.badge}>
                 <Clock size={16} color={colors.primary.base} />
                 <Text fontSize={12} color={colors.text.dark}>
-                  {option.label}
+                  {t(option.labelKey)}
                 </Text>
               </View>
             );

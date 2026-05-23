@@ -27,6 +27,7 @@ import {
 } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
 import { usePractice } from "@/hooks/usePractices";
+import { useMobileTranslation } from "@/i18n";
 
 type CheckInDetailRecord = {
   id: string | number;
@@ -50,7 +51,7 @@ type CheckInsResponse = {
 };
 
 const formatDateTime = (value?: string | null) => {
-  if (!value) return "未提供日期";
+  if (!value) return "-";
 
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
@@ -65,7 +66,7 @@ const formatDateTime = (value?: string | null) => {
 };
 
 const formatDate = (value?: string | null) => {
-  if (!value) return "未提供日期";
+  if (!value) return "-";
 
   const date = new Date(`${value}T00:00:00`);
   if (Number.isNaN(date.getTime())) return value.replace(/-/g, ".");
@@ -139,6 +140,7 @@ function EditCheckInModal({
   onClose: () => void;
   onSave: (values: { mood: MoodType; note: string; tags: string[]; existingImageUrls: string[] }) => Promise<void>;
 }) {
+  const t = useMobileTranslation("mobile.checkInDetail");
   const [mood, setMood] = useState<MoodType | null>(null);
   const [note, setNote] = useState("");
   const [tags, setTags] = useState<string[]>([]);
@@ -153,7 +155,7 @@ function EditCheckInModal({
 
   const handleSave = async () => {
     if (!mood) {
-      Alert.alert("錯誤", "請選擇心情");
+      Alert.alert(t("errorTitle"), t("moodRequired"));
       return;
     }
 
@@ -178,15 +180,15 @@ function EditCheckInModal({
           <XStack padding="$4" alignItems="center" justifyContent="space-between">
             <Button size="$3" chromeless onPress={onClose} disabled={isSaving}>
               <Text fontSize={14} color="$color">
-                取消
+                {t("cancel")}
               </Text>
             </Button>
             <Text fontSize={16} fontWeight="600" color="$color">
-              編輯打卡
+              {t("editTitle")}
             </Text>
             <Button size="$3" chromeless onPress={handleSave} disabled={isSaving}>
               <Text fontSize={14} color={colors.primary.base} fontWeight="600">
-                {isSaving ? "儲存中" : "儲存"}
+                {isSaving ? t("saving") : t("save")}
               </Text>
             </Button>
           </XStack>
@@ -195,13 +197,13 @@ function EditCheckInModal({
             <TagSelector value={tags} onChange={setTags} />
             <YStack gap="$2">
               <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
-                打卡筆記
+                {t("noteLabel")}
               </Text>
               <TextArea
                 size="$4"
                 value={note}
                 onChangeText={setNote}
-                placeholder="寫下這次打卡的想法"
+                placeholder={t("notePlaceholder")}
                 numberOfLines={5}
                 maxLength={300}
               />
@@ -219,6 +221,8 @@ function EditCheckInModal({
 export default function CheckInDetailScreen() {
   const { id, checkInId } = useLocalSearchParams<{ id: string; checkInId: string }>();
   const router = useRouter();
+  const t = useMobileTranslation("mobile.checkInDetail");
+  const tCommon = useMobileTranslation("common");
   const { practice, isLoading: isPracticeLoading, error: practiceError } = usePractice(id);
   const {
     data: checkInsData,
@@ -343,9 +347,9 @@ export default function CheckInDetailScreen() {
         existingImageUrls: values.existingImageUrls,
       });
       await mutateCheckIns();
-      Alert.alert("成功", "打卡已更新");
+      Alert.alert(t("successTitle"), t("updateSuccess"));
     } catch (updateError) {
-      Alert.alert("錯誤", getErrorMessage(updateError, "更新打卡失敗，請稍後再試"));
+      Alert.alert(t("errorTitle"), getErrorMessage(updateError, t("updateFailed")));
       throw updateError;
     }
   };
@@ -370,25 +374,25 @@ export default function CheckInDetailScreen() {
               circular
               chromeless
               onPress={() => router.back()}
-              accessibilityLabel="返回"
+              accessibilityLabel={tCommon("back")}
             >
               <ChevronLeft size={24} color="$color" />
             </Button>
             <Text fontSize={18} fontWeight="600" color="$color">
-              打卡詳情
+              {t("title")}
             </Text>
           </XStack>
 
           <YStack flex={1} alignItems="center" justifyContent="center" gap="$4" padding="$5">
             <Text fontSize={16} fontWeight="600" color="$color">
-              {error ? "讀取打卡失敗" : "找不到此打卡"}
+              {error ? t("loadFailed") : t("notFound")}
             </Text>
             <Text fontSize={14} color="$color" opacity={0.6} textAlign="center">
-              請返回實踐頁後再試一次
+              {t("returnPracticeDescription")}
             </Text>
             <Button backgroundColor={colors.primary.base} borderRadius="$md" onPress={goToPractice}>
               <Text color="white" fontWeight="600">
-                返回實踐
+                {t("backToPractice")}
               </Text>
             </Button>
           </YStack>
@@ -406,13 +410,13 @@ export default function CheckInDetailScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>
             <Text fontSize={18} fontWeight="600" color="$color">
-              打卡詳情
+              {t("title")}
             </Text>
             <Text fontSize={13} color="$color" opacity={0.6} numberOfLines={1}>
               {practice.title}
@@ -423,7 +427,7 @@ export default function CheckInDetailScreen() {
             circular
             chromeless
             onPress={() => setShowEditModal(true)}
-            accessibilityLabel="編輯打卡"
+            accessibilityLabel={t("editTitle")}
           >
             <Pencil size={20} color="$color" />
           </Button>
@@ -447,7 +451,7 @@ export default function CheckInDetailScreen() {
                   disabled={!hasPreviousSameDay}
                   opacity={hasPreviousSameDay ? 1 : 0.35}
                   onPress={() => goToCheckIn(sameDayState.ids[sameDayState.currentIndex - 1])}
-                  accessibilityLabel="上一筆同日打卡"
+                  accessibilityLabel={t("previousSameDay")}
                 >
                   <ChevronLeft size={20} color={colors.primary.base} />
                 </Button>
@@ -461,7 +465,7 @@ export default function CheckInDetailScreen() {
                   disabled={!hasNextSameDay}
                   opacity={hasNextSameDay ? 1 : 0.35}
                   onPress={() => goToCheckIn(sameDayState.ids[sameDayState.currentIndex + 1])}
-                  accessibilityLabel="下一筆同日打卡"
+                  accessibilityLabel={t("nextSameDay")}
                 >
                   <ChevronRight size={20} color={colors.primary.base} />
                 </Button>
@@ -471,7 +475,7 @@ export default function CheckInDetailScreen() {
             <Card backgroundColor="white" borderRadius={12} padding="$4" gap="$4">
               <YStack gap="$2">
                 <Text fontSize={12} color="$color" opacity={0.6}>
-                  主題實踐
+                  {t("practiceLabel")}
                 </Text>
                 <Text fontSize={20} fontWeight="700" color="$color">
                   {practice.title}
@@ -490,7 +494,7 @@ export default function CheckInDetailScreen() {
                   <Smile size={18} color={colors.primary.base} />
                   <Text fontSize={22}>{moodOption.emoji}</Text>
                   <Text fontSize={14} color="$color">
-                    心情{moodOption.label}
+                    {t("moodLabel", { mood: moodOption.label })}
                   </Text>
                 </XStack>
               )}
@@ -500,11 +504,11 @@ export default function CheckInDetailScreen() {
               <XStack alignItems="center" gap="$2">
                 <MessageSquare size={18} color={colors.primary.base} />
                 <Text fontSize={16} fontWeight="600" color="$color">
-                  打卡筆記
+                  {t("noteLabel")}
                 </Text>
               </XStack>
               <Text fontSize={15} lineHeight={24} color="$color" opacity={checkIn.note ? 1 : 0.5}>
-                {checkIn.note || "這次打卡沒有留下筆記"}
+                {checkIn.note || t("emptyNote")}
               </Text>
             </Card>
 
@@ -513,7 +517,7 @@ export default function CheckInDetailScreen() {
                 <XStack alignItems="center" gap="$2">
                   <Tag size={18} color={colors.primary.base} />
                   <Text fontSize={16} fontWeight="600" color="$color">
-                    標籤
+                    {t("tags")}
                   </Text>
                 </XStack>
                 <XStack flexWrap="wrap" gap="$2">
@@ -539,7 +543,7 @@ export default function CheckInDetailScreen() {
                 <XStack alignItems="center" gap="$2">
                   <ImageIcon size={18} color={colors.primary.base} />
                   <Text fontSize={16} fontWeight="600" color="$color">
-                    圖片
+                    {t("images")}
                   </Text>
                 </XStack>
                 <YStack gap="$3">
@@ -562,7 +566,7 @@ export default function CheckInDetailScreen() {
               onPress={goToPractice}
             >
               <Text color="white" fontWeight="600" fontSize={16}>
-                返回實踐
+                {t("backToPractice")}
               </Text>
             </Button>
           </YStack>

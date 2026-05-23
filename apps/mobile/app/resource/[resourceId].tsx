@@ -15,34 +15,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Image, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { getResourceCategory, getResourceSubcategory } from "@/constants/resource";
 import { colors } from "@/generated/design-tokens";
-
-const levelLabels = new Map([
-  ["beginner", "初級"],
-  ["intermediate", "中級"],
-  ["expert", "進階"],
-  ["all_levels", "不限程度"],
-]);
-
-const typeLabels = new Map([
-  ["learning_platform_app", "學習平台 / App"],
-  ["learning_tools", "學習工具"],
-  ["books_articles", "書籍 / 文章"],
-  ["video_content", "影音內容"],
-  ["podcast_content", "Podcast"],
-  ["workshops_courses", "工作坊 / 課程"],
-  ["professional_certificates", "專業證照"],
-  ["community_organization", "社群 / 組織"],
-  ["other", "其他"],
-]);
-
-const costLabels = new Map([
-  ["free", "免費"],
-  ["paid", "付費"],
-  ["partial_free", "部分免費"],
-]);
+import { useMobileTranslation } from "@/i18n";
 
 const formatDate = (value?: string | null) => {
-  if (!value) return "未知日期";
+  if (!value) return "-";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString("zh-TW", {
@@ -54,6 +30,12 @@ const formatDate = (value?: string | null) => {
 
 export default function ResourceDetailRoute() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.resources");
+  const tCommon = useMobileTranslation("common");
+  const tOrValue = (key: string, fallback: string) => {
+    const translated = t(key);
+    return translated === `mobile.resources.${key}` ? fallback : translated;
+  };
   const { resourceId } = useLocalSearchParams<{ resourceId?: string | string[] }>();
   const id = Array.isArray(resourceId) ? resourceId[0] : resourceId;
   const { data, error, isLoading, mutate } = useResourceById(id ?? "");
@@ -78,15 +60,15 @@ export default function ResourceDetailRoute() {
 
   const renderHeader = () => (
     <XStack padding="$4" alignItems="center" gap="$3">
-      <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel="返回">
+      <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel={tCommon("back")}>
         <ChevronLeft size={24} color="$color" />
       </Button>
       <YStack flex={1}>
         <Text fontSize={18} fontWeight="600" color="$color" numberOfLines={1}>
-          資源詳情
+          {t("detail_title")}
         </Text>
         <Text fontSize={13} color="$color" opacity={0.6} numberOfLines={1}>
-          {resource?.name ?? "學習資源"}
+          {resource?.name ?? t("title")}
         </Text>
       </YStack>
     </XStack>
@@ -100,7 +82,7 @@ export default function ResourceDetailRoute() {
           <YStack flex={1} alignItems="center" justifyContent="center" gap="$3">
             <Spinner size="large" color={colors.primary.base} />
             <Text fontSize={14} color="$color" opacity={0.6}>
-              載入中...
+              {t("loading")}
             </Text>
           </YStack>
         </YStack>
@@ -116,14 +98,14 @@ export default function ResourceDetailRoute() {
           <YStack flex={1} alignItems="center" justifyContent="center" gap="$4" padding="$6">
             <BookOpen size={40} color={colors.primary.base} />
             <Text fontSize={16} fontWeight="600" color="$color">
-              找不到資源
+              {t("not_found")}
             </Text>
             <Text fontSize={14} color="$color" opacity={0.65} textAlign="center">
-              資源可能已下架，或目前無法載入。
+              {t("not_found_description")}
             </Text>
             <Button backgroundColor={colors.primary.base} borderRadius="$md" onPress={() => mutate()}>
               <Text color="white" fontWeight="600">
-                重新整理
+                {t("refresh")}
               </Text>
             </Button>
           </YStack>
@@ -172,7 +154,7 @@ export default function ResourceDetailRoute() {
                   paddingVertical="$1"
                   borderRadius="$lg"
                 >
-                  {levelLabels.get(resource.level) ?? resource.level}
+                  {tOrValue(`level_${resource.level}`, resource.level)}
                 </Text>
                 <Text
                   fontSize={12}
@@ -182,7 +164,7 @@ export default function ResourceDetailRoute() {
                   paddingVertical="$1"
                   borderRadius="$lg"
                 >
-                  {typeLabels.get(resource.type) ?? resource.type}
+                  {tOrValue(`type_${resource.type}`, resource.type)}
                 </Text>
                 <Text
                   fontSize={12}
@@ -192,7 +174,7 @@ export default function ResourceDetailRoute() {
                   paddingVertical="$1"
                   borderRadius="$lg"
                 >
-                  {costLabels.get(resource.cost) ?? resource.cost}
+                  {tOrValue(`cost_${resource.cost}`, resource.cost)}
                 </Text>
               </XStack>
 
@@ -216,7 +198,7 @@ export default function ResourceDetailRoute() {
                 gap="$3"
               >
                 <Text fontSize={16} fontWeight="700" color="$color">
-                  分類
+                  {t("categories")}
                 </Text>
                 <XStack gap="$2" flexWrap="wrap" alignItems="center">
                   {majorCategory && (
@@ -256,7 +238,7 @@ export default function ResourceDetailRoute() {
                 <XStack gap="$2" alignItems="center">
                   <ExternalLink size={18} color={colors.basic.white} />
                   <Text color="white" fontWeight="600">
-                    查看資源
+                    {t("open_resource")}
                   </Text>
                 </XStack>
               </Button>
@@ -274,7 +256,7 @@ export default function ResourceDetailRoute() {
               gap="$3"
             >
               <Text fontSize={16} fontWeight="700" color="$color">
-                資源介紹
+                {t("introduction")}
               </Text>
               <Text fontSize={14} color="$color" opacity={0.72} lineHeight={22}>
                 {resource.description}
@@ -282,7 +264,7 @@ export default function ResourceDetailRoute() {
               <XStack justifyContent="flex-end" gap="$2" alignItems="center">
                 <Calendar size={14} color={colors.text.light} />
                 <Text fontSize={12} color="$color" opacity={0.55}>
-                  更新於 {formatDate(resource.updatedAt ?? resource.createdAt)}
+                  {t("updated_at", { date: formatDate(resource.updatedAt ?? resource.createdAt) })}
                 </Text>
               </XStack>
             </Card>
@@ -297,14 +279,14 @@ export default function ResourceDetailRoute() {
             >
               <XStack alignItems="center" justifyContent="space-between">
                 <Text fontSize={16} fontWeight="700" color="$color">
-                  心得
+                  {t("reviews")}
                 </Text>
                 <Text fontSize={13} color="$color" opacity={0.55}>
-                  {resource.reviewCount || 0} 則
+                  {t("review_count", { count: resource.reviewCount || 0 })}
                 </Text>
               </XStack>
               <Text fontSize={14} color="$color" opacity={0.65} textAlign="center" paddingVertical="$5">
-                心得分享功能尚未開放
+                {t("reviews_unavailable")}
               </Text>
             </Card>
 
@@ -318,7 +300,7 @@ export default function ResourceDetailRoute() {
                 gap="$3"
               >
                 <Text fontSize={16} fontWeight="700" color="$color">
-                  標籤
+                  {t("tags")}
                 </Text>
                 <XStack gap="$2" flexWrap="wrap">
                   {resource.tags.map((tag) => (
@@ -348,7 +330,7 @@ export default function ResourceDetailRoute() {
                 gap="$2"
               >
                 <Text fontSize={16} fontWeight="700" color="$color">
-                  貢獻者
+                  {t("contributor")}
                 </Text>
                 <Text
                   fontSize={14}

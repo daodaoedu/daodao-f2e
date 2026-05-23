@@ -21,6 +21,7 @@ import { Avatar, Button, Card, ScrollView, Spinner, Text, XStack, YStack } from 
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { unfollowTarget } from "@/hooks/useFollow";
+import { useMobileTranslation } from "@/i18n";
 
 type MainTab = "connections" | "following";
 type FollowTab = "users" | "practices";
@@ -75,6 +76,7 @@ function SectionTitle({ children }: { children: ReactNode }) {
 
 export default function SocialTab() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.social");
   const [tab, setTab] = useState<MainTab>("connections");
   const [followTab, setFollowTab] = useState<FollowTab>("users");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -115,27 +117,27 @@ export default function SocialTab() {
   };
 
   const handleAccept = async (request: IConnectionRequest) => {
-    const name = request.requesterNickname ?? "用戶";
+    const name = request.requesterNickname ?? t("fallback_user");
     try {
       await respondConnectionRequest(String(request.requestId), "accept");
       await Promise.all([incoming.mutate(), connections.mutate()]);
     } catch {
-      Alert.alert("操作失敗", `無法接受 ${name} 的連結請求，請稍後再試。`);
+      Alert.alert(t("action_failed"), t("accept_failed", { name }));
     }
   };
 
   const handleIgnore = (request: IConnectionRequest) => {
-    const name = request.requesterNickname ?? "用戶";
-    Alert.alert("忽略連結請求？", `確定要忽略來自 ${name} 的連結請求嗎？`, [
-      { text: "先不要", style: "cancel" },
+    const name = request.requesterNickname ?? t("fallback_user");
+    Alert.alert(t("ignore_title"), t("ignore_message", { name }), [
+      { text: t("keep"), style: "cancel" },
       {
-        text: "忽略",
+        text: t("ignore"),
         onPress: async () => {
           try {
             await respondConnectionRequest(String(request.requestId), "reject");
             await incoming.mutate();
           } catch {
-            Alert.alert("操作失敗", "請稍後再試。");
+            Alert.alert(t("action_failed"), t("retry_later"));
           }
         },
       },
@@ -143,17 +145,17 @@ export default function SocialTab() {
   };
 
   const handleWithdraw = (request: IConnectionRequest) => {
-    const name = request.receiverNickname ?? "用戶";
-    Alert.alert("撤回連結請求？", `確定要撤回發給 ${name} 的連結請求嗎？`, [
-      { text: "先不要", style: "cancel" },
+    const name = request.receiverNickname ?? t("fallback_user");
+    Alert.alert(t("withdraw_title"), t("withdraw_message", { name }), [
+      { text: t("keep"), style: "cancel" },
       {
-        text: "撤回",
+        text: t("withdraw"),
         onPress: async () => {
           try {
             await withdrawConnectionRequest(String(request.requestId));
             await outgoing.mutate();
           } catch {
-            Alert.alert("操作失敗", "請稍後再試。");
+            Alert.alert(t("action_failed"), t("retry_later"));
           }
         },
       },
@@ -161,18 +163,18 @@ export default function SocialTab() {
   };
 
   const handleDisconnect = (connection: IConnectionItem) => {
-    const name = connection.nickname ?? "用戶";
-    Alert.alert("解除連結？", `解除連結後，你與 ${name} 將失去對彼此非公開內容的存取權。`, [
-      { text: "先不要", style: "cancel" },
+    const name = connection.nickname ?? t("fallback_user");
+    Alert.alert(t("disconnect_title"), t("disconnect_message", { name }), [
+      { text: t("keep"), style: "cancel" },
       {
-        text: "解除連結",
+        text: t("disconnect"),
         style: "destructive",
         onPress: async () => {
           try {
             await disconnectUser(connection.externalId);
             await connections.mutate();
           } catch {
-            Alert.alert("操作失敗", "請稍後再試。");
+            Alert.alert(t("action_failed"), t("retry_later"));
           }
         },
       },
@@ -184,7 +186,7 @@ export default function SocialTab() {
       await unfollowTarget(targetType, targetId);
       await following.mutate();
     } catch {
-      Alert.alert("操作失敗", "無法取消關注，請稍後再試。");
+      Alert.alert(t("action_failed"), t("unfollow_failed"));
     }
   };
 
@@ -211,7 +213,7 @@ export default function SocialTab() {
   );
 
   const renderConnectionCard = (connection: IConnectionItem) => {
-    const name = connection.nickname ?? "用戶";
+    const name = connection.nickname ?? t("fallback_user");
     return (
       <Card
         key={connection.connectionId}
@@ -241,7 +243,7 @@ export default function SocialTab() {
             onPress={() => handleDisconnect(connection)}
           >
             <Text fontSize={12} color="$color">
-              解除連結
+              {t("disconnect")}
             </Text>
           </Button>
         </XStack>
@@ -256,9 +258,9 @@ export default function SocialTab() {
       <YStack gap="$5">
         {incomingRequests.length > 0 && (
           <YStack gap="$3">
-            <SectionTitle>收到的請求</SectionTitle>
+            <SectionTitle>{t("incoming_requests")}</SectionTitle>
             {incomingRequests.map((request) => {
-              const name = request.requesterNickname ?? "用戶";
+              const name = request.requesterNickname ?? t("fallback_user");
               return (
                 <Card
                   key={request.requestId}
@@ -296,7 +298,7 @@ export default function SocialTab() {
                         onPress={() => handleAccept(request)}
                       >
                         <Text fontSize={13} color={colors.basic.white} fontWeight="600">
-                          接受
+                          {t("accept")}
                         </Text>
                       </Button>
                       <Button
@@ -308,7 +310,7 @@ export default function SocialTab() {
                         onPress={() => handleIgnore(request)}
                       >
                         <Text fontSize={13} color="$color">
-                          忽略
+                          {t("ignore")}
                         </Text>
                       </Button>
                     </XStack>
@@ -321,9 +323,9 @@ export default function SocialTab() {
 
         {outgoingRequests.length > 0 && (
           <YStack gap="$3">
-            <SectionTitle>發出的請求</SectionTitle>
+            <SectionTitle>{t("outgoing_requests")}</SectionTitle>
             {outgoingRequests.map((request) => {
-              const name = request.receiverNickname ?? "用戶";
+              const name = request.receiverNickname ?? t("fallback_user");
               return (
                 <Card
                   key={request.requestId}
@@ -345,7 +347,7 @@ export default function SocialTab() {
                         {name}
                       </Text>
                       <Text fontSize={12} color="$color" opacity={0.5}>
-                        等待對方回應
+                        {t("waiting_response")}
                       </Text>
                     </YStack>
                     <Button
@@ -356,7 +358,7 @@ export default function SocialTab() {
                       onPress={() => handleWithdraw(request)}
                     >
                       <Text fontSize={12} color="$color">
-                        撤回
+                        {t("withdraw")}
                       </Text>
                     </Button>
                   </XStack>
@@ -368,10 +370,10 @@ export default function SocialTab() {
 
         <YStack gap="$3">
           <SectionTitle>
-            已連結的夥伴{connectionItems.length > 0 ? ` · ${connectionItems.length} 人` : ""}
+            {t("connected_partners_count", { count: connectionItems.length })}
           </SectionTitle>
           {connectionItems.length === 0 ? (
-            <EmptyState icon="connections" text="尚未與任何人建立連結" />
+            <EmptyState icon="connections" text={t("empty_connections")} />
           ) : (
             connectionItems.map(renderConnectionCard)
           )}
@@ -415,7 +417,7 @@ export default function SocialTab() {
           onPress={() => handleUnfollow("user", user.id)}
         >
           <Text fontSize={12} color="$color">
-            取消關注
+            {t("unfollow")}
           </Text>
         </Button>
       </XStack>
@@ -455,7 +457,7 @@ export default function SocialTab() {
           onPress={() => handleUnfollow("practice", practice.id)}
         >
           <Text fontSize={12} color="$color">
-            取消關注
+            {t("unfollow")}
           </Text>
         </Button>
       </XStack>
@@ -468,7 +470,7 @@ export default function SocialTab() {
     return (
       <YStack gap="$5">
         <YStack gap="$3">
-          <SectionTitle>我關注的</SectionTitle>
+          <SectionTitle>{t("following_section")}</SectionTitle>
           <XStack borderBottomWidth={1} borderBottomColor="$borderColor">
             {(["users", "practices"] as const).map((value) => (
               <YStack
@@ -486,7 +488,7 @@ export default function SocialTab() {
                   color={followTab === value ? colors.primary.base : "$color"}
                   opacity={followTab === value ? 1 : 0.5}
                 >
-                  {value === "users" ? "使用者" : "實踐"}
+                  {value === "users" ? t("users") : t("practices")}
                 </Text>
               </YStack>
             ))}
@@ -495,7 +497,7 @@ export default function SocialTab() {
           {followTab === "users" ? (
             <YStack gap="$3">
               {followedUsers.length === 0 ? (
-                <EmptyState icon="following" text="尚未關注任何使用者" />
+                <EmptyState icon="following" text={t("empty_followed_users")} />
               ) : (
                 followedUsers.map(({ user }) => (user ? renderFollowCard(user) : null))
               )}
@@ -503,7 +505,7 @@ export default function SocialTab() {
           ) : (
             <YStack gap="$3">
               {followedPractices.length === 0 ? (
-                <EmptyState icon="following" text="尚未關注任何實踐" />
+                <EmptyState icon="following" text={t("empty_followed_practices")} />
               ) : (
                 followedPractices.map(({ practice }) =>
                   practice ? renderPracticeCard(practice) : null
@@ -515,10 +517,10 @@ export default function SocialTab() {
 
         <YStack gap="$3">
           <SectionTitle>
-            關注我的{followerItems.length > 0 ? ` · ${followerItems.length} 人` : ""}
+            {t("followers_count", { count: followerItems.length })}
           </SectionTitle>
           {followerItems.length === 0 ? (
-            <EmptyState icon="following" text="目前還沒有人關注你" />
+            <EmptyState icon="following" text={t("empty_followers")} />
           ) : (
             followerItems.map((user) => (
               <Card
@@ -572,17 +574,17 @@ export default function SocialTab() {
           </YStack>
           <YStack flex={1}>
             <Text fontSize={18} fontWeight="600" color="$color">
-              社交
+              {t("title")}
             </Text>
             <Text fontSize={13} color="$color" opacity={0.6}>
-              管理夥伴連結與關注名單
+              {t("subtitle")}
             </Text>
           </YStack>
         </XStack>
 
         <XStack borderBottomWidth={1} borderBottomColor="$borderColor">
-          {renderTabButton("connections", "連結")}
-          {renderTabButton("following", "關注")}
+          {renderTabButton("connections", t("connections"))}
+          {renderTabButton("following", t("following"))}
         </XStack>
 
         <ScrollView
@@ -598,11 +600,13 @@ export default function SocialTab() {
 }
 
 function LoadingState() {
+  const t = useMobileTranslation("mobile.social");
+
   return (
     <YStack alignItems="center" justifyContent="center" paddingVertical="$10" gap="$3">
       <Spinner size="large" color={colors.primary.base} />
       <Text fontSize={14} color="$color" opacity={0.55}>
-        載入中...
+        {t("loading")}
       </Text>
     </YStack>
   );

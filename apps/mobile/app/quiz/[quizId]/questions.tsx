@@ -4,11 +4,14 @@ import { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { type IQuizAnswer, mockQuestions } from "@/types/quiz";
 
 export default function QuizQuestionsScreen() {
   const { quizId } = useLocalSearchParams<{ quizId: string }>();
   const router = useRouter();
+  const t = useMobileTranslation("mobile.quiz");
+  const commonT = useMobileTranslation("common");
 
   const questions = mockQuestions.filter((q) => q.quizId === quizId);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -59,10 +62,10 @@ export default function QuizQuestionsScreen() {
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" gap="$4">
           <Text fontSize={16} color="$color" opacity={0.6}>
-            沒有找到題目
+            {t("no_questions")}
           </Text>
           <Button onPress={() => router.back()}>
-            <Text>返回</Text>
+            <Text>{commonT("back")}</Text>
           </Button>
         </YStack>
       </SafeAreaView>
@@ -74,7 +77,7 @@ export default function QuizQuestionsScreen() {
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" justifyContent="space-between" alignItems="center">
-          <Button size="$4" circular chromeless onPress={handleExit} accessibilityLabel="離開測驗">
+          <Button size="$4" circular chromeless onPress={handleExit} accessibilityLabel={t("exit")}>
             <X size={24} color="$color" />
           </Button>
           <Text fontSize={14} color="$color" opacity={0.6}>
@@ -99,7 +102,7 @@ export default function QuizQuestionsScreen() {
         <YStack flex={1} padding="$4" gap="$6">
           <YStack gap="$2" paddingVertical="$4">
             <Text fontSize={22} fontWeight="700" color="$color" lineHeight={32}>
-              {currentQuestion.question}
+              {t(`questions.${currentQuestion.id}.question`)}
             </Text>
           </YStack>
 
@@ -142,7 +145,7 @@ export default function QuizQuestionsScreen() {
                       color={isSelected ? colors.primary.darker : "$color"}
                       fontWeight={isSelected ? "600" : "400"}
                     >
-                      {option.text}
+                      {t(`questions.${currentQuestion.id}.options.${option.id}`)}
                     </Text>
                   </XStack>
                 </Button>
@@ -162,7 +165,7 @@ export default function QuizQuestionsScreen() {
           >
             <XStack alignItems="center" gap="$2">
               <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                {isLastQuestion ? "完成測驗" : "下一題"}
+                {isLastQuestion ? t("finish") : t("next")}
               </Text>
               <ChevronRight size={20} color={colors.basic.white} />
             </XStack>

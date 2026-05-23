@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Calendar, type DateData, LocaleConfig } from "react-native-calendars";
 import { YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileI18n } from "@/i18n";
 
 // 設定中文語系
 LocaleConfig.locales["zh-TW"] = {
@@ -37,6 +38,39 @@ LocaleConfig.locales["zh-TW"] = {
   dayNamesShort: ["日", "一", "二", "三", "四", "五", "六"],
   today: "今天",
 };
+LocaleConfig.locales.en = {
+  monthNames: [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ],
+  monthNamesShort: [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ],
+  dayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  dayNamesShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  today: "Today",
+};
 LocaleConfig.defaultLocale = "zh-TW";
 
 interface CheckInCalendarProps {
@@ -63,6 +97,9 @@ export function CheckInCalendar({
   currentMonth,
   onMonthChange,
 }: CheckInCalendarProps) {
+  const { locale } = useMobileI18n();
+  LocaleConfig.defaultLocale = locale;
+
   const markedDates = useMemo<IMarkedDates>(() => {
     const marks: IMarkedDates = {};
 

@@ -3,11 +3,14 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { availableQuizzes } from "@/types/quiz";
 
 export default function QuizStartScreen() {
   const { quizId } = useLocalSearchParams<{ quizId: string }>();
   const router = useRouter();
+  const t = useMobileTranslation("mobile.quiz");
+  const commonT = useMobileTranslation("common");
 
   const quiz = availableQuizzes.find((q) => q.id === quizId);
 
@@ -16,10 +19,10 @@ export default function QuizStartScreen() {
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" gap="$4">
           <Text fontSize={16} color="$color" opacity={0.6}>
-            找不到此測驗
+            {t("not_found")}
           </Text>
           <Button onPress={() => router.back()}>
-            <Text>返回</Text>
+            <Text>{commonT("back")}</Text>
           </Button>
         </YStack>
       </SafeAreaView>
@@ -36,7 +39,7 @@ export default function QuizStartScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={commonT("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
@@ -59,10 +62,10 @@ export default function QuizStartScreen() {
             {/* Title & Description */}
             <YStack alignItems="center" gap="$3">
               <Text fontSize={24} fontWeight="700" color="$color" textAlign="center">
-                {quiz.title}
+                {t(`quizzes.${quiz.id}.title`)}
               </Text>
               <Text fontSize={15} color="$color" opacity={0.6} textAlign="center">
-                {quiz.description}
+                {t(`quizzes.${quiz.id}.description`)}
               </Text>
             </YStack>
 
@@ -80,10 +83,10 @@ export default function QuizStartScreen() {
                   <HelpCircle size={24} color={colors.primary.base} />
                 </XStack>
                 <Text fontSize={14} fontWeight="600" color="$color">
-                  {quiz.questionCount} 題
+                  {t("question_count", { count: quiz.questionCount })}
                 </Text>
                 <Text fontSize={12} color="$color" opacity={0.5}>
-                  問題數量
+                  {t("question_count_label")}
                 </Text>
               </YStack>
 
@@ -99,10 +102,10 @@ export default function QuizStartScreen() {
                   <Clock size={24} color={colors.primary.base} />
                 </XStack>
                 <Text fontSize={14} fontWeight="600" color="$color">
-                  {quiz.estimatedTime}
+                  {t(`quizzes.${quiz.id}.estimatedTime`)}
                 </Text>
                 <Text fontSize={12} color="$color" opacity={0.5}>
-                  預估時間
+                  {t("estimated_time_label")}
                 </Text>
               </YStack>
             </XStack>
@@ -116,17 +119,17 @@ export default function QuizStartScreen() {
               gap="$2"
             >
               <Text fontSize={14} fontWeight="600" color="$color">
-                測驗說明
+                {t("instructions_title")}
               </Text>
               <YStack gap="$1">
                 <Text fontSize={13} color="$color" opacity={0.7}>
-                  • 請根據你的第一直覺作答
+                  {t("instruction_1")}
                 </Text>
                 <Text fontSize={13} color="$color" opacity={0.7}>
-                  • 沒有對錯之分，選擇最符合你的選項
+                  {t("instruction_2")}
                 </Text>
                 <Text fontSize={13} color="$color" opacity={0.7}>
-                  • 完成後將獲得專屬的學習島嶼結果
+                  {t("instruction_3")}
                 </Text>
               </YStack>
             </YStack>
@@ -144,7 +147,7 @@ export default function QuizStartScreen() {
             <XStack alignItems="center" gap="$2">
               <Play size={20} color={colors.basic.white} />
               <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                開始測驗
+                {t("start")}
               </Text>
             </XStack>
           </Button>

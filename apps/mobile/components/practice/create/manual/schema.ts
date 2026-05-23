@@ -34,120 +34,139 @@ const formatDate = (date: Date): string => {
 // Form Options Constants
 // 這些選項使用 constants 中的值，確保與 schema 驗證一致
 export const DURATION_MINUTES_OPTIONS = [
-  { value: 15, label: "15分鐘" },
-  { value: 30, label: "30分鐘" },
-  { value: 45, label: "45分鐘" },
-  { value: 60, label: "60分鐘" },
+  { value: 15, labelKey: "duration_15min" },
+  { value: 30, labelKey: "duration_30min" },
+  { value: 45, labelKey: "duration_45min" },
+  { value: 60, labelKey: "duration_60min" },
 ] as const;
 
 export const DURATION_DAYS_OPTIONS = [
-  { value: DurationDays.seven, label: "7天" },
-  { value: DurationDays.fourteen, label: "14天" },
-  { value: DurationDays.twentyOne, label: "21天" },
-  { value: DurationDays.thirty, label: "30天" },
+  { value: DurationDays.seven, labelKey: "duration_7days" },
+  { value: DurationDays.fourteen, labelKey: "duration_14days" },
+  { value: DurationDays.twentyOne, labelKey: "duration_21days" },
+  { value: DurationDays.thirty, labelKey: "duration_30days" },
 ] as const;
 
 export const FREQUENCY_OPTIONS = [
   {
     value: Frequency.twoToFour,
     label: "2-4",
-    unit: "天",
-    description: "輕鬆起步",
+    unitKey: "frequency_unit",
+    descriptionKey: "frequency_easy",
   },
   {
     value: Frequency.threeToFive,
     label: "3-5",
-    unit: "天",
-    description: "紮實執行",
+    unitKey: "frequency_unit",
+    descriptionKey: "frequency_solid",
   },
   {
     value: Frequency.fourToSeven,
     label: "4-7",
-    unit: "天",
-    description: "密集小跑",
+    unitKey: "frequency_unit",
+    descriptionKey: "frequency_intensive",
   },
 ] as const;
 
 export const EXECUTION_TIMING_OPTIONS = [
-  { value: ExecutionTiming.morning, label: "早餐前" },
-  { value: ExecutionTiming.commute, label: "通勤時" },
-  { value: ExecutionTiming.lunchBreak, label: "午休時" },
-  { value: ExecutionTiming.evening, label: "晚餐後" },
-  { value: ExecutionTiming.beforeSleep, label: "睡前" },
+  { value: ExecutionTiming.morning, labelKey: "timing_morning" },
+  { value: ExecutionTiming.commute, labelKey: "timing_commute" },
+  { value: ExecutionTiming.lunchBreak, labelKey: "timing_lunch" },
+  { value: ExecutionTiming.evening, labelKey: "timing_evening" },
+  { value: ExecutionTiming.beforeSleep, labelKey: "timing_before_sleep" },
 ] as const;
 
-// Form Schema
-export const manualPracticeFormSchema = z
-  .object({
-    // Step 1
-    name: z.string().min(1, "請輸入名稱"),
-    actionDescription: z.string().min(1, "請輸入實踐行動").max(50, "最多50字").default(""),
+type PracticeTranslator = (key: string, values?: Record<string, string | number>) => string;
 
-    // Step 2
-    startDate: z
-      .string()
-      .min(1, "請選擇開始時間")
-      .refine(
-        (val) => {
-          if (!val) return false;
-          const date = parseDate(val);
-          if (!date) return false;
-          const today = startOfDay(new Date());
-          const maxDate = startOfDay(addDays(new Date(), 14));
-          const dateStartOfDay = startOfDay(date);
-          return dateStartOfDay >= today && dateStartOfDay <= maxDate;
-        },
-        (val) => {
-          if (!val) return { message: "請選擇開始時間" };
-          const date = parseDate(val);
-          if (!date) return { message: "請選擇有效的日期" };
-          const today = startOfDay(new Date());
-          const maxDate = startOfDay(addDays(new Date(), 14));
-          const dateStartOfDay = startOfDay(date);
-          if (dateStartOfDay < today) {
-            return { message: "日期不能早於今天" };
+const passthroughTranslator: PracticeTranslator = (key, values) => {
+  if (!values) return key;
+  return Object.entries(values).reduce(
+    (result, [valueKey, value]) => result.replaceAll(`{${valueKey}}`, String(value)),
+    key
+  );
+};
+
+export const createManualPracticeFormSchema = (t: PracticeTranslator) =>
+  z
+    .object({
+      // Step 1
+      name: z.string().min(1, t("validation_name_required")),
+      actionDescription: z
+        .string()
+        .min(1, t("validation_action_required"))
+        .max(50, t("validation_action_max"))
+        .default(""),
+
+      // Step 2
+      startDate: z
+        .string()
+        .min(1, t("validation_start_date_required"))
+        .refine(
+          (val) => {
+            if (!val) return false;
+            const date = parseDate(val);
+            if (!date) return false;
+            const today = startOfDay(new Date());
+            const maxDate = startOfDay(addDays(new Date(), 14));
+            const dateStartOfDay = startOfDay(date);
+            return dateStartOfDay >= today && dateStartOfDay <= maxDate;
+          },
+          (val) => {
+            if (!val) return { message: t("validation_start_date_required") };
+            const date = parseDate(val);
+            if (!date) return { message: t("validation_start_date_invalid") };
+            const today = startOfDay(new Date());
+            const maxDate = startOfDay(addDays(new Date(), 14));
+            const dateStartOfDay = startOfDay(date);
+            if (dateStartOfDay < today) {
+              return { message: t("validation_start_date_too_early") };
+            }
+            if (dateStartOfDay > maxDate) {
+              return {
+                message: t("validation_start_date_too_late", { maxDate: formatDate(maxDate) }),
+              };
+            }
+            return { message: t("validation_start_date_out_of_range") };
           }
-          if (dateStartOfDay > maxDate) {
-            const maxDateFormatted = formatDate(maxDate);
-            return { message: `日期不能晚於 ${maxDateFormatted}` };
-          }
-          return { message: "日期不在允許的範圍內" };
-        }
-      ),
-    durationDays: z.nativeEnum(DurationDays, {
-      required_error: "請選擇想要持續多久",
-    }),
-    frequency: z.nativeEnum(Frequency, {
-      required_error: "請選擇每週實踐頻率",
-    }),
+        ),
+      durationDays: z.nativeEnum(DurationDays, {
+        required_error: t("validation_duration_required"),
+      }),
+      frequency: z.nativeEnum(Frequency, {
+        required_error: t("validation_frequency_required"),
+      }),
 
-    // Step 3
-    durationMinutes: z.number(),
-    executionTiming: z.array(z.nativeEnum(ExecutionTiming)),
-    customTiming: z.string(),
+      // Step 3
+      durationMinutes: z.number(),
+      executionTiming: z.array(z.nativeEnum(ExecutionTiming)),
+      customTiming: z.string(),
 
-    // Step 4
-    tags: z.array(z.string()).max(MAX_PRACTICE_TAGS, `標籤最多 ${MAX_PRACTICE_TAGS} 個`).optional(),
-    resources: z
-      .array(
-        z.object({
-          id: z.string(),
-          name: z.string().min(1, "請輸入資源名稱"),
-          url: z
-            .string()
-            .url("請輸入有效的網址")
-            .refine((val) => !val || val.startsWith("https://"), {
-              message: "網址必須使用 HTTPS",
-            })
-            .optional()
-            .or(z.literal("")),
-        })
-      )
-      .optional(),
-  })
-  .refine((data) => data.executionTiming.length > 0 || data.customTiming.trim().length > 0, {
-    message: "請至少選擇一個執行時機或填寫其他時段",
-    path: ["executionTiming"],
-  });
+      // Step 4
+      tags: z
+        .array(z.string())
+        .max(MAX_PRACTICE_TAGS, t("validation_tags_max", { max: MAX_PRACTICE_TAGS }))
+        .optional(),
+      resources: z
+        .array(
+          z.object({
+            id: z.string(),
+            name: z.string().min(1, t("validation_resource_name_required")),
+            url: z
+              .string()
+              .url(t("validation_resource_url_invalid"))
+              .refine((val) => !val || val.startsWith("https://"), {
+                message: t("step4_url_https_required"),
+              })
+              .optional()
+              .or(z.literal("")),
+          })
+        )
+        .optional(),
+    })
+    .refine((data) => data.executionTiming.length > 0 || data.customTiming.trim().length > 0, {
+      message: t("validation_execution_timing_required"),
+      path: ["executionTiming"],
+    });
 
+export const manualPracticeFormSchema = createManualPracticeFormSchema(passthroughTranslator);
 export type ManualPracticeFormValuesType = z.infer<typeof manualPracticeFormSchema>;

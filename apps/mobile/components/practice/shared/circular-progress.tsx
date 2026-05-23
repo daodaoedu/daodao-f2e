@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { Text } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 interface CircularProgressProps {
   value: number; // 0-100
@@ -26,6 +27,7 @@ export const CircularProgress = ({
   progressColor = colors.primary.base,
   backgroundColor = colors.basic["200"],
 }: CircularProgressProps) => {
+  const t = useMobileTranslation("practice");
   const { radius, circumference, offset, clampedValue } = useMemo(() => {
     const r = (size - strokeWidth) / 2;
     const c = r * 2 * Math.PI;
@@ -37,7 +39,7 @@ export const CircularProgress = ({
   return (
     <View
       style={[styles.container, { width: size, height: size }]}
-      accessibilityLabel={`進度 ${Math.round(value)}%`}
+      accessibilityLabel={t("progress_accessibility", { progress: Math.round(value) })}
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now: clampedValue }}
     >

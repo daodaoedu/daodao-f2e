@@ -3,6 +3,7 @@ import { forwardRef } from "react";
 import { View } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileI18n, useMobileTranslation } from "@/i18n";
 import type { IPractice } from "@/types/practice";
 
 interface ShareableCheckInCardProps {
@@ -13,7 +14,9 @@ interface ShareableCheckInCardProps {
 
 export const ShareableCheckInCard = forwardRef<View, ShareableCheckInCardProps>(
   function ShareableCheckInCard({ practice, streakCount, date = new Date() }, ref) {
-    const formattedDate = date.toLocaleDateString("zh-TW", {
+    const { locale } = useMobileI18n();
+    const t = useMobileTranslation("mobile.shareCheckIn");
+    const formattedDate = date.toLocaleDateString(locale, {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -40,7 +43,7 @@ export const ShareableCheckInCard = forwardRef<View, ShareableCheckInCardProps>(
               {formattedDate}
             </Text>
             <Text fontSize={14} fontWeight="700" color={colors.primary.base}>
-              島島阿學
+              {t("brand")}
             </Text>
           </XStack>
 
@@ -82,7 +85,7 @@ export const ShareableCheckInCard = forwardRef<View, ShareableCheckInCardProps>(
           >
             <Flame size={24} color={colors.semantic.warning} />
             <Text fontSize={18} fontWeight="700" color={cardColor}>
-              連續打卡 {streakCount} 天
+              {t("streak_days", { count: streakCount })}
             </Text>
           </XStack>
 
@@ -90,10 +93,13 @@ export const ShareableCheckInCard = forwardRef<View, ShareableCheckInCardProps>(
           <YStack gap="$2">
             <XStack justifyContent="space-between" alignItems="center">
               <Text fontSize={13} color={colors.basic[500]}>
-                目標進度
+                {t("goal_progress")}
               </Text>
               <Text fontSize={13} fontWeight="600" color={cardColor}>
-                {practice.completedDays} / {practice.targetDays} 天
+                {t("days_progress", {
+                  completed: practice.completedDays,
+                  total: practice.targetDays,
+                })}
               </Text>
             </XStack>
             <YStack

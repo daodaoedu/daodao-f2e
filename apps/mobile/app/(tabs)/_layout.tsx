@@ -3,10 +3,12 @@ import { Tabs, usePathname, useRouter } from "expo-router";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { BellIcon, HomeIcon, SettingsIcon, UserIcon } from "@/components/icons";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 export default function TabLayout() {
   const router = useRouter();
   const pathname = usePathname();
+  const t = useMobileTranslation("mobile.tabs");
 
   const handleAddPractice = () => {
     router.push("/practices/create");
@@ -62,7 +64,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "主頁",
+            title: t("home"),
             tabBarIcon: ({ color, focused }) => (
               <HomeIcon size={32} color={color} filled={focused} />
             ),
@@ -71,14 +73,14 @@ export default function TabLayout() {
         <Tabs.Screen
           name="showcase"
           options={{
-            title: "靈感頁",
+            title: t("showcase"),
             tabBarIcon: ({ color }) => <Compass size={28} color={color} />,
           }}
         />
         <Tabs.Screen
           name="notifications"
           options={{
-            title: "最新通知",
+            title: t("notifications"),
             tabBarIcon: ({ color, focused }) => (
               <BellIcon size={32} color={color} filled={focused} />
             ),
@@ -87,14 +89,14 @@ export default function TabLayout() {
         <Tabs.Screen
           name="social"
           options={{
-            title: "社交",
+            title: t("social"),
             tabBarIcon: ({ color }) => <UsersRound size={28} color={color} />,
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
-            title: "我的小島",
+            title: t("profile"),
             tabBarIcon: ({ color, focused }) => (
               <UserIcon size={32} color={color} filled={focused} />
             ),
@@ -103,7 +105,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="settings"
           options={{
-            title: "設定",
+            title: t("settings"),
             tabBarIcon: ({ color, focused }) => (
               <SettingsIcon size={32} color={color} filled={focused} />
             ),
@@ -130,7 +132,7 @@ export default function TabLayout() {
           style={styles.fab}
           onPress={handleAddPractice}
           accessibilityRole="button"
-          accessibilityLabel="建立主題實踐"
+          accessibilityLabel={t("createPractice")}
         >
           <Plus size={24} color="white" />
         </Pressable>

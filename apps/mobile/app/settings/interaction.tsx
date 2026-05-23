@@ -7,16 +7,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useMobileTranslation } from "@/i18n";
 
 function assertSuccessfulResponse(response: { error?: unknown }) {
   if (!response.error) return;
 
   const error = response.error as { error?: { message?: string }; message?: string };
-  throw new Error(error.error?.message ?? error.message ?? "更新失敗，請稍後再試");
+  throw new Error(error.error?.message ?? error.message ?? "Update failed. Please try again later.");
 }
 
 export default function InteractionSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.interactionSettings");
+  const tCommon = useMobileTranslation("common");
   const { user, isLoading } = useCurrentUser();
   const { updateCurrentUser } = useUserMutations();
 
@@ -34,8 +37,8 @@ export default function InteractionSettingsScreen() {
     } catch (error) {
       setLocalIsOpenProfile(null);
       Alert.alert(
-        "更新失敗",
-        error instanceof Error ? error.message : "無法更新互動設定，請稍後再試。"
+        t("errorTitle"),
+        error instanceof Error ? error.message : t("saveError")
       );
     } finally {
       setIsSaving(false);
@@ -51,12 +54,12 @@ export default function InteractionSettingsScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            互動設定
+            {t("title")}
           </Text>
         </XStack>
 
@@ -71,10 +74,10 @@ export default function InteractionSettingsScreen() {
             <XStack padding="$4" alignItems="center" justifyContent="space-between">
               <YStack flex={1} gap="$1">
                 <Text fontSize={15} color="$color">
-                  公開我的實踐
+                  {t("openProfileTitle")}
                 </Text>
                 <Text fontSize={12} color="$color" opacity={0.5}>
-                  開啟後，你的實踐將可以被搜尋展示
+                  {t("openProfileDescription")}
                 </Text>
               </YStack>
               <Switch

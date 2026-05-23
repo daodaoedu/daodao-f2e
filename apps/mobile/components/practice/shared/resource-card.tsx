@@ -3,6 +3,7 @@ import { memo, useCallback, useState } from "react";
 import { Linking, Pressable, StyleSheet } from "react-native";
 import { Image, Spinner, Text, View, XStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 export interface IResourceCardData {
   id: string | number;
@@ -16,6 +17,7 @@ export interface ResourceCardProps {
 }
 
 const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
+  const t = useMobileTranslation("practice");
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
@@ -49,7 +51,7 @@ const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
     <Pressable
       onPress={handlePress}
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      accessibilityLabel={`開啟資源：${resource.name}`}
+      accessibilityLabel={t("resource_open_accessibility", { name: resource.name })}
       accessibilityRole="link"
     >
       {/* Preview Area */}
@@ -78,7 +80,7 @@ const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
           <Pressable
             onPress={handleRemove}
             style={styles.removeButton}
-            accessibilityLabel="移除資源"
+            accessibilityLabel={t("resource_remove_accessibility")}
             accessibilityRole="button"
           >
             <X size={12} color={colors.basic.white} />

@@ -9,6 +9,7 @@ import { FlatList, RefreshControl, View as RNView, StyleSheet } from "react-nati
 import { Text, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
+import { useMobileTranslation } from "@/i18n";
 
 interface ShowcaseFeedProps {
   practices: IShowcasePractice[];
@@ -31,14 +32,15 @@ export function ShowcaseFeed({
   renderItem,
   renderHeader,
 }: ShowcaseFeedProps) {
+  const t = useMobileTranslation("mobile.home");
   const renderFooter = useCallback(
     () =>
       isValidating ? (
         <Text textAlign="center" paddingVertical="$4" color="rgba(0,0,0,0.5)" fontSize={14}>
-          載入中...
+          {t("loading")}
         </Text>
       ) : null,
-    [isValidating]
+    [isValidating, t]
   );
 
   const renderEmpty = useCallback(
@@ -46,11 +48,11 @@ export function ShowcaseFeed({
       !isLoading ? (
         <YStack alignItems="center" paddingVertical="$8">
           <Text color="rgba(0,0,0,0.5)" fontSize={14}>
-            沒有找到相關實踐
+            {t("empty_showcase")}
           </Text>
         </YStack>
       ) : null,
-    [isLoading]
+    [isLoading, t]
   );
 
   if (isLoading && practices.length === 0) {
