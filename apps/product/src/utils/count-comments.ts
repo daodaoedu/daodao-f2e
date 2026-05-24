@@ -9,9 +9,14 @@ function isCommentLike(v: unknown): v is CommentLike {
 
 export function countTotalComments(comments: CommentLike[]): number {
   return comments.reduce((total, comment) => {
-    const replies = Array.isArray(comment.replies)
-      ? comment.replies.filter(isCommentLike).length
-      : 0;
-    return total + 1 + replies;
+    let replyCount = 0;
+    if (Array.isArray(comment.replies)) {
+      for (const reply of comment.replies) {
+        if (isCommentLike(reply)) {
+          replyCount++;
+        }
+      }
+    }
+    return total + 1 + replyCount;
   }, 0);
 }
