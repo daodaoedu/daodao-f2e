@@ -1,3 +1,4 @@
+import { ArrowCircleSvg } from "@daodao/assets";
 import { cn } from "@daodao/ui/lib/utils";
 import { ThumbsUp } from "lucide-react";
 
@@ -15,7 +16,7 @@ export function ActivityCard({ event_text, label, onClick, className }: Activity
       onClick={onClick}
       disabled={!onClick}
       className={cn(
-        "w-full text-left bg-white rounded-2xl p-4 border border-[#E8F8FF] flex items-start gap-3",
+        "w-full text-left bg-white rounded-2xl p-4 border border-[#E8F8FF] flex items-center gap-3",
         onClick && "cursor-pointer transition hover:border-logo-cyan/40 hover:shadow-sm",
         className
       )}
@@ -29,6 +30,9 @@ export function ActivityCard({ event_text, label, onClick, className }: Activity
         </span>
         <p className="text-sm text-text-dark leading-snug">{event_text}</p>
       </div>
+      {onClick && (
+        <ArrowCircleSvg className="shrink-0 size-8 self-center" />
+      )}
     </button>
   );
 }
