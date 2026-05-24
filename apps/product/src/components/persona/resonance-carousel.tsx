@@ -105,12 +105,12 @@ function CarouselQuestionCard({
         }}
       >
         {/* Front — question */}
-        {/* biome-ignore lint/a11y/useKeyWithClickEvents: card flip interaction */}
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction, contains interactive children */}
         <div
           className="group absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex flex-col cursor-pointer select-none"
           style={{ backfaceVisibility: "hidden" }}
           onClick={() => setIsFlipped(true)}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setIsFlipped(true); }}
         >
           <QuoteFillSvg className="mt-4 mb-4 self-center shrink-0 text-logo-cyan" />
           <p className="text-[24px] font-semibold text-text-dark text-center leading-snug flex-1 flex items-center justify-center overflow-hidden">
@@ -123,12 +123,12 @@ function CarouselQuestionCard({
         </div>
 
         {/* Back — answer form */}
-        {/* biome-ignore lint/a11y/useKeyWithClickEvents: card flip interaction */}
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction, contains interactive children */}
         <div
           className="absolute inset-0 bg-white rounded-2xl px-6 pt-5 pb-6 shadow-sm border border-[#E8F8FF] flex flex-col cursor-pointer overflow-hidden"
           style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
           onClick={() => setIsFlipped(false)}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setIsFlipped(false); }}
         >
           <div className="flex items-start gap-2 shrink-0">
             <p className="text-sm text-primary-darker line-clamp-2 leading-relaxed flex-1">
@@ -152,10 +152,10 @@ function CarouselQuestionCard({
           {isChoice ? (
             <>
               {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for option grid */}
-              {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation for option grid */}
               <div
                 className="flex-1 grid grid-cols-2 gap-2 mt-4 min-w-0"
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
               >
                 {options.map((opt) => (
                   <Button
@@ -181,10 +181,10 @@ function CarouselQuestionCard({
           ) : (
             <>
               {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for textarea area */}
-              {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation for textarea area */}
               <div
                 className="flex-1 flex items-center min-h-0"
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
               >
                 <textarea
                   rows={2}
