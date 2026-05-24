@@ -31,10 +31,10 @@ export function CheckinReactionList({ targetId }: CheckinReactionListProps) {
 
   return (
     <div className="flex flex-col gap-1 px-4">
-      {items.map((item) => {
+      {items.map((item, index) => {
         const config = REACTION_CONFIG[item.reactionType as ReactionTypeType];
         return (
-          <div key={`${item.userId}-${item.reactedAt}`} className="flex items-center gap-3 py-2">
+          <div key={`${item.userId}-${index}`} className="flex items-center gap-3 py-2">
             <Avatar className="size-8 shrink-0">
               {item.photoURL && <AvatarImage src={item.photoURL} alt={item.name} />}
               <AvatarFallback className="text-[10px] font-medium text-text-dark bg-primary-palest">
