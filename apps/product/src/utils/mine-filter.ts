@@ -15,8 +15,9 @@ export function buildMineFilterCounts(tasks: HasStatus[]): MineFilterCounts {
     [FilterStatus.completed]: 0,
   };
   for (const task of tasks) {
-    if (task.status in counts && task.status !== FilterStatus.all) {
-      counts[task.status as FilterStatusType]++;
+    const status = task.status as FilterStatusType;
+    if (status !== FilterStatus.all && Object.hasOwn(counts, status)) {
+      counts[status]++;
     }
   }
   return counts;
