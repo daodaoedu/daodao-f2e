@@ -22,12 +22,13 @@ import {
   type FilterStatus as FilterStatusType,
   mapPracticeStatusToTaskStatus,
 } from "@/constants/task-status";
+import { applyMineFilter, buildMineFilterCounts } from "@/utils/mine-filter";
 
 const filterOptions = [
+  { value: FilterStatus.inProgress, labelKey: "filter_in_progress" },
   { value: FilterStatus.all, labelKey: "filter_all" },
   { value: FilterStatus.draft, labelKey: "filter_draft" },
   { value: FilterStatus.notStarted, labelKey: "filter_not_started" },
-  { value: FilterStatus.inProgress, labelKey: "filter_in_progress" },
   { value: FilterStatus.completed, labelKey: "filter_completed" },
 ] as const;
 
@@ -64,13 +65,10 @@ export default function MyPage() {
     return { inProgressTasks: inProgressTasksData };
   }, [allPracticesData, t]);
 
-  const filteredInProgressTasks = useMemo(() => {
-    if (filterStatus === FilterStatus.completed)
-      return inProgressTasks.filter((task) => task.status === FilterStatus.completed);
-    if (filterStatus === FilterStatus.all)
-      return inProgressTasks.filter((task) => task.status !== FilterStatus.completed);
-    return inProgressTasks.filter((task) => task.status === filterStatus);
-  }, [inProgressTasks, filterStatus]);
+  const filteredInProgressTasks = useMemo(
+    () => applyMineFilter(inProgressTasks, filterStatus),
+    [inProgressTasks, filterStatus]
+  );
 
   const stats = useMemo(() => {
     const statsDataValue = statsData?.data;
@@ -92,24 +90,7 @@ export default function MyPage() {
 
   const hasPractices = inProgressTasks.length > 0;
 
-  const filterCounts = useMemo(() => {
-    const counts = {
-      [FilterStatus.all]: 0,
-      [FilterStatus.draft]: 0,
-      [FilterStatus.notStarted]: 0,
-      [FilterStatus.inProgress]: 0,
-      [FilterStatus.completed]: 0,
-    };
-    for (const task of inProgressTasks) {
-      if (task.status !== FilterStatus.completed) {
-        counts[FilterStatus.all]++;
-      }
-      if (task.status in counts) {
-        counts[task.status as keyof typeof counts]++;
-      }
-    }
-    return counts;
-  }, [inProgressTasks]);
+  const filterCounts = useMemo(() => buildMineFilterCounts(inProgressTasks), [inProgressTasks]);
 
   return (
     <div className="relative min-h-screen">
