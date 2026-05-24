@@ -141,6 +141,20 @@ export const initiateOAuthLogin = (
 };
 
 /**
+ * 驗證 redirect URL 是否安全（同源或相對路徑），防止 open redirect 攻擊
+ */
+export function isSafeRedirectUrl(url: string): boolean {
+  if (!url) return false;
+  if (url.startsWith("/") && !url.startsWith("//")) return true;
+  try {
+    const parsed = new URL(url);
+    return parsed.origin === window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * 驗證並清除 OAuth State（用於回調驗證）
  * 驗證成功後會清除存儲的 nonce，確保一次性使用
  * @param state OAuth State 物件

@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@daodao/auth";
+import { isSafeRedirectUrl, useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -30,8 +30,8 @@ export default function LoginPage() {
   // - 避開 next/navigation 的 router.push 不帶 locale prefix 在 next-intl 下的不一致行為
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      const redirectUrl = searchParams.get("redirect") || "/";
-      window.location.href = redirectUrl;
+      const rawRedirect = searchParams.get("redirect") || "/";
+      window.location.href = isSafeRedirectUrl(rawRedirect) ? rawRedirect : "/";
     }
   }, [isLoading, isAuthenticated, searchParams]);
 
