@@ -4,6 +4,7 @@ import { Alert } from "react-native";
 import { mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import { useMobileTranslation } from "@/i18n";
+import { authStorage } from "@/services/auth-storage";
 import type { ICheckInFormData } from "../../types";
 
 // React Native file-like object for FormData
@@ -91,11 +92,19 @@ export const useCheckInSubmit = ({
         throw new Error(t("api_url_missing"));
       }
 
+      // 取得 Bearer token（React Native 不支援 cookie credentials，需明確帶 Authorization header）
+      const accessToken = await authStorage.getAccessToken();
+      if (!accessToken) {
+        throw new Error(t("auth_required"));
+      }
+
       // 發送請求
       const response = await fetch(`${apiUrl}/api/v1/practices/${practiceId}/checkins`, {
         method: "POST",
         body: formData,
-        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
 
       if (!response.ok) {
