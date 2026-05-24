@@ -13,8 +13,8 @@ export default function VerifyEmailScreen() {
       variant={isSuccess ? "success" : "error"}
       title={isSuccess ? t("verify_success_title") : t("verify_error_title")}
       description={isSuccess ? t("verify_success_description") : t("verify_error_description")}
-      primaryLabel={isSuccess ? t("go_settings") : t("retry_login")}
-      onPrimaryPress={() => router.replace(isSuccess ? "/settings" : "/login")}
+      primaryLabel={isSuccess ? t("back_home") : t("retry_login")}
+      onPrimaryPress={() => router.replace(isSuccess ? "/" : "/login")}
       secondaryLabel={t("back_home")}
       onSecondaryPress={() => router.replace("/" as never)}
     />
