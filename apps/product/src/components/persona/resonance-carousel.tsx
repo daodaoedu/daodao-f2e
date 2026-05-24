@@ -3,17 +3,18 @@
 import {
   dismissPersonaCarousel,
   submitPersonaAnswer,
+  useCurrentUser,
   useMutate,
   usePersonaCarouselState,
 } from "@daodao/api";
 import { ArrowCircleSvg, QuoteFillSvg } from "@daodao/assets";
+import { useLocale, useTranslations } from "@daodao/i18n";
+import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
-import { useLocale, useTranslations } from "@daodao/i18n";
 import { CheckCircle2, Laugh, RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "@daodao/i18n/navigation";
 
 interface CarouselQuestionCardProps {
   questionId: number;
@@ -40,6 +41,7 @@ function CarouselQuestionCard({
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
+  const { data: currentUser } = useCurrentUser();
 
   const isChoice = questionType === "choice" && options && options.length > 0;
   const frontLabel = isChoice ? t("choicePrompt") : t("openPrompt");
@@ -62,7 +64,6 @@ function CarouselQuestionCard({
       setSelected("");
       setTextValue("");
       setSubmitted(true);
-      onAnswered();
     } catch {
       toast.error(tProfile("submitError"));
     } finally {
@@ -80,7 +81,11 @@ function CarouselQuestionCard({
         </p>
         <button
           type="button"
-          onClick={() => router.push("/users/me")}
+          onClick={() => {
+            onAnswered();
+            const identifier = currentUser?.data?.customId ?? currentUser?.data?.id;
+            if (identifier) router.push(`/users/${identifier}`);
+          }}
           className="mt-2 flex items-center gap-1.5 text-sm font-medium text-primary-darker hover:opacity-80 transition-opacity"
         >
           {t("submitted.cta")}
@@ -91,7 +96,7 @@ function CarouselQuestionCard({
   }
 
   return (
-    <div style={{ perspective: "1000px", height: isChoice ? "360px" : "280px" }} className="w-full">
+    <div style={{ perspective: "1000px", height: isChoice ? "360px" : "320px" }} className="w-full">
       <div
         className="relative w-full h-full transition-transform duration-500 ease-in-out"
         style={{
@@ -107,8 +112,8 @@ function CarouselQuestionCard({
           style={{ backfaceVisibility: "hidden" }}
           onClick={() => setIsFlipped(true)}
         >
-          <QuoteFillSvg className="mt-4 mb-3 self-center shrink-0 size-10 md:size-16 text-logo-cyan" />
-          <p className="text-lg md:text-[22px] font-semibold text-text-dark text-center leading-snug flex-1 flex items-center justify-center overflow-hidden">
+          <QuoteFillSvg className="mt-4 mb-4 self-center shrink-0 text-logo-cyan" />
+          <p className="text-[24px] font-semibold text-text-dark text-center leading-snug flex-1 flex items-center justify-center overflow-hidden">
             {prompt}
           </p>
           <div className="flex items-center gap-2 self-end mt-3 transition-transform duration-200 group-hover:translate-x-1.5">
@@ -133,7 +138,10 @@ function CarouselQuestionCard({
               type="button"
               variant="ghost"
               size="sm"
-              onClick={(e) => { e.stopPropagation(); onSwitch(questionId); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSwitch(questionId);
+              }}
               className="shrink-0 -mt-0.5 -mr-1 flex items-center gap-1 px-2 py-1 rounded-full text-xs text-text-dark/30 hover:text-text-dark/55 hover:bg-black/5 h-auto transition-colors"
             >
               <RefreshCw className="size-3" />
@@ -154,7 +162,10 @@ function CarouselQuestionCard({
                     key={opt}
                     type="button"
                     variant="ghost"
-                    onClick={(e) => { e.stopPropagation(); setSelected(opt); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelected(opt);
+                    }}
                     className={cn(
                       "w-full min-w-0 whitespace-normal rounded-xl border-2 text-sm py-3 px-3 h-auto transition-all text-left leading-snug justify-start",
                       selected === opt
@@ -189,7 +200,10 @@ function CarouselQuestionCard({
 
           <Button
             type="button"
-            onClick={(e) => { e.stopPropagation(); handleSubmit(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSubmit();
+            }}
             disabled={submitting || (isChoice ? !selected : !textValue.trim())}
             className={cn(
               "shrink-0 mt-4 w-full py-3 rounded-full font-medium text-base transition-all h-auto",
@@ -208,7 +222,6 @@ function CarouselQuestionCard({
 
 export function ResonanceCarousel() {
   const t = useTranslations("persona.carousel");
-  const tProfile = useTranslations("persona.myProfile");
   const locale = useLocale();
   const mutate = useMutate();
   const [replaceId, setReplaceId] = useState<number | undefined>(undefined);
@@ -239,7 +252,6 @@ export function ResonanceCarousel() {
 
   const handleAnswered = async () => {
     await mutate(["/api/v1/persona/carousel-state"] as const);
-    toast.success(tProfile("submitSuccess"));
   };
 
   const handleSwitch = (questionId: number) => {
@@ -267,17 +279,19 @@ export function ResonanceCarousel() {
         </Button>
       </div>
 
-      {questions[0] && (
-        <CarouselQuestionCard
-          key={questions[0].id}
-          questionId={questions[0].id}
-          prompt={questions[0].prompt}
-          questionType={questions[0].questionType}
-          options={questions[0].options}
-          onAnswered={handleAnswered}
-          onSwitch={handleSwitch}
-        />
-      )}
+      <div className="flex flex-col gap-3">
+        {questions.slice(0, 2).map((q) => (
+          <CarouselQuestionCard
+            key={q.id}
+            questionId={q.id}
+            prompt={q.prompt}
+            questionType={q.questionType}
+            options={q.options}
+            onAnswered={handleAnswered}
+            onSwitch={handleSwitch}
+          />
+        ))}
+      </div>
     </div>
   );
 }

@@ -25,9 +25,7 @@ export const FootprintsList = () => {
   const footprints = data?.data ?? [];
 
   if (footprints.length === 0) {
-    return (
-      <div className="text-center py-16 text-[#9FB5B8] text-sm">{t("footprints_empty")}</div>
-    );
+    return <div className="text-center py-16 text-[#9FB5B8] text-sm">{t("footprints_empty")}</div>;
   }
 
   return (

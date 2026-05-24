@@ -10,12 +10,12 @@ import {
   useCurrentUser,
   useFollowStatus,
 } from "@daodao/api";
-import { useTranslations } from "@daodao/i18n";
 import FacebookSvg from "@daodao/assets/images/social-icons/facebook-filled.svg";
 import GithubSvg from "@daodao/assets/images/social-icons/github.svg";
 import InstagramSvg from "@daodao/assets/images/social-icons/instagram-filled.svg";
 import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin-filled.svg";
 import ThreadsSvg from "@daodao/assets/images/social-icons/threads-filled.svg";
+import { useTranslations } from "@daodao/i18n";
 import { useIsMobile } from "@daodao/shared";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";

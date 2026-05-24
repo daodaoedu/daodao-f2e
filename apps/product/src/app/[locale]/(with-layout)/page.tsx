@@ -82,7 +82,7 @@ export default function HomePage() {
   });
   const [keyword, setKeyword] = useState(searchParams.get("keyword") ?? "");
 
-  // Redirect legacy `/?tab=mine` URLs (old bookmarks/history) to the dedicated /my route.
+  // Redirect legacy `/?tab=mine` URLs (old bookmarks/history) to the dedicated /mine route.
   useEffect(() => {
     if (searchParams.get("tab") !== "mine") return;
     const params = new URLSearchParams(searchParams.toString());
@@ -408,9 +408,7 @@ export default function HomePage() {
               <div ref={sentinelRef} className="h-4" />
 
               {isValidating && (
-                <div className="text-center py-4 text-text-dark/50 text-sm">
-                  {t("loading")}
-                </div>
+                <div className="text-center py-4 text-text-dark/50 text-sm">{t("loading")}</div>
               )}
             </div>
           )}

@@ -1,11 +1,11 @@
 "use client";
 
 import { submitPersonaAnswer, useMutate, usePersonaProfileMe } from "@daodao/api";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
-import { useLocale, useTranslations } from "@daodao/i18n";
 import { useState } from "react";
 
 interface InlineAnswerFormProps {

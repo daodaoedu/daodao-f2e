@@ -21,7 +21,7 @@ import { ReflectionQuestion } from "./components/reflection-question";
 import { TagSelector } from "./components/tag-selector";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
 import { useCheckInSubmit } from "./hooks/use-check-in-submit";
-import { createCheckInFormSchema, type CheckInFormValuesType } from "./schema";
+import { type CheckInFormValuesType, createCheckInFormSchema } from "./schema";
 
 export type { ICheckInFormData as CheckInData, ICheckInStatusOptions as CheckInStatusOptions };
 export type { CheckInStatusType as CheckInStatus } from "@/constants/check-in-status";

@@ -1,8 +1,8 @@
 "use client";
 
 import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
-import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
 import { useTranslations } from "@daodao/i18n";
+import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
 import * as React from "react";

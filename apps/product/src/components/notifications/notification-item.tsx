@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "@daodao/i18n";
 import { ArrowRightOutlineSvg, MoreSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -92,14 +92,18 @@ function NotificationText({ notification }: { notification: INotificationData })
   const count = aggregationCount ?? 1;
   const name = <span className="font-semibold">{actor.name}</span>;
   const suffix =
-    count > 1 ? <span className="text-text-dark/60">{t("and_others", { count: count - 1 })}</span> : null;
+    count > 1 ? (
+      <span className="text-text-dark/60">{t("and_others", { count: count - 1 })}</span>
+    ) : null;
   const practiceName = practice ? <span className="font-semibold">「{practice.name}」</span> : null;
 
   if (type === NotificationType.reaction) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
         {name}
-        {suffix && <> {suffix}</>} {t("reaction_text")}{practiceName}{t("reaction_gave")}：{reaction ?? "🙌"}
+        {suffix && <> {suffix}</>} {t("reaction_text")}
+        {practiceName}
+        {t("reaction_gave")}：{reaction ?? "🙌"}
       </p>
     );
   }
@@ -107,19 +111,25 @@ function NotificationText({ notification }: { notification: INotificationData })
   if (type === NotificationType.comment) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} {t("comment_text")}{practiceName}：<span className="font-semibold">{content}</span>
+        {name} {t("comment_text")}
+        {practiceName}：<span className="font-semibold">{content}</span>
       </p>
     );
   }
 
   if (type === NotificationType.followUser) {
-    return <p className="text-sm leading-5 truncate">{name} {t("follow_user_text")}</p>;
+    return (
+      <p className="text-sm leading-5 truncate">
+        {name} {t("follow_user_text")}
+      </p>
+    );
   }
 
   if (type === NotificationType.followPractice) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} {t("follow_practice_text")}{practiceName}
+        {name} {t("follow_practice_text")}
+        {practiceName}
       </p>
     );
   }
@@ -127,7 +137,9 @@ function NotificationText({ notification }: { notification: INotificationData })
   if (type === NotificationType.connect) {
     return (
       <div className="flex flex-col gap-1">
-        <p className="text-sm leading-5">{name} {t("connect_request_text")}</p>
+        <p className="text-sm leading-5">
+          {name} {t("connect_request_text")}
+        </p>
         {connectMessage && (
           <p className="text-sm leading-5 text-text-dark/70 bg-[#F2F7F7] rounded px-2 py-1 line-clamp-2">
             「{connectMessage}」
@@ -138,17 +150,28 @@ function NotificationText({ notification }: { notification: INotificationData })
   }
 
   if (type === NotificationType.agreeConnect) {
-    return <p className="text-sm leading-5 truncate">{t("agree_connect_prefix")}{name} {t("agree_connect_text")}</p>;
+    return (
+      <p className="text-sm leading-5 truncate">
+        {t("agree_connect_prefix")}
+        {name} {t("agree_connect_text")}
+      </p>
+    );
   }
 
   if (type === NotificationType.connectAgree || type === NotificationType.connectRejected) {
-    return <p className="text-sm leading-5 truncate">{name} {t("connect_request_text")}</p>;
+    return (
+      <p className="text-sm leading-5 truncate">
+        {name} {t("connect_request_text")}
+      </p>
+    );
   }
 
   if (type === NotificationType.updatePracticeCheckin) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} {t("checkin_text")}{practiceName}{t("checkin_action")}
+        {name} {t("checkin_text")}
+        {practiceName}
+        {t("checkin_action")}
         {content && (
           <>
             ：<span className="font-semibold">{content}</span>
@@ -161,7 +184,8 @@ function NotificationText({ notification }: { notification: INotificationData })
   if (type === NotificationType.updatePracticeFinish) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} {t("finish_text")}{practiceName}
+        {name} {t("finish_text")}
+        {practiceName}
       </p>
     );
   }
@@ -169,7 +193,8 @@ function NotificationText({ notification }: { notification: INotificationData })
   if (type === NotificationType.practiceCreated) {
     return (
       <p className="text-sm leading-5 line-clamp-2">
-        {name} {t("practice_created_text")}{practiceName}
+        {name} {t("practice_created_text")}
+        {practiceName}
       </p>
     );
   }
@@ -207,7 +232,9 @@ function NotificationRightAction({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => onConnectAgree?.(id)}>{t("agree_connect")}</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onConnectAgree?.(id)}>
+            {t("agree_connect")}
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => onConnectReject?.(id)}>{t("ignore")}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

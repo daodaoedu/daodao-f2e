@@ -96,9 +96,7 @@ export const ArchivedContentList = () => {
   if (isLoading) {
     return (
       <div className="bg-white rounded-2xl p-6">
-        <h2 className="text-lg font-medium text-bg-dark mb-6">
-          {t("archived_practices_title")}
-        </h2>
+        <h2 className="text-lg font-medium text-bg-dark mb-6">{t("archived_practices_title")}</h2>
         <div className="text-center py-8 text-basic-400">
           <p>{t("loading")}</p>
         </div>
@@ -109,9 +107,7 @@ export const ArchivedContentList = () => {
   if (error) {
     return (
       <div className="bg-white rounded-2xl p-6">
-        <h2 className="text-lg font-medium text-bg-dark mb-6">
-          {t("archived_practices_title")}
-        </h2>
+        <h2 className="text-lg font-medium text-bg-dark mb-6">{t("archived_practices_title")}</h2>
         <div className="text-center py-8 text-basic-400">
           <p>{t("load_failed_retry")}</p>
         </div>
@@ -122,9 +118,7 @@ export const ArchivedContentList = () => {
   if (practices.length === 0) {
     return (
       <div className="bg-white rounded-2xl p-6">
-        <h2 className="text-lg font-medium text-bg-dark mb-6">
-          {t("archived_practices_title")}
-        </h2>
+        <h2 className="text-lg font-medium text-bg-dark mb-6">{t("archived_practices_title")}</h2>
         <div className="text-center py-8 text-basic-400">
           <p>{t("archived_empty")}</p>
         </div>

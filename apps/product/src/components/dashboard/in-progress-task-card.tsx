@@ -14,7 +14,7 @@ import {
   practiceThemeSvgMap,
 } from "@/constants/practice-theme";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
-import { calculateRemainingDays, formatCardDate } from "@/utils/practice-card";
+import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 
 interface InProgressTaskCardProps {
   id: string;
@@ -53,7 +53,7 @@ export const InProgressTaskCard = ({
   const statusInfo = getStatusConfig(status);
   const isDraft = status === TaskStatus.draft;
   const formattedStartDate = formatCardDate(startDate);
-  const remainingDays = calculateRemainingDays(endDate);
+  const daysProgress = calculateDaysProgress(startDate, endDate);
   const statusLabel =
     status === TaskStatus.draft
       ? t("filter_draft")
@@ -100,8 +100,8 @@ export const InProgressTaskCard = ({
             </div>
           </div>
 
-          {/* Start date + remaining days */}
-          {(formattedStartDate !== null || (remainingDays !== null && remainingDays > 0)) && (
+          {/* Start date + days progress */}
+          {(formattedStartDate !== null || daysProgress !== null) && (
             <div className="flex items-center gap-2 text-xs text-text-dark">
               {formattedStartDate !== null && (
                 <span className="flex items-center gap-1">
@@ -109,10 +109,10 @@ export const InProgressTaskCard = ({
                   {t("card_start_date", { date: formattedStartDate })}
                 </span>
               )}
-              {remainingDays !== null && remainingDays > 0 && (
+              {daysProgress !== null && (
                 <span className="flex items-center gap-1">
                   <Timer className="size-3.5 shrink-0" />
-                  {t("card_remaining_days", { count: remainingDays })}
+                  {t("card_days_progress", { current: daysProgress.elapsed, total: daysProgress.total })}
                 </span>
               )}
             </div>
@@ -122,10 +122,12 @@ export const InProgressTaskCard = ({
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1 text-xs text-text-dark">
               <CalendarCheck className="size-3.5 shrink-0" />
-              {t.rich("checked_in_count", {
-                count: checkInCount,
-                bold: (chunks) => <span className="font-semibold">{chunks}</span>,
-              })}
+              {checkInCount === 0
+                ? t("checked_in_count_zero")
+                : t.rich("checked_in_count", {
+                    count: checkInCount,
+                    bold: (chunks) => <span className="font-semibold">{chunks}</span>,
+                  })}
             </span>
             {/* TODO: MVP 先不開放 */}
             <div className="hidden items-center gap-1">

@@ -1,6 +1,6 @@
+import type { useTranslations } from "@daodao/i18n";
 import { differenceInYears } from "date-fns";
 import { z } from "zod";
-import type { useTranslations } from "@daodao/i18n";
 import { INTEREST_CATEGORIES } from "@/constants/interest-categories";
 import { AVAILABLE_FIELDS } from "@/constants/professional-fields";
 import { REFERRAL_SOURCE_OPTIONS } from "@/constants/referral-source";

@@ -1,4 +1,5 @@
 import { getResourceById } from "@daodao/api";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,7 +8,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@daodao/ui/components/breadcrumb";
-import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import {

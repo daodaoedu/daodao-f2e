@@ -1,12 +1,12 @@
 import { useCreatePracticeCheckIn } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
-import { mapMoodTypeToApiMood } from "@/constants/mood";
-import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import {
   applyOnboardingUpdateFromResponse,
   refreshOnboardingStatus,
 } from "@/components/task-guide/onboarding-progress-context";
+import { mapMoodTypeToApiMood } from "@/constants/mood";
+import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import type { ICheckInFormData } from "../../types";
 
 interface UseCheckInSubmitOptions {

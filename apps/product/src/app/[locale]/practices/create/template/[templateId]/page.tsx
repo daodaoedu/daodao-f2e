@@ -326,10 +326,16 @@ export default function TemplateDetailPage() {
   );
 
   // 換一個：在目前分類內重新抽一個模板
-  const handleRefresh = useCallback(() => goToRandomTemplate(currentCategory), [goToRandomTemplate, currentCategory]);
+  const handleRefresh = useCallback(
+    () => goToRandomTemplate(currentCategory),
+    [goToRandomTemplate, currentCategory]
+  );
 
   // 切換分類：抽取所選分類的一個模板
-  const handleSelectCategory = useCallback((categoryId: string) => goToRandomTemplate(categoryId), [goToRandomTemplate]);
+  const handleSelectCategory = useCallback(
+    (categoryId: string) => goToRandomTemplate(categoryId),
+    [goToRandomTemplate]
+  );
 
   // Loading 狀態
   if (isLoading) {

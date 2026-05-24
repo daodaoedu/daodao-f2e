@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@daodao/auth";
 import { getRequiredEnv } from "@daodao/config";
 import { useTranslations } from "@daodao/i18n";
@@ -9,7 +8,8 @@ import { Progress } from "@daodao/ui/components/progress";
 import { cn } from "@daodao/ui/lib/utils";
 import { BadgeCheck, Check, ListChecks, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useOnboardingProgress, type OnboardingTaskKey } from "./onboarding-progress-context";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { type OnboardingTaskKey, useOnboardingProgress } from "./onboarding-progress-context";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 

@@ -118,7 +118,9 @@ export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCar
                 <div className="text-sm text-text-dark">{t("summary_card_footprint")}</div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-5xl font-bold text-text-dark">{summary.checkInCount}</span>
-                  <span className="text-base text-text-dark">{t("summary_card_footprint_count")}</span>
+                  <span className="text-base text-text-dark">
+                    {t("summary_card_footprint_count")}
+                  </span>
                 </div>
               </div>
             </div>

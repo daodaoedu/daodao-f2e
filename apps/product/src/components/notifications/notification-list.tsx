@@ -298,4 +298,5 @@ export function NotificationList() {
     </div>
   );
 }
+
 import { useTranslations } from "@daodao/i18n";

@@ -6,10 +6,10 @@ import {
   useMutate,
   usePersonaProfileUser,
 } from "@daodao/api";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
-import { useLocale, useTranslations } from "@daodao/i18n";
 import { useEffect, useState } from "react";
 
 function getResonanceClass(isResonating: boolean, hasResonated: boolean): string {
@@ -66,7 +66,10 @@ export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
           else s.add(answerId);
           return s;
         });
-        await mutate(["/api/v1/persona/profile/{userId}", { params: { path: { userId: targetUserId } } }] as const);
+        await mutate([
+          "/api/v1/persona/profile/{userId}",
+          { params: { path: { userId: targetUserId } } },
+        ] as const);
       }
     } catch {
       toast.error(t("resonance.error"));
@@ -110,7 +113,9 @@ export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => currentQuestion.answer && handleResonance(currentQuestion.answer.id)}
+                  onClick={() =>
+                    currentQuestion.answer && handleResonance(currentQuestion.answer.id)
+                  }
                   disabled={resonatingIds.has(currentQuestion.answer.id)}
                   className={cn(
                     "text-xs flex items-center gap-1 h-auto p-0",
@@ -120,8 +125,7 @@ export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
                     )
                   )}
                 >
-                  ✦{" "}
-                  {currentQuestion.answer.resonanceCount}
+                  ✦ {currentQuestion.answer.resonanceCount}
                 </Button>
               </div>
             )}

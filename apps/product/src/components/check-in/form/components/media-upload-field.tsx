@@ -71,7 +71,9 @@ export const MediaUploadField = ({
       if (oversizedGifs.length > 0) {
         form.setError("media", {
           type: "manual",
-          message: t("upload_gif_size_error", { names: oversizedGifs.map((f) => f.name).join("、") }),
+          message: t("upload_gif_size_error", {
+            names: oversizedGifs.map((f) => f.name).join("、"),
+          }),
         });
         fieldOnChange(newFiles.filter((f) => !(f.type === "image/gif" && f.size > MAX_MEDIA_SIZE)));
         return;
@@ -125,12 +127,17 @@ export const MediaUploadField = ({
       render={({ field }) => (
         <FormItem className="mb-16 md:mb-8">
           <div className="mb-3 flex items-center justify-between gap-2">
-            <FormLabel className="block text-base font-medium text-text-dark">{t("upload_photo")}</FormLabel>
+            <FormLabel className="block text-base font-medium text-text-dark">
+              {t("upload_photo")}
+            </FormLabel>
 
             <FormDescription className="text-sm text-light-gray">
               {isCompressing
                 ? t("compressing")
-                : t("upload_count", { count: keptImages.length + (field.value?.length || 0), max: 3 })}
+                : t("upload_count", {
+                    count: keptImages.length + (field.value?.length || 0),
+                    max: 3,
+                  })}
             </FormDescription>
           </div>
 

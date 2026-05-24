@@ -48,7 +48,12 @@ export const Step3 = ({ form }: Step3Props) => {
                   max={60}
                   step={15}
                   className="w-full"
-                  renderTooltip={(value) => <div>{value}{t("minutes_unit")}</div>}
+                  renderTooltip={(value) => (
+                    <div>
+                      {value}
+                      {t("minutes_unit")}
+                    </div>
+                  )}
                 />
                 {/* Labels */}
                 <div className="flex justify-between">
@@ -81,8 +86,12 @@ export const Step3 = ({ form }: Step3Props) => {
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between mb-3">
-              <FormLabel className="text-base font-medium text-text-dark">{t("form_execution_timing")}</FormLabel>
-              <FormDescription className="text-sm text-light-gray">{t("form_execution_timing_multi")}</FormDescription>
+              <FormLabel className="text-base font-medium text-text-dark">
+                {t("form_execution_timing")}
+              </FormLabel>
+              <FormDescription className="text-sm text-light-gray">
+                {t("form_execution_timing_multi")}
+              </FormDescription>
             </div>
             <FormControl>
               <div className="grid grid-cols-3 gap-3">

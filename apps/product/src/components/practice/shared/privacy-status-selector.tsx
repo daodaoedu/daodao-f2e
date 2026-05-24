@@ -49,9 +49,7 @@ export function PrivacyStatusSelector({ value, onChange, className }: PrivacySta
 
   return (
     <div className={cn("space-y-2", className)}>
-      <p className="text-sm font-medium text-text-dark mb-3">
-        {t("practice_visibility_question")}
-      </p>
+      <p className="text-sm font-medium text-text-dark mb-3">{t("practice_visibility_question")}</p>
       <div className="flex flex-col gap-2">
         {PRIVACY_OPTION_ICONS.map((option) => {
           const Icon = option.icon;

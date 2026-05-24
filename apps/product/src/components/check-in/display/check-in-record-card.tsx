@@ -78,9 +78,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
       <div>
         <h3 className="font-medium text-text-dark mb-3">{t("record_title")}</h3>
         <div className="bg-white rounded-lg px-4 py-2">
-          <div className="text-xs text-text-dark font-medium text-center py-4">
-            {t("loading")}
-          </div>
+          <div className="text-xs text-text-dark font-medium text-center py-4">{t("loading")}</div>
         </div>
       </div>
     );

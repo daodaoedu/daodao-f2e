@@ -2,13 +2,13 @@
 
 import { useSettingsCompletion } from "@daodao/api";
 import { ArrowRightOutlineSvg, TelescopeSvg } from "@daodao/assets";
-import { CustomLink } from "@daodao/ui/components/custom-link";
 import { useTranslations } from "@daodao/i18n";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import {
   AlertCircle,
   Archive,
-  Bell,
   BadgeCheck,
+  Bell,
   HeartHandshake,
   LibraryBig,
   LogOut,

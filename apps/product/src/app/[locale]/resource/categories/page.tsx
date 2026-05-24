@@ -14,7 +14,9 @@ export async function generateMetadata({
   };
 }
 
-export default async function ResourceCategoriesPage({ params }: PageProps<"/[locale]/resource/categories">) {
+export default async function ResourceCategoriesPage({
+  params,
+}: PageProps<"/[locale]/resource/categories">) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "app_product" });
