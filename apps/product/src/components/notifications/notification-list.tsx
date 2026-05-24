@@ -18,6 +18,7 @@ import {
   useNotifications,
 } from "@/hooks/use-notifications";
 import { formatRelativeTime } from "@/utils/format-time";
+import { filterActivityNotifications } from "@/utils/filter-notifications";
 import type { INotificationData } from "./notification-item";
 import { NotificationItem } from "./notification-item";
 
@@ -154,7 +155,9 @@ export function NotificationList() {
 
   const apiItems = useMemo(
     () =>
-      ((data?.data?.notifications ?? []) as unknown as NotificationApiItem[])
+      filterActivityNotifications(
+        (data?.data?.notifications ?? []) as unknown as NotificationApiItem[]
+      )
         .slice()
         .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
     [data?.data?.notifications]
