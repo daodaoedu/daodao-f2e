@@ -14,7 +14,15 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2, Laugh, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+type CarouselQuestion = {
+  id: number;
+  prompt: string;
+  questionType: "choice" | "sentence_completion" | "scenario";
+  options: string[] | null;
+  isNewUserPriority: boolean;
+};
 
 interface CarouselQuestionCardProps {
   questionId: number;
@@ -226,13 +234,37 @@ export function ResonanceCarousel() {
   const mutate = useMutate();
   const [replaceId, setReplaceId] = useState<number | undefined>(undefined);
   const [dismissing, setDismissing] = useState(false);
+  const [displayedQuestions, setDisplayedQuestions] = useState<CarouselQuestion[]>([]);
+  const lastProcessedReplaceId = useRef<number | undefined>(undefined);
 
   const { data, isLoading } = usePersonaCarouselState(replaceId, locale);
 
   const shouldShow = data?.data?.shouldShow;
-  const questions = data?.data?.questions ?? [];
+  const apiQuestions = data?.data?.questions ?? [];
 
-  if (isLoading || !shouldShow) return null;
+  // Populate on initial load
+  useEffect(() => {
+    if (displayedQuestions.length === 0 && apiQuestions.length > 0) {
+      setDisplayedQuestions(apiQuestions.slice(0, 2));
+    }
+  }, [apiQuestions, displayedQuestions.length]);
+
+  // After switch: update only the replaced card, leave the other unchanged
+  useEffect(() => {
+    if (replaceId == null || isLoading || apiQuestions.length === 0) return;
+    if (lastProcessedReplaceId.current === replaceId) return;
+    lastProcessedReplaceId.current = replaceId;
+    const newQuestion = apiQuestions.find((q) => displayedQuestions.every((dq) => dq.id !== q.id));
+    if (newQuestion) {
+      setDisplayedQuestions((prev) => prev.map((q) => (q.id === replaceId ? newQuestion : q)));
+    }
+  }, [replaceId, isLoading, apiQuestions, displayedQuestions]);
+
+  // Initial load with no data yet
+  if (displayedQuestions.length === 0 && isLoading) return null;
+  // Dismissed or shouldShow=false after fetch completes
+  if (!isLoading && shouldShow === false) return null;
+  if (displayedQuestions.length === 0) return null;
 
   const handleDismiss = async () => {
     setDismissing(true);
@@ -258,8 +290,6 @@ export function ResonanceCarousel() {
     setReplaceId(questionId);
   };
 
-  if (questions.length === 0) return null;
-
   return (
     <div className="mb-4">
       <div className="flex items-center justify-between mb-3">
@@ -280,7 +310,7 @@ export function ResonanceCarousel() {
       </div>
 
       <div className="flex flex-col gap-3">
-        {questions.slice(0, 2).map((q) => (
+        {displayedQuestions.map((q) => (
           <CarouselQuestionCard
             key={q.id}
             questionId={q.id}
