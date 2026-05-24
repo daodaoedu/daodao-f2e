@@ -187,7 +187,7 @@ function CarouselQuestionCard({
                 onClick={(e) => e.stopPropagation()}
               >
                 <textarea
-                  rows={1}
+                  rows={2}
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
                   placeholder={tProfile("textPlaceholder")}
