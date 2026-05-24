@@ -1,6 +1,7 @@
 "use client";
 
 import { type ActivityCardItem, type FeedItem, useFeed, useReactionsBatch } from "@daodao/api";
+import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { getStorage, StorageEnum } from "@daodao/shared";
@@ -20,52 +21,71 @@ import {
 } from "@/components/showcase";
 import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 
-// Reorder feed items into the cycle: [打卡 1] → [互動 1] → [實踐 3] → repeat
-// 互動 slot: feed_reason="cheered" 的卡片優先，不足時 fallback 到文字 ActivityCard
-function reorderFeedItems(items: FeedItem[]): FeedItem[] {
-  const checkins: Extract<FeedItem, { type: "checkin" }>[] = [];
-  const cheered: Extract<FeedItem, { type: "practice" | "checkin" }>[] = [];
-  const textActivities: ActivityCardItem[] = [];
-  const practices: Extract<FeedItem, { type: "practice" }>[] = [];
-
+// Reorder feed items into the cycle: [打卡] → [互動] → [實踐] → repeat (1:1:1)
+// 規則：
+// ① 最新打卡和互動排前面（API 已依時間排序，保留 bucket 內相對順序）
+// ② 自己的互動不優先（currentUserId 的互動推後）
+// ③ 有打卡的實踐不再顯示實踐卡（同一 practice_id 只擇一）
+// ⑤ 打卡:互動:實踐 = 1:1:1
+function reorderFeedItems(items: FeedItem[], currentUserId?: string | null): FeedItem[] {
+  // Rule ③: 蒐集有打卡的 practice_id
+  const practiceIdsWithCheckins = new Set<string>();
   for (const item of items) {
-    if (item.type === "checkin" || item.type === "practice") {
-      if (item.feed_reason === "cheered") {
-        cheered.push(item);
-      } else if (item.type === "checkin") {
-        checkins.push(item);
-      } else {
-        practices.push(item);
-      }
-    } else if (item.type === "activity") {
-      textActivities.push(item as ActivityCardItem);
+    if (item.type === "checkin") {
+      practiceIdsWithCheckins.add(item.data.practice.id);
     }
   }
 
-  const activitySlot: FeedItem[] = [...cheered, ...textActivities];
+  const checkins: Extract<FeedItem, { type: "checkin" }>[] = [];
+  const interactions: FeedItem[] = [];
+  const practices: Extract<FeedItem, { type: "practice" }>[] = [];
 
+  for (const item of items) {
+    if (item.type === "checkin") {
+      if (item.feed_reason === "cheered") {
+        interactions.push(item);
+      } else {
+        checkins.push(item);
+      }
+    } else if (item.type === "practice") {
+      if (item.feed_reason === "cheered") {
+        interactions.push(item);
+      } else if (!practiceIdsWithCheckins.has(item.data.id)) {
+        // Rule ③: 有打卡紀錄的實踐不出現實踐卡
+        practices.push(item);
+      }
+    } else if (item.type === "activity") {
+      interactions.push(item as ActivityCardItem);
+    }
+  }
+
+  // Rule ②: 自己的互動推到後面
+  if (currentUserId) {
+    const isOwn = (item: FeedItem) =>
+      (item.type === "checkin" || item.type === "practice") &&
+      item.data.user?.id === currentUserId;
+    const others = interactions.filter((i) => !isOwn(i));
+    const own = interactions.filter((i) => isOwn(i));
+    interactions.length = 0;
+    interactions.push(...others, ...own);
+  }
+
+  // Rule ⑤: 1:1:1 cycle
   const result: FeedItem[] = [];
   let ci = 0;
-  let ai = 0;
+  let ii = 0;
   let pi = 0;
 
-  while (ci < checkins.length || ai < activitySlot.length || pi < practices.length) {
+  while (ci < checkins.length || ii < interactions.length || pi < practices.length) {
     if (ci < checkins.length) {
-      const checkin = checkins[ci];
-      if (checkin) result.push(checkin);
-      ci++;
+      result.push(checkins[ci++]!);
     }
-    if (ai < activitySlot.length) {
-      const activity = activitySlot[ai];
-      if (activity) result.push(activity);
-      ai++;
+    if (ii < interactions.length) {
+      result.push(interactions[ii++]!);
     }
-    for (let i = 0; i < 3 && pi < practices.length; i++) {
-      const practice = practices[pi];
-      if (practice) result.push(practice);
-      pi++;
+    if (pi < practices.length) {
+      result.push(practices[pi++]!);
     }
-    if (ci >= checkins.length && ai >= activitySlot.length && pi >= practices.length) break;
   }
 
   return result;
@@ -75,6 +95,7 @@ export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("dashboard");
+  const { user } = useAuth();
 
   const [searchValue, setSearchValue] = useState(searchParams.get("keyword") ?? "");
   const [filters, _setFilters] = useState<ShowcaseFilterState>({
@@ -128,7 +149,10 @@ export default function HomePage() {
     isValidating,
   } = useFeed(feedParams);
 
-  const orderedFeedItems = useMemo(() => reorderFeedItems(feedItems), [feedItems]);
+  const orderedFeedItems = useMemo(
+    () => reorderFeedItems(feedItems, user?.id),
+    [feedItems, user?.id]
+  );
 
   const practiceIds = useMemo(
     () =>
