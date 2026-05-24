@@ -132,5 +132,3 @@ export { default as ThreadsFilledSvg } from "./social-icons/threads-filled";
 export { default as ThreadsSvg } from "./social-icons/threads";
 export { default as XFilledSvg } from "./social-icons/x-filled";
 export { default as XSvg } from "./social-icons/x";
-export { default as ArrowCircleSvg } from "./persona/arrow-circle";
-export { default as QuoteFillSvg } from "./persona/quote-fill";
