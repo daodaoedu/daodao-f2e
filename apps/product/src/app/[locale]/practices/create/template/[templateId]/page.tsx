@@ -211,7 +211,7 @@ export default function TemplateDetailPage() {
         icon: metadata?.icon ?? CompassSvg,
       };
     });
-  }, [categoriesData]);
+  }, [categoriesData, t]);
 
   // 目前模板所屬分類：優先取已知分類，否則取第一個
   const currentCategory = useMemo(() => {
@@ -223,11 +223,11 @@ export default function TemplateDetailPage() {
   }, [data]);
 
   // 下拉選單觸發鈕顯示的分類名稱，未知分類時退回原本的「主題實踐」標題
-  const currentCategoryLabel = currentCategory
-    ? (practiceCategoryMetadataMap[currentCategory]
-        ? t(practiceCategoryMetadataMap[currentCategory].labelKey as Parameters<typeof t>[0])
-        : currentCategory)
-    : t("create_title");
+  const currentCategoryLabel = useMemo(() => {
+    if (!currentCategory) return t("create_title");
+    const metadata = practiceCategoryMetadataMap[currentCategory];
+    return metadata ? t(metadata.labelKey as Parameters<typeof t>[0]) : currentCategory;
+  }, [currentCategory, t]);
 
   const [showActions, setShowActions] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -326,10 +326,10 @@ export default function TemplateDetailPage() {
   );
 
   // 換一個：在目前分類內重新抽一個模板
-  const handleRefresh = () => goToRandomTemplate(currentCategory);
+  const handleRefresh = useCallback(() => goToRandomTemplate(currentCategory), [goToRandomTemplate, currentCategory]);
 
   // 切換分類：抽取所選分類的一個模板
-  const handleSelectCategory = (categoryId: string) => goToRandomTemplate(categoryId);
+  const handleSelectCategory = useCallback((categoryId: string) => goToRandomTemplate(categoryId), [goToRandomTemplate]);
 
   // Loading 狀態
   if (isLoading) {
