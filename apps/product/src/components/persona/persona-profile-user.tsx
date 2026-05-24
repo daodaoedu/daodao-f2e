@@ -13,9 +13,9 @@ import { useLocale, useTranslations } from "@daodao/i18n";
 import { useEffect, useState } from "react";
 
 function getResonanceClass(isResonating: boolean, hasResonated: boolean): string {
-  if (isResonating) return "text-blue-300";
-  if (hasResonated) return "text-blue-500 hover:text-blue-400";
-  return "text-gray-400 hover:text-blue-400";
+  if (isResonating) return "text-logo-cyan/50";
+  if (hasResonated) return "text-logo-cyan hover:text-logo-cyan/70";
+  return "text-gray-400 hover:text-logo-cyan/70";
 }
 
 interface PersonaProfileUserProps {

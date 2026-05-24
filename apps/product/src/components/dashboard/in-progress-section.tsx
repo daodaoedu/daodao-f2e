@@ -6,7 +6,6 @@ import { InProgressTaskCard } from "./in-progress-task-card";
 
 export interface InProgressTask {
   id: string;
-  label: string;
   title: string;
   description: string;
   checkInCount: number;
@@ -41,7 +40,6 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
           <InProgressTaskCard
             key={task.id}
             id={task.id.toString()}
-            label={task.label}
             title={task.title}
             description={task.description}
             checkInCount={task.checkInCount}

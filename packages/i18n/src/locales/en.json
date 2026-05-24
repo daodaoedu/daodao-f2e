@@ -174,6 +174,7 @@
     "skill_map_coming_soon": "Feature coming soon, stay tuned.",
     "tab_projects": "Learning Projects",
     "tab_practices": "Practice Topics",
+    "recent_practice_count": "{count} check-ins in the last 7 days",
     "tab_ideas": "Ideas",
     "tab_circles": "Circles",
     "tab_resources": "Resources",
@@ -4798,8 +4799,8 @@
     "completed_title": "Completed",
     "fab_add_task": "Add task",
     "fab_create_practice": "Create a themed practice",
-    "checked_in_count": "Checked in <bold>{count}</bold> times",
-    "card_start_date": "Starts {date}",
+    "checked_in_count": "<bold>{count}</bold> times",
+    "card_start_date": "{date}",
     "card_remaining_days": "{count} days left",
     "card_due_today": "Due today",
     "card_overdue_days": "{count} days overdue",
@@ -4982,9 +4983,16 @@
       "error": "Failed to resonate, please try again"
     },
     "carousel": {
-      "title": "Learning Persona",
+      "title": "Let's get to know you!",
       "dismiss": "Don't show today",
       "switchQuestion": "Try another",
+      "choicePrompt": "Choose my answer",
+      "openPrompt": "Share my thoughts",
+      "submitted": {
+        "title": "Thanks for sharing!",
+        "description": "You can always revisit your answers and explore more.",
+        "cta": "View my island"
+      },
       "error": "Operation failed, please try again"
     }
   },
@@ -5759,6 +5767,7 @@
       "connections": "Connections",
       "followers": "Followers",
       "recent_practices": "Recent practices",
+      "recent_practice_count": "{count} check-ins in the last 7 days",
       "common_circles": "Common circles",
       "hidden_count": "Hidden",
       "no_common_circles": "None",

@@ -84,25 +84,25 @@ export const MobileCheckInDateSelector = ({
 
   // 滑鼠拖曳：按下
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (!navRef.current) return;
+    if (!scrollContainerRef.current) return;
     isMouseDown.current = true;
     isDragging.current = false;
     dragStartX.current = e.pageX;
-    dragScrollLeft.current = navRef.current.scrollLeft;
+    dragScrollLeft.current = scrollContainerRef.current.scrollLeft;
   }, []);
 
   // 滑鼠拖曳：移動
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isMouseDown.current || !navRef.current) return;
+    if (!isMouseDown.current || !scrollContainerRef.current) return;
     const walk = e.pageX - dragStartX.current;
     // 超過 3px 才視為拖曳，避免影響按鈕點擊
     if (!isDragging.current && Math.abs(walk) > 3) {
       isDragging.current = true;
-      navRef.current.style.cursor = "grabbing";
+      if (navRef.current) navRef.current.style.cursor = "grabbing";
     }
     if (isDragging.current) {
       e.preventDefault();
-      navRef.current.scrollLeft = dragScrollLeft.current - walk;
+      scrollContainerRef.current.scrollLeft = dragScrollLeft.current - walk;
     }
   }, []);
 

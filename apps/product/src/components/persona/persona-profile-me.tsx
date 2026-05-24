@@ -66,8 +66,8 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
               className={cn(
                 "rounded-full border text-sm h-auto py-1.5 px-3",
                 selectedValue === opt
-                  ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-500 hover:text-white"
-                  : "border-gray-300 text-gray-700 hover:border-blue-400 hover:text-gray-700"
+                  ? "bg-logo-cyan text-white border-logo-cyan hover:bg-logo-cyan hover:text-white"
+                  : "border-gray-300 text-gray-700 hover:border-logo-cyan/40 hover:text-gray-700"
               )}
             >
               {opt}
