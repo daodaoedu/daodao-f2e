@@ -46,7 +46,7 @@ export default function CreatePracticePage() {
       const metadata = practiceCategoryMetadataMap[categoryId];
       return {
         id: categoryId,
-        label: metadata?.label ? t(metadata.label) : categoryId,
+        label: metadata ? t(metadata.labelKey as Parameters<typeof t>[0]) : categoryId,
         icon: metadata?.icon ?? LifeSvg,
       };
     });

@@ -6,6 +6,7 @@ import {
   getRandomPracticeTemplates,
   type PracticeTemplateType,
   usePracticeTemplateById,
+  usePracticeTemplateCategories,
 } from "@daodao/api";
 import { ArrowRightOutlineSvg, CompassSvg, Deco4Svg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
@@ -13,10 +14,16 @@ import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@daodao/ui/components/dropdown-menu";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { format } from "date-fns";
-import { Loader, RefreshCcw } from "lucide-react";
+import { ChevronDown, Loader, RefreshCcw } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout";
@@ -31,6 +38,7 @@ import {
   applyOnboardingUpdateFromResponse,
   refreshOnboardingStatus,
 } from "@/components/task-guide/onboarding-progress-context";
+import { practiceCategoryMetadataMap } from "@/constants/practice-category";
 import {
   DURATION_DAYS_NUMBER_OPTIONS,
   DurationDays,
@@ -110,11 +118,13 @@ const convertTemplateToFormValues = (template: PracticeTemplateType): ManualPrac
 
     // Step 4
     tags: template.suggestedTags || [],
-    resources: (template.resources || []).map((resource) => ({
-      id: resource.id,
-      name: resource.name,
-      url: resource.url,
-    })),
+    resources: (template.resources || [])
+      .filter((resource, index, self) => index === self.findIndex((r) => r.id === resource.id))
+      .map((resource) => ({
+        id: resource.id,
+        name: resource.name,
+        url: resource.url,
+      })),
   };
 };
 
@@ -185,6 +195,40 @@ export default function TemplateDetailPage() {
     return convertTemplateToFormValues(data.data);
   }, [data]);
 
+  // 取得可選的模板分類
+  const { data: categoriesData } = usePracticeTemplateCategories();
+
+  // 將 API 分類 ID 轉成含 label 與 icon 的選項
+  const categoryOptions = useMemo(() => {
+    if (!categoriesData?.data) {
+      return [];
+    }
+    return categoriesData.data.map((categoryId: string) => {
+      const metadata = practiceCategoryMetadataMap[categoryId];
+      return {
+        id: categoryId,
+        label: metadata ? t(metadata.labelKey as Parameters<typeof t>[0]) : categoryId,
+        icon: metadata?.icon ?? CompassSvg,
+      };
+    });
+  }, [categoriesData]);
+
+  // 目前模板所屬分類：優先取已知分類，否則取第一個
+  const currentCategory = useMemo(() => {
+    const categories = data?.data?.categories;
+    if (!categories || categories.length === 0) {
+      return undefined;
+    }
+    return categories.find((category) => category in practiceCategoryMetadataMap) ?? categories[0];
+  }, [data]);
+
+  // 下拉選單觸發鈕顯示的分類名稱，未知分類時退回原本的「主題實踐」標題
+  const currentCategoryLabel = currentCategory
+    ? (practiceCategoryMetadataMap[currentCategory]
+        ? t(practiceCategoryMetadataMap[currentCategory].labelKey as Parameters<typeof t>[0])
+        : currentCategory)
+    : t("create_title");
+
   const [showActions, setShowActions] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -254,31 +298,38 @@ export default function TemplateDetailPage() {
     });
   }, [requireAuth, doCreatePractice]);
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      // 取得 1 個隨機模板
-      const response = await getRandomPracticeTemplates({
-        count: 1,
-      });
+  // 取得指定分類的隨機模板並導向；未指定分類則跨全部分類
+  const goToRandomTemplate = useCallback(
+    async (category?: string) => {
+      setIsRefreshing(true);
+      try {
+        const response = await getRandomPracticeTemplates({ count: 1, category });
 
-      const templates = response.data?.data?.[0];
+        const nextTemplate = response.data?.data?.[0];
 
-      if (!templates) {
-        // 如果沒有模板，導航回列表頁面
+        if (!nextTemplate) {
+          // 如果沒有模板，導航回列表頁面
+          router.push("/practices/create");
+          return;
+        }
+
+        router.replace(`/practices/create/template/${nextTemplate.id}`);
+      } catch (error) {
+        // 發生錯誤時導航回列表頁面
+        console.error("Failed to fetch random templates:", error);
         router.push("/practices/create");
-        return;
+      } finally {
+        setIsRefreshing(false);
       }
+    },
+    [router]
+  );
 
-      router.replace(`/practices/create/template/${templates.id}`);
-    } catch (error) {
-      // 發生錯誤時導航回列表頁面
-      console.error("Failed to fetch random templates:", error);
-      router.push("/practices/create");
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
+  // 換一個：在目前分類內重新抽一個模板
+  const handleRefresh = () => goToRandomTemplate(currentCategory);
+
+  // 切換分類：抽取所選分類的一個模板
+  const handleSelectCategory = (categoryId: string) => goToRandomTemplate(categoryId);
 
   // Loading 狀態
   if (isLoading) {
@@ -312,9 +363,43 @@ export default function TemplateDetailPage() {
         {/* Category Label */}
         <div className="py-4">
           <div className="max-w-[448px] mx-auto px-5">
-            <Badge variant="secondary" size="sm" className="text-xs md:text-sm mb-2">
-              {t("create_title")}
-            </Badge>
+            {categoryOptions.length > 0 ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Badge
+                    variant="secondary"
+                    size="sm"
+                    className="text-xs md:text-sm mb-2 cursor-pointer gap-1 hover:bg-white/90 transition-colors"
+                  >
+                    {currentCategoryLabel}
+                    <ChevronDown className="size-3 opacity-70" />
+                  </Badge>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" sideOffset={0} className="mt-0.5 w-44">
+                  {categoryOptions.map((category) => {
+                    const Icon = category.icon;
+                    const isSelected = currentCategory === category.id;
+                    return (
+                      <DropdownMenuItem
+                        key={category.id}
+                        onClick={() => handleSelectCategory(category.id)}
+                        className={cn(
+                          "gap-2 min-h-[44px] text-text-dark",
+                          isSelected && "font-medium text-logo-cyan"
+                        )}
+                      >
+                        <Icon className="size-4 shrink-0" />
+                        {category.label}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Badge variant="secondary" size="sm" className="text-xs md:text-sm mb-2">
+                {currentCategoryLabel}
+              </Badge>
+            )}
             <div className="flex md:flex-col md:gap-3">
               <div className="flex flex-1 items-start gap-1">
                 <div className="flex-1">
