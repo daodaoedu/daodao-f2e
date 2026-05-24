@@ -108,10 +108,16 @@ export function getElementCaptureDimensions(element: {
   scrollHeight: number;
   clientWidth: number;
   clientHeight: number;
+  offsetWidth: number;
+  offsetHeight: number;
 }): { width: number; height: number } {
+  // scrollWidth/scrollHeight exclude element borders; add the border thickness
+  // so the captured image includes the full painted area (borders + scrollable content).
+  const borderWidth = element.offsetWidth - element.clientWidth;
+  const borderHeight = element.offsetHeight - element.clientHeight;
   return {
-    width: Math.max(element.scrollWidth, element.clientWidth),
-    height: Math.max(element.scrollHeight, element.clientHeight),
+    width: Math.max(element.scrollWidth + borderWidth, element.offsetWidth),
+    height: Math.max(element.scrollHeight + borderHeight, element.offsetHeight),
   };
 }
 
