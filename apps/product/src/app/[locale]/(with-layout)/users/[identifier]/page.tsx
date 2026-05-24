@@ -169,10 +169,7 @@ export default async function UserProfilePage({
           targetUserId={userId}
         />
 
-        <UserProfileTabs
-          targetUserId={userId}
-          isOwnProfile={isOwnProfile}
-        />
+        <UserProfileTabs targetUserId={userId} isOwnProfile={isOwnProfile} />
       </main>
     </div>
   );

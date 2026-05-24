@@ -80,7 +80,9 @@ export const Step4 = ({ form }: Step4Props) => {
         name="tags"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block text-base font-normal text-text-dark mb-3">{t("step4_tags_label")}</FormLabel>
+            <FormLabel className="block text-base font-normal text-text-dark mb-3">
+              {t("step4_tags_label")}
+            </FormLabel>
             <FormControl>
               <div>
                 <div className="flex flex-wrap gap-2 mb-3">

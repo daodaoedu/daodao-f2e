@@ -48,20 +48,11 @@ export const DesktopCheckInDateSelector = ({
       setCanScrollDown(scrollTop < scrollHeight - clientHeight - 1);
     };
 
-    // 禁止使用者滾動（滑鼠滾輪和觸控）
-    const preventScroll = (e: WheelEvent | TouchEvent) => {
-      e.preventDefault();
-    };
-
     updateScrollButtons();
     container.addEventListener("scroll", updateScrollButtons);
-    container.addEventListener("wheel", preventScroll, { passive: false });
-    container.addEventListener("touchmove", preventScroll, { passive: false });
 
     return () => {
       container.removeEventListener("scroll", updateScrollButtons);
-      container.removeEventListener("wheel", preventScroll);
-      container.removeEventListener("touchmove", preventScroll);
     };
   }, []);
 

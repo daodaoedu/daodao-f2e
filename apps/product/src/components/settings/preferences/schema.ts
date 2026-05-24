@@ -1,5 +1,5 @@
-import { z } from "zod";
 import type { useTranslations } from "@daodao/i18n";
+import { z } from "zod";
 
 type TFunction = ReturnType<typeof useTranslations<"preferences_settings">>;
 

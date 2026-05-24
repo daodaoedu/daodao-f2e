@@ -47,7 +47,6 @@ export default function MyPage() {
       const lastCheckInDate = practice.lastCheckinAt ?? null;
       inProgressTasksData.push({
         id: practice.id,
-        label: t("task_label_practice"),
         title: practice.title,
         description: practice.practiceAction || "",
         checkInCount: practice.checkInCount,

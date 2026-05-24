@@ -207,7 +207,8 @@ export const ConnectionsSettings = () => {
       {/* ── 已連結的夥伴 ── */}
       <section className="flex flex-col gap-2">
         <h2 className="text-xs font-medium text-[#9FB5B8] px-1">
-          {t("conn_connected_section")} {connections.length > 0 && `· ${connections.length} ${t("conn_people_count")}`}
+          {t("conn_connected_section")}{" "}
+          {connections.length > 0 && `· ${connections.length} ${t("conn_people_count")}`}
         </h2>
         {connections.length === 0 ? (
           <div className="text-center py-12 text-[#9FB5B8] text-sm">{t("conn_empty")}</div>

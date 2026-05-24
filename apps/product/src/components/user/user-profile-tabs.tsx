@@ -1,9 +1,9 @@
 "use client";
 
 import { useCurrentUser } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
-import { useTranslations } from "@daodao/i18n";
 import { PersonaProfileMe } from "@/components/persona/persona-profile-me";
 import { PersonaProfileUser } from "@/components/persona/persona-profile-user";
 import { PracticeSection } from "@/components/practice";
@@ -47,10 +47,16 @@ export function UserProfileTabs({
   return (
     <Tabs value={currentTab} onValueChange={handleTabChange} className="mt-4">
       <TabsList className="w-full">
-        <TabsTrigger value={TabEnum.Practice} className="flex-1 data-[state=inactive]:text-basic-400">
+        <TabsTrigger
+          value={TabEnum.Practice}
+          className="flex-1 data-[state=inactive]:text-basic-400"
+        >
           {tUser("tab_practices")}
         </TabsTrigger>
-        <TabsTrigger value={TabEnum.Persona} className="flex-1 data-[state=inactive]:text-basic-400">
+        <TabsTrigger
+          value={TabEnum.Persona}
+          className="flex-1 data-[state=inactive]:text-basic-400"
+        >
           {t("tabLabel")}
         </TabsTrigger>
       </TabsList>

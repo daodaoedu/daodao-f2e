@@ -6,7 +6,7 @@ describe("home tab navigation paths", () => {
     expect(HOME_TAB_PATHS.inspire).toBe("/");
   });
 
-  it("mine tab uses /my path", () => {
-    expect(HOME_TAB_PATHS.mine).toBe("/my");
+  it("mine tab uses /mine path", () => {
+    expect(HOME_TAB_PATHS.mine).toBe("/mine");
   });
 });

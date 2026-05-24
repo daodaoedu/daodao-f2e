@@ -1,13 +1,12 @@
 "use client";
 
-import { useTranslations } from "@daodao/i18n";
-
 import {
   type PracticeTemplateType,
   usePracticeTemplateCategories,
   usePracticeTemplates,
 } from "@daodao/api";
 import { LifeSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -185,7 +184,9 @@ export default function CreatePracticePage() {
                   // SWR 會自動重新驗證
                   window.location.reload();
                 }}
-              >{t("create_reload")}</Button>
+              >
+                {t("create_reload")}
+              </Button>
             </div>
           ) : currentPractices.length === 0 ? (
             <div className="flex items-center justify-center py-12">

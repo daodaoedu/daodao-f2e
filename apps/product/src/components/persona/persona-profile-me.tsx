@@ -1,11 +1,11 @@
 "use client";
 
 import { submitPersonaAnswer, useMutate, usePersonaProfileMe } from "@daodao/api";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
-import { useLocale, useTranslations } from "@daodao/i18n";
 import { useState } from "react";
 
 interface InlineAnswerFormProps {
@@ -66,8 +66,8 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
               className={cn(
                 "rounded-full border text-sm h-auto py-1.5 px-3",
                 selectedValue === opt
-                  ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-500 hover:text-white"
-                  : "border-gray-300 text-gray-700 hover:border-blue-400 hover:text-gray-700"
+                  ? "bg-logo-cyan text-white border-logo-cyan hover:bg-logo-cyan hover:text-white"
+                  : "border-gray-300 text-gray-700 hover:border-logo-cyan/40 hover:text-gray-700"
               )}
             >
               {opt}

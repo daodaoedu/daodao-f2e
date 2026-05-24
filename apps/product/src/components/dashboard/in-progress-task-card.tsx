@@ -6,7 +6,7 @@ import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
-import { PenLine } from "lucide-react";
+import { Calendar, CalendarCheck, PenLine, Timer } from "lucide-react";
 import { CheckInButton } from "@/components/check-in";
 import {
   getThemeNameFromColor,
@@ -14,10 +14,9 @@ import {
   practiceThemeSvgMap,
 } from "@/constants/practice-theme";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
-import { calculateRemainingDays, formatCardDate } from "@/utils/practice-card";
+import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 
 interface InProgressTaskCardProps {
-  label: string;
   id: string;
   title: string;
   description: string;
@@ -34,7 +33,6 @@ interface InProgressTaskCardProps {
 }
 
 export const InProgressTaskCard = ({
-  label,
   id,
   title,
   description,
@@ -55,7 +53,7 @@ export const InProgressTaskCard = ({
   const statusInfo = getStatusConfig(status);
   const isDraft = status === TaskStatus.draft;
   const formattedStartDate = formatCardDate(startDate);
-  const remainingDays = calculateRemainingDays(endDate);
+  const daysProgress = calculateDaysProgress(startDate, endDate);
   const statusLabel =
     status === TaskStatus.draft
       ? t("filter_draft")
@@ -76,80 +74,79 @@ export const InProgressTaskCard = ({
         className="absolute inset-0 w-full h-full rounded-[12px]"
         preserveAspectRatio="xMidYMid slice"
       />
-      {/* Label */}
-      <div className="absolute inset-0 p-5 pb-6 z-10 flex flex-col gap-5">
-        <div className="flex-1 flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-2">
-            <Badge variant="secondary" size="sm" className="w-fit">
-              {label}
-            </Badge>
-            {statusInfo && (
-              <Badge variant={statusInfo.variant} size="sm" className="w-fit">
-                {statusLabel}
-              </Badge>
-            )}
-          </div>
 
-          <div className="flex justify-between gap-2 flex-1">
-            <div className="flex flex-col gap-2">
-              {/* Title */}
-              <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">{title}</h3>
+      {/* Main content — flex-1 absorbs available space, clips if overflow */}
+      <div className="absolute inset-0 p-5 pb-4 z-10 flex flex-col">
+        <div className="flex-1 min-h-0 flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between gap-2">
+              {statusInfo && (
+                <Badge variant={statusInfo.variant} size="sm" className="w-fit">
+                  {statusLabel}
+                </Badge>
+              )}
+            </div>
 
-              {/* Description */}
-              <div className="flex-1">
+            <div className="flex justify-between gap-2">
+              <div className="flex flex-col gap-2">
+                <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">{title}</h3>
                 <p className="line-clamp-2 text-xs text-text-dark">{description}</p>
               </div>
+              <div className="shrink-0 self-center">
+                <span className="inline-flex items-center justify-center size-10">
+                  <ArrowRightOutlineSvg className="size-6 text-light-gray" />
+                </span>
+              </div>
             </div>
-            <div className="shrink-0 self-center">
-              <span className="inline-flex items-center justify-center size-10">
-                <ArrowRightOutlineSvg className="size-6 text-light-gray" />
-              </span>
+          </div>
+
+          {/* Start date + days progress */}
+          {(formattedStartDate !== null || daysProgress !== null) && (
+            <div className="flex items-center gap-2 text-xs text-text-dark">
+              {formattedStartDate !== null && (
+                <span className="flex items-center gap-1">
+                  <Calendar className="size-3.5 shrink-0" />
+                  {t("card_start_date", { date: formattedStartDate })}
+                </span>
+              )}
+              {daysProgress !== null && (
+                <span className="flex items-center gap-1">
+                  <Timer className="size-3.5 shrink-0" />
+                  {t("card_days_progress", { current: daysProgress.elapsed, total: daysProgress.total })}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Check-in count */}
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1 text-xs text-text-dark">
+              <CalendarCheck className="size-3.5 shrink-0" />
+              {checkInCount === 0
+                ? t("checked_in_count_zero")
+                : t.rich("checked_in_count", {
+                    count: checkInCount,
+                    bold: (chunks) => <span className="font-semibold">{chunks}</span>,
+                  })}
+            </span>
+            {/* TODO: MVP 先不開放 */}
+            <div className="hidden items-center gap-1">
+              <MessagesSvg className="size-4 text-text-dark" />
+              {isUnreadMessages ? (
+                <Badge variant="alert" size="xs" className="font-semibold min-w-5.5 justify-center">
+                  {messagesCount}
+                </Badge>
+              ) : (
+                <span className="text-text-dark text-xs font-semibold">{messagesCount}</span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Start date + remaining days */}
-        {(formattedStartDate !== null || remainingDays !== null) && (
-          <div className="flex items-center gap-2 text-xs text-text-dark">
-            {formattedStartDate !== null && (
-              <span>{t("card_start_date", { date: formattedStartDate })}</span>
-            )}
-            {remainingDays !== null && (
-              <span className={remainingDays < 0 ? "text-red-500" : ""}>
-                {remainingDays > 0
-                  ? t("card_remaining_days", { count: remainingDays })
-                  : remainingDays === 0
-                    ? t("card_due_today")
-                    : t("card_overdue_days", { count: Math.abs(remainingDays) })}
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Progress */}
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-text-dark">
-            {t.rich("checked_in_count", {
-              count: checkInCount,
-              bold: (chunks) => <span className="font-semibold">{chunks}</span>,
-            })}
-          </span>
-          {/* TODO: MVP 先不開放 */}
-          <div className="hidden items-center gap-1">
-            <MessagesSvg className="size-4 text-text-dark" />
-            {isUnreadMessages ? (
-              <Badge variant="alert" size="xs" className="font-semibold min-w-5.5 justify-center">
-                {messagesCount}
-              </Badge>
-            ) : (
-              <span className="text-text-dark text-xs font-semibold">{messagesCount}</span>
-            )}
-          </div>
-        </div>
-
-        {/* Check-in Button - span 用於阻止點擊事件冒泡和導航 */}
+        {/* Check-in Button — always visible at bottom, separated from content */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: 此處用於阻止事件冒泡到父元素 */}
         <span
+          className="mt-3 shrink-0 block"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -180,7 +177,8 @@ export const InProgressTaskCard = ({
         </span>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 overflow-hidden rounded-b-full">
+      {/* Progress bar — always at card bottom */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 overflow-hidden">
         <Progress value={progress} />
       </div>
     </CustomLink>

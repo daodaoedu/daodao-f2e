@@ -1,7 +1,7 @@
 "use client";
 
-import { type CapturedImageData, captureElementAsImage } from "@daodao/shared";
 import { useTranslations } from "@daodao/i18n";
+import { type CapturedImageData, captureElementAsImage } from "@daodao/shared";
 import { useCallback, useRef, useState } from "react";
 
 interface UsePracticeSummaryImageOptions {

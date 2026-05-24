@@ -205,9 +205,7 @@ function RecommendationEmptyState({ onGoToInspire }: { onGoToInspire: () => void
   return (
     <div className="flex flex-col items-center gap-3 py-10 text-center">
       <p className="font-bold text-text-dark">{t("empty_title")}</p>
-      <p className="text-sm text-gray-500 max-w-[280px]">
-        {t("empty_description")}
-      </p>
+      <p className="text-sm text-gray-500 max-w-[280px]">{t("empty_description")}</p>
       <Button variant="outline" onClick={onGoToInspire} className="mt-1">
         {t("empty_cta")}
       </Button>

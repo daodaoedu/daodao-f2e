@@ -21,7 +21,9 @@ export function FeedLabel({
     return (
       <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mt-4 mb-4 px-1">
         <ThumbsUp className="size-3.5 shrink-0" />
-        <span>{t("showcase_feed_new_practice", { userName: userName ?? t("showcase_someone") })}</span>
+        <span>
+          {t("showcase_feed_new_practice", { userName: userName ?? t("showcase_someone") })}
+        </span>
       </div>
     );
   }

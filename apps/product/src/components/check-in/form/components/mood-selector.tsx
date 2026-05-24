@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import {
   FormControl,
   FormField,
@@ -5,7 +6,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@daodao/ui/components/form";
-import { useTranslations } from "@daodao/i18n";
 import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
 import { cn } from "@daodao/ui/lib/utils";
 import type { UseFormReturn } from "react-hook-form";

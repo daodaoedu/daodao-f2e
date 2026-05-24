@@ -1,8 +1,8 @@
 "use client";
 
 import emptyPng from "@daodao/assets/images/common/empty.png";
-import { Badge } from "@daodao/ui/components/badge";
 import { useTranslations } from "@daodao/i18n";
+import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";

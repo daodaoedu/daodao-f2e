@@ -174,6 +174,7 @@
     "skill_map_coming_soon": "功能即將開放，敬請期待。",
     "tab_projects": "學習計劃",
     "tab_practices": "主題實踐",
+    "recent_practice_count": "近 7 天打卡 {count} 次",
     "tab_ideas": "想法",
     "tab_circles": "發起揪團",
     "tab_resources": "分享資源",
@@ -4798,9 +4799,11 @@
     "completed_title": "已完成",
     "fab_add_task": "新增任務",
     "fab_create_practice": "建立主題實踐",
-    "checked_in_count": "已打卡 <bold>{count}</bold> 次",
-    "card_start_date": "開始 {date}",
+    "checked_in_count": "<bold>{count}</bold> 次",
+    "checked_in_count_zero": "開始你的第一次打卡吧！",
+    "card_start_date": "{date}",
     "card_remaining_days": "剩 {count} 天",
+    "card_days_progress": "{current}/{total} 天",
     "card_due_today": "今天到期",
     "card_overdue_days": "已逾期 {count} 天",
     "header_month_unit": "月",
@@ -4982,9 +4985,16 @@
       "error": "共鳴操作失敗，請稍後再試"
     },
     "carousel": {
-      "title": "學習人物誌",
+      "title": "讓我們更認識你！",
       "dismiss": "今天不再顯示",
       "switchQuestion": "換一題",
+      "choicePrompt": "選擇我的答案",
+      "openPrompt": "分享我的想法",
+      "submitted": {
+        "title": "感謝你的分享！",
+        "description": "你可以隨時查看你的回答，並繼續探索更多問題。",
+        "cta": "前往我的小島查看"
+      },
       "error": "操作失敗，請稍後再試"
     }
   },
@@ -5759,6 +5769,7 @@
       "connections": "連結",
       "followers": "追蹤者",
       "recent_practices": "近期實踐",
+      "recent_practice_count": "近 7 天打卡 {count} 次",
       "common_circles": "共同圈子",
       "hidden_count": "隱藏",
       "no_common_circles": "無",

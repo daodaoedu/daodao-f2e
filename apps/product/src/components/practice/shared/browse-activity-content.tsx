@@ -136,8 +136,16 @@ export function BrowseActivityContent({
       {tab === "data" && (
         <div className="flex flex-col divide-y divide-[#E4EAE9] px-4 mt-2">
           {[
-            { icon: <TelescopeSvg className="size-5" />, label: t("showcase_views"), count: viewCount },
-            { icon: <DialogOutlineSvg className="size-5" />, label: commonT("comments"), count: commentCount },
+            {
+              icon: <TelescopeSvg className="size-5" />,
+              label: t("showcase_views"),
+              count: viewCount,
+            },
+            {
+              icon: <DialogOutlineSvg className="size-5" />,
+              label: commonT("comments"),
+              count: commentCount,
+            },
             {
               icon: <ChartColumnIncreasingSvg className="size-5" />,
               label: t("showcase_echo"),

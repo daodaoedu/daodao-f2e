@@ -22,9 +22,7 @@ export const SocialLinksSection = ({ form }: ISocialLinksSectionProps) => {
 
   return (
     <div className="bg-white rounded-xl p-4 space-y-4">
-      <h3 className="text-base font-medium text-text-dark mb-4">
-        {t("public_info_social_title")}
-      </h3>
+      <h3 className="text-base font-medium text-text-dark mb-4">{t("public_info_social_title")}</h3>
 
       {/* 個人網址 */}
       <FormField

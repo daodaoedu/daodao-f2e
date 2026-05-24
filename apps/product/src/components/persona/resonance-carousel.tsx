@@ -3,19 +3,17 @@
 import {
   dismissPersonaCarousel,
   submitPersonaAnswer,
+  useCurrentUser,
   useMutate,
   usePersonaCarouselState,
 } from "@daodao/api";
-import { Button } from "@daodao/ui/components/button";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@daodao/ui/components/carousel";
-import { toast } from "@daodao/ui/components/sonner";
-import { Textarea } from "@daodao/ui/components/textarea";
-import { cn } from "@daodao/ui/lib/utils";
+import { ArrowCircleSvg, QuoteFillSvg } from "@daodao/assets";
 import { useLocale, useTranslations } from "@daodao/i18n";
+import { useRouter } from "@daodao/i18n/navigation";
+import { Button } from "@daodao/ui/components/button";
+import { toast } from "@daodao/ui/components/sonner";
+import { cn } from "@daodao/ui/lib/utils";
+import { CheckCircle2, Laugh, RefreshCw } from "lucide-react";
 import { useState } from "react";
 
 interface CarouselQuestionCardProps {
@@ -37,11 +35,16 @@ function CarouselQuestionCard({
 }: CarouselQuestionCardProps) {
   const t = useTranslations("persona.carousel");
   const tProfile = useTranslations("persona.myProfile");
+  const [isFlipped, setIsFlipped] = useState(false);
   const [selected, setSelected] = useState("");
   const [textValue, setTextValue] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const router = useRouter();
+  const { data: currentUser } = useCurrentUser();
 
   const isChoice = questionType === "choice" && options && options.length > 0;
+  const frontLabel = isChoice ? t("choicePrompt") : t("openPrompt");
 
   const handleSubmit = async () => {
     const body = isChoice
@@ -60,7 +63,7 @@ function CarouselQuestionCard({
       }
       setSelected("");
       setTextValue("");
-      onAnswered();
+      setSubmitted(true);
     } catch {
       toast.error(tProfile("submitError"));
     } finally {
@@ -68,58 +71,150 @@ function CarouselQuestionCard({
     }
   };
 
-  return (
-    <div className="rounded-xl border bg-white p-4 shadow-sm">
-      <p className="text-sm font-medium text-gray-700 mb-3">{prompt}</p>
+  if (submitted) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 h-[280px] flex flex-col items-center justify-center gap-2 px-6">
+        <CheckCircle2 className="size-10 text-logo-cyan mb-1" />
+        <p className="text-base font-medium text-text-dark">{t("submitted.title")}</p>
+        <p className="text-sm text-text-dark/50 text-center leading-relaxed">
+          {t("submitted.description")}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            onAnswered();
+            const identifier = currentUser?.data?.customId ?? currentUser?.data?.id;
+            if (identifier) router.push(`/users/${identifier}`);
+          }}
+          className="mt-2 flex items-center gap-1.5 text-sm font-medium text-primary-darker hover:opacity-80 transition-opacity"
+        >
+          {t("submitted.cta")}
+          <ArrowCircleSvg className="size-6 shrink-0" />
+        </button>
+      </div>
+    );
+  }
 
-      {isChoice ? (
-        <div className="flex flex-wrap gap-2 mb-3">
-          {options.map((opt) => (
+  return (
+    <div style={{ perspective: "1000px", height: isChoice ? "360px" : "320px" }} className="w-full">
+      <div
+        className="relative w-full h-full transition-transform duration-500 ease-in-out"
+        style={{
+          transformStyle: "preserve-3d",
+          transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+        }}
+      >
+        {/* Front — question */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction, contains interactive children */}
+        <div
+          className="group absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex flex-col cursor-pointer select-none"
+          style={{ backfaceVisibility: "hidden" }}
+          onClick={() => setIsFlipped(true)}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setIsFlipped(true); }}
+        >
+          <QuoteFillSvg className="mt-4 mb-4 self-center shrink-0 text-logo-cyan" />
+          <p className="text-[24px] font-semibold text-text-dark text-center leading-snug flex-1 flex items-center justify-center overflow-hidden">
+            {prompt}
+          </p>
+          <div className="flex items-center gap-2 self-end mt-3 transition-transform duration-200 group-hover:translate-x-1.5">
+            <span className="text-sm text-primary-darker">{frontLabel}</span>
+            <ArrowCircleSvg className="size-8 shrink-0" />
+          </div>
+        </div>
+
+        {/* Back — answer form */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction, contains interactive children */}
+        <div
+          className="absolute inset-0 bg-white rounded-2xl px-6 pt-5 pb-6 shadow-sm border border-[#E8F8FF] flex flex-col cursor-pointer overflow-hidden"
+          style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+          onClick={() => setIsFlipped(false)}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setIsFlipped(false); }}
+        >
+          <div className="flex items-start gap-2 shrink-0">
+            <p className="text-sm text-primary-darker line-clamp-2 leading-relaxed flex-1">
+              {prompt}
+            </p>
             <Button
-              key={opt}
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => setSelected(opt)}
-              className={cn(
-                "rounded-full border text-sm h-auto py-1.5 px-3",
-                selected === opt
-                  ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-500 hover:text-white"
-                  : "border-gray-300 text-gray-700 hover:border-blue-400 hover:text-gray-700"
-              )}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSwitch(questionId);
+              }}
+              className="shrink-0 -mt-0.5 -mr-1 flex items-center gap-1 px-2 py-1 rounded-full text-xs text-text-dark/30 hover:text-text-dark/55 hover:bg-black/5 h-auto transition-colors"
             >
-              {opt}
+              <RefreshCw className="size-3" />
+              {t("switchQuestion")}
             </Button>
-          ))}
-        </div>
-      ) : (
-        <Textarea
-          value={textValue}
-          onChange={(e) => setTextValue(e.target.value)}
-          placeholder={tProfile("textPlaceholder")}
-          rows={2}
-          maxLength={300}
-          className="mb-3 resize-none"
-        />
-      )}
+          </div>
 
-      <div className="flex justify-between items-center">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => onSwitch(questionId)}
-          className="text-xs text-gray-400 hover:text-gray-600"
-        >
-          {t("switchQuestion")}
-        </Button>
-        <Button
-          size="sm"
-          onClick={handleSubmit}
-          disabled={submitting || (isChoice ? !selected : !textValue.trim())}
-        >
-          {submitting ? tProfile("submitting") : tProfile("submit")}
-        </Button>
+          {isChoice ? (
+            <>
+              {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for option grid */}
+              <div
+                className="flex-1 grid grid-cols-2 gap-2 mt-4 min-w-0"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+              >
+                {options.map((opt) => (
+                  <Button
+                    key={opt}
+                    type="button"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelected(opt);
+                    }}
+                    className={cn(
+                      "w-full min-w-0 whitespace-normal rounded-xl border-2 text-sm py-3 px-3 h-auto transition-all text-left leading-snug justify-start",
+                      selected === opt
+                        ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium hover:bg-logo-cyan/10 hover:text-logo-cyan"
+                        : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40 hover:bg-transparent"
+                    )}
+                  >
+                    {opt}
+                  </Button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for textarea area */}
+              <div
+                className="flex-1 flex items-center min-h-0"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+              >
+                <textarea
+                  rows={2}
+                  value={textValue}
+                  onChange={(e) => setTextValue(e.target.value)}
+                  placeholder={tProfile("textPlaceholder")}
+                  maxLength={300}
+                  className="w-full border-0 border-b-2 border-logo-cyan text-base text-text-dark outline-none bg-transparent placeholder:text-text-dark/25 pb-1 resize-none"
+                />
+              </div>
+            </>
+          )}
+
+          <Button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSubmit();
+            }}
+            disabled={submitting || (isChoice ? !selected : !textValue.trim())}
+            className={cn(
+              "shrink-0 mt-4 w-full py-3 rounded-full font-medium text-base transition-all h-auto",
+              !submitting && (isChoice ? selected : textValue.trim())
+                ? "bg-[#F5A93E] text-white hover:bg-[#F5A93E]/90"
+                : "bg-[#F5A93E]/30 text-white/70 cursor-not-allowed"
+            )}
+          >
+            {submitting ? tProfile("submitting") : tProfile("submit")}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -127,7 +222,6 @@ function CarouselQuestionCard({
 
 export function ResonanceCarousel() {
   const t = useTranslations("persona.carousel");
-  const tProfile = useTranslations("persona.myProfile");
   const locale = useLocale();
   const mutate = useMutate();
   const [replaceId, setReplaceId] = useState<number | undefined>(undefined);
@@ -158,7 +252,6 @@ export function ResonanceCarousel() {
 
   const handleAnswered = async () => {
     await mutate(["/api/v1/persona/carousel-state"] as const);
-    toast.success(tProfile("submitSuccess"));
   };
 
   const handleSwitch = (questionId: number) => {
@@ -169,36 +262,36 @@ export function ResonanceCarousel() {
 
   return (
     <div className="mb-4">
-      <div className="flex justify-between items-center mb-2">
-        <p className="text-sm font-semibold text-gray-700">{t("title")}</p>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-1.5 text-xs text-text-dark/60">
+          <Laugh className="size-3.5 shrink-0" />
+          <span>{t("title")}</span>
+        </div>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleDismiss}
           disabled={dismissing}
-          className="text-xs text-gray-400 hover:text-gray-600 h-auto p-0"
+          className="text-xs text-text-dark/40 hover:text-text-dark/60 h-auto p-0"
         >
           {t("dismiss")}
         </Button>
       </div>
 
-      <Carousel opts={{ align: "start" }} className="w-full">
-        <CarouselContent>
-          {questions.map((q) => (
-            <CarouselItem key={q.id} className="basis-5/6 md:basis-1/2">
-              <CarouselQuestionCard
-                questionId={q.id}
-                prompt={q.prompt}
-                questionType={q.questionType}
-                options={q.options}
-                onAnswered={handleAnswered}
-                onSwitch={handleSwitch}
-              />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+      <div className="flex flex-col gap-3">
+        {questions.slice(0, 2).map((q) => (
+          <CarouselQuestionCard
+            key={q.id}
+            questionId={q.id}
+            prompt={q.prompt}
+            questionType={q.questionType}
+            options={q.options}
+            onAnswered={handleAnswered}
+            onSwitch={handleSwitch}
+          />
+        ))}
+      </div>
     </div>
   );
 }
