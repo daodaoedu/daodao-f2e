@@ -122,21 +122,33 @@ export function useFeed(params: IFeedParams) {
     { revalidateFirstPage: false }
   );
 
-  const feedItems: FeedItem[] = useMemo(
-    () =>
-      data
-        ? data.flatMap((page) =>
-            (page.data ?? []).filter((item) => {
-              const isValid = !!(item?.type && (item?.type === "activity" || item?.data));
-              if (!isValid && getEnv("NODE_ENV") !== "production") {
-                console.warn("[useFeed] Malformed feed item (missing type/data):", item);
-              }
-              return isValid;
-            })
-          )
-        : [],
-    [data]
-  );
+  const feedItems: FeedItem[] = useMemo(() => {
+    if (!data) return [];
+    const seen = new Set<string>();
+    return data.flatMap((page) =>
+      (page.data ?? []).filter((item) => {
+        const isValid = !!(item?.type && (item?.type === "activity" || item?.data));
+        if (!isValid && getEnv("NODE_ENV") !== "production") {
+          console.warn("[useFeed] Malformed feed item (missing type/data):", item);
+        }
+        if (!isValid) return false;
+
+        let dedupeKey: string;
+        if (item.type === "activity") {
+          if (!item.event_id) return true;
+          dedupeKey = `activity-${item.event_type}-${item.event_id}`;
+        } else if (item.type === "checkin") {
+          dedupeKey = `checkin-${item.data.id}-${item.feed_reason}`;
+        } else {
+          dedupeKey = `practice-${item.data.id}-${item.feed_reason}`;
+        }
+
+        if (seen.has(dedupeKey)) return false;
+        seen.add(dedupeKey);
+        return true;
+      })
+    );
+  }, [data]);
 
   const hasMore = data ? (data[data.length - 1]?.pagination?.hasNext ?? false) : false;
 

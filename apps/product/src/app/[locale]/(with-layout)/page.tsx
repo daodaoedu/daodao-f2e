@@ -262,7 +262,7 @@ export default function HomePage() {
               {orderedFeedItems.map((feedItem, index) => {
                 if (feedItem.type === "activity") {
                   const canOpenActivity = !!feedItem.practice_id && !!feedItem.checkin_id;
-                  const activityKey = `activity-${feedItem.event_type ?? "event"}-${feedItem.event_id || index}`;
+                  const activityKey = `activity-${feedItem.event_type ?? "event"}-${feedItem.event_id ?? index}-${index}`;
                   return (
                     <div key={activityKey} data-feed-id={activityKey}>
                       <ActivityCard
