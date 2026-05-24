@@ -103,6 +103,18 @@ const cropImage = async (
   }
 };
 
+export function getElementCaptureDimensions(element: {
+  scrollWidth: number;
+  scrollHeight: number;
+  clientWidth: number;
+  clientHeight: number;
+}): { width: number; height: number } {
+  return {
+    width: Math.max(element.scrollWidth, element.clientWidth),
+    height: Math.max(element.scrollHeight, element.clientHeight),
+  };
+}
+
 export const captureElementAsImage = async (
   element: HTMLElement,
   cropOptions?: CropOptions
@@ -110,16 +122,19 @@ export const captureElementAsImage = async (
   try {
     const { toPng } = await import("html-to-image");
     const devicePixelRatio = window.devicePixelRatio || 1;
+    const { width, height } = getElementCaptureDimensions(element);
     const dataUrl = await toPng(element, {
       pixelRatio: devicePixelRatio,
       // 添加 cacheBust 繞過 Cloudflare 快取，確保獲取帶有 CORS headers 的回應
       cacheBust: true,
+      width,
+      height,
     });
 
     const imageData: CapturedImageData = {
       src: dataUrl,
-      width: element.clientWidth,
-      height: element.clientHeight,
+      width,
+      height,
     };
 
     // 如果需要裁切，則進行裁切
