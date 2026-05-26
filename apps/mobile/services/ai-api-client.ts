@@ -1,6 +1,6 @@
 import { authStorage, refreshTokens } from "./auth-storage";
 
-const AI_API_BASE_URL = (process.env.EXPO_PUBLIC_AI_API_URL ?? "https://ai-dev.daodao.so").replace(
+const AI_API_BASE_URL = (process.env.EXPO_PUBLIC_AI_API_URL ?? "https://ai.daodao.so").replace(
   /\/$/,
   ""
 );
