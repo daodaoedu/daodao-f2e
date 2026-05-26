@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge } from "@daodao/ui/components/badge";
+import { Badge, type BadgeProps } from "@daodao/ui/components/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@daodao/ui/components/card";
 import type { Insight } from "../../types";
 
@@ -11,7 +11,7 @@ interface AIInsightsProps {
 
 const insightConfig: Record<
   Insight["type"],
-  { label: string; variant: "default" | "alert" | "secondary" | "outline-ghost"; className: string }
+  { label: string; variant: BadgeProps["variant"]; className: string }
 > = {
   strength: {
     label: "優勢",
@@ -36,7 +36,7 @@ const insightConfig: Record<
   },
 };
 
-export function AIInsights({ insights, summary }: AIInsightsProps) {
+export function AIInsights({ insights = [], summary }: AIInsightsProps) {
   if (!insights.length && !summary) {
     return (
       <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
