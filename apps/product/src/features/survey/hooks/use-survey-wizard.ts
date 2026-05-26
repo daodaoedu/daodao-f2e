@@ -56,11 +56,11 @@ function reducer(state: WizardState, action: WizardAction): WizardState {
   switch (action.type) {
     case "NEXT_STEP": {
       const i = STEPS.indexOf(state.currentStep)
-      return { ...state, currentStep: STEPS[Math.min(i + 1, STEPS.length - 1)] }
+      return { ...state, currentStep: STEPS[Math.min(i + 1, STEPS.length - 1)]! }
     }
     case "PREV_STEP": {
       const i = STEPS.indexOf(state.currentStep)
-      return { ...state, currentStep: STEPS[Math.max(i - 1, 0)] }
+      return { ...state, currentStep: STEPS[Math.max(i - 1, 0)]! }
     }
     case "GO_TO_STEP":
       return { ...state, currentStep: action.step }
@@ -84,7 +84,7 @@ function reducer(state: WizardState, action: WizardAction): WizardState {
       return { ...state, survey: { ...state.survey, questions: [...state.survey.questions, action.question] } }
     case "UPDATE_QUESTION": {
       const questions = [...state.survey.questions]
-      questions[action.index] = { ...questions[action.index], ...action.question }
+      questions[action.index] = { ...questions[action.index]!, ...action.question }
       return { ...state, survey: { ...state.survey, questions } }
     }
     case "REMOVE_QUESTION": {
@@ -94,7 +94,7 @@ function reducer(state: WizardState, action: WizardAction): WizardState {
     case "REORDER_QUESTIONS": {
       const questions = [...state.survey.questions]
       const [moved] = questions.splice(action.fromIndex, 1)
-      questions.splice(action.toIndex, 0, moved)
+      questions.splice(action.toIndex, 0, moved!)
       return { ...state, survey: { ...state.survey, questions } }
     }
     case "UPDATE_CONFIG":

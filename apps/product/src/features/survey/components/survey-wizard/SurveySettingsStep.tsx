@@ -18,7 +18,7 @@ export function SurveySettingsStep({ wizard }: { wizard: ReturnType<typeof useSu
         </div>
         <Switch
           checked={config.isAnonymous ?? false}
-          onCheckedChange={(v) => updateConfig({ isAnonymous: v })}
+          onCheckedChange={(v: boolean) => updateConfig({ isAnonymous: v })}
         />
       </div>
 
@@ -29,7 +29,7 @@ export function SurveySettingsStep({ wizard }: { wizard: ReturnType<typeof useSu
         </div>
         <Switch
           checked={config.showProgressBar ?? true}
-          onCheckedChange={(v) => updateConfig({ showProgressBar: v })}
+          onCheckedChange={(v: boolean) => updateConfig({ showProgressBar: v })}
         />
       </div>
 
