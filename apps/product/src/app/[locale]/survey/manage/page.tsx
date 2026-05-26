@@ -1,10 +1,10 @@
 "use client";
 
+import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@daodao/ui/components/card";
 import { BarChart2, List, Loader2, PauseCircle, PlayCircle, Plus, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { deleteSurvey, listSurveys, updateSurveyStatus } from "@/features/survey/services/survey";
 import type { Survey, SurveyStatus } from "@/features/survey/types";
@@ -29,10 +29,18 @@ export default function SurveyManagePage() {
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     listSurveys()
-      .then((r) => setSurveys(r.data))
+      .then((r) => {
+        if (!cancelled) setSurveys(r.data);
+      })
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleDelete = async (id: string) => {
