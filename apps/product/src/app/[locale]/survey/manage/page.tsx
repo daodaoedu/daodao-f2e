@@ -1,65 +1,77 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@daodao/ui/components/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@daodao/ui/components/card"
-import { Badge } from "@daodao/ui/components/badge"
-import { Loader2, Plus, BarChart2, Trash2, PlayCircle, PauseCircle, List } from "lucide-react"
-import { listSurveys, deleteSurvey, updateSurveyStatus } from "@/features/survey/services/survey"
-import type { Survey, SurveyStatus } from "@/features/survey/types"
+import { Badge } from "@daodao/ui/components/badge";
+import { Button } from "@daodao/ui/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@daodao/ui/components/card";
+import { BarChart2, List, Loader2, PauseCircle, PlayCircle, Plus, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { deleteSurvey, listSurveys, updateSurveyStatus } from "@/features/survey/services/survey";
+import type { Survey, SurveyStatus } from "@/features/survey/types";
 
 const STATUS_LABEL: Record<SurveyStatus, string> = {
-  draft: "草稿", active: "進行中", closed: "已關閉", archived: "已封存",
-}
-const STATUS_VARIANT: Record<SurveyStatus, "default" | "secondary" | "outline"> = {
-  draft: "outline", active: "default", closed: "secondary", archived: "secondary",
-}
+  draft: "草稿",
+  active: "進行中",
+  closed: "已關閉",
+  archived: "已封存",
+};
+const STATUS_VARIANT: Record<SurveyStatus, "default" | "secondary" | "outline-ghost"> = {
+  draft: "outline-ghost",
+  active: "default",
+  closed: "secondary",
+  archived: "secondary",
+};
 
 export default function SurveyManagePage() {
-  const router = useRouter()
-  const [surveys, setSurveys] = useState<Survey[]>([])
-  const [loading, setLoading] = useState(true)
-  const [togglingId, setTogglingId] = useState<string | null>(null)
+  const router = useRouter();
+  const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   useEffect(() => {
-    listSurveys().then((r) => setSurveys(r.data)).catch(console.error).finally(() => setLoading(false))
-  }, [])
+    listSurveys()
+      .then((r) => setSurveys(r.data))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("確定要刪除此問卷？")) return
+    if (!confirm("確定要刪除此問卷？")) return;
     try {
-      await deleteSurvey(id)
-      setSurveys((prev) => prev.filter((s) => s.id !== id))
+      await deleteSurvey(id);
+      setSurveys((prev) => prev.filter((s) => s.id !== id));
     } catch {
-      alert("刪除失敗，請再試一次")
+      alert("刪除失敗，請再試一次");
     }
-  }
+  };
 
   const handleToggleStatus = async (s: Survey) => {
-    const nextStatus: SurveyStatus = s.status === "active" ? "closed" : "active"
-    setTogglingId(s.id)
+    const nextStatus: SurveyStatus = s.status === "active" ? "closed" : "active";
+    setTogglingId(s.id);
     try {
-      await updateSurveyStatus(s.id, nextStatus)
-      setSurveys((prev) => prev.map((x) => x.id === s.id ? { ...x, status: nextStatus } : x))
+      await updateSurveyStatus(s.id, nextStatus);
+      setSurveys((prev) => prev.map((x) => (x.id === s.id ? { ...x, status: nextStatus } : x)));
     } catch {
-      alert("操作失敗，請再試一次")
+      alert("操作失敗，請再試一次");
     } finally {
-      setTogglingId(null)
+      setTogglingId(null);
     }
-  }
+  };
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">我的問卷</h1>
         <Button onClick={() => router.push("/survey/create")}>
-          <Plus className="h-4 w-4 mr-2" />建立問卷
+          <Plus className="h-4 w-4 mr-2" />
+          建立問卷
         </Button>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+        <div className="flex justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
       ) : surveys.length === 0 ? (
         <div className="flex flex-col items-center py-20 gap-4 text-muted-foreground">
           <p>還沒有問卷，立即建立第一份！</p>
@@ -87,12 +99,13 @@ export default function SurveyManagePage() {
                       disabled={togglingId === s.id}
                       title={s.status === "active" ? "暫停收集" : "發布"}
                     >
-                      {togglingId === s.id
-                        ? <Loader2 className="h-4 w-4 animate-spin" />
-                        : s.status === "active"
-                          ? <PauseCircle className="h-4 w-4 text-amber-500" />
-                          : <PlayCircle className="h-4 w-4 text-emerald-500" />
-                      }
+                      {togglingId === s.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : s.status === "active" ? (
+                        <PauseCircle className="h-4 w-4 text-amber-500" />
+                      ) : (
+                        <PlayCircle className="h-4 w-4 text-emerald-500" />
+                      )}
                     </Button>
                   )}
                   {/* Responses */}
@@ -135,5 +148,5 @@ export default function SurveyManagePage() {
         </div>
       )}
     </div>
-  )
+  );
 }
