@@ -2,7 +2,7 @@
 
 // ============================================================================
 // UX Mockup — Learning Persona in Inspire Tab
-// feat/learning-persona
+// feat/learning-persona — v2 community responses
 // ============================================================================
 
 import {
