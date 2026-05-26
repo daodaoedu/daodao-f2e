@@ -68,7 +68,13 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
 
   const page1Items = data?.data ?? (isDefaultView ? initialItems : []);
   const baseNextCursor = data?.pagination?.nextCursor ?? (isDefaultView ? initialNextCursor : null);
-  const items = [...page1Items, ...extraPages.flat()];
+  // 合併分頁結果並依 external_id 去重（page1 重新驗證後游標窗口位移可能與追加頁重疊）
+  const seenIds = new Set<string>();
+  const items = [...page1Items, ...extraPages.flat()].filter((it) => {
+    if (seenIds.has(it.external_id)) return false;
+    seenIds.add(it.external_id);
+    return true;
+  });
   const effectiveCursor = extraPages.length === 0 ? baseNextCursor : moreCursor;
 
   const loadMore = async () => {

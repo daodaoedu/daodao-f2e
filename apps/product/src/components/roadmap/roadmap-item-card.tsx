@@ -4,9 +4,10 @@ import type { RoadmapItemPublic } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
+import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { Heart } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { categoryKey, statusKey } from "./constants";
 
 interface RoadmapItemCardProps {
@@ -31,9 +32,11 @@ export function RoadmapItemCard({
   const [voted, setVoted] = useState(item.voted);
   const [count, setCount] = useState(item.support_count);
   const [pending, setPending] = useState(false);
+  const pendingRef = useRef(false);
 
-  // 上游資料更新時（切換分頁、重新整理）同步
+  // 上游資料更新時（切換分頁、重新整理）同步；投票進行中則略過，避免覆寫樂觀值
   useEffect(() => {
+    if (pendingRef.current) return;
     setVoted(item.voted);
     setCount(item.support_count);
   }, [item.voted, item.support_count]);
@@ -50,6 +53,7 @@ export function RoadmapItemCard({
     setVoted(!prevVoted);
     setCount(prevCount + (prevVoted ? -1 : 1));
     setPending(true);
+    pendingRef.current = true;
     try {
       const result = await onToggle(item.external_id, prevVoted);
       setVoted(result.voted);
@@ -58,8 +62,10 @@ export function RoadmapItemCard({
       // rollback
       setVoted(prevVoted);
       setCount(prevCount);
+      toast.error(t("toast_vote_failed"));
     } finally {
       setPending(false);
+      pendingRef.current = false;
     }
   };
 
