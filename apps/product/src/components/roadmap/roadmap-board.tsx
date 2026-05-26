@@ -11,8 +11,8 @@ import {
   useToggleSupport,
 } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
-import { useTranslations } from "@daodao/i18n";
-import { useRouter } from "@daodao/i18n/navigation";
+import { useLocale, useTranslations } from "@daodao/i18n";
+import { getPathname, useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Tabs, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
@@ -37,7 +37,8 @@ const ROADMAP_PATH = "/roadmap";
 
 export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: RoadmapBoardProps) {
   const t = useTranslations("roadmap");
-  const { isAuthenticated, openLoginDialog } = useAuth();
+  const locale = useLocale();
+  const { isAuthenticated, isLoading: authLoading, openLoginDialog } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -87,8 +88,12 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
 
   const { toggle } = useToggleSupport();
 
+  // 登入後返回需帶 locale 前綴（OAuth state 以原始 window 導向，非 locale-aware）
+  const localizedRoadmap = getPathname({ href: ROADMAP_PATH, locale });
   const buildReturnTo = (intent?: string) =>
-    intent ? `${ROADMAP_PATH}?intent=${encodeURIComponent(intent)}` : `${ROADMAP_PATH}?openWish=1`;
+    intent
+      ? `${localizedRoadmap}?intent=${encodeURIComponent(intent)}`
+      : `${localizedRoadmap}?openWish=1`;
 
   const handleUnauthVote = (externalId: string) => {
     openLoginDialog({ redirectUrl: buildReturnTo(`vote:${externalId}`) });
@@ -116,14 +121,20 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
       return;
     }
 
-    if (intent?.startsWith("vote:") && isAuthenticated) {
+    if (intent?.startsWith("vote:")) {
+      // 等 auth 解析完再決定，避免在 isAuthenticated 仍為 false 時誤判而提早 strip intent
+      if (authLoading) return;
       restoredRef.current = true;
       const externalId = intent.slice("vote:".length);
-      void addSupport(externalId)
-        .then(() => mutate())
-        .finally(() => router.replace(ROADMAP_PATH));
+      if (isAuthenticated) {
+        void addSupport(externalId)
+          .then(() => mutate())
+          .finally(() => router.replace(ROADMAP_PATH));
+      } else {
+        router.replace(ROADMAP_PATH);
+      }
     }
-  }, [searchParams, isAuthenticated, router, mutate]);
+  }, [searchParams, isAuthenticated, authLoading, router, mutate]);
 
   const showEmpty = !isLoading && items.length === 0;
 
@@ -213,7 +224,7 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
         {/* 訪客引導（需登入區塊不空白） */}
         {!isAuthenticated ? (
           <div className="mt-10">
-            <GuestGuidedState onLogin={() => openLoginDialog({ redirectUrl: ROADMAP_PATH })} />
+            <GuestGuidedState onLogin={() => openLoginDialog({ redirectUrl: localizedRoadmap })} />
           </div>
         ) : null}
       </div>

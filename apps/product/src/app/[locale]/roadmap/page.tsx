@@ -2,6 +2,7 @@ import { getRoadmapItems, getRoadmapStats } from "@daodao/api";
 import daodaoLogo from "@daodao/assets/images/brand/daodao-logo.webp";
 import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { RoadmapBoard } from "@/components/roadmap";
 
 interface RoadmapPageProps {
@@ -48,10 +49,12 @@ export default async function RoadmapPage({ params }: RoadmapPageProps) {
   const initialStats = statsRes.status === "fulfilled" ? (statsRes.value.data?.data ?? null) : null;
 
   return (
-    <RoadmapBoard
-      initialStats={initialStats}
-      initialItems={initialItems}
-      initialNextCursor={initialNextCursor}
-    />
+    <Suspense fallback={null}>
+      <RoadmapBoard
+        initialStats={initialStats}
+        initialItems={initialItems}
+        initialNextCursor={initialNextCursor}
+      />
+    </Suspense>
   );
 }
