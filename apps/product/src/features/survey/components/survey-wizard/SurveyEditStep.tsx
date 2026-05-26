@@ -50,7 +50,7 @@ export function SurveyEditStep({ wizard }: { wizard: ReturnType<typeof useSurvey
                     className="text-sm"
                   />
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">{TYPE_LABELS[q.questionType]}</Badge>
+                    <Badge variant="outline-ghost" className="text-xs">{TYPE_LABELS[q.questionType]}</Badge>
                     <label className="flex items-center gap-1 text-xs text-muted-foreground cursor-pointer">
                       <input
                         type="checkbox"

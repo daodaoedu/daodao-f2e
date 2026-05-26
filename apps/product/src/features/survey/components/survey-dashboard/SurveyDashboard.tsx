@@ -13,7 +13,7 @@ function QuestionStatCard({ stat }: { stat: PerQuestionStat }) {
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium">{stat.questionText}</CardTitle>
-        <Badge variant="outline" className="w-fit text-xs">{stat.questionType}</Badge>
+        <Badge variant="outline-ghost" className="w-fit text-xs">{stat.questionType}</Badge>
       </CardHeader>
       <CardContent className="space-y-2">
         {distribution?.map((item) => (

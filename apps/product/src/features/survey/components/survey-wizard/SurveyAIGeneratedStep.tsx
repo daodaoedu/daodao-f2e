@@ -81,7 +81,7 @@ export function SurveyAIGeneratedStep({ wizard }: { wizard: ReturnType<typeof us
                 <span className="text-xs text-muted-foreground mt-0.5 shrink-0">{i + 1}.</span>
                 <div className="space-y-1 flex-1">
                   <p className="text-sm">{q.questionText}</p>
-                  <Badge variant="outline" className="text-xs">{q.questionType}</Badge>
+                  <Badge variant="outline-ghost" className="text-xs">{q.questionType}</Badge>
                 </div>
               </div>
             </CardContent>

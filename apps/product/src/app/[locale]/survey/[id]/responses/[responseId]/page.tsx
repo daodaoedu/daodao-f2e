@@ -114,7 +114,7 @@ export default function ResponseDetailPage() {
                     {questionTextMap.get(a.question_id) ?? `問題 #${a.question_id}`}
                   </CardTitle>
                 </div>
-                <Badge variant="outline" className="text-xs shrink-0">
+                <Badge variant="outline-ghost" className="text-xs shrink-0">
                   {TYPE_LABEL[questionTypeMap.get(a.question_id) ?? a.question_type] ?? a.question_type}
                 </Badge>
               </CardHeader>
