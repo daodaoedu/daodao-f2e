@@ -17,6 +17,7 @@
     "./locales/*": "./src/locales/*.json"
   },
   "scripts": {
+    "test": "vitest run",
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "biome lint .",
