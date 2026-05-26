@@ -44,6 +44,9 @@ export * from "./practice-hooks";
 // Reaction Service
 export * from "./reaction";
 export * from "./reaction-hooks";
+// Roadmap / Wishpool Service
+export * from "./roadmap";
+export * from "./roadmap-hooks";
 // Recommendation Service
 export * from "./recommendation-hooks";
 // Resource Service
