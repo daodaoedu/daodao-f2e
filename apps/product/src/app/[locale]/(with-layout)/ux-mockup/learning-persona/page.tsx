@@ -19,7 +19,7 @@ import { useIsMobile } from "@daodao/shared";
 import { Avatar, AvatarFallback } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
 import { cn } from "@daodao/ui/lib/utils";
-import { CalendarCheck, CheckCircle2, Laugh, RefreshCw, Rss, Search, ThumbsUp, X } from "lucide-react";
+import { ArrowRight, CalendarCheck, CheckCircle2, Laugh, Lock, Maximize2, RefreshCw, Rss, Search, ThumbsUp, X } from "lucide-react";
 import { useRef, useState } from "react";
 import type { ElementType } from "react";
 import { BackgroundAnimation, Banner } from "@/components/layout";
@@ -135,6 +135,95 @@ const QUESTION_BANK = [
   { question: "你理想的學習環境是什麼樣子？", example: "例：安靜的咖啡廳，有輕音樂陪伴" },
 ];
 
+const RESPONSE_PREVIEWS = [
+  {
+    name: "長文測試",
+    color: "#F5A93E",
+    text: "對我來說，持續不斷的實踐與反思最重要。剛開始接觸新領域時，一定會覺得很困難，但慢慢就會找到節奏。",
+    locked: false,
+  },
+  {
+    name: "林小明",
+    color: "#16B9B3",
+    text: "能夠立刻應用在實際工作中。如果只是純理論，我很容易就會失去動力，實作對我來說最重要。",
+    locked: false,
+  },
+  {
+    name: "??",
+    color: "#B8D0CF",
+    text: "這是被鎖起來的回應，先分享你的想法就能解鎖查看完整內容。這個人有很精彩的觀點。",
+    locked: true,
+  },
+  {
+    name: "??",
+    color: "#B8D0CF",
+    text: "另一個隱藏的回應，回答問題後即可查看所有人的分享內容，一起交流成長。",
+    locked: true,
+  },
+];
+
+function ResponseCard({
+  name,
+  color,
+  text,
+  locked,
+  onUnlock,
+}: {
+  name: string;
+  color: string;
+  text: string;
+  locked?: boolean;
+  onUnlock?: () => void;
+}) {
+  return (
+    <div className="flex-shrink-0 w-[172px] h-[148px] rounded-xl border border-[#EEF4F4] bg-white p-3 relative overflow-hidden flex flex-col">
+      {locked ? (
+        <>
+          <div className="blur-sm select-none pointer-events-none flex flex-col flex-1">
+            <div className="flex items-center gap-1.5 mb-2 shrink-0">
+              <div className="size-6 rounded-full shrink-0" style={{ background: color }} />
+              <div className="h-2.5 bg-text-dark/15 rounded-full w-14" />
+            </div>
+            <div className="space-y-1.5">
+              <div className="h-2 bg-text-dark/10 rounded-full w-full" />
+              <div className="h-2 bg-text-dark/10 rounded-full w-4/5" />
+              <div className="h-2 bg-text-dark/10 rounded-full w-full" />
+              <div className="h-2 bg-text-dark/10 rounded-full w-3/5" />
+            </div>
+          </div>
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: mockup lock card */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: mockup lock card */}
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center gap-2 cursor-pointer"
+            onClick={(e) => { e.stopPropagation(); onUnlock?.(); }}
+          >
+            <Lock className="size-4 text-logo-cyan" />
+            <span className="text-[11px] text-text-dark/55 border border-[#D8ECEC] rounded-full px-3 py-1 bg-white whitespace-nowrap text-center leading-tight">
+              用你的回答來解鎖吧！
+            </span>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="flex items-center gap-1.5 mb-2 shrink-0">
+            <div
+              className="size-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
+              style={{ background: color }}
+            >
+              {name[0]}
+            </div>
+            <span className="text-xs font-medium text-text-dark truncate">{name}</span>
+          </div>
+          <p className="text-xs text-text-dark/60 leading-relaxed flex-1 line-clamp-5">{text}</p>
+          <div className="self-end shrink-0 mt-1">
+            <Maximize2 className="size-3.5 text-text-dark/20" />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function LearningPersonaCard({
   questionIndex,
   answer,
@@ -151,8 +240,7 @@ function LearningPersonaCard({
   onTryAnother: () => void;
 }) {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [cardHeight, setCardHeight] = useState(280);
-  const perspectiveRef = useRef<HTMLDivElement>(null);
+  const [extraMinHeight, setExtraMinHeight] = useState(0);
   const item = QUESTION_BANK[questionIndex] ?? QUESTION_BANK[0]!;
 
   if (submitted) {
@@ -175,9 +263,9 @@ function LearningPersonaCard({
   }
 
   return (
-    <div ref={perspectiveRef} style={{ perspective: "1000px", height: `${cardHeight}px` }} className="w-full transition-[height] duration-200">
+    <div style={{ perspective: "1000px" }} className="w-full">
       <div
-        className="relative w-full h-full transition-transform duration-500 ease-in-out"
+        className="relative w-full transition-transform duration-500 ease-in-out"
         style={{
           transformStyle: "preserve-3d",
           transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
@@ -187,17 +275,42 @@ function LearningPersonaCard({
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: card flip interaction */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction */}
         <div
-          className="group absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex flex-col cursor-pointer select-none"
-          style={{ backfaceVisibility: "hidden" }}
+          className="group w-full bg-white rounded-2xl px-5 pt-5 pb-5 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex flex-col cursor-pointer select-none"
+          style={{ backfaceVisibility: "hidden", minHeight: extraMinHeight || undefined }}
           onClick={() => setIsFlipped(true)}
         >
-          <QuoteSvg className="mt-4 mb-4 self-center shrink-0" />
-          <p className="text-[24px] font-semibold text-text-dark text-center leading-snug flex-1 flex items-center justify-center">
+          <QuoteSvg className="mt-2 mb-3 self-center shrink-0" />
+          <p className="text-[22px] font-semibold text-text-dark text-center leading-snug shrink-0">
             {item.question}
           </p>
-          <div className="flex items-center gap-2 self-end mt-3 transition-transform duration-200 group-hover:translate-x-1.5">
-            <span className="text-sm text-primary-darker">分享我的想法</span>
-            <ArrowCircleSvg className="size-8 shrink-0" />
+
+          {/* 大家的回答是... header */}
+          <div className="mt-6 mb-2 flex items-center gap-1.5 shrink-0">
+            <span className="text-sm font-medium text-text-dark/65">大家的回答是...</span>
+            <span className="bg-logo-cyan/10 text-logo-cyan text-xs font-bold rounded-full px-2 py-0.5">5+</span>
+          </div>
+
+          {/* 橫向滑動回應 */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for scroll */}
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation for scroll */}
+          <div
+            className="flex gap-3 overflow-x-auto -mx-5 px-5 pb-1 shrink-0"
+            style={{ scrollbarWidth: "none" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {RESPONSE_PREVIEWS.map((r, i) => (
+              <ResponseCard key={i} name={r.name} color={r.color} text={r.text} locked={r.locked} onUnlock={() => setIsFlipped(true)} />
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div className="mt-[40px] flex items-center justify-end shrink-0">
+            <div className="flex items-center gap-2 transition-transform duration-200 group-hover:translate-x-1">
+              <span className="text-sm font-medium text-primary-darker">分享我的想法</span>
+              <div className="size-9 rounded-full bg-logo-cyan flex items-center justify-center shrink-0">
+                <ArrowRight className="size-4 text-white" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -235,11 +348,8 @@ function LearningPersonaCard({
                 onAnswerChange(e.target.value);
                 e.target.style.height = "auto";
                 e.target.style.height = `${e.target.scrollHeight}px`;
-                const newHeight = Math.max(280, e.target.scrollHeight + 160);
-                setCardHeight(newHeight);
-                if (perspectiveRef.current) {
-                  perspectiveRef.current.style.height = `${newHeight}px`;
-                }
+                const newHeight = e.target.scrollHeight + 160;
+                if (newHeight > 280) setExtraMinHeight(newHeight);
               }}
               placeholder={item.example}
               className="w-full border-0 border-b-2 border-logo-cyan text-base text-text-dark outline-none bg-transparent placeholder:text-text-dark/25 pb-1 resize-none overflow-hidden"
@@ -356,9 +466,9 @@ function LearningPersonaMCCard({
   }
 
   return (
-    <div style={{ perspective: "1000px" }} className="w-full h-[280px]">
+    <div style={{ perspective: "1000px" }} className="w-full">
       <div
-        className="relative w-full h-full transition-transform duration-500 ease-in-out"
+        className="relative w-full transition-transform duration-500 ease-in-out"
         style={{
           transformStyle: "preserve-3d",
           transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
@@ -368,15 +478,35 @@ function LearningPersonaMCCard({
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: card flip interaction */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction */}
         <div
-          className="group absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex flex-col cursor-pointer select-none"
+          className="group w-full bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex flex-col cursor-pointer select-none"
           style={{ backfaceVisibility: "hidden" }}
           onClick={() => setIsFlipped(true)}
         >
           <QuoteSvg className="mt-4 mb-4 self-center shrink-0" />
-          <p className="text-[24px] font-semibold text-text-dark text-center leading-snug flex-1 flex items-center justify-center">
+          <p className="text-[24px] font-semibold text-text-dark text-center leading-snug shrink-0">
             {item.question}
           </p>
-          <div className="flex items-center gap-2 self-end mt-3 transition-transform duration-200 group-hover:translate-x-1.5">
+
+          {/* 大家的回答是... header */}
+          <div className="mt-6 mb-2 flex items-center gap-1.5 shrink-0">
+            <span className="text-sm font-medium text-text-dark/65">大家的回答是...</span>
+            <span className="bg-logo-cyan/10 text-logo-cyan text-xs font-bold rounded-full px-2 py-0.5">5+</span>
+          </div>
+
+          {/* 橫向滑動回應 */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for scroll */}
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation for scroll */}
+          <div
+            className="flex gap-3 overflow-x-auto -mx-6 px-6 pb-1 shrink-0"
+            style={{ scrollbarWidth: "none" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {RESPONSE_PREVIEWS.map((r, i) => (
+              <ResponseCard key={i} name={r.name} color={r.color} text={r.text} locked={r.locked} onUnlock={() => setIsFlipped(true)} />
+            ))}
+          </div>
+
+          <div className="mt-[40px] flex items-center gap-2 self-end shrink-0 transition-transform duration-200 group-hover:translate-x-1.5">
             <span className="text-sm text-primary-darker">選擇我的答案</span>
             <ArrowCircleSvg className="size-8 shrink-0" />
           </div>
