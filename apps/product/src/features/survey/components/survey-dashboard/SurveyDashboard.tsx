@@ -117,7 +117,7 @@ export function SurveyDashboard({ surveyId }: { surveyId: string }) {
           {analytics.insights.map((insight, i) => (
             <Card key={i}>
               <CardContent className="pt-3 pb-3 flex items-start gap-3">
-                <Badge variant={insight.type === "strength" ? "default" : insight.type === "weakness" ? "destructive" : "secondary"} className="text-xs shrink-0 mt-0.5">
+                <Badge variant={insight.type === "strength" ? "default" : insight.type === "weakness" ? "alert" : "secondary"} className="text-xs shrink-0 mt-0.5">
                   {insight.type === "strength" ? "優勢" : insight.type === "weakness" ? "待改善" : insight.type === "suggestion" ? "建議" : insight.type === "trend" ? "趨勢" : "情感"}
                 </Badge>
                 <p className="text-sm">{insight.text}</p>

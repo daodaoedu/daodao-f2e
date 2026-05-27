@@ -20,7 +20,7 @@ export function useSurveyResponse(shareId: string) {
   }, [shareId])
 
   const submit = useCallback(
-    (payload: SubmitResponseInput): Promise<SurveyResponse> => submitResponse(payload),
+    (payload: SubmitResponseInput) => submitResponse(payload),
     []
   )
 

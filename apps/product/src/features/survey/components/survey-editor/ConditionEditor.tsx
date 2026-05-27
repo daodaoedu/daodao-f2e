@@ -37,7 +37,7 @@ export function ConditionEditor({
   const handleAdd = () => {
     if (availableQuestions.length === 0) return
     const newCondition: Condition = {
-      dependsOn: availableQuestions[0].id,
+      dependsOn: availableQuestions[0]!.id,
       operator: "equals",
       value: "",
       showQuestionId: currentQuestionId,

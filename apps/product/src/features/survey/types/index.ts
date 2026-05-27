@@ -40,6 +40,7 @@ export interface SurveyConfig {
 
 export interface SurveyWithQuestions extends Survey {
   questions: SurveyQuestion[]
+  coverUrl?: string
 }
 
 export interface SurveyQuestion {
@@ -110,6 +111,7 @@ export interface Insight {
 export interface TrendData {
   daily?: { date: string; count: number }[]
   hourly?: { hour: string; count: number }[]
+  dropOff?: { last_position: number; count: number }[]
 }
 
 export interface PerQuestionStat {
@@ -143,6 +145,8 @@ export interface AIGenerateResponse {
   }
   error?: string
 }
+
+export type { AIGenerateInput } from '../schema'
 
 export interface SurveyQueryParams {
   status?: SurveyStatus
