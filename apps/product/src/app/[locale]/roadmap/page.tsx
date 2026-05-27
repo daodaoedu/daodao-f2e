@@ -43,6 +43,18 @@ export default async function RoadmapPage({ params }: RoadmapPageProps) {
     getRoadmapStats(),
   ]);
 
+  if (itemsRes.status === "rejected") {
+    console.error("Failed to fetch roadmap items on server:", itemsRes.reason);
+  } else if (itemsRes.value.error) {
+    console.error("Roadmap items API returned error on server:", itemsRes.value.error);
+  }
+
+  if (statsRes.status === "rejected") {
+    console.error("Failed to fetch roadmap stats on server:", statsRes.reason);
+  } else if (statsRes.value.error) {
+    console.error("Roadmap stats API returned error on server:", statsRes.value.error);
+  }
+
   const initialItems = itemsRes.status === "fulfilled" ? (itemsRes.value.data?.data ?? []) : [];
   const initialNextCursor =
     itemsRes.status === "fulfilled" ? (itemsRes.value.data?.pagination?.nextCursor ?? null) : null;

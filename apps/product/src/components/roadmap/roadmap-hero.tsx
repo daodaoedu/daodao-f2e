@@ -25,16 +25,16 @@ export function RoadmapHero({ stats }: RoadmapHeroProps) {
         {stats ? (
           <div className="mt-8 flex items-center justify-center gap-8">
             <div>
-              <p className="text-2xl font-bold text-logo-cyan">{roundDown(stats.partners)}+</p>
+              <p className="text-2xl font-bold text-logo-cyan">{roundDown(stats.partners ?? 0)}+</p>
               <p className="mt-1 text-sm text-light-gray">
-                {t("hero_partners", { count: roundDown(stats.partners) })}
+                {t("hero_partners", { count: roundDown(stats.partners ?? 0) })}
               </p>
             </div>
             <div className="h-10 w-px bg-light-gray/40" />
             <div>
-              <p className="text-2xl font-bold text-logo-cyan">{roundDown(stats.feedback)}+</p>
+              <p className="text-2xl font-bold text-logo-cyan">{roundDown(stats.feedback ?? 0)}+</p>
               <p className="mt-1 text-sm text-light-gray">
-                {t("hero_feedback", { count: roundDown(stats.feedback) })}
+                {t("hero_feedback", { count: roundDown(stats.feedback ?? 0) })}
               </p>
             </div>
           </div>

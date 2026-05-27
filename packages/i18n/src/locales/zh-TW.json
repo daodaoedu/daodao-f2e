@@ -60,6 +60,7 @@
     "done_desc": "謝謝你的回饋，我們會把它納入考量，有進展會通知你。",
     "done_close": "關閉",
     "required": "此欄位為必填",
+    "validation_email_invalid": "請輸入有效的電子郵件地址",
     "toast_vote_failed": "操作失敗，請稍後再試",
     "toast_wish_success": "許願成功！",
     "toast_wish_failed": "送出失敗，請稍後再試",

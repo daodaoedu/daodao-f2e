@@ -16,6 +16,7 @@ import { getPathname, useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Tabs, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
+import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -52,7 +53,7 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
   const stats = statsData?.data ?? initialStats;
 
   // 預設視圖以 SSR 結果作為初始資料，避免首屏閃爍（見下方 page1Items）
-  const { data, isLoading, mutate } = useRoadmapItems({ status: tab, category });
+  const { data, isLoading, error, mutate } = useRoadmapItems({ status: tab, category });
 
   // 載入更多（cursor 分頁，於既有頁面後追加）
   const [extraPages, setExtraPages] = useState<RoadmapItemPublic[][]>([]);
@@ -82,11 +83,15 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
     setLoadingMore(true);
     try {
       const res = await getRoadmapItems({ status: tab, category, cursor: effectiveCursor });
-      const body = res.data;
-      if (body) {
-        setExtraPages((p) => [...p, body.data]);
-        setMoreCursor(body.pagination?.nextCursor ?? null);
+      if (res.error || !res.data) {
+        toast.error(t("toast_vote_failed"));
+        return;
       }
+      const body = res.data;
+      setExtraPages((p) => [...p, body.data]);
+      setMoreCursor(body.pagination?.nextCursor ?? null);
+    } catch {
+      toast.error(t("toast_vote_failed"));
     } finally {
       setLoadingMore(false);
     }
@@ -134,7 +139,16 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
       const externalId = intent.slice("vote:".length);
       if (isAuthenticated) {
         void addSupport(externalId)
-          .then(() => mutate())
+          .then((res) => {
+            if (res.error) {
+              toast.error(t("toast_vote_failed"));
+            } else {
+              void mutate();
+            }
+          })
+          .catch(() => {
+            toast.error(t("toast_vote_failed"));
+          })
           .finally(() => router.replace(ROADMAP_PATH));
       } else {
         router.replace(ROADMAP_PATH);
@@ -191,7 +205,9 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
 
         {/* 看板項目 */}
         <div className="mt-6 grid gap-4">
-          {isLoading && items.length === 0 ? (
+          {error && items.length === 0 ? (
+            <p className="py-10 text-center text-red">{t("load_failed")}</p>
+          ) : isLoading && items.length === 0 ? (
             <p className="py-10 text-center text-light-gray">{t("loading")}</p>
           ) : showEmpty ? (
             <div className="rounded-2xl border border-dashed border-light-gray/50 px-6 py-12 text-center">

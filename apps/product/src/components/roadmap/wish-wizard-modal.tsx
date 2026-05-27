@@ -108,6 +108,10 @@ export function WishWizardModal({
     (step === 2 && draft.situation.trim().length >= SITUATION_MIN) ||
     (step === 3 && draft.desire.trim().length > 0);
 
+  const isEmailValid =
+    !draft.contactEmail.trim() ||
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.contactEmail.trim());
+
   const handleSubmit = async () => {
     if (!draft.category) return;
     if (!isAuthenticated) {
@@ -256,6 +260,9 @@ export function WishWizardModal({
                       placeholder={t("contact_placeholder")}
                       onChange={(e) => persist({ ...draft, contactEmail: e.target.value })}
                     />
+                    {!isEmailValid && (
+                      <p className="mt-1 text-xs text-red">{t("validation_email_invalid")}</p>
+                    )}
                     <p className="mt-1 text-xs text-light-gray">{t("contact_hint")}</p>
                   </div>
                 </div>
@@ -276,7 +283,7 @@ export function WishWizardModal({
                   {t("next")}
                 </Button>
               ) : (
-                <Button type="button" disabled={submitting} onClick={handleSubmit}>
+                <Button type="button" disabled={submitting || !isEmailValid} onClick={handleSubmit}>
                   {submitting ? t("submitting") : t("submit")}
                 </Button>
               )}

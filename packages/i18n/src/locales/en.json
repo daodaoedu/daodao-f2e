@@ -60,6 +60,7 @@
     "done_desc": "Thanks for your feedback. We'll take it into account and let you know about progress.",
     "done_close": "Close",
     "required": "This field is required",
+    "validation_email_invalid": "Please enter a valid email address",
     "toast_vote_failed": "Action failed, please try again",
     "toast_wish_success": "Wish submitted!",
     "toast_wish_failed": "Submission failed, please try again",
