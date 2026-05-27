@@ -210,7 +210,7 @@ export default function UserDetailPage() {
               <tbody>
                 {loginHistory.records.map((record, index) => (
                   <tr
-                    key={`login-${index}-${record.loginAt ?? record.ipAddress}`}
+                    key={`login-${record.loginAt ?? ""}-${record.ipAddress ?? ""}`}
                     className="border-b border-border/50"
                   >
                     <td className="px-4 py-2 whitespace-nowrap">

@@ -128,7 +128,7 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
     if (openWish === "1") {
       restoredRef.current = true;
       setWizardOpen(true);
-      router.replace(ROADMAP_PATH);
+      router.replace(localizedRoadmap);
       return;
     }
 
@@ -149,12 +149,12 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
           .catch(() => {
             toast.error(t("toast_vote_failed"));
           })
-          .finally(() => router.replace(ROADMAP_PATH));
+          .finally(() => router.replace(localizedRoadmap));
       } else {
-        router.replace(ROADMAP_PATH);
+        router.replace(localizedRoadmap);
       }
     }
-  }, [searchParams, isAuthenticated, authLoading, router, mutate]);
+  }, [searchParams, isAuthenticated, authLoading, router, mutate, localizedRoadmap]);
 
   const showEmpty = !isLoading && items.length === 0;
 

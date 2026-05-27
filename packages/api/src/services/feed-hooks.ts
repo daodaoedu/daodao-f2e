@@ -135,8 +135,9 @@ export function useFeed(params: IFeedParams) {
 
         let dedupeKey: string;
         if (item.type === "activity") {
-          if (!item.event_id) return true;
-          dedupeKey = `activity-${item.event_type}-${item.event_id}`;
+          dedupeKey = item.event_id
+            ? `activity-${item.event_type}-${item.event_id}`
+            : `activity-${item.activity_type}-${item.event_type ?? "none"}-${item.event_text}`;
         } else if (item.type === "checkin") {
           dedupeKey = `checkin-${item.data.id}-${item.feed_reason}`;
         } else {
