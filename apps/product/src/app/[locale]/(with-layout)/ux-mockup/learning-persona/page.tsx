@@ -19,8 +19,9 @@ import { useIsMobile } from "@daodao/shared";
 import { Avatar, AvatarFallback } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
 import { cn } from "@daodao/ui/lib/utils";
-import { ArrowRight, CalendarCheck, CheckCircle2, Laugh, Lock, Maximize2, RefreshCw, Rss, Search, ThumbsUp, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { CalendarCheck, CheckCircle2, ChevronDown, Laugh, Lock, Maximize2, RefreshCw, Rss, Search, ThumbsUp, X } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import type { ElementType } from "react";
 import { BackgroundAnimation, Banner } from "@/components/layout";
 import { DesktopSidebar } from "@/components/layout/sidebar/desktop";
@@ -122,18 +123,166 @@ function ExpandableSearch({
   );
 }
 
-// ─── Learning Persona ─────────────────────────────────────────────────────────
+// ─── Question bank (shared) ───────────────────────────────────────────────────
 
 const QUESTION_BANK = [
-  { question: "當你對某件事失去動力時，什麼能幫助你重新找回熱情？", example: "例：睡一覺讓自己好好休息" },
-  { question: "對我來說，學習最有價值的部分是⋯⋯", example: "例：把知識應用在真實生活中" },
-  { question: "哪種學習方式最適合你？為什麼？", example: "例：邊做邊學，從錯誤中進步" },
-  { question: "說說一次讓你意外認識自己的學習經歷。", example: "例：學樂器時發現自己很沒耐心" },
-  { question: "你目前正在培養或戒掉的習慣是什麼？", example: "例：每天早起讀 30 分鐘書" },
-  { question: "如果明年能精通任何一項技能，你會選什麼？", example: "例：公開演講，因為很害怕但很重要" },
-  { question: "你怎麼知道自己真的理解了一件新事物？", example: "例：能用自己的話解釋給別人聽" },
-  { question: "你理想的學習環境是什麼樣子？", example: "例：安靜的咖啡廳，有輕音樂陪伴" },
+  { question: "最想瞬間「下載」的技能？", example: "例：流利說任何一種語言" },
+  { question: "最怪的產出（生產力）習慣？", example: "例：只有戴耳機才能進入狀態" },
+  { question: "聽過但「沒聽進去」的好建議？", example: "例：早一點開始存錢" },
+  { question: "讓你忘掉時間的興趣？", example: "例：畫畫，一抬頭三小時過去了" },
+  { question: "「學習」這件事，如何改變了你的性格？", example: "例：變得更願意承認自己不懂" },
+  { question: "在課堂之外，你學過最重要的一課？", example: "例：失敗後如何重新站起來" },
+  { question: "你最近最意想不到的靈感來源？", example: "例：排隊時聽到陌生人的對話" },
+  { question: "最近一件讓你感到自豪「我學會了」的事？", example: "例：終於看懂財報了" },
+  { question: "哪件事你純粹是「為了快樂」而學？", example: "例：學做甜點，不為別人只為自己" },
+  { question: "哪一個童年時的好奇心，你到現在還有？", example: "例：星星到底有多遠" },
+  { question: "哪一本書讓你印象深刻？", example: "例：《被討厭的勇氣》，讀完整個人放鬆了" },
+  { question: "你有什麼特定的「學習儀式感」？", example: "例：泡一杯咖啡，把手機翻面放" },
+  { question: "有沒有哪一次讓你當下覺得「完蛋了」，後來卻變成意外的轉折點？", example: "例：被退學後反而找到真正想做的事" },
+  { question: "哪個主題你可以滔滔不絕聊三小時？", example: "例：城市設計與人的行為" },
+  { question: "學習狀況不好時，你如何面對自己？", example: "例：先去走走，給自己一個小時的假" },
+  { question: "有哪項技能，你曾以為自己絕對學不會？", example: "例：游泳，但後來真的會了" },
+  { question: "對你來說，「哇，我好像跟以前不一樣了」，那個具體的瞬間發生了什麼事？", example: "例：某次開口說了以前不敢說的話" },
+  { question: "哪句關於你能力的稱讚，曾讓你信心大增？", example: "例：老師說「你的問題問得很好」" },
+  { question: "最近對哪件事「改觀」或「轉念」了？", example: "例：以前討厭運動，現在反而需要它" },
+  { question: "你保持專注的「秘密武器」是什麼？", example: "例：番茄鐘＋白噪音" },
+  { question: "哪部紀錄片或電影曾讓你深受感動？", example: "例：《徒手攀岩》，看完整個人都燃起來了" },
+  { question: "你的社交圈如何影響了你的成長？", example: "例：朋友的一句話讓我鼓起勇氣換工作" },
+  { question: "給過去的自己，你會想說哪句建議？", example: "例：不要那麼怕被拒絕" },
+  { question: "你有一個「不為人知」的興趣嗎？", example: "例：研究各國地鐵路線圖" },
+  { question: "你收過最深刻、最有意義的回饋？", example: "例：「你讓我覺得被理解了」" },
 ];
+
+// ─── 人物誌 Tab data & components ────────────────────────────────────────────
+
+const PERSONA_QUESTIONS = QUESTION_BANK.map((q, i) => ({
+  id: i + 1,
+  question: q.question,
+  answeredByMe: i < 4,
+}));
+
+const PERSONA_RESPONSES: Record<number, { name: string; color: string; answer: string; isMe?: boolean }[]> = {
+  1: [
+    { name: "我", color: "#16B9B3", answer: "流利地說日語。我學了三年還是卡在中級，如果能直接下載就好了。", isMe: true },
+    { name: "林小明", color: "#F5A93E", answer: "公開演講。我每次上台都心跳加速，如果能直接有那種從容感就太好了。" },
+    { name: "Amy", color: "#9B8FE0", answer: "快速閱讀。現在書單越積越長，如果閱讀速度能直接翻倍就太好了。" },
+    { name: "宇翔", color: "#F5A93E", answer: "彈鋼琴。小時候學過但沒認真，現在很後悔。" },
+    { name: "Kevin", color: "#16B9B3", answer: "程式設計。我是非本科轉職，如果當初能直接下載那個思維模式就好了。" },
+    { name: "小綠", color: "#5BA58C", answer: "換個答案，我想下載「不在意他人眼光」的能力，那根本不是技能但我最需要它。" },
+  ],
+  2: [
+    { name: "我", color: "#16B9B3", answer: "一定要先把桌面清空才能開工，不然腦子也會亂。別人覺得這很奇怪。", isMe: true },
+    { name: "Mia", color: "#9B8FE0", answer: "我習慣把所有 app 通知都關掉，連電話也靜音，朋友都說找不到我。" },
+    { name: "林小明", color: "#F5A93E", answer: "專注前一定要先整理明天的待辦，哪怕只是移動幾個卡片，讓腦袋先「清空」一次。" },
+  ],
+  3: [
+    { name: "我", color: "#16B9B3", answer: "「趁年輕多嘗試，失敗也沒關係。」大學時覺得是老生常談，出社會才懂有多珍貴。", isMe: true },
+    { name: "Amy", color: "#9B8FE0", answer: "「先完成再完美」。我老是想等準備好了再開始，拖了好多事。" },
+    { name: "宇翔", color: "#F5A93E", answer: "「多花時間在人身上，少花在事情上。」以前工作狂，現在有點後悔。" },
+  ],
+  4: [
+    { name: "我", color: "#16B9B3", answer: "煮咖啡。進入心流之後根本忘記外面的世界，朋友說跟我約喝咖啡都要等我「回來」。", isMe: true },
+    { name: "Kevin", color: "#16B9B3", answer: "登山。踏上山徑之後腦袋就完全切換，工作的事情完全想不起來。" },
+    { name: "Mia", color: "#9B8FE0", answer: "做陶。手在動的時候，思緒反而最安靜。" },
+    { name: "小綠", color: "#5BA58C", answer: "打電動。我知道大家會說這個，但真的是唯一讓我完全在「當下」的事。" },
+  ],
+};
+
+function MiniResponseCard({ name, color, answer, isMe }: { name: string; color: string; answer: string; isMe?: boolean }) {
+  return (
+    <div className={cn("rounded-xl p-2.5 flex flex-col gap-1.5", isMe ? "bg-logo-cyan/[0.08]" : "bg-[#F5F9F9]")}>
+      <div className="flex items-center gap-1.5">
+        <div className="size-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold shrink-0" style={{ background: color }}>
+          {name[0]}
+        </div>
+        <span className={cn("text-xs font-medium truncate", isMe ? "text-logo-cyan" : "text-text-dark")}>{name}</span>
+      </div>
+      <p className="text-[11px] text-text-dark/55 line-clamp-3 leading-relaxed">{answer}</p>
+    </div>
+  );
+}
+
+function PersonaQuestionCard({ id, question, answeredByMe }: { id: number; question: string; answeredByMe: boolean }) {
+  const responses = PERSONA_RESPONSES[id];
+  const preview = responses?.slice(0, 4) ?? [];
+  const total = responses?.length ?? 0;
+
+  return (
+    <a
+      href={`/zh-TW/ux-mockup/learning-persona/${id}`}
+      className="group block bg-white rounded-2xl shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 overflow-hidden"
+    >
+      <div className="px-4 pt-4 pb-3 flex items-start gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-text-dark leading-snug">{question}</p>
+          <div className="mt-1.5 flex items-center gap-2">
+            {answeredByMe
+              ? <span className="text-xs text-logo-cyan font-medium">已回答</span>
+              : <span className="text-xs text-text-dark/35">尚未回答</span>}
+            {total > 0 && <span className="text-xs text-text-dark/35">· {total} 則回應</span>}
+          </div>
+        </div>
+        <ArrowCircleSvg className="size-8 shrink-0 mt-0.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
+      </div>
+
+      {answeredByMe && preview.length > 0 ? (
+        <div className="grid grid-cols-2 gap-1.5 px-4 pb-4">
+          {preview.map((r) => (
+            <MiniResponseCard key={r.name} name={r.name} color={r.color} answer={r.answer} isMe={r.isMe} />
+          ))}
+        </div>
+      ) : (
+        <div className="px-4 pb-4">
+          <div className="rounded-xl bg-[#F5F9F9] py-4 flex items-center justify-center">
+            <span className="text-xs text-text-dark/35">回答後即可查看大家的想法</span>
+          </div>
+        </div>
+      )}
+    </a>
+  );
+}
+
+function PersonaTab() {
+  return (
+    <div className="flex flex-col gap-3 mt-2">
+      <div className="px-1 h-20 flex flex-col justify-center text-center">
+        <p className="text-base font-bold text-text-dark leading-snug">遇見各式各樣的學習者</p>
+        <p className="text-xs text-text-dark/45 mt-1">看見別人，認識自己</p>
+      </div>
+      {PERSONA_QUESTIONS.map((q) => (
+        <PersonaQuestionCard key={q.id} id={q.id} question={q.question} answeredByMe={q.answeredByMe} />
+      ))}
+    </div>
+  );
+}
+
+// ─── Drag-to-scroll hook ──────────────────────────────────────────────────────
+
+function useDragScroll() {
+  const ref = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeftStart = useRef(0);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    isDragging.current = true;
+    startX.current = e.clientX;
+    scrollLeftStart.current = ref.current.scrollLeft;
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !ref.current) return;
+    e.preventDefault();
+    ref.current.scrollLeft = scrollLeftStart.current - (e.clientX - startX.current);
+  };
+
+  const stop = () => { isDragging.current = false; };
+
+  return { ref, onMouseDown, onMouseMove, onMouseUp: stop, onMouseLeave: stop };
+}
+
+// ─── Learning Persona ─────────────────────────────────────────────────────────
 
 const RESPONSE_PREVIEWS = [
   {
@@ -231,6 +380,7 @@ function LearningPersonaCard({
   onSubmit,
   submitted,
   onTryAnother,
+  onViewPersona,
 }: {
   questionIndex: number;
   answer: string;
@@ -238,27 +388,47 @@ function LearningPersonaCard({
   onSubmit: () => void;
   submitted: boolean;
   onTryAnother: () => void;
+  onViewPersona?: () => void;
 }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [extraMinHeight, setExtraMinHeight] = useState(0);
+  const dragScroll = useDragScroll();
   const item = QUESTION_BANK[questionIndex] ?? QUESTION_BANK[0]!;
 
   if (submitted) {
+    const questionId = questionIndex + 1;
+    const responseCount = PERSONA_RESPONSES[questionId]?.length ?? 0;
+
     return (
-      <div className="bg-white rounded-2xl shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 h-[280px] flex flex-col items-center justify-center gap-2 px-6">
-        <CheckCircle2 className="size-10 text-logo-cyan mb-1" />
-        <p className="text-base font-medium text-text-dark">感謝你的分享！</p>
-        <p className="text-sm text-text-dark/50 text-center leading-relaxed">
-          你可以隨時查看你的回答，並繼續探索更多問題。
-        </p>
-        <a
-          href="/zh-TW/users/me"
-          className="mt-2 flex items-center gap-1.5 text-sm font-medium text-primary-darker hover:opacity-80 transition-opacity"
-        >
-          前往我的小島查看
-          <ArrowCircleSvg className="size-6 shrink-0" />
-        </a>
-      </div>
+      <a
+        href={`/zh-TW/ux-mockup/learning-persona/${questionId}`}
+        className="group block bg-white rounded-2xl shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 overflow-hidden"
+      >
+        {/* Question + badge */}
+        <div className="px-5 pt-4 pb-3 border-b border-[#F0F5F5]">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <CheckCircle2 className="size-3.5 text-logo-cyan shrink-0" />
+            <span className="text-xs text-logo-cyan font-medium">已回答</span>
+          </div>
+          <p className="text-sm font-semibold text-text-dark leading-snug">{item.question}</p>
+        </div>
+
+        {/* Answer preview */}
+        <div className="px-5 py-4">
+          <p className="text-sm text-text-dark/70 leading-relaxed line-clamp-4">{answer}</p>
+        </div>
+
+        {/* Footer CTA */}
+        <div className="px-5 pb-4 flex items-center justify-between">
+          {responseCount > 0
+            ? <span className="text-xs text-text-dark/35">{responseCount} 則回應</span>
+            : <span />}
+          <div className="flex items-center gap-1.5 text-sm font-medium text-primary-darker transition-transform duration-200 group-hover:translate-x-0.5">
+            查看大家怎麼回答
+            <ArrowCircleSvg className="size-7 shrink-0" />
+          </div>
+        </div>
+      </a>
     );
   }
 
@@ -291,11 +461,16 @@ function LearningPersonaCard({
           </div>
 
           {/* 橫向滑動回應 */}
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for scroll */}
-          {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation for scroll */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: drag-scroll interaction */}
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: drag-scroll interaction */}
           <div
-            className="flex gap-3 overflow-x-auto -mx-5 px-5 pb-1 shrink-0"
+            ref={dragScroll.ref}
+            className="flex gap-3 overflow-x-auto -mx-5 px-5 pb-1 shrink-0 cursor-grab active:cursor-grabbing select-none"
             style={{ scrollbarWidth: "none" }}
+            onMouseDown={dragScroll.onMouseDown}
+            onMouseMove={dragScroll.onMouseMove}
+            onMouseUp={dragScroll.onMouseUp}
+            onMouseLeave={dragScroll.onMouseLeave}
             onClick={(e) => e.stopPropagation()}
           >
             {RESPONSE_PREVIEWS.map((r, i) => (
@@ -307,9 +482,7 @@ function LearningPersonaCard({
           <div className="mt-[40px] flex items-center justify-end shrink-0">
             <div className="flex items-center gap-2 transition-transform duration-200 group-hover:translate-x-1">
               <span className="text-sm font-medium text-primary-darker">分享我的想法</span>
-              <div className="size-9 rounded-full bg-logo-cyan flex items-center justify-center shrink-0">
-                <ArrowRight className="size-4 text-white" />
-              </div>
+              <ArrowCircleSvg className="size-8 shrink-0" />
             </div>
           </div>
         </div>
@@ -374,7 +547,7 @@ function LearningPersonaCard({
   );
 }
 
-function LearningPersonaSection() {
+function LearningPersonaSection({ onViewPersona }: { onViewPersona?: () => void }) {
   const [visible, setVisible] = useState(true);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -412,6 +585,7 @@ function LearningPersonaSection() {
         onSubmit={() => setSubmitted(true)}
         submitted={submitted}
         onTryAnother={handleTryAnother}
+        onViewPersona={onViewPersona}
       />
     </div>
   );
@@ -451,17 +625,39 @@ function LearningPersonaMCCard({
 }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const dragScroll = useDragScroll();
   const item = MC_QUESTION_BANK[questionIndex] ?? MC_QUESTION_BANK[0]!;
 
   if (submitted) {
+    const selectedLabel = selectedOption !== null ? item.options[selectedOption] : "";
+
     return (
-      <div className="bg-white rounded-2xl shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 h-[280px] flex flex-col items-center justify-center gap-3 px-6">
-        <CheckCircle2 className="size-10 text-logo-cyan" />
-        <p className="text-base font-medium text-text-dark">感謝你的分享！</p>
-        <p className="text-sm text-text-dark/50 text-center leading-relaxed">
-          你的回答幫助我們更了解你的學習方式。
-        </p>
-      </div>
+      <a
+        href="/zh-TW/ux-mockup/learning-persona?tab=persona"
+        className="group block bg-white rounded-2xl shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 overflow-hidden"
+      >
+        {/* Question + badge */}
+        <div className="px-5 pt-4 pb-3 border-b border-[#F0F5F5]">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <CheckCircle2 className="size-3.5 text-logo-cyan shrink-0" />
+            <span className="text-xs text-logo-cyan font-medium">已回答</span>
+          </div>
+          <p className="text-sm font-semibold text-text-dark leading-snug">{item.question}</p>
+        </div>
+
+        {/* Selected answer */}
+        <div className="px-5 py-4">
+          <p className="text-sm text-text-dark/70 leading-relaxed">{selectedLabel}</p>
+        </div>
+
+        {/* Footer CTA */}
+        <div className="px-5 pb-4 flex items-center justify-end">
+          <div className="flex items-center gap-1.5 text-sm font-medium text-primary-darker transition-transform duration-200 group-hover:translate-x-0.5">
+            查看大家怎麼回答
+            <ArrowCircleSvg className="size-7 shrink-0" />
+          </div>
+        </div>
+      </a>
     );
   }
 
@@ -494,11 +690,16 @@ function LearningPersonaMCCard({
           </div>
 
           {/* 橫向滑動回應 */}
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for scroll */}
-          {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation for scroll */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: drag-scroll interaction */}
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: drag-scroll interaction */}
           <div
-            className="flex gap-3 overflow-x-auto -mx-6 px-6 pb-1 shrink-0"
+            ref={dragScroll.ref}
+            className="flex gap-3 overflow-x-auto -mx-6 px-6 pb-1 shrink-0 cursor-grab active:cursor-grabbing select-none"
             style={{ scrollbarWidth: "none" }}
+            onMouseDown={dragScroll.onMouseDown}
+            onMouseMove={dragScroll.onMouseMove}
+            onMouseUp={dragScroll.onMouseUp}
+            onMouseLeave={dragScroll.onMouseLeave}
             onClick={(e) => e.stopPropagation()}
           >
             {RESPONSE_PREVIEWS.map((r, i) => (
@@ -947,7 +1148,10 @@ function ActivityCardStatic({ label, text }: { label: string; text: string }) {
 
 export default function LearningPersonaMockupPage() {
   const isMobile = useIsMobile();
-  const [activeTab, setActiveTab] = useState<"inspire" | "mine">("inspire");
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<"inspire" | "persona" | "mine">(
+    searchParams?.get("tab") === "persona" ? "persona" : "inspire"
+  );
   const [searchValue, setSearchValue] = useState("");
 
   return (
@@ -965,7 +1169,7 @@ export default function LearningPersonaMockupPage() {
 
           {/* Tab switcher */}
           <div className="flex border-b border-[#E5E7EB] mb-4">
-            {(["inspire", "mine"] as const).map((tab) => (
+            {(["inspire", "persona", "mine"] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
@@ -977,7 +1181,7 @@ export default function LearningPersonaMockupPage() {
                     : "text-text-dark/40"
                 )}
               >
-                {tab === "inspire" ? "Inspire" : "Mine"}
+                {tab === "inspire" ? "靈感" : tab === "persona" ? "人物誌" : "我的"}
               </button>
             ))}
           </div>
@@ -991,7 +1195,7 @@ export default function LearningPersonaMockupPage() {
               </div>
 
               {/* ── Learning Persona Section ── */}
-              <LearningPersonaSection />
+              <LearningPersonaSection onViewPersona={() => setActiveTab("persona")} />
               <LearningPersonaMCSection />
 
               {/* ── Feed ── */}
@@ -1139,6 +1343,9 @@ export default function LearningPersonaMockupPage() {
               </div>
             </>
           )}
+
+          {/* ── 人物誌 Tab ── */}
+          {activeTab === "persona" && <PersonaTab />}
 
           {/* ── Mine Tab ── */}
           {activeTab === "mine" && (
