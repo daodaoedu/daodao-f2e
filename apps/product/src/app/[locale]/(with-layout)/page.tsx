@@ -321,7 +321,7 @@ export default function HomePage() {
                     checkin.reactions?.find((r) => r.latestActorName)?.latestActorName;
                   return (
                     <div
-                      key={`checkin-${checkin.id}-${feedItem.feed_reason}-${index}`}
+                      key={`checkin-${checkin.id}-${feedItem.feed_reason}`}
                       data-feed-id={`checkin-${checkin.id}`}
                     >
                       {showFeedLabel &&
@@ -362,7 +362,7 @@ export default function HomePage() {
                     practice.reactions?.find((r) => r.latestActorName)?.latestActorName;
                   return (
                     <div
-                      key={`practice-${practice.id}-${feedItem.feed_reason}-${index}`}
+                      key={`practice-${practice.id}-${feedItem.feed_reason}`}
                       data-feed-id={`practice-${practice.id}`}
                     >
                       {showFeedLabel &&

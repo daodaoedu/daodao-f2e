@@ -4,6 +4,935 @@
  */
 
 export interface paths {
+    "/api/v1/admin/wishes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 許願收件匣列表 */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 狀態過濾 */
+                    status?: "pending" | "linked" | "archived";
+                    /** @description 分類過濾 */
+                    category?: "operation" | "practice" | "social" | "explore" | "challenge" | "ai" | "profile" | "other";
+                    /** @description 關鍵字（搜尋 situation/desire） */
+                    q?: string;
+                    /** @description 分頁游標（不透明） */
+                    cursor?: string;
+                    /** @description 每頁筆數 */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 許願列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/wishes/{id}/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 歸入既有項目 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 許願內部 id */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["LinkWish"];
+                };
+            };
+            responses: {
+                /** @description 已歸併 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/wishes/{id}/promote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 促成新項目並歸併 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 許願內部 id */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PromoteWish"];
+                };
+            };
+            responses: {
+                /** @description 已促成並歸併 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/wishes/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 封存許願 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 許願內部 id */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已封存 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/roadmap/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 建立路線圖項目 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateRoadmapItem"];
+                };
+            };
+            responses: {
+                /** @description 已建立 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/roadmap/items/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * 編輯路線圖項目
+         * @description status→done 時寫 shipped_at 並通知所有支持者一次
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 路線圖項目內部 id */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateRoadmapItem"];
+                };
+            };
+            responses: {
+                /** @description 已更新 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/admin/roadmap/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 趨勢報表 */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 時間範圍（預設本月） */
+                    range?: "week" | "month" | "quarter" | "year";
+                    /** @description 熱門項目排行的狀態過濾 */
+                    status?: "collected" | "discussing" | "planned" | "in_progress" | "done" | "parked";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 四指標報表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roadmap/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 公開看板項目列表
+         * @description 公開免登入唯讀；status 分頁（all/scheduled/discussing/done），登入時回傳 voted
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 看板分頁；scheduled = planned + in_progress */
+                    status?: "all" | "scheduled" | "discussing" | "done";
+                    /** @description 分類過濾 */
+                    category?: "operation" | "practice" | "social" | "explore" | "challenge" | "ai" | "profile" | "other";
+                    /** @description 分頁游標（不透明） */
+                    cursor?: string;
+                    /** @description 每頁筆數 */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 看板項目列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description Array of paginated data items */
+                            data: components["schemas"]["RoadmapItemPublic"][];
+                            /**
+                             * @description Cursor-based pagination information
+                             * @example {
+                             *       "cursors": {
+                             *         "start": "eyJpZCI6ODUzLCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTIxVDE3OjM3OjE3LjcwMFoifQ==",
+                             *         "end": "eyJpZCI6ODQ5LCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTIxVDE3OjM3OjE3LjY5N1oifQ=="
+                             *       },
+                             *       "hasMore": true,
+                             *       "count": 5,
+                             *       "limit": 5,
+                             *       "hasNext": true,
+                             *       "hasPrev": true,
+                             *       "nextCursor": "eyJpZCI6ODQ5LCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTIxVDE3OjM3OjE3LjY5N1oifQ==",
+                             *       "prevCursor": "eyJpZCI6ODUzLCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTIxVDE3OjM3OjE3LjcwMFoifQ==",
+                             *       "totalEstimate": 5,
+                             *       "parentTotalEstimate": null
+                             *     }
+                             * @example {
+                             *       "cursors": {
+                             *         "start": "eyJpZCI6MTgwLCJjcmVhdGVkQXQiOiIyMDI0LTAxLTE1VDE0OjMwOjAwWiJ9",
+                             *         "end": null
+                             *       },
+                             *       "hasMore": false,
+                             *       "count": 8,
+                             *       "limit": 10,
+                             *       "hasNext": false,
+                             *       "hasPrev": true,
+                             *       "nextCursor": null,
+                             *       "prevCursor": "eyJpZCI6MTgwLCJjcmVhdGVkQXQiOiIyMDI0LTAxLTE1VDE0OjMwOjAwWiJ9",
+                             *       "totalEstimate": 8,
+                             *       "parentTotalEstimate": null
+                             *     }
+                             */
+                            pagination: {
+                                /** @description Cursor boundaries for the current page */
+                                cursors: {
+                                    /** @description Start cursor for the current page */
+                                    start: string | null;
+                                    /** @description End cursor for the current page */
+                                    end: string | null;
+                                };
+                                /** @description Whether there are more items after the current page */
+                                hasMore: boolean;
+                                /** @description Number of items in the current page */
+                                count: number;
+                                /** @description Maximum number of items per page */
+                                limit: number;
+                                /** @description Whether there are more items in the next page */
+                                hasNext: boolean;
+                                /** @description Whether there are items in the previous page */
+                                hasPrev: boolean;
+                                /** @description Cursor to fetch the next page */
+                                nextCursor: string | null;
+                                /** @description Cursor to fetch the previous page */
+                                prevCursor: string | null;
+                                /** @description Estimated total number of items (may be null if unknown) */
+                                totalEstimate: number | null;
+                                /** @description Estimated total number of items in parent context (may be null) */
+                                parentTotalEstimate: number | null;
+                            };
+                            /**
+                             * @description Faceted search aggregations for filtering
+                             * @example {
+                             *       "majorCategory": [
+                             *         {
+                             *           "value": "education_learning",
+                             *           "count": 45
+                             *         },
+                             *         {
+                             *           "value": "nature_environment",
+                             *           "count": 32
+                             *         },
+                             *         {
+                             *           "value": "information_computer_science",
+                             *           "count": 28
+                             *         }
+                             *       ],
+                             *       "subCategory": [
+                             *         {
+                             *           "value": "physics",
+                             *           "count": 15
+                             *         },
+                             *         {
+                             *           "value": "biology",
+                             *           "count": 12
+                             *         },
+                             *         {
+                             *           "value": "mathematics",
+                             *           "count": 10
+                             *         }
+                             *       ]
+                             *     }
+                             */
+                            facets?: {
+                                /** @description Major category facet values (parent_id is NULL) */
+                                majorCategory?: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
+                                /** @description Sub category facet values (parent_id is NOT NULL) */
+                                subCategory?: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
+                            } & {
+                                [key: string]: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roadmap/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Hero 統計
+         * @description 回傳 { partners, feedback }，Redis 快取 1 小時
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 統計資料 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            data: components["schemas"]["RoadmapStats"] & unknown;
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roadmap/items/{externalId}/supports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 投票支持
+         * @description 登入使用者對項目投票（冪等）；回傳最新票數與 voted
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 路線圖項目 external_id（UUID） */
+                    externalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 投票結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            data: components["schemas"]["ToggleSupportResult"] & unknown;
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        /**
+         * 取消投票
+         * @description 登入使用者取消對項目的投票（冪等）；回傳最新票數與 voted
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 路線圖項目 external_id（UUID） */
+                    externalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 取消投票結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            data: components["schemas"]["ToggleSupportResult"] & unknown;
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wishes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 提交許願
+         * @description 登入使用者提交三步驟許願；situation ≥ 10 字；submitter 取登入帳號
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateWish"];
+                };
+            };
+            responses: {
+                /** @description 許願已建立 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            data: components["schemas"]["CreateWishResult"];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/roles": {
         parameters: {
             query?: never;
@@ -22165,6 +23094,127 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        RoadmapItemPublic: {
+            /** @description 對外 UUID */
+            external_id: string;
+            /** @description 對外標題 */
+            title: string;
+            /** @description 對外描述 */
+            description: string;
+            /**
+             * @description 分類
+             * @enum {string}
+             */
+            category: "operation" | "practice" | "social" | "explore" | "challenge" | "ai" | "profile" | "other";
+            /**
+             * @description 狀態
+             * @enum {string}
+             */
+            status: "collected" | "discussing" | "planned" | "in_progress" | "done" | "parked";
+            /**
+             * @description 票數（去重支持者數）
+             * @example 42
+             */
+            support_count: number;
+            /** @description 當前使用者是否已投票（未登入恆為 false） */
+            voted: boolean;
+        };
+        RoadmapStats: {
+            /**
+             * @description 曾許願或投票的去重使用者數
+             * @example 128
+             */
+            partners: number;
+            /**
+             * @description 許願總則數
+             * @example 256
+             */
+            feedback: number;
+        };
+        ToggleSupportResult: {
+            /** @description 最新票數 */
+            support_count: number;
+            /** @description 當前使用者投票狀態 */
+            voted: boolean;
+        };
+        CreateRoadmapItem: {
+            /** @description 對外標題 */
+            title: string;
+            /** @description 對外描述 */
+            description: string;
+            /**
+             * @description 分類
+             * @enum {string}
+             */
+            category: "operation" | "practice" | "social" | "explore" | "challenge" | "ai" | "profile" | "other";
+            /**
+             * @description 初始狀態（預設 collected）
+             * @enum {string}
+             */
+            status?: "collected" | "discussing" | "planned" | "in_progress" | "done" | "parked";
+            /** @description 是否公開 */
+            is_public?: boolean;
+            /** @description 置頂 */
+            pinned?: boolean;
+            /** @description 手動排序 */
+            sort_order?: number;
+        };
+        UpdateRoadmapItem: {
+            title?: string;
+            description?: string;
+            /** @enum {string} */
+            category?: "operation" | "practice" | "social" | "explore" | "challenge" | "ai" | "profile" | "other";
+            /** @enum {string} */
+            status?: "collected" | "discussing" | "planned" | "in_progress" | "done" | "parked";
+            is_public?: boolean;
+            pinned?: boolean;
+            sort_order?: number;
+        };
+        CreateWish: {
+            /**
+             * @description 許願分類
+             * @example practice
+             * @enum {string}
+             */
+            category: "operation" | "practice" | "social" | "explore" | "challenge" | "ai" | "profile" | "other";
+            /** @description Step 2 情境描述（≥ 10 字） */
+            situation: string;
+            /** @description Step 3 期待描述 */
+            desire: string;
+            /**
+             * Format: email
+             * @description 進度通知 email（選填，預設取帳號 email）
+             */
+            contact_email?: string;
+        };
+        LinkWish: {
+            /** @description 歸入的路線圖項目內部 id */
+            roadmap_item_id: number;
+            /** @description 內部模組子標籤（category=other 時必填） */
+            internal_module_tag?: string;
+        };
+        PromoteWish: {
+            /** @description 對外標題 */
+            title: string;
+            /** @description 對外描述 */
+            description: string;
+            /**
+             * @description 分類
+             * @enum {string}
+             */
+            category: "operation" | "practice" | "social" | "explore" | "challenge" | "ai" | "profile" | "other";
+            /**
+             * @description 初始狀態（預設 collected）
+             * @enum {string}
+             */
+            status?: "collected" | "discussing" | "planned" | "in_progress" | "done" | "parked";
+            /** @description 內部模組子標籤（category=other 時必填） */
+            internal_module_tag?: string;
+        };
+        CreateWishResult: {
+            /** @description 建立的許願 id */
+            id: number;
+        };
         PracticeStatsQuery: {
             /**
              * @description 開始日期

@@ -58,6 +58,7 @@ function GlobalProvider({
                         "^/auth/error",
                         "^/users/",
                         "^/practices/[^/]+$",
+                        "^/roadmap(/.*)?$",
                         "^/dev/",
                       ]}
                       onAuthRequired={(currentPath) => {

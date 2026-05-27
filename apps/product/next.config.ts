@@ -28,6 +28,20 @@ const nextConfig: NextConfig = {
     globalNotFound: true,
     scrollRestoration: true,
   },
+  async redirects() {
+    return [
+      {
+        source: "/my",
+        destination: "/mine",
+        permanent: true,
+      },
+      {
+        source: "/:locale/my",
+        destination: "/:locale/mine",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);
