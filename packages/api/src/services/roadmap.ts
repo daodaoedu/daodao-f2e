@@ -15,6 +15,15 @@ export type RoadmapStats = components["schemas"]["RoadmapStats"];
 export type ToggleSupportResult = components["schemas"]["ToggleSupportResult"];
 export type CreateWishBody = components["schemas"]["CreateWish"];
 
+type ApiDataResponse<T> = Promise<{ data?: { data: T }; error?: unknown }>;
+
+export interface GetPublicWishesParams {
+  status?: "pending" | "linked" | "archived";
+  category?: RoadmapCategory;
+  cursor?: string;
+  limit?: number;
+}
+
 type ListQuery = NonNullable<paths["/api/v1/roadmap/items"]["get"]["parameters"]["query"]>;
 export type BoardTab = NonNullable<ListQuery["status"]>;
 export type RoadmapCategory = NonNullable<ListQuery["category"]>;
@@ -45,6 +54,21 @@ export const getRoadmapItems = async (params: GetRoadmapItemsParams = {}) =>
 
 export const getRoadmapStats = async () => client.GET("/api/v1/roadmap/stats", {});
 
+export const getPublicWishes = async (params: GetPublicWishesParams = {}) =>
+  (client as unknown as { GET: (path: string, options?: Record<string, unknown>) => unknown }).GET(
+    "/api/v1/wishes",
+    {
+      params: {
+        query: {
+          status: params.status,
+          category: params.category,
+          cursor: params.cursor,
+          limit: params.limit,
+        },
+      },
+    }
+  );
+
 export const addSupport = async (externalId: string) =>
   client.POST("/api/v1/roadmap/items/{externalId}/supports", {
     params: { path: { externalId } },
@@ -54,5 +78,25 @@ export const removeSupport = async (externalId: string) =>
   client.DELETE("/api/v1/roadmap/items/{externalId}/supports", {
     params: { path: { externalId } },
   });
+
+export const addWishSupport = async (externalId: string) =>
+  (
+    client as unknown as {
+      POST: (
+        path: string,
+        options?: Record<string, unknown>
+      ) => ApiDataResponse<ToggleSupportResult>;
+    }
+  ).POST(`/api/v1/wishes/${externalId}/supports`, {});
+
+export const removeWishSupport = async (externalId: string) =>
+  (
+    client as unknown as {
+      DELETE: (
+        path: string,
+        options?: Record<string, unknown>
+      ) => ApiDataResponse<ToggleSupportResult>;
+    }
+  ).DELETE(`/api/v1/wishes/${externalId}/supports`, {});
 
 export const createWish = async (body: CreateWishBody) => client.POST("/api/v1/wishes", { body });
