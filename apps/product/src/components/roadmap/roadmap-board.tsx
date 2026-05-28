@@ -86,18 +86,17 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
   const roadmapItems = data?.data ?? (isDefaultView ? initialItems : []);
   const baseNextCursor = data?.pagination?.nextCursor ?? (isDefaultView ? initialNextCursor : null);
   // 合併分頁結果並依 external_id 去重（page1 重新驗證後游標窗口位移可能與追加頁重疊）
-  const seenIds = new Set<string>();
-  const mergedRoadmapItems = [...roadmapItems, ...extraPages.flat()].filter((it) => {
-    if (seenIds.has(it.external_id)) return false;
-    seenIds.add(it.external_id);
-    return true;
-  });
+  const dedup = (items: RoadmapItemPublic[]) => {
+    const seen = new Set<string>();
+    return items.filter((it) => {
+      if (seen.has(it.external_id)) return false;
+      seen.add(it.external_id);
+      return true;
+    });
+  };
+  const mergedRoadmapItems = dedup([...roadmapItems, ...extraPages.flat()]);
   const wishItems = wishData?.data ?? [];
-  const allItems = [...mergedRoadmapItems, ...wishItems].filter((it) => {
-    if (seenIds.has(it.external_id)) return false;
-    seenIds.add(it.external_id);
-    return true;
-  });
+  const allItems = dedup([...mergedRoadmapItems, ...wishItems]);
   const effectiveCursor = extraPages.length === 0 ? baseNextCursor : moreCursor;
 
   const loadMore = async () => {
@@ -133,7 +132,7 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
 
   // 登入後返回需帶 locale 前綴（OAuth state 以原始 window 導向，非 locale-aware）
   const localizedRoadmap =
-    ROADMAP_PATH_WITH_LOCALE[locale as keyof typeof ROADMAP_PATH_WITH_LOCALE];
+    ROADMAP_PATH_WITH_LOCALE[locale as keyof typeof ROADMAP_PATH_WITH_LOCALE] ?? ROADMAP_PATH;
   const buildReturnTo = (intent?: string) =>
     intent
       ? `${localizedRoadmap}?intent=${encodeURIComponent(intent)}`
