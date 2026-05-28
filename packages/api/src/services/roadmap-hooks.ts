@@ -7,11 +7,31 @@
 import { useQuery } from "../hooks";
 import {
   addSupport,
+  addWishSupport,
   type CreateWishBody,
   createWish,
+  type GetPublicWishesParams,
   type GetRoadmapItemsParams,
+  type RoadmapItemPublic,
   removeSupport,
+  removeWishSupport,
 } from "./roadmap";
+
+type PublicWishesResponse = {
+  data: RoadmapItemPublic[];
+  pagination?: { nextCursor: string | null };
+};
+
+type UntypedQuery = (
+  path: string,
+  options: Record<string, unknown> | null,
+  config?: { revalidateOnFocus?: boolean }
+) => {
+  data?: PublicWishesResponse;
+  isLoading: boolean;
+  error?: unknown;
+  mutate: () => Promise<unknown>;
+};
 
 // ============================================================================
 // Query Hooks
@@ -49,6 +69,30 @@ export const useRoadmapStats = (options?: { enabled?: boolean }) => {
   });
 };
 
+export const usePublicWishes = (
+  params: GetPublicWishesParams = {},
+  options?: { enabled?: boolean }
+) => {
+  const enabled = options?.enabled ?? true;
+  const useUntypedQuery = useQuery as unknown as UntypedQuery;
+  return useUntypedQuery(
+    "/api/v1/wishes",
+    enabled
+      ? {
+          params: {
+            query: {
+              status: params.status,
+              category: params.category,
+              cursor: params.cursor,
+              limit: params.limit,
+            },
+          },
+        }
+      : null,
+    { revalidateOnFocus: false }
+  );
+};
+
 // ============================================================================
 // Mutation Hooks
 // ============================================================================
@@ -58,8 +102,16 @@ export const useRoadmapStats = (options?: { enabled?: boolean }) => {
  * 此處負責呼叫 API 並回傳最新票數，失敗則 throw 供呼叫端 rollback。
  */
 export const useToggleSupport = () => {
+  const isWishExternal = (externalId: string) => /^wish-/u.test(externalId);
   const toggle = async (externalId: string, currentlyVoted: boolean) => {
-    const res = currentlyVoted ? await removeSupport(externalId) : await addSupport(externalId);
+    const resolver = currentlyVoted
+      ? isWishExternal(externalId)
+        ? removeWishSupport
+        : removeSupport
+      : isWishExternal(externalId)
+        ? addWishSupport
+        : addSupport;
+    const res = await resolver(externalId);
     if (res.error || !res.data) {
       throw new Error("toggle support failed");
     }

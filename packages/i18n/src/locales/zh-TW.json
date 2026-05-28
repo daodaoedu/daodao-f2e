@@ -7,6 +7,7 @@
     "hero_partners": "{count}+ 位夥伴參與",
     "hero_feedback": "累積 {count}+ 則回饋",
     "tab_all": "全部",
+    "tab_wishes": "許願中",
     "tab_scheduled": "排程中",
     "tab_discussing": "討論中",
     "tab_done": "已完成",
@@ -27,6 +28,11 @@
     "vote": "我支持",
     "voted": "已支持",
     "supporters": "{count} 人支持",
+    "wish_pool_title": "許願池",
+    "wish_pool_status": "待採納",
+    "wish_vote_soon": "採納後可支持",
+    "wish_pool_empty_title": "目前還沒有許願",
+    "wish_pool_empty_desc": "先送出第一筆願望，讓它先出現在這裡。",
     "wish_cta": "點我許願",
     "wish_cta_sub": "有想法或遇到困擾？告訴我們",
     "empty_title": "這個分類目前還沒有項目",
@@ -6290,44 +6296,20 @@
         "explorer": {
           "name": "探索者島",
           "description": "你是一位好奇心旺盛的探索者，喜歡嘗試新事物",
-          "traits": [
-            "好奇心強",
-            "勇於嘗試",
-            "獨立思考"
-          ],
-          "recommendations": [
-            "每日閱讀",
-            "程式學習",
-            "語言學習"
-          ]
+          "traits": ["好奇心強", "勇於嘗試", "獨立思考"],
+          "recommendations": ["每日閱讀", "程式學習", "語言學習"]
         },
         "creator": {
           "name": "創造者島",
           "description": "你擁有豐富的創造力，善於將想法付諸實踐",
-          "traits": [
-            "創意豐富",
-            "動手能力強",
-            "有藝術天賦"
-          ],
-          "recommendations": [
-            "寫作練習",
-            "藝術創作",
-            "設計學習"
-          ]
+          "traits": ["創意豐富", "動手能力強", "有藝術天賦"],
+          "recommendations": ["寫作練習", "藝術創作", "設計學習"]
         },
         "connector": {
           "name": "連結者島",
           "description": "你善於建立人際關係，喜歡與他人合作學習",
-          "traits": [
-            "善於溝通",
-            "團隊合作",
-            "同理心強"
-          ],
-          "recommendations": [
-            "社群活動",
-            "語言學習",
-            "團隊專案"
-          ]
+          "traits": ["善於溝通", "團隊合作", "同理心強"],
+          "recommendations": ["社群活動", "語言學習", "團隊專案"]
         }
       }
     },

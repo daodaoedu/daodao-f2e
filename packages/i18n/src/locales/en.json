@@ -7,6 +7,7 @@
     "hero_partners": "{count}+ partners involved",
     "hero_feedback": "{count}+ pieces of feedback",
     "tab_all": "All",
+    "tab_wishes": "Wishes",
     "tab_scheduled": "Scheduled",
     "tab_discussing": "Discussing",
     "tab_done": "Done",
@@ -27,6 +28,11 @@
     "vote": "Support",
     "voted": "Supported",
     "supporters": "{count} supporters",
+    "wish_pool_title": "Wish pool",
+    "wish_pool_status": "pending review",
+    "wish_vote_soon": "Support after adopt",
+    "wish_pool_empty_title": "No wishes yet",
+    "wish_pool_empty_desc": "Submit your first wish and it will appear here.",
     "wish_cta": "Make a wish",
     "wish_cta_sub": "Got an idea or a pain point? Tell us",
     "empty_title": "No items in this category yet",
@@ -6290,44 +6296,20 @@
         "explorer": {
           "name": "Explorer Island",
           "description": "You are a curious explorer who enjoys trying new things.",
-          "traits": [
-            "Curious",
-            "Willing to try",
-            "Independent thinker"
-          ],
-          "recommendations": [
-            "Daily reading",
-            "Coding practice",
-            "Language learning"
-          ]
+          "traits": ["Curious", "Willing to try", "Independent thinker"],
+          "recommendations": ["Daily reading", "Coding practice", "Language learning"]
         },
         "creator": {
           "name": "Creator Island",
           "description": "You are highly creative and good at turning ideas into action.",
-          "traits": [
-            "Creative",
-            "Hands-on",
-            "Artistic"
-          ],
-          "recommendations": [
-            "Writing practice",
-            "Art creation",
-            "Design learning"
-          ]
+          "traits": ["Creative", "Hands-on", "Artistic"],
+          "recommendations": ["Writing practice", "Art creation", "Design learning"]
         },
         "connector": {
           "name": "Connector Island",
           "description": "You build relationships easily and enjoy learning with others.",
-          "traits": [
-            "Communicative",
-            "Team-oriented",
-            "Empathetic"
-          ],
-          "recommendations": [
-            "Community activities",
-            "Language learning",
-            "Team projects"
-          ]
+          "traits": ["Communicative", "Team-oriented", "Empathetic"],
+          "recommendations": ["Community activities", "Language learning", "Team projects"]
         }
       }
     },

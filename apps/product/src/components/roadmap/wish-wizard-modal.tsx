@@ -33,6 +33,7 @@ interface WishWizardModalProps {
   isAuthenticated: boolean;
   /** 未登入送出時呼叫；草稿已存於 localStorage */
   onRequireLogin: () => void;
+  onCreated?: () => Promise<void> | void;
 }
 
 const SITUATION_MIN = 10;
@@ -66,6 +67,7 @@ export function WishWizardModal({
   onOpenChange,
   isAuthenticated,
   onRequireLogin,
+  onCreated,
 }: WishWizardModalProps) {
   const t = useTranslations("roadmap");
   const { create } = useCreateWish();
@@ -109,8 +111,7 @@ export function WishWizardModal({
     (step === 3 && draft.desire.trim().length > 0);
 
   const isEmailValid =
-    !draft.contactEmail.trim() ||
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.contactEmail.trim());
+    !draft.contactEmail.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.contactEmail.trim());
 
   const handleSubmit = async () => {
     if (!draft.category) return;
@@ -127,6 +128,7 @@ export function WishWizardModal({
         ...(draft.contactEmail.trim() ? { contact_email: draft.contactEmail.trim() } : {}),
       };
       await create(body);
+      await onCreated?.();
       clearDraft();
       setDone(true);
       toast.success(t("toast_wish_success"));
@@ -139,7 +141,7 @@ export function WishWizardModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="mx-4 w-[calc(100%-2rem)] max-w-md p-4 sm:p-5">
         {done ? (
           <div className="flex flex-col items-center gap-4 py-6 text-center">
             <div className="flex size-14 items-center justify-center rounded-full bg-logo-cyan/15">
@@ -174,20 +176,22 @@ export function WishWizardModal({
                   </legend>
                   <div className="grid grid-cols-2 gap-2">
                     {ROADMAP_CATEGORIES.map((c) => (
-                      <button
+                      <Button
                         key={c}
                         type="button"
+                        variant={draft.category === c ? "default" : "outline"}
+                        size="sm"
                         onClick={() => persist({ ...draft, category: c })}
                         className={cn(
-                          "rounded-xl border px-3 py-2.5 text-sm transition-colors",
+                          "h-auto w-full rounded-xl px-3 py-2.5 text-sm transition-colors justify-start",
                           draft.category === c
-                            ? "border-logo-cyan bg-light-blue text-text-dark"
+                            ? "bg-logo-cyan text-white"
                             : "border-light-gray/50 bg-basic-white text-light-gray hover:border-logo-cyan/60"
                         )}
                         aria-pressed={draft.category === c}
                       >
                         {t(categoryKey(c))}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </fieldset>

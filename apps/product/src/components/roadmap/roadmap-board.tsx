@@ -6,27 +6,27 @@ import {
   type RoadmapCategory,
   type RoadmapItemPublic,
   type RoadmapStats,
+  usePublicWishes,
   useRoadmapItems,
   useRoadmapStats,
   useToggleSupport,
 } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useLocale, useTranslations } from "@daodao/i18n";
-import { getPathname, useRouter } from "@daodao/i18n/navigation";
-import { Badge } from "@daodao/ui/components/badge";
+import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
-import { Tabs, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
 import { toast } from "@daodao/ui/components/sonner";
+import { Tabs, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
 import { cn } from "@daodao/ui/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BOARD_TABS, categoryKey, ROADMAP_CATEGORIES, tabKey } from "./constants";
+import { BOARD_TABS, type BoardTab, categoryKey, ROADMAP_CATEGORIES, tabKey } from "./constants";
 import { GuestGuidedState } from "./guest-guided-state";
 import { RoadmapHero } from "./roadmap-hero";
 import { RoadmapItemCard } from "./roadmap-item-card";
 import { WishWizardModal } from "./wish-wizard-modal";
 
-type BoardTabValue = (typeof BOARD_TABS)[number];
+type BoardTabValue = BoardTab;
 
 interface RoadmapBoardProps {
   initialStats: RoadmapStats | null;
@@ -35,6 +35,10 @@ interface RoadmapBoardProps {
 }
 
 const ROADMAP_PATH = "/roadmap";
+const ROADMAP_PATH_WITH_LOCALE = {
+  "zh-TW": ROADMAP_PATH,
+  en: "/en/roadmap",
+} as const;
 
 export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: RoadmapBoardProps) {
   const t = useTranslations("roadmap");
@@ -48,12 +52,24 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
   const [wizardOpen, setWizardOpen] = useState(false);
 
   const isDefaultView = tab === "all" && category === undefined;
+  const isWishTab = tab === "wishes";
+  const isAllTab = tab === "all";
 
   const { data: statsData } = useRoadmapStats();
   const stats = statsData?.data ?? initialStats;
 
   // 預設視圖以 SSR 結果作為初始資料，避免首屏閃爍（見下方 page1Items）
-  const { data, isLoading, error, mutate } = useRoadmapItems({ status: tab, category });
+  const roadmapTab = isWishTab ? undefined : tab;
+  const { data, isLoading, error, mutate } = useRoadmapItems({ status: roadmapTab, category });
+  const {
+    data: wishData,
+    isLoading: isWishesLoading,
+    error: wishError,
+    mutate: mutateWishes,
+  } = usePublicWishes(
+    { status: "pending", category, limit: 20 },
+    { enabled: isAllTab || isWishTab }
+  );
 
   // 載入更多（cursor 分頁，於既有頁面後追加）
   const [extraPages, setExtraPages] = useState<RoadmapItemPublic[][]>([]);
@@ -67,22 +83,28 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
     setMoreCursor(null);
   }, [tab, category]);
 
-  const page1Items = data?.data ?? (isDefaultView ? initialItems : []);
+  const roadmapItems = data?.data ?? (isDefaultView ? initialItems : []);
   const baseNextCursor = data?.pagination?.nextCursor ?? (isDefaultView ? initialNextCursor : null);
   // 合併分頁結果並依 external_id 去重（page1 重新驗證後游標窗口位移可能與追加頁重疊）
-  const seenIds = new Set<string>();
-  const items = [...page1Items, ...extraPages.flat()].filter((it) => {
-    if (seenIds.has(it.external_id)) return false;
-    seenIds.add(it.external_id);
-    return true;
-  });
+  const dedup = (items: RoadmapItemPublic[]) => {
+    const seen = new Set<string>();
+    return items.filter((it) => {
+      if (seen.has(it.external_id)) return false;
+      seen.add(it.external_id);
+      return true;
+    });
+  };
+  const mergedRoadmapItems = dedup([...roadmapItems, ...extraPages.flat()]);
+  const wishItems = wishData?.data ?? [];
+  const allItems = dedup([...mergedRoadmapItems, ...wishItems]);
   const effectiveCursor = extraPages.length === 0 ? baseNextCursor : moreCursor;
 
   const loadMore = async () => {
+    if (isWishTab) return;
     if (!effectiveCursor || loadingMore) return;
     setLoadingMore(true);
     try {
-      const res = await getRoadmapItems({ status: tab, category, cursor: effectiveCursor });
+      const res = await getRoadmapItems({ status: roadmapTab, category, cursor: effectiveCursor });
       if (res.error || !res.data) {
         toast.error(t("toast_vote_failed"));
         return;
@@ -99,8 +121,18 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
 
   const { toggle } = useToggleSupport();
 
+  const displayedItems = isWishTab ? wishItems : isAllTab ? allItems : mergedRoadmapItems;
+  const isListLoading = isWishTab
+    ? isWishesLoading
+    : isAllTab
+      ? isLoading || isWishesLoading
+      : isLoading;
+  const listError = isWishTab ? wishError : isAllTab ? (error ?? wishError) : error;
+  const showEmpty = !isListLoading && displayedItems.length === 0;
+
   // 登入後返回需帶 locale 前綴（OAuth state 以原始 window 導向，非 locale-aware）
-  const localizedRoadmap = getPathname({ href: ROADMAP_PATH, locale });
+  const localizedRoadmap =
+    ROADMAP_PATH_WITH_LOCALE[locale as keyof typeof ROADMAP_PATH_WITH_LOCALE] ?? ROADMAP_PATH;
   const buildReturnTo = (intent?: string) =>
     intent
       ? `${localizedRoadmap}?intent=${encodeURIComponent(intent)}`
@@ -154,13 +186,16 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
         router.replace(localizedRoadmap);
       }
     }
-  }, [searchParams, isAuthenticated, authLoading, router, mutate, localizedRoadmap]);
-
-  const showEmpty = !isLoading && items.length === 0;
+  }, [searchParams, isAuthenticated, authLoading, router, mutate, localizedRoadmap, t]);
 
   const onTabChange = useCallback((value: string) => {
     setTab(value as BoardTabValue);
   }, []);
+
+  const handleWishCreated = () => {
+    void mutate();
+    void mutateWishes();
+  };
 
   return (
     <div className="min-h-screen bg-basic-white pb-20">
@@ -180,34 +215,40 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
 
         {/* 分類過濾 */}
         <div className="mt-4 flex flex-wrap gap-2">
-          <button
+          <Button
             type="button"
+            size="sm"
+            variant={category === undefined ? "default" : "outline"}
             onClick={() => setCategory(undefined)}
-            className={cn(category === undefined && "ring-2 ring-logo-cyan rounded-full")}
+            className={cn(
+              "rounded-full px-4 py-1.5 text-sm",
+              category !== undefined ? "border-[#C1ECFF] text-text-dark" : ""
+            )}
           >
-            <Badge variant={category === undefined ? "default" : "outline-ghost"} size="sm">
-              {t("tab_all")}
-            </Badge>
-          </button>
+            {t("tab_all")}
+          </Button>
           {ROADMAP_CATEGORIES.map((c) => (
-            <button
+            <Button
               key={c}
               type="button"
               onClick={() => setCategory((prev) => (prev === c ? undefined : c))}
-              className={cn(category === c && "ring-2 ring-logo-cyan rounded-full")}
+              size="sm"
+              variant={category === c ? "default" : "outline"}
+              className={cn(
+                "rounded-full px-4 py-1.5 text-sm",
+                category !== c ? "border-[#C1ECFF] text-text-dark" : ""
+              )}
             >
-              <Badge variant={category === c ? "default" : "outline-ghost"} size="sm">
-                {t(categoryKey(c))}
-              </Badge>
-            </button>
+              {t(categoryKey(c))}
+            </Button>
           ))}
         </div>
 
         {/* 看板項目 */}
         <div className="mt-6 grid gap-4">
-          {error && items.length === 0 ? (
+          {listError && displayedItems.length === 0 ? (
             <p className="py-10 text-center text-red">{t("load_failed")}</p>
-          ) : isLoading && items.length === 0 ? (
+          ) : isListLoading && displayedItems.length === 0 ? (
             <p className="py-10 text-center text-light-gray">{t("loading")}</p>
           ) : showEmpty ? (
             <div className="rounded-2xl border border-dashed border-light-gray/50 px-6 py-12 text-center">
@@ -215,7 +256,7 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
               <p className="mt-1 text-sm text-light-gray">{t("empty_desc")}</p>
             </div>
           ) : (
-            items.map((item) => (
+            displayedItems.map((item) => (
               <RoadmapItemCard
                 key={item.external_id}
                 item={item}
@@ -227,7 +268,7 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
           )}
         </div>
 
-        {effectiveCursor ? (
+        {tab !== "wishes" && effectiveCursor ? (
           <div className="mt-6 text-center">
             <Button type="button" variant="light" onClick={loadMore} disabled={loadingMore}>
               {loadingMore ? t("loading") : t("load_more")}
@@ -259,6 +300,7 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
           setWizardOpen(false);
           openLoginDialog({ redirectUrl: buildReturnTo() });
         }}
+        onCreated={handleWishCreated}
       />
     </div>
   );

@@ -1,4 +1,6 @@
-import type { BoardTab, RoadmapCategory, RoadmapStatus } from "@daodao/api";
+import type { RoadmapCategory, RoadmapStatus } from "@daodao/api";
+
+export type BoardTab = "all" | "wishes" | "scheduled" | "discussing" | "done";
 
 export const ROADMAP_CATEGORIES: RoadmapCategory[] = [
   "operation",
@@ -11,7 +13,7 @@ export const ROADMAP_CATEGORIES: RoadmapCategory[] = [
   "other",
 ];
 
-export const BOARD_TABS: BoardTab[] = ["all", "scheduled", "discussing", "done"];
+export const BOARD_TABS: BoardTab[] = ["all", "wishes", "scheduled", "discussing", "done"];
 
 /** i18n key（roadmap namespace） */
 export const categoryKey = (c: RoadmapCategory) => `cat_${c}` as const;
