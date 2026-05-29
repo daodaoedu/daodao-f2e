@@ -1,9 +1,20 @@
 "use client";
 
-import { isSafeRedirectUrl, useAuth } from "@daodao/auth";
+import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+
+function isSafeRedirectUrl(url: string): boolean {
+  if (!url) return false;
+  if (url.startsWith("/") && !url.startsWith("//")) return true;
+  try {
+    const parsed = new URL(url);
+    return parsed.origin === window.location.origin;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * 登入頁面
@@ -30,8 +41,9 @@ export default function LoginPage() {
   // - 避開 next/navigation 的 router.push 不帶 locale prefix 在 next-intl 下的不一致行為
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      const rawRedirect = searchParams.get("redirect") || "/";
-      window.location.href = isSafeRedirectUrl(rawRedirect) ? rawRedirect : "/";
+      const redirectUrl = searchParams.get("redirect") || "/";
+      const safeUrl = isSafeRedirectUrl(redirectUrl) ? redirectUrl : "/";
+      window.location.href = safeUrl;
     }
   }, [isLoading, isAuthenticated, searchParams]);
 
