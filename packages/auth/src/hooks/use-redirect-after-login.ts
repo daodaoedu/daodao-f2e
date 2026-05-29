@@ -3,7 +3,7 @@
 import { getStorage, StorageEnum } from "@daodao/shared";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { decodeOAuthState, isSafeRedirectUrl, verifyAndConsumeOAuthState } from "../lib/auth-client";
+import { decodeOAuthState, verifyAndConsumeOAuthState } from "../lib/auth-client";
 import { DEFAULT_REDIRECT_URL, ONBOARDING_URL } from "../lib/auth-constants";
 
 /**
@@ -82,8 +82,19 @@ export const useRedirectAfterLogin = () => {
       // 新用戶跳轉到 onboarding 流程
       hardNavigate(ONBOARDING_URL);
     } else {
-      // 舊用戶跳轉到原目標頁面，驗證必須是同源或相對路徑，防止 open redirect
-      hardNavigate(isSafeRedirectUrl(state.redirectUrl) ? state.redirectUrl : DEFAULT_REDIRECT_URL);
+      // 舊用戶跳轉到原目標頁面
+      // 驗證 redirect URL 必須為相對路徑或同 origin，防止 open redirect 攻擊
+      const redirectUrl = state.redirectUrl;
+      const isSafeRedirect = (() => {
+        if (!redirectUrl) return false;
+        if (redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) return true;
+        try {
+          return new URL(redirectUrl).origin === window.location.origin;
+        } catch {
+          return false;
+        }
+      })();
+      hardNavigate(isSafeRedirect ? redirectUrl : DEFAULT_REDIRECT_URL);
     }
   }, [searchParams]);
 };
