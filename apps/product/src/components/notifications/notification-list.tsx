@@ -87,6 +87,8 @@ function buildDeepLink(item: NotificationApiItem): string | null {
       return item.actor.id ? `/users/${item.actor.id}` : null;
     case "buddy_request":
       return extId ? `/practices/${extId}` : null;
+    case "persona_answer":
+      return item.url ?? null;
     default:
       return null;
   }

@@ -231,7 +231,12 @@ export const QuizResult = () => {
                   回到 島島阿學
                 </CustomLink>
               ) : (
-                <CustomLink href="/">前往 島島阿學</CustomLink>
+                <CustomLink
+                  href="/"
+                  onClick={() => localStorage.setItem('daodao_registration_flow', 'quiz')}
+                >
+                  前往 島島阿學
+                </CustomLink>
               )}
             </Button>
           </footer>

@@ -1,6 +1,5 @@
-// Main form component
-
 // Section components
+export { DynamicStep } from "./dynamic-step";
 export { InterestsSection } from "./interests-section";
 export { OnboardingForm } from "./onboarding-form";
 // Stepper component
@@ -20,4 +19,5 @@ export {
 } from "./schema";
 export { SuccessSection } from "./success-section";
 // Hooks
+export { useActiveFlow } from "./use-active-flow";
 export { useOnboardingStep } from "./use-onboarding-step";

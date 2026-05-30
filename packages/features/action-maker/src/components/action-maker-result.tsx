@@ -98,6 +98,7 @@ export function ActionMakerResult() {
 
     if (!isAuthenticated) {
       pendingCreate.current = true;
+      localStorage.setItem('daodao_registration_flow', 'action_maker');
       const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL || window.location.origin;
       openLoginDialog({
         redirectUrl: `${websiteUrl}/action-maker/result`,

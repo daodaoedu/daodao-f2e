@@ -4710,7 +4710,7 @@ export interface paths {
             parameters: {
                 query: {
                     /** @description 查詢的目標類型 */
-                    targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin";
+                    targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin" | "persona_answer";
                     /** @description 目標對象ID */
                     targetId: string;
                 };
@@ -4905,7 +4905,7 @@ export interface paths {
             parameters: {
                 query: {
                     /** @description 查詢的目標類型 */
-                    targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin";
+                    targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin" | "persona_answer";
                     /** @description 目標對象ID */
                     targetId: string;
                     /** @description 候選人數量上限 */
@@ -10234,6 +10234,51 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/persona/questions/{questionId}/answers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 取得特定問題的社群回答清單
+         * @description 以 cursor 分頁取得指定人物誌問題的所有用戶回答。
+         */
+        get: {
+            parameters: {
+                query?: {
+                    locale?: string;
+                    limit?: number;
+                    cursor?: number;
+                };
+                header?: never;
+                path: {
+                    questionId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PersonaQuestionAnswersApiResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -17846,7 +17891,7 @@ export interface paths {
             parameters: {
                 query: {
                     /** @description 反應目標類型 */
-                    targetType: "practice" | "comment" | "checkin";
+                    targetType: "practice" | "comment" | "checkin" | "persona_answer";
                     /** @description 目標外部 ID（UUID） */
                     targetId: string;
                 };
@@ -18129,7 +18174,7 @@ export interface paths {
             parameters: {
                 query: {
                     /** @description 反應目標類型 */
-                    targetType: "practice" | "comment" | "checkin";
+                    targetType: "practice" | "comment" | "checkin" | "persona_answer";
                     /** @description 目標外部 ID（UUID） */
                     targetId: string;
                 };
@@ -18234,7 +18279,7 @@ export interface paths {
             parameters: {
                 query: {
                     /** @description 反應目標類型 */
-                    targetType: "practice" | "comment" | "checkin";
+                    targetType: "practice" | "comment" | "checkin" | "persona_answer";
                     /** @description 逗號分隔的目標 ID（practice 為 UUID，comment/checkin 為整數），最多 50 個 */
                     targetIds: string;
                 };
@@ -25345,7 +25390,7 @@ export interface components {
              * @example resource
              * @enum {string}
              */
-            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin";
+            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin" | "persona_answer";
             /**
              * @description 留言內容
              * @example 這個資源非常有用，謝謝分享！
@@ -25392,7 +25437,7 @@ export interface components {
              * @example outcome
              * @enum {string}
              */
-            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin";
+            targetType: "post" | "resource" | "note" | "outcome" | "review" | "circle" | "idea" | "practice" | "portfolio" | "checkin" | "persona_answer";
             /**
              * @description 目標對象的唯一識別碼
              * @example 123e4567-e89b-12d3-a456-426614174000
@@ -28965,6 +29010,11 @@ export interface components {
              * @example false
              */
             isDraft: boolean;
+            /**
+             * @description 實踐建立來源
+             * @enum {string}
+             */
+            creationMethod?: "self_created" | "copied" | "action_generator";
         };
         /**
          * @description 實踐活動簽到記錄
@@ -30372,7 +30422,7 @@ export interface components {
              * @example practice
              * @enum {string}
              */
-            targetType: "practice" | "comment" | "checkin";
+            targetType: "practice" | "comment" | "checkin" | "persona_answer";
             /**
              * @description 目標外部 ID（UUID）
              * @example 32859587-f159-43fd-93e7-fcc890661781
@@ -30396,7 +30446,7 @@ export interface components {
              * @example practice
              * @enum {string}
              */
-            targetType: "practice" | "comment" | "checkin";
+            targetType: "practice" | "comment" | "checkin" | "persona_answer";
             /**
              * @description 目標外部 ID（UUID）
              * @example 32859587-f159-43fd-93e7-fcc890661781
@@ -34606,6 +34656,41 @@ export interface components {
         PersonaCarouselDismiss: {
             /** @description 是否成功 dismiss */
             dismissed: boolean;
+        };
+        PersonaQuestionAnswerItem: {
+            answerId: number;
+            userId: string | null;
+            name: string | null;
+            photoURL: string | null;
+            selectedValue: string | null;
+            textAnswer: string | null;
+            resonanceCount: number;
+            currentUserReaction: string | null;
+            isPublic: boolean;
+            isConnection: boolean;
+            answeredAt: string;
+            isSelf: boolean;
+        };
+        PersonaQuestionAnswersData: {
+            question: {
+                id: number;
+                prompt: string;
+                /** @enum {string} */
+                questionType: "choice" | "sentence_completion" | "scenario";
+                options: string[] | null;
+                totalAnswerCount: number;
+            };
+            answers: components["schemas"]["PersonaQuestionAnswerItem"][];
+            hasMore: boolean;
+            nextCursor: number | null;
+            viewerIsLocked?: boolean;
+            answersNeeded?: number;
+        };
+        PersonaQuestionAnswersApiResponse: {
+            /** @enum {boolean} */
+            success: true;
+            data: components["schemas"]["PersonaQuestionAnswersData"];
+            timestamp: string;
         };
         /** @description The main response data */
         DeleteTemplateResponse: {

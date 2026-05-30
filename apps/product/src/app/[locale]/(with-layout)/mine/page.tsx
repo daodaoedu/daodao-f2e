@@ -2,6 +2,7 @@
 
 import { useMyPracticeStats, useMyPractices } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
+import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
@@ -34,6 +35,7 @@ const filterOptions = [
 export default function MyPage() {
   const router = useRouter();
   const t = useTranslations("dashboard");
+  const { isAuthenticated, isLoading: isAuthLoading, login } = useAuth();
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
 
   const { data: allPracticesData, isLoading: isMyLoading } = useMyPractices({ limit: 16 });
@@ -129,6 +131,13 @@ export default function MyPage() {
             </button>
             <button
               type="button"
+              onClick={() => router.replace(HOME_TAB_PATHS.persona)}
+              className={cn("flex-1 py-2 text-sm font-medium transition-all", "text-text-dark/40")}
+            >
+              {t("tab_persona")}
+            </button>
+            <button
+              type="button"
               className={cn(
                 "flex-1 py-2 text-sm font-medium transition-all",
                 "text-text-dark border-b-2 border-logo-cyan -mb-px"
@@ -138,7 +147,19 @@ export default function MyPage() {
             </button>
           </div>
 
-          {isMyLoading ? (
+          {!isAuthLoading && !isAuthenticated ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
+              <p className="text-lg font-semibold text-text-dark">{t("not_logged_in_title")}</p>
+              <p className="text-sm text-text-dark/60">{t("not_logged_in_description")}</p>
+              <button
+                type="button"
+                onClick={() => login()}
+                className="px-6 py-2.5 rounded-full bg-primary-base text-white text-sm font-medium"
+              >
+                {t("not_logged_in_action")}
+              </button>
+            </div>
+          ) : isMyLoading ? (
             <div className="text-center text-text-dark">{t("loading")}</div>
           ) : (
             <>

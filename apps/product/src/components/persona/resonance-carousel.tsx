@@ -13,7 +13,7 @@ import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
-import { CheckCircle2, Laugh, RefreshCw } from "lucide-react";
+import { CheckCircle2, Laugh, Lock, RefreshCw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 type CarouselQuestion = {
@@ -23,6 +23,72 @@ type CarouselQuestion = {
   options: string[] | null;
   isNewUserPriority: boolean;
 };
+
+// ── Drag-scroll hook ──────────────────────────────────────────────────────────
+
+function useDragScroll() {
+  const ref = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    dragging.current = true;
+    startX.current = e.pageX - ref.current.offsetLeft;
+    scrollLeft.current = ref.current.scrollLeft;
+  };
+  const stop = () => {
+    dragging.current = false;
+  };
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!dragging.current || !ref.current) return;
+    e.preventDefault();
+    const x = e.pageX - ref.current.offsetLeft;
+    ref.current.scrollLeft = scrollLeft.current - (x - startX.current);
+  };
+
+  return { ref, onMouseDown, onMouseUp: stop, onMouseLeave: stop, onMouseMove };
+}
+
+// ── Locked response card (community preview placeholder) ──────────────────────
+
+function LockedResponseCard({ onUnlock }: { onUnlock: () => void }) {
+  const t = useTranslations("persona.carousel");
+  return (
+    <div className="flex-shrink-0 w-[160px] h-[136px] rounded-xl border border-[#EEF4F4] bg-white p-3 relative overflow-hidden flex flex-col">
+      {/* Blurred placeholder content */}
+      <div className="blur-sm select-none pointer-events-none flex flex-col flex-1">
+        <div className="flex items-center gap-1.5 mb-2 shrink-0">
+          <div className="size-6 rounded-full bg-logo-cyan/30 shrink-0" />
+          <div className="h-2.5 bg-text-dark/15 rounded-full w-14" />
+        </div>
+        <div className="space-y-1.5">
+          <div className="h-2 bg-text-dark/10 rounded-full w-full" />
+          <div className="h-2 bg-text-dark/10 rounded-full w-4/5" />
+          <div className="h-2 bg-text-dark/10 rounded-full w-full" />
+          <div className="h-2 bg-text-dark/10 rounded-full w-3/5" />
+        </div>
+      </div>
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: lock card unlock interaction */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: lock card unlock interaction */}
+      <div
+        className="absolute inset-0 flex flex-col items-center justify-center gap-2 cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation();
+          onUnlock();
+        }}
+      >
+        <Lock className="size-4 text-logo-cyan" />
+        <span className="text-[11px] text-text-dark/55 border border-[#D8ECEC] rounded-full px-3 py-1 bg-white whitespace-nowrap text-center leading-tight">
+          {t("unlockHint")}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ── Carousel question card ────────────────────────────────────────────────────
 
 interface CarouselQuestionCardProps {
   questionId: number;
@@ -48,8 +114,11 @@ function CarouselQuestionCard({
   const [textValue, setTextValue] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submittedAnswer, setSubmittedAnswer] = useState("");
+  const [extraMinHeight, setExtraMinHeight] = useState(0);
   const router = useRouter();
   const { data: currentUser } = useCurrentUser();
+  const dragScroll = useDragScroll();
 
   const isChoice = questionType === "choice" && options && options.length > 0;
   const frontLabel = isChoice ? t("choicePrompt") : t("openPrompt");
@@ -69,6 +138,7 @@ function CarouselQuestionCard({
         toast.error(tProfile("submitError"));
         return;
       }
+      setSubmittedAnswer(isChoice ? selected : textValue.trim());
       setSelected("");
       setTextValue("");
       setSubmitted(true);
@@ -79,22 +149,28 @@ function CarouselQuestionCard({
     }
   };
 
+  const navigateToProfile = () => {
+    onAnswered();
+    const identifier = currentUser?.data?.customId ?? currentUser?.data?.id;
+    if (identifier) router.push(`/users/${identifier}`);
+  };
+
+  // Feature B: already-answered card — shows the actual answer + CTA
   if (submitted) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 h-[280px] flex flex-col items-center justify-center gap-2 px-6">
-        <CheckCircle2 className="size-10 text-logo-cyan mb-1" />
-        <p className="text-base font-medium text-text-dark">{t("submitted.title")}</p>
-        <p className="text-sm text-text-dark/50 text-center leading-relaxed">
-          {t("submitted.description")}
-        </p>
+      <div className="bg-white rounded-2xl shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 px-5 pt-4 pb-5 flex flex-col gap-2">
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-logo-cyan bg-logo-cyan/10 rounded-full px-2.5 py-1 self-start">
+          <CheckCircle2 className="size-3" />
+          {t("answered")}
+        </span>
+        <p className="text-sm text-text-dark/60 leading-relaxed line-clamp-2">{prompt}</p>
+        {submittedAnswer && (
+          <p className="text-base font-medium text-text-dark line-clamp-4">{submittedAnswer}</p>
+        )}
         <button
           type="button"
-          onClick={() => {
-            onAnswered();
-            const identifier = currentUser?.data?.customId ?? currentUser?.data?.id;
-            if (identifier) router.push(`/users/${identifier}`);
-          }}
-          className="mt-2 flex items-center gap-1.5 text-sm font-medium text-primary-darker hover:opacity-80 transition-opacity"
+          onClick={navigateToProfile}
+          className="mt-1 flex items-center gap-1.5 text-sm font-medium text-primary-darker hover:opacity-80 transition-opacity self-start"
         >
           {t("submitted.cta")}
           <ArrowCircleSvg className="size-6 shrink-0" />
@@ -104,39 +180,70 @@ function CarouselQuestionCard({
   }
 
   return (
-    <div style={{ perspective: "1000px", height: isChoice ? "360px" : "320px" }} className="w-full">
+    <div style={{ perspective: "1000px" }} className="w-full">
       <div
-        className="relative w-full h-full transition-transform duration-500 ease-in-out"
+        className="relative w-full transition-transform duration-500 ease-in-out"
         style={{
           transformStyle: "preserve-3d",
           transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
         }}
       >
-        {/* Front — question */}
+        {/* Front — question + community preview (normal flow, sets card height) */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction, contains interactive children */}
         <div
-          className="group absolute inset-0 bg-white rounded-2xl px-6 pt-6 pb-5 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex flex-col cursor-pointer select-none"
-          style={{ backfaceVisibility: "hidden" }}
+          className="group w-full bg-white rounded-2xl px-5 pt-5 pb-5 shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 flex flex-col cursor-pointer select-none"
+          style={{ backfaceVisibility: "hidden", minHeight: extraMinHeight || undefined }}
           onClick={() => setIsFlipped(true)}
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setIsFlipped(true); }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") setIsFlipped(true);
+          }}
         >
-          <QuoteFillSvg className="mt-4 mb-4 self-center shrink-0 text-logo-cyan" />
-          <p className="text-[24px] font-semibold text-text-dark text-center leading-snug flex-1 flex items-center justify-center overflow-hidden">
+          <QuoteFillSvg className="mt-2 mb-3 self-center shrink-0 text-logo-cyan" />
+          <p className="text-[22px] font-semibold text-text-dark text-center leading-snug shrink-0">
             {prompt}
           </p>
-          <div className="flex items-center gap-2 self-end mt-3 transition-transform duration-200 group-hover:translate-x-1.5">
-            <span className="text-sm text-primary-darker">{frontLabel}</span>
-            <ArrowCircleSvg className="size-8 shrink-0" />
+
+          {/* Community responses header */}
+          <div className="mt-5 mb-2 flex items-center gap-1.5 shrink-0">
+            <span className="text-sm font-medium text-text-dark/65">{t("communityLabel")}</span>
+          </div>
+
+          {/* Horizontal scroll of locked placeholder cards */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for scroll area */}
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation for scroll area */}
+          <div
+            ref={dragScroll.ref}
+            className="flex gap-3 overflow-x-auto -mx-5 px-5 pb-1 shrink-0 cursor-grab active:cursor-grabbing"
+            style={{ scrollbarWidth: "none" }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={dragScroll.onMouseDown}
+            onMouseUp={dragScroll.onMouseUp}
+            onMouseLeave={dragScroll.onMouseLeave}
+            onMouseMove={dragScroll.onMouseMove}
+          >
+            {[0, 1, 2].map((i) => (
+              <LockedResponseCard key={i} onUnlock={() => setIsFlipped(true)} />
+            ))}
+          </div>
+
+          {/* Footer CTA */}
+          <div className="mt-9 flex items-center justify-end shrink-0">
+            <div className="flex items-center gap-2 transition-transform duration-200 group-hover:translate-x-1">
+              <span className="text-sm font-medium text-primary-darker">{frontLabel}</span>
+              <ArrowCircleSvg className="size-8 shrink-0" />
+            </div>
           </div>
         </div>
 
-        {/* Back — answer form */}
+        {/* Back — answer form (absolute, fills front face height) */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip interaction, contains interactive children */}
         <div
           className="absolute inset-0 bg-white rounded-2xl px-6 pt-5 pb-6 shadow-sm border border-[#E8F8FF] flex flex-col cursor-pointer overflow-hidden"
           style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
           onClick={() => setIsFlipped(false)}
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setIsFlipped(false); }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") setIsFlipped(false);
+          }}
         >
           <div className="flex items-start gap-2 shrink-0">
             <p className="text-sm text-primary-darker line-clamp-2 leading-relaxed flex-1">
@@ -158,52 +265,54 @@ function CarouselQuestionCard({
           </div>
 
           {isChoice ? (
-            <>
-              {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for option grid */}
-              <div
-                className="flex-1 grid grid-cols-2 gap-2 mt-4 min-w-0"
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-              >
-                {options.map((opt) => (
-                  <Button
-                    key={opt}
-                    type="button"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelected(opt);
-                    }}
-                    className={cn(
-                      "w-full min-w-0 whitespace-normal rounded-xl border-2 text-sm py-3 px-3 h-auto transition-all text-left leading-snug justify-start",
-                      selected === opt
-                        ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium hover:bg-logo-cyan/10 hover:text-logo-cyan"
-                        : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40 hover:bg-transparent"
-                    )}
-                  >
-                    {opt}
-                  </Button>
-                ))}
-              </div>
-            </>
+            // biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for option grid
+            <div
+              className="flex-1 grid grid-cols-2 gap-2 mt-4 min-w-0"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
+              {options.map((opt) => (
+                <Button
+                  key={opt}
+                  type="button"
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelected(opt);
+                  }}
+                  className={cn(
+                    "w-full min-w-0 whitespace-normal rounded-xl border-2 text-sm py-3 px-3 h-auto transition-all text-left leading-snug justify-start",
+                    selected === opt
+                      ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium hover:bg-logo-cyan/10 hover:text-logo-cyan"
+                      : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40 hover:bg-transparent"
+                  )}
+                >
+                  {opt}
+                </Button>
+              ))}
+            </div>
           ) : (
-            <>
-              {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for textarea area */}
-              <div
-                className="flex-1 flex items-center min-h-0"
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-              >
-                <textarea
-                  rows={2}
-                  value={textValue}
-                  onChange={(e) => setTextValue(e.target.value)}
-                  placeholder={tProfile("textPlaceholder")}
-                  maxLength={300}
-                  className="w-full border-0 border-b-2 border-logo-cyan text-base text-text-dark outline-none bg-transparent placeholder:text-text-dark/25 pb-1 resize-none"
-                />
-              </div>
-            </>
+            // biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for textarea area
+            <div
+              className="flex-1 flex items-center min-h-0"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
+              <textarea
+                rows={2}
+                value={textValue}
+                onChange={(e) => {
+                  setTextValue(e.target.value);
+                  e.target.style.height = "auto";
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                  const needed = e.target.scrollHeight + 200;
+                  if (needed > 380) setExtraMinHeight(needed);
+                }}
+                placeholder={tProfile("textPlaceholder")}
+                maxLength={300}
+                className="w-full border-0 border-b-2 border-logo-cyan text-base text-text-dark outline-none bg-transparent placeholder:text-text-dark/25 pb-1 resize-none"
+              />
+            </div>
           )}
 
           <Button
@@ -227,6 +336,8 @@ function CarouselQuestionCard({
     </div>
   );
 }
+
+// ── Carousel container ────────────────────────────────────────────────────────
 
 export function ResonanceCarousel() {
   const t = useTranslations("persona.carousel");
@@ -260,9 +371,7 @@ export function ResonanceCarousel() {
     }
   }, [replaceId, isLoading, apiQuestions, displayedQuestions]);
 
-  // Initial load with no data yet
   if (displayedQuestions.length === 0 && isLoading) return null;
-  // Dismissed or shouldShow=false after fetch completes
   if (!isLoading && shouldShow === false) return null;
   if (displayedQuestions.length === 0) return null;
 

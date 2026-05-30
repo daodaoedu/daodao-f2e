@@ -241,6 +241,7 @@ export interface UpdateUserFormDataRequest {
   share?: string | string[];
   preferences?: Record<string, string[]>;
   referralSource?: string;
+  registrationFlow?: 'landing_page' | 'quiz' | 'action_maker';
 }
 
 /**
@@ -273,6 +274,7 @@ const buildUserFormData = (data: UpdateUserFormDataRequest, photoFile?: File): F
   // 其他 string 欄位
   if (data.educationStage) formData.append("educationStage", data.educationStage);
   if (data.referralSource) formData.append("referralSource", data.referralSource);
+  if (data.registrationFlow) formData.append("registrationFlow", data.registrationFlow);
 
   // 陣列/物件欄位需轉成 JSON 字串
   if (data.tagList) formData.append("tagList", JSON.stringify(data.tagList));
