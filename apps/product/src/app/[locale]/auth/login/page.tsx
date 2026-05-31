@@ -5,6 +5,17 @@ import { useTranslations } from "@daodao/i18n";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
+function isSafeRedirectUrl(url: string): boolean {
+  if (!url) return false;
+  if (url.startsWith("/") && !url.startsWith("//")) return true;
+  try {
+    const parsed = new URL(url);
+    return parsed.origin === window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * 登入頁面
  * 自動打開登入 Dialog，並處理 redirect 參數
@@ -31,7 +42,8 @@ export default function LoginPage() {
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       const redirectUrl = searchParams.get("redirect") || "/";
-      window.location.href = redirectUrl;
+      const safeUrl = isSafeRedirectUrl(redirectUrl) ? redirectUrl : "/";
+      window.location.href = safeUrl;
     }
   }, [isLoading, isAuthenticated, searchParams]);
 
