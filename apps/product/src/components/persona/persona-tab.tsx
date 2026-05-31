@@ -118,8 +118,8 @@ export function PersonaTab() {
   const locale = useLocale();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
-  const { data: profileData, isLoading: isProfileLoading } = usePersonaProfileMe(locale);
-  const { data: questionsData, isLoading: isQuestionsLoading } = usePersonaQuestions(locale);
+  const { data: profileData, isLoading: isProfileLoading } = usePersonaProfileMe(locale, { enabled: isAuthenticated });
+  const { data: questionsData, isLoading: isQuestionsLoading } = usePersonaQuestions(locale, { enabled: !isAuthenticated });
 
   const isLoading = isAuthLoading || (isAuthenticated ? isProfileLoading : isQuestionsLoading);
 

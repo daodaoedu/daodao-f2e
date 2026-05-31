@@ -7,6 +7,7 @@ import {
   deleteComment,
   getPersonaQuestionAnswers,
   removeReaction,
+  submitPersonaAnswer,
   updateComment,
   useComments,
   useCurrentUser,
@@ -14,6 +15,7 @@ import {
   useReactions,
   upsertReaction,
 } from "@daodao/api";
+import { useAuth } from "@daodao/auth";
 import { DialogOutlineSvg } from "@daodao/assets";
 import type { MentionCandidate } from "@daodao/features-mention";
 import { useLocale } from "@daodao/i18n";
@@ -242,6 +244,7 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
   const [, startReactionTransition] = useTransition();
   const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(undefined);
   const { open: openSheet } = useSheetManager();
+  const { isAuthenticated, login } = useAuth();
 
   // ── Reactions ──────────────────────────────────────────────────────────────
   const { data: reactionsData, mutate: mutateReactions } = useReactions({
@@ -255,6 +258,7 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
 
   const handleReactionToggle = useCallback(
     (type: ReactionTypeType) => {
+      if (!isAuthenticated) { login(); return; }
       const isSelected = currentUserReaction === type;
       setPendingReaction(isSelected ? null : type);
       startReactionTransition(async () => {
@@ -267,7 +271,7 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
         setPendingReaction(undefined);
       });
     },
-    [currentUserReaction, targetId, mutateReactions]
+    [isAuthenticated, login, currentUserReaction, targetId, mutateReactions]
   );
 
   // ── Comment count (for badge) ──────────────────────────────────────────────
@@ -278,6 +282,7 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
   }, [commentsData]);
 
   const handleOpenComments = useCallback(() => {
+    if (!isAuthenticated) { login(); return; }
     openSheet({
       title: "留言",
       content: <PersonaAnswerCommentSheetContent answerId={answerId} />,
@@ -285,7 +290,7 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
       closeOnEscape: true,
       showCloseButton: true,
     });
-  }, [openSheet, answerId]);
+  }, [isAuthenticated, login, openSheet, answerId]);
 
   return (
     <div className="-mx-4 -mb-4 mt-3 rounded-b-2xl overflow-hidden">
@@ -386,6 +391,7 @@ function LoadingDots() {
 export default function LearningPersonaDetailPage() {
   const router = useRouter();
   const locale = useLocale();
+  const { isAuthenticated, login } = useAuth();
   const params = useParams();
   const idParam = params?.id;
   const id = typeof idParam === "string" ? Number.parseInt(idParam, 10) : Number.NaN;
@@ -452,13 +458,21 @@ export default function LearningPersonaDetailPage() {
   const isAnswered = isSelfAnswered || answeredInline;
 
   const handleAnswerSubmit = async (ans: string) => {
-    setMyInlineAnswer(ans);
-    setAnsweredInline(true);
-    // Refresh answers after submission
-    setAnswers([]);
-    setNextCursor(undefined);
-    setInitialLoading(true);
-    fetchAnswers();
+    if (!isAuthenticated) {
+      login();
+      return;
+    }
+    try {
+      await submitPersonaAnswer({ questionId: id, textAnswer: ans });
+      setMyInlineAnswer(ans);
+      setAnsweredInline(true);
+      setAnswers([]);
+      setNextCursor(undefined);
+      setInitialLoading(true);
+      fetchAnswers();
+    } catch {
+      toast.error("送出失敗，請稍後再試");
+    }
   };
 
   if (Number.isNaN(id)) {

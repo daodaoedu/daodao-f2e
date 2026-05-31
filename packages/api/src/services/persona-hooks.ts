@@ -11,10 +11,12 @@ import { useQuery } from "../hooks";
 // Query Hooks
 // ============================================================================
 
-export const usePersonaQuestions = (locale?: string) => {
-  return useQuery("/api/v1/persona/questions", {
-    params: { query: locale ? { locale } : undefined },
-  });
+export const usePersonaQuestions = (locale?: string, options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled ?? true;
+  return useQuery(
+    "/api/v1/persona/questions",
+    enabled ? { params: { query: locale ? { locale } : undefined } } : null,
+  );
 };
 
 export const usePersonaCarouselState = (replace?: number, locale?: string) => {
@@ -28,10 +30,12 @@ export const usePersonaCarouselState = (replace?: number, locale?: string) => {
   });
 };
 
-export const usePersonaProfileMe = (locale?: string) => {
-  return useQuery("/api/v1/persona/profile/me", {
-    params: { query: locale ? { locale } : undefined },
-  });
+export const usePersonaProfileMe = (locale?: string, options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled ?? true;
+  return useQuery(
+    "/api/v1/persona/profile/me",
+    enabled ? { params: { query: locale ? { locale } : undefined } } : null,
+  );
 };
 
 export const usePersonaQuestionAnswers = (
