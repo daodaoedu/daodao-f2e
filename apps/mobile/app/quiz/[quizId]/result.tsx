@@ -5,10 +5,35 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
-import { type IIslandResult, mockIslandResults } from "@/types/quiz";
+import { type IIslandResult, type IQuizAnswer, mockIslandResults } from "@/types/quiz";
+
+function calculateResultFromAnswers(answers: IQuizAnswer[]): IIslandResult {
+  const scores: Record<string, number> = { explorer: 0, creator: 0, connector: 0 };
+  for (const answer of answers) {
+    switch (answer.value) {
+      case "reading":       scores.explorer  += 1; break;
+      case "visual":        scores.creator   += 1; break;
+      case "kinesthetic":   scores.explorer  += 2; break;
+      case "social":        scores.connector += 2; break;
+      case "morning":       scores.explorer  += 1; break;
+      case "afternoon":     scores.creator   += 1; break;
+      case "evening":       scores.creator   += 1; break;
+      case "flexible":      scores.connector += 1; break;
+      case "independent":   scores.explorer  += 2; break;
+      case "collaborative": scores.connector += 2; break;
+      case "patient":       scores.creator   += 1; break;
+      case "experimental":  scores.explorer  += 1; scores.creator += 1; break;
+    }
+  }
+  const topId = Object.entries(scores).reduce(
+    (best, [id, score]) => (score > best.score ? { id, score } : best),
+    { id: "explorer", score: -1 }
+  ).id;
+  return mockIslandResults.find((r) => r.id === topId) ?? mockIslandResults[0];
+}
 
 export default function QuizResultScreen() {
-  const { quizId } = useLocalSearchParams<{
+  const { quizId, answers } = useLocalSearchParams<{
     quizId: string;
     answers?: string;
   }>();
@@ -19,16 +44,18 @@ export default function QuizResultScreen() {
   const [showAnimation, setShowAnimation] = useState(true);
 
   useEffect(() => {
-    // Simulate result calculation
     const timer = setTimeout(() => {
-      // In real app, calculate based on answers
-      const randomIndex = Math.floor(Math.random() * mockIslandResults.length);
-      setResult(mockIslandResults[randomIndex]);
+      try {
+        const parsedAnswers: IQuizAnswer[] = answers ? JSON.parse(answers) : [];
+        setResult(calculateResultFromAnswers(parsedAnswers));
+      } catch {
+        setResult(mockIslandResults[0]);
+      }
       setShowAnimation(false);
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [answers]);
 
   if (showAnimation || !result) {
     return (
