@@ -106,6 +106,7 @@ export const oauthService = {
       email: data.user.email,
       name: data.user.name,
       avatar: data.user.avatar,
+      roles: data.user.roles ?? [],
     };
 
     return { tokens, user };
@@ -166,6 +167,7 @@ export const oauthService = {
       email: data.user.email,
       name: data.user.name,
       avatar: data.user.avatar,
+      roles: data.user.roles ?? [],
     };
 
     return { tokens, user };

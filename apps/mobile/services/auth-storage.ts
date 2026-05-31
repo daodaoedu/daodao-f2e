@@ -14,6 +14,7 @@ export interface IStoredUser {
   email: string;
   name: string;
   avatar?: string;
+  roles?: string[];
 }
 
 export interface IAuthTokens {
