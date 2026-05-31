@@ -11,10 +11,12 @@ import { useQuery } from "../hooks";
 // Query Hooks
 // ============================================================================
 
-export const usePersonaQuestions = (locale?: string) => {
-  return useQuery("/api/v1/persona/questions", {
-    params: { query: locale ? { locale } : undefined },
-  });
+export const usePersonaQuestions = (locale?: string, options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled ?? true;
+  return useQuery(
+    "/api/v1/persona/questions",
+    enabled ? { params: { query: locale ? { locale } : undefined } } : null,
+  );
 };
 
 export const usePersonaCarouselState = (replace?: number, locale?: string) => {
@@ -28,10 +30,34 @@ export const usePersonaCarouselState = (replace?: number, locale?: string) => {
   });
 };
 
-export const usePersonaProfileMe = (locale?: string) => {
-  return useQuery("/api/v1/persona/profile/me", {
-    params: { query: locale ? { locale } : undefined },
-  });
+export const usePersonaProfileMe = (locale?: string, options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled ?? true;
+  return useQuery(
+    "/api/v1/persona/profile/me",
+    enabled ? { params: { query: locale ? { locale } : undefined } } : null,
+  );
+};
+
+export const usePersonaQuestionAnswers = (
+  questionId: number,
+  options?: { locale?: string; limit?: number; cursor?: number; enabled?: boolean }
+) => {
+  const enabled = options?.enabled ?? true;
+  return useQuery(
+    "/api/v1/persona/questions/{questionId}/answers",
+    enabled
+      ? {
+          params: {
+            path: { questionId },
+            query: {
+              ...(options?.locale ? { locale: options.locale } : {}),
+              ...(options?.limit != null ? { limit: options.limit } : {}),
+              ...(options?.cursor != null ? { cursor: options.cursor } : {}),
+            },
+          },
+        }
+      : null,
+  );
 };
 
 export const usePersonaProfileUser = (userId: string, options?: { exclude?: number; enabled?: boolean; locale?: string }) => {

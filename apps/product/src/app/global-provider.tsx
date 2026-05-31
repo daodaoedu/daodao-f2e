@@ -50,16 +50,21 @@ function GlobalProvider({
                     <AuthProvider
                       defaultProtected
                       publicPattern={[
-                        "^/auth/login",
-                        "^/auth/callback",
-                        "^/auth/error",
-                        "^/auth/onboarding",
-                        "^/auth/verify-email(/.*)?$",
-                        "^/auth/error",
+                        // auth flows
+                        "^/auth/",
+                        // content pages (no login required)
+                        "^/$",
                         "^/users/",
                         "^/practices/[^/]+$",
+                        "^/practices/[^/]+/check-ins/",
                         "^/roadmap(/.*)?$",
+                        "^/resource(/.*)?$",
+                        "^/persona(/.*)?$",
+                        "^/mine(/.*)?$",
+                        "^/survey/r/",
+                        // misc
                         "^/dev/",
+                        "^/ux-mockup/",
                       ]}
                       onAuthRequired={(currentPath) => {
                         router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);

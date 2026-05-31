@@ -4886,6 +4886,7 @@
     "want_to_practice": "I want to try this too",
     "continue_editing": "Continue editing",
     "tab_inspire": "Inspire",
+    "tab_persona": "Persona",
     "tab_mine": "Mine",
     "loading": "Loading...",
     "filter_aria_label": "Filter tasks",
@@ -4898,7 +4899,10 @@
     "stats_streak_unit": "days",
     "stats_responses_label": "Responses",
     "stats_responses_unit": "times",
-    "task_label_practice": "Topic Practice"
+    "task_label_practice": "Topic Practice",
+    "not_logged_in_title": "Log in to see your practices",
+    "not_logged_in_description": "Track your growth and daily practice progress",
+    "not_logged_in_action": "Log in"
   },
   "notification": {
     "and_others": "and {count} others",
@@ -5048,7 +5052,16 @@
       "selectRequired": "Please select an option",
       "textRequired": "Please fill in your answer",
       "textPlaceholder": "Enter your answer...",
-      "resonances": "resonances"
+      "resonances": "resonances",
+      "unansweredHint": "Answer to see what others think",
+      "unansweredLabel": "Not answered",
+      "answeredLabel": "Answered",
+      "myAnswerLabel": "My answer",
+      "cancel": "Cancel"
+    },
+    "tab": {
+      "headerTitle": "Meet all kinds of learners",
+      "headerSubtitle": "See others, know yourself"
     },
     "userProfile": {
       "loading": "Loading...",
@@ -5070,6 +5083,9 @@
         "description": "You can always revisit your answers and explore more.",
         "cta": "View my island"
       },
+      "answered": "Answered",
+      "communityLabel": "What others said...",
+      "unlockHint": "Share your answer to unlock!",
       "error": "Operation failed, please try again"
     }
   },

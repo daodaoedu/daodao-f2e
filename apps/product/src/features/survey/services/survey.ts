@@ -388,7 +388,7 @@ export async function generateSurveyQuestions(input: AIGenerateInput): Promise<A
 // ---------------------------------------------------------------------------
 
 async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? '/api'
+  const baseUrl = `${process.env.NEXT_PUBLIC_API_URL ?? ''}/api/v1`
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),

@@ -57,6 +57,8 @@ export * from "./showcase-hooks";
 // Tag Service
 export * from "./tag";
 export * from "./tag-hooks";
+// Onboarding Flow Service
+export * from "./onboarding-flow";
 // User Service
 export * from "./user";
 export * from "./user-hooks";

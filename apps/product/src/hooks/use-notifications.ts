@@ -78,4 +78,5 @@ export interface NotificationApiItem {
   buddyRequestId?: string;
   reactionType?: string;
   checkinId?: number;
+  url?: string;
 }
