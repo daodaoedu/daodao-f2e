@@ -1,8 +1,13 @@
 "use client";
 
-import { checkCustomIdAvailability, submitOnboardingFlowResponse, useUserMutations } from "@daodao/api";
+import {
+  checkCustomIdAvailability,
+  submitOnboardingFlowResponse,
+  useUserMutations,
+} from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
@@ -37,21 +42,15 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
   const [dynamicStepError, setDynamicStepError] = useState<string | null>(null);
 
   // 動態流程：若有啟用的流程，以其步驟取代固定的興趣 + 來源步驟
-  const { data: activeFlow } = useActiveFlow();
+  const { data: activeFlow, isLoading: isActiveFlowLoading } = useActiveFlow();
   const flowSteps = activeFlow?.steps ?? null;
 
   // totalSteps = 1 (profile) + N (動態 or 2 固定) + 1 (success)
   const dynamicStepCount = flowSteps?.length ?? 2;
   const totalSteps = 1 + dynamicStepCount + 1;
 
-  const {
-    currentStep,
-    nextStep,
-    prevStep,
-    isFirstStep,
-    isLastInputStep,
-    isSuccessStep,
-  } = useOnboardingStep(totalSteps);
+  const { currentStep, nextStep, prevStep, isFirstStep, isLastInputStep, isSuccessStep } =
+    useOnboardingStep(totalSteps);
 
   // 當前動態步驟（step 2 → index 0, step 3 → index 1, ...）
   const dynamicStepIndex = currentStep - 2;
@@ -81,7 +80,10 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
       return false;
     }
     if (!response.data?.data?.available) {
-      form.setError("customId", { type: "server", message: t("steps.profile.usernameUnavailable") });
+      form.setError("customId", {
+        type: "server",
+        message: t("steps.profile.usernameUnavailable"),
+      });
       return false;
     }
     return true;
@@ -104,7 +106,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
 
       // 動態流程步驟驗證
       if (flowSteps && currentDynamicStep) {
-        const answers = (values.dynamicAnswers ?? {})[currentDynamicStep.id.toString()] ?? [];
+        const answers = values.dynamicAnswers?.[currentDynamicStep.id.toString()] ?? [];
         if (currentDynamicStep.questionType !== "text" && answers.length === 0) {
           setDynamicStepError("請選擇至少一個選項");
           return false;
@@ -176,12 +178,14 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
       };
 
       if (isTemporary) {
-        const storedFlow = localStorage.getItem('daodao_registration_flow');
-        const registrationFlow = (storedFlow === 'quiz' || storedFlow === 'action_maker')
-          ? storedFlow
-          : 'landing_page';
+        const registrationFlowStorage = getStorage<"quiz" | "action_maker">(
+          StorageEnum.RegistrationFlow
+        );
+        const storedFlow = registrationFlowStorage.get();
+        const registrationFlow =
+          storedFlow === "quiz" || storedFlow === "action_maker" ? storedFlow : "landing_page";
         await createCurrentUserWithFormData({ ...updateData, registrationFlow });
-        localStorage.removeItem('daodao_registration_flow');
+        registrationFlowStorage.remove();
         await refreshToken();
       } else {
         await updateCurrentUserWithFormData(updateData);
@@ -252,6 +256,20 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
   const showInterestsStep = !isFirstStep && !isSuccessStep && !flowSteps && currentStep === 2;
   const showReferralStep = !isFirstStep && !isSuccessStep && !flowSteps && currentStep === 3;
 
+  if (isActiveFlowLoading) {
+    return (
+      <Form {...form}>
+        <div className="space-y-6">
+          <div className="h-10 rounded-full bg-white/70 animate-pulse" />
+          <div className="space-y-4">
+            <div className="h-8 rounded-lg bg-white/70 animate-pulse" />
+            <div className="h-28 rounded-xl bg-white/70 animate-pulse" />
+          </div>
+        </div>
+      </Form>
+    );
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -259,7 +277,12 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
 
         {currentStep === 1 && <ProfileSection form={form} />}
         {showDynamicStep && (
-          <DynamicStep step={currentDynamicStep} form={form} error={dynamicStepError} />
+          <DynamicStep
+            step={currentDynamicStep}
+            form={form}
+            error={dynamicStepError}
+            onChange={() => setDynamicStepError(null)}
+          />
         )}
         {showInterestsStep && <InterestsSection form={form} />}
         {showReferralStep && <ReferralSection form={form} />}

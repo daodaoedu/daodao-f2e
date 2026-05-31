@@ -1,44 +1,44 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@daodao/ui/components/button"
-import { Badge } from "@daodao/ui/components/badge"
-import { Loader2, Copy, Check, ExternalLink } from "lucide-react"
-import { createSurvey, updateSurvey } from "../../services/survey"
-import type { useSurveyWizard } from "../../hooks/use-survey-wizard"
-import type { Survey } from "../../types"
+import { Badge } from "@daodao/ui/components/badge";
+import { Button } from "@daodao/ui/components/button";
+import { Check, Copy, ExternalLink, Loader2 } from "lucide-react";
+import { useState } from "react";
+import type { useSurveyWizard } from "../../hooks/use-survey-wizard";
+import { createSurvey, updateSurveyStatus } from "../../services/survey";
+import type { Survey } from "../../types";
 
 export function SurveyPublishStep({ wizard }: { wizard: ReturnType<typeof useSurveyWizard> }) {
-  const { state } = wizard
-  const [publishing, setPublishing] = useState(false)
-  const [published, setPublished] = useState<Survey | null>(null)
-  const [copied, setCopied] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { state } = wizard;
+  const [publishing, setPublishing] = useState(false);
+  const [published, setPublished] = useState<Survey | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const shareUrl = published
     ? `${typeof window !== "undefined" ? window.location.origin : ""}/survey/r/${published.shareId}`
-    : null
+    : null;
 
   const handlePublish = async () => {
-    setPublishing(true)
-    setError(null)
+    setPublishing(true);
+    setError(null);
     try {
-      const survey = await createSurvey(state.survey)
-      await updateSurvey(survey.id, { status: "active" } as any)
-      setPublished({ ...survey, status: "active" })
+      const survey = await createSurvey(state.survey);
+      const activeSurvey = await updateSurveyStatus(survey.id, "active");
+      setPublished(activeSurvey);
     } catch (e) {
-      setError((e as Error).message ?? "發佈失敗")
+      setError((e as Error).message ?? "發佈失敗");
     } finally {
-      setPublishing(false)
+      setPublishing(false);
     }
-  }
+  };
 
   const handleCopy = () => {
-    if (!shareUrl) return
-    navigator.clipboard.writeText(shareUrl)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+    if (!shareUrl) return;
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (published) {
     return (
@@ -59,7 +59,7 @@ export function SurveyPublishStep({ wizard }: { wizard: ReturnType<typeof useSur
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -76,5 +76,5 @@ export function SurveyPublishStep({ wizard }: { wizard: ReturnType<typeof useSur
         發佈問卷
       </Button>
     </div>
-  )
+  );
 }

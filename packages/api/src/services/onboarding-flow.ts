@@ -1,9 +1,13 @@
-import { client, getApiBaseUrl } from '../client';
+import { client, getApiBaseUrl } from "../client";
+
+type UntypedPostClient = {
+  POST: (url: string, init: { body: unknown }) => Promise<unknown>;
+};
 
 export interface OnboardingFlowStep {
   id: number;
   questionText: string;
-  questionType: 'single' | 'multi' | 'text';
+  questionType: "single" | "multi" | "text";
   options: string[];
   fieldKey?: string;
   sortOrder: number;
@@ -23,7 +27,7 @@ export async function getActiveOnboardingFlow(): Promise<ActiveOnboardingFlow | 
     const baseUrl = getApiBaseUrl();
     const res = await fetch(`${baseUrl}/api/v1/onboarding/flows/active`);
     if (!res.ok) return null;
-    const json = await res.json() as { data: ActiveOnboardingFlow | null };
+    const json = (await res.json()) as { data: ActiveOnboardingFlow | null };
     return json.data ?? null;
   } catch {
     return null;
@@ -36,10 +40,13 @@ export async function getActiveOnboardingFlow(): Promise<ActiveOnboardingFlow | 
 export async function submitOnboardingFlowResponse(
   flowId: number,
   stepId: number,
-  answer: string[],
+  answer: string[]
 ): Promise<void> {
   // Uses openapi-fetch client which has auth middleware
-  await (client as any).POST(`/api/v1/onboarding/flows/${flowId}/responses`, {
-    body: { stepId, answer },
-  });
+  await (client as unknown as UntypedPostClient).POST(
+    `/api/v1/onboarding/flows/${flowId}/responses`,
+    {
+      body: { stepId, answer },
+    }
+  );
 }

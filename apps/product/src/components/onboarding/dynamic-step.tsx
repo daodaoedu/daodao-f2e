@@ -10,6 +10,7 @@ interface DynamicStepProps {
   step: OnboardingFlowStep;
   form: UseFormReturn<OnboardingFormValues>;
   error?: string | null;
+  onChange?: () => void;
 }
 
 /**
@@ -19,12 +20,13 @@ interface DynamicStepProps {
  * - multi：多選 Badge
  * - text：文字輸入
  */
-export const DynamicStep = ({ step, form, error }: DynamicStepProps) => {
+export const DynamicStep = ({ step, form, error, onChange }: DynamicStepProps) => {
   const allAnswers = form.watch("dynamicAnswers") ?? {};
   const answers = allAnswers[step.id.toString()] ?? [];
 
   const setAnswers = (newAnswers: string[]) => {
     const current = form.getValues("dynamicAnswers") ?? {};
+    onChange?.();
     form.setValue(
       "dynamicAnswers",
       { ...current, [step.id.toString()]: newAnswers },
@@ -45,9 +47,7 @@ export const DynamicStep = ({ step, form, error }: DynamicStepProps) => {
     <div className="space-y-8">
       <div className="text-center mb-8">
         <h1 className="heading-lg text-text-dark mb-2">{step.questionText}</h1>
-        {step.questionType === "multi" && (
-          <p className="text-sm text-light-gray">可選擇多個選項</p>
-        )}
+        {step.questionType === "multi" && <p className="text-sm text-light-gray">可選擇多個選項</p>}
       </div>
 
       {(step.questionType === "single" || step.questionType === "multi") && (

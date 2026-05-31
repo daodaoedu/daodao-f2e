@@ -15,7 +15,10 @@ function MiniLockedCard({ onUnlock }: { onUnlock: () => void }) {
     // biome-ignore lint/a11y/noStaticElementInteractions: lock card
     <div
       className="rounded-xl bg-[#F5F9F9] p-2.5 flex flex-col gap-1.5 relative overflow-hidden cursor-pointer"
-      onClick={(e) => { e.stopPropagation(); onUnlock(); }}
+      onClick={(e) => {
+        e.stopPropagation();
+        onUnlock();
+      }}
     >
       <div className="blur-sm select-none pointer-events-none">
         <div className="flex items-center gap-1.5 mb-1">
@@ -57,7 +60,11 @@ function MiniMyAnswerCard({ answerText }: { answerText: string }) {
 interface PersonaQuestionCardProps {
   id: number;
   prompt: string;
-  answer: { selectedValue: string | null; textAnswer: string | null; resonanceCount: number } | null;
+  answer: {
+    selectedValue: string | null;
+    textAnswer: string | null;
+    resonanceCount: number;
+  } | null;
 }
 
 function PersonaQuestionCard({ id, prompt, answer }: PersonaQuestionCardProps) {
@@ -69,12 +76,10 @@ function PersonaQuestionCard({ id, prompt, answer }: PersonaQuestionCardProps) {
   const handleNavigate = () => router.push(`/persona/${id}`);
 
   return (
-    <div
+    <button
+      type="button"
       className="group bg-white rounded-2xl shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200 overflow-hidden cursor-pointer"
       onClick={handleNavigate}
-      onKeyDown={(e) => { if (e.key === "Enter") handleNavigate(); }}
-      role="button"
-      tabIndex={0}
     >
       {/* Top row: question + arrow */}
       <div className="px-4 pt-4 pb-3 flex items-start gap-3">
@@ -107,7 +112,7 @@ function PersonaQuestionCard({ id, prompt, answer }: PersonaQuestionCardProps) {
           <span className="text-xs text-text-dark/35">{t("unansweredHint")}</span>
         </div>
       )}
-    </div>
+    </button>
   );
 }
 
@@ -118,8 +123,12 @@ export function PersonaTab() {
   const locale = useLocale();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
-  const { data: profileData, isLoading: isProfileLoading } = usePersonaProfileMe(locale, { enabled: isAuthenticated });
-  const { data: questionsData, isLoading: isQuestionsLoading } = usePersonaQuestions(locale, { enabled: !isAuthenticated });
+  const { data: profileData, isLoading: isProfileLoading } = usePersonaProfileMe(locale, {
+    enabled: isAuthenticated,
+  });
+  const { data: questionsData, isLoading: isQuestionsLoading } = usePersonaQuestions(locale, {
+    enabled: !isAuthenticated,
+  });
 
   const isLoading = isAuthLoading || (isAuthenticated ? isProfileLoading : isQuestionsLoading);
 
@@ -146,30 +155,19 @@ export function PersonaTab() {
   }
 
   if (questions.length === 0) {
-    return (
-      <div className="py-8 text-center text-text-dark/40 text-sm">
-        {t("myProfile.empty")}
-      </div>
-    );
+    return <div className="py-8 text-center text-text-dark/40 text-sm">{t("myProfile.empty")}</div>;
   }
 
   return (
     <div className="flex flex-col gap-3 mt-2">
       {/* Header */}
       <div className="px-1 h-20 flex flex-col justify-center text-center">
-        <p className="text-base font-bold text-text-dark leading-snug">
-          {t("tab.headerTitle")}
-        </p>
+        <p className="text-base font-bold text-text-dark leading-snug">{t("tab.headerTitle")}</p>
         <p className="text-xs text-text-dark/45 mt-1">{t("tab.headerSubtitle")}</p>
       </div>
 
       {questions.map((q) => (
-        <PersonaQuestionCard
-          key={q.id}
-          id={q.id}
-          prompt={q.prompt}
-          answer={q.answer}
-        />
+        <PersonaQuestionCard key={q.id} id={q.id} prompt={q.prompt} answer={q.answer} />
       ))}
     </div>
   );
