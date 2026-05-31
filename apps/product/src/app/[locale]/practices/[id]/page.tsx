@@ -14,6 +14,8 @@ import {
   usePracticeById,
   usePracticeCheckIns,
   useReactionsList,
+  useRecordReadProgress,
+  useRecordTimeSpent,
   useRecordView,
 } from "@daodao/api";
 import type { MentionCandidate } from "@daodao/features-mention";
@@ -170,6 +172,8 @@ export default function PracticeDetailPage() {
   const { deletePractice: deletePracticeById } = useDeletePractice(practiceId);
 
   const recordView = useRecordView();
+  useRecordReadProgress(practiceId);
+  useRecordTimeSpent(practiceId);
 
   useEffect(() => {
     if (practiceId) {
