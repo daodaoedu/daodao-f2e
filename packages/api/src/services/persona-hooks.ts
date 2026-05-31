@@ -60,28 +60,6 @@ export const usePersonaQuestionAnswers = (
   );
 };
 
-export const usePersonaQuestionAnswers = (
-  questionId: number,
-  options?: { locale?: string; limit?: number; cursor?: number; enabled?: boolean }
-) => {
-  const enabled = options?.enabled ?? true;
-  return useQuery(
-    "/api/v1/persona/questions/{questionId}/answers",
-    enabled
-      ? {
-          params: {
-            path: { questionId },
-            query: {
-              ...(options?.locale ? { locale: options.locale } : {}),
-              ...(options?.limit != null ? { limit: options.limit } : {}),
-              ...(options?.cursor != null ? { cursor: options.cursor } : {}),
-            },
-          },
-        }
-      : null,
-  );
-};
-
 export const usePersonaProfileUser = (userId: string, options?: { exclude?: number; enabled?: boolean; locale?: string }) => {
   const enabled = options?.enabled ?? true;
   return useQuery(
