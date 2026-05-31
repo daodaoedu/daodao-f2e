@@ -50,50 +50,65 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
     setFocused(false);
   };
 
+  const searchBarClassName = cn(
+    "flex items-center bg-white border rounded-full overflow-hidden transition-all duration-300 ease-in-out",
+    expanded
+      ? "w-full border-[#9fb5b8] px-4 h-10"
+      : "w-10 h-10 border-[#e4eae9] cursor-pointer justify-center"
+  );
+
+  const searchBarContent = (
+    <>
+      <Search
+        className={cn(
+          "shrink-0 transition-all duration-200",
+          expanded ? "size-4 text-text-dark/40 mr-2" : "size-[18px] text-text-dark/60"
+        )}
+      />
+      <Input
+        ref={inputRef}
+        type="text"
+        value={value}
+        placeholder={t("showcase_search_placeholder")}
+        tabIndex={expanded ? 0 : -1}
+        className={cn(
+          "h-auto rounded-none border-0 bg-transparent px-0 py-0 text-sm text-text-dark outline-none placeholder:text-text-dark/40 hover:border-0 focus-visible:border-0 focus-visible:px-0 focus-visible:py-0 focus-visible:ring-0 transition-all duration-300",
+          expanded ? "flex-1 opacity-100" : "w-0 opacity-0 pointer-events-none"
+        )}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setTimeout(() => setFocused(false), 150)}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+    </>
+  );
+
   return (
     <div className="relative">
-      <div
-        className={cn(
-          "flex items-center bg-white border rounded-full overflow-hidden transition-all duration-300 ease-in-out",
-          expanded
-            ? "w-full border-[#9fb5b8] px-4 h-10"
-            : "w-10 h-10 border-[#e4eae9] cursor-pointer justify-center"
-        )}
-        onClick={!expanded ? expand : undefined}
-        role={!expanded ? "button" : undefined}
-        aria-label={!expanded ? t("showcase_search_placeholder") : undefined}
-      >
-        <Search
-          className={cn(
-            "shrink-0 transition-all duration-200",
-            expanded ? "size-4 text-text-dark/40 mr-2" : "size-[18px] text-text-dark/60"
+      {expanded ? (
+        <div className={searchBarClassName}>
+          {searchBarContent}
+          {value && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="ml-1 text-text-dark/40 hover:text-text-dark/70 transition-colors"
+              aria-label={t("showcase_search_clear")}
+            >
+              <X className="size-4" />
+            </button>
           )}
-        />
-        <Input
-          ref={inputRef}
-          type="text"
-          value={value}
-          placeholder={t("showcase_search_placeholder")}
-          tabIndex={expanded ? 0 : -1}
-          className={cn(
-            "h-auto rounded-none border-0 bg-transparent px-0 py-0 text-sm text-text-dark outline-none placeholder:text-text-dark/40 hover:border-0 focus-visible:border-0 focus-visible:px-0 focus-visible:py-0 focus-visible:ring-0 transition-all duration-300",
-            expanded ? "flex-1 opacity-100" : "w-0 opacity-0 pointer-events-none"
-          )}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setTimeout(() => setFocused(false), 150)}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        {expanded && value && (
-          <button
-            type="button"
-            onClick={handleClear}
-            className="ml-1 text-text-dark/40 hover:text-text-dark/70 transition-colors"
-          >
-            <X className="size-4" />
-          </button>
-        )}
-      </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          className={searchBarClassName}
+          onClick={expand}
+          aria-label={t("showcase_search_placeholder")}
+        >
+          {searchBarContent}
+        </button>
+      )}
 
       {/* Suggestions dropdown */}
       {expanded && focused && !value && allSuggestions.length > 0 && (

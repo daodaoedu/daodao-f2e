@@ -10,6 +10,10 @@ import { client } from "../client";
 
 export type ViewTrackingEntityType = "practice" | "resource";
 
+type UntypedPostClient = {
+  POST: (url: string, init: { body: unknown }) => Promise<unknown>;
+};
+
 /**
  * 記錄瀏覽事件的 Hook（fire-and-forget）
  * 進入詳情頁時呼叫，不等待結果
@@ -51,8 +55,7 @@ export const useRecordReadProgress = (practiceId: string | number) => {
       for (const threshold of READ_PROGRESS_THRESHOLDS) {
         if (depth >= threshold && !tracked.current.has(threshold)) {
           tracked.current.add(threshold);
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (client as any)
+          (client as unknown as UntypedPostClient)
             .POST(`/api/v1/practices/${practiceId}/progress`, {
               body: { depthPercent: threshold },
             })
@@ -76,8 +79,7 @@ export const useRecordTimeSpent = (practiceId: string | number) => {
     const send = () => {
       const seconds = Math.round((Date.now() - startTime.current) / 1000);
       if (seconds < 5) return;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (client as any)
+      (client as unknown as UntypedPostClient)
         .POST(`/api/v1/practices/${practiceId}/time-spent`, {
           body: { seconds },
         })

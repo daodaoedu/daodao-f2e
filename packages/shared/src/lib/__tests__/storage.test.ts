@@ -11,6 +11,7 @@ describe("getStorageKey", () => {
     expect(getStorageKey(StorageEnum.ActionMaker)).toBe("_actionmaker");
     expect(getStorageKey(StorageEnum.AuthSignal)).toBe("_authsignal");
     expect(getStorageKey(StorageEnum.HomeFeedAnchor)).toBe("_homefeedanchor");
+    expect(getStorageKey(StorageEnum.RegistrationFlow)).toBe("_registrationflow");
   });
 });
 
@@ -25,6 +26,7 @@ describe("StorageEnum", () => {
     expect(keys).toContain("ActionMaker");
     expect(keys).toContain("AuthSignal");
     expect(keys).toContain("HomeFeedAnchor");
-    expect(keys).toHaveLength(8);
+    expect(keys).toContain("RegistrationFlow");
+    expect(keys).toHaveLength(9);
   });
 });

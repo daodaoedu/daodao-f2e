@@ -3,7 +3,7 @@
 import logoLargePng from "@daodao/assets/images/action-maker/logo-large.png";
 import logoSmallPng from "@daodao/assets/images/action-maker/logo-small.png";
 import { useAuth } from "@daodao/auth";
-import { captureElementAsImage } from "@daodao/shared";
+import { captureElementAsImage, getStorage, StorageEnum } from "@daodao/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useActionMaker } from "../hooks/use-action-maker";
 import { useCreatePracticeFromAction } from "../hooks/use-create-practice-from-action";
@@ -98,7 +98,7 @@ export function ActionMakerResult() {
 
     if (!isAuthenticated) {
       pendingCreate.current = true;
-      localStorage.setItem('daodao_registration_flow', 'action_maker');
+      getStorage<"action_maker">(StorageEnum.RegistrationFlow).set("action_maker");
       const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL || window.location.origin;
       openLoginDialog({
         redirectUrl: `${websiteUrl}/action-maker/result`,

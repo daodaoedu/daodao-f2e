@@ -5072,6 +5072,27 @@
     "resonance": {
       "error": "Failed to resonate, please try again"
     },
+    "detail": {
+      "shareThoughts": "Share my thoughts",
+      "thoughtPlaceholder": "Write down your thoughts...",
+      "anonymousUser": "Anonymous user",
+      "justNow": "Just now",
+      "commentSubmitError": "Failed to post comment",
+      "commentsTitle": "Comments",
+      "myAnswer": "My answer",
+      "collapse": "Collapse",
+      "expand": "Read more",
+      "loadError": "Failed to load answers, please try again later",
+      "questionNotFound": "Question not found",
+      "close": "Close",
+      "responseCount": "{count} responses",
+      "responsesTitle": "Everyone's answers",
+      "answerAdded": "Thanks for sharing! Your answer has been added to your persona.",
+      "allResponsesShown": "Showing all {count} responses",
+      "emptyResponses": "No one else has answered this question yet. You're the first!",
+      "lockedResponses": "Answer to see what others said",
+      "answeredCount": "{count} people answered"
+    },
     "carousel": {
       "title": "Let's get to know you!",
       "dismiss": "Don't show today",

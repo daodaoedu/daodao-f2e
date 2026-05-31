@@ -29,26 +29,42 @@ type CarouselQuestion = {
 function useDragScroll() {
   const ref = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
+  const hasDragged = useRef(false);
+  const suppressNextClick = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
 
   const onMouseDown = (e: React.MouseEvent) => {
     if (!ref.current) return;
     dragging.current = true;
+    hasDragged.current = false;
+    suppressNextClick.current = false;
     startX.current = e.pageX - ref.current.offsetLeft;
     scrollLeft.current = ref.current.scrollLeft;
   };
   const stop = () => {
+    if (hasDragged.current) {
+      suppressNextClick.current = true;
+    }
     dragging.current = false;
   };
   const onMouseMove = (e: React.MouseEvent) => {
     if (!dragging.current || !ref.current) return;
     e.preventDefault();
     const x = e.pageX - ref.current.offsetLeft;
+    if (Math.abs(x - startX.current) > 5) {
+      hasDragged.current = true;
+    }
     ref.current.scrollLeft = scrollLeft.current - (x - startX.current);
   };
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (!suppressNextClick.current) return;
+    suppressNextClick.current = false;
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
-  return { ref, onMouseDown, onMouseUp: stop, onMouseLeave: stop, onMouseMove };
+  return { ref, onClickCapture, onMouseDown, onMouseUp: stop, onMouseLeave: stop, onMouseMove };
 }
 
 // ── Locked response card (community preview placeholder) ──────────────────────
@@ -216,6 +232,7 @@ function CarouselQuestionCard({
             className="flex gap-3 overflow-x-auto -mx-5 px-5 pb-1 shrink-0 cursor-grab active:cursor-grabbing"
             style={{ scrollbarWidth: "none" }}
             onClick={(e) => e.stopPropagation()}
+            onClickCapture={dragScroll.onClickCapture}
             onMouseDown={dragScroll.onMouseDown}
             onMouseUp={dragScroll.onMouseUp}
             onMouseLeave={dragScroll.onMouseLeave}

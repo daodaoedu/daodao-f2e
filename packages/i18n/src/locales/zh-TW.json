@@ -5072,6 +5072,27 @@
     "resonance": {
       "error": "共鳴操作失敗，請稍後再試"
     },
+    "detail": {
+      "shareThoughts": "分享我的想法",
+      "thoughtPlaceholder": "寫下你的想法...",
+      "anonymousUser": "匿名用戶",
+      "justNow": "剛剛",
+      "commentSubmitError": "留言失敗",
+      "commentsTitle": "留言",
+      "myAnswer": "我的回答",
+      "collapse": "收起",
+      "expand": "展開全文",
+      "loadError": "回答載入失敗，請稍後再試",
+      "questionNotFound": "找不到這個問題",
+      "close": "關閉",
+      "responseCount": "{count} 則回應",
+      "responsesTitle": "大家的回答",
+      "answerAdded": "感謝你的分享！你的回答已加入人物誌。",
+      "allResponsesShown": "已顯示全部 {count} 則回應",
+      "emptyResponses": "還沒有其他人回答這題，你是第一個！",
+      "lockedResponses": "回答後即可看到其他人怎麼說",
+      "answeredCount": "{count} 人已回答"
+    },
     "carousel": {
       "title": "讓我們更認識你！",
       "dismiss": "今天不再顯示",
