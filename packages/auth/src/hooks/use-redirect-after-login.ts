@@ -83,9 +83,16 @@ export const useRedirectAfterLogin = () => {
       hardNavigate(ONBOARDING_URL);
     } else {
       // 舊用戶跳轉到原目標頁面
-      // 過濾掉 /auth/error 路徑，避免成功登入後仍被導向錯誤頁面
-      const isSafeRedirect = !state.redirectUrl.includes("/auth/error");
-      hardNavigate(isSafeRedirect ? state.redirectUrl : DEFAULT_REDIRECT_URL);
+      // Guard against open redirect: only allow same-origin redirects or relative paths
+      const isRelative = state.redirectUrl.startsWith("/") && !state.redirectUrl.startsWith("//");
+      let isSameOrigin = false;
+      try {
+        isSameOrigin = new URL(state.redirectUrl).origin === window.location.origin;
+      } catch {
+        // not a valid absolute URL
+      }
+      const safeRedirectUrl = (isRelative || isSameOrigin) ? state.redirectUrl : DEFAULT_REDIRECT_URL;
+      hardNavigate(safeRedirectUrl);
     }
   }, [searchParams]);
 };

@@ -5,6 +5,17 @@ import { useTranslations } from "@daodao/i18n";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
+function isSafeRedirectUrl(url: string): boolean {
+  if (!url) return false;
+  if (url.startsWith("/") && !url.startsWith("//")) return true;
+  try {
+    const parsed = new URL(url);
+    return parsed.origin === window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * 登入頁面
  * 自動打開登入 Dialog，並處理 redirect 參數
@@ -30,7 +41,16 @@ export default function LoginPage() {
   // - 避開 next/navigation 的 router.push 不帶 locale prefix 在 next-intl 下的不一致行為
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      const redirectUrl = searchParams.get("redirect") || "/";
+      const raw = searchParams.get("redirect") || "/";
+      // Guard against open redirect: only allow same-origin or relative paths
+      const isRelative = raw.startsWith("/") && !raw.startsWith("//");
+      let isSameOrigin = false;
+      try {
+        isSameOrigin = new URL(raw).origin === window.location.origin;
+      } catch {
+        // not a valid absolute URL
+      }
+      const redirectUrl = (isRelative || isSameOrigin) ? raw : "/";
       window.location.href = redirectUrl;
     }
   }, [isLoading, isAuthenticated, searchParams]);
