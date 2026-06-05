@@ -1,9 +1,12 @@
 "use client";
 
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
-import { useTranslations } from "@daodao/i18n";
-import { usePathname } from "@daodao/i18n/navigation";
-import { LanguageSwitcher } from "@daodao/ui/components/language-switcher";
+import { useLocale, useTranslations } from "@daodao/i18n";
+import { usePathname, useSearchParams } from "@daodao/i18n/navigation";
+import { languageOptions } from "@daodao/i18n/routing";
+import { CustomLink } from "@daodao/ui/components/custom-link";
+import { Globe } from "lucide-react";
+import { Suspense } from "react";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
@@ -15,6 +18,32 @@ import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const GlobeToggleContent = ({ pathname }: { pathname: string }) => {
+  const locale = useLocale();
+  const searchParams = useSearchParams();
+  const nextLocale = languageOptions.find((l) => l.value !== locale);
+
+  if (!nextLocale) return null;
+
+  return (
+    <CustomLink
+      locale={nextLocale.value}
+      href={{ pathname, query: searchParams?.toString() }}
+      scroll={false}
+      className="text-text-dark/60 hover:text-primary-base transition-colors"
+      aria-label={`Switch to ${nextLocale.label}`}
+    >
+      <Globe className="size-5" />
+    </CustomLink>
+  );
+};
+
+const GlobeToggle = ({ pathname }: { pathname: string }) => (
+  <Suspense fallback={<Globe className="size-5 text-text-dark/60" />}>
+    <GlobeToggleContent pathname={pathname} />
+  </Suspense>
+);
 
 export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
@@ -62,7 +91,7 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
         </CustomLink>
       </div>
       <div className="fixed top-5 right-5 z-20">
-        <LanguageSwitcher variant="light" />
+        <GlobeToggle pathname={pathname} />
       </div>
       <nav
         className={cn(
