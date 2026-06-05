@@ -1,4 +1,9 @@
-import { dismissPersonaCarousel, submitPersonaAnswer, usePersonaCarouselState, useMutate } from "@daodao/api";
+import {
+  dismissPersonaCarousel,
+  submitPersonaAnswer,
+  useMutate,
+  usePersonaCarouselState,
+} from "@daodao/api";
 import { useState } from "react";
 import { Alert, ScrollView, TextInput } from "react-native";
 import { Button, Card, Text, XStack, YStack } from "tamagui";
@@ -13,7 +18,14 @@ interface QuestionCardProps {
   onSwitch: (questionId: number) => void;
 }
 
-function QuestionCard({ questionId, prompt, questionType, options, onAnswered, onSwitch }: QuestionCardProps) {
+function QuestionCard({
+  questionId,
+  prompt,
+  questionType,
+  options,
+  onAnswered,
+  onSwitch,
+}: QuestionCardProps) {
   const t = useMobileTranslation("persona.myProfile");
   const carouselT = useMobileTranslation("persona.carousel");
   const [selected, setSelected] = useState("");
@@ -28,7 +40,9 @@ function QuestionCard({ questionId, prompt, questionType, options, onAnswered, o
     setSubmitting(true);
     try {
       const res = await submitPersonaAnswer(
-        isChoice ? { questionId, selectedValue: selected } : { questionId, textAnswer: textAnswer.trim() }
+        isChoice
+          ? { questionId, selectedValue: selected }
+          : { questionId, textAnswer: textAnswer.trim() }
       );
       if (res.error) {
         Alert.alert(t("submitError"));
@@ -44,7 +58,9 @@ function QuestionCard({ questionId, prompt, questionType, options, onAnswered, o
 
   return (
     <Card bordered p="$3" mr="$2" width={280} bg="$background">
-      <Text fontSize="$3" fontWeight="600" mb="$2">{prompt}</Text>
+      <Text fontSize="$3" fontWeight="600" mb="$2">
+        {prompt}
+      </Text>
 
       {isChoice ? (
         <XStack flexWrap="wrap" gap="$2" mb="$3">
@@ -67,7 +83,14 @@ function QuestionCard({ questionId, prompt, questionType, options, onAnswered, o
           multiline
           numberOfLines={3}
           maxLength={300}
-          style={{ borderWidth: 1, borderColor: "#d1d5db", borderRadius: 8, padding: 8, fontSize: 14, marginBottom: 12 }}
+          style={{
+            borderWidth: 1,
+            borderColor: "#d1d5db",
+            borderRadius: 8,
+            padding: 8,
+            fontSize: 14,
+            marginBottom: 12,
+          }}
         />
       )}
 
@@ -119,7 +142,9 @@ export function ResonanceCarousel() {
   return (
     <YStack mb="$3">
       <XStack jc="space-between" ai="center" mb="$2" px="$1">
-        <Text fontSize="$4" fontWeight="600">{carouselT("title")}</Text>
+        <Text fontSize="$4" fontWeight="600">
+          {carouselT("title")}
+        </Text>
         <Button size="$2" variant="outlined" onPress={handleDismiss} disabled={dismissing}>
           {carouselT("dismiss")}
         </Button>

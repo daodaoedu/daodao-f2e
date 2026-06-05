@@ -16,7 +16,6 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
-
 const CollapsedLocaleBadgeContent = ({ pathname }: { pathname: string }) => {
   const locale = useLocale();
   const searchParams = useSearchParams();
@@ -153,7 +152,11 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
           isCollapsed ? "justify-center" : "px-6"
         )}
       >
-        {isCollapsed ? <CollapsedLocaleBadge pathname={pathname} /> : <LanguageSwitcher variant="light" showIcon />}
+        {isCollapsed ? (
+          <CollapsedLocaleBadge pathname={pathname} />
+        ) : (
+          <LanguageSwitcher variant="light" showIcon />
+        )}
       </div>
     </nav>
   );

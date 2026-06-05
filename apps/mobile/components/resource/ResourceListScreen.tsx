@@ -1,5 +1,12 @@
 import { type IGetResourceListParams, useInfiniteResources } from "@daodao/api";
-import { BookOpen, ChevronLeft, Eye, MessageCircle, RefreshCw, Search } from "@tamagui/lucide-icons";
+import {
+  BookOpen,
+  ChevronLeft,
+  Eye,
+  MessageCircle,
+  RefreshCw,
+  Search,
+} from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { RefreshControl } from "react-native";
@@ -49,13 +56,7 @@ function ResourceImage({ uri, name }: { uri?: string | null; name: string }) {
   );
 }
 
-function CategoryCard({
-  category,
-  onPress,
-}: {
-  category: ResourceCategory;
-  onPress: () => void;
-}) {
+function CategoryCard({ category, onPress }: { category: ResourceCategory; onPress: () => void }) {
   return (
     <Card
       width="48%"
@@ -67,7 +68,13 @@ function CategoryCard({
       backgroundColor={colors.primary.base}
     >
       {category.image ? (
-        <Image source={{ uri: category.image }} position="absolute" width="100%" height="100%" resizeMode="cover" />
+        <Image
+          source={{ uri: category.image }}
+          position="absolute"
+          width="100%"
+          height="100%"
+          resizeMode="cover"
+        />
       ) : null}
       <YStack
         flex={1}
@@ -134,14 +141,20 @@ export function ResourceListScreen({
     subcategories && subcategories.length > 0
       ? subcategories
       : params?.majorCategory
-        ? RESOURCE_SUBCATEGORIES[params.majorCategory] ?? []
+        ? (RESOURCE_SUBCATEGORIES[params.majorCategory] ?? [])
         : [];
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <YStack flex={1} backgroundColor="$background">
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel={tCommon("back")}>
+          <Button
+            size="$4"
+            circular
+            chromeless
+            onPress={() => router.back()}
+            accessibilityLabel={tCommon("back")}
+          >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>
@@ -265,7 +278,11 @@ export function ResourceListScreen({
                 <Text fontSize={14} color="$color" opacity={0.6}>
                   {t("retry_later")}
                 </Text>
-                <Button backgroundColor={colors.primary.base} borderRadius="$md" onPress={() => mutate()}>
+                <Button
+                  backgroundColor={colors.primary.base}
+                  borderRadius="$md"
+                  onPress={() => mutate()}
+                >
                   <Text color="white" fontWeight="600">
                     {t("refresh")}
                   </Text>
@@ -295,14 +312,26 @@ export function ResourceListScreen({
                     <ResourceImage uri={resource.imageUrl} name={resource.name} />
                     <YStack gap="$2">
                       <XStack alignItems="center" justifyContent="space-between" gap="$2">
-                        <Text flex={1} fontSize={16} fontWeight="700" color="$color" numberOfLines={1}>
+                        <Text
+                          flex={1}
+                          fontSize={16}
+                          fontWeight="700"
+                          color="$color"
+                          numberOfLines={1}
+                        >
                           {resource.name}
                         </Text>
                         <Text fontSize={12} color={colors.primary.base} fontWeight="600">
                           {tOrValue(`level_${resource.level}`, resource.level)}
                         </Text>
                       </XStack>
-                      <Text fontSize={14} color="$color" opacity={0.68} lineHeight={20} numberOfLines={2}>
+                      <Text
+                        fontSize={14}
+                        color="$color"
+                        opacity={0.68}
+                        lineHeight={20}
+                        numberOfLines={2}
+                      >
                         {resource.description}
                       </Text>
                       {resource.tags.length > 0 && (

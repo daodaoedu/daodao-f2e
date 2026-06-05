@@ -15,7 +15,7 @@ export const usePersonaQuestions = (locale?: string, options?: { enabled?: boole
   const enabled = options?.enabled ?? true;
   return useQuery(
     "/api/v1/persona/questions",
-    enabled ? { params: { query: locale ? { locale } : undefined } } : null,
+    enabled ? { params: { query: locale ? { locale } : undefined } } : null
   );
 };
 
@@ -34,7 +34,7 @@ export const usePersonaProfileMe = (locale?: string, options?: { enabled?: boole
   const enabled = options?.enabled ?? true;
   return useQuery(
     "/api/v1/persona/profile/me",
-    enabled ? { params: { query: locale ? { locale } : undefined } } : null,
+    enabled ? { params: { query: locale ? { locale } : undefined } } : null
   );
 };
 
@@ -56,11 +56,14 @@ export const usePersonaQuestionAnswers = (
             },
           },
         }
-      : null,
+      : null
   );
 };
 
-export const usePersonaProfileUser = (userId: string, options?: { exclude?: number; enabled?: boolean; locale?: string }) => {
+export const usePersonaProfileUser = (
+  userId: string,
+  options?: { exclude?: number; enabled?: boolean; locale?: string }
+) => {
   const enabled = options?.enabled ?? true;
   return useQuery(
     "/api/v1/persona/profile/{userId}",
@@ -74,6 +77,6 @@ export const usePersonaProfileUser = (userId: string, options?: { exclude?: numb
             },
           },
         }
-      : null,
+      : null
   );
 };

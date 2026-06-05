@@ -77,11 +77,15 @@ export const createOnboardingStepSchemas = (t?: TFunction) => {
 
   const profileStepSchema = z.object({
     email: z.string().email(),
-    birthDate: z.date({ required_error: msg("validation.birthDateRequired") }).refine(
-      (date) => differenceInYears(new Date(), date) >= 16,
-      { message: msg("validation.birthDateAge") }
-    ),
-    name: z.string().min(1, msg("validation.nameRequired")).max(50, msg("validation.nameMax", { max: 50 })),
+    birthDate: z
+      .date({ required_error: msg("validation.birthDateRequired") })
+      .refine((date) => differenceInYears(new Date(), date) >= 16, {
+        message: msg("validation.birthDateAge"),
+      }),
+    name: z
+      .string()
+      .min(1, msg("validation.nameRequired"))
+      .max(50, msg("validation.nameMax", { max: 50 })),
     customId: z
       .string()
       .trim()

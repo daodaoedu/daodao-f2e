@@ -1,6 +1,6 @@
 "use client";
 
-import { getActiveOnboardingFlow, type ActiveOnboardingFlow } from "@daodao/api";
+import { type ActiveOnboardingFlow, getActiveOnboardingFlow } from "@daodao/api";
 import { useEffect, useState } from "react";
 
 interface UseActiveFlowReturn {

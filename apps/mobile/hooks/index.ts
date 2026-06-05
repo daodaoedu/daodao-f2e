@@ -10,5 +10,5 @@ export * from "./use-tag-edit-sheet";
 export * from "./useAnalytics";
 export * from "./useCurrentUser";
 export * from "./usePractices";
-export * from "./useShare";
 export * from "./useSettingsCompletion";
+export * from "./useShare";

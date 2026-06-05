@@ -1,13 +1,13 @@
 import useSWR from "swr";
 import {
   AdminScreen,
+  asArray,
+  asRecord,
   FieldRow,
+  formatNumber,
   LoadingState,
   SectionCard,
   StatusPill,
-  asArray,
-  asRecord,
-  formatNumber,
   stringValue,
 } from "@/components/admin/admin-components";
 import { useMobileTranslation } from "@/i18n";
@@ -67,7 +67,10 @@ export default function AdminSystemScreen() {
 
           <SectionCard title={t("system_info")}>
             <FieldRow label={t("hostname")} value={stringValue(system.hostname)} />
-            <FieldRow label={t("platform")} value={`${stringValue(system.platform)} / ${stringValue(system.arch)}`} />
+            <FieldRow
+              label={t("platform")}
+              value={`${stringValue(system.platform)} / ${stringValue(system.arch)}`}
+            />
             <FieldRow label={t("uptime")} value={formatUptime(system.uptime)} />
             <FieldRow
               label={t("memory")}

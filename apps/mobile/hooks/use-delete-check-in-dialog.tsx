@@ -29,42 +29,45 @@ export enum DeleteCheckInResult {
  */
 export function useDeleteCheckInDialog() {
   const t = useMobileTranslation("mobile.dialogs");
-  const openDeleteDialog = useCallback(async (checkInId: string): Promise<DeleteCheckInResult> => {
-    return new Promise((resolve) => {
-      Alert.alert(t("delete_checkin_title"), t("delete_checkin_message"), [
-        {
-          text: t("not_now"),
-          style: "cancel",
-          onPress: () => {
-            resolve(DeleteCheckInResult.Cancelled);
+  const openDeleteDialog = useCallback(
+    async (checkInId: string): Promise<DeleteCheckInResult> => {
+      return new Promise((resolve) => {
+        Alert.alert(t("delete_checkin_title"), t("delete_checkin_message"), [
+          {
+            text: t("not_now"),
+            style: "cancel",
+            onPress: () => {
+              resolve(DeleteCheckInResult.Cancelled);
+            },
           },
-        },
-        {
-          text: t("delete_confirm"),
-          style: "destructive",
-          onPress: () => {
-            // 顯示成功訊息並提供復原選項
-            Alert.alert(t("delete_checkin_success"), "", [
-              {
-                text: t("restore"),
-                onPress: () => {
-                  console.log("Restore check-in:", checkInId);
-                  resolve(DeleteCheckInResult.Restored);
+          {
+            text: t("delete_confirm"),
+            style: "destructive",
+            onPress: () => {
+              // 顯示成功訊息並提供復原選項
+              Alert.alert(t("delete_checkin_success"), "", [
+                {
+                  text: t("restore"),
+                  onPress: () => {
+                    console.log("Restore check-in:", checkInId);
+                    resolve(DeleteCheckInResult.Restored);
+                  },
                 },
-              },
-              {
-                text: t("confirm"),
-                style: "default",
-                onPress: () => {
-                  resolve(DeleteCheckInResult.Deleted);
+                {
+                  text: t("confirm"),
+                  style: "default",
+                  onPress: () => {
+                    resolve(DeleteCheckInResult.Deleted);
+                  },
                 },
-              },
-            ]);
+              ]);
+            },
           },
-        },
-      ]);
-    });
-  }, [t]);
+        ]);
+      });
+    },
+    [t]
+  );
 
   return { openDeleteDialog };
 }

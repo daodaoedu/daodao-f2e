@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-export const createCreatePracticeSchema = (t: (key: string, values?: Record<string, string | number>) => string) =>
+export const createCreatePracticeSchema = (
+  t: (key: string, values?: Record<string, string | number>) => string
+) =>
   z.object({
     // Step 1: 標題與描述
     title: z.string().min(1, t("validation_name_required")).max(50, t("validation_action_max")),
@@ -10,7 +12,10 @@ export const createCreatePracticeSchema = (t: (key: string, values?: Record<stri
     frequency: z.enum(["daily", "weekly", "custom"], {
       required_error: t("validation_frequency_required"),
     }),
-    targetDays: z.number().min(1, t("validation_target_days_min")).max(365, t("validation_target_days_max")),
+    targetDays: z
+      .number()
+      .min(1, t("validation_target_days_min"))
+      .max(365, t("validation_target_days_max")),
     customDays: z.array(z.number().min(0).max(6)).optional(), // 0=Sunday, 6=Saturday
 
     // Step 3: 執行時機
@@ -18,7 +23,10 @@ export const createCreatePracticeSchema = (t: (key: string, values?: Record<stri
     reminderEnabled: z.boolean().default(false),
 
     // Step 4: 標籤與資源
-    tags: z.array(z.string()).max(5, t("validation_tags_max", { max: 5 })).default([]),
+    tags: z
+      .array(z.string())
+      .max(5, t("validation_tags_max", { max: 5 }))
+      .default([]),
     color: z.string().optional(),
     icon: z.string().optional(),
 

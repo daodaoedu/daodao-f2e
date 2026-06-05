@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@daodao/ui/components/button"
-import { Input } from "@daodao/ui/components/input"
-import { Badge } from "@daodao/ui/components/badge"
-import { Card, CardContent } from "@daodao/ui/components/card"
-import { Trash2, Plus, GripVertical } from "lucide-react"
-import type { useSurveyWizard } from "../../hooks/use-survey-wizard"
-import type { QuestionType } from "../../types"
+import { Badge } from "@daodao/ui/components/badge";
+import { Button } from "@daodao/ui/components/button";
+import { Card, CardContent } from "@daodao/ui/components/card";
+import { Input } from "@daodao/ui/components/input";
+import { GripVertical, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import type { useSurveyWizard } from "../../hooks/use-survey-wizard";
+import type { QuestionType } from "../../types";
 
 const TYPE_LABELS: Record<QuestionType, string> = {
   text: "開放文字",
@@ -17,11 +17,11 @@ const TYPE_LABELS: Record<QuestionType, string> = {
   rating: "評分",
   scale: "量表",
   ranking: "排序",
-}
+};
 
 export function SurveyEditStep({ wizard }: { wizard: ReturnType<typeof useSurveyWizard> }) {
-  const { state, addQuestion, updateQuestion, removeQuestion } = wizard
-  const questions = state.survey.questions
+  const { state, addQuestion, updateQuestion, removeQuestion } = wizard;
+  const questions = state.survey.questions;
 
   const handleAddQuestion = () => {
     addQuestion({
@@ -30,8 +30,8 @@ export function SurveyEditStep({ wizard }: { wizard: ReturnType<typeof useSurvey
       options: [],
       isRequired: true,
       conditions: [],
-    })
-  }
+    });
+  };
 
   return (
     <div className="space-y-3">
@@ -50,7 +50,9 @@ export function SurveyEditStep({ wizard }: { wizard: ReturnType<typeof useSurvey
                     className="text-sm"
                   />
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline-ghost" className="text-xs">{TYPE_LABELS[q.questionType]}</Badge>
+                    <Badge variant="outline-ghost" className="text-xs">
+                      {TYPE_LABELS[q.questionType]}
+                    </Badge>
                     <label className="flex items-center gap-1 text-xs text-muted-foreground cursor-pointer">
                       <input
                         type="checkbox"
@@ -81,5 +83,5 @@ export function SurveyEditStep({ wizard }: { wizard: ReturnType<typeof useSurvey
         新增問題
       </Button>
     </div>
-  )
+  );
 }

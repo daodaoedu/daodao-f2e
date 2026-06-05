@@ -79,7 +79,9 @@ export default function PracticeCopySuccessScreen() {
             <Button
               size="$5"
               backgroundColor={colors.primary.base}
-              onPress={() => (id ? router.replace(`/practices/${id}` as never) : router.replace("/" as never))}
+              onPress={() =>
+                id ? router.replace(`/practices/${id}` as never) : router.replace("/" as never)
+              }
             >
               <XStack alignItems="center" gap="$2">
                 <ArrowRight size={18} color={colors.basic.white} />
@@ -93,7 +95,9 @@ export default function PracticeCopySuccessScreen() {
               backgroundColor="transparent"
               borderWidth={1}
               borderColor={colors.border.light}
-              onPress={() => (id ? router.replace(`/practices/${id}/edit` as never) : router.replace("/" as never))}
+              onPress={() =>
+                id ? router.replace(`/practices/${id}/edit` as never) : router.replace("/" as never)
+              }
             >
               <XStack alignItems="center" gap="$2">
                 <Edit3 size={18} color="$color" />

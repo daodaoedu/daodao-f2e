@@ -67,10 +67,7 @@ export function FeatureGrid() {
       description: t("feature_grid_item_2_description"),
       tag: t("feature_grid_item_2_tag"),
       image: "/assets/landing-page/feature-chart.png",
-      details: [
-        t("feature_grid_item_2_detail_0"),
-        t("feature_grid_item_2_detail_1"),
-      ],
+      details: [t("feature_grid_item_2_detail_0"), t("feature_grid_item_2_detail_1")],
     },
   ];
 

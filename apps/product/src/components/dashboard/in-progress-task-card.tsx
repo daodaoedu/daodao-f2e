@@ -112,7 +112,10 @@ export const InProgressTaskCard = ({
               {daysProgress !== null && (
                 <span className="flex items-center gap-1">
                   <Timer className="size-3.5 shrink-0" />
-                  {t("card_days_progress", { current: daysProgress.elapsed, total: daysProgress.total })}
+                  {t("card_days_progress", {
+                    current: daysProgress.elapsed,
+                    total: daysProgress.total,
+                  })}
                 </span>
               )}
             </div>

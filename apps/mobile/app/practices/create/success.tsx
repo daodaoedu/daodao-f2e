@@ -57,7 +57,9 @@ export default function PracticeCreateSuccessScreen() {
             <Button
               size="$5"
               backgroundColor={colors.primary.base}
-              onPress={() => (id ? router.replace(`/practices/${id}` as never) : router.replace("/" as never))}
+              onPress={() =>
+                id ? router.replace(`/practices/${id}` as never) : router.replace("/" as never)
+              }
             >
               <XStack alignItems="center" gap="$2">
                 <ArrowRight size={18} color={colors.basic.white} />

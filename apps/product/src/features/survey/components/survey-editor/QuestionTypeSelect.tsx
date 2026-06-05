@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Select,
@@ -6,8 +6,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@daodao/ui/components/select"
-import type { QuestionType } from "../../types"
+} from "@daodao/ui/components/select";
+import type { QuestionType } from "../../types";
 
 const TYPE_LABELS: Record<QuestionType, string> = {
   multiple_choice: "多選題",
@@ -17,7 +17,7 @@ const TYPE_LABELS: Record<QuestionType, string> = {
   yesno: "是/否",
   scale: "量表",
   ranking: "排序",
-}
+};
 
 const QUESTION_TYPES: QuestionType[] = [
   "multiple_choice",
@@ -27,12 +27,12 @@ const QUESTION_TYPES: QuestionType[] = [
   "yesno",
   "scale",
   "ranking",
-]
+];
 
 interface QuestionTypeSelectProps {
-  value: QuestionType
-  onChange: (type: QuestionType) => void
-  disabled?: boolean
+  value: QuestionType;
+  onChange: (type: QuestionType) => void;
+  disabled?: boolean;
 }
 
 export function QuestionTypeSelect({ value, onChange, disabled }: QuestionTypeSelectProps) {
@@ -49,5 +49,5 @@ export function QuestionTypeSelect({ value, onChange, disabled }: QuestionTypeSe
         ))}
       </SelectContent>
     </Select>
-  )
+  );
 }

@@ -4,13 +4,13 @@ import useSWR from "swr";
 import { Button, Input, Text, XStack, YStack } from "tamagui";
 import {
   AdminScreen,
-  EmptyState,
-  FieldRow,
-  LoadingState,
-  SectionCard,
   asArray,
   asRecord,
+  EmptyState,
+  FieldRow,
   formatDate,
+  LoadingState,
+  SectionCard,
   stringValue,
 } from "@/components/admin/admin-components";
 import { colors } from "@/generated/design-tokens";
@@ -149,7 +149,12 @@ function RoleRow({ role }: { role: Record<string, unknown> }) {
 
   return (
     <YStack gap="$2">
-      <Button height="auto" padding="$3" backgroundColor="$backgroundHover" onPress={() => setExpanded((v) => !v)}>
+      <Button
+        height="auto"
+        padding="$3"
+        backgroundColor="$backgroundHover"
+        onPress={() => setExpanded((v) => !v)}
+      >
         <YStack flex={1} alignItems="stretch" gap="$1">
           <Text fontSize={15} fontWeight="700" color="$color">
             {stringValue(role.name)}

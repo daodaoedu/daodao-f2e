@@ -39,41 +39,37 @@ export function useArchivePracticeDialog() {
   const openArchiveDialog = useCallback(
     async (options?: IArchiveDialogOptions): Promise<ArchivePracticeResult> => {
       return new Promise((resolve) => {
-        Alert.alert(
-          t("archive_practice_title"),
-          t("archive_practice_message"),
-          [
-            {
-              text: t("not_now"),
-              style: "cancel",
-              onPress: () => {
-                resolve(ArchivePracticeResult.Cancelled);
-              },
+        Alert.alert(t("archive_practice_title"), t("archive_practice_message"), [
+          {
+            text: t("not_now"),
+            style: "cancel",
+            onPress: () => {
+              resolve(ArchivePracticeResult.Cancelled);
             },
-            {
-              text: t("archive_confirm"),
-              style: "destructive",
-              onPress: () => {
-                // 顯示成功訊息並提供復原選項
-                Alert.alert(t("archive_success_title"), t("archive_success_message"), [
-                  {
-                    text: t("restore"),
-                    onPress: () => {
-                      options?.onRestore?.();
-                    },
+          },
+          {
+            text: t("archive_confirm"),
+            style: "destructive",
+            onPress: () => {
+              // 顯示成功訊息並提供復原選項
+              Alert.alert(t("archive_success_title"), t("archive_success_message"), [
+                {
+                  text: t("restore"),
+                  onPress: () => {
+                    options?.onRestore?.();
                   },
-                  {
-                    text: t("confirm"),
-                    style: "default",
-                    onPress: () => {
-                      resolve(ArchivePracticeResult.Archived);
-                    },
+                },
+                {
+                  text: t("confirm"),
+                  style: "default",
+                  onPress: () => {
+                    resolve(ArchivePracticeResult.Archived);
                   },
-                ]);
-              },
+                },
+              ]);
             },
-          ]
-        );
+          },
+        ]);
       });
     },
     [t]

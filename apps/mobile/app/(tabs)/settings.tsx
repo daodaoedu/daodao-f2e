@@ -1,7 +1,8 @@
 import {
-  Archive,
   AlertCircle,
+  Archive,
   Bell,
+  BookOpen,
   ChevronRight,
   Footprints,
   HeartHandshake,
@@ -11,7 +12,6 @@ import {
   Settings,
   SquareUser,
   Telescope,
-  BookOpen,
 } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";

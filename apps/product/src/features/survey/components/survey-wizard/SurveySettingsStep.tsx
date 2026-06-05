@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { Input } from "@daodao/ui/components/input"
-import { Label } from "@daodao/ui/components/label"
-import { Switch } from "@daodao/ui/components/switch"
-import type { useSurveyWizard } from "../../hooks/use-survey-wizard"
+import { Input } from "@daodao/ui/components/input";
+import { Label } from "@daodao/ui/components/label";
+import { Switch } from "@daodao/ui/components/switch";
+import type { useSurveyWizard } from "../../hooks/use-survey-wizard";
 
 export function SurveySettingsStep({ wizard }: { wizard: ReturnType<typeof useSurveyWizard> }) {
-  const { state, updateConfig } = wizard
-  const config = state.survey.config ?? {}
+  const { state, updateConfig } = wizard;
+  const config = state.survey.config ?? {};
 
   return (
     <div className="space-y-5">
@@ -41,7 +41,9 @@ export function SurveySettingsStep({ wizard }: { wizard: ReturnType<typeof useSu
           min={1}
           placeholder="不限制"
           value={config.maxResponses ?? ""}
-          onChange={(e) => updateConfig({ maxResponses: e.target.value ? Number(e.target.value) : null })}
+          onChange={(e) =>
+            updateConfig({ maxResponses: e.target.value ? Number(e.target.value) : null })
+          }
         />
       </div>
 
@@ -64,5 +66,5 @@ export function SurveySettingsStep({ wizard }: { wizard: ReturnType<typeof useSu
         />
       </div>
     </div>
-  )
+  );
 }

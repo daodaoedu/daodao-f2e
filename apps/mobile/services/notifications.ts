@@ -54,7 +54,8 @@ const notificationMessages = {
     practiceCompletedBody: (practiceTitle: string, totalDays: number) =>
       `Congratulations on completing ${totalDays} days of "${practiceTitle}"!`,
     firstCheckInTitle: "🌟 First check-in",
-    firstCheckInBody: "Congratulations on your first check-in! This is the start of a great journey!",
+    firstCheckInBody:
+      "Congratulations on your first check-in! This is the start of a great journey!",
   },
 } as const;
 

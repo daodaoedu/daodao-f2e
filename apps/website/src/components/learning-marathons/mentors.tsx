@@ -368,7 +368,9 @@ export const Mentors = () => {
             <section className="mb-4">
               {activeMentor && activeMentor.experiences.length > 0 && (
                 <>
-                  <h3 className="body-md mb-2 font-bold text-basic-400">{t("mentor_modal_experiences_label")}</h3>
+                  <h3 className="body-md mb-2 font-bold text-basic-400">
+                    {t("mentor_modal_experiences_label")}
+                  </h3>
                   <ul>
                     {activeMentor.experiences.map((experience) => (
                       <li key={experience} className="body-sm text-basic-400">
@@ -380,7 +382,9 @@ export const Mentors = () => {
               )}
             </section>
             <section>
-              <h3 className="body-md mb-2 font-bold text-basic-400">{t("mentor_modal_intro_label")}</h3>
+              <h3 className="body-md mb-2 font-bold text-basic-400">
+                {t("mentor_modal_intro_label")}
+              </h3>
               <p className="body-sm whitespace-pre-wrap text-basic-400">
                 {activeMentor?.introduction || ""}
               </p>

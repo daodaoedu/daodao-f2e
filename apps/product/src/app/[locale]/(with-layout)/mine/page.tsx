@@ -131,19 +131,19 @@ export default function MyPage() {
             </button>
             <button
               type="button"
-              onClick={() => router.replace(HOME_TAB_PATHS.persona)}
-              className={cn("flex-1 py-2 text-sm font-medium transition-all", "text-text-dark/40")}
-            >
-              {t("tab_persona")}
-            </button>
-            <button
-              type="button"
               className={cn(
                 "flex-1 py-2 text-sm font-medium transition-all",
                 "text-text-dark border-b-2 border-logo-cyan -mb-px"
               )}
             >
               {t("tab_mine")}
+            </button>
+            <button
+              type="button"
+              onClick={() => router.replace(HOME_TAB_PATHS.persona)}
+              className={cn("flex-1 py-2 text-sm font-medium transition-all", "text-text-dark/40")}
+            >
+              {t("tab_persona")}
             </button>
           </div>
 

@@ -193,7 +193,9 @@ export default function ProfileScreen() {
             )}
           </XStack>
           <Text fontSize={16} fontWeight="500" color={colors.text.dark} marginBottom="$3">
-            {isEmptyResult ? t("quiz_prompt") : t("learning_type_result", { result: learningTypeMessage })}
+            {isEmptyResult
+              ? t("quiz_prompt")
+              : t("learning_type_result", { result: learningTypeMessage })}
           </Text>
           <Button
             backgroundColor={colors.logo.orange}

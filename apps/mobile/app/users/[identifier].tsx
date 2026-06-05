@@ -5,8 +5,8 @@ import {
   getUserProfileByIdentifier,
   respondConnectionRequest,
   sendConnectionRequest,
-  useConnectionStatus,
   type UserProfileData,
+  useConnectionStatus,
   withdrawConnectionRequest,
 } from "@daodao/api";
 import {
@@ -216,7 +216,10 @@ export default function UserProfileRoute() {
       await withdrawConnectionRequest(String(connectionRequestId));
       await refreshConnectionState();
     } catch (connectionError) {
-      Alert.alert(t("withdraw_connection_failed"), getErrorMessage(connectionError, t("retry_later")));
+      Alert.alert(
+        t("withdraw_connection_failed"),
+        getErrorMessage(connectionError, t("retry_later"))
+      );
     } finally {
       setIsMutatingConnection(false);
     }
@@ -231,7 +234,10 @@ export default function UserProfileRoute() {
         await respondConnectionRequest(String(connectionRequestId), action);
         await refreshConnectionState();
       } catch (connectionError) {
-        Alert.alert(t("respond_connection_failed"), getErrorMessage(connectionError, t("retry_later")));
+        Alert.alert(
+          t("respond_connection_failed"),
+          getErrorMessage(connectionError, t("retry_later"))
+        );
       } finally {
         setIsMutatingConnection(false);
       }

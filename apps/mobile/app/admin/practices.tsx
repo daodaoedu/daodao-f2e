@@ -3,19 +3,19 @@ import useSWR from "swr";
 import { Button, Text, XStack, YStack } from "tamagui";
 import {
   AdminScreen,
+  asArray,
+  asRecord,
+  buildQuery,
   EmptyState,
   FieldRow,
+  formatDate,
+  formatNumber,
   LoadingState,
   PaginationRow,
   SearchRow,
   SectionCard,
   StatGrid,
   StatusPill,
-  asArray,
-  asRecord,
-  buildQuery,
-  formatDate,
-  formatNumber,
   stringValue,
 } from "@/components/admin/admin-components";
 import { colors } from "@/generated/design-tokens";
@@ -128,7 +128,10 @@ export default function AdminPracticesScreen() {
                     </XStack>
                     <FieldRow label={t("creator")} value={stringValue(author.name)} />
                     <FieldRow label={t("start_date")} value={formatDate(practice.startDate)} />
-                    <FieldRow label={t("duration_days")} value={formatNumber(practice.durationDays)} />
+                    <FieldRow
+                      label={t("duration_days")}
+                      value={formatNumber(practice.durationDays)}
+                    />
                     <FieldRow label={t("checkins")} value={formatNumber(practice.checkInCount)} />
                     <FieldRow label={t("likes")} value={formatNumber(practiceStats.likeCount)} />
                   </YStack>

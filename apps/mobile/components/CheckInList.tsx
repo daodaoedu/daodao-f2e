@@ -41,11 +41,7 @@ function formatDate(
   }
 }
 
-export function CheckInList({
-  checkIns,
-  emptyText,
-  practiceId,
-}: CheckInListProps) {
+export function CheckInList({ checkIns, emptyText, practiceId }: CheckInListProps) {
   const router = useRouter();
   const { locale } = useMobileI18n();
   const t = useMobileTranslation("mobile.checkInList");
@@ -102,7 +98,7 @@ export function CheckInList({
                     第 {checkIns.length - index} 次打卡
                   </Text>
                   <Text fontSize={12} color="$color" opacity={0.5}>
-                  {formatDate(checkIn.createdAt, locale, t)}
+                    {formatDate(checkIn.createdAt, locale, t)}
                   </Text>
                 </XStack>
 

@@ -148,13 +148,7 @@ export function StatGrid({
   );
 }
 
-export function SectionCard({
-  title,
-  children,
-}: {
-  title?: string;
-  children: ReactNode;
-}) {
+export function SectionCard({ title, children }: { title?: string; children: ReactNode }) {
   return (
     <Card
       padding="$4"

@@ -1,5 +1,9 @@
 import {
   disconnectUser,
+  type IConnectionItem,
+  type IConnectionRequest,
+  type IFollowPracticeProfile,
+  type IFollowUserProfile,
   respondConnectionRequest,
   useConnections,
   useFollowers,
@@ -7,10 +11,6 @@ import {
   useIncomingConnectionRequests,
   useOutgoingConnectionRequests,
   withdrawConnectionRequest,
-  type IConnectionItem,
-  type IConnectionRequest,
-  type IFollowPracticeProfile,
-  type IFollowUserProfile,
 } from "@daodao/api";
 import { Link2, UserPlus, UsersRound } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
@@ -516,9 +516,7 @@ export default function SocialTab() {
         </YStack>
 
         <YStack gap="$3">
-          <SectionTitle>
-            {t("followers_count", { count: followerItems.length })}
-          </SectionTitle>
+          <SectionTitle>{t("followers_count", { count: followerItems.length })}</SectionTitle>
           {followerItems.length === 0 ? (
             <EmptyState icon="following" text={t("empty_followers")} />
           ) : (

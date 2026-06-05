@@ -15,7 +15,13 @@ export default function CreateScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-      <YStack flex={1} alignItems="center" justifyContent="center" gap="$3" backgroundColor="$background">
+      <YStack
+        flex={1}
+        alignItems="center"
+        justifyContent="center"
+        gap="$3"
+        backgroundColor="$background"
+      >
         <Spinner color={colors.primary.base} />
         <Text fontSize={14} color="$color" opacity={0.7}>
           {t("loading")}

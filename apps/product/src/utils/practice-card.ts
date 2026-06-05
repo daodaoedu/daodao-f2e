@@ -9,7 +9,7 @@ export function calculateRemainingDays(endDate: string | null | undefined): numb
 
 export function calculateDaysProgress(
   startDate: string | null | undefined,
-  endDate: string | null | undefined,
+  endDate: string | null | undefined
 ): { elapsed: number; total: number } | null {
   if (!startDate || !endDate) return null;
   const start = parseISO(startDate);

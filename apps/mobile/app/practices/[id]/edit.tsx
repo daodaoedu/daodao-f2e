@@ -5,9 +5,9 @@ import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Input, ScrollView, Spinner, Text, TextArea, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { usePractice } from "@/hooks/usePractices";
 import { useMobileTranslation } from "@/i18n";
 import { api } from "@/services/api-client";
-import { usePractice } from "@/hooks/usePractices";
 
 type FrequencyOption = "daily" | "weekly" | "custom";
 type PrivacyStatus = "private" | "public" | "delayed";
@@ -162,7 +162,10 @@ export default function PracticeEditScreen() {
         },
       ]);
     } catch (error) {
-      Alert.alert(t("edit_save_failed"), error instanceof Error ? error.message : t("edit_save_failed"));
+      Alert.alert(
+        t("edit_save_failed"),
+        error instanceof Error ? error.message : t("edit_save_failed")
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -213,12 +216,22 @@ export default function PracticeEditScreen() {
 
         <ScrollView flex={1} contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
           <YStack gap="$4">
-            <Card backgroundColor="$background" borderWidth={1} borderColor="$borderColor" padding="$4" gap="$3">
+            <Card
+              backgroundColor="$background"
+              borderWidth={1}
+              borderColor="$borderColor"
+              padding="$4"
+              gap="$3"
+            >
               <YStack gap="$2">
                 <Text fontSize={14} fontWeight="500" color="$color">
                   {t("mobile_title_label")}
                 </Text>
-                <Input value={title} onChangeText={setTitle} placeholder={t("mobile_title_placeholder")} />
+                <Input
+                  value={title}
+                  onChangeText={setTitle}
+                  placeholder={t("mobile_title_placeholder")}
+                />
               </YStack>
 
               <YStack gap="$2">
@@ -234,7 +247,13 @@ export default function PracticeEditScreen() {
               </YStack>
             </Card>
 
-            <Card backgroundColor="$background" borderWidth={1} borderColor="$borderColor" padding="$4" gap="$3">
+            <Card
+              backgroundColor="$background"
+              borderWidth={1}
+              borderColor="$borderColor"
+              padding="$4"
+              gap="$3"
+            >
               <Text fontSize={14} fontWeight="500" color="$color">
                 {t("mobile_frequency_label")}
               </Text>
@@ -252,7 +271,11 @@ export default function PracticeEditScreen() {
                     >
                       <XStack flex={1} justifyContent="space-between" alignItems="center">
                         <YStack>
-                          <Text fontSize={15} fontWeight="500" color={isSelected ? colors.primary.darker : "$color"}>
+                          <Text
+                            fontSize={15}
+                            fontWeight="500"
+                            color={isSelected ? colors.primary.darker : "$color"}
+                          >
                             {t(option.labelKey)}
                           </Text>
                           <Text fontSize={12} color="$color" opacity={0.6}>
@@ -267,7 +290,13 @@ export default function PracticeEditScreen() {
               </YStack>
             </Card>
 
-            <Card backgroundColor="$background" borderWidth={1} borderColor="$borderColor" padding="$4" gap="$3">
+            <Card
+              backgroundColor="$background"
+              borderWidth={1}
+              borderColor="$borderColor"
+              padding="$4"
+              gap="$3"
+            >
               <Text fontSize={14} fontWeight="500" color="$color">
                 {t("mobile_duration_days_label")}
               </Text>
@@ -305,7 +334,9 @@ export default function PracticeEditScreen() {
                     }
                     onPress={() => setSessionDurationMinutes(minutes)}
                   >
-                    <Text color={sessionDurationMinutes === minutes ? colors.basic.white : "$color"}>
+                    <Text
+                      color={sessionDurationMinutes === minutes ? colors.basic.white : "$color"}
+                    >
                       {t("mobile_minutes", { count: minutes })}
                     </Text>
                   </Button>
@@ -313,7 +344,13 @@ export default function PracticeEditScreen() {
               </XStack>
             </Card>
 
-            <Card backgroundColor="$background" borderWidth={1} borderColor="$borderColor" padding="$4" gap="$3">
+            <Card
+              backgroundColor="$background"
+              borderWidth={1}
+              borderColor="$borderColor"
+              padding="$4"
+              gap="$3"
+            >
               <Text fontSize={14} fontWeight="500" color="$color">
                 {t("mobile_tags_limit_label")}
               </Text>
@@ -324,7 +361,13 @@ export default function PracticeEditScreen() {
               />
             </Card>
 
-            <Card backgroundColor="$background" borderWidth={1} borderColor="$borderColor" padding="$4" gap="$3">
+            <Card
+              backgroundColor="$background"
+              borderWidth={1}
+              borderColor="$borderColor"
+              padding="$4"
+              gap="$3"
+            >
               <Text fontSize={14} fontWeight="500" color="$color">
                 {t("mobile_privacy_label")}
               </Text>
