@@ -49,6 +49,7 @@ const CollapsedLocaleBadge = ({ pathname }: { pathname: string }) => {
   );
 };
 
+
 export const DesktopSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
   const t = useTranslations("app_product");
