@@ -324,7 +324,9 @@ export default function ConnectionsSettingsScreen() {
                                 fontSize={14}
                                 fontWeight="500"
                                 color="$color"
-                                onPress={() => router.push(`/users/${user?.identifier ?? user?.id}`)}
+                                onPress={() =>
+                                  router.push(`/users/${user?.identifier ?? user?.id}`)
+                                }
                               >
                                 {name}
                               </Text>

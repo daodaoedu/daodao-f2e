@@ -1,4 +1,4 @@
-import { submitPersonaAnswer, usePersonaProfileMe, useMutate } from "@daodao/api";
+import { submitPersonaAnswer, useMutate, usePersonaProfileMe } from "@daodao/api";
 import { useState } from "react";
 import { Alert, ScrollView as RNScrollView, TextInput } from "react-native";
 import { Button, Card, Text, XStack, YStack } from "tamagui";
@@ -25,7 +25,9 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
     setSubmitting(true);
     try {
       const res = await submitPersonaAnswer(
-        isChoice ? { questionId, selectedValue: selected } : { questionId, textAnswer: textAnswer.trim() }
+        isChoice
+          ? { questionId, selectedValue: selected }
+          : { questionId, textAnswer: textAnswer.trim() }
       );
       if (res.error) {
         Alert.alert(t("submitError"));
@@ -70,7 +72,13 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
         multiline
         numberOfLines={3}
         maxLength={300}
-        style={{ borderWidth: 1, borderColor: "#d1d5db", borderRadius: 8, padding: 8, fontSize: 14 }}
+        style={{
+          borderWidth: 1,
+          borderColor: "#d1d5db",
+          borderRadius: 8,
+          padding: 8,
+          fontSize: 14,
+        }}
       />
       <Button size="$3" onPress={handleSubmit} disabled={submitting || !textAnswer.trim()}>
         {submitting ? t("submitting") : t("submit")}
@@ -114,7 +122,9 @@ export function PersonaProfileTab() {
               p="$3"
               onPress={() => setExpandedId(isExpanded ? null : q.id)}
             >
-              <Text fontSize="$3" color="$gray10">{q.prompt}</Text>
+              <Text fontSize="$3" color="$gray10">
+                {q.prompt}
+              </Text>
               {isExpanded ? (
                 <InlineAnswerForm
                   questionId={q.id}
@@ -123,7 +133,9 @@ export function PersonaProfileTab() {
                   onSuccess={() => handleAnswerSuccess()}
                 />
               ) : (
-                <Text fontSize="$2" color="$blue9" mt="$1">{t("clickToAnswer")}</Text>
+                <Text fontSize="$2" color="$blue9" mt="$1">
+                  {t("clickToAnswer")}
+                </Text>
               )}
             </Card>
           );
@@ -131,7 +143,9 @@ export function PersonaProfileTab() {
 
         return (
           <Card key={q.id} bordered p="$3" bg="$background">
-            <Text fontSize="$2" color="$gray9" mb="$1">{q.prompt}</Text>
+            <Text fontSize="$2" color="$gray9" mb="$1">
+              {q.prompt}
+            </Text>
             <Text fontSize="$4" fontWeight="600">
               {q.answer?.selectedValue ?? q.answer?.textAnswer ?? ""}
             </Text>

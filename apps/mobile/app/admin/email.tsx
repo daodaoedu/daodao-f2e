@@ -4,17 +4,17 @@ import useSWR from "swr";
 import { Button, Input, Text, TextArea, XStack, YStack } from "tamagui";
 import {
   AdminScreen,
+  asArray,
+  asRecord,
+  buildQuery,
   EmptyState,
   FieldRow,
+  formatDate,
+  formatNumber,
   LoadingState,
   SectionCard,
   StatGrid,
   StatusPill,
-  asArray,
-  asRecord,
-  buildQuery,
-  formatDate,
-  formatNumber,
   stringValue,
 } from "@/components/admin/admin-components";
 import { colors } from "@/generated/design-tokens";
@@ -29,14 +29,18 @@ export default function AdminEmailScreen() {
   const [content, setContent] = useState("");
   const [sending, setSending] = useState(false);
   const historyEndpoint = useMemo(
-    () => buildQuery("/admin/email/history", { page: 1, limit: 20, sortBy: "sentAt", sortOrder: "desc" }),
+    () =>
+      buildQuery("/admin/email/history", {
+        page: 1,
+        limit: 20,
+        sortBy: "sentAt",
+        sortOrder: "desc",
+      }),
     []
   );
   const stats = useSWR("/email/stats", () => api.get<{ data?: unknown }>("/email/stats"));
   const health = useSWR("/email/health", () => api.get<{ data?: unknown }>("/email/health"));
-  const history = useSWR(historyEndpoint, () =>
-    api.get<{ data?: unknown }>(historyEndpoint)
-  );
+  const history = useSWR(historyEndpoint, () => api.get<{ data?: unknown }>(historyEndpoint));
 
   const statsData = asRecord(stats.data?.data);
   const healthData = asRecord(health.data?.data);
@@ -116,7 +120,13 @@ export default function AdminEmailScreen() {
                 {records.slice(0, 10).map((record, index) => (
                   <YStack key={`${stringValue(record.id, "email")}-${index}`} gap="$1">
                     <XStack justifyContent="space-between" gap="$2">
-                      <Text flex={1} fontSize={14} fontWeight="700" color="$color" numberOfLines={1}>
+                      <Text
+                        flex={1}
+                        fontSize={14}
+                        fontWeight="700"
+                        color="$color"
+                        numberOfLines={1}
+                      >
                         {stringValue(record.subject, stringValue(record.emailType))}
                       </Text>
                       <StatusPill
@@ -161,9 +171,19 @@ export default function AdminEmailScreen() {
 
       {activeTab === "send" ? (
         <SectionCard title={t("send_custom_email")}>
-          <Input value={recipient} onChangeText={setRecipient} placeholder={t("recipient")} autoCapitalize="none" />
+          <Input
+            value={recipient}
+            onChangeText={setRecipient}
+            placeholder={t("recipient")}
+            autoCapitalize="none"
+          />
           <Input value={subject} onChangeText={setSubject} placeholder={t("subject")} />
-          <TextArea value={content} onChangeText={setContent} placeholder={t("content")} minHeight={140} />
+          <TextArea
+            value={content}
+            onChangeText={setContent}
+            placeholder={t("content")}
+            minHeight={140}
+          />
           <Button
             disabled={sending || !recipient.trim() || !subject.trim() || !content.trim()}
             backgroundColor={colors.primary.base}

@@ -28,7 +28,10 @@ export default function ResourceCategoryDetailRoute() {
       subCategory ? `subcategory_${subCategory.value}` : undefined,
       subCategory?.label
     ) ??
-    translateValue(majorCategory ? `category_${majorCategory.value}` : undefined, majorCategory?.label) ??
+    translateValue(
+      majorCategory ? `category_${majorCategory.value}` : undefined,
+      majorCategory?.label
+    ) ??
     t("category_detail_fallback_title");
 
   return (

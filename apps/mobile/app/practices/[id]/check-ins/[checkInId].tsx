@@ -138,7 +138,12 @@ function EditCheckInModal({
   visible: boolean;
   checkIn?: CheckInDetailRecord;
   onClose: () => void;
-  onSave: (values: { mood: MoodType; note: string; tags: string[]; existingImageUrls: string[] }) => Promise<void>;
+  onSave: (values: {
+    mood: MoodType;
+    note: string;
+    tags: string[];
+    existingImageUrls: string[];
+  }) => Promise<void>;
 }) {
   const t = useMobileTranslation("mobile.checkInDetail");
   const [mood, setMood] = useState<MoodType | null>(null);

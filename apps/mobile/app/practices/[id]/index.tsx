@@ -25,14 +25,28 @@ import { useAuth } from "@/providers/AuthProvider";
 import { api } from "@/services/api-client";
 
 // 狀態標籤配置
-const statusConfig: Record<string, { labelKey: string; backgroundColor: string; textColor: string }> =
-  {
-    draft: { labelKey: "status_draft", backgroundColor: "rgba(255, 255, 255, 0.8)", textColor: "#666666" },
-    "not-started": { labelKey: "status_not_started", backgroundColor: "#E0F4FF", textColor: "#0088CC" },
-    "in-progress": { labelKey: "status_in_progress", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
-    active: { labelKey: "status_in_progress", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
-    completed: { labelKey: "status_completed", backgroundColor: "#10B981", textColor: "#FFFFFF" },
-  };
+const statusConfig: Record<
+  string,
+  { labelKey: string; backgroundColor: string; textColor: string }
+> = {
+  draft: {
+    labelKey: "status_draft",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    textColor: "#666666",
+  },
+  "not-started": {
+    labelKey: "status_not_started",
+    backgroundColor: "#E0F4FF",
+    textColor: "#0088CC",
+  },
+  "in-progress": {
+    labelKey: "status_in_progress",
+    backgroundColor: "#16B9B3",
+    textColor: "#FFFFFF",
+  },
+  active: { labelKey: "status_in_progress", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
+  completed: { labelKey: "status_completed", backgroundColor: "#10B981", textColor: "#FFFFFF" },
+};
 
 // 執行時機標籤
 const timingLabels: Record<string, string> = {

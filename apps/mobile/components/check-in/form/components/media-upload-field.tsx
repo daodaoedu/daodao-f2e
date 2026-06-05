@@ -1,9 +1,9 @@
+import { CHECK_IN_MAX_IMAGES } from "@daodao/shared/lib/check-in-image";
 import { Camera, X } from "@tamagui/lucide-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useCallback } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { Image, Text, View, XStack, YStack } from "tamagui";
-import { CHECK_IN_MAX_IMAGES } from "@daodao/shared/lib/check-in-image";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 

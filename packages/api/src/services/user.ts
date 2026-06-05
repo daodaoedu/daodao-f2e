@@ -241,7 +241,7 @@ export interface UpdateUserFormDataRequest {
   share?: string | string[];
   preferences?: Record<string, string[]>;
   referralSource?: string;
-  registrationFlow?: 'landing_page' | 'quiz' | 'action_maker';
+  registrationFlow?: "landing_page" | "quiz" | "action_maker";
 }
 
 /**

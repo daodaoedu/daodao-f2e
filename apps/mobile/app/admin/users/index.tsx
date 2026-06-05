@@ -4,17 +4,17 @@ import useSWR from "swr";
 import { Button, Text, XStack, YStack } from "tamagui";
 import {
   AdminScreen,
+  asArray,
+  asRecord,
+  buildQuery,
   EmptyState,
+  formatDate,
+  formatNumber,
   LoadingState,
   PaginationRow,
   SearchRow,
   SectionCard,
   StatGrid,
-  asArray,
-  asRecord,
-  buildQuery,
-  formatDate,
-  formatNumber,
   stringValue,
 } from "@/components/admin/admin-components";
 import { useMobileTranslation } from "@/i18n";
@@ -44,9 +44,13 @@ export default function AdminUsersScreen() {
   const segment = useSWR("/admin/user-stats/segmentation", () =>
     api.get<{ data?: unknown }>("/admin/user-stats/segmentation")
   );
-  const users = useSWR(endpoint, () => api.get<{ data?: unknown; pagination?: unknown }>(endpoint), {
-    revalidateOnFocus: false,
-  });
+  const users = useSWR(
+    endpoint,
+    () => api.get<{ data?: unknown; pagination?: unknown }>(endpoint),
+    {
+      revalidateOnFocus: false,
+    }
+  );
 
   const overviewData = asRecord(overview.data?.data);
   const segmentData = asRecord(segment.data?.data);

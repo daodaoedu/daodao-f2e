@@ -9,9 +9,21 @@ import { useMobileTranslation } from "@/i18n";
 import { useCreatePractice } from "@/providers/CreatePracticeProvider";
 
 const frequencyOptions = [
-  { value: "daily", labelKey: "mobile_frequency_daily", descriptionKey: "mobile_frequency_daily_description" },
-  { value: "weekly", labelKey: "mobile_frequency_weekly", descriptionKey: "mobile_frequency_weekly_description" },
-  { value: "custom", labelKey: "mobile_frequency_custom", descriptionKey: "mobile_frequency_custom_description" },
+  {
+    value: "daily",
+    labelKey: "mobile_frequency_daily",
+    descriptionKey: "mobile_frequency_daily_description",
+  },
+  {
+    value: "weekly",
+    labelKey: "mobile_frequency_weekly",
+    descriptionKey: "mobile_frequency_weekly_description",
+  },
+  {
+    value: "custom",
+    labelKey: "mobile_frequency_custom",
+    descriptionKey: "mobile_frequency_custom_description",
+  },
 ] as const;
 
 const targetDaysOptions = [7, 14, 21, 30, 60, 90, 100, 365];
@@ -72,7 +84,13 @@ export default function Step2Screen() {
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel={commonT("back")}>
+          <Button
+            size="$4"
+            circular
+            chromeless
+            onPress={handleBack}
+            accessibilityLabel={commonT("back")}
+          >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>

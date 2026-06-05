@@ -9,12 +9,12 @@ import { ShowcaseFeed } from "@/components/showcase/ShowcaseFeed";
 import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
 import { usePractices } from "@/hooks/usePractices";
-import { useMobileTranslation } from "@/i18n";
 import {
   type IShowcaseFeedParams,
   type IShowcasePractice,
   useShowcaseFeed,
 } from "@/hooks/useShowcaseFeed";
+import { useMobileTranslation } from "@/i18n";
 
 export default function ShowcaseScreen() {
   const t = useMobileTranslation("mobile.home");

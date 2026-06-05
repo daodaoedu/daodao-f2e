@@ -131,7 +131,13 @@ export default function PracticeSummaryScreen() {
 
   const renderHeader = () => (
     <XStack padding="$4" alignItems="center" gap="$3">
-      <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel={tCommon("back")}>
+      <Button
+        size="$4"
+        circular
+        chromeless
+        onPress={() => router.back()}
+        accessibilityLabel={tCommon("back")}
+      >
         <ChevronLeft size={24} color="$color" />
       </Button>
       <YStack flex={1}>

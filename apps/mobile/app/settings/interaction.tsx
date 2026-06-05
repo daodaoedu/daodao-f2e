@@ -36,10 +36,7 @@ export default function InteractionSettingsScreen() {
       assertSuccessfulResponse(response, t("saveError"));
     } catch (error) {
       setLocalIsOpenProfile(null);
-      Alert.alert(
-        t("errorTitle"),
-        error instanceof Error ? error.message : t("saveError")
-      );
+      Alert.alert(t("errorTitle"), error instanceof Error ? error.message : t("saveError"));
     } finally {
       setIsSaving(false);
     }

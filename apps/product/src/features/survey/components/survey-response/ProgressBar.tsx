@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { cn } from "@daodao/ui/lib/utils"
+import { cn } from "@daodao/ui/lib/utils";
 
 interface ProgressBarProps {
-  value: number
-  className?: string
+  value: number;
+  className?: string;
 }
 
 export function ProgressBar({ value, className }: ProgressBarProps) {
@@ -19,5 +19,5 @@ export function ProgressBar({ value, className }: ProgressBarProps) {
         aria-valuemax={100}
       />
     </div>
-  )
+  );
 }

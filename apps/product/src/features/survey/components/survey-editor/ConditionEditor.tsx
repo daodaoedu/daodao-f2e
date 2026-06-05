@@ -1,28 +1,28 @@
-"use client"
+"use client";
 
-import { Button } from "@daodao/ui/components/button"
-import { Input } from "@daodao/ui/components/input"
+import { Button } from "@daodao/ui/components/button";
+import { Input } from "@daodao/ui/components/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@daodao/ui/components/select"
-import { Plus, X } from "lucide-react"
-import type { Condition } from "../../types"
+} from "@daodao/ui/components/select";
+import { Plus, X } from "lucide-react";
+import type { Condition } from "../../types";
 
 const OPERATOR_LABELS: Record<Condition["operator"], string> = {
   equals: "等於",
   not_equals: "不等於",
   contains: "包含",
-}
+};
 
 interface ConditionEditorProps {
-  conditions: Condition[]
-  onChange: (conditions: Condition[]) => void
-  questions: Array<{ id: string; questionText: string }>
-  currentQuestionId: string
+  conditions: Condition[];
+  onChange: (conditions: Condition[]) => void;
+  questions: Array<{ id: string; questionText: string }>;
+  currentQuestionId: string;
 }
 
 export function ConditionEditor({
@@ -31,28 +31,28 @@ export function ConditionEditor({
   questions,
   currentQuestionId,
 }: ConditionEditorProps) {
-  const availableQuestions = questions.filter((q) => q.id !== currentQuestionId)
-  const condition = conditions[0] ?? null
+  const availableQuestions = questions.filter((q) => q.id !== currentQuestionId);
+  const condition = conditions[0] ?? null;
 
   const handleAdd = () => {
-    if (availableQuestions.length === 0) return
+    if (availableQuestions.length === 0) return;
     const newCondition: Condition = {
       dependsOn: availableQuestions[0]!.id,
       operator: "equals",
       value: "",
       showQuestionId: currentQuestionId,
-    }
-    onChange([newCondition])
-  }
+    };
+    onChange([newCondition]);
+  };
 
   const handleRemove = () => {
-    onChange([])
-  }
+    onChange([]);
+  };
 
   const handleUpdate = (patch: Partial<Condition>) => {
-    if (!condition) return
-    onChange([{ ...condition, ...patch }])
-  }
+    if (!condition) return;
+    onChange([{ ...condition, ...patch }]);
+  };
 
   if (!condition) {
     return (
@@ -66,7 +66,7 @@ export function ConditionEditor({
         <Plus className="h-3 w-3 mr-1" />
         新增顯示條件
       </Button>
-    )
+    );
   }
 
   return (
@@ -85,10 +85,7 @@ export function ConditionEditor({
 
       <div className="space-y-1.5">
         <p className="text-xs text-muted-foreground">依據問題</p>
-        <Select
-          value={condition.dependsOn}
-          onValueChange={(v) => handleUpdate({ dependsOn: v })}
-        >
+        <Select value={condition.dependsOn} onValueChange={(v) => handleUpdate({ dependsOn: v })}>
           <SelectTrigger className="h-7 text-xs">
             <SelectValue />
           </SelectTrigger>
@@ -124,12 +121,12 @@ export function ConditionEditor({
       <div className="space-y-1.5">
         <p className="text-xs text-muted-foreground">值</p>
         <Input
-          value={Array.isArray(condition.value) ? condition.value.join(',') : condition.value}
+          value={Array.isArray(condition.value) ? condition.value.join(",") : condition.value}
           onChange={(e) => handleUpdate({ value: e.target.value })}
           placeholder="輸入條件值"
           className="h-7 text-xs"
         />
       </div>
     </div>
-  )
+  );
 }

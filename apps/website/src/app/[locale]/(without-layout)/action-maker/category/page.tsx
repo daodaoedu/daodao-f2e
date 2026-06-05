@@ -7,7 +7,9 @@ export const metadata: Metadata = {
   robots: "noindex",
 };
 
-export default async function CategoryPage({ params }: PageProps<"/[locale]/action-maker/category">) {
+export default async function CategoryPage({
+  params,
+}: PageProps<"/[locale]/action-maker/category">) {
   const { locale } = await params;
   setRequestLocale(locale);
   return <ActionMakerCategory />;

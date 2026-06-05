@@ -60,7 +60,13 @@ export default function ResourceDetailRoute() {
 
   const renderHeader = () => (
     <XStack padding="$4" alignItems="center" gap="$3">
-      <Button size="$4" circular chromeless onPress={() => router.back()} accessibilityLabel={tCommon("back")}>
+      <Button
+        size="$4"
+        circular
+        chromeless
+        onPress={() => router.back()}
+        accessibilityLabel={tCommon("back")}
+      >
         <ChevronLeft size={24} color="$color" />
       </Button>
       <YStack flex={1}>
@@ -103,7 +109,11 @@ export default function ResourceDetailRoute() {
             <Text fontSize={14} color="$color" opacity={0.65} textAlign="center">
               {t("not_found_description")}
             </Text>
-            <Button backgroundColor={colors.primary.base} borderRadius="$md" onPress={() => mutate()}>
+            <Button
+              backgroundColor={colors.primary.base}
+              borderRadius="$md"
+              onPress={() => mutate()}
+            >
               <Text color="white" fontWeight="600">
                 {t("refresh")}
               </Text>
@@ -179,8 +189,14 @@ export default function ResourceDetailRoute() {
               </XStack>
 
               <XStack gap="$4" alignItems="center">
-                <Metric icon={<Eye size={16} color={colors.text.light} />} value={resource.viewCount} />
-                <Metric icon={<Heart size={16} color={colors.text.light} />} value={resource.favoriteCount} />
+                <Metric
+                  icon={<Eye size={16} color={colors.text.light} />}
+                  value={resource.viewCount}
+                />
+                <Metric
+                  icon={<Heart size={16} color={colors.text.light} />}
+                  value={resource.favoriteCount}
+                />
                 <Metric
                   icon={<MessageCircle size={16} color={colors.text.light} />}
                   value={resource.reviewCount}
@@ -206,7 +222,9 @@ export default function ResourceDetailRoute() {
                       size="$3"
                       borderRadius="$lg"
                       backgroundColor={colors.primary.palest}
-                      onPress={() => router.push(`/resource/categories/${majorCategory.value}` as never)}
+                      onPress={() =>
+                        router.push(`/resource/categories/${majorCategory.value}` as never)
+                      }
                     >
                       <Text fontSize={13} color={colors.primary.base} fontWeight="600">
                         {majorCategory.label}
@@ -234,7 +252,12 @@ export default function ResourceDetailRoute() {
             )}
 
             <XStack gap="$2">
-              <Button flex={1} backgroundColor={colors.primary.base} borderRadius="$md" onPress={openResource}>
+              <Button
+                flex={1}
+                backgroundColor={colors.primary.base}
+                borderRadius="$md"
+                onPress={openResource}
+              >
                 <XStack gap="$2" alignItems="center">
                   <ExternalLink size={18} color={colors.basic.white} />
                   <Text color="white" fontWeight="600">
@@ -242,7 +265,12 @@ export default function ResourceDetailRoute() {
                   </Text>
                 </XStack>
               </Button>
-              <Button width={52} borderRadius="$md" borderColor="$borderColor" onPress={shareResource}>
+              <Button
+                width={52}
+                borderRadius="$md"
+                borderColor="$borderColor"
+                onPress={shareResource}
+              >
                 <Share2 size={18} color="$color" />
               </Button>
             </XStack>
@@ -285,7 +313,13 @@ export default function ResourceDetailRoute() {
                   {t("review_count", { count: resource.reviewCount || 0 })}
                 </Text>
               </XStack>
-              <Text fontSize={14} color="$color" opacity={0.65} textAlign="center" paddingVertical="$5">
+              <Text
+                fontSize={14}
+                color="$color"
+                opacity={0.65}
+                textAlign="center"
+                paddingVertical="$5"
+              >
                 {t("reviews_unavailable")}
               </Text>
             </Card>

@@ -1,37 +1,31 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import { Card, CardContent } from "@daodao/ui/components/card"
-import { Button } from "@daodao/ui/components/button"
-import { Textarea } from "@daodao/ui/components/textarea"
-import { Checkbox } from "@daodao/ui/components/checkbox"
-import { Label } from "@daodao/ui/components/label"
-import { Separator } from "@daodao/ui/components/separator"
-import {
-  GripVertical,
-  ChevronUp,
-  ChevronDown,
-  Trash2,
-  Settings2,
-} from "lucide-react"
-import { cn } from "@daodao/ui/lib/utils"
-import { QuestionTypeSelect } from "./QuestionTypeSelect"
-import { OptionEditor } from "./OptionEditor"
-import { ConditionEditor } from "./ConditionEditor"
-import type { SurveyQuestion, QuestionType } from "../../types"
+import { Button } from "@daodao/ui/components/button";
+import { Card, CardContent } from "@daodao/ui/components/card";
+import { Checkbox } from "@daodao/ui/components/checkbox";
+import { Label } from "@daodao/ui/components/label";
+import { Separator } from "@daodao/ui/components/separator";
+import { Textarea } from "@daodao/ui/components/textarea";
+import { cn } from "@daodao/ui/lib/utils";
+import { ChevronDown, ChevronUp, GripVertical, Settings2, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
+import type { QuestionType, SurveyQuestion } from "../../types";
+import { ConditionEditor } from "./ConditionEditor";
+import { OptionEditor } from "./OptionEditor";
+import { QuestionTypeSelect } from "./QuestionTypeSelect";
 
-const OPTION_QUESTION_TYPES: QuestionType[] = ["multiple_choice", "single_choice", "ranking"]
+const OPTION_QUESTION_TYPES: QuestionType[] = ["multiple_choice", "single_choice", "ranking"];
 
 interface QuestionCardProps {
-  question: SurveyQuestion
-  index: number
-  allQuestions: SurveyQuestion[]
-  onUpdate: (updated: SurveyQuestion) => void
-  onDelete: () => void
-  onMoveUp: () => void
-  onMoveDown: () => void
-  isFirst: boolean
-  isLast: boolean
+  question: SurveyQuestion;
+  index: number;
+  allQuestions: SurveyQuestion[];
+  onUpdate: (updated: SurveyQuestion) => void;
+  onDelete: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  isFirst: boolean;
+  isLast: boolean;
 }
 
 export function QuestionCard({
@@ -45,32 +39,35 @@ export function QuestionCard({
   isFirst,
   isLast,
 }: QuestionCardProps) {
-  const [showConditions, setShowConditions] = useState(false)
-  const savedOptionsRef = useRef<import("../../types").QuestionOption[]>(question.options)
+  const [showConditions, setShowConditions] = useState(false);
+  const savedOptionsRef = useRef<import("../../types").QuestionOption[]>(question.options);
 
-  const showOptions = OPTION_QUESTION_TYPES.includes(question.questionType)
+  const showOptions = OPTION_QUESTION_TYPES.includes(question.questionType);
 
   const handleTypeChange = (newType: QuestionType) => {
-    const wasOptionType = OPTION_QUESTION_TYPES.includes(question.questionType)
-    const isOptionType = OPTION_QUESTION_TYPES.includes(newType)
+    const wasOptionType = OPTION_QUESTION_TYPES.includes(question.questionType);
+    const isOptionType = OPTION_QUESTION_TYPES.includes(newType);
 
     if (wasOptionType && !isOptionType) {
-      savedOptionsRef.current = question.options
+      savedOptionsRef.current = question.options;
     }
 
     const restoredOptions = isOptionType
-      ? (savedOptionsRef.current.length > 0
-          ? savedOptionsRef.current
-          : [{ label: "", order: 0 }, { label: "", order: 1 }])
-      : question.options
+      ? savedOptionsRef.current.length > 0
+        ? savedOptionsRef.current
+        : [
+            { label: "", order: 0 },
+            { label: "", order: 1 },
+          ]
+      : question.options;
 
-    onUpdate({ ...question, questionType: newType, options: restoredOptions })
-  }
+    onUpdate({ ...question, questionType: newType, options: restoredOptions });
+  };
 
   const availableQuestions = allQuestions.map((q) => ({
     id: q.id,
     questionText: q.questionText,
-  }))
+  }));
 
   return (
     <Card>
@@ -78,9 +75,7 @@ export function QuestionCard({
         {/* Header */}
         <div className="flex items-center gap-1.5">
           <GripVertical className="h-4 w-4 text-muted-foreground shrink-0 cursor-grab" />
-          <span className="text-xs font-medium text-muted-foreground shrink-0">
-            #{index + 1}
-          </span>
+          <span className="text-xs font-medium text-muted-foreground shrink-0">#{index + 1}</span>
           <div className="flex-1" />
           <Button
             variant="ghost"
@@ -124,18 +119,13 @@ export function QuestionCard({
         {/* Type + Required */}
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            <QuestionTypeSelect
-              value={question.questionType}
-              onChange={handleTypeChange}
-            />
+            <QuestionTypeSelect value={question.questionType} onChange={handleTypeChange} />
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             <Checkbox
               id={`required-${question.id}`}
               checked={question.isRequired}
-              onCheckedChange={(checked) =>
-                onUpdate({ ...question, isRequired: checked === true })
-              }
+              onCheckedChange={(checked) => onUpdate({ ...question, isRequired: checked === true })}
               className="h-3.5 w-3.5"
             />
             <Label htmlFor={`required-${question.id}`} className="text-xs cursor-pointer">
@@ -177,5 +167,5 @@ export function QuestionCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

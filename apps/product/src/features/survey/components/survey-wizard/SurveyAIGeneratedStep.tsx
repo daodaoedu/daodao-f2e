@@ -1,32 +1,32 @@
-"use client"
+"use client";
 
-import { Loader2, Sparkles } from "lucide-react"
-import { Button } from "@daodao/ui/components/button"
-import { Badge } from "@daodao/ui/components/badge"
-import { Card, CardContent } from "@daodao/ui/components/card"
-import { useSurveyGenerate } from "../../hooks/use-survey-generate"
-import type { useSurveyWizard } from "../../hooks/use-survey-wizard"
+import { Badge } from "@daodao/ui/components/badge";
+import { Button } from "@daodao/ui/components/button";
+import { Card, CardContent } from "@daodao/ui/components/card";
+import { Loader2, Sparkles } from "lucide-react";
+import { useSurveyGenerate } from "../../hooks/use-survey-generate";
+import type { useSurveyWizard } from "../../hooks/use-survey-wizard";
 
 export function SurveyAIGeneratedStep({ wizard }: { wizard: ReturnType<typeof useSurveyWizard> }) {
-  const { state, setGeneratedQuestions, setIsGenerating, nextStep } = wizard
-  const { generate, loading } = useSurveyGenerate()
-  const questions = state.aiGeneratedQuestions ?? []
+  const { state, setGeneratedQuestions, setIsGenerating, nextStep } = wizard;
+  const { generate, loading } = useSurveyGenerate();
+  const questions = state.aiGeneratedQuestions ?? [];
 
   const handleRegenerate = async () => {
-    if (!state.survey.purpose) return
-    setIsGenerating(true)
+    if (!state.survey.purpose) return;
+    setIsGenerating(true);
     try {
       const q = await generate({
         purpose: state.survey.purpose,
         audience: state.survey.audience,
         tone: state.survey.tone,
         questionCount: state.survey.questionCount,
-      })
-      setGeneratedQuestions(q)
+      });
+      setGeneratedQuestions(q);
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
+  };
 
   const handleAccept = () => {
     // Convert AI questions to survey questions
@@ -37,10 +37,10 @@ export function SurveyAIGeneratedStep({ wizard }: { wizard: ReturnType<typeof us
         options: q.options ?? [],
         isRequired: true,
         conditions: [],
-      })
-    })
-    nextStep()
-  }
+      });
+    });
+    nextStep();
+  };
 
   if (state.isGenerating) {
     return (
@@ -48,7 +48,7 @@ export function SurveyAIGeneratedStep({ wizard }: { wizard: ReturnType<typeof us
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <p className="text-sm text-muted-foreground">AI 正在生成問題...</p>
       </div>
-    )
+    );
   }
 
   if (questions.length === 0) {
@@ -60,7 +60,7 @@ export function SurveyAIGeneratedStep({ wizard }: { wizard: ReturnType<typeof us
           立即生成
         </Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -81,7 +81,9 @@ export function SurveyAIGeneratedStep({ wizard }: { wizard: ReturnType<typeof us
                 <span className="text-xs text-muted-foreground mt-0.5 shrink-0">{i + 1}.</span>
                 <div className="space-y-1 flex-1">
                   <p className="text-sm">{q.questionText}</p>
-                  <Badge variant="outline-ghost" className="text-xs">{q.questionType}</Badge>
+                  <Badge variant="outline-ghost" className="text-xs">
+                    {q.questionType}
+                  </Badge>
                 </div>
               </div>
             </CardContent>
@@ -93,5 +95,5 @@ export function SurveyAIGeneratedStep({ wizard }: { wizard: ReturnType<typeof us
         接受並繼續編輯
       </Button>
     </div>
-  )
+  );
 }

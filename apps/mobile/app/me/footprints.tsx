@@ -178,9 +178,7 @@ export default function FootprintsRoute() {
           <ScrollView
             flex={1}
             contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
-            refreshControl={
-              <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
-            }
+            refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
           >
             <YStack gap="$3">
               {footprints.map((item) => (
@@ -213,7 +211,13 @@ export default function FootprintsRoute() {
                     </Text>
                   </XStack>
 
-                  <Text fontSize={14} color="$color" opacity={0.72} lineHeight={21} numberOfLines={3}>
+                  <Text
+                    fontSize={14}
+                    color="$color"
+                    opacity={0.72}
+                    lineHeight={21}
+                    numberOfLines={3}
+                  >
                     {item.content}
                   </Text>
                 </Card>

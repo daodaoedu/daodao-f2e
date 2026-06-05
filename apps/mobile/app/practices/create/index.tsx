@@ -1,4 +1,8 @@
-import { type PracticeTemplateType, usePracticeTemplateCategories, usePracticeTemplates } from "@daodao/api";
+import {
+  type PracticeTemplateType,
+  usePracticeTemplateCategories,
+  usePracticeTemplates,
+} from "@daodao/api";
 import { ChevronLeft, ChevronRight, Plus, RefreshCw } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -26,7 +30,11 @@ const getCategoryColor = (category: string, index = 0) => {
     colors.semantic.warning,
   ];
 
-  return categoryColorMap[category] ?? fallbackColors[index % fallbackColors.length] ?? colors.primary.base;
+  return (
+    categoryColorMap[category] ??
+    fallbackColors[index % fallbackColors.length] ??
+    colors.primary.base
+  );
 };
 
 export default function CreatePracticeScreen() {

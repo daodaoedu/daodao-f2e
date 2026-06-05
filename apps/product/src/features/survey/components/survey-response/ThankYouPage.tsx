@@ -1,17 +1,20 @@
-"use client"
+"use client";
 
-import { Button } from "@daodao/ui/components/button"
-import { Card, CardContent } from "@daodao/ui/components/card"
-import { CheckCircle2 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Button } from "@daodao/ui/components/button";
+import { Card, CardContent } from "@daodao/ui/components/card";
+import { CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ThankYouPageProps {
-  message?: string
-  redirectPath?: string
+  message?: string;
+  redirectPath?: string;
 }
 
-export function ThankYouPage({ message = "感謝你的回應！", redirectPath = "/" }: ThankYouPageProps) {
-  const router = useRouter()
+export function ThankYouPage({
+  message = "感謝你的回應！",
+  redirectPath = "/",
+}: ThankYouPageProps) {
+  const router = useRouter();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-6 px-4">
@@ -26,5 +29,5 @@ export function ThankYouPage({ message = "感謝你的回應！", redirectPath =
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -5,16 +5,16 @@ import useSWR from "swr";
 import { Button, Text, XStack, YStack } from "tamagui";
 import {
   AdminScreen,
+  asArray,
+  asRecord,
   EmptyState,
   FieldRow,
+  formatDate,
+  formatNumber,
   LoadingState,
   SectionCard,
   StatGrid,
   StatusPill,
-  asArray,
-  asRecord,
-  formatDate,
-  formatNumber,
   stringValue,
 } from "@/components/admin/admin-components";
 import { colors } from "@/generated/design-tokens";
@@ -117,7 +117,10 @@ export default function AdminUserDetailScreen() {
             <FieldRow label={t("created_at")} value={formatDate(userData.createdAt)} />
             <FieldRow label={t("last_login_label")} value={formatDate(userData.lastLoginAt)} />
             <FieldRow label={t("login_count")} value={formatNumber(userData.loginCount)} />
-            <FieldRow label={t("current_role")} value={stringValue(currentRole.name, t("unassigned"))} />
+            <FieldRow
+              label={t("current_role")}
+              value={stringValue(currentRole.name, t("unassigned"))}
+            />
             <Button disabled={savingStatus} onPress={updateStatus}>
               {userData.isActive ? t("deactivate_user") : t("activate_user")}
             </Button>
@@ -127,7 +130,10 @@ export default function AdminUserDetailScreen() {
             items={[
               { label: t("total_practices"), value: formatNumber(activityData.totalPractices) },
               { label: t("active_practices"), value: formatNumber(activityData.activePractices) },
-              { label: t("completed_practices"), value: formatNumber(activityData.completedPractices) },
+              {
+                label: t("completed_practices"),
+                value: formatNumber(activityData.completedPractices),
+              },
               { label: t("total_checkins"), value: formatNumber(activityData.totalCheckIns) },
             ]}
           />

@@ -4,7 +4,7 @@ import { Alert, Pressable, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { NotificationType } from "@/constants/notification-type";
-import { type ReactionTypeType, REACTION_CONFIG } from "@/constants/reaction-type";
+import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
 import {
   type INotificationApiItem,
@@ -56,7 +56,10 @@ function getReactionEmoji(reactionType: string | undefined): string {
   return REACTION_CONFIG[reactionType as ReactionTypeType]?.emoji ?? "🙌";
 }
 
-function getNotificationText(item: INotificationApiItem, t: (key: string, values?: Record<string, string | number>) => string): string {
+function getNotificationText(
+  item: INotificationApiItem,
+  t: (key: string, values?: Record<string, string | number>) => string
+): string {
   const type = normalizeType(item.type);
   const name = item.actor.name;
   const count = item.aggregationCount ?? 1;
@@ -246,9 +249,9 @@ export default function NotificationsScreen() {
   const t = useMobileTranslation("mobile.notifications");
   const { notifications, unreadCount, isLoading, mutate } = useNotifications();
   const [refreshing, setRefreshing] = useState(false);
-  const [localOverrides, setLocalOverrides] = useState<Record<number, Partial<INotificationApiItem>>>(
-    {}
-  );
+  const [localOverrides, setLocalOverrides] = useState<
+    Record<number, Partial<INotificationApiItem>>
+  >({});
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -275,44 +278,54 @@ export default function NotificationsScreen() {
     [router]
   );
 
-  const handleAcceptConnect = useCallback(async (item: INotificationApiItem) => {
-    if (!item.connectionRequestId) return;
-    setLocalOverrides((prev) => ({
-      ...prev,
-      [item.id]: { ...(prev[item.id] ?? {}), type: NotificationType.connectAgree, isRead: true },
-    }));
-    try {
-      await respondConnectionRequest(String(item.connectionRequestId), "accept");
-      Alert.alert("", t("connect_accepted_toast", { name: item.actor.name }));
-      revalidateAllNotifications();
-    } catch {
-      setLocalOverrides((prev) => {
-        const next = { ...prev };
-        delete next[item.id];
-        return next;
-      });
-      Alert.alert(t("error_title"), t("operation_failed"));
-    }
-  }, [t]);
+  const handleAcceptConnect = useCallback(
+    async (item: INotificationApiItem) => {
+      if (!item.connectionRequestId) return;
+      setLocalOverrides((prev) => ({
+        ...prev,
+        [item.id]: { ...(prev[item.id] ?? {}), type: NotificationType.connectAgree, isRead: true },
+      }));
+      try {
+        await respondConnectionRequest(String(item.connectionRequestId), "accept");
+        Alert.alert("", t("connect_accepted_toast", { name: item.actor.name }));
+        revalidateAllNotifications();
+      } catch {
+        setLocalOverrides((prev) => {
+          const next = { ...prev };
+          delete next[item.id];
+          return next;
+        });
+        Alert.alert(t("error_title"), t("operation_failed"));
+      }
+    },
+    [t]
+  );
 
-  const handleRejectConnect = useCallback(async (item: INotificationApiItem) => {
-    if (!item.connectionRequestId) return;
-    setLocalOverrides((prev) => ({
-      ...prev,
-      [item.id]: { ...(prev[item.id] ?? {}), type: NotificationType.connectRejected, isRead: true },
-    }));
-    try {
-      await respondConnectionRequest(String(item.connectionRequestId), "reject");
-      revalidateAllNotifications();
-    } catch {
-      setLocalOverrides((prev) => {
-        const next = { ...prev };
-        delete next[item.id];
-        return next;
-      });
-      Alert.alert(t("error_title"), t("operation_failed"));
-    }
-  }, [t]);
+  const handleRejectConnect = useCallback(
+    async (item: INotificationApiItem) => {
+      if (!item.connectionRequestId) return;
+      setLocalOverrides((prev) => ({
+        ...prev,
+        [item.id]: {
+          ...(prev[item.id] ?? {}),
+          type: NotificationType.connectRejected,
+          isRead: true,
+        },
+      }));
+      try {
+        await respondConnectionRequest(String(item.connectionRequestId), "reject");
+        revalidateAllNotifications();
+      } catch {
+        setLocalOverrides((prev) => {
+          const next = { ...prev };
+          delete next[item.id];
+          return next;
+        });
+        Alert.alert(t("error_title"), t("operation_failed"));
+      }
+    },
+    [t]
+  );
 
   const handleMarkAllRead = useCallback(async () => {
     await markAllNotificationsRead().catch(() => {});

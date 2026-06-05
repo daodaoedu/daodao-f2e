@@ -150,7 +150,9 @@ export function PracticeCard({
   const accessibilityLabel = useMemo(() => {
     const status = practice.todayCheckedIn ? t("today_completed") : t("today_pending");
     const streak =
-      practice.currentStreak > 0 ? t("accessibility_streak", { count: practice.currentStreak }) : "";
+      practice.currentStreak > 0
+        ? t("accessibility_streak", { count: practice.currentStreak })
+        : "";
     return t("accessibility_label", {
       title: practice.title,
       status,

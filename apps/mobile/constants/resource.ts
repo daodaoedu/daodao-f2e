@@ -12,7 +12,11 @@ export const RESOURCE_CATEGORIES: ResourceCategory[] = [
     label: "資訊與電腦科學",
     image: "https://i.imgur.com/sIJeYIp.png",
   },
-  { value: "humanities_history_geography", label: "人文史地", image: "https://i.imgur.com/Ea2cmzs.png" },
+  {
+    value: "humanities_history_geography",
+    label: "人文史地",
+    image: "https://i.imgur.com/Ea2cmzs.png",
+  },
   { value: "nature_environment", label: "自然與環境", image: "https://i.imgur.com/jSaZ7AF.png" },
   { value: "arts_design", label: "藝術與設計", image: "https://i.imgur.com/GvJ1ddz.png" },
   { value: "education_learning", label: "教育與學習", image: "https://i.imgur.com/M21rIig.png" },

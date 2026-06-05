@@ -101,7 +101,9 @@ export default function Step5Screen() {
           error?: { message?: string };
           message?: string;
         };
-        throw new Error(errorResponse.error?.message ?? errorResponse.message ?? t("create_failed"));
+        throw new Error(
+          errorResponse.error?.message ?? errorResponse.message ?? t("create_failed")
+        );
       }
 
       Alert.alert(t("create_success_title"), t("create_success_message"), [
@@ -114,7 +116,10 @@ export default function Step5Screen() {
         },
       ]);
     } catch (error) {
-      Alert.alert(t("create_failed_title"), error instanceof Error ? error.message : t("retry_later"));
+      Alert.alert(
+        t("create_failed_title"),
+        error instanceof Error ? error.message : t("retry_later")
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -157,7 +162,13 @@ export default function Step5Screen() {
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel={tCommon("back")}>
+          <Button
+            size="$4"
+            circular
+            chromeless
+            onPress={handleBack}
+            accessibilityLabel={tCommon("back")}
+          >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>

@@ -26,15 +26,7 @@ interface IFollowUser {
   id: string;
 }
 
-function CountCard({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: number;
-  icon: ReactNode;
-}) {
+function CountCard({ label, value, icon }: { label: string; value: number; icon: ReactNode }) {
   return (
     <Card
       flex={1}

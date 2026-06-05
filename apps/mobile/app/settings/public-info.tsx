@@ -58,10 +58,12 @@ function getErrorDetails(error: unknown): Array<{ path?: string; message?: strin
   }
   if (typeof error === "object" && error !== null) {
     const directDetails = (error as { details?: unknown }).details;
-    if (Array.isArray(directDetails)) return directDetails as Array<{ path?: string; message?: string }>;
+    if (Array.isArray(directDetails))
+      return directDetails as Array<{ path?: string; message?: string }>;
 
     const nestedDetails = (error as { error?: { details?: unknown } }).error?.details;
-    if (Array.isArray(nestedDetails)) return nestedDetails as Array<{ path?: string; message?: string }>;
+    if (Array.isArray(nestedDetails))
+      return nestedDetails as Array<{ path?: string; message?: string }>;
   }
   return [];
 }
@@ -186,7 +188,8 @@ export default function PublicInfoSettingsScreen() {
   const [threads, setThreads] = useState("");
   const [personalUrl, setPersonalUrl] = useState("");
 
-  const userLocation = ((user as unknown as Record<string, unknown> | null)?.location as string) || "";
+  const userLocation =
+    ((user as unknown as Record<string, unknown> | null)?.location as string) || "";
   const { data: countriesData, isLoading: isCountriesLoading } = useCountries();
   const { data: selectedLocationCitiesData, isLoading: isSelectedLocationLoading } = useCities({
     search: userLocation || undefined,
@@ -220,7 +223,8 @@ export default function PublicInfoSettingsScreen() {
 
   const initialCountry = useMemo(() => {
     return (
-      selectedLocationCitiesData?.data?.find((item) => item.code === userLocation)?.countryCode ?? ""
+      selectedLocationCitiesData?.data?.find((item) => item.code === userLocation)?.countryCode ??
+      ""
     );
   }, [selectedLocationCitiesData, userLocation]);
 
@@ -566,8 +570,14 @@ export default function PublicInfoSettingsScreen() {
                     onPress={() => setShowCountryPicker(true)}
                     disabled={isCountriesLoading}
                   >
-                    <Text fontSize={14} color={countryLabel ? "$color" : "$color"} opacity={countryLabel ? 1 : 0.5}>
-                      {isCountriesLoading ? t("loadingCountries") : countryLabel || t("selectCountry")}
+                    <Text
+                      fontSize={14}
+                      color={countryLabel ? "$color" : "$color"}
+                      opacity={countryLabel ? 1 : 0.5}
+                    >
+                      {isCountriesLoading
+                        ? t("loadingCountries")
+                        : countryLabel || t("selectCountry")}
                     </Text>
                     <ChevronDown size={16} color="$color" opacity={0.5} />
                   </Button>
@@ -581,7 +591,11 @@ export default function PublicInfoSettingsScreen() {
                     disabled={!country || isCitiesLoading}
                     opacity={!country ? 0.6 : 1}
                   >
-                    <Text fontSize={14} color={cityLabel ? "$color" : "$color"} opacity={cityLabel ? 1 : 0.5}>
+                    <Text
+                      fontSize={14}
+                      color={cityLabel ? "$color" : "$color"}
+                      opacity={cityLabel ? 1 : 0.5}
+                    >
                       {!country
                         ? t("selectCountryFirst")
                         : isCitiesLoading

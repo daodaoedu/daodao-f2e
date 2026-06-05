@@ -51,7 +51,13 @@ export default function Step3Screen() {
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel={commonT("back")}>
+          <Button
+            size="$4"
+            circular
+            chromeless
+            onPress={handleBack}
+            accessibilityLabel={commonT("back")}
+          >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>

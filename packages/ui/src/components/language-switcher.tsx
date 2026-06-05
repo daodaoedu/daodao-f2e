@@ -17,7 +17,11 @@ interface LanguageSwitcherButtonsProps {
   showIcon?: boolean;
 }
 
-const LanguageSwitcherButtons = ({ searchParams, variant = "dark", showIcon = false }: LanguageSwitcherButtonsProps) => {
+const LanguageSwitcherButtons = ({
+  searchParams,
+  variant = "dark",
+  showIcon = false,
+}: LanguageSwitcherButtonsProps) => {
   const locale = useLocale();
   const pathname = usePathname();
 
@@ -61,7 +65,9 @@ interface LanguageSwitcherContentProps {
 const LanguageSwitcherContent = ({ variant, showIcon }: LanguageSwitcherContentProps) => {
   const searchParams = useSearchParams();
 
-  return <LanguageSwitcherButtons searchParams={searchParams} variant={variant} showIcon={showIcon} />;
+  return (
+    <LanguageSwitcherButtons searchParams={searchParams} variant={variant} showIcon={showIcon} />
+  );
 };
 
 interface LanguageSwitcherProps {
