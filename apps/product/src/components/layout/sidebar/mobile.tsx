@@ -3,6 +3,7 @@
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname } from "@daodao/i18n/navigation";
+import { LanguageSwitcher } from "@daodao/ui/components/language-switcher";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
@@ -59,6 +60,9 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
         <CustomLink href="/" aria-label={t("back_to_website")}>
           <Image src={favicon256Png.src} alt="daodao logo" width={40} height={40} />
         </CustomLink>
+      </div>
+      <div className="fixed top-5 right-5 z-20">
+        <LanguageSwitcher variant="light" />
       </div>
       <nav
         className={cn(
