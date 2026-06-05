@@ -62,8 +62,7 @@ function reorderFeedItems(items: FeedItem[], currentUserId?: string | null): Fee
   // Rule ②: 自己的互動推到後面
   if (currentUserId) {
     const isOwn = (item: FeedItem) =>
-      (item.type === "checkin" || item.type === "practice") &&
-      item.data.user?.id === currentUserId;
+      (item.type === "checkin" || item.type === "practice") && item.data.user?.id === currentUserId;
     const others = interactions.filter((i) => !isOwn(i));
     const own = interactions.filter((i) => isOwn(i));
     interactions.length = 0;
@@ -254,17 +253,17 @@ export default function HomePage() {
             </button>
             <button
               type="button"
-              onClick={() => router.replace(HOME_TAB_PATHS.persona)}
-              className={cn("flex-1 py-2 text-sm font-medium transition-all", "text-text-dark/40")}
-            >
-              {t("tab_persona")}
-            </button>
-            <button
-              type="button"
               onClick={() => router.replace(HOME_TAB_PATHS.mine)}
               className={cn("flex-1 py-2 text-sm font-medium transition-all", "text-text-dark/40")}
             >
               {t("tab_mine")}
+            </button>
+            <button
+              type="button"
+              onClick={() => router.replace(HOME_TAB_PATHS.persona)}
+              className={cn("flex-1 py-2 text-sm font-medium transition-all", "text-text-dark/40")}
+            >
+              {t("tab_persona")}
             </button>
           </div>
 
