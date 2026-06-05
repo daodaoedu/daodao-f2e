@@ -28,8 +28,11 @@ const LanguageSwitcherButtons = ({ searchParams, variant = "dark" }: LanguageSwi
           <CustomLink
             className={cn(
               "text-sm font-medium transition-colors hover:text-primary-base",
-              isLight ? "text-text-dark/60" : "text-white/70",
-              locale === language.value && "text-primary-base"
+              locale === language.value
+                ? "text-primary-base"
+                : isLight
+                  ? "text-text-dark/60"
+                  : "text-white/70"
             )}
             locale={language.value}
             href={{

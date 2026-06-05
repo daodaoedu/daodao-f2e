@@ -3,32 +3,47 @@
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg, VerticalFullSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { useLocale, useTranslations } from "@daodao/i18n";
-import { usePathname } from "@daodao/i18n/navigation";
+import { usePathname, useSearchParams } from "@daodao/i18n/navigation";
 import { languageOptions } from "@daodao/i18n/routing";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { LanguageSwitcher } from "@daodao/ui/components/language-switcher";
 import { cn } from "@daodao/ui/lib/utils";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
-const CollapsedLocaleBadge = ({ pathname }: { pathname: string }) => {
+const localeShortNames: Record<string, string> = {
+  "zh-TW": "中",
+  en: "EN",
+};
+
+const CollapsedLocaleBadgeContent = ({ pathname }: { pathname: string }) => {
   const locale = useLocale();
+  const searchParams = useSearchParams();
   const nextLocale = languageOptions.find((l) => l.value !== locale) ?? languageOptions[0];
+  const shortLabel = localeShortNames[locale] ?? locale.toUpperCase();
 
   return (
     <CustomLink
       locale={nextLocale.value}
-      href={{ pathname }}
+      href={{ pathname, query: searchParams?.toString() }}
       scroll={false}
       className="text-xs font-medium text-text-dark/60 hover:text-primary-base transition-colors"
       aria-label={`Switch to ${nextLocale.label}`}
     >
-      {locale === "zh-TW" ? "中" : "EN"}
+      {shortLabel}
     </CustomLink>
+  );
+};
+
+const CollapsedLocaleBadge = ({ pathname }: { pathname: string }) => {
+  return (
+    <Suspense fallback={<span className="text-xs font-medium text-text-dark/60">...</span>}>
+      <CollapsedLocaleBadgeContent pathname={pathname} />
+    </Suspense>
   );
 };
 
