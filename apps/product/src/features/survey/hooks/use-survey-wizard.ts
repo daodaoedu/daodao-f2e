@@ -166,7 +166,7 @@ export function useSurveyWizard(initialDraftKey?: string) {
   useEffect(() => {
     if (!initialDraftKey) return;
     try {
-      const saved = localStorage.getItem(`survey-draft-${initialDraftKey}`);
+      const saved = localStorage.getItem(initialDraftKey);
       if (saved) dispatch({ type: "RESTORE_DRAFT", draft: JSON.parse(saved) });
     } catch {
       /* ignore */

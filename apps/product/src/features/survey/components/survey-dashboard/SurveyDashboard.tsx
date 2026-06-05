@@ -106,7 +106,7 @@ export function SurveyDashboard({ surveyId }: { surveyId: string }) {
                   <p className="text-xs text-muted-foreground">填答者在哪題停止作答</p>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {dropOff
+                  {[...dropOff]
                     .sort((a, b) => a.last_position - b.last_position)
                     .map((d) => (
                       <div key={d.last_position} className="flex items-center gap-2 text-sm">

@@ -53,14 +53,14 @@ export function SurveyResponsePage() {
 
   // Restore saved answers
   useEffect(() => {
-    if (!survey || !shareId) return;
+    if (!shareId) return;
     try {
       const saved = localStorage.getItem(`survey-answers-${shareId}`);
       if (saved) setAnswers(JSON.parse(saved));
     } catch {
       /* ignore */
     }
-  }, [survey, shareId]);
+  }, [shareId]);
 
   // Auto-save answers (debounced)
   useEffect(() => {
