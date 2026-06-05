@@ -8,13 +8,18 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { CustomLink } from "./custom-link";
 
+export type LanguageSwitcherVariant = "dark" | "light";
+
 interface LanguageSwitcherButtonsProps {
   searchParams?: URLSearchParams | null;
+  variant?: LanguageSwitcherVariant;
 }
 
-const LanguageSwitcherButtons = ({ searchParams }: LanguageSwitcherButtonsProps) => {
+const LanguageSwitcherButtons = ({ searchParams, variant = "dark" }: LanguageSwitcherButtonsProps) => {
   const locale = useLocale();
   const pathname = usePathname();
+
+  const isLight = variant === "light";
 
   return (
     <div className="flex items-center gap-2">
@@ -22,7 +27,8 @@ const LanguageSwitcherButtons = ({ searchParams }: LanguageSwitcherButtonsProps)
         <div key={language.value} className="flex items-center gap-2">
           <CustomLink
             className={cn(
-              "text-sm font-medium text-white/70 transition-colors hover:text-primary-base",
+              "text-sm font-medium transition-colors hover:text-primary-base",
+              isLight ? "text-text-dark/60" : "text-white/70",
               locale === language.value && "text-primary-base"
             )}
             locale={language.value}
@@ -34,23 +40,33 @@ const LanguageSwitcherButtons = ({ searchParams }: LanguageSwitcherButtonsProps)
           >
             {language.label}
           </CustomLink>
-          {index < languageOptions.length - 1 && <span className="text-sm text-white/40">|</span>}
+          {index < languageOptions.length - 1 && (
+            <span className={cn("text-sm", isLight ? "text-text-dark/30" : "text-white/40")}>|</span>
+          )}
         </div>
       ))}
     </div>
   );
 };
 
-const LanguageSwitcherContent = () => {
+interface LanguageSwitcherContentProps {
+  variant?: LanguageSwitcherVariant;
+}
+
+const LanguageSwitcherContent = ({ variant }: LanguageSwitcherContentProps) => {
   const searchParams = useSearchParams();
 
-  return <LanguageSwitcherButtons searchParams={searchParams} />;
+  return <LanguageSwitcherButtons searchParams={searchParams} variant={variant} />;
 };
 
-export const LanguageSwitcher = () => {
+interface LanguageSwitcherProps {
+  variant?: LanguageSwitcherVariant;
+}
+
+export const LanguageSwitcher = ({ variant }: LanguageSwitcherProps) => {
   return (
-    <Suspense fallback={<LanguageSwitcherButtons />}>
-      <LanguageSwitcherContent />
+    <Suspense fallback={<LanguageSwitcherButtons variant={variant} />}>
+      <LanguageSwitcherContent variant={variant} />
     </Suspense>
   );
 };
