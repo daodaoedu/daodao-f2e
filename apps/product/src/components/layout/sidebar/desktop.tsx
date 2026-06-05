@@ -23,8 +23,10 @@ const localeShortNames: Record<string, string> = {
 const CollapsedLocaleBadgeContent = ({ pathname }: { pathname: string }) => {
   const locale = useLocale();
   const searchParams = useSearchParams();
-  const nextLocale = languageOptions.find((l) => l.value !== locale) ?? languageOptions[0];
+  const nextLocale = languageOptions.find((l) => l.value !== locale);
   const shortLabel = localeShortNames[locale] ?? locale.toUpperCase();
+
+  if (!nextLocale) return null;
 
   return (
     <CustomLink
@@ -46,6 +48,7 @@ const CollapsedLocaleBadge = ({ pathname }: { pathname: string }) => {
     </Suspense>
   );
 };
+
 
 export const DesktopSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
