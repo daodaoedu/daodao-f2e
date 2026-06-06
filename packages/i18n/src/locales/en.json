@@ -270,8 +270,10 @@
     "accentColor": "Accent Color",
     "currentModeHint": "Current mode",
     "previewText": "Preview text",
-    "mode.light": "Light Mode",
-    "mode.dark": "Dark Mode",
+    "mode": {
+      "light": "Light Mode",
+      "dark": "Dark Mode"
+    },
     "following_follow": "Follow",
     "following_follow_with_plus": "+ Follow",
     "following_unfollow": "Unfollow",
@@ -5489,15 +5491,21 @@
       "responseCount": "{count} responses",
       "responsesTitle": "Community Responses",
       "shareThoughts": "Share Thoughts",
-      "submitted.cta": "View Responses",
+      "submitted": {
+        "cta": "View Responses"
+      },
       "switchQuestion": "Next Question",
-      "tab.headerTitle": "Persona",
-      "tab.headerSubtitle": "Explore your unique style by answering questions",
+      "tab": {
+        "headerTitle": "Persona",
+        "headerSubtitle": "Explore your unique style by answering questions"
+      },
       "thoughtPlaceholder": "Share your thoughts...",
       "title": "Persona",
       "unlockHint": "Answer to unlock",
       "allResponsesShown": "All responses shown",
-      "myProfile.empty": "No questions answered yet"
+      "myProfile": {
+        "empty": "No questions answered yet"
+      }
     },
     "tab": {
       "headerTitle": "Meet all kinds of learners",
@@ -6097,14 +6105,20 @@
     "save_success": "Saved successfully",
     "showcase_search_clear": "Clear search",
     "hot_tags": "Hot Tags",
-    "steps.interests.title": "Select Interests",
-    "steps.interests.interestsLabel": "Interests",
-    "steps.interests.maxReached": "Maximum reached",
-    "steps.interests.professionalFieldsLabel": "Professional Fields",
-    "steps.referral.title": "Referral Source",
-    "steps.referral.subtitle": "How did you hear about Daodao?",
-    "steps.referral.otherLabel": "Other",
-    "steps.referral.otherPlaceholder": "Please specify"
+    "steps": {
+      "interests": {
+        "title": "Select Interests",
+        "interestsLabel": "Interests",
+        "maxReached": "Maximum reached",
+        "professionalFieldsLabel": "Professional Fields"
+      },
+      "referral": {
+        "title": "Referral Source",
+        "subtitle": "How did you hear about Daodao?",
+        "otherLabel": "Other",
+        "otherPlaceholder": "Please specify"
+      }
+    }
   },
   "resource": {
     "hot_tags": "Hot Tags",
