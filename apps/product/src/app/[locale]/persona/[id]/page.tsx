@@ -85,12 +85,8 @@ function InlineFlipCard({
     const el = backRef.current;
     if (!el) return;
     const contentHeight = el.scrollHeight;
-    if (contentHeight > extraMinHeight) {
-      setExtraMinHeight(contentHeight);
-    }
-  }, [isChoice, options?.length, extraMinHeight]);
-
-  const isChoice = questionType === "choice" && options && options.length > 0;
+    setExtraMinHeight((prev) => Math.max(prev, contentHeight));
+  }, [isChoice, options?.length]);
 
   return (
     <div style={{ perspective: "1000px" }} className="w-full mb-4">
