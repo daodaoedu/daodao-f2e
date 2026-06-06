@@ -77,8 +77,18 @@ function InlineFlipCard({
   const [answer, setAnswer] = useState("");
   const [selected, setSelected] = useState("");
   const [extraMinHeight, setExtraMinHeight] = useState(0);
+  const backRef = useRef<HTMLDivElement>(null);
 
   const isChoice = questionType === "choice" && options && options.length > 0;
+
+  useEffect(() => {
+    const el = backRef.current;
+    if (!el) return;
+    const contentHeight = el.scrollHeight;
+    if (contentHeight > extraMinHeight) {
+      setExtraMinHeight(contentHeight);
+    }
+  }, [isChoice, options?.length, extraMinHeight]);
 
   return (
     <div style={{ perspective: "1000px" }} className="w-full mb-4">
@@ -130,6 +140,7 @@ function InlineFlipCard({
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: card flip */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: card flip */}
         <div
+          ref={backRef}
           className="absolute inset-0 bg-white rounded-2xl px-6 pt-5 pb-6 shadow-sm border border-[#E8F8FF] flex flex-col cursor-pointer"
           style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
           onClick={() => onFlippedChange(false)}
