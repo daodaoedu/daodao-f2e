@@ -5,6 +5,20 @@ import type { NextConfig } from "next";
 
 loadEnvConfig(process.cwd());
 
+function buildRemotePatterns(): import("next").NextConfig["images"]["remotePatterns"] {
+  const patterns: import("next").NextConfig["images"]["remotePatterns"] = [
+    { protocol: "https", hostname: "lh3.googleusercontent.com" },
+    { protocol: "https", hostname: "pub-*.r2.dev" },
+  ];
+  const r2Url = process.env.R2_PUBLIC_URL;
+  if (r2Url) {
+    try {
+      patterns.push({ protocol: "https", hostname: new URL(r2Url).hostname });
+    } catch {}
+  }
+  return patterns;
+}
+
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
@@ -22,7 +36,7 @@ const nextConfig: NextConfig = {
     "@daodao/ui",
   ],
   images: {
-    unoptimized: true,
+    remotePatterns: buildRemotePatterns(),
   },
   experimental: {
     globalNotFound: true,
