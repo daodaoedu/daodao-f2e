@@ -59,19 +59,26 @@ function QuoteSvg({ className }: { className?: string }) {
 
 function InlineFlipCard({
   prompt,
+  questionType,
+  options,
   flipped,
   onFlippedChange,
   onSubmit,
 }: {
   prompt: string;
+  questionType: "choice" | "sentence_completion" | "scenario";
+  options: string[] | null;
   flipped: boolean;
   onFlippedChange: (v: boolean) => void;
-  onSubmit: (answer: string) => void;
+  onSubmit: (answer: string, isChoice: boolean) => void;
 }) {
   const t = useTranslations("persona.detail");
   const tProfile = useTranslations("persona.myProfile");
   const [answer, setAnswer] = useState("");
+  const [selected, setSelected] = useState("");
   const [extraMinHeight, setExtraMinHeight] = useState(0);
+
+  const isChoice = questionType === "choice" && options && options.length > 0;
 
   return (
     <div style={{ perspective: "1000px" }} className="w-full mb-4">
@@ -130,36 +137,62 @@ function InlineFlipCard({
           <p className="text-sm text-primary-darker leading-relaxed shrink-0 line-clamp-2">
             {prompt}
           </p>
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation */}
-          {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation */}
-          <div
-            className="flex-1 flex items-center min-h-[80px]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <textarea
-              rows={1}
-              value={answer}
-              onChange={(e) => {
-                setAnswer(e.target.value);
-                e.target.style.height = "auto";
-                e.target.style.height = `${e.target.scrollHeight}px`;
-                const newHeight = e.target.scrollHeight + 160;
-                if (newHeight > 280) setExtraMinHeight(newHeight);
-              }}
-              placeholder={t("thoughtPlaceholder")}
-              className="w-full border-0 border-b-2 border-logo-cyan text-base text-text-dark outline-none bg-transparent placeholder:text-text-dark/25 pb-1 resize-none overflow-hidden"
-            />
-          </div>
+          {isChoice ? (
+            // biome-ignore lint/a11y/noStaticElementInteractions: stop propagation
+            // biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation
+            <div
+              className="flex-1 flex flex-col gap-2 mt-4 min-h-[80px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {options.map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setSelected(opt)}
+                  className={cn(
+                    "w-full text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
+                    selected === opt
+                      ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
+                      : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
+                  )}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          ) : (
+            // biome-ignore lint/a11y/noStaticElementInteractions: stop propagation
+            // biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation
+            <div
+              className="flex-1 flex items-center min-h-[80px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <textarea
+                rows={1}
+                value={answer}
+                onChange={(e) => {
+                  setAnswer(e.target.value);
+                  e.target.style.height = "auto";
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                  const newHeight = e.target.scrollHeight + 160;
+                  if (newHeight > 280) setExtraMinHeight(newHeight);
+                }}
+                placeholder={t("thoughtPlaceholder")}
+                className="w-full border-0 border-b-2 border-logo-cyan text-base text-text-dark outline-none bg-transparent placeholder:text-text-dark/25 pb-1 resize-none overflow-hidden"
+              />
+            </div>
+          )}
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (answer.trim()) onSubmit(answer.trim());
+              if (isChoice && selected) onSubmit(selected, true);
+              else if (!isChoice && answer.trim()) onSubmit(answer.trim(), false);
             }}
-            disabled={!answer.trim()}
+            disabled={isChoice ? !selected : !answer.trim()}
             className={cn(
-              "shrink-0 w-full py-3 rounded-full font-medium text-base transition-all",
-              answer.trim()
+              "shrink-0 w-full py-3 rounded-full font-medium text-base transition-all mt-4",
+              (isChoice ? selected : answer.trim())
                 ? "bg-[#F5A93E] text-white"
                 : "bg-[#F5A93E]/30 text-white/70 cursor-not-allowed"
             )}
@@ -498,6 +531,8 @@ export default function LearningPersonaDetailPage() {
 
   // Question + answers state
   const [questionPrompt, setQuestionPrompt] = useState("");
+  const [questionType, setQuestionType] = useState<"choice" | "sentence_completion" | "scenario">("sentence_completion");
+  const [questionOptions, setQuestionOptions] = useState<string[] | null>(null);
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [answers, setAnswers] = useState<PersonaQuestionAnswerItem[]>([]);
   const [nextCursor, setNextCursor] = useState<number | undefined>(undefined);
@@ -535,6 +570,8 @@ export default function LearningPersonaDetailPage() {
           setNextCursor(next ?? undefined);
           if (question) {
             setQuestionPrompt(question.prompt);
+            setQuestionType(question.questionType);
+            setQuestionOptions(question.options);
             setTotalCount(question.totalAnswerCount);
           }
         }
@@ -574,13 +611,16 @@ export default function LearningPersonaDetailPage() {
   const isSelfAnswered = answers.some((a) => a.isSelf);
   const isAnswered = isSelfAnswered || answeredInline;
 
-  const handleAnswerSubmit = async (ans: string) => {
+  const handleAnswerSubmit = async (ans: string, isChoice: boolean) => {
     if (!isAuthenticated) {
       login();
       return;
     }
     try {
-      const res = await submitPersonaAnswer({ questionId: id, textAnswer: ans });
+      const body = isChoice
+        ? { questionId: id, selectedValue: ans }
+        : { questionId: id, textAnswer: ans };
+      const res = await submitPersonaAnswer(body);
       if (res.error) {
         toast.error(tProfile("submitError"));
         return;
@@ -647,6 +687,8 @@ export default function LearningPersonaDetailPage() {
             ) : (
               <InlineFlipCard
                 prompt={questionPrompt}
+                questionType={questionType}
+                options={questionOptions}
                 flipped={cardFlipped}
                 onFlippedChange={setCardFlipped}
                 onSubmit={handleAnswerSubmit}
