@@ -7,7 +7,7 @@ import { Button } from "@daodao/ui/components/button";
 import { Progress } from "@daodao/ui/components/progress";
 import { cn } from "@daodao/ui/lib/utils";
 import { BadgeCheck, Check, ListChecks, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type OnboardingTaskKey, useOnboardingProgress } from "./onboarding-progress-context";
 
@@ -50,6 +50,7 @@ export function TaskGuideWidget() {
   const { taskList, completedTasks, badgeGranted, isLoading } = useOnboardingProgress();
   const t = useTranslations("onboarding.taskGuide");
   const router = useRouter();
+  const pathname = usePathname();
 
   const [expanded, setExpanded] = useState(false);
   const [celebrationDismissed, setCelebrationDismissed] = useState(false);
@@ -92,8 +93,10 @@ export function TaskGuideWidget() {
     sessionStorage.setItem(SESSION_KEY, "1");
   }, []);
 
-  // Gating：未登入 / isTemporary → 不顯示
-  if (!isAuthenticated || isTemporary) return null;
+  const isOnboarding = pathname?.replace(/^\/[a-z]{2}/, "").startsWith("/auth/onboarding");
+
+  // Gating：未登入 / isTemporary / onboarding 頁面 → 不顯示
+  if (!isAuthenticated || isTemporary || isOnboarding) return null;
   if (isLoading || taskList.length === 0) return null;
 
   const total = taskList.length;
