@@ -90,6 +90,8 @@ function InlineFlipCard({
     }
   }, [isChoice, options?.length, extraMinHeight]);
 
+  const isChoice = questionType === "choice" && options && options.length > 0;
+
   return (
     <div style={{ perspective: "1000px" }} className="w-full mb-4">
       <div
