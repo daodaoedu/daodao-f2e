@@ -38,6 +38,7 @@ export default function ShowcaseScreen() {
 
   // ── Mine tab state ──
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
+  const [isRefreshingPractices, setIsRefreshingPractices] = useState(false);
   const {
     inProgressTasks,
     completedTasks,
@@ -132,8 +133,11 @@ export default function ShowcaseScreen() {
         }
         refreshControl={
           <RefreshControl
-            refreshing={false}
-            onRefresh={() => mutatePractices()}
+            refreshing={isRefreshingPractices}
+            onRefresh={async () => {
+              setIsRefreshingPractices(true);
+              try { await mutatePractices(); } finally { setIsRefreshingPractices(false); }
+            }}
             tintColor={colors.primary.base}
           />
         }

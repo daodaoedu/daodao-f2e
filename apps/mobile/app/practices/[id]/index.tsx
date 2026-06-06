@@ -70,6 +70,7 @@ export default function PracticeDetailScreen() {
 
   const [showCheckInSheet, setShowCheckInSheet] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleCheckIn = useCallback(
     async (data: ICheckInData) => {
@@ -89,7 +90,12 @@ export default function PracticeDetailScreen() {
   );
 
   const handleRefresh = useCallback(async () => {
-    await mutate();
+    setIsRefreshing(true);
+    try {
+      await mutate();
+    } finally {
+      setIsRefreshing(false);
+    }
   }, [mutate]);
 
   const handleArchive = useCallback(() => {
@@ -206,7 +212,7 @@ export default function PracticeDetailScreen() {
         backgroundColor="$background"
         refreshControl={
           <RefreshControl
-            refreshing={false}
+            refreshing={isRefreshing}
             onRefresh={handleRefresh}
             tintColor={colors.primary.base}
           />

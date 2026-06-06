@@ -58,6 +58,7 @@ export default function ProfileScreen() {
 
   // ── Practices ──
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const {
     stats,
     inProgressTasks,
@@ -120,9 +121,13 @@ export default function ProfileScreen() {
     }
   }, [router, resultType]);
 
-  const handleRefresh = useCallback(() => {
-    mutateUser();
-    mutatePractices();
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([mutateUser(), mutatePractices()]);
+    } finally {
+      setIsRefreshing(false);
+    }
   }, [mutateUser, mutatePractices]);
 
   const handleOpenFootprints = useCallback(() => {
@@ -223,7 +228,7 @@ export default function ProfileScreen() {
           scrollEventThrottle={16}
           refreshControl={
             <RefreshControl
-              refreshing={false}
+              refreshing={isRefreshing}
               onRefresh={handleRefresh}
               tintColor={colors.primary.base}
             />

@@ -76,6 +76,7 @@ export default function HomeScreen() {
     isLoading: isMyLoading,
     mutate: mutatePractices,
   } = usePractices();
+  const [isRefreshingPractices, setIsRefreshingPractices] = useState(false);
 
   const filteredInProgressTasks = useMemo(() => {
     if (filterStatus === FilterStatus.completed) return [];
@@ -183,8 +184,11 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={
           <RefreshControl
-            refreshing={false}
-            onRefresh={() => mutatePractices()}
+            refreshing={isRefreshingPractices}
+            onRefresh={async () => {
+              setIsRefreshingPractices(true);
+              try { await mutatePractices(); } finally { setIsRefreshingPractices(false); }
+            }}
             tintColor={colors.primary.base}
           />
         }

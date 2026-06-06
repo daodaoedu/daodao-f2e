@@ -66,11 +66,12 @@ interface PublicPracticeViewProps {
     };
   };
   onRefresh: () => Promise<void>;
+  isRefreshing?: boolean;
 }
 
 const TALLY_REPORT_URL = "https://tally.so/r/BzGQy4";
 
-export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewProps) {
+export function PublicPracticeView({ practice, onRefresh, isRefreshing = false }: PublicPracticeViewProps) {
   const router = useRouter();
   const t = useMobileTranslation("mobile.practiceDetail");
   const {
@@ -190,7 +191,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
           backgroundColor="$background"
           refreshControl={
             <RefreshControl
-              refreshing={false}
+              refreshing={isRefreshing}
               onRefresh={onRefresh}
               tintColor={colors.primary.base}
             />
