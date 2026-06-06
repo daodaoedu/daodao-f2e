@@ -93,7 +93,7 @@ export function TaskGuideWidget() {
     sessionStorage.setItem(SESSION_KEY, "1");
   }, []);
 
-  const isOnboarding = pathname?.replace(/^\/[a-z]{2}/, "").startsWith("/auth/onboarding");
+  const isOnboarding = pathname?.replace(/^\/[a-z]{2}(-[a-zA-Z]{2})?(?=\/|$)/, "").startsWith("/auth/onboarding");
 
   // Gating：未登入 / isTemporary / onboarding 頁面 → 不顯示
   if (!isAuthenticated || isTemporary || isOnboarding) return null;
