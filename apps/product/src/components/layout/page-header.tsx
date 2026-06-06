@@ -112,7 +112,7 @@ export const PageHeader = ({
       </div>
 
       {/* Right Action */}
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end pr-10 md:pr-0">
         {rightAction !== null && (
           <Button
             variant="ghost"
