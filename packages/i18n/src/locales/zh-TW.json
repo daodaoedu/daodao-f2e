@@ -270,10 +270,8 @@
     "accentColor": "強調色",
     "currentModeHint": "目前模式",
     "previewText": "預覽文字",
-    "mode": {
-      "light": "淺色模式",
-      "dark": "深色模式"
-    },
+    "mode.light": "淺色模式",
+    "mode.dark": "深色模式",
     "following_follow": "關注",
     "following_follow_with_plus": "+ 關注",
     "following_unfollow": "取消關注",
@@ -5491,21 +5489,15 @@
       "responseCount": "{count} 則回應",
       "responsesTitle": "社群回應",
       "shareThoughts": "分享想法",
-      "submitted": {
-        "cta": "查看回應"
-      },
+      "submitted.cta": "查看回應",
       "switchQuestion": "換一題",
-      "tab": {
-        "headerTitle": "人格探索",
-        "headerSubtitle": "透過回答問題，探索你的獨特風格"
-      },
+      "tab.headerTitle": "人格探索",
+      "tab.headerSubtitle": "透過回答問題，探索你的獨特風格",
       "thoughtPlaceholder": "分享你的想法...",
       "title": "人格探索",
       "unlockHint": "回答問題以解鎖",
       "allResponsesShown": "已顯示所有回應",
-      "myProfile": {
-        "empty": "尚未回答任何問題"
-      }
+      "myProfile.empty": "尚未回答任何問題"
     },
     "tab": {
       "headerTitle": "遇見各式各樣的學習者",
@@ -6105,20 +6097,14 @@
     "save_success": "儲存成功",
     "showcase_search_clear": "清除搜尋",
     "hot_tags": "熱門標籤",
-    "steps": {
-      "interests": {
-        "title": "興趣選擇",
-        "interestsLabel": "興趣",
-        "maxReached": "已達上限",
-        "professionalFieldsLabel": "專業領域"
-      },
-      "referral": {
-        "title": "推薦來源",
-        "subtitle": "你是怎麼知道島島阿學的？",
-        "otherLabel": "其他",
-        "otherPlaceholder": "請填寫其他來源"
-      }
-    }
+    "steps.interests.title": "興趣選擇",
+    "steps.interests.interestsLabel": "興趣",
+    "steps.interests.maxReached": "已達上限",
+    "steps.interests.professionalFieldsLabel": "專業領域",
+    "steps.referral.title": "推薦來源",
+    "steps.referral.subtitle": "你是怎麼知道島島阿學的？",
+    "steps.referral.otherLabel": "其他",
+    "steps.referral.otherPlaceholder": "請填寫其他來源"
   },
   "resource": {
     "hot_tags": "熱門標籤",
