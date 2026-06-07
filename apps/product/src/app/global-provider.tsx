@@ -11,6 +11,7 @@ import { SheetManagerProvider } from "@daodao/ui/components/animate-ui/component
 import { Toaster } from "@daodao/ui/components/sonner";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
 import { useRouter } from "next/navigation";
+import { HarnessProvider } from "@/components/learning-harness/embedded/harness-gate";
 import { OnboardingProgressProvider } from "@/components/task-guide/onboarding-progress-context";
 import { TaskGuideWidget } from "@/components/task-guide/task-guide-widget";
 
@@ -79,9 +80,11 @@ function GlobalProvider({
                       }}
                     >
                       <OnboardingProgressProvider>
-                        <TaskGuideWidget />
-                        <Toaster />
-                        {children}
+                        <HarnessProvider>
+                          <TaskGuideWidget />
+                          <Toaster />
+                          {children}
+                        </HarnessProvider>
                       </OnboardingProgressProvider>
                     </AuthProvider>
                   </SheetManagerProvider>
