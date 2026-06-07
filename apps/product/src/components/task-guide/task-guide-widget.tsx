@@ -93,10 +93,13 @@ export function TaskGuideWidget() {
     sessionStorage.setItem(SESSION_KEY, "1");
   }, []);
 
-  const isOnboarding = pathname?.replace(/^\/[a-z]{2}(-[a-zA-Z]{2})?(?=\/|$)/, "").startsWith("/auth/onboarding");
+  const strippedPath = pathname?.replace(/^\/[a-z]{2}(-[a-zA-Z]{2})?(?=\/|$)/, "") || "/";
+  const isAllowedPage =
+    strippedPath === "/" ||
+    /^\/(notifications|mine|settings)(\/|$)/.test(strippedPath);
 
-  // Gating：未登入 / isTemporary / onboarding 頁面 → 不顯示
-  if (!isAuthenticated || isTemporary || isOnboarding) return null;
+  // Gating：未登入 / isTemporary / 非白名單頁面 → 不顯示
+  if (!isAuthenticated || isTemporary || !isAllowedPage) return null;
   if (isLoading || taskList.length === 0) return null;
 
   const total = taskList.length;
