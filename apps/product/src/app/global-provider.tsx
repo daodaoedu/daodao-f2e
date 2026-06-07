@@ -13,6 +13,7 @@ import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
 import { useRouter } from "next/navigation";
 import { OnboardingProgressProvider } from "@/components/task-guide/onboarding-progress-context";
 import { TaskGuideWidget } from "@/components/task-guide/task-guide-widget";
+import { TrackingRefCapture } from "@/components/tracking-ref-capture";
 
 interface GlobalProviderProps {
   head?: React.ReactNode;
@@ -40,6 +41,7 @@ function GlobalProvider({
     >
       {head}
       <body>
+        <TrackingRefCapture />
         <AnalyticsScripts />
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
           <DeviceProvider initialDevice={initialDevice}>
