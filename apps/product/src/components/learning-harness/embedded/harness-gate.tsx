@@ -42,7 +42,7 @@ export function HarnessProvider({ children }: { children: ReactNode }) {
         type="button"
         onClick={toggle}
         className={cn(
-          "fixed bottom-20 right-4 z-50 flex items-center gap-1.5 px-3 py-2 rounded-full shadow-lg transition-all text-xs font-medium",
+          "fixed bottom-20 left-4 z-50 flex items-center gap-1.5 px-3 py-2 rounded-full shadow-lg transition-all text-xs font-medium",
           enabled ? "bg-logo-cyan text-white" : "bg-white text-light-gray border border-light-gray"
         )}
       >
