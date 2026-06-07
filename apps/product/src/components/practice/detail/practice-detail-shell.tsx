@@ -380,7 +380,9 @@ export function PracticeDetailShell({
   const handleHeaderReactionToggle = useCallback(
     (type: ReactionTypeType) => {
       if (!currentUserId) {
-        router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+        const queryString = searchParams.toString();
+        const redirectUrl = queryString ? `${pathname}?${queryString}` : pathname;
+        router.push(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
         return;
       }
       const isSelected = currentUserReaction === type;
@@ -400,7 +402,7 @@ export function PracticeDetailShell({
         setPendingReaction(undefined);
       });
     },
-    [currentUserId, router, pathname, currentUserReaction, practiceId, mutateReactions]
+    [currentUserId, router, pathname, searchParams, currentUserReaction, practiceId, mutateReactions]
   );
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { openWarningDialog } = useDialog();
@@ -428,7 +430,9 @@ export function PracticeDetailShell({
 
   const handleToggleFollowPractice = async () => {
     if (!currentUserId) {
-      router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+      const queryString = searchParams.toString();
+      const redirectUrl = queryString ? `${pathname}?${queryString}` : pathname;
+      router.push(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
       return;
     }
     const wasFollowing = isFollowingPractice;

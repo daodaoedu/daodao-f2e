@@ -96,9 +96,7 @@ export function TaskGuideWidget() {
   const strippedPath = pathname?.replace(/^\/[a-z]{2}(-[a-zA-Z]{2})?(?=\/|$)/, "") || "/";
   const isAllowedPage =
     strippedPath === "/" ||
-    strippedPath.startsWith("/notifications") ||
-    strippedPath.startsWith("/mine") ||
-    strippedPath.startsWith("/settings");
+    /^\/(notifications|mine|settings)(\/|$)/.test(strippedPath);
 
   // Gating：未登入 / isTemporary / 非白名單頁面 → 不顯示
   if (!isAuthenticated || isTemporary || !isAllowedPage) return null;

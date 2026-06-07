@@ -483,7 +483,9 @@ export function CommentSection({
   const pathname = usePathname();
   const requireAuth = useCallback(() => {
     if (!isAuthenticated) {
-      router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+      const search = typeof window !== "undefined" ? window.location.search : "";
+      const redirectUrl = search ? `${pathname}${search}` : pathname;
+      router.push(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
       return false;
     }
     return true;

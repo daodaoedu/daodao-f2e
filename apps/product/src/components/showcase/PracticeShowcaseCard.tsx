@@ -116,7 +116,9 @@ export function PracticeShowcaseCard({
 
   const handleToggleFollow = async () => {
     if (!isAuthenticated) {
-      router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+      const search = typeof window !== "undefined" ? window.location.search : "";
+      const redirectUrl = search ? `${pathname}${search}` : pathname;
+      router.push(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
       return;
     }
     const wasFollowing = isFollowing;
