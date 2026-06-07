@@ -16,6 +16,7 @@ import {
   RecommendationSection,
 } from "@/components/dashboard";
 import { BackgroundAnimation, Banner } from "@/components/layout";
+import { DailyDigest, HarnessGate } from "@/components/learning-harness/embedded";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 import {
@@ -164,6 +165,12 @@ export default function MyPage() {
           ) : (
             <>
               <DashboardHeader stats={stats} />
+
+              {/* Harness: 每日聚合通知 */}
+              <HarnessGate>
+                <DailyDigest lastPracticeName={inProgressTasks[0]?.title} />
+              </HarnessGate>
+
               {!hasPractices && <RandomPracticesSection compact />}
               {hasPractices && (
                 <>

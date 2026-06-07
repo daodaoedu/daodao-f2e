@@ -46,6 +46,12 @@ import {
 } from "@/components/check-in/reactions";
 import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
 import {
+  BuddyEmberStatus,
+  DriftAlert,
+  HarnessGate,
+  SkillSuggestion,
+} from "@/components/learning-harness/embedded";
+import {
   ExecutionDurationCard,
   ExecutionTimingCard,
   PracticeOverviewCard,
@@ -609,6 +615,24 @@ export function PracticeDetailShell({
             showProgress
             creator={practice.creator}
           />
+
+          {/* Harness: Buddy + Drift + Skills */}
+          <HarnessGate>
+            <div className="px-4 space-y-3 mb-3">
+              <BuddyEmberStatus />
+              <DriftAlert
+                checkIns={(checkInsData?.data ?? []).map((c) => ({
+                  checkinDate: c.checkinDate,
+                  createdAt: c.createdAt,
+                  note: c.note,
+                }))}
+                frequencyMaxDays={
+                  practice.frequency === "3-5" ? 5 : practice.frequency === "2-4" ? 4 : 7
+                }
+              />
+              <SkillSuggestion tags={practice.tags} />
+            </div>
+          </HarnessGate>
 
           <div className="px-4">
             <div className="border-t border-[#E4EAE9] mb-3" />

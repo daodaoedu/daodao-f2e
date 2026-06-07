@@ -14,6 +14,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
+import {
+  HarnessGate,
+  LetterToFutureSelf,
+  PersonaQuickInit,
+} from "@/components/learning-harness/embedded";
 import { type ManualPracticeFormValues, manualPracticeFormSchema } from "@/components/practice";
 import { Step1 } from "@/components/practice/create/manual/steps/step-1";
 import { Step2 } from "@/components/practice/create/manual/steps/step-2";
@@ -353,16 +358,28 @@ export default function CreateManualPracticePage() {
               </div>
             )}
 
+            {/* Harness: Persona 快問 */}
+            {currentStep === 1 && (
+              <HarnessGate>
+                <PersonaQuickInit />
+              </HarnessGate>
+            )}
             {currentStep === 1 && <Step1 form={form} />}
             {currentStep === 2 && <Step2 form={form} />}
             {currentStep === 3 && <Step3 form={form} />}
             {currentStep === 4 && <Step4 form={form} />}
             {currentStep === 5 && (
-              <Step5
-                form={form}
-                privacyStatus={privacyStatus}
-                onPrivacyStatusChange={setPrivacyStatus}
-              />
+              <>
+                <Step5
+                  form={form}
+                  privacyStatus={privacyStatus}
+                  onPrivacyStatusChange={setPrivacyStatus}
+                />
+                {/* Harness: 寫信給未來的自己 */}
+                <HarnessGate>
+                  <LetterToFutureSelf />
+                </HarnessGate>
+              </>
             )}
 
             {/* Navigation Buttons */}

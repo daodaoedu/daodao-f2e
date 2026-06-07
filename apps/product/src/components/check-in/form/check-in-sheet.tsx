@@ -9,6 +9,7 @@ import { isBefore, parse, startOfDay } from "date-fns";
 import { CalendarCheck, Check, Eye } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { HarnessGate, PreCheckInRitual } from "@/components/learning-harness/embedded";
 import { CheckInStatus } from "@/constants/check-in-status";
 import { useCheckInPhase2Sheet } from "@/hooks/use-check-in-phase2-sheet";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
@@ -39,6 +40,8 @@ interface ICheckInSheetContentProps {
   existingImages?: string[];
   /** 提交按鈕文字 */
   submitButtonText?: string;
+  /** 最近一次打卡的筆記（Harness: pre-check-in ritual） */
+  lastCheckInNote?: string | null;
 }
 
 export const CheckInSheetContent = ({
@@ -47,6 +50,7 @@ export const CheckInSheetContent = ({
   initialValues,
   existingImages,
   submitButtonText,
+  lastCheckInNote,
 }: ICheckInSheetContentProps) => {
   const t = useTranslations("check_in");
   const resolvedSubmitButtonText = submitButtonText ?? t("submit_check_in");
@@ -87,6 +91,11 @@ export const CheckInSheetContent = ({
         <h2 className="text-md leading-8 font-medium text-bg-dark wrap-break-word mb-8">
           {taskTitle}
         </h2>
+
+        {/* Harness: Pre-check-in ritual */}
+        <HarnessGate>
+          <PreCheckInRitual lastNote={lastCheckInNote} practiceTitle={taskTitle} />
+        </HarnessGate>
 
         {/* Mood Selection */}
         <MoodSelector form={form} />

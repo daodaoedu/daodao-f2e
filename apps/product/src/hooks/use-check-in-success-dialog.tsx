@@ -10,6 +10,7 @@ import { SplitText } from "@daodao/ui/components/split-text";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { HarnessGate, PostCheckInFeedback } from "@/components/learning-harness/embedded";
 
 interface UseCheckInSuccessDialogOptions {
   title: string;
@@ -304,6 +305,9 @@ function CheckInSuccessContent({ title, from, to, encouragement }: CheckInSucces
     <>
       <Step1Animation title={title} from={from} to={to} />
       <Step2Animation encouragement={encouragement} />
+      <HarnessGate>
+        <PostCheckInFeedback />
+      </HarnessGate>
     </>
   );
 }

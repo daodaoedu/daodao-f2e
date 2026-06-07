@@ -29,6 +29,11 @@ import { motion } from "motion/react";
 import type { ComponentType } from "react";
 import { useState } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
+import {
+  Day1LetterReveal,
+  HarnessGate,
+  JourneyReview,
+} from "@/components/learning-harness/embedded";
 import { usePracticeSummaryImage } from "./hooks";
 import { PracticeSummaryCard } from "./practice-summary-card";
 
@@ -218,6 +223,25 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
             <PracticeSummaryCard summary={summary} />
           </div>
         </motion.section>
+
+        {/* Harness: 旅程回顧 + Day 1 對比 */}
+        <HarnessGate>
+          <motion.section
+            className="mb-6 space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+          >
+            <JourneyReview
+              moods={summary.topMoods.map((m) => m.mood)}
+              topNotes={summary.topNotes}
+            />
+            <Day1LetterReveal
+              firstNote={summary.topNotes[0] ?? null}
+              lastNote={summary.topNotes[summary.topNotes.length - 1] ?? null}
+            />
+          </motion.section>
+        </HarnessGate>
 
         {/* 分享功能區塊 */}
         <motion.section
