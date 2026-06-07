@@ -1,7 +1,8 @@
 "use client";
 
 import { useTranslations } from "@daodao/i18n";
-import { Bell, Flame } from "lucide-react";
+import { Bell } from "lucide-react";
+import { EmberFlame } from "./ember-flame";
 
 interface DailyDigestProps {
   lastPracticeName?: string;
@@ -19,7 +20,7 @@ export function DailyDigest({ lastPracticeName, lastNote }: DailyDigestProps) {
       </div>
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-2 text-xs text-text-dark">
-          <Flame className="size-3 text-orange-500 shrink-0" />
+          <EmberFlame className="size-4" animated />
           <span>小明打卡了 · 火苗在等你</span>
         </div>
         {lastPracticeName && (

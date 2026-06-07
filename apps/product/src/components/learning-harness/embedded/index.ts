@@ -2,6 +2,7 @@ export { BuddyEmberStatus } from "./buddy-ember-status";
 export { DailyDigest } from "./daily-digest";
 export { Day1LetterReveal } from "./day1-letter-reveal";
 export { DriftAlert } from "./drift-alert";
+export { EmberFlame } from "./ember-flame";
 export { HarnessGate } from "./harness-gate";
 export { JourneyReview } from "./journey-review";
 export { LetterToFutureSelf } from "./letter-to-future-self";
