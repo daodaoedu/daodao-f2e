@@ -5447,6 +5447,7 @@
   },
   "persona": {
     "tabLabel": "Learning Persona",
+    "tabLabelShort": "Persona",
     "myProfile": {
       "loading": "Loading...",
       "empty": "No questions yet",
@@ -5627,6 +5628,7 @@
     "settings_completion_prompt": "Complete your profile for more accurate learning recommendations",
     "settings_completion_label": "Profile completion",
     "settings_early_user_badge_done": "Completed the onboarding tasks",
+    "settings_language": "Language",
     "settings_logout": "Log out",
     "settings_logging_out": "Logging out...",
     "following_users_tab": "Following Users",

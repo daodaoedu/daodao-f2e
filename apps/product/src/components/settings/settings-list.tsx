@@ -2,13 +2,16 @@
 
 import { useSettingsCompletion } from "@daodao/api";
 import { ArrowRightOutlineSvg, TelescopeSvg } from "@daodao/assets";
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
+import { usePathname, useSearchParams } from "@daodao/i18n/navigation";
+import { languageOptions } from "@daodao/i18n/routing";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import {
   AlertCircle,
   Archive,
   BadgeCheck,
   Bell,
+  Globe,
   HeartHandshake,
   LibraryBig,
   LogOut,
@@ -102,6 +105,33 @@ function SettingsItemLink({ item, isIncomplete }: { item: SettingsItem; isIncomp
   );
 }
 
+function LanguageSwitchRow() {
+  const t = useTranslations("app_product");
+  const locale = useLocale();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const nextLocale = languageOptions.find((l) => l.value !== locale);
+
+  if (!nextLocale) return null;
+
+  return (
+    <div className="rounded bg-white overflow-hidden">
+      <CustomLink
+        locale={nextLocale.value}
+        href={{ pathname, query: searchParams?.toString() }}
+        scroll={false}
+        className="flex items-center gap-2 py-4 px-3 hover:bg-light-blue transition-colors"
+        aria-label={t("settings_language")}
+      >
+        <Globe className="size-4.5 text-light-gray shrink-0" />
+        <span className="flex-1 text-base text-text-dark">{t("settings_language")}</span>
+        <span className="text-sm text-text-dark/50">{nextLocale.label}</span>
+        <ArrowRightOutlineSvg className="size-4.5 text-bg-dark shrink-0" />
+      </CustomLink>
+    </div>
+  );
+}
+
 export const SettingsList = () => {
   const t = useTranslations("app_product");
   const { openLogoutDialog, isLoggingOut } = useLogoutDialog();
@@ -158,6 +188,9 @@ export const SettingsList = () => {
           );
         })}
       </ul>
+
+      {/* 語系切換 */}
+      <LanguageSwitchRow />
 
       {/* 登出按鈕 */}
       <button
