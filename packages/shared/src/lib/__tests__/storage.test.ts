@@ -12,6 +12,9 @@ describe("getStorageKey", () => {
     expect(getStorageKey(StorageEnum.AuthSignal)).toBe("_authsignal");
     expect(getStorageKey(StorageEnum.HomeFeedAnchor)).toBe("_homefeedanchor");
     expect(getStorageKey(StorageEnum.RegistrationFlow)).toBe("_registrationflow");
+    expect(getStorageKey(StorageEnum.HarnessDemoEnabled)).toBe("_harnessdemoenabled");
+    expect(getStorageKey(StorageEnum.HarnessPersona)).toBe("_harnesspersona");
+    expect(getStorageKey(StorageEnum.HarnessLetter)).toBe("_harnessletter");
   });
 });
 
@@ -27,6 +30,9 @@ describe("StorageEnum", () => {
     expect(keys).toContain("AuthSignal");
     expect(keys).toContain("HomeFeedAnchor");
     expect(keys).toContain("RegistrationFlow");
-    expect(keys).toHaveLength(9);
+    expect(keys).toContain("HarnessDemoEnabled");
+    expect(keys).toContain("HarnessPersona");
+    expect(keys).toContain("HarnessLetter");
+    expect(keys).toHaveLength(12);
   });
 });

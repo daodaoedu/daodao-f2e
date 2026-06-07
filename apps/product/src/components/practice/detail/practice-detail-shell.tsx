@@ -47,6 +47,7 @@ import {
 import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
 import {
   BuddyEmberStatus,
+  BuddyMessageCard,
   DriftAlert,
   HarnessGate,
   SkillSuggestion,
@@ -620,6 +621,7 @@ export function PracticeDetailShell({
           <HarnessGate>
             <div className="px-4 space-y-3 mb-3">
               <BuddyEmberStatus />
+              <BuddyMessageCard />
               <DriftAlert
                 checkIns={(checkInsData?.data ?? []).map((c) => ({
                   checkinDate: c.checkinDate,

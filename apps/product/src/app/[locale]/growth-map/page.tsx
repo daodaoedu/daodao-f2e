@@ -11,7 +11,7 @@ export default function GrowthMapPage() {
   const router = useRouter();
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
+    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-very-light-gray">
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
         <button
           type="button"

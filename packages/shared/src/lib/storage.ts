@@ -27,6 +27,12 @@ export enum StorageEnum {
   HomeFeedAnchor = "HomeFeedAnchor",
   /** 用於記錄註冊來源流程 */
   RegistrationFlow = "RegistrationFlow",
+  /** 用於開關 Learning Harness demo 嵌入 */
+  HarnessDemoEnabled = "HarnessDemoEnabled",
+  /** 用於存儲 Learning Harness 快速認識你資料 */
+  HarnessPersona = "HarnessPersona",
+  /** 用於存儲 Learning Harness 寫給未來自己的信 */
+  HarnessLetter = "HarnessLetter",
 }
 
 const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
@@ -39,6 +45,9 @@ const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   AuthSignal: "localStorage",
   HomeFeedAnchor: "sessionStorage",
   RegistrationFlow: "localStorage",
+  HarnessDemoEnabled: "localStorage",
+  HarnessPersona: "localStorage",
+  HarnessLetter: "localStorage",
 };
 
 export interface StorageInstance<T> {

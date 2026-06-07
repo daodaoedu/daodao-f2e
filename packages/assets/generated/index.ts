@@ -114,6 +114,7 @@ export { default as QuoteFillSvg } from "./persona/quote-fill";
 export { default as ActiveShaperSvg } from "./quiz/active-shaper";
 export { default as CommunityConnectorSvg } from "./quiz/community-connector";
 export { default as DeepExplorerSvg } from "./quiz/deep-explorer";
+export { default as EmberFlameSvg } from "./quiz/ember-flame";
 export { default as LiquidIntegratorSvg } from "./quiz/liquid-integrator";
 export { default as OrderBuilderSvg } from "./quiz/order-builder";
 export { default as QuoteSvg } from "./quiz/quote";

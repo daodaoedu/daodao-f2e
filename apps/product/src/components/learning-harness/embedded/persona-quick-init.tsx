@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "@daodao/i18n";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Textarea } from "@daodao/ui/components/textarea";
@@ -8,13 +9,13 @@ import { cn } from "@daodao/ui/lib/utils";
 import { Brain, Check } from "lucide-react";
 import { useCallback, useState } from "react";
 
-const STORAGE_KEY = "harness_persona";
-
 interface PersonaData {
   why: string;
   style: string;
   time: string;
 }
+
+const personaStorage = getStorage<PersonaData>(StorageEnum.HarnessPersona);
 
 export function PersonaQuickInit() {
   const t = useTranslations("learning_harness");
@@ -25,7 +26,7 @@ export function PersonaQuickInit() {
   const styles = t("persona_q2_options").split(",");
 
   const handleSave = useCallback(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    personaStorage.set(data);
     setSaved(true);
   }, [data]);
 

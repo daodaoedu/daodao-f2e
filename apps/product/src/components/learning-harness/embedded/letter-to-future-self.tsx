@@ -1,12 +1,19 @@
 "use client";
 
 import { useTranslations } from "@daodao/i18n";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Textarea } from "@daodao/ui/components/textarea";
+import { formatISO } from "date-fns";
 import { Check, Mail } from "lucide-react";
 import { useCallback, useState } from "react";
 
-const STORAGE_KEY = "harness_letter";
+interface HarnessLetterData {
+  text: string;
+  date: string;
+}
+
+const letterStorage = getStorage<HarnessLetterData>(StorageEnum.HarnessLetter);
 
 export function LetterToFutureSelf() {
   const t = useTranslations("learning_harness");
@@ -15,10 +22,7 @@ export function LetterToFutureSelf() {
 
   const handleSave = useCallback(() => {
     if (!letter.trim()) return;
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ text: letter, date: new Date().toISOString() })
-    );
+    letterStorage.set({ text: letter, date: formatISO(Date.now()) });
     setSaved(true);
   }, [letter]);
 

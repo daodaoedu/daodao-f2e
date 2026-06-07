@@ -1,13 +1,15 @@
 "use client";
 
 import type { MoodType, PracticeSummary as PracticeSummaryType } from "@daodao/api";
-import { FineSvg, HappySvg, MascotBasicSvg, NeutralSvg } from "@daodao/assets";
+import { EmberFlameSvg, FineSvg, HappySvg, MascotBasicSvg, NeutralSvg } from "@daodao/assets";
+import emberFlameJson from "@daodao/assets/images/quiz/ember-flame.json";
 import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Switch } from "@daodao/ui/components/switch";
 import { cn } from "@daodao/ui/lib/utils";
+import Lottie from "lottie-react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -15,14 +17,10 @@ import {
   BookOpen,
   Brain,
   Check,
-  Eye,
-  Flame,
   Heart,
   Lightbulb,
   Mail,
-  MessageCircle,
   RotateCcw,
-  Settings,
   Share2,
   Sparkles,
   Sunrise,
@@ -130,6 +128,37 @@ function Narrative({ text }: { text: string }) {
     <div className="bg-very-light-gray rounded-xl px-4 py-3 mb-1">
       <p className="text-sm text-text-dark leading-relaxed">{text}</p>
     </div>
+  );
+}
+
+function EmberFlame({
+  className,
+  animated = false,
+  muted = false,
+}: {
+  className?: string;
+  animated?: boolean;
+  muted?: boolean;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex shrink-0 items-center justify-center",
+        muted && "grayscale",
+        className
+      )}
+    >
+      {animated ? (
+        <Lottie
+          animationData={emberFlameJson}
+          autoplay
+          loop
+          className="size-full *:h-full *:w-full"
+        />
+      ) : (
+        <EmberFlameSvg className="size-full" />
+      )}
+    </span>
   );
 }
 
@@ -247,7 +276,7 @@ function DayDay1({ t }: { t: (k: string) => string }) {
             <div>
               <p className="text-sm font-medium text-text-dark">{t("j_d1_buddy_matched")}</p>
               <div className="flex items-center gap-1 mt-1">
-                <Flame className="size-3 text-orange-400" />
+                <EmberFlame className="size-3" />
                 <span className="text-[10px] text-light-gray">{t("ember_level_1")}</span>
               </div>
             </div>
@@ -321,7 +350,7 @@ function DayDay4({ t }: { t: (k: string) => string }) {
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
                 >
-                  <Flame className="size-4 text-orange-500" />
+                  <EmberFlame className="size-4" animated />
                 </motion.div>
                 <span className="text-xs text-text-dark">{t("ember_level_2")}</span>
               </div>
@@ -427,11 +456,10 @@ function DayDay12({ t }: { t: (k: string) => string }) {
                   }
                   style={{ opacity: level.opacity }}
                 >
-                  <Flame
-                    className={cn(
-                      level.size,
-                      level.animate ? "text-light-gray" : "text-orange-500"
-                    )}
+                  <EmberFlame
+                    className={level.size}
+                    animated={level.animate}
+                    muted={level.animate}
                   />
                 </motion.div>
                 <span className="text-[8px] text-light-gray mt-1 block">{level.label}</span>
@@ -472,7 +500,7 @@ function DayDay15({ t }: { t: (k: string) => string }) {
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
           >
-            <Flame className="size-5 text-orange-500" />
+            <EmberFlame className="size-5" animated />
             <span className="text-sm text-text-dark">{t("j_d15_ember_back")}</span>
           </motion.div>
         </motion.div>

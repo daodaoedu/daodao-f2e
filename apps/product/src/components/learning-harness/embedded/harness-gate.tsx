@@ -1,36 +1,36 @@
 "use client";
 
-import { Button } from "@daodao/ui/components/button";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { cn } from "@daodao/ui/lib/utils";
 import { FlaskConical } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
 
-const STORAGE_KEY = "harness_demo_enabled";
-
 const HarnessContext = createContext(false);
+const harnessDemoStorage = getStorage<boolean>(StorageEnum.HarnessDemoEnabled);
 
 export function useHarnessEnabled() {
   return useContext(HarnessContext);
 }
 
 export function HarnessProvider({ children }: { children: ReactNode }) {
+  const searchParams = useSearchParams();
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "1") setEnabled(true);
+    const stored = harnessDemoStorage.get();
+    if (stored) setEnabled(true);
 
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("harness") === "1") {
+    if (searchParams.get("harness") === "1") {
       setEnabled(true);
-      localStorage.setItem(STORAGE_KEY, "1");
+      harnessDemoStorage.set(true);
     }
-  }, []);
+  }, [searchParams]);
 
   const toggle = useCallback(() => {
     setEnabled((prev) => {
       const next = !prev;
-      localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
+      harnessDemoStorage.set(next);
       return next;
     });
   }, []);

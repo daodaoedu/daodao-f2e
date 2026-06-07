@@ -1,4 +1,5 @@
 export { BuddyEmberStatus } from "./buddy-ember-status";
+export { BuddyMessageCard } from "./buddy-message-card";
 export { DailyDigest } from "./daily-digest";
 export { Day1LetterReveal } from "./day1-letter-reveal";
 export { DriftAlert } from "./drift-alert";

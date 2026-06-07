@@ -33,6 +33,7 @@
     "@vercel/og": "^0.8.6",
     "add": "^2.0.6",
     "browser-image-compression": "^2.0.2",
+    "d3-force": "^3.0.0",
     "date-fns": "catalog:",
     "gsap": "catalog:",
     "lottie-react": "catalog:",
@@ -52,6 +53,7 @@
   "devDependencies": {
     "@daodao/config": "workspace:*",
     "@tailwindcss/postcss": "catalog:",
+    "@types/d3-force": "^3.0.10",
     "@types/matter-js": "^0.20.2",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

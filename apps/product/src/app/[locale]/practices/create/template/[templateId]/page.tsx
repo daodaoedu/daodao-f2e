@@ -27,6 +27,7 @@ import { ChevronDown, Loader, RefreshCcw } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout";
+import { HarnessGate, PersonaQuickInit } from "@/components/learning-harness/embedded";
 import {
   ExecutionDurationCard,
   ExecutionTimingCard,
@@ -471,6 +472,11 @@ export default function TemplateDetailPage() {
                 tags={template.tags}
               />
             </div>
+
+            {/* Harness: Persona 快問 */}
+            <HarnessGate>
+              <PersonaQuickInit />
+            </HarnessGate>
 
             {/* Execution Timing and Duration Cards */}
             <div className="grid grid-cols-2 gap-4 mb-3.5">

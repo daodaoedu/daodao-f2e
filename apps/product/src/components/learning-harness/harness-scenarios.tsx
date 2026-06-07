@@ -18,7 +18,7 @@ import {
   TrendingDown,
   Trophy,
   Users,
-  Video,
+  BookOpen,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type { ComponentType, ReactNode } from "react";
@@ -113,8 +113,8 @@ function ScenarioActive({ t }: { t: (key: string, values?: Record<string, string
         <p className="text-sm font-medium text-text-dark mb-1">{t("s1_auto_method")}</p>
         <p className="text-xs text-light-gray mb-3">{t("s1_auto_method_desc")}</p>
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#E6FBF8] border border-[#C1ECFF] w-fit">
-          <Video className="size-4 text-logo-cyan" />
-          <span className="text-sm font-medium text-logo-cyan">影片跟讀</span>
+          <BookOpen className="size-4 text-logo-cyan" />
+          <span className="text-sm font-medium text-logo-cyan">文字閱讀</span>
           <span className="text-[10px] text-light-gray ml-1">auto</span>
         </div>
         <p className="text-[10px] text-light-gray mt-2 italic">{t("s1_inferred_from")}</p>
@@ -122,8 +122,8 @@ function ScenarioActive({ t }: { t: (key: string, values?: Record<string, string
 
       <div className="bg-white rounded-2xl p-5 border border-[#C1ECFF]">
         <div className="text-center">
-          <h3 className="font-medium text-text-dark mb-1">商務日語口說計畫</h3>
-          <p className="text-xs text-light-gray mb-1">精通 N5-3 文法 + 跟讀法學職場日語</p>
+          <h3 className="font-medium text-text-dark mb-1">更了解人跟學習的關係</h3>
+          <p className="text-xs text-light-gray mb-1">看 People-Based Learning，從中找出更多以人為本的學習方式</p>
           <p className="text-xs text-logo-cyan mb-4">本週 4/3-5 次 · 達成率 120%</p>
 
           {!checked ? (
