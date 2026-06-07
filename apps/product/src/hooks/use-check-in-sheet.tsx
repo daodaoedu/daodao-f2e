@@ -13,6 +13,8 @@ interface IUseCheckInSheetOptions {
   onComplete: (data: CheckInData) => Promise<void> | void;
   /** 關閉時的回調 */
   onClose?: () => void;
+  /** 最近一次打卡的筆記（Harness: pre-check-in ritual） */
+  lastCheckInNote?: string | null;
 }
 
 /**
@@ -30,7 +32,12 @@ interface IUseCheckInSheetOptions {
  * openCheckInSheet();
  * ```
  */
-export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInSheetOptions) {
+export function useCheckInSheet({
+  taskTitle,
+  onComplete,
+  onClose,
+  lastCheckInNote,
+}: IUseCheckInSheetOptions) {
   const t = useTranslations("check_in");
   const { open } = useSheetManager();
   const closeRef = useRef<(() => void) | null>(null);
@@ -42,6 +49,7 @@ export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInS
       content: (
         <CheckInSheetContent
           taskTitle={taskTitle}
+          lastCheckInNote={lastCheckInNote}
           onComplete={async (data) => {
             // 先關閉 sheet
             closeRef.current?.();

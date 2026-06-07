@@ -21,13 +21,17 @@ const TAG_SKILL_MAP: Record<string, { titleKey: string; descKey: string; tipKey:
   },
 };
 
+const DEFAULT_SKILL = {
+  titleKey: "skill_cornell_title",
+  descKey: "skill_cornell_desc",
+  tipKey: "skill_cornell_tip",
+};
+
 export function SkillSuggestion({ tags }: SkillSuggestionProps) {
   const t = useTranslations("learning_harness");
 
-  const matchedSkill = tags?.find((tag) => TAG_SKILL_MAP[tag]);
-  if (!matchedSkill) return null;
-
-  const skill = TAG_SKILL_MAP[matchedSkill]!;
+  const matchedTag = tags?.find((tag) => TAG_SKILL_MAP[tag]);
+  const skill = (matchedTag ? TAG_SKILL_MAP[matchedTag] : undefined) ?? DEFAULT_SKILL;
 
   return (
     <div className="bg-white rounded-xl p-4 border border-[#C1ECFF]">
