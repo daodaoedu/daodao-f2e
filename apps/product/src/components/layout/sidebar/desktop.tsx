@@ -2,47 +2,17 @@
 
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg, VerticalFullSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
-import { useLocale, useTranslations } from "@daodao/i18n";
-import { usePathname, useSearchParams } from "@daodao/i18n/navigation";
-import { languageOptions } from "@daodao/i18n/routing";
+import { useTranslations } from "@daodao/i18n";
+import { usePathname } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
-import { LanguageSwitcher } from "@daodao/ui/components/language-switcher";
 import { cn } from "@daodao/ui/lib/utils";
-import { Globe } from "lucide-react";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
-const CollapsedLocaleBadgeContent = ({ pathname }: { pathname: string }) => {
-  const locale = useLocale();
-  const searchParams = useSearchParams();
-  const nextLocale = languageOptions.find((l) => l.value !== locale);
-
-  if (!nextLocale) return null;
-
-  return (
-    <CustomLink
-      locale={nextLocale.value}
-      href={{ pathname, query: searchParams?.toString() }}
-      scroll={false}
-      className="text-text-dark/60 hover:text-primary-base transition-colors"
-      aria-label={`Switch to ${nextLocale.label}`}
-    >
-      <Globe className="size-5" />
-    </CustomLink>
-  );
-};
-
-const CollapsedLocaleBadge = ({ pathname }: { pathname: string }) => {
-  return (
-    <Suspense fallback={<Globe className="size-5 text-text-dark/60" />}>
-      <CollapsedLocaleBadgeContent pathname={pathname} />
-    </Suspense>
-  );
-};
 
 export const DesktopSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
@@ -145,19 +115,6 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
         })}
       </ul>
 
-      {/* Language Switcher */}
-      <div
-        className={cn(
-          "flex items-center pb-4 pt-2 transition-all duration-300",
-          isCollapsed ? "justify-center" : "px-6"
-        )}
-      >
-        {isCollapsed ? (
-          <CollapsedLocaleBadge pathname={pathname} />
-        ) : (
-          <LanguageSwitcher variant="light" showIcon />
-        )}
-      </div>
     </nav>
   );
 };

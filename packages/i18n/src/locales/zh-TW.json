@@ -5447,6 +5447,7 @@
   },
   "persona": {
     "tabLabel": "學習人物誌",
+    "tabLabelShort": "人物誌",
     "myProfile": {
       "loading": "載入中...",
       "empty": "尚無問題",
@@ -5627,6 +5628,7 @@
     "settings_completion_prompt": "完成個人資訊設定，獲得更精準的學習推薦",
     "settings_completion_label": "個人設定完整度",
     "settings_early_user_badge_done": "已完成新手入門任務",
+    "settings_language": "語言切換",
     "settings_logout": "登出",
     "settings_logging_out": "登出中...",
     "following_users_tab": "關注的使用者",
