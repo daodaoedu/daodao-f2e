@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { clearTrackingRef, getTrackingRef } from "@/lib/tracking-ref";
 import { DynamicStep } from "./dynamic-step";
 import { InterestsSection } from "./interests-section";
 import { OnboardingStepper } from "./onboarding-stepper";
@@ -167,6 +168,11 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
         }
       }
 
+      const trackingRef = getTrackingRef();
+      if (trackingRef) {
+        referralSource = trackingRef;
+      }
+
       const updateData: Parameters<typeof updateCurrentUserWithFormData>[0] = {
         birthDay: format(values.birthDate, "yyyy-MM-dd"),
         name: values.name.trim(),
@@ -192,6 +198,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
       }
 
       await refreshAuth();
+      clearTrackingRef();
 
       // 記錄動態流程回答（非阻塞，失敗不影響用戶）
       if (activeFlow && flowSteps) {
