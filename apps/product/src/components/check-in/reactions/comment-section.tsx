@@ -2,10 +2,12 @@
 
 import type { ReactionTypeValue } from "@daodao/api";
 import { removeReaction, upsertReaction, useReactions } from "@daodao/api";
+import { useAuth } from "@daodao/auth";
 import { DialogOutlineSvg } from "@daodao/assets";
 import type { MentionCandidate } from "@daodao/features-mention";
 import { MentionInput, useMentionInput } from "@daodao/features-mention";
 import { useTranslations } from "@daodao/i18n";
+import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -135,6 +137,7 @@ interface CommentBubbleProps {
   onEdit?: (id: string, content: string, mentionedUserIds?: number[]) => Promise<unknown> | unknown;
   onDelete?: (id: string) => Promise<unknown> | unknown;
   participants: MentionCandidate[];
+  onAuthRequired?: () => boolean;
 }
 
 function CommentBubble({
@@ -145,6 +148,7 @@ function CommentBubble({
   onEdit,
   onDelete,
   participants,
+  onAuthRequired,
 }: CommentBubbleProps) {
   const t = useTranslations("app_product");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -187,6 +191,7 @@ function CommentBubble({
 
   const handleCommentReactionToggle = useCallback(
     (type: ReactionTypeType) => {
+      if (onAuthRequired && !onAuthRequired()) return;
       const isSelected = currentUserReaction === type;
       setPendingReaction(isSelected ? null : type);
       startReactionTransition(async () => {
@@ -203,7 +208,7 @@ function CommentBubble({
         setPendingReaction(undefined);
       });
     },
-    [currentUserReaction, comment.id, mutateReactions]
+    [onAuthRequired, currentUserReaction, comment.id, mutateReactions]
   );
   const { openWarningDialog } = useDialog();
 
@@ -473,6 +478,16 @@ export function CommentSection({
   onDeleteComment,
 }: CommentSectionProps) {
   const t = useTranslations("app_product");
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const requireAuth = useCallback(() => {
+    if (!isAuthenticated) {
+      router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+      return false;
+    }
+    return true;
+  }, [isAuthenticated, router, pathname]);
   const [inputValue, setInputValue] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyInputs, setReplyInputs] = useState<Record<string, string>>({});
@@ -547,6 +562,7 @@ export function CommentSection({
   }, [selectedReactions]);
 
   const handleSubmit = () => {
+    if (!requireAuth()) return;
     const trimmed = inputValue.trim();
     if (!trimmed) return;
 
@@ -565,6 +581,7 @@ export function CommentSection({
   };
 
   const handleReplySubmit = (parentId: string) => {
+    if (!requireAuth()) return;
     const replyValue = replyInputs[parentId] ?? "";
     const trimmed = replyValue.trim();
     if (!trimmed) return;
@@ -600,6 +617,7 @@ export function CommentSection({
         onEdit={onEditComment}
         onDelete={onDeleteComment}
         participants={participants}
+        onAuthRequired={requireAuth}
       />
       {/* Replies */}
       {comment.replies?.map((reply) => (
@@ -614,6 +632,7 @@ export function CommentSection({
             onEdit={onEditComment}
             onDelete={onDeleteComment}
             participants={participants}
+            onAuthRequired={requireAuth}
           />
         </div>
       ))}

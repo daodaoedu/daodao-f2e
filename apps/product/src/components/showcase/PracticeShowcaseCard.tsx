@@ -14,8 +14,9 @@ import {
   FlagOutlineSvg,
   TelescopeSvg,
 } from "@daodao/assets";
+import { useAuth } from "@daodao/auth";
 import { useLocale, useTranslations } from "@daodao/i18n";
-import { Link, useRouter } from "@daodao/i18n/navigation";
+import { Link, usePathname, useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
@@ -91,7 +92,9 @@ export function PracticeShowcaseCard({
   const [menuOpen, setMenuOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { data: practiceData } = usePracticeById(id);
   const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
@@ -112,6 +115,10 @@ export function PracticeShowcaseCard({
   }, [menuOpen]);
 
   const handleToggleFollow = async () => {
+    if (!isAuthenticated) {
+      router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+      return;
+    }
     const wasFollowing = isFollowing;
     setIsFollowing(!wasFollowing);
     try {

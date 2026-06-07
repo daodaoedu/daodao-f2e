@@ -379,6 +379,10 @@ export function PracticeDetailShell({
 
   const handleHeaderReactionToggle = useCallback(
     (type: ReactionTypeType) => {
+      if (!currentUserId) {
+        router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+        return;
+      }
       const isSelected = currentUserReaction === type;
       // Optimistic update: reflect change immediately before API resolves
       setPendingReaction(isSelected ? null : type);
@@ -396,7 +400,7 @@ export function PracticeDetailShell({
         setPendingReaction(undefined);
       });
     },
-    [currentUserReaction, practiceId, mutateReactions]
+    [currentUserId, router, pathname, currentUserReaction, practiceId, mutateReactions]
   );
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { openWarningDialog } = useDialog();
@@ -423,6 +427,10 @@ export function PracticeDetailShell({
   };
 
   const handleToggleFollowPractice = async () => {
+    if (!currentUserId) {
+      router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+      return;
+    }
     const wasFollowing = isFollowingPractice;
     setIsFollowingPractice(!wasFollowing);
     try {
