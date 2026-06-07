@@ -404,17 +404,17 @@ export function SkillGalaxy() {
             {graph.nodes
               .filter((node) => node.type === "skill")
               .map((node) => {
-              return (
-                <text
-                  key={`label-${node.id}`}
+                return (
+                  <text
+                    key={`label-${node.id}`}
                     x={node.x}
                     y={(node.y ?? 0) + node.radius + 14}
-                  textAnchor="middle"
+                    textAnchor="middle"
                     className="fill-text-dark text-[10px] font-semibold"
-                >
-                  {node.label}
-                </text>
-              );
+                  >
+                    {node.label}
+                  </text>
+                );
               })}
           </g>
         </svg>
