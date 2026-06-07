@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import type { PracticeStatus } from "@/constants/practice-status";
 import { PersonaProfileMe } from "@/components/persona/persona-profile-me";
+import { PersonaProfileUser } from "@/components/persona/persona-profile-user";
 import {
   mapPracticeStatusToTaskStatus,
   TaskStatus,
@@ -232,7 +233,11 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
 
       {/* 內容區域 */}
       {activeTab === "persona" ? (
-        <PersonaProfileMe />
+        isOwnData ? (
+          <PersonaProfileMe />
+        ) : (
+          <PersonaProfileUser targetUserId={userId} />
+        )
       ) : (
         <div className="space-y-2.5">
           {isLoading ? (

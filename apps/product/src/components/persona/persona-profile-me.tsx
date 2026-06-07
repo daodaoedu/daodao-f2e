@@ -2,8 +2,8 @@
 
 import { submitPersonaAnswer, useMutate, usePersonaProfileMe } from "@daodao/api";
 import { useLocale, useTranslations } from "@daodao/i18n";
-import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
@@ -102,7 +102,6 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
 export function PersonaProfileMe() {
   const t = useTranslations("persona");
   const locale = useLocale();
-  const router = useRouter();
   const { data, isLoading } = usePersonaProfileMe(locale);
   const mutate = useMutate();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -146,10 +145,9 @@ export function PersonaProfileMe() {
 
       {/* Single question card */}
       {isAnswered ? (
-        <button
-          type="button"
-          className="rounded-xl bg-white/80 backdrop-blur-sm p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow w-full text-left"
-          onClick={() => router.push(`/persona/${currentQuestion.id}`)}
+        <CustomLink
+          href={`/persona/${currentQuestion.id}`}
+          className="block rounded-xl bg-white/80 backdrop-blur-sm p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow w-full text-left"
         >
           <p className="text-xs text-gray-400 mb-1">{currentQuestion.prompt}</p>
           <p className="text-sm font-medium text-gray-800">
@@ -160,7 +158,7 @@ export function PersonaProfileMe() {
               ✦ {currentQuestion.answer?.resonanceCount} {t("myProfile.resonances")}
             </p>
           )}
-        </button>
+        </CustomLink>
       ) : (
         <div
           className={cn(
