@@ -4846,7 +4846,7 @@
     "success_title": "Check-in complete!",
     "success_default_encouragement": "Congrats, you took action again!",
     "success_continue_hint": "Want to record your mood? Continue filling in!",
-    "success_share_more": "Share more notes",
+    "success_share_more": "Record mood",
     "success_complete": "Done",
     "delete_dialog_title": "Delete this check-in?",
     "delete_dialog_message": "Are you sure you want to say goodbye to this check-in? This cannot be undone.",
