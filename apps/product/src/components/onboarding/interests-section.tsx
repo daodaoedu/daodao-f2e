@@ -78,7 +78,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
                       key={field.value}
                       variant={isSelected ? "outline-blue" : "outline-ghost"}
                       className={cn(
-                        "cursor-pointer transition-all px-4 py-2 rounded-lg",
+                        "cursor-pointer transition-all px-4 py-3 rounded-lg",
                         isSelected && "border-logo-cyan bg-light-blue",
                         isDisabled && "opacity-50 cursor-not-allowed"
                       )}
@@ -123,7 +123,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
                       key={category.value}
                       variant={isSelected ? "outline-blue" : "outline-ghost"}
                       className={cn(
-                        "cursor-pointer transition-all px-4 py-2 rounded-lg",
+                        "cursor-pointer transition-all px-4 py-3 rounded-lg",
                         isSelected && "border-logo-cyan bg-light-blue",
                         isDisabled && "opacity-50 cursor-not-allowed"
                       )}

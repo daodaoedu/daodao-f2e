@@ -112,7 +112,7 @@ export const FieldSelectionSheetContent = ({
                   variant="ghost"
                   onClick={() => handleAddField(field.value)}
                   disabled={!canAddMore}
-                  className="rounded-lg bg-very-light-blue border border-blue px-4 py-2"
+                  className="rounded-lg bg-very-light-blue border border-blue px-4 py-3"
                   aria-label={t("selection_add_item", { item: field.label })}
                 >
                   <span className="text-sm">{field.label}</span>
@@ -161,7 +161,7 @@ export const FieldSelectionSheetContent = ({
                   type="button"
                   variant="ghost"
                   onClick={() => handleRemoveField(value)}
-                  className="px-4 py-2 rounded-lg bg-white border border-blue transition-colors"
+                  className="px-4 py-3 rounded-lg bg-white border border-blue transition-colors"
                   aria-label={t("selection_remove_item", { item: getLabelByValue(value) })}
                 >
                   <span className="text-left flex-1">{getLabelByValue(value)}</span>

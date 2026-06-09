@@ -84,7 +84,7 @@ export const FieldSelectionSection = ({
                 {Array.isArray(field.value) && field.value.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {field.value.map((value) => (
-                      <Badge key={value} variant="outline-blue" className="rounded-lg px-4 py-2">
+                      <Badge key={value} variant="outline-blue" className="rounded-lg px-4 py-3">
                         {getLabelByValue(value)}
                       </Badge>
                     ))}
