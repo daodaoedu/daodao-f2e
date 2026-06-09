@@ -4627,7 +4627,7 @@
       "success": {
         "verified": {
           "title": "Email Verified!",
-          "description": "Complete your profile settings for more personalized learning recommendations."
+          "description": "Complete your profile for better recommendations."
         },
         "alreadyVerified": {
           "title": "Email Already Verified",
@@ -6873,7 +6873,7 @@
         "settings": "Settings"
       },
       "completion": {
-        "prompt": "Complete your profile settings for more personalized learning recommendations.",
+        "prompt": "Complete your profile for better recommendations.",
         "label": "Profile completion"
       },
       "items": {
@@ -6898,7 +6898,7 @@
     "notificationSettings": {
       "title": "Notification Settings",
       "globalTitle": "Notification Master Switch",
-      "globalDescription": "When off, all email notifications stop. The notification center will keep collecting updates.",
+      "globalDescription": "Turn off all email notifications. In-app notifications stay on.",
       "emailSection": "Email Notification Settings",
       "inAppNote": "The in-app notification center stays on. Only email notifications can be turned off.",
       "types": {
@@ -6944,7 +6944,7 @@
     "interactionSettings": {
       "title": "Interaction Settings",
       "openProfileTitle": "Make My Practices Public",
-      "openProfileDescription": "When enabled, your practices can be searched and shown to others.",
+      "openProfileDescription": "Allow others to discover your practices.",
       "enabledSuccess": "Your practices are now public.",
       "disabledSuccess": "Your practices are now private.",
       "errorTitle": "Error",
@@ -6974,7 +6974,7 @@
       "nameRequired": "Name is required.",
       "personalWebsite": "Personal Website",
       "hideConnectionsTitle": "Hide Connection Count",
-      "hideConnectionsDescription": "When enabled, others will not see your number of connected partners.",
+      "hideConnectionsDescription": "Hide your connection count from others.",
       "validationRequired": "This field is required",
       "validationUrl": "Please enter a valid URL",
       "validationCustomIdMin": "ID must be at least 3 characters",
