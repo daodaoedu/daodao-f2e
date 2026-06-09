@@ -6,7 +6,6 @@ import { useSheetManager } from "@daodao/ui/components/animate-ui/components/rad
 import { toast } from "@daodao/ui/components/sonner";
 import { useCallback, useRef } from "react";
 import { CheckInPhase2SheetContent } from "@/components/check-in/form/check-in-sheet";
-import type { MoodType } from "@/constants/mood";
 import { mapMoodTypeToApiMood } from "@/constants/mood";
 
 interface IUseCheckInPhase2SheetOptions {
@@ -30,23 +29,19 @@ export function useCheckInPhase2Sheet({
   const closeRef = useRef<(() => void) | null>(null);
 
   const openPhase2Sheet = useCallback(
-    (checkInId: string, mood: MoodType | null) => {
+    (checkInId: string) => {
       const { close } = open({
         title: t("phase2_title"),
         description: t("phase2_description"),
         content: (
           <CheckInPhase2SheetContent
             taskTitle={taskTitle}
-            mood={mood}
             onComplete={async (data) => {
               const loadingToast = toast.loading(t("saving"));
               try {
                 const apiMood = data.mood ? mapMoodTypeToApiMood(data.mood) : undefined;
                 await updatePracticeCheckInWithFormData(practiceId, checkInId, {
                   mood: apiMood,
-                  tags: data.tags,
-                  description: data.description,
-                  media: data.media,
                 });
                 closeRef.current?.();
                 // 刷新打卡列表 cache

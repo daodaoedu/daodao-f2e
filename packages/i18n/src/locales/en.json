@@ -4837,15 +4837,15 @@
     "edit_sheet_title": "Edit Check-in",
     "edit_sheet_description": "Update your check-in content",
     "save_changes": "Save Changes",
-    "phase2_title": "Share Notes",
-    "phase2_description": "Add tags, notes, and photos",
+    "phase2_title": "Select Mood",
+    "phase2_description": "How did you feel about today's learning?",
     "notes_saved": "Notes saved!",
     "save_failed": "Failed to save, please try again later",
     "share_sheet_title": "Share",
     "share_sheet_description": "Share your check-in record",
     "success_title": "Check-in complete!",
     "success_default_encouragement": "Congrats, you took action again!",
-    "success_continue_hint": "Want to leave more notes? Add tags, thoughts, and photos.",
+    "success_continue_hint": "Want to record your mood? Continue filling in!",
     "success_share_more": "Share more notes",
     "success_complete": "Done",
     "delete_dialog_title": "Delete this check-in?",
@@ -4922,6 +4922,7 @@
     "date_scroll_up": "Scroll up",
     "date_scroll_down": "Scroll down",
     "validation_mood_required": "Please select a mood",
+    "validation_tags_required": "Please select at least one tag",
     "validation_description_max": "Maximum {max} characters",
     "validation_media_max": "You can upload up to {max} images",
     "anonymous": "Anonymous",
@@ -6825,44 +6826,20 @@
         "explorer": {
           "name": "Explorer Island",
           "description": "You are a curious explorer who enjoys trying new things.",
-          "traits": [
-            "Curious",
-            "Willing to try",
-            "Independent thinker"
-          ],
-          "recommendations": [
-            "Daily reading",
-            "Coding practice",
-            "Language learning"
-          ]
+          "traits": ["Curious", "Willing to try", "Independent thinker"],
+          "recommendations": ["Daily reading", "Coding practice", "Language learning"]
         },
         "creator": {
           "name": "Creator Island",
           "description": "You are highly creative and good at turning ideas into action.",
-          "traits": [
-            "Creative",
-            "Hands-on",
-            "Artistic"
-          ],
-          "recommendations": [
-            "Writing practice",
-            "Art creation",
-            "Design learning"
-          ]
+          "traits": ["Creative", "Hands-on", "Artistic"],
+          "recommendations": ["Writing practice", "Art creation", "Design learning"]
         },
         "connector": {
           "name": "Connector Island",
           "description": "You build relationships easily and enjoy learning with others.",
-          "traits": [
-            "Communicative",
-            "Team-oriented",
-            "Empathetic"
-          ],
-          "recommendations": [
-            "Community activities",
-            "Language learning",
-            "Team projects"
-          ]
+          "traits": ["Communicative", "Team-oriented", "Empathetic"],
+          "recommendations": ["Community activities", "Language learning", "Team projects"]
         }
       }
     },
