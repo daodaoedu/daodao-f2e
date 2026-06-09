@@ -14,8 +14,8 @@ interface UseCheckInSubmitOptions {
   taskTitle: string;
   progressPercentage?: number;
   onComplete?: (data: ICheckInFormData) => void;
-  /** Phase 2 回調：打卡成功後使用者選擇「繼續分享心得」時呼叫，帶入打卡記錄 ID 和心情 */
-  onOpenPhase2?: (checkInId: string, mood: ICheckInFormData["mood"]) => void;
+  /** Phase 2 回調：打卡成功後使用者選擇「繼續選擇心情」時呼叫，帶入打卡記錄 ID */
+  onOpenPhase2?: (checkInId: string) => void;
 }
 
 /**
@@ -86,8 +86,8 @@ export const useCheckInSubmit = ({
       const result = await openSuccessDialog(from, to, encouragement);
 
       if (result.value === "share" && checkInId && onOpenPhase2) {
-        // 使用者選擇繼續分享心得，開啟 Phase 2 Sheet
-        onOpenPhase2(checkInId, data.mood);
+        // 使用者選擇繼續選擇心情，開啟 Phase 2 Sheet
+        onOpenPhase2(checkInId);
       } else if (result.value === "complete") {
         // 成功對話框關閉後，執行原本的完成回調
         onComplete?.(data);

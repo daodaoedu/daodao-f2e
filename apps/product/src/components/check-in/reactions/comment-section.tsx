@@ -2,8 +2,8 @@
 
 import type { ReactionTypeValue } from "@daodao/api";
 import { removeReaction, upsertReaction, useReactions } from "@daodao/api";
-import { useAuth } from "@daodao/auth";
 import { DialogOutlineSvg } from "@daodao/assets";
+import { useAuth } from "@daodao/auth";
 import type { MentionCandidate } from "@daodao/features-mention";
 import { MentionInput, useMentionInput } from "@daodao/features-mention";
 import { useTranslations } from "@daodao/i18n";

@@ -379,7 +379,7 @@ export const createPracticeCheckInWithFormData = async (
 export const updatePracticeCheckInWithFormData = async (
   practiceId: string,
   checkInId: string,
-  data: ICheckInFormData
+  data: Partial<ICheckInFormData>
 ): Promise<CreateCheckInResponse> => {
   const formData = new FormData();
 
@@ -520,7 +520,7 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
 export const useUpdatePracticeCheckIn = (practiceId: string, checkInId: string) => {
   const mutate = useMutate();
 
-  const updateCheckIn = async (formData: ICheckInFormData) => {
+  const updateCheckIn = async (formData: Partial<ICheckInFormData>) => {
     const response = await updatePracticeCheckInWithFormData(practiceId, checkInId, formData);
 
     // 刷新打卡列表的 cache（使用空 query 對象來匹配所有 query 參數組合）

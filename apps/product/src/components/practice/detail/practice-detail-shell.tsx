@@ -402,7 +402,15 @@ export function PracticeDetailShell({
         setPendingReaction(undefined);
       });
     },
-    [currentUserId, router, pathname, searchParams, currentUserReaction, practiceId, mutateReactions]
+    [
+      currentUserId,
+      router,
+      pathname,
+      searchParams,
+      currentUserReaction,
+      practiceId,
+      mutateReactions,
+    ]
   );
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { openWarningDialog } = useDialog();

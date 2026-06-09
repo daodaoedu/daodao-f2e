@@ -13,9 +13,9 @@ import { cn } from "@daodao/ui/lib/utils";
 import type { ElementType } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import type { PracticeStatus } from "@/constants/practice-status";
 import { PersonaProfileMe } from "@/components/persona/persona-profile-me";
 import { PersonaProfileUser } from "@/components/persona/persona-profile-user";
+import type { PracticeStatus } from "@/constants/practice-status";
 import {
   mapPracticeStatusToTaskStatus,
   TaskStatus,
@@ -96,7 +96,12 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
   const personaT = useTranslations("persona");
   const tabs: Tab[] = [
     { id: "practices", label: t("practice_section_title"), Icon: ExperimentSvg },
-    { id: "persona", label: personaT("tabLabel"), mobileLabel: personaT("tabLabelShort"), Icon: BookSvg },
+    {
+      id: "persona",
+      label: personaT("tabLabel"),
+      mobileLabel: personaT("tabLabelShort"),
+      Icon: BookSvg,
+    },
     { id: "plans", label: t("practice_tab_plans"), disabled: true, Icon: FlagSvg },
     { id: "ideas", label: t("practice_tab_ideas"), disabled: true, Icon: NoteSvg },
   ];

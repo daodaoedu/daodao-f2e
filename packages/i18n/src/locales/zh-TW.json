@@ -4837,16 +4837,16 @@
     "edit_sheet_title": "編輯打卡",
     "edit_sheet_description": "修改你的打卡內容",
     "save_changes": "儲存變更",
-    "phase2_title": "分享心得",
-    "phase2_description": "補充你的標籤、心得與照片",
+    "phase2_title": "選擇心情",
+    "phase2_description": "告訴我們今天的學習心情",
     "notes_saved": "心得已儲存！",
     "save_failed": "儲存失敗，請稍後再試",
     "share_sheet_title": "分享",
     "share_sheet_description": "分享你的打卡記錄",
     "success_title": "打卡成功!",
     "success_default_encouragement": "恭喜，你又成功行動了一次！",
-    "success_continue_hint": "想留下更多紀錄嗎？繼續填寫標籤、心得與照片吧！",
-    "success_share_more": "繼續分享心得",
+    "success_continue_hint": "想紀錄今天的心情嗎？繼續填寫吧！",
+    "success_share_more": "記錄心情",
     "success_complete": "完成",
     "delete_dialog_title": "確定刪除這個打卡?",
     "delete_dialog_message": "確定要跟這個打卡說再見了嗎？一旦刪除，就無法復原囉。",
@@ -4922,6 +4922,7 @@
     "date_scroll_up": "向上滾動",
     "date_scroll_down": "向下滾動",
     "validation_mood_required": "請選擇心情",
+    "validation_tags_required": "請至少選擇一個標籤",
     "validation_description_max": "最多 {max} 字",
     "validation_media_max": "最多只能上傳 {max} 張圖片",
     "anonymous": "匿名",
@@ -6825,44 +6826,20 @@
         "explorer": {
           "name": "探索者島",
           "description": "你是一位好奇心旺盛的探索者，喜歡嘗試新事物",
-          "traits": [
-            "好奇心強",
-            "勇於嘗試",
-            "獨立思考"
-          ],
-          "recommendations": [
-            "每日閱讀",
-            "程式學習",
-            "語言學習"
-          ]
+          "traits": ["好奇心強", "勇於嘗試", "獨立思考"],
+          "recommendations": ["每日閱讀", "程式學習", "語言學習"]
         },
         "creator": {
           "name": "創造者島",
           "description": "你擁有豐富的創造力，善於將想法付諸實踐",
-          "traits": [
-            "創意豐富",
-            "動手能力強",
-            "有藝術天賦"
-          ],
-          "recommendations": [
-            "寫作練習",
-            "藝術創作",
-            "設計學習"
-          ]
+          "traits": ["創意豐富", "動手能力強", "有藝術天賦"],
+          "recommendations": ["寫作練習", "藝術創作", "設計學習"]
         },
         "connector": {
           "name": "連結者島",
           "description": "你善於建立人際關係，喜歡與他人合作學習",
-          "traits": [
-            "善於溝通",
-            "團隊合作",
-            "同理心強"
-          ],
-          "recommendations": [
-            "社群活動",
-            "語言學習",
-            "團隊專案"
-          ]
+          "traits": ["善於溝通", "團隊合作", "同理心強"],
+          "recommendations": ["社群活動", "語言學習", "團隊專案"]
         }
       }
     },
