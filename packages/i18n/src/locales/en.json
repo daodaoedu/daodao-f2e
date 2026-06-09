@@ -1,11 +1,11 @@
 {
   "roadmap": {
-    "meta_title": "DaoDao Roadmap | What we're building and thinking about",
-    "meta_description": "See what DaoDao is building and considering, make a wish, and help us build a better DaoDao together.",
-    "hero_title": "DaoDao is evolving",
+    "meta_title": "Dao Dao Roadmap | What we're building and thinking about",
+    "meta_description": "See what Dao Dao is building and considering, make a wish, and help us build a better Dao Dao together.",
+    "hero_title": "Dao Dao is evolving",
     "hero_subtitle": "Everything we're building and thinking about is here. Every wish you make shapes where we go next.",
-    "hero_partners": "{count}+ partners involved",
-    "hero_feedback": "{count}+ pieces of feedback",
+    "hero_partners": "{count}+ Users Engaged",
+    "hero_feedback": "{count} Wishes Submitted",
     "tab_all": "All",
     "tab_wishes": "Wishes",
     "tab_scheduled": "Scheduled",
@@ -35,7 +35,7 @@
     "wish_pool_empty_desc": "Submit your first wish and it will appear here.",
     "wish_cta": "Make a wish",
     "wish_cta_sub": "Got an idea or a pain point? Tell us",
-    "empty_title": "No items in this category yet",
+    "empty_title": "No wishes in this category yet",
     "empty_desc": "Be the first to make a wish!",
     "loading": "Loading…",
     "load_failed": "Failed to load, please try again",
@@ -50,7 +50,7 @@
     "step2_placeholder": "Describe the situation or pain point (at least 10 characters)",
     "step2_min": "Please enter at least 10 characters",
     "step3_title": "What change do you hope for?",
-    "step3_placeholder": "Describe what you'd like DaoDao to become",
+    "step3_placeholder": "Describe what you'd like Dao Dao to become",
     "confirm_title": "Confirm and submit",
     "confirm_category": "Area",
     "confirm_situation": "Situation",
@@ -84,7 +84,7 @@
     "landing_persona_subtitle": "Where personal growth meets collective wisdom!",
     "landing_persona_profession": "Expertise",
     "landing_persona_exploration": "Exploring",
-    "landing_foundation_title": "Start with curiosity.\nSmall steps to practice everyday ",
+    "landing_foundation_title": "Start with curiosity.\nSmall steps to practice every day ",
     "landing_foundation_title_highlight": "learning inspiration.",
     "landing_foundation_subtitle_1": "7-30 day lightweight learning plan",
     "landing_foundation_subtitle_2": "No need to be perfect — just start exploring",
@@ -543,7 +543,7 @@
     "skill_map_title": "Skill Map",
     "skill_map_coming_soon": "Feature coming soon, stay tuned.",
     "tab_projects": "Learning Projects",
-    "tab_practices": "Practice Topics",
+    "tab_practices": "Practice",
     "recent_practice_count": "{count} practices in the last 7 days",
     "tab_ideas": "Ideas",
     "tab_circles": "Circles",
@@ -4627,7 +4627,7 @@
       "success": {
         "verified": {
           "title": "Email Verified!",
-          "description": "Complete your profile settings for more personalized learning recommendations."
+          "description": "Complete your profile for better recommendations."
         },
         "alreadyVerified": {
           "title": "Email Already Verified",
@@ -4786,7 +4786,7 @@
     },
     "validation": {
       "birthDateRequired": "Please select your birthday",
-      "birthDateAge": "DaoDao is currently available only to users aged 16 or older",
+      "birthDateAge": "Dao Dao is currently available only to users aged 16 or older",
       "nameRequired": "Please enter your name",
       "nameMax": "Name must be at most {max} characters",
       "customIdRequired": "Please enter a user ID",
@@ -4799,7 +4799,7 @@
       "professionalFieldsMax": "You can select up to {max} professional fields",
       "interestsRequired": "Please select at least {min} interest field",
       "interestsMax": "You can select up to {max} interest fields",
-      "referralSourceRequired": "Please select how you heard about DaoDao"
+      "referralSourceRequired": "Please select how you heard about Dao Dao"
     }
   },
   "check_in": {
@@ -5641,7 +5641,7 @@
     "following_follow_with_plus": "+ Follow",
     "following_unfollowed": "Unfollowed",
     "following_followed_practice": "Followed this practice",
-    "archived_practices_title": "Practice Topics",
+    "archived_practices_title": "Practice",
     "archived_empty": "No archived content yet",
     "archived_unarchive": "Unarchive",
     "archived_unarchived": "Practice unarchived successfully",
@@ -5782,7 +5782,7 @@
     "practice_once": "Once",
     "practice_minutes": "minutes",
     "practice_created_is": "My practice is",
-    "practice_section_title": "Practice Topics",
+    "practice_section_title": "Practice",
     "practice_include_completed": "Include completed",
     "practice_empty_practices": "No practice topics yet",
     "practice_empty_plans": "No learning plans yet",
@@ -6578,7 +6578,7 @@
       "browse_inspiration": "Browse inspiration"
     },
     "auth": {
-      "title": "Welcome back to DaoDao!",
+      "title": "Welcome back to Dao Dao!",
       "subtitle": "Build your learning island and grow with community partners",
       "login_failed": "Login failed",
       "google_failed": "Google login failed",
@@ -6596,7 +6596,7 @@
       "google_accessibility": "Sign in with Google",
       "apple_login": "Sign up / log in with Apple",
       "google_login": "Sign up / log in with Google",
-      "terms_prefix": "By signing up, you agree to DaoDao's",
+      "terms_prefix": "By signing up, you agree to Dao Dao's",
       "terms": "Terms of Service",
       "and": "and",
       "privacy": "Privacy Policy"
@@ -6873,7 +6873,7 @@
         "settings": "Settings"
       },
       "completion": {
-        "prompt": "Complete your profile settings for more personalized learning recommendations.",
+        "prompt": "Complete your profile for better recommendations.",
         "label": "Profile completion"
       },
       "items": {
@@ -6898,7 +6898,7 @@
     "notificationSettings": {
       "title": "Notification Settings",
       "globalTitle": "Notification Master Switch",
-      "globalDescription": "When off, all email notifications stop. The notification center will keep collecting updates.",
+      "globalDescription": "Turn off all email notifications. In-app notifications stay on.",
       "emailSection": "Email Notification Settings",
       "inAppNote": "The in-app notification center stays on. Only email notifications can be turned off.",
       "types": {
@@ -6944,7 +6944,7 @@
     "interactionSettings": {
       "title": "Interaction Settings",
       "openProfileTitle": "Make My Practices Public",
-      "openProfileDescription": "When enabled, your practices can be searched and shown to others.",
+      "openProfileDescription": "Allow others to discover your practices.",
       "enabledSuccess": "Your practices are now public.",
       "disabledSuccess": "Your practices are now private.",
       "errorTitle": "Error",
@@ -6952,7 +6952,7 @@
     },
     "archivedSettings": {
       "title": "Archived Content",
-      "practiceSection": "Practice Topics",
+      "practiceSection": "Practice",
       "loading": "Loading...",
       "loadError": "Failed to load. Please try again later.",
       "empty": "No archived content yet.",
@@ -6974,7 +6974,7 @@
       "nameRequired": "Name is required.",
       "personalWebsite": "Personal Website",
       "hideConnectionsTitle": "Hide Connection Count",
-      "hideConnectionsDescription": "When enabled, others will not see your number of connected partners.",
+      "hideConnectionsDescription": "Hide your connection count from others.",
       "validationRequired": "This field is required",
       "validationUrl": "Please enter a valid URL",
       "validationCustomIdMin": "ID must be at least 3 characters",

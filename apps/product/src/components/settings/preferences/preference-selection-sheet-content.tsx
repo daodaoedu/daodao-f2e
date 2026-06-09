@@ -86,7 +86,7 @@ export const PreferenceSelectionSheetContent = ({
                   variant="ghost"
                   onClick={() => handleAddOption(option.id)}
                   disabled={!canAddMore}
-                  className="w-full justify-between rounded-lg bg-very-light-blue border border-blue px-4 py-2 hover:bg-very-light-blue/80"
+                  className="w-full justify-between rounded-lg bg-very-light-blue border border-blue px-4 py-3 hover:bg-very-light-blue/80"
                   aria-label={t("selection_add_item", { item: option.name })}
                 >
                   <span className="text-sm text-left flex-1 whitespace-normal wrap-break-word">
@@ -115,7 +115,7 @@ export const PreferenceSelectionSheetContent = ({
                   type="button"
                   variant="ghost"
                   onClick={() => handleRemoveOption(option.id)}
-                  className="w-full justify-between px-4 py-2 rounded-lg bg-white border border-blue transition-colors"
+                  className="w-full justify-between px-4 py-3 rounded-lg bg-white border border-blue transition-colors"
                   aria-label={t("selection_remove_item", { item: option.name })}
                 >
                   <span className="text-left flex-1 whitespace-normal wrap-break-word">
