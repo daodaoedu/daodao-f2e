@@ -100,7 +100,7 @@ export const PreferenceSection = ({
                       <Badge
                         key={selectedOptionIds[index]}
                         variant="outline-blue"
-                        className="rounded-lg px-4 py-3"
+                        className="rounded-lg px-4 py-2"
                       >
                         {name}
                       </Badge>
