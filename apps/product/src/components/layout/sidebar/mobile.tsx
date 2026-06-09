@@ -15,7 +15,6 @@ import type { SidebarProps } from "./type";
 
 gsap.registerPlugin(ScrollTrigger);
 
-
 export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
   const t = useTranslations("app_product");

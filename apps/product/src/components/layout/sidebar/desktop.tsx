@@ -13,7 +13,6 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
-
 export const DesktopSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
   const t = useTranslations("app_product");
@@ -114,7 +113,6 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
           );
         })}
       </ul>
-
     </nav>
   );
 };

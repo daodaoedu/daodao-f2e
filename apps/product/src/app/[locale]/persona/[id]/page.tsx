@@ -528,7 +528,9 @@ export default function LearningPersonaDetailPage() {
 
   // Question + answers state
   const [questionPrompt, setQuestionPrompt] = useState("");
-  const [questionType, setQuestionType] = useState<"choice" | "sentence_completion" | "scenario">("sentence_completion");
+  const [questionType, setQuestionType] = useState<"choice" | "sentence_completion" | "scenario">(
+    "sentence_completion"
+  );
   const [questionOptions, setQuestionOptions] = useState<string[] | null>(null);
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [answers, setAnswers] = useState<PersonaQuestionAnswerItem[]>([]);
