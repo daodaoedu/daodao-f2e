@@ -50,7 +50,7 @@
     "step2_placeholder": "Describe the situation or pain point (at least 10 characters)",
     "step2_min": "Please enter at least 10 characters",
     "step3_title": "What change do you hope for?",
-    "step3_placeholder": "Describe what you'd like DaoDao to become",
+    "step3_placeholder": "Describe what you'd like Dao Dao to become",
     "confirm_title": "Confirm and submit",
     "confirm_category": "Area",
     "confirm_situation": "Situation",
@@ -84,7 +84,7 @@
     "landing_persona_subtitle": "Where personal growth meets collective wisdom!",
     "landing_persona_profession": "Expertise",
     "landing_persona_exploration": "Exploring",
-    "landing_foundation_title": "Start with curiosity.\nSmall steps to practice everyday ",
+    "landing_foundation_title": "Start with curiosity.\nSmall steps to practice every day ",
     "landing_foundation_title_highlight": "learning inspiration.",
     "landing_foundation_subtitle_1": "7-30 day lightweight learning plan",
     "landing_foundation_subtitle_2": "No need to be perfect — just start exploring",
@@ -4786,7 +4786,7 @@
     },
     "validation": {
       "birthDateRequired": "Please select your birthday",
-      "birthDateAge": "DaoDao is currently available only to users aged 16 or older",
+      "birthDateAge": "Dao Dao is currently available only to users aged 16 or older",
       "nameRequired": "Please enter your name",
       "nameMax": "Name must be at most {max} characters",
       "customIdRequired": "Please enter a user ID",
@@ -4799,7 +4799,7 @@
       "professionalFieldsMax": "You can select up to {max} professional fields",
       "interestsRequired": "Please select at least {min} interest field",
       "interestsMax": "You can select up to {max} interest fields",
-      "referralSourceRequired": "Please select how you heard about DaoDao"
+      "referralSourceRequired": "Please select how you heard about Dao Dao"
     }
   },
   "check_in": {
@@ -6578,7 +6578,7 @@
       "browse_inspiration": "Browse inspiration"
     },
     "auth": {
-      "title": "Welcome back to DaoDao!",
+      "title": "Welcome back to Dao Dao!",
       "subtitle": "Build your learning island and grow with community partners",
       "login_failed": "Login failed",
       "google_failed": "Google login failed",
@@ -6596,7 +6596,7 @@
       "google_accessibility": "Sign in with Google",
       "apple_login": "Sign up / log in with Apple",
       "google_login": "Sign up / log in with Google",
-      "terms_prefix": "By signing up, you agree to DaoDao's",
+      "terms_prefix": "By signing up, you agree to Dao Dao's",
       "terms": "Terms of Service",
       "and": "and",
       "privacy": "Privacy Policy"
