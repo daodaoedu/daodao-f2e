@@ -459,6 +459,8 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
             href={userHref}
             className={cn(avatarClasses, "hover:opacity-80 transition-opacity")}
             style={{ background: avatarColor }}
+            tabIndex={-1}
+            aria-hidden="true"
           >
             {initial}
           </Link>
