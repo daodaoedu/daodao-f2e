@@ -34,6 +34,7 @@ import {
 import { CommentSection, ReactionPickerButton } from "@/components/check-in/reactions";
 import type { IComment } from "@/components/check-in/reactions/comment-section";
 import { BackgroundAnimation } from "@/components/layout";
+import { resolvePersonaCloseTarget } from "@/utils/persona-close-navigation";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 
 function QuoteSvg({ className }: { className?: string }) {
@@ -652,10 +653,12 @@ export default function LearningPersonaDetailPage() {
         <button
           type="button"
           onClick={() => {
-            if (typeof window !== "undefined" && window.history.length > 1) {
+            const canGoBack = typeof window !== "undefined" && window.history.length > 1;
+            const target = resolvePersonaCloseTarget(canGoBack);
+            if (target.action === "back") {
               router.back();
             } else {
-              router.push("/persona");
+              router.push(target.path);
             }
           }}
           className="pointer-events-auto flex items-center justify-center size-10 rounded-full text-text-dark/40 bg-very-light-gray/70 backdrop-blur-sm hover:text-logo-cyan hover:bg-white/80 transition-all"
