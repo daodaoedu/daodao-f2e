@@ -4,15 +4,29 @@ type CommentLike = {
 };
 
 function isCommentLike(v: unknown): v is CommentLike {
-  return typeof v === "object" && v !== null && "id" in v;
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    "id" in v &&
+    (typeof (v as { id: unknown }).id === "number" ||
+      typeof (v as { id: unknown }).id === "string")
+  );
 }
 
 export function countCommentsWithReplies(raw: unknown): number {
   if (!Array.isArray(raw)) return 0;
-  const topLevel = raw.filter(isCommentLike);
-  const replyCount = topLevel.reduce((sum, c) => {
-    const replies = Array.isArray(c.replies) ? c.replies : [];
-    return sum + replies.filter(isCommentLike).length;
-  }, 0);
-  return topLevel.length + replyCount;
+  let count = 0;
+  for (const c of raw) {
+    if (isCommentLike(c)) {
+      count++;
+      if (Array.isArray(c.replies)) {
+        for (const r of c.replies) {
+          if (isCommentLike(r)) {
+            count++;
+          }
+        }
+      }
+    }
+  }
+  return count;
 }
