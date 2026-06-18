@@ -46,6 +46,7 @@ import { applyOnboardingUpdateFromResponse } from "@/components/task-guide/onboa
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { useEditCheckInSheet } from "@/hooks/use-edit-check-in-sheet";
 import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
+import { countCommentsWithReplies } from "@/utils/count-comments";
 import { formatRelativeTime } from "@/utils/format-time";
 import type { ICheckInDisplayData, ICheckInFormData } from "../types";
 import { CheckInCard } from "./check-in-card";
@@ -364,8 +365,7 @@ export const CheckInDetail = ({
   const { data: currentUserData } = useCurrentUser();
 
   const commentCount = React.useMemo(() => {
-    const raw = commentsData?.data;
-    return Array.isArray(raw) ? raw.filter(isApiCommentNode).length : 0;
+    return countCommentsWithReplies(commentsData?.data);
   }, [commentsData]);
 
   const currentUser = currentUserData?.data;
