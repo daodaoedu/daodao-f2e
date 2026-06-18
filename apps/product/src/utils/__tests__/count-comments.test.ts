@@ -37,4 +37,11 @@ describe("countTotalComments", () => {
     ];
     expect(countTotalComments(comments)).toBe(7); // 3 top + 3 + 0 + 1 replies
   });
+
+  it("ignores invalid reply nodes that do not have an id", () => {
+    const comments = [
+      { id: 1, replies: [{ id: 10 }, null, { content: "invalid" }] },
+    ];
+    expect(countTotalComments(comments)).toBe(2); // 1 top + 1 valid reply
+  });
 });
