@@ -79,7 +79,7 @@ function InlineFlipCard({
   const [selected, setSelected] = useState("");
   const [otherText, setOtherText] = useState("");
 
-  const isChoice = questionType === "choice" && options && options.length > 0;
+  const isChoice = questionType === "choice" && options != null && options.length > 0;
   const isOtherSelected = isChoice && selected === OTHER_OPTION_VALUE;
 
   return (
@@ -165,15 +165,13 @@ function InlineFlipCard({
                 </button>
               ))}
               {isOtherSelected && (
-                // biome-ignore lint/a11y/noStaticElementInteractions: stop propagation
-                // biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation
                 <textarea
                   rows={2}
                   value={otherText}
                   onChange={(e) => setOtherText(e.target.value)}
                   placeholder={t("thoughtPlaceholder")}
+                  maxLength={300}
                   className="w-full border-2 border-logo-cyan rounded-xl text-sm text-text-dark outline-none bg-transparent placeholder:text-text-dark/25 p-3 resize-none"
-                  onClick={(e) => e.stopPropagation()}
                 />
               )}
             </div>

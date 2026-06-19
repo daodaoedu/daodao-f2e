@@ -25,7 +25,7 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
   const [otherText, setOtherText] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const isChoice = questionType === "choice" && options && options.length > 0;
+  const isChoice = questionType === "choice" && options != null && options.length > 0;
   const isOtherSelected = isChoice && selectedValue === OTHER_OPTION_VALUE;
 
   const handleSubmit = async () => {
