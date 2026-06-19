@@ -9,6 +9,7 @@ import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { RefreshCcw } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import { OTHER_OPTION_VALUE, buildPersonaAnswerBody } from "./other-option-utils";
 
 interface InlineAnswerFormProps {
   questionId: number;
@@ -21,23 +22,34 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
   const t = useTranslations("persona");
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [textAnswer, setTextAnswer] = useState("");
+  const [otherText, setOtherText] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const isChoice = questionType === "choice" && options && options.length > 0;
+  const isOtherSelected = isChoice && selectedValue === OTHER_OPTION_VALUE;
 
   const handleSubmit = async () => {
-    const body = isChoice
-      ? { questionId, selectedValue: selectedValue || undefined }
-      : { questionId, textAnswer: textAnswer.trim() || undefined };
-
-    if (isChoice && !selectedValue) {
-      toast.error(t("myProfile.selectRequired"));
-      return;
-    }
-    if (!isChoice && !textAnswer.trim()) {
+    if (isChoice) {
+      if (!selectedValue) {
+        toast.error(t("myProfile.selectRequired"));
+        return;
+      }
+      if (isOtherSelected && !otherText.trim()) {
+        toast.error(t("myProfile.textRequired"));
+        return;
+      }
+    } else if (!textAnswer.trim()) {
       toast.error(t("myProfile.textRequired"));
       return;
     }
+
+    const body = buildPersonaAnswerBody(
+      questionId,
+      !!isChoice,
+      selectedValue,
+      textAnswer,
+      otherText
+    );
 
     setSubmitting(true);
     try {
@@ -64,7 +76,10 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => setSelectedValue(opt)}
+              onClick={() => {
+                setSelectedValue(opt);
+                if (opt !== OTHER_OPTION_VALUE) setOtherText("");
+              }}
               className={cn(
                 "rounded-full border text-sm h-auto py-1.5 px-3",
                 selectedValue === opt
@@ -76,7 +91,20 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
             </Button>
           ))}
         </div>
-        <Button size="sm" onClick={handleSubmit} disabled={submitting || !selectedValue}>
+        {isOtherSelected && (
+          <Textarea
+            value={otherText}
+            onChange={(e) => setOtherText(e.target.value)}
+            placeholder={t("myProfile.textPlaceholder")}
+            rows={3}
+            maxLength={300}
+          />
+        )}
+        <Button
+          size="sm"
+          onClick={handleSubmit}
+          disabled={submitting || !selectedValue || (isOtherSelected && !otherText.trim())}
+        >
           {submitting ? t("myProfile.submitting") : t("myProfile.submit")}
         </Button>
       </div>

@@ -35,6 +35,7 @@ import { CommentSection, ReactionPickerButton } from "@/components/check-in/reac
 import type { IComment } from "@/components/check-in/reactions/comment-section";
 import { BackgroundAnimation } from "@/components/layout";
 import type { ReactionTypeType } from "@/constants/reaction-type";
+import { OTHER_OPTION_VALUE } from "@/components/persona/other-option-utils";
 
 function QuoteSvg({ className }: { className?: string }) {
   return (
@@ -76,8 +77,10 @@ function InlineFlipCard({
   const tProfile = useTranslations("persona.myProfile");
   const [answer, setAnswer] = useState("");
   const [selected, setSelected] = useState("");
+  const [otherText, setOtherText] = useState("");
 
   const isChoice = questionType === "choice" && options && options.length > 0;
+  const isOtherSelected = isChoice && selected === OTHER_OPTION_VALUE;
 
   return (
     <div style={{ perspective: "1000px" }} className="w-full mb-4">
@@ -147,7 +150,10 @@ function InlineFlipCard({
                 <button
                   key={opt}
                   type="button"
-                  onClick={() => setSelected(opt)}
+                  onClick={() => {
+                    setSelected(opt);
+                    if (opt !== OTHER_OPTION_VALUE) setOtherText("");
+                  }}
                   className={cn(
                     "w-full text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
                     selected === opt
@@ -158,6 +164,18 @@ function InlineFlipCard({
                   {opt}
                 </button>
               ))}
+              {isOtherSelected && (
+                // biome-ignore lint/a11y/noStaticElementInteractions: stop propagation
+                // biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation
+                <textarea
+                  rows={2}
+                  value={otherText}
+                  onChange={(e) => setOtherText(e.target.value)}
+                  placeholder={t("thoughtPlaceholder")}
+                  className="w-full border-2 border-logo-cyan rounded-xl text-sm text-text-dark outline-none bg-transparent placeholder:text-text-dark/25 p-3 resize-none"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              )}
             </div>
           ) : (
             // biome-ignore lint/a11y/noStaticElementInteractions: stop propagation
@@ -183,13 +201,24 @@ function InlineFlipCard({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (isChoice && selected) onSubmit(selected, true);
-              else if (!isChoice && answer.trim()) onSubmit(answer.trim(), false);
+              if (isChoice && selected) {
+                if (isOtherSelected && otherText.trim()) {
+                  onSubmit(otherText.trim(), false);
+                } else if (!isOtherSelected) {
+                  onSubmit(selected, true);
+                }
+              } else if (!isChoice && answer.trim()) {
+                onSubmit(answer.trim(), false);
+              }
             }}
-            disabled={isChoice ? !selected : !answer.trim()}
+            disabled={
+              isChoice
+                ? !selected || (isOtherSelected && !otherText.trim())
+                : !answer.trim()
+            }
             className={cn(
               "shrink-0 w-full py-3 rounded-full font-medium text-base transition-all mt-4",
-              (isChoice ? selected : answer.trim())
+              (isChoice ? (isOtherSelected ? otherText.trim() : selected) : answer.trim())
                 ? "bg-[#F5A93E] text-white"
                 : "bg-[#F5A93E]/30 text-white/70 cursor-not-allowed"
             )}
