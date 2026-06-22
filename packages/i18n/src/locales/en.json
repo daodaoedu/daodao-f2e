@@ -5453,7 +5453,7 @@
       "loading": "Loading...",
       "empty": "No questions yet",
       "clickToAnswer": "Answer",
-      "progress": "Answered {answered}/{total}",
+      "progress": "{remaining}/{total} questions left to complete your persona",
       "startPrompt": "Click any question to start building your learner persona",
       "showMore": "Show {count} more",
       "showLess": "Show less",

@@ -5453,7 +5453,7 @@
       "loading": "載入中...",
       "empty": "尚無問題",
       "clickToAnswer": "填寫",
-      "progress": "已回答 {answered}/{total} 題",
+      "progress": "剩 {remaining}/{total} 題完成人物誌",
       "startPrompt": "點擊任一題開始填寫你的學習人物誌",
       "showMore": "顯示更多 {count} 題",
       "showLess": "收起",

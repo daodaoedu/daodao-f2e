@@ -115,6 +115,7 @@ export function PersonaProfileMe() {
 
   const questions = useMemo(() => data?.data?.questions ?? [], [data]);
   const answered = useMemo(() => questions.filter((q) => !q.isPlaceholder), [questions]);
+  const remaining = questions.length - answered.length;
 
   const handleNextQuestion = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % questions.length);
@@ -140,7 +141,7 @@ export function PersonaProfileMe() {
     <div className="flex flex-col gap-3 py-4">
       {/* Progress */}
       <p className="text-xs text-gray-400 text-right">
-        {t("myProfile.progress", { answered: answered.length, total: questions.length })}
+        {t("myProfile.progress", { remaining, total: questions.length })}
       </p>
 
       {/* Single question card */}
