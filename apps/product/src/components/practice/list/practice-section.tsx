@@ -1,18 +1,13 @@
 "use client";
 
 import { useUserPractices } from "@daodao/api";
-import { ArrowRightOutlineSvg, BookSvg, ExperimentSvg, FlagSvg, NoteSvg } from "@daodao/assets";
+import { ArrowRightOutlineSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
-import { useIsMobile, useScrollVisibility } from "@daodao/shared";
 import { Badge } from "@daodao/ui/components/badge";
-import { Button } from "@daodao/ui/components/button";
 import { Checkbox } from "@daodao/ui/components/checkbox";
 import { CustomLink } from "@daodao/ui/components/custom-link";
-import { cn } from "@daodao/ui/lib/utils";
-import type { ElementType } from "react";
-import { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
+import { useMemo, useState } from "react";
 import { PersonaProfileMe } from "@/components/persona/persona-profile-me";
 import { PersonaProfileUser } from "@/components/persona/persona-profile-user";
 import type { PracticeStatus } from "@/constants/practice-status";
@@ -22,8 +17,6 @@ import {
   type TaskStatus as TaskStatusType,
 } from "@/constants/task-status";
 import { RandomPracticesSection } from "../shared/random-practices-section";
-
-type TabType = "practices" | "plans" | "ideas" | "persona";
 
 interface PracticeItem {
   id: string;
@@ -40,25 +33,14 @@ interface PracticeSectionProps {
   userId: string;
 }
 
-interface Tab {
-  id: TabType;
-  label: string;
-  mobileLabel?: string;
-  disabled?: boolean;
-  Icon: ElementType;
-}
-
 /**
  * 「主題實踐」區塊組件
  */
 export function PracticeSection({ userId }: PracticeSectionProps) {
   const t = useTranslations("app_product");
   const dashboardT = useTranslations("dashboard");
-  const [activeTab, setActiveTab] = useState<TabType>("practices");
+  const personaT = useTranslations("persona");
   const [includeCompleted, setIncludeCompleted] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
-  const isMobile = useIsMobile();
-  const isScrolled = useScrollVisibility({ threshold: 167 });
   const { user } = useAuth();
 
   const {
@@ -88,23 +70,6 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
       tags: practice.tags || [],
     }));
   }, [practicesData]);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const personaT = useTranslations("persona");
-  const tabs: Tab[] = [
-    { id: "practices", label: t("practice_section_title"), Icon: ExperimentSvg },
-    {
-      id: "persona",
-      label: personaT("tabLabel"),
-      mobileLabel: personaT("tabLabelShort"),
-      Icon: BookSvg,
-    },
-    { id: "plans", label: t("practice_tab_plans"), disabled: true, Icon: FlagSvg },
-    { id: "ideas", label: t("practice_tab_ideas"), disabled: true, Icon: NoteSvg },
-  ];
 
   const getStatusBadge = (status: PracticeItem["status"]) => {
     switch (status) {
@@ -145,105 +110,28 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
     ? practices
     : practices.filter((p) => p.status !== TaskStatus.completed);
 
-  const renderSubNavigation = () => {
-    const content = (
-      <>
-        {tabs.map(({ Icon, ...tab }) => (
-          <Button
-            key={tab.id}
-            variant="ghost"
-            onClick={() => setActiveTab(tab.id)}
-            className="flex flex-col items-center gap-0.5 p-0 h-auto"
-            aria-label={tab.label}
-            animation="none"
-            disabled={tab.disabled}
-          >
-            <div
-              className={cn(
-                "size-10 flex items-center justify-center rounded-full transition-colors",
-                activeTab === tab.id
-                  ? "text-logo-cyan bg-logo-cyan/10 md:bg-logo-cyan md:text-white"
-                  : "bg-white text-bg-dark"
-              )}
-            >
-              <Icon className="size-6" />
-            </div>
-            <div
-              className={cn(
-                "text-xs text-bg-dark leading-normal text-center",
-                activeTab !== tab.id && "opacity-50"
-              )}
-            >
-              <span className="md:hidden">{tab.mobileLabel ?? tab.label}</span>
-              <span className="hidden md:inline">{tab.label}</span>
-            </div>
-          </Button>
-        ))}
-      </>
-    );
-
-    if (!isMounted) return null;
-
-    if (isMobile) {
-      return createPortal(
-        <div
-          className={cn(
-            "fixed top-0 inset-x-0 z-40 grid grid-cols-4 bg-white border-b border-light-gray px-5 py-2.5 transition-transform",
-            isScrolled ? "translate-y-0" : "-translate-y-full"
-          )}
-        >
-          {content}
-        </div>,
-        document.body
-      );
-    }
-
-    return (
-      <div
-        className={cn(
-          "hidden md:absolute md:top-0 md:right-full md:flex md:flex-col md:gap-4 md:mt-6 md:mr-3"
-        )}
-      >
-        {content}
-      </div>
-    );
-  };
-
   return (
-    <div className="relative bg-white rounded-2xl p-6">
-      {/* 標題和篩選 */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-medium text-bg-dark">
-          {activeTab === "persona" ? personaT("tabLabel") : t("practice_section_title")}
-        </h2>
-        {activeTab !== "persona" && practices.length > 0 && (
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="include-completed"
-              checked={includeCompleted}
-              onCheckedChange={(checked) => setIncludeCompleted(checked === true)}
-            />
-            <label
-              htmlFor="include-completed"
-              className="text-sm text-text-dark cursor-pointer select-none"
-            >
-              {t("practice_include_completed")}
-            </label>
-          </div>
-        )}
-      </div>
-
-      {/* 子導航 */}
-      {renderSubNavigation()}
-
-      {/* 內容區域 */}
-      {activeTab === "persona" ? (
-        isOwnData ? (
-          <PersonaProfileMe />
-        ) : (
-          <PersonaProfileUser targetUserId={userId} />
-        )
-      ) : (
+    <div className="flex flex-col gap-4">
+      {/* 主題實踐 section */}
+      <div className="bg-white rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-medium text-bg-dark">{t("practice_section_title")}</h2>
+          {practices.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="include-completed"
+                checked={includeCompleted}
+                onCheckedChange={(checked) => setIncludeCompleted(checked === true)}
+              />
+              <label
+                htmlFor="include-completed"
+                className="text-sm text-text-dark cursor-pointer select-none"
+              >
+                {t("practice_include_completed")}
+              </label>
+            </div>
+          )}
+        </div>
         <div className="space-y-2.5">
           {isLoading ? (
             <div className="text-center py-8 text-basic-400">{t("loading")}</div>
@@ -254,9 +142,7 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
               <RandomPracticesSection compact />
             ) : (
               <div className="text-center py-8 text-basic-400">
-                {activeTab === "practices" && t("practice_empty_practices")}
-                {activeTab === "plans" && t("practice_empty_plans")}
-                {activeTab === "ideas" && t("practice_empty_ideas")}
+                {t("practice_empty_practices")}
               </div>
             )
           ) : (
@@ -298,7 +184,13 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
             ))
           )}
         </div>
-      )}
+      </div>
+
+      {/* 學習人物誌 section */}
+      <div className="bg-white rounded-2xl p-6">
+        <h2 className="text-lg font-medium text-bg-dark mb-2">{personaT("tabLabel")}</h2>
+        {isOwnData ? <PersonaProfileMe /> : <PersonaProfileUser targetUserId={userId} />}
+      </div>
     </div>
   );
 }
