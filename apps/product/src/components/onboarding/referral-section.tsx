@@ -24,6 +24,7 @@ interface ReferralSectionProps {
  */
 export const ReferralSection = ({ form }: ReferralSectionProps) => {
   const t = useTranslations("onboarding");
+  const productT = useTranslations("app_product");
 
   const selectedSource = form.watch("referralSource");
   const isOthersSelected = selectedSource === "others";
@@ -57,7 +58,9 @@ export const ReferralSection = ({ form }: ReferralSectionProps) => {
                     )}
                   >
                     <RadioGroupItem id={`referral-${option.value}`} value={option.value} />
-                    <span className="text-text-dark">{option.label}</span>
+                    <span className="text-text-dark">
+                      {productT(`option_${option.value.replace(/[^a-zA-Z0-9]/g, "_")}`)}
+                    </span>
                   </label>
                 ))}
               </RadioGroup>

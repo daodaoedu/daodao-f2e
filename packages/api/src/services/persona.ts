@@ -14,6 +14,8 @@ export type PersonaQuestionItem = components["schemas"]["PersonaQuestionItem"];
 export type PersonaAnswerItem = components["schemas"]["PersonaAnswerItem"];
 export type PersonaResonanceData = components["schemas"]["PersonaResonanceData"];
 export type PersonaCarouselState = components["schemas"]["PersonaCarouselState"];
+export type PersonaQuestionAnswerItem = components["schemas"]["PersonaQuestionAnswerItem"];
+export type PersonaQuestionAnswersData = components["schemas"]["PersonaQuestionAnswersData"];
 
 export type SubmitPersonaAnswerBody = components["schemas"]["SubmitPersonaAnswerBody"];
 export type SubmitPersonaSkipBody = components["schemas"]["SubmitPersonaSkipBody"];
@@ -77,6 +79,22 @@ export const dismissPersonaCarousel = async () => {
 export const getPersonaProfileMe = async (locale?: string) => {
   return client.GET("/api/v1/persona/profile/me", {
     params: { query: locale ? { locale } : undefined },
+  });
+};
+
+export const getPersonaQuestionAnswers = async (
+  questionId: number,
+  options?: { locale?: string; limit?: number; cursor?: number }
+) => {
+  return client.GET("/api/v1/persona/questions/{questionId}/answers", {
+    params: {
+      path: { questionId },
+      query: {
+        ...(options?.locale ? { locale: options.locale } : {}),
+        ...(options?.limit != null ? { limit: options.limit } : {}),
+        ...(options?.cursor != null ? { cursor: options.cursor } : {}),
+      },
+    },
   });
 };
 

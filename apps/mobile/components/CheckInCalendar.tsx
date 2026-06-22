@@ -2,41 +2,36 @@ import { useMemo } from "react";
 import { Calendar, type DateData, LocaleConfig } from "react-native-calendars";
 import { YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileI18n } from "@/i18n";
 
-// 設定中文語系
-LocaleConfig.locales["zh-TW"] = {
-  monthNames: [
-    "一月",
-    "二月",
-    "三月",
-    "四月",
-    "五月",
-    "六月",
-    "七月",
-    "八月",
-    "九月",
-    "十月",
-    "十一月",
-    "十二月",
-  ],
-  monthNamesShort: [
-    "1月",
-    "2月",
-    "3月",
-    "4月",
-    "5月",
-    "6月",
-    "7月",
-    "8月",
-    "9月",
-    "10月",
-    "11月",
-    "12月",
-  ],
-  dayNames: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
-  dayNamesShort: ["日", "一", "二", "三", "四", "五", "六"],
-  today: "今天",
+const CALENDAR_LOCALE_TODAY: Record<string, string> = {
+  "zh-TW": "今天",
+  en: "Today",
 };
+
+function buildCalendarLocale(locale: string) {
+  const monthDate = new Date(Date.UTC(2024, 0, 1));
+  const sunday = new Date(Date.UTC(2024, 0, 7));
+  const monthName = (month: number, format: Intl.DateTimeFormatOptions["month"]) => {
+    monthDate.setUTCMonth(month);
+    return new Intl.DateTimeFormat(locale, { month: format, timeZone: "UTC" }).format(monthDate);
+  };
+  const dayName = (day: number, format: Intl.DateTimeFormatOptions["weekday"]) => {
+    sunday.setUTCDate(7 + day);
+    return new Intl.DateTimeFormat(locale, { weekday: format, timeZone: "UTC" }).format(sunday);
+  };
+
+  return {
+    monthNames: Array.from({ length: 12 }, (_, month) => monthName(month, "long")),
+    monthNamesShort: Array.from({ length: 12 }, (_, month) => monthName(month, "short")),
+    dayNames: Array.from({ length: 7 }, (_, day) => dayName(day, "long")),
+    dayNamesShort: Array.from({ length: 7 }, (_, day) => dayName(day, "short")),
+    today: CALENDAR_LOCALE_TODAY[locale] ?? CALENDAR_LOCALE_TODAY.en,
+  };
+}
+
+LocaleConfig.locales["zh-TW"] = buildCalendarLocale("zh-TW");
+LocaleConfig.locales.en = buildCalendarLocale("en");
 LocaleConfig.defaultLocale = "zh-TW";
 
 interface CheckInCalendarProps {
@@ -63,6 +58,9 @@ export function CheckInCalendar({
   currentMonth,
   onMonthChange,
 }: CheckInCalendarProps) {
+  const { locale } = useMobileI18n();
+  LocaleConfig.defaultLocale = locale;
+
   const markedDates = useMemo<IMarkedDates>(() => {
     const marks: IMarkedDates = {};
 

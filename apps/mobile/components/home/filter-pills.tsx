@@ -1,13 +1,14 @@
 import { Pressable, StyleSheet } from "react-native";
 import { ScrollView, Text } from "tamagui";
 import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
+import { useMobileTranslation } from "@/i18n";
 
 const filterOptions = [
-  { value: FilterStatus.all, label: "全部" },
-  { value: FilterStatus.draft, label: "草稿" },
-  { value: FilterStatus.notStarted, label: "未開始" },
-  { value: FilterStatus.inProgress, label: "進行中" },
-  { value: FilterStatus.completed, label: "已完成" },
+  { value: FilterStatus.all, labelKey: "filter_all" },
+  { value: FilterStatus.draft, labelKey: "filter_draft" },
+  { value: FilterStatus.notStarted, labelKey: "filter_not_started" },
+  { value: FilterStatus.inProgress, labelKey: "filter_in_progress" },
+  { value: FilterStatus.completed, labelKey: "filter_completed" },
 ];
 
 interface FilterPillsProps {
@@ -17,6 +18,7 @@ interface FilterPillsProps {
 }
 
 export function FilterPills({ activeFilter, onFilterChange, counts }: FilterPillsProps) {
+  const t = useMobileTranslation("mobile.home");
   const safeCounts = counts ?? {};
   return (
     <ScrollView
@@ -35,7 +37,7 @@ export function FilterPills({ activeFilter, onFilterChange, counts }: FilterPill
             style={[styles.pill, isActive ? styles.pillActive : styles.pillInactive]}
           >
             <Text fontSize={14} color={isActive ? "white" : "#16B9B3"}>
-              {option.label}
+              {t(option.labelKey)}
               {count !== undefined ? ` ${count}` : ""}
             </Text>
           </Pressable>

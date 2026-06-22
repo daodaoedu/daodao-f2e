@@ -83,7 +83,10 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
   };
 
   // 準備分享內容
-  const shareText = t("summary_page_share_text", { practiceName: summary.practiceName, checkInCount: String(summary.checkInCount) });
+  const shareText = t("summary_page_share_text", {
+    practiceName: summary.practiceName,
+    checkInCount: String(summary.checkInCount),
+  });
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const shareAPI = getShareAPI({
@@ -136,7 +139,9 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
           <div className="flex items-center gap-2">
             <Globe className="size-4 text-logo-cyan" />
             <div>
-              <p className="text-sm font-medium text-text-dark">{t("summary_page_publish_label")}</p>
+              <p className="text-sm font-medium text-text-dark">
+                {t("summary_page_publish_label")}
+              </p>
               <p className="text-xs text-text-dark/50">{t("summary_page_publish_desc")}</p>
             </div>
           </div>
@@ -151,7 +156,11 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
                 : "bg-logo-cyan text-white hover:bg-logo-cyan/90"
             )}
           >
-            {isPublic ? t("summary_page_published") : isPublishing ? t("summary_page_publishing") : t("summary_page_publish")}
+            {isPublic
+              ? t("summary_page_published")
+              : isPublishing
+                ? t("summary_page_publishing")
+                : t("summary_page_publish")}
           </button>
         </div>
 
@@ -217,7 +226,9 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
         >
-          <h3 className="text-base font-medium text-text-dark text-center mb-4">{t("summary_page_share_title")}</h3>
+          <h3 className="text-base font-medium text-text-dark text-center mb-4">
+            {t("summary_page_share_title")}
+          </h3>
           <div className="flex justify-center gap-4 mb-4">
             <Button
               type="button"

@@ -24,6 +24,7 @@ interface InterestsSectionProps {
  */
 export const InterestsSection = ({ form }: InterestsSectionProps) => {
   const t = useTranslations("onboarding");
+  const productT = useTranslations("app_product");
 
   const selectedProfessional = form.watch("professionalFields") || [];
   const selectedInterests = form.watch("interests") || [];
@@ -77,7 +78,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
                       key={field.value}
                       variant={isSelected ? "outline-blue" : "outline-ghost"}
                       className={cn(
-                        "cursor-pointer transition-all px-4 py-2 rounded-lg",
+                        "cursor-pointer transition-all px-4 py-3 rounded-lg",
                         isSelected && "border-logo-cyan bg-light-blue",
                         isDisabled && "opacity-50 cursor-not-allowed"
                       )}
@@ -87,7 +88,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
                         }
                       }}
                     >
-                      {field.label}
+                      {productT(`option_${field.value.replace(/[^a-zA-Z0-9]/g, "_")}`)}
                     </Badge>
                   );
                 })}
@@ -122,7 +123,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
                       key={category.value}
                       variant={isSelected ? "outline-blue" : "outline-ghost"}
                       className={cn(
-                        "cursor-pointer transition-all px-4 py-2 rounded-lg",
+                        "cursor-pointer transition-all px-4 py-3 rounded-lg",
                         isSelected && "border-logo-cyan bg-light-blue",
                         isDisabled && "opacity-50 cursor-not-allowed"
                       )}
@@ -132,7 +133,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
                         }
                       }}
                     >
-                      {category.label}
+                      {productT(`option_${category.value.replace(/[^a-zA-Z0-9]/g, "_")}`)}
                     </Badge>
                   );
                 })}

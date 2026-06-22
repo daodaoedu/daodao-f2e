@@ -10,6 +10,7 @@ import { CompletedCard, FilterPills, InProgressCard } from "@/components/home";
 import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
 import type { ICompletedTask, IInProgressTask } from "@/hooks/usePractices";
+import { useMobileTranslation } from "@/i18n";
 
 interface PracticeTasksSectionProps {
   filterStatus: FilterStatusType;
@@ -31,9 +32,11 @@ export function PracticeTasksSection({
   showCompleted,
   completedTasks,
   isEmpty,
-  emptyMessage = "還沒有任何實踐，快去建立第一個吧！",
+  emptyMessage,
   counts,
 }: PracticeTasksSectionProps) {
+  const t = useMobileTranslation("mobile.home");
+
   return (
     <YStack paddingHorizontal="$4">
       <FilterPills activeFilter={filterStatus} onFilterChange={onFilterChange} counts={counts} />
@@ -53,7 +56,7 @@ export function PracticeTasksSection({
       {showCompleted && completedTasks.length > 0 && (
         <YStack gap="$3" marginBottom="$4">
           <Text fontSize={18} fontWeight="500" color={colors.text.dark}>
-            已完成
+            {t("completed")}
           </Text>
           {completedTasks.map((task) => (
             <CompletedCard key={task.id} task={task} />
@@ -64,7 +67,7 @@ export function PracticeTasksSection({
       {isEmpty && (
         <YStack alignItems="center" paddingVertical="$8">
           <Text color="rgba(0,0,0,0.5)" fontSize={14}>
-            {emptyMessage}
+            {emptyMessage ?? t("empty_practices")}
           </Text>
         </YStack>
       )}

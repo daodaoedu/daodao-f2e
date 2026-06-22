@@ -1,11 +1,12 @@
 import { useCreatePracticeCheckIn } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
-import { mapMoodTypeToApiMood } from "@/constants/mood";
-import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import {
   applyOnboardingUpdateFromResponse,
   refreshOnboardingStatus,
 } from "@/components/task-guide/onboarding-progress-context";
+import { mapMoodTypeToApiMood } from "@/constants/mood";
+import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import type { ICheckInFormData } from "../../types";
 
 interface UseCheckInSubmitOptions {
@@ -13,8 +14,8 @@ interface UseCheckInSubmitOptions {
   taskTitle: string;
   progressPercentage?: number;
   onComplete?: (data: ICheckInFormData) => void;
-  /** Phase 2 回調：打卡成功後使用者選擇「繼續分享心得」時呼叫，帶入打卡記錄 ID 和心情 */
-  onOpenPhase2?: (checkInId: string, mood: ICheckInFormData["mood"]) => void;
+  /** Phase 2 回調：打卡成功後使用者選擇「繼續選擇心情」時呼叫，帶入打卡記錄 ID */
+  onOpenPhase2?: (checkInId: string) => void;
 }
 
 /**
@@ -27,6 +28,7 @@ export const useCheckInSubmit = ({
   onComplete,
   onOpenPhase2,
 }: UseCheckInSubmitOptions) => {
+  const t = useTranslations("check_in");
   const { createCheckIn } = useCreatePracticeCheckIn(practiceId);
   const { openSuccessDialog } = useCheckInSuccessDialog({
     title: taskTitle,
@@ -34,7 +36,7 @@ export const useCheckInSubmit = ({
 
   const submitCheckIn = async (data: ICheckInFormData) => {
     // 顯示 loading toast
-    const loadingToast = toast.loading("打卡中...");
+    const loadingToast = toast.loading(t("checking_in"));
 
     try {
       // 將前端的 MoodType 映射到 API 的 ApiMoodType
@@ -84,8 +86,8 @@ export const useCheckInSubmit = ({
       const result = await openSuccessDialog(from, to, encouragement);
 
       if (result.value === "share" && checkInId && onOpenPhase2) {
-        // 使用者選擇繼續分享心得，開啟 Phase 2 Sheet
-        onOpenPhase2(checkInId, data.mood);
+        // 使用者選擇繼續選擇心情，開啟 Phase 2 Sheet
+        onOpenPhase2(checkInId);
       } else if (result.value === "complete") {
         // 成功對話框關閉後，執行原本的完成回調
         onComplete?.(data);
@@ -95,8 +97,8 @@ export const useCheckInSubmit = ({
       toast.dismiss(loadingToast);
 
       // 顯示錯誤提示
-      const errorMessage = error instanceof Error ? error.message : "打卡失敗，請稍後再試";
-      console.error("打卡失敗:", error);
+      const errorMessage = error instanceof Error ? error.message : t("check_in_failed");
+      console.error("Check-in failed:", error);
       toast.error(errorMessage);
       throw error;
     }

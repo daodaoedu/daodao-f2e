@@ -1,13 +1,14 @@
-import { setRequestLocale } from "@daodao/i18n/server";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { SocialHub } from "@/components/social/social-hub";
 
 export default async function SocialPage({ params }: PageProps<"/[locale]/social">) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "app_product" });
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto">
-      <PageHeader leftAction="back" title="社交" />
+      <PageHeader leftAction="back" title={t("social_title")} />
 
       <BackgroundAnimation />
 

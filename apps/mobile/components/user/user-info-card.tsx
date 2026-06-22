@@ -3,6 +3,7 @@ import { Linking, Pressable } from "react-native";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 import { Avatar, Card, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import type { IContactList } from "@/types/user";
 
 // ── Social Icons ──
@@ -153,7 +154,8 @@ export function UserInfoCard({
   personalSlogan,
   contactList,
 }: UserInfoCardProps) {
-  const displayName = name || "未命名用戶";
+  const t = useMobileTranslation("mobile.profile");
+  const displayName = name || t("unnamed_user");
 
   // 將 contactList 轉成有值的 social links 陣列
   const socialLinks = contactList

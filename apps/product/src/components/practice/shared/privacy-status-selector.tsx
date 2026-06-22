@@ -1,32 +1,25 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { Globe, Lock, Timer } from "lucide-react";
 
 export type PrivacyStatus = "private" | "public" | "delayed";
 
-const PRIVACY_OPTIONS: {
+const PRIVACY_OPTION_ICONS: {
   value: PrivacyStatus;
-  label: string;
-  description: string;
   icon: typeof Lock;
 }[] = [
   {
     value: "private",
-    label: "私人",
-    description: "只有自己可以看到",
     icon: Lock,
   },
   {
     value: "public",
-    label: "即時公開",
-    description: "立即顯示在靈感廣場",
     icon: Globe,
   },
   {
     value: "delayed",
-    label: "完成後分享",
-    description: "完成後公開打卡內容",
     icon: Timer,
   },
 ];
@@ -38,13 +31,30 @@ interface PrivacyStatusSelectorProps {
 }
 
 export function PrivacyStatusSelector({ value, onChange, className }: PrivacyStatusSelectorProps) {
+  const t = useTranslations("app_product");
+  const privacyText = {
+    private: {
+      label: t("practice_visibility_private"),
+      description: t("practice_visibility_private_desc"),
+    },
+    public: {
+      label: t("practice_visibility_public"),
+      description: t("practice_visibility_public_desc"),
+    },
+    delayed: {
+      label: t("practice_visibility_delayed"),
+      description: t("practice_visibility_delayed_desc"),
+    },
+  };
+
   return (
     <div className={cn("space-y-2", className)}>
-      <p className="text-sm font-medium text-text-dark mb-3">誰可以看到你的實踐？</p>
+      <p className="text-sm font-medium text-text-dark mb-3">{t("practice_visibility_question")}</p>
       <div className="flex flex-col gap-2">
-        {PRIVACY_OPTIONS.map((option) => {
+        {PRIVACY_OPTION_ICONS.map((option) => {
           const Icon = option.icon;
           const isSelected = value === option.value;
+          const text = privacyText[option.value];
           return (
             <button
               key={option.value}
@@ -72,9 +82,9 @@ export function PrivacyStatusSelector({ value, onChange, className }: PrivacySta
                     isSelected ? "text-logo-cyan" : "text-text-dark"
                   )}
                 >
-                  {option.label}
+                  {text.label}
                 </p>
-                <p className="text-xs text-text-dark/50">{option.description}</p>
+                <p className="text-xs text-text-dark/50">{text.description}</p>
               </div>
               {isSelected && (
                 <div className="size-4 rounded-full bg-logo-cyan flex items-center justify-center shrink-0">

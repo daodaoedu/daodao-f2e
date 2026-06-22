@@ -1,16 +1,17 @@
 import { Pressable, StyleSheet } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
+import { useMobileTranslation } from "@/i18n";
 
 const DURATION_OPTIONS = [
-  { label: "7 天", min: 1, max: 7 },
-  { label: "14 天", min: 8, max: 14 },
-  { label: "21 天", min: 15, max: 21 },
-  { label: "30 天", min: 22, max: 30 },
+  { labelKey: "duration_7", min: 1, max: 7 },
+  { labelKey: "duration_14", min: 8, max: 14 },
+  { labelKey: "duration_21", min: 15, max: 21 },
+  { labelKey: "duration_30", min: 22, max: 30 },
 ];
 
 const STATUS_OPTIONS = [
-  { label: "進行中", value: "active" as const },
-  { label: "已完成", value: "completed" as const },
+  { labelKey: "status_active", value: "active" as const },
+  { labelKey: "status_completed", value: "completed" as const },
 ];
 
 export interface IShowcaseFilterState {
@@ -26,6 +27,8 @@ interface ShowcaseFilterBarProps {
 }
 
 export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBarProps) {
+  const t = useMobileTranslation("mobile.showcaseFilter");
+
   const toggleStatus = (value: "active" | "completed") => {
     onFiltersChange({
       ...filters,
@@ -47,7 +50,7 @@ export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBa
       {/* Status filter */}
       <YStack>
         <Text fontSize={12} color="rgba(0,0,0,0.5)" marginBottom="$1.5">
-          狀態
+          {t("status")}
         </Text>
         <XStack gap="$2" flexWrap="wrap">
           {STATUS_OPTIONS.map((opt) => {
@@ -59,7 +62,7 @@ export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBa
                 style={[styles.pill, isSelected ? styles.pillActive : styles.pillInactive]}
               >
                 <Text fontSize={14} color={isSelected ? "white" : "#1a1a1a"}>
-                  {opt.label}
+                  {t(opt.labelKey)}
                 </Text>
               </Pressable>
             );
@@ -70,19 +73,19 @@ export function ShowcaseFilterBar({ filters, onFiltersChange }: ShowcaseFilterBa
       {/* Duration filter */}
       <YStack>
         <Text fontSize={12} color="rgba(0,0,0,0.5)" marginBottom="$1.5">
-          實踐週期
+          {t("duration")}
         </Text>
         <XStack gap="$2" flexWrap="wrap">
           {DURATION_OPTIONS.map((opt) => {
             const isSelected = filters.durationMin === opt.min && filters.durationMax === opt.max;
             return (
               <Pressable
-                key={opt.label}
+                key={opt.labelKey}
                 onPress={() => toggleDuration(opt.min, opt.max)}
                 style={[styles.pill, isSelected ? styles.pillActive : styles.pillInactive]}
               >
                 <Text fontSize={14} color={isSelected ? "white" : "#1a1a1a"}>
-                  {opt.label}
+                  {t(opt.labelKey)}
                 </Text>
               </Pressable>
             );

@@ -1,11 +1,20 @@
+import {
+  type IConnectionItem as ApiConnectionItem,
+  type IConnectionRequest as ApiConnectionRequest,
+  disconnectUser,
+  respondConnectionRequest,
+  useConnections,
+  useIncomingConnectionRequests,
+  useOutgoingConnectionRequests,
+  withdrawConnectionRequest,
+} from "@daodao/api";
 import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useSWR from "swr";
 import { Avatar, Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import { api } from "@/services/api-client";
+import { useMobileTranslation } from "@/i18n";
 
 interface IConnectionUser {
   id: string;
@@ -31,67 +40,97 @@ interface IConnection {
   partner?: IConnectionUser;
 }
 
+const mapConnectionUser = (
+  id: string,
+  nickname: string | null,
+  photoURL?: string | null
+): IConnectionUser => ({
+  id,
+  identifier: id,
+  name: nickname ?? "User",
+  photoURL: photoURL ?? undefined,
+});
+
+const mapIncomingRequest = (request: ApiConnectionRequest): IConnectionRequest => ({
+  id: String(request.requestId),
+  requesterId: request.requesterExternalId,
+  receiverId: request.receiverExternalId,
+  intent: request.intent ?? undefined,
+  requester: mapConnectionUser(
+    request.requesterExternalId,
+    request.requesterNickname,
+    request.requesterPhotoUrl
+  ),
+});
+
+const mapOutgoingRequest = (request: ApiConnectionRequest): IConnectionRequest => ({
+  id: String(request.requestId),
+  requesterId: request.requesterExternalId,
+  receiverId: request.receiverExternalId,
+  intent: request.intent ?? undefined,
+  receiver: mapConnectionUser(
+    request.receiverExternalId,
+    request.receiverNickname,
+    request.receiverPhotoUrl
+  ),
+});
+
+const mapConnection = (connection: ApiConnectionItem): IConnection => ({
+  id: String(connection.connectionId),
+  userAId: "",
+  userBId: String(connection.userId),
+  partner: mapConnectionUser(connection.externalId, connection.nickname, connection.photoUrl),
+});
+
 export default function ConnectionsSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.connectionsSettings");
+  const tCommon = useMobileTranslation("common");
 
   const {
     data: incomingRequests,
     isLoading: loadingIncoming,
     mutate: mutateIncoming,
-  } = useSWR<IConnectionRequest[]>(
-    "/connections/requests/incoming",
-    () =>
-      api.get<{ data: IConnectionRequest[] }>("/connections/requests/incoming").then((r) => r.data),
-    { revalidateOnFocus: false }
-  );
+  } = useIncomingConnectionRequests();
   const {
     data: outgoingRequests,
     isLoading: loadingOutgoing,
     mutate: mutateOutgoing,
-  } = useSWR<IConnectionRequest[]>(
-    "/connections/requests/outgoing",
-    () =>
-      api.get<{ data: IConnectionRequest[] }>("/connections/requests/outgoing").then((r) => r.data),
-    { revalidateOnFocus: false }
-  );
+  } = useOutgoingConnectionRequests();
   const {
     data: connections,
     isLoading: loadingConnections,
     mutate: mutateConnections,
-  } = useSWR<IConnection[]>(
-    "/connections",
-    () => api.get<{ data: IConnection[] }>("/connections").then((r) => r.data),
-    { revalidateOnFocus: false }
-  );
+  } = useConnections();
 
   const isLoading = loadingIncoming || loadingOutgoing || loadingConnections;
-  const incoming = incomingRequests ?? [];
-  const outgoing = outgoingRequests ?? [];
-  const conns = connections ?? [];
+  const incoming = incomingRequests?.data.map(mapIncomingRequest) ?? [];
+  const outgoing = outgoingRequests?.data.map(mapOutgoingRequest) ?? [];
+  const conns = connections?.data.map(mapConnection) ?? [];
   const hasPending = incoming.length > 0 || outgoing.length > 0;
 
   const refreshAll = () => Promise.all([mutateIncoming(), mutateOutgoing(), mutateConnections()]);
 
   const handleAccept = async (requestId: string) => {
     try {
-      await api.post(`/connections/requests/${requestId}/respond`, { action: "accept" });
+      await respondConnectionRequest(requestId, "accept");
       await refreshAll();
     } catch {
-      Alert.alert("錯誤", "操作失敗，請稍後再試");
+      Alert.alert(t("errorTitle"), t("operationFailed"));
     }
   };
 
   const handleIgnore = (requestId: string, name: string) => {
-    Alert.alert("忽略連結請求？", `確定要忽略來自 ${name} 的連結請求嗎？`, [
-      { text: "先不要", style: "cancel" },
+    Alert.alert(t("ignoreTitle"), t("ignoreMessage", { name }), [
+      { text: t("keep"), style: "cancel" },
       {
-        text: "忽略",
+        text: t("ignore"),
         onPress: async () => {
           try {
-            await api.post(`/connections/requests/${requestId}/respond`, { action: "reject" });
+            await respondConnectionRequest(requestId, "reject");
             await mutateIncoming();
           } catch {
-            Alert.alert("錯誤", "操作失敗，請稍後再試");
+            Alert.alert(t("errorTitle"), t("operationFailed"));
           }
         },
       },
@@ -99,16 +138,16 @@ export default function ConnectionsSettingsScreen() {
   };
 
   const handleWithdraw = (requestId: string, name: string) => {
-    Alert.alert("撤回連結請求？", `確定要撤回發給 ${name} 的連結請求嗎？`, [
-      { text: "先不要", style: "cancel" },
+    Alert.alert(t("withdrawTitle"), t("withdrawMessage", { name }), [
+      { text: t("keep"), style: "cancel" },
       {
-        text: "撤回",
+        text: t("withdraw"),
         onPress: async () => {
           try {
-            await api.delete(`/connections/requests/${requestId}`);
+            await withdrawConnectionRequest(requestId);
             await mutateOutgoing();
           } catch {
-            Alert.alert("錯誤", "操作失敗，請稍後再試");
+            Alert.alert(t("errorTitle"), t("operationFailed"));
           }
         },
       },
@@ -116,17 +155,17 @@ export default function ConnectionsSettingsScreen() {
   };
 
   const handleDisconnect = (userId: string, name: string) => {
-    Alert.alert("解除連結？", `解除連結後，你與 ${name} 將失去對彼此非公開內容的存取權。`, [
-      { text: "先不要", style: "cancel" },
+    Alert.alert(t("disconnectTitle"), t("disconnectMessage", { name }), [
+      { text: t("keep"), style: "cancel" },
       {
-        text: "解除連結",
+        text: t("disconnect"),
         style: "destructive",
         onPress: async () => {
           try {
-            await api.delete(`/connections/${userId}`);
+            await disconnectUser(userId);
             await mutateConnections();
           } catch {
-            Alert.alert("錯誤", "操作失敗，請稍後再試");
+            Alert.alert(t("errorTitle"), t("operationFailed"));
           }
         },
       },
@@ -142,12 +181,12 @@ export default function ConnectionsSettingsScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            連結的夥伴
+            {t("title")}
           </Text>
         </XStack>
 
@@ -155,7 +194,7 @@ export default function ConnectionsSettingsScreen() {
           {isLoading ? (
             <YStack alignItems="center" paddingVertical="$8">
               <Text fontSize={14} color="$color" opacity={0.5}>
-                載入中...
+                {t("loading")}
               </Text>
             </YStack>
           ) : (
@@ -169,11 +208,11 @@ export default function ConnectionsSettingsScreen() {
                     opacity={0.5}
                     paddingLeft="$1"
                   >
-                    待處理請求
+                    {t("pendingRequests")}
                   </Text>
                   {incoming.map((req) => {
                     const user = req.requester;
-                    const name = user?.name ?? "用戶";
+                    const name = user?.name ?? t("fallbackUser");
                     return (
                       <Card
                         key={req.id ?? `in-${req.requesterId}`}
@@ -198,7 +237,16 @@ export default function ConnectionsSettingsScreen() {
                             </Avatar>
                             <YStack flex={1}>
                               <Text fontSize={14} fontWeight="500" color="$color">
-                                {name}
+                                <Text
+                                  fontSize={14}
+                                  fontWeight="500"
+                                  color="$color"
+                                  onPress={() =>
+                                    router.push(`/users/${user?.identifier ?? user?.id}`)
+                                  }
+                                >
+                                  {name}
+                                </Text>
                               </Text>
                               {user?.bio && (
                                 <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>
@@ -226,7 +274,7 @@ export default function ConnectionsSettingsScreen() {
                               onPress={() => handleAccept(req.id)}
                             >
                               <Text fontSize={13} color={colors.basic.white} fontWeight="500">
-                                接受
+                                {t("accept")}
                               </Text>
                             </Button>
                             <Button
@@ -238,7 +286,7 @@ export default function ConnectionsSettingsScreen() {
                               onPress={() => handleIgnore(req.id, name)}
                             >
                               <Text fontSize={13} color="$color">
-                                忽略
+                                {t("ignore")}
                               </Text>
                             </Button>
                           </XStack>
@@ -248,7 +296,7 @@ export default function ConnectionsSettingsScreen() {
                   })}
                   {outgoing.map((req) => {
                     const user = req.receiver;
-                    const name = user?.name ?? "用戶";
+                    const name = user?.name ?? t("fallbackUser");
                     return (
                       <Card
                         key={req.id ?? `out-${req.receiverId}`}
@@ -272,10 +320,19 @@ export default function ConnectionsSettingsScreen() {
                           </Avatar>
                           <YStack flex={1}>
                             <Text fontSize={14} fontWeight="500" color="$color">
-                              {name}
+                              <Text
+                                fontSize={14}
+                                fontWeight="500"
+                                color="$color"
+                                onPress={() =>
+                                  router.push(`/users/${user?.identifier ?? user?.id}`)
+                                }
+                              >
+                                {name}
+                              </Text>
                             </Text>
                             <Text fontSize={12} color="$color" opacity={0.5}>
-                              等待對方回應
+                              {t("waitingResponse")}
                             </Text>
                           </YStack>
                           <Button
@@ -286,7 +343,7 @@ export default function ConnectionsSettingsScreen() {
                             onPress={() => handleWithdraw(req.id, name)}
                           >
                             <Text fontSize={12} color="$color">
-                              撤回
+                              {t("withdraw")}
                             </Text>
                           </Button>
                         </XStack>
@@ -298,18 +355,18 @@ export default function ConnectionsSettingsScreen() {
 
               <YStack gap="$3">
                 <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingLeft="$1">
-                  已連結的夥伴{conns.length > 0 ? ` · ${conns.length} 人` : ""}
+                  {t("connectedPartnersCount", { count: conns.length })}
                 </Text>
                 {conns.length === 0 ? (
                   <YStack alignItems="center" paddingVertical="$8">
                     <Text fontSize={14} color="$color" opacity={0.5}>
-                      尚未與任何人建立連結
+                      {t("empty")}
                     </Text>
                   </YStack>
                 ) : (
                   conns.map((conn) => {
                     const partner = conn.partner;
-                    const name = partner?.name ?? "用戶";
+                    const name = partner?.name ?? t("fallbackUser");
                     const partnerId = partner?.identifier ?? partner?.id ?? conn.userAId;
                     return (
                       <Card
@@ -334,7 +391,14 @@ export default function ConnectionsSettingsScreen() {
                           </Avatar>
                           <YStack flex={1}>
                             <Text fontSize={14} fontWeight="500" color="$color">
-                              {name}
+                              <Text
+                                fontSize={14}
+                                fontWeight="500"
+                                color="$color"
+                                onPress={() => router.push(`/users/${partnerId}`)}
+                              >
+                                {name}
+                              </Text>
                             </Text>
                             {partner?.bio && (
                               <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>
@@ -350,7 +414,7 @@ export default function ConnectionsSettingsScreen() {
                             onPress={() => handleDisconnect(partnerId, name)}
                           >
                             <Text fontSize={12} color="$color">
-                              解除連結
+                              {t("disconnect")}
                             </Text>
                           </Button>
                         </XStack>

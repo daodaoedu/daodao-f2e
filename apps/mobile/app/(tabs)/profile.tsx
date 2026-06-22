@@ -22,6 +22,7 @@ import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { usePractices } from "@/hooks/usePractices";
+import { useMobileTranslation } from "@/i18n";
 
 const bannerImage = require("@/assets/images/user-mobile-banner.png");
 const logoImage = require("@/assets/images/logo.png");
@@ -29,6 +30,8 @@ const BANNER_HEIGHT = 420;
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.profile");
+  const homeT = useMobileTranslation("mobile.home");
   const { width: screenWidth } = useWindowDimensions();
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -77,9 +80,9 @@ export default function ProfileScreen() {
   const dashboardStats = useMemo(
     () => [
       {
-        label: "連續登入",
+        label: homeT("stats_streak_label"),
         value: String(stats.currentStreak || 0),
-        unit: "天",
+        unit: homeT("stats_days_unit"),
         icon: (
           <CheckCircle2
             size={48}
@@ -89,9 +92,9 @@ export default function ProfileScreen() {
         ),
       },
       {
-        label: "獲得迴響",
+        label: homeT("stats_responses_label"),
         value: String(stats.totalCheckIns || 0),
-        unit: "次",
+        unit: homeT("stats_times_unit"),
         icon: (
           <MessageSquare
             size={48}
@@ -101,7 +104,7 @@ export default function ProfileScreen() {
         ),
       },
     ],
-    [stats]
+    [stats, homeT]
   );
 
   // ── Handlers ──
@@ -121,6 +124,10 @@ export default function ProfileScreen() {
     mutateUser();
     mutatePractices();
   }, [mutateUser, mutatePractices]);
+
+  const handleOpenFootprints = useCallback(() => {
+    router.push("/me/footprints" as never);
+  }, [router]);
 
   return (
     <RNView style={styles.container}>
@@ -148,7 +155,7 @@ export default function ProfileScreen() {
         >
           <Animated.Image source={logoImage} style={styles.logo} />
           <Text fontSize={18} fontWeight="500" color={colors.text.dark}>
-            我的小島
+            {t("title")}
           </Text>
           <RNView style={{ width: 24 }} />
         </XStack>
@@ -172,21 +179,23 @@ export default function ProfileScreen() {
         >
           <XStack justifyContent="space-between" alignItems="center" marginBottom="$2">
             <Text fontSize={14} fontWeight="500" color={colors.logo.cyan}>
-              學習類型
+              {t("learning_type")}
             </Text>
             {!isEmptyResult && (
               <Pressable onPress={handleRetakeQuiz}>
                 <XStack alignItems="center" gap="$1">
                   <RefreshCw size={16} color={colors.text.muted} />
                   <Text fontSize={12} color={colors.text.dark}>
-                    重新測驗
+                    {t("retake_quiz")}
                   </Text>
                 </XStack>
               </Pressable>
             )}
           </XStack>
           <Text fontSize={16} fontWeight="500" color={colors.text.dark} marginBottom="$3">
-            {isEmptyResult ? "你是哪一種島？快來測驗看看！" : `我是${learningTypeMessage}`}
+            {isEmptyResult
+              ? t("quiz_prompt")
+              : t("learning_type_result", { result: learningTypeMessage })}
           </Text>
           <Button
             backgroundColor={colors.logo.orange}
@@ -197,7 +206,7 @@ export default function ProfileScreen() {
           >
             <XStack alignItems="center" gap="$1">
               <Text color={colors.text.light} fontWeight="500">
-                {isEmptyResult ? "立即測驗" : "觀看詳細說明"}
+                {isEmptyResult ? t("start_quiz") : t("view_details")}
               </Text>
               <ChevronRight size={16} color={colors.text.light} />
             </XStack>
@@ -227,7 +236,7 @@ export default function ProfileScreen() {
           <YStack paddingHorizontal="$4" paddingBottom={120} minHeight={300}>
             {isUserLoading || isMyLoading ? (
               <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical="$8">
-                <Text color={colors.text.dark}>載入中...</Text>
+                <Text color={colors.text.dark}>{homeT("loading")}</Text>
               </YStack>
             ) : (
               <>
@@ -243,6 +252,20 @@ export default function ProfileScreen() {
 
                 {/* Dashboard 統計 */}
                 <DashboardHeader stats={dashboardStats} />
+
+                <Button
+                  marginBottom="$4"
+                  backgroundColor={colors.background.light}
+                  borderWidth={1}
+                  borderColor={colors.border.light}
+                  onPress={handleOpenFootprints}
+                >
+                  <XStack alignItems="center" gap="$2">
+                    <MessageSquare size={18} color={colors.logo.cyan} />
+                    <Text color={colors.text.dark}>{t("view_footprints")}</Text>
+                    <ChevronRight size={16} color={colors.text.muted} />
+                  </XStack>
+                </Button>
 
                 {!hasPractices && <RandomPracticesSection compact />}
 
@@ -267,7 +290,7 @@ export default function ProfileScreen() {
                     {showCompleted && completedTasks.length > 0 && (
                       <YStack gap="$3" marginBottom="$4">
                         <Text fontSize={18} fontWeight="500" color={colors.text.dark}>
-                          已完成
+                          {homeT("completed")}
                         </Text>
                         {completedTasks.map((task) => (
                           <CompletedCard key={task.id} task={task} />

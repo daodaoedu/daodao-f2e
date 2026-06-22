@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { addDays, differenceInDays, format, isValid, parse } from "date-fns";
 import type { ManualPracticeFormValues } from "../create/manual/schema";
 
@@ -14,6 +15,7 @@ export const ExecutionDurationCard = ({
   startDate,
   showRemaining = false,
 }: ExecutionDurationCardProps) => {
+  const t = useTranslations("practice");
   const days = typeof durationDays === "string" ? Number.parseInt(durationDays, 10) : durationDays;
 
   const today = new Date();
@@ -29,21 +31,21 @@ export const ExecutionDurationCard = ({
     <div className="relative bg-very-light-blue rounded-lg p-4 flex flex-col justify-between min-h-[120px]">
       {showRemaining ? (
         <div>
-          <h3 className="text-xs text-text-dark">剩餘</h3>
+          <h3 className="text-xs text-text-dark">{t("duration_card_remaining")}</h3>
           <div className="flex items-baseline gap-0.5">
             <div className="text-lg font-medium text-logo-orange">{remainingDays}</div>
-            <div className="text-xs text-text-dark">天</div>
-            <div className="text-xs text-text-dark">/ 總共</div>
+            <div className="text-xs text-text-dark">{t("duration_card_days_unit")}</div>
+            <div className="text-xs text-text-dark">{t("duration_card_total")}</div>
             <div className="text-xs text-text-dark">{days}</div>
-            <div className="text-xs text-text-dark">天</div>
+            <div className="text-xs text-text-dark">{t("duration_card_days_unit")}</div>
           </div>
         </div>
       ) : (
         <div>
-          <h3 className="text-xs text-text-dark">執行時長</h3>
+          <h3 className="text-xs text-text-dark">{t("duration_card_title")}</h3>
           <div className="flex items-baseline gap-0.5">
             <div className="text-lg font-medium text-logo-orange">{durationDays}</div>
-            <div className="text-xs text-text-dark">天</div>
+            <div className="text-xs text-text-dark">{t("duration_card_days_unit")}</div>
           </div>
         </div>
       )}
@@ -51,13 +53,13 @@ export const ExecutionDurationCard = ({
         <div className="mt-2">
           {start && (
             <div>
-              <div className="text-xs text-text-dark">開始日</div>
+              <div className="text-xs text-text-dark">{t("duration_card_start")}</div>
               <div className="text-sm text-logo-cyan">{format(start, "yyyy/MM/dd")}</div>
             </div>
           )}
           {end && (
             <div>
-              <div className="text-xs text-text-dark">結束日</div>
+              <div className="text-xs text-text-dark">{t("duration_card_end")}</div>
               <div className="text-sm text-logo-cyan">{format(end, "yyyy/MM/dd")}</div>
             </div>
           )}

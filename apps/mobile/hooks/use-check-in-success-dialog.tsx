@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { Alert } from "react-native";
+import { useMobileTranslation } from "@/i18n";
 
 interface IUseCheckInSuccessDialogOptions {
   title: string;
@@ -39,6 +40,7 @@ export function useCheckInSuccessDialog({
   from = 0,
   to = 100,
 }: IUseCheckInSuccessDialogOptions): IUseCheckInSuccessDialogReturn {
+  const t = useMobileTranslation("mobile.dialogs");
   const [isOpen, setIsOpen] = useState(false);
   const [percentage, setPercentage] = useState(from);
 
@@ -52,11 +54,11 @@ export function useCheckInSuccessDialog({
 
       return new Promise((resolve) => {
         Alert.alert(
-          "打卡成功!",
-          `${title}\n進度：${finalFrom}% → ${finalTo}%\n\n恭喜，你又成功行動了一次！`,
+          t("checkin_success_title"),
+          t("checkin_success_message", { title, from: finalFrom, to: finalTo }),
           [
             {
-              text: "完成",
+              text: t("done"),
               onPress: () => {
                 setIsOpen(false);
                 resolve({ value: "complete" });
@@ -66,7 +68,7 @@ export function useCheckInSuccessDialog({
         );
       });
     },
-    [title, from, to]
+    [title, from, to, t]
   );
 
   const closeSuccessDialog = useCallback(() => {

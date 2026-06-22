@@ -1,4 +1,5 @@
 export const HOME_TAB_PATHS = {
   inspire: "/",
-  mine: "/my",
+  persona: "/persona",
+  mine: "/mine",
 } as const;

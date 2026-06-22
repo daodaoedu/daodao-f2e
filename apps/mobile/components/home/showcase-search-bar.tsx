@@ -4,6 +4,7 @@ import { Keyboard, Pressable, StyleSheet, TextInput } from "react-native";
 import { Text, View, XStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useShowcaseSuggestions } from "@/hooks/useShowcaseSuggestions";
+import { useMobileTranslation } from "@/i18n";
 
 interface ShowcaseSearchBarProps {
   value: string;
@@ -12,6 +13,7 @@ interface ShowcaseSearchBarProps {
 }
 
 export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchBarProps) {
+  const t = useMobileTranslation("mobile.home");
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
@@ -64,6 +66,7 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
           onSubmitEditing={handleSubmit}
           returnKeyType="search"
           style={styles.input}
+          placeholder={t("search_placeholder")}
           placeholderTextColor="rgba(0,0,0,0.4)"
         />
         {value ? (
@@ -85,7 +88,7 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
                 paddingHorizontal="$3"
                 paddingVertical="$1"
               >
-                近期熱門
+                {t("recent_hot")}
               </Text>
               {trendingKeywords.map((kw) => (
                 <Pressable
@@ -110,7 +113,7 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
                 paddingVertical="$1"
                 marginTop="$1"
               >
-                你的興趣
+                {t("your_interests")}
               </Text>
               {interestTags.map((tag) => (
                 <Pressable

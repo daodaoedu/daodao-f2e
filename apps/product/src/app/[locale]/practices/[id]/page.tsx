@@ -14,6 +14,8 @@ import {
   usePracticeById,
   usePracticeCheckIns,
   useReactionsList,
+  useRecordReadProgress,
+  useRecordTimeSpent,
   useRecordView,
 } from "@daodao/api";
 import type { MentionCandidate } from "@daodao/features-mention";
@@ -170,6 +172,8 @@ export default function PracticeDetailPage() {
   const { deletePractice: deletePracticeById } = useDeletePractice(practiceId);
 
   const recordView = useRecordView();
+  useRecordReadProgress(practiceId);
+  useRecordTimeSpent(practiceId);
 
   useEffect(() => {
     if (practiceId) {
@@ -242,9 +246,9 @@ export default function PracticeDetailPage() {
       return [];
     }
 
-    return rawComments.filter(isApiCommentNode).map((comment) =>
-      mapComment(comment, commentOptions)
-    );
+    return rawComments
+      .filter(isApiCommentNode)
+      .map((comment) => mapComment(comment, commentOptions));
   }, [commentsData, commentOptions]);
 
   const mentionCandidates = useMemo<MentionCandidate[]>(() => {
@@ -297,7 +301,8 @@ export default function PracticeDetailPage() {
           await restorePractice();
           toast.success(t("restore_success"));
         } catch (restoreError) {
-          const errorMessage = restoreError instanceof Error ? restoreError.message : t("restore_failed");
+          const errorMessage =
+            restoreError instanceof Error ? restoreError.message : t("restore_failed");
           console.error("Failed to restore practice:", errorMessage);
           toast.error(errorMessage);
         }
@@ -309,7 +314,8 @@ export default function PracticeDetailPage() {
         await archivePractice();
         router.push("/settings/archived");
       } catch (archiveError) {
-        const errorMessage = archiveError instanceof Error ? archiveError.message : t("archive_failed");
+        const errorMessage =
+          archiveError instanceof Error ? archiveError.message : t("archive_failed");
         console.error("Failed to archive practice:", errorMessage);
         toast.error(errorMessage);
       }
@@ -323,7 +329,8 @@ export default function PracticeDetailPage() {
         await deletePracticeById();
         router.push("/");
       } catch (deleteError) {
-        const errorMessage = deleteError instanceof Error ? deleteError.message : t("delete_failed");
+        const errorMessage =
+          deleteError instanceof Error ? deleteError.message : t("delete_failed");
         console.error("Failed to delete practice:", errorMessage);
         toast.error(errorMessage);
       }

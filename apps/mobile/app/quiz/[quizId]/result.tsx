@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { type IIslandResult, mockIslandResults } from "@/types/quiz";
 
 export default function QuizResultScreen() {
@@ -12,6 +13,7 @@ export default function QuizResultScreen() {
     answers?: string;
   }>();
   const router = useRouter();
+  const t = useMobileTranslation("mobile.quiz");
 
   const [result, setResult] = useState<IIslandResult | null>(null);
   const [showAnimation, setShowAnimation] = useState(true);
@@ -35,10 +37,10 @@ export default function QuizResultScreen() {
           <YStack alignItems="center" gap="$4">
             <Text fontSize={64}>🏝️</Text>
             <Text fontSize={18} fontWeight="600" color="$color">
-              正在分析你的答案...
+              {t("analyzing")}
             </Text>
             <Text fontSize={14} color="$color" opacity={0.6}>
-              發現你的專屬學習島嶼
+              {t("discovering")}
             </Text>
           </YStack>
         </YStack>
@@ -54,7 +56,7 @@ export default function QuizResultScreen() {
             {/* Result Header */}
             <YStack alignItems="center" gap="$2">
               <Text fontSize={14} color="$color" opacity={0.6}>
-                你的學習島嶼是
+                {t("result_label")}
               </Text>
             </YStack>
 
@@ -82,10 +84,10 @@ export default function QuizResultScreen() {
 
               <YStack alignItems="center" gap="$2">
                 <Text fontSize={28} fontWeight="700" color={result.color}>
-                  {result.name}
+                  {t(`results.${result.id}.name`)}
                 </Text>
                 <Text fontSize={15} color="$color" opacity={0.7} textAlign="center">
-                  {result.description}
+                  {t(`results.${result.id}.description`)}
                 </Text>
               </YStack>
             </YStack>
@@ -93,10 +95,10 @@ export default function QuizResultScreen() {
             {/* Traits */}
             <YStack width="100%" gap="$3">
               <Text fontSize={16} fontWeight="600" color="$color">
-                你的特質
+                {t("traits_title")}
               </Text>
               <XStack gap="$2" flexWrap="wrap">
-                {result.traits.map((trait) => (
+                {result.traits.map((trait, index) => (
                   <YStack
                     key={trait}
                     paddingHorizontal="$3"
@@ -105,7 +107,7 @@ export default function QuizResultScreen() {
                     borderRadius="$sm"
                   >
                     <Text fontSize={14} color={result.color} fontWeight="500">
-                      {trait}
+                      {t(`results.${result.id}.traits.${index}`)}
                     </Text>
                   </YStack>
                 ))}
@@ -115,7 +117,7 @@ export default function QuizResultScreen() {
             {/* Recommendations */}
             <YStack width="100%" gap="$3">
               <Text fontSize={16} fontWeight="600" color="$color">
-                推薦實踐
+                {t("recommendations_title")}
               </Text>
               <YStack padding="$4" backgroundColor={colors.basic[100]} borderRadius="$md" gap="$2">
                 {result.recommendations.map((rec, index) => (
@@ -133,7 +135,7 @@ export default function QuizResultScreen() {
                       </Text>
                     </YStack>
                     <Text fontSize={14} color="$color">
-                      {rec}
+                      {t(`results.${result.id}.recommendations.${index}`)}
                     </Text>
                   </XStack>
                 ))}
@@ -153,7 +155,7 @@ export default function QuizResultScreen() {
             <XStack alignItems="center" gap="$2">
               <Home size={20} color={colors.basic.white} />
               <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                開始我的學習之旅
+                {t("start_journey")}
               </Text>
             </XStack>
           </Button>
@@ -169,7 +171,7 @@ export default function QuizResultScreen() {
             >
               <XStack alignItems="center" gap="$2">
                 <RotateCcw size={18} color="$color" />
-                <Text color="$color">重新測驗</Text>
+                <Text color="$color">{t("retake")}</Text>
               </XStack>
             </Button>
 
@@ -182,7 +184,7 @@ export default function QuizResultScreen() {
             >
               <XStack alignItems="center" gap="$2">
                 <Share2 size={18} color="$color" />
-                <Text color="$color">分享結果</Text>
+                <Text color="$color">{t("share_result")}</Text>
               </XStack>
             </Button>
           </XStack>

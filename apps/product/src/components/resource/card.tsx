@@ -9,6 +9,7 @@ import {
   MoreSvg,
   ViewSvg,
 } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -21,7 +22,6 @@ import {
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isWithinInterval, subMonths } from "date-fns";
-import { targetAudienceTypeMap } from "@/constants/resource";
 
 export function ResourceCardSkeleton() {
   return (
@@ -58,6 +58,7 @@ type ResourceCardProps = {
 };
 
 export function ResourceCard(props: ResourceCardProps) {
+  const t = useTranslations("app_product");
   const {
     id,
     userName,
@@ -68,8 +69,8 @@ export function ResourceCard(props: ResourceCardProps) {
     coverImageUrl = "",
     tags = [],
     label = [],
-    level = "初級",
-    viewCount = "尚未計算",
+    level,
+    viewCount,
     commentCount = 0,
   } = props;
 
@@ -80,7 +81,16 @@ export function ResourceCard(props: ResourceCardProps) {
       })
     : false;
 
-  const labels = isNewResource ? ["近期新增", ...label] : label;
+  const displayLevel =
+    !level || level === "beginner"
+      ? t("resource_level_beginner")
+      : level === "intermediate"
+        ? t("resource_level_intermediate")
+        : level === "expert"
+          ? t("resource_level_expert")
+          : level;
+  const displayViewCount = viewCount ?? t("resource_view_count_pending");
+  const labels = isNewResource ? [t("resource_recently_added"), ...label] : label;
 
   return (
     <CustomLink
@@ -155,16 +165,16 @@ export function ResourceCard(props: ResourceCardProps) {
           <div className="flex">
             <div className="mr-2 flex border-r border-solid border-basic-200">
               <GroupSvg />
-              <div className="ml-2 mr-1">適合</div>
+              <div className="ml-2 mr-1">{t("resource_suitable_for")}</div>
             </div>
-            <span className="text-primary-base">{targetAudienceTypeMap.get(level) ?? level}</span>
+            <span className="text-primary-base">{displayLevel}</span>
           </div>
 
           <div className="body-md flex items-center justify-between gap-3 md:justify-center">
             <div className="flex items-center justify-center gap-3">
               <div className="flex items-center justify-center gap-1">
                 <ViewSvg />
-                <div>{viewCount}</div>
+                <div>{displayViewCount}</div>
               </div>
               <div className="flex items-center justify-center gap-1">
                 <CommentSvg />
@@ -186,7 +196,7 @@ export function ResourceCard(props: ResourceCardProps) {
                     className="block p-2"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    檢舉
+                    {t("report")}
                   </CustomLink>
                 </DropdownMenuItem>
               </DropdownMenuContent>

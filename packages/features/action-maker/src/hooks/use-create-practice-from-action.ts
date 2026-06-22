@@ -44,6 +44,7 @@ export function useCreatePracticeFromAction(): UseCreatePracticeReturn {
           frequencyMinDays: 1,
           frequencyMaxDays: 1,
           isDraft: false,
+          creationMethod: "action_generator",
         });
 
         if (error || !data) {

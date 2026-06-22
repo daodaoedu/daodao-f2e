@@ -2,6 +2,7 @@
 
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg, VerticalFullSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
+import { useTranslations } from "@daodao/i18n";
 import { usePathname } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -14,6 +15,7 @@ import type { SidebarProps } from "./type";
 
 export const DesktopSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
+  const t = useTranslations("app_product");
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleToggleSidebar = () => {
@@ -35,7 +37,7 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
           isCollapsed ? "top-4 left-1/2 -translate-x-1/2" : "top-4 right-3"
         )}
         onClick={handleToggleSidebar}
-        aria-label={isCollapsed ? "展開側邊欄" : "收合側邊欄"}
+        aria-label={isCollapsed ? t("sidebar_expand") : t("sidebar_collapse")}
       >
         {isCollapsed ? (
           <ArrowRightOutlineSvg className="size-6 text-gray-500" />
@@ -45,7 +47,7 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
       </Button>
 
       <div className="flex-1 relative">
-        <CustomLink href="/" aria-label="回到官網">
+        <CustomLink href="/" aria-label={t("back_to_website")}>
           <div
             className={cn(
               "ml-10 mr-12 transition-all duration-300 relative z-10",
@@ -70,9 +72,10 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
         {menuItems.map((item) => {
           const isActive = item.isMatch(pathname, identifier);
           const Icon = isActive ? item.activeIcon : item.icon;
+          const label = t(item.labelKey);
           return (
             <li
-              key={item.label}
+              key={item.labelKey}
               className={cn(
                 isCollapsed ? "w-full flex justify-center" : "",
                 item.hidden && "hidden"
@@ -84,7 +87,7 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
                   "flex items-center px-6 py-3 text-text-dark cursor-pointer transition-all duration-300",
                   isCollapsed ? "justify-center" : "gap-2"
                 )}
-                aria-label={item.label}
+                aria-label={label}
               >
                 {item.href === "/notifications" ? (
                   <NotificationBell isActive={isActive} />
@@ -103,7 +106,7 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
                     isCollapsed && "flex-0 overflow-hidden"
                   )}
                 >
-                  {item.label}
+                  {label}
                 </span>
               </CustomLink>
             </li>

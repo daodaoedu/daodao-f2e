@@ -1,7 +1,8 @@
-import { submitPersonaAnswer, usePersonaProfileMe, useMutate } from "@daodao/api";
+import { submitPersonaAnswer, useMutate, usePersonaProfileMe } from "@daodao/api";
 import { useState } from "react";
 import { Alert, ScrollView as RNScrollView, TextInput } from "react-native";
 import { Button, Card, Text, XStack, YStack } from "tamagui";
+import { useMobileTranslation } from "@/i18n";
 
 interface InlineAnswerFormProps {
   questionId: number;
@@ -11,6 +12,7 @@ interface InlineAnswerFormProps {
 }
 
 function InlineAnswerForm({ questionId, questionType, options, onSuccess }: InlineAnswerFormProps) {
+  const t = useMobileTranslation("persona.myProfile");
   const [selected, setSelected] = useState("");
   const [textAnswer, setTextAnswer] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -23,15 +25,17 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
     setSubmitting(true);
     try {
       const res = await submitPersonaAnswer(
-        isChoice ? { questionId, selectedValue: selected } : { questionId, textAnswer: textAnswer.trim() }
+        isChoice
+          ? { questionId, selectedValue: selected }
+          : { questionId, textAnswer: textAnswer.trim() }
       );
       if (res.error) {
-        Alert.alert("送出失敗，請稍後再試");
+        Alert.alert(t("submitError"));
         return;
       }
       onSuccess();
     } catch {
-      Alert.alert("送出失敗，請稍後再試");
+      Alert.alert(t("submitError"));
     } finally {
       setSubmitting(false);
     }
@@ -53,7 +57,7 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
           ))}
         </XStack>
         <Button size="$3" onPress={handleSubmit} disabled={submitting || !selected}>
-          {submitting ? "送出中..." : "送出"}
+          {submitting ? t("submitting") : t("submit")}
         </Button>
       </YStack>
     );
@@ -64,20 +68,27 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
       <TextInput
         value={textAnswer}
         onChangeText={setTextAnswer}
-        placeholder="請輸入你的答案..."
+        placeholder={t("textPlaceholder")}
         multiline
         numberOfLines={3}
         maxLength={300}
-        style={{ borderWidth: 1, borderColor: "#d1d5db", borderRadius: 8, padding: 8, fontSize: 14 }}
+        style={{
+          borderWidth: 1,
+          borderColor: "#d1d5db",
+          borderRadius: 8,
+          padding: 8,
+          fontSize: 14,
+        }}
       />
       <Button size="$3" onPress={handleSubmit} disabled={submitting || !textAnswer.trim()}>
-        {submitting ? "送出中..." : "送出"}
+        {submitting ? t("submitting") : t("submit")}
       </Button>
     </YStack>
   );
 }
 
 export function PersonaProfileTab() {
+  const t = useMobileTranslation("persona.myProfile");
   const { data, isLoading } = usePersonaProfileMe();
   const mutate = useMutate();
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -90,7 +101,7 @@ export function PersonaProfileTab() {
   if (isLoading) {
     return (
       <YStack flex={1} ai="center" jc="center" p="$4">
-        <Text color="$gray8">載入中...</Text>
+        <Text color="$gray8">{t("loading")}</Text>
       </YStack>
     );
   }
@@ -111,7 +122,9 @@ export function PersonaProfileTab() {
               p="$3"
               onPress={() => setExpandedId(isExpanded ? null : q.id)}
             >
-              <Text fontSize="$3" color="$gray10">{q.prompt}</Text>
+              <Text fontSize="$3" color="$gray10">
+                {q.prompt}
+              </Text>
               {isExpanded ? (
                 <InlineAnswerForm
                   questionId={q.id}
@@ -120,7 +133,9 @@ export function PersonaProfileTab() {
                   onSuccess={() => handleAnswerSuccess()}
                 />
               ) : (
-                <Text fontSize="$2" color="$blue9" mt="$1">點擊填寫答案</Text>
+                <Text fontSize="$2" color="$blue9" mt="$1">
+                  {t("clickToAnswer")}
+                </Text>
               )}
             </Card>
           );
@@ -128,13 +143,15 @@ export function PersonaProfileTab() {
 
         return (
           <Card key={q.id} bordered p="$3" bg="$background">
-            <Text fontSize="$2" color="$gray9" mb="$1">{q.prompt}</Text>
+            <Text fontSize="$2" color="$gray9" mb="$1">
+              {q.prompt}
+            </Text>
             <Text fontSize="$4" fontWeight="600">
               {q.answer?.selectedValue ?? q.answer?.textAnswer ?? ""}
             </Text>
             {(q.answer?.resonanceCount ?? 0) > 0 && (
               <Text fontSize="$2" color="$gray8" mt="$1">
-                ✦ {q.answer?.resonanceCount} 共鳴
+                ✦ {q.answer?.resonanceCount} {t("resonances")}
               </Text>
             )}
           </Card>

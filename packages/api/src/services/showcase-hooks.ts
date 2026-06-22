@@ -12,6 +12,7 @@
 import { getRequiredEnv } from "@daodao/config";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
+import { getApiBaseUrl, unauthorizedHandler } from "../client";
 
 // ============================================================================
 // Types
@@ -164,8 +165,8 @@ export async function reactToPractice(
   reactionType: string,
   isCurrentlyReacted: boolean
 ): Promise<void> {
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
-  const res = await fetch(`${baseUrl}/api/v1/reactions`, {
+  const baseUrl = getApiBaseUrl();
+  const res = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/reactions`, {
     method: isCurrentlyReacted ? "DELETE" : "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },

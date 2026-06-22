@@ -1,6 +1,6 @@
+import type { useTranslations } from "@daodao/i18n";
 import { addDays, format, isAfter, isBefore, isValid, parse, startOfDay } from "date-fns";
 import { z } from "zod";
-import type { useTranslations } from "@daodao/i18n";
 import {
   DurationDays,
   ExecutionTiming,
@@ -98,7 +98,9 @@ const createStartDateSchema = (minDate?: Date, t?: TFunction) => {
             return { message: msg("validation_start_date_too_early") };
           }
           const minDateFormatted = format(minDateStartOfDay, "yyyy/MM/dd");
-          return { message: msg("validation_start_date_too_early_min", { minDate: minDateFormatted }) };
+          return {
+            message: msg("validation_start_date_too_early_min", { minDate: minDateFormatted }),
+          };
         }
         if (isAfter(dateStartOfDay, maxDate)) {
           const maxDateFormatted = format(maxDate, "yyyy/MM/dd");
@@ -110,7 +112,10 @@ const createStartDateSchema = (minDate?: Date, t?: TFunction) => {
 };
 
 // Form Schema 工廠函數
-export const createManualPracticeFormSchema = (options?: ManualPracticeSchemaOptions, t?: TFunction) => {
+export const createManualPracticeFormSchema = (
+  options?: ManualPracticeSchemaOptions,
+  t?: TFunction
+) => {
   // 不提供預設值，讓 createStartDateSchema 在驗證時動態決定
   const minStartDate = options?.minStartDate;
 

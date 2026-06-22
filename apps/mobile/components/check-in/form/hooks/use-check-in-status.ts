@@ -1,11 +1,13 @@
 import { useMemo } from "react";
 import { CheckInStatus, type CheckInStatusType } from "@/constants/check-in-status";
+import { useMobileTranslation } from "@/i18n";
 import type { ICheckInStatusOptions } from "../../types";
 
 /**
  * Hook 用於檢查打卡狀態 (Mobile)
  */
 export const useCheckInStatus = (options: ICheckInStatusOptions) => {
+  const t = useMobileTranslation("mobile.checkIn");
   const { practiceStatus } = options;
 
   return useMemo(() => {
@@ -27,13 +29,13 @@ export const useCheckInStatus = (options: ICheckInStatusOptions) => {
     const getButtonLabel = (): string => {
       switch (status) {
         case CheckInStatus.practiceCompleted:
-          return "實踐已完成";
+          return t("practice_completed");
         case CheckInStatus.alreadyCheckedIn:
-          return "24 小時內已打過卡囉！";
+          return t("already_checked_in");
         case CheckInStatus.available:
-          return "打卡";
+          return t("title");
         default:
-          return "打卡";
+          return t("title");
       }
     };
 
@@ -47,5 +49,5 @@ export const useCheckInStatus = (options: ICheckInStatusOptions) => {
       canCheckIn,
       getButtonLabel,
     };
-  }, [practiceStatus]);
+  }, [practiceStatus, t]);
 };

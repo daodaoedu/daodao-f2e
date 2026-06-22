@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import { Image, Text, View, XStack, YStack } from "tamagui";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 interface ICheckInCardProps {
   taskTitle: string;
@@ -29,6 +30,7 @@ export const CheckInCard = ({
   titleColor = colors.basic.white,
   onImagePress,
 }: ICheckInCardProps) => {
+  const t = useMobileTranslation("mobile.checkIn");
   const moodOption = useMemo(
     () => (mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null),
     [mood]
@@ -138,7 +140,7 @@ export const CheckInCard = ({
               <XStack alignItems="center" gap="$2">
                 <Text fontSize={24}>{moodOption.emoji}</Text>
                 <Text fontSize={14} color={colors.text.dark}>
-                  心情{moodOption.label}
+                  {t("mood_display", { mood: t(moodOption.labelKey) })}
                 </Text>
               </XStack>
             )}

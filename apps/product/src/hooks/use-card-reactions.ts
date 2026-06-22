@@ -7,6 +7,8 @@ import type {
   ReactionTypeValue,
 } from "@daodao/api";
 import { removeReaction, upsertReaction, useReactions, useReactionsList } from "@daodao/api";
+import { useAuth } from "@daodao/auth";
+import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { useCallback, useTransition } from "react";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 
@@ -26,6 +28,9 @@ export function useCardReactions(
     { targetType, targetId },
     { enabled: shouldFetchIndividual }
   );
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
   const [, startTransition] = useTransition();
 
   const source = prefetchedData ?? reactionsData?.data;
@@ -44,6 +49,12 @@ export function useCardReactions(
 
   const handleToggle = useCallback(
     (type: ReactionTypeType) => {
+      if (!isAuthenticated) {
+        const search = typeof window !== "undefined" ? window.location.search : "";
+        const redirectUrl = search ? `${pathname}${search}` : pathname;
+        router.push(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
+        return;
+      }
       const isSelected = currentUserReaction === type;
       startTransition(async () => {
         if (isSelected) {
@@ -59,7 +70,7 @@ export function useCardReactions(
         onMutate?.();
       });
     },
-    [currentUserReaction, targetType, targetId, mutate, onMutate]
+    [isAuthenticated, router, pathname, currentUserReaction, targetType, targetId, mutate, onMutate]
   );
 
   return {

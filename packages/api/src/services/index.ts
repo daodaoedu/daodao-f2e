@@ -32,12 +32,14 @@ export * from "./location-hooks";
 // Notification Service
 export * from "./notification";
 export * from "./notification-hooks";
-// Persona Service
-export * from "./persona";
-export * from "./persona-hooks";
 // OG Image Service
 export * from "./og-image";
 export * from "./og-image-hooks";
+// Onboarding Flow Service
+export * from "./onboarding-flow";
+// Persona Service
+export * from "./persona";
+export * from "./persona-hooks";
 // Practice Service
 export * from "./practice";
 export * from "./practice-hooks";
@@ -49,6 +51,9 @@ export * from "./recommendation-hooks";
 // Resource Service
 export * from "./resource";
 export * from "./resource-hooks";
+// Roadmap / Wishpool Service
+export * from "./roadmap";
+export * from "./roadmap-hooks";
 // Showcase Service
 export * from "./showcase-hooks";
 // Tag Service

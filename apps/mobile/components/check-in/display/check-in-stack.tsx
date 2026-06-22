@@ -3,6 +3,7 @@ import { FlatList, type ListRenderItemInfo, Pressable, StyleSheet } from "react-
 import { Text, View, YStack } from "tamagui";
 import { type ApiMoodType, MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import type { ICheckInItem } from "../types";
 
 // Shape colors for visual variety
@@ -43,6 +44,7 @@ const formatCheckInDate = (checkinDate: string): string => {
  * 用於顯示多個打卡記錄，以卡片列表形式呈現
  */
 export const CheckInStack = ({ checkInsData, onCheckInPress }: ICheckInStackProps) => {
+  const t = useMobileTranslation("mobile.checkInList");
   // 將 API 資料轉換為 ICheckInItem[] 格式
   const items: ICheckInItem[] = useMemo(() => {
     if (!checkInsData?.data) {
@@ -87,7 +89,7 @@ export const CheckInStack = ({ checkInsData, onCheckInPress }: ICheckInStackProp
             { backgroundColor: shapeColor },
             pressed && styles.itemPressed,
           ]}
-          accessibilityLabel={`第 ${index + 1} 次打卡：${item.date}`}
+          accessibilityLabel={t("stack_accessibility", { number: index + 1, date: item.date })}
           accessibilityRole="button"
         >
           <YStack flex={1} gap="$2" alignItems="center" justifyContent="center">
@@ -115,7 +117,7 @@ export const CheckInStack = ({ checkInsData, onCheckInPress }: ICheckInStackProp
         </Pressable>
       );
     },
-    [handlePress]
+    [handlePress, t]
   );
 
   const keyExtractor = useCallback((item: ICheckInItem) => item.id, []);

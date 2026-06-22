@@ -90,17 +90,49 @@ export const INTEREST_CATEGORIES = [
 ] as const;
 
 export const NOTIFICATION_TYPES = [
-  { type: "reaction", label: "反應", description: "有人對你的內容按了反應" },
-  { type: "comment", label: "留言與 @", description: "有人留言或 @ 提及了你" },
-  { type: "follow-user", label: "關注", description: "有人關注了你" },
-  { type: "connect", label: "連結請求", description: "有人向你發出連結請求" },
-  { type: "agree-connect", label: "連結確認", description: "對方同意了你的連結請求" },
-  { type: "update-practice-checkin", label: "關注的實踐更新", description: "你關注的實踐有新打卡" },
   {
-    type: "practice-started",
-    label: "關注的人開始實踐",
-    description: "你關注的人開始了新主題實踐",
+    type: "reaction",
+    labelKey: "types.reaction.label",
+    descriptionKey: "types.reaction.description",
   },
-  { type: "buddy-request", label: "Buddy 請求", description: "有人邀請你成為實踐夥伴" },
-  { type: "weekly", label: "週報", description: "每週一的島嶼探索摘要" },
+  {
+    type: "comment",
+    labelKey: "types.comment.label",
+    descriptionKey: "types.comment.description",
+  },
+  {
+    type: "UserFollowed",
+    labelKey: "types.follow.label",
+    descriptionKey: "types.follow.description",
+  },
+  {
+    type: "Connect",
+    labelKey: "types.connect.label",
+    descriptionKey: "types.connect.description",
+  },
+  {
+    type: "ConnectAccepted",
+    labelKey: "types.connectAccepted.label",
+    descriptionKey: "types.connectAccepted.description",
+  },
+  {
+    type: "update-practice-checkin",
+    labelKey: "types.practiceCheckin.label",
+    descriptionKey: "types.practiceCheckin.description",
+  },
+  {
+    type: "PracticeCreated",
+    labelKey: "types.practiceCreated.label",
+    descriptionKey: "types.practiceCreated.description",
+  },
+  {
+    type: "BuddyRequest",
+    labelKey: "types.buddyRequest.label",
+    descriptionKey: "types.buddyRequest.description",
+  },
+  {
+    type: "WeeklyDigest",
+    labelKey: "types.weeklyDigest.label",
+    descriptionKey: "types.weeklyDigest.description",
+  },
 ] as const;

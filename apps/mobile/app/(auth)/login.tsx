@@ -4,13 +4,38 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Image, Spinner, Text, XStack, YStack } from "tamagui";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { useAuth } from "@/providers/AuthProvider";
 import { oauthService } from "@/services/oauth";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const mobileLoginImage = require("@/assets/images/mobile-login.png");
 
+const OAUTH_ERROR_KEYS: Record<string, string> = {
+  "oauth.cancelled": "cancelled",
+  "oauth.google_failed": "google_failed",
+  "oauth.missing_auth_code": "missing_auth_code",
+  "oauth.invalid_server_response": "invalid_server_response",
+  "oauth.incomplete_user_data": "incomplete_user_data",
+  "oauth.invalid_token": "invalid_token",
+  "oauth.invalid_email": "invalid_email",
+  "oauth.apple_failed": "apple_failed",
+  "oauth.apple_missing_identity_token": "apple_missing_identity_token",
+  "oauth.apple_invalid_server_response": "apple_invalid_server_response",
+  "oauth.apple_incomplete_user_data": "apple_incomplete_user_data",
+};
+
+function isOAuthCancelled(message: string) {
+  return message === "oauth.cancelled" || message === "The user canceled the authorization attempt";
+}
+
+function mapOAuthErrorMessage(message: string, t: (key: string) => string) {
+  const key = OAUTH_ERROR_KEYS[message];
+  return key ? t(key) : message;
+}
+
 export default function LoginScreen() {
+  const t = useMobileTranslation("mobile.auth");
   const { signIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<"google" | "apple" | null>(null);
@@ -28,8 +53,10 @@ export default function LoginScreen() {
       const { tokens, user } = await oauthService.signInWithGoogle();
       await signIn(tokens, user, "google");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Google 登入失敗";
-      Alert.alert("登入失敗", message);
+      const rawMessage = err instanceof Error ? err.message : "oauth.google_failed";
+      if (!isOAuthCancelled(rawMessage)) {
+        Alert.alert(t("login_failed"), mapOAuthErrorMessage(rawMessage, t));
+      }
     } finally {
       setIsLoading(false);
       setLoadingProvider(null);
@@ -44,9 +71,9 @@ export default function LoginScreen() {
       const { tokens, user } = await oauthService.signInWithApple();
       await signIn(tokens, user, "apple");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Apple 登入失敗";
-      if (message !== "The user canceled the authorization attempt") {
-        Alert.alert("登入失敗", message);
+      const rawMessage = err instanceof Error ? err.message : "oauth.apple_failed";
+      if (!isOAuthCancelled(rawMessage)) {
+        Alert.alert(t("login_failed"), mapOAuthErrorMessage(rawMessage, t));
       }
     } finally {
       setIsLoading(false);
@@ -62,10 +89,10 @@ export default function LoginScreen() {
           {/* 標題區域 */}
           <YStack alignItems="center" gap="$2">
             <Text fontSize={28} fontWeight="500" color={colors.basic.black}>
-              歡迎回來島島阿學!
+              {t("title")}
             </Text>
             <Text fontSize={16} color={colors.basic[600]} textAlign="center">
-              建立你的學習小島，與社群夥伴一同成長
+              {t("subtitle")}
             </Text>
           </YStack>
 
@@ -80,7 +107,7 @@ export default function LoginScreen() {
                 pressStyle={{ opacity: 0.8 }}
                 onPress={handleAppleLogin}
                 disabled={isLoading}
-                accessibilityLabel="使用 Apple 登入"
+                accessibilityLabel={t("apple_accessibility")}
                 accessibilityRole="button"
               >
                 {loadingProvider === "apple" ? (
@@ -89,7 +116,7 @@ export default function LoginScreen() {
                   <XStack alignItems="center" gap="$2.5">
                     <Text color={colors.basic.white} fontSize={20}></Text>
                     <Text color={colors.basic.white} fontWeight="500" fontSize={16}>
-                      Apple 帳號註冊 / 登入
+                      {t("apple_login")}
                     </Text>
                   </XStack>
                 )}
@@ -106,7 +133,7 @@ export default function LoginScreen() {
               pressStyle={{ backgroundColor: colors.basic[50] }}
               onPress={handleGoogleLogin}
               disabled={isLoading}
-              accessibilityLabel="使用 Google 帳號登入"
+              accessibilityLabel={t("google_accessibility")}
               accessibilityRole="button"
             >
               {loadingProvider === "google" ? (
@@ -115,7 +142,7 @@ export default function LoginScreen() {
                 <XStack alignItems="center" gap="$2.5">
                   <GoogleIcon size={20} />
                   <Text fontWeight="500" fontSize={16} color={colors.basic[500]}>
-                    Google 帳號註冊 / 登入
+                    {t("google_login")}
                   </Text>
                 </XStack>
               )}
@@ -125,7 +152,7 @@ export default function LoginScreen() {
           {/* 服務條款 */}
           <YStack alignItems="center">
             <Text fontSize={13} color={colors.basic[600]} textAlign="center">
-              註冊即代表您同意島島阿學的
+              {t("terms_prefix")}
             </Text>
             <XStack gap="$1.5">
               <Text
@@ -134,10 +161,10 @@ export default function LoginScreen() {
                 textDecorationLine="underline"
                 onPress={() => Linking.openURL("https://daodao.so/terms/service")}
               >
-                服務條款
+                {t("terms")}
               </Text>
               <Text fontSize={13} color={colors.basic[600]}>
-                與
+                {t("and")}
               </Text>
               <Text
                 fontSize={13}
@@ -145,7 +172,7 @@ export default function LoginScreen() {
                 textDecorationLine="underline"
                 onPress={() => Linking.openURL("https://daodao.so/terms/privacy")}
               >
-                隱私權政策
+                {t("privacy")}
               </Text>
             </XStack>
           </YStack>

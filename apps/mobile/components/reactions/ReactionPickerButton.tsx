@@ -7,6 +7,7 @@ import {
   REACTION_CONFIG,
   type ReactionTypeType,
 } from "@/constants/reaction-type";
+import { useMobileTranslation } from "@/i18n";
 
 const LONG_PRESS_DELAY = 400;
 
@@ -62,6 +63,7 @@ export function ReactionPickerButton({
   displayReactions = [],
   firstReactorName,
 }: ReactionPickerButtonProps) {
+  const t = useMobileTranslation("mobile.reactions");
   const [pickerOpen, setPickerOpen] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -96,9 +98,11 @@ export function ReactionPickerButton({
   const summaryText = (() => {
     if (totalCount <= 0) return null;
     if (firstReactorName) {
-      return totalCount > 1 ? `${firstReactorName} 與其他 ${totalCount - 1} 人` : firstReactorName;
+      return totalCount > 1
+        ? t("with_others", { name: firstReactorName, count: totalCount - 1 })
+        : firstReactorName;
     }
-    return `${totalCount} 人`;
+    return t("people_count", { count: totalCount });
   })();
 
   return (

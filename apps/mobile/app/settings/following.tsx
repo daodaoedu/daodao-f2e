@@ -1,42 +1,37 @@
+import { useFollowing } from "@daodao/api";
 import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useSWR from "swr";
 import { Avatar, Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { api } from "@/services/api-client";
+import { unfollowTarget } from "@/hooks/useFollow";
+import { useMobileTranslation } from "@/i18n";
 
 interface IFollowItem {
   targetType: "user" | "practice";
-  user?: { id: string; name: string; photoURL?: string; bio?: string };
+  user?: { id: string; identifier?: string; name: string; photoURL?: string; bio?: string };
   practice?: { id: string; title: string; ownerName: string; ownerPhotoURL?: string };
 }
 
 export default function FollowingSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.followingSettings");
+  const tCommon = useMobileTranslation("common");
   const [tab, setTab] = useState<"users" | "practices">("users");
   const { user: currentUser } = useCurrentUser();
   const userId = currentUser?.id ?? "";
 
-  const {
-    data: followingItems,
-    isLoading,
-    mutate,
-  } = useSWR<IFollowItem[]>(
-    userId ? `/users/${userId}/following` : null,
-    () => api.get<{ data: IFollowItem[] }>(`/users/${userId}/following`).then((r) => r.data),
-    { revalidateOnFocus: false }
-  );
+  const { data: followingData, isLoading, mutate } = useFollowing({ userId, limit: 100 });
 
-  const items = followingItems ?? [];
+  const items = (followingData?.data ?? []) as IFollowItem[];
   const followedUsers = items.filter((item) => item.targetType === "user" && item.user);
   const followedPractices = items.filter((item) => item.targetType === "practice" && item.practice);
 
   const handleUnfollow = async (targetType: "user" | "practice", targetId: string) => {
     try {
-      await api.delete(`/follows/${targetType}/${targetId}`);
+      await unfollowTarget(targetType, targetId);
       await mutate();
     } catch {
       // silently fail
@@ -52,35 +47,35 @@ export default function FollowingSettingsScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            關注設定
+            {t("title")}
           </Text>
         </XStack>
 
         {/* Tab Bar */}
         <XStack borderBottomWidth={1} borderBottomColor="$borderColor">
-          {(["users", "practices"] as const).map((t) => (
+          {(["users", "practices"] as const).map((tabValue) => (
             <YStack
-              key={t}
+              key={tabValue}
               flex={1}
               alignItems="center"
               paddingVertical="$3"
               borderBottomWidth={2}
-              borderBottomColor={tab === t ? colors.primary.base : "transparent"}
+              borderBottomColor={tab === tabValue ? colors.primary.base : "transparent"}
               pressStyle={{ opacity: 0.7 }}
-              onPress={() => setTab(t)}
+              onPress={() => setTab(tabValue)}
             >
               <Text
                 fontSize={14}
                 fontWeight="500"
-                color={tab === t ? colors.primary.base : "$color"}
-                opacity={tab === t ? 1 : 0.5}
+                color={tab === tabValue ? colors.primary.base : "$color"}
+                opacity={tab === tabValue ? 1 : 0.5}
               >
-                {t === "users" ? "關注的使用者" : "關注的實踐"}
+                {tabValue === "users" ? t("usersTab") : t("practicesTab")}
               </Text>
             </YStack>
           ))}
@@ -90,7 +85,7 @@ export default function FollowingSettingsScreen() {
           {isLoading ? (
             <YStack alignItems="center" paddingVertical="$8">
               <Text fontSize={14} color="$color" opacity={0.5}>
-                載入中...
+                {t("loading")}
               </Text>
             </YStack>
           ) : tab === "users" ? (
@@ -98,7 +93,7 @@ export default function FollowingSettingsScreen() {
               {followedUsers.length === 0 ? (
                 <YStack alignItems="center" paddingVertical="$8">
                   <Text fontSize={14} color="$color" opacity={0.5}>
-                    尚未關注任何使用者
+                    {t("emptyUsers")}
                   </Text>
                 </YStack>
               ) : (
@@ -127,7 +122,14 @@ export default function FollowingSettingsScreen() {
                         </Avatar>
                         <YStack flex={1}>
                           <Text fontSize={14} fontWeight="500" color="$color">
-                            {user.name}
+                            <Text
+                              fontSize={14}
+                              fontWeight="500"
+                              color="$color"
+                              onPress={() => router.push(`/users/${user.identifier ?? user.id}`)}
+                            >
+                              {user.name}
+                            </Text>
                           </Text>
                           {user.bio && (
                             <Text fontSize={12} color="$color" opacity={0.5} numberOfLines={1}>
@@ -143,7 +145,7 @@ export default function FollowingSettingsScreen() {
                           onPress={() => handleUnfollow("user", user.id)}
                         >
                           <Text fontSize={12} color="$color">
-                            取消關注
+                            {t("unfollow")}
                           </Text>
                         </Button>
                       </XStack>
@@ -157,7 +159,7 @@ export default function FollowingSettingsScreen() {
               {followedPractices.length === 0 ? (
                 <YStack alignItems="center" paddingVertical="$8">
                   <Text fontSize={14} color="$color" opacity={0.5}>
-                    尚未關注任何實踐
+                    {t("emptyPractices")}
                   </Text>
                 </YStack>
               ) : (
@@ -185,7 +187,13 @@ export default function FollowingSettingsScreen() {
                           )}
                         </Avatar>
                         <YStack flex={1}>
-                          <Text fontSize={14} fontWeight="500" color="$color" numberOfLines={1}>
+                          <Text
+                            fontSize={14}
+                            fontWeight="500"
+                            color="$color"
+                            numberOfLines={1}
+                            onPress={() => router.push(`/practices/${practice.id}`)}
+                          >
                             {practice.title}
                           </Text>
                           <Text fontSize={12} color="$color" opacity={0.5}>
@@ -200,7 +208,7 @@ export default function FollowingSettingsScreen() {
                           onPress={() => handleUnfollow("practice", practice.id)}
                         >
                           <Text fontSize={12} color="$color">
-                            取消關注
+                            {t("unfollow")}
                           </Text>
                         </Button>
                       </XStack>

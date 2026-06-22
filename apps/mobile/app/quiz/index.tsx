@@ -3,10 +3,13 @@ import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { availableQuizzes } from "@/types/quiz";
 
 export default function QuizListScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.quiz");
+  const commonT = useMobileTranslation("common");
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -18,12 +21,12 @@ export default function QuizListScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={commonT("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            性格測驗
+            {t("title")}
           </Text>
         </XStack>
 
@@ -39,11 +42,11 @@ export default function QuizListScreen() {
             <XStack alignItems="center" gap="$2">
               <HelpCircle size={20} color={colors.primary.base} />
               <Text fontSize={15} fontWeight="600" color={colors.primary.darker}>
-                探索你的學習風格
+                {t("intro_title")}
               </Text>
             </XStack>
             <Text fontSize={13} color={colors.primary.darker} opacity={0.8}>
-              透過測驗了解自己的學習偏好，獲得個人化的學習建議，解鎖專屬的學習島嶼！
+              {t("intro_description")}
             </Text>
           </YStack>
 
@@ -74,22 +77,22 @@ export default function QuizListScreen() {
 
                   <YStack flex={1} gap="$1">
                     <Text fontSize={16} fontWeight="600" color="$color">
-                      {quiz.title}
+                      {t(`quizzes.${quiz.id}.title`)}
                     </Text>
                     <Text fontSize={13} color="$color" opacity={0.6} numberOfLines={2}>
-                      {quiz.description}
+                      {t(`quizzes.${quiz.id}.description`)}
                     </Text>
                     <XStack gap="$3" marginTop="$1">
                       <XStack alignItems="center" gap="$1">
                         <HelpCircle size={14} color="$color" opacity={0.5} />
                         <Text fontSize={12} color="$color" opacity={0.5}>
-                          {quiz.questionCount} 題
+                          {t("question_count", { count: quiz.questionCount })}
                         </Text>
                       </XStack>
                       <XStack alignItems="center" gap="$1">
                         <Clock size={14} color="$color" opacity={0.5} />
                         <Text fontSize={12} color="$color" opacity={0.5}>
-                          {quiz.estimatedTime}
+                          {t(`quizzes.${quiz.id}.estimatedTime`)}
                         </Text>
                       </XStack>
                     </XStack>

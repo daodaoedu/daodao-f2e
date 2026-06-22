@@ -1,12 +1,19 @@
+import { useAvailablePreferences, useCurrentUserPreferences, useUserMutations } from "@daodao/api";
 import { Check, ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useSWR from "swr";
 import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import { api } from "@/services/api-client";
+import { useMobileTranslation } from "@/i18n";
+
+function assertSuccessfulResponse(response: { error?: unknown }, fallbackMessage: string) {
+  if (!response.error) return;
+
+  const error = response.error as { error?: { message?: string }; message?: string };
+  throw new Error(error.error?.message ?? error.message ?? fallbackMessage);
+}
 
 interface IPreferenceOption {
   id: number;
@@ -31,24 +38,16 @@ interface IUserPreference {
 
 export default function PreferencesSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.preferencesSettings");
+  const tCommon = useMobileTranslation("common");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { updateCurrentUserPreferences } = useUserMutations();
 
-  const { data: availableTypes, isLoading: isLoadingAvailable } = useSWR<IPreferenceType[]>(
-    "/users/preferences/available",
-    () => api.get<{ data: IPreferenceType[] }>("/users/preferences/available").then((r) => r.data),
-    { revalidateOnFocus: false }
-  );
+  const { data: availablePrefsData, isLoading: isLoadingAvailable } = useAvailablePreferences();
+  const { data: userPrefsData, isLoading: isLoadingPrefs } = useCurrentUserPreferences();
 
-  const { data: userPrefs, isLoading: isLoadingPrefs } = useSWR<IUserPreference[]>(
-    "/users/me/preferences",
-    () =>
-      api
-        .get<{ data: { preferences: IUserPreference[] } }>("/users/me/preferences")
-        .then((r) => r.data.preferences),
-    { revalidateOnFocus: false }
-  );
-
-  const preferenceTypes = availableTypes ?? [];
+  const preferenceTypes = (availablePrefsData?.data ?? []) as IPreferenceType[];
+  const userPrefs = (userPrefsData?.data?.preferences ?? []) as IUserPreference[];
 
   const initialSelections = useMemo(() => {
     const selections: Record<string, number[]> = {};
@@ -68,12 +67,28 @@ export default function PreferencesSettingsScreen() {
   }, [userPrefs, preferenceTypes]);
 
   const [selections, setSelections] = useState<Record<string, number[]>>({});
+  const isDirty = useMemo(
+    () => JSON.stringify(selections) !== JSON.stringify(initialSelections),
+    [initialSelections, selections]
+  );
 
   useEffect(() => {
     if (Object.keys(initialSelections).length > 0) {
       setSelections(initialSelections);
     }
   }, [initialSelections]);
+
+  const handleBack = () => {
+    if (!isDirty) {
+      router.back();
+      return;
+    }
+
+    Alert.alert(t("unsavedTitle"), t("unsavedMessage"), [
+      { text: t("keepEditing"), style: "cancel" },
+      { text: t("leave"), style: "destructive", onPress: () => router.back() },
+    ]);
+  };
 
   const toggleOption = useCallback(
     (typeId: string, optionId: number, maxSelections: number | null) => {
@@ -112,11 +127,14 @@ export default function PreferencesSettingsScreen() {
         });
       });
 
-      await api.put("/users/me/preferences", { preferences: preferenceItems });
+      const response = await updateCurrentUserPreferences({ preferences: preferenceItems });
+      assertSuccessfulResponse(response, t("saveError"));
 
-      Alert.alert("成功", "偏好設定已更新", [{ text: "確定", onPress: () => router.back() }]);
-    } catch {
-      Alert.alert("錯誤", "更新失敗，請稍後再試");
+      Alert.alert(t("successTitle"), t("saveSuccess"), [
+        { text: t("confirm"), onPress: () => router.back() },
+      ]);
+    } catch (error) {
+      Alert.alert(t("errorTitle"), error instanceof Error ? error.message : t("saveError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -132,23 +150,24 @@ export default function PreferencesSettingsScreen() {
             size="$4"
             circular
             chromeless
-            onPress={() => router.back()}
-            accessibilityLabel="返回"
+            onPress={handleBack}
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color" flex={1}>
-            領域偏好設定
+            {t("title")}
           </Text>
           <Button
             size="$3"
             backgroundColor={colors.primary.base}
             pressStyle={{ opacity: 0.8 }}
             onPress={handleSave}
-            disabled={isSubmitting || isLoading}
+            disabled={isSubmitting || isLoading || !isDirty}
+            opacity={isDirty ? 1 : 0.55}
           >
             <Text color={colors.basic.white} fontWeight="600" fontSize={14}>
-              {isSubmitting ? "儲存中..." : "儲存"}
+              {isSubmitting ? t("saving") : t("save")}
             </Text>
           </Button>
         </XStack>
@@ -156,13 +175,13 @@ export default function PreferencesSettingsScreen() {
         {isLoading ? (
           <YStack flex={1} alignItems="center" justifyContent="center">
             <Text fontSize={14} color="$color" opacity={0.5}>
-              載入中...
+              {t("loading")}
             </Text>
           </YStack>
         ) : preferenceTypes.length === 0 ? (
           <YStack flex={1} alignItems="center" justifyContent="center">
             <Text fontSize={14} color="$color" opacity={0.5}>
-              目前沒有可用的偏好設定
+              {t("empty")}
             </Text>
           </YStack>
         ) : (
@@ -184,7 +203,10 @@ export default function PreferencesSettingsScreen() {
                       )}
                       {preferenceType.maxSelections && (
                         <Text fontSize={12} color="$color" opacity={0.5}>
-                          最多選 {preferenceType.maxSelections} 項（已選 {selectedIds.length} 項）
+                          {t("selection_count", {
+                            max: preferenceType.maxSelections,
+                            count: selectedIds.length,
+                          })}
                         </Text>
                       )}
                     </YStack>

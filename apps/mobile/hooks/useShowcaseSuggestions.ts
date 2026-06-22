@@ -1,7 +1,5 @@
 import useSWR from "swr";
-import { apiClient } from "@/services/api-client";
-
-const AI_API_URL = process.env.EXPO_PUBLIC_AI_API_URL ?? "https://ai-dev.daodao.so";
+import { aiApiClient } from "@/services/ai-api-client";
 
 interface IAIResponse<T> {
   success: boolean;
@@ -14,7 +12,7 @@ export interface IShowcaseSuggestions {
 }
 
 async function fetchAiBackend<T>(path: string): Promise<T> {
-  return apiClient<T>(`${AI_API_URL}${path}`);
+  return aiApiClient<T>(path);
 }
 
 export function useShowcaseSuggestions(enabled: boolean) {

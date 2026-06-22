@@ -14,22 +14,39 @@ const differenceInYears = (dateA: Date, dateB: Date): number => {
 };
 
 // Form Schema
-export const accountFormSchema = z.object({
-  email: z.string().email(),
-  birthday: z
-    .date()
-    .refine(
-      (date) => {
-        const age = differenceInYears(new Date(), date);
-        return age >= 16;
-      },
-      { message: "必須年滿16歲" }
-    )
-    .optional(),
-  role: z.string().min(1, "請選擇身份"),
-  educationStage: z.string().min(1, "請選擇教育階段"),
-  professionalFields: z.array(z.string()).max(5, "最多只能選擇5個專業領域").default([]),
-  explorationFields: z.array(z.string()).max(5, "最多只能選擇5個探索領域").default([]),
+export const createAccountFormSchema = (
+  t: (key: string, values?: Record<string, string | number>) => string
+) =>
+  z.object({
+    email: z.string().email(),
+    birthday: z
+      .date()
+      .refine(
+        (date) => {
+          const age = differenceInYears(new Date(), date);
+          return age >= 16;
+        },
+        { message: t("birthday_age_requirement") }
+      )
+      .optional(),
+    role: z.string().min(1, t("role_placeholder")),
+    educationStage: z.string().min(1, t("education_stage_placeholder")),
+    professionalFields: z
+      .array(z.string())
+      .max(5, t("professional_field_max_selection", { count: 5 }))
+      .default([]),
+    explorationFields: z
+      .array(z.string())
+      .max(5, t("exploration_field_max_selection", { count: 5 }))
+      .default([]),
+  });
+
+export const accountFormSchema = createAccountFormSchema((key, values) => {
+  if (!values) return key;
+  return Object.entries(values).reduce(
+    (result, [valueKey, value]) => result.replaceAll(`{${valueKey}}`, String(value)),
+    key
+  );
 });
 
 export type AccountFormValuesType = z.infer<typeof accountFormSchema>;

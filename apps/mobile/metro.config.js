@@ -21,6 +21,28 @@ config.resolver.unstable_enablePackageExports = true;
 // 支援 workspace packages
 config.resolver.disableHierarchicalLookup = false;
 
+const appModuleAliases = new Set(["react", "react/jsx-runtime", "react/jsx-dev-runtime", "swr"]);
+const defaultResolveRequest = config.resolver.resolveRequest;
+
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (appModuleAliases.has(moduleName)) {
+    return context.resolveRequest(
+      {
+        ...context,
+        originModulePath: path.join(projectRoot, "index.js"),
+      },
+      moduleName,
+      platform
+    );
+  }
+
+  if (defaultResolveRequest) {
+    return defaultResolveRequest(context, moduleName, platform);
+  }
+
+  return context.resolveRequest(context, moduleName, platform);
+};
+
 module.exports = withTamagui(config, {
   components: ["tamagui"],
   config: "./tamagui.config.ts",

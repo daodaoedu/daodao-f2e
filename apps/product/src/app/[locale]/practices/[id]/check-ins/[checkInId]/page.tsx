@@ -264,7 +264,7 @@ export default function CheckInDetailPage() {
 
   const handleCheckInComplete = (data: unknown) => {
     // TODO: 處理打卡資料
-    console.log("打卡資料:", data);
+    console.log("Check-in data:", data);
   };
 
   const handleEditComplete = async (data: ICheckInFormData) => {
@@ -279,7 +279,7 @@ export default function CheckInDetailPage() {
       });
       toast.success(t("checkin_updated"));
     } catch (error) {
-      console.error("更新打卡失敗:", error);
+      console.error("Failed to update check-in:", error);
       toast.error(t("checkin_update_failed"));
       throw error;
     }

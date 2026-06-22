@@ -6,6 +6,7 @@ import { Pressable, StyleSheet } from "react-native";
 import { Button, Text, View, XStack, YStack } from "tamagui";
 import { PRACTICE_THEMES, PracticeTheme, practiceThemeColorMap } from "@/constants/practice-theme";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 interface IRandomPractice {
   id: string;
@@ -32,19 +33,20 @@ interface IRandomPracticeCardProps {
 
 const RandomPracticeCard = ({ practice, theme, onAction }: IRandomPracticeCardProps) => {
   const themeColor = practiceThemeColorMap[theme] || practiceThemeColorMap[PracticeTheme.yellow];
+  const t = useMobileTranslation("practice");
 
   return (
     <Pressable
       style={[styles.practiceCard, { backgroundColor: themeColor }]}
       onPress={onAction}
-      accessibilityLabel={`實踐：${practice.title}`}
+      accessibilityLabel={t("create_select_practice_label", { title: practice.title })}
       accessibilityRole="button"
     >
       <YStack flex={1} justifyContent="space-between" padding="$4">
         <YStack gap="$2">
           <View style={styles.themeBadge}>
             <Text fontSize={12} color={colors.text.dark}>
-              主題實踐
+              {t("create_title")}
             </Text>
           </View>
           <Text fontSize={18} fontWeight="500" color={colors.text.dark} numberOfLines={2}>
@@ -60,7 +62,7 @@ const RandomPracticeCard = ({ practice, theme, onAction }: IRandomPracticeCardPr
           onPress={onAction}
         >
           <Text color={colors.text.dark} fontWeight="500">
-            馬上行動
+            {t("want_to_practice")}
           </Text>
         </Button>
       </YStack>
@@ -81,6 +83,7 @@ export const RandomPracticesSection = ({
   compact = false,
 }: IRandomPracticesSectionProps) => {
   const router = useRouter();
+  const t = useMobileTranslation("practice");
 
   // Get 3 random templates
   const { data: randomTemplatesData } = useRandomPracticeTemplates({
@@ -111,7 +114,7 @@ export const RandomPracticesSection = ({
 
   const handleAction = useCallback(
     (templateId: string) => {
-      router.push(`/practices/create/template/${templateId}` as const);
+      router.push(`/practices/create/${templateId}` as const);
     },
     [router]
   );
@@ -135,7 +138,7 @@ export const RandomPracticesSection = ({
           textAlign="center"
           marginBottom="$4"
         >
-          從好奇開始, 一起小步實踐生活裡的學習靈感。
+          {t("mobile_random_intro")}
         </Text>
 
         {/* Practice Cards */}
@@ -161,7 +164,7 @@ export const RandomPracticesSection = ({
         >
           <XStack alignItems="center" gap="$2">
             <Text color={colors.basic.white} fontWeight="500">
-              更多主題
+              {t("mobile_more_themes")}
             </Text>
             <ArrowRight size={18} color={colors.basic.white} />
           </XStack>

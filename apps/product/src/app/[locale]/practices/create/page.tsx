@@ -1,13 +1,12 @@
 "use client";
 
-import { useTranslations } from "@daodao/i18n";
-
 import {
   type PracticeTemplateType,
   usePracticeTemplateCategories,
   usePracticeTemplates,
 } from "@daodao/api";
 import { LifeSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -46,11 +45,11 @@ export default function CreatePracticePage() {
       const metadata = practiceCategoryMetadataMap[categoryId];
       return {
         id: categoryId,
-        label: metadata?.label ?? categoryId,
+        label: metadata ? t(metadata.labelKey as Parameters<typeof t>[0]) : categoryId,
         icon: metadata?.icon ?? LifeSvg,
       };
     });
-  }, [categoriesData]);
+  }, [categoriesData, t]);
 
   // 預設選擇第一個分類，如果沒有分類則為空字串
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -185,7 +184,9 @@ export default function CreatePracticePage() {
                   // SWR 會自動重新驗證
                   window.location.reload();
                 }}
-              >{t("create_reload")}</Button>
+              >
+                {t("create_reload")}
+              </Button>
             </div>
           ) : currentPractices.length === 0 ? (
             <div className="flex items-center justify-center py-12">

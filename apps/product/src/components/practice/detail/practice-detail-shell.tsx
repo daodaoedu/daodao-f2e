@@ -379,6 +379,12 @@ export function PracticeDetailShell({
 
   const handleHeaderReactionToggle = useCallback(
     (type: ReactionTypeType) => {
+      if (!currentUserId) {
+        const queryString = searchParams.toString();
+        const redirectUrl = queryString ? `${pathname}?${queryString}` : pathname;
+        router.push(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
+        return;
+      }
       const isSelected = currentUserReaction === type;
       // Optimistic update: reflect change immediately before API resolves
       setPendingReaction(isSelected ? null : type);
@@ -396,7 +402,15 @@ export function PracticeDetailShell({
         setPendingReaction(undefined);
       });
     },
-    [currentUserReaction, practiceId, mutateReactions]
+    [
+      currentUserId,
+      router,
+      pathname,
+      searchParams,
+      currentUserReaction,
+      practiceId,
+      mutateReactions,
+    ]
   );
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { openWarningDialog } = useDialog();
@@ -423,6 +437,12 @@ export function PracticeDetailShell({
   };
 
   const handleToggleFollowPractice = async () => {
+    if (!currentUserId) {
+      const queryString = searchParams.toString();
+      const redirectUrl = queryString ? `${pathname}?${queryString}` : pathname;
+      router.push(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
+      return;
+    }
     const wasFollowing = isFollowingPractice;
     setIsFollowingPractice(!wasFollowing);
     try {
@@ -445,7 +465,7 @@ export function PracticeDetailShell({
         <div className="flex items-center justify-between mb-2">
           {statusInfo ? (
             <Badge variant={statusInfo.variant} size="sm">
-              {statusInfo.label}
+              {t(statusInfo.label)}
             </Badge>
           ) : (
             <div />
@@ -698,7 +718,10 @@ export function PracticeDetailShell({
               const firstName = followers[0]?.name;
               const text =
                 followers.length > 1
-                  ? t("followers_with_others", { firstName: firstName ?? "", count: String(followers.length - 1) })
+                  ? t("followers_with_others", {
+                      firstName: firstName ?? "",
+                      count: String(followers.length - 1),
+                    })
                   : followers.length === 1
                     ? firstName
                     : effectiveReaction
@@ -708,7 +731,10 @@ export function PracticeDetailShell({
                       : totalReactionCount > 0
                         ? latestActorName
                           ? totalReactionCount > 1
-                            ? t("others_with_count", { name: latestActorName, count: String(totalReactionCount - 1) })
+                            ? t("others_with_count", {
+                                name: latestActorName,
+                                count: String(totalReactionCount - 1),
+                              })
                             : latestActorName
                           : t("count_people", { count: String(totalReactionCount) })
                         : undefined;
@@ -809,7 +835,9 @@ export function PracticeDetailShell({
       {activeTab === "comments" && (
         <div className="mx-4 mt-4 mb-4 bg-white rounded-xl shadow-sm">
           {isLoadingComments ? (
-            <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">{t("comments_loading")}</div>
+            <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">
+              {t("comments_loading")}
+            </div>
           ) : (
             <CommentSection
               comments={comments}

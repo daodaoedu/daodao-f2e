@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import {
   FormControl,
   FormDescription,
@@ -18,6 +19,7 @@ interface IIntroductionSectionProps {
 }
 
 export const IntroductionSection = ({ form }: IIntroductionSectionProps) => {
+  const t = useTranslations("app_product");
   const personalSlogan = form.watch("personalSlogan");
   const selfIntroduction = form.watch("selfIntroduction");
 
@@ -31,7 +33,8 @@ export const IntroductionSection = ({ form }: IIntroductionSectionProps) => {
           <FormItem>
             <div className="flex items-center justify-between mb-3">
               <FormLabel className="block font-medium text-text-dark">
-                個人標語<span className="text-red ml-1">*</span>
+                {t("public_info_slogan_label")}
+                <span className="text-red ml-1">*</span>
               </FormLabel>
               <FormDescription className="text-sm text-light-gray m-0">
                 {personalSlogan?.length || 0}/150
@@ -40,7 +43,7 @@ export const IntroductionSection = ({ form }: IIntroductionSectionProps) => {
             <FormControl>
               <Textarea
                 {...field}
-                placeholder="輸入能代表你的一句話"
+                placeholder={t("public_info_slogan_placeholder")}
                 className={cn(
                   "min-h-[80px] resize-none",
                   form.formState.errors.personalSlogan && "border-red focus-visible:border-red"
@@ -60,7 +63,9 @@ export const IntroductionSection = ({ form }: IIntroductionSectionProps) => {
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between mb-3">
-              <FormLabel className="block font-medium text-text-dark">關於我</FormLabel>
+              <FormLabel className="block font-medium text-text-dark">
+                {t("public_info_about_label")}
+              </FormLabel>
               <FormDescription className="text-sm text-light-gray m-0">
                 {selfIntroduction?.length || 0}/350
               </FormDescription>
@@ -68,7 +73,7 @@ export const IntroductionSection = ({ form }: IIntroductionSectionProps) => {
             <FormControl>
               <Textarea
                 {...field}
-                placeholder="輸入你的一段詳細描述"
+                placeholder={t("public_info_about_placeholder")}
                 className={cn(
                   "min-h-[120px] resize-none",
                   form.formState.errors.selfIntroduction && "border-red focus-visible:border-red"

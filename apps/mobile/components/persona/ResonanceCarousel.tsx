@@ -1,7 +1,13 @@
-import { dismissPersonaCarousel, submitPersonaAnswer, usePersonaCarouselState, useMutate } from "@daodao/api";
+import {
+  dismissPersonaCarousel,
+  submitPersonaAnswer,
+  useMutate,
+  usePersonaCarouselState,
+} from "@daodao/api";
 import { useState } from "react";
 import { Alert, ScrollView, TextInput } from "react-native";
 import { Button, Card, Text, XStack, YStack } from "tamagui";
+import { useMobileTranslation } from "@/i18n";
 
 interface QuestionCardProps {
   questionId: number;
@@ -12,7 +18,16 @@ interface QuestionCardProps {
   onSwitch: (questionId: number) => void;
 }
 
-function QuestionCard({ questionId, prompt, questionType, options, onAnswered, onSwitch }: QuestionCardProps) {
+function QuestionCard({
+  questionId,
+  prompt,
+  questionType,
+  options,
+  onAnswered,
+  onSwitch,
+}: QuestionCardProps) {
+  const t = useMobileTranslation("persona.myProfile");
+  const carouselT = useMobileTranslation("persona.carousel");
   const [selected, setSelected] = useState("");
   const [textAnswer, setTextAnswer] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -25,15 +40,17 @@ function QuestionCard({ questionId, prompt, questionType, options, onAnswered, o
     setSubmitting(true);
     try {
       const res = await submitPersonaAnswer(
-        isChoice ? { questionId, selectedValue: selected } : { questionId, textAnswer: textAnswer.trim() }
+        isChoice
+          ? { questionId, selectedValue: selected }
+          : { questionId, textAnswer: textAnswer.trim() }
       );
       if (res.error) {
-        Alert.alert("送出失敗，請稍後再試");
+        Alert.alert(t("submitError"));
         return;
       }
       onAnswered();
     } catch {
-      Alert.alert("送出失敗，請稍後再試");
+      Alert.alert(t("submitError"));
     } finally {
       setSubmitting(false);
     }
@@ -41,7 +58,9 @@ function QuestionCard({ questionId, prompt, questionType, options, onAnswered, o
 
   return (
     <Card bordered p="$3" mr="$2" width={280} bg="$background">
-      <Text fontSize="$3" fontWeight="600" mb="$2">{prompt}</Text>
+      <Text fontSize="$3" fontWeight="600" mb="$2">
+        {prompt}
+      </Text>
 
       {isChoice ? (
         <XStack flexWrap="wrap" gap="$2" mb="$3">
@@ -60,24 +79,31 @@ function QuestionCard({ questionId, prompt, questionType, options, onAnswered, o
         <TextInput
           value={textAnswer}
           onChangeText={setTextAnswer}
-          placeholder="請輸入你的答案..."
+          placeholder={t("textPlaceholder")}
           multiline
           numberOfLines={3}
           maxLength={300}
-          style={{ borderWidth: 1, borderColor: "#d1d5db", borderRadius: 8, padding: 8, fontSize: 14, marginBottom: 12 }}
+          style={{
+            borderWidth: 1,
+            borderColor: "#d1d5db",
+            borderRadius: 8,
+            padding: 8,
+            fontSize: 14,
+            marginBottom: 12,
+          }}
         />
       )}
 
       <XStack jc="space-between" ai="center">
         <Button size="$2" variant="outlined" onPress={() => onSwitch(questionId)}>
-          換一題
+          {carouselT("switchQuestion")}
         </Button>
         <Button
           size="$2"
           onPress={handleSubmit}
           disabled={submitting || (isChoice ? !selected : !textAnswer.trim())}
         >
-          {submitting ? "送出中..." : "送出"}
+          {submitting ? t("submitting") : t("submit")}
         </Button>
       </XStack>
     </Card>
@@ -85,6 +111,7 @@ function QuestionCard({ questionId, prompt, questionType, options, onAnswered, o
 }
 
 export function ResonanceCarousel() {
+  const carouselT = useMobileTranslation("persona.carousel");
   const mutate = useMutate();
   const [replaceId, setReplaceId] = useState<number | undefined>(undefined);
   const [dismissing, setDismissing] = useState(false);
@@ -102,7 +129,7 @@ export function ResonanceCarousel() {
       await dismissPersonaCarousel();
       await mutate(["/api/v1/persona/carousel-state"] as const);
     } catch {
-      Alert.alert("操作失敗，請稍後再試");
+      Alert.alert(carouselT("error"));
     } finally {
       setDismissing(false);
     }
@@ -115,9 +142,11 @@ export function ResonanceCarousel() {
   return (
     <YStack mb="$3">
       <XStack jc="space-between" ai="center" mb="$2" px="$1">
-        <Text fontSize="$4" fontWeight="600">學習人物誌</Text>
+        <Text fontSize="$4" fontWeight="600">
+          {carouselT("title")}
+        </Text>
         <Button size="$2" variant="outlined" onPress={handleDismiss} disabled={dismissing}>
-          今天不再顯示
+          {carouselT("dismiss")}
         </Button>
       </XStack>
 
