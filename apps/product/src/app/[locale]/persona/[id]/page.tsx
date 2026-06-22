@@ -273,8 +273,8 @@ function PersonaAnswerCommentSheetContent({ answerId }: { answerId: number }) {
         toast.error(t("commentSubmitError"));
         return;
       }
-      await mutateComments();
       toast.success(t("commentSubmitSuccess"));
+      await mutateComments();
     },
     [targetId, mutateComments, t]
   );
