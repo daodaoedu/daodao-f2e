@@ -42,7 +42,9 @@ Audit `UserInfoCard`, `UserProfileTabs`, and `PracticeSection` for any auth-gate
 
 ### 2. Add login prompt for protected navigation
 
-When an unauthenticated user clicks a protected navigation link (sidebar items, FAB, settings), show a toast or modal prompting registration/login — **do not redirect away from the current page**.
+The `Sidebar` already returns `null` for unauthenticated users, so sidebar nav items are hidden by default — **no changes needed to `sidebar/index.tsx`**. The AC "若點選其他頁面則提示需註冊/登入" applies to **other visible interactive elements** on the shared page: action buttons (e.g., resonance FAB, follow button, check-in CTA) and any links that lead to protected routes.
+
+When an unauthenticated user clicks one of these elements, show a toast or modal prompting registration/login — **do not redirect away from the current page**.
 
 Use the existing `login()` from `useAuth()` rather than `router.push('/auth/login')`.
 
@@ -54,8 +56,10 @@ After successful login, redirect back to the originally requested shared page UR
 
 - `apps/product/src/components/user/` — audit for auth-gated calls
 - `apps/product/src/components/practice/list/practice-section.tsx` — handle unauthenticated state for `isOwnData`
-- `apps/product/src/components/layout/sidebar/index.tsx` — replace any hard redirects with `login()` prompt
 - `apps/product/src/app/[locale]/(with-layout)/mine/page.tsx` — verify no hard redirect for unauthenticated entry
+- Any action button / FAB components on the shared user page that need `login()` prompt for unauthenticated clicks
+
+> Note: `apps/product/src/components/layout/sidebar/index.tsx` already returns `null` for unauthenticated users and requires **no changes**.
 
 ## Open Questions
 
