@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate as globalMutate } from "swr";
+import { shouldBlockNavigation } from "./nav-blocker-condition";
 import {
   applyOnboardingUpdateFromResponse,
   refreshOnboardingStatus,
@@ -29,6 +30,7 @@ export const PublicInfoForm = () => {
   const mutate = useMutate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isSavedSuccessfully, setIsSavedSuccessfully] = useState(false);
 
   // 使用 search 參數精確搜尋用戶的城市，以獲取 countryCode
   const userLocation = userData?.data?.location;
@@ -174,6 +176,7 @@ export const PublicInfoForm = () => {
 
       // 成功
       toast.success(t("public_info_updated"));
+      setIsSavedSuccessfully(true);
       form.reset(form.getValues()); // 重置 dirty 狀態
       setAvatarFile(null); // 清除頭像檔案
     } catch (error) {
@@ -226,7 +229,9 @@ export const PublicInfoForm = () => {
     }
   };
 
-  useNavigationBlockerEffect(form.formState.isDirty);
+  useNavigationBlockerEffect(
+    shouldBlockNavigation(form.formState.isDirty, !!avatarFile, isSavedSuccessfully),
+  );
 
   // 載入中狀態
   if (isLoading) {
@@ -248,11 +253,18 @@ export const PublicInfoForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form
+        onChange={() => setIsSavedSuccessfully(false)}
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-6"
+      >
         <AvatarUploadSection
           form={form}
           avatarFile={avatarFile}
-          onAvatarFileChange={setAvatarFile}
+          onAvatarFileChange={(file) => {
+            setAvatarFile(file);
+            setIsSavedSuccessfully(false);
+          }}
         />
 
         <BasicInfoSection form={form} initialCustomId={userData?.data?.customId || ""} />
