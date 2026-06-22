@@ -19,7 +19,7 @@ import { DialogOutlineSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
 import type { MentionCandidate } from "@daodao/features-mention";
 import { useLocale, useTranslations } from "@daodao/i18n";
-import { useRouter } from "@daodao/i18n/navigation";
+import { Link, useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
@@ -426,6 +426,7 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
   const isLong = answer.length > 70;
   const displayName = item.name ?? "??";
   const initial = displayName[0] ?? "?";
+  const userHref = item.userId ? (`/users/${item.userId}` as const) : null;
 
   const AVATAR_COLORS = [
     "#F5A93E",
@@ -440,6 +441,9 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
     displayName.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % AVATAR_COLORS.length;
   const avatarColor = item.isSelf ? "#16B9B3" : (AVATAR_COLORS[colorIndex] ?? "#16B9B3");
 
+  const avatarClasses = "size-9 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 mt-0.5";
+  const nameClasses = cn("text-sm font-semibold", item.isSelf ? "text-logo-cyan" : "text-text-dark");
+
   return (
     <div
       className={cn(
@@ -450,22 +454,32 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
       )}
     >
       <div className="flex items-start gap-3">
-        <div
-          className="size-9 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 mt-0.5"
-          style={{ background: avatarColor }}
-        >
-          {initial}
-        </div>
+        {userHref ? (
+          <Link
+            href={userHref}
+            className={cn(avatarClasses, "hover:opacity-80 transition-opacity")}
+            style={{ background: avatarColor }}
+            tabIndex={-1}
+            aria-hidden="true"
+          >
+            {initial}
+          </Link>
+        ) : (
+          <div className={avatarClasses} style={{ background: avatarColor }}>
+            {initial}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5">
-            <span
-              className={cn(
-                "text-sm font-semibold",
-                item.isSelf ? "text-logo-cyan" : "text-text-dark"
-              )}
-            >
-              {displayName}
-            </span>
+            {userHref ? (
+              <Link href={userHref} className={cn(nameClasses, "hover:underline")}>
+                {displayName}
+              </Link>
+            ) : (
+              <span className={nameClasses}>
+                {displayName}
+              </span>
+            )}
             {item.isSelf && (
               <span className="text-[10px] text-logo-cyan bg-logo-cyan/10 rounded-full px-2 py-0.5 font-medium leading-none">
                 {t("myAnswer")}
