@@ -45,8 +45,9 @@ function applyTieBreaking(scores: ScoreRecord, answers: ParsedAnswers): void {
   const maxVal = Math.max(...Object.values(scores));
   const tied = (Object.keys(scores) as AnswerKey[]).filter((k) => scores[k] === maxVal);
   if (tied.length <= 1) return;
-  const reversed = Object.values(answers).reverse();
-  const last = reversed.find(({ selectedAnswer }) => tied.includes(selectedAnswer));
+  const last = Object.entries(answers)
+    .sort(([a], [b]) => parseInt(b.slice(1), 10) - parseInt(a.slice(1), 10))
+    .find(([, v]) => tied.includes(v.selectedAnswer))?.[1];
   if (last) scores[last.selectedAnswer] += 1;
 }
 
