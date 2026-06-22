@@ -22,6 +22,7 @@ import {
   REACTION_CONFIG,
   type ReactionTypeType,
 } from "@/constants/reaction-type";
+import { extractCommentSegments } from "./comment-url-segments";
 import { tokenizeMentionContent } from "./comment-mentions";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
@@ -85,7 +86,7 @@ function getAuthorIslandHref(author: ICommentAuthor) {
 // @mention helpers
 // ============================================================================
 
-/** Renders comment content with @mention tokens highlighted and linked */
+/** Renders comment content with @mention tokens highlighted/linked and bare URLs as clickable links */
 function renderContent(
   content: string,
   participants: MentionCandidate[],
@@ -96,8 +97,29 @@ function renderContent(
     <>
       {segments.map((segment, i) => {
         if (segment.type === "text") {
-          // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
-          return <span key={i}>{segment.text}</span>;
+          const urlSegments = extractCommentSegments(segment.text);
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
+            <span key={i}>
+              {urlSegments.map((urlSeg, j) =>
+                urlSeg.type === "url" ? (
+                  <a
+                    // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
+                    key={j}
+                    href={urlSeg.value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-logo-cyan underline"
+                  >
+                    {urlSeg.value}
+                  </a>
+                ) : (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: static parsed segments
+                  <span key={j}>{urlSeg.value}</span>
+                )
+              )}
+            </span>
+          );
         }
 
         const className = "text-logo-cyan font-medium hover:underline";
@@ -155,6 +177,10 @@ function CommentBubble({
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
   const menuRef = useRef<HTMLDivElement>(null);
+  const renderedContent = useMemo(
+    () => renderContent(comment.content, participants, t),
+    [comment.content, participants, t]
+  );
   const {
     handleMentionSelect: handleEditMentionSelect,
     getActiveMentionIds: getActiveEditMentionIds,
@@ -395,8 +421,8 @@ function CommentBubble({
             </div>
           </div>
         ) : (
-          <p className={cn("text-[#295E5C] leading-5 whitespace-pre-wrap", "text-sm")}>
-            {renderContent(comment.content, participants, t)}
+          <p className={cn("text-[#295E5C] leading-5 whitespace-pre-wrap break-words", "text-sm")}>
+            {renderedContent}
           </p>
         )}
 
