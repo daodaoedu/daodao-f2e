@@ -16,23 +16,7 @@ describe("home tab navigation paths", () => {
 });
 
 describe("home tab order", () => {
-  it("first tab is inspire", () => {
-    expect(HOME_TAB_ORDER[0]).toBe("inspire");
-  });
-
-  it("second tab is mine (not persona)", () => {
-    expect(HOME_TAB_ORDER[1]).toBe("mine");
-    expect(HOME_TAB_ORDER[1]).not.toBe("persona");
-  });
-
-  it("third tab is persona", () => {
-    expect(HOME_TAB_ORDER[2]).toBe("persona");
-  });
-
-  it("contains all three tabs", () => {
-    expect(HOME_TAB_ORDER).toHaveLength(3);
-    expect(HOME_TAB_ORDER).toContain("inspire");
-    expect(HOME_TAB_ORDER).toContain("mine");
-    expect(HOME_TAB_ORDER).toContain("persona");
+  it("should have the correct canonical order", () => {
+    expect(HOME_TAB_ORDER).toEqual(["inspire", "mine", "persona"]);
   });
 });
