@@ -10,7 +10,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate as globalMutate } from "swr";
-import { shouldBlockNavigation } from "./nav-blocker-condition";
 import {
   applyOnboardingUpdateFromResponse,
   refreshOnboardingStatus,
@@ -30,7 +29,6 @@ export const PublicInfoForm = () => {
   const mutate = useMutate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [isSavedSuccessfully, setIsSavedSuccessfully] = useState(false);
 
   // 使用 search 參數精確搜尋用戶的城市，以獲取 countryCode
   const userLocation = userData?.data?.location;
@@ -167,18 +165,17 @@ export const PublicInfoForm = () => {
       // 調用 FormData API 更新用戶資訊（包含圖片上傳）
       const response = await updateCurrentUserWithFormData(updateData, avatarFile || undefined);
 
+      // 立即重置表單狀態，在 SWR refetch 之前解除導航阻擋
+      form.reset(form.getValues());
+      setAvatarFile(null);
+      toast.success(t("public_info_updated"));
+
       // 刷新用戶資料
       await mutate(["/api/v1/users/me"] as const);
       globalMutate("/api/v1/users/settings-summary");
       if (!applyOnboardingUpdateFromResponse(response)) {
         refreshOnboardingStatus();
       }
-
-      // 成功
-      toast.success(t("public_info_updated"));
-      setIsSavedSuccessfully(true);
-      form.reset(form.getValues()); // 重置 dirty 狀態
-      setAvatarFile(null); // 清除頭像檔案
     } catch (error) {
       console.error("Failed to update user:", error);
 
@@ -229,9 +226,7 @@ export const PublicInfoForm = () => {
     }
   };
 
-  useNavigationBlockerEffect(
-    shouldBlockNavigation(form.formState.isDirty, !!avatarFile, isSavedSuccessfully),
-  );
+  useNavigationBlockerEffect(form.formState.isDirty || !!avatarFile);
 
   // 載入中狀態
   if (isLoading) {
@@ -253,18 +248,11 @@ export const PublicInfoForm = () => {
 
   return (
     <Form {...form}>
-      <form
-        onChange={() => setIsSavedSuccessfully(false)}
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-6"
-      >
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <AvatarUploadSection
           form={form}
           avatarFile={avatarFile}
-          onAvatarFileChange={(file) => {
-            setAvatarFile(file);
-            setIsSavedSuccessfully(false);
-          }}
+          onAvatarFileChange={setAvatarFile}
         />
 
         <BasicInfoSection form={form} initialCustomId={userData?.data?.customId || ""} />
