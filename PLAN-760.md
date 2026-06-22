@@ -28,7 +28,7 @@ The duplicate send is server-side. Possible causes in **daodao-server**:
 
 Search for all locations that call the welcome email send:
 ```bash
-grep -rn "email.welcome\|sendWelcome\|welcomeEmail\|welcome.*email" src/ --include="*.ts"
+grep -rnE "email\.welcome|sendWelcome|welcomeEmail|welcome.*email" src/ --include="*.ts"
 ```
 
 Expected: exactly one call site. If two are found, one should be removed or guarded with a "already sent" check.
