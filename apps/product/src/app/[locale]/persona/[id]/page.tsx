@@ -274,6 +274,7 @@ function PersonaAnswerCommentSheetContent({ answerId }: { answerId: number }) {
         return;
       }
       await mutateComments();
+      toast.success(t("commentSubmitSuccess"));
     },
     [targetId, mutateComments, t]
   );
