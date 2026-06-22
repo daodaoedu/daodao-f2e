@@ -286,11 +286,17 @@ export default function PracticeDetailPage() {
   }, [practicesListData, practiceId]);
 
   const handlePrevious = () => {
-    if (previousPracticeId) router.push(`/practices/${previousPracticeId}`);
+    if (previousPracticeId) {
+      const from = searchParams.get("from");
+      router.push(`/practices/${previousPracticeId}${from ? `?from=${from}` : ""}`);
+    }
   };
 
   const handleNext = () => {
-    if (nextPracticeId) router.push(`/practices/${nextPracticeId}`);
+    if (nextPracticeId) {
+      const from = searchParams.get("from");
+      router.push(`/practices/${nextPracticeId}${from ? `?from=${from}` : ""}`);
+    }
   };
 
   const handleEdit = () => {

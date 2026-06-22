@@ -14,7 +14,11 @@ describe("getBackPath", () => {
     expect(getBackPath(null)).toBe("/mine");
   });
 
+  it("returns persona path when from=persona", () => {
+    expect(getBackPath("persona")).toBe("/persona");
+  });
+
   it("returns mine path when from is an unknown value", () => {
-    expect(getBackPath("persona")).toBe("/mine");
+    expect(getBackPath("unknown-tab")).toBe("/mine");
   });
 });
