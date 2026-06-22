@@ -40,11 +40,34 @@ if (selectedValue === OTHER_OPTION) {
 
 The flip card back face also renders choice / text UI (lines 139–181). Same "Other" free-text pattern needs to be applied here for consistency.
 
-## Proposed Constant
+## Proposed Constant & i18n Consideration
+
+> **Gemini review flag (addressed):** Hardcoding `"其他"` as a string sentinel is fragile in multilingual environments if the backend ever localizes option labels for different locales.
+
+**Recommended approach — backend sentinel (`__other__`):**
+
+The backend should store a locale-independent marker as the "other" option value (e.g., `"__other__"`), and send the display label separately (or let the frontend translate it from the i18n key). The frontend matches against the stable marker:
 
 ```ts
-const OTHER_OPTION = "其他"; // or import from @/constants if a shared constant exists
+const OTHER_OPTION = "__other__"; // matches backend sentinel, never localized
 ```
+
+If the backend cannot be changed to use a sentinel, the fallback is **position-based detection** — the "other" option is always the last item in `options[]`:
+
+```ts
+const isOtherSelected = options && selectedValue === options[options.length - 1];
+```
+
+**If neither approach is feasible** (backend always returns `"其他"` regardless of locale because the product is Chinese-primary), document the constraint explicitly:
+
+```ts
+// Backend always stores and returns "其他" for the "other" option,
+// regardless of the user's display locale. This is intentional for
+// the Chinese-primary DaoDao platform. Change if the platform goes multilingual.
+const OTHER_OPTION = "其他";
+```
+
+The implementer should confirm with the backend team which approach is used before coding.
 
 ## Files to Change
 
