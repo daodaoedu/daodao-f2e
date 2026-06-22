@@ -180,7 +180,7 @@ export function PracticeShowcaseCard({
     // biome-ignore lint/a11y/noStaticElementInteractions: card click for navigation
     <div
       className="bg-white rounded-xl p-5 cursor-pointer shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200"
-      onClick={() => router.push(`/practices/${id}`)}
+      onClick={() => router.push(`/practices/${id}?from=inspire`)}
     >
       {/* Header row */}
       <div className="flex items-center gap-2 mb-2">
@@ -323,7 +323,7 @@ export function PracticeShowcaseCard({
         />
 
         <Link
-          href={`/practices/${id}?tab=comments`}
+          href={`/practices/${id}?tab=comments&from=inspire`}
           className="flex items-center gap-1.5 text-[#9FB5B8] hover:text-text-dark transition-colors"
         >
           <DialogOutlineSvg className="size-6" />
