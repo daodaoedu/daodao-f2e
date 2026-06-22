@@ -391,8 +391,8 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
   }, [isAuthenticated, login, openSheet, answerId, t]);
 
   return (
-    <div className="-mx-4 -mb-4 mt-3 rounded-b-2xl overflow-hidden">
-      <div className="flex items-center bg-white border-t border-[#E4EAE9] py-1">
+    <div className="-mx-4 -mb-4 mt-3">
+      <div className="flex items-center bg-white border-t border-[#E4EAE9] py-1 rounded-b-2xl">
         <div className="flex-1 flex justify-center rounded-xl hover:bg-gray-50 transition-colors py-1 mx-1">
           <ReactionPickerButton
             selectedReactions={selectedReactions}
