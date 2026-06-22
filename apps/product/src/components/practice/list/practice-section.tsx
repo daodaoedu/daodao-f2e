@@ -187,7 +187,7 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
       </div>
 
       {/* 學習人物誌 section */}
-      <div className="bg-white rounded-2xl p-6">
+      <div className="bg-white rounded-2xl pt-6 px-6 pb-2">
         <h2 className="text-lg font-medium text-bg-dark mb-2">{personaT("tabLabel")}</h2>
         {isOwnData ? <PersonaProfileMe /> : <PersonaProfileUser targetUserId={userId} />}
       </div>
