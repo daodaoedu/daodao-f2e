@@ -1,18 +1,14 @@
-interface CommentLike {
-  id: number | string;
-  replies?: unknown[];
-}
+import {
+  type ApiCommentNode,
+  isApiCommentNode,
+} from "@/components/check-in/display/check-in-detail";
 
-function isCommentLike(v: unknown): v is CommentLike {
-  return typeof v === "object" && v !== null && "id" in v;
-}
-
-export function countTotalComments(comments: CommentLike[]): number {
+export function countTotalComments(comments: ApiCommentNode[]): number {
   return comments.reduce((total, comment) => {
     let replyCount = 0;
     if (Array.isArray(comment.replies)) {
       for (const reply of comment.replies) {
-        if (isCommentLike(reply)) {
+        if (isApiCommentNode(reply)) {
           replyCount++;
         }
       }
