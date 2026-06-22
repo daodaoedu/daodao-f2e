@@ -1,5 +1,6 @@
 import { type MutableRefObject, type RefObject, useCallback, useRef, useState } from "react";
 import type { View } from "react-native";
+import { useMobileTranslation } from "@/i18n";
 import { analyticsService } from "@/services/analytics";
 import { shareService } from "@/services/share";
 
@@ -19,6 +20,7 @@ interface IUseShareReturn {
 }
 
 export function useShare(options: IUseShareOptions): IUseShareReturn {
+  const t = useMobileTranslation("mobile.shareCheckIn");
   const { practiceId, practiceTitle, streakCount } = options;
   const viewRef = useRef<View | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -47,12 +49,12 @@ export function useShare(options: IUseShareOptions): IUseShareReturn {
     try {
       const uri = await captureIfNeeded();
       if (!uri) {
-        return { success: false, error: "無法擷取圖片" };
+        return { success: false, error: t("capture_failed") };
       }
 
-      const shareText = shareService.generateCheckInShareText(practiceTitle, streakCount);
+      const shareText = t("share_text", { title: practiceTitle, count: streakCount });
       const result = await shareService.share({
-        title: "分享打卡成果",
+        title: t("share_result"),
         message: shareText,
         imageUri: uri,
       });
@@ -66,21 +68,25 @@ export function useShare(options: IUseShareOptions): IUseShareReturn {
     } finally {
       setIsSharing(false);
     }
-  }, [captureIfNeeded, practiceId, practiceTitle, streakCount]);
+  }, [captureIfNeeded, practiceId, practiceTitle, streakCount, t]);
 
   const saveToGallery = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
     setIsSaving(true);
     try {
       const uri = await captureIfNeeded();
       if (!uri) {
-        return { success: false, error: "無法擷取圖片" };
+        return { success: false, error: t("capture_failed") };
       }
 
-      return await shareService.saveToGallery(uri);
+      const result = await shareService.saveToGallery(uri);
+      if (!result.success && result.error === "photo_library_permission_required") {
+        return { ...result, error: t("permission_message") };
+      }
+      return result;
     } finally {
       setIsSaving(false);
     }
-  }, [captureIfNeeded]);
+  }, [captureIfNeeded, t]);
 
   return {
     viewRef,

@@ -82,11 +82,10 @@ export interface CommentFormatOptions {
   locale?: DateFnsLocale;
 }
 
-export function formatCommentTime(
-  createdAt?: string,
-  options: CommentFormatOptions = {}
-): string {
-  const justNowLabel = options.justNowLabel ?? "剛剛";
+export function formatCommentTime(createdAt?: string, options: CommentFormatOptions = {}): string {
+  const justNowLabel =
+    options.justNowLabel ??
+    new Intl.RelativeTimeFormat("en", { numeric: "auto" }).format(0, "second");
   const locale = options.locale ?? zhTW;
   if (!createdAt) return justNowLabel;
   const parsed = parseISO(createdAt);
@@ -112,11 +111,8 @@ export function isApiCommentNode(v: unknown): v is ApiCommentNode {
   return typeof v === "object" && v !== null && "id" in v;
 }
 
-export function mapReply(
-  reply: ApiCommentNode,
-  options: CommentFormatOptions = {}
-): ICommentReply {
-  const anonymousLabel = options.anonymousLabel ?? "匿名使用者";
+export function mapReply(reply: ApiCommentNode, options: CommentFormatOptions = {}): ICommentReply {
+  const anonymousLabel = options.anonymousLabel ?? "Anonymous user";
   return {
     id: String(reply.id),
     author: {
@@ -131,11 +127,8 @@ export function mapReply(
   };
 }
 
-export function mapComment(
-  comment: ApiCommentNode,
-  options: CommentFormatOptions = {}
-): IComment {
-  const anonymousLabel = options.anonymousLabel ?? "匿名使用者";
+export function mapComment(comment: ApiCommentNode, options: CommentFormatOptions = {}): IComment {
+  const anonymousLabel = options.anonymousLabel ?? "Anonymous user";
   const rawReplies = Array.isArray(comment.replies) ? comment.replies : [];
   const mappedReplies = rawReplies.filter(isApiCommentNode).map((r) => mapReply(r, options));
   return {
@@ -309,6 +302,7 @@ export const CheckInDetail = ({
   isOwner = true,
 }: ICheckInDetailProps) => {
   const t = useTranslations("check_in");
+  const locale = useLocale();
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
   const checkInId = checkInData.id;
 
@@ -389,7 +383,7 @@ export const CheckInDetail = ({
       id: String(item.userId),
       name: item.name,
       photoURL: item.photoURL ?? undefined,
-      time: formatRelativeTime(item.reactedAt),
+      time: formatRelativeTime(item.reactedAt, locale),
       reaction: item.reactionType as ReactionTypeType,
     }));
     openSheet({
@@ -406,7 +400,7 @@ export const CheckInDetail = ({
       closeOnEscape: true,
       showCloseButton: true,
     });
-  }, [reactionsListData, commentCount, openSheet]);
+  }, [reactionsListData, commentCount, openSheet, locale, t]);
 
   // ── Edit / Share ───────────────────────────────────────────────────────────
   const { openEditCheckInSheet } = useEditCheckInSheet({

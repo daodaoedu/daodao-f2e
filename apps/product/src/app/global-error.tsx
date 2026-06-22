@@ -9,10 +9,11 @@ import GlobalProvider from "./global-provider";
 function GlobalErrorPage() {
   const pathname = usePathname();
   const { locale, messages } = getMessagesFromPathname(pathname);
+  const commonMessages = messages.common as Record<string, string>;
 
   const head = (
     <head>
-      <title>未知錯誤 | 島島阿學</title>
+      <title>{commonMessages.global_error_title}</title>
       <link rel="shortcut icon" href={faviconPng.src} />
     </head>
   );
@@ -21,8 +22,8 @@ function GlobalErrorPage() {
     <GlobalProvider head={head} locale={locale} messages={messages}>
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">發生錯誤</h1>
-          <p className="mt-4 text-muted-foreground">請稍後再試或聯繫客服</p>
+          <h1 className="text-2xl font-bold">{commonMessages.global_error_heading}</h1>
+          <p className="mt-4 text-muted-foreground">{commonMessages.global_error_description}</p>
         </div>
       </div>
     </GlobalProvider>

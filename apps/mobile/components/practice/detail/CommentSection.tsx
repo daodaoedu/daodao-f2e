@@ -10,6 +10,7 @@ import {
   updateComment,
   useComments,
 } from "@/hooks/useComments";
+import { useMobileTranslation } from "@/i18n";
 import { useAuth } from "@/providers/AuthProvider";
 import { formatRelativeTime } from "@/utils/format-time";
 
@@ -19,6 +20,7 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ targetType, targetId }: CommentSectionProps) {
+  const t = useMobileTranslation("mobile.comments");
   const { user } = useAuth();
   const { comments, mutate } = useComments(targetType, targetId);
   const [inputValue, setInputValue] = useState("");
@@ -40,11 +42,11 @@ export function CommentSection({ targetType, targetId }: CommentSectionProps) {
       setInputValue("");
       await mutate();
     } catch {
-      Alert.alert("錯誤", editingId ? "編輯留言失敗" : "留言失敗，請稍後再試");
+      Alert.alert(t("error_title"), editingId ? t("edit_failed") : t("create_failed"));
     } finally {
       setIsSending(false);
     }
-  }, [inputValue, isSending, editingId, targetType, targetId, mutate]);
+  }, [inputValue, isSending, editingId, targetType, targetId, mutate, t]);
 
   const handleEdit = useCallback((comment: Comment) => {
     setEditingId(comment.id);
@@ -53,23 +55,23 @@ export function CommentSection({ targetType, targetId }: CommentSectionProps) {
 
   const handleDelete = useCallback(
     (commentId: string) => {
-      Alert.alert("刪除留言", "確定要刪除此留言嗎？", [
-        { text: "取消", style: "cancel" },
+      Alert.alert(t("delete_title"), t("delete_message"), [
+        { text: t("cancel"), style: "cancel" },
         {
-          text: "刪除",
+          text: t("delete_confirm"),
           style: "destructive",
           onPress: async () => {
             try {
               await deleteComment(commentId);
               await mutate();
             } catch {
-              Alert.alert("錯誤", "刪除留言失敗");
+              Alert.alert(t("error_title"), t("delete_failed"));
             }
           },
         },
       ]);
     },
-    [mutate]
+    [mutate, t]
   );
 
   const cancelEdit = useCallback(() => {
@@ -83,7 +85,7 @@ export function CommentSection({ targetType, targetId }: CommentSectionProps) {
         {comments.length === 0 ? (
           <YStack alignItems="center" paddingVertical="$8">
             <Text color="rgba(0,0,0,0.4)" fontSize={14}>
-              還沒有留言
+              {t("empty")}
             </Text>
           </YStack>
         ) : (
@@ -103,7 +105,7 @@ export function CommentSection({ targetType, targetId }: CommentSectionProps) {
                 <YStack flex={1}>
                   <XStack alignItems="center" gap="$1.5">
                     <Text fontSize={13} fontWeight="600" color="#295E5C">
-                      {comment.user?.name ?? "匿名"}
+                      {comment.user?.name ?? t("anonymous")}
                     </Text>
                     <Text fontSize={11} color="#9FB5B8">
                       {formatRelativeTime(comment.createdAt)}
@@ -139,13 +141,13 @@ export function CommentSection({ targetType, targetId }: CommentSectionProps) {
         {editingId && (
           <Pressable onPress={cancelEdit}>
             <Text fontSize={12} color={colors.primary.base}>
-              取消
+              {t("cancel")}
             </Text>
           </Pressable>
         )}
         <TextInput
           style={styles.input}
-          placeholder={editingId ? "編輯留言..." : "寫留言..."}
+          placeholder={editingId ? t("edit_placeholder") : t("placeholder")}
           placeholderTextColor="#9CA3AF"
           value={inputValue}
           onChangeText={setInputValue}

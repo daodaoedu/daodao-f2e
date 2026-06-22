@@ -5,6 +5,7 @@ import { HorizontalFullSvg, VerticalFullSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { AuthButton, useAuth } from "@daodao/auth";
 import { useRouter } from "@daodao/i18n/navigation";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import {
   type CapturedImageData,
   captureElementAsImage,
@@ -231,7 +232,12 @@ export const QuizResult = () => {
                   回到 島島阿學
                 </CustomLink>
               ) : (
-                <CustomLink href="/">前往 島島阿學</CustomLink>
+                <CustomLink
+                  href="/"
+                  onClick={() => getStorage<"quiz">(StorageEnum.RegistrationFlow).set("quiz")}
+                >
+                  前往 島島阿學
+                </CustomLink>
               )}
             </Button>
           </footer>

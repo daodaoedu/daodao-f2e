@@ -3,6 +3,7 @@ import Constants from "expo-constants";
 import { Alert } from "react-native";
 import { mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
+import { useMobileTranslation } from "@/i18n";
 import type { ICheckInFormData } from "../../types";
 
 // React Native file-like object for FormData
@@ -48,6 +49,7 @@ export const useCheckInSubmit = ({
   progressPercentage = 0,
   onComplete,
 }: IUseCheckInSubmitOptions) => {
+  const t = useMobileTranslation("mobile.checkIn");
   const mutate = useMutate();
   const { openSuccessDialog } = useCheckInSuccessDialog({
     title: taskTitle,
@@ -86,7 +88,7 @@ export const useCheckInSubmit = ({
       // 獲取 API URL
       const apiUrl = Constants.expoConfig?.extra?.apiUrl || process.env.EXPO_PUBLIC_API_URL;
       if (!apiUrl) {
-        throw new Error("API URL not configured");
+        throw new Error(t("api_url_missing"));
       }
 
       // 發送請求
@@ -98,9 +100,9 @@ export const useCheckInSubmit = ({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({
-          error: { message: "打卡失敗" },
+          error: { message: t("failed") },
         }));
-        throw new Error(errorData.error?.message || "打卡失敗");
+        throw new Error(errorData.error?.message || t("failed"));
       }
 
       const responseData = await response.json();
@@ -157,9 +159,9 @@ export const useCheckInSubmit = ({
       }
     } catch (error) {
       // 顯示錯誤提示
-      const errorMessage = error instanceof Error ? error.message : "打卡失敗，請稍後再試";
+      const errorMessage = error instanceof Error ? error.message : t("failed_retry");
       console.error("打卡失敗:", error);
-      Alert.alert("打卡失敗", errorMessage);
+      Alert.alert(t("failed"), errorMessage);
       throw error;
     }
   };

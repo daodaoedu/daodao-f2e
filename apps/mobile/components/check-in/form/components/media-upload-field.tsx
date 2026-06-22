@@ -1,10 +1,11 @@
+import { CHECK_IN_MAX_IMAGES } from "@daodao/shared/lib/check-in-image";
 import { Camera, X } from "@tamagui/lucide-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useCallback } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { Image, Text, View, XStack, YStack } from "tamagui";
-import { CHECK_IN_MAX_IMAGES } from "@daodao/shared/lib/check-in-image";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 interface IMediaUploadFieldProps {
   value: string[];
@@ -15,6 +16,7 @@ interface IMediaUploadFieldProps {
  * 媒體上傳欄位組件 (Mobile)
  */
 export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) => {
+  const t = useMobileTranslation("mobile.checkIn");
   const handlePickImage = useCallback(async () => {
     if (value.length >= CHECK_IN_MAX_IMAGES) return;
 
@@ -43,10 +45,10 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
     <YStack marginBottom="$8">
       <XStack justifyContent="space-between" alignItems="center" marginBottom="$3">
         <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
-          上傳圖片
+          {t("upload_images")}
         </Text>
         <Text fontSize={14} color={colors.basic["400"]}>
-          已上傳 {value.length}/{CHECK_IN_MAX_IMAGES} 張
+          {t("uploaded_count", { count: value.length, total: CHECK_IN_MAX_IMAGES })}
         </Text>
       </XStack>
 
@@ -66,13 +68,13 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
                 width={80}
                 height={80}
                 resizeMode="cover"
-                alt={`圖片預覽 ${index + 1}`}
+                alt={t("image_preview_alt", { number: index + 1 })}
               />
             </View>
             <Pressable
               style={styles.removeButton}
               onPress={() => handleRemoveMedia(index)}
-              accessibilityLabel="移除圖片"
+              accessibilityLabel={t("remove_image")}
               accessibilityRole="button"
             >
               <X size={12} color={colors.basic.white} />
@@ -85,7 +87,7 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
           <Pressable style={styles.uploadButton} onPress={handlePickImage}>
             <Camera size={24} color={colors.basic["400"]} />
             <Text fontSize={12} color={colors.basic["400"]}>
-              點擊上傳
+              {t("tap_upload")}
             </Text>
           </Pressable>
         )}

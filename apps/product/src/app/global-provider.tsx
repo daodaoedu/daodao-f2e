@@ -13,6 +13,7 @@ import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
 import { useRouter } from "next/navigation";
 import { OnboardingProgressProvider } from "@/components/task-guide/onboarding-progress-context";
 import { TaskGuideWidget } from "@/components/task-guide/task-guide-widget";
+import { TrackingRefCapture } from "@/components/tracking-ref-capture";
 
 interface GlobalProviderProps {
   head?: React.ReactNode;
@@ -40,6 +41,7 @@ function GlobalProvider({
     >
       {head}
       <body>
+        <TrackingRefCapture />
         <AnalyticsScripts />
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
           <DeviceProvider initialDevice={initialDevice}>
@@ -50,15 +52,21 @@ function GlobalProvider({
                     <AuthProvider
                       defaultProtected
                       publicPattern={[
-                        "^/auth/login",
-                        "^/auth/callback",
-                        "^/auth/error",
-                        "^/auth/onboarding",
-                        "^/auth/verify-email(/.*)?$",
-                        "^/auth/error",
+                        // auth flows
+                        "^/auth/",
+                        // content pages (no login required)
+                        "^/$",
                         "^/users/",
                         "^/practices/[^/]+$",
+                        "^/practices/[^/]+/check-ins/",
+                        "^/roadmap(/.*)?$",
+                        "^/resource(/.*)?$",
+                        "^/persona(/.*)?$",
+                        "^/mine(/.*)?$",
+                        "^/survey/r/",
+                        // misc
                         "^/dev/",
+                        "^/ux-mockup/",
                       ]}
                       onAuthRequired={(currentPath) => {
                         router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);

@@ -3,8 +3,11 @@
 import type { ReactionTypeValue } from "@daodao/api";
 import { removeReaction, upsertReaction, useReactions } from "@daodao/api";
 import { DialogOutlineSvg } from "@daodao/assets";
+import { useAuth } from "@daodao/auth";
 import type { MentionCandidate } from "@daodao/features-mention";
 import { MentionInput, useMentionInput } from "@daodao/features-mention";
+import { useTranslations } from "@daodao/i18n";
+import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -83,7 +86,11 @@ function getAuthorIslandHref(author: ICommentAuthor) {
 // ============================================================================
 
 /** Renders comment content with @mention tokens highlighted and linked */
-function renderContent(content: string, participants: MentionCandidate[]) {
+function renderContent(
+  content: string,
+  participants: MentionCandidate[],
+  t: ReturnType<typeof useTranslations<"app_product">>
+) {
   const segments = tokenizeMentionContent(content, participants);
   return (
     <>
@@ -101,7 +108,7 @@ function renderContent(content: string, participants: MentionCandidate[]) {
               key={i}
               href={segment.href}
               className={className}
-              aria-label={`前往 ${segment.text.slice(1)} 的小島`}
+              aria-label={t("showcase_user_island_aria", { userName: segment.text.slice(1) })}
             >
               {segment.text}
             </CustomLink>
@@ -130,6 +137,7 @@ interface CommentBubbleProps {
   onEdit?: (id: string, content: string, mentionedUserIds?: number[]) => Promise<unknown> | unknown;
   onDelete?: (id: string) => Promise<unknown> | unknown;
   participants: MentionCandidate[];
+  onAuthRequired?: () => boolean;
 }
 
 function CommentBubble({
@@ -140,7 +148,9 @@ function CommentBubble({
   onEdit,
   onDelete,
   participants,
+  onAuthRequired,
 }: CommentBubbleProps) {
+  const t = useTranslations("app_product");
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
@@ -181,6 +191,7 @@ function CommentBubble({
 
   const handleCommentReactionToggle = useCallback(
     (type: ReactionTypeType) => {
+      if (onAuthRequired && !onAuthRequired()) return;
       const isSelected = currentUserReaction === type;
       setPendingReaction(isSelected ? null : type);
       startReactionTransition(async () => {
@@ -197,7 +208,7 @@ function CommentBubble({
         setPendingReaction(undefined);
       });
     },
-    [currentUserReaction, comment.id, mutateReactions]
+    [onAuthRequired, currentUserReaction, comment.id, mutateReactions]
   );
   const { openWarningDialog } = useDialog();
 
@@ -217,7 +228,7 @@ function CommentBubble({
     if (!trimmed) return;
     const result = await onEdit?.(comment.id, trimmed, getActiveEditMentionIds(trimmed));
     if (result === false) return; // page-level handler already shows the error toast
-    toast.success("已更新留言");
+    toast.success(t("comments_updated"));
     resetEditMentions();
     setEditing(false);
   };
@@ -246,7 +257,7 @@ function CommentBubble({
         {authorIslandHref ? (
           <CustomLink
             href={authorIslandHref}
-            aria-label={`前往 ${comment.author.name} 的小島`}
+            aria-label={t("showcase_user_island_aria", { userName: comment.author.name })}
             className="block"
           >
             {avatar}
@@ -299,7 +310,7 @@ function CommentBubble({
                     className="w-full h-auto justify-start gap-2 px-3 py-2 text-xs text-[#295E5C] hover:bg-[#F0F9F8] transition-colors"
                   >
                     <Pencil className="size-3.5" />
-                    <span>修改</span>
+                    <span>{t("comments_edit")}</span>
                   </Button>
                   <Button
                     type="button"
@@ -307,25 +318,33 @@ function CommentBubble({
                     onClick={async () => {
                       setMenuOpen(false);
                       const result = await openWarningDialog({
-                        title: "確定刪除這則留言？",
-                        message: "一旦刪除就無法復原。",
+                        title: t("comments_delete_confirm_title"),
+                        message: t("comments_delete_confirm_message"),
                         textAlign: "left",
                         buttons: [
-                          { label: "確定刪除", value: "confirm", variant: "outline" },
-                          { label: "先不要", value: "cancel", variant: "orange" },
+                          {
+                            label: t("comments_delete_confirm"),
+                            value: "confirm",
+                            variant: "outline",
+                          },
+                          {
+                            label: t("comments_delete_cancel"),
+                            value: "cancel",
+                            variant: "orange",
+                          },
                         ],
                       });
                       if (result.value === "confirm") {
                         const deleteResult = await onDelete?.(comment.id);
                         if (deleteResult !== false) {
-                          toast.success("已刪除留言");
+                          toast.success(t("comments_deleted"));
                         }
                       }
                     }}
                     className="w-full h-auto justify-start gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors"
                   >
                     <Trash2 className="size-3.5" />
-                    <span>刪除</span>
+                    <span>{t("comments_delete")}</span>
                   </Button>
                 </div>
               )}
@@ -362,7 +381,7 @@ function CommentBubble({
                 }}
                 className="text-xs px-3 py-1 rounded-full border-[#E4EAE9] text-[#9FB5B8] hover:bg-[#F0F9F8] transition-colors"
               >
-                取消
+                {t("comments_delete_cancel")}
               </Button>
               <Button
                 type="button"
@@ -371,13 +390,13 @@ function CommentBubble({
                 }}
                 className="text-xs px-3 py-1 rounded-full bg-logo-cyan text-white hover:bg-logo-cyan/80 transition-colors"
               >
-                儲存
+                {t("save")}
               </Button>
             </div>
           </div>
         ) : (
           <p className={cn("text-[#295E5C] leading-5 whitespace-pre-wrap", "text-sm")}>
-            {renderContent(comment.content, participants)}
+            {renderContent(comment.content, participants, t)}
           </p>
         )}
 
@@ -458,6 +477,19 @@ export function CommentSection({
   onEditComment,
   onDeleteComment,
 }: CommentSectionProps) {
+  const t = useTranslations("app_product");
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const requireAuth = useCallback(() => {
+    if (!isAuthenticated) {
+      const search = typeof window !== "undefined" ? window.location.search : "";
+      const redirectUrl = search ? `${pathname}${search}` : pathname;
+      router.push(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
+      return false;
+    }
+    return true;
+  }, [isAuthenticated, router, pathname]);
   const [inputValue, setInputValue] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyInputs, setReplyInputs] = useState<Record<string, string>>({});
@@ -514,7 +546,7 @@ export function CommentSection({
 
     if (newlyAdded.length > 0) {
       setInputValue((current) => {
-        const additions = newlyAdded.map((r) => REACTION_CONFIG[r].placeholder).join(" ");
+        const additions = newlyAdded.map((r) => t(REACTION_CONFIG[r].placeholder)).join(" ");
         return current.trim() ? `${current.trim()} ${additions}` : additions;
       });
       requestAnimationFrame(() => {
@@ -532,6 +564,7 @@ export function CommentSection({
   }, [selectedReactions]);
 
   const handleSubmit = () => {
+    if (!requireAuth()) return;
     const trimmed = inputValue.trim();
     if (!trimmed) return;
 
@@ -550,6 +583,7 @@ export function CommentSection({
   };
 
   const handleReplySubmit = (parentId: string) => {
+    if (!requireAuth()) return;
     const replyValue = replyInputs[parentId] ?? "";
     const trimmed = replyValue.trim();
     if (!trimmed) return;
@@ -585,6 +619,7 @@ export function CommentSection({
         onEdit={onEditComment}
         onDelete={onDeleteComment}
         participants={participants}
+        onAuthRequired={requireAuth}
       />
       {/* Replies */}
       {comment.replies?.map((reply) => (
@@ -599,6 +634,7 @@ export function CommentSection({
             onEdit={onEditComment}
             onDelete={onDeleteComment}
             participants={participants}
+            onAuthRequired={requireAuth}
           />
         </div>
       ))}
@@ -614,7 +650,7 @@ export function CommentSection({
                 handleReplySubmit(comment.id);
               }
             }}
-            placeholder="寫下你的留言…"
+            placeholder={t("comments_placeholder")}
             rows={1}
             participants={participants}
             className="flex-1 resize-none overflow-hidden rounded-lg border border-[#E4EAE9] bg-white px-4 py-2 text-sm text-[#295E5C] placeholder:text-[#9FB5B8] focus:outline-none focus:border-logo-cyan transition-colors min-h-[40px] w-full"
@@ -648,7 +684,7 @@ export function CommentSection({
         {/* User avatar */}
         <Avatar className="size-9 shrink-0">
           {currentUserPhotoURL && (
-            <AvatarImage src={currentUserPhotoURL} alt={currentUserName || "我"} />
+            <AvatarImage src={currentUserPhotoURL} alt={currentUserName || t("current_user_alt")} />
           )}
           <AvatarFallback className={cn(getAvatarColor("Me"))} />
         </Avatar>
@@ -658,7 +694,7 @@ export function CommentSection({
           value={inputValue}
           onChange={setInputValue}
           onKeyDown={handleKeyDown}
-          placeholder={selectedReactions.length === 0 ? "寫下你的留言..." : ""}
+          placeholder={selectedReactions.length === 0 ? t("comments_placeholder") : ""}
           rows={1}
           inputRef={ref}
           participants={participants}
@@ -686,7 +722,7 @@ export function CommentSection({
         </div>
       ) : (
         <div className="flex items-center justify-center px-4 py-8 text-sm text-[#9FB5B8] rounded-b-xl">
-          尚未有留言
+          {t("comments_empty")}
         </div>
       )}
 
@@ -700,7 +736,7 @@ export function CommentSection({
             onClick={() => setExpanded((v) => !v)}
             className="w-full h-auto py-3 text-sm text-[#9FB5B8] flex items-center justify-between px-4 border-t border-[#E4EAE9] hover:text-text-dark/60 transition-colors"
           >
-            <span>{expanded ? "收起留言" : "更多留言"}</span>
+            <span>{expanded ? t("comments_show_less") : t("comments_show_more")}</span>
             <svg
               width="16"
               height="16"

@@ -46,11 +46,11 @@ export const oauthService = {
     );
 
     if (result.type === "cancel") {
-      throw new Error("登入已取消");
+      throw new Error("oauth.cancelled");
     }
 
     if (result.type !== "success") {
-      throw new Error("Google 登入失敗");
+      throw new Error("oauth.google_failed");
     }
 
     // Parse URL to get authorization code
@@ -58,7 +58,7 @@ export const oauthService = {
     const code = url.searchParams.get("code");
 
     if (!code) {
-      throw new Error("登入失敗：未取得授權碼");
+      throw new Error("oauth.missing_auth_code");
     }
 
     // Exchange code for tokens
@@ -72,28 +72,28 @@ export const oauthService = {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Google 登入失敗");
+      throw new Error(errorData.message || "oauth.google_failed");
     }
 
     const data = await response.json();
 
     // Validate response structure
     if (!data.accessToken || !data.refreshToken || !data.user) {
-      throw new Error("登入失敗：伺服器回應格式錯誤");
+      throw new Error("oauth.invalid_server_response");
     }
 
     if (!data.user.id || !data.user.email || !data.user.name) {
-      throw new Error("登入失敗：用戶資料不完整");
+      throw new Error("oauth.incomplete_user_data");
     }
 
     // Validate token format
     if (!validateTokenFormat(data.accessToken)) {
-      throw new Error("登入失敗：無效的認證令牌");
+      throw new Error("oauth.invalid_token");
     }
 
     // Validate email format
     if (!validateEmail(data.user.email)) {
-      throw new Error("登入失敗：無效的電子郵件格式");
+      throw new Error("oauth.invalid_email");
     }
 
     const tokens: IAuthTokens = {
@@ -123,7 +123,7 @@ export const oauthService = {
     });
 
     if (!credential.identityToken) {
-      throw new Error("Apple 登入失敗：未取得身份令牌");
+      throw new Error("oauth.apple_missing_identity_token");
     }
 
     // Exchange Apple credential with backend
@@ -142,18 +142,18 @@ export const oauthService = {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Apple 登入失敗");
+      throw new Error(errorData.message || "oauth.apple_failed");
     }
 
     const data = await response.json();
 
     // Validate response structure
     if (!data.accessToken || !data.refreshToken || !data.user) {
-      throw new Error("Apple 登入失敗：伺服器回應格式錯誤");
+      throw new Error("oauth.apple_invalid_server_response");
     }
 
     if (!data.user.id || !data.user.email || !data.user.name) {
-      throw new Error("Apple 登入失敗：用戶資料不完整");
+      throw new Error("oauth.apple_incomplete_user_data");
     }
 
     const tokens: IAuthTokens = {

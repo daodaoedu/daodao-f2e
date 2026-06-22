@@ -21,7 +21,11 @@ import { ReflectionQuestion } from "./components/reflection-question";
 import { TagSelector } from "./components/tag-selector";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
 import { useCheckInSubmit } from "./hooks/use-check-in-submit";
-import { type CheckInFormValuesType, checkInFormSchema } from "./schema";
+import {
+  type CheckInFormValuesType,
+  createCheckInFormSchema,
+  createCheckInPhase2Schema,
+} from "./schema";
 
 export type { ICheckInFormData as CheckInData, ICheckInStatusOptions as CheckInStatusOptions };
 export type { CheckInStatusType as CheckInStatus } from "@/constants/check-in-status";
@@ -39,6 +43,8 @@ interface ICheckInSheetContentProps {
   existingImages?: string[];
   /** 提交按鈕文字 */
   submitButtonText?: string;
+  /** 是否顯示心情選擇（編輯模式用） */
+  showMood?: boolean;
 }
 
 export const CheckInSheetContent = ({
@@ -47,11 +53,12 @@ export const CheckInSheetContent = ({
   initialValues,
   existingImages,
   submitButtonText,
+  showMood = false,
 }: ICheckInSheetContentProps) => {
   const t = useTranslations("check_in");
   const resolvedSubmitButtonText = submitButtonText ?? t("submit_check_in");
   const form = useForm<CheckInFormValuesType>({
-    resolver: zodResolver(checkInFormSchema),
+    resolver: zodResolver(createCheckInFormSchema(t)),
     defaultValues: {
       mood: initialValues?.mood ?? null,
       tags: initialValues?.tags ?? [],
@@ -88,22 +95,20 @@ export const CheckInSheetContent = ({
           {taskTitle}
         </h2>
 
-        {/* Mood Selection */}
-        <MoodSelector form={form} />
+        {/* Mood Selection (edit mode only) */}
+        {showMood && <MoodSelector form={form} />}
 
         {/* Thought Sharing (tags, description, media) */}
-        {initialValues && (
-          <div className="mb-8">
-            <h3 className="text-base font-medium mb-3 text-text-dark">{t("thought_sharing")}</h3>
-            <TagSelector form={form} />
-            <DescriptionField form={form} beforeTextarea={<ReflectionQuestion />} />
-            <MediaUploadField
-              form={form}
-              existingImages={existingImages}
-              onExistingImagesChange={setKeptExistingImages}
-            />
-          </div>
-        )}
+        <div className="mb-8">
+          <h3 className="text-base font-medium mb-3 text-text-dark">{t("thought_sharing")}</h3>
+          <TagSelector form={form} />
+          <DescriptionField form={form} beforeTextarea={<ReflectionQuestion />} />
+          <MediaUploadField
+            form={form}
+            existingImages={existingImages}
+            onExistingImagesChange={setKeptExistingImages}
+          />
+        </div>
 
         {/* Complete Button */}
         <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
@@ -256,28 +261,22 @@ export const CheckInButton = ({
 
 interface ICheckInPhase2SheetContentProps {
   taskTitle: string;
-  /** Phase 1 選擇的心情（用於渲染卡片圖） */
-  mood: ICheckInFormData["mood"];
   onComplete: (data: ICheckInFormData) => Promise<void> | void;
-  /** API 無資料時的備用標籤列表（例如 mock 環境） */
-  suggestedTags?: string[];
 }
 
 /**
  * 打卡第二階段表單
- * 讓使用者在快速打卡（心情）完成後，進一步填寫標籤、心得描述與照片
+ * 讓使用者在打卡（標籤、心得）完成後，進一步選擇心情
  */
 export const CheckInPhase2SheetContent = ({
   taskTitle,
-  mood,
   onComplete,
-  suggestedTags,
 }: ICheckInPhase2SheetContentProps) => {
   const t = useTranslations("check_in");
   const form = useForm<CheckInFormValuesType>({
-    resolver: zodResolver(checkInFormSchema),
+    resolver: zodResolver(createCheckInPhase2Schema(t)),
     defaultValues: {
-      mood,
+      mood: null,
       tags: [],
       description: "",
       media: [],
@@ -309,15 +308,8 @@ export const CheckInPhase2SheetContent = ({
           {taskTitle}
         </h2>
 
-        {/* Thought Sharing */}
-        <div className="mb-8">
-          <h3 className="text-base font-medium mb-3 text-text-dark">{t("thought_sharing")}</h3>
-          <TagSelector form={form} fallbackTags={suggestedTags} />
-          <DescriptionField form={form} beforeTextarea={<ReflectionQuestion />} />
-        </div>
-
-        {/* Media Upload */}
-        <MediaUploadField form={form} />
+        {/* Mood Selection */}
+        <MoodSelector form={form} />
 
         {/* Submit Button */}
         <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">

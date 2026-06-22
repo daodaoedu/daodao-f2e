@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { useCallback, useRef } from "react";
 import type { TagEditData } from "@/components/practice/create/manual/tag-edit-content";
@@ -38,12 +39,13 @@ export function useTagEditSheet({
   onComplete,
   onClose,
 }: UseTagEditSheetOptions) {
+  const t = useTranslations("practice");
   const { open } = useSheetManager();
   const closeRef = useRef<(() => void) | null>(null);
 
   const openTagEditSheet = useCallback(() => {
     const { close } = open({
-      title: "編輯標籤",
+      title: t("tag_edit_title"),
       content: (
         <TagEditSheetContent
           initialTags={initialTags}
@@ -66,7 +68,7 @@ export function useTagEditSheet({
       },
     });
     closeRef.current = close;
-  }, [initialTags, initialKeyword, onComplete, onClose, open]);
+  }, [initialTags, initialKeyword, onComplete, onClose, open, t]);
 
   return { openTagEditSheet };
 }

@@ -25,6 +25,8 @@ export enum StorageEnum {
   AuthSignal = "AuthSignal",
   /** 用於還原主頁 feed 位置：點擊卡片時存卡片 ID，回到主頁時 scrollIntoView */
   HomeFeedAnchor = "HomeFeedAnchor",
+  /** 用於記錄註冊來源流程 */
+  RegistrationFlow = "RegistrationFlow",
 }
 
 const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
@@ -36,6 +38,7 @@ const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   ActionMaker: "sessionStorage",
   AuthSignal: "localStorage",
   HomeFeedAnchor: "sessionStorage",
+  RegistrationFlow: "localStorage",
 };
 
 export interface StorageInstance<T> {
@@ -65,12 +68,31 @@ export function getStorage<T>(key: StorageEnum): StorageInstance<T> {
     };
   }
 
-  const storage = storageType === "localStorage" ? localStorage : sessionStorage;
+  let storage: Storage;
+  try {
+    storage = storageType === "localStorage" ? localStorage : sessionStorage;
+  } catch {
+    return {
+      set: () => undefined,
+      get: () => undefined,
+      remove: () => undefined,
+    };
+  }
 
-  const remove = () => storage.removeItem(storageKey);
+  const remove = () => {
+    try {
+      storage.removeItem(storageKey);
+    } catch {
+      return undefined;
+    }
+  };
 
   const set = (value: T) => {
-    storage.setItem(storageKey, JSON.stringify(value));
+    try {
+      storage.setItem(storageKey, JSON.stringify(value));
+    } catch {
+      return undefined;
+    }
   };
 
   const get = (): T | undefined => {

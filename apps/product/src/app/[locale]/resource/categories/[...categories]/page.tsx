@@ -1,5 +1,5 @@
 import bannerImage from "@daodao/assets/images/resource/banner.webp";
-import { setRequestLocale } from "@daodao/i18n/server";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,6 +16,7 @@ import {
   ResourceBanner,
   ResourceInfiniteContainer,
 } from "@/components/resource";
+import { getResourceCategoryLabelKey } from "@/constants/resource";
 
 function parseToArray<T>(source: unknown): T[] {
   if (Array.isArray(source)) return source as T[];
@@ -25,21 +26,22 @@ function parseToArray<T>(source: unknown): T[] {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ categories?: string[] }>;
+  params: Promise<{ locale: string; categories?: string[] }>;
 }): Promise<Metadata> {
-  const { categories } = await params;
+  const { locale, categories } = await params;
+  const t = await getTranslations({ locale, namespace: "app_product" });
   const [majorCategory, subCategory = null] = parseCategoryHierarchy(parseToArray(categories));
 
   if (!majorCategory) {
     return {
-      title: "分類頁面｜島島阿學",
+      title: t("resource_meta_category_title"),
     };
   }
 
-  const title = subCategory?.label ?? majorCategory.label;
+  const title = t(getResourceCategoryLabelKey((subCategory ?? majorCategory).value));
 
   return {
-    title: `${title}學習資源列表｜島島阿學`,
+    title: t("resource_meta_category_list_title", { title }),
   };
 }
 
@@ -50,6 +52,7 @@ export default async function ResourceCategoriesDetailPage({
 }) {
   const { locale, categories } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "app_product" });
   const categoryHierarchy = parseCategoryHierarchy(parseToArray(categories));
   const [majorCategory, subCategory = null] = categoryHierarchy;
 
@@ -57,7 +60,9 @@ export default async function ResourceCategoriesDetailPage({
     notFound();
   }
 
-  const title = subCategory?.label ?? majorCategory.label;
+  const title = t(getResourceCategoryLabelKey((subCategory ?? majorCategory).value));
+  const majorCategoryLabel = t(getResourceCategoryLabelKey(majorCategory.value));
+  const subCategoryLabel = subCategory ? t(getResourceCategoryLabelKey(subCategory.value)) : null;
 
   const baseCategoriesUrl = "/resource/categories";
 
@@ -66,7 +71,7 @@ export default async function ResourceCategoriesDetailPage({
       <ResourceBanner
         size="md"
         title={title}
-        content={`探索 ${title} 相關的學習資源`}
+        content={t("resource_related_content", { title })}
         image={bannerImage}
       />
 
@@ -74,24 +79,24 @@ export default async function ResourceCategoriesDetailPage({
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/resource">找資源</BreadcrumbLink>
+              <BreadcrumbLink href="/resource">{t("resource_find")}</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             {subCategory ? (
               <>
                 <BreadcrumbItem>
                   <BreadcrumbLink href={`${baseCategoriesUrl}/${majorCategory.value}`}>
-                    {majorCategory.label}
+                    {majorCategoryLabel}
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{subCategory.label}</BreadcrumbPage>
+                  <BreadcrumbPage>{subCategoryLabel}</BreadcrumbPage>
                 </BreadcrumbItem>
               </>
             ) : (
               <BreadcrumbItem>
-                <BreadcrumbPage>{majorCategory.label}</BreadcrumbPage>
+                <BreadcrumbPage>{majorCategoryLabel}</BreadcrumbPage>
               </BreadcrumbItem>
             )}
           </BreadcrumbList>

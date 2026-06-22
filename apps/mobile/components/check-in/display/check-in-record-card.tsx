@@ -9,6 +9,7 @@ import {
   mapApiMoodToMoodType,
 } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import type { IMoodStat } from "../types";
 
 // Enable LayoutAnimation for Android
@@ -32,6 +33,7 @@ interface ICheckInRecordCardProps {
  * 顯示心情統計排行
  */
 export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInRecordCardProps) => {
+  const t = useMobileTranslation("mobile.checkIn");
   const [isExpanded, setIsExpanded] = useState(true);
 
   // 從打卡記錄計算心情統計
@@ -79,7 +81,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
     return (
       <YStack>
         <Text fontWeight="500" color={colors.text.dark} marginBottom="$3">
-          打卡紀錄
+          {t("records_title")}
         </Text>
         <YStack
           backgroundColor={colors.basic.white}
@@ -99,7 +101,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
   return (
     <YStack>
       <Text fontWeight="500" color={colors.text.dark} marginBottom="$3">
-        打卡紀錄
+        {t("records_title")}
       </Text>
       <YStack
         backgroundColor={colors.basic.white}
@@ -110,11 +112,11 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
         {/* Header */}
         <XStack alignItems="center" justifyContent="space-between" marginBottom="$3">
           <Text fontSize={12} color={colors.text.dark} fontWeight="500">
-            心情排行
+            {t("mood_ranking")}
           </Text>
           <Pressable
             onPress={handleToggle}
-            accessibilityLabel={isExpanded ? "收合" : "展開"}
+            accessibilityLabel={isExpanded ? t("collapse") : t("expand")}
             accessibilityRole="button"
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >

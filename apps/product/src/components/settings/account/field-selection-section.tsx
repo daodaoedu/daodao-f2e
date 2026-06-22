@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRightOutlineSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import {
@@ -31,6 +32,7 @@ export const FieldSelectionSection = ({
   availableFields,
   maxSelection,
 }: FieldSelectionSectionProps) => {
+  const t = useTranslations("app_product");
   const selectedFields = form.watch(fieldName) || [];
 
   // 根據 value 取得 label 的輔助函數
@@ -43,7 +45,8 @@ export const FieldSelectionSection = ({
   );
 
   // 根據欄位類型決定自訂欄位的標籤
-  const customFieldLabel = fieldName === "position" ? "其他角色" : "其他領域";
+  const customFieldLabel =
+    fieldName === "position" ? t("field_custom_role") : t("field_custom_field");
 
   const { openFieldSelectionSheet } = useFieldSelectionSheet({
     initialFields: selectedFields,
@@ -66,7 +69,7 @@ export const FieldSelectionSection = ({
         <FormLabel className="font-medium text-base text-text-dark">{label}</FormLabel>
         {selectedFields.length > 0 && (
           <Button type="button" variant="outline" size="sm" onClick={handleClear} className="h-9">
-            清空選項
+            {t("selection_clear")}
           </Button>
         )}
       </div>
@@ -92,7 +95,7 @@ export const FieldSelectionSection = ({
                   onClick={openFieldSelectionSheet}
                   className="w-full bg-logo-cyan text-white hover:bg-logo-cyan/90"
                 >
-                  編輯
+                  {t("edit")}
                   <ArrowRightOutlineSvg className="size-4.5" />
                 </Button>
               </div>

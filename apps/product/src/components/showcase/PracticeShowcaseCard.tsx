@@ -14,7 +14,9 @@ import {
   FlagOutlineSvg,
   TelescopeSvg,
 } from "@daodao/assets";
-import { Link, useRouter } from "@daodao/i18n/navigation";
+import { useAuth } from "@daodao/auth";
+import { useLocale, useTranslations } from "@daodao/i18n";
+import { Link, usePathname, useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
@@ -79,6 +81,9 @@ export function PracticeShowcaseCard({
   batchReactionData,
   onReactionMutate,
 }: PracticeShowcaseCardProps) {
+  const t = useTranslations("app_product");
+  const commonT = useTranslations("common");
+  const locale = useLocale();
   const startFmt = formatShowcaseDate(startDate);
   const endFmt = formatShowcaseDate(endDate);
   const taskStatus = status === "active" ? TaskStatus.inProgress : TaskStatus.completed;
@@ -87,7 +92,9 @@ export function PracticeShowcaseCard({
   const [menuOpen, setMenuOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { data: practiceData } = usePracticeById(id);
   const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
@@ -108,19 +115,25 @@ export function PracticeShowcaseCard({
   }, [menuOpen]);
 
   const handleToggleFollow = async () => {
+    if (!isAuthenticated) {
+      const search = typeof window !== "undefined" ? window.location.search : "";
+      const redirectUrl = search ? `${pathname}${search}` : pathname;
+      router.push(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
+      return;
+    }
     const wasFollowing = isFollowing;
     setIsFollowing(!wasFollowing);
     try {
       if (wasFollowing) {
         await unfollowTarget("practice", id);
-        toast.success("已取消關注");
+        toast.success(t("following_unfollowed"));
       } else {
         await followTarget({ targetType: "practice", targetId: id });
-        toast.success("已關注此實踐");
+        toast.success(t("following_followed_practice"));
       }
     } catch {
       setIsFollowing(wasFollowing);
-      toast.error("操作失敗，請稍後再試");
+      toast.error(t("operation_failed_retry"));
     }
   };
 
@@ -130,11 +143,11 @@ export function PracticeShowcaseCard({
       id: item.userId,
       name: item.name,
       photoURL: item.photoURL ?? undefined,
-      time: formatRelativeTime(item.reactedAt),
+      time: formatRelativeTime(item.reactedAt, locale),
       reaction: item.reactionType as ReactionTypeType,
     }));
     openSheet({
-      title: "瀏覽活動",
+      title: t("showcase_browse_activity"),
       content: (
         <BrowseActivityContent
           viewCount={practiceData?.data?.stats?.viewCount ?? 0}
@@ -172,7 +185,7 @@ export function PracticeShowcaseCard({
       {/* Header row */}
       <div className="flex items-center gap-2 mb-2">
         <Badge variant={statusInfo.variant} size="sm" className="w-fit text-[10px]">
-          {statusInfo.label}
+          {t(statusInfo.label)}
         </Badge>
         {startFmt && endFmt && (
           <span className="text-xs text-text-dark/50 flex-1">
@@ -206,7 +219,7 @@ export function PracticeShowcaseCard({
                 className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
               >
                 <FlagOutlineSvg className="size-5 shrink-0" />
-                <span>檢舉</span>
+                <span>{commonT("report")}</span>
               </Button>
               <Button
                 type="button"
@@ -223,7 +236,7 @@ export function PracticeShowcaseCard({
                 )}
               >
                 <TelescopeSvg className="size-5 shrink-0" />
-                <span>{isFollowing ? "取消關注" : "關注"}</span>
+                <span>{isFollowing ? t("following_unfollow") : t("following_follow")}</span>
               </Button>
               <Button
                 type="button"
@@ -232,7 +245,7 @@ export function PracticeShowcaseCard({
                 className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
               >
                 <ChartColumnIncreasingSvg className="size-5 shrink-0" />
-                <span>瀏覽活動</span>
+                <span>{t("showcase_browse_activity")}</span>
               </Button>
             </div>
           )}
@@ -276,13 +289,15 @@ export function PracticeShowcaseCard({
                         ? frequencyMinDays
                         : `${frequencyMinDays}-${frequencyMaxDays}`}
                     </span>
-                    <span className="text-text-dark/60 ml-0.5">天/週</span>
+                    <span className="text-text-dark/60 ml-0.5">{t("showcase_days_per_week")}</span>
                   </span>
                 )}
                 {sessionDurationMinutes && (
                   <span className="text-sm">
                     <span className="font-semibold text-logo-cyan">{sessionDurationMinutes}</span>
-                    <span className="text-text-dark/60 ml-0.5">分鐘/次</span>
+                    <span className="text-text-dark/60 ml-0.5">
+                      {t("showcase_minutes_per_session")}
+                    </span>
                   </span>
                 )}
               </div>
@@ -334,7 +349,7 @@ export function PracticeShowcaseCard({
             onClick={(e) => e.stopPropagation()}
           >
             {preview.map((comment) => {
-              const commentUserName = comment.user?.name ?? "匿名";
+              const commentUserName = comment.user?.name ?? commonT("anonymous");
               const commentUserIslandHref = getUserIslandHref(comment.user);
               const commentAvatar = (
                 <Avatar className="size-6 shrink-0 mt-0.5">
@@ -354,7 +369,7 @@ export function PracticeShowcaseCard({
                       href={commentUserIslandHref}
                       // 預先載入使用者小島頁，降低點擊頭像後的等待體感
                       prefetch
-                      aria-label={`前往 ${commentUserName} 的小島`}
+                      aria-label={t("showcase_user_island_aria", { userName: commentUserName })}
                       className="shrink-0"
                     >
                       {commentAvatar}
@@ -380,7 +395,7 @@ export function PracticeShowcaseCard({
                     <span className="text-xs text-text-dark line-clamp-1">{comment.content}</span>
                   </div>
                   <span className="shrink-0 text-[11px] text-[#9FB5B8]">
-                    {formatRelativeTime(comment.createdAt)}
+                    {formatRelativeTime(comment.createdAt, locale)}
                   </span>
                 </div>
               );

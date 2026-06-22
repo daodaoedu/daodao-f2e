@@ -5,10 +5,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Input, ScrollView, Text, TextArea, XStack, YStack } from "tamagui";
 import { StepIndicator } from "@/components";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { useCreatePractice } from "@/providers/CreatePracticeProvider";
 
 export default function Step1Screen() {
   const router = useRouter();
+  const t = useMobileTranslation("practice");
+  const commonT = useMobileTranslation("common");
   const { form, currentStep, totalSteps, nextStep } = useCreatePractice();
   const {
     control,
@@ -38,16 +41,16 @@ export default function Step1Screen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={commonT("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>
             <Text fontSize={18} fontWeight="600" color="$color">
-              標題與描述
+              {t("mobile_step1_title")}
             </Text>
             <Text fontSize={12} color="$color" opacity={0.6}>
-              步驟 {currentStep} / {totalSteps}
+              {t("mobile_step_progress", { current: currentStep, total: totalSteps })}
             </Text>
           </YStack>
         </XStack>
@@ -60,7 +63,7 @@ export default function Step1Screen() {
             <YStack gap="$2">
               <XStack alignItems="center" gap="$1">
                 <Text fontSize={14} fontWeight="500" color="$color">
-                  實踐標題
+                  {t("mobile_title_label")}
                 </Text>
                 <Text fontSize={14} color={colors.semantic.error}>
                   *
@@ -74,7 +77,7 @@ export default function Step1Screen() {
                     size="$4"
                     value={value}
                     onChangeText={onChange}
-                    placeholder="例如：每日閱讀"
+                    placeholder={t("mobile_title_placeholder")}
                     borderColor={errors.title ? colors.semantic.error : colors.basic[200]}
                     focusStyle={{
                       borderColor: errors.title ? colors.semantic.error : colors.primary.base,
@@ -100,7 +103,7 @@ export default function Step1Screen() {
             {/* Description */}
             <YStack gap="$2">
               <Text fontSize={14} fontWeight="500" color="$color">
-                描述（選填）
+                {t("mobile_description_label")}
               </Text>
               <Controller
                 control={control}
@@ -110,7 +113,7 @@ export default function Step1Screen() {
                     size="$4"
                     value={value}
                     onChangeText={onChange}
-                    placeholder="簡單描述這個實踐的目標..."
+                    placeholder={t("mobile_description_placeholder")}
                     borderColor={errors.description ? colors.semantic.error : colors.basic[200]}
                     focusStyle={{
                       borderColor: errors.description ? colors.semantic.error : colors.primary.base,
@@ -147,7 +150,7 @@ export default function Step1Screen() {
           >
             <XStack alignItems="center" gap="$2">
               <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                下一步
+                {t("manual_next_step")}
               </Text>
               <ChevronRight size={20} color={colors.basic.white} />
             </XStack>

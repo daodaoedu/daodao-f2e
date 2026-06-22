@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 import Svg, { Circle, Rect } from "react-native-svg";
 import { Button, Card, Spinner, Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import type { IPractice } from "@/types/practice";
 
 type CardVariantType = "default" | "gradient" | "completed";
@@ -85,37 +86,37 @@ const themeBackgrounds: Record<string, React.FC> = {
 // 狀態標籤配置 - 對應 Product 的 Badge variants
 const statusConfig: Record<
   string,
-  { label: string; backgroundColor: string; textColor: string; borderColor: string }
+  { labelKey: string; backgroundColor: string; textColor: string; borderColor: string }
 > = {
   draft: {
     // outline-ghost: transparent bg, light-gray border
-    label: "草稿",
+    labelKey: "status_draft",
     backgroundColor: "transparent",
     textColor: "#666666",
     borderColor: "#9CA3AF", // light-gray
   },
   "not-started": {
     // very-light-blue: very-light-blue bg and border
-    label: "未開始",
+    labelKey: "status_not_started",
     backgroundColor: "#E6FFFE", // very-light-blue
     textColor: "#333333",
     borderColor: "#E6FFFE",
   },
   "in-progress": {
     // default: logo-cyan bg, white text
-    label: "進行中",
+    labelKey: "status_in_progress",
     backgroundColor: "#16B9B3", // logo-cyan
     textColor: "#FFFFFF",
     borderColor: "transparent",
   },
   active: {
-    label: "進行中",
+    labelKey: "status_in_progress",
     backgroundColor: "#16B9B3",
     textColor: "#FFFFFF",
     borderColor: "transparent",
   },
   completed: {
-    label: "已完成",
+    labelKey: "status_completed",
     backgroundColor: "#16B9B3",
     textColor: "#FFFFFF",
     borderColor: "transparent",
@@ -139,6 +140,7 @@ export function PracticeCard({
   isCheckingIn = false,
   variant = "default",
 }: PracticeCardProps) {
+  const t = useMobileTranslation("mobile.practiceCard");
   const progress = useMemo(() => {
     return practice.targetDays > 0
       ? Math.round((practice.completedDays / practice.targetDays) * 100)
@@ -146,10 +148,18 @@ export function PracticeCard({
   }, [practice.completedDays, practice.targetDays]);
 
   const accessibilityLabel = useMemo(() => {
-    const status = practice.todayCheckedIn ? "已完成" : "待完成";
-    const streak = practice.currentStreak > 0 ? `，連續 ${practice.currentStreak} 天` : "";
-    return `${practice.title}，${status}，進度 ${progress}%${streak}`;
-  }, [practice.title, practice.todayCheckedIn, practice.currentStreak, progress]);
+    const status = practice.todayCheckedIn ? t("today_completed") : t("today_pending");
+    const streak =
+      practice.currentStreak > 0
+        ? t("accessibility_streak", { count: practice.currentStreak })
+        : "";
+    return t("accessibility_label", {
+      title: practice.title,
+      status,
+      progress,
+      streak,
+    });
+  }, [practice.title, practice.todayCheckedIn, practice.currentStreak, progress, t]);
 
   // 獲取主題
   const theme = practice.theme || "yellow";
@@ -172,7 +182,7 @@ export function PracticeCard({
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
-        accessibilityHint="點擊查看詳情"
+        accessibilityHint={t("view_detail_hint")}
       >
         {/* SVG 背景 */}
         <ThemeBackground />
@@ -200,7 +210,7 @@ export function PracticeCard({
                 borderColor="white"
               >
                 <Text fontSize={12} color="#333333">
-                  主題實踐
+                  {t("practice_label")}
                 </Text>
               </XStack>
 
@@ -214,7 +224,7 @@ export function PracticeCard({
                 borderColor={statusInfo.borderColor}
               >
                 <Text fontSize={12} color={statusInfo.textColor}>
-                  {statusInfo.label}
+                  {t(statusInfo.labelKey)}
                 </Text>
               </XStack>
             </XStack>
@@ -226,7 +236,7 @@ export function PracticeCard({
                   {practice.title}
                 </Text>
                 <Text fontSize={12} color="#333333" numberOfLines={2}>
-                  {practice.description || "每天學習，持續進步"}
+                  {practice.description || t("default_description")}
                 </Text>
               </YStack>
               {/* 右側箭頭 - light-gray */}
@@ -238,13 +248,13 @@ export function PracticeCard({
             {/* 打卡次數 */}
             <XStack alignItems="center" gap={4}>
               <Text fontSize={12} color="#333333">
-                已打卡
+                {t("checked_in")}
               </Text>
               <Text fontSize={12} color="#333333" fontWeight="600">
                 {practice.completedDays}
               </Text>
               <Text fontSize={12} color="#333333">
-                次
+                {t("times_unit")}
               </Text>
             </XStack>
 
@@ -270,7 +280,7 @@ export function PracticeCard({
                 <XStack alignItems="center" gap={8}>
                   <PenLine size={16} color="#16B9B3" />
                   <Text color="#333333" fontWeight="500" fontSize={14}>
-                    繼續編輯
+                    {t("continue_editing")}
                   </Text>
                 </XStack>
               </Button>
@@ -299,7 +309,7 @@ export function PracticeCard({
                   <XStack alignItems="center" gap={8}>
                     <Check size={16} color="#16B9B3" />
                     <Text color="#333333" fontWeight="500" fontSize={14}>
-                      打卡
+                      {t("check_in")}
                     </Text>
                   </XStack>
                 )}
@@ -343,7 +353,7 @@ export function PracticeCard({
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
-        accessibilityHint="點擊查看詳情"
+        accessibilityHint={t("view_detail_hint")}
       >
         <YStack gap={4}>
           {/* 頂部：分類標籤 + Tags */}
@@ -358,7 +368,7 @@ export function PracticeCard({
               borderColor={colors.primary.base}
             >
               <Text fontSize={12} color={colors.primary.base}>
-                主題實踐
+                {t("practice_label")}
               </Text>
             </XStack>
 
@@ -392,7 +402,7 @@ export function PracticeCard({
                 {practice.title}
               </Text>
               <Text fontSize={12} color="#333333" numberOfLines={2}>
-                {practice.description || "每天學習，持續進步"}
+                {practice.description || t("default_description")}
               </Text>
             </YStack>
             <View alignSelf="center">
@@ -421,7 +431,7 @@ export function PracticeCard({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
-      accessibilityHint="點擊查看詳情"
+      accessibilityHint={t("view_detail_hint")}
     >
       <XStack gap="$4" alignItems="center">
         {/* Content */}
@@ -436,7 +446,7 @@ export function PracticeCard({
                 paddingHorizontal="$2"
                 paddingVertical="$1"
                 borderRadius="$sm"
-                accessibilityLabel="今日已完成"
+                accessibilityLabel={t("today_completed")}
               >
                 <Check size={12} color={colors.basic.white} />
               </XStack>
@@ -445,14 +455,17 @@ export function PracticeCard({
 
           <XStack alignItems="center" gap="$3">
             <Text fontSize={13} color="$color" opacity={0.6}>
-              {practice.completedDays}/{practice.targetDays} 天
+              {t("days_progress", {
+                completed: practice.completedDays,
+                total: practice.targetDays,
+              })}
             </Text>
 
             {practice.currentStreak > 0 && (
               <XStack alignItems="center" gap="$1">
                 <Flame size={14} color={colors.semantic.warning} />
                 <Text fontSize={13} color={colors.semantic.warning}>
-                  {practice.currentStreak} 天連續
+                  {t("streak_days", { count: practice.currentStreak })}
                 </Text>
               </XStack>
             )}
@@ -491,8 +504,8 @@ export function PracticeCard({
               circular
               disabled={isCheckingIn}
               accessibilityRole="button"
-              accessibilityLabel={`打卡 ${practice.title}`}
-              accessibilityHint="點擊完成今日打卡"
+              accessibilityLabel={t("check_in_practice", { title: practice.title })}
+              accessibilityHint={t("check_in_hint")}
             >
               {isCheckingIn ? (
                 <Spinner size="small" color={colors.basic.white} />

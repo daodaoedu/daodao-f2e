@@ -180,7 +180,9 @@ export function TypewriterBubble() {
               alt={t("typewriter_bubble_mascot_alt")}
               className="absolute -top-5 right-3 z-2"
             />
-            <p className="my-2 mb-1 w-full px-6 font-semibold text-basic-white">{t("typewriter_bubble_tagline_1")}</p>
+            <p className="my-2 mb-1 w-full px-6 font-semibold text-basic-white">
+              {t("typewriter_bubble_tagline_1")}
+            </p>
             <p className="text-basic-darker my-2 w-full px-6 font-semibold">
               {t("typewriter_bubble_tagline_2")}
             </p>

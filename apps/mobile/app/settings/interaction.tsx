@@ -1,15 +1,27 @@
+import { useUserMutations } from "@daodao/api";
 import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { api } from "@/services/api-client";
+import { useMobileTranslation } from "@/i18n";
+
+function assertSuccessfulResponse(response: { error?: unknown }, fallbackMessage: string) {
+  if (!response.error) return;
+
+  const error = response.error as { error?: { message?: string }; message?: string };
+  throw new Error(error.error?.message ?? error.message ?? fallbackMessage);
+}
 
 export default function InteractionSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.interactionSettings");
+  const tCommon = useMobileTranslation("common");
   const { user, isLoading } = useCurrentUser();
+  const { updateCurrentUser } = useUserMutations();
 
   const serverIsOpenProfile = (user as { isOpenProfile?: boolean })?.isOpenProfile ?? true;
   const [localIsOpenProfile, setLocalIsOpenProfile] = useState<boolean | null>(null);
@@ -20,9 +32,11 @@ export default function InteractionSettingsScreen() {
     setLocalIsOpenProfile(value);
     setIsSaving(true);
     try {
-      await api.put("/users/me", { isOpenProfile: value });
-    } catch {
+      const response = await updateCurrentUser({ isOpenProfile: value });
+      assertSuccessfulResponse(response, t("saveError"));
+    } catch (error) {
       setLocalIsOpenProfile(null);
+      Alert.alert(t("errorTitle"), error instanceof Error ? error.message : t("saveError"));
     } finally {
       setIsSaving(false);
     }
@@ -37,12 +51,12 @@ export default function InteractionSettingsScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            互動設定
+            {t("title")}
           </Text>
         </XStack>
 
@@ -57,10 +71,10 @@ export default function InteractionSettingsScreen() {
             <XStack padding="$4" alignItems="center" justifyContent="space-between">
               <YStack flex={1} gap="$1">
                 <Text fontSize={15} color="$color">
-                  公開我的實踐
+                  {t("openProfileTitle")}
                 </Text>
                 <Text fontSize={12} color="$color" opacity={0.5}>
-                  開啟後，你的實踐將可以被搜尋展示
+                  {t("openProfileDescription")}
                 </Text>
               </YStack>
               <Switch

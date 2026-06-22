@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@daodao/auth";
+import { useTranslations } from "@daodao/i18n";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { useCallback, useState } from "react";
 import { useSWRConfig } from "swr";
@@ -28,6 +29,7 @@ export enum LogoutResult {
  * ```
  */
 export function useLogoutDialog() {
+  const t = useTranslations("common");
   const { openWarningDialog } = useDialog();
   const { logout } = useAuth();
   const { cache } = useSWRConfig();
@@ -36,12 +38,12 @@ export function useLogoutDialog() {
   const openLogoutDialog = useCallback(async (): Promise<LogoutResult> => {
     // 顯示確認對話框
     const result = await openWarningDialog({
-      title: "確定要登出嗎？",
-      message: "登出後需要重新登入才能使用完整功能。",
+      title: t("logout_title"),
+      message: t("logout_message"),
       textAlign: "left",
       buttons: [
-        { label: "確定登出", value: "confirm", variant: "outline" },
-        { label: "取消", value: "cancel", variant: "orange" },
+        { label: t("logout_confirm"), value: "confirm", variant: "outline" },
+        { label: t("cancel"), value: "cancel", variant: "orange" },
       ],
     });
 
@@ -68,7 +70,7 @@ export function useLogoutDialog() {
     } finally {
       setIsLoggingOut(false);
     }
-  }, [openWarningDialog, logout, cache]);
+  }, [openWarningDialog, logout, cache, t]);
 
   return { openLogoutDialog, isLoggingOut };
 }

@@ -41,6 +41,7 @@ import {
   useReactions,
   useReactionsList,
 } from "@/hooks/useReactions";
+import { useMobileTranslation } from "@/i18n";
 import { BrowseActivitySheet } from "./BrowseActivitySheet";
 import { CommentSection } from "./CommentSection";
 import { type PracticeTab, PracticeTabBar } from "./PracticeTabBar";
@@ -71,6 +72,7 @@ const TALLY_REPORT_URL = "https://tally.so/r/BzGQy4";
 
 export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewProps) {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.practiceDetail");
   const {
     id,
     title,
@@ -124,10 +126,10 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
       }
       await mutateFollow();
     } catch {
-      Alert.alert("錯誤", "操作失敗，請稍後再試");
+      Alert.alert(t("error_title"), t("operation_failed"));
     }
     setMenuOpen(false);
-  }, [isFollowing, id, mutateFollow]);
+  }, [isFollowing, id, mutateFollow, t]);
 
   const handleReport = useCallback(() => {
     setMenuOpen(false);
@@ -151,19 +153,21 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
   const browseActivityText = (() => {
     if (reactors.length > 0) {
       const firstName = reactors[0]?.name;
-      return reactors.length > 1 ? `${firstName} 與其他 ${reactors.length - 1} 人` : firstName;
+      return reactors.length > 1
+        ? t("browse_with_others", { name: firstName ?? "", count: reactors.length - 1 })
+        : firstName;
     }
     if (currentUserReaction) {
-      return totalCount > 1 ? `你 與其他 ${totalCount - 1} 人` : "你";
+      return totalCount > 1 ? t("you_with_others", { count: totalCount - 1 }) : t("you");
     }
     if (totalCount > 0) {
       return firstReactorName
         ? totalCount > 1
-          ? `${firstReactorName} 與其他 ${totalCount - 1} 人`
+          ? t("browse_with_others", { name: firstReactorName, count: totalCount - 1 })
           : firstReactorName
-        : `${totalCount} 人`;
+        : t("people_count", { count: totalCount });
     }
-    return "觀看瀏覽活動";
+    return t("view_browse_activity");
   })();
 
   // Browse activity emoji circles
@@ -271,7 +275,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
                           color={isFollowing ? colors.primary.base : "#295E5C"}
                         />
                         <Text fontSize={14} color={isFollowing ? colors.primary.base : "#295E5C"}>
-                          {isFollowing ? "取消關注" : "關注"}
+                          {isFollowing ? t("unfollow") : t("follow")}
                         </Text>
                       </XStack>
                     </Button>
@@ -493,17 +497,21 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
               (checkInsError ? (
                 <YStack alignItems="center" paddingVertical="$8">
                   <Text color="rgba(0,0,0,0.4)" fontSize={14}>
-                    無法載入打卡紀錄
+                    {t("checkins_load_failed")}
                   </Text>
                 </YStack>
               ) : (
-                <CheckInList checkIns={checkIns || []} emptyText="尚無打卡紀錄" />
+                <CheckInList
+                  checkIns={checkIns || []}
+                  emptyText={t("empty_checkins")}
+                  practiceId={id}
+                />
               ))}
 
             {activeTab === "resources" && (
               <YStack paddingVertical="$4">
                 <Text color="#9FB5B8" fontSize={14}>
-                  目前沒有使用資源
+                  {t("empty_resources")}
                 </Text>
               </YStack>
             )}

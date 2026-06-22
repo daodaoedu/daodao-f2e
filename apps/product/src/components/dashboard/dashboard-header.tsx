@@ -27,11 +27,15 @@ export const DashboardHeader = ({ stats }: DashboardHeaderProps) => {
         <div className="flex gap-2">
           <span className="flex items-center gap-1">
             <span className="text-4xl text-text-dark font-semibold">{format(today, "M")}</span>
-            <span className="mt-1 text-[1.375rem] text-text-dark font-medium">{t("header_month_unit")}</span>
+            <span className="mt-1 text-[1.375rem] text-text-dark font-medium">
+              {t("header_month_unit")}
+            </span>
           </span>
           <span className="flex items-center gap-1">
             <span className="text-4xl text-text-dark font-semibold">{format(today, "d")}</span>
-            <span className="mt-1 text-[1.375rem] text-text-dark font-medium">{t("header_day_unit")}</span>
+            <span className="mt-1 text-[1.375rem] text-text-dark font-medium">
+              {t("header_day_unit")}
+            </span>
           </span>
         </div>
       </time>

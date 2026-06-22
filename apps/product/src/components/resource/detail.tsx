@@ -2,6 +2,7 @@
 
 import type { ResourceData } from "@daodao/api";
 import { BoxSvg, GroupSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -13,7 +14,6 @@ import {
 } from "@daodao/ui/components/dropdown-menu";
 import { Image } from "@daodao/ui/components/image";
 import { Ellipsis, Globe, Share2 } from "lucide-react";
-import { resourceTypeMap, targetAudienceTypeMap } from "@/constants/resource";
 
 interface ResourceDetailProps {
   resource: Pick<ResourceData, "id" | "name" | "url" | "imageUrl" | "tags" | "level" | "type">;
@@ -26,12 +26,39 @@ export function ResourceDetail({
   onEditClick,
   isOwnResource = false,
 }: ResourceDetailProps) {
+  const t = useTranslations("app_product");
+  const targetAudienceLabel =
+    resource.level === "beginner"
+      ? t("resource_level_beginner")
+      : resource.level === "intermediate"
+        ? t("resource_level_intermediate")
+        : resource.level === "expert"
+          ? t("resource_level_expert")
+          : resource.level;
+  const resourceTypeLabel =
+    resource.type === "learning_platform_app"
+      ? t("resource_type_learning_platform_app")
+      : resource.type === "learning_tools"
+        ? t("resource_type_learning_tools")
+        : resource.type === "books_articles"
+          ? t("resource_type_books_articles")
+          : resource.type === "video_content"
+            ? t("resource_type_video_content")
+            : resource.type === "podcast_content"
+              ? t("resource_type_podcast_content")
+              : resource.type === "workshops_courses"
+                ? t("resource_type_workshops_courses")
+                : resource.type === "professional_certificates"
+                  ? t("resource_type_professional_certificates")
+                  : resource.type === "community_organization"
+                    ? t("resource_type_community_organization")
+                    : resource.type;
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `我要分享「${resource.name}」資源`,
-          text: `我要分享「${resource.name}」資源`,
+          title: t("resource_share_text", { name: resource.name }),
+          text: t("resource_share_text", { name: resource.name }),
           url: window.location.href,
         });
       } catch {
@@ -58,22 +85,18 @@ export function ResourceDetail({
             <div className="flex items-center gap-2">
               <span className="flex items-center gap-2 font-medium">
                 <GroupSvg />
-                適合
+                {t("resource_suitable_for")}
               </span>
               <span className="h-4 w-px bg-gray-300" />
-              <span className="text-primary">
-                {targetAudienceTypeMap.get(resource.level) ?? resource.level}
-              </span>
+              <span className="text-primary">{targetAudienceLabel}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="flex items-center gap-2 font-medium">
                 <BoxSvg />
-                資源類型
+                {t("resource_type")}
               </span>
               <span className="h-4 w-px bg-gray-300" />
-              <span className="text-primary">
-                {resourceTypeMap.get(resource.type) ?? resource.type}
-              </span>
+              <span className="text-primary">{resourceTypeLabel}</span>
             </div>
           </div>
         </div>
@@ -82,7 +105,7 @@ export function ResourceDetail({
           <Button size="default" asChild>
             <CustomLink href={resource.url} target="_blank">
               <Globe size={16} />
-              查看資源
+              {t("resource_view")}
             </CustomLink>
           </Button>
           <Button size="default" onClick={handleShare}>
@@ -102,7 +125,7 @@ export function ResourceDetail({
                     onClick={onEditClick}
                     className="block w-full p-2 text-left"
                   >
-                    編輯
+                    {t("edit")}
                   </button>
                 </DropdownMenuItem>
               ) : (
@@ -113,7 +136,7 @@ export function ResourceDetail({
                     className="block p-2"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    檢舉
+                    {t("report")}
                   </CustomLink>
                 </DropdownMenuItem>
               )}

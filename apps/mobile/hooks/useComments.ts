@@ -1,5 +1,11 @@
+import {
+  createComment as apiCreateComment,
+  deleteComment as apiDeleteComment,
+  getComments as apiGetComments,
+  updateComment as apiUpdateComment,
+  type CommentTargetType,
+} from "@daodao/api";
 import useSWR from "swr";
-import { api } from "@/services/api-client";
 
 // ── Types ──
 
@@ -20,12 +26,65 @@ interface CommentsResponse {
   data?: Comment[];
 }
 
+type ApiComment = NonNullable<Awaited<ReturnType<typeof apiGetComments>>["data"]>["data"][number];
+
+function toMobileComment(comment: ApiComment): Comment {
+  return {
+    id: String(comment.id),
+    content: comment.content,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    user: comment.user
+      ? {
+          id: comment.user.id,
+          name: comment.user.name,
+          photoURL: comment.user.photoURL,
+        }
+      : undefined,
+  };
+}
+
+function getErrorMessage(error: unknown): string {
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string" && message.length > 0) {
+      return message;
+    }
+  }
+
+  return "Request failed";
+}
+
+function parseCommentId(commentId: string): number {
+  const numericCommentId = Number(commentId);
+
+  if (!Number.isInteger(numericCommentId)) {
+    throw new Error("Invalid comment id");
+  }
+
+  return numericCommentId;
+}
+
 // ── Query Hook ──
 
 export function useComments(targetType: string, targetId: string) {
   const { data, error, isLoading, mutate } = useSWR<CommentsResponse>(
-    targetId ? `/comments?targetType=${targetType}&targetId=${targetId}` : null,
-    (url: string) => api.get<CommentsResponse>(url),
+    targetId ? ["/api/v1/comments", targetType, targetId] : null,
+    async () => {
+      const response = await apiGetComments({
+        targetType: targetType as CommentTargetType,
+        targetId,
+      });
+
+      if (response.error) {
+        throw new Error(getErrorMessage(response.error));
+      }
+
+      return {
+        ...response.data,
+        data: response.data.data.map(toMobileComment),
+      };
+    },
     { revalidateOnFocus: false }
   );
 
@@ -37,17 +96,39 @@ export function useComments(targetType: string, targetId: string) {
 // ── Mutations ──
 
 export async function createComment(targetType: string, targetId: string, content: string) {
-  return api.post<{ success: boolean; data?: Comment }>("/comments", {
+  const response = await apiCreateComment({
     targetType,
     targetId,
     content,
-  });
+    visibility: "public",
+  } as Parameters<typeof apiCreateComment>[0]);
+
+  if (response.error) {
+    throw new Error(getErrorMessage(response.error));
+  }
+
+  return {
+    ...response.data,
+    data: toMobileComment(response.data.data),
+  };
 }
 
 export async function updateComment(commentId: string, content: string) {
-  return api.put<{ success: boolean }>(`/comments/${commentId}`, { content });
+  const response = await apiUpdateComment(parseCommentId(commentId), { content });
+
+  if (response.error) {
+    throw new Error(getErrorMessage(response.error));
+  }
+
+  return { success: response.data.success };
 }
 
 export async function deleteComment(commentId: string) {
-  return api.delete<{ success: boolean }>(`/comments/${commentId}`);
+  const response = await apiDeleteComment(parseCommentId(commentId));
+
+  if (response.error) {
+    throw new Error(getErrorMessage(response.error));
+  }
+
+  return { success: response.data.success };
 }

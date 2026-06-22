@@ -6,6 +6,7 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import type { StaticImageData } from "next/image";
+import { getResourceCategoryLabelKey } from "@/constants/resource";
 import { SectionTitle } from "./section-title";
 
 interface HotTag {
@@ -31,6 +32,7 @@ export function ResourceBanner({
   length,
 }: ResourceBannerProps) {
   const t = useTranslations("resource");
+  const productT = useTranslations("app_product");
   const isMediumSize = size === "md";
   const isLargeSize = size === "lg";
 
@@ -73,19 +75,22 @@ export function ResourceBanner({
                   {t("hot_tags")}
                 </div>
                 <div className="flex flex-wrap gap-1 md:gap-2">
-                  {hotTags.map(({ label, value }) => (
-                    <Badge
-                      key={value}
-                      variant="outline-logo"
-                      className="px-3 py-0.5 text-primary-base"
-                      asChild
-                    >
-                      <CustomLink href={`/resource/categories/${value}`}>
-                        <span className="font-bold">#</span>
-                        {label}
-                      </CustomLink>
-                    </Badge>
-                  ))}
+                  {hotTags.map(({ value }) => {
+                    const categoryValue = value.split("/").at(-1) ?? value;
+                    return (
+                      <Badge
+                        key={value}
+                        variant="outline-logo"
+                        className="px-3 py-0.5 text-primary-base"
+                        asChild
+                      >
+                        <CustomLink href={`/resource/categories/${value}`}>
+                          <span className="font-bold">#</span>
+                          {productT(getResourceCategoryLabelKey(categoryValue))}
+                        </CustomLink>
+                      </Badge>
+                    );
+                  })}
                 </div>
               </div>
             )}

@@ -1,4 +1,5 @@
 import { getResourceById } from "@daodao/api";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,7 +8,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@daodao/ui/components/breadcrumb";
-import { setRequestLocale } from "@daodao/i18n/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import {
@@ -15,6 +15,7 @@ import {
   ResourceDetail,
   ResourceDetailClient,
 } from "@/components/resource";
+import { getResourceCategoryLabelKey } from "@/constants/resource";
 
 interface ResourceDetailPageProps {
   params: Promise<{
@@ -26,6 +27,7 @@ interface ResourceDetailPageProps {
 export default async function ResourceDetailPage({ params }: ResourceDetailPageProps) {
   const { locale, resourceId } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "app_product" });
 
   const { data: response, error } = await getResourceById(resourceId);
 
@@ -39,6 +41,10 @@ export default async function ResourceDetailPage({ params }: ResourceDetailPageP
     resource.majorCategory ?? "",
     resource.subCategory ?? "",
   ]);
+  const majorCategoryLabel = majorCategory
+    ? t(getResourceCategoryLabelKey(majorCategory.value))
+    : null;
+  const subCategoryLabel = subCategory ? t(getResourceCategoryLabelKey(subCategory.value)) : null;
 
   const baseCategoriesUrl = "/resource/categories";
 
@@ -48,14 +54,14 @@ export default async function ResourceDetailPage({ params }: ResourceDetailPageP
         <Breadcrumb className="mb-5 md:mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/resource">找資源</BreadcrumbLink>
+              <BreadcrumbLink href="/resource">{t("resource_find")}</BreadcrumbLink>
             </BreadcrumbItem>
             {majorCategory && (
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbLink href={`${baseCategoriesUrl}/${majorCategory.value}`}>
-                    {majorCategory.label}
+                    {majorCategoryLabel}
                   </BreadcrumbLink>
                 </BreadcrumbItem>
               </>
@@ -67,7 +73,7 @@ export default async function ResourceDetailPage({ params }: ResourceDetailPageP
                   <BreadcrumbLink
                     href={`${baseCategoriesUrl}/${majorCategory?.value}/${subCategory.value}`}
                   >
-                    {subCategory.label}
+                    {subCategoryLabel}
                   </BreadcrumbLink>
                 </BreadcrumbItem>
               </>

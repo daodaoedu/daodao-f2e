@@ -90,8 +90,9 @@ export const useUserByIdentifier = (identifier: string) => {
 /**
  * 獲取當前用戶資訊的 Hook
  */
-export const useCurrentUser = () => {
-  return useQuery("/api/v1/users/me");
+export const useCurrentUser = (options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled ?? true;
+  return useQuery("/api/v1/users/me", enabled ? {} : null);
 };
 
 /**

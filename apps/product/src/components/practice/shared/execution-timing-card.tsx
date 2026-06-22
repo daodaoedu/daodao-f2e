@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "@daodao/i18n";
 import { BookSvg, ClockSolidSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { EXECUTION_TIMING_OPTIONS, type ManualPracticeFormValues } from "../create/manual/schema";
 

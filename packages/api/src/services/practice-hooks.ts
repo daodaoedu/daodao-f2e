@@ -5,9 +5,8 @@
  * 提供實踐相關的 React Hooks（用於 Client Components）
  */
 
-import { getRequiredEnv } from "@daodao/config";
 import useSWR from "swr";
-import { client, unauthorizedHandler } from "../client";
+import { client, getApiBaseUrl, unauthorizedHandler } from "../client";
 import { useMutate, useQuery } from "../hooks";
 import type { components, paths } from "../types";
 import type {
@@ -350,7 +349,7 @@ export const createPracticeCheckInWithFormData = async (
     });
   }
 
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const baseUrl = getApiBaseUrl();
   const response = await unauthorizedHandler.wrapFetch(
     `${baseUrl}/api/v1/practices/${practiceId}/checkins`,
     {
@@ -380,7 +379,7 @@ export const createPracticeCheckInWithFormData = async (
 export const updatePracticeCheckInWithFormData = async (
   practiceId: string,
   checkInId: string,
-  data: ICheckInFormData
+  data: Partial<ICheckInFormData>
 ): Promise<CreateCheckInResponse> => {
   const formData = new FormData();
 
@@ -405,7 +404,7 @@ export const updatePracticeCheckInWithFormData = async (
     });
   }
 
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const baseUrl = getApiBaseUrl();
   const response = await unauthorizedHandler.wrapFetch(
     `${baseUrl}/api/v1/practices/${practiceId}/checkins/${checkInId}`,
     {
@@ -521,7 +520,7 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
 export const useUpdatePracticeCheckIn = (practiceId: string, checkInId: string) => {
   const mutate = useMutate();
 
-  const updateCheckIn = async (formData: ICheckInFormData) => {
+  const updateCheckIn = async (formData: Partial<ICheckInFormData>) => {
     const response = await updatePracticeCheckInWithFormData(practiceId, checkInId, formData);
 
     // 刷新打卡列表的 cache（使用空 query 對象來匹配所有 query 參數組合）

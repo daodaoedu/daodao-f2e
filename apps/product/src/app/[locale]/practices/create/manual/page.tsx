@@ -2,6 +2,7 @@
 
 import { type CreatePracticeRequestType, createPractice } from "@daodao/api";
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { StorageEnum, useFormDraft } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -13,7 +14,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import { useTranslations } from "@daodao/i18n";
 import { type ManualPracticeFormValues, manualPracticeFormSchema } from "@/components/practice";
 import { Step1 } from "@/components/practice/create/manual/steps/step-1";
 import { Step2 } from "@/components/practice/create/manual/steps/step-2";
@@ -22,16 +22,16 @@ import { Step4 } from "@/components/practice/create/manual/steps/step-4";
 import { Step5 } from "@/components/practice/create/manual/steps/step-5";
 import type { PrivacyStatus } from "@/components/practice/shared/privacy-status-selector";
 import {
+  applyOnboardingUpdateFromResponse,
+  refreshOnboardingStatus,
+} from "@/components/task-guide/onboarding-progress-context";
+import {
   type ExecutionTiming,
   type Frequency,
   mapExecutionTimingToPracticeTimePeriods,
   parseFrequency,
 } from "@/constants/practice-form";
 import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
-import {
-  applyOnboardingUpdateFromResponse,
-  refreshOnboardingStatus,
-} from "@/components/task-guide/onboarding-progress-context";
 
 const TOTAL_STEPS = 5;
 
@@ -316,7 +316,10 @@ export default function CreateManualPracticePage() {
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <PageHeader title={currentStep === 5 ? t("manual_preview_title") : t("manual_create_title")} rightActionTo="/" />
+      <PageHeader
+        title={currentStep === 5 ? t("manual_preview_title") : t("manual_create_title")}
+        rightActionTo="/"
+      />
 
       <main className="relative px-5 max-w-[448px] mx-auto pb-20">
         {/* Progress Bar */}

@@ -95,7 +95,7 @@ class ShareService {
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
-        return { success: false, error: "需要相簿存取權限才能儲存圖片" };
+        return { success: false, error: "photo_library_permission_required" };
       }
 
       await MediaLibrary.saveToLibraryAsync(imageUri);
@@ -114,8 +114,11 @@ class ShareService {
   /**
    * Generate share text for check-in
    */
-  generateCheckInShareText(practiceTitle: string, streakCount: number): string {
-    return `我在「${practiceTitle}」已經連續打卡 ${streakCount} 天！🔥 #島島阿學`;
+  generateCheckInShareText(practiceTitle: string, streakCount: number, locale?: string): string {
+    const isEnglish = locale?.toLowerCase().startsWith("en");
+    return isEnglish
+      ? `I have checked in for ${streakCount} straight days on "${practiceTitle}"! 🔥 #DaoDao`
+      : `我在「${practiceTitle}」已經連續打卡 ${streakCount} 天！🔥 #島島阿學`;
   }
 }
 

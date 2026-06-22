@@ -1,5 +1,5 @@
 import { MessageCircle, MoreHorizontal } from "@tamagui/lucide-icons";
-import { useRouter } from "expo-router";
+import { type Href, useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
 import { Image, Pressable, StyleSheet } from "react-native";
@@ -10,6 +10,7 @@ import { getStatusConfig } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
 import { removeReaction, upsertReaction } from "@/hooks/useReactions";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
+import { useMobileTranslation } from "@/i18n";
 
 interface ShowcaseCardProps {
   practice: IShowcasePractice;
@@ -20,6 +21,8 @@ interface ShowcaseCardProps {
   onReactionToggle?: (type: ReactionTypeType) => Promise<void>;
   /** 反應按鈕被點擊時觸發（用於 haptic 等副作用，不影響內部狀態） */
   onReactionTap?: () => void;
+  /** 反應 mutation 成功後觸發，用於刷新 feed cache */
+  onReactionUpdated?: () => void | Promise<void>;
   /** 三點選單 callback */
   onMenuPress?: () => void;
 }
@@ -36,9 +39,11 @@ export function ShowcaseCard({
   selectedReaction: externalSelectedReaction,
   onReactionToggle: externalOnReactionToggle,
   onReactionTap,
+  onReactionUpdated,
   onMenuPress,
 }: ShowcaseCardProps) {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.home");
   const {
     id,
     title,
@@ -77,11 +82,12 @@ export function ShowcaseCard({
         } else {
           await upsertReaction("practice", id, type);
         }
+        await onReactionUpdated?.();
       } catch {
         setInternalReaction(isSelected ? type : null);
       }
     },
-    [internalReaction, id, onReactionTap]
+    [internalReaction, id, onReactionTap, onReactionUpdated]
   );
 
   const handleReactionToggle = externalOnReactionToggle ?? internalHandleReactionToggle;
@@ -96,9 +102,9 @@ export function ShowcaseCard({
       style={styles.card}
       onPress={() =>
         router.push({
-          pathname: "/practices/[id]",
-          params: { id, showcaseData: JSON.stringify(practice) },
-        })
+          pathname: `/practices/${id}`,
+          params: { showcaseData: JSON.stringify(practice) },
+        } as Href)
       }
     >
       {/* Header row */}
@@ -111,7 +117,7 @@ export function ShowcaseCard({
             ]}
           >
             <Text fontSize={12} color="white">
-              {statusInfo.label}
+              {taskStatus === "completed" ? t("filter_completed") : t("filter_in_progress")}
             </Text>
           </View>
         )}
@@ -165,7 +171,7 @@ export function ShowcaseCard({
                       : `${frequency_min_days}-${frequency_max_days}`}
                   </Text>
                   <Text fontSize={14} color="rgba(0,0,0,0.6)" marginLeft={2}>
-                    天/週
+                    {t("days_per_week")}
                   </Text>
                 </XStack>
               )}
@@ -175,7 +181,7 @@ export function ShowcaseCard({
                     {session_duration_minutes}
                   </Text>
                   <Text fontSize={14} color="rgba(0,0,0,0.6)" marginLeft={2}>
-                    分鐘/次
+                    {t("minutes_per_session")}
                   </Text>
                 </XStack>
               )}

@@ -1,8 +1,8 @@
 "use client";
 
 import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
-import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
 import { useTranslations } from "@daodao/i18n";
+import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
 import * as React from "react";
@@ -47,6 +47,7 @@ export const CheckInCard = ({
 }: ICheckInCardProps) => {
   const t = useTranslations("check_in");
   const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
+  const moodLabel = mood ? t(`moods.${mood}`) : "";
   const MoodEmoji = moodOption?.emoji;
 
   const mainRef = React.useRef<HTMLElement>(null);
@@ -121,13 +122,15 @@ export const CheckInCard = ({
                 {MoodEmoji && (
                   <div className="flex items-center gap-2">
                     <MoodEmoji className="size-6" />
-                    <span className="text-sm text-text-dark">{t("mood_label", { label: moodOption?.label ?? "" })}</span>
+                    <span className="text-sm text-text-dark">
+                      {t("mood_label", { label: moodLabel || moodOption?.label || "" })}
+                    </span>
                   </div>
                 )}
 
                 {/* 文字內容 */}
                 {isBlankContent(content) && showEmptyHint ? (
-                  <p className="text-light-gray text-sm italic">歡迎隨時追加內容</p>
+                  <p className="text-light-gray text-sm italic">{t("empty_content_hint")}</p>
                 ) : (
                   <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">
                     {parseTextLinks(content).map((seg, i) =>

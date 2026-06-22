@@ -43,7 +43,11 @@ export const Marathon = () => {
         </p>
       </Section>
 
-      <Section title={t("marathon_section_who_title")} id="marathon-who" className="bg-primary-lightest">
+      <Section
+        title={t("marathon_section_who_title")}
+        id="marathon-who"
+        className="bg-primary-lightest"
+      >
         <List className="my-9">
           <li>16歲以上學習者皆可申請，優先以高中及大學生為主</li>
           <li>有意願為自己打造專屬學習旅程的學習者</li>
@@ -61,9 +65,13 @@ export const Marathon = () => {
       </Section>
 
       <Section title={t("marathon_section_how_title")} id="marathon-how" className="bg-white">
-        <h3 className="heading-sm my-9 leading-[1.2] text-basic-500">{t("marathon_section_how_equipment_subtitle")}</h3>
+        <h3 className="heading-sm my-9 leading-[1.2] text-basic-500">
+          {t("marathon_section_how_equipment_subtitle")}
+        </h3>
         <Equipment />
-        <h3 className="heading-sm my-9 leading-[1.2] text-basic-500">{t("marathon_section_how_spotlight_subtitle")}</h3>
+        <h3 className="heading-sm my-9 leading-[1.2] text-basic-500">
+          {t("marathon_section_how_spotlight_subtitle")}
+        </h3>
         <Spotlight />
       </Section>
 
@@ -71,7 +79,11 @@ export const Marathon = () => {
         <Mentors />
       </Section>
 
-      <Section title={t("marathon_section_benefit_title")} id="marathon-benefit" className="bg-primary-lightest">
+      <Section
+        title={t("marathon_section_benefit_title")}
+        id="marathon-benefit"
+        className="bg-primary-lightest"
+      >
         <p className="mb-5 mt-9">
           只要申請，不論有無入選，就可以優先使用島島阿學AI個人化學習工具，包含自主學習模板、學習日誌、學習進度追蹤、AI推薦與引導等功能！
         </p>
@@ -135,7 +147,11 @@ export const Marathon = () => {
         </List>
       </Section>
 
-      <Section title={t("marathon_section_apply_title")} id="marathon-apply" className="bg-[#EEF9F9]">
+      <Section
+        title={t("marathon_section_apply_title")}
+        id="marathon-apply"
+        className="bg-[#EEF9F9]"
+      >
         <div className="mt-9">
           <ApplicationInfo />
         </div>
@@ -153,7 +169,11 @@ export const Marathon = () => {
         </div>
       </Section>
 
-      <Section title={t("marathon_section_organizer_title")} id="marathon-organizer" className="bg-white">
+      <Section
+        title={t("marathon_section_organizer_title")}
+        id="marathon-organizer"
+        className="bg-white"
+      >
         <p className="my-2.5">
           島島阿學團隊由一群大學生、教育工作者、工程師和設計師等來自不同背景的夥伴組成。
           <br />

@@ -210,7 +210,8 @@ const ConnectionsTab = () => {
       {/* 我的夥伴 */}
       <section className="flex flex-col gap-2">
         <h2 className="text-xs font-medium text-[#9FB5B8] px-1">
-          {t("conn_partners_section")}{connections.length > 0 && ` · ${connections.length} ${t("conn_people_count")}`}
+          {t("conn_partners_section")}
+          {connections.length > 0 && ` · ${connections.length} ${t("conn_people_count")}`}
         </h2>
         {connections.length === 0 ? (
           <div className="text-center py-12 text-[#9FB5B8] text-sm">{t("conn_empty")}</div>
@@ -359,7 +360,9 @@ const FollowingTab = () => {
         ) : (
           <div className="flex flex-col gap-2">
             {followedPractices.length === 0 ? (
-              <div className="text-center py-12 text-[#9FB5B8] text-sm">{t("follow_no_practices")}</div>
+              <div className="text-center py-12 text-[#9FB5B8] text-sm">
+                {t("follow_no_practices")}
+              </div>
             ) : (
               followedPractices.map(({ practice }) => {
                 if (!practice) return null;
@@ -402,7 +405,8 @@ const FollowingTab = () => {
       {/* 關注我的 section */}
       <section className="flex flex-col gap-2">
         <h2 className="text-xs font-medium text-[#9FB5B8] px-1">
-          {t("follow_followers_section")}{followers.length > 0 && ` · ${followers.length} ${t("conn_people_count")}`}
+          {t("follow_followers_section")}
+          {followers.length > 0 && ` · ${followers.length} ${t("conn_people_count")}`}
         </h2>
         {loadingFollowers ? (
           <div className="flex justify-center py-8 text-[#9FB5B8] text-sm">{t("loading")}</div>

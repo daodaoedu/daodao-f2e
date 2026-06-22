@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { Text, TextArea, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 const MAX_LENGTH = 300;
 
@@ -13,6 +14,7 @@ interface IDescriptionFieldProps {
  * 描述輸入欄位組件 (Mobile)
  */
 export const DescriptionField = ({ value, onChange }: IDescriptionFieldProps) => {
+  const t = useMobileTranslation("mobile.checkIn");
   const handleChange = useCallback(
     (text: string) => {
       // 限制最大長度
@@ -25,7 +27,7 @@ export const DescriptionField = ({ value, onChange }: IDescriptionFieldProps) =>
     <YStack marginBottom="$6">
       <XStack justifyContent="space-between" alignItems="center" marginBottom="$2">
         <Text fontSize={14} color={colors.text.dark}>
-          詳細描述
+          {t("description_label")}
         </Text>
         <Text fontSize={14} color={colors.basic[400]}>
           {value.length}/{MAX_LENGTH}
@@ -33,7 +35,7 @@ export const DescriptionField = ({ value, onChange }: IDescriptionFieldProps) =>
       </XStack>
       <TextArea
         size="$4"
-        placeholder="簡單紀錄今天的發現，或卡關的地方"
+        placeholder={t("description_placeholder")}
         value={value}
         onChangeText={handleChange}
         numberOfLines={4}

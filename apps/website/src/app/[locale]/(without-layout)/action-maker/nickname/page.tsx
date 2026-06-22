@@ -7,7 +7,9 @@ export const metadata: Metadata = {
   robots: "noindex",
 };
 
-export default async function NicknamePage({ params }: PageProps<"/[locale]/action-maker/nickname">) {
+export default async function NicknamePage({
+  params,
+}: PageProps<"/[locale]/action-maker/nickname">) {
   const { locale } = await params;
   setRequestLocale(locale);
   return <ActionMakerNickname />;
