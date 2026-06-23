@@ -367,7 +367,6 @@ export function PracticeShowcaseCard({
                   {commentUserIslandHref ? (
                     <Link
                       href={commentUserIslandHref}
-                      // 預先載入使用者小島頁，降低點擊頭像後的等待體感
                       prefetch
                       aria-label={t("showcase_user_island_aria", { userName: commentUserName })}
                       className="shrink-0"
@@ -381,7 +380,6 @@ export function PracticeShowcaseCard({
                     {commentUserIslandHref ? (
                       <Link
                         href={commentUserIslandHref}
-                        // 預先載入使用者小島頁，降低點擊名稱後的等待體感
                         prefetch
                         className="text-xs font-semibold text-[#295E5C] mr-1.5 hover:underline"
                       >
