@@ -56,7 +56,6 @@ export function ActionMakerIntro() {
           <p className="text-lg md:text-2xl text-[#BCD5EE]">定好習慣，目標就離你不遠！</p>
 
           <div className="mt-1 md:mt-[60px] flex flex-col gap-1 text-sm md:text-lg text-[#7B9FC4]">
-            <p>總是覺得規劃新年目標很難嗎</p>
             <p>我們陪你一步一步建立小習慣</p>
             <p>每天都比昨天更進步一些</p>
           </div>

@@ -75,7 +75,7 @@ export function ActionMakerCategory() {
         <ProgressBar current={1} />
 
         <div className="flex flex-1 flex-col items-center gap-6 pt-8">
-          <h2 className="px-6 text-2xl font-bold text-white">新的一年，你想抓住哪顆星？</h2>
+          <h2 className="px-6 text-2xl font-bold text-white">你想抓住哪顆星？</h2>
 
           {/* Category carousel with loop */}
           <Carousel
