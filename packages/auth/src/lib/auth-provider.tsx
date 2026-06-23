@@ -76,7 +76,7 @@ export interface AuthProviderRouteConfig {
   onboardingPath?: string;
 
   /**
-   * 當偉測到臨時用戶時的回調函數
+   * 當偵測到臨時用戶時的回調函數
    * 如果提供了此函數，則會呼叫此函數而不是使用 onboardingPath 跳轉
    * @param currentPath 當前路徑（包含 query string）
    */
@@ -90,7 +90,7 @@ export interface AuthProviderRouteConfig {
   emailVerificationPath?: string;
 
   /**
-   * 當偉測到未驗證 email 的用戶時的回調函數
+   * 當偵測到未驗證 email 的用戶時的回調函數
    * 如果提供了此函數，則會呼叫此函數而不是使用 emailVerificationPath 跳轉
    * @param currentPath 當前路徑（包含 query string）
    */
@@ -471,6 +471,9 @@ export const AuthProvider = ({
       } else {
         onAuthRequired?.(currentUrl);
       }
+    } else if (authMode === "dialog" && isLoginDialogOpen && !loginDialogDismissible) {
+      // navigated back to a public page — close the non-dismissible login dialog
+      setIsLoginDialogOpen(false);
     }
   }, [
     pathname,
@@ -483,6 +486,8 @@ export const AuthProvider = ({
     onAuthRequired,
     authMode,
     openLoginDialog,
+    isLoginDialogOpen,
+    loginDialogDismissible,
   ]);
 
   /**
