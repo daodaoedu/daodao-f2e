@@ -26,6 +26,9 @@ import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2, ChevronDown, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+
+// Backend always stores "其他" for the "other" option (Chinese-primary platform)
+const OTHER_OPTION = "其他";
 import {
   getDateFnsLocale,
   isApiCommentNode,
@@ -76,8 +79,10 @@ function InlineFlipCard({
   const tProfile = useTranslations("persona.myProfile");
   const [answer, setAnswer] = useState("");
   const [selected, setSelected] = useState("");
+  const [otherText, setOtherText] = useState("");
 
-  const isChoice = questionType === "choice" && options && options.length > 0;
+  const isChoice = questionType === "choice" && options != null && options.length > 0;
+  const isOtherSelected = isChoice && selected === OTHER_OPTION;
 
   return (
     <div style={{ perspective: "1000px" }} className="w-full mb-4">
@@ -147,7 +152,10 @@ function InlineFlipCard({
                 <button
                   key={opt}
                   type="button"
-                  onClick={() => setSelected(opt)}
+                  onClick={() => {
+                    setSelected(opt);
+                    if (opt !== OTHER_OPTION) setOtherText("");
+                  }}
                   className={cn(
                     "w-full text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
                     selected === opt
@@ -158,6 +166,17 @@ function InlineFlipCard({
                   {opt}
                 </button>
               ))}
+              {isOtherSelected && (
+                <textarea
+                  rows={2}
+                  value={otherText}
+                  onChange={(e) => setOtherText(e.target.value)}
+                  placeholder={tProfile("otherPlaceholder")}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full rounded-xl border-2 border-logo-cyan/40 text-sm py-2 px-3 text-text-dark outline-none bg-white placeholder:text-text-dark/35 resize-none focus:border-logo-cyan"
+                  maxLength={300}
+                />
+              )}
             </div>
           ) : (
             // biome-ignore lint/a11y/noStaticElementInteractions: stop propagation
@@ -183,13 +202,23 @@ function InlineFlipCard({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (isChoice && selected) onSubmit(selected, true);
-              else if (!isChoice && answer.trim()) onSubmit(answer.trim(), false);
+              if (isChoice && selected) {
+                const submitValue = isOtherSelected ? otherText.trim() : selected;
+                if (submitValue) onSubmit(submitValue, !isOtherSelected);
+              } else if (!isChoice && answer.trim()) {
+                onSubmit(answer.trim(), false);
+              }
             }}
-            disabled={isChoice ? !selected : !answer.trim()}
+            disabled={
+              isChoice
+                ? !selected || (isOtherSelected && !otherText.trim())
+                : !answer.trim()
+            }
             className={cn(
               "shrink-0 w-full py-3 rounded-full font-medium text-base transition-all mt-4",
-              (isChoice ? selected : answer.trim())
+              (isChoice
+                ? selected && (!isOtherSelected || otherText.trim())
+                : answer.trim())
                 ? "bg-[#F5A93E] text-white"
                 : "bg-[#F5A93E]/30 text-white/70 cursor-not-allowed"
             )}

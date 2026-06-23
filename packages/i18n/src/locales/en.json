@@ -5464,6 +5464,8 @@
       "selectRequired": "Please select an option",
       "textRequired": "Please fill in your answer",
       "textPlaceholder": "Enter your answer...",
+      "otherPlaceholder": "Please describe your answer...",
+      "otherRequired": "Please fill in your answer for \"Other\"",
       "resonances": "resonances",
       "unansweredHint": "Answer to see what others think",
       "unansweredLabel": "Not answered",

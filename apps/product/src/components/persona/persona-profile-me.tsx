@@ -10,6 +10,9 @@ import { cn } from "@daodao/ui/lib/utils";
 import { RefreshCcw } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 
+// Backend always stores "其他" for the "other" option (Chinese-primary platform)
+const OTHER_OPTION = "其他";
+
 interface InlineAnswerFormProps {
   questionId: number;
   questionType: "choice" | "sentence_completion" | "scenario";
@@ -21,23 +24,32 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
   const t = useTranslations("persona");
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [textAnswer, setTextAnswer] = useState("");
+  const [otherText, setOtherText] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const isChoice = questionType === "choice" && options && options.length > 0;
+  const isChoice = questionType === "choice" && options != null && options.length > 0;
+  const isOtherSelected = isChoice && selectedValue === OTHER_OPTION;
 
   const handleSubmit = async () => {
-    const body = isChoice
-      ? { questionId, selectedValue: selectedValue || undefined }
-      : { questionId, textAnswer: textAnswer.trim() || undefined };
-
-    if (isChoice && !selectedValue) {
-      toast.error(t("myProfile.selectRequired"));
-      return;
-    }
-    if (!isChoice && !textAnswer.trim()) {
+    if (isChoice) {
+      if (!selectedValue) {
+        toast.error(t("myProfile.selectRequired"));
+        return;
+      }
+      if (isOtherSelected && !otherText.trim()) {
+        toast.error(t("myProfile.otherRequired"));
+        return;
+      }
+    } else if (!textAnswer.trim()) {
       toast.error(t("myProfile.textRequired"));
       return;
     }
+
+    const body = isChoice
+      ? isOtherSelected
+        ? { questionId, textAnswer: otherText.trim() }
+        : { questionId, selectedValue }
+      : { questionId, textAnswer: textAnswer.trim() };
 
     setSubmitting(true);
     try {
@@ -54,6 +66,10 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
     }
   };
 
+  const isSubmitDisabled =
+    submitting ||
+    (isChoice ? !selectedValue || (isOtherSelected && !otherText.trim()) : !textAnswer.trim());
+
   if (isChoice) {
     return (
       <div className="flex flex-col gap-3 mt-3">
@@ -64,7 +80,10 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => setSelectedValue(opt)}
+              onClick={() => {
+                setSelectedValue(opt);
+                if (opt !== OTHER_OPTION) setOtherText("");
+              }}
               className={cn(
                 "rounded-full border text-sm h-auto py-1.5 px-3",
                 selectedValue === opt
@@ -76,7 +95,16 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
             </Button>
           ))}
         </div>
-        <Button size="sm" onClick={handleSubmit} disabled={submitting || !selectedValue}>
+        {isOtherSelected && (
+          <Textarea
+            value={otherText}
+            onChange={(e) => setOtherText(e.target.value)}
+            placeholder={t("myProfile.otherPlaceholder")}
+            rows={3}
+            maxLength={300}
+          />
+        )}
+        <Button size="sm" onClick={handleSubmit} disabled={isSubmitDisabled}>
           {submitting ? t("myProfile.submitting") : t("myProfile.submit")}
         </Button>
       </div>
@@ -92,7 +120,7 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
         rows={3}
         maxLength={300}
       />
-      <Button size="sm" onClick={handleSubmit} disabled={submitting || !textAnswer.trim()}>
+      <Button size="sm" onClick={handleSubmit} disabled={isSubmitDisabled}>
         {submitting ? t("myProfile.submitting") : t("myProfile.submit")}
       </Button>
     </div>
