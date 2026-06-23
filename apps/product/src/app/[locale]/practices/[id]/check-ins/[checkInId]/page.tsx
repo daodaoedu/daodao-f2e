@@ -11,7 +11,7 @@ import { useTranslations } from "@daodao/i18n";
 import { useParams, useSearchParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { addDays, format, isValid, parse } from "date-fns";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import {
   CheckInButton,
   CheckInDateSelector,
@@ -74,7 +74,7 @@ const generateFullDateRange = (
   return dates;
 };
 
-export default function CheckInDetailPage() {
+function CheckInDetailContent() {
   const t = useTranslations("practice");
   const params = useParams();
   const searchParams = useSearchParams();
@@ -341,5 +341,13 @@ export default function CheckInDetailPage() {
         </footer>
       )}
     </div>
+  );
+}
+
+export default function CheckInDetailPage() {
+  return (
+    <Suspense>
+      <CheckInDetailContent />
+    </Suspense>
   );
 }
