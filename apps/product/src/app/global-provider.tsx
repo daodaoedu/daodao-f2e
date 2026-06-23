@@ -51,6 +51,7 @@ function GlobalProvider({
                   <SheetManagerProvider>
                     <AuthProvider
                       defaultProtected
+                      authMode="dialog"
                       publicPattern={[
                         // auth flows
                         "^/auth/",
@@ -62,15 +63,11 @@ function GlobalProvider({
                         "^/roadmap(/.*)?$",
                         "^/resource(/.*)?$",
                         "^/persona(/.*)?$",
-                        "^/mine(/.*)?$",
                         "^/survey/r/",
                         // misc
                         "^/dev/",
                         "^/ux-mockup/",
                       ]}
-                      onAuthRequired={(currentPath) => {
-                        router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
-                      }}
                       onboardingPath="/auth/onboarding"
                       onTemporaryUser={() => {
                         router.push("/auth/onboarding");

@@ -12,6 +12,7 @@ import { getStorage, getStorageKey, StorageEnum } from "@daodao/shared";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { LoginDialog } from "../components/login-dialog";
 import type { AuthContextValue, StoredUser } from "../types";
+import { isProtectedPath, removeLocalePrefix } from "../utils/route-protection";
 import { initiateOAuthLogin } from "./auth-client";
 import { DEFAULT_REDIRECT_URL } from "./auth-constants";
 
@@ -75,7 +76,7 @@ export interface AuthProviderRouteConfig {
   onboardingPath?: string;
 
   /**
-   * 當偵測到臨時用戶時的回調函數
+   * 當偉測到臨時用戶時的回調函數
    * 如果提供了此函數，則會呼叫此函數而不是使用 onboardingPath 跳轉
    * @param currentPath 當前路徑（包含 query string）
    */
@@ -89,11 +90,18 @@ export interface AuthProviderRouteConfig {
   emailVerificationPath?: string;
 
   /**
-   * 當偵測到未驗證 email 的用戶時的回調函數
+   * 當偉測到未驗證 email 的用戶時的回調函數
    * 如果提供了此函數，則會呼叫此函數而不是使用 emailVerificationPath 跳轉
    * @param currentPath 當前路徑（包含 query string）
    */
   onEmailUnverified?: (currentPath: string) => void;
+
+  /**
+   * 當路徑需要保護且未登入時的提示模式
+   * - 'redirect'（預設）：呼叫 onAuthRequired，通常為跳轉至登入頁
+   * - 'dialog'：直接開啟內建 LoginDialog，使用者可在當前畫面登入
+   */
+  authMode?: "redirect" | "dialog";
 }
 
 interface AuthProviderProps {
@@ -107,81 +115,8 @@ interface AuthProviderProps {
   onTemporaryUser?: (currentPath: string) => void;
   emailVerificationPath?: string;
   onEmailUnverified?: (currentPath: string) => void;
+  authMode?: "redirect" | "dialog";
 }
-
-/**
- * 檢查路徑是否匹配給定的正則表達式字串
- */
-const matchesPath = (pathname: string, pattern: string): boolean => {
-  try {
-    const regex = new RegExp(pattern);
-    return regex.test(pathname);
-  } catch (error) {
-    // 如果正則表達式無效，記錄錯誤並返回 false
-    console.error(`Invalid regex pattern: ${pattern}`, error);
-    return false;
-  }
-};
-
-/**
- * 移除 pathname 中的 locale 前綴
- */
-const removeLocalePrefix = (pathname: string): string => {
-  const segments = pathname.split("/").filter(Boolean);
-  if (segments.length === 0) {
-    return pathname;
-  }
-
-  const firstSegment = segments[0];
-  // 檢查是否是有效的 locale
-  if (firstSegment && routing.locales.includes(firstSegment as (typeof routing.locales)[number])) {
-    const remainingPath = segments.slice(1).join("/");
-    return remainingPath ? `/${remainingPath}` : "/";
-  }
-
-  return pathname;
-};
-
-/**
- * 將路徑模式標準化為陣列
- */
-const normalizePathPattern = (pattern: PathPattern | undefined): string[] => {
-  if (!pattern) {
-    return [];
-  }
-  if (typeof pattern === "string") {
-    return [pattern];
-  }
-  return pattern;
-};
-
-/**
- * 檢查路徑是否需要保護
- */
-const isProtectedPath = (
-  pathname: string,
-  config: Pick<AuthProviderRouteConfig, "publicPattern" | "protectedPattern" | "defaultProtected">
-): boolean => {
-  // 移除 locale 前綴以便匹配
-  const pathnameWithoutLocale = removeLocalePrefix(pathname);
-
-  // 將路徑模式標準化為陣列
-  const publicPatterns = normalizePathPattern(config.publicPattern);
-  const protectedPatterns = normalizePathPattern(config.protectedPattern);
-
-  // 檢查是否為公開路徑（優先級最高）
-  if (publicPatterns.some((pattern) => matchesPath(pathnameWithoutLocale, pattern))) {
-    return false;
-  }
-
-  // 如果指定了 protectedPattern，只保護這些路徑
-  if (protectedPatterns.length > 0) {
-    return protectedPatterns.some((pattern) => matchesPath(pathnameWithoutLocale, pattern));
-  }
-
-  // 根據 defaultProtected 設定決定是否保護所有路徑
-  return config.defaultProtected !== false;
-};
 
 /**
  * Auth Provider 組件
@@ -198,6 +133,7 @@ export const AuthProvider = ({
   onTemporaryUser,
   emailVerificationPath,
   onEmailUnverified,
+  authMode = "redirect",
 }: AuthProviderProps) => {
   const [user, setUser] = useState<StoredUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -395,49 +331,7 @@ export const AuthProvider = ({
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [checkAuth, isAuthenticated]);
 
-  /**
-   * 路由保護：檢查當前路徑是否需要登入
-   * 如果未登入且路徑需要保護，重定向到登入頁面
-   */
-  useEffect(() => {
-    // 如果禁用路由保護，直接返回
-    if (!enableRouteProtection) {
-      return;
-    }
-
-    // 如果還在載入中，不進行檢查
-    if (isLoading) {
-      return;
-    }
-
-    // 如果已登入，不需要檢查
-    if (isAuthenticated) {
-      return;
-    }
-
-    // 檢查當前路徑是否需要保護
-    const needsProtection = isProtectedPath(pathname, {
-      publicPattern: publicPattern,
-      protectedPattern: protectedPattern,
-      defaultProtected: defaultProtected,
-    });
-
-    if (needsProtection) {
-      // 需要保護但未登入
-      const currentUrl = pathname + (typeof window !== "undefined" ? window.location.search : "");
-
-      onAuthRequired?.(currentUrl);
-    }
-  }, [
-    pathname,
-    isAuthenticated,
-    isLoading,
-    publicPattern,
-    protectedPattern,
-    defaultProtected,
-    enableRouteProtection,
-    onAuthRequired,
-  ]);
+  // NOTE: route protection effect is placed after openLoginDialog definition below
 
   /**
    * 臨時用戶處理：如果用戶是臨時用戶，跳轉到 onboarding 頁面
@@ -454,7 +348,7 @@ export const AuthProvider = ({
     }
 
     // 移除 locale 前綴後檢查是否已在 onboarding 頁面
-    const pathnameWithoutLocale = removeLocalePrefix(pathname);
+    const pathnameWithoutLocale = removeLocalePrefix(pathname, [...routing.locales]);
     const isOnOnboardingPage = onboardingPath
       ? pathnameWithoutLocale.startsWith(onboardingPath)
       : false;
@@ -491,7 +385,7 @@ export const AuthProvider = ({
     }
 
     // 移除 locale 前綴後檢查路徑
-    const pathnameWithoutLocale = removeLocalePrefix(pathname);
+    const pathnameWithoutLocale = removeLocalePrefix(pathname, [...routing.locales]);
 
     // 如果在 email 驗證頁面，不需要跳轉
     const isOnVerificationPage = emailVerificationPath
@@ -553,6 +447,43 @@ export const AuthProvider = ({
     },
     []
   );
+
+  /**
+   * 路由保護：檢查當前路徑是否需要登入
+   * authMode='dialog' 時開啟內建 LoginDialog；'redirect' 時呼叫 onAuthRequired
+   */
+  useEffect(() => {
+    if (!enableRouteProtection || isLoading || isAuthenticated) {
+      return;
+    }
+
+    const needsProtection = isProtectedPath(
+      pathname,
+      { publicPattern, protectedPattern, defaultProtected },
+      [...routing.locales]
+    );
+
+    if (needsProtection) {
+      const currentUrl = pathname + (typeof window !== "undefined" ? window.location.search : "");
+
+      if (authMode === "dialog") {
+        openLoginDialog({ redirectUrl: currentUrl, dismissible: false });
+      } else {
+        onAuthRequired?.(currentUrl);
+      }
+    }
+  }, [
+    pathname,
+    isAuthenticated,
+    isLoading,
+    publicPattern,
+    protectedPattern,
+    defaultProtected,
+    enableRouteProtection,
+    onAuthRequired,
+    authMode,
+    openLoginDialog,
+  ]);
 
   /**
    * 需要登入時自動打開 Dialog，如果已登入則執行回調
