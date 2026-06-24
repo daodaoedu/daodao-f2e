@@ -14,7 +14,7 @@ export function reorderFeedItems(items: FeedItem[], currentUserId?: string | nul
   // Rule ③: collect practice_ids that have at least one check-in
   const practiceIdsWithCheckins = new Set<string>();
   for (const item of items) {
-    if (item.type === "checkin") {
+    if (item.type === "checkin" && item.data.practice?.id) {
       practiceIdsWithCheckins.add(item.data.practice.id);
     }
   }
@@ -36,7 +36,7 @@ export function reorderFeedItems(items: FeedItem[], currentUserId?: string | nul
       } else if (!practiceIdsWithCheckins.has(item.data.id)) {
         // Rule ③: suppress practice card when a check-in exists for the same practice
         // Rule ④: exclude non-brewing practices that have no content (no check-ins ever recorded)
-        const hasContent = item.data.last_checkin_summary !== null && item.data.last_checkin_summary !== undefined;
+        const hasContent = item.data.last_checkin_summary != null;
         const isBrewing = item.data.is_brewing === true;
         if (hasContent || isBrewing) {
           practices.push(item);
