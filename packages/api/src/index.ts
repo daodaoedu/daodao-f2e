@@ -16,5 +16,8 @@ export { useMutate } from "./hooks";
 // Export domain-specific services
 export * from "./services";
 
+// Export utilities
+export { reorderFeedItems } from "./utils/feed-reorder";
+
 // Export SWR configuration
 export * from "./swr-config";
