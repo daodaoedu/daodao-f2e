@@ -22,8 +22,8 @@ import {
   REACTION_CONFIG,
   type ReactionTypeType,
 } from "@/constants/reaction-type";
-import { extractCommentSegments } from "./comment-url-segments";
 import { tokenizeMentionContent } from "./comment-mentions";
+import { extractCommentSegments } from "./comment-url-segments";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
 const PREVIEW_COUNT = 2;

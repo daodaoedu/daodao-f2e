@@ -25,6 +25,7 @@ export interface INotificationActor {
   id?: string;
   name: string;
   photoURL?: string;
+  customId?: string | null;
 }
 
 export interface INotificationPractice {
@@ -310,7 +311,7 @@ export function NotificationItem({
       {/* 頭像 */}
       {actor.id ? (
         <CustomLink
-          href={`/users/${actor.id}`}
+          href={`/users/${actor.customId ?? actor.id}`}
           className="shrink-0"
           onClick={(e) => e.stopPropagation()}
         >

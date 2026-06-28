@@ -46,6 +46,7 @@ interface PracticeShowcaseCardProps {
     id: string;
     name: string;
     photoUrl?: string | null;
+    customId?: string | null;
   };
   actionDescription?: string | null;
   frequencyMinDays?: number | null;
@@ -143,6 +144,7 @@ export function PracticeShowcaseCard({
       id: item.userId,
       name: item.name,
       photoURL: item.photoURL ?? undefined,
+      customId: item.customId,
       time: formatRelativeTime(item.reactedAt, locale),
       reaction: item.reactionType as ReactionTypeType,
     }));
@@ -266,7 +268,7 @@ export function PracticeShowcaseCard({
             // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
             // biome-ignore lint/a11y/noStaticElementInteractions: stop card click
             <span onClick={(e) => e.stopPropagation()}>
-              <Link href={`/users/${user.id}`} prefetch className="shrink-0">
+              <Link href={`/users/${user.customId ?? user.id}`} prefetch className="shrink-0">
                 <Avatar className="size-16">
                   {user.photoUrl && <AvatarImage src={user.photoUrl} />}
                   <AvatarFallback>

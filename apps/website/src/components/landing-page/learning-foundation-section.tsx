@@ -72,9 +72,7 @@ function PracticeCard({
           </span>
           <h3 className="mt-3 text-2xl font-bold text-primary-darker">{title}</h3>
           <p className="mt-2 text-sm text-basic-400">{description}</p>
-          {userName && (
-            <p className="mt-1 text-xs text-basic-400/60">{userName} 正在實踐</p>
-          )}
+          {userName && <p className="mt-1 text-xs text-basic-400/60">{userName} 正在實踐</p>}
         </div>
 
         {isActive && (
@@ -134,7 +132,7 @@ export function LearningFoundationSection() {
         description={practice.practiceAction || ""}
         frequency={formatFrequency(
           practice.frequencyMinDays ?? null,
-          practice.frequencyMaxDays ?? null,
+          practice.frequencyMaxDays ?? null
         )}
         frequencyUnit="天/週"
         duration={String(practice.sessionDurationMinutes ?? 30)}
@@ -183,12 +181,7 @@ export function LearningFoundationSection() {
               <Loader2 className="size-8 animate-spin text-primary-base" />
             </div>
           ) : cards.length > 0 ? (
-            <Stack
-              cards={cards}
-              sendToBackOnClick
-              sensitivity={80}
-              renderCount={3}
-            />
+            <Stack cards={cards} sendToBackOnClick sensitivity={80} renderCount={3} />
           ) : (
             <div className="flex h-full items-center justify-center text-basic-400">
               暫無實踐資料

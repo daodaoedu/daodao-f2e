@@ -21,8 +21,8 @@ import type { MentionCandidate } from "@daodao/features-mention";
 import { useLocale, useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
-import { toast } from "@daodao/ui/components/sonner";
 import { CustomLink } from "@daodao/ui/components/custom-link";
+import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2, ChevronDown, X } from "lucide-react";
 import Image from "next/image";
@@ -36,9 +36,8 @@ import {
 import { CommentSection, ReactionPickerButton } from "@/components/check-in/reactions";
 import type { IComment } from "@/components/check-in/reactions/comment-section";
 import { BackgroundAnimation } from "@/components/layout";
-import { resolvePersonaCloseTarget } from "@/utils/persona-close-navigation";
 import type { ReactionTypeType } from "@/constants/reaction-type";
-
+import { resolvePersonaCloseTarget } from "@/utils/persona-close-navigation";
 
 function QuoteSvg({ className }: { className?: string }) {
   return (
@@ -230,11 +229,7 @@ function InlineFlipCard({
                 onSubmit(answer.trim(), false);
               }
             }}
-            disabled={
-              isChoice
-                ? isCustomAnswer ? !customText.trim() : !selected
-                : !answer.trim()
-            }
+            disabled={isChoice ? (isCustomAnswer ? !customText.trim() : !selected) : !answer.trim()}
             className={cn(
               "shrink-0 w-full py-3 rounded-full font-medium text-base transition-all mt-4",
               (isChoice ? (isCustomAnswer ? customText.trim() : selected) : answer.trim())
@@ -500,7 +495,7 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
     >
       <div className="flex items-start gap-3">
         {item.userId ? (
-          <CustomLink href={`/users/${item.userId}`} className="shrink-0 mt-0.5">
+          <CustomLink href={`/users/${item.customId ?? item.userId}`} className="shrink-0 mt-0.5">
             {item.photoURL ? (
               <Image
                 src={item.photoURL}
@@ -530,7 +525,7 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
           <div className="flex items-center gap-2 mb-1.5">
             {item.userId ? (
               <CustomLink
-                href={`/users/${item.userId}`}
+                href={`/users/${item.customId ?? item.userId}`}
                 className={cn(
                   "text-sm font-semibold hover:underline",
                   item.isSelf ? "text-logo-cyan" : "text-text-dark"

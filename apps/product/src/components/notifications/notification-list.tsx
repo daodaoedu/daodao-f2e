@@ -52,6 +52,7 @@ function apiItemToDisplay(item: NotificationApiItem, locale: string): INotificat
       id: item.actor.id ? String(item.actor.id) : undefined,
       name: item.actor.name,
       photoURL: item.actor.photoURL,
+      customId: item.actor.customId,
     },
     practice: item.practiceTitle
       ? { id: item.entityId ?? "", name: item.practiceTitle }
