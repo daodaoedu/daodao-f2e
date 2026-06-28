@@ -35,7 +35,7 @@ import { CommentSection, ReactionPickerButton } from "@/components/check-in/reac
 import type { IComment } from "@/components/check-in/reactions/comment-section";
 import { BackgroundAnimation } from "@/components/layout";
 import type { ReactionTypeType } from "@/constants/reaction-type";
-import { OTHER_OPTION_VALUE } from "@/components/persona/other-option-utils";
+
 
 function QuoteSvg({ className }: { className?: string }) {
   return (
@@ -77,10 +77,10 @@ function InlineFlipCard({
   const tProfile = useTranslations("persona.myProfile");
   const [answer, setAnswer] = useState("");
   const [selected, setSelected] = useState("");
-  const [otherText, setOtherText] = useState("");
+  const [isCustomAnswer, setIsCustomAnswer] = useState(false);
+  const [customText, setCustomText] = useState("");
 
   const isChoice = questionType === "choice" && options != null && options.length > 0;
-  const isOtherSelected = isChoice && selected === OTHER_OPTION_VALUE;
 
   return (
     <div style={{ perspective: "1000px" }} className="w-full mb-4">
@@ -152,11 +152,12 @@ function InlineFlipCard({
                   type="button"
                   onClick={() => {
                     setSelected(opt);
-                    if (opt !== OTHER_OPTION_VALUE) setOtherText("");
+                    setIsCustomAnswer(false);
+                    setCustomText("");
                   }}
                   className={cn(
                     "w-full text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
-                    selected === opt
+                    !isCustomAnswer && selected === opt
                       ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
                       : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
                   )}
@@ -164,11 +165,26 @@ function InlineFlipCard({
                   {opt}
                 </button>
               ))}
-              {isOtherSelected && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelected("");
+                  setIsCustomAnswer(true);
+                }}
+                className={cn(
+                  "w-full text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
+                  isCustomAnswer
+                    ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
+                    : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
+                )}
+              >
+                {tProfile("otherOption")}
+              </button>
+              {isCustomAnswer && (
                 <textarea
                   rows={2}
-                  value={otherText}
-                  onChange={(e) => setOtherText(e.target.value)}
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
                   placeholder={t("thoughtPlaceholder")}
                   maxLength={300}
                   className="w-full border-2 border-logo-cyan rounded-xl text-sm text-text-dark outline-none bg-transparent placeholder:text-text-dark/25 p-3 resize-none"
@@ -199,24 +215,24 @@ function InlineFlipCard({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (isChoice && selected) {
-                if (isOtherSelected && otherText.trim()) {
-                  onSubmit(otherText.trim(), false);
-                } else if (!isOtherSelected) {
+              if (isChoice) {
+                if (isCustomAnswer && customText.trim()) {
+                  onSubmit(customText.trim(), false);
+                } else if (!isCustomAnswer && selected) {
                   onSubmit(selected, true);
                 }
-              } else if (!isChoice && answer.trim()) {
+              } else if (answer.trim()) {
                 onSubmit(answer.trim(), false);
               }
             }}
             disabled={
               isChoice
-                ? !selected || (isOtherSelected && !otherText.trim())
+                ? isCustomAnswer ? !customText.trim() : !selected
                 : !answer.trim()
             }
             className={cn(
               "shrink-0 w-full py-3 rounded-full font-medium text-base transition-all mt-4",
-              (isChoice ? (isOtherSelected ? otherText.trim() : selected) : answer.trim())
+              (isChoice ? (isCustomAnswer ? customText.trim() : selected) : answer.trim())
                 ? "bg-[#F5A93E] text-white"
                 : "bg-[#F5A93E]/30 text-white/70 cursor-not-allowed"
             )}

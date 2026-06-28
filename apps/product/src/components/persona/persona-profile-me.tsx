@@ -9,7 +9,7 @@ import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { RefreshCcw } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import { OTHER_OPTION_VALUE, buildPersonaAnswerBody } from "./other-option-utils";
+import { buildPersonaAnswerBody } from "./other-option-utils";
 
 interface InlineAnswerFormProps {
   questionId: number;
@@ -22,19 +22,19 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
   const t = useTranslations("persona");
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [textAnswer, setTextAnswer] = useState("");
-  const [otherText, setOtherText] = useState("");
+  const [isCustomAnswer, setIsCustomAnswer] = useState(false);
+  const [customText, setCustomText] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const isChoice = questionType === "choice" && options != null && options.length > 0;
-  const isOtherSelected = isChoice && selectedValue === OTHER_OPTION_VALUE;
 
   const handleSubmit = async () => {
     if (isChoice) {
-      if (!selectedValue) {
+      if (!isCustomAnswer && !selectedValue) {
         toast.error(t("myProfile.selectRequired"));
         return;
       }
-      if (isOtherSelected && !otherText.trim()) {
+      if (isCustomAnswer && !customText.trim()) {
         toast.error(t("myProfile.textRequired"));
         return;
       }
@@ -48,7 +48,8 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
       !!isChoice,
       selectedValue,
       textAnswer,
-      otherText
+      isCustomAnswer,
+      customText
     );
 
     setSubmitting(true);
@@ -78,11 +79,12 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
               size="sm"
               onClick={() => {
                 setSelectedValue(opt);
-                if (opt !== OTHER_OPTION_VALUE) setOtherText("");
+                setIsCustomAnswer(false);
+                setCustomText("");
               }}
               className={cn(
                 "rounded-full border text-sm h-auto py-1.5 px-3",
-                selectedValue === opt
+                !isCustomAnswer && selectedValue === opt
                   ? "bg-logo-cyan text-white border-logo-cyan hover:bg-logo-cyan hover:text-white"
                   : "border-gray-300 text-gray-700 hover:border-logo-cyan/40 hover:text-gray-700"
               )}
@@ -90,11 +92,28 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
               {opt}
             </Button>
           ))}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setSelectedValue("");
+              setIsCustomAnswer(true);
+            }}
+            className={cn(
+              "rounded-full border text-sm h-auto py-1.5 px-3",
+              isCustomAnswer
+                ? "bg-logo-cyan text-white border-logo-cyan hover:bg-logo-cyan hover:text-white"
+                : "border-gray-300 text-gray-700 hover:border-logo-cyan/40 hover:text-gray-700"
+            )}
+          >
+            {t("myProfile.otherOption")}
+          </Button>
         </div>
-        {isOtherSelected && (
+        {isCustomAnswer && (
           <Textarea
-            value={otherText}
-            onChange={(e) => setOtherText(e.target.value)}
+            value={customText}
+            onChange={(e) => setCustomText(e.target.value)}
             placeholder={t("myProfile.textPlaceholder")}
             rows={3}
             maxLength={300}
@@ -103,7 +122,7 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
         <Button
           size="sm"
           onClick={handleSubmit}
-          disabled={submitting || !selectedValue || (isOtherSelected && !otherText.trim())}
+          disabled={submitting || (!isCustomAnswer && !selectedValue) || (isCustomAnswer && !customText.trim())}
         >
           {submitting ? t("myProfile.submitting") : t("myProfile.submit")}
         </Button>
