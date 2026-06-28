@@ -119,8 +119,12 @@ export default async function UserProfilePage({
     notFound();
   }
 
-  const userData = userResponse.data?.data;
+  const userData = userResponse.data?.data ?? userResponse.data;
   const profileData = profileResponse?.data;
+
+  if (!userData) {
+    notFound();
+  }
 
   // 用 UUID 訪問且使用者有設 customId 時，redirect 到 customId 版本的網址
   if (UUID_REGEX.test(identifier) && userData?.customId && identifier !== userData.customId) {

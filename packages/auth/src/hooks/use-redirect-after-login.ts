@@ -84,9 +84,10 @@ export const useRedirectAfterLogin = () => {
     } else {
       // 舊用戶跳轉到原目標頁面
       // 過濾掉不適合作為登入後落地頁的路徑（設定頁、錯誤頁）
+      const redirectUrl = state.redirectUrl ?? DEFAULT_REDIRECT_URL;
       const isUnwantedLanding =
-        state.redirectUrl.includes("/auth/error") || state.redirectUrl.includes("/settings");
-      hardNavigate(isUnwantedLanding ? DEFAULT_REDIRECT_URL : state.redirectUrl);
+        redirectUrl.includes("/auth/error") || redirectUrl.includes("/settings");
+      hardNavigate(isUnwantedLanding ? DEFAULT_REDIRECT_URL : redirectUrl);
     }
   }, [searchParams]);
 };

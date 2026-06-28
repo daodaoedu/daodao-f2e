@@ -470,6 +470,7 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
   const isLong = answer.length > 70;
   const displayName = item.name ?? "??";
   const initial = displayName[0] ?? "?";
+  const profileLink = item.customId || item.userId;
 
   const AVATAR_COLORS = [
     "#F5A93E",
@@ -492,10 +493,10 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
           ? "bg-logo-cyan/[0.06] border border-logo-cyan/20"
           : "bg-white border border-[#EEF4F4]"
       )}
-    >
+      >
       <div className="flex items-start gap-3">
         {item.userId ? (
-          <CustomLink href={`/users/${item.customId ?? item.userId}`} className="shrink-0 mt-0.5">
+          <CustomLink href={`/users/${profileLink}`} className="shrink-0 mt-0.5">
             {item.photoURL ? (
               <Image
                 src={item.photoURL}
@@ -524,13 +525,10 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5">
             {item.userId ? (
-              <CustomLink
-                href={`/users/${item.customId ?? item.userId}`}
-                className={cn(
-                  "text-sm font-semibold hover:underline",
-                  item.isSelf ? "text-logo-cyan" : "text-text-dark"
-                )}
-              >
+              <CustomLink href={`/users/${profileLink}`} className={cn(
+                "text-sm font-semibold hover:underline",
+                item.isSelf ? "text-logo-cyan" : "text-text-dark"
+              )}>
                 {displayName}
               </CustomLink>
             ) : (

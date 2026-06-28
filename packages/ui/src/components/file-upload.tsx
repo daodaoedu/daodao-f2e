@@ -7,14 +7,27 @@ import * as React from "react";
 import { cn } from "../lib/utils";
 
 // 使用 FileReader data URL 取代 blob URL，避免 blob 生命週期問題（Strict Mode、in-app browser）
+const MAX_PREVIEW_FILE_SIZE = 5 * 1024 * 1024;
+
 const FilePreviewImage = ({ file, index }: { file: File; index: number }) => {
   const [dataUrl, setDataUrl] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    if (file.size > MAX_PREVIEW_FILE_SIZE) {
+      console.error(`File too large for preview: ${file.name}`);
+      return;
+    }
+
     let cancelled = false;
     const reader = new FileReader();
     reader.onload = () => {
       if (!cancelled) setDataUrl(reader.result as string);
+    };
+    reader.onerror = () => {
+      if (!cancelled) {
+        setDataUrl(null);
+        console.error(`Failed to read file for preview: ${file.name}`);
+      }
     };
     reader.readAsDataURL(file);
 
