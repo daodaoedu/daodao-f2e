@@ -1,6 +1,6 @@
 "use client";
 
-import { type FeedItem, useFeed, useMyPracticeStats, useMyPractices } from "@daodao/api";
+import { useMyPracticeStats, useMyPractices } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
@@ -15,10 +15,7 @@ import {
   RecommendationSection,
 } from "@/components/dashboard";
 import { BackgroundAnimation, Banner } from "@/components/layout";
-import {
-  type IFeedPracticeItem,
-  RandomPracticesSection,
-} from "@/components/practice/shared/random-practices-section";
+import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 import {
   FilterStatus,
@@ -41,7 +38,6 @@ export default function MyPage() {
 
   const { data: allPracticesData, isLoading: isMyLoading } = useMyPractices({ limit: 16 });
   const { data: statsData } = useMyPracticeStats();
-  const { feedItems } = useFeed({});
 
   const { inProgressTasks } = useMemo(() => {
     const practices = allPracticesData?.data || [];
@@ -97,18 +93,6 @@ export default function MyPage() {
 
   const hasPractices = inProgressTasks.length > 0;
 
-  const feedPractices = useMemo((): IFeedPracticeItem[] => {
-    return feedItems
-      .filter((item): item is Extract<FeedItem, { type: "practice" }> => item.type === "practice")
-      .slice(0, 3)
-      .map((item) => ({
-        id: item.data.id,
-        title: item.data.title,
-        description: item.data.practice_action ?? "",
-        userName: item.data.user?.name,
-      }));
-  }, [feedItems]);
-
   const filterCounts = useMemo(() => {
     const counts = {
       [FilterStatus.all]: 0,
@@ -160,7 +144,7 @@ export default function MyPage() {
           ) : (
             <>
               <DashboardHeader stats={stats} />
-              {!hasPractices && <RandomPracticesSection compact feedPractices={feedPractices} />}
+              {!hasPractices && <RandomPracticesSection compact />}
               {hasPractices && (
                 <>
                   <div className="mb-4">

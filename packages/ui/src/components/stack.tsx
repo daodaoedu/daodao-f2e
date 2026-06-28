@@ -57,6 +57,7 @@ interface StackProps {
   pauseOnHover?: boolean;
   mobileClickOnly?: boolean;
   mobileBreakpoint?: number;
+  renderCount?: number;
 }
 
 export default function Stack({
@@ -70,6 +71,7 @@ export default function Stack({
   pauseOnHover = false,
   mobileClickOnly = false,
   mobileBreakpoint = 768,
+  renderCount,
 }: StackProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -140,7 +142,7 @@ export default function Stack({
         onMouseLeave: () => setIsPaused(false),
       })}
     >
-      {stack.map((card, index) => {
+      {stack.slice(renderCount ? -renderCount : 0).map((card, index, visibleStack) => {
         const randomRotate = randomRotation ? Math.random() * 10 - 5 : 0;
         return (
           <CardRotate
@@ -153,7 +155,7 @@ export default function Stack({
               className="rounded-2xl overflow-hidden w-full h-full"
               onClick={() => shouldEnableClick && sendToBack(card.id)}
               animate={{
-                rotateZ: (stack.length - index - 1) * 5 + randomRotate,
+                rotateZ: (visibleStack.length - index - 1) * 5 + randomRotate,
                 transformOrigin: "70% 160%",
               }}
               initial={false}

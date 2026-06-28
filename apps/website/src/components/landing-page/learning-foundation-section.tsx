@@ -1,6 +1,6 @@
 "use client";
 
-import { type PracticeTemplateType, usePracticeTemplates } from "@daodao/api";
+import { usePublicPractices } from "@daodao/api";
 import { BlueSvg, GreenSvg, PinkSvg, YellowSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { ANCHOR_IDS } from "@daodao/shared";
@@ -9,7 +9,6 @@ import Stack from "@daodao/ui/components/stack";
 import { ChevronRight, Loader2 } from "lucide-react";
 import { useCallback, useMemo } from "react";
 
-// 主題 SVG 背景組件映射（參考 product/src/constants/practice-theme.ts）
 const themeSvgMap = {
   yellow: YellowSvg,
   blue: BlueSvg,
@@ -19,30 +18,14 @@ const themeSvgMap = {
 
 type PracticeTheme = keyof typeof themeSvgMap;
 
-// 主題循環陣列，用於動態分配主題
 const themeOrder: PracticeTheme[] = ["yellow", "pink", "blue", "green"];
 
-// Product App URL
 const PRODUCT_APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://app.daodao.so";
 
-// 將 API 頻率轉換為顯示格式
 const formatFrequency = (minDays: number | null, maxDays: number | null): string => {
   if (minDays === null || maxDays === null) return "3-5";
   return `${minDays}-${maxDays}`;
 };
-
-// 將模板資料轉換為卡片格式
-const convertTemplateToCard = (template: PracticeTemplateType, index: number) => ({
-  id: template.id,
-  title: template.title,
-  description: template.practiceAction || template.suggestedTags?.join("、") || template.title,
-  frequency: formatFrequency(template.frequencyMinDays, template.frequencyMaxDays),
-  frequencyUnit: "天/週",
-  duration: String(template.sessionDurationMinutes ?? 30),
-  durationUnit: "分/次",
-  theme: themeOrder[index % themeOrder.length] as PracticeTheme,
-  templateId: template.id,
-});
 
 function PracticeCard({
   tag,
@@ -53,7 +36,8 @@ function PracticeCard({
   duration,
   durationUnit,
   theme,
-  templateId,
+  practiceId,
+  userName,
   isActive = false,
   onClick,
 }: {
@@ -65,23 +49,22 @@ function PracticeCard({
   duration: string;
   durationUnit: string;
   theme: PracticeTheme;
-  templateId: string;
+  practiceId: string;
+  userName?: string;
   isActive?: boolean;
-  onClick?: (templateId: string) => void;
+  onClick?: (practiceId: string) => void;
 }) {
   const ThemeSvg = themeSvgMap[theme];
 
   const handleIconClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onClick?.(templateId);
+    onClick?.(practiceId);
   };
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-2xl text-left">
-      {/* SVG 背景 */}
       <ThemeSvg className="absolute inset-0 size-full" preserveAspectRatio="xMidYMid slice" />
 
-      {/* 內容層 */}
       <div className="relative flex h-full flex-col justify-between p-6">
         <div>
           <span className="inline-block rounded-full border border-primary-base bg-white/70 px-3 py-1 text-xs font-medium text-primary-darker">
@@ -89,21 +72,22 @@ function PracticeCard({
           </span>
           <h3 className="mt-3 text-2xl font-bold text-primary-darker">{title}</h3>
           <p className="mt-2 text-sm text-basic-400">{description}</p>
+          {userName && (
+            <p className="mt-1 text-xs text-basic-400/60">{userName} 正在實踐</p>
+          )}
         </div>
 
-        {/* Speech bubble - 只有當前顯示的卡片顯示 */}
         {isActive && (
           <div className="mt-4 flex justify-end">
             <div className="relative">
               <div className="rounded-lg bg-basic-500 px-4 py-2 text-sm text-white">
-                喜歡嗎？馬上開始！
+                一起來實踐吧！
               </div>
               <div className="absolute -bottom-2 right-8 size-0 border-x-8 border-t-8 border-x-transparent border-t-basic-500" />
             </div>
           </div>
         )}
 
-        {/* Stats + next button */}
         <div className="mt-4 flex items-end justify-between">
           <div className="flex items-baseline gap-4">
             <div className="flex items-baseline">
@@ -116,7 +100,6 @@ function PracticeCard({
             </div>
           </div>
 
-          {/* Next button - 只有這裡可以點擊跳轉 */}
           <button
             type="button"
             onClick={handleIconClick}
@@ -134,24 +117,34 @@ export function LearningFoundationSection() {
   const t = useTranslations("common");
   const tag = t("landing_foundation_tag");
 
-  // 從 API 取得模板資料
-  const { data, isLoading } = usePracticeTemplates({ limit: 3 });
+  const { data, isLoading } = usePublicPractices({ limit: 20 });
 
-  // 跳轉到 Product App 模板詳情頁
-  const handleCardClick = useCallback((templateId: string) => {
-    window.location.href = `${PRODUCT_APP_URL}/practices/create/template/${templateId}`;
+  const handleCardClick = useCallback((practiceId: string) => {
+    window.location.href = `${PRODUCT_APP_URL}/practices/${practiceId}`;
   }, []);
 
-  // 將 API 資料轉換為卡片格式
   const cards = useMemo(() => {
-    if (!data?.data || data.data.length === 0) {
-      return [];
-    }
+    if (!data?.data || data.data.length === 0) return [];
 
-    return data.data.map((template, index) => {
-      const cardData = convertTemplateToCard(template, index);
-      return <PracticeCard key={cardData.id} tag={tag} {...cardData} onClick={handleCardClick} />;
-    });
+    return data.data.map((practice, index) => (
+      <PracticeCard
+        key={practice.id}
+        tag={tag}
+        title={practice.title}
+        description={practice.practiceAction || ""}
+        frequency={formatFrequency(
+          practice.frequencyMinDays ?? null,
+          practice.frequencyMaxDays ?? null,
+        )}
+        frequencyUnit="天/週"
+        duration={String(practice.sessionDurationMinutes ?? 30)}
+        durationUnit="分/次"
+        theme={themeOrder[index % themeOrder.length] as PracticeTheme}
+        practiceId={practice.id}
+        userName={practice.user?.name}
+        onClick={handleCardClick}
+      />
+    ));
   }, [data, tag, handleCardClick]);
 
   return (
@@ -159,7 +152,6 @@ export function LearningFoundationSection() {
       id={ANCHOR_IDS.LEARNING_INSPIRATION}
       className="relative overflow-hidden bg-white py-16 md:py-24"
     >
-      {/* Background blur decorations */}
       <Image
         src="/assets/landing-page/bg-blur-1.svg"
         alt=""
@@ -176,7 +168,6 @@ export function LearningFoundationSection() {
       />
 
       <div className="container relative z-10 mx-auto px-6">
-        {/* Header - centered */}
         <div className="mb-12 text-center">
           <h2 className="whitespace-pre-line text-[1.75rem] font-bold leading-tight md:text-3xl">
             <span className="text-primary-darker">{t("landing_foundation_title")}</span>
@@ -186,7 +177,6 @@ export function LearningFoundationSection() {
           <p className="mt-1 text-sm text-basic-400">{t("landing_foundation_subtitle_2")}</p>
         </div>
 
-        {/* Card Stack - centered */}
         <div className="relative mx-auto h-[360px] w-[300px] md:h-[400px] md:w-[340px]">
           {isLoading ? (
             <div className="flex h-full items-center justify-center">
@@ -196,14 +186,12 @@ export function LearningFoundationSection() {
             <Stack
               cards={cards}
               sendToBackOnClick
-              autoplay
-              autoplayDelay={4000}
-              pauseOnHover
               sensitivity={80}
+              renderCount={3}
             />
           ) : (
             <div className="flex h-full items-center justify-center text-basic-400">
-              暫無推薦模板
+              暫無實踐資料
             </div>
           )}
         </div>
