@@ -105,7 +105,7 @@ export default function CheckInDetailPage() {
       const displayData: ICheckInDisplayData = {
         id: String(checkIn.id),
         date: formatCheckInDate(checkIn.checkinDate),
-        mood: mapApiMoodToMoodType(checkIn.mood),
+        mood: mapApiMoodToMoodType(checkIn.mood ?? undefined),
         content: checkIn.note || "",
         tags: checkIn.tags || [],
         images: checkIn.imageUrls || [],
