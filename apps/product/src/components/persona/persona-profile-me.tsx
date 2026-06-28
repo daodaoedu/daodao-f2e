@@ -70,45 +70,41 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
   if (isChoice) {
     return (
       <div className="flex flex-col gap-3 mt-3">
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {options.map((opt) => (
-            <Button
+            <button
               key={opt}
               type="button"
-              variant="ghost"
-              size="sm"
               onClick={() => {
                 setSelectedValue(opt);
                 setIsCustomAnswer(false);
                 setCustomText("");
               }}
               className={cn(
-                "rounded-full border text-sm h-auto py-1.5 px-3",
+                "rounded-xl border-2 text-sm text-left py-3 px-4 transition-all leading-snug",
                 !isCustomAnswer && selectedValue === opt
-                  ? "bg-logo-cyan text-white border-logo-cyan hover:bg-logo-cyan hover:text-white"
-                  : "border-gray-300 text-gray-700 hover:border-logo-cyan/40 hover:text-gray-700"
+                  ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
+                  : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
               )}
             >
               {opt}
-            </Button>
+            </button>
           ))}
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="sm"
             onClick={() => {
               setSelectedValue("");
               setIsCustomAnswer(true);
             }}
             className={cn(
-              "rounded-full border text-sm h-auto py-1.5 px-3",
+              "rounded-xl border-2 text-sm text-left py-3 px-4 transition-all leading-snug",
               isCustomAnswer
-                ? "bg-logo-cyan text-white border-logo-cyan hover:bg-logo-cyan hover:text-white"
-                : "border-gray-300 text-gray-700 hover:border-logo-cyan/40 hover:text-gray-700"
+                ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
+                : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
             )}
           >
             {t("myProfile.otherOption")}
-          </Button>
+          </button>
         </div>
         {isCustomAnswer && (
           <Textarea

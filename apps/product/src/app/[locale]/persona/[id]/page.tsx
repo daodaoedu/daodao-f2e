@@ -145,43 +145,45 @@ function InlineFlipCard({
             // biome-ignore lint/a11y/noStaticElementInteractions: stop propagation
             // biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation
             <div
-              className="flex-1 flex flex-col gap-2 mt-4 min-h-[80px]"
+              className="flex-1 flex flex-col gap-3 mt-4 min-h-[80px]"
               onClick={(e) => e.stopPropagation()}
             >
-              {options.map((opt) => (
+              <div className="grid grid-cols-2 gap-2">
+                {options.map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      setSelected(opt);
+                      setIsCustomAnswer(false);
+                      setCustomText("");
+                    }}
+                    className={cn(
+                      "text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
+                      !isCustomAnswer && selected === opt
+                        ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
+                        : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
+                    )}
+                  >
+                    {opt}
+                  </button>
+                ))}
                 <button
-                  key={opt}
                   type="button"
                   onClick={() => {
-                    setSelected(opt);
-                    setIsCustomAnswer(false);
-                    setCustomText("");
+                    setSelected("");
+                    setIsCustomAnswer(true);
                   }}
                   className={cn(
-                    "w-full text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
-                    !isCustomAnswer && selected === opt
+                    "text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
+                    isCustomAnswer
                       ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
                       : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
                   )}
                 >
-                  {opt}
+                  {tProfile("otherOption")}
                 </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => {
-                  setSelected("");
-                  setIsCustomAnswer(true);
-                }}
-                className={cn(
-                  "w-full text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
-                  isCustomAnswer
-                    ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
-                    : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
-                )}
-              >
-                {tProfile("otherOption")}
-              </button>
+              </div>
               {isCustomAnswer && (
                 <textarea
                   rows={2}
