@@ -29199,6 +29199,8 @@ export interface components {
              * @example 熱愛學習的開發者
              */
             selfIntroduction?: string | null;
+            /** @description 用戶自訂 ID */
+            customId?: string | null;
         };
         /**
          * @description 實踐活動統計資訊
@@ -30461,6 +30463,8 @@ export interface components {
             name: string;
             /** @description 用戶頭像 URL */
             photoURL: string | null;
+            /** @description 用戶自訂 ID */
+            customId: string | null;
             /**
              * @description 反應類型
              * @example fire
@@ -34662,6 +34666,7 @@ export interface components {
             userId: string | null;
             name: string | null;
             photoURL: string | null;
+            customId: string | null;
             selectedValue: string | null;
             textAnswer: string | null;
             resonanceCount: number;

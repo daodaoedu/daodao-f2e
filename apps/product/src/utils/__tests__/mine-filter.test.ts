@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildMineFilterCounts,
-  applyMineFilter,
-} from "../mine-filter";
 import { FilterStatus } from "@/constants/task-status";
+import { applyMineFilter, buildMineFilterCounts } from "../mine-filter";
 
 interface Task {
   status: string;
@@ -81,9 +78,7 @@ describe("applyMineFilter", () => {
   });
 
   it("draft filter returns only draft tasks", () => {
-    expect(applyMineFilter(tasks, FilterStatus.draft)).toEqual([
-      { status: FilterStatus.draft },
-    ]);
+    expect(applyMineFilter(tasks, FilterStatus.draft)).toEqual([{ status: FilterStatus.draft }]);
   });
 
   it("notStarted filter returns only notStarted tasks", () => {

@@ -26,8 +26,8 @@ import {
 import { applyMineFilter, buildMineFilterCounts } from "@/utils/mine-filter";
 
 const filterOptions = [
-  { value: FilterStatus.inProgress, labelKey: "filter_in_progress" },
   { value: FilterStatus.all, labelKey: "filter_all" },
+  { value: FilterStatus.inProgress, labelKey: "filter_in_progress" },
   { value: FilterStatus.draft, labelKey: "filter_draft" },
   { value: FilterStatus.notStarted, labelKey: "filter_not_started" },
   { value: FilterStatus.completed, labelKey: "filter_completed" },

@@ -37,6 +37,7 @@ export interface IShowcasePractice {
     id: string;
     name: string;
     photo_url?: string | null;
+    custom_id?: string | null;
   };
   frequency_min_days?: number | null;
   frequency_max_days?: number | null;

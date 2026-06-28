@@ -13,6 +13,7 @@ interface CreatorInfo {
   id: string;
   name: string;
   photoURL?: string | null;
+  customId?: string | null;
   date?: string;
 }
 
@@ -46,7 +47,7 @@ export const PracticeOverviewCard = ({
       {/* 建立者資訊 - 僅在公開頁面顯示 */}
       {creator && (
         <div className="flex items-center gap-2 mb-3">
-          <Link href={`/users/${creator.id}`}>
+          <Link href={`/users/${creator.customId ?? creator.id}`}>
             <Avatar className="size-8">
               {creator.photoURL && <AvatarImage src={creator.photoURL} />}
               <AvatarFallback>
@@ -55,7 +56,7 @@ export const PracticeOverviewCard = ({
             </Avatar>
           </Link>
           <Link
-            href={`/users/${creator.id}`}
+            href={`/users/${creator.customId ?? creator.id}`}
             className="text-sm font-medium text-text-dark hover:underline"
           >
             {creator.name}

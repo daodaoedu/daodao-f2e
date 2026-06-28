@@ -39,6 +39,7 @@ interface BrewingCardProps {
     id: string;
     name: string;
     photoUrl?: string | null;
+    customId?: string | null;
   };
   actionDescription?: string | null;
   frequencyMinDays?: number | null;
@@ -126,6 +127,7 @@ export function BrewingCard({
       id: item.userId,
       name: item.name,
       photoURL: item.photoURL ?? undefined,
+      customId: item.customId,
       time: formatRelativeTime(item.reactedAt, locale),
       reaction: item.reactionType as ReactionTypeType,
     }));
@@ -248,7 +250,7 @@ export function BrewingCard({
             // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
             // biome-ignore lint/a11y/noStaticElementInteractions: stop card click
             <span onClick={(e) => e.stopPropagation()}>
-              <Link href={`/users/${user.id}`} className="shrink-0">
+              <Link href={`/users/${user.customId ?? user.id}`} className="shrink-0">
                 <Avatar className="size-16">
                   {user.photoUrl && <AvatarImage src={user.photoUrl} />}
                   <AvatarFallback>

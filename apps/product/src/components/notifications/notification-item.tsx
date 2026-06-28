@@ -25,6 +25,7 @@ export interface INotificationActor {
   id?: string;
   name: string;
   photoURL?: string;
+  customId?: string | null;
 }
 
 export interface INotificationPractice {
@@ -273,6 +274,7 @@ export function NotificationItem({
   onClick,
 }: NotificationItemProps) {
   const { actor, time, isRead } = notification;
+  const actorProfileLink = actor.customId || actor.id;
 
   const isClickable =
     notification.type !== NotificationType.connect &&
@@ -308,9 +310,9 @@ export function NotificationItem({
       {!isRead && <div className="absolute left-3 top-3.5 size-1.5 rounded-full bg-[#FF6E0B]" />}
 
       {/* 頭像 */}
-      {actor.id ? (
+      {actorProfileLink ? (
         <CustomLink
-          href={`/users/${actor.id}`}
+          href={`/users/${actorProfileLink}`}
           className="shrink-0"
           onClick={(e) => e.stopPropagation()}
         >

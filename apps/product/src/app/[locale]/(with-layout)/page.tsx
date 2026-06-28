@@ -391,6 +391,7 @@ export default function HomePage() {
                                   id: practice.user.id,
                                   name: practice.user.name,
                                   photoUrl: practice.user.photo_url,
+                                  customId: practice.user.custom_id,
                                 }
                               : undefined
                           }
@@ -415,6 +416,7 @@ export default function HomePage() {
                                   id: practice.user.id,
                                   name: practice.user.name,
                                   photoUrl: practice.user.photo_url,
+                                  customId: practice.user.custom_id,
                                 }
                               : undefined
                           }

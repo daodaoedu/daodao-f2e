@@ -2,9 +2,11 @@ import { getUserByIdentifier, getUserProfileByIdentifier } from "@daodao/api";
 import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
 import { IslandHeader, UserInfoCard, UserProfileTabs } from "@/components/user";
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * 個人頁面
@@ -117,8 +119,17 @@ export default async function UserProfilePage({
     notFound();
   }
 
-  const userData = userResponse.data?.data;
+  const userData = userResponse.data?.data ?? userResponse.data;
   const profileData = profileResponse?.data;
+
+  if (!userData) {
+    notFound();
+  }
+
+  // 用 UUID 訪問且使用者有設 customId 時，redirect 到 customId 版本的網址
+  if (UUID_REGEX.test(identifier) && userData?.customId && identifier !== userData.customId) {
+    redirect(`/${locale}/users/${userData.customId}`);
+  }
 
   // 轉換為大寫以符合統一格式 (L/C/A/D/O)，同時相容舊的小寫資料
   const resultType = (userData.latestQuizResult?.resultType ?? "").toUpperCase();

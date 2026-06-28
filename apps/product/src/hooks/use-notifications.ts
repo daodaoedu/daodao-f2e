@@ -55,6 +55,7 @@ export interface NotificationActorData {
   id: string;
   name: string;
   photoURL?: string;
+  customId?: string | null;
 }
 
 /** 後端 controller 將 payload JSONB 展開後回傳的通知物件 */

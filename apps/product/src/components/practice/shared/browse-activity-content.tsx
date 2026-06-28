@@ -16,6 +16,7 @@ export interface IBrowseActivityFollower {
   name: string;
   time: string;
   photoURL?: string;
+  customId?: string | null;
   reaction: ReactionTypeType;
 }
 
@@ -53,7 +54,11 @@ function FollowerRow({
 
   return (
     <div className="flex items-center gap-3 py-3">
-      <Link href={`/users/${follower.id}`} className="relative shrink-0" onClick={onClose}>
+      <Link
+        href={`/users/${follower.customId ?? follower.id}`}
+        className="relative shrink-0"
+        onClick={onClose}
+      >
         <Avatar className="size-10">
           {follower.photoURL && <AvatarImage src={follower.photoURL} alt={follower.name} />}
           <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
@@ -70,7 +75,7 @@ function FollowerRow({
         </div>
       </Link>
       <div className="flex-1 min-w-0">
-        <Link href={`/users/${follower.id}`} onClick={onClose}>
+        <Link href={`/users/${follower.customId ?? follower.id}`} onClick={onClose}>
           <p className="text-sm font-medium text-[#295E5C] hover:underline">{follower.name}</p>
         </Link>
         <p className="text-xs text-[#9FB5B8]">{follower.time}</p>

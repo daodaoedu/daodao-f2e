@@ -118,7 +118,11 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
         <Button
           size="sm"
           onClick={handleSubmit}
-          disabled={submitting || (!isCustomAnswer && !selectedValue) || (isCustomAnswer && !customText.trim())}
+          disabled={
+            submitting ||
+            (!isCustomAnswer && !selectedValue) ||
+            (isCustomAnswer && !customText.trim())
+          }
         >
           {submitting ? t("myProfile.submitting") : t("myProfile.submit")}
         </Button>

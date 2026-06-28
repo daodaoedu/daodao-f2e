@@ -75,6 +75,7 @@ interface IPracticeDetailCreator {
   id: string;
   name: string;
   photoURL?: string | null;
+  customId?: string | null;
   date?: string;
 }
 

@@ -6,27 +6,40 @@ import * as React from "react";
 
 import { cn } from "../lib/utils";
 
-// Component to handle image preview with proper cleanup
-// 使用 useState + effect cleanup 先清除 src 再 revoke，避免 React Strict Mode 雙重 effect
-// 導致 URL 失效後 img 仍指向已 revoked blob URL 而破圖
+// 使用 FileReader data URL 取代 blob URL，避免 blob 生命週期問題（Strict Mode、in-app browser）
+const MAX_PREVIEW_FILE_SIZE = 5 * 1024 * 1024;
+
 const FilePreviewImage = ({ file, index }: { file: File; index: number }) => {
-  const [objectUrl, setObjectUrl] = React.useState<string | null>(null);
+  const [dataUrl, setDataUrl] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const url = URL.createObjectURL(file);
-    setObjectUrl(url);
+    if (file.size > MAX_PREVIEW_FILE_SIZE) {
+      console.error(`File too large for preview: ${file.name}`);
+      return;
+    }
+
+    let cancelled = false;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (!cancelled) setDataUrl(reader.result as string);
+    };
+    reader.onerror = () => {
+      if (!cancelled) {
+        setDataUrl(null);
+        console.error(`Failed to read file for preview: ${file.name}`);
+      }
+    };
+    reader.readAsDataURL(file);
 
     return () => {
-      setObjectUrl(null);
-      URL.revokeObjectURL(url);
+      cancelled = true;
+      reader.abort();
     };
   }, [file]);
 
-  if (!objectUrl) return null;
+  if (!dataUrl) return null;
 
-  return (
-    <img src={objectUrl} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
-  );
+  return <img src={dataUrl} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />;
 };
 
 export interface FileUploadProps {

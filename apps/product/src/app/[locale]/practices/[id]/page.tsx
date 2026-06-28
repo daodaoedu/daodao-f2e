@@ -494,6 +494,7 @@ export default function PracticeDetailPage() {
                   id: practiceData.data.user.id,
                   name: practiceData.data.user.name,
                   photoURL: practiceData.data.user.photoURL,
+                  customId: practiceData.data.user.customId,
                   date: creatorDate,
                 }
               : undefined,
