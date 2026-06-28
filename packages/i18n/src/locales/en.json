@@ -5528,6 +5528,7 @@
       "anonymousUser": "Anonymous user",
       "justNow": "Just now",
       "commentSubmitError": "Failed to post comment",
+      "commentSubmitSuccess": "Comment posted!",
       "commentsTitle": "Comments",
       "myAnswer": "My answer",
       "collapse": "Collapse",
