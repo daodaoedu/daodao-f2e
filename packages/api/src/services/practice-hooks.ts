@@ -78,6 +78,23 @@ export const useMyPracticeStats = (params?: IGetPracticeStatsParams) => {
 };
 
 /**
+ * 獲取公開實踐列表（含使用者資訊），用於 Landing Page 展示真實用戶實踐
+ */
+export const usePublicPractices = (params?: { limit?: number }) => {
+  return useQuery("/api/v1/practices", {
+    params: {
+      query: {
+        limit: params?.limit,
+        status: "all" as const,
+        include: "user",
+        sort: "updatedAt" as const,
+        order: "desc" as const,
+      },
+    },
+  });
+};
+
+/**
  * 獲取實踐模板列表的 Hook
  */
 export const usePracticeTemplates = (params?: IGetPracticeTemplatesParams) => {
