@@ -22,8 +22,10 @@ import { useLocale, useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { toast } from "@daodao/ui/components/sonner";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2, ChevronDown, X } from "lucide-react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
@@ -493,22 +495,55 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
       )}
     >
       <div className="flex items-start gap-3">
-        <div
-          className="size-9 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 mt-0.5"
-          style={{ background: avatarColor }}
-        >
-          {initial}
-        </div>
+        {item.userId ? (
+          <CustomLink href={`/users/${item.userId}`} className="shrink-0 mt-0.5">
+            {item.photoURL ? (
+              <Image
+                src={item.photoURL}
+                alt={displayName}
+                width={36}
+                height={36}
+                className="size-9 rounded-full object-cover"
+              />
+            ) : (
+              <div
+                className="size-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                style={{ background: avatarColor }}
+              >
+                {initial}
+              </div>
+            )}
+          </CustomLink>
+        ) : (
+          <div
+            className="size-9 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 mt-0.5"
+            style={{ background: avatarColor }}
+          >
+            {initial}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5">
-            <span
-              className={cn(
-                "text-sm font-semibold",
-                item.isSelf ? "text-logo-cyan" : "text-text-dark"
-              )}
-            >
-              {displayName}
-            </span>
+            {item.userId ? (
+              <CustomLink
+                href={`/users/${item.userId}`}
+                className={cn(
+                  "text-sm font-semibold hover:underline",
+                  item.isSelf ? "text-logo-cyan" : "text-text-dark"
+                )}
+              >
+                {displayName}
+              </CustomLink>
+            ) : (
+              <span
+                className={cn(
+                  "text-sm font-semibold",
+                  item.isSelf ? "text-logo-cyan" : "text-text-dark"
+                )}
+              >
+                {displayName}
+              </span>
+            )}
             {item.isSelf && (
               <span className="text-[10px] text-logo-cyan bg-logo-cyan/10 rounded-full px-2 py-0.5 font-medium leading-none">
                 {t("myAnswer")}
