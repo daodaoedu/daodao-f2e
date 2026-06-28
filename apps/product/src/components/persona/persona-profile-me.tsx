@@ -9,6 +9,7 @@ import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { RefreshCcw } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import { buildPersonaAnswerBody } from "./other-option-utils";
 
 interface InlineAnswerFormProps {
   questionId: number;
@@ -21,23 +22,35 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
   const t = useTranslations("persona");
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [textAnswer, setTextAnswer] = useState("");
+  const [isCustomAnswer, setIsCustomAnswer] = useState(false);
+  const [customText, setCustomText] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const isChoice = questionType === "choice" && options && options.length > 0;
+  const isChoice = questionType === "choice" && options != null && options.length > 0;
 
   const handleSubmit = async () => {
-    const body = isChoice
-      ? { questionId, selectedValue: selectedValue || undefined }
-      : { questionId, textAnswer: textAnswer.trim() || undefined };
-
-    if (isChoice && !selectedValue) {
-      toast.error(t("myProfile.selectRequired"));
-      return;
-    }
-    if (!isChoice && !textAnswer.trim()) {
+    if (isChoice) {
+      if (!isCustomAnswer && !selectedValue) {
+        toast.error(t("myProfile.selectRequired"));
+        return;
+      }
+      if (isCustomAnswer && !customText.trim()) {
+        toast.error(t("myProfile.textRequired"));
+        return;
+      }
+    } else if (!textAnswer.trim()) {
       toast.error(t("myProfile.textRequired"));
       return;
     }
+
+    const body = buildPersonaAnswerBody(
+      questionId,
+      !!isChoice,
+      selectedValue,
+      textAnswer,
+      isCustomAnswer,
+      customText
+    );
 
     setSubmitting(true);
     try {
@@ -57,26 +70,56 @@ function InlineAnswerForm({ questionId, questionType, options, onSuccess }: Inli
   if (isChoice) {
     return (
       <div className="flex flex-col gap-3 mt-3">
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {options.map((opt) => (
-            <Button
+            <button
               key={opt}
               type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedValue(opt)}
+              onClick={() => {
+                setSelectedValue(opt);
+                setIsCustomAnswer(false);
+                setCustomText("");
+              }}
               className={cn(
-                "rounded-full border text-sm h-auto py-1.5 px-3",
-                selectedValue === opt
-                  ? "bg-logo-cyan text-white border-logo-cyan hover:bg-logo-cyan hover:text-white"
-                  : "border-gray-300 text-gray-700 hover:border-logo-cyan/40 hover:text-gray-700"
+                "rounded-xl border-2 text-sm text-left py-3 px-4 transition-all leading-snug",
+                !isCustomAnswer && selectedValue === opt
+                  ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
+                  : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
               )}
             >
               {opt}
-            </Button>
+            </button>
           ))}
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedValue("");
+              setIsCustomAnswer(true);
+            }}
+            className={cn(
+              "rounded-xl border-2 text-sm text-left py-3 px-4 transition-all leading-snug",
+              isCustomAnswer
+                ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
+                : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
+            )}
+          >
+            {t("myProfile.otherOption")}
+          </button>
         </div>
-        <Button size="sm" onClick={handleSubmit} disabled={submitting || !selectedValue}>
+        {isCustomAnswer && (
+          <Textarea
+            value={customText}
+            onChange={(e) => setCustomText(e.target.value)}
+            placeholder={t("myProfile.textPlaceholder")}
+            rows={3}
+            maxLength={300}
+          />
+        )}
+        <Button
+          size="sm"
+          onClick={handleSubmit}
+          disabled={submitting || (!isCustomAnswer && !selectedValue) || (isCustomAnswer && !customText.trim())}
+        >
           {submitting ? t("myProfile.submitting") : t("myProfile.submit")}
         </Button>
       </div>

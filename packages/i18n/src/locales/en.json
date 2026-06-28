@@ -5463,7 +5463,8 @@
       "submitError": "Submission failed, please try again",
       "selectRequired": "Please select an option",
       "textRequired": "Please fill in your answer",
-      "textPlaceholder": "Enter your answer...",
+      "textPlaceholder": "Let others get to know you better",
+      "otherOption": "Others",
       "resonances": "resonances",
       "unansweredHint": "Answer to see what others think",
       "unansweredLabel": "Not answered",
@@ -5499,7 +5500,7 @@
       "switchQuestion": "Next Question",
       "tab": {
         "headerTitle": "Persona",
-        "headerSubtitle": "Explore your unique style by answering questions"
+        "headerSubtitle": "Let us get to know you!"
       },
       "thoughtPlaceholder": "Share your thoughts...",
       "title": "Persona",

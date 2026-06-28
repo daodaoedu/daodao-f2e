@@ -22,8 +22,10 @@ import { useLocale, useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { toast } from "@daodao/ui/components/sonner";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2, ChevronDown, X } from "lucide-react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
@@ -36,6 +38,7 @@ import type { IComment } from "@/components/check-in/reactions/comment-section";
 import { BackgroundAnimation } from "@/components/layout";
 import { resolvePersonaCloseTarget } from "@/utils/persona-close-navigation";
 import type { ReactionTypeType } from "@/constants/reaction-type";
+
 
 function QuoteSvg({ className }: { className?: string }) {
   return (
@@ -77,8 +80,10 @@ function InlineFlipCard({
   const tProfile = useTranslations("persona.myProfile");
   const [answer, setAnswer] = useState("");
   const [selected, setSelected] = useState("");
+  const [isCustomAnswer, setIsCustomAnswer] = useState(false);
+  const [customText, setCustomText] = useState("");
 
-  const isChoice = questionType === "choice" && options && options.length > 0;
+  const isChoice = questionType === "choice" && options != null && options.length > 0;
 
   return (
     <div style={{ perspective: "1000px" }} className="w-full mb-4">
@@ -141,24 +146,55 @@ function InlineFlipCard({
             // biome-ignore lint/a11y/noStaticElementInteractions: stop propagation
             // biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation
             <div
-              className="flex-1 flex flex-col gap-2 mt-4 min-h-[80px]"
+              className="flex-1 flex flex-col gap-3 mt-4 min-h-[80px]"
               onClick={(e) => e.stopPropagation()}
             >
-              {options.map((opt) => (
+              <div className="grid grid-cols-2 gap-2">
+                {options.map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      setSelected(opt);
+                      setIsCustomAnswer(false);
+                      setCustomText("");
+                    }}
+                    className={cn(
+                      "text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
+                      !isCustomAnswer && selected === opt
+                        ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
+                        : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
+                    )}
+                  >
+                    {opt}
+                  </button>
+                ))}
                 <button
-                  key={opt}
                   type="button"
-                  onClick={() => setSelected(opt)}
+                  onClick={() => {
+                    setSelected("");
+                    setIsCustomAnswer(true);
+                  }}
                   className={cn(
-                    "w-full text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
-                    selected === opt
+                    "text-left rounded-xl border-2 text-sm py-3 px-4 transition-all leading-snug",
+                    isCustomAnswer
                       ? "border-logo-cyan bg-logo-cyan/10 text-logo-cyan font-medium"
                       : "border-[#E8F8FF] text-text-dark/65 hover:border-logo-cyan/40"
                   )}
                 >
-                  {opt}
+                  {tProfile("otherOption")}
                 </button>
-              ))}
+              </div>
+              {isCustomAnswer && (
+                <textarea
+                  rows={2}
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  placeholder={t("thoughtPlaceholder")}
+                  maxLength={300}
+                  className="w-full border-2 border-logo-cyan rounded-xl text-sm text-text-dark outline-none bg-transparent placeholder:text-text-dark/25 p-3 resize-none"
+                />
+              )}
             </div>
           ) : (
             // biome-ignore lint/a11y/noStaticElementInteractions: stop propagation
@@ -184,13 +220,24 @@ function InlineFlipCard({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (isChoice && selected) onSubmit(selected, true);
-              else if (!isChoice && answer.trim()) onSubmit(answer.trim(), false);
+              if (isChoice) {
+                if (isCustomAnswer && customText.trim()) {
+                  onSubmit(customText.trim(), false);
+                } else if (!isCustomAnswer && selected) {
+                  onSubmit(selected, true);
+                }
+              } else if (answer.trim()) {
+                onSubmit(answer.trim(), false);
+              }
             }}
-            disabled={isChoice ? !selected : !answer.trim()}
+            disabled={
+              isChoice
+                ? isCustomAnswer ? !customText.trim() : !selected
+                : !answer.trim()
+            }
             className={cn(
               "shrink-0 w-full py-3 rounded-full font-medium text-base transition-all mt-4",
-              (isChoice ? selected : answer.trim())
+              (isChoice ? (isCustomAnswer ? customText.trim() : selected) : answer.trim())
                 ? "bg-[#F5A93E] text-white"
                 : "bg-[#F5A93E]/30 text-white/70 cursor-not-allowed"
             )}
@@ -452,22 +499,55 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
       )}
     >
       <div className="flex items-start gap-3">
-        <div
-          className="size-9 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 mt-0.5"
-          style={{ background: avatarColor }}
-        >
-          {initial}
-        </div>
+        {item.userId ? (
+          <CustomLink href={`/users/${item.userId}`} className="shrink-0 mt-0.5">
+            {item.photoURL ? (
+              <Image
+                src={item.photoURL}
+                alt={displayName}
+                width={36}
+                height={36}
+                className="size-9 rounded-full object-cover"
+              />
+            ) : (
+              <div
+                className="size-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                style={{ background: avatarColor }}
+              >
+                {initial}
+              </div>
+            )}
+          </CustomLink>
+        ) : (
+          <div
+            className="size-9 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 mt-0.5"
+            style={{ background: avatarColor }}
+          >
+            {initial}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5">
-            <span
-              className={cn(
-                "text-sm font-semibold",
-                item.isSelf ? "text-logo-cyan" : "text-text-dark"
-              )}
-            >
-              {displayName}
-            </span>
+            {item.userId ? (
+              <CustomLink
+                href={`/users/${item.userId}`}
+                className={cn(
+                  "text-sm font-semibold hover:underline",
+                  item.isSelf ? "text-logo-cyan" : "text-text-dark"
+                )}
+              >
+                {displayName}
+              </CustomLink>
+            ) : (
+              <span
+                className={cn(
+                  "text-sm font-semibold",
+                  item.isSelf ? "text-logo-cyan" : "text-text-dark"
+                )}
+              >
+                {displayName}
+              </span>
+            )}
             {item.isSelf && (
               <span className="text-[10px] text-logo-cyan bg-logo-cyan/10 rounded-full px-2 py-0.5 font-medium leading-none">
                 {t("myAnswer")}

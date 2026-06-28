@@ -48,45 +48,45 @@ function GlobalProvider({
             <NavigationBlockerProvider>
               <SwrConfigProvider>
                 <DialogManagerProvider>
-                  <SheetManagerProvider>
-                    <AuthProvider
-                      defaultProtected
-                      publicPattern={[
-                        // auth flows
-                        "^/auth/",
-                        // content pages (no login required)
-                        "^/$",
-                        "^/users/",
-                        "^/practices/[^/]+$",
-                        "^/practices/[^/]+/check-ins/",
-                        "^/roadmap(/.*)?$",
-                        "^/resource(/.*)?$",
-                        "^/persona(/.*)?$",
-                        "^/mine(/.*)?$",
-                        "^/survey/r/",
-                        // misc
-                        "^/dev/",
-                        "^/ux-mockup/",
-                      ]}
-                      onAuthRequired={(currentPath) => {
-                        router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
-                      }}
-                      onboardingPath="/auth/onboarding"
-                      onTemporaryUser={() => {
-                        router.push("/auth/onboarding");
-                      }}
-                      emailVerificationPath="/auth/verify-email"
-                      onEmailUnverified={() => {
-                        router.push("/auth/verify-email/pending");
-                      }}
-                    >
+                  <AuthProvider
+                    defaultProtected
+                    publicPattern={[
+                      // auth flows
+                      "^/auth/",
+                      // content pages (no login required)
+                      "^/$",
+                      "^/users/",
+                      "^/practices/[^/]+$",
+                      "^/practices/[^/]+/check-ins/",
+                      "^/roadmap(/.*)?$",
+                      "^/resource(/.*)?$",
+                      "^/persona(/.*)?$",
+                      "^/mine(/.*)?$",
+                      "^/survey/r/",
+                      // misc
+                      "^/dev/",
+                      "^/ux-mockup/",
+                    ]}
+                    onAuthRequired={(currentPath) => {
+                      router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
+                    }}
+                    onboardingPath="/auth/onboarding"
+                    onTemporaryUser={() => {
+                      router.push("/auth/onboarding");
+                    }}
+                    emailVerificationPath="/auth/verify-email"
+                    onEmailUnverified={() => {
+                      router.push("/auth/verify-email/pending");
+                    }}
+                  >
+                    <SheetManagerProvider>
                       <OnboardingProgressProvider>
                         <TaskGuideWidget />
                         <Toaster />
                         {children}
                       </OnboardingProgressProvider>
-                    </AuthProvider>
-                  </SheetManagerProvider>
+                    </SheetManagerProvider>
+                  </AuthProvider>
                 </DialogManagerProvider>
               </SwrConfigProvider>
             </NavigationBlockerProvider>
