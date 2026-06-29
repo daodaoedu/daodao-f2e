@@ -47,7 +47,10 @@ export function ActionMakerResult() {
     if (!result || !cardRef.current) return;
     setDownloading(true);
 
-    // Temporarily remove overflow-hidden from ancestors so html-to-image captures the full card
+    // Temporarily adjust styles so html-to-image captures the full card on narrow viewports
+    const savedWidth = cardRef.current.style.width;
+    cardRef.current.style.width = "fit-content";
+
     const overflowAncestors: { el: HTMLElement; original: string }[] = [];
     let parent = cardRef.current.parentElement;
     while (parent) {
@@ -101,7 +104,7 @@ export function ActionMakerResult() {
       // Delay revoke so browsers (esp. Safari) can complete the download
       setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
     } finally {
-      // Restore ancestor overflow styles
+      cardRef.current.style.width = savedWidth;
       for (const { el, original } of overflowAncestors) {
         el.style.overflow = original;
       }
@@ -177,7 +180,7 @@ export function ActionMakerResult() {
           恭喜！你建立了新的習慣
         </h1>
         {/* ===== Share card area (captured by cardRef) ===== */}
-        <div ref={cardRef} className="mx-auto w-fit p-6">
+        <div ref={cardRef} className="mx-auto p-6">
           <div
             className="flex w-[350px] flex-col rounded-2xl px-5 pb-6 pt-12"
             style={{
