@@ -133,6 +133,9 @@ export const captureElementAsImage = async (
       scale: devicePixelRatio,
       width,
       height,
+      fetch: {
+        bypassingCache: true,
+      },
     });
 
     const imageData: CapturedImageData = {
