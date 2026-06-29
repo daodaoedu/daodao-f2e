@@ -126,13 +126,11 @@ export const captureElementAsImage = async (
   cropOptions?: CropOptions
 ): Promise<CapturedImageData | null> => {
   try {
-    const { toPng } = await import("html-to-image");
+    const { domToPng } = await import("modern-screenshot");
     const devicePixelRatio = window.devicePixelRatio || 1;
     const { width, height } = getElementCaptureDimensions(element);
-    const dataUrl = await toPng(element, {
-      pixelRatio: devicePixelRatio,
-      // 添加 cacheBust 繞過 Cloudflare 快取，確保獲取帶有 CORS headers 的回應
-      cacheBust: true,
+    const dataUrl = await domToPng(element, {
+      scale: devicePixelRatio,
       width,
       height,
     });
@@ -143,7 +141,6 @@ export const captureElementAsImage = async (
       height,
     };
 
-    // 如果需要裁切，則進行裁切
     if (cropOptions) {
       const croppedData = await cropImage(dataUrl, cropOptions, devicePixelRatio);
       return croppedData;

@@ -47,26 +47,10 @@ export function ActionMakerResult() {
     if (!result || !cardRef.current) return;
     setDownloading(true);
 
-    // Temporarily adjust styles so html-to-image captures the full card on narrow viewports
-    const savedWidth = cardRef.current.style.width;
-    cardRef.current.style.width = "fit-content";
-
-    const overflowAncestors: { el: HTMLElement; original: string }[] = [];
-    let parent = cardRef.current.parentElement;
-    while (parent) {
-      const style = getComputedStyle(parent);
-      if (style.overflow === "hidden" || style.overflowX === "hidden") {
-        overflowAncestors.push({ el: parent, original: parent.style.overflow });
-        parent.style.overflow = "visible";
-      }
-      parent = parent.parentElement;
-    }
-
     try {
       const imageData = await captureElementAsImage(cardRef.current);
       if (!imageData) return;
 
-      // Convert data URL to Blob without fetch() to avoid CSP connect-src blocking data: URIs
       const [header, base64] = imageData.src.split(",");
       const mime = header?.split(":")[1]?.split(";")[0] ?? "image/png";
       const binary = atob(base64 ?? "");
@@ -79,7 +63,6 @@ export function ActionMakerResult() {
         type: mime,
       });
 
-      // Mobile: prefer native share with image
       const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
       if (isMobile && navigator.share) {
         try {
@@ -95,21 +78,13 @@ export function ActionMakerResult() {
         }
       }
 
-      // Desktop / fallback: trigger download
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = blobUrl;
       a.download = "action-maker-result.png";
       a.click();
-      // Delay revoke so browsers (esp. Safari) can complete the download
       setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
     } finally {
-      if (cardRef.current) {
-        cardRef.current.style.width = savedWidth;
-      }
-      for (const { el, original } of overflowAncestors) {
-        el.style.overflow = original;
-      }
       setDownloading(false);
     }
   }, [result]);
