@@ -1,6 +1,8 @@
 "use client";
 
+import { saveQuizResult } from "@daodao/api";
 import { HorizontalFullSvg } from "@daodao/assets";
+import { useAuth } from "@daodao/auth";
 import { AspectRatio } from "@daodao/ui/components/aspect-ratio";
 import { Badge } from "@daodao/ui/components/badge";
 import { BackButton, Button } from "@daodao/ui/components/button";
@@ -8,7 +10,8 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { SquareArrowOutUpRightIcon } from "lucide-react";
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef } from "react";
+import { useQuiz } from "../hooks";
 import { useResultStyles } from "../hooks/use-result-styles";
 import { resultDetailMap } from "../utils/result-detail-map";
 import { themeMap } from "../utils/theme-map";
@@ -22,6 +25,32 @@ export const QuizResultDetail = ({ resultId }: QuizResultDetailProps) => {
   const resultDetail = resultDetailMap.get(resultId);
   const theme = themeMap.get(resultId);
   const { rootStyle } = useResultStyles(theme);
+  const { isAuthenticated } = useAuth();
+  const { result, analysis, hasAnalysis } = useQuiz();
+  const hasSavedRef = useRef(false);
+
+  // 已登入 + 有完整測驗資料 → 自動儲存（OAuth 回來後觸發）
+  useEffect(() => {
+    if (!isAuthenticated || !hasAnalysis || hasSavedRef.current) return;
+
+    const formattedAnswers: Record<string, { selectedAnswer: string }> = {};
+    for (const [questionId, answer] of Object.entries(result)) {
+      const questionNumber = questionId.replace("q", "");
+      formattedAnswers[questionNumber] = { selectedAnswer: answer.selectedAnswer };
+    }
+
+    saveQuizResult({
+      resultType: resultId.toUpperCase(),
+      scores: analysis,
+      answers: formattedAnswers,
+    })
+      .then(() => {
+        hasSavedRef.current = true;
+      })
+      .catch((error) => {
+        console.error("Failed to save quiz result on detail page:", error);
+      });
+  }, [isAuthenticated, hasAnalysis, resultId, result, analysis]);
 
   if (!resultDetail || !theme) return null;
 

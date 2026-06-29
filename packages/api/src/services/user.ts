@@ -479,6 +479,22 @@ export const saveQuizResult = async (data: SaveQuizResultRequest) => {
   });
 };
 
+/**
+ * 暫存測驗結果（匿名用戶，不需認證）
+ * 後端會設定 quiz_claim cookie，登入後可自動認領
+ */
+export const saveQuizPending = async (data: SaveQuizResultRequest) => {
+  const baseUrl = getApiBaseUrl();
+  const res = await fetch(`${baseUrl}/api/v1/quiz/pending`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to save pending quiz result");
+  return res.json() as Promise<{ success: true; data: { claimToken: string } }>;
+};
+
 export interface SettingsSummary {
   completed: number;
   total: number;
