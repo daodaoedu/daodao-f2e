@@ -104,7 +104,9 @@ export function ActionMakerResult() {
       // Delay revoke so browsers (esp. Safari) can complete the download
       setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
     } finally {
-      cardRef.current.style.width = savedWidth;
+      if (cardRef.current) {
+        cardRef.current.style.width = savedWidth;
+      }
       for (const { el, original } of overflowAncestors) {
         el.style.overflow = original;
       }
