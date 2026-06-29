@@ -47,6 +47,18 @@ export function ActionMakerResult() {
     if (!result || !cardRef.current) return;
     setDownloading(true);
 
+    // Temporarily remove overflow-hidden from ancestors so html-to-image captures the full card
+    const overflowAncestors: { el: HTMLElement; original: string }[] = [];
+    let parent = cardRef.current.parentElement;
+    while (parent) {
+      const style = getComputedStyle(parent);
+      if (style.overflow === "hidden" || style.overflowX === "hidden") {
+        overflowAncestors.push({ el: parent, original: parent.style.overflow });
+        parent.style.overflow = "visible";
+      }
+      parent = parent.parentElement;
+    }
+
     try {
       const imageData = await captureElementAsImage(cardRef.current);
       if (!imageData) return;
@@ -89,6 +101,10 @@ export function ActionMakerResult() {
       // Delay revoke so browsers (esp. Safari) can complete the download
       setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
     } finally {
+      // Restore ancestor overflow styles
+      for (const { el, original } of overflowAncestors) {
+        el.style.overflow = original;
+      }
       setDownloading(false);
     }
   }, [result]);
@@ -161,7 +177,7 @@ export function ActionMakerResult() {
           恭喜！你建立了新的習慣
         </h1>
         {/* ===== Share card area (captured by cardRef) ===== */}
-        <div ref={cardRef} className="mx-auto p-6">
+        <div ref={cardRef} className="mx-auto w-fit p-6">
           <div
             className="flex w-[350px] flex-col rounded-2xl px-5 pb-6 pt-12"
             style={{
