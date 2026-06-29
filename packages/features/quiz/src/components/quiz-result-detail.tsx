@@ -39,17 +39,16 @@ export const QuizResultDetail = ({ resultId }: QuizResultDetailProps) => {
       formattedAnswers[questionNumber] = { selectedAnswer: answer.selectedAnswer };
     }
 
+    hasSavedRef.current = true;
+
     saveQuizResult({
       resultType: resultId.toUpperCase(),
       scores: analysis,
       answers: formattedAnswers,
-    })
-      .then(() => {
-        hasSavedRef.current = true;
-      })
-      .catch((error) => {
-        console.error("Failed to save quiz result on detail page:", error);
-      });
+    }).catch((error) => {
+      hasSavedRef.current = false;
+      console.error("Failed to save quiz result on detail page:", error);
+    });
   }, [isAuthenticated, hasAnalysis, resultId, result, analysis]);
 
   if (!resultDetail || !theme) return null;
