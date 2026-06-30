@@ -14,6 +14,7 @@ import * as decomp from "poly-decomp-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   MOOD_OPTIONS,
+  MoodType,
   type MoodType as MoodTypeType,
   mapApiMoodToMoodType,
 } from "@/constants/mood";
@@ -287,28 +288,18 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
   const animationFrameRef = useRef<number | undefined>(undefined);
   const [svgGeometries, setSvgGeometries] = useState<(ISvgGeometry | null)[]>([]);
 
-  // 將 API 資料轉換為 ICheckInItem[] 格式
+  // 將 API 資料轉換為 ICheckInItem[] 格式（NULL mood fallback 到 neutral，避免整筆被隱藏）
   const items: ICheckInItem[] = useMemo(() => {
     if (!checkInsData?.data) {
       return [];
     }
 
-    return checkInsData.data
-      .map((checkIn) => {
-        const moodType = mapApiMoodToMoodType(checkIn.mood);
-        // 如果沒有心情類型，跳過這個打卡記錄
-        if (!moodType) {
-          return null;
-        }
-
-        return {
-          id: String(checkIn.id),
-          date: formatCheckInDate(checkIn.checkinDate),
-          mood: moodType,
-          content: checkIn.note || "",
-        };
-      })
-      .filter((item): item is ICheckInItem => item !== null);
+    return checkInsData.data.map((checkIn) => ({
+      id: String(checkIn.id),
+      date: formatCheckInDate(checkIn.checkinDate),
+      mood: mapApiMoodToMoodType(checkIn.mood) ?? MoodType.neutral,
+      content: checkIn.note || "",
+    }));
   }, [checkInsData]);
 
   const count = items.length;
@@ -573,11 +564,6 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
 
     return "";
   };
-
-  // 如果沒有資料（載入完成後），不顯示任何內容
-  if (count === 0) {
-    return null;
-  }
 
   return (
     <div ref={handleWrapperRef} style={{ width: "100%", height: containerHeight * scale }}>

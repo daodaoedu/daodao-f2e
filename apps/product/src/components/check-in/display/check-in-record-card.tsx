@@ -6,7 +6,7 @@ import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronUp } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { MOOD_OPTIONS, type MoodType, mapApiMoodToMoodType } from "@/constants/mood";
+import { MOOD_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
 import type { IMoodStat } from "../types";
 
 interface ICheckInRecordCardProps {
@@ -35,13 +35,11 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
       moodCountMap.set(option.id, 0);
     });
 
-    // 統計每個心情的出現次數
+    // 統計每個心情的出現次數（NULL mood fallback 到 neutral，避免被排除在心情排行之外）
     checkInsData.data.forEach((checkIn) => {
-      const moodType = mapApiMoodToMoodType(checkIn.mood);
-      if (moodType) {
-        const currentCount = moodCountMap.get(moodType) ?? 0;
-        moodCountMap.set(moodType, currentCount + 1);
-      }
+      const moodType = mapApiMoodToMoodType(checkIn.mood) ?? MoodType.neutral;
+      const currentCount = moodCountMap.get(moodType) ?? 0;
+      moodCountMap.set(moodType, currentCount + 1);
     });
 
     // 轉換為陣列格式
