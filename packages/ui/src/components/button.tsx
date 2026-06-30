@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "@daodao/i18n/navigation";
-import { Slot, Slottable } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { ChevronLeft } from "lucide-react";
+import { Slot as SlotPrimitive } from "radix-ui";
 import * as React from "react";
 
 import { cn } from "../lib/utils";
@@ -92,7 +92,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const rippleRef = React.useRef<HTMLDivElement>(null);
-    const Comp = asChild ? Slot : "button";
+    const Comp = asChild ? SlotPrimitive.Slot : "button";
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (disabled) {
@@ -123,7 +123,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled}
         {...props}
       >
-        <Slottable>{children}</Slottable>
+        <SlotPrimitive.Slottable>{children}</SlotPrimitive.Slottable>
         <div
           ref={rippleRef}
           className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]"
