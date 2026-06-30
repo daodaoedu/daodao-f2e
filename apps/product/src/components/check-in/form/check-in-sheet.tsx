@@ -10,7 +10,6 @@ import { CalendarCheck, Check, Eye } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CheckInStatus } from "@/constants/check-in-status";
-import { useCheckInPhase2Sheet } from "@/hooks/use-check-in-phase2-sheet";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
 import { EarlyStartResult, useEarlyStartDialog } from "@/hooks/use-early-start-dialog";
 import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
@@ -21,11 +20,7 @@ import { ReflectionQuestion } from "./components/reflection-question";
 import { TagSelector } from "./components/tag-selector";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
 import { useCheckInSubmit } from "./hooks/use-check-in-submit";
-import {
-  type CheckInFormValuesType,
-  createCheckInFormSchema,
-  createCheckInPhase2Schema,
-} from "./schema";
+import { type CheckInFormValuesType, createCheckInFormSchema } from "./schema";
 
 export type { ICheckInFormData as CheckInData, ICheckInStatusOptions as CheckInStatusOptions };
 export type { CheckInStatusType as CheckInStatus } from "@/constants/check-in-status";
@@ -43,8 +38,6 @@ interface ICheckInSheetContentProps {
   existingImages?: string[];
   /** 提交按鈕文字 */
   submitButtonText?: string;
-  /** 是否顯示心情選擇（編輯模式用） */
-  showMood?: boolean;
 }
 
 export const CheckInSheetContent = ({
@@ -53,7 +46,6 @@ export const CheckInSheetContent = ({
   initialValues,
   existingImages,
   submitButtonText,
-  showMood = false,
 }: ICheckInSheetContentProps) => {
   const t = useTranslations("check_in");
   const resolvedSubmitButtonText = submitButtonText ?? t("submit_check_in");
@@ -95,8 +87,8 @@ export const CheckInSheetContent = ({
           {taskTitle}
         </h2>
 
-        {/* Mood Selection (edit mode only) */}
-        {showMood && <MoodSelector form={form} />}
+        {/* Mood Selection */}
+        <MoodSelector form={form} />
 
         {/* Thought Sharing (tags, description, media) */}
         <div className="mb-8">
@@ -179,14 +171,11 @@ export const CheckInButton = ({
     endDate,
   });
 
-  const { openPhase2Sheet } = useCheckInPhase2Sheet({ practiceId, taskTitle });
-
   const { submitCheckIn } = useCheckInSubmit({
     practiceId,
     taskTitle,
     progressPercentage,
     onComplete,
-    onOpenPhase2: openPhase2Sheet,
   });
 
   const { openCheckInSheet } = useCheckInSheet({
@@ -255,70 +244,3 @@ export const CheckInButton = ({
   );
 };
 
-// ============================================================================
-// Phase 2 Sheet Content（想法分享 + 上傳照片）
-// ============================================================================
-
-interface ICheckInPhase2SheetContentProps {
-  taskTitle: string;
-  onComplete: (data: ICheckInFormData) => Promise<void> | void;
-}
-
-/**
- * 打卡第二階段表單
- * 讓使用者在打卡（標籤、心得）完成後，進一步選擇心情
- */
-export const CheckInPhase2SheetContent = ({
-  taskTitle,
-  onComplete,
-}: ICheckInPhase2SheetContentProps) => {
-  const t = useTranslations("check_in");
-  const form = useForm<CheckInFormValuesType>({
-    resolver: zodResolver(createCheckInPhase2Schema(t)),
-    defaultValues: {
-      mood: null,
-      tags: [],
-      description: "",
-      media: [],
-    },
-  });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const onSubmit = async (values: CheckInFormValuesType) => {
-    setIsSubmitting(true);
-    try {
-      await onComplete({
-        mood: values.mood,
-        tags: values.tags,
-        description: values.description,
-        media: values.media,
-      });
-      form.reset();
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="px-6">
-        {/* Activity Title */}
-        <h2 className="text-md leading-8 font-medium text-bg-dark wrap-break-word mb-6">
-          {taskTitle}
-        </h2>
-
-        {/* Mood Selection */}
-        <MoodSelector form={form} />
-
-        {/* Submit Button */}
-        <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
-          <Button type="submit" variant="orange" className="w-full" disabled={isSubmitting}>
-            <Check className="size-4.5" />
-            {isSubmitting ? t("saving") : t("save_notes")}
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
-};

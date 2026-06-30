@@ -45,7 +45,6 @@ export function useEditCheckInSheet({
       content: (
         <CheckInSheetContent
           taskTitle={taskTitle}
-          showMood={true}
           initialValues={{
             mood: checkInData.mood,
             tags: checkInData.tags,

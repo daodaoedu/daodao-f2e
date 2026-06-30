@@ -346,7 +346,6 @@ export function useCheckInSuccessDialog({
         ),
         textAlign: "left",
         buttons: [
-          { label: t("success_share_more"), value: "share", variant: "outline" },
           { label: t("success_complete"), value: "complete", variant: "orange" },
         ],
       });

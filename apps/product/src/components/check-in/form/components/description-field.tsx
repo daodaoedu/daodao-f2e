@@ -37,7 +37,7 @@ export const DescriptionField = ({ form, beforeTextarea }: IDescriptionFieldProp
             </FormLabel>
 
             <FormDescription className="text-sm text-light-gray">
-              {descriptionLength}/300
+              {descriptionLength}/600
             </FormDescription>
           </div>
           {beforeTextarea}
