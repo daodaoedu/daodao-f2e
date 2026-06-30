@@ -5,10 +5,14 @@
  * 提供瀏覽追蹤相關的 React Hooks
  */
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { client } from "../client";
 
 export type ViewTrackingEntityType = "practice" | "resource";
+
+type UntypedPostClient = {
+  POST: (url: string, init: { body: unknown }) => Promise<unknown>;
+};
 
 /**
  * 記錄瀏覽事件的 Hook（fire-and-forget）
@@ -35,4 +39,61 @@ export const useRecordView = () => {
         });
     }
   }, []);
+};
+
+const READ_PROGRESS_THRESHOLDS = [25, 50, 75, 100];
+
+export const useRecordReadProgress = (practiceId: string | number) => {
+  const tracked = useRef(new Set<number>());
+
+  useEffect(() => {
+    tracked.current = new Set<number>();
+
+    const handleScroll = () => {
+      const el = document.documentElement;
+      const depth = Math.round(((el.scrollTop + el.clientHeight) / el.scrollHeight) * 100);
+      for (const threshold of READ_PROGRESS_THRESHOLDS) {
+        if (depth >= threshold && !tracked.current.has(threshold)) {
+          tracked.current.add(threshold);
+          (client as unknown as UntypedPostClient)
+            .POST(`/api/v1/practices/${practiceId}/progress`, {
+              body: { depthPercent: threshold },
+            })
+            .catch(() => {});
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [practiceId]);
+};
+
+export const useRecordTimeSpent = (practiceId: string | number) => {
+  const startTime = useRef(Date.now());
+
+  useEffect(() => {
+    startTime.current = Date.now();
+
+    const send = () => {
+      const seconds = Math.round((Date.now() - startTime.current) / 1000);
+      if (seconds < 5) return;
+      (client as unknown as UntypedPostClient)
+        .POST(`/api/v1/practices/${practiceId}/time-spent`, {
+          body: { seconds },
+        })
+        .catch(() => {});
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") send();
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      send();
+    };
+  }, [practiceId]);
 };

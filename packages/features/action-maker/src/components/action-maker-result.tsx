@@ -3,7 +3,7 @@
 import logoLargePng from "@daodao/assets/images/action-maker/logo-large.png";
 import logoSmallPng from "@daodao/assets/images/action-maker/logo-small.png";
 import { useAuth } from "@daodao/auth";
-import { captureElementAsImage } from "@daodao/shared";
+import { captureElementAsImage, getStorage, StorageEnum } from "@daodao/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useActionMaker } from "../hooks/use-action-maker";
 import { useCreatePracticeFromAction } from "../hooks/use-create-practice-from-action";
@@ -40,6 +40,7 @@ export function ActionMakerResult() {
   const { isCreating, createError, createPracticeFromResult } = useCreatePracticeFromAction();
   const cardRef = useRef<HTMLDivElement>(null);
   const pendingCreate = useRef(false);
+  const hasHadResult = useRef(false);
   const [downloading, setDownloading] = useState(false);
 
   const handleDownloadShareImage = useCallback(async () => {
@@ -50,12 +51,18 @@ export function ActionMakerResult() {
       const imageData = await captureElementAsImage(cardRef.current);
       if (!imageData) return;
 
-      const blob = await fetch(imageData.src).then((r) => r.blob());
-      const imageFile = new File([blob], "action-maker-result.jpg", {
-        type: "image/jpeg",
+      const [header, base64] = imageData.src.split(",");
+      const mime = header?.split(":")[1]?.split(";")[0] ?? "image/png";
+      const binary = atob(base64 ?? "");
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: mime });
+      const imageFile = new File([blob], "action-maker-result.png", {
+        type: mime,
       });
 
-      // Mobile: prefer native share with image
       const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
       if (isMobile && navigator.share) {
         try {
@@ -71,11 +78,12 @@ export function ActionMakerResult() {
         }
       }
 
-      // Desktop / fallback: trigger download
+      const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = imageData.src;
-      a.download = "action-maker-result.jpg";
+      a.href = blobUrl;
+      a.download = "action-maker-result.png";
       a.click();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
     } finally {
       setDownloading(false);
     }
@@ -86,6 +94,7 @@ export function ActionMakerResult() {
 
     if (!isAuthenticated) {
       pendingCreate.current = true;
+      getStorage<"action_maker">(StorageEnum.RegistrationFlow).set("action_maker");
       const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL || window.location.origin;
       openLoginDialog({
         redirectUrl: `${websiteUrl}/action-maker/result`,
@@ -116,7 +125,13 @@ export function ActionMakerResult() {
   }, [isAuthenticated, result, handleStartPractice]);
 
   useEffect(() => {
-    if (isHydrated && !result) {
+    if (result) {
+      hasHadResult.current = true;
+    }
+  }, [result]);
+
+  useEffect(() => {
+    if (isHydrated && !result && !hasHadResult.current) {
       navigateTo("/action-maker", { replace: true });
     }
   }, [isHydrated, result, navigateTo]);

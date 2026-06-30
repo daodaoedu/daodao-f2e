@@ -1,22 +1,19 @@
-import useSWR from "swr";
-import { api } from "@/services/api-client";
+import {
+  followTarget as apiFollowTarget,
+  unfollowTarget as apiUnfollowTarget,
+  useFollowStatus as useApiFollowStatus,
+} from "@daodao/api";
 
 // ── Types ──
 
-interface FollowStatusResponse {
-  success: boolean;
-  data?: {
-    isFollowing: boolean;
-  };
-}
+type FollowTargetType = "user" | "practice";
 
 // ── Query Hook ──
 
 export function useFollowStatus(targetType: string, targetId: string) {
-  const { data, error, isLoading, mutate } = useSWR<FollowStatusResponse>(
-    targetId ? `/follows/check/${targetType}/${targetId}` : null,
-    (url: string) => api.get<FollowStatusResponse>(url),
-    { revalidateOnFocus: false }
+  const { data, error, isLoading, mutate } = useApiFollowStatus(
+    targetType as FollowTargetType,
+    targetId
   );
 
   const isFollowing = data?.data?.isFollowing ?? false;
@@ -27,9 +24,9 @@ export function useFollowStatus(targetType: string, targetId: string) {
 // ── Mutations ──
 
 export async function followTarget(targetType: string, targetId: string) {
-  return api.post("/follows", { targetType, targetId });
+  return apiFollowTarget({ targetType: targetType as FollowTargetType, targetId });
 }
 
 export async function unfollowTarget(targetType: string, targetId: string) {
-  return api.delete(`/follows/${targetType}/${targetId}`);
+  return apiUnfollowTarget(targetType as FollowTargetType, targetId);
 }

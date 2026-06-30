@@ -8,6 +8,7 @@ import {
   submitRecommendationFeedback,
   useTopicRecommendations,
 } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { toast } from "@daodao/ui/components/sonner";
@@ -41,6 +42,7 @@ interface RecommendationCardProps {
 }
 
 function RecommendationCard({ card, isHiding, onDislike, onLike }: RecommendationCardProps) {
+  const t = useTranslations("dashboard");
   const [feedbackState, setFeedbackState] = useState<FeedbackState>(card.feedbackState);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -69,7 +71,7 @@ function RecommendationCard({ card, isHiding, onDislike, onLike }: Recommendatio
           platform: "web",
         });
         if (!isCurrentlyLiked) {
-          toast.success("收到！往後你會更容易看到類似的主題喔！");
+          toast.success(t("feedback_liked_toast"));
         }
         onLike(card);
       } catch {
@@ -141,7 +143,7 @@ function RecommendationCard({ card, isHiding, onDislike, onLike }: Recommendatio
                   ? "text-primary-base hover:text-primary-darker"
                   : "text-gray-400 hover:text-primary-base"
               )}
-              aria-label="喜歡"
+              aria-label={t("feedback_like")}
             >
               <ThumbsUp
                 className="size-4"
@@ -157,7 +159,7 @@ function RecommendationCard({ card, isHiding, onDislike, onLike }: Recommendatio
               }}
               disabled={isSubmitting}
               className="size-8 text-gray-400 hover:text-red-400"
-              aria-label="不喜歡"
+              aria-label={t("feedback_dislike")}
             >
               <ThumbsDown className="size-4" />
             </Button>
@@ -199,14 +201,13 @@ function RecommendationSkeleton() {
 // ── Empty State ───────────────────────────────────────────────
 
 function RecommendationEmptyState({ onGoToInspire }: { onGoToInspire: () => void }) {
+  const t = useTranslations("dashboard");
   return (
     <div className="flex flex-col items-center gap-3 py-10 text-center">
-      <p className="font-bold text-text-dark">暫時沒有推薦</p>
-      <p className="text-sm text-gray-500 max-w-[280px]">
-        你可以先專注於當前的計畫，或到「靈感」分頁看看其他主題實踐
-      </p>
+      <p className="font-bold text-text-dark">{t("empty_title")}</p>
+      <p className="text-sm text-gray-500 max-w-[280px]">{t("empty_description")}</p>
       <Button variant="outline" onClick={onGoToInspire} className="mt-1">
-        去看看靈感
+        {t("empty_cta")}
       </Button>
     </div>
   );
@@ -219,6 +220,7 @@ interface RecommendationSectionProps {
 }
 
 export function RecommendationSection({ onGoToInspire }: RecommendationSectionProps) {
+  const t = useTranslations("dashboard");
   const [displayedCards, setDisplayedCards] = useState<ITopicCard[]>([]);
   const [initialized, setInitialized] = useState(false);
   const [hidingIds, setHidingIds] = useState<Set<string>>(new Set());
@@ -307,9 +309,9 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
 
       hideTimersRef.current.set(card.practiceId, timer);
 
-      toast.success("已隱藏此推薦", {
+      toast.success(t("hidden_toast"), {
         action: {
-          label: "復原",
+          label: t("undo"),
           onClick: () => handleUndoHide(card.practiceId),
         },
       });
@@ -337,10 +339,10 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
           return [...prev, ...newCards.filter((c) => !existingIds.has(c.practiceId))];
         });
       } else {
-        toast.info("努力產出中，可以先到「靈感」看看哦！");
+        toast.info(t("load_more_empty_toast"));
       }
     } catch {
-      toast.error("載入失敗，請稍後再試");
+      toast.error(t("load_more_error_toast"));
     } finally {
       setIsLoadingMore(false);
     }
@@ -350,8 +352,8 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
     <section className="pt-8 flex flex-col gap-4 mb-6">
       {/* Section header */}
       <div className="flex items-center gap-2 flex-wrap">
-        <h2 className="text-xl font-bold text-text-dark">✦ 探索相關主題</h2>
-        <span className="text-sm text-gray-400">看看其他人都在實踐什麼</span>
+        <h2 className="text-xl font-bold text-text-dark">✦ {t("section_title")}</h2>
+        <span className="text-sm text-gray-400">{t("section_subtitle")}</span>
       </div>
 
       {/* Cards */}
@@ -385,13 +387,13 @@ export function RecommendationSection({ onGoToInspire }: RecommendationSectionPr
             >
               <span className="text-2xl">{isLoadingMore ? "…" : "＋"}</span>
               <span className="text-sm font-medium leading-snug text-center px-4">
-                查看更多推薦
+                {t("load_more")}
               </span>
             </button>
 
             <div className="shrink-0 w-4" aria-hidden="true" />
           </div>
-          <span className="text-xs text-gray-400">此主題為AI生成推薦</span>
+          <span className="text-xs text-gray-400">{t("ai_disclaimer")}</span>
         </>
       )}
     </section>

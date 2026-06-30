@@ -1,5 +1,8 @@
 import * as SecureStore from "expo-secure-store";
 
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so";
+const REQUEST_TIMEOUT = 30000;
+
 const KEYS = {
   ACCESS_TOKEN: "daodao_access_token",
   REFRESH_TOKEN: "daodao_refresh_token",
@@ -16,6 +19,45 @@ export interface IStoredUser {
 export interface IAuthTokens {
   accessToken: string;
   refreshToken: string;
+}
+
+export async function refreshTokens(): Promise<void> {
+  const refreshToken = await authStorage.getRefreshToken();
+  if (!refreshToken) {
+    throw new Error("No refresh token available");
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      await authStorage.clearAll();
+      throw new Error("Token refresh failed");
+    }
+
+    const data = (await response.json()) as Partial<IAuthTokens>;
+    if (!data.accessToken || !data.refreshToken) {
+      await authStorage.clearAll();
+      throw new Error("Token refresh response is invalid");
+    }
+
+    await authStorage.setTokens({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 export const authStorage = {

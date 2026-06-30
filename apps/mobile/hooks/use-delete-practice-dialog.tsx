@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { Alert } from "react-native";
+import { useMobileTranslation } from "@/i18n";
 
 export enum DeletePracticeResult {
   /** 實踐已成功刪除 */
@@ -25,18 +26,19 @@ export enum DeletePracticeResult {
  * ```
  */
 export function useDeletePracticeDialog() {
+  const t = useMobileTranslation("mobile.dialogs");
   const openDeleteDialog = useCallback(async (): Promise<DeletePracticeResult> => {
     return new Promise((resolve) => {
-      Alert.alert("確定刪除這個實踐？", "確定要跟這個主題說再見了嗎？一旦刪除，就無法復原囉。", [
+      Alert.alert(t("delete_practice_title"), t("delete_practice_message"), [
         {
-          text: "先不要",
+          text: t("not_now"),
           style: "cancel",
           onPress: () => {
             resolve(DeletePracticeResult.Cancelled);
           },
         },
         {
-          text: "確定刪除",
+          text: t("delete_confirm"),
           style: "destructive",
           onPress: () => {
             resolve(DeletePracticeResult.Deleted);
@@ -44,7 +46,7 @@ export function useDeletePracticeDialog() {
         },
       ]);
     });
-  }, []);
+  }, [t]);
 
   return { openDeleteDialog };
 }

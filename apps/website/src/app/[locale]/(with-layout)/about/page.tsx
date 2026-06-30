@@ -1,4 +1,4 @@
-import { getTranslations } from "@daodao/i18n/server";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import { ANCHOR_IDS, SOCIAL_LINKS } from "@daodao/shared";
 import { Image } from "@daodao/ui/components/image";
 import { SectionHeader } from "@daodao/ui/components/section-header";
@@ -18,6 +18,7 @@ export async function generateMetadata({
 
 export default async function AboutPage({ params }: PageProps<"/[locale]/about">) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "about" });
 
   const missionGoals = [

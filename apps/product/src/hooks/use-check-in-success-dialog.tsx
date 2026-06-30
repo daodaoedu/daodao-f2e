@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import {
   Tooltip,
   TooltipPanel,
@@ -15,9 +16,6 @@ interface UseCheckInSuccessDialogOptions {
   from?: number;
   to?: number;
 }
-
-/** 預設鼓勵句，當 API 未返回時使用 */
-const DEFAULT_ENCOURAGEMENT = "恭喜，你又成功行動了一次！";
 
 interface DelayedSplitTextProps {
   title: string;
@@ -284,10 +282,12 @@ interface Step2AnimationProps {
 }
 
 function Step2Animation({ encouragement }: Step2AnimationProps) {
+  const t = useTranslations("check_in");
+
   return (
     <div className="space-y-1">
-      <p>{encouragement || DEFAULT_ENCOURAGEMENT}</p>
-      <p className="text-sm text-text-dark/60">想留下更多紀錄嗎？繼續填寫標籤、心得與照片吧！</p>
+      <p>{encouragement || t("success_default_encouragement")}</p>
+      <p className="text-sm text-text-dark/60">{t("success_continue_hint")}</p>
     </div>
   );
 }
@@ -327,6 +327,7 @@ export function useCheckInSuccessDialog({
   from = 0,
   to = 100,
 }: UseCheckInSuccessDialogOptions) {
+  const t = useTranslations("check_in");
   const { openSuccessDialog: openDialog } = useDialog();
 
   const openSuccessDialog = useCallback(
@@ -334,7 +335,7 @@ export function useCheckInSuccessDialog({
       const finalFrom = dynamicFrom !== undefined ? dynamicFrom : from;
       const finalTo = dynamicTo !== undefined ? dynamicTo : to;
       return openDialog({
-        title: "打卡成功!",
+        title: t("success_title"),
         message: (
           <CheckInSuccessContent
             title={title}
@@ -345,12 +346,11 @@ export function useCheckInSuccessDialog({
         ),
         textAlign: "left",
         buttons: [
-          { label: "繼續分享心得", value: "share", variant: "outline" },
-          { label: "完成", value: "complete", variant: "orange" },
+          { label: t("success_complete"), value: "complete", variant: "orange" },
         ],
       });
     },
-    [openDialog, title, from, to]
+    [openDialog, title, from, to, t]
   );
 
   return { openSuccessDialog };

@@ -19,6 +19,7 @@ import {
   mapApiMoodToMoodType,
 } from "@/constants/mood";
 import type { IBodyPosition, ICheckInItem, ISvgGeometry } from "../types";
+import { computeBodyDisplayLeft } from "./check-in-stack-utils";
 
 const { Engine, World, Bodies, Vertices, Runner, Body } = Matter;
 Matter.Common.setDecomp(decomp);
@@ -278,10 +279,12 @@ interface ICheckInStackProps {
 
 export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const svgRefsRef = useRef<(SVGSVGElement | null)[]>([]);
   const bodiesRef = useRef<Matter.Body[]>([]);
   const [positions, setPositions] = useState<IBodyPosition[]>([]);
   const [containerHeight, setContainerHeight] = useState(MIN_CONTAINER_HEIGHT);
+  const [scale, setScale] = useState(1);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const [svgGeometries, setSvgGeometries] = useState<(ISvgGeometry | null)[]>([]);
 
@@ -300,6 +303,26 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
   }, [checkInsData]);
 
   const count = items.length;
+
+  // 可用寬度小於設計寬度（手機 viewport）時，整體等比縮放，避免容器水平溢出。
+  // 用 callback ref 在 wrapper 掛載/卸載時建立或清掉 ResizeObserver。
+  const handleWrapperRef = useCallback((node: HTMLDivElement | null) => {
+    resizeObserverRef.current?.disconnect();
+    if (!node) {
+      resizeObserverRef.current = null;
+      return;
+    }
+    const updateScale = () => {
+      const available = node.clientWidth;
+      if (available > 0) {
+        setScale(Math.min(1, available / CONTAINER_WIDTH));
+      }
+    };
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(node);
+    resizeObserverRef.current = observer;
+  }, []);
 
   /**
    * 獲取 SVG 組件配置
@@ -543,97 +566,105 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="relative"
-      style={{ width: CONTAINER_WIDTH, height: containerHeight }}
-    >
-      {/* 隱藏的 SVG 區域，用於提取幾何數據 */}
-      <div className="absolute opacity-0 pointer-events-none invisible h-px overflow-hidden">
-        {SVG_CONFIGS.map(({ name, Component }, i) => (
-          <Component key={name} ref={handleSvgRef(i)} />
-        ))}
-      </div>
+    <div ref={handleWrapperRef} style={{ width: "100%", height: containerHeight * scale }}>
+      <div
+        ref={containerRef}
+        className="relative"
+        style={{
+          width: CONTAINER_WIDTH,
+          height: containerHeight,
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+        }}
+      >
+        {/* 隱藏的 SVG 區域，用於提取幾何數據 */}
+        <div className="absolute opacity-0 pointer-events-none invisible h-px overflow-hidden">
+          {SVG_CONFIGS.map(({ name, Component }, i) => (
+            <Component key={name} ref={handleSvgRef(i)} />
+          ))}
+        </div>
 
-      {/* SVG clipPath 定義 */}
-      <svg width="0" height="0" className="absolute" aria-hidden="true">
-        <defs>
-          {positions.map((position, i) => {
-            const geometry = svgGeometries[i];
-            if (!geometry || !geometry.path) return null;
+        {/* SVG clipPath 定義 */}
+        <svg width="0" height="0" className="absolute" aria-hidden="true">
+          <defs>
+            {positions.map((position, i) => {
+              const geometry = svgGeometries[i];
+              if (!geometry || !geometry.path) return null;
 
-            return (
-              <clipPath key={position.id} id={`clip-path-${i}`}>
-                <path d={geometry.path} />
-              </clipPath>
-            );
-          })}
-        </defs>
-      </svg>
+              return (
+                <clipPath key={position.id} id={`clip-path-${i}`}>
+                  <path d={geometry.path} />
+                </clipPath>
+              );
+            })}
+          </defs>
+        </svg>
 
-      {/* 渲染物理物體 */}
-      {positions.map((position, i) => {
-        const config = getSvgConfig(i);
-        if (!config) return null;
-        const { Component } = config;
+        {/* 渲染物理物體 */}
+        {positions.map((position, i) => {
+          const config = getSvgConfig(i);
+          if (!config) return null;
+          const { Component } = config;
 
-        const geometry = svgGeometries[i];
-        if (!geometry) return null;
-        const { width, height } = geometry;
-        const x = Number.isFinite(position.x) ? position.x : 0;
-        const y = Number.isFinite(position.y) ? position.y : 0;
-        const angle = Number.isFinite(position.angle) ? position.angle : 0;
-        const w = Number.isFinite(width) ? width : 0;
-        const h = Number.isFinite(height) ? height : 0;
-        const id = position.id;
+          const geometry = svgGeometries[i];
+          if (!geometry) return null;
+          const { width, height } = geometry;
+          const x = Number.isFinite(position.x) ? position.x : 0;
+          const y = Number.isFinite(position.y) ? position.y : 0;
+          const angle = Number.isFinite(position.angle) ? position.angle : 0;
+          const w = Number.isFinite(width) ? width : 0;
+          const h = Number.isFinite(height) ? height : 0;
+          const id = position.id;
 
-        const left = x - w / 2 - WALL_THICKNESS;
-        const top = y - h / 2;
+          const left = computeBodyDisplayLeft(x, w, h, angle, CONTAINER_WIDTH);
+          const top = y - h / 2;
 
-        // 如果計算結果無效，不渲染
-        if (!Number.isFinite(left) || !Number.isFinite(top)) {
-          return null;
-        }
+          // 如果計算結果無效，不渲染
+          if (!Number.isFinite(left) || !Number.isFinite(top)) {
+            return null;
+          }
 
-        const clipPath = getClipPath(geometry, i);
-        const item = items[i];
+          const clipPath = getClipPath(geometry, i);
+          const item = items[i];
 
-        if (!item) return null;
+          if (!item) return null;
 
-        const { mood, date, content } = item;
-        const Emoji = (MOOD_MAP[mood as MoodTypeType] ?? MOOD_OPTIONS[0]?.emoji) as React.FC<
-          React.SVGProps<SVGSVGElement>
-        >;
+          const { mood, date, content } = item;
+          const Emoji = (MOOD_MAP[mood as MoodTypeType] ?? MOOD_OPTIONS[0]?.emoji) as React.FC<
+            React.SVGProps<SVGSVGElement>
+          >;
 
-        return (
-          <Link
-            key={id}
-            href={`/practices/${practiceId}/check-ins/${item.id}`}
-            className="absolute cursor-pointer hover:shadow-2xl"
-            style={{
-              width: w,
-              height: h,
-              left,
-              top,
-              transform: `rotate(${angle}rad) ${i % 5 === 3 ? "translateY(20px)" : ""}`,
-              transformOrigin: "center center",
-              clipPath: clipPath || undefined,
-            }}
-          >
-            <Component className="w-full h-full" />
-            <div
-              className={cn(
-                "absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2",
-                i % 5 === 3 && "pb-11"
-              )}
+          return (
+            <Link
+              key={id}
+              href={`/practices/${practiceId}/check-ins/${item.id}`}
+              className="absolute cursor-pointer hover:shadow-2xl"
+              style={{
+                width: w,
+                height: h,
+                left,
+                top,
+                // translateY 放在 rotate 前面（螢幕座標系），避免旋轉時 translate 帶入水平分量超出容器
+                transform: `${i % 5 === 3 ? "translateY(20px) " : ""}rotate(${angle}rad)`,
+                transformOrigin: "center center",
+                clipPath: clipPath || undefined,
+              }}
             >
-              <Emoji className="size-6" />
-              <div className="text-xs text-bg-dark">{date}</div>
-              <div className="max-w-40 text-bg-dark line-clamp-2">{content}</div>
-            </div>
-          </Link>
-        );
-      })}
+              <Component className="w-full h-full" />
+              <div
+                className={cn(
+                  "absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2",
+                  i % 5 === 3 && "pb-11"
+                )}
+              >
+                <Emoji className="size-6" />
+                <div className="text-xs text-bg-dark">{date}</div>
+                <div className="max-w-40 text-bg-dark line-clamp-2">{content}</div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 };

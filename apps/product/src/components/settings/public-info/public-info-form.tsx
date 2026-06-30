@@ -1,7 +1,7 @@
 "use client";
 
 import { useCities, useCurrentUser, useMutate, useUserMutations } from "@daodao/api";
-import { useLocale } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
@@ -10,15 +10,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate as globalMutate } from "swr";
+import {
+  applyOnboardingUpdateFromResponse,
+  refreshOnboardingStatus,
+} from "@/components/task-guide/onboarding-progress-context";
 import { AvatarUploadSection } from "./avatar-upload-section";
 import { BasicInfoSection } from "./basic-info-section";
 import { IntroductionSection } from "./introduction-section";
 import { PrivacySection } from "./privacy-section";
-import { type PublicInfoFormValues, publicInfoFormSchema } from "./schema";
+import { createPublicInfoFormSchema, type PublicInfoFormValues } from "./schema";
 import { SocialLinksSection } from "./social-links-section";
 
 export const PublicInfoForm = () => {
   const locale = useLocale();
+  const t = useTranslations("app_product");
   const { data: userData, isLoading, error: userError } = useCurrentUser();
   const { updateCurrentUserWithFormData } = useUserMutations();
   const mutate = useMutate();
@@ -33,7 +38,7 @@ export const PublicInfoForm = () => {
   });
 
   const form = useForm<PublicInfoFormValues>({
-    resolver: zodResolver(publicInfoFormSchema),
+    resolver: zodResolver(createPublicInfoFormSchema(t)),
     defaultValues: {
       photoURL: "",
       name: "",
@@ -63,7 +68,6 @@ export const PublicInfoForm = () => {
       // 若 user 有設定 location，需等 citiesData 載入後才能解出 countryCode
       // 避免先以 country:"" 重置，導致城市 select 顯示空白
       if (user.location && isCitiesLoading) return;
-      
 
       // 根據 location 找到對應的 countryCode
       let countryCode = "";
@@ -159,21 +163,24 @@ export const PublicInfoForm = () => {
       };
 
       // 調用 FormData API 更新用戶資訊（包含圖片上傳）
-      await updateCurrentUserWithFormData(updateData, avatarFile || undefined);
+      const response = await updateCurrentUserWithFormData(updateData, avatarFile || undefined);
 
       // 刷新用戶資料
       await mutate(["/api/v1/users/me"] as const);
       globalMutate("/api/v1/users/settings-summary");
+      if (!applyOnboardingUpdateFromResponse(response)) {
+        refreshOnboardingStatus();
+      }
 
       // 成功
-      toast.success("公開資訊設定已更新");
+      toast.success(t("public_info_updated"));
       form.reset(form.getValues()); // 重置 dirty 狀態
       setAvatarFile(null); // 清除頭像檔案
     } catch (error) {
       console.error("Failed to update user:", error);
 
       // 處理錯誤
-      let errorMessage = "更新失敗，請稍後再試";
+      let errorMessage = t("update_failed_retry");
 
       if (error instanceof Error) {
         errorMessage = error.message;
@@ -225,7 +232,7 @@ export const PublicInfoForm = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-text-dark">載入中...</p>
+        <p className="text-text-dark">{t("loading")}</p>
       </div>
     );
   }
@@ -234,7 +241,7 @@ export const PublicInfoForm = () => {
   if (userError) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-red">載入用戶資料失敗，請稍後再試</p>
+        <p className="text-red">{t("public_info_load_failed")}</p>
       </div>
     );
   }
@@ -257,14 +264,14 @@ export const PublicInfoForm = () => {
         <PrivacySection form={form} />
 
         {/* 儲存按鈕 */}
-        <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray">
+        <footer className="fixed bottom-20 left-0 right-0 z-20 flex justify-center gap-6 border-t border-light-gray bg-very-light-gray p-6 md:bottom-0">
           <Button
             type="submit"
             variant="orange"
             className="w-full sm:max-w-[288px]"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "儲存中..." : "儲存"}
+            {isSubmitting ? t("saving") : t("save")}
           </Button>
         </footer>
       </form>

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet } from "react-native";
 import { Text, XStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 export type PracticeTab = "comments" | "checkins" | "resources";
 
@@ -12,10 +13,10 @@ interface PracticeTabBarProps {
   resourceCount?: number;
 }
 
-const TABS: { key: PracticeTab; label: string }[] = [
-  { key: "comments", label: "留言" },
-  { key: "checkins", label: "打卡紀錄" },
-  { key: "resources", label: "使用資源" },
+const TABS: { key: PracticeTab; labelKey: string }[] = [
+  { key: "comments", labelKey: "tab_comments" },
+  { key: "checkins", labelKey: "tab_checkins" },
+  { key: "resources", labelKey: "tab_resources" },
 ];
 
 export function PracticeTabBar({
@@ -25,6 +26,7 @@ export function PracticeTabBar({
   checkinCount,
   resourceCount,
 }: PracticeTabBarProps) {
+  const t = useMobileTranslation("mobile.practiceDetail");
   const countMap: Record<PracticeTab, number | undefined> = {
     comments: commentCount,
     checkins: checkinCount,
@@ -36,7 +38,8 @@ export function PracticeTabBar({
       {TABS.map((tab) => {
         const isActive = activeTab === tab.key;
         const count = countMap[tab.key];
-        const label = count != null && count > 0 ? `${tab.label}(${count})` : tab.label;
+        const tabLabel = t(tab.labelKey);
+        const label = count != null && count > 0 ? `${tabLabel}(${count})` : tabLabel;
         return (
           <Pressable
             key={tab.key}

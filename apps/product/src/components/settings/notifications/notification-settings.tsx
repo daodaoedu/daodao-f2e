@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useState } from "react";
@@ -23,20 +24,36 @@ type PreferencesMap = Record<string, PreferenceState>;
 // ============================================================================
 
 const NOTIFICATION_TYPES = [
-  { type: "reaction", label: "反應", description: "有人對你的內容按了反應" },
-  { type: "comment", label: "留言與 @", description: "有人留言或 @ 提及了你" },
-  { type: "UserFollowed", label: "關注", description: "有人關注了你" },
-  { type: "Connect", label: "連結請求", description: "有人向你發出連結請求" },
-  { type: "ConnectAccepted", label: "連結確認", description: "對方同意了你的連結請求" },
-  { type: "update-practice-checkin", label: "關注的實踐更新", description: "你關注的實踐有新打卡" },
+  { type: "reaction", labelKey: "notif_type_reaction", descriptionKey: "notif_type_reaction_desc" },
+  { type: "comment", labelKey: "notif_type_comment", descriptionKey: "notif_type_comment_desc" },
+  { type: "UserFollowed", labelKey: "notif_type_follow", descriptionKey: "notif_type_follow_desc" },
+  { type: "Connect", labelKey: "notif_type_connect", descriptionKey: "notif_type_connect_desc" },
+  {
+    type: "ConnectAccepted",
+    labelKey: "notif_type_connect_accepted",
+    descriptionKey: "notif_type_connect_accepted_desc",
+  },
+  {
+    type: "update-practice-checkin",
+    labelKey: "notif_type_practice_checkin",
+    descriptionKey: "notif_type_practice_checkin_desc",
+  },
   {
     type: "PracticeCreated",
-    label: "關注的人開始實踐",
-    description: "你關注的人開始了新主題實踐",
+    labelKey: "notif_type_practice_created",
+    descriptionKey: "notif_type_practice_created_desc",
   },
-  { type: "BuddyRequest", label: "Buddy 請求", description: "有人邀請你成為實踐夥伴" },
-  { type: "WeeklyDigest", label: "週報", description: "每週一的島嶼探索摘要" },
-];
+  {
+    type: "BuddyRequest",
+    labelKey: "notif_type_buddy_request",
+    descriptionKey: "notif_type_buddy_request_desc",
+  },
+  {
+    type: "WeeklyDigest",
+    labelKey: "notif_type_weekly_digest",
+    descriptionKey: "notif_type_weekly_digest_desc",
+  },
+] as const;
 
 const DEFAULT_PREFS: PreferencesMap = Object.fromEntries(
   NOTIFICATION_TYPES.map((t) => [t.type, { emailEnabled: true }])
@@ -83,6 +100,7 @@ function Toggle({
 // ============================================================================
 
 export const NotificationSettings = () => {
+  const t = useTranslations("account_settings");
   const { data, mutate } = useNotificationPreferences();
 
   const [globalEnabled, setGlobalEnabled] = useState<boolean | undefined>(undefined);
@@ -108,10 +126,10 @@ export const NotificationSettings = () => {
     setIsSaving(true);
     try {
       await updateNotificationPreferences({ globalEnabled: value });
-      toast.success(value ? "已開啟通知" : "已關閉通知");
+      toast.success(value ? t("notif_enabled") : t("notif_disabled"));
     } catch {
       setGlobalEnabled(!value);
-      toast.error("儲存失敗，請稍後再試");
+      toast.error(t("save_error"));
     } finally {
       setIsSaving(false);
       mutate();
@@ -131,7 +149,7 @@ export const NotificationSettings = () => {
         ...(p ?? DEFAULT_PREFS),
         [notificationType]: prev ?? { emailEnabled: true },
       }));
-      toast.error("儲存失敗，請稍後再試");
+      toast.error(t("save_error"));
     } finally {
       setIsSaving(false);
       mutate();
@@ -175,9 +193,9 @@ export const NotificationSettings = () => {
       <div className="bg-white rounded-2xl overflow-hidden divide-y divide-[#E4EAE9]">
         <div className="flex items-center gap-3 px-4 py-4">
           <div className="flex-1">
-            <p className="text-sm font-medium text-text-dark">通知總開關</p>
+            <p className="text-sm font-medium text-text-dark">{t("notif_global_title")}</p>
             <p className="text-xs text-[#9FB5B8] mt-0.5 leading-relaxed">
-              關閉後將停止所有 Email 通知，通知中心仍繼續累積
+              {t("notif_global_desc")}
             </p>
           </div>
           <Toggle
@@ -190,16 +208,16 @@ export const NotificationSettings = () => {
 
       {/* 分項設定 */}
       <div className="flex flex-col gap-2">
-        <h2 className="text-xs font-medium text-[#9FB5B8] px-1">Email 通知設定</h2>
+        <h2 className="text-xs font-medium text-[#9FB5B8] px-1">{t("notif_email_section")}</h2>
         <div className="bg-white rounded-2xl overflow-hidden divide-y divide-[#E4EAE9]">
           {NOTIFICATION_TYPES.map((item) => {
             const isEnabled = prefs[item.type]?.emailEnabled ?? true;
             return (
               <div key={item.type} className="flex items-center gap-3 px-4 py-3">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-text-dark">{item.label}</p>
+                  <p className="text-sm font-medium text-text-dark">{t(item.labelKey)}</p>
                   <p className="text-xs text-[#9FB5B8] mt-0.5 leading-relaxed">
-                    {item.description}
+                    {t(item.descriptionKey)}
                   </p>
                 </div>
                 <Toggle
@@ -214,7 +232,7 @@ export const NotificationSettings = () => {
       </div>
 
       <p className="text-xs text-[#9FB5B8] text-center px-4 leading-relaxed">
-        In-App 通知中心（島嶼上的通知鈴）永遠開啟，只有 Email 可以關閉
+        {t("notif_inapp_note")}
       </p>
     </div>
   );

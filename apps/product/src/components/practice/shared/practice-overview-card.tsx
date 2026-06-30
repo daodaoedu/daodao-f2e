@@ -1,6 +1,7 @@
 "use client";
 
 import { DefaultAvatarSvg, TagSolidSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
@@ -12,6 +13,7 @@ interface CreatorInfo {
   id: string;
   name: string;
   photoURL?: string | null;
+  customId?: string | null;
   date?: string;
 }
 
@@ -39,12 +41,13 @@ export const PracticeOverviewCard = ({
   creator,
   practiceId,
 }: PracticeOverviewCardProps) => {
+  const t = useTranslations("practice");
   return (
     <div className="relative bg-white pt-4 px-4 pb-4 mb-4 rounded-xl">
       {/* 建立者資訊 - 僅在公開頁面顯示 */}
       {creator && (
         <div className="flex items-center gap-2 mb-3">
-          <Link href={`/users/${creator.id}`}>
+          <Link href={`/users/${creator.customId ?? creator.id}`}>
             <Avatar className="size-8">
               {creator.photoURL && <AvatarImage src={creator.photoURL} />}
               <AvatarFallback>
@@ -53,7 +56,7 @@ export const PracticeOverviewCard = ({
             </Avatar>
           </Link>
           <Link
-            href={`/users/${creator.id}`}
+            href={`/users/${creator.customId ?? creator.id}`}
             className="text-sm font-medium text-text-dark hover:underline"
           >
             {creator.name}
@@ -69,17 +72,17 @@ export const PracticeOverviewCard = ({
           {/* Time Commitments */}
           <div className="flex pb-3 mb-3 border-b border-bg-gray">
             <div className="w-20">
-              <div className="text-xs text-text-dark">一週</div>
+              <div className="text-xs text-text-dark">{t("overview_per_week")}</div>
               <div className="flex items-baseline gap-0.5">
                 <div className="text-lg font-medium text-logo-cyan">{frequency}</div>
-                <div className="text-xs text-text-dark">天</div>
+                <div className="text-xs text-text-dark">{t("overview_days_unit")}</div>
               </div>
             </div>
             <div className="w-20">
-              <div className="text-xs text-text-dark">一次</div>
+              <div className="text-xs text-text-dark">{t("overview_per_session")}</div>
               <div className="flex items-baseline gap-0.5">
                 <div className="text-lg font-medium text-logo-cyan">{durationMinutes}</div>
-                <div className="text-xs text-text-dark">分鐘</div>
+                <div className="text-xs text-text-dark">{t("overview_minutes_unit")}</div>
               </div>
             </div>
           </div>

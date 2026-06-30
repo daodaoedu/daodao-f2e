@@ -44,19 +44,19 @@ export interface StatusBadgeConfig {
 
 const statusConfig: Record<TaskStatus, StatusConfig> = {
   [TaskStatus.draft]: {
-    label: "草稿",
+    label: "filter_draft",
     variant: "outline-ghost",
   },
   [TaskStatus.notStarted]: {
-    label: "未開始",
+    label: "filter_not_started",
     variant: "very-light-blue",
   },
   [TaskStatus.inProgress]: {
-    label: "進行中",
+    label: "filter_in_progress",
     variant: "default",
   },
   [TaskStatus.completed]: {
-    label: "已完成",
+    label: "filter_completed",
     variant: "outline-logo",
   },
 };
@@ -67,6 +67,9 @@ const statusConfig: Record<TaskStatus, StatusConfig> = {
 export const getStatusConfig = (status: TaskStatus | string): StatusConfig => {
   return statusConfig[status as TaskStatus];
 };
+
+export const getTaskStatusLabelKey = (status: TaskStatus | string): string | undefined =>
+  statusConfig[status as TaskStatus]?.label;
 
 /**
  * 將 API 的 PracticeStatus 映射到 TaskStatus

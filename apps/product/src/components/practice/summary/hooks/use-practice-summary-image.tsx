@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { type CapturedImageData, captureElementAsImage } from "@daodao/shared";
 import { useCallback, useRef, useState } from "react";
 
@@ -52,6 +53,7 @@ export const usePracticeSummaryImage = ({
   practiceName,
   timeout = 10000,
 }: UsePracticeSummaryImageOptions): UsePracticeSummaryImageReturn => {
+  const t = useTranslations("practice");
   const summaryCardRef = useRef<HTMLDivElement | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +67,7 @@ export const usePracticeSummaryImage = ({
    */
   const generateImage = useCallback(async (): Promise<CapturedImageData | null> => {
     if (!summaryCardRef.current) {
-      setError("找不到摘要卡片元素");
+      setError(t("summary_image_error_element_missing"));
       return null;
     }
 
@@ -78,7 +80,7 @@ export const usePracticeSummaryImage = ({
     const timeoutId = setTimeout(() => {
       isCancelledRef.current = true;
       setIsGenerating(false);
-      setError("圖片生成超時，請重試");
+      setError(t("summary_image_error_timeout"));
     }, timeout);
 
     try {
@@ -93,7 +95,7 @@ export const usePracticeSummaryImage = ({
       }
 
       if (!result) {
-        setError("圖片生成失敗");
+        setError(t("summary_image_error_generation_failed"));
         setImageData(null);
         return null;
       }
@@ -109,7 +111,7 @@ export const usePracticeSummaryImage = ({
         return null;
       }
 
-      const errorMessage = err instanceof Error ? err.message : "圖片生成發生錯誤";
+      const errorMessage = err instanceof Error ? err.message : t("summary_image_error_unknown");
       setError(errorMessage);
       setImageData(null);
       return null;
@@ -119,7 +121,7 @@ export const usePracticeSummaryImage = ({
         setIsGenerating(false);
       }
     }
-  }, [timeout]);
+  }, [timeout, t]);
 
   /**
    * 下載圖片
@@ -146,11 +148,10 @@ export const usePracticeSummaryImage = ({
       const link = document.createElement("a");
       link.href = dataToDownload.src;
 
-      // 生成檔案名稱：實踐名稱_日期
       const date = new Date();
       const dateString = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;
       const sanitizedName = sanitizeFilename(practiceName);
-      link.download = `${sanitizedName}_總結_${dateString}.png`;
+      link.download = `${sanitizedName}_${t("summary_image_filename_suffix")}_${dateString}.png`;
 
       // 觸發下載
       document.body.appendChild(link);
@@ -165,10 +166,10 @@ export const usePracticeSummaryImage = ({
         }, 100);
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "下載圖片時發生錯誤";
+      const errorMessage = err instanceof Error ? err.message : t("summary_image_error_download");
       setError(errorMessage);
     }
-  }, [imageData, generateImage, practiceName]);
+  }, [imageData, generateImage, practiceName, t]);
 
   /**
    * 重置狀態

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { toast } from "@daodao/ui/components/sonner";
@@ -38,6 +39,7 @@ function ExploreTopicCard({
     authorAvatarColor,
     templateId,
   } = topic;
+  const t = useTranslations("dashboard");
 
   const href = templateId
     ? templateId === "dev-preview"
@@ -90,7 +92,7 @@ function ExploreTopicCard({
               className="w-full"
               onClick={() => onCopyPractice(topic.practiceId as string)}
             >
-              我也想實踐
+              {t("want_to_practice")}
             </Button>
           )}
           <div className="flex items-center justify-between">
@@ -147,6 +149,7 @@ export function ExploreTopicsSection({
   onNavigateToInspiration,
   onCopyPractice,
 }: ExploreTopicsSectionProps) {
+  const t = useTranslations("dashboard");
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [hidingIds, setHidingIds] = useState<Set<string>>(new Set());
@@ -170,10 +173,10 @@ export function ExploreTopicsSection({
         return next;
       });
       if (!isCurrentlyLiked) {
-        toast.success("收到！往後你會更容易看到類似的主題喔！");
+        toast.success(t("feedback_liked_toast"));
       }
     },
-    [likedIds]
+    [likedIds, t]
   );
 
   const handleUndoHide = useCallback((id: string) => {
@@ -207,14 +210,14 @@ export function ExploreTopicsSection({
         hideTimersRef.current.delete(id);
       }, 300);
       hideTimersRef.current.set(id, timer);
-      toast.success("已隱藏此推薦", {
+      toast.success(t("hidden_toast"), {
         action: {
-          label: "復原",
+          label: t("undo"),
           onClick: () => handleUndoHide(id),
         },
       });
     },
-    [handleUndoHide]
+    [handleUndoHide, t]
   );
 
   if (topics.length === 0) return null;
@@ -223,21 +226,19 @@ export function ExploreTopicsSection({
     <div className="pt-8 flex flex-col gap-4">
       {/* Section header */}
       <div className="max-w-[640px] mx-auto px-4 w-full flex items-center gap-2 flex-wrap">
-        <h2 className="text-xl font-bold text-text-dark">✦ 探索相關主題</h2>
-        <span className="text-sm text-gray-400">看看其他人都在實踐什麼</span>
+        <h2 className="text-xl font-bold text-text-dark">✦ {t("section_title")}</h2>
+        <span className="text-sm text-gray-400">{t("section_subtitle")}</span>
       </div>
 
       {/* Empty state */}
       {visibleTopics.length === 0 ? (
         <div className="max-w-[640px] mx-auto px-4 w-full flex flex-col items-center gap-3 py-10 text-center">
           <Compass className="size-12 text-gray-300" />
-          <p className="font-bold text-text-dark">暫時沒有推薦</p>
-          <p className="text-sm text-gray-500 max-w-[280px]">
-            你可以先專注於當前的計畫，或到「靈感」分頁看看其他主題實踐
-          </p>
+          <p className="font-bold text-text-dark">{t("empty_title")}</p>
+          <p className="text-sm text-gray-500 max-w-[280px]">{t("empty_description")}</p>
           {onNavigateToInspiration && (
             <Button variant="outline" onClick={onNavigateToInspiration} className="mt-1">
-              去看看靈感
+              {t("empty_cta")}
             </Button>
           )}
         </div>
@@ -266,7 +267,7 @@ export function ExploreTopicsSection({
               >
                 <span className="text-2xl">＋</span>
                 <span className="text-sm font-medium leading-snug text-center px-4">
-                  查看更多推薦
+                  {t("load_more")}
                 </span>
               </button>
             )}
@@ -276,7 +277,7 @@ export function ExploreTopicsSection({
 
           {/* AI label */}
           <div className="max-w-[640px] mx-auto px-4 w-full">
-            <span className="text-xs text-gray-400">此主題為AI生成推薦</span>
+            <span className="text-xs text-gray-400">{t("ai_disclaimer")}</span>
           </div>
         </>
       )}

@@ -1,6 +1,48 @@
 import { z } from "zod";
 
-export const createPracticeSchema = z.object({
+export const createCreatePracticeSchema = (
+  t: (key: string, values?: Record<string, string | number>) => string
+) =>
+  z.object({
+    // Step 1: 標題與描述
+    title: z.string().min(1, t("validation_name_required")).max(50, t("validation_action_max")),
+    description: z.string().max(200, t("validation_description_max")).optional(),
+
+    // Step 2: 頻率與時長
+    frequency: z.enum(["daily", "weekly", "custom"], {
+      required_error: t("validation_frequency_required"),
+    }),
+    targetDays: z
+      .number()
+      .min(1, t("validation_target_days_min"))
+      .max(365, t("validation_target_days_max")),
+    customDays: z.array(z.number().min(0).max(6)).optional(), // 0=Sunday, 6=Saturday
+
+    // Step 3: 執行時機
+    reminderTime: z.string().optional(), // HH:mm format
+    reminderEnabled: z.boolean().default(false),
+
+    // Step 4: 標籤與資源
+    tags: z
+      .array(z.string())
+      .max(5, t("validation_tags_max", { max: 5 }))
+      .default([]),
+    color: z.string().optional(),
+    icon: z.string().optional(),
+
+    // Step 5: 隱私設定
+    privacy_status: z.enum(["private", "public", "delayed"]).default("private"),
+  });
+
+export const createPracticeSchema = createCreatePracticeSchema((key, values) => {
+  if (!values) return key;
+  return Object.entries(values).reduce(
+    (result, [valueKey, value]) => result.replaceAll(`{${valueKey}}`, String(value)),
+    key
+  );
+});
+
+const createPracticeSchemaForType = z.object({
   // Step 1: 標題與描述
   title: z.string().min(1, "請輸入標題").max(50, "標題最多 50 字"),
   description: z.string().max(200, "描述最多 200 字").optional(),
@@ -25,7 +67,7 @@ export const createPracticeSchema = z.object({
   privacy_status: z.enum(["private", "public", "delayed"]).default("private"),
 });
 
-export type CreatePracticeInputType = z.infer<typeof createPracticeSchema>;
+export type CreatePracticeInputType = z.infer<typeof createPracticeSchemaForType>;
 
 export const defaultCreatePracticeValues: CreatePracticeInputType = {
   title: "",

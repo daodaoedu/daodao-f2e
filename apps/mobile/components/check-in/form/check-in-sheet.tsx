@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarCheck, Check } from "@tamagui/lucide-icons";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, StyleSheet } from "react-native";
 import { Button, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
 import { DescriptionField } from "./components/description-field";
 import { MediaUploadField } from "./components/media-upload-field";
@@ -12,7 +13,7 @@ import { MoodSelector } from "./components/mood-selector";
 import { TagSelector } from "./components/tag-selector";
 import { useCheckInImageRender } from "./hooks/use-check-in-image-render";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
-import { type CheckInFormValuesType, checkInFormSchema } from "./schema";
+import { type CheckInFormValuesType, createCheckInFormSchema } from "./schema";
 
 // Export types for external use (avoid naming conflicts with legacy CheckInSheet)
 export type { ICheckInFormData, ICheckInStatusOptions };
@@ -28,6 +29,8 @@ interface ICheckInSheetContentProps {
 }
 
 export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetContentProps) => {
+  const t = useMobileTranslation("mobile.checkIn");
+  const checkInFormSchema = useMemo(() => createCheckInFormSchema(t), [t]);
   const {
     control,
     handleSubmit,
@@ -157,7 +160,7 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
               <Check size={18} color={colors.basic.white} />
             )}
             <Text color={colors.basic.white} fontWeight="600">
-              {isRendering ? "打卡中..." : "完成打卡"}
+              {isRendering ? t("submitting") : t("submit")}
             </Text>
           </XStack>
         </Button>

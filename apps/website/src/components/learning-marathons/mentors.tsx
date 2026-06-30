@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { ArrowRight } from "lucide-react";
@@ -260,6 +261,7 @@ const Tag = ({ text, className }: TagProps) => (
 );
 
 export const Mentors = () => {
+  const t = useTranslations("learning_marathon");
   const [activeMentorName, setActiveMentorName] = useState<string>("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -283,7 +285,7 @@ export const Mentors = () => {
         <div className="mx-6 lg:ml-60">
           <div className="flex items-center justify-between lg:mr-60">
             <h2 className="heading-md text-basic-500" id="marathon-mentor">
-              引導師介紹
+              {t("mentors_section_title")}
             </h2>
           </div>
           <div className="mt-9 overflow-x-auto">
@@ -306,7 +308,7 @@ export const Mentors = () => {
                       {mentor.title} | {mentor.name}
                     </div>
                     <div className="flex items-center justify-end gap-1 bg-white px-3 py-2 text-gray-400 group-hover:text-primary-base">
-                      more
+                      {t("mentor_card_more")}
                       <ArrowRight className="text-base" />
                     </div>
                   </div>
@@ -366,7 +368,9 @@ export const Mentors = () => {
             <section className="mb-4">
               {activeMentor && activeMentor.experiences.length > 0 && (
                 <>
-                  <h3 className="body-md mb-2 font-bold text-basic-400">經歷</h3>
+                  <h3 className="body-md mb-2 font-bold text-basic-400">
+                    {t("mentor_modal_experiences_label")}
+                  </h3>
                   <ul>
                     {activeMentor.experiences.map((experience) => (
                       <li key={experience} className="body-sm text-basic-400">
@@ -378,7 +382,9 @@ export const Mentors = () => {
               )}
             </section>
             <section>
-              <h3 className="body-md mb-2 font-bold text-basic-400">自我介紹</h3>
+              <h3 className="body-md mb-2 font-bold text-basic-400">
+                {t("mentor_modal_intro_label")}
+              </h3>
               <p className="body-sm whitespace-pre-wrap text-basic-400">
                 {activeMentor?.introduction || ""}
               </p>

@@ -1,4 +1,4 @@
-import { getTranslations } from "@daodao/i18n/server";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import MarkdownRenderer from "@daodao/ui/components/markdown-renderer";
 import { Paper } from "@daodao/ui/components/wrapper";
 import type { Metadata } from "next";
@@ -43,6 +43,8 @@ export async function generateMetadata({
 }
 
 export default async function TermsPage({ params }: PageProps<"/[locale]/terms/[type]">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const { content } = await getTermsData(params);
 
   return (

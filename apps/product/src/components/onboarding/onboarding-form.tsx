@@ -1,55 +1,64 @@
 "use client";
 
-import { checkCustomIdAvailability, useUserMutations } from "@daodao/api";
+import {
+  checkCustomIdAvailability,
+  submitOnboardingFlowResponse,
+  useUserMutations,
+} from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { clearTrackingRef, getTrackingRef } from "@/lib/tracking-ref";
+import { DynamicStep } from "./dynamic-step";
 import { InterestsSection } from "./interests-section";
 import { OnboardingStepper } from "./onboarding-stepper";
 import { ProfileSection } from "./profile-section";
 import { ReferralSection } from "./referral-section";
 import {
-  interestsStepSchema,
+  createOnboardingFormSchema,
+  createOnboardingStepSchemas,
   type OnboardingFormValues,
-  onboardingFormSchema,
-  profileStepSchema,
-  referralStepSchema,
 } from "./schema";
 import { SuccessSection } from "./success-section";
+import { useActiveFlow } from "./use-active-flow";
 import { useOnboardingStep } from "./use-onboarding-step";
 
 interface OnboardingFormProps {
-  /** 用戶的 email，從 OAuth 取得 */
   initialEmail?: string;
 }
 
-/**
- * Onboarding 主表單元件
- * 管理整個 onboarding 流程，包含步驟導航和資料提交
- */
 export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
   const t = useTranslations("onboarding");
+  const schemas = useMemo(() => createOnboardingStepSchemas(t), [t]);
   const { isTemporary, refreshAuth, refreshToken } = useAuth();
   const { updateCurrentUserWithFormData, createCurrentUserWithFormData } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {
-    currentStep,
-    nextStep,
-    prevStep,
-    totalSteps,
-    isFirstStep,
-    isLastInputStep,
-    isSuccessStep,
-  } = useOnboardingStep();
+  const [dynamicStepError, setDynamicStepError] = useState<string | null>(null);
+
+  // 動態流程：若有啟用的流程，以其步驟取代固定的興趣 + 來源步驟
+  const { data: activeFlow, isLoading: isActiveFlowLoading } = useActiveFlow();
+  const flowSteps = activeFlow?.steps ?? null;
+
+  // totalSteps = 1 (profile) + N (動態 or 2 固定) + 1 (success)
+  const dynamicStepCount = flowSteps?.length ?? 2;
+  const totalSteps = 1 + dynamicStepCount + 1;
+
+  const { currentStep, nextStep, prevStep, isFirstStep, isLastInputStep, isSuccessStep } =
+    useOnboardingStep(totalSteps);
+
+  // 當前動態步驟（step 2 → index 0, step 3 → index 1, ...）
+  const dynamicStepIndex = currentStep - 2;
+  const currentDynamicStep = flowSteps?.[dynamicStepIndex] ?? null;
 
   const form = useForm<OnboardingFormValues>({
-    resolver: zodResolver(onboardingFormSchema),
+    resolver: zodResolver(createOnboardingFormSchema(t)),
     defaultValues: {
       email: initialEmail || "",
       birthDate: undefined,
@@ -60,19 +69,17 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
       interests: [],
       referralSource: "",
       otherReferralText: "",
+      dynamicAnswers: {},
     },
     mode: "onChange",
   });
 
   const validateCustomIdAvailability = async (customId: string): Promise<boolean> => {
     const response = await checkCustomIdAvailability(customId.trim());
-
     if (response.error) {
-      console.error("Failed to check customId availability:", response.error);
       toast.error(t("errors.submitFailed"));
       return false;
     }
-
     if (!response.data?.data?.available) {
       form.setError("customId", {
         type: "server",
@@ -80,111 +87,143 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
       });
       return false;
     }
-
     return true;
   };
 
-  /**
-   * 驗證當前步驟的欄位
-   */
   const validateCurrentStep = async (): Promise<boolean> => {
     const values = form.getValues();
 
     try {
-      switch (currentStep) {
-        case 1:
-          // Profile 步驟：確認必填欄位與 customId 可用性
-          await profileStepSchema.parseAsync({
-            email: values.email,
-            birthDate: values.birthDate,
-            name: values.name,
-            customId: values.customId,
-            personalSlogan: values.personalSlogan,
-          });
-          return validateCustomIdAvailability(values.customId);
-
-        case 2:
-          // Interests 步驟：interests 是必填
-          await interestsStepSchema.parseAsync({
-            professionalFields: values.professionalFields,
-            interests: values.interests,
-          });
-          return true;
-
-        case 3:
-          // Referral 步驟：referralSource 是必填
-          await referralStepSchema.parseAsync({
-            referralSource: values.referralSource,
-            otherReferralText: values.otherReferralText,
-          });
-          return true;
-
-        default:
-          return true;
+      if (currentStep === 1) {
+        await schemas.profileStepSchema.parseAsync({
+          email: values.email,
+          birthDate: values.birthDate,
+          name: values.name,
+          customId: values.customId,
+          personalSlogan: values.personalSlogan,
+        });
+        return validateCustomIdAvailability(values.customId);
       }
+
+      // 動態流程步驟驗證
+      if (flowSteps && currentDynamicStep) {
+        const answers = values.dynamicAnswers?.[currentDynamicStep.id.toString()] ?? [];
+        if (currentDynamicStep.questionType !== "text" && answers.length === 0) {
+          setDynamicStepError("請選擇至少一個選項");
+          return false;
+        }
+        if (currentDynamicStep.questionType === "text" && !answers[0]?.trim()) {
+          setDynamicStepError("請輸入你的回答");
+          return false;
+        }
+        setDynamicStepError(null);
+        return true;
+      }
+
+      // 固定流程步驟驗證（fallback）
+      if (currentStep === 2) {
+        await schemas.interestsStepSchema.parseAsync({
+          professionalFields: values.professionalFields,
+          interests: values.interests,
+        });
+        return true;
+      }
+      if (currentStep === 3) {
+        await schemas.referralStepSchema.parseAsync({
+          referralSource: values.referralSource,
+          otherReferralText: values.otherReferralText,
+        });
+        return true;
+      }
+
+      return true;
     } catch {
-      // 觸發表單驗證以顯示錯誤訊息
       await form.trigger();
       return false;
     }
   };
 
-  /**
-   * 處理「下一步」按鈕
-   */
   const handleNext = async () => {
     const isValid = await validateCurrentStep();
-    if (isValid) {
-      nextStep();
-    }
+    if (isValid) nextStep();
   };
 
-  /**
-   * 處理表單提交
-   */
   const handleSubmit = async (values: OnboardingFormValues) => {
     setIsSubmitting(true);
 
     try {
-      // 組裝 API 請求資料（所有欄位都是必填）
+      const dynamicAnswerMap = values.dynamicAnswers ?? {};
+
+      // 預設使用固定流程欄位；動態流程透過 fieldKey 覆蓋
+      let interestList: string[] = values.interests ?? [];
+      let professionalField: string[] = values.professionalFields ?? [];
+      let referralSource = values.referralSource ?? "";
+
+      if (flowSteps) {
+        for (const step of flowSteps) {
+          const answers = dynamicAnswerMap[step.id.toString()] ?? [];
+          if (step.fieldKey === "interests") interestList = answers;
+          else if (step.fieldKey === "professional_fields") professionalField = answers;
+          else if (step.fieldKey === "referral") referralSource = answers[0] ?? "";
+        }
+      }
+
+      const trackingRef = getTrackingRef();
+      if (trackingRef) {
+        referralSource = trackingRef;
+      }
+
       const updateData: Parameters<typeof updateCurrentUserWithFormData>[0] = {
         birthDay: format(values.birthDate, "yyyy-MM-dd"),
         name: values.name.trim(),
         customId: values.customId.trim(),
         personalSlogan: values.personalSlogan.trim(),
-        professionalField: values.professionalFields,
-        interestList: values.interests,
-        referralSource: values.referralSource,
+        professionalField,
+        interestList,
+        referralSource,
       };
 
-      // 臨時用戶使用 POST 創建，正常用戶使用 PUT 更新
       if (isTemporary) {
-        await createCurrentUserWithFormData(updateData);
-        // 臨時用戶完成 onboarding 後，後端會發新的 token
-        // 需要先刷新 token 再檢查認證狀態
+        const registrationFlowStorage = getStorage<"quiz" | "action_maker">(
+          StorageEnum.RegistrationFlow
+        );
+        const storedFlow = registrationFlowStorage.get();
+        const registrationFlow =
+          storedFlow === "quiz" || storedFlow === "action_maker" ? storedFlow : "landing_page";
+        await createCurrentUserWithFormData({ ...updateData, registrationFlow });
+        registrationFlowStorage.remove();
         await refreshToken();
       } else {
         await updateCurrentUserWithFormData(updateData);
       }
 
-      // 重新檢查認證狀態，更新 isTemporary 為 false
       await refreshAuth();
+      clearTrackingRef();
 
-      // 成功後前往成功頁面
+      // 記錄動態流程回答（非阻塞，失敗不影響用戶）
+      if (activeFlow && flowSteps) {
+        await Promise.allSettled(
+          flowSteps
+            .filter((step) => (dynamicAnswerMap[step.id.toString()] ?? []).length > 0)
+            .map((step) =>
+              submitOnboardingFlowResponse(
+                activeFlow.id,
+                step.id,
+                dynamicAnswerMap[step.id.toString()] ?? []
+              )
+            )
+        );
+      }
+
       nextStep();
     } catch (error) {
       console.error("Failed to submit onboarding:", error);
 
-      // 處理伺服器驗證錯誤
       if (error instanceof Error) {
-        const apiError = error as Error & {
-          details?: Array<{ path?: string; message?: string }>;
-        };
-
+        const apiError = error as Error & { details?: Array<{ path?: string; message?: string }> };
         if (apiError.details && Array.isArray(apiError.details)) {
           apiError.details.forEach((detail) => {
             if (detail.path && detail.message) {
-              // 嘗試將 API 錯誤路徑映射到表單欄位
               const fieldName = mapApiPathToFormField(detail.path);
               if (fieldName) {
                 form.setError(fieldName as keyof OnboardingFormValues, {
@@ -195,7 +234,6 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
             }
           });
         }
-
         toast.error(error.message || t("errors.submitFailed"));
       } else {
         toast.error(t("errors.submitFailed"));
@@ -205,9 +243,6 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
     }
   };
 
-  /**
-   * 將 API 錯誤路徑映射到表單欄位名稱
-   */
   const mapApiPathToFormField = (apiPath: string): string | null => {
     const mapping: Record<string, string> = {
       birthDay: "birthDate",
@@ -218,29 +253,48 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
       interestList: "interests",
       referralSource: "referralSource",
     };
-
-    // 從 API 路徑中提取欄位名稱（例如 "/birthDay" -> "birthDay"）
     const pathParts = apiPath.split("/").filter(Boolean);
     const fieldName = pathParts[pathParts.length - 1];
-
-    // 使用完全相等比對，避免子字串誤判
     if (!fieldName) return null;
     return mapping[fieldName] ?? null;
   };
 
+  const showDynamicStep = !isFirstStep && !isSuccessStep && flowSteps && currentDynamicStep;
+  const showInterestsStep = !isFirstStep && !isSuccessStep && !flowSteps && currentStep === 2;
+  const showReferralStep = !isFirstStep && !isSuccessStep && !flowSteps && currentStep === 3;
+
+  if (isActiveFlowLoading) {
+    return (
+      <Form {...form}>
+        <div className="space-y-6">
+          <div className="h-10 rounded-full bg-white/70 animate-pulse" />
+          <div className="space-y-4">
+            <div className="h-8 rounded-lg bg-white/70 animate-pulse" />
+            <div className="h-28 rounded-xl bg-white/70 animate-pulse" />
+          </div>
+        </div>
+      </Form>
+    );
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        {/* 步驟指示器 */}
         <OnboardingStepper currentStep={currentStep} totalSteps={totalSteps} />
 
-        {/* 步驟內容 */}
         {currentStep === 1 && <ProfileSection form={form} />}
-        {currentStep === 2 && <InterestsSection form={form} />}
-        {currentStep === 3 && <ReferralSection form={form} />}
-        {currentStep === 4 && <SuccessSection userName={form.getValues("name") || undefined} />}
+        {showDynamicStep && (
+          <DynamicStep
+            step={currentDynamicStep}
+            form={form}
+            error={dynamicStepError}
+            onChange={() => setDynamicStepError(null)}
+          />
+        )}
+        {showInterestsStep && <InterestsSection form={form} />}
+        {showReferralStep && <ReferralSection form={form} />}
+        {isSuccessStep && <SuccessSection userName={form.getValues("name") || undefined} />}
 
-        {/* 導航按鈕（成功頁面不顯示） */}
         {!isSuccessStep && (
           <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-4 p-6 border-t border-light-gray bg-very-light-gray">
             <div className="w-full max-w-[448px] flex gap-4">

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { format } from "date-fns";
 import type { ElementType } from "react";
 import { StatCard } from "./stat-card";
@@ -16,6 +17,7 @@ interface DashboardHeaderProps {
 }
 
 export const DashboardHeader = ({ stats }: DashboardHeaderProps) => {
+  const t = useTranslations("dashboard");
   const today = new Date();
 
   return (
@@ -25,11 +27,15 @@ export const DashboardHeader = ({ stats }: DashboardHeaderProps) => {
         <div className="flex gap-2">
           <span className="flex items-center gap-1">
             <span className="text-4xl text-text-dark font-semibold">{format(today, "M")}</span>
-            <span className="mt-1 text-[1.375rem] text-text-dark font-medium">月</span>
+            <span className="mt-1 text-[1.375rem] text-text-dark font-medium">
+              {t("header_month_unit")}
+            </span>
           </span>
           <span className="flex items-center gap-1">
             <span className="text-4xl text-text-dark font-semibold">{format(today, "d")}</span>
-            <span className="mt-1 text-[1.375rem] text-text-dark font-medium">日</span>
+            <span className="mt-1 text-[1.375rem] text-text-dark font-medium">
+              {t("header_day_unit")}
+            </span>
           </span>
         </div>
       </time>

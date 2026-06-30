@@ -2,6 +2,7 @@
 
 import { type CreatePracticeRequestType, createPractice } from "@daodao/api";
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { StorageEnum, useFormDraft } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -20,6 +21,10 @@ import { Step3 } from "@/components/practice/create/manual/steps/step-3";
 import { Step4 } from "@/components/practice/create/manual/steps/step-4";
 import { Step5 } from "@/components/practice/create/manual/steps/step-5";
 import type { PrivacyStatus } from "@/components/practice/shared/privacy-status-selector";
+import {
+  applyOnboardingUpdateFromResponse,
+  refreshOnboardingStatus,
+} from "@/components/task-guide/onboarding-progress-context";
 import {
   type ExecutionTiming,
   type Frequency,
@@ -89,10 +94,11 @@ const convertFormValuesToApiRequest = (
 };
 
 export default function CreateManualPracticePage() {
+  const t = useTranslations("practice");
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus>("private");
+  const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus>("public");
   const isRestoreDialogOpenRef = useRef(false);
 
   const form = useForm<ManualPracticeFormValues>({
@@ -169,7 +175,7 @@ export default function CreateManualPracticePage() {
     try {
       const apiRequest = {
         ...convertFormValuesToApiRequest(values),
-        privacy_status: privacyStatus,
+        privacyStatus,
       } as CreatePracticeRequestType;
 
       const response = await createPractice(apiRequest);
@@ -185,7 +191,7 @@ export default function CreateManualPracticePage() {
         };
 
         const error = errorResponse.error || errorResponse;
-        let errorMessage = "建立實踐失敗";
+        let errorMessage = t("create_failed");
         let shouldNavigateToStep: number | null = null;
 
         // 處理錯誤訊息
@@ -250,6 +256,9 @@ export default function CreateManualPracticePage() {
 
       // 提交成功後清除暫存資料
       clearDraft();
+      if (!applyOnboardingUpdateFromResponse(response.data)) {
+        refreshOnboardingStatus();
+      }
 
       // 取得新建立的實踐 ID
       const practiceId = response.data?.data?.id;
@@ -265,7 +274,7 @@ export default function CreateManualPracticePage() {
         );
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "建立實踐失敗，請稍後再試";
+      const errorMessage = error instanceof Error ? error.message : t("create_failed_retry");
       console.error("Failed to create practice:", error);
       toast.error(errorMessage);
       setIsSubmitting(false);
@@ -307,7 +316,10 @@ export default function CreateManualPracticePage() {
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <PageHeader title={currentStep === 5 ? "預覽" : "建立實踐"} rightActionTo="/" />
+      <PageHeader
+        title={currentStep === 5 ? t("manual_preview_title") : t("manual_create_title")}
+        rightActionTo="/"
+      />
 
       <main className="relative px-5 max-w-[448px] mx-auto pb-20">
         {/* Progress Bar */}
@@ -363,7 +375,7 @@ export default function CreateManualPracticePage() {
                 disabled={isCheckingDraft}
               >
                 <ArrowLeftOutlineSvg className="size-4.5 text-logo-cyan group-hover:text-white" />
-                上一步
+                {t("manual_prev_step")}
               </Button>
 
               <Button
@@ -372,7 +384,7 @@ export default function CreateManualPracticePage() {
                 className="w-full sm:max-w-[288px]"
                 disabled={isCheckingDraft || isSubmitting}
               >
-                {currentStep === TOTAL_STEPS ? "完成新增" : "下一步"}
+                {currentStep === TOTAL_STEPS ? t("manual_finish") : t("manual_next_step")}
                 {currentStep !== TOTAL_STEPS && <ArrowRightOutlineSvg className="size-4.5" />}
               </Button>
             </footer>

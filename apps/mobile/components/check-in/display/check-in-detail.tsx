@@ -1,6 +1,7 @@
 import { Share2 } from "@tamagui/lucide-icons";
 import { Button, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import type { ICheckInDisplayData } from "../types";
 import { CheckInCard } from "./check-in-card";
 
@@ -15,6 +16,7 @@ interface ICheckInDetailProps {
  * 顯示完整的打卡內容和分享按鈕
  */
 export const CheckInDetail = ({ checkInData, onShare, onImagePress }: ICheckInDetailProps) => {
+  const t = useMobileTranslation("mobile.checkIn");
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
 
   return (
@@ -42,7 +44,7 @@ export const CheckInDetail = ({ checkInData, onShare, onImagePress }: ICheckInDe
             <XStack alignItems="center" gap="$2">
               <Share2 size={16} color={colors.text.dark} />
               <Text color={colors.text.dark} fontWeight="500">
-                分享這篇打卡
+                {t("share_this_checkin")}
               </Text>
             </XStack>
           </Button>

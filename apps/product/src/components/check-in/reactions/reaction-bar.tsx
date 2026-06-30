@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import {
   REACTION_CONFIG,
@@ -37,6 +38,7 @@ export function ReactionBar({
   onReactionClick,
   className,
 }: ReactionBarProps) {
+  const t = useTranslations("app_product");
   return (
     <div className={cn("flex items-center gap-2 px-4 py-3", className ?? "flex-wrap")}>
       {REACTION_TYPE_LIST.map((type) => {
@@ -63,7 +65,7 @@ export function ReactionBar({
               size={20}
               play={isSelected}
             />
-            <span className="text-sm leading-none">{config.label}</span>
+            <span className="text-sm leading-none">{t(config.label)}</span>
             {count > 0 && (
               <span
                 className={cn(

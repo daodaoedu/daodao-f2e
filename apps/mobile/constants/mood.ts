@@ -18,16 +18,17 @@ export type MoodType = (typeof MoodType)[keyof typeof MoodType];
 export interface IMoodOption {
   id: MoodType;
   label: string;
+  labelKey: string;
   emoji: string;
 }
 
 export const MOOD_OPTIONS: IMoodOption[] = [
-  { id: MoodType.hopeless, label: "想放棄", emoji: "😞" },
-  { id: MoodType.frustrated, label: "受挫", emoji: "😤" },
-  { id: MoodType.bored, label: "無聊", emoji: "😐" },
-  { id: MoodType.neutral, label: "普通", emoji: "😶" },
-  { id: MoodType.fine, label: "還不錯", emoji: "🙂" },
-  { id: MoodType.happy, label: "開心", emoji: "😊" },
+  { id: MoodType.hopeless, label: "想放棄", labelKey: "mood_hopeless", emoji: "😞" },
+  { id: MoodType.frustrated, label: "受挫", labelKey: "mood_frustrated", emoji: "😤" },
+  { id: MoodType.bored, label: "無聊", labelKey: "mood_bored", emoji: "😐" },
+  { id: MoodType.neutral, label: "普通", labelKey: "mood_neutral", emoji: "😶" },
+  { id: MoodType.fine, label: "還不錯", labelKey: "mood_fine", emoji: "🙂" },
+  { id: MoodType.happy, label: "開心", labelKey: "mood_happy", emoji: "😊" },
 ];
 
 /**

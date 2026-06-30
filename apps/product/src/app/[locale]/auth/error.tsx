@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { XCircle } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +12,8 @@ interface AuthErrorProps {
 }
 
 export default function AuthError({ reset }: AuthErrorProps) {
+  const t = useTranslations("app_product");
+
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto">
       <PageHeader leftAction={null} rightActionTo="/" />
@@ -23,9 +26,9 @@ export default function AuthError({ reset }: AuthErrorProps) {
             <XCircle className="w-10 h-10 text-red-600" />
           </div>
 
-          <h1 className="text-2xl font-bold text-text-dark">發生錯誤</h1>
+          <h1 className="text-2xl font-bold text-text-dark">{t("auth_error_title")}</h1>
 
-          <p className="text-text-gray">請稍後再試，或透過以下方式聯繫我們：</p>
+          <p className="text-text-gray">{t("auth_error_description")}</p>
 
           <div className="flex gap-4 text-sm text-[--logo-cyan]">
             <Link
@@ -51,11 +54,11 @@ export default function AuthError({ reset }: AuthErrorProps) {
 
           <div className="flex flex-col gap-3 w-full mt-8">
             <Button variant="orange" className="w-full" onClick={reset}>
-              重試
+              {t("auth_error_retry")}
             </Button>
 
             <Button variant="ghost" className="w-full" asChild>
-              <Link href="/">返回首頁</Link>
+              <Link href="/">{t("auth_error_back_home")}</Link>
             </Button>
           </div>
         </div>

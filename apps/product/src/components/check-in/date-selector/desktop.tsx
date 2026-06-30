@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -13,6 +14,7 @@ export const DesktopCheckInDateSelector = ({
   practiceId,
   activeCheckInId,
 }: ICheckInDateSelectorProps) => {
+  const t = useTranslations("check_in");
   const router = useRouter();
   const [canScrollUp, setCanScrollUp] = useState(false);
   const [canScrollDown, setCanScrollDown] = useState(false);
@@ -46,20 +48,11 @@ export const DesktopCheckInDateSelector = ({
       setCanScrollDown(scrollTop < scrollHeight - clientHeight - 1);
     };
 
-    // 禁止使用者滾動（滑鼠滾輪和觸控）
-    const preventScroll = (e: WheelEvent | TouchEvent) => {
-      e.preventDefault();
-    };
-
     updateScrollButtons();
     container.addEventListener("scroll", updateScrollButtons);
-    container.addEventListener("wheel", preventScroll, { passive: false });
-    container.addEventListener("touchmove", preventScroll, { passive: false });
 
     return () => {
       container.removeEventListener("scroll", updateScrollButtons);
-      container.removeEventListener("wheel", preventScroll);
-      container.removeEventListener("touchmove", preventScroll);
     };
   }, []);
 
@@ -109,7 +102,7 @@ export const DesktopCheckInDateSelector = ({
               onClick={handleScrollUp}
               disabled={!canScrollUp}
               className="text-white hover:text-white"
-              aria-label="向上滾動"
+              aria-label={t("date_scroll_up")}
             >
               <ChevronUp className="size-6" />
             </Button>
@@ -136,7 +129,7 @@ export const DesktopCheckInDateSelector = ({
               onClick={handleScrollDown}
               disabled={!canScrollDown}
               className="text-white hover:text-white"
-              aria-label="向下滾動"
+              aria-label={t("date_scroll_down")}
             >
               <ChevronDown className="size-6" />
             </Button>

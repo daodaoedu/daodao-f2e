@@ -1,12 +1,25 @@
 import { getResources } from "@daodao/api";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import type { Metadata } from "next";
 import { CategoriesContainer, ResourceContainer, SectionTitle } from "@/components/resource";
 
-export const metadata: Metadata = {
-  title: "所有分類｜島島阿學",
-};
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/resource/categories">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "app_product" });
 
-export default async function ResourceCategoriesPage() {
+  return {
+    title: t("resource_all_categories_meta"),
+  };
+}
+
+export default async function ResourceCategoriesPage({
+  params,
+}: PageProps<"/[locale]/resource/categories">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "app_product" });
   const { data: resourceData } = await getResources({ limit: "10" });
 
   const resources =
@@ -25,14 +38,14 @@ export default async function ResourceCategoriesPage() {
 
   return (
     <div className="container py-8">
-      <SectionTitle as="h1" title="所有分類" />
+      <SectionTitle as="h1" title={t("resource_all_categories")} />
 
       <section className="mb-12">
         <CategoriesContainer size="md" />
       </section>
 
       <section>
-        <SectionTitle title="最新資源" />
+        <SectionTitle title={t("resource_latest")} />
         <ResourceContainer data={resources} />
       </section>
     </div>

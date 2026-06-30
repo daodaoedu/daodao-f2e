@@ -1,6 +1,7 @@
 "use client";
 
 import { suggestTags } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import {
   PinList,
   type PinListItem,
@@ -48,6 +49,7 @@ export const TagEditSheetContent = ({
   onComplete: (data: TagEditData) => void;
   onClose?: () => void;
 }) => {
+  const t = useTranslations("practice");
   const form = useForm<TagEditFormValues>({
     resolver: zodResolver(tagEditFormSchema),
     defaultValues: {
@@ -257,10 +259,14 @@ export const TagEditSheetContent = ({
             render={({ field }) => (
               <FormItem className="mb-8">
                 <FormLabel className="block text-base font-medium mb-3 text-text-dark">
-                  關鍵字
+                  {t("tag_edit_keyword_label")}
                 </FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="輸入自訂關鍵字" className="w-full" />
+                  <Input
+                    {...field}
+                    placeholder={t("tag_edit_keyword_placeholder")}
+                    className="w-full"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -272,12 +278,12 @@ export const TagEditSheetContent = ({
             <PinList
               items={pinListItems}
               labels={{
-                pinned: "已選用標籤",
-                unpinned: "可用標籤",
+                pinned: t("tag_edit_pinned"),
+                unpinned: t("tag_edit_unpinned"),
               }}
               unpinnedPlaceholder={
                 <div className="text-light-gray bg-very-light-gray border border-bg-gray py-[50px] text-center">
-                  無符合標籤
+                  {t("tag_edit_empty")}
                 </div>
               }
               onItemToggle={handleToggleTag}
@@ -292,7 +298,7 @@ export const TagEditSheetContent = ({
         <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6">
           <Button type="button" className="w-full" onClick={form.handleSubmit(onSubmit)}>
             <Check className="size-4.5" />
-            完成
+            {t("tag_edit_done")}
           </Button>
         </div>
       </form>

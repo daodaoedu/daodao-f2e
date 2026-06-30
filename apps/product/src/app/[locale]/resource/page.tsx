@@ -1,14 +1,25 @@
 import { getResources } from "@daodao/api";
 import bannerImage from "@daodao/assets/images/resource/banner.webp";
+import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import type { Metadata } from "next";
 import { CategoriesContainer, ResourceBanner, ResourceContainer } from "@/components/resource";
 import { HOT_TAGS } from "@/constants/resource";
 
-export const metadata: Metadata = {
-  title: "多元學習資源列表｜島島阿學",
-};
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/resource">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "app_product" });
 
-export default async function ResourcePage() {
+  return {
+    title: t("resource_meta_list_title"),
+  };
+}
+
+export default async function ResourcePage({ params }: PageProps<"/[locale]/resource">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "app_product" });
   const { data: resourceData } = await getResources({ limit: "10" });
 
   const resources =
@@ -28,20 +39,20 @@ export default async function ResourcePage() {
   return (
     <div>
       <ResourceBanner
-        title="探索多元學習資源"
-        content="在這裡，你可以找到各種學習資源，包括線上課程、書籍、工具等，幫助你達成學習目標！"
+        title={t("resource_banner_title")}
+        content={t("resource_banner_content")}
         image={bannerImage}
         hotTags={HOT_TAGS}
       />
 
       <div className="container py-8">
         <section className="mb-12">
-          <h2 className="mb-6 text-2xl font-bold">探索分類</h2>
+          <h2 className="mb-6 text-2xl font-bold">{t("resource_explore_categories")}</h2>
           <CategoriesContainer size="md" maxLength={12} disabledCollapse />
         </section>
 
         <section>
-          <h2 className="mb-6 text-2xl font-bold">最新資源</h2>
+          <h2 className="mb-6 text-2xl font-bold">{t("resource_latest")}</h2>
           <ResourceContainer data={resources} />
         </section>
       </div>

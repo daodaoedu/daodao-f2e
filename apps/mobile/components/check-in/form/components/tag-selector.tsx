@@ -3,9 +3,17 @@ import { useCallback, useMemo, useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { Button, Input, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
-// 預設標籤
-const DEFAULT_TAGS = ["練習", "新概念", "實作", "有趣", "創造", "困難", "刻意練習"];
+const DEFAULT_TAG_KEYS = [
+  "tag_practice",
+  "tag_new_concept",
+  "tag_hands_on",
+  "tag_interesting",
+  "tag_creative",
+  "tag_difficult",
+  "tag_deliberate_practice",
+];
 
 interface ITagSelectorProps {
   value: string[];
@@ -17,13 +25,15 @@ interface ITagSelectorProps {
  * 標籤選擇器組件 (Mobile)
  */
 export const TagSelector = ({ value, onChange, onTagSelected }: ITagSelectorProps) => {
+  const t = useMobileTranslation("mobile.checkIn");
   const [customTagInput, setCustomTagInput] = useState("");
   const [customTags, setCustomTags] = useState<string[]>([]);
+  const defaultTags = useMemo(() => DEFAULT_TAG_KEYS.map((key) => t(key)), [t]);
 
   // 合併預設標籤和自訂標籤
   const availableTags = useMemo(
-    () => Array.from(new Set([...DEFAULT_TAGS, ...customTags, ...value])),
-    [customTags, value]
+    () => Array.from(new Set([...defaultTags, ...customTags, ...value])),
+    [defaultTags, customTags, value]
   );
 
   const handleToggleTag = useCallback(
@@ -59,7 +69,7 @@ export const TagSelector = ({ value, onChange, onTagSelected }: ITagSelectorProp
   return (
     <YStack marginBottom="$6">
       <Text fontSize={16} fontWeight="500" color={colors.text.dark} marginBottom="$3">
-        想法分享
+        {t("thoughts")}
       </Text>
 
       {/* 標籤列表 */}
@@ -89,7 +99,7 @@ export const TagSelector = ({ value, onChange, onTagSelected }: ITagSelectorProp
         <Input
           flex={1}
           size="$3"
-          placeholder="輸入自訂標籤"
+          placeholder={t("custom_tag_placeholder")}
           value={customTagInput}
           onChangeText={setCustomTagInput}
           onSubmitEditing={handleAddCustomTag}
@@ -107,7 +117,7 @@ export const TagSelector = ({ value, onChange, onTagSelected }: ITagSelectorProp
           <XStack alignItems="center" gap="$1">
             <Plus size={16} color={colors.basic.white} />
             <Text color={colors.basic.white} fontSize={14}>
-              加入
+              {t("add")}
             </Text>
           </XStack>
         </Button>

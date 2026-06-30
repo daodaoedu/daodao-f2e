@@ -103,26 +103,47 @@ const cropImage = async (
   }
 };
 
+export function getElementCaptureDimensions(element: {
+  scrollWidth: number;
+  scrollHeight: number;
+  clientWidth: number;
+  clientHeight: number;
+  offsetWidth: number;
+  offsetHeight: number;
+}): { width: number; height: number } {
+  // scrollWidth/scrollHeight exclude element borders; add the border thickness
+  // so the captured image includes the full painted area (borders + scrollable content).
+  const borderWidth = element.offsetWidth - element.clientWidth;
+  const borderHeight = element.offsetHeight - element.clientHeight;
+  return {
+    width: Math.max(element.scrollWidth + borderWidth, element.offsetWidth),
+    height: Math.max(element.scrollHeight + borderHeight, element.offsetHeight),
+  };
+}
+
 export const captureElementAsImage = async (
   element: HTMLElement,
   cropOptions?: CropOptions
 ): Promise<CapturedImageData | null> => {
   try {
-    const { toPng } = await import("html-to-image");
+    const { domToPng } = await import("modern-screenshot");
     const devicePixelRatio = window.devicePixelRatio || 1;
-    const dataUrl = await toPng(element, {
-      pixelRatio: devicePixelRatio,
-      // 添加 cacheBust 繞過 Cloudflare 快取，確保獲取帶有 CORS headers 的回應
-      cacheBust: true,
+    const { width, height } = getElementCaptureDimensions(element);
+    const dataUrl = await domToPng(element, {
+      scale: devicePixelRatio,
+      width,
+      height,
+      fetch: {
+        bypassingCache: true,
+      },
     });
 
     const imageData: CapturedImageData = {
       src: dataUrl,
-      width: element.clientWidth,
-      height: element.clientHeight,
+      width,
+      height,
     };
 
-    // 如果需要裁切，則進行裁切
     if (cropOptions) {
       const croppedData = await cropImage(dataUrl, cropOptions, devicePixelRatio);
       return croppedData;

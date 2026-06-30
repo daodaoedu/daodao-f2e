@@ -10,6 +10,7 @@ import {
   useIncomingConnectionRequests,
   useOutgoingConnectionRequests,
 } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -23,6 +24,7 @@ import { useState } from "react";
 // ─────────────────────────────────────────────
 
 const ConnectionsTab = () => {
+  const t = useTranslations("social");
   const { data: incomingData, isLoading: loadingIncoming } = useIncomingConnectionRequests();
   const { data: outgoingData, isLoading: loadingOutgoing } = useOutgoingConnectionRequests();
   const { data: connectionsData, isLoading: loadingConnections } = useConnections();
@@ -36,72 +38,72 @@ const ConnectionsTab = () => {
   const connections = connectionsData?.data ?? [];
 
   if (isLoading) {
-    return <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">載入中...</div>;
+    return <div className="flex justify-center py-16 text-[#9FB5B8] text-sm">{t("loading")}</div>;
   }
 
   const handleAccept = async (requestId: string, name: string) => {
     try {
       await accept(requestId);
-      toast.success(`已與 ${name} 成為夥伴`);
+      toast.success(t("conn_accept_success", { name }));
     } catch {
-      toast.error("操作失敗，請稍後再試");
+      toast.error(t("operation_failed"));
     }
   };
 
   const handleIgnore = async (requestId: string, name: string) => {
     const result = await openWarningDialog({
-      title: "忽略連結請求？",
-      message: `確定要忽略來自 ${name} 的連結請求嗎？`,
+      title: t("conn_ignore_title"),
+      message: t("conn_ignore_message", { name }),
       textAlign: "left",
       buttons: [
-        { label: "忽略", value: "confirm", variant: "outline" },
-        { label: "先不要", value: "cancel", variant: "orange" },
+        { label: t("conn_ignore_confirm"), value: "confirm", variant: "outline" },
+        { label: t("conn_cancel_btn"), value: "cancel", variant: "orange" },
       ],
     });
     if (result.value !== "confirm") return;
     try {
       await ignore(requestId);
-      toast.success("已忽略連結請求");
+      toast.success(t("conn_ignore_success"));
     } catch {
-      toast.error("操作失敗，請稍後再試");
+      toast.error(t("operation_failed"));
     }
   };
 
   const handleWithdraw = async (requestId: string, name: string) => {
     const result = await openWarningDialog({
-      title: "撤回連結請求？",
-      message: `確定要撤回發給 ${name} 的連結請求嗎？`,
+      title: t("conn_withdraw_title"),
+      message: t("conn_withdraw_message", { name }),
       textAlign: "left",
       buttons: [
-        { label: "撤回", value: "confirm", variant: "outline" },
-        { label: "先不要", value: "cancel", variant: "orange" },
+        { label: t("conn_withdraw_confirm"), value: "confirm", variant: "outline" },
+        { label: t("conn_cancel_btn"), value: "cancel", variant: "orange" },
       ],
     });
     if (result.value !== "confirm") return;
     try {
       await withdraw(requestId);
-      toast.success("已撤回連結請求");
+      toast.success(t("conn_withdraw_success"));
     } catch {
-      toast.error("操作失敗，請稍後再試");
+      toast.error(t("operation_failed"));
     }
   };
 
   const handleDisconnect = async (userId: string, name: string) => {
     const result = await openWarningDialog({
-      title: "解除連結？",
-      message: `解除連結後，你與 ${name} 將失去對彼此非公開內容的存取權。`,
+      title: t("conn_disconnect_title"),
+      message: t("conn_disconnect_message", { name }),
       textAlign: "left",
       buttons: [
-        { label: "解除連結", value: "confirm", variant: "outline" },
-        { label: "先不要", value: "cancel", variant: "orange" },
+        { label: t("conn_disconnect_confirm"), value: "confirm", variant: "outline" },
+        { label: t("conn_cancel_btn"), value: "cancel", variant: "orange" },
       ],
     });
     if (result.value !== "confirm") return;
     try {
       await disconnect(userId);
-      toast.success(`已解除與 ${name} 的連結`);
+      toast.success(t("conn_disconnect_success", { name }));
     } catch {
-      toast.error("操作失敗，請稍後再試");
+      toast.error(t("operation_failed"));
     }
   };
 
@@ -110,10 +112,10 @@ const ConnectionsTab = () => {
       {/* 收到的請求 */}
       {incomingRequests.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="text-xs font-medium text-[#9FB5B8] px-1">收到的請求</h2>
+          <h2 className="text-xs font-medium text-[#9FB5B8] px-1">{t("conn_incoming_section")}</h2>
           <div className="flex flex-col gap-2">
             {incomingRequests.map((req) => {
-              const name = req.requesterNickname ?? "用戶";
+              const name = req.requesterNickname ?? t("default_user");
               return (
                 <div key={req.requestId} className="bg-white rounded-lg p-3 flex flex-col gap-3">
                   <div className="flex items-center gap-3">
@@ -145,7 +147,7 @@ const ConnectionsTab = () => {
                       onClick={() => handleAccept(String(req.requestId), name)}
                       className="flex-1 h-8 text-xs cursor-pointer bg-logo-cyan hover:bg-logo-cyan/90 text-white"
                     >
-                      接受
+                      {t("conn_accept_btn")}
                     </Button>
                     <Button
                       variant="outline"
@@ -153,7 +155,7 @@ const ConnectionsTab = () => {
                       onClick={() => handleIgnore(String(req.requestId), name)}
                       className="flex-1 h-8 text-xs cursor-pointer"
                     >
-                      忽略
+                      {t("conn_ignore_confirm")}
                     </Button>
                   </div>
                 </div>
@@ -166,10 +168,10 @@ const ConnectionsTab = () => {
       {/* 發出的請求 */}
       {outgoingRequests.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="text-xs font-medium text-[#9FB5B8] px-1">發出的請求</h2>
+          <h2 className="text-xs font-medium text-[#9FB5B8] px-1">{t("conn_outgoing_section")}</h2>
           <div className="flex flex-col gap-2">
             {outgoingRequests.map((req) => {
-              const name = req.receiverNickname ?? "用戶";
+              const name = req.receiverNickname ?? t("default_user");
               return (
                 <div
                   key={req.requestId}
@@ -188,7 +190,7 @@ const ConnectionsTab = () => {
                     >
                       {name}
                     </CustomLink>
-                    <p className="text-xs text-[#9FB5B8]">等待對方回應</p>
+                    <p className="text-xs text-[#9FB5B8]">{t("conn_waiting_response")}</p>
                   </div>
                   <Button
                     variant="outline"
@@ -196,7 +198,7 @@ const ConnectionsTab = () => {
                     onClick={() => handleWithdraw(String(req.requestId), name)}
                     className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                   >
-                    撤回
+                    {t("conn_withdraw_confirm")}
                   </Button>
                 </div>
               );
@@ -208,14 +210,15 @@ const ConnectionsTab = () => {
       {/* 我的夥伴 */}
       <section className="flex flex-col gap-2">
         <h2 className="text-xs font-medium text-[#9FB5B8] px-1">
-          我的夥伴{connections.length > 0 && ` · ${connections.length} 人`}
+          {t("conn_partners_section")}
+          {connections.length > 0 && ` · ${connections.length} ${t("conn_people_count")}`}
         </h2>
         {connections.length === 0 ? (
-          <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未與任何人建立連結</div>
+          <div className="text-center py-12 text-[#9FB5B8] text-sm">{t("conn_empty")}</div>
         ) : (
           <div className="flex flex-col gap-2">
             {connections.map((conn) => {
-              const name = conn.nickname ?? "用戶";
+              const name = conn.nickname ?? t("default_user");
               return (
                 <div
                   key={conn.connectionId}
@@ -241,7 +244,7 @@ const ConnectionsTab = () => {
                     onClick={() => handleDisconnect(conn.externalId, name)}
                     className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                   >
-                    解除連結
+                    {t("conn_disconnect_confirm")}
                   </Button>
                 </div>
               );
@@ -258,6 +261,7 @@ const ConnectionsTab = () => {
 // ─────────────────────────────────────────────
 
 const FollowingTab = () => {
+  const t = useTranslations("social");
   const [subTab, setSubTab] = useState<"users" | "practices">("users");
   const { data: currentUserData } = useCurrentUser();
   const userId = currentUserData?.data?.id ?? "";
@@ -276,15 +280,15 @@ const FollowingTab = () => {
 
   const handleUnfollow = async (targetType: "user" | "practice", targetId: string) => {
     const result = await openWarningDialog({
-      title: "取消關注",
-      message: "確定要取消關注嗎？",
+      title: t("follow_unfollow_title"),
+      message: t("follow_unfollow_message"),
     });
     if (!result) return;
     try {
       await unfollow(targetType, targetId);
-      toast.success("已取消關注");
+      toast.success(t("follow_unfollow_success"));
     } catch {
-      toast.error("操作失敗，請稍後再試");
+      toast.error(t("operation_failed"));
     }
   };
 
@@ -292,22 +296,22 @@ const FollowingTab = () => {
     <div className="flex flex-col gap-4">
       {/* 我關注的 section */}
       <section className="flex flex-col gap-3">
-        <h2 className="text-xs font-medium text-[#9FB5B8] px-1">我關注的</h2>
+        <h2 className="text-xs font-medium text-[#9FB5B8] px-1">{t("follow_following_section")}</h2>
 
         {/* Sub-tab bar */}
         <div className="flex border-b border-[#E4EAE9]">
-          {(["users", "practices"] as const).map((t) => (
+          {(["users", "practices"] as const).map((tab) => (
             <button
-              key={t}
+              key={tab}
               type="button"
-              onClick={() => setSubTab(t)}
+              onClick={() => setSubTab(tab)}
               className={cn(
                 "flex-1 py-3 text-sm font-medium transition-colors cursor-pointer relative",
-                subTab === t ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-text-dark/60"
+                subTab === tab ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-text-dark/60"
               )}
             >
-              {t === "users" ? "使用者" : "實踐"}
-              {subTab === t && (
+              {tab === "users" ? t("follow_subtab_users") : t("follow_subtab_practices")}
+              {subTab === tab && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-logo-cyan rounded-full" />
               )}
             </button>
@@ -315,11 +319,11 @@ const FollowingTab = () => {
         </div>
 
         {loadingFollowing ? (
-          <div className="flex justify-center py-8 text-[#9FB5B8] text-sm">載入中...</div>
+          <div className="flex justify-center py-8 text-[#9FB5B8] text-sm">{t("loading")}</div>
         ) : subTab === "users" ? (
           <div className="flex flex-col gap-2">
             {followedUsers.length === 0 ? (
-              <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未關注任何使用者</div>
+              <div className="text-center py-12 text-[#9FB5B8] text-sm">{t("follow_no_users")}</div>
             ) : (
               followedUsers.map(({ user }) => {
                 if (!user) return null;
@@ -346,7 +350,7 @@ const FollowingTab = () => {
                       onClick={() => handleUnfollow("user", user.id)}
                       className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                     >
-                      取消關注
+                      {t("follow_unfollow_btn")}
                     </Button>
                   </div>
                 );
@@ -356,7 +360,9 @@ const FollowingTab = () => {
         ) : (
           <div className="flex flex-col gap-2">
             {followedPractices.length === 0 ? (
-              <div className="text-center py-12 text-[#9FB5B8] text-sm">尚未關注任何實踐</div>
+              <div className="text-center py-12 text-[#9FB5B8] text-sm">
+                {t("follow_no_practices")}
+              </div>
             ) : (
               followedPractices.map(({ practice }) => {
                 if (!practice) return null;
@@ -386,7 +392,7 @@ const FollowingTab = () => {
                       onClick={() => handleUnfollow("practice", practice.id)}
                       className="shrink-0 h-8 px-3 text-xs cursor-pointer"
                     >
-                      取消關注
+                      {t("follow_unfollow_btn")}
                     </Button>
                   </div>
                 );
@@ -399,12 +405,13 @@ const FollowingTab = () => {
       {/* 關注我的 section */}
       <section className="flex flex-col gap-2">
         <h2 className="text-xs font-medium text-[#9FB5B8] px-1">
-          關注我的{followers.length > 0 && ` · ${followers.length} 人`}
+          {t("follow_followers_section")}
+          {followers.length > 0 && ` · ${followers.length} ${t("conn_people_count")}`}
         </h2>
         {loadingFollowers ? (
-          <div className="flex justify-center py-8 text-[#9FB5B8] text-sm">載入中...</div>
+          <div className="flex justify-center py-8 text-[#9FB5B8] text-sm">{t("loading")}</div>
         ) : followers.length === 0 ? (
-          <div className="text-center py-12 text-[#9FB5B8] text-sm">目前還沒有人關注你</div>
+          <div className="text-center py-12 text-[#9FB5B8] text-sm">{t("follow_no_followers")}</div>
         ) : (
           <div className="flex flex-col gap-2">
             {followers.map((user) => (
@@ -438,24 +445,25 @@ const FollowingTab = () => {
 // ─────────────────────────────────────────────
 
 export const SocialHub = () => {
+  const t = useTranslations("social");
   const [tab, setTab] = useState<"connections" | "following">("connections");
 
   return (
     <div className="flex flex-col gap-4">
       {/* Main tab bar */}
       <div className="flex border-b border-[#E4EAE9]">
-        {(["connections", "following"] as const).map((t) => (
+        {(["connections", "following"] as const).map((tabKey) => (
           <button
-            key={t}
+            key={tabKey}
             type="button"
-            onClick={() => setTab(t)}
+            onClick={() => setTab(tabKey)}
             className={cn(
               "flex-1 py-3 text-sm font-medium transition-colors cursor-pointer relative",
-              tab === t ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-text-dark/60"
+              tab === tabKey ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-text-dark/60"
             )}
           >
-            {t === "connections" ? "連結" : "關注"}
-            {tab === t && (
+            {tabKey === "connections" ? t("tab_connections") : t("tab_following")}
+            {tab === tabKey && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-logo-cyan rounded-full" />
             )}
           </button>

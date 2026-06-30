@@ -1,9 +1,8 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 import { useEffect, useRef, useState } from "react";
-
-const LINES = ["看看別人怎麼做", "參考成功案例", "從作品得到靈感", "把方法帶回你的計畫"];
 
 const TYPE_SPEED = 120; // 打字速度（每字）
 const PAUSE_DONE = 1900; // 打完停留
@@ -56,8 +55,8 @@ const erase = (
   });
 };
 
-// 計算氣泡寬度以避免抖動
 const fitBubbleWidth = (
+  lines: string[],
   textRef: React.RefObject<HTMLDivElement | null>,
   setBubbleWidth: React.Dispatch<React.SetStateAction<number | null>>
 ) => {
@@ -65,21 +64,20 @@ const fitBubbleWidth = (
 
   const probe = document.createElement("span");
   probe.style.cssText = `
-    position: absolute; 
-    visibility: hidden; 
+    position: absolute;
+    visibility: hidden;
     white-space: nowrap;
     font: ${getComputedStyle(textRef.current).font};
   `;
   document.body.appendChild(probe);
 
   let max = 0;
-  LINES.forEach((s) => {
+  lines.forEach((s) => {
     probe.textContent = s;
     max = Math.max(max, probe.getBoundingClientRect().width);
   });
   document.body.removeChild(probe);
 
-  // 加上內邊距與邊框
   const styles = getComputedStyle(textRef.current);
   const padX = Number.parseFloat(styles.paddingLeft) + Number.parseFloat(styles.paddingRight);
   const borderX =
@@ -87,8 +85,8 @@ const fitBubbleWidth = (
   setBubbleWidth(Math.ceil(max + padX + borderX));
 };
 
-// 開始動畫
 const startAnimation = (
+  lines: string[],
   setCurrentText: React.Dispatch<React.SetStateAction<string>>,
   intervalsRef: React.MutableRefObject<Set<NodeJS.Timeout>>
 ) => {
@@ -96,13 +94,13 @@ const startAnimation = (
   let isAnimating = true;
 
   const animateNextLine = async () => {
-    if (!isAnimating) return; // 如果動畫被停止，則退出
+    if (!isAnimating) return;
 
-    if (currentLineIndex >= LINES.length) {
-      currentLineIndex = 0; // 重新開始
+    if (currentLineIndex >= lines.length) {
+      currentLineIndex = 0;
     }
 
-    const currentLine = LINES[currentLineIndex];
+    const currentLine = lines[currentLineIndex];
     if (!currentLine) return;
     await type(currentLine, setCurrentText, intervalsRef);
     await wait(PAUSE_DONE);
@@ -111,7 +109,6 @@ const startAnimation = (
 
     currentLineIndex += 1;
 
-    // 使用 requestAnimationFrame 來確保動畫流暢
     if (isAnimating) {
       requestAnimationFrame(animateNextLine);
     }
@@ -119,31 +116,29 @@ const startAnimation = (
 
   animateNextLine();
 
-  // 返回停止函數
   return () => {
     isAnimating = false;
   };
 };
 
 const TypewriterBubbleText = () => {
+  const t = useTranslations("landing_page");
+  const LINES = [
+    t("typewriter_line_0"),
+    t("typewriter_line_1"),
+    t("typewriter_line_2"),
+    t("typewriter_line_3"),
+  ];
   const [currentText, setCurrentText] = useState("");
   const [bubbleWidth, setBubbleWidth] = useState<number | null>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const intervalsRef = useRef<Set<NodeJS.Timeout>>(new Set());
 
   useEffect(() => {
-    // 計算氣泡寬度
-    fitBubbleWidth(textRef, setBubbleWidth);
-
-    // 開始動畫並獲取停止函數
-    const stopAnimation = startAnimation(setCurrentText, intervalsRef);
-
-    // 清理函數
+    fitBubbleWidth(LINES, textRef, setBubbleWidth);
+    const stopAnimation = startAnimation(LINES, setCurrentText, intervalsRef);
     return () => {
-      // 停止動畫
       stopAnimation();
-
-      // 清理所有 interval
       intervalsRef.current.forEach(clearInterval);
       intervalsRef.current.clear();
       intervalsRef.current = new Set();
@@ -165,11 +160,12 @@ const TypewriterBubbleText = () => {
 };
 
 export function TypewriterBubble() {
+  const t = useTranslations("landing_page");
   return (
     <div className="relative flex min-h-[400px] flex-col items-center justify-center overflow-x-clip pb-[60px] pt-12">
       {/* 對話文字區域 */}
       <div className="flex w-full items-center justify-between pl-6 pr-[10%] md:pr-[20%] md:text-xl">
-        <p className="font-medium text-primary-darker">在這裡你可以...</p>
+        <p className="font-medium text-primary-darker">{t("typewriter_bubble_prompt")}</p>
         <TypewriterBubbleText />
       </div>
 
@@ -181,12 +177,14 @@ export function TypewriterBubble() {
               src="/assets/landing-page/mascot-face.svg"
               width={118}
               height={92}
-              alt="吉祥物臉部"
+              alt={t("typewriter_bubble_mascot_alt")}
               className="absolute -top-5 right-3 z-2"
             />
-            <p className="my-2 mb-1 w-full px-6 font-semibold text-basic-white">讓學習從壓力來源</p>
+            <p className="my-2 mb-1 w-full px-6 font-semibold text-basic-white">
+              {t("typewriter_bubble_tagline_1")}
+            </p>
             <p className="text-basic-darker my-2 w-full px-6 font-semibold">
-              變成生活中最期待的部分
+              {t("typewriter_bubble_tagline_2")}
             </p>
           </div>
         </div>

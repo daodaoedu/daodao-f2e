@@ -63,7 +63,7 @@ export const ResourceHeader = () => {
           <CustomLink href={websiteUrl}>
             <Image
               src="/assets/landing-page/logo-simple.svg"
-              alt="回到首頁"
+              alt={t("back_to_home")}
               width={142}
               height={24}
             />
@@ -85,7 +85,7 @@ export const ResourceHeader = () => {
         ))}
         <li>
           <Button variant="ctaOrangeSmall" onClick={() => openLoginDialog({ redirectUrl: "/" })}>
-            立即加入
+            {t("landing_join_cta")}
           </Button>
         </li>
       </ul>

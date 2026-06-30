@@ -1,8 +1,9 @@
 "use client";
 
 import { useUserPractices } from "@daodao/api";
-import { ArrowRightOutlineSvg, ExperimentSvg, FlagSvg, NoteSvg } from "@daodao/assets";
+import { ArrowRightOutlineSvg, BookSvg, ExperimentSvg, FlagSvg, NoteSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
+import { useTranslations } from "@daodao/i18n";
 import { useIsMobile, useScrollVisibility } from "@daodao/shared";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -12,6 +13,8 @@ import { cn } from "@daodao/ui/lib/utils";
 import type { ElementType } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { PersonaProfileMe } from "@/components/persona/persona-profile-me";
+import { PersonaProfileUser } from "@/components/persona/persona-profile-user";
 import type { PracticeStatus } from "@/constants/practice-status";
 import {
   mapPracticeStatusToTaskStatus,
@@ -20,7 +23,7 @@ import {
 } from "@/constants/task-status";
 import { RandomPracticesSection } from "../shared/random-practices-section";
 
-type TabType = "practices" | "plans" | "ideas";
+type TabType = "practices" | "plans" | "ideas" | "persona";
 
 interface PracticeItem {
   id: string;
@@ -40,6 +43,7 @@ interface PracticeSectionProps {
 interface Tab {
   id: TabType;
   label: string;
+  mobileLabel?: string;
   disabled?: boolean;
   Icon: ElementType;
 }
@@ -48,6 +52,8 @@ interface Tab {
  * 「主題實踐」區塊組件
  */
 export function PracticeSection({ userId }: PracticeSectionProps) {
+  const t = useTranslations("app_product");
+  const dashboardT = useTranslations("dashboard");
   const [activeTab, setActiveTab] = useState<TabType>("practices");
   const [includeCompleted, setIncludeCompleted] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
@@ -87,10 +93,17 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
     setIsMounted(true);
   }, []);
 
+  const personaT = useTranslations("persona");
   const tabs: Tab[] = [
-    { id: "practices", label: "主題實踐", Icon: ExperimentSvg },
-    { id: "plans", label: "學習計劃", disabled: true, Icon: FlagSvg },
-    { id: "ideas", label: "想法", disabled: true, Icon: NoteSvg },
+    { id: "practices", label: t("practice_section_title"), Icon: ExperimentSvg },
+    {
+      id: "persona",
+      label: personaT("tabLabel"),
+      mobileLabel: personaT("tabLabelShort"),
+      Icon: BookSvg,
+    },
+    { id: "plans", label: t("practice_tab_plans"), disabled: true, Icon: FlagSvg },
+    { id: "ideas", label: t("practice_tab_ideas"), disabled: true, Icon: NoteSvg },
   ];
 
   const getStatusBadge = (status: PracticeItem["status"]) => {
@@ -98,31 +111,31 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
       case TaskStatus.draft:
         return (
           <Badge variant="gray" size="sm">
-            草稿
+            {dashboardT("filter_draft")}
           </Badge>
         );
       case TaskStatus.notStarted:
         return (
           <Badge variant="gray" size="sm">
-            未開始
+            {dashboardT("filter_not_started")}
           </Badge>
         );
       case TaskStatus.inProgress:
         return (
           <Badge variant="outline-logo" size="sm">
-            進行中
+            {dashboardT("filter_in_progress")}
           </Badge>
         );
       case TaskStatus.completed:
         return (
           <Badge variant="default" size="sm">
-            已完成
+            {dashboardT("filter_completed")}
           </Badge>
         );
       default:
         return (
           <Badge variant="gray" size="sm">
-            未知
+            {t("practice_status_unknown")}
           </Badge>
         );
     }
@@ -140,7 +153,7 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
             key={tab.id}
             variant="ghost"
             onClick={() => setActiveTab(tab.id)}
-            className="flex gap-2 md:flex-col items-center md:gap-0.5 p-0 h-auto"
+            className="flex flex-col items-center gap-0.5 p-0 h-auto"
             aria-label={tab.label}
             animation="none"
             disabled={tab.disabled}
@@ -149,7 +162,7 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
               className={cn(
                 "size-10 flex items-center justify-center rounded-full transition-colors",
                 activeTab === tab.id
-                  ? "text-logo-cyan md:bg-logo-cyan md:text-white"
+                  ? "text-logo-cyan bg-logo-cyan/10 md:bg-logo-cyan md:text-white"
                   : "bg-white text-bg-dark"
               )}
             >
@@ -157,11 +170,12 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
             </div>
             <div
               className={cn(
-                "text-sm md:text-xs text-bg-dark whitespace-nowrap leading-normal",
+                "text-xs text-bg-dark leading-normal text-center",
                 activeTab !== tab.id && "opacity-50"
               )}
             >
-              {tab.label}
+              <span className="md:hidden">{tab.mobileLabel ?? tab.label}</span>
+              <span className="hidden md:inline">{tab.label}</span>
             </div>
           </Button>
         ))}
@@ -174,7 +188,7 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
       return createPortal(
         <div
           className={cn(
-            "fixed top-0 inset-x-0 z-40 grid grid-cols-3 bg-white border-b border-light-gray px-5 py-2.5 transition-transform",
+            "fixed top-0 inset-x-0 z-40 grid grid-cols-4 bg-white border-b border-light-gray px-5 py-2.5 transition-transform",
             isScrolled ? "translate-y-0" : "-translate-y-full"
           )}
         >
@@ -199,8 +213,10 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
     <div className="relative bg-white rounded-2xl p-6">
       {/* 標題和篩選 */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-medium text-bg-dark">主題實踐</h2>
-        {practices.length > 0 && (
+        <h2 className="text-lg font-medium text-bg-dark">
+          {activeTab === "persona" ? personaT("tabLabel") : t("practice_section_title")}
+        </h2>
+        {activeTab !== "persona" && practices.length > 0 && (
           <div className="flex items-center gap-2">
             <Checkbox
               id="include-completed"
@@ -211,7 +227,7 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
               htmlFor="include-completed"
               className="text-sm text-text-dark cursor-pointer select-none"
             >
-              包含已完成
+              {t("practice_include_completed")}
             </label>
           </div>
         )}
@@ -220,61 +236,69 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
       {/* 子導航 */}
       {renderSubNavigation()}
 
-      {/* 實踐列表 */}
-      <div className="space-y-2.5">
-        {isLoading ? (
-          <div className="text-center py-8 text-basic-400">載入中...</div>
-        ) : error ? (
-          <div className="text-center py-8 text-basic-400">載入失敗，請稍後再試</div>
-        ) : filteredPractices.length === 0 ? (
-          isOwnData ? (
-            <RandomPracticesSection compact />
-          ) : (
-            <div className="text-center py-8 text-basic-400">
-              {activeTab === "practices" && "尚無主題實踐"}
-              {activeTab === "plans" && "尚無學習計劃"}
-              {activeTab === "ideas" && "尚無想法"}
-            </div>
-          )
+      {/* 內容區域 */}
+      {activeTab === "persona" ? (
+        isOwnData ? (
+          <PersonaProfileMe />
         ) : (
-          filteredPractices.map((practice) => (
-            <CustomLink
-              key={practice.id}
-              href={`/practices/${practice.id}`}
-              className="block p-4 rounded-lg border-b border-bg-gray hover:shadow-sm transition-shadow bg-white"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  {getStatusBadge(practice.status)}
-                  <div className="flex h-fit flex-wrap gap-2">
-                    {practice.tags.slice(0, 2).map((tag) => (
-                      <Badge key={tag} variant="gray" size="sm">
-                        {tag}
-                      </Badge>
-                    ))}
-                    {practice.tags.length > 2 && (
-                      <span className="text-xs text-basic-400 py-0.5">
-                        +{practice.tags.length - 2}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-medium text-text-dark line-clamp-1 mb-1">
-                      {practice.title}
-                    </h3>
-                    <p className="text-xs text-text-dark line-clamp-1">{practice.description}</p>
-                  </div>
-                  <div className="shrink-0">
-                    <ArrowRightOutlineSvg className="size-5 text-light-gray" />
-                  </div>
-                </div>
+          <PersonaProfileUser targetUserId={userId} />
+        )
+      ) : (
+        <div className="space-y-2.5">
+          {isLoading ? (
+            <div className="text-center py-8 text-basic-400">{t("loading")}</div>
+          ) : error ? (
+            <div className="text-center py-8 text-basic-400">{t("load_failed_retry")}</div>
+          ) : filteredPractices.length === 0 ? (
+            isOwnData ? (
+              <RandomPracticesSection compact />
+            ) : (
+              <div className="text-center py-8 text-basic-400">
+                {activeTab === "practices" && t("practice_empty_practices")}
+                {activeTab === "plans" && t("practice_empty_plans")}
+                {activeTab === "ideas" && t("practice_empty_ideas")}
               </div>
-            </CustomLink>
-          ))
-        )}
-      </div>
+            )
+          ) : (
+            filteredPractices.map((practice) => (
+              <CustomLink
+                key={practice.id}
+                href={`/practices/${practice.id}`}
+                className="block p-4 rounded-lg border-b border-bg-gray hover:shadow-sm transition-shadow bg-white"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    {getStatusBadge(practice.status)}
+                    <div className="flex h-fit flex-wrap gap-2">
+                      {practice.tags.slice(0, 2).map((tag) => (
+                        <Badge key={tag} variant="gray" size="sm">
+                          {tag}
+                        </Badge>
+                      ))}
+                      {practice.tags.length > 2 && (
+                        <span className="text-xs text-basic-400 py-0.5">
+                          +{practice.tags.length - 2}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-medium text-text-dark line-clamp-1 mb-1">
+                        {practice.title}
+                      </h3>
+                      <p className="text-xs text-text-dark line-clamp-1">{practice.description}</p>
+                    </div>
+                    <div className="shrink-0">
+                      <ArrowRightOutlineSvg className="size-5 text-light-gray" />
+                    </div>
+                  </div>
+                </div>
+              </CustomLink>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }

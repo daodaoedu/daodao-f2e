@@ -1,5 +1,10 @@
 import { useCreatePracticeCheckIn } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
+import {
+  applyOnboardingUpdateFromResponse,
+  refreshOnboardingStatus,
+} from "@/components/task-guide/onboarding-progress-context";
 import { mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import type { ICheckInFormData } from "../../types";
@@ -9,8 +14,6 @@ interface UseCheckInSubmitOptions {
   taskTitle: string;
   progressPercentage?: number;
   onComplete?: (data: ICheckInFormData) => void;
-  /** Phase 2 回調：打卡成功後使用者選擇「繼續分享心得」時呼叫，帶入打卡記錄 ID 和心情 */
-  onOpenPhase2?: (checkInId: string, mood: ICheckInFormData["mood"]) => void;
 }
 
 /**
@@ -21,8 +24,8 @@ export const useCheckInSubmit = ({
   taskTitle,
   progressPercentage = 0,
   onComplete,
-  onOpenPhase2,
 }: UseCheckInSubmitOptions) => {
+  const t = useTranslations("check_in");
   const { createCheckIn } = useCreatePracticeCheckIn(practiceId);
   const { openSuccessDialog } = useCheckInSuccessDialog({
     title: taskTitle,
@@ -30,7 +33,7 @@ export const useCheckInSubmit = ({
 
   const submitCheckIn = async (data: ICheckInFormData) => {
     // 顯示 loading toast
-    const loadingToast = toast.loading("打卡中...");
+    const loadingToast = toast.loading(t("checking_in"));
 
     try {
       // 將前端的 MoodType 映射到 API 的 ApiMoodType
@@ -46,18 +49,17 @@ export const useCheckInSubmit = ({
 
       // 使用封裝好的函數創建打卡記錄（自動處理圖片上傳和 cache 刷新）
       const response = await createCheckIn(apiFormData);
+      if (!applyOnboardingUpdateFromResponse(response)) {
+        refreshOnboardingStatus();
+      }
 
       // 關閉 loading toast
       toast.dismiss(loadingToast);
 
-      // 從 API response 中取得打卡記錄 ID、新進度百分比和鼓勵句
+      // 從 API response 中取得新進度百分比和鼓勵句
       const responseData = response.data as
-        | { id?: number; practiceProgressPercentage?: number; encouragement?: string }
+        | { practiceProgressPercentage?: number; encouragement?: string }
         | undefined;
-      const checkInId =
-        responseData && "id" in responseData && typeof responseData.id === "number"
-          ? String(responseData.id)
-          : undefined;
       const newProgressPercentage =
         responseData &&
         "practiceProgressPercentage" in responseData &&
@@ -72,24 +74,16 @@ export const useCheckInSubmit = ({
           : undefined;
 
       // 顯示成功對話框
-      const from = progressPercentage;
-      const to = newProgressPercentage;
-      const result = await openSuccessDialog(from, to, encouragement);
+      await openSuccessDialog(progressPercentage, newProgressPercentage, encouragement);
 
-      if (result.value === "share" && checkInId && onOpenPhase2) {
-        // 使用者選擇繼續分享心得，開啟 Phase 2 Sheet
-        onOpenPhase2(checkInId, data.mood);
-      } else if (result.value === "complete") {
-        // 成功對話框關閉後，執行原本的完成回調
-        onComplete?.(data);
-      }
+      onComplete?.(data);
     } catch (error) {
       // 關閉 loading toast
       toast.dismiss(loadingToast);
 
       // 顯示錯誤提示
-      const errorMessage = error instanceof Error ? error.message : "打卡失敗，請稍後再試";
-      console.error("打卡失敗:", error);
+      const errorMessage = error instanceof Error ? error.message : t("check_in_failed");
+      console.error("Check-in failed:", error);
       toast.error(errorMessage);
       throw error;
     }

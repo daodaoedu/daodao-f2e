@@ -9,7 +9,13 @@ export enum StorageEnum {
   UserInfo = "UserInfo",
   /** 用於存儲外連結受信任網站列表的 localStorage */
   Whitelist = "Whitelist",
-  /** 用於存儲 OAuth nonce 的 sessionStorage（防止偽造和重放攻擊） */
+  /**
+   * 用於存儲 OAuth nonce（防止偽造和重放攻擊）
+   * 使用 localStorage 而非 sessionStorage：iOS Safari ITP / Android Chrome Custom Tab
+   * 場景下 sessionStorage 在 OAuth 跨域 redirect 後可能被清空或不共享，
+   * 導致 callback 端 state 驗證失敗、redirectUrl 被丟掉、使用者被踢回登入頁。
+   * 安全性仍由 timestamp（10 分鐘 TTL）+ 一次性消費保障。
+   */
   OAuthNonce = "OAuthNonce",
   /** 用於存儲手動建立實踐表單草稿的 sessionStorage */
   ManualPracticeDraft = "ManualPracticeDraft",
@@ -19,17 +25,20 @@ export enum StorageEnum {
   AuthSignal = "AuthSignal",
   /** 用於還原主頁 feed 位置：點擊卡片時存卡片 ID，回到主頁時 scrollIntoView */
   HomeFeedAnchor = "HomeFeedAnchor",
+  /** 用於記錄註冊來源流程 */
+  RegistrationFlow = "RegistrationFlow",
 }
 
 const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   Quiz: "sessionStorage",
   UserInfo: "localStorage",
   Whitelist: "localStorage",
-  OAuthNonce: "sessionStorage",
+  OAuthNonce: "localStorage",
   ManualPracticeDraft: "sessionStorage",
   ActionMaker: "sessionStorage",
   AuthSignal: "localStorage",
   HomeFeedAnchor: "sessionStorage",
+  RegistrationFlow: "localStorage",
 };
 
 export interface StorageInstance<T> {
@@ -59,12 +68,31 @@ export function getStorage<T>(key: StorageEnum): StorageInstance<T> {
     };
   }
 
-  const storage = storageType === "localStorage" ? localStorage : sessionStorage;
+  let storage: Storage;
+  try {
+    storage = storageType === "localStorage" ? localStorage : sessionStorage;
+  } catch {
+    return {
+      set: () => undefined,
+      get: () => undefined,
+      remove: () => undefined,
+    };
+  }
 
-  const remove = () => storage.removeItem(storageKey);
+  const remove = () => {
+    try {
+      storage.removeItem(storageKey);
+    } catch {
+      return undefined;
+    }
+  };
 
   const set = (value: T) => {
-    storage.setItem(storageKey, JSON.stringify(value));
+    try {
+      storage.setItem(storageKey, JSON.stringify(value));
+    } catch {
+      return undefined;
+    }
   };
 
   const get = (): T | undefined => {

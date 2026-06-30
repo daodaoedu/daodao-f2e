@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import { ApplicationInfo } from "./application-info";
 import { ApplyButton } from "./apply-button";
 import { Banner } from "./banner";
@@ -11,11 +12,12 @@ import { Spotlight } from "./spotlight";
 import { List, Section } from "./styled";
 
 export const Marathon = () => {
+  const t = useTranslations("learning_marathon");
   return (
     <>
       <Banner />
       <Sidebar />
-      <Section title="活動介紹" id="marathon-intro" className="bg-white">
+      <Section title={t("marathon_section_intro_title")} id="marathon-intro" className="bg-white">
         <p className="mb-5 mt-2.5">
           學習這趟漫長的馬拉松，我可不可以用我的方式跑向屬於我的終點？
           <br />
@@ -41,7 +43,11 @@ export const Marathon = () => {
         </p>
       </Section>
 
-      <Section title="誰適合參加？" id="marathon-who" className="bg-primary-lightest">
+      <Section
+        title={t("marathon_section_who_title")}
+        id="marathon-who"
+        className="bg-primary-lightest"
+      >
         <List className="my-9">
           <li>16歲以上學習者皆可申請，優先以高中及大學生為主</li>
           <li>有意願為自己打造專屬學習旅程的學習者</li>
@@ -58,10 +64,14 @@ export const Marathon = () => {
         </p>
       </Section>
 
-      <Section title="馬拉松進行方式" id="marathon-how" className="bg-white">
-        <h3 className="heading-sm my-9 leading-[1.2] text-basic-500">我們提供的裝備</h3>
+      <Section title={t("marathon_section_how_title")} id="marathon-how" className="bg-white">
+        <h3 className="heading-sm my-9 leading-[1.2] text-basic-500">
+          {t("marathon_section_how_equipment_subtitle")}
+        </h3>
         <Equipment />
-        <h3 className="heading-sm my-9 leading-[1.2] text-basic-500">這場馬拉松有什麼不一樣？</h3>
+        <h3 className="heading-sm my-9 leading-[1.2] text-basic-500">
+          {t("marathon_section_how_spotlight_subtitle")}
+        </h3>
         <Spotlight />
       </Section>
 
@@ -69,7 +79,11 @@ export const Marathon = () => {
         <Mentors />
       </Section>
 
-      <Section title="你可以預期的收穫" id="marathon-benefit" className="bg-primary-lightest">
+      <Section
+        title={t("marathon_section_benefit_title")}
+        id="marathon-benefit"
+        className="bg-primary-lightest"
+      >
         <p className="mb-5 mt-9">
           只要申請，不論有無入選，就可以優先使用島島阿學AI個人化學習工具，包含自主學習模板、學習日誌、學習進度追蹤、AI推薦與引導等功能！
         </p>
@@ -85,7 +99,7 @@ export const Marathon = () => {
         </List>
       </Section>
 
-      <Section title="成果發表與獎勵" id="marathon-reward" className="bg-white">
+      <Section title={t("marathon_section_reward_title")} id="marathon-reward" className="bg-white">
         <p className="mb-8 mt-3">
           在學習馬拉松尾聲，針對入選的 20
           位學員，島島阿學將舉辦成果分享日，並邀請引導師及入選者作為評審，更提供總獎金 NT$ 25,000元
@@ -133,25 +147,33 @@ export const Marathon = () => {
         </List>
       </Section>
 
-      <Section title="如何申請" id="marathon-apply" className="bg-[#EEF9F9]">
+      <Section
+        title={t("marathon_section_apply_title")}
+        id="marathon-apply"
+        className="bg-[#EEF9F9]"
+      >
         <div className="mt-9">
           <ApplicationInfo />
         </div>
       </Section>
 
-      <Section title="入選後活動費用" id="marathon-price" className="bg-white">
+      <Section title={t("marathon_section_price_title")} id="marathon-price" className="bg-white">
         <div className="mt-9">
           <Pricing />
         </div>
       </Section>
 
-      <Section title="FAQ" id="marathon-faq" className="bg-white">
+      <Section title={t("marathon_section_faq_title")} id="marathon-faq" className="bg-white">
         <div className="mt-9">
           <FAQ />
         </div>
       </Section>
 
-      <Section title="主辦單位介紹" id="marathon-organizer" className="bg-white">
+      <Section
+        title={t("marathon_section_organizer_title")}
+        id="marathon-organizer"
+        className="bg-white"
+      >
         <p className="my-2.5">
           島島阿學團隊由一群大學生、教育工作者、工程師和設計師等來自不同背景的夥伴組成。
           <br />
@@ -162,7 +184,7 @@ export const Marathon = () => {
           <br />
           聯絡方式： contact@daoedu.tw
         </p>
-        <h2 className="heading-md mb-2.5 text-basic-500">合作夥伴</h2>
+        <h2 className="heading-md mb-2.5 text-basic-500">{t("marathon_partners_title")}</h2>
         <p className="mb-2.5">
           魚水教育催化劑
           <br />
@@ -180,7 +202,7 @@ export const Marathon = () => {
 
       <Section className="px-6 py-8 text-center md:py-[50px]">
         <ApplyButton className="mx-auto inline-block rounded-full bg-primary-base px-10 text-base font-normal leading-none text-white hover:bg-primary-base hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)]">
-          立即申請
+          {t("marathon_apply_button")}
         </ApplyButton>
       </Section>
     </>

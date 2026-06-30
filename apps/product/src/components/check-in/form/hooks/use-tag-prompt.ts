@@ -38,7 +38,7 @@ export const useTagPrompt = (form: UseFormReturn<CheckInFormValuesType>) => {
       }
     } catch (error) {
       // 靜默處理錯誤，不影響標籤選擇
-      console.error("取得標籤引導句失敗:", error);
+      console.error("Failed to fetch tag prompt:", error);
     }
   };
 

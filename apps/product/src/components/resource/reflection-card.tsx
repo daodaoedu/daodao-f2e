@@ -13,11 +13,11 @@ type ReflectionCardProps = {
 export function ReflectionCard(props: ReflectionCardProps) {
   const {
     className,
-    userName = "小許",
+    userName = "User",
     userAvatar = <DefaultAvatarSvg className="origin-top-left scale-150" />,
     stars = 4,
-    content = "學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得",
-    buttonContent = " 自然語言處理 Naturalewqeqwe",
+    content = "Learning reflection",
+    buttonContent = "Natural language processing",
   } = props;
 
   return (

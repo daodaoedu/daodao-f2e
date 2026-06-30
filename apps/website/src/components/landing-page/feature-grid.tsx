@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 import { SectionHeader } from "@daodao/ui/components/section-header";
 
@@ -36,35 +37,37 @@ export function FeatureCard({ title, description, tag, image, details }: Feature
 }
 
 export function FeatureGrid() {
+  const t = useTranslations("landing_page");
+
   const features = [
     {
-      title: "個人學習管理",
-      description: "有計劃、追蹤進度、記錄反思",
-      tag: "不再混亂",
+      title: t("feature_grid_item_0_title"),
+      description: t("feature_grid_item_0_description"),
+      tag: t("feature_grid_item_0_tag"),
       image: "/assets/landing-page/feature-tracker.png",
       details: [
-        "長期計劃或短期實踐，掌控學習節奏",
-        "追蹤項目進度，將目標轉化為行動",
-        "定期記錄覆盤，深化學習",
+        t("feature_grid_item_0_detail_0"),
+        t("feature_grid_item_0_detail_1"),
+        t("feature_grid_item_0_detail_2"),
       ],
     },
     {
-      title: "社群支持",
-      description: "分享學習想法和心得，在互動討論中找到志同道合夥伴",
-      tag: "不再孤單",
+      title: t("feature_grid_item_1_title"),
+      description: t("feature_grid_item_1_description"),
+      tag: t("feature_grid_item_1_tag"),
       image: "/assets/landing-page/feature-community.png",
       details: [
-        "貝殼表達感謝，鼓勵知識和學習的分享",
-        "所有互動都為了加深理解、促進成長",
-        "建立學習連結，共同探索而非相互競爭",
+        t("feature_grid_item_1_detail_0"),
+        t("feature_grid_item_1_detail_1"),
+        t("feature_grid_item_1_detail_2"),
       ],
     },
     {
-      title: "成長視覺化",
-      description: "記錄每一步努力，讓每個突破都清晰可見",
-      tag: "不再無感",
+      title: t("feature_grid_item_2_title"),
+      description: t("feature_grid_item_2_description"),
+      tag: t("feature_grid_item_2_tag"),
       image: "/assets/landing-page/feature-chart.png",
-      details: ["學習紀錄和活躍度呈現，看見成長軌跡", "個人技能地圖，視覺化個人成長發展"],
+      details: [t("feature_grid_item_2_detail_0"), t("feature_grid_item_2_detail_1")],
     },
   ];
 
@@ -76,8 +79,8 @@ export function FeatureGrid() {
           id="solutions"
         >
           <SectionHeader
-            title="告別三大學習困境"
-            subtitle="從學習痛點到美好體驗，讓每一步成長都看得見"
+            title={t("feature_grid_section_title")}
+            subtitle={t("feature_grid_section_subtitle")}
             variant="dark"
             size="lg"
             alignment="center"

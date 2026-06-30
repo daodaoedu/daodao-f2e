@@ -14,8 +14,10 @@ import {
   type IShowcasePractice,
   useShowcaseFeed,
 } from "@/hooks/useShowcaseFeed";
+import { useMobileTranslation } from "@/i18n";
 
 export default function ShowcaseScreen() {
+  const t = useMobileTranslation("mobile.home");
   const [activeTab, setActiveTab] = useState<TabType>("inspire");
 
   // ── Inspire tab state ──
@@ -55,8 +57,15 @@ export default function ShowcaseScreen() {
 
   // ── Inspire tab render ──
   const renderShowcaseItem = useCallback(
-    ({ item }: { item: IShowcasePractice }) => <PracticeShowcaseCard practice={item} />,
-    []
+    ({ item }: { item: IShowcasePractice }) => (
+      <PracticeShowcaseCard
+        practice={item}
+        onReactionUpdated={async () => {
+          await mutate();
+        }}
+      />
+    ),
+    [mutate]
   );
 
   const renderShowcaseHeader = useCallback(
@@ -106,7 +115,7 @@ export default function ShowcaseScreen() {
             </YStack>
             {isMyLoading ? (
               <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical="$8">
-                <Text color={colors.text.dark}>載入中...</Text>
+                <Text color={colors.text.dark}>{t("loading")}</Text>
               </YStack>
             ) : (
               <PracticeTasksSection

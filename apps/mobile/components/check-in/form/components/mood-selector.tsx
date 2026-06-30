@@ -3,6 +3,7 @@ import { Pressable, StyleSheet } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 interface IMoodSelectorProps {
   value: MoodType | null;
@@ -13,6 +14,7 @@ interface IMoodSelectorProps {
  * 心情選擇器組件 (Mobile)
  */
 export const MoodSelector = ({ value, onChange }: IMoodSelectorProps) => {
+  const t = useMobileTranslation("mobile.checkIn");
   const handleSelect = useCallback(
     (mood: MoodType) => {
       onChange(mood);
@@ -23,7 +25,7 @@ export const MoodSelector = ({ value, onChange }: IMoodSelectorProps) => {
   return (
     <YStack marginBottom="$6">
       <Text fontSize={16} fontWeight="500" color={colors.text.dark} marginBottom="$3">
-        心情如何?
+        {t("mood_question")}
       </Text>
       <XStack justifyContent="space-between">
         {MOOD_OPTIONS.map((moodOption) => {
@@ -33,13 +35,13 @@ export const MoodSelector = ({ value, onChange }: IMoodSelectorProps) => {
               key={moodOption.id}
               onPress={() => handleSelect(moodOption.id)}
               style={[styles.moodItem, isSelected && styles.moodItemSelected]}
-              accessibilityLabel={moodOption.label}
+              accessibilityLabel={t(moodOption.labelKey)}
               accessibilityRole="radio"
               accessibilityState={{ checked: isSelected }}
             >
               <Text fontSize={36}>{moodOption.emoji}</Text>
               <Text fontSize={12} color={isSelected ? colors.text.dark : colors.basic[400]}>
-                {moodOption.label}
+                {t(moodOption.labelKey)}
               </Text>
             </Pressable>
           );

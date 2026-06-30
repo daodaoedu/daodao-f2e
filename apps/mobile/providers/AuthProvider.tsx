@@ -1,3 +1,4 @@
+import { clearMobileClient, initMobileClient, unauthorizedHandler } from "@daodao/api";
 import { useRouter, useSegments } from "expo-router";
 import {
   createContext,
@@ -9,7 +10,12 @@ import {
   useState,
 } from "react";
 import { analyticsService } from "@/services/analytics";
-import { authStorage, type IAuthTokens, type IStoredUser } from "@/services/auth-storage";
+import {
+  authStorage,
+  type IAuthTokens,
+  type IStoredUser,
+  refreshTokens,
+} from "@/services/auth-storage";
 
 interface IAuthState {
   user: IStoredUser | null;
@@ -35,7 +41,7 @@ function useProtectedRoute(isAuthenticated: boolean, isLoading: boolean) {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === "(auth)";
+    const inAuthGroup = segments[0] === "(auth)" || segments[0] === "auth";
     let targetRoute: string | null = null;
 
     if (!isAuthenticated && !inAuthGroup) {
@@ -64,6 +70,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
   });
 
   const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    initMobileClient({
+      baseUrl: process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so",
+      getToken: () => authStorage.getAccessToken(),
+    });
+
+    unauthorizedHandler.setHandler(async () => {
+      try {
+        await refreshTokens();
+        return true;
+      } catch {
+        return false;
+      }
+    });
+
+    return () => {
+      clearMobileClient();
+      unauthorizedHandler.clearHandler();
+    };
+  }, []);
 
   // Initialize: Load auth state from SecureStore
   useEffect(() => {

@@ -16,6 +16,7 @@ import {
   VectorHalfBlueSvg,
   VectorSvg,
 } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { type ComponentType, forwardRef } from "react";
 
@@ -52,6 +53,7 @@ const BUBBLE_COLORS = {
  */
 export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCardProps>(
   ({ summary, className }, ref) => {
+    const t = useTranslations("practice");
     // 格式化日期顯示
     const formatDate = (dateStr: string) => {
       if (!dateStr) return "";
@@ -88,11 +90,11 @@ export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCar
 
           {/* 實踐期間 */}
           <div className="text-sm mb-3">
-            <span className="text-text-gray">從 </span>
+            <span className="text-text-gray">{t("summary_card_from")} </span>
             <span className="text-logo-cyan">{formatDate(summary.startDate)}</span>
-            <span className="text-text-gray"> 到 </span>
+            <span className="text-text-gray"> {t("summary_card_to")} </span>
             <span className="text-logo-cyan">{formatDate(summary.endDate)}</span>
-            <span className="text-text-gray"> 實踐了</span>
+            <span className="text-text-gray"> {t("summary_card_practiced")}</span>
           </div>
 
           {/* 實踐標題 */}
@@ -113,10 +115,12 @@ export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCar
             <div className="absolute -left-[70px] top-0 w-[300px] h-[111px]">
               <VectorSvg className="absolute inset-0 w-full h-full" />
               <div className="relative pl-20 pt-6">
-                <div className="text-sm text-text-dark">你留下了</div>
+                <div className="text-sm text-text-dark">{t("summary_card_footprint")}</div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-5xl font-bold text-text-dark">{summary.checkInCount}</span>
-                  <span className="text-base text-text-dark">個成長足跡</span>
+                  <span className="text-base text-text-dark">
+                    {t("summary_card_footprint_count")}
+                  </span>
                 </div>
               </div>
             </div>
@@ -127,7 +131,7 @@ export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCar
             {/* 過程心情 - 右上 */}
             {summary.topMoods.length > 0 && (
               <div className="absolute right-2 top-0">
-                <div className="text-sm text-text-dark mb-2">過程心情</div>
+                <div className="text-sm text-text-dark mb-2">{t("summary_card_mood")}</div>
                 <div className="relative">
                   {summary.topMoods.map((moodStat, index) => {
                     const MoodIcon = MoodIconMap[moodStat.mood];
@@ -196,7 +200,7 @@ export const PracticeSummaryCard = forwardRef<HTMLDivElement, PracticeSummaryCar
           {/* Footer */}
           <div className="flex items-center justify-between -mx-6 px-6 py-3 border-t border-gray-100 mt-auto">
             <span className="text-xs text-text-dark">daodao.so</span>
-            <span className="text-xs text-text-dark">我的小島 | 主題實踐</span>
+            <span className="text-xs text-text-dark">{t("summary_card_footer")}</span>
           </div>
         </div>
 

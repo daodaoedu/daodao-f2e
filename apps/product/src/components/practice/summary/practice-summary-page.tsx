@@ -17,6 +17,7 @@ import {
   VerifiedSvg,
   XFilledSvg,
 } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { dataUrlToFile, getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -52,6 +53,7 @@ const MoodIconMap: Record<MoodType, ComponentType<{ className?: string }>> = {
  * @description 顯示實踐完成的慶祝頁面、摘要圖片和分享功能
  */
 export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
+  const t = useTranslations("practice");
   const router = useRouter();
   const [isPublic, setIsPublic] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -74,21 +76,24 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
       } as UpdatePracticeRequestType);
       setIsPublic(true);
     } catch {
-      toast.error("公開失敗，請稍後再試");
+      toast.error(t("summary_page_publish_failed"));
     } finally {
       setIsPublishing(false);
     }
   };
 
   // 準備分享內容
-  const shareText = `我完成了「${summary.practiceName}」的實踐旅程！\n留下了 ${summary.checkInCount} 個成長足跡`;
+  const shareText = t("summary_page_share_text", {
+    practiceName: summary.practiceName,
+    checkInCount: String(summary.checkInCount),
+  });
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const shareAPI = getShareAPI({
-    title: `${summary.userName} 完成了主題實踐`,
+    title: t("summary_page_share_og_title", { userName: summary.userName }),
     text: shareText,
     url: shareUrl,
-    hashtag: "#島島阿學 #主題實踐",
+    hashtag: t("summary_page_share_hashtag"),
   });
 
   // 處理下載圖片
@@ -109,12 +114,12 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
       });
 
       if (!didShare) {
-        toast.error("此瀏覽器不支援系統分享");
+        toast.error(t("summary_page_no_share"));
       }
     } catch (error) {
       const isCancelled = error instanceof DOMException && error.name === "AbortError";
       if (!isCancelled) {
-        toast.error("分享失敗，請稍後再試");
+        toast.error(t("summary_page_share_failed"));
       }
     }
   };
@@ -134,8 +139,10 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
           <div className="flex items-center gap-2">
             <Globe className="size-4 text-logo-cyan" />
             <div>
-              <p className="text-sm font-medium text-text-dark">公開至靈感廣場</p>
-              <p className="text-xs text-text-dark/50">讓其他人看到你的實踐成果</p>
+              <p className="text-sm font-medium text-text-dark">
+                {t("summary_page_publish_label")}
+              </p>
+              <p className="text-xs text-text-dark/50">{t("summary_page_publish_desc")}</p>
             </div>
           </div>
           <button
@@ -149,7 +156,11 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
                 : "bg-logo-cyan text-white hover:bg-logo-cyan/90"
             )}
           >
-            {isPublic ? "已公開 ✓" : isPublishing ? "處理中..." : "公開"}
+            {isPublic
+              ? t("summary_page_published")
+              : isPublishing
+                ? t("summary_page_publishing")
+                : t("summary_page_publish")}
           </button>
         </div>
 
@@ -160,7 +171,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-2xl font-bold text-text-dark mb-2">實踐完成</h1>
+            <h1 className="text-2xl font-bold text-text-dark mb-2">{t("summary_page_complete")}</h1>
           </motion.div>
 
           <motion.div
@@ -168,7 +179,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <p className="text-text-dark mb-4">你完成了一個尋找可能性的旅程</p>
+            <p className="text-text-dark mb-4">{t("summary_page_subtitle")}</p>
           </motion.div>
 
           {/* 慶祝人物插圖 */}
@@ -191,7 +202,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
               {summary.encouragementText}
             </p>
             <p className="font-inter text-sm font-normal text-text-dark text-center leading-loose mt-1">
-              以下是這趟旅程的總結
+              {t("summary_page_journey")}
             </p>
           </motion.div>
         </section>
@@ -215,14 +226,16 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
         >
-          <h3 className="text-base font-medium text-text-dark text-center mb-4">分享到社群媒體</h3>
+          <h3 className="text-base font-medium text-text-dark text-center mb-4">
+            {t("summary_page_share_title")}
+          </h3>
           <div className="flex justify-center gap-4 mb-4">
             <Button
               type="button"
               variant="link"
               size="icon"
               onClick={shareAPI.lineShare}
-              aria-label="分享到 LINE"
+              aria-label={t("summary_page_share_line")}
             >
               <LineFilledSvg className="size-10" />
             </Button>
@@ -231,7 +244,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
               variant="link"
               size="icon"
               onClick={shareAPI.threadsShare}
-              aria-label="分享到 Threads"
+              aria-label={t("summary_page_share_threads")}
             >
               <ThreadsFilledSvg className="size-10 text-logo-purple" />
             </Button>
@@ -240,7 +253,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
               variant="link"
               size="icon"
               onClick={shareAPI.facebookShare}
-              aria-label="分享到 Facebook"
+              aria-label={t("summary_page_share_facebook")}
             >
               <FacebookFilledSvg className="size-10 text-logo-blue" />
             </Button>
@@ -249,7 +262,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
               variant="link"
               size="icon"
               onClick={shareAPI.xShare}
-              aria-label="分享到 X (Twitter)"
+              aria-label={t("summary_page_share_x")}
             >
               <XFilledSvg className="size-10" />
             </Button>
@@ -258,7 +271,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
               variant="link"
               size="icon"
               onClick={shareAPI.linkedinShare}
-              aria-label="分享到 LinkedIn"
+              aria-label={t("summary_page_share_linkedin")}
             >
               <LinkedinFilledSvg className="size-10" />
             </Button>
@@ -268,7 +281,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
               size="icon"
               className="bg-light-blue rounded-lg"
               onClick={handleNativeShare}
-              aria-label="分享到其他平台"
+              aria-label={t("summary_page_share_other")}
             >
               <ExternalLink className="size-7" />
             </Button>
@@ -283,7 +296,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
             disabled={isGenerating}
           >
             <Download className="size-4.5" />
-            {isGenerating ? "正在生成圖片..." : "下載圖片"}
+            {isGenerating ? t("summary_page_generating") : t("summary_page_download")}
           </Button>
         </motion.section>
 
@@ -299,7 +312,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
             className="w-full justify-center"
             animation="none"
           >
-            回到主頁
+            {t("summary_page_back_home")}
             <ArrowRightOutlineSvg className="size-4.5" />
           </Button>
         </motion.div>

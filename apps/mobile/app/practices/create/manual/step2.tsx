@@ -5,28 +5,43 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { StepIndicator } from "@/components";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 import { useCreatePractice } from "@/providers/CreatePracticeProvider";
 
 const frequencyOptions = [
-  { value: "daily", label: "每日", description: "每天執行一次" },
-  { value: "weekly", label: "每週", description: "每週執行一次" },
-  { value: "custom", label: "自訂", description: "選擇特定日子" },
+  {
+    value: "daily",
+    labelKey: "mobile_frequency_daily",
+    descriptionKey: "mobile_frequency_daily_description",
+  },
+  {
+    value: "weekly",
+    labelKey: "mobile_frequency_weekly",
+    descriptionKey: "mobile_frequency_weekly_description",
+  },
+  {
+    value: "custom",
+    labelKey: "mobile_frequency_custom",
+    descriptionKey: "mobile_frequency_custom_description",
+  },
 ] as const;
 
 const targetDaysOptions = [7, 14, 21, 30, 60, 90, 100, 365];
 
 const weekDays = [
-  { value: 0, label: "日" },
-  { value: 1, label: "一" },
-  { value: 2, label: "二" },
-  { value: 3, label: "三" },
-  { value: 4, label: "四" },
-  { value: 5, label: "五" },
-  { value: 6, label: "六" },
+  { value: 0, labelKey: "mobile_weekday_sun" },
+  { value: 1, labelKey: "mobile_weekday_mon" },
+  { value: 2, labelKey: "mobile_weekday_tue" },
+  { value: 3, labelKey: "mobile_weekday_wed" },
+  { value: 4, labelKey: "mobile_weekday_thu" },
+  { value: 5, labelKey: "mobile_weekday_fri" },
+  { value: 6, labelKey: "mobile_weekday_sat" },
 ];
 
 export default function Step2Screen() {
   const router = useRouter();
+  const t = useMobileTranslation("practice");
+  const commonT = useMobileTranslation("common");
   const { form, currentStep, totalSteps, nextStep, prevStep } = useCreatePractice();
   const {
     control,
@@ -69,15 +84,21 @@ export default function Step2Screen() {
       <YStack flex={1} backgroundColor="$background">
         {/* Header */}
         <XStack padding="$4" alignItems="center" gap="$3">
-          <Button size="$4" circular chromeless onPress={handleBack} accessibilityLabel="返回">
+          <Button
+            size="$4"
+            circular
+            chromeless
+            onPress={handleBack}
+            accessibilityLabel={commonT("back")}
+          >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <YStack flex={1}>
             <Text fontSize={18} fontWeight="600" color="$color">
-              頻率與時長
+              {t("mobile_step2_title")}
             </Text>
             <Text fontSize={12} color="$color" opacity={0.6}>
-              步驟 {currentStep} / {totalSteps}
+              {t("mobile_step_progress", { current: currentStep, total: totalSteps })}
             </Text>
           </YStack>
         </XStack>
@@ -89,7 +110,7 @@ export default function Step2Screen() {
             {/* Frequency */}
             <YStack gap="$3">
               <Text fontSize={14} fontWeight="500" color="$color">
-                執行頻率
+                {t("mobile_frequency_label")}
               </Text>
               <Controller
                 control={control}
@@ -115,10 +136,10 @@ export default function Step2Screen() {
                               fontWeight="500"
                               color={value === option.value ? colors.primary.darker : "$color"}
                             >
-                              {option.label}
+                              {t(option.labelKey)}
                             </Text>
                             <Text fontSize={12} color="$color" opacity={0.6}>
-                              {option.description}
+                              {t(option.descriptionKey)}
                             </Text>
                           </YStack>
                           {value === option.value && (
@@ -136,7 +157,7 @@ export default function Step2Screen() {
             {frequency === "custom" && (
               <YStack gap="$3">
                 <Text fontSize={14} fontWeight="500" color="$color">
-                  選擇執行日
+                  {t("mobile_custom_days_label")}
                 </Text>
                 <XStack gap="$2" justifyContent="space-between">
                   {weekDays.map((day) => (
@@ -160,7 +181,7 @@ export default function Step2Screen() {
                         fontWeight="500"
                         color={customDays.includes(day.value) ? colors.basic.white : "$color"}
                       >
-                        {day.label}
+                        {t(day.labelKey)}
                       </Text>
                     </Button>
                   ))}
@@ -171,7 +192,7 @@ export default function Step2Screen() {
             {/* Target Days */}
             <YStack gap="$3">
               <Text fontSize={14} fontWeight="500" color="$color">
-                目標天數
+                {t("mobile_duration_days_label")}
               </Text>
               <Controller
                 control={control}
@@ -190,7 +211,7 @@ export default function Step2Screen() {
                         marginBottom="$2"
                       >
                         <Text fontSize={14} color={value === days ? colors.basic.white : "$color"}>
-                          {days} 天
+                          {t("mobile_days", { count: days })}
                         </Text>
                       </Button>
                     ))}
@@ -216,7 +237,7 @@ export default function Step2Screen() {
           >
             <XStack alignItems="center" gap="$2">
               <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                下一步
+                {t("manual_next_step")}
               </Text>
               <ChevronRight size={20} color={colors.basic.white} />
             </XStack>

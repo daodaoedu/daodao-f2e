@@ -1,10 +1,11 @@
 "use client";
 
-import { saveQuizResult } from "@daodao/api";
+import { saveQuizPending, saveQuizResult } from "@daodao/api";
 import { HorizontalFullSvg, VerticalFullSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { AuthButton, useAuth } from "@daodao/auth";
 import { useRouter } from "@daodao/i18n/navigation";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import {
   type CapturedImageData,
   captureElementAsImage,
@@ -54,29 +55,33 @@ export const QuizResult = () => {
     };
   }, [hasAnalysis, router]);
 
-  // 當用戶已登入且有測驗結果時，自動儲存到後端
+  // 測驗結果儲存：已登入 → 直接儲存；未登入 → 暫存（後端設定 cookie，登入後自動認領）
   useEffect(() => {
     const saveResult = async () => {
-      if (!isAuthenticated || !hasAnalysis || !detail || hasSavedResult) {
+      if (!hasAnalysis || !detail || hasSavedResult) {
         return;
       }
 
       try {
-        // 轉換答案格式：從 { q1: { selectedAnswer: 'A' } } 轉為 { "1": { selectedAnswer: "A" } }
         const formattedAnswers: Record<string, { selectedAnswer: string }> = {};
         for (const [questionId, answer] of Object.entries(result)) {
           const questionNumber = questionId.replace("q", "");
           formattedAnswers[questionNumber] = { selectedAnswer: answer.selectedAnswer };
         }
 
-        await saveQuizResult({
-          resultType: detail.id, // 已經是大寫格式 (L/C/A/D/O)
+        const quizData = {
+          resultType: detail.id,
           scores: analysis,
           answers: formattedAnswers,
-        });
+        };
+
+        if (isAuthenticated) {
+          await saveQuizResult(quizData);
+        } else {
+          await saveQuizPending(quizData);
+        }
         setHasSavedResult(true);
       } catch (error) {
-        // 儲存失敗時靜默處理，不影響用戶體驗
         console.error("Failed to save quiz result:", error);
       }
     };
@@ -212,7 +217,12 @@ export const QuizResult = () => {
           <AuthButton
             variant="outline"
             className="mb-6 block w-full border-basic-400 text-basic-400 hover:bg-basic-400"
-            onClick={handleViewAnalysis}
+            onClick={() => {
+              if (!isAuthenticated) {
+                getStorage<"quiz">(StorageEnum.RegistrationFlow).set("quiz");
+              }
+              handleViewAnalysis();
+            }}
             redirectUrl={`/quiz/result/${detail?.id}`}
           >
             看深度分析
@@ -231,7 +241,12 @@ export const QuizResult = () => {
                   回到 島島阿學
                 </CustomLink>
               ) : (
-                <CustomLink href="/">前往 島島阿學</CustomLink>
+                <CustomLink
+                  href="/"
+                  onClick={() => getStorage<"quiz">(StorageEnum.RegistrationFlow).set("quiz")}
+                >
+                  前往 島島阿學
+                </CustomLink>
               )}
             </Button>
           </footer>

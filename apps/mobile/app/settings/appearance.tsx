@@ -5,46 +5,49 @@ import { useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
+import { useMobileTranslation } from "@/i18n";
 
 type ThemeModeType = "light" | "dark" | "system";
 
 const themeOptions: {
   value: ThemeModeType;
-  label: string;
+  labelKey: string;
   icon: typeof Sun;
-  description: string;
+  descriptionKey: string;
 }[] = [
   {
     value: "light",
-    label: "淺色模式",
+    labelKey: "theme.light.label",
     icon: Sun,
-    description: "始終使用淺色主題",
+    descriptionKey: "theme.light.description",
   },
   {
     value: "dark",
-    label: "深色模式",
+    labelKey: "theme.dark.label",
     icon: Moon,
-    description: "始終使用深色主題",
+    descriptionKey: "theme.dark.description",
   },
   {
     value: "system",
-    label: "跟隨系統",
+    labelKey: "theme.system.label",
     icon: Smartphone,
-    description: "根據系統設定自動切換",
+    descriptionKey: "theme.system.description",
   },
 ];
 
 const accentColors = [
-  { value: "#4F46E5", label: "靛藍" },
-  { value: "#7C3AED", label: "紫色" },
-  { value: "#EC4899", label: "粉紅" },
-  { value: "#059669", label: "綠色" },
-  { value: "#DC2626", label: "紅色" },
-  { value: "#EA580C", label: "橘色" },
+  { value: "#4F46E5", labelKey: "accent.indigo" },
+  { value: "#7C3AED", labelKey: "accent.purple" },
+  { value: "#EC4899", labelKey: "accent.pink" },
+  { value: "#059669", labelKey: "accent.green" },
+  { value: "#DC2626", labelKey: "accent.red" },
+  { value: "#EA580C", labelKey: "accent.orange" },
 ];
 
 export default function AppearanceSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.appearanceSettings");
+  const tCommon = useMobileTranslation("common");
   const systemColorScheme = useColorScheme();
 
   const [themeMode, setThemeModeType] = useState<ThemeModeType>("system");
@@ -62,12 +65,12 @@ export default function AppearanceSettingsScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            外觀設定
+            {t("title")}
           </Text>
         </XStack>
 
@@ -76,7 +79,7 @@ export default function AppearanceSettingsScreen() {
             {/* Theme Mode */}
             <YStack gap="$3">
               <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingLeft="$1">
-                主題模式
+                {t("themeMode")}
               </Text>
               <Card
                 backgroundColor="$background"
@@ -120,10 +123,10 @@ export default function AppearanceSettingsScreen() {
                             fontWeight={isSelected ? "600" : "400"}
                             color={isSelected ? colors.primary.darker : "$color"}
                           >
-                            {option.label}
+                            {t(option.labelKey)}
                           </Text>
                           <Text fontSize={12} color="$color" opacity={0.5}>
-                            {option.description}
+                            {t(option.descriptionKey)}
                           </Text>
                         </YStack>
                       </XStack>
@@ -137,7 +140,7 @@ export default function AppearanceSettingsScreen() {
             {/* Accent Color */}
             <YStack gap="$3">
               <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingLeft="$1">
-                主題顏色
+                {t("accentColor")}
               </Text>
               <Card
                 padding="$4"
@@ -164,7 +167,7 @@ export default function AppearanceSettingsScreen() {
                           {isSelected && <Check size={20} color={colors.basic.white} />}
                         </Button>
                         <Text fontSize={11} color="$color" opacity={0.6}>
-                          {color.label}
+                          {t(color.labelKey)}
                         </Text>
                       </YStack>
                     );
@@ -176,7 +179,7 @@ export default function AppearanceSettingsScreen() {
             {/* Preview */}
             <YStack gap="$3">
               <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingLeft="$1">
-                預覽
+                {t("preview")}
               </Text>
               <Card
                 padding="$4"
@@ -199,7 +202,7 @@ export default function AppearanceSettingsScreen() {
                     </Text>
                   </YStack>
                   <Text fontSize={15} fontWeight="600" color={accentColor}>
-                    這是你選擇的主題顏色
+                    {t("previewText")}
                   </Text>
                 </YStack>
               </Card>
@@ -208,7 +211,9 @@ export default function AppearanceSettingsScreen() {
             {/* Info */}
             <YStack padding="$4" backgroundColor={colors.basic[100]} borderRadius="$md" gap="$2">
               <Text fontSize={13} color="$color" opacity={0.6}>
-                提示：目前顯示模式為{currentTheme === "dark" ? "深色" : "淺色"}模式
+                {t("currentModeHint", {
+                  mode: currentTheme === "dark" ? t("mode.dark") : t("mode.light"),
+                })}
               </Text>
             </YStack>
           </YStack>

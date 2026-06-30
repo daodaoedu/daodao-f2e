@@ -1,11 +1,11 @@
+import { CHECK_IN_MAX_IMAGES } from "@daodao/shared/lib/check-in-image";
 import { Camera, X } from "@tamagui/lucide-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useCallback } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { Image, Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-
-const MAX_FILES = 3;
+import { useMobileTranslation } from "@/i18n";
 
 interface IMediaUploadFieldProps {
   value: string[];
@@ -16,19 +16,21 @@ interface IMediaUploadFieldProps {
  * 媒體上傳欄位組件 (Mobile)
  */
 export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) => {
+  const t = useMobileTranslation("mobile.checkIn");
   const handlePickImage = useCallback(async () => {
-    if (value.length >= MAX_FILES) return;
+    if (value.length >= CHECK_IN_MAX_IMAGES) return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      // Images only: videos cannot be previewed with the Image component
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
-      selectionLimit: MAX_FILES - value.length,
+      selectionLimit: CHECK_IN_MAX_IMAGES - value.length,
       quality: 0.8,
     });
 
     if (!result.canceled) {
       const newMedia = result.assets.map((asset) => asset.uri);
-      onChange([...value, ...newMedia].slice(0, MAX_FILES));
+      onChange([...value, ...newMedia].slice(0, CHECK_IN_MAX_IMAGES));
     }
   }, [value, onChange]);
 
@@ -43,15 +45,15 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
     <YStack marginBottom="$8">
       <XStack justifyContent="space-between" alignItems="center" marginBottom="$3">
         <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
-          上傳照片或影片
+          {t("upload_images")}
         </Text>
         <Text fontSize={14} color={colors.basic["400"]}>
-          已上傳 {value.length}/{MAX_FILES} 張
+          {t("uploaded_count", { count: value.length, total: CHECK_IN_MAX_IMAGES })}
         </Text>
       </XStack>
 
       <XStack gap="$3" flexWrap="wrap">
-        {/* 已上傳的媒體預覽 */}
+        {/* 已上傳的圖片預覽 */}
         {value.map((uri, index) => (
           <View key={uri} style={styles.mediaPreview}>
             <View
@@ -61,12 +63,18 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
               overflow="hidden"
               backgroundColor={colors.basic["200"]}
             >
-              <Image source={{ uri }} width="100%" height="100%" resizeMode="cover" />
+              <Image
+                source={{ uri }}
+                width={80}
+                height={80}
+                resizeMode="cover"
+                alt={t("image_preview_alt", { number: index + 1 })}
+              />
             </View>
             <Pressable
               style={styles.removeButton}
               onPress={() => handleRemoveMedia(index)}
-              accessibilityLabel="移除媒體"
+              accessibilityLabel={t("remove_image")}
               accessibilityRole="button"
             >
               <X size={12} color={colors.basic.white} />
@@ -75,11 +83,11 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
         ))}
 
         {/* 上傳按鈕 */}
-        {value.length < MAX_FILES && (
+        {value.length < CHECK_IN_MAX_IMAGES && (
           <Pressable style={styles.uploadButton} onPress={handlePickImage}>
             <Camera size={24} color={colors.basic["400"]} />
             <Text fontSize={12} color={colors.basic["400"]}>
-              點擊上傳
+              {t("tap_upload")}
             </Text>
           </Pressable>
         )}

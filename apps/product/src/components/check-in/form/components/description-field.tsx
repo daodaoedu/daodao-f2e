@@ -1,3 +1,4 @@
+import { useTranslations } from "@daodao/i18n";
 import {
   FormControl,
   FormDescription,
@@ -21,6 +22,7 @@ interface IDescriptionFieldProps {
  * 描述輸入欄位組件
  */
 export const DescriptionField = ({ form, beforeTextarea }: IDescriptionFieldProps) => {
+  const t = useTranslations("check_in");
   const descriptionLength = form.watch("description")?.length || 0;
 
   return (
@@ -30,15 +32,17 @@ export const DescriptionField = ({ form, beforeTextarea }: IDescriptionFieldProp
       render={({ field }) => (
         <FormItem className="mt-4">
           <div className="mb-1.5 flex items-center justify-between gap-2">
-            <FormLabel className="text-base font-medium text-text-dark">詳細描述</FormLabel>
+            <FormLabel className="text-base font-medium text-text-dark">
+              {t("description_label")}
+            </FormLabel>
 
             <FormDescription className="text-sm text-light-gray">
-              {descriptionLength}/300
+              {descriptionLength}/600
             </FormDescription>
           </div>
           {beforeTextarea}
           <FormControl>
-            <Textarea {...field} placeholder="簡單紀錄今天的發現，或卡關的地方" />
+            <Textarea {...field} placeholder={t("description_placeholder")} />
           </FormControl>
           <FormMessage />
         </FormItem>

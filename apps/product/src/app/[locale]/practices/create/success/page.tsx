@@ -2,6 +2,7 @@
 
 import { ArrowRightOutlineSvg } from "@daodao/assets";
 import featureHappyJson from "@daodao/assets/images/quiz/feature-happy.json";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
@@ -12,6 +13,7 @@ import { useCallback, useEffect, useState } from "react";
 import { BackgroundAnimation } from "@/components/layout";
 
 export default function PracticeSuccessPage() {
+  const t = useTranslations("app_product");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [countdown, setCountdown] = useState(11);
@@ -69,14 +71,16 @@ export default function PracticeSuccessPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-4xl font-medium text-text-dark leading-normal">太棒啦！</h1>
+            <h1 className="text-4xl font-medium text-text-dark leading-normal">
+              {t("practice_success_title")}
+            </h1>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <p className="text-sm text-text-dark">你已成功建立了一項主題實踐</p>
+            <p className="text-sm text-text-dark">{t("practice_success_subtitle")}</p>
           </motion.div>
         </div>
 
@@ -97,8 +101,8 @@ export default function PracticeSuccessPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.7 }}
         >
-          <p className="text-sm text-logo-cyan">完成規劃已是踏出第一步，已為你推進 20% 進度！</p>
-          <p className="text-sm text-logo-cyan">期待你的第一次打卡分享！</p>
+          <p className="text-sm text-logo-cyan">{t("practice_success_progress")}</p>
+          <p className="text-sm text-logo-cyan">{t("practice_success_next")}</p>
         </motion.div>
 
         {/* 按鈕區域 */}
@@ -109,7 +113,7 @@ export default function PracticeSuccessPage() {
           transition={{ duration: 0.6, delay: 0.9 }}
         >
           <Button onClick={handleStartPractice} variant="ctaOrange" className="inline-flex mb-6">
-            開始主題實踐
+            {t("practice_success_start")}
             <ArrowRightOutlineSvg className="size-4.5" />
           </Button>
 
@@ -119,7 +123,7 @@ export default function PracticeSuccessPage() {
             className="inline-flex mb-px"
             animation="none"
           >
-            回到主頁
+            {t("practice_success_home")}
             <ArrowRightOutlineSvg className="size-4.5" />
           </Button>
           {/* 倒數計時提示 */}
@@ -129,7 +133,7 @@ export default function PracticeSuccessPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 1.1 }}
           >
-            {countdown} 秒後自動跳轉
+            {t("practice_success_countdown", { count: countdown })}
           </motion.p>
         </motion.div>
       </main>

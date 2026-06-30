@@ -1,12 +1,12 @@
+import { updateNotificationPreferences, useNotificationPreferences } from "@daodao/api";
 import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useSWR from "swr";
 import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
 import { NOTIFICATION_TYPES } from "@/constants/settings";
 import { colors } from "@/generated/design-tokens";
-import { api } from "@/services/api-client";
+import { useMobileTranslation } from "@/i18n";
 
 interface INotificationPref {
   type: string;
@@ -20,14 +20,32 @@ const DEFAULT_PREFS: PreferencesMapType = Object.fromEntries(
   NOTIFICATION_TYPES.map((t) => [t.type, { emailEnabled: true }])
 );
 
+function mapNotificationPreferences(prefsData?: { data?: INotificationPref[] }) {
+  const newPrefs: PreferencesMapType = { ...DEFAULT_PREFS };
+
+  for (const p of prefsData?.data ?? []) {
+    if (p.channel === "N01" && newPrefs[p.type]) {
+      newPrefs[p.type] = { emailEnabled: p.isEnabled };
+    }
+  }
+
+  return newPrefs;
+}
+
+function assertPreferenceUpdateSucceeded(
+  response: Awaited<ReturnType<typeof updateNotificationPreferences>>
+) {
+  if (response.error) {
+    throw new Error("Failed to update notification preferences");
+  }
+}
+
 export default function NotificationSettingsScreen() {
   const router = useRouter();
+  const t = useMobileTranslation("mobile.notificationSettings");
+  const tCommon = useMobileTranslation("common");
 
-  const { data: prefsData, mutate } = useSWR<INotificationPref[]>(
-    "/notifications/preferences",
-    () => api.get<{ data: INotificationPref[] }>("/notifications/preferences").then((r) => r.data),
-    { revalidateOnFocus: false }
-  );
+  const { data: prefsData, mutate } = useNotificationPreferences();
 
   const [globalEnabled, setGlobalEnabled] = useState(true);
   const [prefs, setPrefs] = useState<PreferencesMapType>(DEFAULT_PREFS);
@@ -35,20 +53,15 @@ export default function NotificationSettingsScreen() {
 
   useEffect(() => {
     if (!prefsData) return;
-    const newPrefs: PreferencesMapType = { ...DEFAULT_PREFS };
-    for (const p of prefsData) {
-      if (p.channel === "N01" && newPrefs[p.type]) {
-        newPrefs[p.type] = { emailEnabled: p.isEnabled };
-      }
-    }
-    setPrefs(newPrefs);
+    setPrefs(mapNotificationPreferences(prefsData));
   }, [prefsData]);
 
   const handleGlobalToggle = async (value: boolean) => {
     setGlobalEnabled(value);
     setIsSaving(true);
     try {
-      await api.put("/notifications/preferences", { globalEnabled: value });
+      const response = await updateNotificationPreferences({ globalEnabled: value });
+      assertPreferenceUpdateSucceeded(response);
       mutate();
     } catch {
       setGlobalEnabled(!value);
@@ -62,9 +75,10 @@ export default function NotificationSettingsScreen() {
     setPrefs((p) => ({ ...p, [notificationType]: { emailEnabled } }));
     setIsSaving(true);
     try {
-      await api.put("/notifications/preferences", {
-        preferences: [{ type: notificationType, channel: "N01", isEnabled: emailEnabled }],
+      const response = await updateNotificationPreferences({
+        preferences: [{ type: notificationType, channel: "N01" as const, isEnabled: emailEnabled }],
       });
+      assertPreferenceUpdateSucceeded(response);
       mutate();
     } catch {
       setPrefs((p) => ({ ...p, [notificationType]: prev ?? { emailEnabled: true } }));
@@ -82,12 +96,12 @@ export default function NotificationSettingsScreen() {
             circular
             chromeless
             onPress={() => router.back()}
-            accessibilityLabel="返回"
+            accessibilityLabel={tCommon("back")}
           >
             <ChevronLeft size={24} color="$color" />
           </Button>
           <Text fontSize={18} fontWeight="600" color="$color">
-            通知設定
+            {t("title")}
           </Text>
         </XStack>
 
@@ -104,10 +118,10 @@ export default function NotificationSettingsScreen() {
               <XStack padding="$4" alignItems="center" justifyContent="space-between">
                 <YStack flex={1} gap="$1">
                   <Text fontSize={15} color="$color">
-                    通知總開關
+                    {t("globalTitle")}
                   </Text>
                   <Text fontSize={12} color="$color" opacity={0.5}>
-                    關閉後將停止所有 Email 通知，通知中心仍繼續累積
+                    {t("globalDescription")}
                   </Text>
                 </YStack>
                 <Switch
@@ -124,7 +138,7 @@ export default function NotificationSettingsScreen() {
             {/* Email 通知設定 */}
             <YStack gap="$3">
               <Text fontSize={13} fontWeight="600" color="$color" opacity={0.5} paddingLeft="$1">
-                Email 通知設定
+                {t("emailSection")}
               </Text>
               <Card
                 backgroundColor="$background"
@@ -146,10 +160,10 @@ export default function NotificationSettingsScreen() {
                     >
                       <YStack flex={1} gap="$1">
                         <Text fontSize={14} color="$color">
-                          {item.label}
+                          {t(item.labelKey)}
                         </Text>
                         <Text fontSize={12} color="$color" opacity={0.5}>
-                          {item.description}
+                          {t(item.descriptionKey)}
                         </Text>
                       </YStack>
                       <Switch
@@ -175,7 +189,7 @@ export default function NotificationSettingsScreen() {
               textAlign="center"
               paddingHorizontal="$4"
             >
-              In-App 通知中心（島嶼上的通知鈴）永遠開啟，只有 Email 可以關閉
+              {t("inAppAlwaysOn")}
             </Text>
           </YStack>
         </ScrollView>

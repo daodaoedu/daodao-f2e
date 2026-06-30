@@ -1,7 +1,6 @@
 "use client";
-import { getRequiredEnv } from "@daodao/config";
 import useSWR from "swr";
-import { unauthorizedHandler } from "../client";
+import { getApiBaseUrl, unauthorizedHandler } from "../client";
 
 export interface IFootprintItem {
   id: number;
@@ -23,7 +22,7 @@ interface IFootprintsResponse {
 }
 
 const getMyFootprints = async (page = 1, limit = 20): Promise<IFootprintsResponse> => {
-  const baseUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
+  const baseUrl = getApiBaseUrl();
   const res = await unauthorizedHandler.wrapFetch(
     `${baseUrl}/api/v1/me/footprints?page=${page}&limit=${limit}`
   );

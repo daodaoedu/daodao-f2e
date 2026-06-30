@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import type { UseFormReturn } from "react-hook-form";
 import { BgRadialAnimation } from "@/components/layout/bg-radial-animation";
 import {
@@ -21,6 +22,7 @@ interface Step5Props {
 }
 
 export const Step5 = ({ form, privacyStatus, onPrivacyStatusChange }: Step5Props) => {
+  const t = useTranslations("app_product");
   const formValues = form.getValues();
   const {
     name,
@@ -39,7 +41,9 @@ export const Step5 = ({ form, privacyStatus, onPrivacyStatusChange }: Step5Props
     <div>
       {/* Header Section */}
       <div className="text-center py-4">
-        <p className="text-sm md:text-base text-text-dark mb-1 md:mb-0.5">我建立的實踐是</p>
+        <p className="text-sm md:text-base text-text-dark mb-1 md:mb-0.5">
+          {t("practice_created_is")}
+        </p>
         <h1 className="text-2xl md:text-4xl font-medium text-text-dark relative">
           {name}
           <BgRadialAnimation className="-translate-y-[calc(50%-44px)]" variant="notebook" />
@@ -66,7 +70,7 @@ export const Step5 = ({ form, privacyStatus, onPrivacyStatusChange }: Step5Props
       {Array.isArray(resources) && resources.length > 0 && (
         <div>
           <h3 className="text-sm text-center font-medium text-text-dark mt-4 mb-3.5">
-            我使用的資源是
+            {t("practice_resource_intro")}
           </h3>
           <div className="grid grid-cols-2 gap-3">
             {resources.map((resource) => (

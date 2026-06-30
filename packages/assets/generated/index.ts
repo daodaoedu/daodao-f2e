@@ -109,6 +109,8 @@ export { default as IslandsSvg } from "./landing-page/islands";
 export { default as JoyrideSvg } from "./landing-page/joyride";
 export { default as TimingSvg } from "./landing-page/timing";
 export { default as VerifiedSvg } from "./landing-page/verified";
+export { default as ArrowCircleSvg } from "./persona/arrow-circle";
+export { default as QuoteFillSvg } from "./persona/quote-fill";
 export { default as ActiveShaperSvg } from "./quiz/active-shaper";
 export { default as CommunityConnectorSvg } from "./quiz/community-connector";
 export { default as DeepExplorerSvg } from "./quiz/deep-explorer";

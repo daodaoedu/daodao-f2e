@@ -24,9 +24,11 @@ import {
   type IShowcasePractice,
   useShowcaseFeed,
 } from "@/hooks/useShowcaseFeed";
+import { useMobileTranslation } from "@/i18n";
 
 export default function HomeScreen() {
   const _router = useRouter();
+  const t = useMobileTranslation("mobile.home");
   const [activeTab, setActiveTab] = useState<TabType>("inspire");
 
   // ── Inspire tab state ──
@@ -105,9 +107,9 @@ export default function HomeScreen() {
   const dashboardStats = useMemo(
     () => [
       {
-        label: "連續登入",
+        label: t("stats_streak_label"),
         value: String(stats.currentStreak || 0),
-        unit: "天",
+        unit: t("stats_days_unit"),
         icon: (
           <CheckCircle2
             size={48}
@@ -117,9 +119,9 @@ export default function HomeScreen() {
         ),
       },
       {
-        label: "獲得迴響",
+        label: t("stats_responses_label"),
         value: String(stats.totalCheckIns || 0),
-        unit: "次",
+        unit: t("stats_times_unit"),
         icon: (
           <MessageSquare
             size={48}
@@ -129,7 +131,7 @@ export default function HomeScreen() {
         ),
       },
     ],
-    [stats]
+    [stats, t]
   );
 
   // ── Inspire tab render ──
@@ -193,7 +195,7 @@ export default function HomeScreen() {
 
         {isMyLoading ? (
           <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical="$8">
-            <Text color={colors.text.dark}>載入中...</Text>
+            <Text color={colors.text.dark}>{t("loading")}</Text>
           </YStack>
         ) : (
           <YStack paddingHorizontal="$4">

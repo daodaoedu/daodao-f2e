@@ -11,6 +11,9 @@ import { SheetManagerProvider } from "@daodao/ui/components/animate-ui/component
 import { Toaster } from "@daodao/ui/components/sonner";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
 import { useRouter } from "next/navigation";
+import { OnboardingProgressProvider } from "@/components/task-guide/onboarding-progress-context";
+import { TaskGuideWidget } from "@/components/task-guide/task-guide-widget";
+import { TrackingRefCapture } from "@/components/tracking-ref-capture";
 
 interface GlobalProviderProps {
   head?: React.ReactNode;
@@ -38,42 +41,52 @@ function GlobalProvider({
     >
       {head}
       <body>
+        <TrackingRefCapture />
         <AnalyticsScripts />
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
           <DeviceProvider initialDevice={initialDevice}>
             <NavigationBlockerProvider>
               <SwrConfigProvider>
                 <DialogManagerProvider>
-                  <SheetManagerProvider>
-                    <AuthProvider
-                      defaultProtected
-                      publicPattern={[
-                        "^/auth/login",
-                        "^/auth/callback",
-                        "^/auth/error",
-                        "^/auth/onboarding",
-                        "^/auth/verify-email(/.*)?$",
-                        "^/auth/error",
-                        "^/users/",
-                        "^/practices/[^/]+$",
-                        "^/dev/",
-                      ]}
-                      onAuthRequired={(currentPath) => {
-                        router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
-                      }}
-                      onboardingPath="/auth/onboarding"
-                      onTemporaryUser={() => {
-                        router.push("/auth/onboarding");
-                      }}
-                      emailVerificationPath="/auth/verify-email"
-                      onEmailUnverified={() => {
-                        router.push("/auth/verify-email/pending");
-                      }}
-                    >
-                      <Toaster />
-                      {children}
-                    </AuthProvider>
-                  </SheetManagerProvider>
+                  <AuthProvider
+                    defaultProtected
+                    publicPattern={[
+                      // auth flows
+                      "^/auth/",
+                      // content pages (no login required)
+                      "^/$",
+                      "^/users/",
+                      "^/practices/[^/]+$",
+                      "^/practices/[^/]+/check-ins/",
+                      "^/roadmap(/.*)?$",
+                      "^/resource(/.*)?$",
+                      "^/persona(/.*)?$",
+                      "^/mine(/.*)?$",
+                      "^/survey/r/",
+                      // misc
+                      "^/dev/",
+                      "^/ux-mockup/",
+                    ]}
+                    onAuthRequired={(currentPath) => {
+                      router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
+                    }}
+                    onboardingPath="/auth/onboarding"
+                    onTemporaryUser={() => {
+                      router.push("/auth/onboarding");
+                    }}
+                    emailVerificationPath="/auth/verify-email"
+                    onEmailUnverified={() => {
+                      router.push("/auth/verify-email/pending");
+                    }}
+                  >
+                    <SheetManagerProvider>
+                      <OnboardingProgressProvider>
+                        <TaskGuideWidget />
+                        <Toaster />
+                        {children}
+                      </OnboardingProgressProvider>
+                    </SheetManagerProvider>
+                  </AuthProvider>
                 </DialogManagerProvider>
               </SwrConfigProvider>
             </NavigationBlockerProvider>

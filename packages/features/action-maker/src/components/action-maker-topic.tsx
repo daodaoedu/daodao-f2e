@@ -16,7 +16,7 @@ export function ActionMakerTopic() {
     dispatch({ type: "SET_TOPIC", payload: topic.trim() });
     dispatch({ type: "SET_SELECTED_TAGS", payload: [] });
     dispatch({ type: "SET_ACTIONS", payload: [] });
-    navigateTo("/action-maker/actions");
+    navigateTo("/action-maker/nickname");
   };
 
   const handleInspiration = () => {
@@ -31,7 +31,7 @@ export function ActionMakerTopic() {
 
         <div className="flex flex-1 flex-col items-center justify-center gap-6 px-6">
           <h2 className="text-2xl font-bold text-white">設定你感興趣的主題</h2>
-          <p className="text-[#BCD5EE]">新的一年，我想要...</p>
+          <p className="text-[#BCD5EE]">我想要...</p>
 
           <div className="w-full max-w-sm">
             <textarea

@@ -9,10 +9,11 @@ import GlobalProvider from "./global-provider";
 function GlobalNotFoundPage() {
   const pathname = usePathname();
   const { locale, messages } = getMessagesFromPathname(pathname);
+  const commonMessages = messages.common as Record<string, string>;
 
   const head = (
     <head>
-      <title>找不到頁面 | 島島阿學</title>
+      <title>{commonMessages.global_not_found_title}</title>
       <link rel="shortcut icon" href={faviconPng.src} />
     </head>
   );
@@ -21,8 +22,10 @@ function GlobalNotFoundPage() {
     <GlobalProvider head={head} locale={locale} messages={messages}>
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">找不到頁面</h1>
-          <p className="mt-4 text-muted-foreground">您要尋找的頁面不存在</p>
+          <h1 className="text-2xl font-bold">{commonMessages.global_not_found_heading}</h1>
+          <p className="mt-4 text-muted-foreground">
+            {commonMessages.global_not_found_description}
+          </p>
         </div>
       </div>
     </GlobalProvider>

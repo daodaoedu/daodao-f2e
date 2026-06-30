@@ -1,11 +1,12 @@
 "use client";
 
 import { ArrowRightOutlineSvg, MessagesSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
-import { PenLine } from "lucide-react";
+import { Calendar, CalendarCheck, PenLine, Timer } from "lucide-react";
 import { CheckInButton } from "@/components/check-in";
 import {
   getThemeNameFromColor,
@@ -13,9 +14,9 @@ import {
   practiceThemeSvgMap,
 } from "@/constants/practice-theme";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
+import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 
 interface InProgressTaskCardProps {
-  label: string;
   id: string;
   title: string;
   description: string;
@@ -32,7 +33,6 @@ interface InProgressTaskCardProps {
 }
 
 export const InProgressTaskCard = ({
-  label,
   id,
   title,
   description,
@@ -47,10 +47,23 @@ export const InProgressTaskCard = ({
   endDate,
   onEdit,
 }: InProgressTaskCardProps) => {
+  const t = useTranslations("dashboard");
   const themeName = getThemeNameFromColor(theme);
   const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
   const statusInfo = getStatusConfig(status);
   const isDraft = status === TaskStatus.draft;
+  const formattedStartDate = formatCardDate(startDate);
+  const daysProgress = calculateDaysProgress(startDate, endDate);
+  const statusLabel =
+    status === TaskStatus.draft
+      ? t("filter_draft")
+      : status === TaskStatus.notStarted
+        ? t("filter_not_started")
+        : status === TaskStatus.inProgress
+          ? t("filter_in_progress")
+          : status === TaskStatus.completed
+            ? t("filter_completed")
+            : statusInfo?.label;
 
   return (
     <CustomLink
@@ -61,61 +74,82 @@ export const InProgressTaskCard = ({
         className="absolute inset-0 w-full h-full rounded-[12px]"
         preserveAspectRatio="xMidYMid slice"
       />
-      {/* Label */}
-      <div className="absolute inset-0 p-5 pb-6 z-10 flex flex-col gap-5">
-        <div className="flex-1 flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-2">
-            <Badge variant="secondary" size="sm" className="w-fit">
-              {label}
-            </Badge>
-            {statusInfo && (
-              <Badge variant={statusInfo.variant} size="sm" className="w-fit">
-                {statusInfo.label}
-              </Badge>
-            )}
-          </div>
 
-          <div className="flex justify-between gap-2 flex-1">
-            <div className="flex flex-col gap-2">
-              {/* Title */}
-              <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">{title}</h3>
+      {/* Main content — flex-1 absorbs available space, clips if overflow */}
+      <div className="absolute inset-0 p-5 pb-4 z-10 flex flex-col">
+        <div className="flex-1 min-h-0 flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between gap-2">
+              {statusInfo && (
+                <Badge variant={statusInfo.variant} size="sm" className="w-fit">
+                  {statusLabel}
+                </Badge>
+              )}
+            </div>
 
-              {/* Description */}
-              <div className="flex-1">
+            <div className="flex justify-between gap-2">
+              <div className="flex flex-col gap-2">
+                <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">{title}</h3>
                 <p className="line-clamp-2 text-xs text-text-dark">{description}</p>
               </div>
+              <div className="shrink-0 self-center">
+                <span className="inline-flex items-center justify-center size-10">
+                  <ArrowRightOutlineSvg className="size-6 text-light-gray" />
+                </span>
+              </div>
             </div>
-            <div className="shrink-0 self-center">
-              <span className="inline-flex items-center justify-center size-10">
-                <ArrowRightOutlineSvg className="size-6 text-light-gray" />
-              </span>
+          </div>
+
+          {/* Start date + days progress */}
+          {(formattedStartDate !== null || daysProgress !== null) && (
+            <div className="flex items-center gap-2 text-xs text-text-dark">
+              {formattedStartDate !== null && (
+                <span className="flex items-center gap-1">
+                  <Calendar className="size-3.5 shrink-0" />
+                  {t("card_start_date", { date: formattedStartDate })}
+                </span>
+              )}
+              {daysProgress !== null && (
+                <span className="flex items-center gap-1">
+                  <Timer className="size-3.5 shrink-0" />
+                  {t("card_days_progress", {
+                    current: daysProgress.elapsed,
+                    total: daysProgress.total,
+                  })}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Check-in count */}
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1 text-xs text-text-dark">
+              <CalendarCheck className="size-3.5 shrink-0" />
+              {checkInCount === 0
+                ? t("checked_in_count_zero")
+                : t.rich("checked_in_count", {
+                    count: checkInCount,
+                    bold: (chunks) => <span className="font-semibold">{chunks}</span>,
+                  })}
+            </span>
+            {/* TODO: MVP 先不開放 */}
+            <div className="hidden items-center gap-1">
+              <MessagesSvg className="size-4 text-text-dark" />
+              {isUnreadMessages ? (
+                <Badge variant="alert" size="xs" className="font-semibold min-w-5.5 justify-center">
+                  {messagesCount}
+                </Badge>
+              ) : (
+                <span className="text-text-dark text-xs font-semibold">{messagesCount}</span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Progress */}
-        <div className="flex items-center justify-between">
-          <span className="text-xs flex gap-1">
-            <span className="text-text-dark">已打卡</span>
-            <span className="text-text-dark font-semibold">{checkInCount}</span>
-            <span className="text-text-dark">次</span>
-          </span>
-          {/* TODO: MVP 先不開放 */}
-          <div className="hidden items-center gap-1">
-            <MessagesSvg className="size-4 text-text-dark" />
-            {isUnreadMessages ? (
-              <Badge variant="alert" size="xs" className="font-semibold min-w-5.5 justify-center">
-                {messagesCount}
-              </Badge>
-            ) : (
-              <span className="text-text-dark text-xs font-semibold">{messagesCount}</span>
-            )}
-          </div>
-        </div>
-
-        {/* Check-in Button - span 用於阻止點擊事件冒泡和導航 */}
+        {/* Check-in Button — always visible at bottom, separated from content */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: 此處用於阻止事件冒泡到父元素 */}
         <span
+          className="mt-3 shrink-0 block"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -127,7 +161,7 @@ export const InProgressTaskCard = ({
           {isDraft ? (
             <Button variant="secondary" onClick={onEdit}>
               <PenLine className="size-4.5 text-logo-cyan" />
-              繼續編輯
+              {t("continue_editing")}
             </Button>
           ) : (
             <CheckInButton
@@ -146,7 +180,8 @@ export const InProgressTaskCard = ({
         </span>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 overflow-hidden rounded-b-full">
+      {/* Progress bar — always at card bottom */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 overflow-hidden">
         <Progress value={progress} />
       </div>
     </CustomLink>
