@@ -238,9 +238,6 @@ export function TaskGuideWidget() {
         })}
       </ul>
 
-      <div className="border-t border-very-light-gray bg-very-light-blue px-4 py-3 text-center text-xs leading-5 text-text-dark/60">
-        {t("footer")}
-      </div>
     </div>
   );
 }
