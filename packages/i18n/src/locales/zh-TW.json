@@ -4769,7 +4769,6 @@
         "badgeDescription": "感謝你完成所有新手任務，你是島島阿學的早期用戶之一！"
       },
       "progress": "{completed}/{total} 完成",
-      "footer": "完成所有任務即可獲得 Early User Badge",
       "ariaOpen": "展開 Onboarding 任務清單",
       "ariaCollapse": "收合",
       "ariaClose": "關閉",
