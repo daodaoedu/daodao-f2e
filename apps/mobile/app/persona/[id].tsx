@@ -23,6 +23,7 @@ export default function PersonaDetailScreen() {
 
   const [cursor, setCursor] = useState<number | undefined>(undefined);
   const [answers, setAnswers] = useState<PersonaQuestionAnswerItem[]>([]);
+  const [pendingReset, setPendingReset] = useState(false);
   const lastDataRef = useRef<unknown>(undefined);
 
   const { data, error, isLoading, mutate } = usePersonaQuestionAnswers(questionId, {
@@ -34,8 +35,26 @@ export default function PersonaDetailScreen() {
   useEffect(() => {
     if (!data?.data || data === lastDataRef.current) return;
     lastDataRef.current = data;
-    setAnswers((prev) => (cursor === undefined ? data.data.answers : [...prev, ...data.data.answers]));
+    setAnswers((prev) => {
+      if (cursor === undefined) return data.data.answers;
+      // De-dupe by answerId so a revalidation of the current page never
+      // re-appends items that are already in the accumulated list.
+      const merged = new Map(prev.map((item) => [item.answerId, item]));
+      for (const item of data.data.answers) {
+        merged.set(item.answerId, item);
+      }
+      return Array.from(merged.values());
+    });
   }, [data, cursor]);
+
+  // Once cursor resets back to the first page, force a fresh revalidation
+  // (bypassing any stale cache) so a newly-submitted answer shows up.
+  useEffect(() => {
+    if (pendingReset && cursor === undefined) {
+      setPendingReset(false);
+      mutate();
+    }
+  }, [pendingReset, cursor, mutate]);
 
   const question = data?.data?.question;
   const hasMore = data?.data?.hasMore ?? false;
@@ -49,7 +68,16 @@ export default function PersonaDetailScreen() {
   };
 
   const handleAnswerSuccess = async () => {
-    await mutate();
+    if (cursor === undefined) {
+      await mutate();
+      return;
+    }
+    // Jump back to the first page so the new answer (and the rest of the
+    // community list) reloads from scratch instead of appending onto
+    // whatever page the user happened to be viewing.
+    setAnswers([]);
+    setPendingReset(true);
+    setCursor(undefined);
   };
 
   const renderHeader = () => (
