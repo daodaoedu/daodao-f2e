@@ -1,4 +1,10 @@
-import { CheckCircle2, ChevronRight, MessageSquare, RefreshCw } from "@tamagui/lucide-icons";
+import {
+  CheckCircle2,
+  ChevronRight,
+  MessageSquare,
+  RefreshCw,
+  Sparkles,
+} from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -32,6 +38,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const t = useMobileTranslation("mobile.profile");
   const homeT = useMobileTranslation("mobile.home");
+  const personaT = useMobileTranslation("persona");
   const { width: screenWidth } = useWindowDimensions();
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -263,6 +270,20 @@ export default function ProfileScreen() {
                   <XStack alignItems="center" gap="$2">
                     <MessageSquare size={18} color={colors.logo.cyan} />
                     <Text color={colors.text.dark}>{t("view_footprints")}</Text>
+                    <ChevronRight size={16} color={colors.text.muted} />
+                  </XStack>
+                </Button>
+
+                <Button
+                  marginBottom="$4"
+                  backgroundColor={colors.background.light}
+                  borderWidth={1}
+                  borderColor={colors.border.light}
+                  onPress={() => router.push("/persona" as never)}
+                >
+                  <XStack alignItems="center" gap="$2">
+                    <Sparkles size={18} color={colors.logo.cyan} />
+                    <Text color={colors.text.dark}>{personaT("tabLabelShort")}</Text>
                     <ChevronRight size={16} color={colors.text.muted} />
                   </XStack>
                 </Button>

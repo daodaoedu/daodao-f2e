@@ -13,6 +13,7 @@ import {
   TabSwitcher,
   type TabType,
 } from "@/components/home";
+import { ResonanceCarousel } from "@/components/persona/ResonanceCarousel";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import { PracticeTasksSection } from "@/components/showcase/PracticeTasksSection";
 import { ShowcaseFeed } from "@/components/showcase/ShowcaseFeed";
@@ -153,6 +154,7 @@ export default function HomeScreen() {
           />
         </YStack>
         {/* TODO: ShowcaseFilterBar hidden for now */}
+        <ResonanceCarousel />
       </YStack>
     ),
     [activeTab, searchValue, handleSearch]
