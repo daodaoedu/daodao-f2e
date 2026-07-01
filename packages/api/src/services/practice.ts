@@ -95,6 +95,8 @@ export interface PracticeSummary {
   nextIntentDraftId?: string;
   /** 已選取用於分享卡的打卡紀錄 ID 列表 */
   selectedCheckInIds?: string[];
+  /** AI 生成的核心洞察文字 */
+  insight?: string;
   /** 洞察回饋（喜歡／不喜歡與原因） */
   insightFeedback?: { type: "positive" | "negative"; reasons?: string[] } | null;
   /** 打卡筆記平均字數 */
@@ -400,6 +402,7 @@ type PracticeDetailExtraFields = {
   nextIntent?: string;
   nextIntentDraftId?: string;
   selectedCheckInIds?: string[];
+  insight?: string;
   insightFeedback?: { type: "positive" | "negative"; reasons?: string[] } | null;
   avgWords?: number;
 };
@@ -477,6 +480,7 @@ export const getPracticeSummary = async (
       nextIntent: practiceExtra.nextIntent,
       nextIntentDraftId: practiceExtra.nextIntentDraftId,
       selectedCheckInIds: practiceExtra.selectedCheckInIds,
+      insight: practiceExtra.insight,
       insightFeedback: practiceExtra.insightFeedback,
       avgWords: practiceExtra.avgWords ?? 0,
       progressPercentage: practice.progressPercentage,

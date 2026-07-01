@@ -4,6 +4,7 @@ import type { PracticeSummary } from "@daodao/api";
 import { toast } from "@daodao/ui/components/sonner";
 import { useState } from "react";
 import { isEnded, usePracticeStage } from "./hooks";
+import { Surface1Summary } from "./surface-1-summary";
 import { SurfaceNavChip } from "./surface-nav-chip";
 
 interface PracticeSummaryPageProps {
@@ -19,10 +20,9 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
   const ended = isEnded(stage);
 
   const [currentSurface, setCurrentSurface] = useState<1 | 2 | 3>(1);
-  // NOTE: reflectionText/selectedCheckInIds/themeIndex 已預留給 Surface 2/3 的實作使用，
-  // 目前尚未串接（Surface 2/3 仍為 placeholder），下個任務接上真正內容後即可移除 biome-ignore。
-  // biome-ignore lint/correctness/noUnusedVariables: reserved for Surface 2 implementation
   const [reflectionText, setReflectionText] = useState(summary.reflection ?? "");
+  // NOTE: selectedCheckInIds/themeIndex 已預留給 Surface 3 的實作使用，
+  // 目前尚未串接（Surface 3 仍為 placeholder），下個任務接上真正內容後即可移除 biome-ignore。
   // biome-ignore lint/correctness/noUnusedVariables: reserved for Surface 3 implementation
   const [selectedCheckInIds, setSelectedCheckInIds] = useState<string[]>(
     summary.selectedCheckInIds ?? []
@@ -48,7 +48,13 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
       />
 
       {currentSurface === 1 && (
-        <div className="max-w-[448px] mx-auto px-5 py-20">Surface 1: 實踐總結 (placeholder)</div>
+        <Surface1Summary
+          summary={summary}
+          stage={stage}
+          reflectionText={reflectionText}
+          onReflectionChange={setReflectionText}
+          onSurfaceChange={handleSurfaceChange}
+        />
       )}
 
       {currentSurface === 2 && (
