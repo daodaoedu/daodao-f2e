@@ -5,6 +5,8 @@ import { toast } from "@daodao/ui/components/sonner";
 import { useState } from "react";
 import { isEnded, usePracticeStage } from "./hooks";
 import { Surface1Summary } from "./surface-1-summary";
+import { Surface2NextIntent } from "./surface-2-next-intent";
+import { Surface3ShareCard } from "./surface-3-share-card";
 import { SurfaceNavChip } from "./surface-nav-chip";
 
 interface PracticeSummaryPageProps {
@@ -21,13 +23,9 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
 
   const [currentSurface, setCurrentSurface] = useState<1 | 2 | 3>(1);
   const [reflectionText, setReflectionText] = useState(summary.reflection ?? "");
-  // NOTE: selectedCheckInIds/themeIndex 已預留給 Surface 3 的實作使用，
-  // 目前尚未串接（Surface 3 仍為 placeholder），下個任務接上真正內容後即可移除 biome-ignore。
-  // biome-ignore lint/correctness/noUnusedVariables: reserved for Surface 3 implementation
   const [selectedCheckInIds, setSelectedCheckInIds] = useState<string[]>(
     summary.selectedCheckInIds ?? []
   );
-  // biome-ignore lint/correctness/noUnusedVariables: reserved for Surface 3 implementation
   const [themeIndex, setThemeIndex] = useState(0);
 
   const handleSurfaceChange = (surface: 1 | 2 | 3) => {
@@ -58,11 +56,20 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
       )}
 
       {currentSurface === 2 && (
-        <div className="max-w-[448px] mx-auto px-5 py-20">Surface 2: 接下來我想 (placeholder)</div>
+        <Surface2NextIntent summary={summary} onSurfaceChange={handleSurfaceChange} />
       )}
 
       {currentSurface === 3 && (
-        <div className="max-w-[448px] mx-auto px-5 py-20">Surface 3: 製作分享卡 (placeholder)</div>
+        <Surface3ShareCard
+          summary={summary}
+          reflectionText={reflectionText}
+          onReflectionChange={setReflectionText}
+          selectedCheckInIds={selectedCheckInIds}
+          onSelectedChange={setSelectedCheckInIds}
+          themeIndex={themeIndex}
+          onThemeChange={setThemeIndex}
+          onSurfaceChange={handleSurfaceChange}
+        />
       )}
     </div>
   );

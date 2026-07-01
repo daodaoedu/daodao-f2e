@@ -12,7 +12,7 @@ interface UsePracticeSummaryImageOptions {
 }
 
 interface UsePracticeSummaryImageReturn {
-  /** 摘要卡片的 ref，需要綁定到 PracticeSummaryCard */
+  /** 摘要卡片的 ref，需要綁定到 ShareCardPreview */
   summaryCardRef: React.RefObject<HTMLDivElement | null>;
   /** 是否正在生成圖片 */
   isGenerating: boolean;
