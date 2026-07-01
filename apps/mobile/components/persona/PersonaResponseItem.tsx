@@ -8,20 +8,12 @@ import { CommentSection } from "@/components/practice/detail/CommentSection";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
-import { removeReaction, upsertReaction, useReactions } from "@/hooks/useReactions";
 import { useComments } from "@/hooks/useComments";
+import { removeReaction, upsertReaction, useReactions } from "@/hooks/useReactions";
 import { useMobileTranslation } from "@/i18n";
 import { CommentSheet } from "./CommentSheet";
 
-const AVATAR_COLORS = [
-  "#F5A93E",
-  "#16B9B3",
-  "#9B8FE0",
-  "#5BA58C",
-  "#E07B7B",
-  "#F5C842",
-  "#7BB8E0",
-];
+const AVATAR_COLORS = ["#F5A93E", "#16B9B3", "#9B8FE0", "#5BA58C", "#E07B7B", "#F5C842", "#7BB8E0"];
 
 function getAvatarColor(name: string) {
   const index = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % AVATAR_COLORS.length;
@@ -124,7 +116,12 @@ export function PersonaResponseItem({ item }: PersonaResponseItemProps) {
             )}
           </XStack>
 
-          <Text fontSize={14} color="$color" opacity={0.75} numberOfLines={expanded ? undefined : 2}>
+          <Text
+            fontSize={14}
+            color="$color"
+            opacity={0.75}
+            numberOfLines={expanded ? undefined : 2}
+          >
             {answerText}
           </Text>
 
@@ -165,11 +162,9 @@ export function PersonaResponseItem({ item }: PersonaResponseItemProps) {
         </Pressable>
       </XStack>
 
-      {commentsOpen && (
-        <CommentSheet open={commentsOpen} onOpenChange={setCommentsOpen} title={t("commentsTitle")}>
-          <CommentSection targetType="persona_answer" targetId={answerId} />
-        </CommentSheet>
-      )}
+      <CommentSheet open={commentsOpen} onOpenChange={setCommentsOpen} title={t("commentsTitle")}>
+        <CommentSection targetType="persona_answer" targetId={answerId} />
+      </CommentSheet>
     </Card>
   );
 }

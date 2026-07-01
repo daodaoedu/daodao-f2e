@@ -26,11 +26,22 @@ export default function PersonaDetailScreen() {
   const [pendingReset, setPendingReset] = useState(false);
   const lastDataRef = useRef<unknown>(undefined);
 
-  const { data, error, isLoading, mutate } = usePersonaQuestionAnswers(questionId, {
+  const { data, error, isLoading, isValidating, mutate } = usePersonaQuestionAnswers(questionId, {
     limit: PAGE_SIZE,
     cursor,
     enabled: isValidId,
   });
+
+  // Reset local pagination state when navigating between different questions,
+  // otherwise the new screen could briefly show (or merge in) the previous
+  // question's answers.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset state when questionId changes
+  useEffect(() => {
+    setCursor(undefined);
+    setAnswers([]);
+    setPendingReset(false);
+    lastDataRef.current = undefined;
+  }, [questionId]);
 
   useEffect(() => {
     if (!data?.data || data === lastDataRef.current) return;
@@ -204,8 +215,8 @@ export default function PersonaDetailScreen() {
                 ))}
 
                 {hasMore ? (
-                  <Button variant="outlined" onPress={handleLoadMore} disabled={isLoading}>
-                    {isLoading ? <Spinner size="small" /> : <Text>{tCommon("load_more")}</Text>}
+                  <Button variant="outlined" onPress={handleLoadMore} disabled={isValidating}>
+                    {isValidating ? <Spinner size="small" /> : <Text>{tCommon("load_more")}</Text>}
                   </Button>
                 ) : (
                   <Text fontSize={12} color={colors.text.muted} textAlign="center">

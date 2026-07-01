@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { ScrollView, Sheet, Text } from "tamagui";
 
@@ -10,8 +10,17 @@ interface CommentSheetProps {
 }
 
 export function CommentSheet({ open, onOpenChange, title, children }: CommentSheetProps) {
-  // Lazy mount: Tamagui Sheet crashes with "setValue of undefined" when mounted with open=false
-  if (!open) {
+  // Tamagui Sheet crashes with "setValue of undefined" when mounted with open=false
+  // on its very first mount, so delay mounting until it has opened at least once.
+  // After that, keep it mounted so closing plays the exit animation instead of
+  // unmounting abruptly.
+  const [hasOpened, setHasOpened] = useState(false);
+
+  if (open && !hasOpened) {
+    setHasOpened(true);
+  }
+
+  if (!hasOpened) {
     return null;
   }
 

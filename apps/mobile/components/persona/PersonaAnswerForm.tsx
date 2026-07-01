@@ -1,7 +1,7 @@
 import { submitPersonaAnswer } from "@daodao/api";
 import { useState } from "react";
-import { Alert, TextInput } from "react-native";
-import { Button, XStack, YStack } from "tamagui";
+import { Alert } from "react-native";
+import { Button, TextArea, XStack, YStack } from "tamagui";
 import { useMobileTranslation } from "@/i18n";
 
 interface PersonaAnswerFormProps {
@@ -70,20 +70,15 @@ export function PersonaAnswerForm({
 
   return (
     <YStack mt="$2" gap="$2">
-      <TextInput
+      <TextArea
         value={textAnswer}
         onChangeText={setTextAnswer}
         placeholder={t("textPlaceholder")}
-        multiline
-        numberOfLines={3}
         maxLength={300}
-        style={{
-          borderWidth: 1,
-          borderColor: "#d1d5db",
-          borderRadius: 8,
-          padding: 8,
-          fontSize: 14,
-        }}
+        minHeight={72}
+        borderColor="$borderColor"
+        backgroundColor="$background"
+        color="$color"
       />
       <Button size="$3" onPress={handleSubmit} disabled={submitting || !textAnswer.trim()}>
         {submitting ? t("submitting") : t("submit")}
