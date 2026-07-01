@@ -13,6 +13,7 @@ import {
   Check,
   Copy,
   Download,
+  Eye,
   Home,
   Info,
   Lock,
@@ -24,6 +25,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePracticeSummaryImage, useReflection } from "./hooks";
 import { CheckinPickerSheet, type PickerCheckIn } from "./sections/checkin-picker-sheet";
 import { SHARE_CARD_THEMES, ShareCardPreview } from "./sections/share-card-preview";
+import { VisitorPreviewModal } from "./visitor-preview-modal";
 
 interface Surface3Props {
   summary: PracticeSummary;
@@ -109,6 +111,8 @@ export function Surface3ShareCard({
 
   const [isEditingReflection, setIsEditingReflection] = useState(false);
   const [reflectionDraft, setReflectionDraft] = useState(reflectionText);
+
+  const [isVisitorPreviewOpen, setIsVisitorPreviewOpen] = useState(false);
 
   const [isPublic, setIsPublic] = useState(false);
   const [isTogglingPublic, setIsTogglingPublic] = useState(false);
@@ -215,6 +219,18 @@ export function Surface3ShareCard({
           調整風格與精選內容，做一張可以分享出去的總結卡。
         </p>
       </section>
+
+      {/* 預覽訪客視角 */}
+      <div className="mt-4 flex justify-center">
+        <button
+          type="button"
+          onClick={() => setIsVisitorPreviewOpen(true)}
+          className="flex items-center gap-1.5 rounded-full border border-basic-200 bg-white px-4 py-2 text-xs font-medium text-text-dark shadow-sm"
+        >
+          <Eye className="size-3.5 text-logo-cyan" />
+          預覽訪客視角
+        </button>
+      </div>
 
       {/* 打卡精選 */}
       <section className="mt-5">
@@ -448,6 +464,15 @@ export function Surface3ShareCard({
           前往主題實踐列表
         </CustomLink>
       </div>
+
+      <VisitorPreviewModal
+        summary={summary}
+        reflectionText={reflectionText}
+        selectedCheckInIds={selectedCheckInIds}
+        themeIndex={themeIndex}
+        open={isVisitorPreviewOpen}
+        onClose={() => setIsVisitorPreviewOpen(false)}
+      />
     </main>
   );
 }

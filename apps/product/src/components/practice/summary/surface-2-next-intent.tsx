@@ -12,6 +12,8 @@ import { isInsightUnlocked, useNextIntent } from "./hooks";
 interface Surface2Props {
   summary: PracticeSummary;
   onSurfaceChange: (surface: 1 | 3) => void;
+  /** 「接下來我想」儲存後回報結果，供離開流程判斷 farewell 文案（草稿 / 已確定方向） */
+  onIntentSaved?: (kind: "draft" | "final") => void;
 }
 
 type NextIntentMode = "preview" | "edit" | "saved";
@@ -20,7 +22,7 @@ type NextIntentMode = "preview" | "edit" | "saved";
  * Surface 2 — 接下來我想
  * @description 米黃色 hero + AI 洞察折疊參考 + 「接下來我想」黃色漸層卡（preview/edit/saved）+ 底部導航
  */
-export function Surface2NextIntent({ summary, onSurfaceChange }: Surface2Props) {
+export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: Surface2Props) {
   const unlocked = isInsightUnlocked(summary);
   const { save, isSaving } = useNextIntent(summary.practiceId);
 
@@ -63,6 +65,7 @@ export function Surface2NextIntent({ summary, onSurfaceChange }: Surface2Props) 
     setNextIntentText(trimmed);
     setJustSavedDraft(saveDraft);
     setMode("saved");
+    onIntentSaved?.(saveDraft ? "draft" : "final");
   };
 
   return (
