@@ -87,6 +87,22 @@ export interface PracticeSummary {
   encouragementText: string;
   /** 主題色（HEX 格式，如 #FCDD84） */
   themeColor?: string;
+  /** 使用者反思文字 */
+  reflection?: string;
+  /** 接下來的意圖文字 */
+  nextIntent?: string;
+  /** 接下來意圖的草稿 ID */
+  nextIntentDraftId?: string;
+  /** 已選取用於分享卡的打卡紀錄 ID 列表 */
+  selectedCheckInIds?: string[];
+  /** 洞察回饋（喜歡／不喜歡與原因） */
+  insightFeedback?: { type: "positive" | "negative"; reasons?: string[] } | null;
+  /** 打卡筆記平均字數 */
+  avgWords: number;
+  /** 實踐進度百分比 */
+  progressPercentage: number;
+  /** 實踐活動狀態 */
+  status: string;
 }
 
 export type IGetMyPracticesParams = NonNullable<
@@ -375,6 +391,20 @@ const truncateText = (text: string | undefined, maxLength: number): string => {
 };
 
 /**
+ * 實踐詳情的擴充欄位
+ * @description 這些欄位已由後端回傳，但尚未同步進 OpenAPI schema
+ * NOTE: 後端部署後執行 pnpm run generate:api 更新 types，屆時可移除此 workaround
+ */
+type PracticeDetailExtraFields = {
+  reflection?: string;
+  nextIntent?: string;
+  nextIntentDraftId?: string;
+  selectedCheckInIds?: string[];
+  insightFeedback?: { type: "positive" | "negative"; reasons?: string[] } | null;
+  avgWords?: number;
+};
+
+/**
  * 獲取實踐完成摘要
  * @description 組合實踐詳情和打卡記錄，生成用於總結圖片的摘要資料
  * @param practiceId 實踐 ID
@@ -393,6 +423,7 @@ export const getPracticeSummary = async (
       };
     }
     const practice = practiceResponse.data.data;
+    const practiceExtra = practice as typeof practice & PracticeDetailExtraFields;
 
     // 2. 獲取打卡記錄（使用合理的上限避免效能問題）
     const checkInLimit = Math.min(
@@ -442,6 +473,14 @@ export const getPracticeSummary = async (
       topNotes,
       encouragementText,
       themeColor: practice.themeColor,
+      reflection: practiceExtra.reflection,
+      nextIntent: practiceExtra.nextIntent,
+      nextIntentDraftId: practiceExtra.nextIntentDraftId,
+      selectedCheckInIds: practiceExtra.selectedCheckInIds,
+      insightFeedback: practiceExtra.insightFeedback,
+      avgWords: practiceExtra.avgWords ?? 0,
+      progressPercentage: practice.progressPercentage,
+      status: practice.status,
     };
 
     return { data: summary, error: null };
@@ -479,4 +518,133 @@ export const copyPractice = async (id: string): Promise<{ id: string }> => {
   }
 
   return response.data?.data as { id: string };
+};
+
+// ============================================================================
+// Practice Summary Mutations (實踐總結頁互動)
+// NOTE: 以下端點尚未同步進 OpenAPI schema，暫用 typed client cast workaround。
+// 後端部署後執行 pnpm run generate:api 更新 types，屆時可移除這些 workaround。
+// ============================================================================
+
+type UpdateReflectionClient = {
+  PATCH: (
+    path: "/api/v1/practices/{id}/reflection",
+    options: { params: { path: { id: string } }; body: { reflection: string } }
+  ) => Promise<{ data?: { data: unknown }; error?: unknown }>;
+};
+
+type UpdateNextIntentClient = {
+  PATCH: (
+    path: "/api/v1/practices/{id}/next-intent",
+    options: {
+      params: { path: { id: string } };
+      body: { nextIntent: string; saveDraft?: boolean };
+    }
+  ) => Promise<{ data?: { data: unknown }; error?: unknown }>;
+};
+
+type UpdateSelectedCheckinsClient = {
+  PATCH: (
+    path: "/api/v1/practices/{id}/selected-checkins",
+    options: { params: { path: { id: string } }; body: { checkinIds: string[] } }
+  ) => Promise<{ data?: { data: unknown }; error?: unknown }>;
+};
+
+type CreateInsightFeedbackClient = {
+  POST: (
+    path: "/api/v1/practices/{id}/insight-feedback",
+    options: {
+      params: { path: { id: string } };
+      body: { type: "positive" | "negative"; reasons?: string[] };
+    }
+  ) => Promise<{ data?: { data: unknown }; error?: unknown }>;
+};
+
+/**
+ * 提取錯誤訊息
+ * @param error API 回應中的錯誤物件
+ * @param fallback 預設錯誤訊息
+ */
+const extractErrorMessage = (error: unknown, fallback: string): string => {
+  return error && typeof error === "object" && "message" in error
+    ? String((error as { message?: unknown }).message)
+    : fallback;
+};
+
+/**
+ * 更新實踐反思文字
+ * @param id 實踐 ID
+ * @param reflection 反思內容
+ */
+export const updateReflection = async (id: string, reflection: string) => {
+  const response = await (client as unknown as UpdateReflectionClient).PATCH(
+    "/api/v1/practices/{id}/reflection",
+    { params: { path: { id } }, body: { reflection } }
+  );
+
+  if (response.error) {
+    throw new Error(extractErrorMessage(response.error, "更新反思失敗"));
+  }
+
+  return response.data?.data;
+};
+
+/**
+ * 更新實踐的「接下來我想」意圖
+ * @param id 實踐 ID
+ * @param nextIntent 意圖內容
+ * @param saveDraft 是否僅存為草稿
+ */
+export const updateNextIntent = async (id: string, nextIntent: string, saveDraft?: boolean) => {
+  const response = await (client as unknown as UpdateNextIntentClient).PATCH(
+    "/api/v1/practices/{id}/next-intent",
+    { params: { path: { id } }, body: { nextIntent, saveDraft } }
+  );
+
+  if (response.error) {
+    throw new Error(extractErrorMessage(response.error, "更新意圖失敗"));
+  }
+
+  return response.data?.data;
+};
+
+/**
+ * 更新已選取用於分享卡的打卡紀錄
+ * @param id 實踐 ID
+ * @param checkinIds 已選取的打卡紀錄 ID 列表
+ */
+export const updateSelectedCheckins = async (id: string, checkinIds: string[]) => {
+  const response = await (client as unknown as UpdateSelectedCheckinsClient).PATCH(
+    "/api/v1/practices/{id}/selected-checkins",
+    { params: { path: { id } }, body: { checkinIds } }
+  );
+
+  if (response.error) {
+    throw new Error(extractErrorMessage(response.error, "更新打卡選取失敗"));
+  }
+
+  return response.data?.data;
+};
+
+/**
+ * 建立洞察回饋
+ * @param id 實踐 ID
+ * @param type 回饋類型（正向／負向）
+ * @param reasons 回饋原因列表
+ */
+export const createInsightFeedback = async (
+  id: string,
+  type: "positive" | "negative",
+  reasons?: string[]
+) => {
+  const response = await (client as unknown as CreateInsightFeedbackClient).POST(
+    "/api/v1/practices/{id}/insight-feedback",
+    { params: { path: { id } }, body: { type, reasons } }
+  );
+
+  if (response.error) {
+    throw new Error(extractErrorMessage(response.error, "送出回饋失敗"));
+  }
+
+  return response.data?.data;
 };
