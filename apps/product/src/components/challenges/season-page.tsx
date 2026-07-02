@@ -1,19 +1,50 @@
 "use client";
 
 import { Button } from "@daodao/ui/components/button";
+import { Progress } from "@daodao/ui/components/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
 import { differenceInCalendarDays, parseISO } from "date-fns";
-import { CheckCircle2, Flame, Heart, MessageCircle, Pencil, Users } from "lucide-react";
+import { CheckCircle2, Flame, MessageCircle, Pencil, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import {
+  CommentSection,
+  type IComment,
+  ReactionPickerButton,
+} from "@/components/check-in/reactions";
 import { ColorAvatar } from "@/components/poc-shared/color-avatar";
+import type { ReactionTypeType } from "@/constants/reaction-type";
 import { MOCK_MY_PROGRESS, MOCK_SEASON_CHECKINS, MOCK_SEASON_RANKING } from "./mock-data";
 import type { Challenge, ChallengeSeason, SeasonCheckin, SeasonRankingEntry } from "./types";
 
 /** 前三名的獎牌配色（金/銀/銅） */
 const RANK_BADGES = ["#D9A606", "#9AA8AC", "#C77B4A"] as const;
 
+/** 打卡卡片：復用專案的 ReactionPickerButton 與 CommentSection */
 function CheckinCard({ checkin }: { checkin: SeasonCheckin }) {
+  const [reactions, setReactions] = useState<ReactionTypeType[]>([]);
+  const [comments, setComments] = useState<IComment[]>([]);
+  const [showComments, setShowComments] = useState(false);
+
+  const toggleReaction = (type: ReactionTypeType) => {
+    setReactions((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  };
+
+  const submitComment = (content: string, commentReactions: ReactionTypeType[]) => {
+    setComments((prev) => [
+      ...prev,
+      {
+        id: `local-${prev.length + 1}`,
+        author: { name: "我" },
+        content,
+        reactions: commentReactions,
+        time: "剛剛",
+      },
+    ]);
+  };
+
   return (
     <div className="rounded-2xl border border-[#E4EAE9] bg-white p-4">
       <div className="flex items-center gap-3">
@@ -28,16 +59,34 @@ function CheckinCard({ checkin }: { checkin: SeasonCheckin }) {
         </div>
       </div>
       <p className="mt-3 text-sm text-text-dark">{checkin.content}</p>
-      <div className="mt-3 flex gap-4 text-sm text-text-secondary">
-        <button type="button" className="flex items-center gap-1 hover:text-text-dark">
-          <Heart className="size-4" />
-          加油
+      <div className="mt-3 flex items-center gap-2">
+        <ReactionPickerButton
+          selectedReactions={reactions}
+          onToggle={toggleReaction}
+          variant="card"
+        />
+        <button
+          type="button"
+          onClick={() => setShowComments((v) => !v)}
+          className="flex size-9 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-[#F0F9F8] hover:text-text-dark"
+          aria-label="留言"
+        >
+          <MessageCircle className="size-5" />
         </button>
-        <button type="button" className="flex items-center gap-1 hover:text-text-dark">
-          <MessageCircle className="size-4" />
-          留言
-        </button>
+        {comments.length > 0 && (
+          <span className="text-xs text-text-secondary">{comments.length} 則留言</span>
+        )}
       </div>
+      {showComments && (
+        <div className="mt-2 border-t border-[#F0F2F4] pt-2">
+          <CommentSection
+            comments={comments}
+            selectedReactions={reactions}
+            onSubmit={submitComment}
+            currentUserName="我"
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -83,7 +132,12 @@ export function SeasonPage({ challenge, season }: SeasonPageProps) {
   const checkins = MOCK_SEASON_CHECKINS[season.id] ?? [];
   const ranking = MOCK_SEASON_RANKING[season.id] ?? [];
   const [joined, setJoined] = useState(progress?.joined ?? false);
-  const daysLeft = Math.max(0, differenceInCalendarDays(parseISO(season.endDate), new Date()));
+
+  const start = parseISO(season.startDate);
+  const end = parseISO(season.endDate);
+  const totalDays = Math.max(1, differenceInCalendarDays(end, start));
+  const elapsedDays = Math.min(totalDays, Math.max(0, differenceInCalendarDays(new Date(), start)));
+  const daysLeft = Math.max(0, differenceInCalendarDays(end, new Date()));
 
   return (
     <div className="flex flex-col gap-4 px-5 pt-4">
@@ -92,7 +146,6 @@ export function SeasonPage({ challenge, season }: SeasonPageProps) {
           {challenge.title}｜第 {season.seasonNumber} 期
         </h1>
         <p className="mt-1 flex items-center justify-center gap-3 text-sm text-text-secondary">
-          <span>剩 {daysLeft} 天</span>
           <span className="flex items-center gap-1">
             <Users className="size-3.5" />
             {season.memberCount} 人
@@ -102,6 +155,14 @@ export function SeasonPage({ challenge, season }: SeasonPageProps) {
             {season.totalCheckins.toLocaleString()} 次打卡
           </span>
         </p>
+        {/* 期程進度條 */}
+        <div className="mx-auto mt-3 max-w-[320px]">
+          <Progress value={(elapsedDays / totalDays) * 100} className="h-2" />
+          <p className="mt-1 flex justify-between text-xs text-text-secondary">
+            <span>第 {elapsedDays} 天</span>
+            <span>剩 {daysLeft} 天</span>
+          </p>
+        </div>
       </section>
 
       {joined ? (

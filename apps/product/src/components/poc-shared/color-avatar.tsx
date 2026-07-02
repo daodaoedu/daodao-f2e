@@ -14,7 +14,9 @@ const AVATAR_COLORS = [
 
 function colorFor(name: string) {
   let hash = 0;
-  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) % 997;
+  for (let i = 0; i < name.length; i++) {
+    hash += name.charCodeAt(i) * (i + 7);
+  }
   return AVATAR_COLORS[hash % AVATAR_COLORS.length] ?? AVATAR_COLORS[0];
 }
 

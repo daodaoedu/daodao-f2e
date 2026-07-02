@@ -2,10 +2,16 @@
 
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
-import { Eye, Flame, Heart, MessageCircle, PenLine, Send, Sprout } from "lucide-react";
+import { Eye, Flame, MessageCircle, PenLine, Send, Sprout } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import {
+  CommentSection,
+  type IComment,
+  ReactionPickerButton,
+} from "@/components/check-in/reactions";
 import { ColorAvatar } from "@/components/poc-shared/color-avatar";
+import type { ReactionTypeType } from "@/constants/reaction-type";
 import {
   getQuietPartners,
   getShiningPartners,
@@ -14,8 +20,33 @@ import {
 } from "./mock-data";
 import type { Partner, PartnerCheckin } from "./types";
 
+/** 夥伴動態卡：復用專案的 ReactionPickerButton 與 CommentSection */
 function CheckinFeedCard({ checkin }: { checkin: PartnerCheckin }) {
-  const [responded, setResponded] = useState(checkin.responded);
+  const [reactions, setReactions] = useState<ReactionTypeType[]>(
+    checkin.responded ? ["touched"] : []
+  );
+  const [comments, setComments] = useState<IComment[]>([]);
+  const [showComments, setShowComments] = useState(false);
+  const responded = reactions.length > 0 || comments.length > 0;
+
+  const toggleReaction = (type: ReactionTypeType) => {
+    setReactions((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  };
+
+  const submitComment = (content: string, commentReactions: ReactionTypeType[]) => {
+    setComments((prev) => [
+      ...prev,
+      {
+        id: `local-${prev.length + 1}`,
+        author: { name: "阿島老師" },
+        content,
+        reactions: commentReactions,
+        time: "剛剛",
+      },
+    ]);
+  };
 
   return (
     <div className="rounded-2xl border border-[#E4EAE9] bg-white p-4">
@@ -36,26 +67,32 @@ function CheckinFeedCard({ checkin }: { checkin: PartnerCheckin }) {
         )}
       </div>
       <p className="mt-3 text-sm text-text-dark">{checkin.content}</p>
-      {!responded && (
-        <div className="mt-3 flex gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            className="rounded-full"
-            onClick={() => setResponded(true)}
-          >
-            <Heart className="size-3.5" />
-            回應
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="rounded-full"
-            onClick={() => setResponded(true)}
-          >
-            <MessageCircle className="size-3.5" />
-            留言鼓勵
-          </Button>
+      <div className="mt-3 flex items-center gap-2">
+        <ReactionPickerButton
+          selectedReactions={reactions}
+          onToggle={toggleReaction}
+          variant="card"
+        />
+        <button
+          type="button"
+          onClick={() => setShowComments((v) => !v)}
+          className="flex size-9 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-[#F0F9F8] hover:text-text-dark"
+          aria-label="留言鼓勵"
+        >
+          <MessageCircle className="size-5" />
+        </button>
+        {comments.length > 0 && (
+          <span className="text-xs text-text-secondary">{comments.length} 則留言</span>
+        )}
+      </div>
+      {showComments && (
+        <div className="mt-2 border-t border-[#F0F2F4] pt-2">
+          <CommentSection
+            comments={comments}
+            selectedReactions={reactions}
+            onSubmit={submitComment}
+            currentUserName="阿島老師"
+          />
         </div>
       )}
     </div>

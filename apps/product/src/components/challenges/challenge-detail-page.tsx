@@ -3,6 +3,8 @@
 import { Link } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
+import { Progress } from "@daodao/ui/components/progress";
+import { Separator } from "@daodao/ui/components/separator";
 import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { Medal, Pencil, Users } from "lucide-react";
 import { CategoryIconTile, getCategoryStyle } from "./category-icon";
@@ -20,7 +22,11 @@ function ActiveSeasonCard({
   challenge: Challenge;
   season: ChallengeSeason;
 }) {
-  const daysLeft = Math.max(0, differenceInCalendarDays(parseISO(season.endDate), new Date()));
+  const start = parseISO(season.startDate);
+  const end = parseISO(season.endDate);
+  const totalDays = Math.max(1, differenceInCalendarDays(end, start));
+  const elapsedDays = Math.min(totalDays, Math.max(0, differenceInCalendarDays(new Date(), start)));
+  const daysLeft = Math.max(0, differenceInCalendarDays(end, new Date()));
   const accent = getCategoryStyle(challenge.category);
 
   return (
@@ -36,7 +42,11 @@ function ActiveSeasonCard({
       <p className="mt-1 text-sm text-text-secondary">
         {formatDateRange(season)}（剩 {daysLeft} 天）
       </p>
-      <div className="mt-2 flex items-center gap-4 text-sm text-text-secondary">
+      <div className="mt-3">
+        <Progress value={(elapsedDays / totalDays) * 100} className="h-2" />
+      </div>
+      <Separator className="my-3" />
+      <div className="flex items-center gap-4 text-sm text-text-secondary">
         <span className="flex items-center gap-1">
           <Users className="size-3.5" />
           {season.memberCount} 人
