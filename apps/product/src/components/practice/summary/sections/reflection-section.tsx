@@ -57,9 +57,11 @@ export function ReflectionSection({
   const handleSave = async () => {
     const trimmed = draft.trim();
     if (!trimmed) return;
-    await save(trimmed);
-    onReflectionChange(trimmed);
-    setIsEditing(false);
+    const success = await save(trimmed);
+    if (success) {
+      onReflectionChange(trimmed);
+      setIsEditing(false);
+    }
   };
 
   if (!ended) {

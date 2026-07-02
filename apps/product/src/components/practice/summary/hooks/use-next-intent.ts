@@ -10,12 +10,14 @@ export function useNextIntent(practiceId: string) {
   const [isSaving, setIsSaving] = useState(false);
 
   const save = useCallback(
-    async (text: string, saveDraft?: boolean) => {
+    async (text: string, saveDraft?: boolean): Promise<boolean> => {
       setIsSaving(true);
       try {
         await updateNextIntent(practiceId, text, saveDraft);
+        return true;
       } catch {
         toast.error("儲存意圖失敗");
+        return false;
       } finally {
         setIsSaving(false);
       }

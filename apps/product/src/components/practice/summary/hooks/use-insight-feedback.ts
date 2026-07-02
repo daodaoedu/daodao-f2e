@@ -10,12 +10,14 @@ export function useInsightFeedback(practiceId: string) {
   const [isSaving, setIsSaving] = useState(false);
 
   const save = useCallback(
-    async (type: "positive" | "negative", reasons?: string[]) => {
+    async (type: "positive" | "negative", reasons?: string[]): Promise<boolean> => {
       setIsSaving(true);
       try {
         await createInsightFeedback(practiceId, type, reasons);
+        return true;
       } catch {
         toast.error("送出回饋失敗");
+        return false;
       } finally {
         setIsSaving(false);
       }

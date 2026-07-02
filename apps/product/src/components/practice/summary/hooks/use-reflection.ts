@@ -10,12 +10,14 @@ export function useReflection(practiceId: string) {
   const [isSaving, setIsSaving] = useState(false);
 
   const save = useCallback(
-    async (text: string) => {
+    async (text: string): Promise<boolean> => {
       setIsSaving(true);
       try {
         await updateReflection(practiceId, text);
+        return true;
       } catch {
         toast.error("儲存反思失敗");
+        return false;
       } finally {
         setIsSaving(false);
       }

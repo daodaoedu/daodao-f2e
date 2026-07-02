@@ -10,12 +10,14 @@ export function useSelectedCheckins(practiceId: string) {
   const [isSaving, setIsSaving] = useState(false);
 
   const save = useCallback(
-    async (checkinIds: string[]) => {
+    async (checkinIds: string[]): Promise<boolean> => {
       setIsSaving(true);
       try {
         await updateSelectedCheckins(practiceId, checkinIds);
+        return true;
       } catch {
         toast.error("儲存選取的打卡紀錄失敗");
+        return false;
       } finally {
         setIsSaving(false);
       }

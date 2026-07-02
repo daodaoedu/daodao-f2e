@@ -61,11 +61,13 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
   const handleSave = async () => {
     const trimmed = draft.trim();
     if (!trimmed) return;
-    await save(trimmed, saveDraft);
-    setNextIntentText(trimmed);
-    setJustSavedDraft(saveDraft);
-    setMode("saved");
-    onIntentSaved?.(saveDraft ? "draft" : "final");
+    const success = await save(trimmed, saveDraft);
+    if (success) {
+      setNextIntentText(trimmed);
+      setJustSavedDraft(saveDraft);
+      setMode("saved");
+      onIntentSaved?.(saveDraft ? "draft" : "final");
+    }
   };
 
   return (

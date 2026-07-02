@@ -166,9 +166,11 @@ export function Surface3ShareCard({
   const handleSaveReflection = async () => {
     const trimmed = reflectionDraft.trim();
     if (!trimmed) return;
-    await saveReflection(trimmed);
-    onReflectionChange(trimmed);
-    setIsEditingReflection(false);
+    const success = await saveReflection(trimmed);
+    if (success) {
+      onReflectionChange(trimmed);
+      setIsEditingReflection(false);
+    }
   };
 
   const handleTogglePublic = async () => {
