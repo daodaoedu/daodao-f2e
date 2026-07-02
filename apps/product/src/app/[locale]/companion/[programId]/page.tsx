@@ -1,0 +1,15 @@
+"use client";
+
+import { CompanionProgramPage } from "@/components/companion";
+import { PageHeader } from "@/components/layout";
+
+export default function CompanionProgramRoute() {
+  return (
+    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+      <PageHeader leftAction="back" leftLabel="" title="寫作陪伴圈" />
+      <main className="max-w-[640px] mx-auto pb-10">
+        <CompanionProgramPage />
+      </main>
+    </div>
+  );
+}
