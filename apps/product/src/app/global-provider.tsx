@@ -66,6 +66,11 @@ function GlobalProvider({
                       // misc
                       "^/dev/",
                       "^/ux-mockup/",
+                      // POC pages (mock data only)
+                      "^/quarterly-report$",
+                      "^/challenges(/.*)?$",
+                      "^/companion/",
+                      "^/dashboard/companion$",
                     ]}
                     onAuthRequired={(currentPath) => {
                       router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);

@@ -15,7 +15,8 @@ export function FriendsTab({ data }: FriendsTabProps) {
     <div className="space-y-4">
       <div className="rounded-xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
         <h3 className="mb-3 text-sm font-bold text-[#2D3436]">
-          你的群島 · {coreFriends.length} 位核心學伴 + {data.friends.length - coreFriends.length} 位島友
+          你的群島 · {coreFriends.length} 位核心學伴 + {data.friends.length - coreFriends.length}{" "}
+          位島友
         </h3>
         <IslandMap userName={data.user.name} friends={data.friends} />
       </div>

@@ -22,7 +22,11 @@ export function MoodCurveChart({ moodCurve }: MoodCurveChartProps) {
     <ChartContainer config={chartConfig} className="h-[200px] w-full">
       <LineChart data={moodCurve} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#F0F2F4" />
-        <XAxis dataKey="week" tick={{ fontSize: 11, fill: "#8A9BA0" }} tickFormatter={(w: number) => `W${w}`} />
+        <XAxis
+          dataKey="week"
+          tick={{ fontSize: 11, fill: "#8A9BA0" }}
+          tickFormatter={(w: number) => `W${w}`}
+        />
         <YAxis tick={{ fontSize: 11, fill: "#8A9BA0" }} domain={[0, 100]} tickCount={5} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Line

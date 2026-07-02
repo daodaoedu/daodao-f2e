@@ -1,13 +1,16 @@
 "use client";
 
 import { cn } from "@daodao/ui/lib/utils";
-import { type MotionValue, animate, motion, useMotionValue, useTransform } from "motion/react";
+import { animate, motion, useMotionValue, useTransform } from "motion/react";
 import { useEffect } from "react";
 
 interface ReportStatCardProps {
   label: string;
   value: number;
+  /** 數字顏色 */
   color?: string;
+  /** 卡片淡色底（依設計稿，數據卡使用主題色的淡色背景） */
+  bg?: string;
 }
 
 function CountUp({ target }: { target: number }) {
@@ -23,13 +26,16 @@ function CountUp({ target }: { target: number }) {
   return <motion.span>{rounded}</motion.span>;
 }
 
-export function ReportStatCard({ label, value, color = "#16B9B3" }: ReportStatCardProps) {
+export function ReportStatCard({
+  label,
+  value,
+  color = "#16B9B3",
+  bg = "#E8F8F7",
+}: ReportStatCardProps) {
   return (
     <div
-      className={cn(
-        "flex flex-col items-center justify-center rounded-xl bg-white p-4",
-        "shadow-[0_1px_3px_rgba(0,0,0,0.06)]",
-      )}
+      className={cn("flex flex-col items-center justify-center rounded-xl p-4")}
+      style={{ backgroundColor: bg }}
     >
       <span className="text-3xl font-bold" style={{ color }}>
         <CountUp target={value} />

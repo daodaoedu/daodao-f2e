@@ -5,14 +5,36 @@ export const MOCK_REPORT_DATA: QuarterlyReportData = {
   quarter: { year: 2026, quarter: 2, totalDays: 91 },
   stats: { activeDays: 45, topics: 12, interactions: 156, friends: 18 },
   months: [
-    { month: 4, activeDays: 15, topics: 4, highlights: ["完成 UX Bootcamp 結業", "開始 Portfolio 規劃"] },
-    { month: 5, activeDays: 18, topics: 5, highlights: ["首件 Portfolio 作品完成", "參加設計工作坊"] },
+    {
+      month: 4,
+      activeDays: 15,
+      topics: 4,
+      highlights: ["完成 UX Bootcamp 結業", "開始 Portfolio 規劃"],
+    },
+    {
+      month: 5,
+      activeDays: 18,
+      topics: 5,
+      highlights: ["首件 Portfolio 作品完成", "參加設計工作坊"],
+    },
     { month: 6, activeDays: 12, topics: 3, highlights: ["加入 UX 設計讀書會", "完成訪談練習"] },
   ],
   milestones: [
-    { date: "2026-04-12", title: "UX Bootcamp 結業", description: "歷時 6 週，完成所有課程模組與期末專案" },
-    { date: "2026-05-20", title: "首件 Portfolio 完成", description: "食物外送 App 重新設計 case study 上線" },
-    { date: "2026-06-08", title: "加入 UX 設計讀書會", description: "每週二固定共學，與 8 位設計師交流" },
+    {
+      date: "2026-04-12",
+      title: "UX Bootcamp 結業",
+      description: "歷時 6 週，完成所有課程模組與期末專案",
+    },
+    {
+      date: "2026-05-20",
+      title: "首件 Portfolio 完成",
+      description: "食物外送 App 重新設計 case study 上線",
+    },
+    {
+      date: "2026-06-08",
+      title: "加入 UX 設計讀書會",
+      description: "每週二固定共學，與 8 位設計師交流",
+    },
   ],
   friends: [
     { name: "小立", isCore: true },

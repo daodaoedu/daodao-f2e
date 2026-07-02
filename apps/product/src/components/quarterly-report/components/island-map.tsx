@@ -24,7 +24,16 @@ export function IslandMap({ userName, friends }: IslandMapProps) {
       {coreFriends.map((_, i) => {
         const pos = ringPosition(cx, cy, 80, i, coreFriends.length);
         return (
-          <line key={`cl-${i}`} x1={cx} y1={cy} x2={pos.x} y2={pos.y} stroke="#16B9B3" strokeWidth="1" opacity="0.2" />
+          <line
+            key={`cl-${i}`}
+            x1={cx}
+            y1={cy}
+            x2={pos.x}
+            y2={pos.y}
+            stroke="#16B9B3"
+            strokeWidth="1"
+            opacity="0.2"
+          />
         );
       })}
 
@@ -33,7 +42,14 @@ export function IslandMap({ userName, friends }: IslandMapProps) {
         return (
           <g key={`o-${i}`}>
             <circle cx={pos.x} cy={pos.y} r="8" fill={OUTER_COLOR} opacity="0.6" />
-            <text x={pos.x} y={pos.y + 3} textAnchor="middle" fill="#536166" fontSize="6" fontWeight="500">
+            <text
+              x={pos.x}
+              y={pos.y + 3}
+              textAnchor="middle"
+              fill="#536166"
+              fontSize="6"
+              fontWeight="500"
+            >
               {f.name.slice(0, 1)}
             </text>
           </g>
@@ -46,7 +62,14 @@ export function IslandMap({ userName, friends }: IslandMapProps) {
         return (
           <g key={`c-${i}`}>
             <circle cx={pos.x} cy={pos.y} r="16" fill={color} />
-            <text x={pos.x} y={pos.y + 4} textAnchor="middle" fill="#fff" fontSize="9" fontWeight="700">
+            <text
+              x={pos.x}
+              y={pos.y + 4}
+              textAnchor="middle"
+              fill="#fff"
+              fontSize="9"
+              fontWeight="700"
+            >
               {f.name}
             </text>
           </g>
