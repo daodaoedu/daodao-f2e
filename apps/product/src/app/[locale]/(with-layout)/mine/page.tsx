@@ -6,7 +6,7 @@ import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { Link, useRouter } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
-import { CheckCircle2, ChevronRight, ScrollText } from "lucide-react";
+import { CheckCircle2, ChevronRight, Flag, ScrollText } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   AddTaskFAB,
@@ -128,20 +128,35 @@ export default function MyPage() {
             </button>
           </div>
 
-          {/* 季度報告入口（POC） */}
-          <Link
-            href="/quarterly-report"
-            className="mb-4 flex items-center gap-3 rounded-2xl border border-[#E4EAE9] bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
-          >
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F8F7]">
-              <ScrollText className="size-5 text-logo-cyan" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-text-dark">我的季度報告</p>
-              <p className="text-xs text-text-secondary">回顧這一季的學習足跡與成長</p>
-            </div>
-            <ChevronRight className="size-4 shrink-0 text-text-secondary" />
-          </Link>
+          {/* POC 功能入口：季度報告 / 共同挑戰 */}
+          <div className="mb-4 grid grid-cols-2 gap-3">
+            <Link
+              href="/quarterly-report"
+              className="flex items-center gap-2.5 rounded-2xl border border-[#E4EAE9] bg-white p-3.5 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#E8F8F7]">
+                <ScrollText className="size-4.5 text-logo-cyan" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold text-text-dark">季度報告</p>
+                <p className="truncate text-xs text-text-secondary">回顧成長足跡</p>
+              </div>
+              <ChevronRight className="size-4 shrink-0 text-text-secondary" />
+            </Link>
+            <Link
+              href="/me/challenges"
+              className="flex items-center gap-2.5 rounded-2xl border border-[#E4EAE9] bg-white p-3.5 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#FFF4E3]">
+                <Flag className="size-4.5 text-[#FFA10B]" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold text-text-dark">我的挑戰</p>
+                <p className="truncate text-xs text-text-secondary">一群人一起完成</p>
+              </div>
+              <ChevronRight className="size-4 shrink-0 text-text-secondary" />
+            </Link>
+          </div>
 
           {!isAuthLoading && !isAuthenticated ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">

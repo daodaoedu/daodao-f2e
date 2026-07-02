@@ -5,8 +5,10 @@ import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Progress } from "@daodao/ui/components/progress";
 import { Separator } from "@daodao/ui/components/separator";
+import { toast } from "@daodao/ui/components/sonner";
 import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { Medal, Pencil, Users } from "lucide-react";
+import { useState } from "react";
 import { CategoryIconTile, getCategoryStyle } from "./category-icon";
 import { CATEGORY_LABELS, MOCK_MY_HISTORY } from "./mock-data";
 import type { Challenge, ChallengeSeason } from "./types";
@@ -64,6 +66,8 @@ function ActiveSeasonCard({
 }
 
 function UpcomingSeasonCard({ season }: { season: ChallengeSeason }) {
+  const [registered, setRegistered] = useState(false);
+
   return (
     <section className="rounded-2xl border border-dashed border-[#E4EAE9] bg-[#F8FBFB] p-4">
       <div className="flex items-center gap-2">
@@ -71,10 +75,19 @@ function UpcomingSeasonCard({ season }: { season: ChallengeSeason }) {
         <h2 className="text-base font-bold text-text-dark">第 {season.seasonNumber} 期預告</h2>
       </div>
       <p className="mt-2 text-sm text-text-secondary">
-        {format(parseISO(season.startDate), "yyyy/MM/dd")} 開始 · 已有 {season.memberCount} 人報名
+        {format(parseISO(season.startDate), "yyyy/MM/dd")} 開始 · 已有{" "}
+        {season.memberCount + (registered ? 1 : 0)} 人報名
       </p>
-      <Button variant="outline" className="mt-3 w-full rounded-full">
-        預先報名，開始時通知我
+      <Button
+        variant="outline"
+        className="mt-3 w-full rounded-full"
+        disabled={registered}
+        onClick={() => {
+          setRegistered(true);
+          toast.success("已預先報名，開始時會通知你");
+        }}
+      >
+        {registered ? "已預先報名 ✓" : "預先報名，開始時通知我"}
       </Button>
     </section>
   );

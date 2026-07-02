@@ -71,6 +71,7 @@ function GlobalProvider({
                       "^/challenges(/.*)?$",
                       "^/companion/",
                       "^/dashboard/companion$",
+                      "^/me/challenges$",
                     ]}
                     onAuthRequired={(currentPath) => {
                       router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);

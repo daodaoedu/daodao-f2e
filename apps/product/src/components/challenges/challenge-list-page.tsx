@@ -22,6 +22,7 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "@daodao/ui/components/item";
+import { toast } from "@daodao/ui/components/sonner";
 import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { Clock, Users } from "lucide-react";
 import { Fragment, useState } from "react";
@@ -123,7 +124,15 @@ function UpcomingChallengeList({ items }: { items: ChallengeWithSeason[] }) {
                 </ItemDescription>
               </ItemContent>
               <ItemActions>
-                <Button size="sm" variant="outline" className="rounded-full">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toast.success("已預先報名，開始時會通知你");
+                  }}
+                >
                   預先報名
                 </Button>
               </ItemActions>

@@ -2,6 +2,7 @@
 
 import { Button } from "@daodao/ui/components/button";
 import { Progress } from "@daodao/ui/components/progress";
+import { toast } from "@daodao/ui/components/sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
 import { differenceInCalendarDays, parseISO } from "date-fns";
 import { CheckCircle2, Flame, MessageCircle, Pencil, Users } from "lucide-react";
@@ -14,6 +15,7 @@ import {
 } from "@/components/check-in/reactions";
 import { ColorAvatar } from "@/components/poc-shared/color-avatar";
 import type { ReactionTypeType } from "@/constants/reaction-type";
+import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
 import { MOCK_MY_PROGRESS, MOCK_SEASON_CHECKINS, MOCK_SEASON_RANKING } from "./mock-data";
 import type { Challenge, ChallengeSeason, SeasonCheckin, SeasonRankingEntry } from "./types";
 
@@ -132,6 +134,16 @@ export function SeasonPage({ challenge, season }: SeasonPageProps) {
   const checkins = MOCK_SEASON_CHECKINS[season.id] ?? [];
   const ranking = MOCK_SEASON_RANKING[season.id] ?? [];
   const [joined, setJoined] = useState(progress?.joined ?? false);
+  const [todayCheckedIn, setTodayCheckedIn] = useState(progress?.todayCheckedIn ?? false);
+
+  // 挑戰打卡沿用主題實踐既有的打卡 sheet，不另做新 UI
+  const { openCheckInSheet } = useCheckInSheet({
+    taskTitle: challenge.title,
+    onComplete: async () => {
+      setTodayCheckedIn(true);
+      toast.success("打卡完成！明天也一起繼續");
+    },
+  });
 
   const start = parseISO(season.startDate);
   const end = parseISO(season.endDate);
@@ -172,8 +184,12 @@ export function SeasonPage({ challenge, season }: SeasonPageProps) {
               今日打卡提示：「{challenge.checkinPrompt}」
             </p>
           )}
-          <Button className="mt-3 w-full rounded-full" disabled={progress?.todayCheckedIn}>
-            {progress?.todayCheckedIn ? (
+          <Button
+            className="mt-3 w-full rounded-full"
+            disabled={todayCheckedIn}
+            onClick={openCheckInSheet}
+          >
+            {todayCheckedIn ? (
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="size-4" />
                 今日已打卡
@@ -197,7 +213,13 @@ export function SeasonPage({ challenge, season }: SeasonPageProps) {
       ) : (
         <section className="rounded-2xl border border-[#E4EAE9] bg-white p-4 text-center">
           <p className="text-sm text-text-dark">目標：{season.targetDescription}</p>
-          <Button className="mt-3 w-full rounded-full" onClick={() => setJoined(true)}>
+          <Button
+            className="mt-3 w-full rounded-full"
+            onClick={() => {
+              setJoined(true);
+              toast.success("已加入挑戰！已為你建立對應的主題實踐");
+            }}
+          >
             加入挑戰
           </Button>
         </section>

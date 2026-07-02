@@ -2,10 +2,12 @@
 
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
+import { toast } from "@daodao/ui/components/sonner";
 import { CheckCircle2, Flame, Heart, PenLine } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { ColorAvatar } from "@/components/poc-shared/color-avatar";
+import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
 import { MOCK_PROGRAM, MOCK_RECENT_CHECKINS } from "./mock-data";
 
 /** 陪伴計畫・夥伴（學員）視角頁 */
@@ -13,6 +15,15 @@ export function CompanionProgramPage() {
   const program = MOCK_PROGRAM;
   const [joined, setJoined] = useState(false);
   const [checkedIn, setCheckedIn] = useState(false);
+
+  // 記錄沿用主題實踐既有的打卡 sheet
+  const { openCheckInSheet } = useCheckInSheet({
+    taskTitle: program.title,
+    onComplete: async () => {
+      setCheckedIn(true);
+      toast.success("已記錄！老師會看見你的每一步");
+    },
+  });
 
   return (
     <div className="flex flex-col gap-4 px-5 pt-4">
@@ -48,7 +59,7 @@ export function CompanionProgramPage() {
           ) : (
             <>
               <p className="text-sm text-text-secondary">今天過得如何？寫下一點紀錄吧</p>
-              <Button className="mt-3 w-full rounded-full" onClick={() => setCheckedIn(true)}>
+              <Button className="mt-3 w-full rounded-full" onClick={openCheckInSheet}>
                 <PenLine className="size-4" />
                 記錄今天
               </Button>
