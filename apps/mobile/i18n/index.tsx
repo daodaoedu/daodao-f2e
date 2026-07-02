@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, useContext, useMemo, useState } from "react";
-import enMessages from "../../../packages/i18n/src/locales/en.json";
-import zhTWMessages from "../../../packages/i18n/src/locales/zh-TW.json";
+import enMessages from "../../../packages/i18n/src/locales/en";
+import zhTWMessages from "../../../packages/i18n/src/locales/zh-TW";
 
 export type MobileLocale = "zh-TW" | "en";
 

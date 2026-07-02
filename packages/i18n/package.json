@@ -14,7 +14,7 @@
     "./middleware": "./src/middleware.ts",
     "./server": "./src/server.ts",
     "./lib/*": "./src/lib/*.ts",
-    "./locales/*": "./src/locales/*.json"
+    "./locales/*": "./src/locales/*"
   },
   "scripts": {
     "build": "tsc",

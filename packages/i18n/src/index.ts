@@ -8,3 +8,4 @@ export {
 export type { Locale } from "./routing";
 export type Messages = Record<string, unknown>;
 export { getMessagesFromPathname } from "./lib/get-messages";
+export { loadMessages } from "./lib/load-messages";
