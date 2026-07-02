@@ -1,3 +1,4 @@
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 interface CheckinHighlightsProps {
   /** 精選打卡筆記（文字最多的最多 3 則，來自 summary.topNotes） */
   topNotes: string[];

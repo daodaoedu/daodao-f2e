@@ -1,5 +1,6 @@
 "use client";
 
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { PracticeSummary } from "@daodao/api";
 import { TitleSvg } from "@daodao/assets";
 import { format, isValid, parse } from "date-fns";
@@ -32,9 +33,11 @@ export const SHARE_CARD_THEMES: readonly ShareCardTheme[] = [
   {
     name: "light",
     bg: "#f4f6f6",
-    text: "var(--text-dark)",
-    accent: "var(--basic-400)",
-    boxBg: "var(--primary-lightest)",
+    // 以下為 --text-dark / --basic-400 / --primary-lightest 的 hex 換算值：
+    // html2canvas 擷取分享卡圖片時無法解析 CSS 變數（oklch），需改用字面色值
+    text: "#295e5c", // was var(--text-dark)
+    accent: "#536166", // was var(--basic-400)
+    boxBg: "#def5f5", // was var(--primary-lightest)
   },
   {
     name: "cyan",
@@ -46,8 +49,8 @@ export const SHARE_CARD_THEMES: readonly ShareCardTheme[] = [
   {
     name: "yellow",
     bg: "#f9e41c",
-    text: "var(--text-dark)",
-    accent: "var(--basic-400)",
+    text: "#295e5c", // was var(--text-dark)
+    accent: "#536166", // was var(--basic-400)
     boxBg: "rgba(0,0,0,.08)",
   },
 ] as const;

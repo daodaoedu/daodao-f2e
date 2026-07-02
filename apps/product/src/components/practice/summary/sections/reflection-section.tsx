@@ -1,5 +1,6 @@
 "use client";
 
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import { Button } from "@daodao/ui/components/button";
 import { Lock, Pencil } from "lucide-react";
 import type { ChangeEvent } from "react";
@@ -18,6 +19,8 @@ interface ReflectionSectionProps {
  * 我的反思區塊
  * @description 四種子狀態：鎖定（未結束）／預覽（已結束但未寫）／編輯／已儲存
  */
+// NOTE: Reflection editing logic is duplicated with surface-3-share-card.tsx
+// Consider extracting a shared ReflectionEditor component
 export function ReflectionSection({
   stage,
   reflectionText,

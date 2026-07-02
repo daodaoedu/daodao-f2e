@@ -1,5 +1,6 @@
 "use client";
 
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { PracticeSummary } from "@daodao/api";
 import { Button } from "@daodao/ui/components/button";
 import { Checkbox } from "@daodao/ui/components/checkbox";

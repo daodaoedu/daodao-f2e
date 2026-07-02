@@ -11,10 +11,11 @@ export type PracticeStage = "active" | "ending" | "ended-deep" | "ended-low";
 
 /**
  * 計算實踐總結頁面所處的階段
+ * @description 純函式（非 React Hook，不含任何 hook 呼叫），命名遵循一般函式慣例而非 use- 前綴
  * @param summary 實踐總結資料
  * @returns 目前所處的階段
  */
-export function usePracticeStage(summary: PracticeSummary): PracticeStage {
+export function getPracticeStage(summary: PracticeSummary): PracticeStage {
   if (summary.status === "active" || summary.status === "not_started") {
     const endDate = new Date(summary.endDate);
     const today = new Date();

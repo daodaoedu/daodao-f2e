@@ -1,3 +1,4 @@
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import { updateReflection } from "@daodao/api";
 import { toast } from "@daodao/ui/components/sonner";
 import { useCallback, useState } from "react";

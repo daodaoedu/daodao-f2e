@@ -1,5 +1,6 @@
 "use client";
 
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { Check, RotateCcw } from "lucide-react";

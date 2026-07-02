@@ -1,5 +1,6 @@
 "use client";
 
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import {
   DropdownMenu,
   DropdownMenuContent,

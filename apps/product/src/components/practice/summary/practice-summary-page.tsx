@@ -1,5 +1,6 @@
 "use client";
 
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { PracticeSummary } from "@daodao/api";
 import { useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
@@ -7,7 +8,7 @@ import { X } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { FarewellScreen, type FarewellVariant } from "./farewell-screen";
-import { isEnded, usePracticeStage } from "./hooks";
+import { getPracticeStage, isEnded } from "./hooks";
 import { Surface1Summary } from "./surface-1-summary";
 import { Surface2NextIntent } from "./surface-2-next-intent";
 import { Surface3ShareCard } from "./surface-3-share-card";
@@ -23,7 +24,7 @@ interface PracticeSummaryPageProps {
  */
 export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
   const router = useRouter();
-  const stage = usePracticeStage(summary);
+  const stage = getPracticeStage(summary);
   const ended = isEnded(stage);
 
   const [currentSurface, setCurrentSurface] = useState<1 | 2 | 3>(1);
@@ -60,64 +61,68 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
     setShowFarewell(true);
   };
 
-  if (showFarewell) {
-    return (
-      <AnimatePresence>
-        <FarewellScreen
-          variant={farewellVariant}
-          onNavigateToList={() => router.push("/practices")}
-        />
-      </AnimatePresence>
-    );
-  }
-
   return (
-    <div className="relative w-screen min-h-screen bg-white">
-      <button
-        type="button"
-        onClick={handleClose}
-        aria-label="離開實踐總結頁"
-        className="fixed right-4 top-4 z-40 flex size-9 items-center justify-center rounded-full bg-white text-logo-gray shadow-sm"
-      >
-        <X className="size-4" />
-      </button>
+    <>
+      {/* AnimatePresence 需常駐掛載才能偵測 FarewellScreen 的 exit 動畫，
+          不可放在條件式 return 內（條件式會直接卸載整個元件樹，略過 exit transition） */}
+      <AnimatePresence>
+        {showFarewell && (
+          <FarewellScreen
+            variant={farewellVariant}
+            onNavigateToList={() => router.push("/practices")}
+          />
+        )}
+      </AnimatePresence>
 
-      <SurfaceNavChip
-        currentSurface={currentSurface}
-        stage={stage}
-        onSurfaceChange={handleSurfaceChange}
-      />
+      {!showFarewell && (
+        <div className="relative w-screen min-h-screen bg-white">
+          <button
+            type="button"
+            onClick={handleClose}
+            aria-label="離開實踐總結頁"
+            className="fixed right-4 top-4 z-40 flex size-9 items-center justify-center rounded-full bg-white text-logo-gray shadow-sm"
+          >
+            <X className="size-4" />
+          </button>
 
-      {currentSurface === 1 && (
-        <Surface1Summary
-          summary={summary}
-          stage={stage}
-          reflectionText={reflectionText}
-          onReflectionChange={setReflectionText}
-          onSurfaceChange={handleSurfaceChange}
-        />
+          <SurfaceNavChip
+            currentSurface={currentSurface}
+            stage={stage}
+            onSurfaceChange={handleSurfaceChange}
+          />
+
+          {currentSurface === 1 && (
+            <Surface1Summary
+              summary={summary}
+              stage={stage}
+              reflectionText={reflectionText}
+              onReflectionChange={setReflectionText}
+              onSurfaceChange={handleSurfaceChange}
+            />
+          )}
+
+          {currentSurface === 2 && (
+            <Surface2NextIntent
+              summary={summary}
+              onSurfaceChange={handleSurfaceChange}
+              onIntentSaved={setNextIntentStatus}
+            />
+          )}
+
+          {currentSurface === 3 && (
+            <Surface3ShareCard
+              summary={summary}
+              reflectionText={reflectionText}
+              onReflectionChange={setReflectionText}
+              selectedCheckInIds={selectedCheckInIds}
+              onSelectedChange={setSelectedCheckInIds}
+              themeIndex={themeIndex}
+              onThemeChange={setThemeIndex}
+              onSurfaceChange={handleSurfaceChange}
+            />
+          )}
+        </div>
       )}
-
-      {currentSurface === 2 && (
-        <Surface2NextIntent
-          summary={summary}
-          onSurfaceChange={handleSurfaceChange}
-          onIntentSaved={setNextIntentStatus}
-        />
-      )}
-
-      {currentSurface === 3 && (
-        <Surface3ShareCard
-          summary={summary}
-          reflectionText={reflectionText}
-          onReflectionChange={setReflectionText}
-          selectedCheckInIds={selectedCheckInIds}
-          onSelectedChange={setSelectedCheckInIds}
-          themeIndex={themeIndex}
-          onThemeChange={setThemeIndex}
-          onSurfaceChange={handleSurfaceChange}
-        />
-      )}
-    </div>
+    </>
   );
 }

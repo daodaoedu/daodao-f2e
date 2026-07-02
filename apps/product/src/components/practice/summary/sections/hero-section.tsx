@@ -1,5 +1,6 @@
 "use client";
 
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { MoodType, PracticeSummary } from "@daodao/api";
 import {
   BoredSvg,

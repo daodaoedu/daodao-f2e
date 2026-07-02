@@ -1,5 +1,6 @@
 "use client";
 
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { PracticeSummary } from "@daodao/api";
 import { cn } from "@daodao/ui/lib/utils";
 import { Heart, Lightbulb, Sprout, Star, ThumbsDown, ThumbsUp } from "lucide-react";

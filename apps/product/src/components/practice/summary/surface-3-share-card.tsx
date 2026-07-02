@@ -1,5 +1,6 @@
 "use client";
 
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import { type PracticeSummary, updatePractice, usePracticeCheckIns } from "@daodao/api";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Button } from "@daodao/ui/components/button";
@@ -177,27 +178,31 @@ export function Surface3ShareCard({
     const nextPublic = !isPublic;
     setIsTogglingPublic(true);
 
-    const response = await updatePractice(summary.practiceId, {
-      privacyStatus: nextPublic ? "public" : "private",
-    });
+    try {
+      const response = await updatePractice(summary.practiceId, {
+        privacyStatus: nextPublic ? "public" : "private",
+      });
 
-    setIsTogglingPublic(false);
+      if (response.error) {
+        const errorMessage =
+          response.error && typeof response.error === "object" && "message" in response.error
+            ? String(response.error.message)
+            : "更新公開狀態失敗";
+        toast.error(errorMessage);
+        return;
+      }
 
-    if (response.error) {
-      const errorMessage =
-        response.error && typeof response.error === "object" && "message" in response.error
-          ? String(response.error.message)
-          : "更新公開狀態失敗";
-      toast.error(errorMessage);
-      return;
-    }
+      setIsPublic(nextPublic);
+      setLinkReady(false);
 
-    setIsPublic(nextPublic);
-    setLinkReady(false);
-
-    if (linkTimeoutRef.current) clearTimeout(linkTimeoutRef.current);
-    if (nextPublic) {
-      linkTimeoutRef.current = setTimeout(() => setLinkReady(true), LINK_GENERATE_DELAY_MS);
+      if (linkTimeoutRef.current) clearTimeout(linkTimeoutRef.current);
+      if (nextPublic) {
+        linkTimeoutRef.current = setTimeout(() => setLinkReady(true), LINK_GENERATE_DELAY_MS);
+      }
+    } catch {
+      toast.error("更新公開狀態失敗");
+    } finally {
+      setIsTogglingPublic(false);
     }
   };
 
@@ -308,6 +313,8 @@ export function Surface3ShareCard({
       </div>
 
       {/* 反思內聯編輯 */}
+      {/* NOTE: Reflection editing logic is duplicated with sections/reflection-section.tsx
+          Consider extracting a shared ReflectionEditor component */}
       <section className="mt-4 rounded-2xl border border-basic-200 bg-white p-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-text-dark">我的反思</h3>

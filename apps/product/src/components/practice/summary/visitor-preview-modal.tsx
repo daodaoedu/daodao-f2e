@@ -1,5 +1,6 @@
 "use client";
 
+// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { PracticeSummary } from "@daodao/api";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -29,9 +30,9 @@ export function VisitorPreviewModal({
   onClose,
 }: VisitorPreviewModalProps) {
   const previewUrl = `app.daodao.so/practices/${summary.practiceId}/showcase`;
-  // PracticeSummary 僅提供 topNotes（無對應 id），以目前精選數量決定顯示則數，維持與 Surface 3 選取狀態的一致性
-  const featuredCount = selectedCheckInIds.length > 0 ? Math.min(selectedCheckInIds.length, 3) : 3;
-  const featuredNotes = summary.topNotes.slice(0, featuredCount);
+  // TODO: Display actual selected check-ins instead of topNotes when checkin data is available by ID
+  // PracticeSummary 僅提供 topNotes（無對應 id），暫以 topNotes 近似顯示，數量對齊 selectedCheckInIds
+  const featuredNotes = summary.topNotes.slice(0, selectedCheckInIds.length || 3);
   const avatarChar = summary.userName.trim().charAt(0) || "島";
 
   return (
