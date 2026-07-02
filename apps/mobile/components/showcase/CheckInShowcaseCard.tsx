@@ -1,9 +1,11 @@
-import { Flag, MessageCircle, MoreHorizontal } from "@tamagui/lucide-icons";
+import { Flag, MessageCircle } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, Linking, Pressable, StyleSheet } from "react-native";
 import { Button, Text, View, XStack, YStack } from "tamagui";
 import { CheckInCard } from "@/components/check-in/display/check-in-card";
+import { CircleAvatar } from "@/components/layout/circle-avatar";
+import { DropdownMenu } from "@/components/layout/dropdown-menu";
 import { CommentSheet } from "@/components/persona/CommentSheet";
 import { CommentSection } from "@/components/practice/detail/CommentSection";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
@@ -91,7 +93,7 @@ export function CheckInShowcaseCard({
   return (
     <Pressable onPress={handlePress} style={styles.card}>
       {/* 封面區 */}
-      <View backgroundColor={colors.primary.base} overflow="hidden">
+      <View backgroundColor={colors.primary.base} overflow="hidden" style={styles.cover}>
         {image_urls && image_urls.length > 0 ? (
           <Image
             source={{ uri: image_urls[0] }}
@@ -148,17 +150,10 @@ export function CheckInShowcaseCard({
         paddingTop="$3"
         paddingBottom="$4"
         gap="$3"
+        style={styles.info}
       >
         <XStack alignItems="flex-start" gap="$3" position="relative">
-          <View style={styles.avatar}>
-            {user?.photo_url ? (
-              <Image source={{ uri: user.photo_url }} style={styles.avatarImage} />
-            ) : (
-              <Text fontSize={20} color="#9CA3AF">
-                {(user?.name ?? "?")[0]}
-              </Text>
-            )}
-          </View>
+          <CircleAvatar uri={user?.photo_url} size={56} fallbackText={user?.name ?? "?"} />
           <YStack flex={1} gap="$1">
             <Text fontSize={12} color={colors.text.muted}>
               {checkin_date}
@@ -175,50 +170,18 @@ export function CheckInShowcaseCard({
           </YStack>
 
           {!isOwnCard && (
-            <View style={{ position: "relative" }}>
-              <Button
-                size="$2"
-                circular
-                chromeless
-                hitSlop={8}
-                onPress={() => setMenuOpen((v) => !v)}
-              >
-                <MoreHorizontal size={18} color="#9CA3AF" />
-              </Button>
-              {menuOpen && (
-                <YStack
-                  position="absolute"
-                  right={0}
-                  top="100%"
-                  marginTop={4}
-                  zIndex={20}
-                  backgroundColor="white"
-                  borderRadius={16}
-                  paddingVertical="$2"
-                  shadowColor="#000"
-                  shadowOffset={{ width: 0, height: 2 }}
-                  shadowOpacity={0.15}
-                  shadowRadius={8}
-                  elevation={5}
-                  minWidth={120}
-                >
-                  <Button
-                    chromeless
-                    onPress={handleReport}
-                    justifyContent="flex-start"
-                    paddingHorizontal="$4"
-                    paddingVertical="$3"
-                  >
-                    <XStack gap="$3" alignItems="center">
-                      <Flag size={16} color="#295E5C" />
-                      <Text fontSize={14} color="#295E5C">
-                        {t("report")}
-                      </Text>
-                    </XStack>
-                  </Button>
-                </YStack>
-              )}
-            </View>
+            <DropdownMenu
+              open={menuOpen}
+              onToggle={() => setMenuOpen((v) => !v)}
+              items={[
+                {
+                  key: "report",
+                  icon: <Flag size={16} color="#295E5C" />,
+                  label: t("report"),
+                  onPress: handleReport,
+                },
+              ]}
+            />
           )}
         </XStack>
 
@@ -251,18 +214,14 @@ export function CheckInShowcaseCard({
               const commentUserName = comment.user?.name ?? t("anonymous");
               return (
                 <XStack key={comment.id} alignItems="flex-start" gap="$2">
-                  <View style={styles.commentAvatar}>
-                    {comment.user?.photo_url ? (
-                      <Image
-                        source={{ uri: comment.user.photo_url }}
-                        style={styles.commentAvatarImage}
-                      />
-                    ) : (
-                      <Text fontSize={10} fontWeight="500" color="#295E5C">
-                        {commentUserName.slice(0, 1)}
-                      </Text>
-                    )}
-                  </View>
+                  <CircleAvatar
+                    uri={comment.user?.photo_url}
+                    size={24}
+                    fallbackText={commentUserName}
+                    backgroundColor="#E8FAF9"
+                    fallbackTextColor="#295E5C"
+                    fallbackFontSize={10}
+                  />
                   <XStack flex={1} flexWrap="wrap" alignItems="baseline" gap="$1">
                     <Text fontSize={12} fontWeight="600" color="#295E5C">
                       {commentUserName}
@@ -288,7 +247,14 @@ export function CheckInShowcaseCard({
 const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
-    overflow: "hidden",
+  },
+  cover: {
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  info: {
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
   },
   coverImage: {
     width: "100%",
@@ -306,34 +272,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     transform: [{ rotate: "15deg" }],
-  },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#F3F4F6",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  avatarImage: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-  },
-  commentAvatar: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#E8FAF9",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    marginTop: 2,
-  },
-  commentAvatarImage: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
   },
 });

@@ -120,10 +120,8 @@ export default function ProfileScreen() {
   const handleOpenQuiz = useCallback(async () => {
     const url = getQuizUrl();
     try {
-      const canOpen = await Linking.canOpenURL(url);
-      if (canOpen) {
-        await Linking.openURL(url);
-      }
+      // https 是所有裝置皆支援的標準協議，canOpenURL 在部分裝置設定下對 https 可能誤判為 false，故直接開啟並用 try/catch 處理例外
+      await Linking.openURL(url);
     } catch (error) {
       console.error("Failed to open quiz URL:", error);
     }

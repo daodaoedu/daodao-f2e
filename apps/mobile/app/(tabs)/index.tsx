@@ -288,7 +288,7 @@ export default function HomeScreen() {
           onEndReachedThreshold={0.3}
           refreshControl={
             <RefreshControl
-              refreshing={false}
+              refreshing={isValidating}
               onRefresh={() => mutateShowcase()}
               tintColor={colors.primary.base}
             />

@@ -1,7 +1,7 @@
-import { BarChart3, Flag, MoreHorizontal, Telescope } from "@tamagui/lucide-icons";
+import { BarChart3, Flag, Telescope } from "@tamagui/lucide-icons";
 import { useCallback, useState } from "react";
 import { Alert, Linking } from "react-native";
-import { Button, Text, View, XStack, YStack } from "tamagui";
+import { DropdownMenu } from "@/components/layout/dropdown-menu";
 import { BrowseActivitySheet } from "@/components/practice/detail/BrowseActivitySheet";
 import { colors } from "@/generated/design-tokens";
 import { useComments } from "@/hooks/useComments";
@@ -24,8 +24,8 @@ export function PracticeMenuButton({ practiceId }: PracticeMenuButtonProps) {
   const [browseActivityOpen, setBrowseActivityOpen] = useState(false);
 
   const { isFollowing, mutate: mutateFollow } = useFollowStatus("practice", practiceId);
-  const { comments } = useComments("practice", practiceId);
-  const { items: reactors } = useReactionsList("practice", practiceId);
+  const { comments = [] } = useComments("practice", practiceId);
+  const { items: reactors = [] } = useReactionsList("practice", practiceId);
 
   const handleReport = useCallback(() => {
     setMenuOpen(false);
@@ -52,72 +52,32 @@ export function PracticeMenuButton({ practiceId }: PracticeMenuButtonProps) {
   }, []);
 
   return (
-    <View style={{ position: "relative" }}>
-      <Button size="$3" circular chromeless hitSlop={8} onPress={() => setMenuOpen((v) => !v)}>
-        <MoreHorizontal size={18} color="#9CA3AF" />
-      </Button>
-
-      {menuOpen && (
-        <YStack
-          position="absolute"
-          right={0}
-          top="100%"
-          marginTop={4}
-          zIndex={20}
-          backgroundColor="white"
-          borderRadius={16}
-          paddingVertical="$2"
-          shadowColor="#000"
-          shadowOffset={{ width: 0, height: 2 }}
-          shadowOpacity={0.15}
-          shadowRadius={8}
-          elevation={5}
-          minWidth={140}
-        >
-          <Button
-            chromeless
-            onPress={handleReport}
-            justifyContent="flex-start"
-            paddingHorizontal="$4"
-            paddingVertical="$3"
-          >
-            <XStack gap="$3" alignItems="center">
-              <Flag size={18} color="#295E5C" />
-              <Text fontSize={14} color="#295E5C">
-                {t("report")}
-              </Text>
-            </XStack>
-          </Button>
-          <Button
-            chromeless
-            onPress={handleToggleFollow}
-            justifyContent="flex-start"
-            paddingHorizontal="$4"
-            paddingVertical="$3"
-          >
-            <XStack gap="$3" alignItems="center">
-              <Telescope size={18} color={isFollowing ? colors.primary.base : "#295E5C"} />
-              <Text fontSize={14} color={isFollowing ? colors.primary.base : "#295E5C"}>
-                {isFollowing ? t("unfollow") : t("follow")}
-              </Text>
-            </XStack>
-          </Button>
-          <Button
-            chromeless
-            onPress={handleBrowseActivity}
-            justifyContent="flex-start"
-            paddingHorizontal="$4"
-            paddingVertical="$3"
-          >
-            <XStack gap="$3" alignItems="center">
-              <BarChart3 size={18} color="#295E5C" />
-              <Text fontSize={14} color="#295E5C">
-                {t("browse_activity")}
-              </Text>
-            </XStack>
-          </Button>
-        </YStack>
-      )}
+    <>
+      <DropdownMenu
+        open={menuOpen}
+        onToggle={() => setMenuOpen((v) => !v)}
+        items={[
+          {
+            key: "report",
+            icon: <Flag size={18} color="#295E5C" />,
+            label: t("report"),
+            onPress: handleReport,
+          },
+          {
+            key: "follow",
+            icon: <Telescope size={18} color={isFollowing ? colors.primary.base : "#295E5C"} />,
+            label: isFollowing ? t("unfollow") : t("follow"),
+            color: isFollowing ? colors.primary.base : undefined,
+            onPress: handleToggleFollow,
+          },
+          {
+            key: "browse",
+            icon: <BarChart3 size={18} color="#295E5C" />,
+            label: t("browse_activity"),
+            onPress: handleBrowseActivity,
+          },
+        ]}
+      />
 
       <BrowseActivitySheet
         open={browseActivityOpen}
@@ -125,6 +85,6 @@ export function PracticeMenuButton({ practiceId }: PracticeMenuButtonProps) {
         commentCount={comments.length}
         reactors={reactors}
       />
-    </View>
+    </>
   );
 }

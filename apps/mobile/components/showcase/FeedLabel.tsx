@@ -10,6 +10,41 @@ interface FeedLabelProps {
   latestActorName?: string;
 }
 
+type Translator = ReturnType<typeof useMobileTranslation>;
+
+function getFeedLabelContent(
+  feedReason: FeedReasonType,
+  userName: string | undefined,
+  practiceTitle: string | undefined,
+  latestActorName: string | undefined,
+  t: Translator
+) {
+  switch (feedReason) {
+    case "new_practice":
+      return {
+        Icon: ThumbsUp,
+        text: t("showcase_feed_new_practice", { userName: userName ?? t("showcase_someone") }),
+      };
+    case "new_release":
+      return { Icon: Rss, text: t("showcase_latest_published") };
+    case "checked_in":
+      return {
+        Icon: CalendarCheck,
+        text: t("showcase_feed_checked_in", {
+          userName: userName ?? t("showcase_someone"),
+          practiceTitle: practiceTitle ?? t("showcase_fallback_practice"),
+        }),
+      };
+    case "cheered":
+      return {
+        Icon: ThumbsUp,
+        text: t("showcase_feed_cheered", { actorName: latestActorName ?? t("showcase_someone") }),
+      };
+    default:
+      return null;
+  }
+}
+
 /**
  * Feed 卡片上方的原因標籤，對齊 apps/product 的 FeedLabel
  */
@@ -20,77 +55,17 @@ export function FeedLabel({
   latestActorName,
 }: FeedLabelProps) {
   const t = useMobileTranslation("app_product");
+  const content = getFeedLabelContent(feedReason, userName, practiceTitle, latestActorName, t);
 
-  if (feedReason === "new_practice") {
-    return (
-      <XStack
-        alignItems="center"
-        gap="$1.5"
-        marginTop="$4"
-        marginBottom="$4"
-        paddingHorizontal="$1"
-      >
-        <ThumbsUp size={14} color="rgba(51,51,51,0.6)" />
-        <Text fontSize={12} color="rgba(51,51,51,0.6)">
-          {t("showcase_feed_new_practice", { userName: userName ?? t("showcase_someone") })}
-        </Text>
-      </XStack>
-    );
-  }
+  if (!content) return null;
 
-  if (feedReason === "new_release") {
-    return (
-      <XStack
-        alignItems="center"
-        gap="$1.5"
-        marginTop="$4"
-        marginBottom="$4"
-        paddingHorizontal="$1"
-      >
-        <Rss size={14} color="rgba(51,51,51,0.6)" />
-        <Text fontSize={12} color="rgba(51,51,51,0.6)">
-          {t("showcase_latest_published")}
-        </Text>
-      </XStack>
-    );
-  }
-
-  if (feedReason === "checked_in") {
-    return (
-      <XStack
-        alignItems="center"
-        gap="$1.5"
-        marginTop="$4"
-        marginBottom="$4"
-        paddingHorizontal="$1"
-      >
-        <CalendarCheck size={14} color="rgba(51,51,51,0.6)" />
-        <Text fontSize={12} color="rgba(51,51,51,0.6)">
-          {t("showcase_feed_checked_in", {
-            userName: userName ?? t("showcase_someone"),
-            practiceTitle: practiceTitle ?? t("showcase_fallback_practice"),
-          })}
-        </Text>
-      </XStack>
-    );
-  }
-
-  if (feedReason === "cheered") {
-    return (
-      <XStack
-        alignItems="center"
-        gap="$1.5"
-        marginTop="$4"
-        marginBottom="$4"
-        paddingHorizontal="$1"
-      >
-        <ThumbsUp size={14} color="rgba(51,51,51,0.6)" />
-        <Text fontSize={12} color="rgba(51,51,51,0.6)">
-          {t("showcase_feed_cheered", { actorName: latestActorName ?? t("showcase_someone") })}
-        </Text>
-      </XStack>
-    );
-  }
-
-  return null;
+  const { Icon, text } = content;
+  return (
+    <XStack alignItems="center" gap="$1.5" marginTop="$4" marginBottom="$4" paddingHorizontal="$1">
+      <Icon size={14} color="rgba(51,51,51,0.6)" />
+      <Text fontSize={12} color="rgba(51,51,51,0.6)">
+        {text}
+      </Text>
+    </XStack>
+  );
 }
