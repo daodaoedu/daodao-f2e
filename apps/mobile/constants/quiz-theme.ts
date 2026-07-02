@@ -26,3 +26,12 @@ export function getQuizThemeMessage(resultType: string | undefined | null): stri
   if (!theme) return null;
   return `${theme.tags[0]}的${theme.title}`;
 }
+
+const WEBSITE_URL = process.env.EXPO_PUBLIC_WEBSITE_URL ?? "https://daodao.so";
+
+/**
+ * 測驗填答流程僅在 apps/website 實作，App 內導去該網址進行測驗
+ */
+export function getQuizUrl(): string {
+  return `${WEBSITE_URL}/quiz`;
+}
