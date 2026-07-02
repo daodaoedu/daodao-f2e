@@ -131,16 +131,28 @@ interface SeasonPageProps {
 
 export function SeasonPage({ challenge, season }: SeasonPageProps) {
   const progress = MOCK_MY_PROGRESS[season.id];
-  const checkins = MOCK_SEASON_CHECKINS[season.id] ?? [];
   const ranking = MOCK_SEASON_RANKING[season.id] ?? [];
   const [joined, setJoined] = useState(progress?.joined ?? false);
   const [todayCheckedIn, setTodayCheckedIn] = useState(progress?.todayCheckedIn ?? false);
+  const [checkins, setCheckins] = useState<SeasonCheckin[]>(MOCK_SEASON_CHECKINS[season.id] ?? []);
 
   // 挑戰打卡沿用主題實踐既有的打卡 sheet，不另做新 UI
   const { openCheckInSheet } = useCheckInSheet({
     taskTitle: challenge.title,
-    onComplete: async () => {
+    onComplete: async (data) => {
       setTodayCheckedIn(true);
+      // 打卡完成後即時出現在打卡牆最上方
+      setCheckins((prev) => [
+        {
+          id: `local-${prev.length + 1}`,
+          userId: "me",
+          displayName: "我",
+          content: data.description || "完成今日打卡！",
+          checkinDate: "今天",
+          streak: (progress?.myStreak ?? 0) + 1,
+        },
+        ...prev,
+      ]);
       toast.success("打卡完成！明天也一起繼續");
     },
   });

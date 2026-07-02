@@ -6,7 +6,7 @@ import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { Link, useRouter } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
-import { CheckCircle2, ChevronRight, Flag, ScrollText } from "lucide-react";
+import { CheckCircle2, ChevronRight, Flag, HeartHandshake, ScrollText } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   AddTaskFAB,
@@ -153,6 +153,19 @@ export default function MyPage() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold text-text-dark">我的挑戰</p>
                 <p className="truncate text-xs text-text-secondary">一群人一起完成</p>
+              </div>
+              <ChevronRight className="size-4 shrink-0 text-text-secondary" />
+            </Link>
+            <Link
+              href="/companion/writing-circle"
+              className="col-span-2 flex items-center gap-2.5 rounded-2xl border border-[#E4EAE9] bg-white p-3.5 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#F3F8E3]">
+                <HeartHandshake className="size-4.5 text-[#7BA428]" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold text-text-dark">我的陪伴計畫</p>
+                <p className="truncate text-xs text-text-secondary">寫作陪伴圈 · 阿島老師陪你走</p>
               </div>
               <ChevronRight className="size-4 shrink-0 text-text-secondary" />
             </Link>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
@@ -42,6 +43,13 @@ export function CompanionProgramPage() {
           {program.visibility === "private" && " · 邀請制"}
         </p>
         <p className="mt-3 text-sm text-text-secondary">{program.description}</p>
+        {/* POC demo 便捷入口：正式版只有計畫發起人看得到 */}
+        <Link
+          href="/dashboard/companion"
+          className="mt-2 inline-block text-xs text-logo-cyan underline underline-offset-2"
+        >
+          我是發起人，前往陪伴儀表板 →
+        </Link>
       </motion.section>
 
       {joined ? (

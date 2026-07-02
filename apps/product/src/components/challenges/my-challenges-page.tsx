@@ -97,6 +97,12 @@ export function MyChallengesPage() {
           </Link>
         );
       })}
+
+      <Link href="/challenges" className="mx-auto">
+        <Button variant="outline" className="rounded-full">
+          探索更多挑戰
+        </Button>
+      </Link>
     </div>
   );
 }
