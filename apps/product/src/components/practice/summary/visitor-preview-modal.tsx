@@ -8,10 +8,17 @@ import { Info, Sparkles, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { ShareCardPreview } from "./sections/share-card-preview";
 
+interface VisitorPreviewCheckIn {
+  day: number;
+  date: string;
+  note: string;
+}
+
 interface VisitorPreviewModalProps {
   summary: PracticeSummary;
   reflectionText: string;
   selectedCheckInIds: string[];
+  selectedCheckIns?: VisitorPreviewCheckIn[];
   themeIndex: number;
   open: boolean;
   onClose: () => void;
@@ -25,14 +32,17 @@ export function VisitorPreviewModal({
   summary,
   reflectionText,
   selectedCheckInIds,
+  selectedCheckIns = [],
   themeIndex,
   open,
   onClose,
 }: VisitorPreviewModalProps) {
   const previewUrl = `app.daodao.so/practices/${summary.practiceId}/showcase`;
-  // TODO: Display actual selected check-ins instead of topNotes when checkin data is available by ID
-  // PracticeSummary 僅提供 topNotes（無對應 id），暫以 topNotes 近似顯示，數量對齊 selectedCheckInIds
-  const featuredNotes = summary.topNotes.slice(0, selectedCheckInIds.length || 3);
+  // 優先使用 Surface 3 選定的實際打卡內容；若無資料則退回 topNotes 近似顯示
+  const featuredNotes: string[] =
+    selectedCheckIns.length > 0
+      ? selectedCheckIns.map((checkIn) => checkIn.note)
+      : summary.topNotes.slice(0, selectedCheckInIds.length || 3);
   const avatarChar = summary.userName.trim().charAt(0) || "島";
 
   return (

@@ -23,8 +23,9 @@ import {
   Undo2,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { usePracticeSummaryImage, useReflection } from "./hooks";
+import { usePracticeSummaryImage } from "./hooks";
 import { CheckinPickerSheet, type PickerCheckIn } from "./sections/checkin-picker-sheet";
+import { ReflectionEditor } from "./sections/reflection-editor";
 import { SHARE_CARD_THEMES, ShareCardPreview } from "./sections/share-card-preview";
 import { VisitorPreviewModal } from "./visitor-preview-modal";
 
@@ -78,7 +79,6 @@ export function Surface3ShareCard({
   onSurfaceChange,
 }: Surface3Props) {
   const { open } = useSheetManager();
-  const { save: saveReflection, isSaving: isSavingReflection } = useReflection(summary.practiceId);
   const { summaryCardRef, isGenerating, downloadImage } = usePracticeSummaryImage({
     practiceName: summary.practiceName,
   });
@@ -109,9 +109,6 @@ export function Surface3ShareCard({
   const featuredCheckIns = allCheckIns
     .filter((checkIn) => selectedCheckInIds.includes(checkIn.id))
     .sort((a, b) => b.day - a.day);
-
-  const [isEditingReflection, setIsEditingReflection] = useState(false);
-  const [reflectionDraft, setReflectionDraft] = useState(reflectionText);
 
   const [isVisitorPreviewOpen, setIsVisitorPreviewOpen] = useState(false);
 
@@ -152,26 +149,6 @@ export function Surface3ShareCard({
       closeOnEscape: true,
       showCloseButton: true,
     });
-  };
-
-  const handleStartEditReflection = () => {
-    setReflectionDraft(reflectionText);
-    setIsEditingReflection(true);
-  };
-
-  const handleCancelEditReflection = () => {
-    setReflectionDraft(reflectionText);
-    setIsEditingReflection(false);
-  };
-
-  const handleSaveReflection = async () => {
-    const trimmed = reflectionDraft.trim();
-    if (!trimmed) return;
-    const success = await saveReflection(trimmed);
-    if (success) {
-      onReflectionChange(trimmed);
-      setIsEditingReflection(false);
-    }
   };
 
   const handleTogglePublic = async () => {
@@ -313,57 +290,14 @@ export function Surface3ShareCard({
       </div>
 
       {/* 反思內聯編輯 */}
-      {/* NOTE: Reflection editing logic is duplicated with sections/reflection-section.tsx
-          Consider extracting a shared ReflectionEditor component */}
       <section className="mt-4 rounded-2xl border border-basic-200 bg-white p-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-text-dark">我的反思</h3>
-          {!isEditingReflection && (
-            <button
-              type="button"
-              onClick={handleStartEditReflection}
-              className="flex items-center gap-1 text-xs text-logo-cyan"
-            >
-              <Pencil className="size-3" />
-              編輯
-            </button>
-          )}
-        </div>
-
-        {isEditingReflection ? (
-          <div className="mt-2.5 space-y-2.5">
-            <textarea
-              value={reflectionDraft}
-              onChange={(event) => setReflectionDraft(event.target.value)}
-              rows={3}
-              placeholder="這段旅程帶給你什麼樣的體會？"
-              className="w-full resize-none rounded-xl border border-basic-200 bg-very-light-gray p-3 text-sm leading-relaxed text-text-dark outline-none focus:border-logo-cyan"
-            />
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleCancelEditReflection}
-                disabled={isSavingReflection}
-              >
-                取消
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleSaveReflection}
-                disabled={isSavingReflection || !reflectionDraft.trim()}
-              >
-                儲存
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <p className="mt-2 text-sm italic leading-relaxed text-text-dark/80">
-            {reflectionText.trim() || "（尚未寫下反思）"}
-          </p>
-        )}
+        <h3 className="text-sm font-semibold text-text-dark">我的反思</h3>
+        <ReflectionEditor
+          compact
+          reflectionText={reflectionText}
+          onReflectionChange={onReflectionChange}
+          practiceId={summary.practiceId}
+        />
       </section>
 
       {/* 下載圖片 */}
@@ -478,6 +412,7 @@ export function Surface3ShareCard({
         summary={summary}
         reflectionText={reflectionText}
         selectedCheckInIds={selectedCheckInIds}
+        selectedCheckIns={featuredCheckIns}
         themeIndex={themeIndex}
         open={isVisitorPreviewOpen}
         onClose={() => setIsVisitorPreviewOpen(false)}
