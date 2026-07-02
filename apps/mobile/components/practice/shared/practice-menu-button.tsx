@@ -1,6 +1,6 @@
 import { BarChart3, Flag, MoreHorizontal, Telescope } from "@tamagui/lucide-icons";
 import { useCallback, useState } from "react";
-import { Linking } from "react-native";
+import { Alert, Linking } from "react-native";
 import { Button, Text, View, XStack, YStack } from "tamagui";
 import { BrowseActivitySheet } from "@/components/practice/detail/BrowseActivitySheet";
 import { colors } from "@/generated/design-tokens";
@@ -41,10 +41,10 @@ export function PracticeMenuButton({ practiceId }: PracticeMenuButtonProps) {
       }
       await mutateFollow();
     } catch {
-      // 忽略錯誤，維持選單關閉即可，不中斷卡片瀏覽
+      Alert.alert(t("error_title"), t("operation_failed"));
     }
     setMenuOpen(false);
-  }, [isFollowing, practiceId, mutateFollow]);
+  }, [isFollowing, practiceId, mutateFollow, t]);
 
   const handleBrowseActivity = useCallback(() => {
     setMenuOpen(false);

@@ -4,7 +4,7 @@
  * - 混合 practice + checkin + activity 卡片，對齊 apps/product 的 useFeed
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
 import { aiApiClient } from "@/services/ai-api-client";
 import type { IReactionCountItem, IShowcasePractice } from "./useShowcaseFeed";
@@ -159,6 +159,35 @@ export function reorderFeedItems(items: FeedItem[], currentUserId?: string | nul
 }
 
 // ============================================================================
+// Dedupe helper
+// ============================================================================
+
+function dedupeFeedItems(pages: IAIFeedResponse[]): FeedItem[] {
+  const seen = new Set<string>();
+  return pages.flatMap((page) =>
+    (page.data ?? []).filter((item) => {
+      const isValid = !!(item?.type && (item.type === "activity" || item.data));
+      if (!isValid) return false;
+
+      let dedupeKey: string;
+      if (item.type === "activity") {
+        dedupeKey = item.event_id
+          ? `activity-${item.event_type}-${item.event_id}`
+          : `activity-${item.activity_type}-${item.event_type ?? "none"}-${item.event_text}`;
+      } else if (item.type === "checkin") {
+        dedupeKey = `checkin-${item.data.id}-${item.feed_reason}`;
+      } else {
+        dedupeKey = `practice-${item.data.id}-${item.feed_reason}`;
+      }
+
+      if (seen.has(dedupeKey)) return false;
+      seen.add(dedupeKey);
+      return true;
+    })
+  );
+}
+
+// ============================================================================
 // Hook
 // ============================================================================
 
@@ -197,31 +226,7 @@ export function useFeed(params: IFeedParams) {
     }
   }, [paramsKey, setSize]);
 
-  const feedItems: FeedItem[] = (() => {
-    if (!data) return [];
-    const seen = new Set<string>();
-    return data.flatMap((page) =>
-      (page.data ?? []).filter((item) => {
-        const isValid = !!(item?.type && (item.type === "activity" || item.data));
-        if (!isValid) return false;
-
-        let dedupeKey: string;
-        if (item.type === "activity") {
-          dedupeKey = item.event_id
-            ? `activity-${item.event_type}-${item.event_id}`
-            : `activity-${item.activity_type}-${item.event_type ?? "none"}-${item.event_text}`;
-        } else if (item.type === "checkin") {
-          dedupeKey = `checkin-${item.data.id}-${item.feed_reason}`;
-        } else {
-          dedupeKey = `practice-${item.data.id}-${item.feed_reason}`;
-        }
-
-        if (seen.has(dedupeKey)) return false;
-        seen.add(dedupeKey);
-        return true;
-      })
-    );
-  })();
+  const feedItems: FeedItem[] = useMemo(() => (data ? dedupeFeedItems(data) : []), [data]);
 
   const hasMore = data ? (data[data.length - 1]?.pagination?.hasNext ?? false) : false;
   const loadMore = () => setSize((currentSize) => currentSize + 1);
