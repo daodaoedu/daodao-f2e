@@ -1,7 +1,7 @@
 "use client";
 
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { PracticeSummary } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { ArrowRight, Heart, Sprout } from "lucide-react";
@@ -19,11 +19,12 @@ interface NextStepCtaProps {
  * @description 分隔線 + 「接下來我想」／「製作分享卡」入口 + ending 溫和提示 + Footer 匯出連結
  */
 export function NextStepCta({ stage, onSurfaceChange, summary }: NextStepCtaProps) {
+  const t = useTranslations("practice");
   const ended = isEnded(stage);
   const hasCheckIns = summary.checkInCount > 0;
 
   const handleExport = () => {
-    toast("匯出功能即將推出，敬請期待！");
+    toast(t("summary_cta_export_coming_soon"));
   };
 
   return (
@@ -31,7 +32,7 @@ export function NextStepCta({ stage, onSurfaceChange, summary }: NextStepCtaProp
       <div className="flex items-center gap-3">
         <hr className="flex-1 border-basic-200" />
         <span className="shrink-0 text-xs text-logo-gray">
-          {ended ? "下一步" : "實踐結束後解鎖"}
+          {ended ? t("summary_cta_next_step") : t("summary_cta_unlock_after_end")}
         </span>
         <hr className="flex-1 border-basic-200" />
       </div>
@@ -49,9 +50,11 @@ export function NextStepCta({ stage, onSurfaceChange, summary }: NextStepCtaProp
           <Sprout className="size-5 text-amber-700" />
         </span>
         <span className="flex-1">
-          <span className="block text-sm font-semibold text-text-dark">接下來想做什麼？</span>
+          <span className="block text-sm font-semibold text-text-dark">
+            {t("summary_cta_what_next")}
+          </span>
           <span className="mt-0.5 block text-xs text-logo-gray">
-            趁著完成的感覺還新鮮，寫下你的下一步方向
+            {t("summary_cta_what_next_desc")}
           </span>
         </span>
         <ArrowRight className="size-4 shrink-0 text-amber-700" />
@@ -66,7 +69,7 @@ export function NextStepCta({ stage, onSurfaceChange, summary }: NextStepCtaProp
           !ended && "pointer-events-none opacity-40"
         )}
       >
-        <span className="text-sm font-medium text-text-dark">也想分享這段實踐嗎？</span>
+        <span className="text-sm font-medium text-text-dark">{t("summary_cta_share_prompt")}</span>
         <ArrowRight className="size-4 shrink-0 text-logo-gray" />
       </button>
 
@@ -74,20 +77,20 @@ export function NextStepCta({ stage, onSurfaceChange, summary }: NextStepCtaProp
         <div className="mt-4 flex items-start gap-2 rounded-xl border border-primary-lighter bg-primary-palest p-4">
           <Heart className="mt-0.5 size-4 shrink-0 text-logo-cyan" />
           <p className="text-xs leading-relaxed text-text-dark/80">
-            這段實踐即將結束，別忘了留下最後幾筆紀錄，讓這趟旅程更完整。
+            {t("summary_cta_ending_hint")}
           </p>
         </div>
       )}
 
       <div className="mt-8 text-center">
-        <p className="text-xs text-logo-gray">這段實踐已經完成，你的學習軌跡會留在島上。</p>
+        <p className="text-xs text-logo-gray">{t("summary_cta_completed_hint")}</p>
         <button
           type="button"
           onClick={handleExport}
           disabled={!hasCheckIns}
           className="mt-2 text-xs text-logo-gray underline underline-offset-2 disabled:opacity-40"
         >
-          匯出實踐紀錄
+          {t("summary_cta_export")}
         </button>
       </div>
     </section>

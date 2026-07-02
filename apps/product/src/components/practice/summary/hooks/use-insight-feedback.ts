@@ -1,5 +1,5 @@
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import { createInsightFeedback } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
 import { useCallback, useState } from "react";
 
@@ -9,6 +9,7 @@ import { useCallback, useState } from "react";
  */
 export function useInsightFeedback(practiceId: string) {
   const [isSaving, setIsSaving] = useState(false);
+  const t = useTranslations("practice");
 
   const save = useCallback(
     async (type: "positive" | "negative", reasons?: string[]): Promise<boolean> => {
@@ -17,7 +18,7 @@ export function useInsightFeedback(practiceId: string) {
         await createInsightFeedback(practiceId, type, reasons);
         return true;
       } catch {
-        toast.error("送出回饋失敗");
+        toast.error(t("summary_insight_feedback_error"));
         return false;
       } finally {
         setIsSaving(false);

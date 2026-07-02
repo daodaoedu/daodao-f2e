@@ -1,7 +1,7 @@
 "use client";
 
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import { type PracticeSummary, updatePractice, usePracticeCheckIns } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -78,6 +78,7 @@ export function Surface3ShareCard({
   onThemeChange,
   onSurfaceChange,
 }: Surface3Props) {
+  const t = useTranslations("practice");
   const { open } = useSheetManager();
   const { summaryCardRef, isGenerating, downloadImage } = usePracticeSummaryImage({
     practiceName: summary.practiceName,
@@ -133,7 +134,7 @@ export function Surface3ShareCard({
 
   const handleOpenPicker = () => {
     const { close } = open({
-      title: "選擇你的打卡精選",
+      title: t("summary_s3_picker_title"),
       content: (
         <CheckinPickerSheet
           checkIns={allCheckIns}
@@ -164,7 +165,7 @@ export function Surface3ShareCard({
         const errorMessage =
           response.error && typeof response.error === "object" && "message" in response.error
             ? String(response.error.message)
-            : "更新公開狀態失敗";
+            : t("summary_s3_update_public_error");
         toast.error(errorMessage);
         return;
       }
@@ -177,7 +178,7 @@ export function Surface3ShareCard({
         linkTimeoutRef.current = setTimeout(() => setLinkReady(true), LINK_GENERATE_DELAY_MS);
       }
     } catch {
-      toast.error("更新公開狀態失敗");
+      toast.error(t("summary_s3_update_public_error"));
     } finally {
       setIsTogglingPublic(false);
     }
@@ -190,7 +191,7 @@ export function Surface3ShareCard({
       if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
       copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_FEEDBACK_MS);
     } catch {
-      toast.error("複製失敗，請手動選取連結文字");
+      toast.error(t("summary_s3_copy_error"));
     }
   };
 
@@ -198,9 +199,9 @@ export function Surface3ShareCard({
     <main className="mx-auto max-w-[448px] px-5 pb-24 pt-8">
       {/* Hero */}
       <section className="rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 px-6 py-7 text-center">
-        <h1 className="text-xl font-bold text-text-dark">製作分享卡</h1>
+        <h1 className="text-xl font-bold text-text-dark">{t("summary_s3_hero_title")}</h1>
         <p className="mx-auto mt-2 max-w-[300px] text-sm leading-relaxed text-logo-gray">
-          調整風格與精選內容，做一張可以分享出去的總結卡。
+          {t("summary_s3_hero_subtitle")}
         </p>
       </section>
 
@@ -212,7 +213,7 @@ export function Surface3ShareCard({
           className="flex items-center gap-1.5 rounded-full border border-basic-200 bg-white px-4 py-2 text-xs font-medium text-text-dark shadow-sm"
         >
           <Eye className="size-3.5 text-logo-cyan" />
-          預覽訪客視角
+          {t("summary_s3_preview_visitor")}
         </button>
       </div>
 
@@ -221,7 +222,7 @@ export function Surface3ShareCard({
         <div className="mb-2 flex items-center justify-between">
           <h2 className="flex items-center gap-1.5 text-[15px] font-semibold text-text-dark">
             <Pencil className="size-[15px] text-logo-cyan" />
-            打卡精選
+            {t("summary_highlights_title")}
           </h2>
           <button
             type="button"
@@ -229,17 +230,17 @@ export function Surface3ShareCard({
             className="flex items-center gap-1 text-xs text-logo-cyan"
           >
             <Pencil className="size-3" />
-            編輯精選
+            {t("summary_s3_edit_highlights")}
           </button>
         </div>
         <p className="mb-3 flex items-start gap-1.5 text-xs text-logo-gray">
           <Info className="mt-0.5 size-3.5 shrink-0 text-basic-300" />
-          系統根據字數最多的反思自動挑選，你可以換成最有意義的 3 則。
+          {t("summary_s3_highlights_hint")}
         </p>
 
         {featuredCheckIns.length === 0 ? (
           <p className="rounded-xl border border-basic-100 bg-white p-4 text-center text-sm text-logo-gray">
-            還沒有精選打卡，點擊「編輯精選」開始選擇。
+            {t("summary_s3_highlights_empty")}
           </p>
         ) : (
           <div className="space-y-2">
@@ -258,14 +259,14 @@ export function Surface3ShareCard({
 
       {/* 背景色選擇器 */}
       <div className="mt-5 flex items-center gap-3">
-        <span className="text-[13px] font-medium text-logo-gray">卡片背景</span>
+        <span className="text-[13px] font-medium text-logo-gray">{t("summary_s3_card_bg")}</span>
         <div className="flex gap-2">
           {THEME_SWATCHES.map((swatch, index) => (
             <button
               key={SHARE_CARD_THEMES[index]?.name ?? index}
               type="button"
               onClick={() => onThemeChange(index)}
-              aria-label={`選擇背景色 ${index + 1}`}
+              aria-label={t("summary_s3_bg_aria_label", { index: index + 1 })}
               className={cn(
                 "size-8 rounded-[10px] transition-shadow",
                 themeIndex === index && "ring-2 ring-logo-cyan ring-offset-2"
@@ -291,7 +292,7 @@ export function Surface3ShareCard({
 
       {/* 反思內聯編輯 */}
       <section className="mt-4 rounded-2xl border border-basic-200 bg-white p-4">
-        <h3 className="text-sm font-semibold text-text-dark">我的反思</h3>
+        <h3 className="text-sm font-semibold text-text-dark">{t("summary_reflection_title")}</h3>
         <ReflectionEditor
           compact
           reflectionText={reflectionText}
@@ -309,7 +310,7 @@ export function Surface3ShareCard({
         disabled={isGenerating}
       >
         <Download className="size-4" />
-        {isGenerating ? "圖片生成中..." : "下載圖片"}
+        {isGenerating ? t("summary_s3_downloading") : t("summary_s3_download")}
       </Button>
 
       {/* 公開此成就頁面 */}
@@ -333,7 +334,7 @@ export function Surface3ShareCard({
                 <Lock className="size-[17px] text-basic-300" />
               )}
             </span>
-            <span className="flex-1 text-sm font-medium text-text-dark">公開此成就頁面</span>
+            <span className="flex-1 text-sm font-medium text-text-dark">{t("summary_s3_publish_page")}</span>
           </button>
           <Switch
             checked={isPublic}
@@ -346,7 +347,7 @@ export function Surface3ShareCard({
           <div className="border-t border-primary-lightest bg-primary-palest px-4 pb-4 pt-3.5">
             <div className="flex items-center gap-2">
               <div className="flex-1 truncate rounded-[10px] border border-primary-lighter bg-white px-3 py-2 font-mono text-xs text-text-dark">
-                {linkReady ? shareUrl : "正在生成連結..."}
+                {linkReady ? shareUrl : t("summary_s3_generating_link")}
               </div>
               <Button
                 type="button"
@@ -358,19 +359,19 @@ export function Surface3ShareCard({
                 {copied ? (
                   <>
                     <Check className="size-3.5" />
-                    已複製
+                    {t("summary_s3_copied")}
                   </>
                 ) : (
                   <>
                     <Copy className="size-3.5" />
-                    複製
+                    {t("summary_s3_copy")}
                   </>
                 )}
               </Button>
             </div>
             <p className="mt-2.5 flex items-start gap-1.5 text-xs leading-relaxed text-logo-gray">
               <Info className="mt-0.5 size-3.5 shrink-0 text-basic-300" />
-              公開時，訪客會看到你的學習軌跡、打卡精選、和我的反思。
+              {t("summary_s3_public_note")}
             </p>
           </div>
         )}
@@ -385,7 +386,7 @@ export function Surface3ShareCard({
           onClick={() => onSurfaceChange(1)}
         >
           <Undo2 className="size-3.5" />
-          回到總結頁
+          {t("summary_nav_back")}
         </Button>
         <Button
           type="button"
@@ -394,7 +395,7 @@ export function Surface3ShareCard({
           onClick={() => onSurfaceChange(2)}
         >
           <ArrowUpRight className="size-3.5" />
-          接下來我想
+          {t("summary_nav_s2_name")}
         </Button>
       </div>
 
@@ -404,7 +405,7 @@ export function Surface3ShareCard({
           className="inline-flex items-center gap-1.5 text-xs text-logo-gray underline underline-offset-2"
         >
           <Home className="size-3.5" />
-          前往主題實踐列表
+          {t("summary_nav_to_practice_list")}
         </CustomLink>
       </div>
 

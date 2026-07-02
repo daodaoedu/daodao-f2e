@@ -1,5 +1,5 @@
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import { updateSelectedCheckins } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
 import { useCallback, useState } from "react";
 
@@ -9,6 +9,7 @@ import { useCallback, useState } from "react";
  */
 export function useSelectedCheckins(practiceId: string) {
   const [isSaving, setIsSaving] = useState(false);
+  const t = useTranslations("practice");
 
   const save = useCallback(
     async (checkinIds: string[]): Promise<boolean> => {
@@ -17,7 +18,7 @@ export function useSelectedCheckins(practiceId: string) {
         await updateSelectedCheckins(practiceId, checkinIds);
         return true;
       } catch {
-        toast.error("儲存選取的打卡紀錄失敗");
+        toast.error(t("summary_picker_save_error"));
         return false;
       } finally {
         setIsSaving(false);

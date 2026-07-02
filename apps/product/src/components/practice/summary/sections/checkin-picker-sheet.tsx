@@ -1,6 +1,6 @@
 "use client";
 
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { Check, RotateCcw } from "lucide-react";
@@ -40,6 +40,7 @@ export function CheckinPickerSheet({
   onConfirm,
   onClose,
 }: CheckinPickerSheetProps) {
+  const t = useTranslations("practice");
   const [selected, setSelected] = useState<string[]>(selectedIds);
 
   const sorted = [...checkIns].sort((a, b) => b.day - a.day);
@@ -63,14 +64,14 @@ export function CheckinPickerSheet({
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between pb-3 text-sm text-logo-gray">
-        <span>最多選 3 則 · {selected.length}/3 已選</span>
+        <span>{t("summary_picker_count", { count: selected.length })}</span>
         <button
           type="button"
           onClick={handleRestoreDefault}
           className="flex items-center gap-1 text-xs text-logo-cyan"
         >
           <RotateCcw className="size-3" />
-          恢復預設
+          {t("summary_picker_restore_default")}
         </button>
       </div>
 
@@ -98,7 +99,9 @@ export function CheckinPickerSheet({
               <span className="flex items-center gap-2 pr-8 text-sm">
                 <span className="font-semibold text-text-dark">Day {checkIn.day}</span>
                 <span className="text-xs text-logo-gray">{checkIn.date}</span>
-                <span className="ml-auto text-[11px] text-basic-300">{checkIn.note.length} 字</span>
+                <span className="ml-auto text-[11px] text-basic-300">
+                  {t("summary_picker_char_unit", { count: checkIn.note.length })}
+                </span>
               </span>
               <p className="mt-1.5 line-clamp-2 pr-8 text-[13px] leading-relaxed text-logo-gray">
                 {checkIn.note}
@@ -108,16 +111,16 @@ export function CheckinPickerSheet({
         })}
 
         {sorted.length === 0 && (
-          <p className="py-8 text-center text-sm text-logo-gray">目前還沒有打卡紀錄</p>
+          <p className="py-8 text-center text-sm text-logo-gray">{t("summary_picker_empty")}</p>
         )}
       </div>
 
       <div className="flex gap-2.5 border-t border-basic-100 pt-3.5">
         <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
-          取消
+          {t("summary_cancel")}
         </Button>
         <Button type="button" className="flex-[2]" onClick={() => onConfirm(selected)}>
-          確認
+          {t("summary_picker_confirm")}
         </Button>
       </div>
     </div>

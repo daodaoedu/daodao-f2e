@@ -1,6 +1,6 @@
 "use client";
 
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Pencil } from "lucide-react";
 import type { ChangeEvent } from "react";
@@ -27,6 +27,7 @@ export function ReflectionEditor({
   practiceId,
   compact = false,
 }: ReflectionEditorProps) {
+  const t = useTranslations("practice");
   const { save, isSaving } = useReflection(practiceId);
 
   const [mode, setMode] = useState<ReflectionMode>(() =>
@@ -74,13 +75,13 @@ export function ReflectionEditor({
         ref={textareaRef}
         value={draft}
         onChange={handleTextareaChange}
-        placeholder="這段旅程帶給你什麼樣的體會？"
+        placeholder={t("summary_reflection_placeholder")}
         rows={3}
         className="w-full resize-none rounded-xl border border-basic-200 bg-very-light-gray p-3 text-sm leading-relaxed text-text-dark outline-none focus:border-logo-cyan"
       />
       <div className="flex justify-end gap-2">
         <Button type="button" variant="ghost" size="sm" onClick={handleCancel} disabled={isSaving}>
-          取消
+          {t("summary_cancel")}
         </Button>
         <Button
           type="button"
@@ -88,7 +89,7 @@ export function ReflectionEditor({
           onClick={() => void handleSave()}
           disabled={isSaving || !draft.trim()}
         >
-          儲存
+          {t("summary_save")}
         </Button>
       </div>
     </div>
@@ -100,7 +101,7 @@ export function ReflectionEditor({
     ) : (
       <div className="mt-2 flex items-start justify-between gap-2">
         <p className="flex-1 text-sm italic leading-relaxed text-text-dark/80">
-          {reflectionText.trim() || "（尚未寫下反思）"}
+          {reflectionText.trim() || t("summary_reflection_no_text")}
         </p>
         <button
           type="button"
@@ -108,7 +109,7 @@ export function ReflectionEditor({
           className="flex shrink-0 items-center gap-1 text-xs text-logo-cyan"
         >
           <Pencil className="size-3" />
-          編輯
+          {t("summary_edit")}
         </button>
       </div>
     );
@@ -116,7 +117,7 @@ export function ReflectionEditor({
 
   return (
     <section className="mt-4 rounded-2xl border border-basic-200 bg-white p-5">
-      <h2 className="text-[15px] font-semibold text-text-dark">我的反思</h2>
+      <h2 className="text-[15px] font-semibold text-text-dark">{t("summary_reflection_title")}</h2>
 
       {mode === "edit" ? (
         editView
@@ -131,12 +132,12 @@ export function ReflectionEditor({
             className="mt-2 flex items-center gap-1 text-xs text-logo-cyan"
           >
             <Pencil className="size-3.5" />
-            編輯
+            {t("summary_edit")}
           </button>
         </div>
       ) : (
         <div className="mt-3">
-          <p className="text-sm text-logo-gray">趁著記憶還新鮮，寫下這段旅程給你的感受吧。</p>
+          <p className="text-sm text-logo-gray">{t("summary_reflection_prompt")}</p>
           <Button
             type="button"
             variant="outline"
@@ -144,7 +145,7 @@ export function ReflectionEditor({
             className="mt-3"
             onClick={handleStartEdit}
           >
-            寫下我的反思
+            {t("summary_reflection_write_cta")}
           </Button>
         </div>
       )}

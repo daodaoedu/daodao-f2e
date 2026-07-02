@@ -1,7 +1,7 @@
 "use client";
 
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { PracticeSummary } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { Heart, Lightbulb, Sprout, Star, ThumbsDown, ThumbsUp } from "lucide-react";
 import type { ComponentType } from "react";
@@ -14,18 +14,22 @@ interface AiInsightCardProps {
   stage: PracticeStage;
 }
 
-interface InsightSectionMeta {
-  icon: ComponentType<{ className?: string }>;
-  title: string;
-}
-
-const SECTION_META: InsightSectionMeta[] = [
-  { icon: Lightbulb, title: "核心突破" },
-  { icon: Sprout, title: "你的節奏" },
-  { icon: Star, title: "值得深挖的洞見" },
+const SECTION_META_KEYS: string[] = [
+  "summary_insight_section_1",
+  "summary_insight_section_2",
+  "summary_insight_section_3",
 ];
 
+const SECTION_ICONS: ComponentType<{ className?: string }>[] = [Lightbulb, Sprout, Star];
+
+/** 送 API 儲存的原始值（作為識別碼）→ 顯示用 i18n key */
 const NEGATIVE_REASONS = ["不是我的感受", "語氣不對", "太籠統", "建議不好"];
+const NEGATIVE_REASON_KEYS: Record<string, string> = {
+  不是我的感受: "summary_insight_reason_not_feeling",
+  語氣不對: "summary_insight_reason_wrong_tone",
+  太籠統: "summary_insight_reason_too_vague",
+  建議不好: "summary_insight_reason_bad_suggestion",
+};
 
 /** 將 AI 洞察文字拆成最多 3 段，若原始文字沒有明顯分段則整段顯示 */
 function splitInsight(insight: string): string[] {
@@ -47,6 +51,7 @@ type FeedbackState = "idle" | "positive" | "negative-panel";
  * @description 依 isInsightUnlocked() 顯示已解鎖的三段洞察，或鎖定狀態的模糊預覽 + 浮動說明卡
  */
 export function AiInsightCard({ summary, stage }: AiInsightCardProps) {
+  const t = useTranslations("practice");
   const unlocked = isInsightUnlocked(summary);
   const { save } = useInsightFeedback(summary.practiceId);
 
@@ -97,17 +102,21 @@ export function AiInsightCard({ summary, stage }: AiInsightCardProps) {
             {stage === "ended-low" ? (
               <>
                 <Heart className="mx-auto size-6 text-logo-cyan" />
-                <p className="mt-2 text-sm font-semibold text-text-dark">給你的鼓勵</p>
+                <p className="mt-2 text-sm font-semibold text-text-dark">
+                  {t("summary_insight_encouragement_title")}
+                </p>
                 <p className="mt-1 text-xs text-logo-gray">
-                  {summary.encouragementText || "每一步都算數，謝謝你走完這段旅程。"}
+                  {summary.encouragementText || t("summary_insight_encouragement_default")}
                 </p>
               </>
             ) : (
               <>
                 <Sprout className="mx-auto size-6 text-logo-cyan" />
-                <p className="mt-2 text-sm font-semibold text-text-dark">洞察累積中</p>
+                <p className="mt-2 text-sm font-semibold text-text-dark">
+                  {t("summary_insight_locked_title")}
+                </p>
                 <p className="mt-1 text-xs text-logo-gray">
-                  持續打卡並寫下你的想法，AI 會在實踐結束後為你整理專屬洞察。
+                  {t("summary_insight_locked_desc")}
                 </p>
               </>
             )}
@@ -122,19 +131,18 @@ export function AiInsightCard({ summary, stage }: AiInsightCardProps) {
   return (
     <section className="mt-4 rounded-2xl border border-basic-200 p-5">
       {paragraphs.map((text, index) => {
-        const meta: InsightSectionMeta =
-          SECTION_META[index] ?? (SECTION_META[SECTION_META.length - 1] as InsightSectionMeta);
-        const Icon = meta.icon;
+        const titleKey = SECTION_META_KEYS[index] ?? SECTION_META_KEYS[SECTION_META_KEYS.length - 1]!;
+        const Icon = SECTION_ICONS[index] ?? SECTION_ICONS[SECTION_ICONS.length - 1]!;
         const isLast = index === paragraphs.length - 1;
 
         return (
           <div
-            key={meta.title}
+            key={titleKey}
             className={cn("py-3 first:pt-0 last:pb-0", !isLast && "border-b border-basic-100")}
           >
             <div className="flex items-center gap-1.5">
               <Icon className="size-4 text-logo-cyan" />
-              <h3 className="text-sm font-semibold text-text-dark">{meta.title}</h3>
+              <h3 className="text-sm font-semibold text-text-dark">{t(titleKey as any)}</h3>
             </div>
             <p className="mt-1.5 text-sm leading-relaxed text-text-dark/80">{text}</p>
           </div>
@@ -142,7 +150,9 @@ export function AiInsightCard({ summary, stage }: AiInsightCardProps) {
       })}
 
       <div className="mt-3 border-t border-basic-100 pt-3">
-        {feedbackState === "positive" && <p className="text-xs text-logo-gray">謝謝你的回饋 ✓</p>}
+        {feedbackState === "positive" && (
+          <p className="text-xs text-logo-gray">{t("summary_insight_feedback_thanks")}</p>
+        )}
 
         {feedbackState === "negative-panel" && (
           <div>
@@ -159,26 +169,26 @@ export function AiInsightCard({ summary, stage }: AiInsightCardProps) {
                       : "border-basic-200 text-logo-gray"
                   )}
                 >
-                  {reason}
+                  {t(NEGATIVE_REASON_KEYS[reason] as any)}
                 </button>
               ))}
             </div>
             {selectedReasons.length > 0 && (
-              <p className="mt-2 text-xs text-logo-gray">謝謝你的回饋 ✓</p>
+              <p className="mt-2 text-xs text-logo-gray">{t("summary_insight_feedback_thanks")}</p>
             )}
           </div>
         )}
 
         {feedbackState === "idle" && (
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-xs text-logo-gray">這段洞察貼近你的感受嗎？</span>
+            <span className="text-xs text-logo-gray">{t("summary_insight_feedback_prompt")}</span>
             <button
               type="button"
               onClick={handlePositive}
               className="flex items-center gap-1 rounded-full border border-basic-200 px-3 py-1 text-xs text-text-dark transition-colors hover:border-logo-cyan"
             >
               <ThumbsUp className="size-3.5" />
-              貼近
+              {t("summary_insight_feedback_positive")}
             </button>
             <button
               type="button"
@@ -186,7 +196,7 @@ export function AiInsightCard({ summary, stage }: AiInsightCardProps) {
               className="flex items-center gap-1 rounded-full border border-basic-200 px-3 py-1 text-xs text-text-dark transition-colors hover:border-logo-cyan"
             >
               <ThumbsDown className="size-3.5" />
-              不太好
+              {t("summary_insight_feedback_negative")}
             </button>
           </div>
         )}

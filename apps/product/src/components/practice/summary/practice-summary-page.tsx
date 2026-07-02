@@ -1,7 +1,7 @@
 "use client";
 
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { PracticeSummary } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { X } from "lucide-react";
@@ -24,6 +24,7 @@ interface PracticeSummaryPageProps {
  */
 export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
   const router = useRouter();
+  const t = useTranslations("practice");
   const stage = getPracticeStage(summary);
   const ended = isEnded(stage);
 
@@ -42,7 +43,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
 
   const handleSurfaceChange = (surface: 1 | 2 | 3) => {
     if (!ended && surface !== 1) {
-      toast.error("實踐結束後才能使用此功能");
+      toast.error(t("summary_nav_locked_toast"));
       return;
     }
     setCurrentSurface(surface);
@@ -79,7 +80,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
           <button
             type="button"
             onClick={handleClose}
-            aria-label="離開實踐總結頁"
+            aria-label={t("summary_close_aria_label")}
             className="fixed right-4 top-4 z-40 flex size-9 items-center justify-center rounded-full bg-white text-logo-gray shadow-sm"
           >
             <X className="size-4" />

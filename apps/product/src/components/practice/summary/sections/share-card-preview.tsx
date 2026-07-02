@@ -1,8 +1,8 @@
 "use client";
 
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { PracticeSummary } from "@daodao/api";
 import { TitleSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { format, isValid, parse } from "date-fns";
 import { Link2 } from "lucide-react";
 import { forwardRef } from "react";
@@ -80,9 +80,10 @@ function getDurationDays(startDate: string, endDate: string): number | null {
  */
 export const ShareCardPreview = forwardRef<HTMLDivElement, ShareCardPreviewProps>(
   ({ summary, reflectionText, themeIndex }, ref) => {
+    const t = useTranslations("practice");
     const theme = SHARE_CARD_THEMES[themeIndex] ?? DEFAULT_SHARE_CARD_THEME;
     const durationDays = getDurationDays(summary.startDate, summary.endDate);
-    const displayReflection = reflectionText.trim() || "（尚未寫下反思）";
+    const displayReflection = reflectionText.trim() || t("summary_reflection_no_text");
 
     return (
       <div
@@ -124,7 +125,7 @@ export const ShareCardPreview = forwardRef<HTMLDivElement, ShareCardPreviewProps
                 className="rounded-full px-3 py-0.5 text-xs font-medium"
                 style={{ color: theme.accent, background: theme.boxBg }}
               >
-                {durationDays} 天
+                {t("summary_card_duration", { days: durationDays })}
               </span>
             )}
           </div>
@@ -135,7 +136,7 @@ export const ShareCardPreview = forwardRef<HTMLDivElement, ShareCardPreviewProps
           {summary.practiceDescription && (
             <div className="mb-4.5">
               <p className="mb-1 text-xs" style={{ color: theme.accent }}>
-                實踐行動
+                {t("summary_card_practice_action")}
               </p>
               <p className="text-sm leading-relaxed">{summary.practiceDescription}</p>
             </div>
@@ -144,7 +145,7 @@ export const ShareCardPreview = forwardRef<HTMLDivElement, ShareCardPreviewProps
           {/* 我的反思 */}
           <div className="mb-5 rounded-xl px-4 py-3.5" style={{ background: theme.boxBg }}>
             <p className="mb-1 text-xs font-medium" style={{ color: theme.accent }}>
-              我的反思
+              {t("summary_reflection_title")}
             </p>
             <p className="text-sm italic leading-relaxed">{displayReflection}</p>
           </div>

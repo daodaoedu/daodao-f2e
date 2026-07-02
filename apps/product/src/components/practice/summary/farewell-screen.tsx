@@ -1,6 +1,6 @@
 "use client";
 
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Home } from "lucide-react";
 import { motion } from "motion/react";
@@ -12,22 +12,22 @@ interface FarewellScreenProps {
   onNavigateToList: () => void;
 }
 
-const FAREWELL_COPY: Record<FarewellVariant, { title: string; subtitle: string }> = {
+const FAREWELL_COPY: Record<FarewellVariant, { titleKey: string; subtitleKey: string }> = {
   completed: {
-    title: "這段實踐已經完成",
-    subtitle: "你的學習軌跡會留在島上",
+    titleKey: "summary_farewell_completed_title",
+    subtitleKey: "summary_farewell_completed_subtitle",
   },
   "draft-saved": {
-    title: "已幫你存好了",
-    subtitle: "你的草稿正在島上等你",
+    titleKey: "summary_farewell_draft_saved_title",
+    subtitleKey: "summary_farewell_draft_saved_subtitle",
   },
   "direction-saved": {
-    title: "你的方向已經記下",
-    subtitle: "你知道下一步要往哪裡走",
+    titleKey: "summary_farewell_direction_saved_title",
+    subtitleKey: "summary_farewell_direction_saved_subtitle",
   },
   "draft-waiting": {
-    title: "你的草稿正在島上等你",
-    subtitle: "隨時回來繼續",
+    titleKey: "summary_farewell_draft_waiting_title",
+    subtitleKey: "summary_farewell_draft_waiting_subtitle",
   },
 };
 
@@ -36,6 +36,7 @@ const FAREWELL_COPY: Record<FarewellVariant, { title: string; subtitle: string }
  * @description 使用者點擊離開（X 按鈕）後顯示的全螢幕告別畫面，依當次操作結果顯示對應文案（FRD FR-3.10.3）
  */
 export function FarewellScreen({ variant, onNavigateToList }: FarewellScreenProps) {
+  const t = useTranslations("practice");
   const copy = FAREWELL_COPY[variant];
 
   return (
@@ -52,7 +53,7 @@ export function FarewellScreen({ variant, onNavigateToList }: FarewellScreenProp
         transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
         className="flex size-16 items-center justify-center rounded-full bg-primary-lightest text-2xl font-bold text-text-dark"
       >
-        島
+        {t("summary_mascot_label")}
       </motion.div>
 
       <motion.h1
@@ -61,7 +62,7 @@ export function FarewellScreen({ variant, onNavigateToList }: FarewellScreenProp
         transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
         className="mt-6 text-2xl font-bold text-text-dark"
       >
-        {copy.title}
+        {t(copy.titleKey as any)}
       </motion.h1>
 
       <motion.p
@@ -70,7 +71,7 @@ export function FarewellScreen({ variant, onNavigateToList }: FarewellScreenProp
         transition={{ duration: 0.6, delay: 0.45, ease: "easeOut" }}
         className="mt-2 text-sm text-logo-gray"
       >
-        {copy.subtitle}
+        {t(copy.subtitleKey as any)}
       </motion.p>
 
       <motion.div
@@ -81,7 +82,7 @@ export function FarewellScreen({ variant, onNavigateToList }: FarewellScreenProp
       >
         <Button type="button" variant="outline" className="gap-1.5" onClick={onNavigateToList}>
           <Home className="size-3.5" />
-          前往主題實踐列表
+          {t("summary_nav_to_practice_list")}
         </Button>
       </motion.div>
     </motion.div>

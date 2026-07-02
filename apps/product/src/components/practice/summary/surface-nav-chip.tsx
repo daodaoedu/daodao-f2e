@@ -1,6 +1,6 @@
 "use client";
 
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
+import { useTranslations } from "@daodao/i18n";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,8 +22,6 @@ interface SurfaceNavChipProps {
 
 interface SurfaceOption {
   surface: 1 | 2 | 3;
-  name: string;
-  description: string;
   icon: ComponentType<{ className?: string }>;
   chipClassName: string;
 }
@@ -34,8 +32,6 @@ interface SurfaceOption {
  */
 const DEFAULT_SURFACE_OPTION: SurfaceOption = {
   surface: 1,
-  name: "實踐總結",
-  description: "回顧這段旅程的足跡與心情",
   icon: FileText,
   chipClassName: "bg-light-cyan text-logo-cyan",
 };
@@ -44,15 +40,11 @@ const SURFACE_OPTIONS: SurfaceOption[] = [
   DEFAULT_SURFACE_OPTION,
   {
     surface: 2,
-    name: "接下來我想",
-    description: "寫下反思，設定下一步意圖",
     icon: Sprout,
     chipClassName: "bg-logo-yellow/25 text-[#8a6d00]",
   },
   {
     surface: 3,
-    name: "製作分享卡",
-    description: "挑選精彩片段做成分享卡",
     icon: Image,
     chipClassName: "bg-emerald-100 text-emerald-700",
   },
@@ -63,6 +55,20 @@ const SURFACE_OPTIONS: SurfaceOption[] = [
  * @description 顯示目前所在的 surface，點擊展開下拉選單切換；Surface 2/3 在未結束前呈現灰階並禁止切換
  */
 export function SurfaceNavChip({ currentSurface, stage, onSurfaceChange }: SurfaceNavChipProps) {
+  const t = useTranslations("practice");
+
+  const surfaceNames: Record<1 | 2 | 3, string> = {
+    1: t("summary_nav_s1_name"),
+    2: t("summary_nav_s2_name"),
+    3: t("summary_nav_s3_name"),
+  };
+
+  const surfaceDescs: Record<1 | 2 | 3, string> = {
+    1: t("summary_nav_s1_desc"),
+    2: t("summary_nav_s2_desc"),
+    3: t("summary_nav_s3_desc"),
+  };
+
   const ended = isEnded(stage);
   const current =
     SURFACE_OPTIONS.find((option) => option.surface === currentSurface) ?? DEFAULT_SURFACE_OPTION;
@@ -70,7 +76,7 @@ export function SurfaceNavChip({ currentSurface, stage, onSurfaceChange }: Surfa
 
   const handleSelect = (surface: 1 | 2 | 3) => {
     if (surface !== 1 && !ended) {
-      toast.error("實踐結束後才能使用此功能");
+      toast.error(t("summary_nav_locked_toast"));
       return;
     }
     onSurfaceChange(surface);
@@ -88,7 +94,7 @@ export function SurfaceNavChip({ currentSurface, stage, onSurfaceChange }: Surfa
             )}
           >
             <CurrentIcon className="size-4" />
-            <span>{current.name}</span>
+            <span>{surfaceNames[current.surface]}</span>
             <ChevronDown className="size-4" />
           </button>
         </DropdownMenuTrigger>
@@ -117,10 +123,14 @@ export function SurfaceNavChip({ currentSurface, stage, onSurfaceChange }: Surfa
                 </span>
                 <span className="flex-1 text-left">
                   <span className="flex items-center gap-1.5">
-                    <span className="text-sm font-medium text-text-dark">{option.name}</span>
+                    <span className="text-sm font-medium text-text-dark">
+                      {surfaceNames[option.surface]}
+                    </span>
                     {isCurrent && <Check className="size-3.5 text-logo-cyan" />}
                   </span>
-                  <span className="block text-xs text-text-dark/60">{option.description}</span>
+                  <span className="block text-xs text-text-dark/60">
+                    {surfaceDescs[option.surface]}
+                  </span>
                 </span>
               </DropdownMenuItem>
             );

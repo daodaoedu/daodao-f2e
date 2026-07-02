@@ -1,6 +1,5 @@
 "use client";
 
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { MoodType, PracticeSummary } from "@daodao/api";
 import {
   BoredSvg,
@@ -10,6 +9,7 @@ import {
   HopelessSvg,
   NeutralSvg,
 } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
 import { cn } from "@daodao/ui/lib/utils";
 import { motion } from "motion/react";
@@ -30,22 +30,22 @@ const MOOD_ICONS: Record<MoodType, typeof HappySvg> = {
   give_up: HopelessSvg,
 };
 
-/** 心情類型對應的中文標籤（供 aria-label 使用） */
-const MOOD_LABELS: Record<MoodType, string> = {
-  happy: "開心",
-  good: "不錯",
-  neutral: "普通",
-  bored: "無聊",
-  frustrated: "挫折",
-  give_up: "想放棄",
+/** 心情類型對應的 i18n key（供 aria-label 使用） */
+const MOOD_LABEL_KEYS: Record<MoodType, string> = {
+  happy: "summary_hero_mood_happy",
+  good: "summary_hero_mood_good",
+  neutral: "summary_hero_mood_neutral",
+  bored: "summary_hero_mood_bored",
+  frustrated: "summary_hero_mood_frustrated",
+  give_up: "summary_hero_mood_give_up",
 };
 
-/** 各 stage 對應的 Badge 文字與樣式 */
-const BADGE_CONFIG: Record<PracticeStage, { text: string; className: string }> = {
-  active: { text: "進行中", className: "bg-amber-100 text-amber-800" },
-  ending: { text: "進行中", className: "bg-amber-100 text-amber-800" },
-  "ended-deep": { text: "實踐完成", className: "bg-primary-lightest text-text-dark" },
-  "ended-low": { text: "走完這段旅程", className: "bg-primary-lightest text-text-dark" },
+/** 各 stage 對應的 Badge i18n key 與樣式 */
+const BADGE_CONFIG: Record<PracticeStage, { textKey: string; className: string }> = {
+  active: { textKey: "summary_hero_badge_active", className: "bg-amber-100 text-amber-800" },
+  ending: { textKey: "summary_hero_badge_active", className: "bg-amber-100 text-amber-800" },
+  "ended-deep": { textKey: "summary_hero_badge_ended_deep", className: "bg-primary-lightest text-text-dark" },
+  "ended-low": { textKey: "summary_hero_badge_ended_low", className: "bg-primary-lightest text-text-dark" },
 };
 
 /** 泡泡圓的大小與底色（由外到內遞減） */
@@ -56,29 +56,29 @@ const BUBBLE_STYLES = [
   "bg-white border border-basic-200",
 ];
 
-function getHeroTitle(stage: PracticeStage, practiceName: string): string {
+function getHeroTitleKey(stage: PracticeStage): string | null {
   switch (stage) {
     case "ended-deep":
-      return "恭喜完成這段實踐";
+      return "summary_hero_title_ended_deep";
     case "ended-low":
-      return "你走完了這段旅程";
+      return "summary_hero_title_ended_low";
     default:
-      return practiceName;
+      return null;
   }
 }
 
-function getHeroSubtitle(stage: PracticeStage): string {
+function getHeroSubtitleKey(stage: PracticeStage): string | null {
   switch (stage) {
     case "active":
-      return "持續累積中，每一次打卡都是足跡";
+      return "summary_hero_subtitle_active";
     case "ending":
-      return "只剩最後幾天，別忘了留下紀錄";
+      return "summary_hero_subtitle_ending";
     case "ended-deep":
-      return "這是你這趟旅程留下的足跡";
+      return "summary_hero_subtitle_ended_deep";
     case "ended-low":
-      return "走過的路都算數，謝謝你的堅持";
+      return "summary_hero_subtitle_ended_low";
     default:
-      return "";
+      return null;
   }
 }
 
@@ -103,9 +103,12 @@ const itemVariants = {
  * @description 顯示放射狀背景裝飾、吉祥物頭像、stage badge、標題副標與成長足跡統計
  */
 export function HeroSection({ summary, stage }: HeroSectionProps) {
+  const t = useTranslations("practice");
   const badge = BADGE_CONFIG[stage];
-  const title = getHeroTitle(stage, summary.practiceName);
-  const subtitle = getHeroSubtitle(stage);
+  const titleKey = getHeroTitleKey(stage);
+  const title = titleKey ? t(titleKey as any) : summary.practiceName;
+  const subtitleKey = getHeroSubtitleKey(stage);
+  const subtitle = subtitleKey ? t(subtitleKey as any) : "";
   const bubbleNotes = summary.topNotes.slice(0, 3);
 
   return (
@@ -149,7 +152,7 @@ export function HeroSection({ summary, stage }: HeroSectionProps) {
 
       {/* 吉祥物頭像 */}
       <div className="absolute right-0 top-6 flex size-12 items-center justify-center rounded-full bg-primary-lightest text-lg font-bold text-text-dark">
-        島
+        {t("summary_mascot_label")}
       </div>
 
       <motion.div className="relative" variants={containerVariants} initial="hidden" animate="show">
@@ -160,7 +163,7 @@ export function HeroSection({ summary, stage }: HeroSectionProps) {
             badge.className
           )}
         >
-          {badge.text}
+          {t(badge.textKey as any)}
         </motion.span>
 
         <motion.h1 variants={itemVariants} className="mt-3 text-2xl font-bold text-text-dark">
@@ -180,7 +183,9 @@ export function HeroSection({ summary, stage }: HeroSectionProps) {
             <div className="shrink-0">
               <p className="text-[28px] font-bold leading-none text-text-dark">
                 {summary.checkInCount}
-                <span className="ml-1 text-sm font-medium text-logo-gray">次</span>
+                <span className="ml-1 text-sm font-medium text-logo-gray">
+                  {t("summary_hero_checkin_unit")}
+                </span>
               </p>
             </div>
 
@@ -204,7 +209,7 @@ export function HeroSection({ summary, stage }: HeroSectionProps) {
 
           {summary.topMoods.length > 0 && (
             <div className="mt-4 flex items-center gap-2 border-t border-basic-200/60 pt-3">
-              <span className="text-[11px] text-logo-gray">過程心情</span>
+              <span className="text-[11px] text-logo-gray">{t("summary_hero_moods_label")}</span>
               <div className="flex items-center gap-1.5">
                 {summary.topMoods.map((moodStat) => {
                   const MoodIcon = MOOD_ICONS[moodStat.mood];
@@ -213,7 +218,7 @@ export function HeroSection({ summary, stage }: HeroSectionProps) {
                     <MoodIcon
                       key={moodStat.mood}
                       className="size-6"
-                      aria-label={MOOD_LABELS[moodStat.mood]}
+                      aria-label={t(MOOD_LABEL_KEYS[moodStat.mood] as any)}
                     />
                   );
                 })}

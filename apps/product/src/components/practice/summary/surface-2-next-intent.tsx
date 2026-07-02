@@ -1,7 +1,7 @@
 "use client";
 
-// TODO: Replace hardcoded strings with useTranslations("practice") when i18n keys are added
 import type { PracticeSummary } from "@daodao/api";
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Checkbox } from "@daodao/ui/components/checkbox";
 import { cn } from "@daodao/ui/lib/utils";
@@ -24,6 +24,7 @@ type NextIntentMode = "preview" | "edit" | "saved";
  * @description 米黃色 hero + AI 洞察折疊參考 + 「接下來我想」黃色漸層卡（preview/edit/saved）+ 底部導航
  */
 export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: Surface2Props) {
+  const t = useTranslations("practice");
   const unlocked = isInsightUnlocked(summary);
   const { save, isSaving } = useNextIntent(summary.practiceId);
 
@@ -78,9 +79,9 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
         <div className="mx-auto flex size-[52px] items-center justify-center rounded-2xl bg-white/70">
           <Sprout className="size-7 text-amber-700" />
         </div>
-        <h1 className="mt-4 text-xl font-bold text-text-dark">為下一段實踐留下方向</h1>
+        <h1 className="mt-4 text-xl font-bold text-text-dark">{t("summary_s2_hero_title")}</h1>
         <p className="mx-auto mt-2 max-w-[300px] text-sm leading-relaxed text-logo-gray">
-          趁這份完成感還新鮮，寫下你想嘗試的方向。不用完整，一句話也可以。
+          {t("summary_s2_hero_subtitle")}
         </p>
       </section>
 
@@ -96,9 +97,11 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
               <Lightbulb className="size-4 text-logo-cyan" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-sm font-medium text-text-dark">AI 洞察可作參考</span>
+              <span className="block text-sm font-medium text-text-dark">
+                {t("summary_s2_insight_title")}
+              </span>
               <span className="mt-0.5 block text-xs text-logo-gray">
-                這段實踐的觀察，點開可參考
+                {t("summary_s2_insight_desc")}
               </span>
             </span>
             <ChevronDown
@@ -123,9 +126,11 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
           </span>
           <span>
             <span className="block text-[13px] font-medium text-logo-gray">
-              這次沒有 AI 洞察可參考
+              {t("summary_s2_insight_unavailable")}
             </span>
-            <span className="mt-0.5 block text-xs text-logo-gray/70">直接寫下你想做什麼也很好</span>
+            <span className="mt-0.5 block text-xs text-logo-gray/70">
+              {t("summary_s2_insight_unavailable_hint")}
+            </span>
           </span>
         </section>
       )}
@@ -136,7 +141,7 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
           <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-white shadow-sm">
             <Sprout className="size-[18px] text-logo-cyan" />
           </span>
-          <span className="text-[15px] font-semibold text-text-dark">接下來我想</span>
+          <span className="text-[15px] font-semibold text-text-dark">{t("summary_s2_card_title")}</span>
           {mode === "saved" && (
             <button
               type="button"
@@ -144,7 +149,7 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
               className="ml-auto flex items-center gap-1 text-xs text-logo-gray"
             >
               <Pencil className="size-3" />
-              編輯
+              {t("summary_edit")}
             </button>
           )}
         </div>
@@ -152,7 +157,7 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
         {mode === "preview" && (
           <div className="mt-3">
             <p className="text-sm leading-relaxed text-logo-gray">
-              趁這份完成感還新鮮，為自己寫下一個方向。不用完整，一句話也可以。
+              {t("summary_s2_card_prompt")}
             </p>
             <Button
               type="button"
@@ -162,7 +167,7 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
               onClick={handleStartEdit}
             >
               <Pencil className="size-3.5" />
-              寫下接下來我想做的
+              {t("summary_s2_card_write_cta")}
             </Button>
           </div>
         )}
@@ -173,7 +178,7 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
               ref={textareaRef}
               value={draft}
               onChange={handleTextareaChange}
-              placeholder="可以參考上面的 AI 洞察，或回顧你的打卡⋯⋯"
+              placeholder={t("summary_s2_card_placeholder")}
               rows={3}
               className="w-full resize-none rounded-xl border border-amber-200 bg-white p-3 text-sm leading-relaxed text-text-dark outline-none focus:border-logo-cyan"
             />
@@ -186,7 +191,7 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
                 checked={saveDraft}
                 onCheckedChange={(checked) => setSaveDraft(checked === true)}
               />
-              存成草稿，之後再設定
+              {t("summary_s2_save_draft_label")}
             </label>
             <div className="flex gap-2">
               <Button
@@ -196,7 +201,7 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
                 onClick={handleCancel}
                 disabled={isSaving}
               >
-                取消
+                {t("summary_cancel")}
               </Button>
               <Button
                 type="button"
@@ -204,7 +209,7 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
                 onClick={handleSave}
                 disabled={isSaving || !draft.trim()}
               >
-                儲存
+                {t("summary_save")}
               </Button>
             </div>
           </div>
@@ -218,12 +223,12 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
               </blockquote>
               <div className="mt-3.5 flex items-center gap-1.5 border-t border-dashed border-amber-200 pt-3">
                 <Check className="size-[15px] text-logo-cyan" />
-                <span className="text-xs text-logo-gray">已記下 ✓</span>
+                <span className="text-xs text-logo-gray">{t("summary_s2_saved_check")}</span>
               </div>
             </div>
             {justSavedDraft && (
               <p className="mt-2 text-center text-xs text-logo-gray">
-                已存成草稿，之後可以在草稿列表找到它
+                {t("summary_s2_draft_saved_hint")}
               </p>
             )}
           </div>
@@ -239,7 +244,7 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
           onClick={() => onSurfaceChange(1)}
         >
           <Undo2 className="size-3.5" />
-          回到總結頁
+          {t("summary_nav_back")}
         </Button>
         <Button
           type="button"
@@ -248,7 +253,7 @@ export function Surface2NextIntent({ summary, onSurfaceChange, onIntentSaved }: 
           onClick={() => onSurfaceChange(3)}
         >
           <ArrowUpRight className="size-3.5" />
-          製作分享卡
+          {t("summary_nav_s3_name")}
         </Button>
       </div>
     </main>
