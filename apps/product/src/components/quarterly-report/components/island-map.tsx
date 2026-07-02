@@ -62,6 +62,7 @@ export function IslandMap({ userName, friends }: IslandMapProps) {
 }
 
 function ringPosition(cx: number, cy: number, radius: number, index: number, total: number) {
+  if (total === 0) return { x: cx, y: cy };
   const angle = (2 * Math.PI * index) / total - Math.PI / 2;
   return { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
 }

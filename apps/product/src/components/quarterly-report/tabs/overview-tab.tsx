@@ -11,7 +11,7 @@ interface OverviewTabProps {
 }
 
 export function OverviewTab({ data }: OverviewTabProps) {
-  const maxActiveDays = Math.max(...data.months.map((m) => m.activeDays));
+  const maxActiveDays = Math.max(...data.months.map((m) => m.activeDays), 0);
 
   return (
     <div className="space-y-6">
@@ -33,7 +33,7 @@ export function OverviewTab({ data }: OverviewTabProps) {
                 <motion.div
                   className="h-full rounded-full bg-[#16B9B3]"
                   initial={{ width: 0 }}
-                  animate={{ width: `${(month.activeDays / maxActiveDays) * 100}%` }}
+                  animate={{ width: `${maxActiveDays > 0 ? (month.activeDays / maxActiveDays) * 100 : 0}%` }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                 />
               </div>
@@ -51,7 +51,7 @@ export function OverviewTab({ data }: OverviewTabProps) {
               <div className="size-1.5 shrink-0 rounded-full bg-[#16B9B3]" />
               <span className="truncate text-sm text-[#2D3436]">{m.title}</span>
               <span className="ml-auto shrink-0 text-xs text-[#8A9BA0]">
-                {new Date(m.date).toLocaleDateString("zh-TW", { month: "numeric", day: "numeric" })}
+                {new Date(m.date).toLocaleDateString("zh-TW", { month: "numeric", day: "numeric", timeZone: "UTC" })}
               </span>
             </div>
           ))}

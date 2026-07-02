@@ -35,5 +35,6 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
-  return `${d.getMonth() + 1}/${d.getDate()}`;
+  if (Number.isNaN(d.getTime())) return dateStr;
+  return `${d.getUTCMonth() + 1}/${d.getUTCDate()}`;
 }

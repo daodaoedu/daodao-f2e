@@ -17,7 +17,8 @@ function CountUp({ target }: { target: number }) {
   useEffect(() => {
     const controls = animate(count, target, { duration: 1.2, ease: "easeOut" });
     return controls.stop;
-  }, [count, target]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target]);
 
   return <motion.span>{rounded}</motion.span>;
 }
