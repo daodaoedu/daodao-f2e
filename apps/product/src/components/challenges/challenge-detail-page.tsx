@@ -8,9 +8,9 @@ import { Separator } from "@daodao/ui/components/separator";
 import { toast } from "@daodao/ui/components/sonner";
 import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { Medal, Pencil, Users } from "lucide-react";
-import { useState } from "react";
 import { CategoryIconTile, getCategoryStyle } from "./category-icon";
 import { CATEGORY_LABELS, MOCK_MY_HISTORY } from "./mock-data";
+import { pocChallengeActions, usePocChallengeStore } from "./poc-store";
 import type { Challenge, ChallengeSeason } from "./types";
 
 function formatDateRange(season: ChallengeSeason): string {
@@ -24,6 +24,8 @@ function ActiveSeasonCard({
   challenge: Challenge;
   season: ChallengeSeason;
 }) {
+  const store = usePocChallengeStore();
+  const joined = store.seasons[season.id]?.joined ?? false;
   const start = parseISO(season.startDate);
   const end = parseISO(season.endDate);
   const totalDays = Math.max(1, differenceInCalendarDays(end, start));
@@ -59,14 +61,26 @@ function ActiveSeasonCard({
         </span>
       </div>
       <Link href={`/challenges/${challenge.id}/seasons/${season.id}`}>
-        <Button className="mt-4 w-full rounded-full">加入本期</Button>
+        <Button
+          className="mt-4 w-full rounded-full"
+          variant={joined ? "outline" : "default"}
+          onClick={() => {
+            if (!joined) {
+              pocChallengeActions.joinSeason(season.id);
+              toast.success("已加入挑戰！已為你建立對應的主題實踐");
+            }
+          }}
+        >
+          {joined ? "已加入，前往打卡" : "加入本期"}
+        </Button>
       </Link>
     </section>
   );
 }
 
 function UpcomingSeasonCard({ season }: { season: ChallengeSeason }) {
-  const [registered, setRegistered] = useState(false);
+  const store = usePocChallengeStore();
+  const registered = store.seasons[season.id]?.registered ?? false;
 
   return (
     <section className="rounded-2xl border border-dashed border-[#E4EAE9] bg-[#F8FBFB] p-4">
@@ -83,7 +97,7 @@ function UpcomingSeasonCard({ season }: { season: ChallengeSeason }) {
         className="mt-3 w-full rounded-full"
         disabled={registered}
         onClick={() => {
-          setRegistered(true);
+          pocChallengeActions.registerSeason(season.id);
           toast.success("已預先報名，開始時會通知你");
         }}
       >

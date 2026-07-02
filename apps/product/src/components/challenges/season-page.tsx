@@ -25,7 +25,8 @@ import {
 import { ColorAvatar } from "@/components/poc-shared/color-avatar";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
-import { MOCK_MY_PROGRESS, MOCK_SEASON_CHECKINS, MOCK_SEASON_RANKING } from "./mock-data";
+import { MOCK_SEASON_CHECKINS, MOCK_SEASON_RANKING } from "./mock-data";
+import { pocChallengeActions, usePocChallengeStore } from "./poc-store";
 import type { Challenge, ChallengeSeason, SeasonCheckin, SeasonRankingEntry } from "./types";
 
 /** 前三名的獎牌配色（金/銀/銅） */
@@ -139,29 +140,25 @@ interface SeasonPageProps {
 }
 
 export function SeasonPage({ challenge, season }: SeasonPageProps) {
-  const progress = MOCK_MY_PROGRESS[season.id];
+  const store = usePocChallengeStore();
+  const my = store.seasons[season.id] ?? {
+    joined: false,
+    registered: false,
+    todayCheckedIn: false,
+    myCheckinCount: 0,
+    myStreak: 0,
+    myRank: null,
+    localCheckins: [],
+  };
   const ranking = MOCK_SEASON_RANKING[season.id] ?? [];
-  const [joined, setJoined] = useState(progress?.joined ?? false);
-  const [todayCheckedIn, setTodayCheckedIn] = useState(progress?.todayCheckedIn ?? false);
-  const [checkins, setCheckins] = useState<SeasonCheckin[]>(MOCK_SEASON_CHECKINS[season.id] ?? []);
+  // 打卡牆 = 自己新增的打卡（store）+ mock 既有打卡
+  const checkins = [...my.localCheckins, ...(MOCK_SEASON_CHECKINS[season.id] ?? [])];
 
   // 挑戰打卡沿用主題實踐既有的打卡 sheet，不另做新 UI
   const { openCheckInSheet } = useCheckInSheet({
     taskTitle: challenge.title,
     onComplete: async (data) => {
-      setTodayCheckedIn(true);
-      // 打卡完成後即時出現在打卡牆最上方
-      setCheckins((prev) => [
-        {
-          id: `local-${prev.length + 1}`,
-          userId: "me",
-          displayName: "我",
-          content: data.description || "完成今日打卡！",
-          checkinDate: "今天",
-          streak: (progress?.myStreak ?? 0) + 1,
-        },
-        ...prev,
-      ]);
+      pocChallengeActions.checkIn(season.id, data.description);
       toast.success("打卡完成！明天也一起繼續");
     },
   });
@@ -198,7 +195,7 @@ export function SeasonPage({ challenge, season }: SeasonPageProps) {
         </div>
       </section>
 
-      {joined ? (
+      {my.joined ? (
         <section className="rounded-2xl border border-[#E4EAE9] bg-white p-4">
           {/* 加入挑戰時自動建立的同名主題實踐（打卡記錄都掛在它底下） */}
           <Link
@@ -216,10 +213,10 @@ export function SeasonPage({ challenge, season }: SeasonPageProps) {
           )}
           <Button
             className="mt-3 w-full rounded-full"
-            disabled={todayCheckedIn}
+            disabled={my.todayCheckedIn}
             onClick={openCheckInSheet}
           >
-            {todayCheckedIn ? (
+            {my.todayCheckedIn ? (
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="size-4" />
                 今日已打卡
@@ -231,14 +228,12 @@ export function SeasonPage({ challenge, season }: SeasonPageProps) {
               </span>
             )}
           </Button>
-          {progress && (
-            <p className="mt-3 flex items-center justify-center gap-1 text-sm text-text-secondary">
-              我的進度：
-              <Flame className="size-3.5 text-[#FFA10B]" />
-              連續 {progress.myStreak} 天 · 共 {progress.myCheckinCount} 次
-              {progress.myRank !== null && ` · 排名 #${progress.myRank}`}
-            </p>
-          )}
+          <p className="mt-3 flex items-center justify-center gap-1 text-sm text-text-secondary">
+            我的進度：
+            <Flame className="size-3.5 text-[#FFA10B]" />
+            連續 {my.myStreak} 天 · 共 {my.myCheckinCount} 次
+            {my.myRank !== null && ` · 排名 #${my.myRank}`}
+          </p>
         </section>
       ) : (
         <section className="rounded-2xl border border-[#E4EAE9] bg-white p-4 text-center">
@@ -246,7 +241,7 @@ export function SeasonPage({ challenge, season }: SeasonPageProps) {
           <Button
             className="mt-3 w-full rounded-full"
             onClick={() => {
-              setJoined(true);
+              pocChallengeActions.joinSeason(season.id);
               toast.success("已加入挑戰！已為你建立對應的主題實踐");
             }}
           >

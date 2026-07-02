@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@daodao/i18n/navigation";
+import { Link, useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import {
@@ -28,6 +28,7 @@ import { Clock, Users } from "lucide-react";
 import { Fragment, useState } from "react";
 import { CategoryIconTile, getCategoryStyle } from "./category-icon";
 import { CATEGORY_LABELS, MOCK_CHALLENGES } from "./mock-data";
+import { pocChallengeActions, usePocChallengeStore } from "./poc-store";
 import type { Challenge, ChallengeSeason } from "./types";
 
 function daysLeft(endDate: string): number {
@@ -41,6 +42,8 @@ interface ChallengeWithSeason {
 
 /** 進行中的挑戰：橫向滑動的大卡（Carousel） */
 function ActiveChallengeCarousel({ items }: { items: ChallengeWithSeason[] }) {
+  const router = useRouter();
+  const store = usePocChallengeStore();
   if (items.length === 0) return null;
 
   return (
@@ -85,8 +88,17 @@ function ActiveChallengeCarousel({ items }: { items: ChallengeWithSeason[] }) {
                         <Clock className="size-3.5" />剩 {daysLeft(season.endDate)} 天
                       </span>
                     </span>
-                    <Button size="sm" className="rounded-full">
-                      加入本期
+                    <Button
+                      size="sm"
+                      variant={store.seasons[season.id]?.joined ? "outline" : "default"}
+                      className="rounded-full"
+                      onClick={(e) => {
+                        // 直接前往本期頁（外層卡片連到主題頁）
+                        e.preventDefault();
+                        router.push(`/challenges/${challenge.id}/seasons/${season.id}`);
+                      }}
+                    >
+                      {store.seasons[season.id]?.joined ? "前往打卡" : "加入本期"}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -101,6 +113,7 @@ function ActiveChallengeCarousel({ items }: { items: ChallengeWithSeason[] }) {
 
 /** 即將開始的挑戰：Item 列表 + 預先報名 */
 function UpcomingChallengeList({ items }: { items: ChallengeWithSeason[] }) {
+  const store = usePocChallengeStore();
   if (items.length === 0) return null;
 
   return (
@@ -128,12 +141,14 @@ function UpcomingChallengeList({ items }: { items: ChallengeWithSeason[] }) {
                   size="sm"
                   variant="outline"
                   className="rounded-full"
+                  disabled={store.seasons[season.id]?.registered ?? false}
                   onClick={(e) => {
                     e.preventDefault();
+                    pocChallengeActions.registerSeason(season.id);
                     toast.success("已預先報名，開始時會通知你");
                   }}
                 >
-                  預先報名
+                  {store.seasons[season.id]?.registered ? "已報名 ✓" : "預先報名"}
                 </Button>
               </ItemActions>
             </Link>

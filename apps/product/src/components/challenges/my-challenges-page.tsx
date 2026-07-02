@@ -8,18 +8,24 @@ import { Progress } from "@daodao/ui/components/progress";
 import { differenceInCalendarDays, parseISO } from "date-fns";
 import { CheckCircle2, ChevronRight, Flame } from "lucide-react";
 import { CategoryIconTile } from "./category-icon";
-import { getChallengeById, MOCK_MY_PROGRESS } from "./mock-data";
+import { MOCK_CHALLENGES } from "./mock-data";
+import { usePocChallengeStore } from "./poc-store";
 
 /** 我的挑戰：我加入的所有挑戰進度總覽（對應 FRD /me/challenges） */
 export function MyChallengesPage() {
-  const myChallenges = Object.values(MOCK_MY_PROGRESS)
-    .map((progress) => {
-      const challenge = getChallengeById(progress.challengeId);
-      const season = challenge?.seasons.find((s) => s.id === progress.seasonId);
-      if (!challenge || !season) return null;
-      return { progress, challenge, season };
-    })
-    .filter((item) => item !== null);
+  const store = usePocChallengeStore();
+  // 從共用 mock store 取出所有已加入的期數（跨頁一致）
+  const myChallenges = MOCK_CHALLENGES.flatMap((challenge) =>
+    challenge.seasons
+      .map((season) => ({ challenge, season, progress: store.seasons[season.id] }))
+      .filter(({ progress }) => progress?.joined)
+      .map(({ challenge: c, season, progress }) => ({
+        challenge: c,
+        season,
+        // biome-ignore lint/style/noNonNullAssertion: filter 已保證存在
+        progress: progress!,
+      }))
+  );
 
   if (myChallenges.length === 0) {
     return (
@@ -49,7 +55,7 @@ export function MyChallengesPage() {
 
         return (
           <Link
-            key={progress.seasonId}
+            key={season.id}
             href={`/challenges/${challenge.id}/seasons/${season.id}`}
             className="rounded-2xl border border-[#E4EAE9] bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
           >
