@@ -5,6 +5,7 @@ import {
   BookOpen,
   ChevronRight,
   Footprints,
+  Globe,
   HeartHandshake,
   LibraryBig,
   LogOut,
@@ -19,8 +20,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Card, ScrollView, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useSettingsCompletion } from "@/hooks/useSettingsCompletion";
-import { useMobileTranslation } from "@/i18n";
+import { type MobileLocale, useMobileI18n, useMobileTranslation } from "@/i18n";
 import { useAuth } from "@/providers/AuthProvider";
+
+const LANGUAGE_OPTIONS: { value: MobileLocale; label: string }[] = [
+  { value: "zh-TW", label: "中文" },
+  { value: "en", label: "English" },
+];
 
 interface ISettingItem {
   icon: typeof Settings;
@@ -98,6 +104,8 @@ export default function SettingsTab() {
   const { signOut } = useAuth();
   const t = useMobileTranslation("mobile.settings");
   const { data: settingsCompletion } = useSettingsCompletion();
+  const { locale, setLocale } = useMobileI18n();
+  const nextLanguage = LANGUAGE_OPTIONS.find((option) => option.value !== locale);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -195,6 +203,43 @@ export default function SettingsTab() {
                 </Card>
               </YStack>
             ))}
+
+            {/* 語系切換 */}
+            {nextLanguage && (
+              <Card
+                backgroundColor="$background"
+                borderRadius="$md"
+                borderWidth={1}
+                borderColor="$borderColor"
+                overflow="hidden"
+              >
+                <XStack
+                  padding="$4"
+                  alignItems="center"
+                  gap="$3"
+                  pressStyle={{ backgroundColor: "$backgroundHover" }}
+                  onPress={() => setLocale(nextLanguage.value)}
+                >
+                  <YStack
+                    width={36}
+                    height={36}
+                    backgroundColor={colors.basic[100]}
+                    borderRadius={18}
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Globe size={18} color={colors.primary.base} />
+                  </YStack>
+                  <Text fontSize={15} color="$color" flex={1}>
+                    {t("language")}
+                  </Text>
+                  <Text fontSize={14} color="$color" opacity={0.5}>
+                    {nextLanguage.label}
+                  </Text>
+                  <ChevronRight size={18} color="$color" opacity={0.4} />
+                </XStack>
+              </Card>
+            )}
 
             {/* 登出 */}
             <Card

@@ -5617,8 +5617,10 @@
     "notifications_connect_accepted_toast": "你同意了 {name} 的連結請求，你們現在可以有更多互動了！",
     "notifications_connect_ignored_toast": "已忽略 {name} 的連結請求",
     "settings_interaction": "互動設定",
+    "settings_footprints": "我的足跡",
     "settings_following": "關注設定",
     "settings_connections": "連結的夥伴",
+    "settings_resources": "學習資源",
     "settings_preferences": "領域偏好設定",
     "settings_account": "帳號設定",
     "settings_public_info": "公開資訊設定",
@@ -6869,6 +6871,7 @@
     },
     "settings": {
       "title": "設定",
+      "language": "語言切換",
       "groups": {
         "social": "社交",
         "settings": "設定"
