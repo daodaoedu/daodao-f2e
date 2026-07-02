@@ -1,34 +1,45 @@
 import { CheckCircle2, MessageSquare } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { RefreshControl, ScrollView, StyleSheet } from "react-native";
+import { FlatList, RefreshControl, View as RNView, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, YStack } from "tamagui";
 import {
   BrewingCard,
   DashboardHeader,
   type IShowcaseFilterState,
-  ShowcaseCard,
   ShowcaseSearchBar,
   TabSwitcher,
   type TabType,
 } from "@/components/home";
 import { ResonanceCarousel } from "@/components/persona/ResonanceCarousel";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
+import { ActivityCard } from "@/components/showcase/ActivityCard";
+import { CheckInShowcaseCard } from "@/components/showcase/CheckInShowcaseCard";
+import { FeedLabel } from "@/components/showcase/FeedLabel";
+import { PracticeShowcaseCard } from "@/components/showcase/PracticeShowcaseCard";
 import { PracticeTasksSection } from "@/components/showcase/PracticeTasksSection";
-import { ShowcaseFeed } from "@/components/showcase/ShowcaseFeed";
 import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { type FeedItem, type IFeedParams, reorderFeedItems, useFeed } from "@/hooks/useFeed";
 import { usePractices } from "@/hooks/usePractices";
-import {
-  type IShowcaseFeedParams,
-  type IShowcasePractice,
-  useShowcaseFeed,
-} from "@/hooks/useShowcaseFeed";
 import { useMobileTranslation } from "@/i18n";
 
+function feedItemKey(item: FeedItem, index: number): string {
+  if (item.type === "activity") {
+    return item.event_id
+      ? `activity-${item.event_type}-${item.event_id}`
+      : `activity-${item.activity_type}-${index}`;
+  }
+  if (item.type === "checkin") {
+    return `checkin-${item.data.id}-${item.feed_reason}`;
+  }
+  return `practice-${item.data.id}-${item.feed_reason}`;
+}
+
 export default function HomeScreen() {
-  const _router = useRouter();
+  const router = useRouter();
   const t = useMobileTranslation("mobile.home");
   const [activeTab, setActiveTab] = useState<TabType>("inspire");
 
@@ -39,26 +50,28 @@ export default function HomeScreen() {
     tags: [],
   });
 
-  const feedParams: IShowcaseFeedParams = useMemo(
+  const feedParams: IFeedParams = useMemo(
     () => ({
       keyword: keyword || undefined,
       tags: filters.tags.length > 0 ? filters.tags : undefined,
-      duration_min: filters.durationMin,
-      duration_max: filters.durationMax,
-      status: filters.status,
-      sort_by: "newest_updated",
     }),
     [keyword, filters]
   );
 
+  const { user: currentUser } = useCurrentUser();
   const {
-    practices,
+    feedItems,
     isLoading: isShowcaseLoading,
     hasMore,
     loadMore,
     isValidating,
     mutate: mutateShowcase,
-  } = useShowcaseFeed(feedParams);
+  } = useFeed(feedParams);
+
+  const orderedFeedItems = useMemo(
+    () => reorderFeedItems(feedItems, currentUser?.id),
+    [feedItems, currentUser?.id]
+  );
 
   const handleSearch = useCallback((value: string) => {
     setKeyword(value);
@@ -136,10 +149,72 @@ export default function HomeScreen() {
   );
 
   // ── Inspire tab render ──
-  const renderShowcaseItem = useCallback(
-    ({ item }: { item: IShowcasePractice }) =>
-      item.is_brewing ? <BrewingCard practice={item} /> : <ShowcaseCard practice={item} />,
-    []
+  const renderFeedItem = useCallback(
+    ({ item, index }: { item: FeedItem; index: number }) => {
+      if (item.type === "activity") {
+        const canOpenActivity = !!item.practice_id && !!item.checkin_id;
+        return (
+          <ActivityCard
+            eventText={item.event_text}
+            label={item.label}
+            onPress={
+              canOpenActivity
+                ? () => router.push(`/practices/${item.practice_id}/check-ins/${item.checkin_id}`)
+                : undefined
+            }
+          />
+        );
+      }
+
+      const isNewRelease = item.feed_reason === "new_release";
+      const prevItem = index > 0 ? orderedFeedItems[index - 1] : undefined;
+      const prevFeedReason =
+        prevItem && prevItem.type !== "activity" ? prevItem.feed_reason : undefined;
+      const showFeedLabel = !isNewRelease || prevFeedReason !== "new_release";
+
+      if (item.type === "checkin") {
+        const checkin = item.data;
+        const latestActorName = checkin.reactions?.find((r) => r.latestActorName)?.latestActorName;
+        return (
+          <YStack>
+            {showFeedLabel && (
+              <FeedLabel
+                feedReason={item.feed_reason}
+                userName={checkin.user?.name}
+                practiceTitle={checkin.practice?.title}
+                latestActorName={latestActorName}
+              />
+            )}
+            <CheckInShowcaseCard {...checkin} />
+          </YStack>
+        );
+      }
+
+      const practice = item.data;
+      const latestActorName = practice.reactions?.find((r) => r.latestActorName)?.latestActorName;
+      return (
+        <YStack>
+          {showFeedLabel && (
+            <FeedLabel
+              feedReason={item.feed_reason}
+              userName={practice.user?.name}
+              latestActorName={latestActorName}
+            />
+          )}
+          {practice.is_brewing ? (
+            <BrewingCard practice={practice} />
+          ) : (
+            <PracticeShowcaseCard
+              practice={practice}
+              onReactionUpdated={() => {
+                mutateShowcase();
+              }}
+            />
+          )}
+        </YStack>
+      );
+    },
+    [orderedFeedItems, mutateShowcase, router]
   );
 
   const renderShowcaseHeader = useCallback(
@@ -160,19 +235,64 @@ export default function HomeScreen() {
     [activeTab, searchValue, handleSearch]
   );
 
+  const renderFeedFooter = useCallback(
+    () =>
+      isValidating ? (
+        <Text textAlign="center" paddingVertical="$4" color="rgba(0,0,0,0.5)" fontSize={14}>
+          {t("loading")}
+        </Text>
+      ) : null,
+    [isValidating, t]
+  );
+
+  const renderFeedEmpty = useCallback(
+    () =>
+      !isShowcaseLoading ? (
+        <YStack alignItems="center" paddingVertical="$8">
+          <Text color="rgba(0,0,0,0.5)" fontSize={14}>
+            {t("empty_showcase")}
+          </Text>
+        </YStack>
+      ) : null,
+    [isShowcaseLoading, t]
+  );
+
   // ── Main render ──
   if (activeTab === "inspire") {
+    if (isShowcaseLoading && orderedFeedItems.length === 0) {
+      return (
+        <SafeAreaView style={styles.container} edges={["top"]}>
+          {renderShowcaseHeader()}
+          <YStack paddingHorizontal="$4" gap="$3">
+            {[1, 2, 3].map((i) => (
+              <RNView key={i} style={styles.skeleton} />
+            ))}
+          </YStack>
+        </SafeAreaView>
+      );
+    }
+
     return (
       <SafeAreaView style={styles.container} edges={["top"]}>
-        <ShowcaseFeed
-          practices={practices}
-          isLoading={isShowcaseLoading}
-          isValidating={isValidating}
-          hasMore={hasMore}
-          loadMore={loadMore}
-          onRefresh={mutateShowcase}
-          renderItem={renderShowcaseItem}
-          renderHeader={renderShowcaseHeader}
+        <FlatList
+          data={orderedFeedItems}
+          keyExtractor={feedItemKey}
+          renderItem={renderFeedItem}
+          ListHeaderComponent={renderShowcaseHeader}
+          ListFooterComponent={renderFeedFooter}
+          ListEmptyComponent={renderFeedEmpty}
+          contentContainerStyle={styles.feedContent}
+          onEndReached={() => {
+            if (hasMore && !isValidating) loadMore();
+          }}
+          onEndReachedThreshold={0.3}
+          refreshControl={
+            <RefreshControl
+              refreshing={isValidating}
+              onRefresh={() => mutateShowcase()}
+              tintColor={colors.primary.base}
+            />
+          }
         />
       </SafeAreaView>
     );
@@ -224,4 +344,13 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
+  feedContent: { paddingHorizontal: 16, gap: 12, paddingBottom: 100 },
+  skeleton: {
+    backgroundColor: "white",
+    borderRadius: 16,
+    height: 192,
+    borderWidth: 1,
+    borderColor: "#E8F8FF",
+    opacity: 0.6,
+  },
 });

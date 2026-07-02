@@ -5617,8 +5617,10 @@
     "notifications_connect_accepted_toast": "You accepted {name}'s connection request. You can now interact more.",
     "notifications_connect_ignored_toast": "Ignored {name}'s connection request",
     "settings_interaction": "Interaction Settings",
+    "settings_footprints": "My Footprints",
     "settings_following": "Following Settings",
     "settings_connections": "Connected Partners",
+    "settings_resources": "Learning Resources",
     "settings_preferences": "Field Preferences",
     "settings_account": "Account Settings",
     "settings_public_info": "Public Profile Settings",
@@ -6869,6 +6871,7 @@
     },
     "settings": {
       "title": "Settings",
+      "language": "Language",
       "groups": {
         "social": "Social",
         "settings": "Settings"

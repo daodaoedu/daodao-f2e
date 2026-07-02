@@ -6,7 +6,7 @@
  * 與後端 API client 不同，後者用於調用外部後端服務（NEXT_PUBLIC_API_URL）
  */
 
-import { getRequiredEnv } from "@daodao/config";
+import { getEnv, getRequiredEnv } from "@daodao/config";
 
 // ============================================================================
 // Base Client
@@ -14,9 +14,14 @@ import { getRequiredEnv } from "@daodao/config";
 
 /**
  * 取得 API 基礎 URL
- * Server-side 需要完整 URL，Client-side 使用相對路徑
+ * Server-side（含 React Native，沒有頁面可解析相對路徑）需要完整 URL，Web Client-side 使用相對路徑
  */
 const getApiBaseUrl = (): string => {
+  const isReactNative = typeof navigator !== "undefined" && navigator.product === "ReactNative";
+  if (isReactNative) {
+    // React Native 沒有 NEXT_PUBLIC_APP_URL 建置流程，允許 fallback 到正式站網址
+    return getEnv("NEXT_PUBLIC_APP_URL", "https://app.daodao.so") ?? "https://app.daodao.so";
+  }
   if (typeof window === "undefined") {
     // Server-side: 需要完整的 URL
     return getRequiredEnv("NEXT_PUBLIC_APP_URL");

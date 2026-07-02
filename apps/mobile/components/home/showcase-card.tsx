@@ -1,10 +1,12 @@
-import { MessageCircle, MoreHorizontal } from "@tamagui/lucide-icons";
+import { MessageCircle } from "@tamagui/lucide-icons";
 import { type Href, useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
 import { Image, Pressable, StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
+import { PracticeMenuButton } from "@/components/practice/shared/practice-menu-button";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
+import { PracticeCommentPreview } from "@/components/showcase/practice-comment-preview";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
@@ -23,8 +25,6 @@ interface ShowcaseCardProps {
   onReactionTap?: () => void;
   /** 反應 mutation 成功後觸發，用於刷新 feed cache */
   onReactionUpdated?: () => void | Promise<void>;
-  /** 三點選單 callback */
-  onMenuPress?: () => void;
 }
 
 function formatDate(dateStr?: string | null): string | null {
@@ -40,7 +40,6 @@ export function ShowcaseCard({
   onReactionToggle: externalOnReactionToggle,
   onReactionTap,
   onReactionUpdated,
-  onMenuPress,
 }: ShowcaseCardProps) {
   const router = useRouter();
   const t = useMobileTranslation("mobile.home");
@@ -126,9 +125,7 @@ export function ShowcaseCard({
             {startFmt} ▶ {endFmt}
           </Text>
         )}
-        <Pressable hitSlop={8} onPress={onMenuPress}>
-          <MoreHorizontal size={16} color="#9CA3AF" />
-        </Pressable>
+        <PracticeMenuButton practiceId={id} />
       </XStack>
 
       {/* Title */}
@@ -211,6 +208,9 @@ export function ShowcaseCard({
           )}
         </XStack>
       </View>
+
+      {/* Comment preview: 最新 2 則留言 */}
+      <PracticeCommentPreview practiceId={id} />
     </Pressable>
   );
 }

@@ -11,6 +11,8 @@ import {
   Archive,
   BadgeCheck,
   Bell,
+  BookOpen,
+  Footprints,
   Globe,
   HeartHandshake,
   LibraryBig,
@@ -32,6 +34,12 @@ type SettingsItem = {
 
 const socialItems: SettingsItem[] = [
   {
+    id: "footprints",
+    labelKey: "settings_footprints",
+    icon: Footprints,
+    href: "/me/footprints",
+  },
+  {
     id: "interaction",
     labelKey: "settings_interaction",
     icon: MessagesSquare,
@@ -52,6 +60,12 @@ const socialItems: SettingsItem[] = [
 ];
 
 const settingsItems: SettingsItem[] = [
+  {
+    id: "resources",
+    labelKey: "settings_resources",
+    icon: BookOpen,
+    href: "/resource",
+  },
   {
     id: "preferences",
     labelKey: "settings_preferences",

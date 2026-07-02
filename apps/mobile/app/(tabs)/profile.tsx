@@ -11,6 +11,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import {
   Animated,
   FlatList,
+  Linking,
   Pressable,
   RefreshControl,
   View as RNView,
@@ -23,7 +24,7 @@ import activeShaper1Json from "@/assets/animations/active-shaper-1.json";
 import { CompletedCard, DashboardHeader, FilterPills, InProgressCard } from "@/components/home";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import { UserInfoCard } from "@/components/user";
-import { getQuizThemeMessage } from "@/constants/quiz-theme";
+import { getQuizThemeMessage, getQuizUrl } from "@/constants/quiz-theme";
 import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -115,17 +116,16 @@ export default function ProfileScreen() {
   );
 
   // ── Handlers ──
-  const handleRetakeQuiz = useCallback(() => {
-    router.push("/quiz/learning-type");
-  }, [router]);
-
-  const handleViewDetails = useCallback(() => {
-    if (resultType) {
-      router.push("/quiz/learning-type/result");
-    } else {
-      router.push("/quiz/learning-type");
+  // 測驗填答流程僅在 apps/website 實作，App 內導去該網址進行測驗
+  const handleOpenQuiz = useCallback(async () => {
+    const url = getQuizUrl();
+    try {
+      // https 是所有裝置皆支援的標準協議，canOpenURL 在部分裝置設定下對 https 可能誤判為 false，故直接開啟並用 try/catch 處理例外
+      await Linking.openURL(url);
+    } catch (error) {
+      console.error("Failed to open quiz URL:", error);
     }
-  }, [router, resultType]);
+  }, []);
 
   const handleRefresh = useCallback(() => {
     mutateUser();
@@ -189,7 +189,7 @@ export default function ProfileScreen() {
               {t("learning_type")}
             </Text>
             {!isEmptyResult && (
-              <Pressable onPress={handleRetakeQuiz}>
+              <Pressable onPress={handleOpenQuiz}>
                 <XStack alignItems="center" gap="$1">
                   <RefreshCw size={16} color={colors.text.muted} />
                   <Text fontSize={12} color={colors.text.dark}>
@@ -209,7 +209,7 @@ export default function ProfileScreen() {
             borderRadius="$md"
             height={44}
             pressStyle={{ opacity: 0.8 }}
-            onPress={handleViewDetails}
+            onPress={handleOpenQuiz}
           >
             <XStack alignItems="center" gap="$1">
               <Text color={colors.text.light} fontWeight="500">
