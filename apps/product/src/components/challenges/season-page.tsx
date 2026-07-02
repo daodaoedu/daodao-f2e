@@ -1,11 +1,20 @@
 "use client";
 
+import { Link } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Progress } from "@daodao/ui/components/progress";
 import { toast } from "@daodao/ui/components/sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
 import { differenceInCalendarDays, parseISO } from "date-fns";
-import { CheckCircle2, Flame, MessageCircle, Pencil, Users } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronRight,
+  Flame,
+  MessageCircle,
+  Pencil,
+  Sprout,
+  Users,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import {
@@ -191,6 +200,15 @@ export function SeasonPage({ challenge, season }: SeasonPageProps) {
 
       {joined ? (
         <section className="rounded-2xl border border-[#E4EAE9] bg-white p-4">
+          {/* 加入挑戰時自動建立的同名主題實踐（打卡記錄都掛在它底下） */}
+          <Link
+            href="/mine"
+            className="mb-3 flex items-center gap-2 rounded-lg bg-primary-palest px-3 py-2 text-xs text-text-dark"
+          >
+            <Sprout className="size-3.5 shrink-0 text-logo-cyan" />
+            <span className="min-w-0 truncate">已連結主題實踐：《{challenge.title}》</span>
+            <ChevronRight className="ml-auto size-3.5 shrink-0 text-text-secondary" />
+          </Link>
           {challenge.checkinPrompt && (
             <p className="text-sm text-text-secondary">
               今日打卡提示：「{challenge.checkinPrompt}」
