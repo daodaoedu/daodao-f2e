@@ -1,11 +1,13 @@
 "use client";
 
+import { Link } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { differenceInCalendarDays, parseISO } from "date-fns";
-import { Link } from "@daodao/i18n/navigation";
+import { Clock, Layers, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { CategoryIconTile } from "./category-icon";
 import { CATEGORY_LABELS, MOCK_CHALLENGES } from "./mock-data";
 import type { Challenge, ChallengeSeason } from "./types";
 
@@ -34,9 +36,11 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
         className="flex flex-col gap-3 rounded-2xl border border-[#E4EAE9] bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
       >
         <div className="flex items-start gap-3">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-palest text-2xl">
-            {challenge.coverEmoji}
-          </div>
+          <CategoryIconTile
+            category={challenge.category}
+            className="size-12"
+            iconClassName="size-6"
+          />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h3 className="truncate text-base font-bold text-text-dark">{challenge.title}</h3>
@@ -50,9 +54,18 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
 
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-3 text-text-secondary">
-            <span>👥 {isUpcoming ? `${season.memberCount} 人已報名` : `${season.memberCount} 人`}</span>
-            <span>📚 第 {season.seasonNumber} 期</span>
-            {!isUpcoming && <span>⏰ 剩 {daysLeft(season.endDate)} 天</span>}
+            <span className="flex items-center gap-1">
+              <Users className="size-3.5" />
+              {isUpcoming ? `${season.memberCount} 人已報名` : `${season.memberCount} 人`}
+            </span>
+            <span className="flex items-center gap-1">
+              <Layers className="size-3.5" />第 {season.seasonNumber} 期
+            </span>
+            {!isUpcoming && (
+              <span className="flex items-center gap-1">
+                <Clock className="size-3.5" />剩 {daysLeft(season.endDate)} 天
+              </span>
+            )}
           </div>
           <Button size="sm" variant={isUpcoming ? "outline" : "default"} className="rounded-full">
             {isUpcoming ? "預先報名" : "加入本期"}

@@ -2,8 +2,10 @@
 
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
+import { CheckCircle2, Flame, Heart, PenLine } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { ColorAvatar } from "@/components/poc-shared/color-avatar";
 import { MOCK_PROGRAM, MOCK_RECENT_CHECKINS } from "./mock-data";
 
 /** 陪伴計畫・夥伴（學員）視角頁 */
@@ -20,8 +22,8 @@ export function CompanionProgramPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-primary-palest text-4xl">
-          {program.coverEmoji}
+        <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-[#FFF4E3]">
+          <PenLine className="size-8 text-[#FFA10B]" />
         </div>
         <h1 className="mt-3 text-xl font-bold text-text-dark">{program.title}</h1>
         <p className="mt-1 text-sm text-text-secondary">
@@ -35,7 +37,10 @@ export function CompanionProgramPage() {
         <section className="rounded-2xl border border-[#E4EAE9] bg-white p-4 text-center">
           {checkedIn ? (
             <>
-              <p className="text-sm font-medium text-text-dark">✅ 今天的紀錄已送出</p>
+              <p className="flex items-center justify-center gap-1.5 text-sm font-medium text-text-dark">
+                <CheckCircle2 className="size-4 text-logo-cyan" />
+                今天的紀錄已送出
+              </p>
               <p className="mt-1 text-xs text-text-secondary">
                 {program.ownerName} 會看見你的每一步
               </p>
@@ -44,7 +49,8 @@ export function CompanionProgramPage() {
             <>
               <p className="text-sm text-text-secondary">今天過得如何？寫下一點紀錄吧</p>
               <Button className="mt-3 w-full rounded-full" onClick={() => setCheckedIn(true)}>
-                ✏️ 記錄今天
+                <PenLine className="size-4" />
+                記錄今天
               </Button>
             </>
           )}
@@ -64,18 +70,19 @@ export function CompanionProgramPage() {
           {MOCK_RECENT_CHECKINS.map((checkin) => (
             <div key={checkin.id} className="rounded-2xl border border-[#E4EAE9] bg-white p-4">
               <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-full bg-primary-palest text-xl">
-                  {checkin.avatarEmoji}
-                </div>
+                <ColorAvatar name={checkin.displayName} />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-text-dark">{checkin.displayName}</p>
-                  <p className="text-xs text-text-secondary">
-                    {checkin.checkinDate} · 🔥 連續 {checkin.streak} 天
+                  <p className="flex items-center gap-1 text-xs text-text-secondary">
+                    {checkin.checkinDate} ·
+                    <Flame className="size-3 text-[#FFA10B]" />
+                    連續 {checkin.streak} 天
                   </p>
                 </div>
                 {checkin.responded && (
-                  <Badge variant="secondary" className="shrink-0">
-                    老師回應過 ❤️
+                  <Badge variant="secondary" className="flex shrink-0 items-center gap-1">
+                    老師回應過
+                    <Heart className="size-3 text-[#E86B2A]" />
                   </Badge>
                 )}
               </div>

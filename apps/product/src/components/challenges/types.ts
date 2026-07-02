@@ -20,7 +20,6 @@ export interface Challenge {
   id: string;
   title: string;
   description: string;
-  coverEmoji: string;
   category: ChallengeCategory;
   isRecurring: boolean;
   checkinPrompt?: string;
@@ -33,7 +32,7 @@ export interface SeasonCheckin {
   id: string;
   userId: string;
   displayName: string;
-  avatarEmoji: string;
+  photoURL?: string;
   content: string;
   checkinDate: string;
   streak: number;
@@ -43,7 +42,7 @@ export interface SeasonRankingEntry {
   rank: number;
   userId: string;
   displayName: string;
-  avatarEmoji: string;
+  photoURL?: string;
   totalCheckins: number;
   currentStreak: number;
   isMe?: boolean;

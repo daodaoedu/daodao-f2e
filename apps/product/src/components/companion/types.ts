@@ -6,7 +6,6 @@ export interface CompanionProgram {
   id: string;
   title: string;
   description: string;
-  coverEmoji: string;
   visibility: "public" | "private";
   ownerName: string;
   partnerCount: number;
@@ -17,7 +16,6 @@ export interface PartnerCheckin {
   id: string;
   partnerId: string;
   displayName: string;
-  avatarEmoji: string;
   content: string;
   checkinDate: string;
   streak: number;
@@ -28,7 +26,6 @@ export interface PartnerCheckin {
 export interface Partner {
   id: string;
   displayName: string;
-  avatarEmoji: string;
   joinedAt: string;
   totalCheckins: number;
   currentStreak: number;

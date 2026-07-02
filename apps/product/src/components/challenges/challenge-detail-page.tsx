@@ -1,9 +1,11 @@
 "use client";
 
+import { Link } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { differenceInCalendarDays, format, parseISO } from "date-fns";
-import { Link } from "@daodao/i18n/navigation";
+import { Medal, Pencil, Users } from "lucide-react";
+import { CategoryIconTile, getCategoryStyle } from "./category-icon";
 import { CATEGORY_LABELS, MOCK_MY_HISTORY } from "./mock-data";
 import type { Challenge, ChallengeSeason } from "./types";
 
@@ -11,11 +13,21 @@ function formatDateRange(season: ChallengeSeason): string {
   return `${format(parseISO(season.startDate), "yyyy/MM/dd")} → ${format(parseISO(season.endDate), "yyyy/MM/dd")}`;
 }
 
-function ActiveSeasonCard({ challenge, season }: { challenge: Challenge; season: ChallengeSeason }) {
+function ActiveSeasonCard({
+  challenge,
+  season,
+}: {
+  challenge: Challenge;
+  season: ChallengeSeason;
+}) {
   const daysLeft = Math.max(0, differenceInCalendarDays(parseISO(season.endDate), new Date()));
+  const accent = getCategoryStyle(challenge.category);
 
   return (
-    <section className="rounded-2xl border border-[#E4EAE9] bg-white p-4 shadow-sm">
+    <section
+      className="rounded-2xl border border-[#E4EAE9] bg-white p-4 shadow-sm"
+      style={{ borderTopWidth: 3, borderTopColor: accent.color }}
+    >
       <div className="flex items-center gap-2">
         <Badge>進行中</Badge>
         <h2 className="text-base font-bold text-text-dark">第 {season.seasonNumber} 期</h2>
@@ -25,8 +37,14 @@ function ActiveSeasonCard({ challenge, season }: { challenge: Challenge; season:
         {formatDateRange(season)}（剩 {daysLeft} 天）
       </p>
       <div className="mt-2 flex items-center gap-4 text-sm text-text-secondary">
-        <span>👥 {season.memberCount} 人</span>
-        <span>✏️ {season.totalCheckins.toLocaleString()} 次打卡</span>
+        <span className="flex items-center gap-1">
+          <Users className="size-3.5" />
+          {season.memberCount} 人
+        </span>
+        <span className="flex items-center gap-1">
+          <Pencil className="size-3.5" />
+          {season.totalCheckins.toLocaleString()} 次打卡
+        </span>
       </div>
       <Link href={`/challenges/${challenge.id}/seasons/${season.id}`}>
         <Button className="mt-4 w-full rounded-full">加入本期</Button>
@@ -65,9 +83,11 @@ export function ChallengeDetailPage({ challenge }: ChallengeDetailPageProps) {
   return (
     <div className="flex flex-col gap-4 px-5 pt-4">
       <section className="text-center">
-        <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-primary-palest text-4xl">
-          {challenge.coverEmoji}
-        </div>
+        <CategoryIconTile
+          category={challenge.category}
+          className="mx-auto size-16 rounded-2xl"
+          iconClassName="size-8"
+        />
         <h1 className="mt-3 text-xl font-bold text-text-dark">{challenge.title}</h1>
         <p className="mt-1 text-sm text-text-secondary">
           {CATEGORY_LABELS[challenge.category]} · 已有 {challenge.allTimeParticipants} 人參加過
@@ -88,11 +108,13 @@ export function ChallengeDetailPage({ challenge }: ChallengeDetailPageProps) {
               return (
                 <div key={season.id} className="flex items-center justify-between text-sm">
                   <span className="text-text-secondary">
-                    第 {season.seasonNumber} 期 · {formatDateRange(season)} · {season.memberCount} 人參加
+                    第 {season.seasonNumber} 期 · {formatDateRange(season)} · {season.memberCount}{" "}
+                    人參加
                   </span>
                   {mine && (
-                    <span className="shrink-0 font-medium text-text-dark">
-                      我打卡 {mine.checkinCount} 天 🏅
+                    <span className="flex shrink-0 items-center gap-1 font-medium text-text-dark">
+                      我打卡 {mine.checkinCount} 天
+                      <Medal className="size-4 text-[#D9A606]" />
                     </span>
                   )}
                 </div>
