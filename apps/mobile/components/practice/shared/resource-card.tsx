@@ -1,3 +1,4 @@
+import { useExtractOgImage } from "@daodao/api";
 import { BookOpen, Link2, X } from "@tamagui/lucide-icons";
 import { memo, useCallback, useState } from "react";
 import { Linking, Pressable, StyleSheet } from "react-native";
@@ -19,10 +20,10 @@ export interface ResourceCardProps {
 const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
   const t = useMobileTranslation("practice");
   const [imageError, setImageError] = useState(false);
-  const [imageLoading, setImageLoading] = useState(true);
+  const { data: ogImageData, isLoading } = useExtractOgImage(resource.url);
 
-  // Simple check if URL is an image
-  const isImageUrl = resource.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+  // 決定顯示的圖片：優先使用 og:image，如果沒有或載入失敗則顯示預設圖示
+  const ogImageUrl = ogImageData?.ogImageUrl ?? null;
 
   const handlePress = useCallback(async () => {
     if (resource.url) {
@@ -45,7 +46,7 @@ const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
     [onRemove]
   );
 
-  const shouldShowDefaultIcon = !resource.url || imageError || !isImageUrl;
+  const shouldShowDefaultIcon = !resource.url || imageError || isLoading || !ogImageUrl;
 
   return (
     <Pressable
@@ -58,7 +59,7 @@ const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
       <View style={styles.previewContainer}>
         {shouldShowDefaultIcon ? (
           <View style={styles.defaultPreview}>
-            {imageLoading && isImageUrl ? (
+            {isLoading ? (
               <Spinner color={colors.primary.base} />
             ) : (
               <BookOpen size={40} color={colors.primary.base} opacity={0.5} />
@@ -66,14 +67,10 @@ const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
           </View>
         ) : (
           <Image
-            source={{ uri: resource.url }}
+            source={{ uri: ogImageUrl }}
             style={styles.previewImage}
             resizeMode="cover"
-            onError={() => {
-              setImageError(true);
-              setImageLoading(false);
-            }}
-            onLoad={() => setImageLoading(false)}
+            onError={() => setImageError(true)}
           />
         )}
         {onRemove && (
