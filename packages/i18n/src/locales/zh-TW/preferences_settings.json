@@ -1,0 +1,62 @@
+{
+  "title": "偏好設定",
+  "subtitle": "設定你的學習偏好，讓我們為你推薦更合適的學習內容",
+  "save": "儲存",
+  "saving": "儲存中...",
+  "save_error": "儲存失敗，請稍後再試",
+  "save_success": "偏好設定已儲存",
+  "goals_label": "你目前有哪些目標？",
+  "goals_min_selection": "請至少選擇一個目標",
+  "goals_max_selection": "最多只能選擇3個目標",
+  "goals_options": {
+    "career_skills": "培養與職涯發展相關的新技能",
+    "personal_interests": "探索個人興趣或嗜好",
+    "project_preparation": "為特定專案或挑戰做準備",
+    "deepen_knowledge": "深化我已具備的專業知識",
+    "academic_preparation": "為升學做準備"
+  },
+  "learning_style_label": "哪種指導方式最能幫助你學習？",
+  "learning_style_min_selection": "請至少選擇一種學習方式",
+  "learning_style_max_selection": "最多只能選擇3種學習方式",
+  "learning_style_options": {
+    "step_by_step": "清楚的步驟指引，按部就班學習",
+    "free_exploration": "喜歡自由探索，發現自己的學習路徑",
+    "project_based": "偏好透過實際專案來學習",
+    "structured_flexible": "希望有結構但保留彈性調整空間",
+    "practical_application": "看到實際應用才能理解概念"
+  },
+  "time_commitment_label": "學習時間的投入？",
+  "time_commitment_min_selection": "請至少選擇一種時間投入方式",
+  "time_commitment_max_selection": "最多只能選擇3種時間投入方式",
+  "time_commitment_options": {
+    "short_daily": "我喜歡每天抽出短時間（5-15分鐘）持續學習",
+    "weekly_focused": "我傾向每週預留幾次較長時間（30-60分鐘）專注學習",
+    "deep_sessions": "我偏好深度學習，每週安排1-2次長時段（1小時以上）",
+    "irregular": "我的學習時間不規律，需要彈性的學習方式"
+  },
+  "interaction_style_label": "喜歡如何與他人互動學習？",
+  "interaction_style_min_selection": "請至少選擇一種互動方式",
+  "interaction_style_max_selection": "最多只能選擇3種互動方式",
+  "interaction_style_options": {
+    "solo": "喜歡獨自學習",
+    "peer_support": "有同儕的陪伴和互相鼓勵",
+    "mentor_guidance": "有經驗者的指導",
+    "feedback": "希望能得到他人的反饋和建議",
+    "teaching_others": "我喜歡分享知識，幫助其他學習者"
+  },
+  "feedback_style_label": "哪種反饋方式能幫助你進步？",
+  "feedback_style_min_selection": "請至少選擇一種反饋方式",
+  "feedback_style_max_selection": "最多只能選擇3種反饋方式",
+  "feedback_style_options": {
+    "detailed_explanation": "當我犯錯時得到詳細的解釋",
+    "encouragement": "鼓勵性的話語以保持我的動力",
+    "thoughtful_questions": "能讓我深入思考的提問",
+    "examples": "了解他人如何解決類似問題的例子",
+    "actionable_guidance": "具體的改進建議和可行動的下一步指引"
+  },
+  "validation_preference_required": "每個偏好類別至少需要選擇一個選項",
+  "loading": "載入中...",
+  "load_error": "載入偏好設定失敗，請稍後再試",
+  "no_preferences": "目前沒有可用的偏好設定",
+  "form_check_error": "請檢查表單欄位"
+}

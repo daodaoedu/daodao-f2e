@@ -1,0 +1,90 @@
+{
+  "steps": {
+    "profile": {
+      "title": "Personal Information",
+      "email": "Email",
+      "emailLinked": "This account is linked to your Google account",
+      "birthDate": "Birthday",
+      "birthDatePlaceholder": "Select your birthday",
+      "ageValid": "Age meets registration requirements",
+      "ageInvalid": "Dao Dao is currently only available for users aged 16 and above. Please come back when you meet the age requirement!",
+      "name": "Your Name",
+      "namePlaceholder": "How would you like others to call you",
+      "username": "Username",
+      "usernamePlaceholder": "Set your unique username",
+      "usernameHint": "Only letters and numbers allowed, 3-15 characters",
+      "usernameValid": "Username is available",
+      "usernameInvalid": "Username must be 3-15 characters, letters and numbers only",
+      "usernameUnavailable": "This username is already taken",
+      "bio": "Personal Tagline",
+      "bioPlaceholder": "Introduce yourself in one sentence"
+    },
+    "interests": {
+      "title": "Professional & Interest Fields",
+      "professionalFieldsLabel": "Your professional or learning fields (optional, max 5)",
+      "interestsLabel": "Fields you're interested in exploring",
+      "interestsRequired": "Required",
+      "maxReached": "Great! We have enough info to personalize your learning experience"
+    },
+    "referral": {
+      "title": "How did you hear about Dao Dao?",
+      "subtitle": "Help us understand how to reach more people",
+      "otherLabel": "Please specify",
+      "otherPlaceholder": "Tell us how you discovered Dao Dao..."
+    },
+    "success": {
+      "title": "Welcome to Dao Dao!",
+      "titleWithName": "{name}, Welcome to Dao Dao!",
+      "primaryButton": "Explore Dao Dao",
+      "emailReminder": "Don't forget to check your inbox for our welcome email!"
+    }
+  },
+  "navigation": {
+    "previous": "Previous",
+    "next": "Next",
+    "complete": "Complete Registration",
+    "submitting": "Submitting..."
+  },
+  "errors": {
+    "submitFailed": "Submission failed, please try again later"
+  },
+  "taskGuide": {
+    "title": "Beginner Tasks",
+    "celebration": {
+      "title": "All done!",
+      "badgeTitle": "You earned the Early User Badge!",
+      "badgeDescription": "Thanks for completing all onboarding tasks — you're one of Dao Dao's earliest users!"
+    },
+    "progress": "{completed}/{total} done",
+    "ariaOpen": "Expand onboarding task list",
+    "ariaCollapse": "Collapse",
+    "ariaClose": "Close",
+    "tasks": {
+      "A": "Complete the learning style quiz",
+      "B": "Complete public info, account, and preferences",
+      "C": "Create your first practice",
+      "D": "Complete your first check-in",
+      "E": "Leave a comment on inspirations"
+    },
+    "taskDescriptions": {
+      "B": "Complete all three sections: public info, account settings, and preferences"
+    }
+  },
+  "validation": {
+    "birthDateRequired": "Please select your birthday",
+    "birthDateAge": "Dao Dao is currently available only to users aged 16 or older",
+    "nameRequired": "Please enter your name",
+    "nameMax": "Name must be at most {max} characters",
+    "customIdRequired": "Please enter a user ID",
+    "customIdMin": "Username must be at least {min} characters",
+    "customIdMax": "Username must be at most {max} characters",
+    "customIdFormat": "Only letters and numbers are allowed",
+    "personalSloganRequired": "Please enter a personal slogan",
+    "personalSloganMax": "Personal slogan must be at most {max} characters",
+    "professionalFieldsRequired": "Please select at least {min} professional field",
+    "professionalFieldsMax": "You can select up to {max} professional fields",
+    "interestsRequired": "Please select at least {min} interest field",
+    "interestsMax": "You can select up to {max} interest fields",
+    "referralSourceRequired": "Please select how you heard about Dao Dao"
+  }
+}

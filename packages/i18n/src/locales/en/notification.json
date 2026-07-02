@@ -1,0 +1,20 @@
+{
+  "and_others": "and {count} others",
+  "reaction_text": "reacted to your practice",
+  "reaction_gave": "with",
+  "comment_text": "replied to your practice",
+  "follow_user_text": "followed you",
+  "follow_practice_text": "followed your practice",
+  "connect_request_text": "sent you a connection request",
+  "agree_connect_prefix": "Congratulations! ",
+  "agree_connect_text": "accepted your connection request",
+  "checkin_text": "checked in to",
+  "checkin_action": "",
+  "finish_text": "completed the practice",
+  "practice_created_text": "started a new practice",
+  "more_options": "More options",
+  "agree_connect": "Accept",
+  "ignore": "Ignore",
+  "agreed": "Accepted",
+  "ignored": "Ignored"
+}

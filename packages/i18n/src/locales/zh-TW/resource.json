@@ -1,0 +1,6 @@
+{
+  "hot_tags": "熱門標籤",
+  "resource_count": "共 <bold>{count}</bold> 筆資源",
+  "empty_category": "這個分類目前沒有學習資源",
+  "all_loaded": "已顯示全部資源"
+}

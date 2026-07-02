@@ -1,0 +1,20 @@
+{
+  "and_others": "與其他 {count} 人",
+  "reaction_text": "對你的主題實踐",
+  "reaction_gave": "給了反應",
+  "comment_text": "回覆了你的主題實踐",
+  "follow_user_text": "關注了你",
+  "follow_practice_text": "關注了你的主題實踐",
+  "connect_request_text": "對你發出了連結請求",
+  "agree_connect_prefix": "恭喜！",
+  "agree_connect_text": "同意了你的連結請求",
+  "checkin_text": "在主題實踐",
+  "checkin_action": "打了卡",
+  "finish_text": "完成了主題實踐",
+  "practice_created_text": "發起了新的主題實踐",
+  "more_options": "更多選項",
+  "agree_connect": "同意連結",
+  "ignore": "忽略",
+  "agreed": "已同意",
+  "ignored": "已忽略"
+}
