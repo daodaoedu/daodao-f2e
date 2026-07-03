@@ -52,7 +52,10 @@ describe("calculateDaysProgress", () => {
 
   it("counts total days inclusively of both start and end date", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-05-01T00:00:00Z"));
+    // Local Date constructor (not a UTC ISO string) so the mocked "now"
+    // lines up with parseISO's local-timezone parsing of date-only strings,
+    // regardless of the machine's timezone offset.
+    vi.setSystemTime(new Date(2026, 4, 1));
     // startDate + (durationDays - 1) = endDate, so a 30-day practice starting
     // 05/01 ends 05/30 — total must report 30, matching backend durationDays.
     expect(calculateDaysProgress("2026-05-01", "2026-05-30")).toEqual({
@@ -63,7 +66,7 @@ describe("calculateDaysProgress", () => {
 
   it("returns total of 1 for a single-day practice", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-05-01T00:00:00Z"));
+    vi.setSystemTime(new Date(2026, 4, 1));
     expect(calculateDaysProgress("2026-05-01", "2026-05-01")).toEqual({
       elapsed: 1,
       total: 1,
@@ -72,7 +75,7 @@ describe("calculateDaysProgress", () => {
 
   it("counts today as an elapsed day (day 1 on the start date)", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-05-03T00:00:00Z"));
+    vi.setSystemTime(new Date(2026, 4, 3));
     expect(calculateDaysProgress("2026-05-01", "2026-05-30")).toEqual({
       elapsed: 3,
       total: 30,
@@ -81,7 +84,7 @@ describe("calculateDaysProgress", () => {
 
   it("caps elapsed at total once the practice period has passed", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-06-23T00:00:00Z"));
+    vi.setSystemTime(new Date(2026, 5, 23));
     expect(calculateDaysProgress("2026-06-10", "2026-06-22")).toEqual({
       elapsed: 13,
       total: 13,
