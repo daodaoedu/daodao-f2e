@@ -27,6 +27,10 @@ export enum StorageEnum {
   HomeFeedAnchor = "HomeFeedAnchor",
   /** 用於記錄註冊來源流程 */
   RegistrationFlow = "RegistrationFlow",
+  /** 用於記錄新手任務面板是否收合的 sessionStorage */
+  TaskGuideCollapsed = "TaskGuideCollapsed",
+  /** 用於記錄新手任務慶祝彈窗是否已關閉的 localStorage（跨登入只顯示一次） */
+  TaskGuideCelebrationDismissed = "TaskGuideCelebrationDismissed",
 }
 
 const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
@@ -39,6 +43,8 @@ const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   AuthSignal: "localStorage",
   HomeFeedAnchor: "sessionStorage",
   RegistrationFlow: "localStorage",
+  TaskGuideCollapsed: "sessionStorage",
+  TaskGuideCelebrationDismissed: "localStorage",
 };
 
 export interface StorageInstance<T> {

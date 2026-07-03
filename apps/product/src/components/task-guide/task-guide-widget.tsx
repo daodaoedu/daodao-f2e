@@ -3,6 +3,7 @@
 import { useAuth } from "@daodao/auth";
 import { getRequiredEnv } from "@daodao/config";
 import { useTranslations } from "@daodao/i18n";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Progress } from "@daodao/ui/components/progress";
 import { cn } from "@daodao/ui/lib/utils";
@@ -13,8 +14,8 @@ import { type OnboardingTaskKey, useOnboardingProgress } from "./onboarding-prog
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const SESSION_KEY = "task-guide-collapsed";
-const CELEBRATION_DISMISSED_KEY = "task-guide-celebration-dismissed";
+const collapsedStorage = getStorage<string>(StorageEnum.TaskGuideCollapsed);
+const celebrationDismissedStorage = getStorage<string>(StorageEnum.TaskGuideCelebrationDismissed);
 const PANEL_POSITION = "fixed bottom-39 right-5 md:bottom-34 md:right-15 z-40";
 const TRIGGER_POSITION = "fixed bottom-[152px] right-[26px] md:bottom-[132px] md:right-[66px] z-40";
 function getQuizUrl() {
@@ -57,7 +58,7 @@ export function TaskGuideWidget() {
   const autoExpandedRef = useRef(false);
 
   useEffect(() => {
-    setCelebrationDismissed(sessionStorage.getItem(CELEBRATION_DISMISSED_KEY) === "1");
+    setCelebrationDismissed(celebrationDismissedStorage.get() === "1");
   }, []);
 
   // 首次進入且 onboarding 未完成時自動展開；完成後則展示一次慶祝畫面。
@@ -73,7 +74,7 @@ export function TaskGuideWidget() {
     }
 
     if (total > 0 && completedTasks < total) {
-      const collapsed = sessionStorage.getItem(SESSION_KEY);
+      const collapsed = collapsedStorage.get();
       if (!collapsed) {
         setExpanded(true);
         autoExpandedRef.current = true;
@@ -83,14 +84,14 @@ export function TaskGuideWidget() {
 
   const handleCollapse = useCallback(() => {
     setExpanded(false);
-    sessionStorage.setItem(SESSION_KEY, "1");
+    collapsedStorage.set("1");
   }, []);
 
   const handleDismissCelebration = useCallback(() => {
     setCelebrationDismissed(true);
     setExpanded(false);
-    sessionStorage.setItem(CELEBRATION_DISMISSED_KEY, "1");
-    sessionStorage.setItem(SESSION_KEY, "1");
+    celebrationDismissedStorage.set("1");
+    collapsedStorage.set("1");
   }, []);
 
   const strippedPath = pathname?.replace(/^\/[a-z]{2}(-[a-zA-Z]{2})?(?=\/|$)/, "") || "/";
