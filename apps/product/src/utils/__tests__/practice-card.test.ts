@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { calculateRemainingDays, formatCardDate } from "../practice-card";
+import { calculateDaysProgress, calculateRemainingDays, formatCardDate } from "../practice-card";
 
 describe("calculateRemainingDays", () => {
   afterEach(() => {
@@ -30,6 +30,62 @@ describe("calculateRemainingDays", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-05-18T00:00:00Z"));
     expect(calculateRemainingDays("2026-05-10")).toBe(-8);
+  });
+});
+
+describe("calculateDaysProgress", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("returns null for null startDate", () => {
+    expect(calculateDaysProgress(null, "2026-05-25")).toBeNull();
+  });
+
+  it("returns null for null endDate", () => {
+    expect(calculateDaysProgress("2026-05-18", null)).toBeNull();
+  });
+
+  it("returns null when endDate is before startDate", () => {
+    expect(calculateDaysProgress("2026-05-20", "2026-05-19")).toBeNull();
+  });
+
+  it("counts total days inclusively of both start and end date", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-01T00:00:00Z"));
+    // startDate + (durationDays - 1) = endDate, so a 30-day practice starting
+    // 05/01 ends 05/30 — total must report 30, matching backend durationDays.
+    expect(calculateDaysProgress("2026-05-01", "2026-05-30")).toEqual({
+      elapsed: 1,
+      total: 30,
+    });
+  });
+
+  it("returns total of 1 for a single-day practice", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-01T00:00:00Z"));
+    expect(calculateDaysProgress("2026-05-01", "2026-05-01")).toEqual({
+      elapsed: 1,
+      total: 1,
+    });
+  });
+
+  it("counts today as an elapsed day (day 1 on the start date)", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-03T00:00:00Z"));
+    expect(calculateDaysProgress("2026-05-01", "2026-05-30")).toEqual({
+      elapsed: 3,
+      total: 30,
+    });
+  });
+
+  it("caps elapsed at total once the practice period has passed", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-23T00:00:00Z"));
+    expect(calculateDaysProgress("2026-06-10", "2026-06-22")).toEqual({
+      elapsed: 13,
+      total: 13,
+    });
   });
 });
 
