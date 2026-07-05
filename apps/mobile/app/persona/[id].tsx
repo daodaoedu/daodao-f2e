@@ -49,6 +49,7 @@ export default function PersonaDetailScreen() {
     setAnswers((prev) => {
       const newAnswers = data.data.answers ?? [];
       if (cursor === undefined) return newAnswers;
+      if (newAnswers.length === 0) return prev;
       // De-dupe by answerId so a revalidation of the current page never
       // re-appends items that are already in the accumulated list.
       const merged = new Map(prev.map((item) => [item.answerId, item]));
