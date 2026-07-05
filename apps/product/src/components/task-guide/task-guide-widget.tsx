@@ -7,7 +7,7 @@ import { getStorage, StorageEnum } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Progress } from "@daodao/ui/components/progress";
 import { cn } from "@daodao/ui/lib/utils";
-import { BadgeCheck, Check, ListChecks, X } from "lucide-react";
+import { Check, ListChecks, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type OnboardingTaskKey, useOnboardingProgress } from "./onboarding-progress-context";
@@ -15,7 +15,6 @@ import { type OnboardingTaskKey, useOnboardingProgress } from "./onboarding-prog
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const collapsedStorage = getStorage<string>(StorageEnum.TaskGuideCollapsed);
-const celebrationDismissedStorage = getStorage<string>(StorageEnum.TaskGuideCelebrationDismissed);
 const PANEL_POSITION = "fixed bottom-39 right-5 md:bottom-34 md:right-15 z-40";
 const TRIGGER_POSITION = "fixed bottom-[152px] right-[26px] md:bottom-[132px] md:right-[66px] z-40";
 function getQuizUrl() {
@@ -48,30 +47,17 @@ const TASK_PATHS: Record<OnboardingTaskKey, string> = {
 
 export function TaskGuideWidget() {
   const { isAuthenticated, isTemporary } = useAuth();
-  const { taskList, completedTasks, badgeGranted, isLoading } = useOnboardingProgress();
+  const { taskList, completedTasks, isLoading } = useOnboardingProgress();
   const t = useTranslations("onboarding.taskGuide");
   const router = useRouter();
   const pathname = usePathname();
 
   const [expanded, setExpanded] = useState(false);
-  const [celebrationDismissed, setCelebrationDismissed] = useState(false);
   const autoExpandedRef = useRef(false);
 
   useEffect(() => {
-    setCelebrationDismissed(celebrationDismissedStorage.get() === "1");
-  }, []);
-
-  // 首次進入且 onboarding 未完成時自動展開；完成後則展示一次慶祝畫面。
-  useEffect(() => {
     if (isLoading || autoExpandedRef.current) return;
     const total = taskList.length;
-    const allCompleted = total > 0 && completedTasks >= total;
-
-    if (allCompleted && !celebrationDismissed) {
-      setExpanded(true);
-      autoExpandedRef.current = true;
-      return;
-    }
 
     if (total > 0 && completedTasks < total) {
       const collapsed = collapsedStorage.get();
@@ -80,17 +66,10 @@ export function TaskGuideWidget() {
         autoExpandedRef.current = true;
       }
     }
-  }, [isLoading, taskList.length, completedTasks, celebrationDismissed]);
+  }, [isLoading, taskList.length, completedTasks]);
 
   const handleCollapse = useCallback(() => {
     setExpanded(false);
-    collapsedStorage.set("1");
-  }, []);
-
-  const handleDismissCelebration = useCallback(() => {
-    setCelebrationDismissed(true);
-    setExpanded(false);
-    celebrationDismissedStorage.set("1");
     collapsedStorage.set("1");
   }, []);
 
@@ -106,39 +85,7 @@ export function TaskGuideWidget() {
   const allCompleted = total > 0 && completedTasks >= total;
   const progressPct = total > 0 ? Math.round((completedTasks / total) * 100) : 0;
 
-  if (badgeGranted && (!allCompleted || celebrationDismissed)) return null;
-
-  // Badge 獲得狀態：allCompleted 時顯示一次慶祝畫面，使用者關閉後才隱藏。
-  if (allCompleted && expanded && !celebrationDismissed) {
-    return (
-      <div
-        className={cn(
-          PANEL_POSITION,
-          "w-[min(calc(100vw-40px),320px)] overflow-hidden rounded-[20px] border border-light-cyan bg-white shadow-[0_16px_40px_rgba(41,94,92,0.14)]"
-        )}
-      >
-        <div className="flex items-center justify-between gap-3 border-b border-very-light-gray px-4 py-3">
-          <span className="text-base font-semibold text-text-dark">{t("celebration.title")}</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleDismissCelebration}
-            className="size-8 text-light-gray hover:text-text-dark"
-            aria-label={t("ariaClose")}
-          >
-            <X className="size-5" />
-          </Button>
-        </div>
-        <div className="flex flex-col items-center gap-3 px-4 py-6 text-center">
-          <div className="flex size-14 items-center justify-center rounded-full bg-logo-orange/20 text-logo-orange">
-            <BadgeCheck className="size-8" />
-          </div>
-          <p className="text-base font-semibold text-text-dark">{t("celebration.badgeTitle")}</p>
-          <p className="text-xs leading-5 text-text-dark/60">{t("celebration.badgeDescription")}</p>
-        </div>
-      </div>
-    );
-  }
+  if (allCompleted) return null;
 
   if (!expanded) {
     return (

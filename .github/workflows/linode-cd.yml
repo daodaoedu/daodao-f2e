@@ -2,7 +2,7 @@ name: Linode CD
 
 # ===== 並發控制設定 =====
 concurrency:
-  group: linode-cd-${{ github.workflow }}-${{ github.ref }}
+  group: linode-cd-${{ github.ref }}-${{ github.event.workflow_run.event }}
   cancel-in-progress: true
 
 # ===== 觸發條件設定 =====

@@ -95,6 +95,14 @@ export const Footer = () => {
                   {t("footer_mission")}
                 </CustomLink>
               </div>
+              <div>
+                <CustomLink
+                  href={`${process.env.NEXT_PUBLIC_APP_URL}/roadmap`}
+                  className="text-white/70 transition-colors hover:text-primary-base"
+                >
+                  {t("footer_roadmap")}
+                </CustomLink>
+              </div>
             </div>
           </div>
           <div className="space-y-4">
