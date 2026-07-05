@@ -18,7 +18,6 @@ export interface OnboardingTaskItem {
 export interface OnboardingStatusData {
   taskList: OnboardingTaskItem[];
   completedTasks: number;
-  badgeGranted: boolean;
 }
 
 interface OnboardingStatusResponse {
@@ -29,7 +28,6 @@ interface OnboardingStatusResponse {
 interface OnboardingProgressContextValue {
   taskList: OnboardingTaskItem[];
   completedTasks: number;
-  badgeGranted: boolean;
   isLoading: boolean;
   mutate: KeyedMutator<OnboardingStatusResponse>;
 }
@@ -69,7 +67,6 @@ export function OnboardingProgressProvider({ children }: { children: ReactNode }
       value={{
         taskList: statusData?.taskList ?? [],
         completedTasks: statusData?.completedTasks ?? 0,
-        badgeGranted: statusData?.badgeGranted ?? false,
         isLoading,
         mutate,
       }}
@@ -118,7 +115,6 @@ export function applyOnboardingUpdateFromResponse(response: unknown): boolean {
           ...prev.data,
           taskList: updatedTaskList,
           completedTasks: updatedTaskList.filter((task) => task.done).length,
-          badgeGranted: prev.data.badgeGranted,
         },
       };
     },
