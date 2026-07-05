@@ -14,7 +14,7 @@ import { type OnboardingTaskKey, useOnboardingProgress } from "./onboarding-prog
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const collapsedStorage = getStorage<string>(StorageEnum.TaskGuideCollapsed);
+const collapsedStorage = getStorage<boolean>(StorageEnum.TaskGuideCollapsed);
 const PANEL_POSITION = "fixed bottom-39 right-5 md:bottom-34 md:right-15 z-40";
 const TRIGGER_POSITION = "fixed bottom-[152px] right-[26px] md:bottom-[132px] md:right-[66px] z-40";
 function getQuizUrl() {
@@ -70,7 +70,7 @@ export function TaskGuideWidget() {
 
   const handleCollapse = useCallback(() => {
     setExpanded(false);
-    collapsedStorage.set("1");
+    collapsedStorage.set(true);
   }, []);
 
   const strippedPath = pathname?.replace(/^\/[a-z]{2}(-[a-zA-Z]{2})?(?=\/|$)/, "") || "/";

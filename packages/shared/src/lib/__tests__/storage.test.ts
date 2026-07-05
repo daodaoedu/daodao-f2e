@@ -13,9 +13,6 @@ describe("getStorageKey", () => {
     expect(getStorageKey(StorageEnum.HomeFeedAnchor)).toBe("_homefeedanchor");
     expect(getStorageKey(StorageEnum.RegistrationFlow)).toBe("_registrationflow");
     expect(getStorageKey(StorageEnum.TaskGuideCollapsed)).toBe("_taskguidecollapsed");
-    expect(getStorageKey(StorageEnum.TaskGuideCelebrationDismissed)).toBe(
-      "_taskguidecelebrationdismissed"
-    );
   });
 });
 
@@ -32,7 +29,6 @@ describe("StorageEnum", () => {
     expect(keys).toContain("HomeFeedAnchor");
     expect(keys).toContain("RegistrationFlow");
     expect(keys).toContain("TaskGuideCollapsed");
-    expect(keys).toContain("TaskGuideCelebrationDismissed");
-    expect(keys).toHaveLength(11);
+    expect(keys).toHaveLength(10);
   });
 });
