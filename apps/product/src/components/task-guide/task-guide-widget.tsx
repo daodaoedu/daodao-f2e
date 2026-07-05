@@ -3,6 +3,7 @@
 import { useAuth } from "@daodao/auth";
 import { getRequiredEnv } from "@daodao/config";
 import { useTranslations } from "@daodao/i18n";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Progress } from "@daodao/ui/components/progress";
 import { cn } from "@daodao/ui/lib/utils";
@@ -13,7 +14,7 @@ import { type OnboardingTaskKey, useOnboardingProgress } from "./onboarding-prog
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const SESSION_KEY = "task-guide-collapsed";
+const collapsedStorage = getStorage<boolean>(StorageEnum.TaskGuideCollapsed);
 const PANEL_POSITION = "fixed bottom-39 right-5 md:bottom-34 md:right-15 z-40";
 const TRIGGER_POSITION = "fixed bottom-[152px] right-[26px] md:bottom-[132px] md:right-[66px] z-40";
 function getQuizUrl() {
@@ -59,7 +60,7 @@ export function TaskGuideWidget() {
     const total = taskList.length;
 
     if (total > 0 && completedTasks < total) {
-      const collapsed = sessionStorage.getItem(SESSION_KEY);
+      const collapsed = collapsedStorage.get();
       if (!collapsed) {
         setExpanded(true);
         autoExpandedRef.current = true;
@@ -69,7 +70,7 @@ export function TaskGuideWidget() {
 
   const handleCollapse = useCallback(() => {
     setExpanded(false);
-    sessionStorage.setItem(SESSION_KEY, "1");
+    collapsedStorage.set(true);
   }, []);
 
   const strippedPath = pathname?.replace(/^\/[a-z]{2}(-[a-zA-Z]{2})?(?=\/|$)/, "") || "/";
