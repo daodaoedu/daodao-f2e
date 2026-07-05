@@ -77,19 +77,6 @@ export const LoginDialog = ({
     initiateOAuthLogin(redirectUrl, defaultSource);
   };
 
-  const handleTermsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    // 這裡可以打開服務條款頁面或 Dialog
-    // 暫時先跳轉到服務條款頁面
-    window.open("/terms/service", "_blank");
-  };
-
-  const handlePrivacyClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    // 這裡可以打開隱私權政策頁面或 Dialog
-    // 暫時先跳轉到隱私權政策頁面
-    window.open("/terms/privacy-policy", "_blank");
-  };
 
   // 處理關閉事件（如果不可關閉，則阻止關閉）
   const handleOpenChange = (newOpen: boolean) => {
@@ -160,7 +147,7 @@ export const LoginDialog = ({
               <br />
               <CustomLink
                 href="/terms/service"
-                onClick={handleTermsClick}
+                target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_terms_link")}
@@ -168,7 +155,7 @@ export const LoginDialog = ({
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
               <CustomLink
                 href="/terms/privacy-policy"
-                onClick={handlePrivacyClick}
+                target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_privacy_link")}
@@ -230,7 +217,7 @@ export const LoginDialog = ({
               <br />
               <CustomLink
                 href="/terms/service"
-                onClick={handleTermsClick}
+                target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_terms_link")}
@@ -238,7 +225,7 @@ export const LoginDialog = ({
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
               <CustomLink
                 href="/terms/privacy-policy"
-                onClick={handlePrivacyClick}
+                target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_privacy_link")}
