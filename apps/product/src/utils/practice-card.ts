@@ -15,9 +15,9 @@ export function calculateDaysProgress(
   const start = parseISO(startDate);
   const end = parseISO(endDate);
   if (!isValid(start) || !isValid(end)) return null;
-  const total = differenceInCalendarDays(end, start);
+  const total = differenceInCalendarDays(end, start) + 1;
   if (total <= 0) return null;
-  const elapsed = Math.min(total, Math.max(0, differenceInCalendarDays(new Date(), start)));
+  const elapsed = Math.min(total, Math.max(0, differenceInCalendarDays(new Date(), start) + 1));
   return { elapsed, total };
 }
 
