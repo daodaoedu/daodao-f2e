@@ -12,6 +12,7 @@ describe("getStorageKey", () => {
     expect(getStorageKey(StorageEnum.AuthSignal)).toBe("_authsignal");
     expect(getStorageKey(StorageEnum.HomeFeedAnchor)).toBe("_homefeedanchor");
     expect(getStorageKey(StorageEnum.RegistrationFlow)).toBe("_registrationflow");
+    expect(getStorageKey(StorageEnum.TaskGuideCollapsed)).toBe("_taskguidecollapsed");
   });
 });
 
@@ -27,6 +28,7 @@ describe("StorageEnum", () => {
     expect(keys).toContain("AuthSignal");
     expect(keys).toContain("HomeFeedAnchor");
     expect(keys).toContain("RegistrationFlow");
-    expect(keys).toHaveLength(9);
+    expect(keys).toContain("TaskGuideCollapsed");
+    expect(keys).toHaveLength(10);
   });
 });
