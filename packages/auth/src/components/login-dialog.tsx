@@ -20,7 +20,6 @@ import {
   SheetTitle,
 } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Button } from "@daodao/ui/components/button";
-import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { getEnv } from "@daodao/config";
 import { initiateOAuthLogin } from "../lib/auth-client";
@@ -148,21 +147,23 @@ export const LoginDialog = ({
             <div className="text-sm text-text-dark text-center">
               <span>{t("login_dialog_terms_prefix")}</span>
               <br />
-              <CustomLink
+              <a
                 href={`${websiteUrl}/terms/service`}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_terms_link")}
-              </CustomLink>
+              </a>
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
-              <CustomLink
+              <a
                 href={`${websiteUrl}/terms/privacy-policy`}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_privacy_link")}
-              </CustomLink>
+              </a>
             </div>
           </div>
           <div className="relative w-full h-[290px]">
@@ -218,21 +219,23 @@ export const LoginDialog = ({
             <div className="text-sm text-text-dark">
               <span>{t("login_dialog_terms_prefix")}</span>
               <br />
-              <CustomLink
+              <a
                 href={`${websiteUrl}/terms/service`}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_terms_link")}
-              </CustomLink>
+              </a>
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
-              <CustomLink
+              <a
                 href={`${websiteUrl}/terms/privacy-policy`}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_privacy_link")}
-              </CustomLink>
+              </a>
             </div>
           </div>
 
