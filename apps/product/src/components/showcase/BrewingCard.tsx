@@ -1,7 +1,16 @@
 "use client";
 
 import type { BatchReactionItem } from "@daodao/api";
-import { followTarget, unfollowTarget, useComments, usePracticeById } from "@daodao/api";
+import {
+  followTarget,
+  unfollowTarget,
+  useArchivePractice,
+  useComments,
+  useCopyPractice,
+  useCurrentUser,
+  useDeletePractice,
+  usePracticeById,
+} from "@daodao/api";
 import {
   ChartColumnIncreasingSvg,
   DefaultAvatarSvg,
@@ -17,13 +26,22 @@ import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
-import { MoreHorizontal } from "lucide-react";
+import { Archive, Copy, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import {
   BrowseActivityContent,
   type IBrowseActivityFollower,
 } from "@/components/practice/shared/browse-activity-content";
+import { refreshOnboardingStatus } from "@/components/task-guide/onboarding-progress-context";
+import {
+  ArchivePracticeResult,
+  useArchivePracticeDialog,
+} from "@/hooks/use-archive-practice-dialog";
+import {
+  DeletePracticeResult,
+  useDeletePracticeDialog,
+} from "@/hooks/use-delete-practice-dialog";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
 import { useCardReactions } from "@/hooks/use-card-reactions";
@@ -75,6 +93,7 @@ export function BrewingCard({
   onReactionMutate,
 }: BrewingCardProps) {
   const t = useTranslations("app_product");
+  const practiceT = useTranslations("practice");
   const commonT = useTranslations("common");
   const locale = useLocale();
   const startFmt = formatShowcaseDate(startDate);
@@ -83,11 +102,20 @@ export function BrewingCard({
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { data: practiceData } = usePracticeById(id);
   const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
+  const { data: currentUserData } = useCurrentUser();
+  const isOwner = !!currentUserData?.data?.id && user?.id === currentUserData.data.id;
+
+  const { copyPractice } = useCopyPractice();
+  const { archivePractice, restorePractice } = useArchivePractice(id);
+  const { deletePractice } = useDeletePractice(id);
+  const { openArchiveDialog } = useArchivePracticeDialog();
+  const { openDeleteDialog } = useDeletePracticeDialog();
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -191,7 +219,103 @@ export function BrewingCard({
             <MoreHorizontal className="size-4" />
           </Button>
 
-          {menuOpen && (
+          {menuOpen && isOwner && (
+            <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setMenuOpen(false);
+                  router.push(`/practices/${id}/edit`);
+                }}
+                className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+              >
+                <Pencil className="size-[18px] shrink-0" />
+                <span>{practiceT("action_edit")}</span>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={isCopying}
+                onClick={async () => {
+                  setMenuOpen(false);
+                  try {
+                    setIsCopying(true);
+                    const { id: newId } = await copyPractice(id);
+                    refreshOnboardingStatus();
+                    router.push(`/practices/copy-success?practiceId=${newId}`);
+                  } catch {
+                    toast.error(practiceT("copy_failed"));
+                  } finally {
+                    setIsCopying(false);
+                  }
+                }}
+                className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+              >
+                <Copy className="size-[18px] shrink-0" />
+                <span>{practiceT("action_copy")}</span>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={async () => {
+                  setMenuOpen(false);
+                  const result = await openArchiveDialog({
+                    onRestore: async () => {
+                      try {
+                        await restorePractice();
+                        toast.success(practiceT("restore_success"));
+                      } catch {
+                        toast.error(practiceT("archive_failed"));
+                      }
+                    },
+                  });
+                  if (result === ArchivePracticeResult.Archived) {
+                    try {
+                      await archivePractice();
+                      router.refresh();
+                    } catch {
+                      toast.error(practiceT("archive_failed"));
+                    }
+                  }
+                }}
+                className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+              >
+                <Archive className="size-[18px] shrink-0" />
+                <span>{practiceT("action_archive")}</span>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleOpenBrowseActivity}
+                className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+              >
+                <ChartColumnIncreasingSvg className="size-[18px] shrink-0" />
+                <span>{practiceT("action_browse_activity")}</span>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={async () => {
+                  setMenuOpen(false);
+                  const result = await openDeleteDialog();
+                  if (result === DeletePracticeResult.Deleted) {
+                    try {
+                      await deletePractice();
+                      router.refresh();
+                    } catch {
+                      toast.error(practiceT("delete_failed"));
+                    }
+                  }
+                }}
+                className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+              >
+                <Trash2 className="size-[18px] shrink-0" />
+                <span>{practiceT("action_delete")}</span>
+              </Button>
+            </div>
+          )}
+          {menuOpen && !isOwner && (
             <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
               <Button
                 type="button"

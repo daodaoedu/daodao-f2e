@@ -88,7 +88,7 @@ export const LoginDialog = ({
     e.preventDefault();
     // 這裡可以打開隱私權政策頁面或 Dialog
     // 暫時先跳轉到隱私權政策頁面
-    window.open("/terms/privacy", "_blank");
+    window.open("/terms/privacy-policy", "_blank");
   };
 
   // 處理關閉事件（如果不可關閉，則阻止關閉）
@@ -167,7 +167,7 @@ export const LoginDialog = ({
               </CustomLink>
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
               <CustomLink
-                href="/terms/privacy"
+                href="/terms/privacy-policy"
                 onClick={handlePrivacyClick}
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
@@ -237,7 +237,7 @@ export const LoginDialog = ({
               </CustomLink>
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
               <CustomLink
-                href="/terms/privacy"
+                href="/terms/privacy-policy"
                 onClick={handlePrivacyClick}
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
