@@ -22,7 +22,10 @@ import {
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
+import { getEnv } from "@daodao/config";
 import { initiateOAuthLogin } from "../lib/auth-client";
+
+const websiteUrl = getEnv("NEXT_PUBLIC_WEBSITE_URL", "");
 
 export interface LoginDialogProps {
   /** 是否開啟 Dialog */
@@ -146,7 +149,7 @@ export const LoginDialog = ({
               <span>{t("login_dialog_terms_prefix")}</span>
               <br />
               <CustomLink
-                href="/terms/service"
+                href={`${websiteUrl}/terms/service`}
                 target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
@@ -154,7 +157,7 @@ export const LoginDialog = ({
               </CustomLink>
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
               <CustomLink
-                href="/terms/privacy-policy"
+                href={`${websiteUrl}/terms/privacy-policy`}
                 target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
@@ -216,7 +219,7 @@ export const LoginDialog = ({
               <span>{t("login_dialog_terms_prefix")}</span>
               <br />
               <CustomLink
-                href="/terms/service"
+                href={`${websiteUrl}/terms/service`}
                 target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
@@ -224,7 +227,7 @@ export const LoginDialog = ({
               </CustomLink>
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
               <CustomLink
-                href="/terms/privacy-policy"
+                href={`${websiteUrl}/terms/privacy-policy`}
                 target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
