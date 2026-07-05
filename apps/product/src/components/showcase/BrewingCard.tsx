@@ -1,24 +1,13 @@
 "use client";
 
 import type { BatchReactionItem } from "@daodao/api";
-import { followTarget, unfollowTarget, useComments, usePracticeById } from "@daodao/api";
-import {
-  ChartColumnIncreasingSvg,
-  DefaultAvatarSvg,
-  DialogOutlineSvg,
-  FlagOutlineSvg,
-  TelescopeSvg,
-} from "@daodao/assets";
+import { useComments, useCurrentUser, usePracticeById } from "@daodao/api";
+import { DefaultAvatarSvg, DialogOutlineSvg } from "@daodao/assets";
 import { useLocale, useTranslations } from "@daodao/i18n";
 import { Link, useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
-import { Button } from "@daodao/ui/components/button";
-import { toast } from "@daodao/ui/components/sonner";
-import { cn } from "@daodao/ui/lib/utils";
-import { MoreHorizontal } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import {
   BrowseActivityContent,
@@ -28,6 +17,7 @@ import type { ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
 import { useCardReactions } from "@/hooks/use-card-reactions";
 import { formatRelativeTime } from "@/utils/format-time";
+import { PracticeActionMenu } from "./PracticeActionMenu";
 import { formatShowcaseDate } from "./utils";
 
 interface BrewingCardProps {
@@ -81,48 +71,14 @@ export function BrewingCard({
   const endFmt = formatShowcaseDate(endDate);
   const statusInfo = getStatusConfig(TaskStatus.inProgress);
 
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { open: openSheet, close: closeSheet } = useSheetManager();
   const { data: practiceData } = usePracticeById(id);
   const { data: commentsData } = useComments({ targetType: "practice", targetId: id });
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, [menuOpen]);
-
-  const handleToggleFollow = async () => {
-    const wasFollowing = isFollowing;
-    setIsFollowing(!wasFollowing);
-    try {
-      if (wasFollowing) {
-        await unfollowTarget("practice", id);
-        toast.success(t("following_unfollowed"));
-      } else {
-        await followTarget({ targetType: "practice", targetId: id });
-        toast.success(t("following_followed_practice"));
-      }
-    } catch {
-      setIsFollowing(wasFollowing);
-      toast.error(t("operation_failed_retry"));
-    }
-  };
+  const { data: currentUserData } = useCurrentUser();
+  const isOwner = !!currentUserData?.data?.id && user?.id === currentUserData.data.id;
 
   const handleOpenBrowseActivity = () => {
-    setMenuOpen(false);
     const followers: IBrowseActivityFollower[] = reactionItems.map((item) => ({
       id: item.userId,
       name: item.name,
@@ -178,62 +134,11 @@ export function BrewingCard({
           </span>
         )}
         {/* More menu */}
-        {/* biome-ignore lint/a11y/useKeyWithClickEvents: stop card click */}
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: stop card click */}
-        <div ref={menuRef} className="relative" onClick={(e) => e.stopPropagation()}>
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            onClick={() => setMenuOpen((v) => !v)}
-            className={cn("h-8 w-8", menuOpen ? "bg-[#E4EAE9]" : "hover:bg-[#E4EAE9]")}
-          >
-            <MoreHorizontal className="size-4" />
-          </Button>
-
-          {menuOpen && (
-            <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  setMenuOpen(false);
-                  window.open("https://tally.so/r/BzGQy4", "_blank");
-                }}
-                className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-              >
-                <FlagOutlineSvg className="size-5 shrink-0" />
-                <span>{commonT("report")}</span>
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  setMenuOpen(false);
-                  void handleToggleFollow();
-                }}
-                className={cn(
-                  "w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm transition-colors cursor-pointer",
-                  isFollowing
-                    ? "text-logo-cyan hover:bg-[#E8FAF9]"
-                    : "text-[#295E5C] hover:bg-[#F0F9F8]"
-                )}
-              >
-                <TelescopeSvg className="size-5 shrink-0" />
-                <span>{isFollowing ? t("following_unfollow") : t("following_follow")}</span>
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={handleOpenBrowseActivity}
-                className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-              >
-                <ChartColumnIncreasingSvg className="size-5 shrink-0" />
-                <span>{t("showcase_browse_activity")}</span>
-              </Button>
-            </div>
-          )}
-        </div>
+        <PracticeActionMenu
+          practiceId={id}
+          isOwner={isOwner}
+          onBrowseActivity={handleOpenBrowseActivity}
+        />
       </div>
 
       {/* Title */}

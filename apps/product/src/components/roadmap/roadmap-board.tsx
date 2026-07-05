@@ -276,13 +276,14 @@ export function RoadmapBoard({ initialStats, initialItems, initialNextCursor }: 
           </div>
         ) : null}
 
-        {/* 許願 CTA */}
-        <div className="mt-12 flex flex-col items-center gap-2 rounded-2xl bg-light-blue/50 px-6 py-8 text-center">
-          <p className="text-sm text-light-gray">{t("wish_cta_sub")}</p>
-          <Button type="button" variant="ctaPrimary" size="huge" onClick={handleWishCta}>
-            {t("wish_cta")}
-          </Button>
-        </div>
+        {/* 許願 CTA — 右側懸浮 */}
+        <Button
+          type="button"
+          onClick={handleWishCta}
+          className="fixed right-5 bottom-20 z-40 inline-flex items-center gap-2 rounded-full bg-primary-base px-6 py-3 font-semibold text-white shadow-[0_2px_8px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.12)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1),0_12px_32px_rgba(0,0,0,0.16)] active:scale-95 md:bottom-15 md:right-15"
+        >
+          {t("wish_cta")}
+        </Button>
 
         {/* 訪客引導（需登入區塊不空白） */}
         {!isAuthenticated ? (
