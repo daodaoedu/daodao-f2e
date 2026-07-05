@@ -4,7 +4,6 @@
  * Mobile 版靈感頁卡片，在 ShowcaseCard 基礎上新增：
  * - Haptic feedback（按反應時震動）
  * - Brewing overlay（延遲分享練習顯示醞釀中提示）
- * - onMenuPress callback
  */
 
 import * as Haptics from "expo-haptics";
@@ -15,7 +14,6 @@ import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
 
 interface PracticeShowcaseCardProps {
   practice: IShowcasePractice;
-  onMenuPress?: (practice: IShowcasePractice) => void;
   onReactionUpdated?: () => void | Promise<void>;
 }
 
@@ -39,11 +37,7 @@ const brewingOverlay = (
   </XStack>
 );
 
-export function PracticeShowcaseCard({
-  practice,
-  onMenuPress,
-  onReactionUpdated,
-}: PracticeShowcaseCardProps) {
+export function PracticeShowcaseCard({ practice, onReactionUpdated }: PracticeShowcaseCardProps) {
   const handleReactionTap = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   }, []);
@@ -54,7 +48,6 @@ export function PracticeShowcaseCard({
       extraContent={practice.is_brewing ? brewingOverlay : undefined}
       onReactionTap={handleReactionTap}
       onReactionUpdated={onReactionUpdated}
-      onMenuPress={onMenuPress ? () => onMenuPress(practice) : undefined}
     />
   );
 }

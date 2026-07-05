@@ -22,7 +22,10 @@ import {
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
+import { getEnv } from "@daodao/config";
 import { initiateOAuthLogin } from "../lib/auth-client";
+
+const websiteUrl = getEnv("NEXT_PUBLIC_WEBSITE_URL", "");
 
 export interface LoginDialogProps {
   /** 是否開啟 Dialog */
@@ -77,19 +80,6 @@ export const LoginDialog = ({
     initiateOAuthLogin(redirectUrl, defaultSource);
   };
 
-  const handleTermsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    // 這裡可以打開服務條款頁面或 Dialog
-    // 暫時先跳轉到服務條款頁面
-    window.open("/terms/service", "_blank");
-  };
-
-  const handlePrivacyClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    // 這裡可以打開隱私權政策頁面或 Dialog
-    // 暫時先跳轉到隱私權政策頁面
-    window.open("/terms/privacy", "_blank");
-  };
 
   // 處理關閉事件（如果不可關閉，則阻止關閉）
   const handleOpenChange = (newOpen: boolean) => {
@@ -159,16 +149,16 @@ export const LoginDialog = ({
               <span>{t("login_dialog_terms_prefix")}</span>
               <br />
               <CustomLink
-                href="/terms/service"
-                onClick={handleTermsClick}
+                href={`${websiteUrl}/terms/service`}
+                target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_terms_link")}
               </CustomLink>
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
               <CustomLink
-                href="/terms/privacy"
-                onClick={handlePrivacyClick}
+                href={`${websiteUrl}/terms/privacy-policy`}
+                target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_privacy_link")}
@@ -229,16 +219,16 @@ export const LoginDialog = ({
               <span>{t("login_dialog_terms_prefix")}</span>
               <br />
               <CustomLink
-                href="/terms/service"
-                onClick={handleTermsClick}
+                href={`${websiteUrl}/terms/service`}
+                target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_terms_link")}
               </CustomLink>
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
               <CustomLink
-                href="/terms/privacy"
-                onClick={handlePrivacyClick}
+                href={`${websiteUrl}/terms/privacy-policy`}
+                target="_blank"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
               >
                 {t("login_dialog_privacy_link")}

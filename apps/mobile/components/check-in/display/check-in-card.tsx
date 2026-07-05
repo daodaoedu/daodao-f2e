@@ -1,5 +1,6 @@
-import { useMemo } from "react";
-import { StyleSheet } from "react-native";
+import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
+import { useCallback, useMemo } from "react";
+import { Linking, StyleSheet } from "react-native";
 import { Image, Text, View, XStack, YStack } from "tamagui";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
@@ -35,6 +36,18 @@ export const CheckInCard = ({
     () => (mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null),
     [mood]
   );
+  const contentSegments = useMemo(() => parseTextLinks(content), [content]);
+
+  const handleOpenLink = useCallback(async (url: string) => {
+    try {
+      const canOpen = await Linking.canOpenURL(url);
+      if (canOpen) {
+        await Linking.openURL(url);
+      }
+    } catch (error) {
+      console.error("Failed to open URL:", error);
+    }
+  }, []);
 
   // 格式化日期
   const { dateYear, dateMonthDay } = useMemo(() => {
@@ -153,7 +166,21 @@ export const CheckInCard = ({
               marginTop={moodOption ? 0 : "$8"}
               marginRight="$10"
             >
-              {content}
+              {contentSegments.map((segment, index) =>
+                segment.type === "url" ? (
+                  <Text
+                    key={`url-${index}-${segment.value}`}
+                    color={colors.logo.cyan}
+                    textDecorationLine="underline"
+                    onPress={() => handleOpenLink(segment.value)}
+                  >
+                    {segment.value}
+                  </Text>
+                ) : (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: 純文字片段，順序不會變動
+                  <Text key={`text-${index}`}>{segment.value}</Text>
+                )
+              )}
             </Text>
 
             {/* 標籤 */}
