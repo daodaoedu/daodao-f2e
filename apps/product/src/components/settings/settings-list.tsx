@@ -9,7 +9,6 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import {
   AlertCircle,
   Archive,
-  BadgeCheck,
   Bell,
   BookOpen,
   Footprints,
@@ -21,7 +20,6 @@ import {
   Settings,
   SquareUser,
 } from "lucide-react";
-import { useOnboardingProgress } from "@/components/task-guide/onboarding-progress-context";
 import { useLogoutDialog } from "@/hooks/use-logout-dialog";
 
 type SettingsItem = {
@@ -150,10 +148,6 @@ export const SettingsList = () => {
   const t = useTranslations("app_product");
   const { openLogoutDialog, isLoggingOut } = useLogoutDialog();
   const { data } = useSettingsCompletion();
-  const { taskList, completedTasks, badgeGranted } = useOnboardingProgress();
-  const hasEarlyUserBadge =
-    badgeGranted || (taskList.length > 0 && completedTasks >= taskList.length);
-
   const handleLogout = async () => {
     await openLogoutDialog();
   };
@@ -171,19 +165,6 @@ export const SettingsList = () => {
           <span className="ml-auto text-sm font-medium text-text-dark">
             {data.completed}/{data.total}
           </span>
-        </div>
-      )}
-      {hasEarlyUserBadge && (
-        <div className="flex items-center gap-3 rounded-lg border border-logo-orange/25 bg-white px-3 py-3 shadow-sm">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-logo-orange/15 text-logo-orange">
-            <BadgeCheck className="size-5" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-text-dark">Early User Badge</p>
-            <p className="text-xs leading-4 text-text-gray">
-              {t("settings_early_user_badge_done")}
-            </p>
-          </div>
         </div>
       )}
       <ul className="flex flex-col gap-2">

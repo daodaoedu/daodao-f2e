@@ -4764,9 +4764,7 @@
     "taskGuide": {
       "title": "Beginner Tasks",
       "celebration": {
-        "title": "All done!",
-        "badgeTitle": "You earned the Early User Badge!",
-        "badgeDescription": "Thanks for completing all onboarding tasks — you're one of Dao Dao's earliest users!"
+        "title": "All done!"
       },
       "progress": "{completed}/{total} done",
       "ariaOpen": "Expand onboarding task list",
@@ -5631,7 +5629,6 @@
     "social_title": "Social",
     "settings_completion_prompt": "Complete your profile for more accurate learning recommendations",
     "settings_completion_label": "Profile completion",
-    "settings_early_user_badge_done": "Completed the onboarding tasks",
     "settings_language": "Language",
     "settings_logout": "Log out",
     "settings_logging_out": "Logging out...",
