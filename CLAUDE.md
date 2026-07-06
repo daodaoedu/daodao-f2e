@@ -4,6 +4,11 @@
 
 進行任何開發工作（規劃、實作、除錯、review）前，先讀 `.claude/skills/project-rules/SKILL.md` 了解專案規範。
 
+## 地圖
+
+- 不熟 codebase 結構 → 先讀 `.claude/skills/codebase-map/SKILL.md`
+- 變更可能影響其他 daodao repo（API contract、DB schema、auth）→ 先讀 `.claude/skills/system-map/SKILL.md`
+
 ## Commit 流程
 
 commit 時必須依序執行：
@@ -23,3 +28,10 @@ commit 時必須依序執行：
 - `pnpm run lint` — Biome lint 檢查（turbo 跑所有 packages）
 - `pnpm run typecheck` — TypeScript 類型檢查（turbo 跑所有 packages）
 - `pnpm run check:fix` — 自動修復 lint + format 問題
+
+## 工作守則
+
+- 規範文件與 codebase 現實衝突時，以現實為準並修正文件
+- 同一個錯誤修三次仍失敗 → 停下來總結「已嘗試什麼、卡在哪」，詢問使用者
+- 禁止 force push、禁止修改已存在的 migration、禁止手改生成物
+- 制度組成與設計原則見 `.claude/README.md`
