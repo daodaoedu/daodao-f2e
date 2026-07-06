@@ -17,7 +17,6 @@
       "Bash(diff:*)",
       "Bash(sort:*)",
       "Bash(jq:*)",
-      "Bash(curl:*)",
       "Bash(git status:*)",
       "Bash(git log:*)",
       "Bash(git diff:*)",
@@ -27,19 +26,30 @@
       "Bash(git remote:*)",
       "Bash(git stash list:*)",
       "Bash(git tag:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh api:*)",
       "Bash(pnpm run:*)",
       "Bash(pnpm test:*)",
       "Bash(pnpm install:*)",
-      "Bash(pnpm add:*)",
       "Bash(pnpm list:*)",
       "Bash(pnpm --filter:*)",
       "Bash(pnpm typecheck:*)",
       "Bash(pnpm lint:*)",
       "Bash(pnpm build:*)",
+      "Bash(npm run:*)",
+      "Bash(npm test:*)",
       "Bash(npx:*)",
       "Bash(make:*)",
       "Bash(python3:*)",
       "Bash(pytest:*)",
+      "Bash(uv run:*)",
+      "Bash(uv sync:*)",
       "Bash(docker ps:*)",
       "Bash(docker logs:*)",
       "Bash(docker compose ps:*)",
@@ -47,24 +57,28 @@
       "Bash(openspec:*)",
       "Bash(wrangler:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)",
-      "Bash(git push origin:*)",
-      "Bash(git checkout -b:*)",
-      "Bash(git checkout:*)",
-      "Bash(git switch:*)",
       "Bash(git add:*)",
-      "Bash(git merge:*)",
-      "Bash(git stash:*)",
       "Bash(git fetch:*)",
       "Bash(git pull:*)",
-      "Bash(rm:*)"
+      "Bash(git checkout:*)",
+      "Bash(git switch:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
+      "Bash(rm -fr:*)",
+      "Bash(rm -r:*)",
+      "Bash(rm -R:*)",
       "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push --force-with-lease:*)",
       "Bash(git reset --hard:*)",
       "Bash(git checkout .:*)",
-      "Bash(git clean -f:*)"
+      "Bash(git clean:*)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)"
     ]
   },
   "hooks": {
@@ -74,7 +88,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/pre-write-guard.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-write-guard.sh"
           }
         ]
       }
@@ -85,7 +99,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/post-write-format.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-write-format.sh"
           }
         ]
       }

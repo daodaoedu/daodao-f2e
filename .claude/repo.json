@@ -1,0 +1,25 @@
+{
+  "repo": "daodao-f2e",
+  "defaultBranch": "dev",
+  "highRisk": false,
+  "quality": {
+    "fix": "pnpm run check:fix",
+    "lint": "pnpm run lint",
+    "typecheck": "pnpm run typecheck",
+    "test": "pnpm test"
+  },
+  "formatFile": "npx biome check --write \"{file}\"",
+  "reviewFocus": [
+    "邏輯錯誤：條件判斷、邊界情況、錯誤處理",
+    "安全：XSS、注入攻擊、敏感資料外洩",
+    "效能：不必要的 re-render、N+1 query、缺少 memo/useMemo",
+    "架構：使用 @daodao/* packages、元件拆分合理性"
+  ],
+  "protectedPaths": [
+    ".github/workflows/*",
+    ".env*",
+    "secrets/*",
+    "migrate/sql/*"
+  ],
+  "generatedBy": "daodao/.claude/sync.sh — 不要手改，改 bin/pipeline.config.json 後重新 sync"
+}

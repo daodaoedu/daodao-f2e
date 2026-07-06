@@ -1,30 +1,40 @@
 #!/usr/bin/env bash
-# PreToolUse hook: 保護敏感檔案 + 自動載入 project-rules
-set -euo pipefail
+# PreToolUse hook（Write|Edit）：阻擋敏感檔案與受保護路徑的寫入。
+# 正本在 daodao monorepo .claude/shared/hooks/，由 sync.sh 同步——不要直接改副本。
+#
+# Claude Code hook 介面：JSON 由 stdin 傳入，.tool_input.file_path 為目標檔案。
+# exit 2 = 阻擋該次寫入（stderr 會回饋給模型）。
+set -uo pipefail
 
-filepath=$(echo "$CLAUDE_TOOL_INPUT" | jq -r '.file_path // .filePath // empty' 2>/dev/null)
-[ -z "$filepath" ] && exit 0
+INPUT=$(cat 2>/dev/null || true)
+FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty' 2>/dev/null || true)
+[ -n "$FILE" ] || exit 0
 
-# 1. 禁止寫入敏感檔案
-if echo "$filepath" | grep -qE '\.(env|pem|key)$'; then
-  echo "❌ 禁止寫入敏感檔案（.env / .pem / .key）" >&2
-  exit 1
-fi
+ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
-# 2. 禁止修改已存在的 migration SQL（僅 daodao-storage）
-if echo "$filepath" | grep -q 'migrate/sql/' && [ -f "$filepath" ]; then
-  echo "❌ 禁止修改已存在的 migration，請新增新的 migration 檔案" >&2
-  exit 1
-fi
+# 1. 敏感檔案（副檔名 / 檔名）
+BASE=$(basename "$FILE")
+case "$BASE" in
+  .env|.env.*|*.pem|*.key|*.p12|*.pfx|id_rsa|id_ed25519|credentials.json|service-account*.json)
+    echo "BLOCKED: ${FILE} 是敏感檔案，禁止由 AI 直接寫入。需要變更請告知使用者手動處理。" >&2
+    exit 2
+    ;;
+esac
 
-# 3. 首次寫入時自動載入 project-rules
-PROJECT_ROOT="${CLAUDE_WORKING_DIRECTORY:-$(pwd)}"
-rules="$PROJECT_ROOT/.claude/skills/project-rules/SKILL.md"
-flag="/tmp/.claude-rules-loaded-$(basename "$PROJECT_ROOT")-$$"
-if [ -f "$rules" ] && [ ! -f "$flag" ]; then
-  echo "📋 自動載入專案規範："
-  cat "$rules"
-  touch "$flag"
+# 2. 受保護路徑（來自 .claude/repo.json 的 protectedPaths，glob 比對）
+REPO_JSON="${ROOT}/.claude/repo.json"
+if [ -f "$REPO_JSON" ]; then
+  REL="${FILE#"$ROOT"/}"
+  while IFS= read -r pat; do
+    [ -n "$pat" ] || continue
+    # shellcheck disable=SC2254
+    case "$REL" in
+      $pat)
+        echo "BLOCKED: ${REL} 屬於受保護路徑（${pat}）。此類檔案禁止由 AI 修改。" >&2
+        exit 2
+        ;;
+    esac
+  done < <(jq -r '.protectedPaths[]? // empty' "$REPO_JSON" 2>/dev/null)
 fi
 
 exit 0
