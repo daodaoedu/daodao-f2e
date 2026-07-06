@@ -30,13 +30,11 @@ import { getStorage, StorageEnum } from "@daodao/shared";
 const userStorage = getStorage<UserInfo>(StorageEnum.UserInfo);
 ```
 
-可用的 StorageEnum：
-- `Quiz` — sessionStorage，島島測試資料
-- `UserInfo` — localStorage，使用者資訊
-- `Whitelist` — localStorage，受信任網站
-- `OAuthNonce` — sessionStorage，OAuth nonce
+**可用 key 的權威清單在 `packages/shared/src/lib/storage.ts` 的 `StorageEnum`**（本文件不窮舉，清單會過時——盤點時已有 11 個 key，如 `UserInfo`、`Quiz`、`ManualPracticeDraft`、`ActionMaker`、`AuthSignal` 等）。
 
-新增 key：在 `packages/shared/src/lib/storage.ts` 的 `StorageEnum` 加 key → `mapStorageKeyToStorageType` 定義類型。
+新增 key：在 `StorageEnum` 加 key → `mapStorageKeyToStorageType` 定義 local/session 類型。
+
+注意：`getStorage` 是 SSR-safe 且靜默失敗（SSR 或例外時回 no-op），呼叫端不可假設寫入成功。
 
 ### UI 元件
 
@@ -48,20 +46,29 @@ import { Button } from "@daodao/ui/components/button";
 
 ### 共用工具
 
-必須用 `@daodao/shared`，禁止重複實作。
+必須用 `@daodao/shared`，禁止重複實作。**匯出的權威清單在 `packages/shared/src/index.ts`**（本文件不窮舉）。寫新 hook/util 前先 grep 該檔確認是否已存在。
 
-- Hooks：`useScrollLock`, `useMediaQuery`, `useQueryState`, `useScrollVisibility`, `useAssetsLoader`
-- 工具：`formatDate`, `shareContent`, `captureElementAsImage`, `getStorage`
+- Hooks 例：`useScrollLock`、`useMediaQuery`（含 `useIsMobile` 等 breakpoint 變體）、`useQueryState`、`useFormDraft`
+- 工具例：`getStorage`、`captureElementAsImage`、`parseTextLinks`、`getShareAPI`
 
 ### API 呼叫
 
 必須用 `@daodao/api`，禁止 `fetch` / `axios`。
 
+**App 端**只 import domain 匯出與 `useMutate`（`useQuery`/`client` 沒有從 package 對外匯出）：
+
 ```typescript
-import { useQuery, useMutate, client } from "@daodao/api";
+import { useCurrentUser, createPractice, useMutate } from "@daodao/api";
 ```
 
-可用的 Hooks：`useQuery`, `useMutate`, `useInfinite`, `useImmutable`
+**`packages/api/src/services/` 內部**才用相對路徑取 `client` 與 hooks 工廠：
+
+```typescript
+import { client } from "../client";
+import { useQuery } from "../hooks";
+```
+
+已知例外（歷史債務，不可仿效）：action-maker feature 直接 `fetch` worker、recommendation/showcase hooks 直接 `fetch` ai-backend。新程式碼一律走 `@daodao/api` 的模式。
 
 ### 日期處理
 
@@ -136,7 +143,7 @@ export type TaskStatus = typeof TaskStatus[keyof typeof TaskStatus];
 
 禁止直接用字串字面量表示常數值。
 
-現有常數：`MoodType`、`TaskStatus`、`FilterStatus`、`CheckInStatus`
+**現有常數以 `apps/product/src/constants/` 目錄為準**（本文件不窮舉——盤點時已有十多個，如 `MoodType`、`TaskStatus`、`PracticeStatus`、`NotificationType`、`ReactionType` 等）。新增前先 grep 該目錄避免重複。
 
 ### Type & Interface
 

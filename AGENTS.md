@@ -4,6 +4,11 @@
 
 進行任何開發工作（規劃、實作、除錯、review）前，先讀 `.claude/skills/project-rules/SKILL.md` 了解專案規範。
 
+## 地圖
+
+- 不熟 codebase 結構 → 先讀 `.claude/skills/codebase-map/SKILL.md`
+- 變更可能影響其他 daodao repo（API contract、DB schema、auth）→ 先讀 `.claude/skills/system-map/SKILL.md`
+
 ## Commit 流程
 
 commit 時必須依序執行：
