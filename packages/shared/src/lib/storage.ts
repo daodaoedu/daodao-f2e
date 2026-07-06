@@ -29,6 +29,8 @@ export enum StorageEnum {
   RegistrationFlow = "RegistrationFlow",
   /** 用於共同挑戰 POC 的跨頁 mock 狀態（正式版由後端取代） */
   PocChallenge = "PocChallenge",
+  /** 用於 LifeWarehouse POC 的生活追蹤 mock 狀態（正式版由後端取代） */
+  PocLifeWarehouse = "PocLifeWarehouse",
 }
 
 const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
@@ -42,6 +44,7 @@ const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   HomeFeedAnchor: "sessionStorage",
   RegistrationFlow: "localStorage",
   PocChallenge: "sessionStorage",
+  PocLifeWarehouse: "sessionStorage",
 };
 
 export interface StorageInstance<T> {
