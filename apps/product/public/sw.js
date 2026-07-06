@@ -1,5 +1,5 @@
 const CACHE_NAME = "daodao-product-v1";
-const PRECACHE_URLS = ["/offline"];
+const PRECACHE_URLS = ["/offline.html"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -24,7 +24,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.mode === "navigate") {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match("/offline")),
+      fetch(event.request).catch(() => caches.match("/offline.html")),
     );
   }
 });

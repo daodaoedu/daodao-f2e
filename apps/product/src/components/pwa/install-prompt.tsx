@@ -28,12 +28,13 @@ export function PwaInstallPrompt() {
     const prompt = deferredPromptRef.current;
     if (!prompt) return;
 
-    await prompt.prompt();
-    const { outcome } = await prompt.userChoice;
-
-    if (outcome === "accepted") {
-      setShowBanner(false);
+    try {
+      await prompt.prompt();
+      await prompt.userChoice;
+    } catch {
+      // prompt failed — hide banner regardless
     }
+    setShowBanner(false);
     deferredPromptRef.current = null;
   }, []);
 
