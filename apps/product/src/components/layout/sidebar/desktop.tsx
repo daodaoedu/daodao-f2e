@@ -2,10 +2,17 @@
 
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg, VerticalFullSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
+import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@daodao/ui/components/dropdown-menu";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { useState } from "react";
@@ -13,14 +20,23 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
-export const DesktopSidebar = ({ identifier }: SidebarProps) => {
+const USER_MENU_ITEMS = [
+  { labelKey: "nav_settings", href: "/settings", emoji: "gear" },
+  { labelKey: "nav_language", href: "/settings/preferences", emoji: "globe" },
+  { labelKey: "nav_feedback", href: "/feedback", emoji: "speech" },
+] as const;
+
+export const DesktopSidebar = ({ identifier, userName, photoURL }: SidebarProps) => {
   const pathname = usePathname();
   const t = useTranslations("app_product");
+  const { logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleToggleSidebar = () => {
     setIsCollapsed((prev) => !prev);
   };
+
+  const initials = userName ? userName.charAt(0).toUpperCase() : "U";
 
   return (
     <nav
@@ -113,6 +129,55 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
           );
         })}
       </ul>
+
+      {/* User Menu */}
+      <div className={cn("mt-6 px-4 pb-4", isCollapsed && "px-2")}>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className={cn(
+                "flex w-full items-center gap-2 rounded-xl p-2 transition-colors hover:bg-white/60",
+                isCollapsed && "justify-center"
+              )}
+            >
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#16B9B3] text-sm font-medium text-white">
+                {photoURL ? (
+                  <Image
+                    src={photoURL}
+                    alt={userName ?? ""}
+                    width={36}
+                    height={36}
+                    className="size-9 rounded-full object-cover"
+                  />
+                ) : (
+                  initials
+                )}
+              </div>
+              {!isCollapsed && (
+                <span className="flex-1 truncate text-left text-sm text-text-dark">
+                  {userName || t("nav_my_island")}
+                </span>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            {USER_MENU_ITEMS.map((menuItem) => (
+              <DropdownMenuItem key={menuItem.labelKey} asChild>
+                <CustomLink
+                  href={menuItem.href}
+                  className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-text-dark hover:bg-accent"
+                >
+                  {t(menuItem.labelKey)}
+                </CustomLink>
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuItem onClick={() => logout()} className="text-[#EF4444]">
+              {t("nav_logout")}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </nav>
   );
 };

@@ -56,6 +56,7 @@ export const menuItems = [
     icon: SettingOutlineSvg,
     labelKey: "nav_settings",
     href: "/settings",
+    hidden: true,
     isMatch: (pathname: string) => pathname.startsWith("/settings"),
   },
 ];
