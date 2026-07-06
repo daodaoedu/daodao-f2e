@@ -2,7 +2,7 @@ import faviconPng from "@daodao/assets/images/brand/favicon.png";
 import { hasLocale } from "@daodao/i18n";
 import { routing } from "@daodao/i18n/routing";
 import { getMessages, getTranslations, setRequestLocale } from "@daodao/i18n/server";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { detectDevice } from "@/lib/device-detection";
 import GlobalProvider from "../global-provider";
@@ -10,6 +10,10 @@ import GlobalProvider from "../global-provider";
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
+
+export const viewport: Viewport = {
+  themeColor: "#16B2A5",
+};
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
@@ -28,6 +32,12 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
     description: t("description"),
     icons: {
       icon: faviconPng.src,
+      apple: "/icons/icon-180x180.png",
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: t("title"),
     },
   };
 }
