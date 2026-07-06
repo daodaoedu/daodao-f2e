@@ -11,6 +11,8 @@ import { SheetManagerProvider } from "@daodao/ui/components/animate-ui/component
 import { Toaster } from "@daodao/ui/components/sonner";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
 import { useRouter } from "next/navigation";
+import { PwaInstallPrompt } from "@/components/pwa/install-prompt";
+import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import { OnboardingProgressProvider } from "@/components/task-guide/onboarding-progress-context";
 import { TaskGuideWidget } from "@/components/task-guide/task-guide-widget";
 import { TrackingRefCapture } from "@/components/tracking-ref-capture";
@@ -42,6 +44,7 @@ function GlobalProvider({
       {head}
       <body>
         <TrackingRefCapture />
+        <RegisterServiceWorker />
         <AnalyticsScripts />
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
           <DeviceProvider initialDevice={initialDevice}>
@@ -84,6 +87,7 @@ function GlobalProvider({
                         <TaskGuideWidget />
                         <Toaster />
                         {children}
+                        <PwaInstallPrompt />
                       </OnboardingProgressProvider>
                     </SheetManagerProvider>
                   </AuthProvider>
