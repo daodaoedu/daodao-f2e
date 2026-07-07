@@ -12,7 +12,7 @@ export function CorrelationsView() {
     <div className="flex flex-col gap-6">
       <p className="text-sm text-[#636E72]">
         系統分析你的打卡與每日狀態，找出「怎樣的日子你學得最好」。統計關聯不代表因果，但能幫你認識自己的模式。
-        <span className="ml-1 text-xs text-[#8A9BA0]">示意資料</span>
+        <span className="ml-1 text-xs text-[#8A9BA0]">功能預覽</span>
       </p>
 
       {strong.length > 0 && (

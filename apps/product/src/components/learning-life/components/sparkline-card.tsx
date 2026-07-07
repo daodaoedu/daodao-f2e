@@ -30,6 +30,12 @@ const TREND_ICONS: Record<string, string> = {
   flat: "→",
 };
 
+const TREND_LABELS: Record<string, string> = {
+  up: "上升",
+  down: "下降",
+  flat: "持平",
+};
+
 export function SparklineCard({ config, value, data, trend = "flat" }: SparklineCardProps) {
   const polyline = buildPolyline(data, 120, 40);
   const gradientId = `sparkline-${config.key}`;
@@ -42,7 +48,7 @@ export function SparklineCard({ config, value, data, trend = "flat" }: Sparkline
           <span className="text-xs text-[#8A9BA0]">{config.label}</span>
         </div>
         <span className="text-xs text-[#8A9BA0]">
-          {TREND_ICONS[trend]} {trend === "up" ? "上升" : trend === "down" ? "下降" : "持平"}
+          {TREND_ICONS[trend]} {TREND_LABELS[trend] ?? "持平"}
         </span>
       </div>
 
