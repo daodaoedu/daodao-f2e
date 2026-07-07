@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@daodao/ui/lib/utils";
-import { format, parseISO, subDays } from "date-fns";
+import { format, getDate, parseISO, subDays } from "date-fns";
 import { useMemo } from "react";
 import { CheckinCard, MetricPill } from "../components";
 import { METRIC_CONFIGS } from "../constants";
@@ -21,7 +21,18 @@ export function DaysView() {
     return dates;
   }, [selectedDate]);
 
-  const dayCheckins = checkins.filter((c) => c.checkinDate === selectedDate);
+  const checkinCountByDate = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const c of checkins) {
+      map.set(c.checkinDate, (map.get(c.checkinDate) ?? 0) + 1);
+    }
+    return map;
+  }, [checkins]);
+
+  const dayCheckins = useMemo(
+    () => checkins.filter((c) => c.checkinDate === selectedDate),
+    [checkins, selectedDate]
+  );
   const record = records[selectedDate];
   const hasContext = record && (record.energy > 0 || record.sleep > 0 || record.contextTags.length > 0);
 
@@ -29,9 +40,9 @@ export function DaysView() {
     <div className="flex flex-col gap-5">
       <div className="flex justify-between gap-1">
         {weekDates.map((dateStr) => {
-          const count = checkins.filter((c) => c.checkinDate === dateStr).length;
+          const count = checkinCountByDate.get(dateStr) ?? 0;
           const isSelected = dateStr === selectedDate;
-          const day = Number(dateStr.split("-")[2]);
+          const day = getDate(parseISO(dateStr));
           let checkinMark = "·";
           if (count === 1) checkinMark = "✓";
           if (count > 1) checkinMark = `✓${count}`;

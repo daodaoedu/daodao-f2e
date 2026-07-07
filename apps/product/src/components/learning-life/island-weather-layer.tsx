@@ -21,7 +21,7 @@ export function IslandWeatherLayer() {
   });
 
   return (
-    <div className="pointer-events-none absolute inset-0" aria-hidden>
+    <div className="pointer-events-none absolute inset-0" aria-hidden="true">
       <span className="absolute -top-2 -right-6 text-3xl drop-shadow-sm">{weather.emoji}</span>
       {weather.lively && (
         <span className="absolute -bottom-1 -left-4 animate-pulse text-xl">✨</span>

@@ -34,14 +34,28 @@ function initState(): LearningLifeState {
   };
 }
 
+const SERVER_SNAPSHOT: LearningLifeState = {
+  records: {},
+  checkins: [],
+  selectedDate: "",
+  activeTab: "today",
+  insightView: "cards",
+  activePeriod: 30,
+};
+
 const storage = getStorage<LearningLifeState>(StorageEnum.PocLifeWarehouse);
 
-let state: LearningLifeState = initState();
+let state: LearningLifeState | null = null;
 const listeners = new Set<() => void>();
 let hydrated = false;
 
+function getState(): LearningLifeState {
+  if (!state) state = initState();
+  return state;
+}
+
 function emit() {
-  storage.set(state);
+  storage.set(getState());
   for (const listener of listeners) listener();
 }
 
@@ -62,12 +76,16 @@ function subscribe(listener: () => void) {
 }
 
 function getSnapshot(): LearningLifeState {
-  return state;
+  return getState();
+}
+
+function getServerSnapshot(): LearningLifeState {
+  return SERVER_SNAPSHOT;
 }
 
 /** 訂閱學習生活狀態（島頁摘要卡、天氣層、完整頁共用同一份） */
 export function useLearningLifeStore(): LearningLifeState {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 function emptyRecord(date: string): DailyRecord {
@@ -75,32 +93,32 @@ function emptyRecord(date: string): DailyRecord {
 }
 
 function updateRecord(date: string, patch: Partial<DailyRecord>) {
-  const current = state.records[date] ?? emptyRecord(date);
+  const current = getState().records[date] ?? emptyRecord(date);
   state = {
-    ...state,
-    records: { ...state.records, [date]: { ...current, ...patch } },
+    ...getState(),
+    records: { ...getState().records, [date]: { ...current, ...patch } },
   };
   emit();
 }
 
 export const learningLifeActions = {
   setEnergy(date: string, energy: number) {
-    updateRecord(date, { energy, source: { ...state.records[date]?.source, energy: "manual" } });
+    updateRecord(date, { energy, source: { ...getState().records[date]?.source, energy: "manual" } });
     posthogCapture("learning_life_quick_track_used", { field: "energy" });
   },
 
   setSleep(date: string, sleep: number) {
-    updateRecord(date, { sleep, source: { ...state.records[date]?.source, sleep: "manual" } });
+    updateRecord(date, { sleep, source: { ...getState().records[date]?.source, sleep: "manual" } });
     posthogCapture("learning_life_quick_track_used", { field: "sleep" });
   },
 
   setFocus(date: string, focus: number) {
-    updateRecord(date, { focus, source: { ...state.records[date]?.source, focus: "manual" } });
+    updateRecord(date, { focus, source: { ...getState().records[date]?.source, focus: "manual" } });
     posthogCapture("learning_life_quick_track_used", { field: "focus" });
   },
 
   toggleContextTag(date: string, tag: string) {
-    const current = state.records[date] ?? emptyRecord(date);
+    const current = getState().records[date] ?? emptyRecord(date);
     const contextTags = current.contextTags.includes(tag)
       ? current.contextTags.filter((t) => t !== tag)
       : [...current.contextTags, tag];
@@ -116,7 +134,7 @@ export const learningLifeActions = {
   addMockCheckin(today: string) {
     const practice = MOCK_PRACTICES[0];
     const checkin: MockCheckin = {
-      id: `local-${state.checkins.length + 1}`,
+      id: `local-${getState().checkins.length + 1}`,
       practiceId: practice.id,
       practiceTitle: practice.title,
       checkinDate: today,
@@ -124,32 +142,32 @@ export const learningLifeActions = {
       note: "完成今日進度！（示意打卡）",
       tags: ["有收穫"],
     };
-    state = { ...state, checkins: [checkin, ...state.checkins] };
+    state = { ...getState(), checkins: [checkin, ...getState().checkins] };
     emit();
     posthogCapture("learning_life_mock_checkin_added", {
-      streak_after: getCheckinStreak(state.checkins, today),
+      streak_after: getCheckinStreak(getState().checkins, today),
     });
   },
 
   setSelectedDate(date: string) {
-    state = { ...state, selectedDate: date };
+    state = { ...getState(), selectedDate: date };
     emit();
   },
 
   setActiveTab(tab: TabId) {
-    state = { ...state, activeTab: tab };
+    state = { ...getState(), activeTab: tab };
     emit();
     posthogCapture("learning_life_tab_switched", { tab });
   },
 
   setInsightView(view: InsightView) {
-    state = { ...state, insightView: view };
+    state = { ...getState(), insightView: view };
     emit();
     if (view !== "cards") posthogCapture("learning_life_insight_drilldown", { view });
   },
 
   setActivePeriod(period: PeriodOption) {
-    state = { ...state, activePeriod: period };
+    state = { ...getState(), activePeriod: period };
     emit();
   },
 };
