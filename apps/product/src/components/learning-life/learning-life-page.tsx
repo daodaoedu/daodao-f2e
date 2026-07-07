@@ -3,6 +3,7 @@
 import { cn } from "@daodao/ui/lib/utils";
 import { format } from "date-fns";
 import { TABS } from "./constants";
+import { InsightsTab } from "./insights/insights-tab";
 import { learningLifeActions, useLearningLifeStore } from "./mock-store";
 import { TodayTab } from "./today/today-tab";
 
@@ -33,7 +34,7 @@ export function LearningLifePage() {
       {activeTab === "today" ? (
         <TodayTab today={today} todayRecord={records[today]} checkins={checkins} />
       ) : (
-        <p className="py-12 text-center text-sm text-[#8A9BA0]">洞察功能即將登場</p>
+        <InsightsTab today={today} />
       )}
     </div>
   );

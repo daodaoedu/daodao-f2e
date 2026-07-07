@@ -7,3 +7,4 @@ export { SectionHeader } from "./section-header";
 export { SparklineCard } from "./sparkline-card";
 export { TagCloud } from "./tag-cloud";
 export { TagToggleGroup } from "./tag-toggle-group";
+export { TrendBars } from "./trend-bars";
