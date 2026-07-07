@@ -13,7 +13,6 @@ const PERIOD_LABELS: Record<PeriodOption, string> = {
   7: "7天",
   30: "30天",
   90: "90天",
-  180: "180天",
 };
 
 export function PeriodSelector({ value, onChange }: PeriodSelectorProps) {

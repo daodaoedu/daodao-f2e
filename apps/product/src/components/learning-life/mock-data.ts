@@ -1,6 +1,6 @@
 import { format, subDays } from "date-fns";
-import { PRESET_TAGS } from "./constants";
-import type { Correlation, DailyRecord } from "./types";
+import { CHECKIN_TAGS, CONTEXT_TAGS } from "./constants";
+import type { CheckinMood, Correlation, DailyRecord, Insight, MockCheckin } from "./types";
 
 function seedRandom(str: string): number {
   let hash = 0;
@@ -16,111 +16,124 @@ function seededValue(seed: number, min: number, max: number): number {
   return min + normalized * (max - min);
 }
 
-function generateDailyRecord(dateStr: string, _dayIndex: number): DailyRecord {
+export const MOCK_PRACTICES = [
+  { id: "jlpt-n3", title: "日檢 N3 備考衝刺" },
+  { id: "neuro-book", title: "《神經可塑性》共讀" },
+  { id: "half-marathon", title: "半馬完賽訓練" },
+] as const;
+
+const CHECKIN_NOTES = [
+  "聽力練了 3 回，語速終於跟上一點了",
+  "讀完第 4 章，神經元用進廢退真的有感",
+  "今天只有 20 分鐘，做了一回單字題。少但沒斷",
+  "跑了 8K，配速 6:10，比上週穩",
+  "文法藍寶書第 12 章，「〜わけではない」搞懂了",
+  "在圖書館待了一下午，效率超高",
+  "有點累，但還是完成了今天的進度",
+  "跟讀書會討論完，觀點被打開",
+];
+
+const MOOD_POOL: CheckinMood[] = [
+  "happy", "good", "good", "neutral", "happy", "frustrated", "good", "neutral", "bored", "happy",
+];
+
+/**
+ * 產生過去 days 天的 mock 打卡。
+ * 今天刻意不產生（保留給使用者體驗打卡動線）；昨天起往回 6 天必有打卡，
+ * 讓使用者今天打卡後 streak 達 7 → 島景出現彩虹。
+ */
+export function generateMockCheckins(days = 90): MockCheckin[] {
+  const checkins: MockCheckin[] = [];
+  const today = new Date();
+  for (let i = 1; i < days; i++) {
+    const dateStr = format(subDays(today, i), "yyyy-MM-dd");
+    const seed = seedRandom(dateStr);
+    const hasCheckin = i <= 6 || seededValue(seed, 0, 1) < 0.72;
+    if (!hasCheckin) continue;
+    const count = seededValue(seed + 1, 0, 1) < 0.25 ? 2 : 1;
+    for (let j = 0; j < count; j++) {
+      const practiceIdx = Math.floor(seededValue(seed + j * 3, 0, MOCK_PRACTICES.length)) % MOCK_PRACTICES.length;
+      const practice = MOCK_PRACTICES[practiceIdx] ?? MOCK_PRACTICES[0];
+      const mood = MOOD_POOL[Math.floor(seededValue(seed + j * 7 + 2, 0, MOOD_POOL.length)) % MOOD_POOL.length] ?? "good";
+      const note = CHECKIN_NOTES[Math.floor(seededValue(seed + j * 11 + 5, 0, CHECKIN_NOTES.length)) % CHECKIN_NOTES.length] ?? "";
+      const tagCount = Math.round(seededValue(seed + j * 13 + 8, 1, 3));
+      const shuffled = [...CHECKIN_TAGS].sort((a, b) => seedRandom(a + dateStr) - seedRandom(b + dateStr));
+      checkins.push({
+        id: `mock-${dateStr}-${j}`,
+        practiceId: practice.id,
+        practiceTitle: practice.title,
+        checkinDate: dateStr,
+        mood,
+        note,
+        tags: shuffled.slice(0, tagCount),
+      });
+    }
+  }
+  return checkins;
+}
+
+function generateDailyRecord(dateStr: string): DailyRecord {
   const seed = seedRandom(dateStr);
-  const dayOfWeek = new Date(dateStr).getDay();
-  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-
-  const baseExercise = isWeekend ? 60 : 20;
-  const exercise = Math.round(seededValue(seed + 1, baseExercise * 0.3, baseExercise * 2.5));
-  const exerciseBoost = Math.min(exercise / 120, 1) * 2;
-
-  const sleep = Number(seededValue(seed + 2, 5, 9).toFixed(1));
-  const sleepBoost = sleep > 7 ? 1 : sleep < 6 ? -1 : 0;
-
-  const coffee = Math.round(seededValue(seed + 3, 0, 4));
-  const coffeeEffect = coffee > 2 ? -0.3 : 0;
-
-  const baseMood = isWeekend ? 6.5 : 5.5;
-  const mood = Math.max(
-    1,
-    Math.min(
-      9,
-      Math.round(
-        baseMood + exerciseBoost + sleepBoost + coffeeEffect + seededValue(seed + 4, -1.5, 1.5)
-      )
-    )
-  );
-
-  const energy = Math.max(
-    1,
-    Math.min(9, Math.round(5 + sleepBoost + exerciseBoost * 0.5 + seededValue(seed + 5, -1.5, 1.5)))
-  );
-
-  const baseSteps = isWeekend ? 9000 : 6000;
-  const steps = Math.round(seededValue(seed + 6, baseSteps * 0.4, baseSteps * 1.8));
-
-  const focus = Number(seededValue(seed + 7, 2, 8).toFixed(1));
-  const spend = Math.round(seededValue(seed + 8, 100, 800));
+  const sleep = Number(seededValue(seed + 2, 5, 8.5).toFixed(1));
+  let sleepBoost = 0;
+  if (sleep >= 7) sleepBoost = 1;
+  if (sleep < 6) sleepBoost = -1;
+  const energy = Math.max(1, Math.min(5, Math.round(3 + sleepBoost + seededValue(seed + 5, -1, 1))));
+  const tagCount = Math.round(seededValue(seed + 12, 1, 3));
+  const shuffled = [...CONTEXT_TAGS].sort((a, b) => seedRandom(a + dateStr) - seedRandom(b + dateStr));
+  const contextTags = shuffled.slice(0, tagCount);
+  const focusBoost = contextTags.includes("圖書館") || contextTags.includes("早起") ? 1 : 0;
+  const focus = Math.max(1, Math.min(5, Math.round(3 + focusBoost + seededValue(seed + 7, -1, 1))));
+  const exercise = Math.round(seededValue(seed + 1, 0, 90));
   const stress = Math.max(1, Math.min(5, Math.round(seededValue(seed + 9, 1, 5))));
-  const water = Math.round(seededValue(seed + 10, 3, 10));
-  const heartRate = Math.round(seededValue(seed + 11, 55, 80));
-
-  const tagCount = Math.round(seededValue(seed + 12, 1, 5));
-  const shuffled = [...PRESET_TAGS].sort(
-    (a, b) => seedRandom(a + dateStr) - seedRandom(b + dateStr)
-  );
-  const tags = shuffled.slice(0, tagCount);
-
-  const notes = [
-    "",
-    "",
-    "",
-    "攀岩日，最高完攀 5.11b。很棒的一天",
-    "有點低落",
-    "去福隆衝浪。很棒的一天",
-    "專注做 side project，效率很高",
-    "跟朋友吃飯聊天，心情很好",
-    "讀完《原子習慣》，很有收穫",
-    "早起跑步 5K",
-    "",
-  ];
-  const noteIdx = Math.round(seededValue(seed + 13, 0, notes.length - 1));
-  const note = notes[noteIdx] ?? "";
-
   return {
     date: dateStr,
-    mood,
     energy,
     sleep,
-    steps,
     focus,
     exercise,
-    coffee,
-    spend,
     stress,
-    water,
-    heartRate,
-    tags,
-    note,
-    intention: "",
-    reflection: "",
-    source: {
-      mood: "manual",
-      energy: "manual",
-      sleep: "mock",
-      steps: "mock",
-      focus: "manual",
-      exercise: "mock",
-      coffee: "manual",
-      spend: "manual",
-      stress: "manual",
-      water: "manual",
-      heartRate: "mock",
-    },
+    contextTags,
+    note: "",
+    source: { energy: "mock", sleep: "mock", focus: "mock", exercise: "mock", stress: "mock" },
   };
 }
 
-export function generateMockRecords(days: number = 90): Record<string, DailyRecord> {
+/** 過去 days 天（不含今天）的每日脈絡；今天由使用者在「今天」tab 記錄 */
+export function generateMockRecords(days = 90): Record<string, DailyRecord> {
   const records: Record<string, DailyRecord> = {};
   const today = new Date();
-  for (let i = 0; i < days; i++) {
-    const date = subDays(today, i);
-    const dateStr = format(date, "yyyy-MM-dd");
-    records[dateStr] = generateDailyRecord(dateStr, i);
+  for (let i = 1; i < days; i++) {
+    const dateStr = format(subDays(today, i), "yyyy-MM-dd");
+    records[dateStr] = generateDailyRecord(dateStr);
   }
   return records;
 }
+
+/** 精選洞察卡（第二層）— POC 寫死，文案全為學習語境 */
+export const MOCK_INSIGHTS: Insight[] = [
+  {
+    id: "library-focus",
+    emoji: "📚",
+    conclusion: "在 #圖書館 的日子，你的專注品質平均高 40%",
+    detail: "過去 30 天有 8 天在圖書館，專注品質平均 4.2/5；其他日子平均 3.0/5。",
+    drillDown: "correlations",
+  },
+  {
+    id: "sleep-checkin",
+    emoji: "😴",
+    conclusion: "睡滿 7 小時的隔天，你的打卡率高 1.8 倍",
+    detail: "睡眠充足的隔日打卡率 86%，不足時只有 48%。休息也是學習的一部分。",
+    drillDown: "trends",
+  },
+  {
+    id: "morning-mood",
+    emoji: "🌅",
+    conclusion: "#早起 的日子，打卡心情明顯更好",
+    detail: "早起日的打卡心情多為「開心」「不錯」，出現頻率比其他日子明顯更高。",
+    drillDown: "days",
+  },
+];
 
 function generateScatterData(
   seed: number,
@@ -135,87 +148,67 @@ function generateScatterData(
       correlation > 0
         ? 70 - (x - 20) * 0.35 * correlation + noise
         : 20 + (x - 20) * 0.35 * Math.abs(correlation) + noise;
-    points.push({
-      x: Math.round(x),
-      y: Math.max(10, Math.min(70, Math.round(y))),
-    });
+    points.push({ x: Math.round(x), y: Math.max(10, Math.min(70, Math.round(y))) });
   }
   return points;
 }
 
-export const MOCK_CORRELATIONS: Correlation[] = [
+/** 學習語境的相關性（第三層下鑽） */
+export const LEARNING_CORRELATIONS: Correlation[] = [
+  {
+    id: "library-focus",
+    metricA: { key: "tag:圖書館", emoji: "📚", label: "#圖書館" },
+    metricB: { key: "focus", emoji: "🎯", label: "專注品質" },
+    rValue: 0.44,
+    strength: "strong",
+    direction: "positive",
+    description: "📚 #圖書館 的日子，🎯 專注品質傾向較高",
+    scatterData: generateScatterData(42, 24, 0.44),
+  },
   {
     id: "exercise-mood",
-    metricA: { key: "exercise", emoji: "💪", label: "運動時間" },
-    metricB: { key: "mood", emoji: "😊", label: "心情" },
+    metricA: { key: "exercise", emoji: "💪", label: "運動" },
+    metricB: { key: "checkinMood", emoji: "😄", label: "打卡心情" },
     rValue: 0.52,
     strength: "strong",
     direction: "positive",
-    description: "💪 運動時間較高時，😊 心情傾向較高",
-    scatterData: generateScatterData(42, 24, 0.52),
+    description: "💪 有運動的日子，😄 打卡心情傾向較好",
+    scatterData: generateScatterData(77, 24, 0.52),
   },
   {
-    id: "coffee-sleep",
-    metricA: { key: "coffee", emoji: "☕", label: "咖啡" },
-    metricB: { key: "sleep", emoji: "😴", label: "睡眠" },
-    rValue: -0.31,
-    strength: "moderate",
-    direction: "negative",
-    description: "☕ 咖啡較高時，😴 睡眠傾向較低",
-    scatterData: generateScatterData(77, 24, -0.31),
-  },
-  {
-    id: "tag-climbing-mood",
-    metricA: { key: "tag:攀岩", emoji: "🏷️", label: "#攀岩" },
-    metricB: { key: "mood", emoji: "😊", label: "心情" },
-    rValue: 0.48,
+    id: "energy-focus",
+    metricA: { key: "energy", emoji: "🔋", label: "精力" },
+    metricB: { key: "focus", emoji: "🎯", label: "專注品質" },
+    rValue: 0.41,
     strength: "strong",
     direction: "positive",
-    description: "🏷️ #攀岩 的日子，😊 心情傾向較高",
+    description: "🔋 精力較高時，🎯 專注品質傾向較高",
   },
   {
-    id: "sleep-energy",
-    metricA: { key: "sleep", emoji: "😴", label: "睡眠品質" },
-    metricB: { key: "energy", emoji: "🔋", label: "精力" },
-    rValue: 0.34,
+    id: "sleep-checkin",
+    metricA: { key: "sleep", emoji: "😴", label: "睡眠" },
+    metricB: { key: "checkinRate", emoji: "✅", label: "打卡率" },
+    rValue: 0.38,
     strength: "moderate",
     direction: "positive",
-    description: "😴 睡眠品質較高時，🔋 精力傾向較高",
+    description: "😴 睡眠較充足的隔天，✅ 打卡率傾向較高",
   },
   {
-    id: "stress-sleep",
-    metricA: { key: "stress", emoji: "😤", label: "壓力" },
-    metricB: { key: "sleep", emoji: "😴", label: "睡眠品質" },
-    rValue: -0.19,
-    strength: "weak",
-    direction: "negative",
-    description: "😤 壓力較高時，😴 睡眠品質傾向較低",
-  },
-  {
-    id: "tag-earlyrise-focus",
-    metricA: { key: "tag:早起", emoji: "🏷️", label: "#早起" },
-    metricB: { key: "focus", emoji: "🎯", label: "專注時數" },
+    id: "earlyrise-focus",
+    metricA: { key: "tag:早起", emoji: "🌅", label: "#早起" },
+    metricB: { key: "focus", emoji: "🎯", label: "專注品質" },
     rValue: 0.29,
     strength: "moderate",
     direction: "positive",
-    description: "🏷️ #早起 的日子，🎯 專注時數傾向較高",
+    description: "🌅 #早起 的日子，🎯 專注品質傾向較高",
   },
   {
-    id: "focus-tasks",
-    metricA: { key: "focus", emoji: "🎯", label: "專注時數" },
-    metricB: { key: "mood", emoji: "✅", label: "完成任務" },
-    rValue: 0.18,
-    strength: "weak",
-    direction: "positive",
-    description: "🎯 專注時數較高時，✅ 完成任務傾向較高",
-  },
-  {
-    id: "alcohol-focus",
-    metricA: { key: "coffee", emoji: "🍺", label: "酒精" },
-    metricB: { key: "focus", emoji: "🎯", label: "專注時數" },
-    rValue: -0.27,
+    id: "stress-focus",
+    metricA: { key: "stress", emoji: "😤", label: "壓力" },
+    metricB: { key: "focus", emoji: "🎯", label: "專注品質" },
+    rValue: -0.31,
     strength: "moderate",
     direction: "negative",
-    description: "🍺 酒精較高時，🎯 專注時數傾向較低（隔日）",
+    description: "😤 壓力較高時，🎯 專注品質傾向較低",
   },
 ];

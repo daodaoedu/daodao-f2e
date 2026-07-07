@@ -1,10 +1,6 @@
 export { ConnectedServicesGrid } from "./connected-services-grid";
 export { CorrelationCard } from "./correlation-card";
-export { DayDetailCard } from "./day-detail-card";
-export { InsightBanner } from "./insight-banner";
 export { MetricPill } from "./metric-pill";
-export { MoodBarChart } from "./mood-bar-chart";
-export { MoodPicker } from "./mood-picker";
 export { PeriodSelector } from "./period-selector";
 export { SectionHeader } from "./section-header";
 export { SparklineCard } from "./sparkline-card";

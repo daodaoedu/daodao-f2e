@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@daodao/ui/lib/utils";
-import { PRESET_TAGS } from "../constants";
+import { CONTEXT_TAGS } from "../constants";
 
 interface TagToggleGroupProps {
   selected: string[];
@@ -11,7 +11,7 @@ interface TagToggleGroupProps {
 export function TagToggleGroup({ selected, onToggle }: TagToggleGroupProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      {PRESET_TAGS.map((tag) => {
+      {CONTEXT_TAGS.map((tag) => {
         const isActive = selected.includes(tag);
         return (
           <button

@@ -1,33 +1,42 @@
 "use client";
 
+import { posthogCapture } from "@daodao/analytics";
 import { getStorage, StorageEnum } from "@daodao/shared";
 import { format } from "date-fns";
 import { useSyncExternalStore } from "react";
+import { getCheckinStreak } from "./checkin-stats";
 import type { PeriodOption } from "./constants";
-import { generateMockRecords } from "./mock-data";
-import type { CustomField, DailyRecord, TabId } from "./types";
+import { generateMockCheckins, generateMockRecords, MOCK_PRACTICES } from "./mock-data";
+import type { DailyRecord, InsightView, MockCheckin, TabId } from "./types";
 
-export interface LifeWarehouseState {
+/**
+ * 學習生活 POC 的跨頁 mock 狀態（module-level store）。
+ * 打卡歷史（checkins）鏡射 CheckInEntity 結構，未來由 GET /me/checkins 取代；
+ * 每日脈絡（records）為新資料模型，未來由 daily-records API 取代。
+ */
+export interface LearningLifeState {
   records: Record<string, DailyRecord>;
-  customFields: CustomField[];
+  checkins: MockCheckin[];
   selectedDate: string;
-  activePeriod: PeriodOption;
   activeTab: TabId;
+  insightView: InsightView;
+  activePeriod: PeriodOption;
 }
 
-function initState(): LifeWarehouseState {
+function initState(): LearningLifeState {
   return {
     records: generateMockRecords(90),
-    customFields: [],
+    checkins: generateMockCheckins(90),
     selectedDate: format(new Date(), "yyyy-MM-dd"),
+    activeTab: "today",
+    insightView: "cards",
     activePeriod: 30,
-    activeTab: "overview",
   };
 }
 
-const storage = getStorage<LifeWarehouseState>(StorageEnum.PocLifeWarehouse);
+const storage = getStorage<LearningLifeState>(StorageEnum.PocLifeWarehouse);
 
-let state: LifeWarehouseState = initState();
+let state: LearningLifeState = initState();
 const listeners = new Set<() => void>();
 let hydrated = false;
 
@@ -38,10 +47,11 @@ function emit() {
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
+  // 首次訂閱（hydration 後）才還原 sessionStorage，避免 SSR 與初次 render 不一致
   if (!hydrated) {
     hydrated = true;
     const persisted = storage.get();
-    if (persisted?.records) {
+    if (persisted?.checkins) {
       state = persisted;
       queueMicrotask(() => {
         for (const l of listeners) l();
@@ -51,21 +61,21 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-function getSnapshot(): LifeWarehouseState {
+function getSnapshot(): LearningLifeState {
   return state;
 }
 
-export function useLifeWarehouseStore(): LifeWarehouseState {
+/** 訂閱學習生活狀態（島頁摘要卡、天氣層、完整頁共用同一份） */
+export function useLearningLifeStore(): LearningLifeState {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
-export function getRecord(date: string): DailyRecord | undefined {
-  return state.records[date];
+function emptyRecord(date: string): DailyRecord {
+  return { date, energy: 0, sleep: 0, focus: 0, exercise: 0, stress: 0, contextTags: [], note: "", source: {} };
 }
 
 function updateRecord(date: string, patch: Partial<DailyRecord>) {
-  const current = state.records[date];
-  if (!current) return;
+  const current = state.records[date] ?? emptyRecord(date);
   state = {
     ...state,
     records: { ...state.records, [date]: { ...current, ...patch } },
@@ -73,66 +83,52 @@ function updateRecord(date: string, patch: Partial<DailyRecord>) {
   emit();
 }
 
-export const lifeWarehouseActions = {
-  setMood(date: string, mood: number) {
-    updateRecord(date, {
-      mood,
-      source: { ...state.records[date]?.source, mood: "manual" },
-    });
-  },
-
+export const learningLifeActions = {
   setEnergy(date: string, energy: number) {
-    updateRecord(date, {
-      energy,
-      source: { ...state.records[date]?.source, energy: "manual" },
-    });
+    updateRecord(date, { energy, source: { ...state.records[date]?.source, energy: "manual" } });
+    posthogCapture("learning_life_quick_track_used", { field: "energy" });
   },
 
-  addTag(date: string, tag: string) {
-    const current = state.records[date];
-    if (!current || current.tags.includes(tag)) return;
-    updateRecord(date, { tags: [...current.tags, tag] });
+  setSleep(date: string, sleep: number) {
+    updateRecord(date, { sleep, source: { ...state.records[date]?.source, sleep: "manual" } });
+    posthogCapture("learning_life_quick_track_used", { field: "sleep" });
   },
 
-  removeTag(date: string, tag: string) {
-    const current = state.records[date];
-    if (!current) return;
-    updateRecord(date, { tags: current.tags.filter((t) => t !== tag) });
+  setFocus(date: string, focus: number) {
+    updateRecord(date, { focus, source: { ...state.records[date]?.source, focus: "manual" } });
+    posthogCapture("learning_life_quick_track_used", { field: "focus" });
+  },
+
+  toggleContextTag(date: string, tag: string) {
+    const current = state.records[date] ?? emptyRecord(date);
+    const contextTags = current.contextTags.includes(tag)
+      ? current.contextTags.filter((t) => t !== tag)
+      : [...current.contextTags, tag];
+    updateRecord(date, { contextTags });
+    posthogCapture("learning_life_quick_track_used", { field: "context_tag" });
   },
 
   setNote(date: string, note: string) {
     updateRecord(date, { note });
   },
 
-  setIntention(date: string, intention: string) {
-    updateRecord(date, { intention });
-  },
-
-  setReflection(date: string, reflection: string) {
-    updateRecord(date, { reflection });
-  },
-
-  updateMetric(date: string, key: keyof DailyRecord, value: number) {
-    updateRecord(date, {
-      [key]: value,
-      source: { ...state.records[date]?.source, [key]: "manual" },
+  /** POC 示意打卡：新增一筆今天的 mock 打卡（正式版走實踐打卡流程） */
+  addMockCheckin(today: string) {
+    const practice = MOCK_PRACTICES[0];
+    const checkin: MockCheckin = {
+      id: `local-${state.checkins.length + 1}`,
+      practiceId: practice.id,
+      practiceTitle: practice.title,
+      checkinDate: today,
+      mood: "happy",
+      note: "完成今日進度！（示意打卡）",
+      tags: ["有收穫"],
+    };
+    state = { ...state, checkins: [checkin, ...state.checkins] };
+    emit();
+    posthogCapture("learning_life_mock_checkin_added", {
+      streak_after: getCheckinStreak(state.checkins, today),
     });
-  },
-
-  addCustomField(field: CustomField) {
-    state = {
-      ...state,
-      customFields: [...state.customFields, field],
-    };
-    emit();
-  },
-
-  removeCustomField(fieldId: string) {
-    state = {
-      ...state,
-      customFields: state.customFields.filter((f) => f.id !== fieldId),
-    };
-    emit();
   },
 
   setSelectedDate(date: string) {
@@ -140,13 +136,20 @@ export const lifeWarehouseActions = {
     emit();
   },
 
-  setActivePeriod(period: PeriodOption) {
-    state = { ...state, activePeriod: period };
-    emit();
-  },
-
   setActiveTab(tab: TabId) {
     state = { ...state, activeTab: tab };
+    emit();
+    posthogCapture("learning_life_tab_switched", { tab });
+  },
+
+  setInsightView(view: InsightView) {
+    state = { ...state, insightView: view };
+    emit();
+    if (view !== "cards") posthogCapture("learning_life_insight_drilldown", { view });
+  },
+
+  setActivePeriod(period: PeriodOption) {
+    state = { ...state, activePeriod: period };
     emit();
   },
 };
