@@ -25,7 +25,7 @@ const USER_MENU_ITEMS = [
   { labelKey: "nav_settings", href: "/settings" },
   { labelKey: "nav_feedback", href: "/feedback" },
   { label: "Roadmap", href: "/roadmap" },
-  { label: "錯誤回報", href: "/roadmap" },
+  { label: "錯誤回報", href: "/bug-report" },
 ] as const;
 
 export const DesktopSidebar = ({ identifier, userName, photoURL }: SidebarProps) => {
