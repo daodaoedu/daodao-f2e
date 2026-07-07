@@ -71,3 +71,18 @@ export interface TabConfig {
   value: TabId;
   label: string;
 }
+
+/** 打卡心情（鏡射後端 CheckInEntity.mood） */
+export type CheckinMood = "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
+
+/** 打卡記錄（結構鏡射 CheckInEntity，未來可換真 API） */
+export interface MockCheckin {
+  id: string;
+  practiceId: string;
+  practiceTitle: string;
+  /** yyyy-MM-dd */
+  checkinDate: string;
+  mood: CheckinMood;
+  note: string;
+  tags: string[];
+}

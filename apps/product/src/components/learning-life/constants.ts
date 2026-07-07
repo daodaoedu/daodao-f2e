@@ -1,4 +1,5 @@
 import type {
+  CheckinMood,
   ConnectedService,
   CorrelationStrength,
   CustomFieldType,
@@ -169,3 +170,13 @@ export const CUSTOM_FIELD_TYPES: Array<{
 
 export const PERIOD_OPTIONS = [7, 30, 90, 180] as const;
 export type PeriodOption = (typeof PERIOD_OPTIONS)[number];
+
+/** 心情是認識自己的訊號，不是表現分數——刻意不含 score，避免暗示「挫折＝壞」 */
+export const CHECKIN_MOOD_META: Record<CheckinMood, { emoji: string; label: string }> = {
+  give_up: { emoji: "😩", label: "想放棄" },
+  frustrated: { emoji: "😖", label: "挫折" },
+  bored: { emoji: "😑", label: "無聊" },
+  neutral: { emoji: "😐", label: "普通" },
+  good: { emoji: "🙂", label: "不錯" },
+  happy: { emoji: "😄", label: "開心" },
+};
