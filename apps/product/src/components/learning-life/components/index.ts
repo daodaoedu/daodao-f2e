@@ -1,3 +1,4 @@
+export { CheckinCard } from "./checkin-card";
 export { ConnectedServicesGrid } from "./connected-services-grid";
 export { CorrelationCard } from "./correlation-card";
 export { MetricPill } from "./metric-pill";
