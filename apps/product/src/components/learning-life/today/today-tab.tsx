@@ -30,8 +30,11 @@ export function TodayTab({ today, todayRecord, checkins }: TodayTabProps) {
         />
         <div className="mt-3 grid grid-cols-3 gap-2 opacity-60">
           {CUSTOM_FIELD_EXAMPLES.map((field) => (
-            <Card key={field.label} className="flex flex-col items-center gap-1 border-[#E0E4E8] p-3">
-              <span className="text-xl">{field.emoji}</span>
+            <Card
+              key={field.label}
+              className="flex flex-col items-center gap-1 border-[#E0E4E8] p-3"
+            >
+              <field.icon className="size-5" />
               <span className="text-xs text-[#636E72]">{field.label}</span>
             </Card>
           ))}

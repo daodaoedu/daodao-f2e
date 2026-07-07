@@ -9,10 +9,11 @@ interface InsightCardProps {
 
 /** 第二層：一句結論＋補充說明，可下鑽 */
 export function InsightCard({ insight, onDrillDown }: InsightCardProps) {
+  const Icon = insight.icon;
   return (
     <Card className="border-[#E0E4E8] p-4">
       <div className="flex items-start gap-3">
-        <span className="text-2xl">{insight.emoji}</span>
+        <Icon className="size-6 shrink-0 text-logo-cyan" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold leading-relaxed text-[#2D3436]">
             {insight.conclusion}

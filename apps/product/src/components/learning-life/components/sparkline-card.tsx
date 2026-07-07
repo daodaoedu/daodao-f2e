@@ -44,7 +44,7 @@ export function SparklineCard({ config, value, data, trend = "flat" }: Sparkline
     <Card className="border-[#E0E4E8] p-4" style={{ backgroundColor: config.bgColor }}>
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <span>{config.emoji}</span>
+          <config.icon className="size-4" />
           <span className="text-xs text-[#8A9BA0]">{config.label}</span>
         </div>
         <span className="text-xs text-[#8A9BA0]">

@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CalendarDays, Link, TrendingUp } from "lucide-react";
+import type { ElementType } from "react";
 import { SectionHeader } from "../components";
 import { MOCK_INSIGHTS } from "../mock-data";
 import { learningLifeActions, useLearningLifeStore } from "../mock-store";
@@ -11,10 +12,14 @@ import { InsightCard } from "./insight-card";
 import { TrendsView } from "./trends-view";
 import { WeeklyHero } from "./weekly-hero";
 
-const EXPLORE_ENTRIES: Array<{ view: Exclude<InsightView, "cards">; emoji: string; label: string }> = [
-  { view: "trends", emoji: "📈", label: "趨勢" },
-  { view: "days", emoji: "📅", label: "每日回顧" },
-  { view: "correlations", emoji: "🔗", label: "相關性" },
+const EXPLORE_ENTRIES: Array<{
+  view: Exclude<InsightView, "cards">;
+  icon: ElementType;
+  label: string;
+}> = [
+  { view: "trends", icon: TrendingUp, label: "趨勢" },
+  { view: "days", icon: CalendarDays, label: "每日回顧" },
+  { view: "correlations", icon: Link, label: "相關性" },
 ];
 
 interface InsightsTabProps {
@@ -76,7 +81,7 @@ export function InsightsTab({ today }: InsightsTabProps) {
               onClick={() => learningLifeActions.setInsightView(entry.view)}
               className="flex flex-col items-center gap-1 rounded-xl border border-[#E0E4E8] bg-white p-3 transition-colors hover:border-[#16B9B3]"
             >
-              <span className="text-xl">{entry.emoji}</span>
+              <entry.icon className="size-5 text-logo-cyan" />
               <span className="text-xs text-[#636E72]">{entry.label}</span>
             </button>
           ))}

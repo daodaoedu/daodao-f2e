@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@daodao/ui/components/card";
+import { CheckCircle, Smile, Tag } from "lucide-react";
 import { useMemo } from "react";
 import { getDailyCheckinCounts, getMoodDistribution } from "../checkin-stats";
 import { PeriodSelector, SectionHeader, SparklineCard, TagCloud, TrendBars } from "../components";
@@ -46,7 +47,7 @@ export function TrendsView({ today }: TrendsViewProps) {
       <PeriodSelector value={activePeriod} onChange={learningLifeActions.setActivePeriod} />
 
       <Card className="border-[#E0E4E8] p-4">
-        <SectionHeader title="✅ 打卡頻率" />
+        <SectionHeader title="打卡頻率" icon={CheckCircle} />
         <TrendBars
           className="mt-3 h-16"
           data={frequency.map((d) => ({ date: d.date, value: d.count || null }))}
@@ -56,14 +57,14 @@ export function TrendsView({ today }: TrendsViewProps) {
 
       {/* 心情用分佈不用平均折線：折線暗示「越高越好」，會教使用者避開有挫折的難題 */}
       <Card className="border-[#E0E4E8] p-4">
-        <SectionHeader title="😄 打卡心情分佈" />
+        <SectionHeader title="打卡心情分佈" icon={Smile} />
         <p className="mt-1 text-xs text-[#8A9BA0]">
           心情是認識自己的訊號，不是分數——挫折常是突破的前奏
         </p>
         <div className="mt-3 flex flex-col gap-2">
           {moodDist.map((m) => (
             <div key={m.mood} className="flex items-center gap-2">
-              <span className="w-6 text-base">{m.emoji}</span>
+              <m.icon className="size-5 shrink-0" />
               <span className="w-12 shrink-0 text-xs text-[#636E72]">{m.label}</span>
               <div className="h-3 flex-1 overflow-hidden rounded-full bg-[#F5F7FA]">
                 <div
@@ -95,7 +96,7 @@ export function TrendsView({ today }: TrendsViewProps) {
 
       {tagFrequency.length > 0 && (
         <section>
-          <SectionHeader title="🏷️ 環境標籤分佈" />
+          <SectionHeader title="環境標籤分佈" icon={Tag} />
           <div className="mt-3">
             <TagCloud tags={tagFrequency} />
           </div>

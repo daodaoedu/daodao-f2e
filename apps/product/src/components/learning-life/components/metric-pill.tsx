@@ -1,14 +1,15 @@
 import { cn } from "@daodao/ui/lib/utils";
+import type { ElementType } from "react";
 
 interface MetricPillProps {
-  emoji: string;
+  icon: ElementType;
   label: string;
   value: string;
   unit?: string;
   className?: string;
 }
 
-export function MetricPill({ emoji, label, value, unit, className }: MetricPillProps) {
+export function MetricPill({ icon: Icon, label, value, unit, className }: MetricPillProps) {
   return (
     <div
       className={cn(
@@ -16,7 +17,7 @@ export function MetricPill({ emoji, label, value, unit, className }: MetricPillP
         className
       )}
     >
-      <span className="text-lg">{emoji}</span>
+      <Icon className="size-5" />
       <div className="flex flex-col">
         <span className="text-xs text-[#8A9BA0]">{label}</span>
         <span className="text-sm font-semibold text-[#2D3436]">

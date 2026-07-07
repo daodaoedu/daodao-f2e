@@ -14,7 +14,7 @@ export function ConnectedServicesGrid() {
               : "border-[#E0E4E8] bg-[#F5F7FA] opacity-50"
           )}
         >
-          <span className="text-xl">{service.emoji}</span>
+          <service.icon className="size-5" />
           <span className="text-[10px] text-[#636E72]">{service.name}</span>
           {service.connected && <span className="text-[10px] text-[#16B9B3]">已連結</span>}
         </div>

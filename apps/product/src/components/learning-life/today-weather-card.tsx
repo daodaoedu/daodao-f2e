@@ -3,10 +3,18 @@
 import { posthogCapture } from "@daodao/analytics";
 import { Link } from "@daodao/i18n/navigation";
 import { format } from "date-fns";
-import { ChevronRight, Flame } from "lucide-react";
+import { ChevronRight, Cloud, CloudFog, Flame, Rainbow, Sun } from "lucide-react";
+import type { ElementType } from "react";
 import { getCheckinStreak, getDaysSinceLastCheckin } from "./checkin-stats";
-import { getIslandWeather } from "./island-weather";
+import { getIslandWeather, type IslandWeatherKind } from "./island-weather";
 import { learningLifeActions, useLearningLifeStore } from "./mock-store";
+
+const WEATHER_ICONS: Record<IslandWeatherKind, ElementType> = {
+  rainbow: Rainbow,
+  sunny: Sun,
+  cloudy: Cloud,
+  overcast: CloudFog,
+};
 
 /** 島頁私有摘要卡 1：今日天氣（打卡狀態）→ 學習生活「今天」 */
 export function TodayWeatherCard() {
@@ -20,6 +28,7 @@ export function TodayWeatherCard() {
     daysSinceLastCheckin: getDaysSinceLastCheckin(checkins, today),
     todayEnergy: records[today]?.energy,
   });
+  const WeatherIcon = WEATHER_ICONS[weather.kind];
 
   return (
     <Link
@@ -30,7 +39,7 @@ export function TodayWeatherCard() {
       }}
       className="flex items-center gap-3 rounded-2xl border border-[#E4EAE9] bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
     >
-      <span className="text-3xl">{weather.emoji}</span>
+      <WeatherIcon className="size-8 shrink-0 text-amber-400" />
       <div className="min-w-0 flex-1">
         <p className="text-sm font-bold text-text-dark">島上天氣</p>
         <p className="truncate text-xs text-text-secondary">{weather.label}</p>

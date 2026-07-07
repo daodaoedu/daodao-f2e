@@ -1,3 +1,5 @@
+import type { ElementType } from "react";
+
 export type TabId = "today" | "insights";
 
 export type InsightView = "cards" | "trends" | "days" | "correlations";
@@ -43,7 +45,7 @@ export interface DailyRecord {
 /** 系統洞察卡（第二層）：一句學習語境的結論＋下鑽目標 */
 export interface Insight {
   id: string;
-  emoji: string;
+  icon: ElementType;
   conclusion: string;
   detail: string;
   drillDown: Exclude<InsightView, "cards">;
@@ -51,7 +53,7 @@ export interface Insight {
 
 export interface CorrelationMetric {
   key: string;
-  emoji: string;
+  icon: ElementType;
   label: string;
 }
 
@@ -69,7 +71,7 @@ export interface Correlation {
 export interface ConnectedService {
   id: string;
   name: string;
-  emoji: string;
+  icon: ElementType;
   connected: boolean;
 }
 
@@ -77,11 +79,16 @@ export type MetricKey = "energy" | "sleep" | "focus" | "exercise" | "stress";
 
 export interface MetricConfig {
   key: MetricKey;
-  emoji: string;
+  icon: ElementType;
   label: string;
   unit: string;
   color: string;
   bgColor: string;
+}
+
+export interface CustomFieldExample {
+  icon: ElementType;
+  label: string;
 }
 
 export interface TabConfig {

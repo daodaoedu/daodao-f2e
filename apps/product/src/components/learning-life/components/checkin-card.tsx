@@ -6,6 +6,7 @@ import type { MockCheckin } from "../types";
 /** 打卡卡片：學習事件的視覺主角（今日/每日回顧共用） */
 export function CheckinCard({ checkin }: { checkin: MockCheckin }) {
   const mood = CHECKIN_MOOD_META[checkin.mood];
+  const MoodIcon = mood.icon;
   return (
     <Card className="border-[#E0E4E8] border-l-4 border-l-logo-cyan p-4">
       <div className="mb-1 flex items-center justify-between">
@@ -13,9 +14,7 @@ export function CheckinCard({ checkin }: { checkin: MockCheckin }) {
           <CheckCircle2 className="size-4 text-logo-cyan" />
           {checkin.practiceTitle}
         </span>
-        <span className="text-lg" title={mood.label}>
-          {mood.emoji}
-        </span>
+        <MoodIcon className="size-6" role="img" aria-label={mood.label} />
       </div>
       {checkin.note && <p className="text-sm leading-relaxed text-[#636E72]">{checkin.note}</p>}
       {checkin.tags.length > 0 && (

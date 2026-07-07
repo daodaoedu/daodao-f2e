@@ -1,4 +1,15 @@
+import { HappySvg } from "@daodao/assets";
 import { format, subDays } from "date-fns";
+import {
+  Battery,
+  BookOpen,
+  Brain,
+  CheckCircle,
+  Dumbbell,
+  Moon,
+  Sunrise,
+  Target,
+} from "lucide-react";
 import { CHECKIN_TAGS, CONTEXT_TAGS } from "./constants";
 import type { CheckinMood, Correlation, DailyRecord, Insight, MockCheckin } from "./types";
 
@@ -34,7 +45,16 @@ const CHECKIN_NOTES = [
 ];
 
 const MOOD_POOL: CheckinMood[] = [
-  "happy", "good", "good", "neutral", "happy", "frustrated", "good", "neutral", "bored", "happy",
+  "happy",
+  "good",
+  "good",
+  "neutral",
+  "happy",
+  "frustrated",
+  "good",
+  "neutral",
+  "bored",
+  "happy",
 ];
 
 /**
@@ -52,12 +72,21 @@ export function generateMockCheckins(days = 90): MockCheckin[] {
     if (!hasCheckin) continue;
     const count = seededValue(seed + 1, 0, 1) < 0.25 ? 2 : 1;
     for (let j = 0; j < count; j++) {
-      const practiceIdx = Math.floor(seededValue(seed + j * 3, 0, MOCK_PRACTICES.length)) % MOCK_PRACTICES.length;
+      const practiceIdx =
+        Math.floor(seededValue(seed + j * 3, 0, MOCK_PRACTICES.length)) % MOCK_PRACTICES.length;
       const practice = MOCK_PRACTICES[practiceIdx] ?? MOCK_PRACTICES[0];
-      const mood = MOOD_POOL[Math.floor(seededValue(seed + j * 7 + 2, 0, MOOD_POOL.length)) % MOOD_POOL.length] ?? "good";
-      const note = CHECKIN_NOTES[Math.floor(seededValue(seed + j * 11 + 5, 0, CHECKIN_NOTES.length)) % CHECKIN_NOTES.length] ?? "";
+      const mood =
+        MOOD_POOL[
+          Math.floor(seededValue(seed + j * 7 + 2, 0, MOOD_POOL.length)) % MOOD_POOL.length
+        ] ?? "good";
+      const note =
+        CHECKIN_NOTES[
+          Math.floor(seededValue(seed + j * 11 + 5, 0, CHECKIN_NOTES.length)) % CHECKIN_NOTES.length
+        ] ?? "";
       const tagCount = Math.round(seededValue(seed + j * 13 + 8, 1, 3));
-      const shuffled = [...CHECKIN_TAGS].sort((a, b) => seedRandom(a + dateStr) - seedRandom(b + dateStr));
+      const shuffled = [...CHECKIN_TAGS].sort(
+        (a, b) => seedRandom(a + dateStr) - seedRandom(b + dateStr)
+      );
       checkins.push({
         id: `mock-${dateStr}-${j}`,
         practiceId: practice.id,
@@ -78,9 +107,14 @@ function generateDailyRecord(dateStr: string): DailyRecord {
   let sleepBoost = 0;
   if (sleep >= 7) sleepBoost = 1;
   if (sleep < 6) sleepBoost = -1;
-  const energy = Math.max(1, Math.min(5, Math.round(3 + sleepBoost + seededValue(seed + 5, -1, 1))));
+  const energy = Math.max(
+    1,
+    Math.min(5, Math.round(3 + sleepBoost + seededValue(seed + 5, -1, 1)))
+  );
   const tagCount = Math.round(seededValue(seed + 12, 1, 3));
-  const shuffled = [...CONTEXT_TAGS].sort((a, b) => seedRandom(a + dateStr) - seedRandom(b + dateStr));
+  const shuffled = [...CONTEXT_TAGS].sort(
+    (a, b) => seedRandom(a + dateStr) - seedRandom(b + dateStr)
+  );
   const contextTags = shuffled.slice(0, tagCount);
   const focusBoost = contextTags.includes("圖書館") || contextTags.includes("早起") ? 1 : 0;
   const focus = Math.max(1, Math.min(5, Math.round(3 + focusBoost + seededValue(seed + 7, -1, 1))));
@@ -114,21 +148,21 @@ export function generateMockRecords(days = 90): Record<string, DailyRecord> {
 export const MOCK_INSIGHTS: Insight[] = [
   {
     id: "library-focus",
-    emoji: "📚",
+    icon: BookOpen,
     conclusion: "在 #圖書館 的日子，你的專注品質平均高 40%",
     detail: "過去 30 天有 8 天在圖書館，專注品質平均 4.2/5；其他日子平均 3.0/5。",
     drillDown: "correlations",
   },
   {
     id: "sleep-checkin",
-    emoji: "😴",
+    icon: Moon,
     conclusion: "睡滿 7 小時的隔天，你的打卡率高 1.8 倍",
     detail: "睡眠充足的隔日打卡率 86%，不足時只有 48%。休息也是學習的一部分。",
     drillDown: "trends",
   },
   {
     id: "morning-mood",
-    emoji: "🌅",
+    icon: Sunrise,
     conclusion: "#早起 的日子，打卡心情明顯更好",
     detail: "早起日的打卡心情多為「開心」「不錯」，出現頻率比其他日子明顯更高。",
     drillDown: "days",
@@ -157,58 +191,58 @@ function generateScatterData(
 export const LEARNING_CORRELATIONS: Correlation[] = [
   {
     id: "library-focus",
-    metricA: { key: "tag:圖書館", emoji: "📚", label: "#圖書館" },
-    metricB: { key: "focus", emoji: "🎯", label: "專注品質" },
+    metricA: { key: "tag:圖書館", icon: BookOpen, label: "#圖書館" },
+    metricB: { key: "focus", icon: Target, label: "專注品質" },
     rValue: 0.44,
     strength: "strong",
     direction: "positive",
-    description: "📚 #圖書館 的日子，🎯 專注品質傾向較高",
+    description: "#圖書館 的日子，專注品質傾向較高",
     scatterData: generateScatterData(42, 24, 0.44),
   },
   {
     id: "exercise-mood",
-    metricA: { key: "exercise", emoji: "💪", label: "運動" },
-    metricB: { key: "checkinMood", emoji: "😄", label: "打卡心情" },
+    metricA: { key: "exercise", icon: Dumbbell, label: "運動" },
+    metricB: { key: "checkinMood", icon: HappySvg, label: "打卡心情" },
     rValue: 0.52,
     strength: "strong",
     direction: "positive",
-    description: "💪 有運動的日子，😄 打卡心情傾向較好",
+    description: "有運動的日子，打卡心情傾向較好",
     scatterData: generateScatterData(77, 24, 0.52),
   },
   {
     id: "energy-focus",
-    metricA: { key: "energy", emoji: "🔋", label: "精力" },
-    metricB: { key: "focus", emoji: "🎯", label: "專注品質" },
+    metricA: { key: "energy", icon: Battery, label: "精力" },
+    metricB: { key: "focus", icon: Target, label: "專注品質" },
     rValue: 0.41,
     strength: "strong",
     direction: "positive",
-    description: "🔋 精力較高時，🎯 專注品質傾向較高",
+    description: "精力較高時，專注品質傾向較高",
   },
   {
     id: "sleep-checkin",
-    metricA: { key: "sleep", emoji: "😴", label: "睡眠" },
-    metricB: { key: "checkinRate", emoji: "✅", label: "打卡率" },
+    metricA: { key: "sleep", icon: Moon, label: "睡眠" },
+    metricB: { key: "checkinRate", icon: CheckCircle, label: "打卡率" },
     rValue: 0.38,
     strength: "moderate",
     direction: "positive",
-    description: "😴 睡眠較充足的隔天，✅ 打卡率傾向較高",
+    description: "睡眠較充足的隔天，打卡率傾向較高",
   },
   {
     id: "earlyrise-focus",
-    metricA: { key: "tag:早起", emoji: "🌅", label: "#早起" },
-    metricB: { key: "focus", emoji: "🎯", label: "專注品質" },
+    metricA: { key: "tag:早起", icon: Sunrise, label: "#早起" },
+    metricB: { key: "focus", icon: Target, label: "專注品質" },
     rValue: 0.29,
     strength: "moderate",
     direction: "positive",
-    description: "🌅 #早起 的日子，🎯 專注品質傾向較高",
+    description: "#早起 的日子，專注品質傾向較高",
   },
   {
     id: "stress-focus",
-    metricA: { key: "stress", emoji: "😤", label: "壓力" },
-    metricB: { key: "focus", emoji: "🎯", label: "專注品質" },
+    metricA: { key: "stress", icon: Brain, label: "壓力" },
+    metricB: { key: "focus", icon: Target, label: "專注品質" },
     rValue: -0.31,
     strength: "moderate",
     direction: "negative",
-    description: "😤 壓力較高時，🎯 專注品質傾向較低",
+    description: "壓力較高時，專注品質傾向較低",
   },
 ];

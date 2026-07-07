@@ -17,10 +17,10 @@ export function CorrelationCard({ correlation, showScatter = false }: Correlatio
     <Card className="overflow-hidden border-[#E0E4E8] p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <span>{metricA.emoji}</span>
+          <metricA.icon className="size-4" />
           <span className="text-xs text-[#8A9BA0]">{metricA.label}</span>
           <span className="text-[#8A9BA0]">×</span>
-          <span>{metricB.emoji}</span>
+          <metricB.icon className="size-4" />
           <span className="text-xs text-[#8A9BA0]">{metricB.label}</span>
         </div>
         <Badge

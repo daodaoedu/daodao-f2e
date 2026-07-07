@@ -2,17 +2,17 @@
 
 import { Card } from "@daodao/ui/components/card";
 import { cn } from "@daodao/ui/lib/utils";
-import { Minus, Plus } from "lucide-react";
+import { Battery, BatteryFull, BatteryLow, BatteryMedium, Minus, Plus, Zap } from "lucide-react";
 import { SectionHeader, TagToggleGroup } from "../components";
 import { learningLifeActions } from "../mock-store";
 import type { DailyRecord } from "../types";
 
 const ENERGY_LEVELS = [
-  { value: 1, emoji: "🪫", label: "沒電" },
-  { value: 2, emoji: "😮‍💨", label: "偏低" },
-  { value: 3, emoji: "🙂", label: "普通" },
-  { value: 4, emoji: "💪", label: "不錯" },
-  { value: 5, emoji: "⚡", label: "滿電" },
+  { value: 1, icon: BatteryLow, label: "沒電" },
+  { value: 2, icon: BatteryMedium, label: "偏低" },
+  { value: 3, icon: Battery, label: "普通" },
+  { value: 4, icon: BatteryFull, label: "不錯" },
+  { value: 5, icon: Zap, label: "滿電" },
 ] as const;
 
 interface QuickTrackProps {
@@ -47,7 +47,7 @@ export function QuickTrack({ today, record }: QuickTrackProps) {
                     : "border-[#E0E4E8] bg-white hover:border-[#16B9B3]"
                 )}
               >
-                <span className="text-lg">{level.emoji}</span>
+                <level.icon className="size-5" />
                 <span className="text-[10px] text-[#636E72]">{level.label}</span>
               </button>
             ))}

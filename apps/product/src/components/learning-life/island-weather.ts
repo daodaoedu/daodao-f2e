@@ -15,17 +15,16 @@ export interface IslandWeatherState {
   kind: IslandWeatherKind;
   /** 島上小動物是否有活力（今日精力 >= 4） */
   lively: boolean;
-  emoji: string;
   label: string;
 }
 
 // 文案原則：中斷不責備。多雲/陰天是「島在等你」的歡迎語，
 // 不是「你沒打卡」的指責——中斷後回來的那一刻是最脆弱的時刻，要接住不要推開
-const WEATHER_META: Record<IslandWeatherKind, { emoji: string; label: string }> = {
-  rainbow: { emoji: "🌈", label: "連續打卡中，島上出現彩虹！" },
-  sunny: { emoji: "☀️", label: "今天已打卡，島上晴朗" },
-  cloudy: { emoji: "⛅", label: "島上飄來幾朵雲，今天的故事還沒開始" },
-  overcast: { emoji: "🌫️", label: "島上有點霧，等你回來就會散" },
+const WEATHER_META: Record<IslandWeatherKind, { label: string }> = {
+  rainbow: { label: "連續打卡中，島上出現彩虹！" },
+  sunny: { label: "今天已打卡，島上晴朗" },
+  cloudy: { label: "島上飄來幾朵雲，今天的故事還沒開始" },
+  overcast: { label: "島上有點霧，等你回來就會散" },
 };
 
 /** 天氣規則（spec §7）：打卡狀態 → 島景天氣。純函式，header 與摘要卡共用 */

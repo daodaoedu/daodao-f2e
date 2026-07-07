@@ -1,4 +1,5 @@
 import { differenceInCalendarDays, format, parseISO, subDays } from "date-fns";
+import type { ElementType } from "react";
 import { CHECKIN_MOOD_META } from "./constants";
 import type { CheckinMood, MockCheckin } from "./types";
 
@@ -80,7 +81,7 @@ export function getWeeklySummary(checkins: MockCheckin[], today: string): Weekly
 
 export interface MoodDistributionItem {
   mood: CheckinMood;
-  emoji: string;
+  icon: ElementType;
   label: string;
   count: number;
 }
@@ -104,7 +105,7 @@ export function getMoodDistribution(
   }
   return (Object.keys(CHECKIN_MOOD_META) as CheckinMood[]).map((mood) => ({
     mood,
-    emoji: CHECKIN_MOOD_META[mood].emoji,
+    icon: CHECKIN_MOOD_META[mood].icon,
     label: CHECKIN_MOOD_META[mood].label,
     count: counts.get(mood) ?? 0,
   }));

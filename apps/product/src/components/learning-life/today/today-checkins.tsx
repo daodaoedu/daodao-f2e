@@ -3,7 +3,7 @@
 import { Link } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Card } from "@daodao/ui/components/card";
-import { Flame } from "lucide-react";
+import { Flame, Sprout } from "lucide-react";
 import { CheckinCard, SectionHeader } from "../components";
 import { learningLifeActions } from "../mock-store";
 import type { MockCheckin } from "../types";
@@ -32,7 +32,7 @@ export function TodayCheckins({ today, checkins, streak }: TodayCheckinsProps) {
       <div className="mt-3 flex flex-col gap-3">
         {checkins.length === 0 ? (
           <Card className="flex flex-col items-center gap-3 border-dashed border-[#E0E4E8] p-6 text-center">
-            <span className="text-3xl">🌱</span>
+            <Sprout className="size-8 text-logo-cyan" />
             <p className="text-sm text-[#636E72]">今天還沒打卡，島上在等你</p>
             <Link href="/mine">
               <Button className="rounded-full">去實踐打卡</Button>

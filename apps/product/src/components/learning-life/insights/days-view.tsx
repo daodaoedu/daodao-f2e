@@ -2,6 +2,7 @@
 
 import { cn } from "@daodao/ui/lib/utils";
 import { format, getDate, parseISO, subDays } from "date-fns";
+import { Waves } from "lucide-react";
 import { useMemo } from "react";
 import { CheckinCard, MetricPill } from "../components";
 import { METRIC_CONFIGS } from "../constants";
@@ -34,7 +35,8 @@ export function DaysView() {
     [checkins, selectedDate]
   );
   const record = records[selectedDate];
-  const hasContext = record && (record.energy > 0 || record.sleep > 0 || record.contextTags.length > 0);
+  const hasContext =
+    record && (record.energy > 0 || record.sleep > 0 || record.contextTags.length > 0);
 
   return (
     <div className="flex flex-col gap-5">
@@ -76,7 +78,7 @@ export function DaysView() {
         </div>
       ) : (
         <div className="flex flex-col items-center gap-2 py-8 text-[#8A9BA0]">
-          <span className="text-3xl">🌊</span>
+          <Waves className="size-8" />
           <p className="text-sm">這天島上很安靜，沒有打卡</p>
         </div>
       )}
@@ -91,7 +93,7 @@ export function DaysView() {
               return (
                 <MetricPill
                   key={config.key}
-                  emoji={config.emoji}
+                  icon={config.icon}
                   label={config.label}
                   value={formatMetricValue(value, config.key)}
                   unit={config.unit}
