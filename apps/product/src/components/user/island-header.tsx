@@ -15,6 +15,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lottie from "lottie-react";
 import { ChevronRight, RefreshCcw } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { IslandWeatherLayer } from "../learning-life";
 import { PageHeader, type PageHeaderProps } from "../layout/page-header";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -204,6 +205,7 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
         )}
         <div className="absolute left-1/2 top-[92px] md:top-[127px] -translate-x-1/2 w-[149px] h-[140px] md:w-[168px] md:h-[158px]">
           {lottieJson && <Lottie animationData={lottieJson} className="*:w-full *:h-full" />}
+          {isOwnProfile && <IslandWeatherLayer />}
           {isOwnProfile && (
             <>
               <div
