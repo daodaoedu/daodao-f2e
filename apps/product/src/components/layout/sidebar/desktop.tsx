@@ -4,7 +4,7 @@ import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg, VerticalFullSvg } from "@dao
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
-import { usePathname } from "@daodao/i18n/navigation";
+import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import {
@@ -28,6 +28,7 @@ const USER_MENU_ITEMS = [
 
 export const DesktopSidebar = ({ identifier, userName, photoURL }: SidebarProps) => {
   const pathname = usePathname();
+  const router = useRouter();
   const t = useTranslations("app_product");
   const { logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -163,13 +164,11 @@ export const DesktopSidebar = ({ identifier, userName, photoURL }: SidebarProps)
           </DropdownMenuTrigger>
           <DropdownMenuContent side="right" align="end" sideOffset={8} className="w-48">
             {USER_MENU_ITEMS.map((menuItem) => (
-              <DropdownMenuItem key={menuItem.labelKey} asChild>
-                <CustomLink
-                  href={menuItem.href}
-                  className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-text-dark hover:bg-accent"
-                >
-                  {t(menuItem.labelKey)}
-                </CustomLink>
+              <DropdownMenuItem
+                key={menuItem.labelKey}
+                onClick={() => router.push(menuItem.href)}
+              >
+                {t(menuItem.labelKey)}
               </DropdownMenuItem>
             ))}
             <DropdownMenuItem onClick={() => logout()} className="text-[#EF4444]">

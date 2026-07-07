@@ -4,7 +4,7 @@ import { UserOutlineSvg, UserSolidSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
-import { usePathname } from "@daodao/i18n/navigation";
+import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import {
   DropdownMenu,
@@ -31,6 +31,7 @@ const USER_MENU_ITEMS = [
 
 export const MobileSidebar = ({ identifier, userName, photoURL }: SidebarProps) => {
   const pathname = usePathname();
+  const router = useRouter();
   const t = useTranslations("app_product");
   const { logout } = useAuth();
   const logoRef = useRef<HTMLDivElement>(null);
@@ -131,13 +132,11 @@ export const MobileSidebar = ({ identifier, userName, photoURL }: SidebarProps) 
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="end" sideOffset={12} className="w-44">
                 {USER_MENU_ITEMS.map((menuItem) => (
-                  <DropdownMenuItem key={menuItem.labelKey} asChild>
-                    <CustomLink
-                      href={menuItem.href}
-                      className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm text-text-dark"
-                    >
-                      {t(menuItem.labelKey)}
-                    </CustomLink>
+                  <DropdownMenuItem
+                    key={menuItem.labelKey}
+                    onClick={() => router.push(menuItem.href)}
+                  >
+                    {t(menuItem.labelKey)}
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuItem onClick={() => logout()} className="text-[#EF4444]">
