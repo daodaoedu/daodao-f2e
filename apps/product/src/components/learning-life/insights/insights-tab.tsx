@@ -5,7 +5,10 @@ import { SectionHeader } from "../components";
 import { MOCK_INSIGHTS } from "../mock-data";
 import { learningLifeActions, useLearningLifeStore } from "../mock-store";
 import type { InsightView } from "../types";
+import { CorrelationsView } from "./correlations-view";
+import { DaysView } from "./days-view";
 import { InsightCard } from "./insight-card";
+import { TrendsView } from "./trends-view";
 import { WeeklyHero } from "./weekly-hero";
 
 const EXPLORE_ENTRIES: Array<{ view: Exclude<InsightView, "cards">; emoji: string; label: string }> = [
@@ -32,8 +35,9 @@ export function InsightsTab({ today }: InsightsTabProps) {
           <ArrowLeft className="size-4" />
           回洞察
         </button>
-        {/* Task 6 將以 TrendsView / DaysView / CorrelationsView 取代此佔位 */}
-        <p className="py-12 text-center text-sm text-[#8A9BA0]">完整分析即將登場</p>
+        {insightView === "trends" && <TrendsView today={today} />}
+        {insightView === "days" && <DaysView />}
+        {insightView === "correlations" && <CorrelationsView />}
       </div>
     );
   }
