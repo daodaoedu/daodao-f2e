@@ -1,172 +1,53 @@
 "use client";
 
-import * as React from "react";
+import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
+import type * as React from "react";
 import { cn } from "../lib/utils";
-import { Button } from "./button";
 
-interface DropdownMenuProps {
-  children: React.ReactNode;
+function DropdownMenu({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
+  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
 }
 
-interface DropdownMenuContextValue {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-}
-
-const DropdownMenuContext = React.createContext<DropdownMenuContextValue | undefined>(undefined);
-
-function useDropdownMenuContext() {
-  const context = React.useContext(DropdownMenuContext);
-  if (!context) {
-    throw new Error("DropdownMenu components must be used within DropdownMenu");
-  }
-  return context;
-}
-
-export function DropdownMenu({ children }: DropdownMenuProps) {
-  const [open, setOpen] = React.useState(false);
-
-  React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (open && !target.closest("[data-dropdown-menu]")) {
-        setOpen(false);
-      }
-    };
-
-    if (open) {
-      document.addEventListener("click", handleClickOutside);
-      return () => document.removeEventListener("click", handleClickOutside);
-    }
-  }, [open]);
-
-  return (
-    <DropdownMenuContext.Provider value={{ open, setOpen }}>
-      <div className="relative" data-dropdown-menu>
-        {children}
-      </div>
-    </DropdownMenuContext.Provider>
-  );
-}
-
-interface DropdownMenuTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  asChild?: boolean;
-  children: React.ReactNode;
-}
-
-export function DropdownMenuTrigger({
-  asChild = false,
-  children,
-  onClick,
+function DropdownMenuTrigger({
   ...props
-}: DropdownMenuTriggerProps) {
-  const { open, setOpen } = useDropdownMenuContext();
-
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setOpen(!open);
-    onClick?.(e);
-  };
-
-  if (asChild && React.isValidElement<React.ButtonHTMLAttributes<HTMLButtonElement>>(children)) {
-    return React.cloneElement(children, {
-      ...props,
-      onClick: handleClick,
-    });
-  }
-
-  return (
-    <Button type="button" onClick={handleClick} {...props}>
-      {children}
-    </Button>
-  );
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
+  return <DropdownMenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />;
 }
 
-interface DropdownMenuContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  align?: "start" | "end" | "center";
-  side?: "bottom" | "right" | "top" | "left";
-  sideOffset?: number;
-  children: React.ReactNode;
-}
-
-export function DropdownMenuContent({
-  align = "start",
-  side = "bottom",
+function DropdownMenuContent({
+  className,
   sideOffset = 4,
-  className,
-  children,
   ...props
-}: DropdownMenuContentProps) {
-  const { open } = useDropdownMenuContext();
-
-  if (!open) return null;
-
-  const positionStyle: React.CSSProperties =
-    side === "right"
-      ? { left: `calc(100% + ${sideOffset}px)`, bottom: 0 }
-      : side === "left"
-        ? { right: `calc(100% + ${sideOffset}px)`, bottom: 0 }
-        : side === "top"
-          ? { bottom: `calc(100% + ${sideOffset}px)` }
-          : { top: `calc(100% + ${sideOffset}px)` };
-
-  const alignClasses =
-    side === "right" || side === "left"
-      ? { start: "top-0", end: "bottom-0", center: "top-1/2 -translate-y-1/2" }
-      : { start: "left-0", end: "right-0", center: "left-1/2 -translate-x-1/2" };
-
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   return (
-    <div
-      className={cn(
-        "absolute z-50 min-w-32 rounded-md border bg-white p-1 shadow-lg",
-        alignClasses[align],
-        className
-      )}
-      style={positionStyle}
-      {...props}
-    >
-      {children}
-    </div>
+    <DropdownMenuPrimitive.Portal>
+      <DropdownMenuPrimitive.Content
+        data-slot="dropdown-menu-content"
+        sideOffset={sideOffset}
+        className={cn(
+          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) rounded-md border bg-white p-1 shadow-md outline-hidden",
+          className
+        )}
+        {...props}
+      />
+    </DropdownMenuPrimitive.Portal>
   );
 }
 
-interface DropdownMenuItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  asChild?: boolean;
-  children: React.ReactNode;
-}
-
-export function DropdownMenuItem({
-  asChild = false,
-  children,
-  onClick,
+function DropdownMenuItem({
   className,
   ...props
-}: DropdownMenuItemProps) {
-  const { setOpen } = useDropdownMenuContext();
-
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setOpen(false);
-    onClick?.(e);
-  };
-
-  if (asChild && React.isValidElement<React.ComponentProps<typeof Button>>(children)) {
-    return React.cloneElement(children, {
-      ...props,
-      onClick: handleClick,
-      className: cn(className, children.props.className),
-    });
-  }
-
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Item>) {
   return (
-    <button
-      type="button"
+    <DropdownMenuPrimitive.Item
+      data-slot="dropdown-menu-item"
       className={cn(
-        "relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+        "relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       )}
-      onClick={handleClick}
       {...props}
-    >
-      {children}
-    </button>
+    />
   );
 }
+
+export { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem };
