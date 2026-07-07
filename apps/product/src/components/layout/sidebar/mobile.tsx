@@ -24,10 +24,9 @@ import type { SidebarProps } from "./type";
 gsap.registerPlugin(ScrollTrigger);
 
 const USER_MENU_ITEMS = [
-  { labelKey: "nav_my_island", href: (id: string) => `/users/${id}` },
-  { labelKey: "nav_settings", href: () => "/settings" },
-  { labelKey: "nav_language", href: () => "/settings/preferences" },
-  { labelKey: "nav_feedback", href: () => "/feedback" },
+  { labelKey: "nav_settings", href: "/settings" },
+  { labelKey: "nav_language", href: "/settings/preferences" },
+  { labelKey: "nav_feedback", href: "/feedback" },
 ] as const;
 
 export const MobileSidebar = ({ identifier, userName, photoURL }: SidebarProps) => {
@@ -69,7 +68,7 @@ export const MobileSidebar = ({ identifier, userName, photoURL }: SidebarProps) 
     };
   }, [isHomePage]);
 
-  const navItems = menuItems.filter((item) => item.labelKey !== "nav_my_island");
+  const navItems = menuItems;
 
   return (
     <>
@@ -134,7 +133,7 @@ export const MobileSidebar = ({ identifier, userName, photoURL }: SidebarProps) 
                 {USER_MENU_ITEMS.map((menuItem) => (
                   <DropdownMenuItem key={menuItem.labelKey} asChild>
                     <CustomLink
-                      href={menuItem.href(identifier)}
+                      href={menuItem.href}
                       className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm text-text-dark"
                     >
                       {t(menuItem.labelKey)}
