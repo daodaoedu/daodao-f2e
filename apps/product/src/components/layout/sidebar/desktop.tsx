@@ -3,8 +3,9 @@
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg, VerticalFullSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { useAuth } from "@daodao/auth";
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter } from "@daodao/i18n/navigation";
+import { languageOptions } from "@daodao/i18n/routing";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import {
@@ -21,17 +22,20 @@ import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
 const USER_MENU_ITEMS = [
-  { labelKey: "nav_settings", href: "/settings", emoji: "gear" },
-  { labelKey: "nav_language", href: "/settings/preferences", emoji: "globe" },
-  { labelKey: "nav_feedback", href: "/feedback", emoji: "speech" },
+  { labelKey: "nav_settings", href: "/settings" },
+  { labelKey: "nav_feedback", href: "/feedback" },
+  { label: "Roadmap", href: "/roadmap" },
+  { label: "錯誤回報", href: "/roadmap" },
 ] as const;
 
 export const DesktopSidebar = ({ identifier, userName, photoURL }: SidebarProps) => {
   const pathname = usePathname();
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations("app_product");
   const { logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const nextLocale = languageOptions.find((l) => l.value !== locale);
 
   const handleToggleSidebar = () => {
     setIsCollapsed((prev) => !prev);
@@ -163,14 +167,30 @@ export const DesktopSidebar = ({ identifier, userName, photoURL }: SidebarProps)
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="right" align="end" sideOffset={8} className="w-48">
+            {userName && (
+              <div className="px-2 py-1.5 text-xs text-[#8A9BA0] truncate">{userName}</div>
+            )}
             {USER_MENU_ITEMS.map((menuItem) => (
               <DropdownMenuItem
-                key={menuItem.labelKey}
+                key={menuItem.href}
                 onClick={() => router.push(menuItem.href)}
               >
-                {t(menuItem.labelKey)}
+                {"labelKey" in menuItem ? t(menuItem.labelKey) : menuItem.label}
               </DropdownMenuItem>
             ))}
+            {nextLocale && (
+              <DropdownMenuItem asChild>
+                <CustomLink
+                  locale={nextLocale.value}
+                  href={{ pathname }}
+                  scroll={false}
+                  className="flex w-full items-center justify-between"
+                >
+                  <span>{t("nav_language")}</span>
+                  <span className="text-xs text-[#8A9BA0]">{nextLocale.label}</span>
+                </CustomLink>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={() => logout()} className="text-[#EF4444]">
               {t("nav_logout")}
             </DropdownMenuItem>
