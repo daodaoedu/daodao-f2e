@@ -161,7 +161,7 @@ export const DesktopSidebar = ({ identifier, userName, photoURL }: SidebarProps)
               )}
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
+          <DropdownMenuContent side="right" align="end" sideOffset={8} className="w-48">
             {USER_MENU_ITEMS.map((menuItem) => (
               <DropdownMenuItem key={menuItem.labelKey} asChild>
                 <CustomLink

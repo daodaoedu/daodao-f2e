@@ -83,12 +83,14 @@ export function DropdownMenuTrigger({
 
 interface DropdownMenuContentProps extends React.HTMLAttributes<HTMLDivElement> {
   align?: "start" | "end" | "center";
+  side?: "bottom" | "right" | "top" | "left";
   sideOffset?: number;
   children: React.ReactNode;
 }
 
 export function DropdownMenuContent({
   align = "start",
+  side = "bottom",
   sideOffset = 4,
   className,
   children,
@@ -98,20 +100,28 @@ export function DropdownMenuContent({
 
   if (!open) return null;
 
-  const alignClasses = {
-    start: "left-0",
-    end: "right-0",
-    center: "left-1/2 -translate-x-1/2",
-  };
+  const positionStyle: React.CSSProperties =
+    side === "right"
+      ? { left: `calc(100% + ${sideOffset}px)`, bottom: 0 }
+      : side === "left"
+        ? { right: `calc(100% + ${sideOffset}px)`, bottom: 0 }
+        : side === "top"
+          ? { bottom: `calc(100% + ${sideOffset}px)` }
+          : { top: `calc(100% + ${sideOffset}px)` };
+
+  const alignClasses =
+    side === "right" || side === "left"
+      ? { start: "top-0", end: "bottom-0", center: "top-1/2 -translate-y-1/2" }
+      : { start: "left-0", end: "right-0", center: "left-1/2 -translate-x-1/2" };
 
   return (
     <div
       className={cn(
-        "absolute z-50 mt-2 min-w-32 rounded-md border bg-white p-1 shadow-lg",
+        "absolute z-50 min-w-32 rounded-md border bg-white p-1 shadow-lg",
         alignClasses[align],
         className
       )}
-      style={{ top: `calc(100% + ${sideOffset}px)` }}
+      style={positionStyle}
       {...props}
     >
       {children}
