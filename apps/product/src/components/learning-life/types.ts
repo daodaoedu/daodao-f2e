@@ -2,7 +2,17 @@ import type { ElementType } from "react";
 
 export type TabId = "today" | "insights";
 
-export type InsightView = "cards" | "trends" | "days" | "correlations";
+export type InsightView =
+  | "cards"
+  | "trends"
+  | "days"
+  | "correlations"
+  | "weekly-report"
+  | "monthly-report"
+  | "quarterly-report"
+  | "annual-review";
+
+export type TimePeriod = "week" | "month" | "quarter" | "year";
 
 export type MetricSource = "manual" | "csv-import" | "integration" | "mock";
 

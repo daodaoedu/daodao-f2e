@@ -1,16 +1,28 @@
 "use client";
 
-import { ArrowLeft, CalendarDays, Link, TrendingUp } from "lucide-react";
+import {
+  ArrowLeft,
+  BarChart3,
+  Calendar,
+  CalendarDays,
+  Link,
+  TrendingUp,
+  Trophy,
+} from "lucide-react";
 import type { ElementType } from "react";
 import { SectionHeader } from "../components";
 import { MOCK_INSIGHTS } from "../mock-data";
 import { learningLifeActions, useLearningLifeStore } from "../mock-store";
 import type { InsightView } from "../types";
+import { AnnualReview } from "./annual-review";
 import { CorrelationsView } from "./correlations-view";
 import { DaysView } from "./days-view";
 import { InsightCard } from "./insight-card";
+import { MonthlyReport } from "./monthly-report";
+import { QuarterlyReportView } from "./quarterly-report-view";
 import { TrendsView } from "./trends-view";
 import { WeeklyHero } from "./weekly-hero";
+import { WeeklyReport } from "./weekly-report";
 
 const EXPLORE_ENTRIES: Array<{
   view: Exclude<InsightView, "cards">;
@@ -22,12 +34,23 @@ const EXPLORE_ENTRIES: Array<{
   { view: "correlations", icon: Link, label: "相關性" },
 ];
 
+const PERIOD_REPORT_ENTRIES: Array<{
+  view: Exclude<InsightView, "cards">;
+  icon: ElementType;
+  label: string;
+}> = [
+  { view: "weekly-report", icon: CalendarDays, label: "週報" },
+  { view: "monthly-report", icon: Calendar, label: "月報" },
+  { view: "quarterly-report", icon: BarChart3, label: "季報" },
+  { view: "annual-review", icon: Trophy, label: "年度回顧" },
+];
+
 interface InsightsTabProps {
   today: string;
 }
 
 export function InsightsTab({ today }: InsightsTabProps) {
-  const { checkins, insightView } = useLearningLifeStore();
+  const { checkins, records, insightView } = useLearningLifeStore();
 
   if (insightView !== "cards") {
     return (
@@ -43,6 +66,12 @@ export function InsightsTab({ today }: InsightsTabProps) {
         {insightView === "trends" && <TrendsView today={today} />}
         {insightView === "days" && <DaysView />}
         {insightView === "correlations" && <CorrelationsView />}
+        {insightView === "weekly-report" && (
+          <WeeklyReport checkins={checkins} records={records} today={today} />
+        )}
+        {insightView === "monthly-report" && <MonthlyReport />}
+        {insightView === "quarterly-report" && <QuarterlyReportView />}
+        {insightView === "annual-review" && <AnnualReview checkins={checkins} today={today} />}
       </div>
     );
   }
@@ -50,6 +79,23 @@ export function InsightsTab({ today }: InsightsTabProps) {
   return (
     <div className="flex flex-col gap-6">
       <WeeklyHero checkins={checkins} today={today} />
+
+      <section>
+        <SectionHeader title="時間回顧" />
+        <div className="mt-3 flex gap-2 overflow-x-auto scrollbar-hide">
+          {PERIOD_REPORT_ENTRIES.map((entry) => (
+            <button
+              type="button"
+              key={entry.view}
+              onClick={() => learningLifeActions.setInsightView(entry.view)}
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-[#E0E4E8] bg-white px-4 py-2 transition-colors hover:border-[#16B9B3]"
+            >
+              <entry.icon className="size-4 text-logo-cyan" />
+              <span className="text-sm text-[#636E72]">{entry.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
       <section>
         <SectionHeader

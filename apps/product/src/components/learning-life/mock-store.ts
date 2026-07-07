@@ -89,7 +89,17 @@ export function useLearningLifeStore(): LearningLifeState {
 }
 
 function emptyRecord(date: string): DailyRecord {
-  return { date, energy: 0, sleep: 0, focus: 0, exercise: 0, stress: 0, contextTags: [], note: "", source: {} };
+  return {
+    date,
+    energy: 0,
+    sleep: 0,
+    focus: 0,
+    exercise: 0,
+    stress: 0,
+    contextTags: [],
+    note: "",
+    source: {},
+  };
 }
 
 function updateRecord(date: string, patch: Partial<DailyRecord>) {
@@ -103,7 +113,10 @@ function updateRecord(date: string, patch: Partial<DailyRecord>) {
 
 export const learningLifeActions = {
   setEnergy(date: string, energy: number) {
-    updateRecord(date, { energy, source: { ...getState().records[date]?.source, energy: "manual" } });
+    updateRecord(date, {
+      energy,
+      source: { ...getState().records[date]?.source, energy: "manual" },
+    });
     posthogCapture("learning_life_quick_track_used", { field: "energy" });
   },
 
