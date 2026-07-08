@@ -1,14 +1,19 @@
 "use client";
 
 import { FrustratedSvg } from "@daodao/assets";
-import { toast } from "@daodao/ui/components/sonner";
+import { Button } from "@daodao/ui/components/button";
+import { Input } from "@daodao/ui/components/input";
+import { Label } from "@daodao/ui/components/label";
 import {
-  AlertTriangle,
-  ChevronDown,
-  Monitor,
-  Smartphone,
-  Tablet,
-} from "lucide-react";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@daodao/ui/components/select";
+import { toast } from "@daodao/ui/components/sonner";
+import { Textarea } from "@daodao/ui/components/textarea";
+import { AlertTriangle, Monitor, Smartphone, Tablet } from "lucide-react";
 import { type ElementType, useState } from "react";
 
 type Severity = "critical" | "major" | "minor" | "cosmetic";
@@ -68,8 +73,9 @@ export function BugReportForm() {
           <br />
           我們會儘快排查並修復。
         </p>
-        <button
-          type="button"
+        <Button
+          variant="ctaPrimary"
+          className="mt-4 rounded-full px-6"
           onClick={() => {
             setSeverity(null);
             setDevice(null);
@@ -80,10 +86,9 @@ export function BugReportForm() {
             setActual("");
             setSubmitted(false);
           }}
-          className="mt-4 rounded-full bg-logo-cyan px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0E8E89]"
         >
           再回報一個
-        </button>
+        </Button>
       </div>
     );
   }
@@ -97,24 +102,22 @@ export function BugReportForm() {
         </p>
       </div>
 
-      <section>
-        <h3 className="text-sm font-semibold text-[#2D3436]">
+      <section className="flex flex-col gap-2">
+        <Label>
           問題標題 <span className="text-[#EF4444]">*</span>
-        </h3>
-        <input
-          type="text"
+        </Label>
+        <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="簡短描述你遇到的問題"
-          className="mt-2 w-full rounded-xl border border-[#E0E4E8] bg-white px-4 py-3 text-sm text-[#2D3436] placeholder:text-[#C0C8CC] focus:border-logo-cyan focus:outline-none"
         />
       </section>
 
-      <section>
-        <h3 className="text-sm font-semibold text-[#2D3436]">
+      <section className="flex flex-col gap-2">
+        <Label>
           嚴重程度 <span className="text-[#EF4444]">*</span>
-        </h3>
-        <div className="mt-2 flex flex-col gap-2">
+        </Label>
+        <div className="flex flex-col gap-2">
           {SEVERITY_OPTIONS.map((opt) => {
             const selected = severity === opt.id;
             return (
@@ -140,9 +143,9 @@ export function BugReportForm() {
         </div>
       </section>
 
-      <section>
-        <h3 className="text-sm font-semibold text-[#2D3436]">使用裝置</h3>
-        <div className="mt-2 flex gap-2">
+      <section className="flex flex-col gap-2">
+        <Label>使用裝置</Label>
+        <div className="flex gap-2">
           {DEVICE_OPTIONS.map((opt) => {
             const Icon = opt.icon;
             const selected = device === opt.id;
@@ -165,71 +168,58 @@ export function BugReportForm() {
         </div>
       </section>
 
-      <section>
-        <h3 className="text-sm font-semibold text-[#2D3436]">發生在哪個頁面</h3>
-        <div className="relative mt-2">
-          <select
-            value={page}
-            onChange={(e) => setPage(e.target.value)}
-            className="w-full appearance-none rounded-xl border border-[#E0E4E8] bg-white px-4 py-3 pr-10 text-sm text-[#2D3436] focus:border-logo-cyan focus:outline-none"
-          >
-            <option value="">選擇頁面</option>
+      <section className="flex flex-col gap-2">
+        <Label>發生在哪個頁面</Label>
+        <Select value={page} onValueChange={setPage}>
+          <SelectTrigger>
+            <SelectValue placeholder="選擇頁面" />
+          </SelectTrigger>
+          <SelectContent>
             {PAGE_OPTIONS.map((p) => (
-              <option key={p} value={p}>
+              <SelectItem key={p} value={p}>
                 {p}
-              </option>
+              </SelectItem>
             ))}
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#8A9BA0]" />
-        </div>
+          </SelectContent>
+        </Select>
       </section>
 
-      <section>
-        <h3 className="text-sm font-semibold text-[#2D3436]">重現步驟</h3>
-        <textarea
+      <section className="flex flex-col gap-2">
+        <Label>重現步驟</Label>
+        <Textarea
           value={steps}
           onChange={(e) => setSteps(e.target.value)}
           placeholder={"1. 進入某頁面\n2. 點擊某按鈕\n3. 就會看到..."}
           rows={4}
-          className="mt-2 w-full resize-none rounded-xl border border-[#E0E4E8] bg-white p-4 text-sm text-[#2D3436] placeholder:text-[#C0C8CC] focus:border-logo-cyan focus:outline-none"
         />
       </section>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <section>
-          <h3 className="text-sm font-semibold text-[#2D3436]">預期行為</h3>
-          <textarea
+        <section className="flex flex-col gap-2">
+          <Label>預期行為</Label>
+          <Textarea
             value={expected}
             onChange={(e) => setExpected(e.target.value)}
             placeholder="應該要發生什麼"
             rows={3}
-            className="mt-2 w-full resize-none rounded-xl border border-[#E0E4E8] bg-white p-4 text-sm text-[#2D3436] placeholder:text-[#C0C8CC] focus:border-logo-cyan focus:outline-none"
           />
         </section>
-        <section>
-          <h3 className="text-sm font-semibold text-[#2D3436]">
+        <section className="flex flex-col gap-2">
+          <Label>
             實際行為 <span className="text-[#EF4444]">*</span>
-          </h3>
-          <textarea
+          </Label>
+          <Textarea
             value={actual}
             onChange={(e) => setActual(e.target.value)}
             placeholder="實際發生了什麼"
             rows={3}
-            className="mt-2 w-full resize-none rounded-xl border border-[#E0E4E8] bg-white p-4 text-sm text-[#2D3436] placeholder:text-[#C0C8CC] focus:border-logo-cyan focus:outline-none"
           />
         </section>
       </div>
 
-      <button
-        type="button"
-        disabled={!canSubmit}
-        onClick={handleSubmit}
-        className={`w-full rounded-full py-3 text-sm font-medium text-white transition-colors ${
-          canSubmit ? "bg-logo-cyan hover:bg-[#0E8E89]" : "cursor-not-allowed bg-[#C0C8CC]"
-        }`}
-      >
+      <Button variant="ctaPrimary" className="w-full rounded-full" disabled={!canSubmit} onClick={handleSubmit}>
         送出回報
-      </button>
+      </Button>
 
       <p className="text-center text-xs text-[#8A9BA0]">功能預覽 — 正式版會將回報送至開發團隊</p>
     </div>

@@ -8,9 +8,12 @@ import {
   HopelessSvg,
   NeutralSvg,
 } from "@daodao/assets";
+import { Button } from "@daodao/ui/components/button";
+import { Label } from "@daodao/ui/components/label";
+import { toast } from "@daodao/ui/components/sonner";
+import { Textarea } from "@daodao/ui/components/textarea";
 import { Bug, Lightbulb, MessageSquare, Sparkles } from "lucide-react";
 import { type ElementType, useState } from "react";
-import { toast } from "@daodao/ui/components/sonner";
 
 type FeedbackCategory = "bug" | "feature" | "improvement" | "other";
 type SatisfactionLevel = 1 | 2 | 3 | 4 | 5 | null;
@@ -57,27 +60,27 @@ export function FeedbackForm() {
           <br />
           我們會盡快查看並改善。
         </p>
-        <button
-          type="button"
+        <Button
+          variant="ctaPrimary"
+          className="mt-4 rounded-full px-6"
           onClick={() => {
             setCategory(null);
             setSatisfaction(null);
             setMessage("");
             setSubmitted(false);
           }}
-          className="mt-4 rounded-full bg-logo-cyan px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0E8E89]"
         >
           再提一則
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-6">
-      <section>
-        <h3 className="text-sm font-semibold text-[#2D3436]">類型</h3>
-        <div className="mt-3 grid grid-cols-2 gap-2">
+      <section className="flex flex-col gap-2">
+        <Label>類型</Label>
+        <div className="grid grid-cols-2 gap-2">
           {CATEGORIES.map((cat) => {
             const Icon = cat.icon;
             const selected = category === cat.id;
@@ -100,10 +103,10 @@ export function FeedbackForm() {
         </div>
       </section>
 
-      <section>
-        <h3 className="text-sm font-semibold text-[#2D3436]">整體滿意度</h3>
-        <p className="mt-1 text-xs text-[#8A9BA0]">你對島島目前的體驗感覺如何？</p>
-        <div className="mt-3 flex justify-between">
+      <section className="flex flex-col gap-2">
+        <Label>整體滿意度</Label>
+        <p className="text-xs text-[#8A9BA0]">你對島島目前的體驗感覺如何？</p>
+        <div className="flex justify-between">
           {SATISFACTION_OPTIONS.map((opt) => {
             const Icon = opt.icon;
             const selected = satisfaction === opt.value;
@@ -127,29 +130,21 @@ export function FeedbackForm() {
         </div>
       </section>
 
-      <section>
-        <h3 className="text-sm font-semibold text-[#2D3436]">
+      <section className="flex flex-col gap-2">
+        <Label>
           詳細描述 <span className="text-[#EF4444]">*</span>
-        </h3>
-        <textarea
+        </Label>
+        <Textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="告訴我們你的想法..."
           rows={5}
-          className="mt-3 w-full resize-none rounded-xl border border-[#E0E4E8] bg-white p-4 text-sm text-[#2D3436] placeholder:text-[#C0C8CC] focus:border-logo-cyan focus:outline-none"
         />
       </section>
 
-      <button
-        type="button"
-        disabled={!canSubmit}
-        onClick={handleSubmit}
-        className={`w-full rounded-full py-3 text-sm font-medium text-white transition-colors ${
-          canSubmit ? "bg-logo-cyan hover:bg-[#0E8E89]" : "cursor-not-allowed bg-[#C0C8CC]"
-        }`}
-      >
+      <Button variant="ctaPrimary" className="w-full rounded-full" disabled={!canSubmit} onClick={handleSubmit}>
         送出回饋
-      </button>
+      </Button>
 
       <p className="text-center text-xs text-[#8A9BA0]">功能預覽 — 正式版會將回饋送至團隊信箱</p>
     </div>
