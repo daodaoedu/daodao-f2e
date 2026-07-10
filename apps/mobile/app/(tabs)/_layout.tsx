@@ -1,7 +1,14 @@
+import BellOutlineSvg from "@daodao/assets/images/icon/bell-outline.svg";
+import BellSolidSvg from "@daodao/assets/images/icon/bell-solid.svg";
+import HomeOutlineSvg from "@daodao/assets/images/icon/home-outline.svg";
+import HomeSolidSvg from "@daodao/assets/images/icon/home-solid.svg";
+import SettingOutlineSvg from "@daodao/assets/images/icon/setting-outline.svg";
+import SettingSolidSvg from "@daodao/assets/images/icon/setting-solid.svg";
+import UserOutlineSvg from "@daodao/assets/images/icon/user-outline.svg";
+import UserSolidSvg from "@daodao/assets/images/icon/user-solid.svg";
 import { Compass, Plus, UsersRound } from "@tamagui/lucide-icons";
 import { Tabs, usePathname, useRouter } from "expo-router";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
-import { BellIcon, HomeIcon, SettingsIcon, UserIcon } from "@/components/icons";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 
@@ -65,9 +72,12 @@ export default function TabLayout() {
           name="index"
           options={{
             title: t("home"),
-            tabBarIcon: ({ color, focused }) => (
-              <HomeIcon size={32} color={color} filled={focused} />
-            ),
+            tabBarIcon: ({ color, focused }) =>
+              focused ? (
+                <HomeSolidSvg width={32} height={32} color={color} />
+              ) : (
+                <HomeOutlineSvg width={32} height={32} color={color} />
+              ),
           }}
         />
         <Tabs.Screen
@@ -81,9 +91,12 @@ export default function TabLayout() {
           name="notifications"
           options={{
             title: t("notifications"),
-            tabBarIcon: ({ color, focused }) => (
-              <BellIcon size={32} color={color} filled={focused} />
-            ),
+            tabBarIcon: ({ color, focused }) =>
+              focused ? (
+                <BellSolidSvg width={32} height={32} color={color} />
+              ) : (
+                <BellOutlineSvg width={32} height={32} color={color} />
+              ),
           }}
         />
         <Tabs.Screen
@@ -97,18 +110,24 @@ export default function TabLayout() {
           name="profile"
           options={{
             title: t("profile"),
-            tabBarIcon: ({ color, focused }) => (
-              <UserIcon size={32} color={color} filled={focused} />
-            ),
+            tabBarIcon: ({ color, focused }) =>
+              focused ? (
+                <UserSolidSvg width={32} height={32} color={color} />
+              ) : (
+                <UserOutlineSvg width={32} height={32} color={color} />
+              ),
           }}
         />
         <Tabs.Screen
           name="settings"
           options={{
             title: t("settings"),
-            tabBarIcon: ({ color, focused }) => (
-              <SettingsIcon size={32} color={color} filled={focused} />
-            ),
+            tabBarIcon: ({ color, focused }) =>
+              focused ? (
+                <SettingSolidSvg width={32} height={32} color={color} />
+              ) : (
+                <SettingOutlineSvg width={32} height={32} color={color} />
+              ),
           }}
         />
         {/* 隱藏的頁面 - 保留路由但不在 Tab 顯示 */}

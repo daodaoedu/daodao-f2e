@@ -1,8 +1,8 @@
+import GoogleFilledSvg from "@daodao/assets/images/social-icons/google-filled.svg";
 import { useEffect, useState } from "react";
 import { Alert, Linking, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, Spinner, Text, XStack, YStack } from "tamagui";
-import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
@@ -141,7 +141,7 @@ export default function LoginScreen() {
                 <Spinner color={colors.primary.base} />
               ) : (
                 <XStack alignItems="center" gap="$2.5">
-                  <GoogleIcon size={20} />
+                  <GoogleFilledSvg width={20} height={20} />
                   <Text fontWeight="500" fontSize={16} color={colors.basic[500]}>
                     {t("google_login")}
                   </Text>
