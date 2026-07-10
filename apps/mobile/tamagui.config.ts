@@ -1,13 +1,23 @@
 import { createAnimations } from "@tamagui/animations-react-native";
 import { tokens as defaultTokens } from "@tamagui/config/v3";
 import { shorthands } from "@tamagui/shorthands";
+import { Platform } from "react-native";
 import { createFont, createTamagui, createTokens } from "tamagui";
 // 使用腳本生成的 Mobile 版本 design tokens
 import { colors, radius, spacing, typography } from "@/generated/design-tokens";
 
-// 字體配置
+// 系統字型：對齊 web globals.css 的 --font-sans fallback（system-ui）。
+// iOS "System" = SF Pro，Android "sans-serif" = Roboto；中文皆走系統 CJK（蘋方 / Noto），
+// 與 web 在 Apple 裝置上的實際表現一致。字重靠 fontWeight，不需 face 檔案映射。
+const systemFontFamily = Platform.select({
+  ios: "System",
+  android: "sans-serif",
+  default: "System",
+});
+
+// 字體配置（系統字，無 face：字重由 fontWeight 驅動）
 const headingFont = createFont({
-  family: "Inter",
+  family: systemFontFamily,
   size: {
     1: typography.fontSizes.xs,
     2: typography.fontSizes.sm,
@@ -23,16 +33,10 @@ const headingFont = createFont({
     6: typography.fontWeights.semibold,
     7: typography.fontWeights.bold,
   },
-  // face 映射確保原生平台正確渲染不同字重
-  face: {
-    400: { normal: "Inter_400" },
-    600: { normal: "Inter_600" },
-    700: { normal: "Inter_700" },
-  },
 });
 
 const bodyFont = createFont({
-  family: "Inter",
+  family: systemFontFamily,
   size: {
     1: typography.fontSizes.xs,
     2: typography.fontSizes.sm,
@@ -43,11 +47,6 @@ const bodyFont = createFont({
     4: typography.fontWeights.normal,
     5: typography.fontWeights.medium,
     6: typography.fontWeights.semibold,
-  },
-  face: {
-    400: { normal: "Inter_400" },
-    500: { normal: "Inter_500" },
-    600: { normal: "Inter_600" },
   },
 });
 

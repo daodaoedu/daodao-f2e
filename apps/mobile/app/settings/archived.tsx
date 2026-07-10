@@ -4,7 +4,8 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
+import { Card, ScrollView, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { useMobileTranslation } from "@/i18n";
 
 interface IArchivedPractice {

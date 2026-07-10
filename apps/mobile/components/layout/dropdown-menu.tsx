@@ -1,7 +1,7 @@
 import { MoreHorizontal } from "@tamagui/lucide-icons";
 import type { ReactNode } from "react";
-import { Button, Text, View, XStack, YStack } from "tamagui";
-
+import { Text, View, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 export interface DropdownMenuItemConfig {
   key: string;
   icon: ReactNode;

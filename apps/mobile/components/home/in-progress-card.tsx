@@ -2,6 +2,7 @@ import { ArrowRight, PenLine } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { Pressable, View as RNView, StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
+import { Badge } from "@/components/ui/badge";
 import {
   getThemeNameFromColor,
   PracticeTheme,
@@ -57,11 +58,10 @@ export function InProgressCard({ task }: InProgressCardProps) {
               </Text>
             </View>
             {statusInfo && (
-              <View
-                style={[
-                  styles.badge,
-                  status === TaskStatus.inProgress ? styles.badgeActive : styles.badgeDefault,
-                ]}
+              <Badge
+                backgroundColor={status === TaskStatus.inProgress ? "#16B9B3" : "white"}
+                paddingHorizontal="$2"
+                paddingVertical="$0.5"
               >
                 <Text
                   fontSize={12}
@@ -69,7 +69,7 @@ export function InProgressCard({ task }: InProgressCardProps) {
                 >
                   {t(statusLabelKey[status] ?? "filter_in_progress")}
                 </Text>
-              </View>
+              </Badge>
             )}
           </XStack>
 
@@ -149,22 +149,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     minHeight: 260,
   },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
   badgeSecondary: {
     backgroundColor: "rgba(255,255,255,0.8)",
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
-  },
-  badgeActive: {
-    backgroundColor: "#16B9B3",
-  },
-  badgeDefault: {
-    backgroundColor: "white",
   },
   actionButton: {
     backgroundColor: "rgba(255,255,255,0.8)",

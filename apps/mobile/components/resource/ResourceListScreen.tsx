@@ -11,7 +11,8 @@ import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, Image, Input, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { Card, Image, Input, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import {
   RESOURCE_CATEGORIES,
   RESOURCE_SUBCATEGORIES,

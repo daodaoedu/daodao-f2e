@@ -7,6 +7,7 @@ import { Text, View, XStack, YStack } from "tamagui";
 import { PracticeMenuButton } from "@/components/practice/shared/practice-menu-button";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
 import { PracticeCommentPreview } from "@/components/showcase/practice-comment-preview";
+import { Badge } from "@/components/ui/badge";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
@@ -109,16 +110,15 @@ export function ShowcaseCard({
       {/* Header row */}
       <XStack alignItems="center" gap="$2" marginBottom="$2">
         {statusInfo && (
-          <View
-            style={[
-              styles.badge,
-              { backgroundColor: taskStatus === "completed" ? "#6B7280" : colors.primary.base },
-            ]}
+          <Badge
+            backgroundColor={taskStatus === "completed" ? "#6B7280" : colors.primary.base}
+            paddingHorizontal="$2"
+            paddingVertical="$0.5"
           >
             <Text fontSize={12} color="white">
               {taskStatus === "completed" ? t("filter_completed") : t("filter_in_progress")}
             </Text>
-          </View>
+          </Badge>
         )}
         {startFmt && endFmt && (
           <Text fontSize={12} color="rgba(0,0,0,0.5)" flex={1}>
@@ -227,11 +227,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
-  },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
   },
   avatar: {
     width: 64,

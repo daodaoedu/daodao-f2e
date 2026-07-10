@@ -3,9 +3,10 @@ import { ChevronLeft, Lock, MessageSquareQuote } from "@tamagui/lucide-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { Card, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { PersonaAnswerForm } from "@/components/persona/PersonaAnswerForm";
 import { PersonaResponseItem } from "@/components/persona/PersonaResponseItem";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 

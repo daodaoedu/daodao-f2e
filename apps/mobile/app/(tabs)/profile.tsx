@@ -19,10 +19,11 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, Text, XStack, YStack } from "tamagui";
+import { Card, Text, XStack, YStack } from "tamagui";
 import activeShaper1Json from "@/assets/animations/active-shaper-1.json";
 import { CompletedCard, DashboardHeader, FilterPills, InProgressCard } from "@/components/home";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
+import { Button } from "@/components/ui/button";
 import { UserInfoCard } from "@/components/user";
 import { getQuizThemeMessage, getQuizUrl } from "@/constants/quiz-theme";
 import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";

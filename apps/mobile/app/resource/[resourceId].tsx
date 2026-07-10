@@ -12,7 +12,8 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Linking, Share } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, Image, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { Card, Image, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { getResourceCategory, getResourceSubcategory } from "@/constants/resource";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";

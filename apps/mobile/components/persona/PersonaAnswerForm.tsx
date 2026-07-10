@@ -1,7 +1,8 @@
 import { submitPersonaAnswer } from "@daodao/api";
 import { useState } from "react";
 import { Alert } from "react-native";
-import { Button, TextArea, XStack, YStack } from "tamagui";
+import { TextArea, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { useMobileTranslation } from "@/i18n";
 
 interface PersonaAnswerFormProps {
