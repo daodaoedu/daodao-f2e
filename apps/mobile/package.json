@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@daodao/api": "workspace:*",
+    "@daodao/assets": "workspace:*",
     "@daodao/design-tokens": "workspace:*",
     "@daodao/shared": "workspace:*",
     "@hookform/resolvers": "catalog:",
