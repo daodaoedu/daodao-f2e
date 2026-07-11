@@ -77,8 +77,14 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
     <YStack flex={1}>
       <ScrollView flex={1} contentContainerStyle={styles.scrollContent}>
         <YStack paddingHorizontal="$6">
-          {/* Activity Title */}
-          <Text fontSize={16} fontWeight="500" color={colors.text.dark} marginBottom="$6">
+          {/* Activity Title（對齊 product：text-bg-dark + leading-8） */}
+          <Text
+            fontSize={16}
+            lineHeight={32}
+            fontWeight="500"
+            color={colors.background.dark}
+            marginBottom="$6"
+          >
             {taskTitle}
           </Text>
 
@@ -142,7 +148,7 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
       {/* Complete Button */}
       <YStack
         paddingHorizontal="$6"
-        paddingVertical="$4"
+        paddingVertical="$6"
         borderTopWidth={1}
         borderTopColor={colors.border.light}
         backgroundColor={colors.basic.white}

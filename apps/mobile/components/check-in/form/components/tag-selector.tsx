@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   tag: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   tagSelected: {
-    backgroundColor: colors.basic["500"],
-    borderColor: colors.basic["500"],
+    backgroundColor: colors.logo.gray,
+    borderColor: colors.logo.gray,
   },
 });

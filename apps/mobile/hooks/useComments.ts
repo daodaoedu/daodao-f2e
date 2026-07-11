@@ -6,6 +6,7 @@ import {
   type CommentTargetType,
 } from "@daodao/api";
 import useSWR from "swr";
+import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 
 // ── Types ──
 
@@ -106,6 +107,9 @@ export async function createComment(targetType: string, targetId: string, conten
   if (response.error) {
     throw new Error(getErrorMessage(response.error));
   }
+
+  // 新手任務 E：即時標記「在靈感頁留言」完成（非靈感頁留言時 server 不回 meta，為 no-op）
+  applyOnboardingUpdateFromResponse(response.data);
 
   return {
     ...response.data,

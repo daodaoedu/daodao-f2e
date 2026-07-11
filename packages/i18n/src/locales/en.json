@@ -6186,7 +6186,7 @@
       "practice_completed": "Practice completed",
       "already_checked_in": "Already checked in within 24 hours",
       "validation_mood_required": "Please choose a mood",
-      "validation_description_max": "Maximum 300 characters",
+      "validation_description_max": "Maximum 600 characters",
       "validation_media_max": "You can upload up to 3 images"
     },
     "checkInList": {
@@ -6256,6 +6256,11 @@
       "follow": "Follow",
       "unfollow": "Unfollow",
       "browse_activity": "Browse activity",
+      "activity_data": "Data",
+      "activity_echo": "Echoes",
+      "activity_views": "Views",
+      "activity_all": "All",
+      "activity_no_records": "No activity yet",
       "with_others": "{name} and {count} others",
       "you_with_others": "You and {count} others",
       "you": "You",

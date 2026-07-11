@@ -1,4 +1,5 @@
-import { Clock } from "@tamagui/lucide-icons";
+import BookSvg from "@daodao/assets/images/dashboard/book.svg";
+import ClockSolidSvg from "@daodao/assets/images/icon/clock-solid.svg";
 import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
@@ -24,7 +25,10 @@ export const ExecutionTimingCard = ({
 
   return (
     <View style={styles.card}>
-      <YStack>
+      <View style={{ position: "absolute", right: 0, bottom: 0, opacity: 0.7 }}>
+        <BookSvg width={126} height={118} />
+      </View>
+      <YStack zIndex={1}>
         <Text fontSize={12} color={colors.text.dark} marginBottom="$2">
           {t("form_execution_timing")}
         </Text>
@@ -34,8 +38,8 @@ export const ExecutionTimingCard = ({
             if (!option) return null;
             return (
               <View key={timing} style={styles.badge}>
-                <Clock size={16} color={colors.primary.base} />
-                <Text fontSize={12} color={colors.text.dark}>
+                <ClockSolidSvg width={18} height={18} color={colors.background.lightCyan} />
+                <Text fontSize={14} color={colors.text.dark}>
                   {t(option.labelKey)}
                 </Text>
               </View>
@@ -43,8 +47,8 @@ export const ExecutionTimingCard = ({
           })}
           {customTiming && (
             <View style={styles.badge}>
-              <Clock size={16} color={colors.primary.base} />
-              <Text fontSize={12} color={colors.text.dark}>
+              <ClockSolidSvg width={18} height={18} color={colors.background.lightCyan} />
+              <Text fontSize={14} color={colors.text.dark}>
                 {customTiming}
               </Text>
             </View>
@@ -57,10 +61,12 @@ export const ExecutionTimingCard = ({
 
 const styles = StyleSheet.create({
   card: {
+    position: "relative",
+    overflow: "hidden",
     backgroundColor: colors.background.lightCyan,
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 16,
-    paddingTop: 32,
+    paddingTop: 16,
     paddingBottom: 12,
   },
   badge: {

@@ -1,6 +1,12 @@
 import { Search, X } from "@tamagui/lucide-icons";
 import { useCallback, useRef, useState } from "react";
-import { Keyboard, Pressable, StyleSheet, TextInput } from "react-native";
+import {
+  Keyboard,
+  type LayoutChangeEvent,
+  Pressable,
+  StyleSheet,
+  TextInput,
+} from "react-native";
 import { Text, View, XStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useShowcaseSuggestions } from "@/hooks/useShowcaseSuggestions";
@@ -12,16 +18,34 @@ interface ShowcaseSearchBarProps {
   onSearch: (value: string) => void;
 }
 
+// 對齊 product ShowcaseSearchBar：預設收合成圓形圖示鈕，聚焦或有輸入時展開成滿版膠囊。
+const COLLAPSED_SIZE = 40;
+const ICON_COLOR_COLLAPSED = "rgba(41,94,92,0.6)"; // text.dark / 60
+const ICON_COLOR_EXPANDED = "rgba(41,94,92,0.4)"; // text.dark / 40
+
 export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchBarProps) {
   const t = useMobileTranslation("mobile.home");
   const [focused, setFocused] = useState(false);
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const inputRef = useRef<TextInput>(null);
+
+  const expanded = focused || !!value;
 
   const { data: suggestionsData } = useShowcaseSuggestions(focused && !value);
   const suggestions = suggestionsData?.data;
   const trendingKeywords = suggestions?.trending_keywords ?? [];
   const interestTags = suggestions?.interest_tags ?? [];
   const allSuggestions = [...new Set([...trendingKeywords, ...interestTags])];
+
+  const handleLayout = useCallback((e: LayoutChangeEvent) => {
+    setContainerWidth(e.nativeEvent.layout.width);
+  }, []);
+
+  const handleExpand = useCallback(() => {
+    if (expanded) return;
+    setFocused(true);
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }, [expanded]);
 
   const handleClear = useCallback(() => {
     onChange("");
@@ -45,18 +69,27 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
   );
 
   return (
-    <View style={{ position: "relative", zIndex: 10 }}>
+    <View style={{ position: "relative", zIndex: 10 }} onLayout={handleLayout}>
       <XStack
+        animation="medium"
+        animateOnly={["width", "borderColor"]}
+        onPress={handleExpand}
+        width={expanded ? (containerWidth ?? "100%") : COLLAPSED_SIZE}
+        height={COLLAPSED_SIZE}
         alignItems="center"
-        gap="$2"
+        justifyContent={expanded ? "flex-start" : "center"}
         backgroundColor="white"
         borderWidth={1}
-        borderColor={focused ? "#9CA3AF" : "#D1D5DB"}
-        borderRadius={12}
-        paddingHorizontal="$3"
-        paddingVertical="$2.5"
+        borderColor={expanded ? colors.gray.mid : colors.gray.light}
+        borderRadius={COLLAPSED_SIZE / 2}
+        paddingHorizontal={expanded ? 16 : 0}
+        overflow="hidden"
       >
-        <Search size={16} color="rgba(0,0,0,0.4)" />
+        <Search
+          size={expanded ? 16 : 18}
+          color={expanded ? ICON_COLOR_EXPANDED : ICON_COLOR_COLLAPSED}
+          marginRight={expanded ? 8 : 0}
+        />
         <TextInput
           ref={inputRef}
           value={value}
@@ -65,13 +98,14 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
           onBlur={() => setTimeout(() => setFocused(false), 200)}
           onSubmitEditing={handleSubmit}
           returnKeyType="search"
-          style={styles.input}
+          style={[styles.input, expanded ? styles.inputExpanded : styles.inputCollapsed]}
+          pointerEvents={expanded ? "auto" : "none"}
           placeholder={t("search_placeholder")}
-          placeholderTextColor="rgba(0,0,0,0.4)"
+          placeholderTextColor={ICON_COLOR_EXPANDED}
         />
-        {value ? (
+        {expanded && value ? (
           <Pressable onPress={handleClear} hitSlop={8}>
-            <X size={16} color="rgba(0,0,0,0.4)" />
+            <X size={16} color={ICON_COLOR_EXPANDED} />
           </Pressable>
         ) : null}
       </XStack>
@@ -136,10 +170,17 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
 
 const styles = StyleSheet.create({
   input: {
-    flex: 1,
     fontSize: 14,
-    color: "#1a1a1a",
+    color: colors.text.dark,
     padding: 0,
+  },
+  inputExpanded: {
+    flex: 1,
+    opacity: 1,
+  },
+  inputCollapsed: {
+    width: 0,
+    opacity: 0,
   },
   dropdown: {
     position: "absolute",

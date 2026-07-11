@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
-import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { MOOD_EMOJI_SVG, MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 
@@ -30,6 +30,7 @@ export const MoodSelector = ({ value, onChange }: IMoodSelectorProps) => {
       <XStack justifyContent="space-between">
         {MOOD_OPTIONS.map((moodOption) => {
           const isSelected = value === moodOption.id;
+          const MoodSvg = MOOD_EMOJI_SVG[moodOption.id];
           return (
             <Pressable
               key={moodOption.id}
@@ -39,8 +40,8 @@ export const MoodSelector = ({ value, onChange }: IMoodSelectorProps) => {
               accessibilityRole="radio"
               accessibilityState={{ checked: isSelected }}
             >
-              <Text fontSize={36}>{moodOption.emoji}</Text>
-              <Text fontSize={12} color={isSelected ? colors.text.dark : colors.basic[400]}>
+              {MoodSvg && <MoodSvg width={48} height={48} />}
+              <Text fontSize={12} color={colors.text.dark}>
                 {t(moodOption.labelKey)}
               </Text>
             </Pressable>

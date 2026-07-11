@@ -3,7 +3,7 @@ import { Text, TextArea, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 
-const MAX_LENGTH = 300;
+const MAX_LENGTH = 600;
 
 interface IDescriptionFieldProps {
   value: string;
@@ -26,7 +26,7 @@ export const DescriptionField = ({ value, onChange }: IDescriptionFieldProps) =>
   return (
     <YStack marginBottom="$6">
       <XStack justifyContent="space-between" alignItems="center" marginBottom="$2">
-        <Text fontSize={14} color={colors.text.dark}>
+        <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
           {t("description_label")}
         </Text>
         <Text fontSize={14} color={colors.basic[400]}>

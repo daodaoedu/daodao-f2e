@@ -1,25 +1,52 @@
+import DialogOutlineSvg from "@daodao/assets/images/icon/dialog-outline.svg";
+import TagSolidSvg from "@daodao/assets/images/icon/tag-solid.svg";
 import {
   Archive,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  FileText,
-  Tag,
+  BarChart3,
+  ChevronDown,
+  ChevronUp,
+  Pencil,
   Trash2,
   X,
 } from "@tamagui/lucide-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { Alert, RefreshControl } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { mutate as globalMutate } from "swr";
-import { Card, ScrollView, Spinner, Text, View, XStack, YStack } from "tamagui";
-import { CheckInList, CheckInSheet, ProgressRing, ShareCheckInSheet } from "@/components";
+import { ScrollView, Spinner, Text, View, XStack, YStack } from "tamagui";
+import { CheckInRecordCard, CheckInSheet, CheckInStack, ShareCheckInSheet } from "@/components";
 import type { ICheckInData } from "@/components/CheckInSheet";
+import { DropdownMenu } from "@/components/layout/dropdown-menu";
+import { BrowseActivitySheet } from "@/components/practice/detail/BrowseActivitySheet";
+import { CommentSection } from "@/components/practice/detail/CommentSection";
+import { type PracticeTab, PracticeTabBar } from "@/components/practice/detail/PracticeTabBar";
+import { PracticeResourceListCard } from "@/components/practice/detail/practice-resource-list-card";
 import { PublicPracticeView } from "@/components/practice/detail/PublicPracticeView";
+import { CircularProgress } from "@/components/practice/shared/circular-progress";
+import { ExecutionDurationCard } from "@/components/practice/shared/execution-duration-card";
+import { ExecutionTimingCard } from "@/components/practice/shared/execution-timing-card";
+import { LottieEmoji } from "@/components/reactions/LottieEmoji";
+import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { type ExecutionTiming, PracticeTimePeriodToExecutionTimingMap } from "@/constants/practice-form";
+import { PICKER_REACTIONS, type ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
+import { useComments } from "@/hooks/useComments";
+import {
+  removeReaction,
+  upsertReaction,
+  useReactions,
+  useReactionsList,
+} from "@/hooks/useReactions";
 import { useCheckIn, useCheckIns, usePractice } from "@/hooks/usePractices";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
 import { useMobileTranslation } from "@/i18n";
@@ -50,14 +77,10 @@ const statusConfig: Record<
   completed: { labelKey: "status_completed", backgroundColor: "#10B981", textColor: "#FFFFFF" },
 };
 
-// 執行時機標籤
-const timingLabels: Record<string, string> = {
-  holiday: "timing_holiday",
-  commute: "timing_commute",
-  beforeSleep: "timing_before_sleep",
-  morning: "timing_morning",
-  lunch: "timing_lunch",
-  evening: "timing_evening",
+// API practiceTimePeriods → 表單 ExecutionTiming（含 commute）
+const timePeriodToTiming: Record<string, ExecutionTiming> = {
+  ...PracticeTimePeriodToExecutionTimingMap,
+  commute: "commute",
 };
 
 export default function PracticeDetailScreen() {
@@ -65,15 +88,31 @@ export default function PracticeDetailScreen() {
   const router = useRouter();
   const t = useMobileTranslation("practice");
   const commonT = useMobileTranslation("common");
+  const detailT = useMobileTranslation("mobile.practiceDetail");
   // Status labels live under mobile.practiceCard, not the practice namespace.
   const statusT = useMobileTranslation("mobile.practiceCard");
   const { user: currentUser } = useAuth();
   const { practice, isLoading, mutate } = usePractice(id);
-  const { checkIn, isChecking } = useCheckIn();
-  const { checkIns } = useCheckIns(id);
+  const { checkIn } = useCheckIn();
+  const { checkIns, checkInsData, isLoading: isLoadingCheckIns, error: checkInsError } =
+    useCheckIns(id);
+
+  // 反應 / 留言（owner 也可與自己的實踐互動，對齊 product）
+  const {
+    currentUserReaction,
+    totalCount,
+    displayReactions,
+    mutate: mutateReactions,
+  } = useReactions("practice", id);
+  const { items: reactors, firstReactorName } = useReactionsList("practice", id);
+  const { comments } = useComments("practice", id);
 
   const [showCheckInSheet, setShowCheckInSheet] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
+  const [activeTab, setActiveTab] = useState<PracticeTab>("comments");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [infoExpanded, setInfoExpanded] = useState(false);
+  const [browseActivityOpen, setBrowseActivityOpen] = useState(false);
 
   const handleCheckIn = useCallback(
     async (data: ICheckInData) => {
@@ -96,7 +135,30 @@ export default function PracticeDetailScreen() {
     await mutate();
   }, [mutate]);
 
+  const handleReactionToggle = useCallback(
+    async (type: ReactionTypeType) => {
+      if (currentUserReaction === type) {
+        await removeReaction("practice", id);
+      } else {
+        await upsertReaction("practice", id, type);
+      }
+      await mutateReactions();
+    },
+    [currentUserReaction, id, mutateReactions]
+  );
+
+  const handleEdit = useCallback(() => {
+    setMenuOpen(false);
+    router.push(`/practices/${id}/edit` as never);
+  }, [id, router]);
+
+  const handleBrowseActivity = useCallback(() => {
+    setMenuOpen(false);
+    setBrowseActivityOpen(true);
+  }, []);
+
   const handleArchive = useCallback(() => {
+    setMenuOpen(false);
     Alert.alert(t("mobile_archive_title"), t("mobile_archive_message"), [
       { text: t("edit_cancel"), style: "cancel" },
       {
@@ -116,6 +178,7 @@ export default function PracticeDetailScreen() {
   }, [id, mutate, router, t]);
 
   const handleDelete = useCallback(() => {
+    setMenuOpen(false);
     Alert.alert(t("delete_practice_title"), t("delete_practice_message"), [
       { text: t("edit_cancel"), style: "cancel" },
       {
@@ -134,6 +197,59 @@ export default function PracticeDetailScreen() {
       },
     ]);
   }, [id, router, t]);
+
+  // 頻率標籤（2-4 / 3-5 …），對齊 product
+  const frequencyLabel = useMemo(() => {
+    const min = practice?.frequencyMinDays;
+    const max = practice?.frequencyMaxDays;
+    if (min == null && max == null) return "";
+    if (min === max) return String(min ?? "");
+    return `${min ?? ""}-${max ?? ""}`;
+  }, [practice?.frequencyMinDays, practice?.frequencyMaxDays]);
+
+  // API practiceTimePeriods → 表單 ExecutionTiming 陣列
+  const executionTiming = useMemo(
+    () =>
+      (practice?.practiceTimePeriods ?? [])
+        .map((period) => timePeriodToTiming[period])
+        .filter((timing): timing is ExecutionTiming => Boolean(timing)),
+    [practice?.practiceTimePeriods]
+  );
+
+  // 瀏覽動態文字（對齊 product 邏輯）
+  const browseActivityText = useMemo(() => {
+    if (reactors.length > 0) {
+      const firstName = reactors[0]?.name ?? "";
+      if (reactors.length > 1) {
+        return detailT("browse_with_others", { name: firstName, count: reactors.length - 1 });
+      }
+      return firstName;
+    }
+    if (currentUserReaction) {
+      if (totalCount > 1) return detailT("you_with_others", { count: totalCount - 1 });
+      return detailT("you");
+    }
+    if (totalCount > 0) {
+      if (firstReactorName) {
+        if (totalCount > 1) {
+          return detailT("browse_with_others", { name: firstReactorName, count: totalCount - 1 });
+        }
+        return firstReactorName;
+      }
+      return detailT("people_count", { count: totalCount });
+    }
+    return detailT("view_browse_activity");
+  }, [reactors, currentUserReaction, totalCount, firstReactorName, detailT]);
+
+  const browseDisplayReactions = useMemo<ReactionTypeType[]>(() => {
+    if (reactors.length > 0) {
+      return [...new Set(reactors.map((r) => r.reactionType))].slice(
+        0,
+        PICKER_REACTIONS.length
+      ) as ReactionTypeType[];
+    }
+    return displayReactions.slice(0, PICKER_REACTIONS.length);
+  }, [reactors, displayReactions]);
 
   // Parse showcase data passed from 靈感 tab
   const showcasePractice = showcaseData ? (JSON.parse(showcaseData) as IShowcasePractice) : null;
@@ -192,308 +308,365 @@ export default function PracticeDetailScreen() {
   }
 
   const progress =
-    practice.targetDays > 0 ? Math.round((practice.completedDays / practice.targetDays) * 100) : 0;
+    practice.progressPercentage ??
+    (practice.targetDays > 0
+      ? Math.round((practice.completedDays / practice.targetDays) * 100)
+      : 0);
 
   const status = practice.status || "in-progress";
   const statusInfo = statusConfig[status] || statusConfig["in-progress"];
   const canViewSummary = status === "completed" || practice.targetDays <= practice.completedDays;
+  const durationDays = practice.durationDays ?? practice.targetDays;
+  const hasStats = Boolean(frequencyLabel) || practice.sessionDurationMinutes != null;
 
-  // 模擬執行時機數據
-  const executionTiming = ["holiday", "commute", "beforeSleep"];
-  const frequency = "2-4";
-  const durationMinutes = 40;
+  // 依實踐狀態渲染底部主要按鈕（對齊 product：orange variant 膠囊、深色字、無圖示、h-10 高度）
+  const renderFooterButton = () => {
+    let label = t("mobile_checkin_action");
+    let disabled = false;
+
+    if (canViewSummary) {
+      label = t("view_summary");
+    } else if (practice.todayCheckedIn) {
+      label = t("mobile_today_completed");
+      disabled = true;
+    }
+
+    const handlePress = () => {
+      if (canViewSummary) {
+        router.push(`/practices/${id}/summary` as never);
+        return;
+      }
+      setShowCheckInSheet(true);
+    };
+
+    return (
+      <Button
+        height={44}
+        backgroundColor={colors.logo.orange}
+        borderRadius="$full"
+        pressStyle={{ opacity: 0.9 }}
+        onPress={handlePress}
+        disabled={disabled}
+        opacity={disabled ? 0.6 : 1}
+      >
+        <Text color={colors.background.dark} fontWeight="600" fontSize={15}>
+          {label}
+        </Text>
+      </Button>
+    );
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-      <ScrollView
-        flex={1}
-        backgroundColor="$background"
-        refreshControl={
-          <RefreshControl
-            refreshing={false}
-            onRefresh={handleRefresh}
-            tintColor={colors.primary.base}
-          />
-        }
-        contentContainerStyle={{ paddingBottom: 100 }}
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background.veryLightGray }}
+      edges={["top"]}
+    >
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        {/* Header */}
-        <XStack padding="$4" justifyContent="space-between" alignItems="center">
-          <Button
-            size="$4"
-            circular
-            chromeless
-            onPress={() => router.back()}
-            accessibilityLabel={commonT("back")}
-          >
-            <ChevronLeft size={24} color="$color" />
-          </Button>
-          <Text fontSize={16} fontWeight="500" color="$color">
-            {t("create_title")}
-          </Text>
-          <Button
-            size="$4"
-            circular
-            chromeless
-            onPress={() => router.push("/")}
-            accessibilityLabel={commonT("close")}
-          >
-            <X size={20} color="$color" />
-          </Button>
-        </XStack>
-
-        <YStack paddingHorizontal="$5" gap="$4">
-          {/* Title Section with Navigation */}
-          <XStack alignItems="center" gap="$2" height={84}>
-            <Button size="$4" circular backgroundColor="white" opacity={0.5} disabled>
-              <ChevronLeft size={24} color="$color" />
-            </Button>
-
-            <YStack flex={1} alignItems="center" gap="$2">
-              <Badge backgroundColor={statusInfo.backgroundColor} paddingHorizontal="$2">
-                <Text fontSize={12} color={statusInfo.textColor} fontWeight="500">
-                  {statusT(statusInfo.labelKey)}
-                </Text>
-              </Badge>
-              <Text
-                fontSize={18}
-                fontWeight="600"
-                color="$color"
-                textAlign="center"
-                numberOfLines={2}
-              >
-                {practice.title}
-              </Text>
-            </YStack>
-
-            <Button size="$4" circular backgroundColor="white" opacity={0.5} disabled>
-              <ChevronRight size={24} color="$color" />
+        <ScrollView
+          flex={1}
+          backgroundColor={colors.background.veryLightGray}
+          refreshControl={
+            <RefreshControl
+              refreshing={false}
+              onRefresh={handleRefresh}
+              tintColor={colors.primary.base}
+            />
+          }
+          contentContainerStyle={{ paddingBottom: 100 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* ── Top bar: close (X) → home, aligned with product web ── */}
+          <XStack padding="$4" justifyContent="flex-end" alignItems="center">
+            <Button
+              size="$4"
+              circular
+              chromeless
+              onPress={() => router.replace("/" as never)}
+              accessibilityLabel={commonT("close")}
+            >
+              <X size={20} color="$color" />
             </Button>
           </XStack>
 
-          {/* Practice Overview Card */}
-          <Card
-            backgroundColor="white"
-            borderRadius={12}
-            padding="$4"
-            shadowColor="rgba(0,0,0,0.1)"
-            shadowOffset={{ width: 0, height: 2 }}
-            shadowOpacity={1}
-            shadowRadius={8}
-          >
-            <XStack>
-              <YStack flex={1} paddingRight="$4">
-                {/* Description */}
-                <Text fontSize={15} fontWeight="500" color="$color" marginBottom="$3">
-                  {practice.description || t("mobile_default_description")}
+          <YStack paddingHorizontal="$4">
+            {/* ── Status badge + owner menu row (matches product) ── */}
+            <XStack justifyContent="space-between" alignItems="center" marginBottom="$2">
+              <Badge backgroundColor={statusInfo.backgroundColor}>
+                <Text fontSize={14} color={statusInfo.textColor}>
+                  {statusT(statusInfo.labelKey)}
                 </Text>
+              </Badge>
 
-                {/* Frequency */}
+              <DropdownMenu
+                open={menuOpen}
+                onToggle={() => setMenuOpen((v) => !v)}
+                items={[
+                  {
+                    key: "edit",
+                    icon: <Pencil size={18} color="#295E5C" />,
+                    label: t("edit_title"),
+                    onPress: handleEdit,
+                  },
+                  {
+                    key: "archive",
+                    icon: <Archive size={18} color="#295E5C" />,
+                    label: t("mobile_archive_action"),
+                    onPress: handleArchive,
+                  },
+                  {
+                    key: "browse",
+                    icon: <BarChart3 size={18} color="#295E5C" />,
+                    label: detailT("browse_activity"),
+                    onPress: handleBrowseActivity,
+                  },
+                  {
+                    key: "delete",
+                    icon: <Trash2 size={18} color="#EF4444" />,
+                    label: t("mobile_delete_action"),
+                    color: "#EF4444",
+                    onPress: handleDelete,
+                  },
+                ]}
+              />
+            </XStack>
+
+            {/* ── Title (left-aligned, matches product h1) ── */}
+            <Text
+              fontSize={18}
+              fontWeight="600"
+              color={colors.text.dark}
+              numberOfLines={2}
+              marginBottom="$4"
+            >
+              {practice.title}
+            </Text>
+
+            {/* ── Single overview card (matches product structure) ── */}
+            <View style={styles.card}>
+              {/* Description */}
+              <Text
+                fontSize={16}
+                fontWeight="500"
+                color={colors.text.dark}
+                marginBottom="$3"
+                paddingRight={88}
+              >
+                {practice.description || t("mobile_default_description")}
+              </Text>
+
+              {/* Progress ring */}
+              <View style={styles.progressRing}>
+                <CircularProgress
+                  value={progress}
+                  size={60}
+                  strokeWidth={4}
+                  backgroundColor={colors.background.gray}
+                />
+              </View>
+
+              {/* Frequency + Duration */}
+              {hasStats && (
                 <XStack
                   marginBottom="$3"
                   paddingBottom="$3"
                   borderBottomWidth={1}
-                  borderBottomColor={colors.basic[200]}
+                  borderBottomColor="#E4EAE9"
                 >
-                  <YStack width={80}>
-                    <Text fontSize={12} color="$color" opacity={0.6}>
-                      {t("mobile_frequency_week_label")}
-                    </Text>
-                    <XStack alignItems="baseline" gap={2}>
-                      <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
-                        {frequency}
+                  {Boolean(frequencyLabel) && (
+                    <YStack width={80}>
+                      <Text fontSize={12} color={colors.text.dark}>
+                        {t("mobile_frequency_week_label")}
                       </Text>
-                      <Text fontSize={12} color="$color">
-                        {t("mobile_day_unit")}
-                      </Text>
-                    </XStack>
-                  </YStack>
-                  <YStack width={80}>
-                    <Text fontSize={12} color="$color" opacity={0.6}>
-                      {t("mobile_once_label")}
-                    </Text>
-                    <XStack alignItems="baseline" gap={2}>
-                      <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
-                        {durationMinutes}
-                      </Text>
-                      <Text fontSize={12} color="$color">
-                        {t("mobile_minute_unit")}
-                      </Text>
-                    </XStack>
-                  </YStack>
-                </XStack>
-
-                {/* Tags */}
-                {practice.tags && practice.tags.length > 0 && (
-                  <XStack flexWrap="wrap" gap="$2">
-                    {practice.tags.map((tag) => (
-                      <XStack
-                        key={tag}
-                        backgroundColor="#E0F4FF"
-                        paddingHorizontal="$2"
-                        paddingVertical={4}
-                        borderRadius="$sm"
-                        alignItems="center"
-                        gap="$1"
-                      >
-                        <Tag size={14} color={colors.primary.lighter} />
-                        <Text fontSize={12} color="$color">
-                          {tag}
+                      <XStack alignItems="baseline" gap={2}>
+                        <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
+                          {frequencyLabel}
+                        </Text>
+                        <Text fontSize={12} color={colors.text.dark}>
+                          {t("mobile_day_unit")}
                         </Text>
                       </XStack>
+                    </YStack>
+                  )}
+                  {practice.sessionDurationMinutes != null && (
+                    <YStack width={80}>
+                      <Text fontSize={12} color={colors.text.dark}>
+                        {t("mobile_once_label")}
+                      </Text>
+                      <XStack alignItems="baseline" gap={2}>
+                        <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
+                          {practice.sessionDurationMinutes}
+                        </Text>
+                        <Text fontSize={12} color={colors.text.dark}>
+                          {t("mobile_minute_unit")}
+                        </Text>
+                      </XStack>
+                    </YStack>
+                  )}
+                </XStack>
+              )}
+
+              {/* Tags */}
+              {practice.tags && practice.tags.length > 0 && (
+                <XStack flexWrap="wrap" gap="$2" marginBottom="$3">
+                  {practice.tags.map((tag) => (
+                    <XStack
+                      key={tag}
+                      backgroundColor={colors.background.veryLightBlue}
+                      paddingHorizontal="$2"
+                      paddingVertical={3}
+                      borderRadius={4}
+                      alignItems="center"
+                      gap="$1"
+                    >
+                      <TagSolidSvg width={18} height={18} color={colors.background.lightCyan} />
+                      <Text fontSize={14} color={colors.text.dark}>
+                        {tag}
+                      </Text>
+                    </XStack>
+                  ))}
+                </XStack>
+              )}
+
+              {/* ── Divider ── */}
+              <View style={styles.divider} />
+
+              {/* ── "更多資訊" expandable (matches product) ── */}
+              <Pressable onPress={() => setInfoExpanded((v) => !v)} style={styles.moreInfoButton}>
+                <Text fontSize={14} color="#9FB5B8">
+                  {detailT("more_info")}
+                </Text>
+                {infoExpanded ? (
+                  <ChevronUp size={16} color="#9FB5B8" />
+                ) : (
+                  <ChevronDown size={16} color="#9FB5B8" />
+                )}
+              </Pressable>
+
+              {infoExpanded && (
+                <XStack gap="$3" marginBottom="$3">
+                  <View style={{ flex: 1 }}>
+                    <ExecutionTimingCard executionTiming={executionTiming} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <ExecutionDurationCard
+                      durationDays={durationDays}
+                      startDate={practice.startDate ?? null}
+                      showRemaining
+                    />
+                  </View>
+                </XStack>
+              )}
+
+              {/* ── Browse Activity button (matches product) ── */}
+              <Pressable onPress={handleBrowseActivity} style={styles.browseActivityButton}>
+                {browseDisplayReactions.length > 0 && (
+                  <XStack alignItems="center">
+                    {browseDisplayReactions.map((type, i) => (
+                      <View
+                        key={type}
+                        style={[styles.browseEmojiCircle, i > 0 && { marginLeft: -6 }]}
+                      >
+                        <LottieEmoji type={type} size={16} play={false} />
+                      </View>
                     ))}
                   </XStack>
                 )}
-              </YStack>
+                <Text fontSize={14} color={colors.text.dark}>
+                  {browseActivityText}
+                </Text>
+              </Pressable>
 
-              {/* Progress Ring */}
-              <View position="absolute" right={16} top={16}>
-                <ProgressRing
-                  progress={progress}
-                  size={72}
-                  strokeWidth={6}
-                  color={colors.primary.base}
-                />
-              </View>
-            </XStack>
-          </Card>
+              {/* ── Reaction bar + Comment count (matches product bottom bar) ── */}
+              <View style={styles.bottomBar}>
+                <View style={styles.bottomBarHalf}>
+                  <ReactionPickerButton
+                    selectedReaction={currentUserReaction}
+                    onToggle={handleReactionToggle}
+                    variant="card"
+                    totalCount={totalCount}
+                    displayReactions={displayReactions}
+                    firstReactorName={firstReactorName}
+                  />
+                </View>
 
-          {/* Execution Timing & Duration */}
-          <XStack gap="$3">
-            {/* Execution Timing Card */}
-            <Card flex={1} backgroundColor={colors.primary.palest} borderRadius={12} padding="$4">
-              <Text fontSize={12} color={colors.primary.darker} marginBottom="$2">
-                {t("mobile_execution_timing_label")}
-              </Text>
-              <XStack flexWrap="wrap" gap="$1">
-                {executionTiming.map((timing) => (
-                  <XStack
-                    key={timing}
-                    backgroundColor="white"
-                    paddingHorizontal="$2"
-                    paddingVertical={4}
-                    borderRadius="$sm"
-                  >
-                    <Text fontSize={12} color={colors.primary.base}>
-                      {timingLabels[timing] ? t(timingLabels[timing]) : timing}
+                <View style={styles.bottomBarDivider} />
+
+                <Pressable style={styles.bottomBarHalf} onPress={() => setActiveTab("comments")}>
+                  <XStack alignItems="center" gap="$1.5" justifyContent="center">
+                    <DialogOutlineSvg width={22} height={22} color={colors.text.dark} />
+                    <Text fontSize={14} fontWeight="500" color={colors.text.dark}>
+                      {comments.length}
                     </Text>
                   </XStack>
-                ))}
-              </XStack>
-            </Card>
+                </Pressable>
+              </View>
+            </View>
 
-            {/* Duration Card */}
-            <Card flex={1} backgroundColor={colors.primary.palest} borderRadius={12} padding="$4">
-              <Text fontSize={12} color={colors.primary.darker} marginBottom="$2">
-                {t("mobile_remaining_days")}
-              </Text>
-              <XStack alignItems="baseline" gap={4}>
-                <Text fontSize={24} fontWeight="600" color={colors.primary.darker}>
-                  {practice.targetDays - practice.completedDays}
-                </Text>
-                <Text fontSize={12} color={colors.primary.darker}>
-                  {t("mobile_remaining_total", { total: practice.targetDays })}
-                </Text>
-              </XStack>
-            </Card>
-          </XStack>
+            {/* ── Tabs (matches product) ── */}
+            <PracticeTabBar
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              commentCount={comments.length}
+              checkinCount={checkIns?.length}
+              resourceCount={practice.resources?.length}
+            />
 
-          {/* Check-in History */}
-          <YStack gap="$3">
-            <Text fontSize={16} fontWeight="600" color="$color">
-              {t("mobile_checkin_history")}
-            </Text>
-            <CheckInList checkIns={checkIns || []} practiceId={id} />
-          </YStack>
+            {/* ── Tab content ── */}
+            {activeTab === "comments" && <CommentSection targetType="practice" targetId={id} />}
 
-          {/* Action Buttons */}
-          <YStack alignItems="center" gap="$3" marginTop="$4">
-            {canViewSummary ? (
-              <Button
-                backgroundColor={colors.primary.base}
-                borderRadius="$md"
-                paddingHorizontal="$6"
-                onPress={() => router.push(`/practices/${id}/summary` as never)}
-              >
-                <XStack alignItems="center" gap="$2">
-                  <FileText size={18} color="white" />
-                  <Text color="white" fontWeight="600">
-                    {t("view_summary")}
+            {activeTab === "checkins" &&
+              (checkInsError ? (
+                <YStack alignItems="center" paddingVertical="$8">
+                  <Text color="rgba(0,0,0,0.4)" fontSize={14}>
+                    {detailT("checkins_load_failed")}
                   </Text>
-                </XStack>
-              </Button>
-            ) : null}
+                </YStack>
+              ) : (
+                <YStack paddingTop="$4" gap="$4">
+                  {/* 心情排行 + 打卡堆疊，對齊 product 的打卡紀錄分頁 */}
+                  <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
+                  <CheckInStack
+                    checkInsData={checkInsData}
+                    onCheckInPress={(checkInId) =>
+                      router.push(`/practices/${id}/check-ins/${checkInId}` as never)
+                    }
+                  />
+                </YStack>
+              ))}
 
-            <Button
-              backgroundColor="white"
-              borderRadius="$md"
-              paddingHorizontal="$6"
-              onPress={handleArchive}
-            >
-              <XStack alignItems="center" gap="$2">
-                <Archive size={18} color="$color" />
-                <Text color="$color">{t("mobile_archive_action")}</Text>
-              </XStack>
-            </Button>
-
-            <Button
-              backgroundColor="transparent"
-              borderWidth={1}
-              borderColor={colors.primary.base}
-              borderRadius="$md"
-              paddingHorizontal="$6"
-              onPress={handleDelete}
-            >
-              <XStack alignItems="center" gap="$2">
-                <Trash2 size={18} color="$color" />
-                <Text color="$color">{t("mobile_delete_action")}</Text>
-              </XStack>
-            </Button>
+            {activeTab === "resources" &&
+              (practice.resources && practice.resources.length > 0 ? (
+                <YStack paddingTop="$4" gap="$3">
+                  {practice.resources.map((resource) => (
+                    <PracticeResourceListCard key={resource.id} resource={resource} />
+                  ))}
+                </YStack>
+              ) : (
+                <YStack paddingVertical="$4">
+                  <Text color="#9FB5B8" fontSize={14}>
+                    {detailT("empty_resources")}
+                  </Text>
+                </YStack>
+              ))}
           </YStack>
-        </YStack>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
-      {/* Fixed Bottom Check-in Button */}
+      {/* Fixed Bottom Action Button */}
       <YStack
         position="absolute"
         bottom={0}
         left={0}
         right={0}
         padding="$4"
-        backgroundColor="$background"
+        backgroundColor={colors.background.veryLightGray}
         borderTopWidth={1}
-        borderTopColor="$borderColor"
+        borderTopColor="#E4EAE9"
       >
-        {!practice.todayCheckedIn ? (
-          <Button
-            size="$5"
-            backgroundColor="#FF8C42"
-            borderRadius="$md"
-            pressStyle={{ opacity: 0.8 }}
-            onPress={() => setShowCheckInSheet(true)}
-            disabled={isChecking}
-          >
-            {isChecking ? (
-              <Spinner color="white" />
-            ) : (
-              <XStack alignItems="center" gap="$2">
-                <Check size={18} color="white" />
-                <Text color="white" fontWeight="600" fontSize={16}>
-                  {t("mobile_checkin_action")}
-                </Text>
-              </XStack>
-            )}
-          </Button>
-        ) : (
-          <Button size="$5" backgroundColor={colors.semantic.success} borderRadius="$md" disabled>
-            <XStack alignItems="center" gap="$2">
-              <Check size={18} color="white" />
-              <Text color="white" fontWeight="600" fontSize={16}>
-                {t("mobile_today_completed")}
-              </Text>
-            </XStack>
-          </Button>
-        )}
+        {renderFooterButton()}
       </YStack>
 
       {/* Check-in Sheet */}
@@ -515,6 +688,77 @@ export default function PracticeDetailScreen() {
         practice={practice}
         streakCount={practice.currentStreak + 1}
       />
+
+      {/* Browse Activity Sheet — lazy mount to avoid Tamagui Sheet crash */}
+      {browseActivityOpen && (
+        <BrowseActivitySheet
+          open={browseActivityOpen}
+          onOpenChange={setBrowseActivityOpen}
+          commentCount={comments.length}
+          reactors={reactors}
+        />
+      )}
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    paddingTop: 16,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    overflow: "hidden",
+  },
+  progressRing: {
+    position: "absolute",
+    right: 16,
+    top: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#E4EAE9",
+    marginBottom: 8,
+  },
+  moreInfoButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 4,
+    marginBottom: 8,
+  },
+  browseActivityButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingBottom: 12,
+  },
+  browseEmojiCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#E8FAF9",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "white",
+  },
+  bottomBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: "#E4EAE9",
+    paddingVertical: 16,
+  },
+  bottomBarHalf: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bottomBarDivider: {
+    width: 1,
+    height: 20,
+    backgroundColor: "#E4EAE9",
+  },
+});

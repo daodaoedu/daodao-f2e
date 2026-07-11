@@ -6186,7 +6186,7 @@
       "practice_completed": "實踐已完成",
       "already_checked_in": "24 小時內已打過卡囉！",
       "validation_mood_required": "請選擇心情",
-      "validation_description_max": "最多300字",
+      "validation_description_max": "最多600字",
       "validation_media_max": "最多只能上傳3張圖片"
     },
     "checkInList": {
@@ -6256,6 +6256,11 @@
       "follow": "關注",
       "unfollow": "取消關注",
       "browse_activity": "瀏覽活動",
+      "activity_data": "數據",
+      "activity_echo": "回響",
+      "activity_views": "瀏覽",
+      "activity_all": "全部",
+      "activity_no_records": "尚無活動紀錄",
       "with_others": "{name} 與其他 {count} 人",
       "you_with_others": "你 與其他 {count} 人",
       "you": "你",

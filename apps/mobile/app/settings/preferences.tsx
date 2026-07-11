@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, Text, XStack, YStack } from "tamagui";
 import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
+import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import { useMobileTranslation } from "@/i18n";
 
 function assertSuccessfulResponse(response: { error?: unknown }, fallbackMessage: string) {
@@ -130,6 +131,8 @@ export default function PreferencesSettingsScreen() {
 
       const response = await updateCurrentUserPreferences({ preferences: preferenceItems });
       assertSuccessfulResponse(response, t("saveError"));
+      // 新手任務 B：即時標記「公開資訊/帳號/領域偏好」完成
+      applyOnboardingUpdateFromResponse(response.data);
 
       Alert.alert(t("successTitle"), t("saveSuccess"), [
         { text: t("confirm"), onPress: () => router.back() },

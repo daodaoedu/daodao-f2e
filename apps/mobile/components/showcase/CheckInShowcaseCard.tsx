@@ -28,6 +28,9 @@ import { useMobileTranslation } from "@/i18n";
 
 const TALLY_REPORT_URL = "https://tally.so/r/BzGQy4";
 
+/** colors.primary.base (#16B9B3) 的 0 alpha 版本，供封面漸層起頭用（避免經過透明黑）。 */
+const COVER_GRADIENT_TRANSPARENT = "rgba(22, 185, 179, 0)";
+
 type CheckInShowcaseCardProps = IShowcaseCheckIn;
 
 /**
@@ -172,9 +175,12 @@ export function CheckInShowcaseCard({
           </YStack>
         )}
 
-        {/* 底部漸層：透明 → primary，讓封面內容平滑融入卡片底色 */}
+        {/* 底部漸層：透明 → primary，讓封面內容平滑融入卡片底色。
+            用 primary 的 0 alpha（非 "transparent"）起頭：expo-linear-gradient 的
+            "transparent" 是透明「黑」(rgba(0,0,0,0))，插值到不透明 teal 會經過半透明黑，
+            中段出現髒黑色帶。改用同色 0 alpha，只有 alpha 變化、不會經過黑色。 */}
         <LinearGradient
-          colors={["transparent", colors.primary.base]}
+          colors={[COVER_GRADIENT_TRANSPARENT, colors.primary.base]}
           style={styles.coverGradient}
           pointerEvents="none"
         />

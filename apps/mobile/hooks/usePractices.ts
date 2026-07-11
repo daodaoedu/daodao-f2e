@@ -67,6 +67,9 @@ type ApiPracticeDetail = IApiPractice & {
   durationDays?: number;
   frequencyMinDays?: number;
   frequencyMaxDays?: number;
+  sessionDurationMinutes?: number;
+  practiceTimePeriods?: string[];
+  resources?: Array<{ id?: string | number; name: string; url?: string }>;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -112,6 +115,20 @@ const mapPracticeDetail = (practice: ApiPracticeDetail | undefined): IPractice |
     lastCheckInAt: practice.lastCheckinAt ?? undefined,
     todayCheckedIn:
       practice.lastCheckinAt?.split("T")[0] === new Date().toISOString().split("T")[0],
+    // 詳情頁對齊 product：保留頻率、時長、執行時機、起訖日、進度等原始欄位
+    frequencyMinDays: practice.frequencyMinDays,
+    frequencyMaxDays: practice.frequencyMaxDays,
+    sessionDurationMinutes: practice.sessionDurationMinutes,
+    practiceTimePeriods: practice.practiceTimePeriods,
+    startDate: practice.startDate ?? null,
+    endDate: practice.endDate ?? null,
+    progressPercentage: practice.progressPercentage,
+    durationDays: practice.durationDays,
+    resources: (practice.resources ?? []).map((resource, index) => ({
+      id: String(resource.id ?? resource.url ?? index),
+      name: resource.name,
+      url: resource.url,
+    })),
   };
 };
 
@@ -147,9 +164,11 @@ export function usePractices() {
 
   const practices = practicesData?.data ?? [];
 
-  const { inProgressTasks, completedTasks } = useMemo(() => {
+  const { inProgressTasks, completedTasks, allTasks } = useMemo(() => {
     const inProgressTasksData: IInProgressTask[] = [];
     const completedTasksData: ICompletedTask[] = [];
+    // 對齊 product：「我的」用單一卡片型別呈現所有狀態的實踐，故所有實踐都轉成同一形狀
+    const allTasksData: IInProgressTask[] = [];
 
     for (const practice of practices) {
       const isInProgress =
@@ -159,22 +178,25 @@ export function usePractices() {
 
       const lastCheckInDate = practice.lastCheckinAt ?? null;
 
+      const unifiedTask: IInProgressTask = {
+        id: practice.id,
+        label: "主題實踐",
+        title: practice.title,
+        description: practice.practiceAction || "",
+        checkInCount: practice.checkInCount,
+        progress: practice.progressPercentage ?? 0,
+        messagesCount: 0,
+        isUnreadMessages: false,
+        theme: practice.themeColor || "#FCDD84",
+        status: mapPracticeStatusToTaskStatus(practice.status as PracticeStatus),
+        lastCheckInDate,
+        startDate: practice.startDate || null,
+        endDate: practice.endDate || null,
+      };
+      allTasksData.push(unifiedTask);
+
       if (isInProgress) {
-        inProgressTasksData.push({
-          id: practice.id,
-          label: "主題實踐",
-          title: practice.title,
-          description: practice.practiceAction || "",
-          checkInCount: practice.checkInCount,
-          progress: practice.progressPercentage ?? 0,
-          messagesCount: 0,
-          isUnreadMessages: false,
-          theme: practice.themeColor || "#FCDD84",
-          status: mapPracticeStatusToTaskStatus(practice.status as PracticeStatus),
-          lastCheckInDate,
-          startDate: practice.startDate || null,
-          endDate: practice.endDate || null,
-        });
+        inProgressTasksData.push(unifiedTask);
       } else if (practice.status === PracticeStatus.completed) {
         completedTasksData.push({
           id: practice.id,
@@ -188,7 +210,11 @@ export function usePractices() {
       }
     }
 
-    return { inProgressTasks: inProgressTasksData, completedTasks: completedTasksData };
+    return {
+      inProgressTasks: inProgressTasksData,
+      completedTasks: completedTasksData,
+      allTasks: allTasksData,
+    };
   }, [practices]);
 
   const stats = useMemo(() => {
@@ -203,6 +229,7 @@ export function usePractices() {
     practices,
     inProgressTasks,
     completedTasks,
+    allTasks,
     stats,
     isLoading: practicesLoading || statsLoading,
     error: practicesError,
@@ -258,6 +285,8 @@ export function useCheckIns(practiceId: string | undefined) {
   return {
     checkIns,
     checkInDates,
+    // 原始回應（含 mood / checkinDate），供心情排行與打卡堆疊使用，對齊 product
+    checkInsData: data?.data,
     isLoading,
     error,
     mutate,

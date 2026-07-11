@@ -61,6 +61,8 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
               height={80}
               borderRadius="$sm"
               overflow="hidden"
+              borderWidth={2}
+              borderColor={colors.basic["200"]}
               backgroundColor={colors.basic["200"]}
             >
               <Image
@@ -101,13 +103,14 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   removeButton: {
+    // 對齊 product：半透明 teal、內縮於預覽圖右上角
     position: "absolute",
-    top: -8,
-    right: -8,
+    top: 6,
+    right: 6,
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: colors.semantic.error,
+    backgroundColor: "rgba(41, 94, 92, 0.4)",
     alignItems: "center",
     justifyContent: "center",
   },
