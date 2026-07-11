@@ -39,7 +39,11 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "APP_ENV": "production"
+        "APP_ENV": "production",
+        "EXPO_PUBLIC_API_URL": "https://server-dev.daodao.so",
+        "EXPO_PUBLIC_AI_API_URL": "https://ai-dev.daodao.so",
+        "NEXT_PUBLIC_API_URL": "https://server-dev.daodao.so",
+        "NEXT_PUBLIC_AI_API_URL": "https://ai-dev.daodao.so"
       },
       "channel": "production"
     }

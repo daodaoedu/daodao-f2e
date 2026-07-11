@@ -4,6 +4,7 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
+    "eas-build-post-install": "pnpm --filter @daodao/config generate:env",
     "dev": "expo start",
     "dev:ios": "expo start --ios",
     "dev:android": "expo start --android",
