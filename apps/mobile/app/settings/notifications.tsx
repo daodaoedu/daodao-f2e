@@ -54,6 +54,8 @@ export default function NotificationSettingsScreen() {
 
   useEffect(() => {
     if (!prefsData) return;
+    const n01Prefs = (prefsData.data ?? []).filter((p) => p.channel === "N01");
+    setGlobalEnabled(n01Prefs.length === 0 || n01Prefs.some((p) => p.isEnabled));
     setPrefs(mapNotificationPreferences(prefsData));
   }, [prefsData]);
 

@@ -120,13 +120,13 @@ export default function SettingsTab() {
           <YStack gap="$5">
             {settingsCompletion && settingsCompletion.completed < settingsCompletion.total && (
               <Card
-                backgroundColor="#FFF7ED"
+                backgroundColor={`${colors.logo.orange}1A`}
                 borderRadius="$md"
                 borderWidth={1}
-                borderColor="#FED7AA"
+                borderColor={`${colors.logo.orange}33`}
                 padding="$3"
               >
-                <Text fontSize={14} color="#C2410C">
+                <Text fontSize={14} color={colors.logo.orange}>
                   {t("completion.prompt")}
                 </Text>
               </Card>
