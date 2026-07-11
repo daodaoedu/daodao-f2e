@@ -1,14 +1,9 @@
-import BoredSvg from "@daodao/assets/images/emotion/bored.svg";
-import FineSvg from "@daodao/assets/images/emotion/fine.svg";
-import FrustratedSvg from "@daodao/assets/images/emotion/frustrated.svg";
-import HappySvg from "@daodao/assets/images/emotion/happy.svg";
-import HopelessSvg from "@daodao/assets/images/emotion/hopeless.svg";
-import NeutralSvg from "@daodao/assets/images/emotion/neutral.svg";
+import StampWhiteSvg from "@daodao/assets/images/dashboard/stamp-white.svg";
 import DialogOutlineSvg from "@daodao/assets/images/icon/dialog-outline.svg";
 import FlagOutlineSvg from "@daodao/assets/images/icon/flag-outline.svg";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { type ComponentType, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { Image, Linking, Pressable, StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { CheckInCard } from "@/components/check-in/display/check-in-card";
@@ -18,7 +13,7 @@ import { CommentSheet } from "@/components/persona/CommentSheet";
 import { CommentSection } from "@/components/practice/detail/CommentSection";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
 import { Button } from "@/components/ui/button";
-import { MOOD_OPTIONS, type MoodType, mapApiMoodToMoodType } from "@/constants/mood";
+import { MOOD_EMOJI_SVG, MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -32,16 +27,6 @@ import {
 import { useMobileTranslation } from "@/i18n";
 
 const TALLY_REPORT_URL = "https://tally.so/r/BzGQy4";
-
-/** 心情插畫 SVG（對齊 apps/product 使用 @daodao/assets 的心情圖，而非原生 emoji） */
-const MOOD_EMOJI_SVG: Record<MoodType, ComponentType<{ width?: number; height?: number }>> = {
-  hopeless: HopelessSvg,
-  frustrated: FrustratedSvg,
-  bored: BoredSvg,
-  neutral: NeutralSvg,
-  fine: FineSvg,
-  happy: HappySvg,
-};
 
 type CheckInShowcaseCardProps = IShowcaseCheckIn;
 
@@ -155,13 +140,34 @@ export function CheckInShowcaseCard({
                 {moodLabel}
               </Text>
             )}
-            <View style={styles.stamp}>
-              <Text fontSize={10} fontWeight="700" color={colors.basic.white}>
-                {stampYear}
-              </Text>
-              <Text fontSize={10} fontWeight="700" color={colors.basic.white}>
-                {stampMonthDay}
-              </Text>
+            <View
+              position="absolute"
+              right={12}
+              bottom={12}
+              width={100}
+              height={100}
+              opacity={0.8}
+              pointerEvents="none"
+            >
+              <StampWhiteSvg width={100} height={100} />
+              <View
+                position="absolute"
+                top={0}
+                left={0}
+                right={0}
+                bottom={0}
+                alignItems="center"
+                justifyContent="center"
+              >
+                <YStack alignItems="center" style={styles.stampDate}>
+                  <Text fontSize={12} fontWeight="700" color={colors.basic.white}>
+                    {stampYear}
+                  </Text>
+                  <Text fontSize={12} fontWeight="700" color={colors.basic.white}>
+                    {stampMonthDay}
+                  </Text>
+                </YStack>
+              </View>
             </View>
           </YStack>
         )}
@@ -306,17 +312,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: 80,
   },
-  stamp: {
-    position: "absolute",
-    right: 12,
-    bottom: 12,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.8)",
-    alignItems: "center",
-    justifyContent: "center",
+  stampDate: {
     transform: [{ rotate: "15deg" }],
   },
 });

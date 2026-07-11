@@ -1,10 +1,15 @@
+import NotebookHoleSvg from "@daodao/assets/images/dashboard/notebook-hole.svg";
+import StampSvg from "@daodao/assets/images/dashboard/stamp.svg";
 import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
 import { useCallback, useMemo } from "react";
 import { Linking, StyleSheet } from "react-native";
 import { Image, Text, View, XStack, YStack } from "tamagui";
-import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { MOOD_EMOJI_SVG, MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
+
+/** 筆記本橫線顏色（對齊 product 的 #99ECFF，設計 token 無對應語意色） */
+const NOTEBOOK_LINE_COLOR = "#99ECFF";
 
 interface ICheckInCardProps {
   taskTitle: string;
@@ -36,6 +41,7 @@ export const CheckInCard = ({
     () => (mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null),
     [mood]
   );
+  const MoodEmojiSvg = mood ? MOOD_EMOJI_SVG[mood] : null;
   const contentSegments = useMemo(() => parseTextLinks(content), [content]);
 
   const handleOpenLink = useCallback(async (url: string) => {
@@ -96,62 +102,70 @@ export const CheckInCard = ({
         borderBottomLeftRadius="$md"
         borderBottomRightRadius="$md"
       >
-        {/* 筆記本裝訂線（頂部） */}
+        {/* 筆記本裝訂孔（頂部）— 對齊 product 的 NotebookHoleSvg */}
+        <NotebookHoleSvg width={350} height={49} style={styles.notebookHole} />
+
+        {/* 橫線紙紋（對齊 product 的 repeating linear-gradient） */}
         <View
           position="absolute"
-          top={-28}
+          top={0}
           left={0}
           right={0}
-          height={28}
-          backgroundColor={colors.basic.white}
-          borderTopLeftRadius="$md"
-          borderTopRightRadius="$md"
+          bottom={0}
+          overflow="hidden"
+          pointerEvents="none"
         >
-          <XStack position="absolute" bottom={0} left={16} right={16} justifyContent="space-around">
-            {[...Array(5)].map((_, i) => (
-              <View
-                // biome-ignore lint/suspicious/noArrayIndexKey: 靜態裝飾元素，順序不會改變
-                key={`binding-dot-${i}`}
-                width={12}
-                height={12}
-                borderRadius={6}
-                backgroundColor={colors.basic[200]}
-              />
-            ))}
-          </XStack>
+          {Array.from({ length: 12 }).map((_, i) => (
+            <View
+              // biome-ignore lint/suspicious/noArrayIndexKey: 靜態裝飾橫線，數量固定
+              key={`rule-line-${i}`}
+              position="absolute"
+              top={62 + i * 39}
+              left={15}
+              right={20}
+              height={1}
+              backgroundColor={NOTEBOOK_LINE_COLOR}
+            />
+          ))}
         </View>
 
         {/* 主要內容區 */}
         <YStack paddingTop="$4" paddingHorizontal="$5" maxHeight={460}>
           <YStack paddingBottom="$6" gap="$4">
-            {/* 時間戳印章 */}
+            {/* 時間戳印章 — 對齊 product 的 StampSvg（原生色 #536166 = logo-gray，白紙上免重上色） */}
             <View
               position="absolute"
-              top={16}
-              right={16}
-              width={80}
-              height={80}
-              borderRadius={40}
-              borderWidth={3}
-              borderColor={colors.primary.base}
-              alignItems="center"
-              justifyContent="center"
-              style={{ transform: [{ rotate: "15deg" }] }}
+              top={0}
+              right={-8}
+              width={100}
+              height={100}
+              pointerEvents="none"
             >
-              <YStack alignItems="center">
-                <Text fontSize={12} fontWeight="700" color={colors.primary.base}>
-                  {dateYear}
-                </Text>
-                <Text fontSize={12} fontWeight="700" color={colors.primary.base}>
-                  {dateMonthDay}
-                </Text>
-              </YStack>
+              <StampSvg width={100} height={100} />
+              <View
+                position="absolute"
+                top={0}
+                left={0}
+                right={0}
+                bottom={0}
+                alignItems="center"
+                justifyContent="center"
+              >
+                <YStack alignItems="center" style={styles.stampDate}>
+                  <Text fontSize={12} fontWeight="700" color={colors.logo.gray}>
+                    {dateYear}
+                  </Text>
+                  <Text fontSize={12} fontWeight="700" color={colors.logo.gray}>
+                    {dateMonthDay}
+                  </Text>
+                </YStack>
+              </View>
             </View>
 
             {/* 心情狀態 */}
             {moodOption && (
               <XStack alignItems="center" gap="$2">
-                <Text fontSize={24}>{moodOption.emoji}</Text>
+                {MoodEmojiSvg && <MoodEmojiSvg width={24} height={24} />}
                 <Text fontSize={14} color={colors.text.dark}>
                   {t("mood_display", { mood: t(moodOption.labelKey) })}
                 </Text>
@@ -164,7 +178,7 @@ export const CheckInCard = ({
               fontWeight="500"
               color={colors.text.dark}
               marginTop={moodOption ? 0 : "$8"}
-              marginRight="$10"
+              marginRight="$12"
             >
               {contentSegments.map((segment, index) =>
                 segment.type === "url" ? (
@@ -234,6 +248,14 @@ export const CheckInCard = ({
 };
 
 const styles = StyleSheet.create({
+  notebookHole: {
+    position: "absolute",
+    top: -28,
+    left: 0,
+  },
+  stampDate: {
+    transform: [{ rotate: "15deg" }],
+  },
   imageFirst: {
     transform: [{ rotate: "-8deg" }],
     zIndex: 2,
