@@ -1,5 +1,4 @@
 import { PortalProvider } from "@tamagui/portal";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
@@ -16,41 +15,32 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
-  // 載入所有需要的字重，名稱需與 tamagui.config.ts 中的 face 映射一致
-  const [loaded, error] = useFonts({
-    Inter_400: require("@tamagui/font-inter/otf/Inter-Regular.otf"),
-    Inter_500: require("@tamagui/font-inter/otf/Inter-Medium.otf"),
-    Inter_600: require("@tamagui/font-inter/otf/Inter-SemiBold.otf"),
-    Inter_700: require("@tamagui/font-inter/otf/Inter-Bold.otf"),
-  });
-
+  // 改用系統字型後不需預載字型檔，掛載後直接隱藏 splash
   useEffect(() => {
-    if (loaded || error) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, error]);
-
-  if (!loaded && !error) {
-    return null;
-  }
+    SplashScreen.hideAsync();
+  }, []);
 
   return (
     <TamaguiProvider config={config}>
-      <PortalProvider>
-        <Theme name={colorScheme === "dark" ? "dark" : "light"}>
-          <MobileI18nProvider>
-            <AnalyticsProvider>
-              <AuthProvider>
+      <Theme name={colorScheme === "dark" ? "dark" : "light"}>
+        <MobileI18nProvider>
+          <AnalyticsProvider>
+            <AuthProvider>
+              {/* PortalProvider must sit inside the app context providers: Tamagui's
+                  native portal (gorhom-based) re-renders teleported Sheet/Dialog
+                  content at the host's position, so the host needs Theme and
+                  MobileI18nProvider as ancestors or portalled content throws. */}
+              <PortalProvider>
                 <Stack
                   screenOptions={{
                     headerShown: false,
                   }}
                 />
-              </AuthProvider>
-            </AnalyticsProvider>
-          </MobileI18nProvider>
-        </Theme>
-      </PortalProvider>
+              </PortalProvider>
+            </AuthProvider>
+          </AnalyticsProvider>
+        </MobileI18nProvider>
+      </Theme>
     </TamaguiProvider>
   );
 }

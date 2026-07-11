@@ -4,7 +4,8 @@ import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { Card, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileI18n, useMobileTranslation } from "@/i18n";
 

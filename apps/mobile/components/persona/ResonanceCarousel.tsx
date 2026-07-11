@@ -6,7 +6,8 @@ import {
 } from "@daodao/api";
 import { useState } from "react";
 import { Alert, ScrollView, TextInput } from "react-native";
-import { Button, Card, Text, XStack, YStack } from "tamagui";
+import { Card, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { useMobileTranslation } from "@/i18n";
 
 interface QuestionCardProps {

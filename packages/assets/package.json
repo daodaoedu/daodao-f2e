@@ -6,7 +6,10 @@
   "main": "./generated/index.ts",
   "exports": {
     ".": "./generated/index.ts",
-    "./images/*.svg": "./generated/*.tsx",
+    "./images/*.svg": {
+      "react-native": "./generated/*.native.tsx",
+      "default": "./generated/*.tsx"
+    },
     "./images/*": "./images/*"
   },
   "scripts": {
@@ -20,10 +23,17 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "react": "catalog:",
+    "react-native-svg": "^15.15.1",
     "tsx": "^4.19.2",
     "typescript": "catalog:"
   },
   "peerDependencies": {
-    "react": "catalog:"
+    "react": "catalog:",
+    "react-native-svg": "^15.15.1"
+  },
+  "peerDependenciesMeta": {
+    "react-native-svg": {
+      "optional": true
+    }
   }
 }

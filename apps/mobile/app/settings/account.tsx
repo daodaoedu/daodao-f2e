@@ -4,7 +4,8 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, Modal, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, Input, ScrollView, Text, XStack, YStack } from "tamagui";
+import { Card, Input, ScrollView, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import {
   AVAILABLE_FIELDS,
   EDUCATION_STAGE_OPTIONS,

@@ -1,7 +1,8 @@
 import { Plus, X } from "@tamagui/lucide-icons";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import { Button, Input, Text, XStack, YStack } from "tamagui";
+import { Input, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 

@@ -7,7 +7,8 @@ import { ChevronLeft, ChevronRight, Plus, RefreshCw } from "@tamagui/lucide-icon
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { Card, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 

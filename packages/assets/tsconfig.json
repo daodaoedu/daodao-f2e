@@ -5,5 +5,6 @@
     "jsx": "react-jsx"
   },
   "include": ["generated/**/*", "scripts/**/*", "../config/types/image.d.ts"],
-  "exclude": ["node_modules", "dist", "images"]
+  "//": ".native.tsx 是 React Native 版（用 react-native-svg），由 mobile 的 Metro 編譯，web tsc 不處理",
+  "exclude": ["node_modules", "dist", "images", "generated/**/*.native.tsx"]
 }

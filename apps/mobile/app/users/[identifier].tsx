@@ -32,7 +32,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useSWR from "swr";
-import { Avatar, Button, Card, Separator, Text, XStack, YStack } from "tamagui";
+import { Avatar, Card, Separator, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { UserInfoCard } from "@/components/user";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";

@@ -261,6 +261,34 @@ export type { SvgComponentProps };
   return componentCode;
 }
 
+// React Native 版本（.native.tsx）：用 react-native-svg 的 SvgXml 直接渲染原始 SVG
+// 字串，免逐標籤映射。Metro 會對 `import XxxSvg from "./x"` 自動優先解析 .native.tsx，
+// web bundler 則載一般 .tsx，兩邊 API 一致（<XxxSvg width height fill … />）。
+function convertSvgToNativeComponent(svgFile: SvgFile): string {
+  const svgContent = sanitizeSvgContent(svgFile.path);
+
+  // 單行化並轉義，以便安全放進模板字串
+  const escapedSvg = svgContent
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\\/g, "\\\\")
+    .replace(/`/g, "\\`")
+    .replace(/\$/g, "\\$");
+
+  return `import { SvgXml, type XmlProps } from "react-native-svg";
+
+const xml = \`${escapedSvg}\`;
+
+export default function ${svgFile.componentName}(props: Omit<XmlProps, "xml">) {
+  return <SvgXml xml={xml} {...props} />;
+}
+`;
+}
+
+function getNativeOutputPath(svgFile: SvgFile): string {
+  return getOutputPath(svgFile).replace(/\.tsx$/, ".native.tsx");
+}
+
 function generateIndexFile(svgFiles: SvgFile[]): string {
   const exports = svgFiles
     .map((file) => {
@@ -297,6 +325,11 @@ function needsRebuild(svgFile: SvgFile): boolean {
     return true;
   }
 
+  // 一般 SVG 還需有對應的 .native.tsx；缺了就重建（例如首次導入 RN 版）
+  if (!svgFile.isMask && !existsSync(getNativeOutputPath(svgFile))) {
+    return true;
+  }
+
   const outputStat = statSync(outputPath);
   const outputMtime = outputStat.mtimeMs;
 
@@ -323,8 +356,9 @@ function buildSingleFile(svgFile: SvgFile): void {
     const constantCode = convertSvgToMaskDataUri(svgFile);
     writeFileSync(outputPath, constantCode, "utf-8");
   } else {
-    const componentCode = convertSvgToComponent(svgFile);
-    writeFileSync(outputPath, componentCode, "utf-8");
+    // web 版（.tsx）+ React Native 版（.native.tsx）
+    writeFileSync(outputPath, convertSvgToComponent(svgFile), "utf-8");
+    writeFileSync(getNativeOutputPath(svgFile), convertSvgToNativeComponent(svgFile), "utf-8");
   }
 
   console.log(`✓ Converted ${svgFile.relativePath} -> ${svgFile.componentName}`);
@@ -369,7 +403,11 @@ function build(incremental: boolean = false) {
   // 清理已刪除的檔案對應的輸出檔案
   if (incremental && existsSync(OUTPUT_DIR)) {
     const existingOutputFiles = getAllOutputFiles(OUTPUT_DIR);
-    const currentSvgFiles = new Set(svgFiles.map((f) => getOutputPath(f)));
+    const currentSvgFiles = new Set(
+      svgFiles.flatMap((f) =>
+        f.isMask ? [getOutputPath(f)] : [getOutputPath(f), getNativeOutputPath(f)]
+      )
+    );
     const indexPath = join(OUTPUT_DIR, "index.ts");
 
     for (const outputFile of existingOutputFiles) {

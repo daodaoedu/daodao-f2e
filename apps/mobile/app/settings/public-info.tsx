@@ -5,18 +5,8 @@ import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Alert, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Avatar,
-  Button,
-  Card,
-  Input,
-  ScrollView,
-  Switch,
-  Text,
-  TextArea,
-  XStack,
-  YStack,
-} from "tamagui";
+import { Avatar, Card, Input, ScrollView, Switch, Text, TextArea, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useMobileTranslation } from "@/i18n";

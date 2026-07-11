@@ -2,7 +2,8 @@ import { CheckCircle2, Mail, XCircle } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, Spinner, Text, XStack, YStack } from "tamagui";
+import { Card, Spinner, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 

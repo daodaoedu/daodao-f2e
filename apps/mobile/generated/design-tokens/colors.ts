@@ -1,15 +1,14 @@
 // 自動生成，請勿手動修改
 // 來源: packages/design-tokens
-// 生成時間: 2026-05-13T14:28:11.215Z
 
 export const colors = {
   "primary": {
-    "palest": "#E6F7F9",
-    "pale": "#D9F3F5",
-    "lightest": "#B3E8E6",
-    "lighter": "#66D4CF",
+    "palest": "#F3FCFC",
+    "pale": "#EEF9F9",
+    "lightest": "#DEF5F5",
+    "lighter": "#89DAD7",
     "base": "#16B9B3",
-    "darker": "#0D7A77"
+    "darker": "#295E5C"
   },
   "gray": {
     "dark": "#0D3036",
@@ -19,30 +18,30 @@ export const colors = {
     "white": "#FFFFFF"
   },
   "mascot": {
-    "aqua": "#7DD3E3",
-    "brightBlue": "#5CC5E8"
+    "aqua": "#98ECFF",
+    "brightBlue": "#4AE8FF"
   },
   "logo": {
-    "gray": "#6B7280",
+    "gray": "#536166",
     "cyan": "#16B9B3",
-    "orange": "#F97316",
-    "yellow": "#FACC15"
+    "orange": "#FFA10E",
+    "yellow": "#F9E41E"
   },
   "background": {
     "light": "#FFFFFF",
-    "dark": "#2D3A4F",
-    "gray": "#F3F4F6",
-    "veryLightGray": "#FAFAFA",
-    "veryLightBlue": "#F0FDFA",
+    "dark": "#0D3036",
+    "gray": "#E4EAE9",
+    "veryLightGray": "#F4F6F6",
+    "veryLightBlue": "#F5FFFD",
     "lightCyan": "#B8E8FD"
   },
   "text": {
-    "dark": "#333333",
+    "dark": "#295E5C",
     "light": "#FFFFFF",
-    "muted": "#6B7280"
+    "muted": "#9FB5B8"
   },
   "border": {
-    "light": "#E5E7EB",
+    "light": "#E5E5E5",
     "lightCyan": "#C1ECFF",
     "white": "#FFFFFF"
   },
@@ -81,21 +80,21 @@ export const colors = {
   },
   "basic": {
     "50": "#FAFAFA",
-    "100": "#F5F5F5",
-    "200": "#E5E5E5",
-    "300": "#A3A3A3",
-    "400": "#6B7280",
-    "500": "#404040",
-    "600": "#2D3A4F",
+    "100": "#F3F3F3",
+    "200": "#DBDBDB",
+    "300": "#92989A",
+    "400": "#536166",
+    "500": "#293A3D",
+    "600": "#0D3036",
     "white": "#FFFFFF",
-    "black": "#1A2B3C"
+    "black": "#011416"
   },
   "semantic": {
-    "success": "#22C55E",
+    "success": "#86C84A",
     "warning": "#F59E0B",
     "error": "#EF4444",
     "info": "#3B82F6",
-    "tips": "#FACC15"
+    "tips": "#FFA10E"
   }
 } as const
 

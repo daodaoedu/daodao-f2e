@@ -13,10 +13,12 @@ import { useCallback, useState } from "react";
 import { Alert, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { mutate as globalMutate } from "swr";
-import { Button, Card, ScrollView, Spinner, Text, View, XStack, YStack } from "tamagui";
+import { Card, ScrollView, Spinner, Text, View, XStack, YStack } from "tamagui";
 import { CheckInList, CheckInSheet, ProgressRing, ShareCheckInSheet } from "@/components";
 import type { ICheckInData } from "@/components/CheckInSheet";
 import { PublicPracticeView } from "@/components/practice/detail/PublicPracticeView";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useCheckIn, useCheckIns, usePractice } from "@/hooks/usePractices";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
@@ -63,6 +65,8 @@ export default function PracticeDetailScreen() {
   const router = useRouter();
   const t = useMobileTranslation("practice");
   const commonT = useMobileTranslation("common");
+  // Status labels live under mobile.practiceCard, not the practice namespace.
+  const statusT = useMobileTranslation("mobile.practiceCard");
   const { user: currentUser } = useAuth();
   const { practice, isLoading, mutate } = usePractice(id);
   const { checkIn, isChecking } = useCheckIn();
@@ -246,16 +250,11 @@ export default function PracticeDetailScreen() {
             </Button>
 
             <YStack flex={1} alignItems="center" gap="$2">
-              <XStack
-                backgroundColor={statusInfo.backgroundColor}
-                paddingHorizontal="$2"
-                paddingVertical="$1"
-                borderRadius="$sm"
-              >
+              <Badge backgroundColor={statusInfo.backgroundColor} paddingHorizontal="$2">
                 <Text fontSize={12} color={statusInfo.textColor} fontWeight="500">
-                  {t(statusInfo.labelKey)}
+                  {statusT(statusInfo.labelKey)}
                 </Text>
-              </XStack>
+              </Badge>
               <Text
                 fontSize={18}
                 fontWeight="600"

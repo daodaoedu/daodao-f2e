@@ -22,9 +22,11 @@ import {
   StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, ScrollView, Text, View, XStack, YStack } from "tamagui";
+import { ScrollView, Text, View, XStack, YStack } from "tamagui";
 import { CheckInList } from "@/components";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   PICKER_REACTIONS,
   REACTION_CONFIG,
@@ -209,18 +211,15 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
             {/* ── Status badge + menu row (matches product) ── */}
             <XStack justifyContent="space-between" alignItems="center" marginBottom="$2">
               {statusInfo ? (
-                <View
-                  style={[
-                    styles.badge,
-                    {
-                      backgroundColor: taskStatus === "completed" ? "#6B7280" : colors.primary.base,
-                    },
-                  ]}
+                <Badge
+                  backgroundColor={taskStatus === "completed" ? "#6B7280" : colors.primary.base}
+                  paddingHorizontal="$2"
+                  paddingVertical="$0.5"
                 >
                   <Text fontSize={12} color="white" fontWeight="500">
                     {statusInfo.label}
                   </Text>
-                </View>
+                </Badge>
               ) : (
                 <View />
               )}
@@ -533,11 +532,6 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
   card: {
     backgroundColor: "white",
     borderRadius: 12,

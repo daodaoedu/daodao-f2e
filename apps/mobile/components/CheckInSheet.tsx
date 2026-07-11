@@ -2,7 +2,8 @@ import { Camera, Check, Plus, Share2, Sparkles, X } from "@tamagui/lucide-icons"
 import * as ImagePicker from "expo-image-picker";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Keyboard, Pressable, ScrollView as RNScrollView, StyleSheet } from "react-native";
-import { Button, Input, Sheet, Spinner, Text, TextArea, View, XStack, YStack } from "tamagui";
+import { Input, Sheet, Spinner, Text, TextArea, View, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 import { analyticsService } from "@/services/analytics";

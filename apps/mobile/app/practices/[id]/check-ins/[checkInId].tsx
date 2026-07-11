@@ -13,11 +13,12 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Alert, Image, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, ScrollView, Spinner, Text, TextArea, XStack, YStack } from "tamagui";
+import { Card, ScrollView, Spinner, Text, TextArea, XStack, YStack } from "tamagui";
 import { CheckInDateSelector } from "@/components/check-in/date-selector";
 import { MoodSelector } from "@/components/check-in/form/components/mood-selector";
 import { TagSelector } from "@/components/check-in/form/components/tag-selector";
 import type { ICheckInDate, ICheckInDisplayData } from "@/components/check-in/types";
+import { Button } from "@/components/ui/button";
 import {
   type ApiMoodType,
   MOOD_OPTIONS,
