@@ -1,0 +1,135 @@
+# =============================================================================
+# EAS Build archive ignore (monorepo root)
+# =============================================================================
+# IMPORTANT: When .easignore exists, EAS CLI uses it INSTEAD of .gitignore.
+# Keep all .gitignore rules here, then add extra exclusions for mobile EAS.
+#
+# Why ~172MB: archive ≈ git-tracked monorepo files (pnpm-lock + packages + apps).
+# Mobile EAS only needs apps/mobile + its workspace packages — not website/product.
+# Docs: https://docs.expo.dev/build-reference/easignore/
+# =============================================================================
+
+# ----- Copy of root .gitignore -----
+node_modules/
+.pnp
+.pnp.js
+
+coverage/
+*.log
+
+.next/
+out/
+dist/
+build/
+
+*.tsbuildinfo
+
+.DS_Store
+*.pem
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.env*.local
+.env
+.env.*
+
+.vercel
+
+.turbo
+.turbo-cache
+
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+**/generated/
+!apps/mobile/generated/
+!apps/mobile/generated/design-tokens/
+!apps/mobile/generated/design-tokens/**
+!packages/assets/generated/
+!packages/assets/generated/**
+
+**/src/**/*.js
+**/src/**/*.js.map
+
+.cursorindexingignore
+.specstory
+
+.worktrees/
+
+.omc
+
+# ----- apps/mobile .gitignore (paths relative to monorepo root) -----
+apps/mobile/node_modules/
+apps/mobile/.expo/
+apps/mobile/dist/
+apps/mobile/web-build/
+apps/mobile/expo-env.d.ts
+apps/mobile/.kotlin/
+apps/mobile/ios/
+apps/mobile/android/
+apps/mobile/.metro-health-check*
+apps/mobile/.tamagui/
+
+# ----- EAS: not needed to build @daodao/mobile -----
+
+# Other apps in monorepo (≈45MB+ tracked)
+apps/website/
+apps/product/
+
+# Docs / internal tooling (not used by Expo build)
+docs/
+docker/
+.github/
+.claude/
+.cursor/
+.superpowers/
+.husky/
+.specstory/
+.worktrees/
+.omc/
+
+# Website-only marketing SVGs (source). Mobile uses generated/*.native.tsx only.
+# ≈29MB — safe: Metro resolves @daodao/assets/images/*.svg → generated/*.native.tsx
+packages/assets/images/landing-page/
+
+# Web-only generated SVG components (not used on React Native).
+# Keep *.native.tsx; ignore plain *.tsx (≈34MB).
+# Gitignore-style: ignore all generated .tsx then re-include native.
+packages/assets/generated/**/*.tsx
+!packages/assets/generated/**/*.native.tsx
+
+# packages/assets/dist is build output (already covered by dist/ if present)
+
+# Feature packages mobile does not use (keep packages/ui — features-quiz depends on it)
+packages/features/action-maker/
+packages/features/mention/
+
+# Large misc / non-build docs at repo root
+**/*.map
+**/.DS_Store
+/LICENSE
+/PLAN.md
+/ADMIN-WIREFRAMES.md
+/sonar-project.properties
+/docker-compose.yaml
+/docker-compose.local.yml.backup
+/vitest.workspace.ts
+/CLAUDE.md
+/AGENTS.md
+/README.md
+
+# Local / secrets (never upload)
+**/*service-account*.json
+**/google-services.json
+**/GoogleService-Info.plist
+**/*.jks
+**/*.p8
+**/*.p12
+**/*.mobileprovision
+**/*.keystore
