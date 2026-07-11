@@ -3,15 +3,19 @@ import { MobileBannerSvg } from "@daodao/assets";
 import { resultDetailMap } from "@daodao/features-quiz/result-detail-map";
 import LottieView, { type AnimationObject } from "lottie-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { Dimensions, StyleSheet } from "react-native";
-import Animated, {
-  interpolate,
-  type SharedValue,
-  useAnimatedStyle,
-} from "react-native-reanimated";
+import { Dimensions, Image, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Svg, { Path } from "react-native-svg";
 import { Text, View } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
+
+// 島島 logo（product 首頁左上角，40x40，隨 banner 一起淡出）— 與 product sidebar/mobile 同資產
+const LOGO = require("@daodao/assets/images/brand/favicon256.png");
+// 頁面底色（用來在 banner 底部畫波浪、切出 product 的 mask-intersect 波浪底邊）
+const PAGE_BG = "#F7F7F7";
+// 波浪高度（banner 底部覆蓋這麼高的頁色波浪）
+const WAVE_HEIGHT = 22;
 
 // quiz 類型 → Lottie JSON（-2 版，與 product 一致）
 const LOTTIE_BY_TYPE: Record<string, AnimationObject> = {
@@ -22,12 +26,17 @@ const LOTTIE_BY_TYPE: Record<string, AnimationObject> = {
   C: require("@daodao/assets/images/quiz/community-connector-2.json"),
 };
 
-const FADE_THRESHOLD = 167;
-// banner SVG 視覺比例固定 195:73（對齊 product `aspect-195/73`）
-const BANNER_ASPECT_RATIO = 73 / 195;
+// banner 狀態列以下的可視高度（對齊 product `aspect-195/73` 的寬版比例）
+export const BANNER_CONTENT_HEIGHT = Math.round((Dimensions.get("window").width * 73) / 195);
 
-export function HomeBanner({ scrollY }: { scrollY: SharedValue<number> }) {
+/**
+ * 頂部吉祥物 banner。三個 tab 共用，放在各 tab 捲動內容的最上面（一般捲動元素，
+ * 會隨內容一起上捲離開）。全出血蓋到狀態列（teal 延伸到螢幕頂端），slogan/吉祥物
+ * 內容壓在安全區 inset 以下。
+ */
+export function HomeBanner() {
   const t = useMobileTranslation("app_product");
+  const insets = useSafeAreaInsets();
   const [resultType, setResultType] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,7 +44,12 @@ export function HomeBanner({ scrollY }: { scrollY: SharedValue<number> }) {
     (async () => {
       const res = await getLatestQuizResult();
       if (res.error) {
-        console.error("Failed to fetch quiz result:", res.error);
+        // 404 = 使用者尚未完成測驗，屬正常空狀態：靜默回退到預設 slogan。
+        // 其他非預期錯誤用 console.log 記錄即可——console.error/warn 在 dev 會觸發
+        // LogBox 紅色通知，把正常的空狀態誤報成錯誤。
+        if (res.response?.status !== 404) {
+          console.log("Failed to fetch quiz result:", res.error);
+        }
         return;
       }
       const type = res.data?.data?.resultType?.toUpperCase();
@@ -52,59 +66,73 @@ export function HomeBanner({ scrollY }: { scrollY: SharedValue<number> }) {
   }, [resultType, t]);
 
   const lottie = LOTTIE_BY_TYPE[resultType ?? "A"] ?? LOTTIE_BY_TYPE.A;
-
-  const bannerHeight = Math.round(Dimensions.get("window").width * BANNER_ASPECT_RATIO);
-
-  const fadeStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollY.value, [0, FADE_THRESHOLD], [1, 0.3], "clamp"),
-  }));
+  const totalHeight = insets.top + BANNER_CONTENT_HEIGHT;
 
   return (
-    <Animated.View
-      style={[styles.wrap, { height: bannerHeight }, fadeStyle]}
-      pointerEvents="none"
-    >
-      {/* 背景 SVG 沒有內建 width/height 屬性，只設 width 無法決定尺寸（react-native-svg
-          會判斷 width && height 同時存在才套用尺寸樣式），故改用 absoluteFillObject 撐滿容器，
-          並用 preserveAspectRatio="none" 讓圖形填滿寬版banner（原生 viewBox 390x420 比例與
-          195:73 的展示比例差距很大，用預設 meet 會在左右留白）。*/}
-      <MobileBannerSvg preserveAspectRatio="none" style={StyleSheet.absoluteFillObject} />
-      <View style={styles.bubble}>
-        <Text fontSize={14} color={colors.text.dark} textAlign="center">
-          {slogan}
-        </Text>
+    <View style={[styles.wrap, { height: totalHeight }]} pointerEvents="none">
+      {/* 背景 SVG 全出血。用 slice + 上緣對齊（xMidYMin）：顯示漸層最濃的 teal 上緣，
+          而非褪色的中間帶（原本 xMidYMid 造成 banner 偏淡、波浪沒對比）。*/}
+      <MobileBannerSvg preserveAspectRatio="xMidYMin slice" style={StyleSheet.absoluteFillObject} />
+
+      {/* 狀態列以下的內容區：slogan 對話框置中，吉祥物靠右垂直置中 */}
+      {/* 島島 logo：左上角（對齊 product fixed top-5 left-5），壓在狀態列 inset 以下 */}
+      <Image source={LOGO} style={[styles.logo, { top: insets.top + 4 }]} resizeMode="contain" />
+
+      <View style={[styles.content, { top: insets.top, height: BANNER_CONTENT_HEIGHT }]}>
+        <View style={styles.bubble}>
+          <Text fontSize={14} color={colors.text.dark} textAlign="center">
+            {slogan}
+          </Text>
+        </View>
         <View style={styles.lottie}>
           <LottieView source={lottie} autoPlay loop style={styles.lottieInner} />
         </View>
       </View>
-    </Animated.View>
+
+      {/* 波浪底邊：用頁色填的波浪蓋在 banner 底部（等同 product 的 mask-intersect 波浪），
+          中央凹得比兩側深（對齊遮罩 path 中央 y=116 < 兩側 y=138）。*/}
+      <Svg
+        width="100%"
+        height={WAVE_HEIGHT}
+        viewBox="0 0 390 22"
+        preserveAspectRatio="none"
+        style={styles.wave}
+      >
+        <Path
+          d="M0 8 C 45.9 2 138.7 0 195 0 C 251.3 0 344.1 2 390 8 L390 22 L0 22 Z"
+          fill={PAGE_BG}
+        />
+      </Svg>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: { width: "100%" },
-  bubble: {
+  content: {
     position: "absolute",
-    alignSelf: "center",
-    // product: bottom-[70%] -translate-y-full（bubble 貼齊 banner 上方 30% 處往上展開）。
-    // RN transform 不支援百分比，故直接用换算後的 top 定位；bubble 實際高度依文字換行而
-    // 略有差異，此值為初值，需在模擬器對照 product 微調。
-    top: "8%",
-    maxWidth: "80%",
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bubble: {
+    maxWidth: "72%",
     backgroundColor: "rgba(255,255,255,0.7)",
     borderColor: "#fff",
     borderWidth: 1,
     borderRadius: 999,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingVertical: 6,
   },
   lottie: {
     position: "absolute",
-    left: "100%",
-    bottom: -32,
-    width: 96,
-    height: 96,
+    right: 8,
+    width: 84,
+    height: 84,
     transform: [{ rotate: "3deg" }],
   },
   lottieInner: { width: "100%", height: "100%" },
+  wave: { position: "absolute", left: 0, right: 0, bottom: 0 },
+  logo: { position: "absolute", left: 16, width: 40, height: 40, borderRadius: 10 },
 });

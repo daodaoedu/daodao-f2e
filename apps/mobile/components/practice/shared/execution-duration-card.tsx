@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import { useMobileI18n, useMobileTranslation } from "@/i18n";
+import { useMobileTranslation } from "@/i18n";
 import type { ManualPracticeFormValuesType } from "../create/manual/schema";
 
 // Date utilities
@@ -36,7 +36,6 @@ export const ExecutionDurationCard = ({
   startDate,
   showRemaining = false,
 }: ExecutionDurationCardProps) => {
-  const { locale } = useMobileI18n();
   const t = useMobileTranslation("practice");
   const { days, start, end, remainingDays } = useMemo(() => {
     const d = typeof durationDays === "string" ? Number.parseInt(durationDays, 10) : durationDays;
@@ -48,15 +47,12 @@ export const ExecutionDurationCard = ({
     return { days: d, start: s, end: e, remainingDays: r };
   }, [durationDays, startDate, showRemaining]);
 
-  const formatDate = useCallback(
-    (date: Date): string =>
-      date.toLocaleDateString(locale, {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }),
-    [locale]
-  );
+  const formatDate = useCallback((date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}/${month}/${day}`;
+  }, []);
 
   return (
     <View style={styles.card}>
@@ -124,8 +120,10 @@ export const ExecutionDurationCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.basic.white,
-    borderRadius: 12,
+    flex: 1,
+    justifyContent: "space-between",
+    backgroundColor: colors.background.veryLightBlue,
+    borderRadius: 8,
     padding: 16,
     minHeight: 120,
   },

@@ -1,8 +1,15 @@
 import NotebookHoleSvg from "@daodao/assets/images/dashboard/notebook-hole.svg";
 import StampSvg from "@daodao/assets/images/dashboard/stamp.svg";
 import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
-import { useCallback, useMemo } from "react";
-import { Linking, StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import {
+  Linking,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 import { Image, Text, View, XStack, YStack } from "tamagui";
 import { MOOD_EMOJI_SVG, MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
@@ -20,7 +27,18 @@ interface ICheckInCardProps {
   images?: string[];
   titleColor?: string;
   onImagePress?: (index: number) => void;
+  /** 標題下方插入的額外內容（例如同日打卡切換導航） */
+  afterTitle?: ReactNode;
+  /** 卡片底部互動區（reaction + 留言按鈕），渲染於筆記本卡片內、含上分隔線 */
+  bottomActions?: ReactNode;
+  /** 內容區改為固定高度內捲動 + 底部漸層遮罩（對齊 product 的 max-h + fade），用於詳情頁 */
+  scrollable?: boolean;
 }
+
+/** 內容區內捲動的最大高度（對齊 product 的 max-h-[400px]） */
+const CONTENT_MAX_HEIGHT = 420;
+/** 底部漸層遮罩高度 */
+const BOTTOM_FADE_HEIGHT = 80;
 
 /**
  * 打卡卡片組件 (Mobile)
@@ -35,8 +53,30 @@ export const CheckInCard = ({
   images,
   titleColor = colors.basic.white,
   onImagePress,
+  afterTitle,
+  bottomActions,
+  scrollable = false,
 }: ICheckInCardProps) => {
   const t = useMobileTranslation("mobile.checkIn");
+
+  // 內容內捲動時，未捲到底部就顯示底部漸層遮罩（對齊 product）
+  const [showBottomFade, setShowBottomFade] = useState(false);
+  const viewHeightRef = useRef(0);
+  const contentHeightRef = useRef(0);
+  const offsetYRef = useRef(0);
+  const recomputeFade = useCallback(() => {
+    setShowBottomFade(contentHeightRef.current - offsetYRef.current - viewHeightRef.current > 4);
+  }, []);
+  const handleContentScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
+      offsetYRef.current = contentOffset.y;
+      viewHeightRef.current = layoutMeasurement.height;
+      contentHeightRef.current = contentSize.height;
+      recomputeFade();
+    },
+    [recomputeFade]
+  );
   const moodOption = useMemo(
     () => (mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null),
     [mood]
@@ -77,6 +117,107 @@ export const CheckInCard = ({
     };
   }, [date]);
 
+  const contentBody = (
+    <YStack paddingBottom="$6" gap="$4">
+      {/* 時間戳印章 — 對齊 product 的 StampSvg（原生色 #536166 = logo-gray，白紙上免重上色） */}
+      <View position="absolute" top={0} right={-8} width={100} height={100} pointerEvents="none">
+        <StampSvg width={100} height={100} />
+        <View
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <YStack alignItems="center" style={styles.stampDate}>
+            <Text fontSize={12} fontWeight="700" color={colors.logo.gray}>
+              {dateYear}
+            </Text>
+            <Text fontSize={12} fontWeight="700" color={colors.logo.gray}>
+              {dateMonthDay}
+            </Text>
+          </YStack>
+        </View>
+      </View>
+
+      {/* 心情狀態 */}
+      {moodOption && (
+        <XStack alignItems="center" gap="$2">
+          {MoodEmojiSvg && <MoodEmojiSvg width={24} height={24} />}
+          <Text fontSize={14} color={colors.text.dark}>
+            {t("mood_display", { mood: t(moodOption.labelKey) })}
+          </Text>
+        </XStack>
+      )}
+
+      {/* 文字內容 */}
+      <Text
+        fontSize={14}
+        fontWeight="500"
+        color={colors.text.dark}
+        marginTop={moodOption ? 0 : "$8"}
+        marginRight="$12"
+      >
+        {contentSegments.map((segment, index) =>
+          segment.type === "url" ? (
+            <Text
+              key={`url-${index}-${segment.value}`}
+              color={colors.logo.cyan}
+              textDecorationLine="underline"
+              onPress={() => handleOpenLink(segment.value)}
+            >
+              {segment.value}
+            </Text>
+          ) : (
+            // biome-ignore lint/suspicious/noArrayIndexKey: 純文字片段，順序不會變動
+            <Text key={`text-${index}`}>{segment.value}</Text>
+          )
+        )}
+      </Text>
+
+      {/* 標籤 */}
+      {tags && tags.length > 0 && (
+        <XStack flexWrap="wrap" gap="$2">
+          {tags.map((tag) => (
+            <Text key={tag} fontSize={14} color={colors.primary.base}>
+              # {tag}
+            </Text>
+          ))}
+        </XStack>
+      )}
+
+      {/* 圖片區域 */}
+      {images && images.length > 0 && (
+        <YStack gap="$3" marginTop="$4">
+          <XStack flexWrap="wrap" gap="$2" justifyContent="center">
+            {images.slice(0, 3).map((imageUrl, index) => (
+              <View
+                key={imageUrl}
+                width={100}
+                height={100}
+                borderRadius="$sm"
+                overflow="hidden"
+                borderWidth={1}
+                borderColor={colors.basic[200]}
+                onPress={() => onImagePress?.(index)}
+                pressStyle={{ opacity: 0.8 }}
+                style={[
+                  index === 0 && styles.imageFirst,
+                  index === 1 && styles.imageSecond,
+                  index === 2 && styles.imageThird,
+                ]}
+              >
+                <Image source={{ uri: imageUrl }} width="100%" height="100%" resizeMode="cover" />
+              </View>
+            ))}
+          </XStack>
+        </YStack>
+      )}
+    </YStack>
+  );
+
   return (
     <YStack width={350} marginHorizontal="auto">
       {/* 實踐標題 */}
@@ -92,11 +233,14 @@ export const CheckInCard = ({
         </Text>
       </YStack>
 
+      {/* 標題下方額外內容（如同日打卡切換導航） */}
+      {afterTitle}
+
       {/* 筆記本風格內容區 */}
       <YStack
         position="relative"
         backgroundColor={colors.basic.white}
-        paddingBottom="$6"
+        paddingBottom={bottomActions ? 0 : "$6"}
         marginBottom="$5"
         marginTop="$5"
         borderBottomLeftRadius="$md"
@@ -129,125 +273,68 @@ export const CheckInCard = ({
           ))}
         </View>
 
-        {/* 主要內容區 */}
-        <YStack paddingTop="$4" paddingHorizontal="$5" maxHeight={460}>
-          <YStack paddingBottom="$6" gap="$4">
-            {/* 時間戳印章 — 對齊 product 的 StampSvg（原生色 #536166 = logo-gray，白紙上免重上色） */}
-            <View
-              position="absolute"
-              top={0}
-              right={-8}
-              width={100}
-              height={100}
-              pointerEvents="none"
+        {/* 主要內容區：scrollable 時固定高度內捲動 + 底部漸層；否則直接展開 */}
+        {scrollable ? (
+          <View position="relative">
+            <ScrollView
+              style={styles.scrollArea}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+              scrollEventThrottle={16}
+              nestedScrollEnabled
+              onScroll={handleContentScroll}
+              onLayout={(e) => {
+                viewHeightRef.current = e.nativeEvent.layout.height;
+                recomputeFade();
+              }}
+              onContentSizeChange={(_, h) => {
+                contentHeightRef.current = h;
+                recomputeFade();
+              }}
             >
-              <StampSvg width={100} height={100} />
-              <View
-                position="absolute"
-                top={0}
-                left={0}
-                right={0}
-                bottom={0}
-                alignItems="center"
-                justifyContent="center"
-              >
-                <YStack alignItems="center" style={styles.stampDate}>
-                  <Text fontSize={12} fontWeight="700" color={colors.logo.gray}>
-                    {dateYear}
-                  </Text>
-                  <Text fontSize={12} fontWeight="700" color={colors.logo.gray}>
-                    {dateMonthDay}
-                  </Text>
-                </YStack>
-              </View>
-            </View>
-
-            {/* 心情狀態 */}
-            {moodOption && (
-              <XStack alignItems="center" gap="$2">
-                {MoodEmojiSvg && <MoodEmojiSvg width={24} height={24} />}
-                <Text fontSize={14} color={colors.text.dark}>
-                  {t("mood_display", { mood: t(moodOption.labelKey) })}
-                </Text>
-              </XStack>
+              {contentBody}
+            </ScrollView>
+            {/* 底部漸層遮罩（未捲到底時顯示），對齊 product 的 fade */}
+            {showBottomFade && (
+              <LinearGradient
+                colors={["rgba(255, 255, 255, 0)", colors.basic.white]}
+                style={styles.bottomFade}
+                pointerEvents="none"
+              />
             )}
-
-            {/* 文字內容 */}
-            <Text
-              fontSize={14}
-              fontWeight="500"
-              color={colors.text.dark}
-              marginTop={moodOption ? 0 : "$8"}
-              marginRight="$12"
-            >
-              {contentSegments.map((segment, index) =>
-                segment.type === "url" ? (
-                  <Text
-                    key={`url-${index}-${segment.value}`}
-                    color={colors.logo.cyan}
-                    textDecorationLine="underline"
-                    onPress={() => handleOpenLink(segment.value)}
-                  >
-                    {segment.value}
-                  </Text>
-                ) : (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: 純文字片段，順序不會變動
-                  <Text key={`text-${index}`}>{segment.value}</Text>
-                )
-              )}
-            </Text>
-
-            {/* 標籤 */}
-            {tags && tags.length > 0 && (
-              <XStack flexWrap="wrap" gap="$2">
-                {tags.map((tag) => (
-                  <Text key={tag} fontSize={14} color={colors.primary.base}>
-                    # {tag}
-                  </Text>
-                ))}
-              </XStack>
-            )}
-
-            {/* 圖片區域 */}
-            {images && images.length > 0 && (
-              <YStack gap="$3" marginTop="$4">
-                <XStack flexWrap="wrap" gap="$2" justifyContent="center">
-                  {images.slice(0, 3).map((imageUrl, index) => (
-                    <View
-                      key={imageUrl}
-                      width={100}
-                      height={100}
-                      borderRadius="$sm"
-                      overflow="hidden"
-                      borderWidth={1}
-                      borderColor={colors.basic[200]}
-                      onPress={() => onImagePress?.(index)}
-                      pressStyle={{ opacity: 0.8 }}
-                      style={[
-                        index === 0 && styles.imageFirst,
-                        index === 1 && styles.imageSecond,
-                        index === 2 && styles.imageThird,
-                      ]}
-                    >
-                      <Image
-                        source={{ uri: imageUrl }}
-                        width="100%"
-                        height="100%"
-                        resizeMode="cover"
-                      />
-                    </View>
-                  ))}
-                </XStack>
-              </YStack>
-            )}
+          </View>
+        ) : (
+          <YStack paddingTop="$4" paddingHorizontal="$5" maxHeight={460}>
+            {contentBody}
           </YStack>
-        </YStack>
+        )}
+
+        {/* 卡片底部互動區（reaction + 留言），對齊 product 的 bottomActions */}
+        {bottomActions && (
+          <View borderTopWidth={1} borderTopColor={colors.gray.light}>
+            {bottomActions}
+          </View>
+        )}
       </YStack>
     </YStack>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollArea: {
+    maxHeight: CONTENT_MAX_HEIGHT,
+  },
+  scrollContent: {
+    paddingTop: 16,
+    paddingHorizontal: 20,
+  },
+  bottomFade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: BOTTOM_FADE_HEIGHT,
+  },
   notebookHole: {
     position: "absolute",
     top: -28,

@@ -35,8 +35,9 @@ export const useTagPrompt = (form: UseFormReturn<CheckInFormValuesType>) => {
         }
       }
     } catch (error) {
-      // 靜默處理錯誤，不影響標籤選擇
-      console.error("取得標籤引導句失敗:", error);
+      // 靜默處理錯誤，不影響標籤選擇。用 console.log 而非 console.error：
+      // 後者在 dev 會觸發 LogBox 紅色通知，與「靜默」意圖矛盾。
+      console.log("取得標籤引導句失敗:", error);
     }
   };
 

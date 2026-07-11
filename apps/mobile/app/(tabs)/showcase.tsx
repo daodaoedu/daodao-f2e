@@ -38,22 +38,7 @@ export default function ShowcaseScreen() {
 
   // ── Mine tab state ──
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
-  const {
-    inProgressTasks,
-    completedTasks,
-    isLoading: isMyLoading,
-    mutate: mutatePractices,
-  } = usePractices();
-
-  const filteredInProgressTasks = useMemo(() => {
-    if (filterStatus === FilterStatus.completed) return [];
-    if (filterStatus === FilterStatus.all) return inProgressTasks;
-    return inProgressTasks.filter((task) => task.status === filterStatus);
-  }, [inProgressTasks, filterStatus]);
-
-  const showCompleted =
-    filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
-  const showInProgress = filterStatus !== FilterStatus.completed;
+  const { allTasks, isLoading: isMyLoading, mutate: mutatePractices } = usePractices();
 
   // ── Inspire tab render ──
   const renderShowcaseItem = useCallback(
@@ -119,13 +104,9 @@ export default function ShowcaseScreen() {
               </YStack>
             ) : (
               <PracticeTasksSection
+                tasks={allTasks}
                 filterStatus={filterStatus}
                 onFilterChange={setFilterStatus}
-                filteredInProgressTasks={filteredInProgressTasks}
-                showInProgress={showInProgress}
-                showCompleted={showCompleted}
-                completedTasks={completedTasks}
-                isEmpty={inProgressTasks.length === 0 && completedTasks.length === 0}
               />
             )}
           </>

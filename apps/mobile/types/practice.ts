@@ -26,6 +26,22 @@ export interface IPractice {
   updatedAt: string;
   lastCheckInAt?: string;
   todayCheckedIn: boolean;
+  // 詳情頁對齊 product 所需欄位
+  frequencyMinDays?: number;
+  frequencyMaxDays?: number;
+  sessionDurationMinutes?: number;
+  practiceTimePeriods?: string[];
+  startDate?: string | null;
+  endDate?: string | null;
+  progressPercentage?: number;
+  durationDays?: number;
+  resources?: IPracticeResource[];
+}
+
+export interface IPracticeResource {
+  id: string;
+  name: string;
+  url?: string;
 }
 
 export interface ICheckIn {

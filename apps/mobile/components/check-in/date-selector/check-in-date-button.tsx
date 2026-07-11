@@ -1,7 +1,5 @@
-import { useMemo } from "react";
 import { Pressable, View as RNView, StyleSheet } from "react-native";
-import { Text, View } from "tamagui";
-import { MOOD_OPTIONS } from "@/constants/mood";
+import { Text } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 import type { ICheckInDate, ICheckInDisplayData } from "../types";
@@ -36,18 +34,10 @@ export const CheckInDateButton = ({
   const t = useMobileTranslation("mobile.checkInList");
   const hasCheckIn = item.hasCheckIn ?? !!checkIns[item.id];
   const isActive = hasCheckIn && item.id === activeCheckInId;
-  const itemCheckIn = checkIns[item.id];
-  const itemMood = itemCheckIn?.mood;
 
   // 計算打卡次數對應的透明度
   const checkInCount = item.checkInCount ?? (hasCheckIn ? 1 : 0);
   const fillOpacity = getCheckInOpacity(checkInCount);
-
-  const moodEmoji = useMemo(() => {
-    if (!itemMood) return null;
-    const moodOption = MOOD_OPTIONS.find((option) => option.id === itemMood);
-    return moodOption?.emoji || null;
-  }, [itemMood]);
 
   const handlePress = () => {
     onSelect(item.id);
@@ -79,13 +69,6 @@ export const CheckInDateButton = ({
       {/* 橘色填充層（有打卡時顯示，透明度根據打卡次數） */}
       {hasCheckIn && <RNView style={[styles.fillOverlay, { backgroundColor: orangeFillColor }]} />}
 
-      {/* 心情 emoji */}
-      {moodEmoji && (
-        <View position="absolute" top={-4} right={-4} zIndex={10}>
-          <Text fontSize={12}>{moodEmoji}</Text>
-        </View>
-      )}
-
       {/* 日期數字 */}
       <Text fontSize={16} fontWeight="500" color={colors.primary.base} zIndex={10}>
         {index + 1}
@@ -98,7 +81,7 @@ const styles = StyleSheet.create({
   button: {
     width: 48,
     height: 48,
-    borderRadius: 8,
+    borderRadius: 24,
     backgroundColor: colors.basic.white,
     alignItems: "center",
     justifyContent: "center",

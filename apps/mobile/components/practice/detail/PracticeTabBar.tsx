@@ -34,7 +34,7 @@ export function PracticeTabBar({
   };
 
   return (
-    <XStack borderBottomWidth={1} borderBottomColor="#E5E7EB">
+    <XStack borderBottomWidth={1} borderBottomColor="#E4EAE9">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.key;
         const count = countMap[tab.key];
@@ -49,7 +49,7 @@ export function PracticeTabBar({
             <Text
               fontSize={14}
               fontWeight="500"
-              color={isActive ? colors.text.dark : "rgba(0,0,0,0.4)"}
+              color={isActive ? colors.primary.base : "#9FB5B8"}
             >
               {label}
             </Text>
@@ -63,10 +63,11 @@ export function PracticeTabBar({
 const styles = StyleSheet.create({
   tab: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 12,
     alignItems: "center",
     borderBottomWidth: 2,
     borderBottomColor: "transparent",
+    marginBottom: -1,
   },
   tabActive: {
     borderBottomColor: "#16B9B3",

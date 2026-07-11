@@ -1,23 +1,22 @@
 import { usePracticeCheckIns, useUpdatePracticeCheckIn } from "@daodao/api";
 import {
+  ArrowLeft,
   BarChart3,
-  Calendar,
   ChevronLeft,
   ChevronRight,
-  Image as ImageIcon,
   MessageCircle,
-  MessageSquare,
   MoreHorizontal,
   Pencil,
-  Smile,
-  Tag,
+  Share2,
 } from "@tamagui/lucide-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Image, Modal, Pressable } from "react-native";
+import { Alert, Modal, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Card, ScrollView, Spinner, Text, TextArea, View, XStack, YStack } from "tamagui";
+import { ScrollView, Spinner, Text, TextArea, View, XStack, YStack } from "tamagui";
+import { ShareCheckInSheet } from "@/components";
 import { CheckInDateSelector } from "@/components/check-in/date-selector";
+import { CheckInCard } from "@/components/check-in/display/check-in-card";
 import { MoodSelector } from "@/components/check-in/form/components/mood-selector";
 import { TagSelector } from "@/components/check-in/form/components/tag-selector";
 import type { ICheckInDate, ICheckInDisplayData } from "@/components/check-in/types";
@@ -35,6 +34,7 @@ import {
 } from "@/constants/mood";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
+import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
 import { useComments } from "@/hooks/useComments";
 import { usePractice } from "@/hooks/usePractices";
 import {
@@ -61,24 +61,7 @@ type CheckInDetailRecord = {
 };
 
 type CheckInsResponse = {
-  data?: {
-    data?: CheckInDetailRecord[];
-  };
-};
-
-const formatDateTime = (value?: string | null) => {
-  if (!value) return "-";
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-
-  return date.toLocaleString("zh-TW", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  data?: CheckInDetailRecord[];
 };
 
 const formatDate = (value?: string | null) => {
@@ -226,10 +209,10 @@ function EditCheckInModal({
                 onChangeText={setNote}
                 placeholder={t("notePlaceholder")}
                 numberOfLines={5}
-                maxLength={300}
+                maxLength={600}
               />
               <Text fontSize={12} color="$color" opacity={0.5} textAlign="right">
-                {note.length}/300
+                {note.length}/600
               </Text>
             </YStack>
           </ScrollView>
@@ -244,6 +227,8 @@ export default function CheckInDetailScreen() {
   const router = useRouter();
   const t = useMobileTranslation("mobile.checkInDetail");
   const tCommon = useMobileTranslation("common");
+  const tCheckIn = useMobileTranslation("mobile.checkIn");
+  const tPractice = useMobileTranslation("mobile.practiceDetail");
   const { practice, isLoading: isPracticeLoading, error: practiceError } = usePractice(id);
   const {
     data: checkInsData,
@@ -266,6 +251,7 @@ export default function CheckInDetailScreen() {
   } = useReactions("checkin", checkInIdStr);
   const { items: reactors, firstReactorName } = useReactionsList("checkin", checkInIdStr);
   const { comments } = useComments("checkin", checkInIdStr);
+  const { isOpen: isShareOpen, openShareSheet, closeShareSheet } = useShareCheckInSheet({});
 
   const handleReactionToggle = useCallback(
     async (type: ReactionTypeType) => {
@@ -280,7 +266,7 @@ export default function CheckInDetailScreen() {
     [currentUserReaction, checkInIdStr, mutateReactions]
   );
 
-  const checkIns = ((checkInsData as CheckInsResponse | undefined)?.data?.data ?? []) as
+  const checkIns = ((checkInsData as CheckInsResponse | undefined)?.data ?? []) as
     | CheckInDetailRecord[]
     | undefined;
 
@@ -290,7 +276,6 @@ export default function CheckInDetailScreen() {
   );
 
   const mood = normalizeMood(checkIn?.mood);
-  const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
   const images = getImages(checkIn);
   const tags = checkIn?.tags ?? [];
   const isLoading = isPracticeLoading || isCheckInsLoading;
@@ -449,211 +434,133 @@ export default function CheckInDetailScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-      <YStack flex={1} backgroundColor="$background">
-        <XStack padding="$4" alignItems="center" gap="$3">
-          <Button
-            size="$4"
-            circular
-            chromeless
-            onPress={() => router.back()}
-            accessibilityLabel={tCommon("back")}
-          >
-            <ChevronLeft size={24} color="$color" />
-          </Button>
-          <YStack flex={1}>
-            <Text fontSize={18} fontWeight="600" color="$color">
-              {t("title")}
-            </Text>
-            <Text fontSize={13} color="$color" opacity={0.6} numberOfLines={1}>
-              {practice.title}
-            </Text>
-          </YStack>
-          <Button
-            size="$4"
-            circular
-            chromeless
-            onPress={() => setShowEditModal(true)}
-            accessibilityLabel={t("editTitle")}
-          >
-            <Pencil size={20} color="$color" />
-          </Button>
-          <View position="relative">
-            <Button
-              size="$4"
-              circular
-              chromeless
-              onPress={() => setShowMenu((v) => !v)}
-              accessibilityLabel="瀏覽活動"
-            >
-              <MoreHorizontal size={20} color="$color" />
-            </Button>
-            {showMenu && (
-              <YStack
-                position="absolute"
-                right={0}
-                top="100%"
-                marginTop={4}
-                zIndex={30}
-                backgroundColor="white"
-                borderRadius={16}
-                paddingVertical="$2"
-                shadowColor="#000"
-                shadowOffset={{ width: 0, height: 2 }}
-                shadowOpacity={0.15}
-                shadowRadius={8}
-                elevation={5}
-                minWidth={140}
-              >
-                <Button
-                  chromeless
-                  onPress={() => {
-                    setShowMenu(false);
-                    setShowBrowseActivity(true);
-                  }}
-                  justifyContent="flex-start"
-                  paddingHorizontal="$4"
-                  paddingVertical="$3"
-                >
-                  <XStack gap="$3" alignItems="center">
-                    <BarChart3 size={18} color="#295E5C" />
-                    <Text fontSize={14} color="#295E5C">
-                      瀏覽活動
-                    </Text>
-                  </XStack>
-                </Button>
-              </YStack>
-            )}
-          </View>
-        </XStack>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.logo.cyan }} edges={["top"]}>
+      <YStack flex={1} backgroundColor={colors.logo.cyan}>
+        {/* 頂部半透明青色 nav：標題置中 + X 關閉 + 日期選擇器 */}
         <CheckInDateSelector
           checkInDates={checkInDates}
           checkIns={checkInsRecord}
           practiceId={id}
           activeCheckInId={String(checkInId)}
           onCheckInSelect={goToCheckIn}
+          title={t("title")}
+          onClose={goToPractice}
         />
 
-        <ScrollView flex={1} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 }}>
-          <YStack gap="$4">
-            {sameDayTotal > 1 && (
-              <XStack alignItems="center" justifyContent="space-between">
-                <Button
-                  size="$4"
-                  circular
+        <ScrollView
+          flex={1}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 }}
+        >
+          {/* 三點選單（編輯 + 瀏覽活動），對齊 product 卡片右上角 */}
+          <XStack justifyContent="flex-end" marginBottom="$2">
+            <View position="relative">
+              <Button
+                size="$4"
+                circular
+                backgroundColor="rgba(41, 94, 92, 0.6)"
+                pressStyle={{ backgroundColor: "rgba(41, 94, 92, 0.8)" }}
+                onPress={() => setShowMenu((v) => !v)}
+                accessibilityLabel={t("editTitle")}
+              >
+                <MoreHorizontal size={20} color={colors.basic.white} />
+              </Button>
+              {showMenu && (
+                <YStack
+                  position="absolute"
+                  right={0}
+                  top="100%"
+                  marginTop={4}
+                  zIndex={30}
                   backgroundColor="white"
-                  disabled={!hasPreviousSameDay}
-                  opacity={hasPreviousSameDay ? 1 : 0.35}
-                  onPress={() => goToCheckIn(sameDayState.ids[sameDayState.currentIndex - 1])}
-                  accessibilityLabel={t("previousSameDay")}
+                  borderRadius={16}
+                  paddingVertical="$2"
+                  shadowColor="#000"
+                  shadowOffset={{ width: 0, height: 2 }}
+                  shadowOpacity={0.15}
+                  shadowRadius={8}
+                  elevation={5}
+                  minWidth={160}
                 >
-                  <ChevronLeft size={20} color={colors.primary.base} />
-                </Button>
-                <Text fontSize={15} fontWeight="600" color="$color">
-                  {sameDayState.currentIndex + 1} / {sameDayTotal}
-                </Text>
-                <Button
-                  size="$4"
-                  circular
-                  backgroundColor="white"
-                  disabled={!hasNextSameDay}
-                  opacity={hasNextSameDay ? 1 : 0.35}
-                  onPress={() => goToCheckIn(sameDayState.ids[sameDayState.currentIndex + 1])}
-                  accessibilityLabel={t("nextSameDay")}
-                >
-                  <ChevronRight size={20} color={colors.primary.base} />
-                </Button>
-              </XStack>
-            )}
-
-            <Card backgroundColor="white" borderRadius={12} padding="$4" gap="$4">
-              <YStack gap="$2">
-                <Text fontSize={12} color="$color" opacity={0.6}>
-                  {t("practiceLabel")}
-                </Text>
-                <Text fontSize={20} fontWeight="700" color="$color">
-                  {practice.title}
-                </Text>
-              </YStack>
-
-              <XStack alignItems="center" gap="$2">
-                <Calendar size={18} color={colors.primary.base} />
-                <Text fontSize={14} color="$color">
-                  {formatDate(toDateKey(checkIn))} · {formatDateTime(checkIn.createdAt)}
-                </Text>
-              </XStack>
-
-              {moodOption && (
-                <XStack alignItems="center" gap="$2">
-                  <Smile size={18} color={colors.primary.base} />
-                  <Text fontSize={22}>{moodOption.emoji}</Text>
-                  <Text fontSize={14} color="$color">
-                    {t("moodLabel", { mood: moodOption.label })}
-                  </Text>
-                </XStack>
-              )}
-            </Card>
-
-            <Card backgroundColor="white" borderRadius={12} padding="$4" gap="$3">
-              <XStack alignItems="center" gap="$2">
-                <MessageSquare size={18} color={colors.primary.base} />
-                <Text fontSize={16} fontWeight="600" color="$color">
-                  {t("noteLabel")}
-                </Text>
-              </XStack>
-              <Text fontSize={15} lineHeight={24} color="$color" opacity={checkIn.note ? 1 : 0.5}>
-                {checkIn.note || t("emptyNote")}
-              </Text>
-            </Card>
-
-            {tags.length > 0 && (
-              <Card backgroundColor="white" borderRadius={12} padding="$4" gap="$3">
-                <XStack alignItems="center" gap="$2">
-                  <Tag size={18} color={colors.primary.base} />
-                  <Text fontSize={16} fontWeight="600" color="$color">
-                    {t("tags")}
-                  </Text>
-                </XStack>
-                <XStack flexWrap="wrap" gap="$2">
-                  {tags.map((tag) => (
-                    <XStack
-                      key={tag}
-                      backgroundColor={colors.primary.palest}
-                      borderRadius="$sm"
-                      paddingHorizontal="$2"
-                      paddingVertical={4}
-                    >
-                      <Text fontSize={13} color={colors.primary.darker}>
-                        # {tag}
+                  <Button
+                    chromeless
+                    onPress={() => {
+                      setShowMenu(false);
+                      setShowEditModal(true);
+                    }}
+                    justifyContent="flex-start"
+                    paddingHorizontal="$4"
+                    paddingVertical="$3"
+                  >
+                    <XStack gap="$3" alignItems="center">
+                      <Pencil size={18} color={colors.text.dark} />
+                      <Text fontSize={14} color={colors.text.dark}>
+                        {t("editTitle")}
                       </Text>
                     </XStack>
-                  ))}
-                </XStack>
-              </Card>
-            )}
-
-            {images.length > 0 && (
-              <Card backgroundColor="white" borderRadius={12} padding="$4" gap="$3">
-                <XStack alignItems="center" gap="$2">
-                  <ImageIcon size={18} color={colors.primary.base} />
-                  <Text fontSize={16} fontWeight="600" color="$color">
-                    {t("images")}
-                  </Text>
-                </XStack>
-                <YStack gap="$3">
-                  {images.map((imageUrl) => (
-                    <Image
-                      key={imageUrl}
-                      source={{ uri: imageUrl }}
-                      style={{ width: "100%", aspectRatio: 1, borderRadius: 12 }}
-                      resizeMode="cover"
-                    />
-                  ))}
+                  </Button>
+                  <Button
+                    chromeless
+                    onPress={() => {
+                      setShowMenu(false);
+                      setShowBrowseActivity(true);
+                    }}
+                    justifyContent="flex-start"
+                    paddingHorizontal="$4"
+                    paddingVertical="$3"
+                  >
+                    <XStack gap="$3" alignItems="center">
+                      <BarChart3 size={18} color={colors.text.dark} />
+                      <Text fontSize={14} color={colors.text.dark}>
+                        {tPractice("browse_activity")}
+                      </Text>
+                    </XStack>
+                  </Button>
                 </YStack>
-              </Card>
-            )}
+              )}
+            </View>
+          </XStack>
 
-            <Card backgroundColor="white" borderRadius={12} padding={0}>
+          {/* 筆記本風格打卡卡片，對齊 product */}
+          <CheckInCard
+            taskTitle={practice.title}
+            date={toDateKey(checkIn)}
+            mood={mood}
+            content={checkIn.note ?? ""}
+            tags={tags}
+            images={images}
+            scrollable
+            afterTitle={
+              sameDayTotal > 1 ? (
+                <XStack alignItems="center" justifyContent="center" gap="$4" marginBottom="$3">
+                  <Button
+                    size="$4"
+                    circular
+                    backgroundColor="white"
+                    disabled={!hasPreviousSameDay}
+                    opacity={hasPreviousSameDay ? 1 : 0.35}
+                    onPress={() => goToCheckIn(sameDayState.ids[sameDayState.currentIndex - 1])}
+                    accessibilityLabel={t("previousSameDay")}
+                  >
+                    <ChevronLeft size={20} color={colors.primary.base} />
+                  </Button>
+                  <Text fontSize={15} fontWeight="600" color={colors.basic.white}>
+                    {sameDayState.currentIndex + 1} / {sameDayTotal}
+                  </Text>
+                  <Button
+                    size="$4"
+                    circular
+                    backgroundColor="white"
+                    disabled={!hasNextSameDay}
+                    opacity={hasNextSameDay ? 1 : 0.35}
+                    onPress={() => goToCheckIn(sameDayState.ids[sameDayState.currentIndex + 1])}
+                    accessibilityLabel={t("nextSameDay")}
+                  >
+                    <ChevronRight size={20} color={colors.primary.base} />
+                  </Button>
+                </XStack>
+              ) : undefined
+            }
+            bottomActions={
               <XStack alignItems="center" paddingVertical="$3">
                 <View flex={1} alignItems="center" justifyContent="center">
                   <ReactionPickerButton
@@ -680,17 +587,38 @@ export default function CheckInDetailScreen() {
                   </XStack>
                 </Pressable>
               </XStack>
-            </Card>
+            }
+          />
 
+          {/* 白色藥丸按鈕：回到實踐 + 分享這篇打卡（alignSelf center + 預設 stretch 讓兩顆等寬） */}
+          <YStack alignSelf="center" gap="$3" marginTop="$2">
             <Button
-              size="$5"
-              backgroundColor={colors.primary.base}
-              borderRadius="$md"
+              backgroundColor="white"
+              borderRadius="$full"
+              paddingHorizontal="$6"
+              pressStyle={{ opacity: 0.85 }}
               onPress={goToPractice}
             >
-              <Text color="white" fontWeight="600" fontSize={16}>
-                {t("backToPractice")}
-              </Text>
+              <XStack alignItems="center" justifyContent="center" gap="$2">
+                <ArrowLeft size={16} color={colors.text.dark} />
+                <Text color={colors.text.dark} fontWeight="600">
+                  {t("backToPractice")}
+                </Text>
+              </XStack>
+            </Button>
+            <Button
+              backgroundColor="white"
+              borderRadius="$full"
+              paddingHorizontal="$6"
+              pressStyle={{ opacity: 0.85 }}
+              onPress={openShareSheet}
+            >
+              <XStack alignItems="center" justifyContent="center" gap="$2">
+                <Share2 size={16} color={colors.text.dark} />
+                <Text color={colors.text.dark} fontWeight="600">
+                  {tCheckIn("share_this_checkin")}
+                </Text>
+              </XStack>
             </Button>
           </YStack>
         </ScrollView>
@@ -715,6 +643,14 @@ export default function CheckInDetailScreen() {
             reactors={reactors}
           />
         )}
+        <ShareCheckInSheet
+          open={isShareOpen}
+          onOpenChange={(open) => {
+            if (!open) closeShareSheet();
+          }}
+          practice={practice}
+          streakCount={(practice.currentStreak ?? 0) + 1}
+        />
       </YStack>
     </SafeAreaView>
   );

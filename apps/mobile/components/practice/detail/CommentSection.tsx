@@ -83,14 +83,14 @@ function CommentItem({ comment, isOwner, onEdit, onDelete, t }: CommentItemProps
       </View>
       <YStack flex={1}>
         <XStack alignItems="center" gap="$1.5">
-          <Text fontSize={13} fontWeight="600" color="#295E5C">
+          <Text fontSize={14} fontWeight="600" color="#295E5C">
             {comment.user?.name ?? t("anonymous")}
           </Text>
-          <Text fontSize={11} color="#9FB5B8">
+          <Text fontSize={12} color="rgba(41,94,92,0.5)">
             {formatRelativeTime(comment.createdAt)}
           </Text>
         </XStack>
-        <Text fontSize={14} color={colors.text.dark} marginTop={2}>
+        <Text fontSize={14} color="#295E5C" marginTop={2}>
           {contentSegments.map((segment, index) =>
             segment.type === "url" ? (
               <Text
@@ -197,49 +197,25 @@ export function CommentSection({ targetType, targetId }: CommentSectionProps) {
   }, []);
 
   return (
-    <YStack flex={1}>
-      <YStack gap="$3" paddingVertical="$3">
-        {comments.length === 0 ? (
-          <YStack alignItems="center" paddingVertical="$8">
-            <Text color="rgba(0,0,0,0.4)" fontSize={14}>
-              {t("empty")}
-            </Text>
-          </YStack>
-        ) : (
-          <>
-            {visibleComments.map((comment) => (
-              <CommentItem
-                key={comment.id}
-                comment={comment}
-                isOwner={user?.id === comment.user?.id}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                t={t}
-              />
-            ))}
-            {hasMoreComments && (
-              <Pressable onPress={() => setExpanded((v) => !v)} hitSlop={8}>
-                <XStack alignItems="center" justifyContent="center" gap="$1" paddingVertical="$1">
-                  <Text fontSize={13} color="#9FB5B8">
-                    {expanded ? t("show_less") : t("show_more")}
-                  </Text>
-                  <View style={expanded ? styles.chevronUp : undefined}>
-                    <ChevronDown size={16} color="#9FB5B8" />
-                  </View>
-                </XStack>
-              </Pressable>
-            )}
-          </>
-        )}
-      </YStack>
-
+    <YStack style={styles.card}>
+      {/* 主留言輸入框（置頂，對齊 product） */}
       <XStack
-        borderTopWidth={1}
-        borderTopColor="#E4EAE9"
-        paddingVertical="$2"
+        borderBottomWidth={1}
+        borderBottomColor="#E4EAE9"
+        paddingHorizontal={16}
+        paddingVertical={12}
         gap="$2"
         alignItems="center"
       >
+        <View style={styles.currentUserAvatar}>
+          {user?.avatar ? (
+            <Image source={{ uri: user.avatar }} style={styles.currentUserAvatarImage} />
+          ) : (
+            <Text fontSize={14} fontWeight="500" color="#9CA3AF">
+              {(user?.name ?? "?").slice(0, 1)}
+            </Text>
+          )}
+        </View>
         {editingId && (
           <Pressable onPress={cancelEdit}>
             <Text fontSize={12} color={colors.primary.base}>
@@ -250,7 +226,7 @@ export function CommentSection({ targetType, targetId }: CommentSectionProps) {
         <TextInput
           style={styles.input}
           placeholder={editingId ? t("edit_placeholder") : t("placeholder")}
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#9FB5B8"
           value={inputValue}
           onChangeText={setInputValue}
           multiline
@@ -261,18 +237,54 @@ export function CommentSection({ targetType, targetId }: CommentSectionProps) {
           disabled={!inputValue.trim() || isSending}
           style={{ opacity: inputValue.trim() ? 1 : 0.4 }}
         >
-          <Send size={20} color={colors.primary.base} />
+          <View style={styles.sendButton}>
+            <Send size={16} color="#FFFFFF" />
+          </View>
         </Pressable>
       </XStack>
+
+      {/* 留言列表 / 空狀態（在輸入框下方，對齊 product） */}
+      {comments.length === 0 ? (
+        <YStack alignItems="center" paddingHorizontal={16} paddingVertical="$8">
+          <Text color="#9FB5B8" fontSize={14}>
+            {t("empty")}
+          </Text>
+        </YStack>
+      ) : (
+        <YStack gap="$5" paddingHorizontal={16} paddingTop={16} paddingBottom={8}>
+          {visibleComments.map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              isOwner={user?.id === comment.user?.id}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              t={t}
+            />
+          ))}
+          {hasMoreComments && (
+            <Pressable onPress={() => setExpanded((v) => !v)} hitSlop={8}>
+              <XStack alignItems="center" justifyContent="center" gap="$1" paddingVertical="$1">
+                <Text fontSize={13} color="#9FB5B8">
+                  {expanded ? t("show_less") : t("show_more")}
+                </Text>
+                <View style={expanded ? styles.chevronUp : undefined}>
+                  <ChevronDown size={16} color="#9FB5B8" />
+                </View>
+              </XStack>
+            </Pressable>
+          )}
+        </YStack>
+      )}
     </YStack>
   );
 }
 
 const styles = StyleSheet.create({
   avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: "#E8FAF9",
     alignItems: "center",
     justifyContent: "center",
@@ -280,21 +292,52 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   avatarImage: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
   chevronUp: {
     transform: [{ rotate: "180deg" }],
   },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    overflow: "hidden",
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  currentUserAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#F3F4F6",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  currentUserAvatarImage: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+  },
+  sendButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#16B9B3",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   input: {
     flex: 1,
     fontSize: 14,
-    color: "#1a1a1a",
+    color: "#295E5C",
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: "#F7F7F7",
-    borderRadius: 20,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E4EAE9",
+    borderRadius: 8,
     maxHeight: 80,
   },
 });

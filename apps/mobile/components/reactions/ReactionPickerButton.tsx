@@ -1,13 +1,10 @@
-import { ThumbsUp } from "@tamagui/lucide-icons";
+import LikeOutlineSvg from "@daodao/assets/images/icon/like-outline.svg";
 import { useCallback, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet } from "react-native";
 import { Text, View, XStack } from "tamagui";
-import {
-  PICKER_REACTIONS,
-  REACTION_CONFIG,
-  type ReactionTypeType,
-} from "@/constants/reaction-type";
+import { PICKER_REACTIONS, type ReactionTypeType } from "@/constants/reaction-type";
 import { useMobileTranslation } from "@/i18n";
+import { LottieEmoji } from "./LottieEmoji";
 
 const LONG_PRESS_DELAY = 400;
 
@@ -39,7 +36,7 @@ function ReactionEmojiStack({
             i > 0 && { marginLeft: overlap },
           ]}
         >
-          <Text fontSize={emojiSize}>{REACTION_CONFIG[type]?.emoji ?? "👍"}</Text>
+          <LottieEmoji type={type} size={emojiSize} play={false} />
         </View>
       ))}
     </XStack>
@@ -114,7 +111,6 @@ export function ReactionPickerButton({
       {pickerOpen && (
         <Animated.View style={[styles.picker, { opacity: fadeAnim }]}>
           {PICKER_REACTIONS.map((type) => {
-            const config = REACTION_CONFIG[type];
             const isSelected = selectedReaction === type;
             return (
               <Pressable
@@ -122,7 +118,7 @@ export function ReactionPickerButton({
                 onPress={() => handleSelect(type)}
                 style={[styles.pickerItem, isSelected && styles.pickerItemSelected]}
               >
-                <Text fontSize={24}>{config.emoji}</Text>
+                <LottieEmoji type={type} size={24} play />
               </Pressable>
             );
           })}
@@ -156,7 +152,7 @@ export function ReactionPickerButton({
                 showCircle
               />
             ) : (
-              <ThumbsUp size={20} color="#9FB5B8" />
+              <LikeOutlineSvg width={20} height={20} color="#9FB5B8" />
             )}
             {summaryText && (
               <Text fontSize={13} color="#295E5C">
@@ -174,9 +170,9 @@ export function ReactionPickerButton({
                 overlap={-4}
               />
             ) : selectedReaction ? (
-              <Text fontSize={18}>{REACTION_CONFIG[selectedReaction]?.emoji ?? "👍"}</Text>
+              <LottieEmoji type={selectedReaction} size={18} play={false} />
             ) : (
-              <ThumbsUp size={20} color="#9FB5B8" />
+              <LikeOutlineSvg width={20} height={20} color="#9FB5B8" />
             )}
             {totalCount > 0 && (
               <Text fontSize={14} fontWeight="500" color="#295E5C">
