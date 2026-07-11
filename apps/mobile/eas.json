@@ -14,7 +14,11 @@
         "buildType": "apk"
       },
       "env": {
-        "APP_ENV": "development"
+        "APP_ENV": "development",
+        "EXPO_PUBLIC_API_URL": "https://server-dev.daodao.so",
+        "EXPO_PUBLIC_AI_API_URL": "https://ai-dev.daodao.so",
+        "NEXT_PUBLIC_API_URL": "https://server-dev.daodao.so",
+        "NEXT_PUBLIC_AI_API_URL": "https://ai-dev.daodao.so"
       }
     },
     "preview": {
@@ -26,7 +30,11 @@
         "buildType": "apk"
       },
       "env": {
-        "APP_ENV": "preview"
+        "APP_ENV": "preview",
+        "EXPO_PUBLIC_API_URL": "https://server-dev.daodao.so",
+        "EXPO_PUBLIC_AI_API_URL": "https://ai-dev.daodao.so",
+        "NEXT_PUBLIC_API_URL": "https://server-dev.daodao.so",
+        "NEXT_PUBLIC_AI_API_URL": "https://ai-dev.daodao.so"
       },
       "channel": "preview"
     },
