@@ -1,12 +1,12 @@
-import {
-  CheckCircle2,
-  ChevronRight,
-  MessageSquare,
-  RefreshCw,
-  Sparkles,
-} from "@tamagui/lucide-icons";
+import { getUserProfileByIdentifier } from "@daodao/api";
+import activeShaperJson from "@daodao/assets/images/quiz/active-shaper-1.json";
+import communityConnectorJson from "@daodao/assets/images/quiz/community-connector-1.json";
+import deepExplorerJson from "@daodao/assets/images/quiz/deep-explorer-1.json";
+import liquidIntegratorJson from "@daodao/assets/images/quiz/liquid-integrator-1.json";
+import orderBuilderJson from "@daodao/assets/images/quiz/order-builder-1.json";
+import { ChevronRight, MessageSquare, RefreshCw, Sparkles } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
-import LottieView from "lottie-react-native";
+import LottieView, { type AnimationObject } from "lottie-react-native";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
   Animated,
@@ -19,9 +19,9 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import useSWR from "swr";
 import { Card, Text, XStack, YStack } from "tamagui";
-import activeShaper1Json from "@/assets/animations/active-shaper-1.json";
-import { CompletedCard, DashboardHeader, FilterPills, InProgressCard } from "@/components/home";
+import { CompletedCard, FilterPills, InProgressCard } from "@/components/home";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import { Button } from "@/components/ui/button";
 import { UserInfoCard } from "@/components/user";
@@ -36,6 +36,15 @@ const bannerImage = require("@/assets/images/user-mobile-banner.png");
 const logoImage = require("@/assets/images/logo.png");
 const BANNER_HEIGHT = 420;
 
+// 對齊 product island-header：依測驗結果類型顯示對應島嶼動畫，無結果時預設動動島
+const resultTypeToLottie: Record<string, AnimationObject> = {
+  D: deepExplorerJson,
+  O: orderBuilderJson,
+  A: activeShaperJson,
+  L: liquidIntegratorJson,
+  C: communityConnectorJson,
+};
+
 export default function ProfileScreen() {
   const router = useRouter();
   const t = useMobileTranslation("mobile.profile");
@@ -47,10 +56,22 @@ export default function ProfileScreen() {
   // ── User data ──
   const { user, isLoading: isUserLoading, mutate: mutateUser } = useCurrentUser();
 
+  // ── Profile 統計（追蹤數 / 連結數 / 近期實踐數）──
+  // 對齊 product：這些數字來自 profile endpoint，非 /me，故另外抓
+  const profileIdentifier = user?.customId ?? user?.id ?? null;
+  const { data: profileResponse, mutate: mutateProfile } = useSWR(
+    profileIdentifier ? ["/api/v1/users/profile/{identifier}", profileIdentifier] : null,
+    ([, identifier]) => getUserProfileByIdentifier(identifier),
+    { revalidateOnFocus: false }
+  );
+  const profile = profileResponse?.data;
+
   // ── 學習類型 ──
   const resultType = user?.latestQuizResult?.resultType?.toUpperCase() ?? null;
   const learningTypeMessage = getQuizThemeMessage(resultType);
   const isEmptyResult = !learningTypeMessage;
+  const lottieSource: AnimationObject =
+    (resultType ? resultTypeToLottie[resultType] : undefined) ?? activeShaperJson;
 
   // ── Scroll ──
   const SCROLL_THRESHOLD = 167;
@@ -68,7 +89,6 @@ export default function ProfileScreen() {
   // ── Practices ──
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
   const {
-    stats,
     inProgressTasks,
     completedTasks,
     isLoading: isMyLoading,
@@ -86,36 +106,6 @@ export default function ProfileScreen() {
   const showCompleted =
     filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
 
-  const dashboardStats = useMemo(
-    () => [
-      {
-        label: homeT("stats_streak_label"),
-        value: String(stats.currentStreak || 0),
-        unit: homeT("stats_days_unit"),
-        icon: (
-          <CheckCircle2
-            size={48}
-            color={colors.text.dark}
-            style={{ transform: [{ rotate: "-12deg" }] }}
-          />
-        ),
-      },
-      {
-        label: homeT("stats_responses_label"),
-        value: String(stats.totalCheckIns || 0),
-        unit: homeT("stats_times_unit"),
-        icon: (
-          <MessageSquare
-            size={48}
-            color={colors.text.dark}
-            style={{ transform: [{ rotate: "-12deg" }] }}
-          />
-        ),
-      },
-    ],
-    [stats, homeT]
-  );
-
   // ── Handlers ──
   // 測驗填答流程僅在 apps/website 實作，App 內導去該網址進行測驗
   const handleOpenQuiz = useCallback(async () => {
@@ -130,8 +120,9 @@ export default function ProfileScreen() {
 
   const handleRefresh = useCallback(() => {
     mutateUser();
+    mutateProfile();
     mutatePractices();
-  }, [mutateUser, mutatePractices]);
+  }, [mutateUser, mutateProfile, mutatePractices]);
 
   const handleOpenFootprints = useCallback(() => {
     router.push("/me/footprints" as never);
@@ -173,7 +164,7 @@ export default function ProfileScreen() {
       <Animated.View
         style={[styles.fixedLottie, { opacity: bannerOpacity, left: screenWidth / 2 - 75 }]}
       >
-        <LottieView source={activeShaper1Json} autoPlay loop style={styles.lottie} />
+        <LottieView source={lottieSource} autoPlay loop style={styles.lottie} />
       </Animated.View>
 
       {/* 固定學習類型卡片 — 隨滾動變淡 */}
@@ -255,14 +246,15 @@ export default function ProfileScreen() {
                   location={user?.locationNameZh ?? user?.location ?? null}
                   selfIntroduction={user?.selfIntroduction}
                   photoURL={user?.photoURL}
-                  personalSlogan={user?.personalSlogan}
+                  personalSlogan={profile?.personalSlogan ?? user?.personalSlogan}
                   contactList={user?.contactList}
+                  connectionsCount={profile?.connectionsCount}
+                  followersCount={profile?.followersCount}
+                  hideConnectionsCount={profile?.hideConnectionsCount}
+                  recentPracticeCount={profile?.recentPracticeCount}
                   editable
                   onEdit={() => router.push("/settings/public-info" as never)}
                 />
-
-                {/* Dashboard 統計 */}
-                <DashboardHeader stats={dashboardStats} />
 
                 <Button
                   marginBottom="$4"

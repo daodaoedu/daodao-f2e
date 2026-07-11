@@ -3,45 +3,44 @@ import {
   usePracticeTemplateCategories,
   usePracticeTemplates,
 } from "@daodao/api";
+import ArtSvg from "@daodao/assets/images/categories/art.svg";
+import HealthSvg from "@daodao/assets/images/categories/health.svg";
+import LanguageSvg from "@daodao/assets/images/categories/language.svg";
+import LifeSvg from "@daodao/assets/images/categories/life.svg";
+import TechSvg from "@daodao/assets/images/categories/tech.svg";
 import { ChevronLeft, ChevronRight, Plus, RefreshCw } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
+import { useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Card, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 
-const categoryColorMap: Record<string, string> = {
-  learning: colors.practice.blue,
-  health: colors.practice.green,
-  mindfulness: colors.practice.pink,
-  creativity: colors.practice.yellow,
-  skill: colors.primary.base,
-  life: colors.semantic.warning,
+type CategoryIcon = typeof LanguageSvg;
+
+// 對齊 product practiceCategoryMetadataMap：類別 ID → 翻譯 key + 圖示
+const categoryMetadataMap: Record<string, { labelKey: string; Icon: CategoryIcon }> = {
+  language: { labelKey: "categories.language", Icon: LanguageSvg },
+  lifestyle: { labelKey: "categories.lifestyle", Icon: LifeSvg },
+  digital_skill: { labelKey: "categories.digital_skill", Icon: TechSvg },
+  art_design: { labelKey: "categories.art_design", Icon: ArtSvg },
+  wellness: { labelKey: "categories.wellness", Icon: HealthSvg },
 };
 
-const getCategoryColor = (category: string, index = 0) => {
-  const fallbackColors = [
-    colors.practice.blue,
-    colors.practice.green,
-    colors.practice.pink,
-    colors.practice.yellow,
-    colors.primary.base,
-    colors.semantic.warning,
-  ];
-
-  return (
-    categoryColorMap[category] ??
-    fallbackColors[index % fallbackColors.length] ??
-    colors.primary.base
-  );
-};
+// 卡片輪播（對齊 product：每頁 2 張、寬度約 80% 讓下一頁露出）
+const H_PADDING = 16;
+const SLIDE_GAP = 8;
+const CARD_HEIGHT = 104;
 
 export default function CreatePracticeScreen() {
   const router = useRouter();
   const t = useMobileTranslation("practice");
   const commonT = useMobileTranslation("common");
+  const { width: screenWidth } = useWindowDimensions();
+
+  const slideWidth = Math.round((screenWidth - H_PADDING * 2) * 0.8);
 
   const {
     data: categoriesData,
@@ -71,6 +70,15 @@ export default function CreatePracticeScreen() {
   const isLoading = isCategoriesLoading || isTemplatesLoading;
   const hasError = categoriesError || templatesError;
 
+  // 每頁 2 張卡片，垂直堆疊，橫向滑動切頁
+  const templateGroups = useMemo(() => {
+    const groups: PracticeTemplateType[][] = [];
+    for (let i = 0; i < templates.length; i += 2) {
+      groups.push(templates.slice(i, i + 2));
+    }
+    return groups;
+  }, [templates]);
+
   const handleReload = () => {
     router.replace("/practices/create");
   };
@@ -94,7 +102,7 @@ export default function CreatePracticeScreen() {
           </Text>
         </XStack>
 
-        <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
+        <ScrollView flex={1} contentContainerStyle={{ padding: H_PADDING }}>
           {/* Custom Practice */}
           <Card
             padding="$4"
@@ -132,20 +140,27 @@ export default function CreatePracticeScreen() {
           {categories.length > 0 && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} marginBottom="$4">
               <XStack gap="$2">
-                {categories.map((category, index) => {
+                {categories.map((category) => {
                   const selected = selectedCategory === category;
+                  const meta = categoryMetadataMap[category];
+                  const label = meta ? t(meta.labelKey) : category;
+                  const Icon = meta?.Icon;
                   return (
                     <Button
                       key={category}
                       size="$3"
-                      backgroundColor={selected ? getCategoryColor(category, index) : "$background"}
+                      backgroundColor={selected ? colors.primary.base : "$background"}
                       borderWidth={1}
-                      borderColor={selected ? getCategoryColor(category, index) : "$borderColor"}
+                      borderColor={selected ? colors.primary.base : "$borderColor"}
                       onPress={() => setSelectedCategory(category)}
+                      accessibilityLabel={t("create_select_category_label", { label })}
                     >
-                      <Text color={selected ? colors.basic.white : "$color"} fontSize={13}>
-                        {category}
-                      </Text>
+                      <XStack alignItems="center" gap="$1.5">
+                        {Icon && <Icon width={18} height={18} />}
+                        <Text color={selected ? colors.basic.white : "$color"} fontSize={13}>
+                          {label}
+                        </Text>
+                      </XStack>
                     </Button>
                   );
                 })}
@@ -176,50 +191,66 @@ export default function CreatePracticeScreen() {
               </Text>
             </YStack>
           ) : (
-            <YStack gap="$3">
-              {templates.map((template: PracticeTemplateType, index) => {
-                const color = getCategoryColor(selectedCategory, index);
-                const description =
-                  template.practiceAction || template.suggestedTags?.join("、") || template.title;
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={slideWidth + SLIDE_GAP}
+              decelerationRate="fast"
+              contentContainerStyle={{ gap: SLIDE_GAP, paddingRight: H_PADDING }}
+            >
+              {templateGroups.map((group, groupIndex) => (
+                <YStack key={group[0]?.id ?? groupIndex} width={slideWidth} gap="$2">
+                  {group.map((template) => {
+                    const description =
+                      template.practiceAction ||
+                      template.suggestedTags?.join("、") ||
+                      template.title;
 
-                return (
-                  <Card
-                    key={template.id}
-                    padding="$4"
-                    backgroundColor="$background"
-                    borderRadius="$md"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                    pressStyle={{ scale: 0.98 }}
-                    onPress={() => router.push(`/practices/create/${template.id}`)}
-                  >
-                    <XStack gap="$3" alignItems="center">
-                      <YStack
-                        width={48}
-                        height={48}
-                        backgroundColor={`${color}20`}
-                        borderRadius={24}
-                        alignItems="center"
-                        justifyContent="center"
+                    return (
+                      <Card
+                        key={template.id}
+                        height={CARD_HEIGHT}
+                        paddingHorizontal={24}
+                        paddingVertical={16}
+                        backgroundColor="rgba(233, 254, 255, 0.7)"
+                        borderRadius="$md"
+                        borderWidth={2}
+                        borderColor={colors.border.lightCyan}
+                        pressStyle={{ scale: 0.98 }}
+                        onPress={() => router.push(`/practices/create/${template.id}`)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t("create_select_practice_label", {
+                          title: template.title,
+                        })}
                       >
-                        <Text fontSize={20} color={color} fontWeight="700">
-                          {template.title.slice(0, 1)}
-                        </Text>
-                      </YStack>
-                      <YStack flex={1} gap="$1">
-                        <Text fontSize={15} fontWeight="600" color="$color" numberOfLines={1}>
-                          {template.title}
-                        </Text>
-                        <Text fontSize={12} color="$color" opacity={0.6} numberOfLines={2}>
-                          {description}
-                        </Text>
-                      </YStack>
-                      <ChevronRight size={20} color="$color" opacity={0.4} />
-                    </XStack>
-                  </Card>
-                );
-              })}
-            </YStack>
+                        <XStack flex={1} gap="$2" alignItems="center">
+                          <YStack flex={1} justifyContent="center">
+                            <Text
+                              fontSize={15}
+                              fontWeight="500"
+                              color={colors.text.dark}
+                              numberOfLines={1}
+                              marginBottom="$1"
+                            >
+                              {template.title}
+                            </Text>
+                            <Text
+                              fontSize={13}
+                              color={colors.text.dark}
+                              opacity={0.7}
+                              numberOfLines={2}
+                            >
+                              {description}
+                            </Text>
+                          </YStack>
+                          <ChevronRight size={18} color={colors.text.dark} />
+                        </XStack>
+                      </Card>
+                    );
+                  })}
+                </YStack>
+              ))}
+            </ScrollView>
           )}
         </ScrollView>
       </YStack>

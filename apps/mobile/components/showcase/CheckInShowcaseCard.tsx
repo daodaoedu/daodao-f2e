@@ -1,6 +1,14 @@
-import { Flag, MessageCircle } from "@tamagui/lucide-icons";
+import BoredSvg from "@daodao/assets/images/emotion/bored.svg";
+import FineSvg from "@daodao/assets/images/emotion/fine.svg";
+import FrustratedSvg from "@daodao/assets/images/emotion/frustrated.svg";
+import HappySvg from "@daodao/assets/images/emotion/happy.svg";
+import HopelessSvg from "@daodao/assets/images/emotion/hopeless.svg";
+import NeutralSvg from "@daodao/assets/images/emotion/neutral.svg";
+import DialogOutlineSvg from "@daodao/assets/images/icon/dialog-outline.svg";
+import FlagOutlineSvg from "@daodao/assets/images/icon/flag-outline.svg";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { type ComponentType, useCallback, useState } from "react";
 import { Image, Linking, Pressable, StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { CheckInCard } from "@/components/check-in/display/check-in-card";
@@ -10,7 +18,7 @@ import { CommentSheet } from "@/components/persona/CommentSheet";
 import { CommentSection } from "@/components/practice/detail/CommentSection";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
 import { Button } from "@/components/ui/button";
-import { MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
+import { MOOD_OPTIONS, type MoodType, mapApiMoodToMoodType } from "@/constants/mood";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -24,6 +32,16 @@ import {
 import { useMobileTranslation } from "@/i18n";
 
 const TALLY_REPORT_URL = "https://tally.so/r/BzGQy4";
+
+/** 心情插畫 SVG（對齊 apps/product 使用 @daodao/assets 的心情圖，而非原生 emoji） */
+const MOOD_EMOJI_SVG: Record<MoodType, ComponentType<{ width?: number; height?: number }>> = {
+  hopeless: HopelessSvg,
+  frustrated: FrustratedSvg,
+  bored: BoredSvg,
+  neutral: NeutralSvg,
+  fine: FineSvg,
+  happy: HappySvg,
+};
 
 type CheckInShowcaseCardProps = IShowcaseCheckIn;
 
@@ -72,6 +90,7 @@ export function CheckInShowcaseCard({
 
   const frontendMood = mapApiMoodToMoodType(mood);
   const moodOption = frontendMood ? MOOD_OPTIONS.find((m) => m.id === frontendMood) : null;
+  const MoodEmojiSvg = frontendMood ? MOOD_EMOJI_SVG[frontendMood] : null;
   const moodLabel = moodOption ? checkInT(`moods.${moodOption.id}`) : null;
   const hasContent = !!(note || (image_urls && image_urls.length > 0) || tags?.length);
   const isOwnCard = !!currentUser?.id && user?.id === currentUser.id;
@@ -115,7 +134,7 @@ export function CheckInShowcaseCard({
             />
           </View>
         ) : (
-          <YStack alignItems="center" justifyContent="center" gap="$2" paddingVertical="$6">
+          <YStack alignItems="center" justifyContent="center" gap="$3" paddingVertical="$8">
             <Text
               color={colors.basic.white}
               fontWeight="600"
@@ -126,7 +145,11 @@ export function CheckInShowcaseCard({
             >
               {practice.title}
             </Text>
-            {moodOption && <Text fontSize={40}>{moodOption.emoji}</Text>}
+            {MoodEmojiSvg ? (
+              <MoodEmojiSvg width={64} height={64} />
+            ) : (
+              <View width={64} height={64} />
+            )}
             {moodLabel && (
               <Text color="rgba(255,255,255,0.7)" fontSize={12}>
                 {moodLabel}
@@ -142,29 +165,44 @@ export function CheckInShowcaseCard({
             </View>
           </YStack>
         )}
+
+        {/* 底部漸層：透明 → primary，讓封面內容平滑融入卡片底色 */}
+        <LinearGradient
+          colors={["transparent", colors.primary.base]}
+          style={styles.coverGradient}
+          pointerEvents="none"
+        />
       </View>
 
       {/* 社群資訊區 */}
       <YStack
         backgroundColor={colors.basic.white}
-        paddingHorizontal="$4"
-        paddingTop="$3"
-        paddingBottom="$4"
-        gap="$3"
+        paddingHorizontal="$5"
+        paddingTop="$4"
+        paddingBottom="$5"
+        gap="$4"
         style={styles.info}
       >
-        <XStack alignItems="flex-start" gap="$3" position="relative">
-          <CircleAvatar uri={user?.photo_url} size={56} fallbackText={user?.name ?? "?"} />
-          <YStack flex={1} gap="$1">
-            <Text fontSize={12} color={colors.text.muted}>
+        <XStack alignItems="flex-start" gap="$4" position="relative">
+          <CircleAvatar uri={user?.photo_url} size={64} fallbackText={user?.name ?? "?"} />
+
+          {/* 心情 badge（疊在頭像右下角，相對於整行容器定位） */}
+          {MoodEmojiSvg && (
+            <View position="absolute" left={45} top={40} zIndex={10}>
+              <MoodEmojiSvg width={24} height={24} />
+            </View>
+          )}
+
+          <YStack flex={1} gap="$2">
+            <Text fontSize={14} color={colors.text.muted}>
               {checkin_date}
             </Text>
             {note ? (
-              <Text fontSize={14} color={colors.text.dark} numberOfLines={2}>
+              <Text fontSize={16} color={colors.text.dark} numberOfLines={2}>
                 {note}
               </Text>
             ) : (
-              <Text fontSize={13} color={colors.text.muted}>
+              <Text fontSize={14} color={colors.text.muted}>
                 {t("completed_checkin")}
               </Text>
             )}
@@ -177,7 +215,7 @@ export function CheckInShowcaseCard({
               items={[
                 {
                   key: "report",
-                  icon: <Flag size={16} color="#295E5C" />,
+                  icon: <FlagOutlineSvg width={20} height={20} color={colors.primary.darker} />,
                   label: t("report"),
                   onPress: handleReport,
                 },
@@ -199,9 +237,9 @@ export function CheckInShowcaseCard({
           />
           <Button chromeless onPress={() => setCommentsOpen(true)} paddingHorizontal={0}>
             <XStack alignItems="center" gap="$1.5">
-              <MessageCircle size={20} color="#9FB5B8" />
+              <DialogOutlineSvg width={24} height={24} color={colors.text.muted} />
               {(comment_count ?? 0) > 0 && (
-                <Text fontSize={14} fontWeight="500" color="#9FB5B8">
+                <Text fontSize={14} fontWeight="500" color={colors.text.muted}>
                   {comment_count}
                 </Text>
               )}
@@ -260,6 +298,13 @@ const styles = StyleSheet.create({
   coverImage: {
     width: "100%",
     height: 240,
+  },
+  coverGradient: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 80,
   },
   stamp: {
     position: "absolute",

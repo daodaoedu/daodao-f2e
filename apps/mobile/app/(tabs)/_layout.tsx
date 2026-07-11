@@ -6,16 +6,21 @@ import SettingOutlineSvg from "@daodao/assets/images/icon/setting-outline.svg";
 import SettingSolidSvg from "@daodao/assets/images/icon/setting-solid.svg";
 import UserOutlineSvg from "@daodao/assets/images/icon/user-outline.svg";
 import UserSolidSvg from "@daodao/assets/images/icon/user-solid.svg";
-import { Compass, Plus, UsersRound } from "@tamagui/lucide-icons";
+import { Plus } from "@tamagui/lucide-icons";
 import { Tabs, usePathname, useRouter } from "expo-router";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { colors } from "@/generated/design-tokens";
+import { useNotifications } from "@/hooks/useNotifications";
 import { useMobileTranslation } from "@/i18n";
 
 export default function TabLayout() {
   const router = useRouter();
   const pathname = usePathname();
   const t = useMobileTranslation("mobile.tabs");
+  const { unreadCount } = useNotifications();
+
+  // 對齊 product：通知未讀數徽章（上限顯示 99+）
+  const notificationBadge = unreadCount > 0 ? (unreadCount > 99 ? "99+" : unreadCount) : undefined;
 
   const handleAddPractice = () => {
     router.push("/practices/create");
@@ -68,42 +73,31 @@ export default function TabLayout() {
           },
         }}
       >
+        {/* 對齊 product：底部導覽只顯示 Home / Notifications / My Island / Settings 四個 */}
         <Tabs.Screen
           name="index"
           options={{
             title: t("home"),
             tabBarIcon: ({ color, focused }) =>
               focused ? (
-                <HomeSolidSvg width={32} height={32} color={color} />
+                <HomeSolidSvg width={36} height={36} color={color} />
               ) : (
-                <HomeOutlineSvg width={32} height={32} color={color} />
+                <HomeOutlineSvg width={36} height={36} color={color} />
               ),
-          }}
-        />
-        <Tabs.Screen
-          name="showcase"
-          options={{
-            title: t("showcase"),
-            tabBarIcon: ({ color }) => <Compass size={28} color={color} />,
           }}
         />
         <Tabs.Screen
           name="notifications"
           options={{
             title: t("notifications"),
+            tabBarBadge: notificationBadge,
+            tabBarBadgeStyle: styles.notificationBadge,
             tabBarIcon: ({ color, focused }) =>
               focused ? (
-                <BellSolidSvg width={32} height={32} color={color} />
+                <BellSolidSvg width={36} height={36} color={color} />
               ) : (
-                <BellOutlineSvg width={32} height={32} color={color} />
+                <BellOutlineSvg width={36} height={36} color={color} />
               ),
-          }}
-        />
-        <Tabs.Screen
-          name="social"
-          options={{
-            title: t("social"),
-            tabBarIcon: ({ color }) => <UsersRound size={28} color={color} />,
           }}
         />
         <Tabs.Screen
@@ -112,9 +106,9 @@ export default function TabLayout() {
             title: t("profile"),
             tabBarIcon: ({ color, focused }) =>
               focused ? (
-                <UserSolidSvg width={32} height={32} color={color} />
+                <UserSolidSvg width={36} height={36} color={color} />
               ) : (
-                <UserOutlineSvg width={32} height={32} color={color} />
+                <UserOutlineSvg width={36} height={36} color={color} />
               ),
           }}
         />
@@ -124,13 +118,25 @@ export default function TabLayout() {
             title: t("settings"),
             tabBarIcon: ({ color, focused }) =>
               focused ? (
-                <SettingSolidSvg width={32} height={32} color={color} />
+                <SettingSolidSvg width={36} height={36} color={color} />
               ) : (
-                <SettingOutlineSvg width={32} height={32} color={color} />
+                <SettingOutlineSvg width={36} height={36} color={color} />
               ),
           }}
         />
         {/* 隱藏的頁面 - 保留路由但不在 Tab 顯示 */}
+        <Tabs.Screen
+          name="showcase"
+          options={{
+            href: null, // 對齊 product：靈感頁不在底部導覽，改由 explore 頁進入
+          }}
+        />
+        <Tabs.Screen
+          name="social"
+          options={{
+            href: null, // 對齊 product：社交/人脈改由 設定 → 連結 進入
+          }}
+        />
         <Tabs.Screen
           name="explore"
           options={{
@@ -161,6 +167,12 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
+  notificationBadge: {
+    backgroundColor: "#FF6E0B",
+    color: colors.basic.white,
+    fontSize: 10,
+    fontWeight: "600",
+  },
   fab: {
     position: "absolute",
     bottom: Platform.OS === "ios" ? 82 : 72,
