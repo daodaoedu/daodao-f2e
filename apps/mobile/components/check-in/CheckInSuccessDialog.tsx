@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   step1: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: colors.gray.white,
     borderRadius: 16,
     paddingHorizontal: 8,
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   progressFillHost: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 999,
   },
   leadingEdge: {

@@ -72,7 +72,7 @@ export function HomeBanner() {
     <View style={[styles.wrap, { height: totalHeight }]} pointerEvents="none">
       {/* 背景 SVG 全出血。用 slice + 上緣對齊（xMidYMin）：顯示漸層最濃的 teal 上緣，
           而非褪色的中間帶（原本 xMidYMid 造成 banner 偏淡、波浪沒對比）。*/}
-      <MobileBannerSvg preserveAspectRatio="xMidYMin slice" style={StyleSheet.absoluteFillObject} />
+      <MobileBannerSvg preserveAspectRatio="xMidYMin slice" style={StyleSheet.absoluteFill} />
 
       {/* 狀態列以下的內容區：slogan 對話框置中，吉祥物靠右垂直置中 */}
       {/* 島島 logo：左上角（對齊 product fixed top-5 left-5），壓在狀態列 inset 以下 */}

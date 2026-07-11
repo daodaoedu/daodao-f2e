@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 8,
   },
   defaultPreview: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: "center",
     justifyContent: "center",
     // product: bg-light-cyan

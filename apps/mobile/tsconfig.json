@@ -3,7 +3,10 @@
   "compilerOptions": {
     "strict": true,
     "baseUrl": ".",
+    // TypeScript 6：baseUrl 仍可用，先 suppress deprecation 直到 TS 7 遷移
+    "ignoreDeprecations": "6.0",
     "resolveJsonModule": true,
+    "types": ["node"],
     "paths": {
       "@/*": ["./*"],
       "@/components/*": ["./components/*"],

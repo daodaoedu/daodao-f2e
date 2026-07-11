@@ -363,7 +363,7 @@ export default function TemplatePreviewScreen() {
       >
         <YStack flex={1}>
           <Pressable
-            style={StyleSheet.absoluteFillObject}
+            style={StyleSheet.absoluteFill}
             onPress={() => setCategoryMenuOpen(false)}
             accessibilityLabel={commonT("close")}
           />

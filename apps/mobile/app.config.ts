@@ -24,18 +24,14 @@ const config: ExpoConfig = {
   icon: "./assets/icon.png",
   scheme: "daodao",
   userInterfaceStyle: "automatic",
-  newArchEnabled: true,
+  // SDK 55+：New Architecture 必開，已移除 newArchEnabled 設定
   updates: {
     url: "https://u.expo.dev/f93cc139-a71b-4dfc-abc3-c093889034a8",
   },
   runtimeVersion: {
     policy: "appVersion",
   },
-  splash: {
-    image: "./assets/splash-icon.png",
-    resizeMode: "contain",
-    backgroundColor: "#16B9B3",
-  },
+  // SDK 56：splash 改由 expo-splash-screen plugin 設定（見 plugins）
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,
@@ -64,6 +60,17 @@ const config: ExpoConfig = {
   },
   plugins: [
     "expo-router",
+    "expo-font",
+    "expo-web-browser",
+    "expo-sharing",
+    [
+      "expo-splash-screen",
+      {
+        image: "./assets/splash-icon.png",
+        resizeMode: "contain",
+        backgroundColor: "#16B9B3",
+      },
+    ],
     [
       "expo-notifications",
       {
@@ -86,6 +93,8 @@ const config: ExpoConfig = {
       "expo-build-properties",
       {
         ios: {
+          // SDK 56 最低 iOS 16.4
+          deploymentTarget: "16.4",
           extraPods: [
             {
               name: "GoogleUtilities",
@@ -102,6 +111,8 @@ const config: ExpoConfig = {
   ],
   experiments: {
     typedRoutes: true,
+    // monorepo：SDK 55+ 預設開啟 autolinking 解析，明確寫出避免重複原生模組
+    autolinkingModuleResolution: true,
   },
   extra: {
     eas: {

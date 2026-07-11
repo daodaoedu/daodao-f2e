@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#B8E8FD",
   },
   fixedBackground: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "#B8E8FD",
     zIndex: 0,
   },

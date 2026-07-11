@@ -84,13 +84,15 @@ cd apps/mobile && npx expo start
 ```bash
 # 發 dev 測試版給人（TestFlight）
 eas build  -p ios --profile preview
-eas submit -p ios --profile testflight-dev
+eas submit -p ios --profile personal
 
 # 發正式版（App Store）
 eas build  -p ios --profile production
-eas submit -p ios --profile testflight-dev
+eas submit -p ios --profile personal
 ```
 
+> **為什麼兩邊的 submit 一樣？** `--profile` 對 `build` 和 `submit` 是兩組不同設定：build profile 決定 bundle id / 後端（dev vs 正式的差異在這），submit profile 只決定「用哪個 Apple 帳號憑證上傳」。上傳進哪個 App Store Connect app 是由 build 的 bundle id 自動判斷，而兩個 app 都在同一個個人 Apple 帳號下，故共用 `personal` 這個 submit profile。
+>
 > `eas submit` 首次會在 App Store Connect 自動建立 app record。憑證由 EAS 代管，不需每次重登 Apple。
 
 **OTA 熱更新（免重新 build / 送審）：**

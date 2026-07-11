@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#D4E8E6",
   },
   thumbDefault: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.background.lightCyan,
