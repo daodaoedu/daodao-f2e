@@ -36,6 +36,8 @@ export interface IPractice {
   progressPercentage?: number;
   durationDays?: number;
   resources?: IPracticeResource[];
+  /** 實踐擁有者（用於判斷 isOwner，對齊 product 的 practice.user） */
+  user?: { id?: string | null } | null;
 }
 
 export interface IPracticeResource {

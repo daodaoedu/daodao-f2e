@@ -40,6 +40,7 @@ import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { followTarget, unfollowTarget, useFollowStatus } from "@/hooks/useFollow";
 import { useMobileTranslation } from "@/i18n";
+import { extractApiErrorMessage } from "@/utils/api-error";
 
 type ConnectionStatus = "none" | "outgoing" | "incoming" | "connected";
 
@@ -73,7 +74,7 @@ function getPracticeStatusLabel(status: string, t: (key: string) => string) {
 }
 
 function getErrorMessage(error: unknown, fallback: string) {
-  return error instanceof Error ? error.message : fallback;
+  return extractApiErrorMessage(error, fallback);
 }
 
 export default function UserProfileRoute() {

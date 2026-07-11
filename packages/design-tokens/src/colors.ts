@@ -6,8 +6,9 @@
  * 「有 CSS 對應」的 token（見 scripts/generate-mobile.ts 的 CSS_TOKEN_MAP），
  * 一旦漂移就讓 build 失敗，避免再次靠人肉手抄而悄悄走鐘。
  *
- * 註：quiz / practice / background.lightCyan / border.lightCyan / basic.50 等
+ * 註：quiz / practice / border.lightCyan / basic.50 等
  * token 在 globals.css 沒有對應，屬 mobile 專屬，不納入驗證。
+ * background.lightCyan 對應 CSS --light-cyan（執行時機卡、資源縮圖底色等）。
  */
 export const colors = {
   // 主色 - Primary variants（對應 --primary-*）
@@ -50,7 +51,8 @@ export const colors = {
     gray: "#E4EAE9", // --bg-gray
     veryLightGray: "#F4F6F6", // --very-light-gray
     veryLightBlue: "#F5FFFD", // --very-light-blue
-    lightCyan: "#B8E8FD", // banner 漸層底色（mobile 專屬，無 CSS 對應）
+    /** 對應 CSS --light-cyan（mint 青，非 sky blue） */
+    lightCyan: "#A9EDE8",
   },
 
   // 文字色彩 - 對應 CSS 變數

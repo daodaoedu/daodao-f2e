@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { NOTIFICATION_TYPES } from "@/constants/settings";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
+import { throwIfOpenApiError } from "@/utils/api-error";
 
 interface INotificationPref {
   type: string;
@@ -36,9 +37,7 @@ function mapNotificationPreferences(prefsData?: { data?: INotificationPref[] }) 
 function assertPreferenceUpdateSucceeded(
   response: Awaited<ReturnType<typeof updateNotificationPreferences>>
 ) {
-  if (response.error) {
-    throw new Error("Failed to update notification preferences");
-  }
+  throwIfOpenApiError(response, "Failed to update notification preferences");
 }
 
 export default function NotificationSettingsScreen() {

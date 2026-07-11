@@ -1,5 +1,6 @@
 import type { ReactionTargetType, ReactionTypeValue } from "@daodao/api";
 import {
+  extractApiErrorMessage,
   removeReaction as apiRemoveReaction,
   upsertReaction as apiUpsertReaction,
   useReactions as useApiReactions,
@@ -71,13 +72,28 @@ export function useReactionsList(targetType: string, targetId: string) {
 // ── Mutations ──
 
 export async function upsertReaction(targetType: string, targetId: string, reactionType: string) {
-  return apiUpsertReaction({
+  const response = await apiUpsertReaction({
     targetType: targetType as ReactionTargetType,
     targetId,
     reactionType: reactionType as ReactionTypeValue,
   });
+
+  if (response.error) {
+    throw new Error(extractApiErrorMessage(response.error, "反應失敗"));
+  }
+
+  return response;
 }
 
 export async function removeReaction(targetType: string, targetId: string) {
-  return apiRemoveReaction({ targetType: targetType as ReactionTargetType, targetId });
+  const response = await apiRemoveReaction({
+    targetType: targetType as ReactionTargetType,
+    targetId,
+  });
+
+  if (response.error) {
+    throw new Error(extractApiErrorMessage(response.error, "取消反應失敗"));
+  }
+
+  return response;
 }

@@ -1,3 +1,4 @@
+import { useCopyPractice } from "@daodao/api";
 import DialogOutlineSvg from "@daodao/assets/images/icon/dialog-outline.svg";
 import TagSolidSvg from "@daodao/assets/images/icon/tag-solid.svg";
 import {
@@ -5,6 +6,7 @@ import {
   BarChart3,
   ChevronDown,
   ChevronUp,
+  Copy,
   Pencil,
   Trash2,
   X,
@@ -28,8 +30,8 @@ import { DropdownMenu } from "@/components/layout/dropdown-menu";
 import { BrowseActivitySheet } from "@/components/practice/detail/BrowseActivitySheet";
 import { CommentSection } from "@/components/practice/detail/CommentSection";
 import { type PracticeTab, PracticeTabBar } from "@/components/practice/detail/PracticeTabBar";
-import { PracticeResourceListCard } from "@/components/practice/detail/practice-resource-list-card";
 import { PublicPracticeView } from "@/components/practice/detail/PublicPracticeView";
+import { PracticeResourceListCard } from "@/components/practice/detail/practice-resource-list-card";
 import { CircularProgress } from "@/components/practice/shared/circular-progress";
 import { ExecutionDurationCard } from "@/components/practice/shared/execution-duration-card";
 import { ExecutionTimingCard } from "@/components/practice/shared/execution-timing-card";
@@ -37,36 +39,43 @@ import { LottieEmoji } from "@/components/reactions/LottieEmoji";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { type ExecutionTiming, PracticeTimePeriodToExecutionTimingMap } from "@/constants/practice-form";
+import {
+  type ExecutionTiming,
+  PracticeTimePeriodToExecutionTimingMap,
+} from "@/constants/practice-form";
 import { PICKER_REACTIONS, type ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
 import { useComments } from "@/hooks/useComments";
+import { useCheckIn, useCheckIns, usePractice } from "@/hooks/usePractices";
 import {
   removeReaction,
   upsertReaction,
   useReactions,
   useReactionsList,
 } from "@/hooks/useReactions";
-import { useCheckIn, useCheckIns, usePractice } from "@/hooks/usePractices";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
 import { useMobileTranslation } from "@/i18n";
 import { useAuth } from "@/providers/AuthProvider";
 import { api } from "@/services/api-client";
+import { runWithErrorAlert } from "@/utils/api-error";
 
 // 狀態標籤配置
+// 狀態徽章配色對齊 product（constants/task-status + Badge variants）：
+// draft→outline-ghost、not-started→very-light-blue、in-progress→default(logo-cyan)、completed→outline-logo
 const statusConfig: Record<
   string,
-  { labelKey: string; backgroundColor: string; textColor: string }
+  { labelKey: string; backgroundColor: string; textColor: string; borderColor?: string }
 > = {
   draft: {
     labelKey: "status_draft",
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    textColor: "#666666",
+    backgroundColor: "transparent",
+    textColor: "#295E5C",
+    borderColor: "#E4EAE9",
   },
   "not-started": {
     labelKey: "status_not_started",
-    backgroundColor: "#E0F4FF",
-    textColor: "#0088CC",
+    backgroundColor: "#F5FFFD",
+    textColor: "#295E5C",
   },
   "in-progress": {
     labelKey: "status_in_progress",
@@ -74,7 +83,12 @@ const statusConfig: Record<
     textColor: "#FFFFFF",
   },
   active: { labelKey: "status_in_progress", backgroundColor: "#16B9B3", textColor: "#FFFFFF" },
-  completed: { labelKey: "status_completed", backgroundColor: "#10B981", textColor: "#FFFFFF" },
+  completed: {
+    labelKey: "status_completed",
+    backgroundColor: "#DBF9FF",
+    textColor: "#295E5C",
+    borderColor: "#16B9B3",
+  },
 };
 
 // API practiceTimePeriods → 表單 ExecutionTiming（含 commute）
@@ -94,8 +108,13 @@ export default function PracticeDetailScreen() {
   const { user: currentUser } = useAuth();
   const { practice, isLoading, mutate } = usePractice(id);
   const { checkIn } = useCheckIn();
-  const { checkIns, checkInsData, isLoading: isLoadingCheckIns, error: checkInsError } =
-    useCheckIns(id);
+  const { copyPractice } = useCopyPractice();
+  const {
+    checkIns,
+    checkInsData,
+    isLoading: isLoadingCheckIns,
+    error: checkInsError,
+  } = useCheckIns(id);
 
   // 反應 / 留言（owner 也可與自己的實踐互動，對齊 product）
   const {
@@ -118,7 +137,14 @@ export default function PracticeDetailScreen() {
     async (data: ICheckInData) => {
       if (!id) return { success: false, error: t("mobile_invalid_practice_id") };
 
-      const result = await checkIn({ practiceId: id, note: data.description });
+      // 必須送出 mood / tags / media，後端 tags 至少 1 個
+      const result = await checkIn({
+        practiceId: id,
+        note: data.description,
+        mood: data.mood,
+        tags: data.tags,
+        mediaUris: data.media,
+      });
 
       if (result.success) {
         await mutate();
@@ -137,20 +163,36 @@ export default function PracticeDetailScreen() {
 
   const handleReactionToggle = useCallback(
     async (type: ReactionTypeType) => {
-      if (currentUserReaction === type) {
-        await removeReaction("practice", id);
-      } else {
-        await upsertReaction("practice", id, type);
-      }
-      await mutateReactions();
+      await runWithErrorAlert(
+        async () => {
+          if (currentUserReaction === type) {
+            await removeReaction("practice", id);
+          } else {
+            await upsertReaction("practice", id, type);
+          }
+          await mutateReactions();
+        },
+        { title: commonT("errorTitle"), fallbackMessage: commonT("operationFailed") }
+      );
     },
-    [currentUserReaction, id, mutateReactions]
+    [currentUserReaction, id, mutateReactions, commonT]
   );
 
   const handleEdit = useCallback(() => {
     setMenuOpen(false);
     router.push(`/practices/${id}/edit` as never);
   }, [id, router]);
+
+  const handleCopy = useCallback(async () => {
+    setMenuOpen(false);
+    try {
+      const result = await copyPractice(id);
+      router.push(`/practices/copy-success?practiceId=${result.id}` as never);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : t("copy_failed");
+      Alert.alert(t("copy_failed"), message);
+    }
+  }, [copyPractice, id, router, t]);
 
   const handleBrowseActivity = useCallback(() => {
     setMenuOpen(false);
@@ -394,8 +436,12 @@ export default function PracticeDetailScreen() {
           <YStack paddingHorizontal="$4">
             {/* ── Status badge + owner menu row (matches product) ── */}
             <XStack justifyContent="space-between" alignItems="center" marginBottom="$2">
-              <Badge backgroundColor={statusInfo.backgroundColor}>
-                <Text fontSize={14} color={statusInfo.textColor}>
+              <Badge
+                backgroundColor={statusInfo.backgroundColor}
+                borderWidth={statusInfo.borderColor ? 1 : 0}
+                borderColor={statusInfo.borderColor ?? "transparent"}
+              >
+                <Text fontSize={12} color={statusInfo.textColor}>
                   {statusT(statusInfo.labelKey)}
                 </Text>
               </Badge>
@@ -409,6 +455,12 @@ export default function PracticeDetailScreen() {
                     icon: <Pencil size={18} color="#295E5C" />,
                     label: t("edit_title"),
                     onPress: handleEdit,
+                  },
+                  {
+                    key: "copy",
+                    icon: <Copy size={18} color="#295E5C" />,
+                    label: t("action_copy"),
+                    onPress: handleCopy,
                   },
                   {
                     key: "archive",
@@ -710,6 +762,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 16,
     overflow: "hidden",
+    // 對齊 product 的 shadow-sm
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
   },
   progressRing: {
     position: "absolute",

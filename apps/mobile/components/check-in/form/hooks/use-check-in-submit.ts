@@ -1,18 +1,11 @@
-import { useMutate } from "@daodao/api";
-import Constants from "expo-constants";
+import { createPracticeCheckInWithFormData, extractApiErrorMessage, useMutate } from "@daodao/api";
 import { Alert } from "react-native";
 import { mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import { useMobileTranslation } from "@/i18n";
+import { createReactNativeFormDataFile } from "@/utils/form-data-file";
 import type { ICheckInFormData } from "../../types";
-
-// React Native file-like object for FormData
-interface IFormDataFile {
-  uri: string;
-  type: string;
-  name: string;
-}
 
 interface IUseCheckInSubmitOptions {
   practiceId: string;
@@ -22,27 +15,8 @@ interface IUseCheckInSubmitOptions {
 }
 
 /**
- * 從 URI 獲取文件擴展名並返回 MIME 類型
- */
-const getMimeType = (uri: string): string => {
-  const extension = uri.split(".").pop()?.toLowerCase();
-  switch (extension) {
-    case "jpg":
-    case "jpeg":
-      return "image/jpeg";
-    case "png":
-      return "image/png";
-    case "gif":
-      return "image/gif";
-    case "webp":
-      return "image/webp";
-    default:
-      return "image/jpeg";
-  }
-};
-
-/**
  * Hook 用於處理打卡提交邏輯 (Mobile)
+ * 走 FormData + unauthorizedHandler（Bearer token），與 product 對齊
  */
 export const useCheckInSubmit = ({
   practiceId,
@@ -52,64 +26,30 @@ export const useCheckInSubmit = ({
 }: IUseCheckInSubmitOptions) => {
   const t = useMobileTranslation("mobile.checkIn");
   const mutate = useMutate();
-  const { openSuccessDialog } = useCheckInSuccessDialog({
+  const successDialog = useCheckInSuccessDialog({
     title: taskTitle,
   });
 
   const submitCheckIn = async (data: ICheckInFormData) => {
     try {
-      // 將前端的 MoodType 映射到 API 的 ApiMoodType
+      if (!data.tags || data.tags.length === 0) {
+        throw new Error(t("validation_tags_required"));
+      }
+
       const apiMood = mapMoodTypeToApiMood(data.mood);
+      const media = (data.mediaUris ?? []).map((uri, index) =>
+        createReactNativeFormDataFile(uri, index)
+      );
 
-      // 構建 FormData
-      const formData = new FormData();
-
-      // 基本欄位
-      if (apiMood) formData.append("mood", apiMood);
-      if (data.description) formData.append("note", data.description);
-
-      // 陣列欄位需轉成 JSON 字串
-      if (data.tags && data.tags.length > 0) {
-        formData.append("tags", JSON.stringify(data.tags));
-      }
-
-      // 圖片檔案（多張）- React Native 使用 uri, type, name 格式
-      if (data.mediaUris && data.mediaUris.length > 0) {
-        data.mediaUris.forEach((uri, index) => {
-          const fileObject: IFormDataFile = {
-            uri,
-            type: getMimeType(uri),
-            name: `image-${index}.${uri.split(".").pop() || "jpg"}`,
-          };
-          // React Native FormData accepts this format
-          formData.append("images", fileObject as unknown as Blob);
-        });
-      }
-
-      // 獲取 API URL
-      const apiUrl = Constants.expoConfig?.extra?.apiUrl || process.env.EXPO_PUBLIC_API_URL;
-      if (!apiUrl) {
-        throw new Error(t("api_url_missing"));
-      }
-
-      // 發送請求
-      const response = await fetch(`${apiUrl}/api/v1/practices/${practiceId}/checkins`, {
-        method: "POST",
-        body: formData,
-        credentials: "include",
+      const response = await createPracticeCheckInWithFormData(practiceId, {
+        mood: apiMood,
+        tags: data.tags,
+        description: data.description ?? "",
+        media,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          error: { message: t("failed") },
-        }));
-        throw new Error(errorData.error?.message || t("failed"));
-      }
-
-      const responseData = await response.json();
-
       // 新手任務 D：即時標記「完成第一次打卡」完成
-      applyOnboardingUpdateFromResponse(responseData);
+      applyOnboardingUpdateFromResponse(response);
 
       // 刷新打卡列表的 cache
       await mutate([
@@ -119,6 +59,7 @@ export const useCheckInSubmit = ({
             path: {
               id: practiceId,
             },
+            query: {},
           },
         },
       ] as const);
@@ -144,31 +85,40 @@ export const useCheckInSubmit = ({
         },
       ] as const);
 
-      // 從 API response 中取得新的進度百分比
+      // CheckInWithEncouragement（data 內層）— 對齊 product use-check-in-submit
+      const payload =
+        response && typeof response === "object" && "data" in response
+          ? (response as { data?: Record<string, unknown> }).data
+          : undefined;
       const newProgressPercentage =
-        responseData &&
-        "practiceProgressPercentage" in responseData &&
-        typeof responseData.practiceProgressPercentage === "number"
-          ? responseData.practiceProgressPercentage
+        payload && typeof payload.practiceProgressPercentage === "number"
+          ? payload.practiceProgressPercentage
           : progressPercentage;
+      const encouragement =
+        payload && typeof payload.encouragement === "string" ? payload.encouragement : undefined;
 
-      // 顯示成功對話框
-      const from = progressPercentage;
-      const to = newProgressPercentage;
-      const result = await openSuccessDialog(from, to);
+      // 開啟獨立成功 Dialog（hook 內附 SuccessDialog 元件，呼叫端必須掛載）
+      const result = await successDialog.openSuccessDialog(
+        progressPercentage,
+        newProgressPercentage,
+        encouragement
+      );
 
-      if (result.value === "complete") {
-        // 成功對話框關閉後，執行原本的完成回調
+      // product：成功 dialog 關閉後一律 onComplete（不論 complete / dismiss）
+      if (result.value === "complete" || result.value === "close") {
         onComplete?.(data);
       }
     } catch (error) {
-      // 顯示錯誤提示
-      const errorMessage = error instanceof Error ? error.message : t("failed_retry");
+      const errorMessage = extractApiErrorMessage(error, t("failed_retry"));
       console.error("打卡失敗:", error);
       Alert.alert(t("failed"), errorMessage);
       throw error;
     }
   };
 
-  return { submitCheckIn };
+  return {
+    submitCheckIn,
+    /** 必須掛在 JSX：`{successDialog.SuccessDialog}` */
+    successDialog,
+  };
 };

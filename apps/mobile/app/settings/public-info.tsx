@@ -11,6 +11,7 @@ import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import { useMobileTranslation } from "@/i18n";
+import { extractApiErrorMessage } from "@/utils/api-error";
 
 type LocationOptionType = {
   value: string;
@@ -31,16 +32,7 @@ type ErrorWithDetails = Error & {
 };
 
 function getErrorMessage(error: unknown, fallback: string) {
-  if (error instanceof Error && error.message) return error.message;
-  if (typeof error === "object" && error !== null && "message" in error) {
-    const message = (error as { message?: unknown }).message;
-    if (typeof message === "string" && message) return message;
-  }
-  if (typeof error === "object" && error !== null && "error" in error) {
-    const nested = (error as { error?: { message?: unknown } }).error;
-    if (typeof nested?.message === "string" && nested.message) return nested.message;
-  }
-  return fallback;
+  return extractApiErrorMessage(error, fallback);
 }
 
 function getErrorDetails(error: unknown): Array<{ path?: string; message?: string }> {

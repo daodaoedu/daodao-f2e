@@ -2,7 +2,7 @@ import { MessageCircle } from "@tamagui/lucide-icons";
 import { type Href, useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
-import { Image, Pressable, StyleSheet } from "react-native";
+import { Alert, Image, Pressable, StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { PracticeMenuButton } from "@/components/practice/shared/practice-menu-button";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
@@ -14,6 +14,7 @@ import { colors } from "@/generated/design-tokens";
 import { removeReaction, upsertReaction } from "@/hooks/useReactions";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
 import { useMobileTranslation } from "@/i18n";
+import { extractApiErrorMessage } from "@/utils/api-error";
 
 interface ShowcaseCardProps {
   practice: IShowcasePractice;
@@ -44,6 +45,7 @@ export function ShowcaseCard({
 }: ShowcaseCardProps) {
   const router = useRouter();
   const t = useMobileTranslation("mobile.home");
+  const commonT = useMobileTranslation("common");
   const {
     id,
     title,
@@ -83,11 +85,15 @@ export function ShowcaseCard({
           await upsertReaction("practice", id, type);
         }
         await onReactionUpdated?.();
-      } catch {
+      } catch (error) {
         setInternalReaction(isSelected ? type : null);
+        Alert.alert(
+          commonT("errorTitle"),
+          extractApiErrorMessage(error, commonT("operationFailed"))
+        );
       }
     },
-    [internalReaction, id, onReactionTap, onReactionUpdated]
+    [internalReaction, id, onReactionTap, onReactionUpdated, commonT]
   );
 
   const handleReactionToggle = externalOnReactionToggle ?? internalHandleReactionToggle;

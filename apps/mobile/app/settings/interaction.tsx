@@ -9,12 +9,10 @@ import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useMobileTranslation } from "@/i18n";
+import { throwIfOpenApiError } from "@/utils/api-error";
 
 function assertSuccessfulResponse(response: { error?: unknown }, fallbackMessage: string) {
-  if (!response.error) return;
-
-  const error = response.error as { error?: { message?: string }; message?: string };
-  throw new Error(error.error?.message ?? error.message ?? fallbackMessage);
+  throwIfOpenApiError(response, fallbackMessage);
 }
 
 export default function InteractionSettingsScreen() {

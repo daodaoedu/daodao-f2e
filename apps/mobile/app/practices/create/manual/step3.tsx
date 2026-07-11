@@ -1,187 +1,183 @@
-import { Bell, ChevronLeft, ChevronRight, Clock } from "@tamagui/lucide-icons";
+import { Clock } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
-import { Controller } from "react-hook-form";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, Switch, Text, XStack, YStack } from "tamagui";
-import { StepIndicator } from "@/components";
-import { Button } from "@/components/ui/button";
+import { Controller, useWatch } from "react-hook-form";
+import { Input, Text, XStack, YStack } from "tamagui";
+import { DurationMinutesSlider } from "@/components/practice/create/manual/DurationMinutesSlider";
+import { ManualStepShell } from "@/components/practice/create/manual/ManualStepShell";
+import { EXECUTION_TIMING_OPTIONS } from "@/components/practice/create/manual/schema";
+import type { ExecutionTiming } from "@/constants/practice-form";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 import { useCreatePractice } from "@/providers/CreatePracticeProvider";
 
-const timeOptions = [
-  "06:00",
-  "07:00",
-  "08:00",
-  "09:00",
-  "10:00",
-  "12:00",
-  "14:00",
-  "16:00",
-  "18:00",
-  "20:00",
-  "21:00",
-  "22:00",
-];
+const CUSTOM_TIMING_MAX = 20;
 
 export default function Step3Screen() {
   const router = useRouter();
   const t = useMobileTranslation("practice");
-  const commonT = useMobileTranslation("common");
   const { form, currentStep, totalSteps, nextStep, prevStep } = useCreatePractice();
-  const { control, watch, setValue, trigger } = form;
+  const {
+    control,
+    trigger,
+    formState: { errors },
+  } = form;
+  const cyan = colors.logo.cyan;
 
-  const reminderEnabled = watch("reminderEnabled");
-  const reminderTime = watch("reminderTime");
+  const name = useWatch({ control, name: "name" });
+  const actionDescription = useWatch({ control, name: "actionDescription" });
 
   const handleNext = async () => {
-    const isValid = await trigger(["reminderEnabled", "reminderTime"]);
-    if (isValid) {
+    if (await trigger(["durationMinutes", "executionTiming", "customTiming"])) {
       nextStep();
       router.push("/practices/create/manual/step4");
     }
   };
 
-  const handleBack = () => {
+  const handlePrev = () => {
     prevStep();
     router.back();
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-      <YStack flex={1} backgroundColor="$background">
-        {/* Header */}
-        <XStack padding="$4" alignItems="center" gap="$3">
-          <Button
-            size="$4"
-            circular
-            chromeless
-            onPress={handleBack}
-            accessibilityLabel={commonT("back")}
-          >
-            <ChevronLeft size={24} color="$color" />
-          </Button>
-          <YStack flex={1}>
-            <Text fontSize={18} fontWeight="600" color="$color">
-              {t("mobile_step3_title")}
+    <ManualStepShell
+      step={currentStep}
+      totalSteps={totalSteps}
+      title={t("manual_create_title")}
+      name={name}
+      actionDescription={actionDescription}
+      showEcho
+      onPrev={handlePrev}
+      onNext={handleNext}
+      nextLabel={t("manual_next_step")}
+    >
+      <YStack gap="$6">
+        {/* Duration per session（滑桿 + 標籤） */}
+        <YStack gap="$4">
+          <XStack alignItems="center" gap="$1">
+            <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
+              {t("form_session_duration")}
             </Text>
-            <Text fontSize={12} color="$color" opacity={0.6}>
-              {t("mobile_step_progress", { current: currentStep, total: totalSteps })}
+            <Text fontSize={16} color={colors.semantic.error}>
+              *
             </Text>
-          </YStack>
-        </XStack>
+          </XStack>
+          <Controller
+            control={control}
+            name="durationMinutes"
+            render={({ field: { onChange, value } }) => (
+              <DurationMinutesSlider value={value} onChange={onChange} />
+            )}
+          />
+        </YStack>
 
-        <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
-
-        <ScrollView flex={1} contentContainerStyle={{ padding: 16 }}>
-          <YStack gap="$5">
-            {/* Reminder Toggle */}
-            <YStack
-              padding="$4"
-              backgroundColor="$background"
-              borderRadius="$md"
-              borderWidth={1}
-              borderColor="$borderColor"
-            >
-              <XStack justifyContent="space-between" alignItems="center">
-                <XStack gap="$3" alignItems="center">
-                  <YStack
-                    width={40}
-                    height={40}
-                    backgroundColor={colors.primary.palest}
-                    borderRadius={20}
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <Bell size={20} color={colors.primary.base} />
-                  </YStack>
-                  <YStack>
-                    <Text fontSize={15} fontWeight="500" color="$color">
-                      {t("mobile_reminder_label")}
-                    </Text>
-                    <Text fontSize={12} color="$color" opacity={0.6}>
-                      {t("mobile_reminder_description")}
-                    </Text>
-                  </YStack>
+        {/* Execution Timing（多選格狀卡片） */}
+        <YStack gap="$3">
+          <XStack alignItems="center" justifyContent="space-between">
+            <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
+              {t("form_execution_timing")}
+            </Text>
+            <Text fontSize={13} color={colors.text.muted}>
+              {t("form_execution_timing_multi")}
+            </Text>
+          </XStack>
+          <Controller
+            control={control}
+            name="executionTiming"
+            render={({ field: { onChange, value } }) => {
+              const selectedList: ExecutionTiming[] = value ?? [];
+              const toggle = (v: ExecutionTiming) => {
+                onChange(
+                  selectedList.includes(v)
+                    ? selectedList.filter((x) => x !== v)
+                    : [...selectedList, v]
+                );
+              };
+              // 與 product step-3 相同：3 欄 grid、選取 cyan 邊框、未選透明邊框
+              return (
+                <XStack flexWrap="wrap" gap={12}>
+                  {EXECUTION_TIMING_OPTIONS.map((option) => {
+                    const selected = selectedList.includes(option.value);
+                    return (
+                      <YStack
+                        key={option.value}
+                        // 3 欄：寬度 = (100% - 2 gaps) / 3
+                        width="31%"
+                        flexGrow={0}
+                        flexShrink={0}
+                        alignItems="center"
+                        justifyContent="center"
+                        paddingVertical={18}
+                        paddingHorizontal={4}
+                        borderRadius={8}
+                        borderWidth={1}
+                        backgroundColor={colors.basic.white}
+                        // mobile 無背景動效，未選用 bg-gray 邊框避免與白底融合
+                        borderColor={selected ? cyan : colors.gray.light}
+                        pressStyle={{ backgroundColor: colors.background.lightCyan }}
+                        onPress={() => toggle(option.value)}
+                        accessibilityRole="checkbox"
+                        accessibilityState={{ checked: selected }}
+                        accessibilityLabel={t(option.labelKey)}
+                      >
+                        <Text
+                          fontSize={14}
+                          fontWeight="500"
+                          color={selected ? cyan : colors.text.dark}
+                          numberOfLines={1}
+                        >
+                          {t(option.labelKey)}
+                        </Text>
+                      </YStack>
+                    );
+                  })}
                 </XStack>
-                <Controller
-                  control={control}
-                  name="reminderEnabled"
-                  render={({ field: { onChange, value } }) => (
-                    <Switch
-                      checked={value}
-                      onCheckedChange={onChange}
-                      backgroundColor={value ? colors.primary.base : colors.basic[300]}
-                    >
-                      <Switch.Thumb />
-                    </Switch>
-                  )}
+              );
+            }}
+          />
+          {errors.executionTiming && (
+            <Text fontSize={12} color={colors.semantic.error}>
+              {errors.executionTiming.message}
+            </Text>
+          )}
+        </YStack>
+
+        {/* Other time */}
+        <YStack gap="$3">
+          <Text fontSize={14} color={colors.text.dark}>
+            {t("form_custom_timing")}
+          </Text>
+          <Controller
+            control={control}
+            name="customTiming"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <XStack
+                alignItems="center"
+                gap="$2"
+                paddingHorizontal="$3"
+                borderRadius={8}
+                borderWidth={1}
+                borderColor={colors.gray.light}
+                backgroundColor={colors.basic.white}
+              >
+                <Clock size={18} color={colors.text.muted} />
+                <Input
+                  flex={1}
+                  unstyled
+                  paddingVertical="$3"
+                  fontSize={15}
+                  color={colors.text.dark}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder={t("form_custom_timing_placeholder")}
+                  placeholderTextColor={colors.text.muted}
+                  maxLength={CUSTOM_TIMING_MAX}
                 />
               </XStack>
-            </YStack>
-
-            {/* Reminder Time */}
-            {reminderEnabled && (
-              <YStack gap="$3">
-                <XStack alignItems="center" gap="$2">
-                  <Clock size={18} color="$color" />
-                  <Text fontSize={14} fontWeight="500" color="$color">
-                    {t("mobile_reminder_time_label")}
-                  </Text>
-                </XStack>
-                <XStack gap="$2" flexWrap="wrap">
-                  {timeOptions.map((time) => (
-                    <Button
-                      key={time}
-                      size="$3"
-                      backgroundColor={reminderTime === time ? colors.primary.base : "$background"}
-                      borderWidth={1}
-                      borderColor={reminderTime === time ? colors.primary.base : "$borderColor"}
-                      pressStyle={{ backgroundColor: colors.primary.palest }}
-                      onPress={() => setValue("reminderTime", time)}
-                      marginBottom="$2"
-                    >
-                      <Text
-                        fontSize={14}
-                        color={reminderTime === time ? colors.basic.white : "$color"}
-                      >
-                        {time}
-                      </Text>
-                    </Button>
-                  ))}
-                </XStack>
-              </YStack>
             )}
-
-            {/* Info */}
-            <YStack padding="$4" backgroundColor={colors.basic[100]} borderRadius="$md" gap="$2">
-              <Text fontSize={13} color="$color" opacity={0.8}>
-                {t("mobile_tip_title")}
-              </Text>
-              <Text fontSize={13} color="$color" opacity={0.6}>
-                {t("mobile_reminder_tip")}
-              </Text>
-            </YStack>
-          </YStack>
-        </ScrollView>
-
-        {/* Footer */}
-        <YStack padding="$4" borderTopWidth={1} borderTopColor="$borderColor">
-          <Button
-            size="$5"
-            backgroundColor={colors.primary.base}
-            pressStyle={{ opacity: 0.8 }}
-            onPress={handleNext}
-          >
-            <XStack alignItems="center" gap="$2">
-              <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
-                {t("manual_next_step")}
-              </Text>
-              <ChevronRight size={20} color={colors.basic.white} />
-            </XStack>
-          </Button>
+          />
         </YStack>
       </YStack>
-    </SafeAreaView>
+    </ManualStepShell>
   );
 }

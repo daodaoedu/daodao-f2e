@@ -1,5 +1,6 @@
 import {
   dismissPersonaCarousel,
+  extractApiErrorMessage,
   submitPersonaAnswer,
   useMutate,
   usePersonaCarouselState,
@@ -19,6 +20,7 @@ import { Text, XStack, YStack } from "tamagui";
 import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileI18n, useMobileTranslation } from "@/i18n";
+import { useAuth } from "@/providers/AuthProvider";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -142,21 +144,22 @@ function CarouselQuestionCard({
     if (!canSubmit) return;
     setSubmitting(true);
     try {
-      const res = await submitPersonaAnswer(
+      // openapi 此 path 未宣告 error response，TS 會把 error 收成 never — 執行時仍可能有 error
+      const res = (await submitPersonaAnswer(
         isChoice
           ? { questionId, selectedValue: selected }
           : { questionId, textAnswer: textValue.trim() }
-      );
+      )) as { error?: unknown };
       if (res.error) {
-        Alert.alert(tProfile("submitError"));
+        Alert.alert(extractApiErrorMessage(res.error, tProfile("submitError")));
         return;
       }
       setSubmittedAnswer(isChoice ? selected : textValue.trim());
       setSelected("");
       setTextValue("");
       setSubmitted(true);
-    } catch {
-      Alert.alert(tProfile("submitError"));
+    } catch (error) {
+      Alert.alert(extractApiErrorMessage(error, tProfile("submitError")));
     } finally {
       setSubmitting(false);
     }
@@ -328,19 +331,51 @@ function CarouselQuestionCard({
 
 // ── Carousel container ────────────────────────────────────────────────────────
 
+/** API 只接受 zh-TW | en；mobile locale 已對齊 */
+function toApiLocale(locale: string): "zh-TW" | "en" {
+  return locale === "en" ? "en" : "zh-TW";
+}
+
 export function ResonanceCarousel() {
   const t = useMobileTranslation("persona.carousel");
   const { locale } = useMobileI18n();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const mutate = useMutate();
   const [replaceId, setReplaceId] = useState<number | undefined>(undefined);
   const [dismissing, setDismissing] = useState(false);
   const [displayedQuestions, setDisplayedQuestions] = useState<CarouselQuestionType[]>([]);
+  // en 無翻譯時 fallback 到 zh-TW（server JOIN 依 locale，無列則 questions=[]）
+  const [localeFallback, setLocaleFallback] = useState<"zh-TW" | "en" | null>(null);
   const lastProcessedReplaceId = useRef<number | undefined>(undefined);
 
-  const { data, isLoading } = usePersonaCarouselState(replaceId, locale);
+  const apiLocale = localeFallback ?? toApiLocale(locale);
+  const carouselEnabled = isAuthenticated && !isAuthLoading;
 
-  const shouldShow = data?.data?.shouldShow;
-  const apiQuestions = data?.data?.questions ?? [];
+  const {
+    data,
+    error,
+    isLoading,
+    isValidating,
+    mutate: mutateCarousel,
+  } = usePersonaCarouselState(replaceId, apiLocale, { enabled: carouselEnabled });
+
+  // swr-openapi 回傳 openapi body：{ success, data: { shouldShow, questions } }
+  const carousel = data?.data;
+  const shouldShow = carousel?.shouldShow;
+  const apiQuestions = carousel?.questions ?? [];
+
+  // en 語系若 shouldShow 但題目為空，改抓 zh-TW 翻譯
+  useEffect(() => {
+    if (
+      !isLoading &&
+      shouldShow === true &&
+      apiQuestions.length === 0 &&
+      apiLocale === "en" &&
+      localeFallback == null
+    ) {
+      setLocaleFallback("zh-TW");
+    }
+  }, [isLoading, shouldShow, apiQuestions.length, apiLocale, localeFallback]);
 
   // Populate on initial load — first 2 questions become flip cards.
   useEffect(() => {
@@ -348,6 +383,13 @@ export function ResonanceCarousel() {
       setDisplayedQuestions(apiQuestions.slice(0, 2));
     }
   }, [apiQuestions, displayedQuestions.length]);
+
+  // dismiss / 不再顯示時清空本地卡片，避免殘留
+  useEffect(() => {
+    if (!isLoading && shouldShow === false) {
+      setDisplayedQuestions([]);
+    }
+  }, [isLoading, shouldShow]);
 
   // After switch: replace only the switched card, leave the other unchanged.
   useEffect(() => {
@@ -360,7 +402,56 @@ export function ResonanceCarousel() {
     }
   }, [replaceId, isLoading, apiQuestions, displayedQuestions]);
 
-  if (displayedQuestions.length === 0 && isLoading) return null;
+  // 未登入不請求
+  if (!carouselEnabled) return null;
+
+  // 首次載入：顯示輕量 skeleton，避免「完全空白」難以辨識
+  if (displayedQuestions.length === 0 && (isLoading || isValidating) && !error) {
+    return (
+      <YStack mb="$4" gap="$2">
+        <XStack ai="center" gap="$1.5">
+          <Laugh size={14} color={TEXT_DARK_60} />
+          <Text fontSize={12} color={TEXT_DARK_60}>
+            {t("title")}
+          </Text>
+        </XStack>
+        <YStack height={120} borderRadius={12} backgroundColor={TEXT_DARK_10} />
+      </YStack>
+    );
+  }
+
+  // API 錯誤時顯示重試（401 / 網路錯誤不再靜默消失）
+  if (error && displayedQuestions.length === 0) {
+    return (
+      <YStack mb="$4" gap="$2">
+        <XStack ai="center" gap="$1.5">
+          <Laugh size={14} color={TEXT_DARK_60} />
+          <Text fontSize={12} color={TEXT_DARK_60}>
+            {t("title")}
+          </Text>
+        </XStack>
+        <YStack
+          borderWidth={1}
+          borderColor={TEXT_DARK_15}
+          borderRadius={12}
+          padding="$3"
+          gap="$2"
+          backgroundColor={colors.background.light}
+        >
+          <Text fontSize={13} color={TEXT_DARK_55}>
+            {t("error")}
+          </Text>
+          <Pressable onPress={() => mutateCarousel()} hitSlop={8}>
+            <Text fontSize={13} fontWeight="500" color={colors.primary.darker}>
+              {t("retry")}
+            </Text>
+          </Pressable>
+        </YStack>
+      </YStack>
+    );
+  }
+
+  // 當天 dismiss 或全部答完 → 不顯示
   if (!isLoading && shouldShow === false) return null;
   if (displayedQuestions.length === 0) return null;
 
@@ -372,6 +463,7 @@ export function ResonanceCarousel() {
         Alert.alert(t("error"));
         return;
       }
+      setDisplayedQuestions([]);
       await mutate(["/api/v1/persona/carousel-state"] as const);
     } catch {
       Alert.alert(t("error"));

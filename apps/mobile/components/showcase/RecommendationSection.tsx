@@ -5,7 +5,7 @@
 import { ThumbsDown, ThumbsUp } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Pressable } from "react-native";
+import { Alert, FlatList, Pressable } from "react-native";
 import { Avatar, Card, Spinner, Text, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import {
@@ -15,12 +15,14 @@ import {
   useTopicCards,
 } from "@/hooks/useTopicCards";
 import { useMobileTranslation } from "@/i18n";
+import { extractApiErrorMessage } from "@/utils/api-error";
 
 const CARD_WIDTH = 280;
 
 export function RecommendationSection() {
   const router = useRouter();
   const t = useMobileTranslation("dashboard");
+  const commonT = useMobileTranslation("common");
   const { data, isLoading } = useTopicCards(true, 3);
   const [cards, setCards] = useState<ITopicCard[]>([]);
 
@@ -44,14 +46,15 @@ export function RecommendationSection() {
     try {
       await submitTopicFeedback(card.practiceId, type);
     } catch (error) {
-      // 已用樂觀更新 + 回滾處理 UX，這裡僅記錄供除錯；用 console.log 而非
-      // console.error 避免 dev LogBox 在網路暫時失敗時誤報。
-      console.log("Failed to submit topic feedback:", error);
-      // 回滾
+      // 回滾並提示
       setCards((prev) =>
         prev.map((c) =>
           c.practiceId === card.practiceId ? { ...c, feedbackState: card.feedbackState } : c
         )
+      );
+      Alert.alert(
+        commonT("errorTitle"),
+        extractApiErrorMessage(error, commonT("operationFailed"))
       );
     }
   };

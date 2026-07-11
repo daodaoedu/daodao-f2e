@@ -16,14 +16,12 @@ import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import { useMobileTranslation } from "@/i18n";
+import { throwIfOpenApiError } from "@/utils/api-error";
 
 type FieldOptionType = { value: string; label: string };
 
 function assertSuccessfulResponse(response: { error?: unknown }, fallbackMessage: string) {
-  if (!response.error) return;
-
-  const error = response.error as { error?: { message?: string }; message?: string };
-  throw new Error(error.error?.message ?? error.message ?? fallbackMessage);
+  throwIfOpenApiError(response, fallbackMessage);
 }
 
 function FieldSelectionModal({

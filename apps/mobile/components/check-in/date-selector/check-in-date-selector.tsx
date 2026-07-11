@@ -1,6 +1,7 @@
 import { X } from "@tamagui/lucide-icons";
-import { useCallback, useEffect, useRef } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { MotiView } from "moti";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FlatList, type LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { Text, XStack } from "tamagui";
 import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
@@ -23,12 +24,27 @@ export const CheckInDateSelector = ({
   checkInDates,
   checkIns,
   activeCheckInId,
+  activeDate,
   onCheckInSelect,
   title,
   onClose,
+  hidden = false,
+  onHeightChange,
 }: ICheckInDateSelectorProps) => {
   const tCommon = useMobileTranslation("common");
   const flatListRef = useRef<FlatList<ICheckInDate>>(null);
+  const [navHeight, setNavHeight] = useState(0);
+
+  const handleLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const height = event.nativeEvent.layout.height;
+      if (height > 0 && height !== navHeight) {
+        setNavHeight(height);
+        onHeightChange?.(height);
+      }
+    },
+    [navHeight, onHeightChange]
+  );
 
   const handleSelect = useCallback(
     (checkInId: string) => {
@@ -37,11 +53,13 @@ export const CheckInDateSelector = ({
     [onCheckInSelect]
   );
 
-  // 當 activeCheckInId 變化時，滾動到對應位置
+  // 當 active 狀態變化時，滾動到對應位置（優先用日期比對，支援同日多筆打卡）
   useEffect(() => {
-    if (!activeCheckInId || checkInDates.length === 0) return;
+    if (checkInDates.length === 0) return;
 
-    const activeIndex = checkInDates.findIndex((item) => item.id === activeCheckInId);
+    const activeIndex = checkInDates.findIndex((item) =>
+      activeDate ? item.date === activeDate : item.id === activeCheckInId
+    );
     if (activeIndex >= 0 && flatListRef.current) {
       flatListRef.current.scrollToIndex({
         index: activeIndex,
@@ -49,7 +67,7 @@ export const CheckInDateSelector = ({
         viewPosition: 0.5,
       });
     }
-  }, [activeCheckInId, checkInDates]);
+  }, [activeCheckInId, activeDate, checkInDates]);
 
   const renderItem = useCallback(
     ({ item, index }: { item: ICheckInDate; index: number }) => (
@@ -58,10 +76,11 @@ export const CheckInDateSelector = ({
         index={index}
         checkIns={checkIns}
         activeCheckInId={activeCheckInId}
+        activeDate={activeDate}
         onSelect={handleSelect}
       />
     ),
-    [checkIns, activeCheckInId, handleSelect]
+    [checkIns, activeCheckInId, activeDate, handleSelect]
   );
 
   const keyExtractor = useCallback((item: ICheckInDate) => item.id, []);
@@ -71,7 +90,12 @@ export const CheckInDateSelector = ({
   const hasHeader = Boolean(title || onClose);
 
   return (
-    <View style={styles.nav}>
+    <MotiView
+      style={styles.nav}
+      onLayout={handleLayout}
+      animate={{ translateY: hidden && navHeight > 0 ? -navHeight : 0 }}
+      transition={{ type: "timing", duration: 250 }}
+    >
       {/* 標題列（標題置中 + 右側關閉），對齊 product 的 nav */}
       {hasHeader && (
         <XStack
@@ -123,12 +147,18 @@ export const CheckInDateSelector = ({
           }}
         />
       )}
-    </View>
+    </MotiView>
   );
 };
 
 const styles = StyleSheet.create({
   nav: {
+    // 固定覆蓋式 nav（對齊 product 的 fixed top nav）
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 30,
     backgroundColor: NAV_BG,
     borderBottomWidth: 2,
     borderBottomColor: NAV_BORDER,

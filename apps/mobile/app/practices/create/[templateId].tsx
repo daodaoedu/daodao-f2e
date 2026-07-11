@@ -2,14 +2,20 @@ import {
   getRandomPracticeTemplates,
   type PracticeTemplateType,
   usePracticeTemplateById,
+  usePracticeTemplateCategories,
 } from "@daodao/api";
+import ArtSvg from "@daodao/assets/images/categories/art.svg";
+import HealthSvg from "@daodao/assets/images/categories/health.svg";
+import LanguageSvg from "@daodao/assets/images/categories/language.svg";
+import LifeSvg from "@daodao/assets/images/categories/life.svg";
+import TechSvg from "@daodao/assets/images/categories/tech.svg";
 import CompassSvg from "@daodao/assets/images/dashboard/compass.svg";
 import Deco4Svg from "@daodao/assets/images/dashboard/deco-4.svg";
 import ArrowRightOutlineSvg from "@daodao/assets/images/icon/arrow-right-outline.svg";
 import { ChevronDown, ChevronLeft, RefreshCw } from "@tamagui/lucide-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo, useState } from "react";
-import { Alert } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { Alert, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import {
@@ -17,6 +23,7 @@ import {
   ExecutionTimingCard,
   PracticeOverviewCard,
   ResourceCard,
+  ResourceGrid,
 } from "@/components/practice/shared";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,13 +39,15 @@ import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 import { api } from "@/services/api-client";
 
-// 對齊 product practiceCategoryMetadataMap：類別 ID → 翻譯 key
-const categoryLabelKeyMap: Record<string, string> = {
-  language: "categories.language",
-  lifestyle: "categories.lifestyle",
-  digital_skill: "categories.digital_skill",
-  art_design: "categories.art_design",
-  wellness: "categories.wellness",
+type CategoryIcon = typeof LanguageSvg;
+
+/** 對齊 product practiceCategoryMetadataMap：類別 ID → 翻譯 key + 圖示 */
+const categoryMetadataMap: Record<string, { labelKey: string; Icon: CategoryIcon }> = {
+  language: { labelKey: "categories.language", Icon: LanguageSvg },
+  lifestyle: { labelKey: "categories.lifestyle", Icon: LifeSvg },
+  digital_skill: { labelKey: "categories.digital_skill", Icon: TechSvg },
+  art_design: { labelKey: "categories.art_design", Icon: ArtSvg },
+  wellness: { labelKey: "categories.wellness", Icon: HealthSvg },
 };
 
 type TemplateFormValues = {
@@ -144,22 +153,118 @@ export default function TemplatePreviewScreen() {
   const commonT = useMobileTranslation("common");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
 
   const { data, error, isLoading } = usePracticeTemplateById(templateId);
+  const { data: categoriesData } = usePracticeTemplateCategories();
   const template = useMemo(() => data?.data ?? null, [data]);
   const formValues = useMemo(
     () => (template ? convertTemplateToFormValues(template) : null),
     [template]
   );
 
-  // 目前模板所屬類別（用於 badge 標籤與「換一個」的隨機來源）
+  /** API 分類 → 選單選項（對齊 product categoryOptions） */
+  const categoryOptions = useMemo(() => {
+    if (!categoriesData?.data) return [];
+    return categoriesData.data.map((categoryId: string) => {
+      const metadata = categoryMetadataMap[categoryId];
+      return {
+        id: categoryId,
+        label: metadata ? t(metadata.labelKey) : categoryId,
+        Icon: metadata?.Icon,
+      };
+    });
+  }, [categoriesData, t]);
+
+  // 目前模板所屬類別（badge +「換一個」隨機來源）
   const currentCategory = useMemo(() => {
     const categories = template?.categories ?? [];
-    return categories.find((c) => c in categoryLabelKeyMap) ?? categories[0];
+    return categories.find((c) => c in categoryMetadataMap) ?? categories[0];
   }, [template]);
+
   const categoryLabel = currentCategory
-    ? t(categoryLabelKeyMap[currentCategory] ?? currentCategory)
+    ? t(categoryMetadataMap[currentCategory]?.labelKey ?? currentCategory)
     : t("create_title");
+
+  // 深連結直接進入此頁時沒有可返回的堆疊，退回首頁避免 GO_BACK 未處理
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(tabs)");
+    }
+  };
+
+  /**
+   * 抽取指定分類的隨機模板並導向（對齊 product goToRandomTemplate）
+   * - 未指定 category → 跨全部分類
+   * - 「換一個」傳 currentCategory；選單切分類傳 categoryId
+   */
+  const goToRandomTemplate = useCallback(
+    async (category?: string) => {
+      if (isRefreshing) return;
+      setIsRefreshing(true);
+      setCategoryMenuOpen(false);
+      try {
+        const response = await getRandomPracticeTemplates({
+          count: 1,
+          category,
+        });
+        const next = response.data?.data?.[0];
+        if (!next) {
+          router.push("/practices/create");
+          return;
+        }
+        router.replace(`/practices/create/${next.id}`);
+      } catch {
+        router.push("/practices/create");
+      } finally {
+        setIsRefreshing(false);
+      }
+    },
+    [isRefreshing, router]
+  );
+
+  // 換一個：在目前分類內重抽
+  const handleRefresh = useCallback(() => {
+    void goToRandomTemplate(currentCategory);
+  }, [goToRandomTemplate, currentCategory]);
+
+  // 切換分類：抽所選分類的一個模板
+  const handleSelectCategory = useCallback(
+    (categoryId: string) => {
+      if (categoryId === currentCategory) {
+        setCategoryMenuOpen(false);
+        return;
+      }
+      void goToRandomTemplate(categoryId);
+    },
+    [goToRandomTemplate, currentCategory]
+  );
+
+  const handleUseTemplate = useCallback(async () => {
+    if (isSubmitting || !template) return;
+    setIsSubmitting(true);
+    try {
+      const response = await api.post<{ data?: { id?: string } }>(
+        "/practices",
+        buildTemplateCreateRequest(template)
+      );
+      const practiceId = response?.data?.id;
+      router.replace(
+        practiceId
+          ? `/practices/create/success?practiceId=${practiceId}`
+          : "/practices/create/success"
+      );
+    } catch (createError) {
+      Alert.alert(
+        t("create_failed"),
+        createError instanceof Error ? createError.message : t("create_failed_retry")
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [isSubmitting, template, router, t]);
 
   if (isLoading) {
     return (
@@ -178,61 +283,13 @@ export default function TemplatePreviewScreen() {
           <Text fontSize={16} color={colors.basic.white}>
             {t("template_load_error")}
           </Text>
-          <Button backgroundColor={colors.basic.white} onPress={() => router.back()}>
+          <Button backgroundColor={colors.basic.white} onPress={handleBack}>
             <Text color={colors.text.dark}>{commonT("back")}</Text>
           </Button>
         </YStack>
       </SafeAreaView>
     );
   }
-
-  const handleRefresh = async () => {
-    if (isRefreshing) return;
-    setIsRefreshing(true);
-    try {
-      const response = await getRandomPracticeTemplates({
-        count: 1,
-        category: currentCategory,
-      });
-      const next = response.data?.data?.[0];
-      if (!next) {
-        router.push("/practices/create");
-        return;
-      }
-      router.replace(`/practices/create/${next.id}`);
-    } catch {
-      router.push("/practices/create");
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  const handleUseTemplate = async () => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    try {
-      const response = await api.post<{ data?: { id?: string } }>(
-        "/practices",
-        buildTemplateCreateRequest(template)
-      );
-      const practiceId = response?.data?.id;
-      Alert.alert(t("mobile_create_success_title"), t("mobile_create_success_message"), [
-        {
-          text: commonT("confirm"),
-          onPress: () => {
-            router.replace(practiceId ? `/practices/${practiceId}` : "/(tabs)");
-          },
-        },
-      ]);
-    } catch (createError) {
-      Alert.alert(
-        t("create_failed"),
-        createError instanceof Error ? createError.message : t("create_failed_retry")
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const hasResources = formValues.resources.length > 0;
 
@@ -243,6 +300,15 @@ export default function TemplatePreviewScreen() {
         <Deco4Svg width={220} height={394} />
       </YStack>
 
+      {/* 點空白關閉類別選單 */}
+      {categoryMenuOpen && (
+        <Pressable
+          style={[StyleSheet.absoluteFillObject, { zIndex: 25 }]}
+          onPress={() => setCategoryMenuOpen(false)}
+          accessibilityLabel={commonT("close")}
+        />
+      )}
+
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1}>
           {/* Header */}
@@ -251,7 +317,7 @@ export default function TemplatePreviewScreen() {
               size="$4"
               circular
               chromeless
-              onPress={() => router.back()}
+              onPress={handleBack}
               accessibilityLabel={commonT("back")}
             >
               <ChevronLeft size={24} color={colors.basic.white} />
@@ -261,21 +327,93 @@ export default function TemplatePreviewScreen() {
           <ScrollView flex={1} contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}>
             {/* 標題區 */}
             <YStack paddingHorizontal="$5" paddingBottom="$4" gap="$2">
-              <Badge backgroundColor={colors.basic.white}>
-                <XStack alignItems="center" gap="$1">
-                  <Text fontSize={12} color={colors.text.dark}>
-                    {categoryLabel}
-                  </Text>
-                  <ChevronDown size={12} color={colors.text.dark} />
-                </XStack>
-              </Badge>
+              {/*
+                類別 badge + 下拉（對齊 product DropdownMenu）
+                選項後 goToRandomTemplate(categoryId)
+              */}
+              <YStack alignSelf="flex-start" zIndex={30} position="relative">
+                {categoryOptions.length > 0 ? (
+                  <>
+                    <Pressable
+                      onPress={() => setCategoryMenuOpen((open) => !open)}
+                      disabled={isRefreshing}
+                      accessibilityRole="button"
+                      accessibilityLabel={categoryLabel}
+                      accessibilityState={{ expanded: categoryMenuOpen }}
+                    >
+                      <Badge backgroundColor={colors.basic.white}>
+                        <XStack alignItems="center" gap="$1">
+                          <Text fontSize={12} color={colors.text.dark}>
+                            {categoryLabel}
+                          </Text>
+                          <ChevronDown size={12} color={colors.text.dark} opacity={0.7} />
+                        </XStack>
+                      </Badge>
+                    </Pressable>
+
+                    {categoryMenuOpen && (
+                      <YStack
+                        position="absolute"
+                        top="100%"
+                        left={0}
+                        marginTop={2}
+                        minWidth={176}
+                        backgroundColor={colors.basic.white}
+                        borderRadius={12}
+                        paddingVertical={4}
+                        shadowColor="#000"
+                        shadowOffset={{ width: 0, height: 2 }}
+                        shadowOpacity={0.15}
+                        shadowRadius={8}
+                        elevation={8}
+                        zIndex={40}
+                      >
+                        {categoryOptions.map((category) => {
+                          const isSelected = currentCategory === category.id;
+                          const Icon = category.Icon;
+                          return (
+                            <Pressable
+                              key={category.id}
+                              onPress={() => handleSelectCategory(category.id)}
+                              style={({ pressed }) => ({
+                                opacity: pressed ? 0.7 : 1,
+                                minHeight: 44,
+                                paddingHorizontal: 16,
+                                paddingVertical: 10,
+                                flexDirection: "row",
+                                alignItems: "center",
+                                gap: 8,
+                              })}
+                              accessibilityRole="menuitem"
+                              accessibilityState={{ selected: isSelected }}
+                            >
+                              {Icon ? <Icon width={16} height={16} /> : null}
+                              <Text
+                                fontSize={14}
+                                fontWeight={isSelected ? "500" : "400"}
+                                color={isSelected ? colors.logo.cyan : colors.text.dark}
+                              >
+                                {category.label}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
+                      </YStack>
+                    )}
+                  </>
+                ) : (
+                  <Badge backgroundColor={colors.basic.white}>
+                    <Text fontSize={12} color={colors.text.dark}>
+                      {categoryLabel}
+                    </Text>
+                  </Badge>
+                )}
+              </YStack>
+
               <XStack alignItems="flex-start" gap="$3">
-                <YStack flex={1} gap="$1">
+                <YStack flex={1}>
                   <Text fontSize={24} lineHeight={32} fontWeight="600" color={colors.basic.white}>
                     {template.title}
-                  </Text>
-                  <Text fontSize={14} color={colors.basic.white}>
-                    {formValues.actionDescription}
                   </Text>
                 </YStack>
                 <Button
@@ -300,7 +438,7 @@ export default function TemplatePreviewScreen() {
               </XStack>
             </YStack>
 
-            {/* 白色圓角內容區 */}
+            {/* 白色圓角內容區 — overflow visible 讓指南針可伸出頂部外 */}
             <YStack
               flexGrow={1}
               backgroundColor={colors.basic.white}
@@ -309,18 +447,30 @@ export default function TemplatePreviewScreen() {
               paddingHorizontal="$5"
               paddingTop="$5"
               gap="$3.5"
+              overflow="visible"
             >
-              {/* 概覽卡（指南針插圖懸掛於右上） */}
-              <YStack position="relative">
-                <YStack position="absolute" top={-52} right={-4} zIndex={10} pointerEvents="none">
-                  <CompassSvg width={100} height={104} />
-                </YStack>
+              {/*
+                概覽卡 + 指南針（對齊 product）：
+                absolute -top-14 -right-1 z-10
+                RN：card 有 elevation 會蓋住先前 sibling，故 compass 放 card 之後 + elevation
+              */}
+              <YStack position="relative" overflow="visible" zIndex={1}>
                 <PracticeOverviewCard
                   actionDescription={formValues.actionDescription}
                   frequency={formValues.frequency}
                   durationMinutes={formValues.durationMinutes}
                   tags={formValues.tags}
                 />
+                <YStack
+                  position="absolute"
+                  top={-56}
+                  right={-4}
+                  zIndex={20}
+                  elevation={12}
+                  pointerEvents="none"
+                >
+                  <CompassSvg width={109} height={114} />
+                </YStack>
               </YStack>
 
               {/* 執行時機 + 執行時長（兩欄） */}
@@ -339,25 +489,14 @@ export default function TemplatePreviewScreen() {
                 </YStack>
               </XStack>
 
-              {/* 推薦資源 */}
+              {/* 推薦資源 — 對齊 product grid-cols-2；標題「Recommended resources」已移除（多餘） */}
               {hasResources && (
-                <YStack gap="$3">
-                  <Text
-                    fontSize={14}
-                    fontWeight="500"
-                    color={colors.text.dark}
-                    textAlign="center"
-                    marginTop="$1"
-                  >
-                    {t("template_resources_title")}
-                  </Text>
-                  <XStack flexWrap="wrap" gap="$3">
+                <YStack marginTop={16}>
+                  <ResourceGrid>
                     {formValues.resources.map((resource) => (
-                      <YStack key={resource.id} width="47%" flexGrow={1}>
-                        <ResourceCard resource={resource} />
-                      </YStack>
+                      <ResourceCard key={resource.id} resource={resource} />
                     ))}
-                  </XStack>
+                  </ResourceGrid>
                 </YStack>
               )}
             </YStack>

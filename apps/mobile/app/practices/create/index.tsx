@@ -89,6 +89,15 @@ export default function CreatePracticeScreen() {
     router.replace("/practices/create");
   };
 
+  // 深連結直接進入此頁時沒有可返回的堆疊，退回首頁避免 GO_BACK 未處理
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(tabs)");
+    }
+  };
+
   return (
     <YStack flex={1}>
       {/* 漸層背景（對齊 product：from #F5F9E8 via white to #F0F4F8） */}
@@ -107,7 +116,7 @@ export default function CreatePracticeScreen() {
               size="$4"
               circular
               chromeless
-              onPress={() => router.back()}
+              onPress={handleBack}
               accessibilityLabel={commonT("back")}
             >
               <ChevronLeft size={24} color={colors.text.dark} />

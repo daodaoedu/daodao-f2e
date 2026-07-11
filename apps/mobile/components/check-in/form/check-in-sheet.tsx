@@ -11,9 +11,11 @@ import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
 import { DescriptionField } from "./components/description-field";
 import { MediaUploadField } from "./components/media-upload-field";
 import { MoodSelector } from "./components/mood-selector";
+import { ReflectionQuestion } from "./components/reflection-question";
 import { TagSelector } from "./components/tag-selector";
 import { useCheckInImageRender } from "./hooks/use-check-in-image-render";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
+import { useTagPrompt } from "./hooks/use-tag-prompt";
 import { type CheckInFormValuesType, createCheckInFormSchema } from "./schema";
 
 // Export types for external use (avoid naming conflicts with legacy CheckInSheet)
@@ -32,12 +34,7 @@ interface ICheckInSheetContentProps {
 export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetContentProps) => {
   const t = useMobileTranslation("mobile.checkIn");
   const checkInFormSchema = useMemo(() => createCheckInFormSchema(t), [t]);
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<CheckInFormValuesType>({
+  const form = useForm<CheckInFormValuesType>({
     resolver: zodResolver(checkInFormSchema),
     defaultValues: {
       mood: null,
@@ -46,6 +43,13 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
       mediaUris: [],
     },
   });
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = form;
+  const { fetchAndAddPrompt } = useTagPrompt(form);
 
   const { isRendering, startRender, renderCheckInCard } = useCheckInImageRender({
     taskTitle,
@@ -108,7 +112,7 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
               control={control}
               name="tags"
               render={({ field: { onChange, value } }) => (
-                <TagSelector value={value} onChange={onChange} />
+                <TagSelector value={value} onChange={onChange} onTagSelected={fetchAndAddPrompt} />
               )}
             />
             {errors.tags && (
@@ -121,7 +125,11 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
               control={control}
               name="description"
               render={({ field: { onChange, value } }) => (
-                <DescriptionField value={value} onChange={onChange} />
+                <DescriptionField
+                  value={value}
+                  onChange={onChange}
+                  beforeTextArea={<ReflectionQuestion />}
+                />
               )}
             />
             {errors.description && (
