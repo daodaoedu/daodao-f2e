@@ -4,7 +4,7 @@
  * Roadmap / Wishpool API Hooks（Client Components）
  */
 
-import { useQuery } from "../hooks";
+import { EMPTY_QUERY_INIT, useQuery } from "../hooks";
 import {
   addSupport,
   addWishSupport,
@@ -64,7 +64,7 @@ export const useRoadmapItems = (
 /** Hero 統計 */
 export const useRoadmapStats = (options?: { enabled?: boolean }) => {
   const enabled = options?.enabled ?? true;
-  return useQuery("/api/v1/roadmap/stats", enabled ? {} : null, {
+  return useQuery("/api/v1/roadmap/stats", enabled ? EMPTY_QUERY_INIT : null, {
     revalidateOnFocus: false,
   });
 };

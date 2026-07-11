@@ -1,3 +1,4 @@
+import { extractApiErrorMessage } from "@daodao/api";
 import { authStorage, refreshTokens } from "./auth-storage";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "https://api.daodao.so";
@@ -11,10 +12,7 @@ interface IRequestOptions extends RequestInit {
 
 async function readJsonError(response: Response) {
   const data = await response.json().catch(() => ({}));
-  if (data && typeof data === "object" && "message" in data) {
-    return String((data as { message?: unknown }).message);
-  }
-  return `Request failed: ${response.status}`;
+  return extractApiErrorMessage(data, `Request failed: ${response.status}`);
 }
 
 async function createHeaders(headers?: HeadersInit, skipAuth?: boolean) {

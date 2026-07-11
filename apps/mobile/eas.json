@@ -14,7 +14,11 @@
         "buildType": "apk"
       },
       "env": {
-        "APP_ENV": "development"
+        "APP_ENV": "development",
+        "EXPO_PUBLIC_API_URL": "https://server-dev.daodao.so",
+        "EXPO_PUBLIC_AI_API_URL": "https://ai-dev.daodao.so",
+        "NEXT_PUBLIC_API_URL": "https://server-dev.daodao.so",
+        "NEXT_PUBLIC_AI_API_URL": "https://ai-dev.daodao.so"
       }
     },
     "preview": {
@@ -26,7 +30,11 @@
         "buildType": "apk"
       },
       "env": {
-        "APP_ENV": "preview"
+        "APP_ENV": "preview",
+        "EXPO_PUBLIC_API_URL": "https://server-dev.daodao.so",
+        "EXPO_PUBLIC_AI_API_URL": "https://ai-dev.daodao.so",
+        "NEXT_PUBLIC_API_URL": "https://server-dev.daodao.so",
+        "NEXT_PUBLIC_AI_API_URL": "https://ai-dev.daodao.so"
       },
       "channel": "preview"
     },
@@ -39,7 +47,11 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "APP_ENV": "production"
+        "APP_ENV": "production",
+        "EXPO_PUBLIC_API_URL": "https://server.daodao.so",
+        "EXPO_PUBLIC_AI_API_URL": "https://ai.daodao.so",
+        "NEXT_PUBLIC_API_URL": "https://server.daodao.so",
+        "NEXT_PUBLIC_AI_API_URL": "https://ai.daodao.so"
       },
       "channel": "production"
     }
@@ -54,6 +66,11 @@
       "android": {
         "serviceAccountKeyPath": "./google-service-account.json",
         "track": "internal"
+      }
+    },
+    "testflight-dev": {
+      "ios": {
+        "appleTeamId": "G5GY9SQ4F7"
       }
     }
   }

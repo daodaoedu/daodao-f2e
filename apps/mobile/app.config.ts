@@ -7,8 +7,17 @@ const androidGoogleServicesFile = "./google-services.json";
 const hasIosGoogleServicesFile = existsSync(resolve(process.cwd(), iosGoogleServicesFile));
 const hasAndroidGoogleServicesFile = existsSync(resolve(process.cwd(), androidGoogleServicesFile));
 
+// 環境區分：APP_ENV 由 eas.json 各 build profile 的 env 設定。
+// 正式版與測試版用不同 bundle id → 是兩個獨立 app，可同時裝在同一支手機、
+// 名稱也區別得出來，測試不會污染正式資料。
+// - production（App Store）：com.daodao.so / "Dao Dao"
+// - 其他（preview/development，TestFlight/內部測試）：com.daodao.so.dev / "Dao Dao (Dev)"
+const IS_PROD = process.env.APP_ENV === "production";
+const bundleIdentifier = IS_PROD ? "com.daodao.so" : "com.daodao.so.dev";
+const appName = IS_PROD ? "Dao Dao" : "Dao Dao (Dev)";
+
 const config: ExpoConfig = {
-  name: "Dao Dao",
+  name: appName,
   slug: "daodao",
   version: "1.0.0",
   orientation: "portrait",
@@ -16,6 +25,12 @@ const config: ExpoConfig = {
   scheme: "daodao",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
+  updates: {
+    url: "https://u.expo.dev/f93cc139-a71b-4dfc-abc3-c093889034a8",
+  },
+  runtimeVersion: {
+    policy: "appVersion",
+  },
   splash: {
     image: "./assets/splash-icon.png",
     resizeMode: "contain",
@@ -24,7 +39,7 @@ const config: ExpoConfig = {
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "com.daodao.app",
+    bundleIdentifier,
     usesAppleSignIn: true,
     ...(hasIosGoogleServicesFile ? { googleServicesFile: iosGoogleServicesFile } : {}),
     infoPlist: {
@@ -39,7 +54,7 @@ const config: ExpoConfig = {
       foregroundImage: "./assets/adaptive-icon.png",
       backgroundColor: "#16B9B3",
     },
-    package: "com.daodao.app",
+    package: bundleIdentifier,
     ...(hasAndroidGoogleServicesFile ? { googleServicesFile: androidGoogleServicesFile } : {}),
   },
   web: {

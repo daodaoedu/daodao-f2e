@@ -33,7 +33,7 @@ export const colors = {
     "gray": "#E4EAE9",
     "veryLightGray": "#F4F6F6",
     "veryLightBlue": "#F5FFFD",
-    "lightCyan": "#B8E8FD"
+    "lightCyan": "#A9EDE8"
   },
   "text": {
     "dark": "#295E5C",

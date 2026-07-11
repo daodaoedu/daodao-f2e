@@ -8,6 +8,7 @@ import type { ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
 import { removeReaction, upsertReaction, useReactions } from "@/hooks/useReactions";
 import { useMobileTranslation } from "@/i18n";
+import { runWithErrorAlert } from "@/utils/api-error";
 import type { ManualPracticeFormValuesType } from "../create/manual/schema";
 import { CircularProgress } from "./circular-progress";
 
@@ -46,6 +47,7 @@ export const PracticeOverviewCard = ({
   practiceId,
 }: PracticeOverviewCardProps) => {
   const t = useMobileTranslation("practice");
+  const commonT = useMobileTranslation("common");
   const router = useRouter();
 
   const {
@@ -58,15 +60,20 @@ export const PracticeOverviewCard = ({
   const handleReactionToggle = useCallback(
     async (type: ReactionTypeType) => {
       if (!practiceId) return;
-      const isSelected = currentUserReaction === type;
-      if (isSelected) {
-        await removeReaction("practice", practiceId);
-      } else {
-        await upsertReaction("practice", practiceId, type);
-      }
-      await mutateReactions();
+      await runWithErrorAlert(
+        async () => {
+          const isSelected = currentUserReaction === type;
+          if (isSelected) {
+            await removeReaction("practice", practiceId);
+          } else {
+            await upsertReaction("practice", practiceId, type);
+          }
+          await mutateReactions();
+        },
+        { title: commonT("errorTitle"), fallbackMessage: commonT("operationFailed") }
+      );
     },
-    [currentUserReaction, practiceId, mutateReactions]
+    [currentUserReaction, practiceId, mutateReactions, commonT]
   );
 
   const handlePressCreator = useCallback(() => {
@@ -108,47 +115,47 @@ export const PracticeOverviewCard = ({
         </Pressable>
       )}
       <YStack flex={1}>
-        {/* Action Description */}
+        {/* Action Description — product 固定 pr-[88px] 留給右上 compass / progress */}
         <Text
           fontSize={14}
           fontWeight="500"
           color={colors.text.dark}
           marginBottom="$3"
-          paddingRight={showProgress ? 80 : 0}
+          paddingRight={showProgress ? 80 : 88}
         >
           {actionDescription}
         </Text>
 
-        {/* Time Commitments */}
+        {/* Time Commitments — 對齊 product overview_per_week / overview_per_session */}
         <XStack
           paddingBottom="$3"
           marginBottom="$3"
           borderBottomWidth={1}
-          borderBottomColor={colors.basic["200"]}
+          borderBottomColor={colors.gray.light}
         >
           <YStack width={80}>
             <Text fontSize={12} color={colors.text.dark}>
-              {t("mobile_frequency_week_label")}
+              {t("overview_per_week")}
             </Text>
             <XStack alignItems="baseline" gap="$0.5">
-              <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
+              <Text fontSize={18} fontWeight="500" color={colors.logo.cyan}>
                 {frequency}
               </Text>
               <Text fontSize={12} color={colors.text.dark}>
-                {t("frequency_unit")}
+                {t("overview_days_unit")}
               </Text>
             </XStack>
           </YStack>
           <YStack width={80}>
             <Text fontSize={12} color={colors.text.dark}>
-              {t("once_label")}
+              {t("overview_per_session")}
             </Text>
             <XStack alignItems="baseline" gap="$0.5">
-              <Text fontSize={18} fontWeight="500" color={colors.primary.base}>
+              <Text fontSize={18} fontWeight="500" color={colors.logo.cyan}>
                 {durationMinutes}
               </Text>
               <Text fontSize={12} color={colors.text.dark}>
-                {t("minutes_unit")}
+                {t("overview_minutes_unit")}
               </Text>
             </XStack>
           </YStack>
@@ -200,14 +207,15 @@ export const PracticeOverviewCard = ({
 const styles = StyleSheet.create({
   card: {
     position: "relative",
+    // 頁面改 very-light-gray 後，白卡自然浮起（對齊 product 白卡在灰底上）
     backgroundColor: colors.basic.white,
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 0,
     shadowColor: colors.basic.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
     elevation: 2,
   },
   tagBadge: {

@@ -7,7 +7,7 @@
 
 import useSWR from "swr";
 import { client } from "../client";
-import { useQuery } from "../hooks";
+import { EMPTY_QUERY_INIT, useQuery } from "../hooks";
 import type {
   CreateUserRequest,
   IGetUsersParams,
@@ -89,10 +89,11 @@ export const useUserByIdentifier = (identifier: string) => {
 
 /**
  * 獲取當前用戶資訊的 Hook
+ * 注意：disabled 用 `null`；enabled 用 EMPTY_QUERY_INIT（hooks 層也會再 stabilize）
  */
 export const useCurrentUser = (options?: { enabled?: boolean }) => {
   const enabled = options?.enabled ?? true;
-  return useQuery("/api/v1/users/me", enabled ? {} : null);
+  return useQuery("/api/v1/users/me", enabled ? EMPTY_QUERY_INIT : null);
 };
 
 /**

@@ -5561,7 +5561,8 @@
       "submit": "送出",
       "submitError": "送出失敗，請稍後再試",
       "submitting": "送出中...",
-      "textPlaceholder": "分享你的想法..."
+      "textPlaceholder": "分享你的想法...",
+      "retry": "重試"
     },
     "answeredLabel": "已回答",
     "unansweredLabel": "未回答",
@@ -6143,6 +6144,9 @@
     "checkIn": {
       "title": "打卡",
       "success_title": "打卡成功！",
+      "success_default_encouragement": "恭喜，你又成功行動了一次！",
+      "success_continue_hint": "想紀錄今天的心情嗎？繼續填寫吧！",
+      "success_complete": "完成",
       "streak_days": "連續 {count} 天",
       "share_result": "分享打卡成果",
       "share": "分享",
@@ -6153,6 +6157,7 @@
       "expand": "展開",
       "mood_display": "心情{mood}",
       "share_this_checkin": "分享這篇打卡",
+      "empty_content_hint": "歡迎隨時追加內容",
       "mood_question": "心情如何？",
       "mood_hopeless": "想放棄",
       "mood_frustrated": "受挫",
@@ -6187,7 +6192,38 @@
       "already_checked_in": "24 小時內已打過卡囉！",
       "validation_mood_required": "請選擇心情",
       "validation_description_max": "最多600字",
-      "validation_media_max": "最多只能上傳3張圖片"
+      "reflection_toggle": "靈感開關",
+      "reflection_refresh": "換一題",
+      "auto_fill_text": "自動填入文字",
+      "reflection_questions": {
+        "0": "今天做了什麼讓你有點小得意的事？",
+        "1": "有什麼事讓你「原來如此！」？",
+        "2": "今天最順手的一件事是？",
+        "3": "有沒有什麼事讓你忍不住想跟人說？",
+        "4": "今天卡在哪裡，後來怎麼過的？",
+        "5": "有什麼事做完之後感覺還不錯？",
+        "6": "今天學到最有趣的一件事是？",
+        "7": "有沒有讓你想繼續探索的東西？",
+        "8": "今天有沒有讓你小小驚訝的瞬間？",
+        "9": "最想記住今天的哪個片刻？",
+        "10": "你今天做了什麼「過去的你」做不到的事？",
+        "11": "今天有什麼事想明天繼續？",
+        "12": "有沒有什麼比想像中簡單的事？",
+        "13": "今天的練習，你給自己打幾分？為什麼？",
+        "14": "如果今天是一個表情符號，你會選哪個？",
+        "15": "今天有沒有什麼事讓你笑了？",
+        "16": "有什麼事做到一半，還想繼續做？",
+        "17": "今天的你和昨天的你，有什麼不一樣？",
+        "18": "有沒有什麼事，做了之後覺得「還好有做」？",
+        "19": "今天有沒有碰到讓你印象深刻的人或事？",
+        "20": "有什麼事做起來比你預期的還好玩？",
+        "21": "今天你最專注的時刻是？",
+        "22": "如果要把今天濃縮成一個畫面，是哪個？",
+        "23": "有什麼小事讓你覺得今天沒白費？",
+        "24": "今天的練習，有沒有讓你想起什麼以前的事？"
+      },
+      "validation_media_max": "最多只能上傳3張圖片",
+      "validation_tags_required": "請至少選擇一個標籤"
     },
     "checkInList": {
       "empty": "還沒有打卡紀錄",
@@ -6239,6 +6275,8 @@
       "anonymous": "匿名",
       "placeholder": "寫留言...",
       "edit_placeholder": "編輯留言...",
+      "edit": "編輯",
+      "delete": "刪除",
       "show_more": "顯示更多留言",
       "show_less": "顯示較少"
     },
@@ -6431,7 +6469,10 @@
       "copy_description": "你可以依照自己的需求調整內容，或直接開始進行。",
       "start": "開始主題實踐",
       "edit": "編輯內容",
-      "back_home": "回到主頁"
+      "back_home": "回到主頁",
+      "progress": "完成規劃已是踏出第一步，已為你推進 20% 進度！",
+      "next": "期待你的第一次打卡分享！",
+      "countdown": "{count} 秒後自動跳轉"
     },
     "practiceSummary": {
       "title": "實踐總結",

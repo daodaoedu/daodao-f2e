@@ -9,6 +9,8 @@ interface ICheckInDateButtonProps {
   index: number;
   checkIns: Record<string, ICheckInDisplayData>;
   activeCheckInId: string;
+  /** 目前打卡的日期（yyyy-MM-dd），優先用日期比對以支援同日多筆打卡 */
+  activeDate?: string;
   onSelect: (checkInId: string) => void;
 }
 
@@ -29,11 +31,14 @@ export const CheckInDateButton = ({
   index,
   checkIns,
   activeCheckInId,
+  activeDate,
   onSelect,
 }: ICheckInDateButtonProps) => {
   const t = useMobileTranslation("mobile.checkInList");
   const hasCheckIn = item.hasCheckIn ?? !!checkIns[item.id];
-  const isActive = hasCheckIn && item.id === activeCheckInId;
+  // 優先用日期比對（支援同日多筆打卡切換仍高亮），否則降級為 ID 比對
+  const isActive =
+    hasCheckIn && (activeDate ? item.date === activeDate : item.id === activeCheckInId);
 
   // 計算打卡次數對應的透明度
   const checkInCount = item.checkInCount ?? (hasCheckIn ? 1 : 0);

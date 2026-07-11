@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useCallback } from "react";
 import { Text, TextArea, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
@@ -8,12 +9,14 @@ const MAX_LENGTH = 600;
 interface IDescriptionFieldProps {
   value: string;
   onChange: (text: string) => void;
+  /** 標題與輸入框之間插入的內容（例如反思提問卡片），對齊 product 的 beforeTextarea */
+  beforeTextArea?: ReactNode;
 }
 
 /**
  * 描述輸入欄位組件 (Mobile)
  */
-export const DescriptionField = ({ value, onChange }: IDescriptionFieldProps) => {
+export const DescriptionField = ({ value, onChange, beforeTextArea }: IDescriptionFieldProps) => {
   const t = useMobileTranslation("mobile.checkIn");
   const handleChange = useCallback(
     (text: string) => {
@@ -33,6 +36,7 @@ export const DescriptionField = ({ value, onChange }: IDescriptionFieldProps) =>
           {value.length}/{MAX_LENGTH}
         </Text>
       </XStack>
+      {beforeTextArea}
       <TextArea
         size="$4"
         placeholder={t("description_placeholder")}

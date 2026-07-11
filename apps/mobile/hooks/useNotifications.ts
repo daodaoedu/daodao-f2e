@@ -2,6 +2,7 @@ import {
   markAllNotificationsRead as apiMarkAllNotificationsRead,
   markNotificationRead as apiMarkNotificationRead,
   respondConnectionRequest as apiRespondConnectionRequest,
+  extractApiErrorMessage,
   getNotifications,
 } from "@daodao/api";
 import useSWR, { mutate as globalMutate } from "swr";
@@ -56,17 +57,6 @@ type ApiNotificationItem = Record<string, unknown> & {
 // ============================================================================
 
 const NOTIFICATIONS_KEY = "/notifications";
-
-function getErrorMessage(error: unknown): string {
-  if (typeof error === "object" && error !== null && "message" in error) {
-    const message = (error as { message?: unknown }).message;
-    if (typeof message === "string" && message.length > 0) {
-      return message;
-    }
-  }
-
-  return "Request failed";
-}
 
 function getString(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;
@@ -139,7 +129,7 @@ export function useNotifications(params?: { limit?: number }) {
       const response = await getNotifications({ limit });
 
       if (response.error) {
-        throw new Error(getErrorMessage(response.error));
+        throw new Error(extractApiErrorMessage(response.error, "載入通知失敗"));
       }
 
       return {
@@ -176,7 +166,7 @@ export async function markNotificationRead(id: number) {
   const response = await apiMarkNotificationRead(id);
 
   if (response.error) {
-    throw new Error(getErrorMessage(response.error));
+    throw new Error(extractApiErrorMessage(response.error, "標記已讀失敗"));
   }
 
   return response.data;
@@ -186,13 +176,14 @@ export async function markAllNotificationsRead() {
   const response = await apiMarkAllNotificationsRead();
 
   if (response.error) {
-    throw new Error(getErrorMessage(response.error));
+    throw new Error(extractApiErrorMessage(response.error, "全部標記已讀失敗"));
   }
 
   return response.data;
 }
 
 export async function respondConnectionRequest(requestId: string, action: "accept" | "reject") {
+  // connection service throws on !ok with server message
   return apiRespondConnectionRequest(requestId, action);
 }
 

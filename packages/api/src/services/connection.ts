@@ -1,4 +1,5 @@
 import { getApiBaseUrl, unauthorizedHandler } from "../client";
+import { extractApiErrorMessage } from "./check-in-form-data";
 import { ApiError } from "../errors";
 
 // ============================================================================
@@ -74,7 +75,7 @@ export const sendConnectionRequest = async (
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, err?.error?.message ?? "發送連結請求失敗");
+    throw new ApiError(res.status, extractApiErrorMessage(err, "發送連結請求失敗"));
   }
   return res.json();
 };
@@ -94,7 +95,7 @@ export const respondConnectionRequest = async (
   );
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message ?? "操作失敗");
+    throw new Error(extractApiErrorMessage(err, "操作失敗"));
   }
 };
 
@@ -105,7 +106,7 @@ export const withdrawConnectionRequest = async (requestId: string): Promise<void
   );
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message ?? "撤回失敗");
+    throw new Error(extractApiErrorMessage(err, "撤回失敗"));
   }
 };
 
@@ -116,7 +117,7 @@ export const disconnectUser = async (userId: string): Promise<void> => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message ?? "解除連結失敗");
+    throw new Error(extractApiErrorMessage(err, "解除連結失敗"));
   }
 };
 

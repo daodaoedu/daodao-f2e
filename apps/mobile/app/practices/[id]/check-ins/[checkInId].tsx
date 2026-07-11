@@ -1,23 +1,37 @@
 import { usePracticeCheckIns, useUpdatePracticeCheckIn } from "@daodao/api";
+import DialogOutlineSvg from "@daodao/assets/images/icon/dialog-outline.svg";
 import {
   ArrowLeft,
   BarChart3,
   ChevronLeft,
   ChevronRight,
-  MessageCircle,
+  Flag,
   MoreHorizontal,
   Pencil,
   Share2,
+  X as XIcon,
 } from "@tamagui/lucide-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Modal, Pressable } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Alert,
+  Image,
+  Linking,
+  Modal,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  Pressable,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, Spinner, Text, TextArea, View, XStack, YStack } from "tamagui";
-import { ShareCheckInSheet } from "@/components";
+import { ScrollView, Spinner, Text, View, XStack, YStack } from "tamagui";
+import { CheckInSheet, ShareCheckInSheet } from "@/components";
+import type { ICheckInData } from "@/components/CheckInSheet";
 import { CheckInDateSelector } from "@/components/check-in/date-selector";
 import { CheckInCard } from "@/components/check-in/display/check-in-card";
+import { DescriptionField } from "@/components/check-in/form/components/description-field";
+import { MediaUploadField } from "@/components/check-in/form/components/media-upload-field";
 import { MoodSelector } from "@/components/check-in/form/components/mood-selector";
+import { ReflectionQuestion } from "@/components/check-in/form/components/reflection-question";
 import { TagSelector } from "@/components/check-in/form/components/tag-selector";
 import type { ICheckInDate, ICheckInDisplayData } from "@/components/check-in/types";
 import { CommentSheet } from "@/components/persona/CommentSheet";
@@ -36,7 +50,7 @@ import type { ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
 import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
 import { useComments } from "@/hooks/useComments";
-import { usePractice } from "@/hooks/usePractices";
+import { useCheckIn, usePractice } from "@/hooks/usePractices";
 import {
   removeReaction,
   upsertReaction,
@@ -44,6 +58,9 @@ import {
   useReactionsList,
 } from "@/hooks/useReactions";
 import { useMobileTranslation } from "@/i18n";
+import { useAuth } from "@/providers/AuthProvider";
+import { extractApiErrorMessage, runWithErrorAlert } from "@/utils/api-error";
+import { createReactNativeFormDataFile } from "@/utils/form-data-file";
 
 type CheckInDetailRecord = {
   id: string | number;
@@ -105,6 +122,9 @@ const normalizeMood = (mood?: ApiMoodType | MoodType | null): MoodType | null =>
   return MOOD_OPTIONS.some((option) => option.id === mood) ? (mood as MoodType) : null;
 };
 
+/** 檢舉表單（對齊 product 的 tally 連結） */
+const TALLY_REPORT_URL = "https://tally.so/r/BzGQy4";
+
 const getImages = (checkIn?: CheckInDetailRecord) => {
   return (
     checkIn?.imageUrls ??
@@ -114,19 +134,6 @@ const getImages = (checkIn?: CheckInDetailRecord) => {
     []
   ).filter(Boolean);
 };
-
-function getErrorMessage(error: unknown, fallback: string) {
-  if (error instanceof Error && error.message) return error.message;
-  if (typeof error === "object" && error !== null && "message" in error) {
-    const message = (error as { message?: unknown }).message;
-    if (typeof message === "string" && message) return message;
-  }
-  if (typeof error === "object" && error !== null && "error" in error) {
-    const nested = (error as { error?: { message?: unknown } }).error;
-    if (typeof nested?.message === "string" && nested.message) return nested.message;
-  }
-  return fallback;
-}
 
 function EditCheckInModal({
   visible,
@@ -141,6 +148,7 @@ function EditCheckInModal({
     mood: MoodType;
     note: string;
     tags: string[];
+    media: string[];
     existingImageUrls: string[];
   }) => Promise<void>;
 }) {
@@ -148,6 +156,8 @@ function EditCheckInModal({
   const [mood, setMood] = useState<MoodType | null>(null);
   const [note, setNote] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [newMedia, setNewMedia] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -155,6 +165,8 @@ function EditCheckInModal({
     setMood(normalizeMood(checkIn.mood));
     setNote(checkIn.note ?? "");
     setTags(checkIn.tags ?? []);
+    setExistingImages(getImages(checkIn));
+    setNewMedia([]);
   }, [checkIn, visible]);
 
   const handleSave = async () => {
@@ -169,7 +181,8 @@ function EditCheckInModal({
         mood,
         note,
         tags,
-        existingImageUrls: getImages(checkIn),
+        media: newMedia,
+        existingImageUrls: existingImages,
       });
       onClose();
     } finally {
@@ -199,22 +212,17 @@ function EditCheckInModal({
           <ScrollView flex={1} contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
             <MoodSelector value={mood} onChange={setMood} />
             <TagSelector value={tags} onChange={setTags} />
-            <YStack gap="$2">
-              <Text fontSize={16} fontWeight="500" color={colors.text.dark}>
-                {t("noteLabel")}
-              </Text>
-              <TextArea
-                size="$4"
-                value={note}
-                onChangeText={setNote}
-                placeholder={t("notePlaceholder")}
-                numberOfLines={5}
-                maxLength={600}
-              />
-              <Text fontSize={12} color="$color" opacity={0.5} textAlign="right">
-                {note.length}/600
-              </Text>
-            </YStack>
+            <DescriptionField
+              value={note}
+              onChange={setNote}
+              beforeTextArea={<ReflectionQuestion />}
+            />
+            <MediaUploadField
+              value={newMedia}
+              onChange={setNewMedia}
+              existingImages={existingImages}
+              onExistingImagesChange={setExistingImages}
+            />
           </ScrollView>
         </YStack>
       </SafeAreaView>
@@ -230,6 +238,9 @@ export default function CheckInDetailScreen() {
   const tCheckIn = useMobileTranslation("mobile.checkIn");
   const tPractice = useMobileTranslation("mobile.practiceDetail");
   const { practice, isLoading: isPracticeLoading, error: practiceError } = usePractice(id);
+  const { user: currentUser } = useAuth();
+  const isOwner = Boolean(practice?.user?.id && practice.user.id === currentUser?.id);
+  const { checkIn: submitCheckIn } = useCheckIn();
   const {
     data: checkInsData,
     error: checkInsError,
@@ -241,6 +252,27 @@ export default function CheckInDetailScreen() {
   const [showComments, setShowComments] = useState(false);
   const [showBrowseActivity, setShowBrowseActivity] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [showCheckInSheet, setShowCheckInSheet] = useState(false);
+  // 固定覆蓋式 nav：向下捲動隱藏、向上/回頂顯示（對齊 product）
+  const [navHidden, setNavHidden] = useState(false);
+  const [navHeight, setNavHeight] = useState(140);
+  const lastScrollY = useRef(0);
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const y = event.nativeEvent.contentOffset.y;
+      const delta = y - lastScrollY.current;
+      if (y <= navHeight) {
+        setNavHidden(false);
+      } else if (delta > 6) {
+        setNavHidden(true);
+      } else if (delta < -6) {
+        setNavHidden(false);
+      }
+      lastScrollY.current = y;
+    },
+    [navHeight]
+  );
 
   const checkInIdStr = String(checkInId);
   const {
@@ -255,15 +287,20 @@ export default function CheckInDetailScreen() {
 
   const handleReactionToggle = useCallback(
     async (type: ReactionTypeType) => {
-      const isSelected = currentUserReaction === type;
-      if (isSelected) {
-        await removeReaction("checkin", checkInIdStr);
-      } else {
-        await upsertReaction("checkin", checkInIdStr, type);
-      }
-      await mutateReactions();
+      await runWithErrorAlert(
+        async () => {
+          const isSelected = currentUserReaction === type;
+          if (isSelected) {
+            await removeReaction("checkin", checkInIdStr);
+          } else {
+            await upsertReaction("checkin", checkInIdStr, type);
+          }
+          await mutateReactions();
+        },
+        { title: t("errorTitle"), fallbackMessage: t("updateFailed") }
+      );
     },
-    [currentUserReaction, checkInIdStr, mutateReactions]
+    [currentUserReaction, checkInIdStr, mutateReactions, t]
   );
 
   const checkIns = ((checkInsData as CheckInsResponse | undefined)?.data ?? []) as
@@ -364,10 +401,27 @@ export default function CheckInDetailScreen() {
     router.push(`/practices/${id}/check-ins/${targetCheckInId}` as never);
   };
 
+  const handleCheckIn = async (data: ICheckInData) => {
+    const result = await submitCheckIn({
+      practiceId: id,
+      note: data.description,
+      mood: data.mood,
+      tags: data.tags,
+      mediaUris: data.media,
+    });
+    if (result.success) {
+      await mutateCheckIns();
+    } else if (result.error) {
+      Alert.alert(t("errorTitle"), result.error);
+    }
+    return result;
+  };
+
   const handleUpdateCheckIn = async (values: {
     mood: MoodType;
     note: string;
     tags: string[];
+    media: string[];
     existingImageUrls: string[];
   }) => {
     try {
@@ -375,13 +429,13 @@ export default function CheckInDetailScreen() {
         mood: mapMoodTypeToApiMood(values.mood),
         tags: values.tags,
         description: values.note,
-        media: [],
+        media: values.media.map((uri, index) => createReactNativeFormDataFile(uri, index)),
         existingImageUrls: values.existingImageUrls,
       });
       await mutateCheckIns();
       Alert.alert(t("successTitle"), t("updateSuccess"));
     } catch (updateError) {
-      Alert.alert(t("errorTitle"), getErrorMessage(updateError, t("updateFailed")));
+      Alert.alert(t("errorTitle"), extractApiErrorMessage(updateError, t("updateFailed")));
       throw updateError;
     }
   };
@@ -442,14 +496,23 @@ export default function CheckInDetailScreen() {
           checkIns={checkInsRecord}
           practiceId={id}
           activeCheckInId={String(checkInId)}
+          activeDate={toDateKey(checkIn)}
           onCheckInSelect={goToCheckIn}
           title={t("title")}
           onClose={goToPractice}
+          hidden={navHidden}
+          onHeightChange={setNavHeight}
         />
 
         <ScrollView
           flex={1}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 }}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingTop: navHeight + 16,
+            paddingBottom: 40,
+          }}
         >
           {/* 三點選單（編輯 + 瀏覽活動），對齊 product 卡片右上角 */}
           <XStack justifyContent="flex-end" marginBottom="$2">
@@ -481,23 +544,43 @@ export default function CheckInDetailScreen() {
                   elevation={5}
                   minWidth={160}
                 >
-                  <Button
-                    chromeless
-                    onPress={() => {
-                      setShowMenu(false);
-                      setShowEditModal(true);
-                    }}
-                    justifyContent="flex-start"
-                    paddingHorizontal="$4"
-                    paddingVertical="$3"
-                  >
-                    <XStack gap="$3" alignItems="center">
-                      <Pencil size={18} color={colors.text.dark} />
-                      <Text fontSize={14} color={colors.text.dark}>
-                        {t("editTitle")}
-                      </Text>
-                    </XStack>
-                  </Button>
+                  {isOwner ? (
+                    <Button
+                      chromeless
+                      onPress={() => {
+                        setShowMenu(false);
+                        setShowEditModal(true);
+                      }}
+                      justifyContent="flex-start"
+                      paddingHorizontal="$4"
+                      paddingVertical="$3"
+                    >
+                      <XStack gap="$3" alignItems="center">
+                        <Pencil size={18} color={colors.text.dark} />
+                        <Text fontSize={14} color={colors.text.dark}>
+                          {t("editTitle")}
+                        </Text>
+                      </XStack>
+                    </Button>
+                  ) : (
+                    <Button
+                      chromeless
+                      onPress={() => {
+                        setShowMenu(false);
+                        Linking.openURL(TALLY_REPORT_URL);
+                      }}
+                      justifyContent="flex-start"
+                      paddingHorizontal="$4"
+                      paddingVertical="$3"
+                    >
+                      <XStack gap="$3" alignItems="center">
+                        <Flag size={18} color={colors.text.dark} />
+                        <Text fontSize={14} color={colors.text.dark}>
+                          {tPractice("report")}
+                        </Text>
+                      </XStack>
+                    </Button>
+                  )}
                   <Button
                     chromeless
                     onPress={() => {
@@ -529,6 +612,8 @@ export default function CheckInDetailScreen() {
             tags={tags}
             images={images}
             scrollable
+            showEmptyHint={isOwner}
+            onImagePress={(index) => setLightboxIndex(index)}
             afterTitle={
               sameDayTotal > 1 ? (
                 <XStack alignItems="center" justifyContent="center" gap="$4" marginBottom="$3">
@@ -578,7 +663,7 @@ export default function CheckInDetailScreen() {
                   onPress={() => setShowComments(true)}
                 >
                   <XStack alignItems="center" gap="$1.5" justifyContent="center">
-                    <MessageCircle size={20} color={colors.text.dark} />
+                    <DialogOutlineSvg width={22} height={22} color={colors.text.dark} />
                     {comments.length > 0 && (
                       <Text fontSize={14} fontWeight="500" color={colors.text.dark}>
                         {comments.length}
@@ -622,6 +707,30 @@ export default function CheckInDetailScreen() {
             </Button>
           </YStack>
         </ScrollView>
+
+        {/* 本人可從打卡詳情再打卡（固定底部），對齊 product 的 footer CheckInButton */}
+        {isOwner && (
+          <YStack paddingHorizontal="$5" paddingVertical="$4" backgroundColor={colors.logo.cyan}>
+            <Button
+              size="$5"
+              backgroundColor={colors.logo.orange}
+              borderRadius="$full"
+              pressStyle={{ opacity: 0.85 }}
+              onPress={() => setShowCheckInSheet(true)}
+            >
+              <Text color={colors.basic.white} fontWeight="600" fontSize={16}>
+                {tCheckIn("title")}
+              </Text>
+            </Button>
+          </YStack>
+        )}
+
+        <CheckInSheet
+          open={showCheckInSheet}
+          onOpenChange={setShowCheckInSheet}
+          practice={practice}
+          onCheckIn={handleCheckIn}
+        />
         <EditCheckInModal
           visible={showEditModal}
           checkIn={checkIn}
@@ -651,6 +760,38 @@ export default function CheckInDetailScreen() {
           practice={practice}
           streakCount={(practice.currentStreak ?? 0) + 1}
         />
+        {/* 圖片 lightbox（點擊打卡圖片全螢幕檢視，對齊 product 的 ImageLightbox） */}
+        <Modal
+          visible={lightboxIndex !== null}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setLightboxIndex(null)}
+        >
+          <Pressable
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0,0,0,0.9)",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onPress={() => setLightboxIndex(null)}
+          >
+            {lightboxIndex !== null && images[lightboxIndex] && (
+              <Image
+                source={{ uri: images[lightboxIndex] }}
+                style={{ width: "100%", height: "80%" }}
+                resizeMode="contain"
+              />
+            )}
+            <Pressable
+              style={{ position: "absolute", top: 60, right: 20, padding: 8 }}
+              onPress={() => setLightboxIndex(null)}
+              accessibilityLabel={tCommon("close")}
+            >
+              <XIcon size={28} color={colors.basic.white} />
+            </Pressable>
+          </Pressable>
+        </Modal>
       </YStack>
     </SafeAreaView>
   );

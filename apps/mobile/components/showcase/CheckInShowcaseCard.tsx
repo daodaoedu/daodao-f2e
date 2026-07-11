@@ -25,6 +25,7 @@ import {
   useReactionsList,
 } from "@/hooks/useReactions";
 import { useMobileTranslation } from "@/i18n";
+import { runWithErrorAlert } from "@/utils/api-error";
 
 const TALLY_REPORT_URL = "https://tally.so/r/BzGQy4";
 
@@ -65,15 +66,20 @@ export function CheckInShowcaseCard({
 
   const handleReactionToggle = useCallback(
     async (type: ReactionTypeType) => {
-      const isSelected = currentUserReaction === type;
-      if (isSelected) {
-        await removeReaction("checkin", id);
-      } else {
-        await upsertReaction("checkin", id, type);
-      }
-      await mutateReactions();
+      await runWithErrorAlert(
+        async () => {
+          const isSelected = currentUserReaction === type;
+          if (isSelected) {
+            await removeReaction("checkin", id);
+          } else {
+            await upsertReaction("checkin", id, type);
+          }
+          await mutateReactions();
+        },
+        { title: t("errorTitle"), fallbackMessage: t("operationFailed") }
+      );
     },
-    [currentUserReaction, id, mutateReactions]
+    [currentUserReaction, id, mutateReactions, t]
   );
 
   const frontendMood = mapApiMoodToMoodType(mood);

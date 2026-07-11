@@ -8,33 +8,53 @@ import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 
 interface IMediaUploadFieldProps {
+  /** 新選取的本地圖片 uri */
   value: string[];
   onChange: (uris: string[]) => void;
+  /** 既有圖片 URL（編輯時預填），可移除，對齊 product 的 existingImages */
+  existingImages?: string[];
+  onExistingImagesChange?: (urls: string[]) => void;
 }
 
 /**
  * 媒體上傳欄位組件 (Mobile)
+ * 支援既有圖片（編輯）+ 新選取圖片，總數上限 CHECK_IN_MAX_IMAGES
  */
-export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) => {
+export const MediaUploadField = ({
+  value,
+  onChange,
+  existingImages = [],
+  onExistingImagesChange,
+}: IMediaUploadFieldProps) => {
   const t = useMobileTranslation("mobile.checkIn");
+  const total = existingImages.length + value.length;
+
   const handlePickImage = useCallback(async () => {
-    if (value.length >= CHECK_IN_MAX_IMAGES) return;
+    const remaining = CHECK_IN_MAX_IMAGES - existingImages.length - value.length;
+    if (remaining <= 0) return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
       // Images only: videos cannot be previewed with the Image component
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
-      selectionLimit: CHECK_IN_MAX_IMAGES - value.length,
+      selectionLimit: remaining,
       quality: 0.8,
     });
 
     if (!result.canceled) {
       const newMedia = result.assets.map((asset) => asset.uri);
-      onChange([...value, ...newMedia].slice(0, CHECK_IN_MAX_IMAGES));
+      onChange([...value, ...newMedia].slice(0, remaining).slice(0, CHECK_IN_MAX_IMAGES));
     }
-  }, [value, onChange]);
+  }, [value, onChange, existingImages.length]);
 
-  const handleRemoveMedia = useCallback(
+  const handleRemoveExisting = useCallback(
+    (index: number) => {
+      onExistingImagesChange?.(existingImages.filter((_, i) => i !== index));
+    },
+    [existingImages, onExistingImagesChange]
+  );
+
+  const handleRemoveNew = useCallback(
     (index: number) => {
       onChange(value.filter((_, i) => i !== index));
     },
@@ -48,23 +68,15 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
           {t("upload_images")}
         </Text>
         <Text fontSize={14} color={colors.basic["400"]}>
-          {t("uploaded_count", { count: value.length, total: CHECK_IN_MAX_IMAGES })}
+          {t("uploaded_count", { count: total, total: CHECK_IN_MAX_IMAGES })}
         </Text>
       </XStack>
 
       <XStack gap="$3" flexWrap="wrap">
-        {/* 已上傳的圖片預覽 */}
-        {value.map((uri, index) => (
-          <View key={uri} style={styles.mediaPreview}>
-            <View
-              width={80}
-              height={80}
-              borderRadius="$sm"
-              overflow="hidden"
-              borderWidth={2}
-              borderColor={colors.basic["200"]}
-              backgroundColor={colors.basic["200"]}
-            >
+        {/* 既有圖片（編輯時） */}
+        {existingImages.map((uri, index) => (
+          <View key={`existing-${uri}`} style={styles.mediaPreview}>
+            <View style={styles.thumb}>
               <Image
                 source={{ uri }}
                 width={80}
@@ -75,7 +87,30 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
             </View>
             <Pressable
               style={styles.removeButton}
-              onPress={() => handleRemoveMedia(index)}
+              onPress={() => handleRemoveExisting(index)}
+              accessibilityLabel={t("remove_image")}
+              accessibilityRole="button"
+            >
+              <X size={12} color={colors.basic.white} />
+            </Pressable>
+          </View>
+        ))}
+
+        {/* 新選取的圖片預覽 */}
+        {value.map((uri, index) => (
+          <View key={`new-${uri}`} style={styles.mediaPreview}>
+            <View style={styles.thumb}>
+              <Image
+                source={{ uri }}
+                width={80}
+                height={80}
+                resizeMode="cover"
+                alt={t("image_preview_alt", { number: existingImages.length + index + 1 })}
+              />
+            </View>
+            <Pressable
+              style={styles.removeButton}
+              onPress={() => handleRemoveNew(index)}
               accessibilityLabel={t("remove_image")}
               accessibilityRole="button"
             >
@@ -85,7 +120,7 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
         ))}
 
         {/* 上傳按鈕 */}
-        {value.length < CHECK_IN_MAX_IMAGES && (
+        {total < CHECK_IN_MAX_IMAGES && (
           <Pressable style={styles.uploadButton} onPress={handlePickImage}>
             <Camera size={24} color={colors.basic["400"]} />
             <Text fontSize={12} color={colors.basic["400"]}>
@@ -101,6 +136,15 @@ export const MediaUploadField = ({ value, onChange }: IMediaUploadFieldProps) =>
 const styles = StyleSheet.create({
   mediaPreview: {
     position: "relative",
+  },
+  thumb: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: colors.basic["200"],
+    backgroundColor: colors.basic["200"],
   },
   removeButton: {
     // 對齊 product：半透明 teal、內縮於預覽圖右上角

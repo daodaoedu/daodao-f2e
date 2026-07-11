@@ -31,7 +31,7 @@ export const createCreatePracticeSchema = (
     icon: z.string().optional(),
 
     // Step 5: 隱私設定
-    privacy_status: z.enum(["private", "public", "delayed"]).default("private"),
+    privacy_status: z.enum(["private", "public", "delayed"]).default("public"),
   });
 
 export const createPracticeSchema = createCreatePracticeSchema((key, values) => {
@@ -63,8 +63,8 @@ const createPracticeSchemaForType = z.object({
   color: z.string().optional(),
   icon: z.string().optional(),
 
-  // Step 5: 隱私設定
-  privacy_status: z.enum(["private", "public", "delayed"]).default("private"),
+  // Step 5: 隱私設定（對齊 product 預設公開）
+  privacy_status: z.enum(["private", "public", "delayed"]).default("public"),
 });
 
 export type CreatePracticeInputType = z.infer<typeof createPracticeSchemaForType>;
@@ -80,7 +80,7 @@ export const defaultCreatePracticeValues: CreatePracticeInputType = {
   tags: [],
   color: undefined,
   icon: undefined,
-  privacy_status: "private",
+  privacy_status: "public",
 };
 
 export interface IPracticeTemplate {

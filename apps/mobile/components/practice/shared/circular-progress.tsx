@@ -68,7 +68,7 @@ export const CircularProgress = ({
       </Svg>
       {showText && (
         <View style={styles.textContainer}>
-          <Text fontSize={size > 50 ? 16 : 12} fontWeight="600" color={textColor}>
+          <Text fontSize={size > 50 ? 18 : 12} fontWeight="600" color={textColor}>
             {Math.round(value)}%
           </Text>
         </View>

@@ -19,8 +19,8 @@ const GLOBALS_CSS = path.resolve(__dirname, "../../ui/src/styles/globals.css");
 
 /**
  * token 路徑 → globals.css 變數名（去掉 `--`）。
- * 只列語意上 1:1 明確對應者；quiz/practice/basic.50/background.lightCyan
- * /border.lightCyan 等 mobile 專屬 token 不在此，不驗證。
+ * 只列語意上 1:1 明確對應者；quiz/practice/basic.50/border.lightCyan
+ * 等 mobile 專屬 token 不在此，不驗證。
  */
 const CSS_TOKEN_MAP: Record<string, string> = {
   "primary.palest": "primary-palest",
@@ -45,6 +45,7 @@ const CSS_TOKEN_MAP: Record<string, string> = {
   "background.gray": "bg-gray",
   "background.veryLightGray": "very-light-gray",
   "background.veryLightBlue": "very-light-blue",
+  "background.lightCyan": "light-cyan",
   "text.dark": "text-dark",
   "text.light": "white",
   "text.muted": "light-gray",

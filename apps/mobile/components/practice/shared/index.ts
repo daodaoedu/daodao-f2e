@@ -5,3 +5,4 @@ export { ExecutionTimingCard } from "./execution-timing-card";
 export { PracticeOverviewCard } from "./practice-overview-card";
 export { RandomPracticesSection } from "./random-practices-section";
 export { type IResourceCardData, ResourceCard, type ResourceCardProps } from "./resource-card";
+export { ResourceGrid } from "./resource-grid";

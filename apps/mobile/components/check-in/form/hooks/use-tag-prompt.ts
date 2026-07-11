@@ -1,23 +1,25 @@
 import { getTagPromptsByTags } from "@daodao/api";
 import type { UseFormReturn } from "react-hook-form";
+import { useMobileI18n } from "@/i18n";
 import type { CheckInFormValuesType } from "../schema";
-
-// Mobile default locale (TODO: integrate with i18n when available)
-const DEFAULT_LOCALE = "zh-TW";
 
 /**
  * Hook 用於處理標籤引導句的獲取和更新 description (Mobile)
  */
 export const useTagPrompt = (form: UseFormReturn<CheckInFormValuesType>) => {
+  const { locale } = useMobileI18n();
+
   /**
    * 取得標籤引導句並更新 description
    */
   const fetchAndAddPrompt = async (tagName: string) => {
     try {
+      // API 需要 "en-US" 格式，i18n 使用 "en"，需轉換（對齊 product）
+      const apiLocale = locale === "en" ? "en-US" : "zh-TW";
       const response = await getTagPromptsByTags({
         tags: tagName,
         usageType: "practice_checkin",
-        locale: DEFAULT_LOCALE,
+        locale: apiLocale,
       });
 
       const promptsData = response.data?.data;

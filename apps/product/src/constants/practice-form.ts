@@ -64,10 +64,12 @@ export type DurationDaysNumber = (typeof DurationDaysNumber)[keyof typeof Durati
 
 /**
  * API 的 practiceTimePeriods 映射到 executionTiming
+ * （含 commute，與 OpenAPI practiceTimePeriods 一致）
  */
 export const PracticeTimePeriodToExecutionTimingMap: Record<string, ExecutionTiming> = {
   morning: ExecutionTiming.morning,
   afternoon: ExecutionTiming.lunchBreak,
+  commute: ExecutionTiming.commute,
   evening: ExecutionTiming.evening,
   night: ExecutionTiming.beforeSleep,
 } as const;
@@ -111,10 +113,13 @@ export const ExecutionTimingToPracticeTimePeriodMap: Record<
  */
 export const mapExecutionTimingToPracticeTimePeriods = (
   executionTiming: ExecutionTiming[]
-): ("morning" | "afternoon" | "evening" | "night")[] => {
+): ("morning" | "afternoon" | "evening" | "night" | "commute")[] => {
   return executionTiming
     .map((timing) => ExecutionTimingToPracticeTimePeriodMap[timing])
-    .filter((period): period is "morning" | "afternoon" | "evening" | "night" => period !== null);
+    .filter(
+      (period): period is "morning" | "afternoon" | "evening" | "night" | "commute" =>
+        period != null
+    );
 };
 
 /**

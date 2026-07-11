@@ -1,16 +1,12 @@
-import {
-  BarChart3,
-  ChevronDown,
-  ChevronLeft,
-  ChevronUp,
-  Flag,
-  MessageCircle,
-  MoreHorizontal,
-  Tag,
-  Telescope,
-} from "@tamagui/lucide-icons";
+import { useCopyPractice } from "@daodao/api";
+import ChartColumnIncreasingSvg from "@daodao/assets/images/icon/chart-column-increasing.svg";
+import DialogOutlineSvg from "@daodao/assets/images/icon/dialog-outline.svg";
+import FlagOutlineSvg from "@daodao/assets/images/icon/flag-outline.svg";
+import TagSolidSvg from "@daodao/assets/images/icon/tag-solid.svg";
+import TelescopeSvg from "@daodao/assets/images/icon/telescope.svg";
+import { ChevronDown, ChevronLeft, ChevronUp, Copy, MoreHorizontal } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Alert,
   Image,
@@ -24,14 +20,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, Text, View, XStack, YStack } from "tamagui";
 import { CheckInList } from "@/components";
+import { CircularProgress } from "@/components/practice/shared/circular-progress";
+import { ExecutionDurationCard } from "@/components/practice/shared/execution-duration-card";
+import { ExecutionTimingCard } from "@/components/practice/shared/execution-timing-card";
+import { LottieEmoji } from "@/components/reactions/LottieEmoji";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  PICKER_REACTIONS,
-  REACTION_CONFIG,
-  type ReactionTypeType,
-} from "@/constants/reaction-type";
+import { PICKER_REACTIONS, type ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
 import { useComments } from "@/hooks/useComments";
@@ -44,6 +40,7 @@ import {
   useReactionsList,
 } from "@/hooks/useReactions";
 import { useMobileTranslation } from "@/i18n";
+import { runWithErrorAlert } from "@/utils/api-error";
 import { BrowseActivitySheet } from "./BrowseActivitySheet";
 import { CommentSection } from "./CommentSection";
 import { type PracticeTab, PracticeTabBar } from "./PracticeTabBar";
@@ -75,23 +72,29 @@ const TALLY_REPORT_URL = "https://tally.so/r/BzGQy4";
 export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewProps) {
   const router = useRouter();
   const t = useMobileTranslation("mobile.practiceDetail");
+  // 複製 / 也來練習 相關文案在 practice namespace（對齊 product）
+  const practiceT = useMobileTranslation("practice");
   const {
     id,
     title,
     status,
     description,
     practiceAction,
+    startDate,
+    endDate,
     tags,
     frequencyMinDays,
     frequencyMaxDays,
     sessionDurationMinutes,
     user,
   } = practice;
+  const { copyPractice } = useCopyPractice();
 
   const [activeTab, setActiveTab] = useState<PracticeTab>("comments");
   const [menuOpen, setMenuOpen] = useState(false);
   const [infoExpanded, setInfoExpanded] = useState(false);
   const [browseActivityOpen, setBrowseActivityOpen] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
 
   // ── Data ──
   const {
@@ -108,15 +111,20 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
   // ── Handlers ──
   const handleReactionToggle = useCallback(
     async (type: ReactionTypeType) => {
-      const isSelected = currentUserReaction === type;
-      if (isSelected) {
-        await removeReaction("practice", id);
-      } else {
-        await upsertReaction("practice", id, type);
-      }
-      await mutateReactions();
+      await runWithErrorAlert(
+        async () => {
+          const isSelected = currentUserReaction === type;
+          if (isSelected) {
+            await removeReaction("practice", id);
+          } else {
+            await upsertReaction("practice", id, type);
+          }
+          await mutateReactions();
+        },
+        { title: t("error_title"), fallbackMessage: t("operation_failed") }
+      );
     },
-    [currentUserReaction, id, mutateReactions]
+    [currentUserReaction, id, mutateReactions, t]
   );
 
   const handleToggleFollow = useCallback(async () => {
@@ -143,8 +151,41 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
     setBrowseActivityOpen(true);
   }, []);
 
+  const handleCopyPractice = useCallback(async () => {
+    setMenuOpen(false);
+    if (isCopying) return;
+    try {
+      setIsCopying(true);
+      const result = await copyPractice(id);
+      router.push(`/practices/copy-success?practiceId=${result.id}` as never);
+    } catch {
+      Alert.alert(t("error_title"), practiceT("copy_failed"));
+    } finally {
+      setIsCopying(false);
+    }
+  }, [copyPractice, id, isCopying, router, t, practiceT]);
+
   // ── Derived ──
   const taskStatus = status === "active" ? "in-progress" : "completed";
+
+  // 公開檢視的 prop 沒有 durationDays / progressPercentage，改由起訖日期推導（對齊 owner 卡片呈現）
+  const durationDays = useMemo(() => {
+    if (!startDate || !endDate) return 0;
+    const s = new Date(startDate).getTime();
+    const e = new Date(endDate).getTime();
+    if (Number.isNaN(s) || Number.isNaN(e) || e <= s) return 0;
+    return Math.max(0, Math.ceil((e - s) / (1000 * 60 * 60 * 24)));
+  }, [startDate, endDate]);
+
+  const progress = useMemo(() => {
+    if (status === "completed") return 100;
+    if (!startDate || !endDate) return 0;
+    const s = new Date(startDate).getTime();
+    const e = new Date(endDate).getTime();
+    if (Number.isNaN(s) || Number.isNaN(e) || e <= s) return 0;
+    return Math.min(100, Math.max(0, Math.round(((Date.now() - s) / (e - s)) * 100)));
+  }, [status, startDate, endDate]);
+
   const statusInfo = getStatusConfig(taskStatus);
   const frequency =
     frequencyMinDays === frequencyMaxDays
@@ -182,14 +223,17 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
       : displayReactions.slice(0, PICKER_REACTIONS.length);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background.veryLightGray }}
+      edges={["top"]}
+    >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
           flex={1}
-          backgroundColor="$background"
+          backgroundColor={colors.background.veryLightGray}
           refreshControl={
             <RefreshControl
               refreshing={false}
@@ -212,11 +256,17 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
             <XStack justifyContent="space-between" alignItems="center" marginBottom="$2">
               {statusInfo ? (
                 <Badge
-                  backgroundColor={taskStatus === "completed" ? "#6B7280" : colors.primary.base}
+                  backgroundColor={taskStatus === "completed" ? "#DBF9FF" : colors.primary.base}
+                  borderWidth={taskStatus === "completed" ? 1 : 0}
+                  borderColor={taskStatus === "completed" ? colors.logo.cyan : "transparent"}
                   paddingHorizontal="$2"
                   paddingVertical="$0.5"
                 >
-                  <Text fontSize={12} color="white" fontWeight="500">
+                  <Text
+                    fontSize={12}
+                    color={taskStatus === "completed" ? colors.text.dark : "white"}
+                    fontWeight="500"
+                  >
                     {statusInfo.label}
                   </Text>
                 </Badge>
@@ -249,15 +299,30 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
                   >
                     <Button
                       chromeless
+                      onPress={handleCopyPractice}
+                      disabled={isCopying}
+                      justifyContent="flex-start"
+                      paddingHorizontal="$4"
+                      paddingVertical="$3"
+                    >
+                      <XStack gap="$3" alignItems="center">
+                        <Copy size={18} color="#295E5C" />
+                        <Text fontSize={14} color="#295E5C">
+                          {practiceT("action_copy")}
+                        </Text>
+                      </XStack>
+                    </Button>
+                    <Button
+                      chromeless
                       onPress={handleReport}
                       justifyContent="flex-start"
                       paddingHorizontal="$4"
                       paddingVertical="$3"
                     >
                       <XStack gap="$3" alignItems="center">
-                        <Flag size={18} color="#295E5C" />
+                        <FlagOutlineSvg width={18} height={18} color="#295E5C" />
                         <Text fontSize={14} color="#295E5C">
-                          檢舉
+                          {t("report")}
                         </Text>
                       </XStack>
                     </Button>
@@ -269,8 +334,9 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
                       paddingVertical="$3"
                     >
                       <XStack gap="$3" alignItems="center">
-                        <Telescope
-                          size={18}
+                        <TelescopeSvg
+                          width={18}
+                          height={18}
                           color={isFollowing ? colors.primary.base : "#295E5C"}
                         />
                         <Text fontSize={14} color={isFollowing ? colors.primary.base : "#295E5C"}>
@@ -286,9 +352,9 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
                       paddingVertical="$3"
                     >
                       <XStack gap="$3" alignItems="center">
-                        <BarChart3 size={18} color="#295E5C" />
+                        <ChartColumnIncreasingSvg width={18} height={18} color="#295E5C" />
                         <Text fontSize={14} color="#295E5C">
-                          瀏覽活動
+                          {t("browse_activity")}
                         </Text>
                       </XStack>
                     </Button>
@@ -310,9 +376,19 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
 
             {/* ── Single overview card (matches product structure) ── */}
             <View style={styles.card}>
+              {/* Progress ring (matches owner) */}
+              <View style={styles.progressRing}>
+                <CircularProgress
+                  value={progress}
+                  size={60}
+                  strokeWidth={4}
+                  backgroundColor={colors.background.gray}
+                />
+              </View>
+
               {/* Creator info */}
               {user && (
-                <XStack alignItems="center" gap="$2" marginBottom="$3">
+                <XStack alignItems="center" gap="$2" marginBottom="$3" paddingRight={72}>
                   <View style={styles.creatorAvatar}>
                     {user.photoUrl ? (
                       <Image source={{ uri: user.photoUrl }} style={styles.creatorAvatarImage} />
@@ -330,7 +406,13 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
 
               {/* Action description */}
               {(practiceAction || description) && (
-                <Text fontSize={15} fontWeight="500" color={colors.text.dark} marginBottom="$3">
+                <Text
+                  fontSize={15}
+                  fontWeight="500"
+                  color={colors.text.dark}
+                  marginBottom="$3"
+                  paddingRight={user ? 0 : 72}
+                >
                   {practiceAction || description}
                 </Text>
               )}
@@ -382,15 +464,15 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
                   {tags.map((tag) => (
                     <XStack
                       key={tag}
-                      backgroundColor="#E0F4FF"
+                      backgroundColor={colors.background.veryLightBlue}
                       paddingHorizontal="$2"
-                      paddingVertical={4}
-                      borderRadius="$sm"
+                      paddingVertical={3}
+                      borderRadius={4}
                       alignItems="center"
                       gap="$1"
                     >
-                      <Tag size={14} color={colors.primary.lighter} />
-                      <Text fontSize={12} color={colors.text.dark}>
+                      <TagSolidSvg width={18} height={18} color={colors.background.lightCyan} />
+                      <Text fontSize={14} color={colors.text.dark}>
                         {tag}
                       </Text>
                     </XStack>
@@ -401,10 +483,32 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
               {/* ── Divider ── */}
               <View style={styles.divider} />
 
+              {/* ── 也來練習 / Copy practice (non-owner affordance, matches product) ── */}
+              <Button
+                width="100%"
+                height={40}
+                backgroundColor="transparent"
+                borderWidth={1}
+                borderColor={colors.logo.cyan}
+                borderRadius="$full"
+                marginBottom="$3"
+                disabled={isCopying}
+                opacity={isCopying ? 0.6 : 1}
+                pressStyle={{ opacity: 0.9 }}
+                onPress={handleCopyPractice}
+              >
+                <XStack alignItems="center" gap="$2">
+                  <Copy size={16} color={colors.text.dark} />
+                  <Text fontSize={14} fontWeight="500" color={colors.text.dark}>
+                    {isCopying ? practiceT("action_copying") : practiceT("action_also_practice")}
+                  </Text>
+                </XStack>
+              </Button>
+
               {/* ── "更多資訊" expandable (matches product) ── */}
               <Pressable onPress={() => setInfoExpanded((v) => !v)} style={styles.moreInfoButton}>
                 <Text fontSize={14} color="#9FB5B8">
-                  更多資訊
+                  {t("more_info")}
                 </Text>
                 {infoExpanded ? (
                   <ChevronUp size={16} color="#9FB5B8" />
@@ -415,23 +519,15 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
 
               {infoExpanded && (
                 <XStack gap="$3" marginBottom="$3">
-                  {/* Execution Timing placeholder */}
-                  <View style={styles.infoCard}>
-                    <Text fontSize={12} color={colors.primary.darker} marginBottom="$2">
-                      執行時機
-                    </Text>
-                    <Text fontSize={12} color="rgba(0,0,0,0.4)">
-                      尚無資料
-                    </Text>
+                  <View style={{ flex: 1 }}>
+                    <ExecutionTimingCard executionTiming={[]} />
                   </View>
-                  {/* Duration card */}
-                  <View style={styles.infoCard}>
-                    <Text fontSize={12} color={colors.primary.darker} marginBottom="$2">
-                      實踐週期
-                    </Text>
-                    <Text fontSize={12} color="rgba(0,0,0,0.4)">
-                      尚無資料
-                    </Text>
+                  <View style={{ flex: 1 }}>
+                    <ExecutionDurationCard
+                      durationDays={durationDays}
+                      startDate={startDate ?? null}
+                      showRemaining
+                    />
                   </View>
                 </XStack>
               )}
@@ -445,7 +541,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
                         key={type}
                         style={[styles.browseEmojiCircle, i > 0 && { marginLeft: -6 }]}
                       >
-                        <Text fontSize={16}>{REACTION_CONFIG[type]?.emoji ?? "👍"}</Text>
+                        <LottieEmoji type={type} size={16} play={false} />
                       </View>
                     ))}
                   </XStack>
@@ -472,7 +568,7 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
 
                 <Pressable style={styles.bottomBarHalf} onPress={() => setActiveTab("comments")}>
                   <XStack alignItems="center" gap="$1.5" justifyContent="center">
-                    <MessageCircle size={20} color={colors.text.dark} />
+                    <DialogOutlineSvg width={22} height={22} color={colors.text.dark} />
                     <Text fontSize={14} fontWeight="500" color={colors.text.dark}>
                       {comments.length}
                     </Text>
@@ -538,12 +634,13 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingHorizontal: 16,
     marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
     overflow: "hidden",
+  },
+  progressRing: {
+    position: "absolute",
+    right: 16,
+    top: 16,
+    zIndex: 1,
   },
   creatorAvatar: {
     width: 32,
@@ -571,12 +668,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     marginBottom: 8,
   },
-  infoCard: {
-    flex: 1,
-    backgroundColor: "#E6F7F9",
-    borderRadius: 12,
-    padding: 16,
-  },
   browseActivityButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -598,7 +689,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderTopWidth: 1,
     borderTopColor: "#E4EAE9",
-    paddingVertical: 12,
+    paddingVertical: 16,
   },
   bottomBarHalf: {
     flex: 1,

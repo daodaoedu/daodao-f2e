@@ -1,6 +1,6 @@
 import { BarChart3, MessageCircle, Telescope } from "@tamagui/lucide-icons";
 import { useState } from "react";
-import { Image, ScrollView, StyleSheet } from "react-native";
+import { Alert, Image, ScrollView, StyleSheet } from "react-native";
 import { Sheet, Text, View, XStack, YStack } from "tamagui";
 import { LottieEmoji } from "@/components/reactions/LottieEmoji";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import type { ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
 import { followTarget, unfollowTarget, useFollowStatus } from "@/hooks/useFollow";
 import { useMobileTranslation } from "@/i18n";
+import { extractApiErrorMessage } from "@/utils/api-error";
 import { formatRelativeTime } from "@/utils/format-time";
 
 interface IReactor {
@@ -46,8 +47,9 @@ function FollowerRow({ reactor }: { reactor: IReactor }) {
         await followTarget("user", reactor.userId);
       }
       await mutate();
-    } catch {
+    } catch (error) {
       setLocalOverride(following);
+      Alert.alert(t("error_title"), extractApiErrorMessage(error, t("operation_failed")));
     }
   };
 

@@ -59,37 +59,37 @@ export const ExecutionDurationCard = ({
       {showRemaining ? (
         <YStack>
           <Text fontSize={12} color={colors.text.dark}>
-            {t("remaining_label")}
+            {t("duration_card_remaining")}
           </Text>
           <XStack alignItems="baseline" gap="$0.5">
             <Text fontSize={18} fontWeight="500" color={colors.logo.orange}>
               {remainingDays}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              {t("frequency_unit")}
+              {t("duration_card_days_unit")}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              {t("total_prefix")}
+              {t("duration_card_total")}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
               {days}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              {t("frequency_unit")}
+              {t("duration_card_days_unit")}
             </Text>
           </XStack>
         </YStack>
       ) : (
         <YStack>
           <Text fontSize={12} color={colors.text.dark}>
-            {t("execution_duration_label")}
+            {t("duration_card_title")}
           </Text>
           <XStack alignItems="baseline" gap="$0.5">
             <Text fontSize={18} fontWeight="500" color={colors.logo.orange}>
               {durationDays}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              {t("frequency_unit")}
+              {t("duration_card_days_unit")}
             </Text>
           </XStack>
         </YStack>
@@ -97,9 +97,9 @@ export const ExecutionDurationCard = ({
       {start && (
         <YStack marginTop="$2">
           <Text fontSize={12} color={colors.text.dark}>
-            {t("start_date_label")}
+            {t("duration_card_start")}
           </Text>
-          <Text fontSize={14} color={colors.primary.base}>
+          <Text fontSize={14} color={colors.logo.cyan}>
             {formatDate(start)}
           </Text>
         </YStack>
@@ -107,9 +107,9 @@ export const ExecutionDurationCard = ({
       {end && (
         <YStack marginTop="$2">
           <Text fontSize={12} color={colors.text.dark}>
-            {t("end_date_label")}
+            {t("duration_card_end")}
           </Text>
-          <Text fontSize={14} color={colors.primary.base}>
+          <Text fontSize={14} color={colors.logo.cyan}>
             {formatDate(end)}
           </Text>
         </YStack>
@@ -122,9 +122,10 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     justifyContent: "space-between",
+    // product: bg-very-light-blue
     backgroundColor: colors.background.veryLightBlue,
     borderRadius: 8,
-    padding: 16,
-    minHeight: 120,
+    padding: 12,
+    minHeight: 128,
   },
 });

@@ -1,5 +1,6 @@
 import NotebookHoleSvg from "@daodao/assets/images/dashboard/notebook-hole.svg";
 import StampSvg from "@daodao/assets/images/dashboard/stamp.svg";
+import TapeSvg from "@daodao/assets/images/dashboard/tape.svg";
 import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
 import { LinearGradient } from "expo-linear-gradient";
 import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
@@ -33,6 +34,8 @@ interface ICheckInCardProps {
   bottomActions?: ReactNode;
   /** 內容區改為固定高度內捲動 + 底部漸層遮罩（對齊 product 的 max-h + fade），用於詳情頁 */
   scrollable?: boolean;
+  /** 內容空白時顯示提示文字（僅本人打卡才顯示，對齊 product 的 showEmptyHint） */
+  showEmptyHint?: boolean;
 }
 
 /** 內容區內捲動的最大高度（對齊 product 的 max-h-[400px]） */
@@ -56,8 +59,10 @@ export const CheckInCard = ({
   afterTitle,
   bottomActions,
   scrollable = false,
+  showEmptyHint = false,
 }: ICheckInCardProps) => {
   const t = useMobileTranslation("mobile.checkIn");
+  const isBlankContent = !content || content.trim().length === 0;
 
   // 內容內捲動時，未捲到底部就顯示底部漸層遮罩（對齊 product）
   const [showBottomFade, setShowBottomFade] = useState(false);
@@ -152,30 +157,42 @@ export const CheckInCard = ({
         </XStack>
       )}
 
-      {/* 文字內容 */}
-      <Text
-        fontSize={14}
-        fontWeight="500"
-        color={colors.text.dark}
-        marginTop={moodOption ? 0 : "$8"}
-        marginRight="$12"
-      >
-        {contentSegments.map((segment, index) =>
-          segment.type === "url" ? (
-            <Text
-              key={`url-${index}-${segment.value}`}
-              color={colors.logo.cyan}
-              textDecorationLine="underline"
-              onPress={() => handleOpenLink(segment.value)}
-            >
-              {segment.value}
-            </Text>
-          ) : (
-            // biome-ignore lint/suspicious/noArrayIndexKey: 純文字片段，順序不會變動
-            <Text key={`text-${index}`}>{segment.value}</Text>
-          )
-        )}
-      </Text>
+      {/* 文字內容（空白且為本人時顯示提示，對齊 product） */}
+      {isBlankContent && showEmptyHint ? (
+        <Text
+          fontSize={14}
+          fontStyle="italic"
+          color={colors.gray.mid}
+          marginTop={moodOption ? 0 : "$8"}
+          marginRight="$12"
+        >
+          {t("empty_content_hint")}
+        </Text>
+      ) : (
+        <Text
+          fontSize={14}
+          fontWeight="500"
+          color={colors.text.dark}
+          marginTop={moodOption ? 0 : "$8"}
+          marginRight="$12"
+        >
+          {contentSegments.map((segment, index) =>
+            segment.type === "url" ? (
+              <Text
+                key={`url-${index}-${segment.value}`}
+                color={colors.logo.cyan}
+                textDecorationLine="underline"
+                onPress={() => handleOpenLink(segment.value)}
+              >
+                {segment.value}
+              </Text>
+            ) : (
+              // biome-ignore lint/suspicious/noArrayIndexKey: 純文字片段，順序不會變動
+              <Text key={`text-${index}`}>{segment.value}</Text>
+            )
+          )}
+        </Text>
+      )}
 
       {/* 標籤 */}
       {tags && tags.length > 0 && (
@@ -188,32 +205,28 @@ export const CheckInCard = ({
         </XStack>
       )}
 
-      {/* 圖片區域 */}
+      {/* 圖片區域：散置拍立得 + 膠帶，對齊 product */}
       {images && images.length > 0 && (
-        <YStack gap="$3" marginTop="$4">
-          <XStack flexWrap="wrap" gap="$2" justifyContent="center">
-            {images.slice(0, 3).map((imageUrl, index) => (
-              <View
-                key={imageUrl}
-                width={100}
-                height={100}
-                borderRadius="$sm"
-                overflow="hidden"
-                borderWidth={1}
-                borderColor={colors.basic[200]}
-                onPress={() => onImagePress?.(index)}
-                pressStyle={{ opacity: 0.8 }}
-                style={[
-                  index === 0 && styles.imageFirst,
-                  index === 1 && styles.imageSecond,
-                  index === 2 && styles.imageThird,
-                ]}
-              >
+        <View style={styles.imageScatter}>
+          {images.slice(0, 3).map((imageUrl, index) => (
+            <View
+              key={imageUrl}
+              onPress={() => onImagePress?.(index)}
+              pressStyle={{ opacity: 0.85 }}
+              style={[
+                styles.polaroid,
+                index === 0 && styles.polaroid0,
+                index === 1 && styles.polaroid1,
+                index === 2 && styles.polaroid2,
+              ]}
+            >
+              <View style={styles.polaroidClip}>
                 <Image source={{ uri: imageUrl }} width="100%" height="100%" resizeMode="cover" />
               </View>
-            ))}
-          </XStack>
-        </YStack>
+              {index === 0 && <TapeSvg width={70} height={38} style={styles.tape} />}
+            </View>
+          ))}
+        </View>
       )}
     </YStack>
   );
@@ -343,15 +356,47 @@ const styles = StyleSheet.create({
   stampDate: {
     transform: [{ rotate: "15deg" }],
   },
-  imageFirst: {
+  imageScatter: {
+    position: "relative",
+    width: "100%",
+    height: 210,
+    marginTop: 8,
+  },
+  polaroid: {
+    position: "absolute",
+    width: 180,
+  },
+  polaroidClip: {
+    width: "100%",
+    aspectRatio: 103 / 67,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.basic[200],
+    overflow: "hidden",
+    backgroundColor: colors.basic.white,
+  },
+  polaroid0: {
+    top: 48,
+    left: 8,
     transform: [{ rotate: "-8deg" }],
     zIndex: 2,
   },
-  imageSecond: {
+  polaroid1: {
+    top: 8,
+    right: 8,
     transform: [{ rotate: "12deg" }],
     zIndex: 1,
   },
-  imageThird: {
+  polaroid2: {
+    bottom: 0,
+    left: 45,
     zIndex: 0,
+  },
+  tape: {
+    position: "absolute",
+    top: -14,
+    left: 55,
+    transform: [{ rotate: "6deg" }],
+    zIndex: 10,
   },
 });

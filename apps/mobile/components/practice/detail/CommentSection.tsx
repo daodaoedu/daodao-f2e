@@ -1,5 +1,5 @@
 import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
-import { ChevronDown, Pencil, Send, Trash2 } from "@tamagui/lucide-icons";
+import { ChevronDown, MoreHorizontal, Pencil, Send, Trash2 } from "@tamagui/lucide-icons";
 import { useCallback, useMemo, useState } from "react";
 import { Alert, Image, Linking, Pressable, StyleSheet, TextInput } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
@@ -16,6 +16,7 @@ import {
 import { removeReaction, upsertReaction, useReactions } from "@/hooks/useReactions";
 import { useMobileTranslation } from "@/i18n";
 import { useAuth } from "@/providers/AuthProvider";
+import { runWithErrorAlert } from "@/utils/api-error";
 import { formatRelativeTime } from "@/utils/format-time";
 
 interface CommentSectionProps {
@@ -37,6 +38,8 @@ interface CommentItemProps {
 }
 
 function CommentItem({ comment, isOwner, onEdit, onDelete, t }: CommentItemProps) {
+  const commonT = useMobileTranslation("common");
+  const [menuOpen, setMenuOpen] = useState(false);
   const {
     currentUserReaction,
     totalCount,
@@ -59,15 +62,21 @@ function CommentItem({ comment, isOwner, onEdit, onDelete, t }: CommentItemProps
 
   const handleReactionToggle = useCallback(
     async (type: ReactionTypeType) => {
-      const isSelected = currentUserReaction === type;
-      if (isSelected) {
-        await removeReaction("comment", comment.id);
-      } else {
-        await upsertReaction("comment", comment.id, type);
-      }
-      await mutateReactions();
+      const ok = await runWithErrorAlert(
+        async () => {
+          const isSelected = currentUserReaction === type;
+          if (isSelected) {
+            await removeReaction("comment", comment.id);
+          } else {
+            await upsertReaction("comment", comment.id, type);
+          }
+          await mutateReactions();
+        },
+        { title: commonT("errorTitle"), fallbackMessage: commonT("operationFailed") }
+      );
+      if (!ok) return;
     },
-    [currentUserReaction, comment.id, mutateReactions]
+    [currentUserReaction, comment.id, mutateReactions, commonT]
   );
 
   return (
@@ -89,6 +98,70 @@ function CommentItem({ comment, isOwner, onEdit, onDelete, t }: CommentItemProps
           <Text fontSize={12} color="rgba(41,94,92,0.5)">
             {formatRelativeTime(comment.createdAt)}
           </Text>
+
+          {/* 本人留言的「更多」選單（對齊 product 的 ··· menu，取代原本外露的 pencil/trash） */}
+          {isOwner && (
+            <View position="relative" marginLeft="auto">
+              <Pressable onPress={() => setMenuOpen((v) => !v)} hitSlop={8}>
+                <MoreHorizontal size={16} color={menuOpen ? "#295E5C" : "#9FB5B8"} />
+              </Pressable>
+              {menuOpen && (
+                <YStack
+                  position="absolute"
+                  right={0}
+                  top="100%"
+                  marginTop={4}
+                  zIndex={20}
+                  backgroundColor="white"
+                  borderRadius={12}
+                  paddingVertical="$1"
+                  minWidth={100}
+                  shadowColor="#000"
+                  shadowOffset={{ width: 0, height: 2 }}
+                  shadowOpacity={0.15}
+                  shadowRadius={8}
+                  elevation={5}
+                >
+                  <Pressable
+                    onPress={() => {
+                      setMenuOpen(false);
+                      onEdit(comment);
+                    }}
+                  >
+                    <XStack
+                      gap="$2"
+                      alignItems="center"
+                      paddingHorizontal="$3"
+                      paddingVertical="$2"
+                    >
+                      <Pencil size={14} color="#295E5C" />
+                      <Text fontSize={12} color="#295E5C">
+                        {t("edit")}
+                      </Text>
+                    </XStack>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => {
+                      setMenuOpen(false);
+                      onDelete(comment.id);
+                    }}
+                  >
+                    <XStack
+                      gap="$2"
+                      alignItems="center"
+                      paddingHorizontal="$3"
+                      paddingVertical="$2"
+                    >
+                      <Trash2 size={14} color="#EF4444" />
+                      <Text fontSize={12} color="#EF4444">
+                        {t("delete")}
+                      </Text>
+                    </XStack>
+                  </Pressable>
+                </YStack>
+              )}
+            </View>
+          )}
         </XStack>
         <Text fontSize={14} color="#295E5C" marginTop={2}>
           {contentSegments.map((segment, index) =>
@@ -111,22 +184,12 @@ function CommentItem({ comment, isOwner, onEdit, onDelete, t }: CommentItemProps
           <ReactionPickerButton
             selectedReaction={currentUserReaction}
             onToggle={handleReactionToggle}
-            variant="summary"
+            variant="comment"
             totalCount={totalCount}
             displayReactions={displayReactions}
           />
         </XStack>
       </YStack>
-      {isOwner && (
-        <XStack gap="$2">
-          <Pressable onPress={() => onEdit(comment)} hitSlop={8}>
-            <Pencil size={14} color="#9FB5B8" />
-          </Pressable>
-          <Pressable onPress={() => onDelete(comment.id)} hitSlop={8}>
-            <Trash2 size={14} color="#9FB5B8" />
-          </Pressable>
-        </XStack>
-      )}
     </XStack>
   );
 }

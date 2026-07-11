@@ -4,6 +4,7 @@
  */
 
 import { client } from "../client";
+import { extractApiErrorMessage } from "./check-in-form-data";
 import type { paths } from "../types";
 
 // ============================================================================
@@ -471,11 +472,7 @@ export const copyPractice = async (id: string): Promise<{ id: string }> => {
   );
 
   if (response.error) {
-    const errorMessage =
-      response.error && typeof response.error === "object" && "message" in response.error
-        ? String(response.error.message)
-        : "複製失敗";
-    throw new Error(errorMessage);
+    throw new Error(extractApiErrorMessage(response.error, "複製失敗"));
   }
 
   return response.data?.data as { id: string };
