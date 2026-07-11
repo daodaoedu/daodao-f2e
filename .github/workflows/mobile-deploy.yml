@@ -1,0 +1,97 @@
+name: Mobile Deploy (EAS Update)
+
+# 合併到 dev 後，把 JS/資產改動以 OTA 方式推到 production channel。
+# 測試者（TestFlight 上裝的 build）下次開 app 就會收到更新，不需重新 build / 重送審。
+#
+# ⚠️ OTA 只適用「JS / TS / 樣式 / 圖片」等改動，且 runtimeVersion 需與 build 相同
+#    （目前 policy=appVersion=1.0.0）。以下情況必須改跑完整 build + submit：
+#    - 新增/移除 native 模組、改 app.config plugins、改原生設定
+#    - 調高 app version（runtimeVersion 會跟著變，舊 build 收不到新 OTA）
+#    完整 build 用 workflow_dispatch 或本機 `eas build -p ios --profile production`。
+
+concurrency:
+  group: mobile-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/api/**'
+      - 'packages/shared/**'
+      - 'packages/design-tokens/**'
+      - 'packages/i18n/**'
+      - 'packages/config/**'
+      - 'packages/assets/**'
+      - 'packages/features/**'
+      - 'pnpm-lock.yaml'
+
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'Update message (顯示在 EAS Update 上)'
+        required: false
+        default: 'Manual OTA update'
+
+env:
+  HUSKY: 0
+  # NOTE: 與 apps/mobile/eas.json 的 production.env 保持一致（develop 後端）。
+  # 這是 OTA bundle 打包時要 inline 的值；eas update 在 GitHub runner 上跑，
+  # 拿不到 eas.json build profile 的 env，故需在此重複一份。日後可改用 EAS-hosted
+  # environment variables 讓 build 與 update 共用單一來源。
+  EXPO_PUBLIC_API_URL: https://server-dev.daodao.so
+  EXPO_PUBLIC_AI_API_URL: https://ai-dev.daodao.so
+  NEXT_PUBLIC_API_URL: https://server-dev.daodao.so
+  NEXT_PUBLIC_AI_API_URL: https://ai-dev.daodao.so
+
+jobs:
+  update:
+    name: Publish EAS Update
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+    steps:
+      - name: Guard missing EXPO_TOKEN
+        if: env.EXPO_TOKEN == ''
+        run: |
+          echo "::error::EXPO_TOKEN secret 未設定，無法推送 EAS Update。" \
+            "請在 repo Settings → Secrets 加入 EXPO_TOKEN。"
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ env.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate config env
+        run: pnpm --filter @daodao/config generate:env
+
+      - name: Typecheck gate
+        run: pnpm --filter @daodao/mobile typecheck
+
+      - name: Publish OTA update to production channel
+        working-directory: apps/mobile
+        run: |
+          eas update \
+            --branch production \
+            --message "${{ github.event.inputs.message || github.event.head_commit.message }}" \
+            --non-interactive
