@@ -62,32 +62,43 @@ npm install -g eas-cli
 eas login
 ```
 
-**開發：**
+**日常開發（模擬器，改 code 即時熱更新）：**
 
 ```bash
-pnpm dev:mobile     # 啟動 Expo 開發伺服器
-
-# 或進入 mobile 目錄執行
-cd apps/mobile
-pnpm dev:ios        # iOS 模擬器
-pnpm dev:android    # Android 模擬器
-pnpm dev:web        # Web 瀏覽器
+cd apps/mobile && npx expo start
+#   跑起來後按 i 開 iOS 模擬器、a 開 Android
 ```
 
-**建置 Mobile App (使用 EAS Build)：**
+**環境區分（正式 vs 測試）**
+
+以 `APP_ENV`（由 `eas.json` 各 profile 設定）切成兩個獨立 app，可同時裝在同一支手機、互不污染資料：
+
+| profile | app 名稱 | bundle id | 後端 | 發佈 |
+| --- | --- | --- | --- | --- |
+| `production` | Dao Dao | `com.daodao.so` | prod（`server.daodao.so` / `ai.daodao.so`） | App Store |
+| `preview` | Dao Dao (Dev) | `com.daodao.so.dev` | dev（`server-dev` / `ai-dev`） | TestFlight / 內部 |
+| `development` | Dao Dao (Dev) | `com.daodao.so.dev` | dev | 模擬器 dev client |
+
+**發佈：**
 
 ```bash
-# 從根目錄執行
-pnpm --filter @daodao/mobile build:dev        # 開發版本
-pnpm --filter @daodao/mobile build:preview    # 預覽版本
-pnpm --filter @daodao/mobile build:production # 正式版本
+# 發 dev 測試版給人（TestFlight）
+eas build  -p ios --profile preview
+eas submit -p ios --profile testflight-dev
 
-# 或進入 mobile 目錄執行
-cd apps/mobile
-pnpm build:dev
-pnpm build:preview
-pnpm build:production
+# 發正式版（App Store）
+eas build  -p ios --profile production
+eas submit -p ios --profile testflight-dev
 ```
+
+> `eas submit` 首次會在 App Store Connect 自動建立 app record。憑證由 EAS 代管，不需每次重登 Apple。
+
+**OTA 熱更新（免重新 build / 送審）：**
+
+JS、樣式、圖片類改動可用 EAS Update 直接推給已安裝的 build。合併到 `dev` 分支會自動觸發
+`.github/workflows/mobile-deploy.yml`，把更新推到 **preview** channel（測試 app）。
+
+> 需在 repo secret 設 `EXPO_TOKEN`。新增/移除 native 模組、改 `app.config` plugins、調高版號，仍必須跑完整 `eas build`。
 
 **類型檢查：**
 
