@@ -59,6 +59,11 @@
         "serviceAccountKeyPath": "./google-service-account.json",
         "track": "internal"
       }
+    },
+    "testflight-dev": {
+      "ios": {
+        "appleTeamId": "G5GY9SQ4F7"
+      }
     }
   }
 }
