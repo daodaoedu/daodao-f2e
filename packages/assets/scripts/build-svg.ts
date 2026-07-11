@@ -290,7 +290,14 @@ function getNativeOutputPath(svgFile: SvgFile): string {
 }
 
 function generateIndexFile(svgFiles: SvgFile[]): string {
+  // 不進 barrel 的路徑（避免 EAS archive / 無用大檔被 index re-export 拖進來）
+  // 需要時請 path import：@daodao/assets/images/...
   const exports = svgFiles
+    .filter(
+      (file) =>
+        !file.relativePath.startsWith("landing-page/") &&
+        file.relativePath !== "icon/mascot-basic.svg"
+    )
     .map((file) => {
       let importPath: string;
       if (file.isMask) {
