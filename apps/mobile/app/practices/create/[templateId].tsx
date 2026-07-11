@@ -14,8 +14,8 @@ import Deco4Svg from "@daodao/assets/images/dashboard/deco-4.svg";
 import ArrowRightOutlineSvg from "@daodao/assets/images/icon/arrow-right-outline.svg";
 import { ChevronDown, ChevronLeft, RefreshCw } from "@tamagui/lucide-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
-import { Alert, Pressable, StyleSheet } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Alert, Modal, Pressable, type View as RNView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import {
@@ -147,17 +147,49 @@ const buildTemplateCreateRequest = (template: PracticeTemplateType): TemplateCre
 });
 
 export default function TemplatePreviewScreen() {
-  const { templateId } = useLocalSearchParams<{ templateId: string }>();
+  const { templateId: routeTemplateId } = useLocalSearchParams<{ templateId: string }>();
   const router = useRouter();
   const t = useMobileTranslation("practice");
   const commonT = useMobileTranslation("common");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+  /** badge 視窗座標，Modal 選單對齊用 */
+  const [badgeLayout, setBadgeLayout] = useState({ x: 20, y: 100, width: 100, height: 28 });
+  const badgeRef = useRef<RNView>(null);
 
-  const { data, error, isLoading } = usePracticeTemplateById(templateId);
+  /**
+   * 目前顯示的模板 id。
+   * 切分類 / 換一個時只更新此 state（+ setParams 同步 URL），
+   * 不 router.replace，避免往左滑 stack 動畫。
+   */
+  const [activeTemplateId, setActiveTemplateId] = useState(routeTemplateId);
+
+  /**
+   * 畫面實際渲染的模板。
+   * 「換一個」時 random API 已回完整 template，先寫入此 state 立即換內容；
+   * 避免 activeTemplateId 變更 → isLoading 整頁 spinner → 閃白。
+   */
+  const [displayTemplate, setDisplayTemplate] = useState<PracticeTemplateType | null>(null);
+
+  // 路由 param 變更時同步（深連結 / setParams）；同值 React 會 bail out
+  useEffect(() => {
+    if (typeof routeTemplateId === "string" && routeTemplateId.length > 0) {
+      setActiveTemplateId(routeTemplateId);
+    }
+  }, [routeTemplateId]);
+
+  const { data, error, isLoading } = usePracticeTemplateById(activeTemplateId);
   const { data: categoriesData } = usePracticeTemplateCategories();
-  const template = useMemo(() => data?.data ?? null, [data]);
+
+  // SWR 詳情就緒且 id 對得上才同步，避免 keepPreviousData 用舊模板蓋掉 random 結果
+  useEffect(() => {
+    if (data?.data?.id && data.data.id === activeTemplateId) {
+      setDisplayTemplate(data.data);
+    }
+  }, [data, activeTemplateId]);
+
+  const template = displayTemplate;
   const formValues = useMemo(
     () => (template ? convertTemplateToFormValues(template) : null),
     [template]
@@ -196,9 +228,13 @@ export default function TemplatePreviewScreen() {
   };
 
   /**
-   * 抽取指定分類的隨機模板並導向（對齊 product goToRandomTemplate）
+   * 抽取指定分類的隨機模板並更新目前頁（對齊 product goToRandomTemplate）
    * - 未指定 category → 跨全部分類
    * - 「換一個」傳 currentCategory；選單切分類傳 categoryId
+   *
+   * 不可 router.replace / push：會觸發往左滑 stack 轉場。
+   * random 回應已是完整 PracticeTemplate → 直接 setDisplayTemplate，
+   * 不要等 usePracticeTemplateById 重抓（那會 isLoading 整頁閃白）。
    */
   const goToRandomTemplate = useCallback(
     async (category?: string) => {
@@ -215,7 +251,11 @@ export default function TemplatePreviewScreen() {
           router.push("/practices/create");
           return;
         }
-        router.replace(`/practices/create/${next.id}`);
+        // 1) 先更新畫面內容（無 loading 卸載）
+        setDisplayTemplate(next);
+        // 2) 同步 id / URL（背景 SWR 會預熱快取，不擋 UI）
+        setActiveTemplateId(next.id);
+        router.setParams({ templateId: next.id });
       } catch {
         router.push("/practices/create");
       } finally {
@@ -242,6 +282,15 @@ export default function TemplatePreviewScreen() {
     [goToRandomTemplate, currentCategory]
   );
 
+  /** 打開類別選單：先量 badge 位置，再用 Modal 浮層（避免被遮罩吃掉點擊） */
+  const openCategoryMenu = useCallback(() => {
+    if (isRefreshing) return;
+    badgeRef.current?.measureInWindow((x, y, width, height) => {
+      setBadgeLayout({ x, y, width, height });
+      setCategoryMenuOpen(true);
+    });
+  }, [isRefreshing]);
+
   const handleUseTemplate = useCallback(async () => {
     if (isSubmitting || !template) return;
     setIsSubmitting(true);
@@ -266,7 +315,9 @@ export default function TemplatePreviewScreen() {
     }
   }, [isSubmitting, template, router, t]);
 
-  if (isLoading) {
+  // 僅「第一次進頁、還沒任何可顯示模板」才整頁 loading
+  // 換一個 / 切分類時已有 displayTemplate，不可卸載整頁（會閃白）
+  if (isLoading && !template) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.logo.cyan }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" gap="$4">
@@ -276,7 +327,7 @@ export default function TemplatePreviewScreen() {
     );
   }
 
-  if (error || !template || !formValues) {
+  if (!template || !formValues) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.logo.cyan }} edges={["top"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" gap="$4" padding="$4">
@@ -300,14 +351,70 @@ export default function TemplatePreviewScreen() {
         <Deco4Svg width={220} height={394} />
       </YStack>
 
-      {/* 點空白關閉類別選單 */}
-      {categoryMenuOpen && (
-        <Pressable
-          style={[StyleSheet.absoluteFillObject, { zIndex: 25 }]}
-          onPress={() => setCategoryMenuOpen(false)}
-          accessibilityLabel={commonT("close")}
-        />
-      )}
+      {/*
+        類別選單用 Modal（對齊 product DropdownMenu 行為）
+        backdrop 與選單為 sibling：選單後繪製在上層，點選項不會被遮罩吃掉
+      */}
+      <Modal
+        visible={categoryMenuOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCategoryMenuOpen(false)}
+      >
+        <YStack flex={1}>
+          <Pressable
+            style={StyleSheet.absoluteFillObject}
+            onPress={() => setCategoryMenuOpen(false)}
+            accessibilityLabel={commonT("close")}
+          />
+          <YStack
+            position="absolute"
+            left={badgeLayout.x}
+            top={badgeLayout.y + badgeLayout.height + 2}
+            minWidth={Math.max(badgeLayout.width, 176)}
+            backgroundColor={colors.basic.white}
+            borderRadius={12}
+            paddingVertical={4}
+            shadowColor="#000"
+            shadowOffset={{ width: 0, height: 2 }}
+            shadowOpacity={0.15}
+            shadowRadius={8}
+            elevation={12}
+            zIndex={2}
+          >
+            {categoryOptions.map((category) => {
+              const isSelected = currentCategory === category.id;
+              const Icon = category.Icon;
+              return (
+                <Pressable
+                  key={category.id}
+                  onPress={() => handleSelectCategory(category.id)}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.7 : 1,
+                    minHeight: 44,
+                    paddingHorizontal: 16,
+                    paddingVertical: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 8,
+                  })}
+                  accessibilityRole="menuitem"
+                  accessibilityState={{ selected: isSelected }}
+                >
+                  {Icon ? <Icon width={16} height={16} /> : null}
+                  <Text
+                    fontSize={14}
+                    fontWeight={isSelected ? "500" : "400"}
+                    color={isSelected ? colors.logo.cyan : colors.text.dark}
+                  >
+                    {category.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </YStack>
+        </YStack>
+      </Modal>
 
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <YStack flex={1}>
@@ -324,83 +431,39 @@ export default function TemplatePreviewScreen() {
             </Button>
           </XStack>
 
-          <ScrollView flex={1} contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}>
-            {/* 標題區 */}
-            <YStack paddingHorizontal="$5" paddingBottom="$4" gap="$2">
-              {/*
-                類別 badge + 下拉（對齊 product DropdownMenu）
-                選項後 goToRandomTemplate(categoryId)
-              */}
-              <YStack alignSelf="flex-start" zIndex={30} position="relative">
+          <ScrollView flex={1} contentContainerStyle={{ flexGrow: 1 }}>
+            {/*
+              標題區 zIndex 高於 compass，避免「換一個」被指南針蓋住
+              （header 已無 actionDescription，高度較矮，compass 易上衝擋到按鈕）
+            */}
+            <YStack paddingHorizontal="$5" paddingBottom={28} gap="$2" zIndex={5}>
+              {/* 類別 badge — 點擊開 Modal 選單 */}
+              <YStack alignSelf="flex-start">
                 {categoryOptions.length > 0 ? (
-                  <>
-                    <Pressable
-                      onPress={() => setCategoryMenuOpen((open) => !open)}
-                      disabled={isRefreshing}
-                      accessibilityRole="button"
-                      accessibilityLabel={categoryLabel}
-                      accessibilityState={{ expanded: categoryMenuOpen }}
-                    >
-                      <Badge backgroundColor={colors.basic.white}>
-                        <XStack alignItems="center" gap="$1">
-                          <Text fontSize={12} color={colors.text.dark}>
-                            {categoryLabel}
-                          </Text>
-                          <ChevronDown size={12} color={colors.text.dark} opacity={0.7} />
-                        </XStack>
-                      </Badge>
-                    </Pressable>
-
-                    {categoryMenuOpen && (
-                      <YStack
-                        position="absolute"
-                        top="100%"
-                        left={0}
-                        marginTop={2}
-                        minWidth={176}
-                        backgroundColor={colors.basic.white}
-                        borderRadius={12}
-                        paddingVertical={4}
-                        shadowColor="#000"
-                        shadowOffset={{ width: 0, height: 2 }}
-                        shadowOpacity={0.15}
-                        shadowRadius={8}
-                        elevation={8}
-                        zIndex={40}
-                      >
-                        {categoryOptions.map((category) => {
-                          const isSelected = currentCategory === category.id;
-                          const Icon = category.Icon;
-                          return (
-                            <Pressable
-                              key={category.id}
-                              onPress={() => handleSelectCategory(category.id)}
-                              style={({ pressed }) => ({
-                                opacity: pressed ? 0.7 : 1,
-                                minHeight: 44,
-                                paddingHorizontal: 16,
-                                paddingVertical: 10,
-                                flexDirection: "row",
-                                alignItems: "center",
-                                gap: 8,
-                              })}
-                              accessibilityRole="menuitem"
-                              accessibilityState={{ selected: isSelected }}
-                            >
-                              {Icon ? <Icon width={16} height={16} /> : null}
-                              <Text
-                                fontSize={14}
-                                fontWeight={isSelected ? "500" : "400"}
-                                color={isSelected ? colors.logo.cyan : colors.text.dark}
-                              >
-                                {category.label}
-                              </Text>
-                            </Pressable>
-                          );
-                        })}
-                      </YStack>
-                    )}
-                  </>
+                  <Pressable
+                    ref={badgeRef}
+                    onPress={() => {
+                      if (categoryMenuOpen) {
+                        setCategoryMenuOpen(false);
+                      } else {
+                        openCategoryMenu();
+                      }
+                    }}
+                    disabled={isRefreshing}
+                    accessibilityRole="button"
+                    accessibilityLabel={categoryLabel}
+                    accessibilityState={{ expanded: categoryMenuOpen }}
+                    collapsable={false}
+                  >
+                    <Badge backgroundColor={colors.basic.white}>
+                      <XStack alignItems="center" gap="$1">
+                        <Text fontSize={12} color={colors.text.dark}>
+                          {categoryLabel}
+                        </Text>
+                        <ChevronDown size={12} color={colors.text.dark} opacity={0.7} />
+                      </XStack>
+                    </Badge>
+                  </Pressable>
                 ) : (
                   <Badge backgroundColor={colors.basic.white}>
                     <Text fontSize={12} color={colors.text.dark}>
@@ -410,35 +473,42 @@ export default function TemplatePreviewScreen() {
                 )}
               </YStack>
 
-              <XStack alignItems="flex-start" gap="$3">
-                <YStack flex={1}>
+              <XStack alignItems="flex-start" gap="$3" zIndex={6}>
+                <YStack flex={1} paddingRight={8}>
                   <Text fontSize={24} lineHeight={32} fontWeight="600" color={colors.basic.white}>
                     {template.title}
                   </Text>
                 </YStack>
-                <Button
-                  height={35}
-                  paddingHorizontal="$3"
-                  backgroundColor={colors.basic.white}
-                  onPress={handleRefresh}
-                  disabled={isRefreshing}
-                  accessibilityLabel={t("template_swap")}
-                >
-                  <XStack alignItems="center" gap="$1.5">
-                    {isRefreshing ? (
-                      <Spinner size="small" color={colors.text.dark} />
-                    ) : (
-                      <RefreshCw size={16} color={colors.text.dark} />
-                    )}
-                    <Text fontSize={14} color={colors.text.dark}>
-                      {t("template_swap")}
-                    </Text>
-                  </XStack>
-                </Button>
+                {/* elevation 確保在 compass 之上可點、完整可見 */}
+                <YStack zIndex={6} elevation={6}>
+                  <Button
+                    height={35}
+                    paddingHorizontal="$3"
+                    backgroundColor={colors.basic.white}
+                    onPress={handleRefresh}
+                    disabled={isRefreshing}
+                    accessibilityLabel={t("template_swap")}
+                  >
+                    <XStack alignItems="center" gap="$1.5">
+                      {isRefreshing ? (
+                        <Spinner size="small" color={colors.text.dark} />
+                      ) : (
+                        <RefreshCw size={16} color={colors.text.dark} />
+                      )}
+                      <Text fontSize={14} color={colors.text.dark}>
+                        {t("template_swap")}
+                      </Text>
+                    </XStack>
+                  </Button>
+                </YStack>
               </XStack>
             </YStack>
 
-            {/* 白色圓角內容區 — overflow visible 讓指南針可伸出頂部外 */}
+            {/*
+              白色圓角內容區（對齊 product bg-white rounded-t-2xl + pb-28）
+              - flexGrow 撐滿剩餘高度，避免底部露出 cyan
+              - paddingBottom 加厚，資源卡與 footer 之間多一截白底
+            */}
             <YStack
               flexGrow={1}
               backgroundColor={colors.basic.white}
@@ -446,13 +516,15 @@ export default function TemplatePreviewScreen() {
               borderTopRightRadius={16}
               paddingHorizontal="$5"
               paddingTop="$5"
+              // product content pb-28；footer 為 in-flow 故略小於 112，仍保留明顯白底
+              paddingBottom={48}
               gap="$3.5"
               overflow="visible"
             >
               {/*
-                概覽卡 + 指南針（對齊 product）：
-                absolute -top-14 -right-1 z-10
-                RN：card 有 elevation 會蓋住先前 sibling，故 compass 放 card 之後 + elevation
+                概覽卡 + 指南針
+                product: -top-14；header 變矮後 -56 會蓋住「換一個」
+                → 略降為 -36，只掛在白卡圓角上，且 elevation 低於 title 區
               */}
               <YStack position="relative" overflow="visible" zIndex={1}>
                 <PracticeOverviewCard
@@ -463,13 +535,13 @@ export default function TemplatePreviewScreen() {
                 />
                 <YStack
                   position="absolute"
-                  top={-56}
+                  top={-36}
                   right={-4}
-                  zIndex={20}
-                  elevation={12}
+                  zIndex={2}
+                  elevation={4}
                   pointerEvents="none"
                 >
-                  <CompassSvg width={109} height={114} />
+                  <CompassSvg width={100} height={104} />
                 </YStack>
               </YStack>
 
@@ -541,3 +613,4 @@ export default function TemplatePreviewScreen() {
     </YStack>
   );
 }
+
