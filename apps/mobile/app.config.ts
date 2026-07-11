@@ -30,7 +30,7 @@ const config: ExpoConfig = {
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "com.daodao.app",
+    bundleIdentifier: "com.daodao.so",
     usesAppleSignIn: true,
     ...(hasIosGoogleServicesFile ? { googleServicesFile: iosGoogleServicesFile } : {}),
     infoPlist: {
