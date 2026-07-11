@@ -16,6 +16,12 @@ const config: ExpoConfig = {
   scheme: "daodao",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
+  updates: {
+    url: "https://u.expo.dev/f93cc139-a71b-4dfc-abc3-c093889034a8",
+  },
+  runtimeVersion: {
+    policy: "appVersion",
+  },
   splash: {
     image: "./assets/splash-icon.png",
     resizeMode: "contain",
