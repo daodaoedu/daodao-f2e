@@ -18,6 +18,7 @@ import { ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
 import { StepIndicator } from "@/components";
 import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
+import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import { useMobileTranslation } from "@/i18n";
 import { useCreatePractice } from "@/providers/CreatePracticeProvider";
 import type { CreatePracticeInputType } from "@/types/create-practice";
@@ -106,6 +107,9 @@ export default function Step5Screen() {
           errorResponse.error?.message ?? errorResponse.message ?? t("create_failed")
         );
       }
+
+      // 新手任務 C：即時標記「建立第一個實踐」完成
+      applyOnboardingUpdateFromResponse(response.data);
 
       Alert.alert(t("create_success_title"), t("create_success_message"), [
         {
