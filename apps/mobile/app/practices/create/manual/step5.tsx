@@ -71,7 +71,7 @@ function toCreatePracticeRequest(values: CreatePracticeInputType): CreatePractic
 
   return {
     ...request,
-    privacy_status: values.privacy_status,
+    privacyStatus: values.privacy_status,
   } as CreatePracticeRequestType;
 }
 

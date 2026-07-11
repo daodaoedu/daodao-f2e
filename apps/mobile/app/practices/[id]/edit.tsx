@@ -151,7 +151,7 @@ export default function PracticeEditScreen() {
         durationDays: targetDays,
         sessionDurationMinutes,
         tags,
-        privacy_status: privacyStatus,
+        privacyStatus,
         ...buildFrequencyPayload(frequency),
       });
 

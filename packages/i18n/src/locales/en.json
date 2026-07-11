@@ -6238,7 +6238,9 @@
       "empty": "No comments yet",
       "anonymous": "Anonymous",
       "placeholder": "Write a comment...",
-      "edit_placeholder": "Edit comment..."
+      "edit_placeholder": "Edit comment...",
+      "show_more": "Show more comments",
+      "show_less": "Show less"
     },
     "reactions": {
       "with_others": "{name} and {count} others",

@@ -231,7 +231,7 @@ export default function EditPracticePage() {
     try {
       const apiRequest = {
         ...convertFormValuesToApiRequest(values),
-        privacy_status: privacyStatus,
+        privacyStatus,
       } as UpdatePracticeRequestType;
 
       const response = await updatePractice(practiceId, apiRequest);

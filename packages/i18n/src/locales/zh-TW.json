@@ -6238,7 +6238,9 @@
       "empty": "還沒有留言",
       "anonymous": "匿名",
       "placeholder": "寫留言...",
-      "edit_placeholder": "編輯留言..."
+      "edit_placeholder": "編輯留言...",
+      "show_more": "顯示更多留言",
+      "show_less": "顯示較少"
     },
     "reactions": {
       "with_others": "{name} 與其他 {count} 人",

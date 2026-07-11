@@ -1,23 +1,30 @@
 import { usePracticeCheckIns, useUpdatePracticeCheckIn } from "@daodao/api";
 import {
+  BarChart3,
   Calendar,
   ChevronLeft,
   ChevronRight,
   Image as ImageIcon,
+  MessageCircle,
   MessageSquare,
+  MoreHorizontal,
   Pencil,
   Smile,
   Tag,
 } from "@tamagui/lucide-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
-import { Alert, Image, Modal } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Alert, Image, Modal, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Card, ScrollView, Spinner, Text, TextArea, XStack, YStack } from "tamagui";
+import { Card, ScrollView, Spinner, Text, TextArea, View, XStack, YStack } from "tamagui";
 import { CheckInDateSelector } from "@/components/check-in/date-selector";
 import { MoodSelector } from "@/components/check-in/form/components/mood-selector";
 import { TagSelector } from "@/components/check-in/form/components/tag-selector";
 import type { ICheckInDate, ICheckInDisplayData } from "@/components/check-in/types";
+import { CommentSheet } from "@/components/persona/CommentSheet";
+import { BrowseActivitySheet } from "@/components/practice/detail/BrowseActivitySheet";
+import { CommentSection } from "@/components/practice/detail/CommentSection";
+import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
 import { Button } from "@/components/ui/button";
 import {
   type ApiMoodType,
@@ -26,8 +33,16 @@ import {
   mapApiMoodToMoodType,
   mapMoodTypeToApiMood,
 } from "@/constants/mood";
+import type { ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
+import { useComments } from "@/hooks/useComments";
 import { usePractice } from "@/hooks/usePractices";
+import {
+  removeReaction,
+  upsertReaction,
+  useReactions,
+  useReactionsList,
+} from "@/hooks/useReactions";
 import { useMobileTranslation } from "@/i18n";
 
 type CheckInDetailRecord = {
@@ -238,6 +253,32 @@ export default function CheckInDetailScreen() {
   } = usePracticeCheckIns(id, { limit: 100, include: "images,tags" });
   const { updateCheckIn } = useUpdatePracticeCheckIn(id, String(checkInId));
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [showBrowseActivity, setShowBrowseActivity] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+
+  const checkInIdStr = String(checkInId);
+  const {
+    currentUserReaction,
+    totalCount: reactionTotalCount,
+    displayReactions,
+    mutate: mutateReactions,
+  } = useReactions("checkin", checkInIdStr);
+  const { items: reactors, firstReactorName } = useReactionsList("checkin", checkInIdStr);
+  const { comments } = useComments("checkin", checkInIdStr);
+
+  const handleReactionToggle = useCallback(
+    async (type: ReactionTypeType) => {
+      const isSelected = currentUserReaction === type;
+      if (isSelected) {
+        await removeReaction("checkin", checkInIdStr);
+      } else {
+        await upsertReaction("checkin", checkInIdStr, type);
+      }
+      await mutateReactions();
+    },
+    [currentUserReaction, checkInIdStr, mutateReactions]
+  );
 
   const checkIns = ((checkInsData as CheckInsResponse | undefined)?.data?.data ?? []) as
     | CheckInDetailRecord[]
@@ -437,6 +478,53 @@ export default function CheckInDetailScreen() {
           >
             <Pencil size={20} color="$color" />
           </Button>
+          <View position="relative">
+            <Button
+              size="$4"
+              circular
+              chromeless
+              onPress={() => setShowMenu((v) => !v)}
+              accessibilityLabel="瀏覽活動"
+            >
+              <MoreHorizontal size={20} color="$color" />
+            </Button>
+            {showMenu && (
+              <YStack
+                position="absolute"
+                right={0}
+                top="100%"
+                marginTop={4}
+                zIndex={30}
+                backgroundColor="white"
+                borderRadius={16}
+                paddingVertical="$2"
+                shadowColor="#000"
+                shadowOffset={{ width: 0, height: 2 }}
+                shadowOpacity={0.15}
+                shadowRadius={8}
+                elevation={5}
+                minWidth={140}
+              >
+                <Button
+                  chromeless
+                  onPress={() => {
+                    setShowMenu(false);
+                    setShowBrowseActivity(true);
+                  }}
+                  justifyContent="flex-start"
+                  paddingHorizontal="$4"
+                  paddingVertical="$3"
+                >
+                  <XStack gap="$3" alignItems="center">
+                    <BarChart3 size={18} color="#295E5C" />
+                    <Text fontSize={14} color="#295E5C">
+                      瀏覽活動
+                    </Text>
+                  </XStack>
+                </Button>
+              </YStack>
+            )}
+          </View>
         </XStack>
         <CheckInDateSelector
           checkInDates={checkInDates}
@@ -565,6 +653,35 @@ export default function CheckInDetailScreen() {
               </Card>
             )}
 
+            <Card backgroundColor="white" borderRadius={12} padding={0}>
+              <XStack alignItems="center" paddingVertical="$3">
+                <View flex={1} alignItems="center" justifyContent="center">
+                  <ReactionPickerButton
+                    selectedReaction={currentUserReaction}
+                    onToggle={handleReactionToggle}
+                    variant="card"
+                    totalCount={reactionTotalCount}
+                    displayReactions={displayReactions}
+                    firstReactorName={firstReactorName}
+                  />
+                </View>
+                <View width={1} height={20} backgroundColor="#E4EAE9" />
+                <Pressable
+                  style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+                  onPress={() => setShowComments(true)}
+                >
+                  <XStack alignItems="center" gap="$1.5" justifyContent="center">
+                    <MessageCircle size={20} color={colors.text.dark} />
+                    {comments.length > 0 && (
+                      <Text fontSize={14} fontWeight="500" color={colors.text.dark}>
+                        {comments.length}
+                      </Text>
+                    )}
+                  </XStack>
+                </Pressable>
+              </XStack>
+            </Card>
+
             <Button
               size="$5"
               backgroundColor={colors.primary.base}
@@ -583,6 +700,21 @@ export default function CheckInDetailScreen() {
           onClose={() => setShowEditModal(false)}
           onSave={handleUpdateCheckIn}
         />
+        <CommentSheet
+          open={showComments}
+          onOpenChange={setShowComments}
+          title={tCommon("comments")}
+        >
+          <CommentSection targetType="checkin" targetId={checkInIdStr} />
+        </CommentSheet>
+        {showBrowseActivity && (
+          <BrowseActivitySheet
+            open={showBrowseActivity}
+            onOpenChange={setShowBrowseActivity}
+            commentCount={comments.length}
+            reactors={reactors}
+          />
+        )}
       </YStack>
     </SafeAreaView>
   );

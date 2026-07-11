@@ -251,11 +251,14 @@ export default function ProfileScreen() {
                 {/* 用戶資料卡片 */}
                 <UserInfoCard
                   name={user?.name ?? null}
+                  customId={user?.customId}
                   location={user?.locationNameZh ?? user?.location ?? null}
                   selfIntroduction={user?.selfIntroduction}
                   photoURL={user?.photoURL}
                   personalSlogan={user?.personalSlogan}
                   contactList={user?.contactList}
+                  editable
+                  onEdit={() => router.push("/settings/public-info" as never)}
                 />
 
                 {/* Dashboard 統計 */}
