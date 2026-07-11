@@ -39,6 +39,7 @@ export { default as NotebookSvg } from "./dashboard/notebook";
 export { default as PinkSvg } from "./dashboard/pink";
 export { default as SemiCircleSvg } from "./dashboard/semi-circle";
 export { default as SpeechBubbleSvg } from "./dashboard/speech-bubble";
+export { default as StampWhiteSvg } from "./dashboard/stamp-white";
 export { default as StampSvg } from "./dashboard/stamp";
 export { default as TapeSvg } from "./dashboard/tape";
 export { default as YellowSvg } from "./dashboard/yellow";

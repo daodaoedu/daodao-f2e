@@ -116,6 +116,9 @@ importers:
       '@daodao/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
+      '@daodao/features-quiz':
+        specifier: workspace:*
+        version: link:../../packages/features/quiz
       '@daodao/shared':
         specifier: workspace:*
         version: link:../../packages/shared

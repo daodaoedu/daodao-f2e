@@ -1,17 +1,20 @@
 import { CheckCircle2, MessageSquare } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { FlatList, RefreshControl, View as RNView, ScrollView, StyleSheet } from "react-native";
+import { Dimensions, RefreshControl, View as RNView, ScrollView, StyleSheet } from "react-native";
+import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, YStack } from "tamagui";
 import {
   BrewingCard,
   DashboardHeader,
+  HomeBanner,
   type IShowcaseFilterState,
   ShowcaseSearchBar,
   TabSwitcher,
   type TabType,
 } from "@/components/home";
+import { PersonaProfileMe } from "@/components/persona/persona-profile-me";
 import { ResonanceCarousel } from "@/components/persona/ResonanceCarousel";
 import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
 import { ActivityCard } from "@/components/showcase/ActivityCard";
@@ -25,6 +28,9 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { type FeedItem, type IFeedParams, reorderFeedItems, useFeed } from "@/hooks/useFeed";
 import { usePractices } from "@/hooks/usePractices";
 import { useMobileTranslation } from "@/i18n";
+
+// banner 比例固定 195:73（對齊 @daodao/assets 的 mobile-banner SVG）
+const BANNER_HEIGHT = Math.round((Dimensions.get("window").width * 73) / 195);
 
 function feedItemKey(item: FeedItem, index: number): string {
   if (item.type === "activity") {
@@ -48,6 +54,12 @@ export default function HomeScreen() {
   const [keyword, setKeyword] = useState("");
   const [filters, setFilters] = useState<IShowcaseFilterState>({
     tags: [],
+  });
+
+  // banner 滾動漸淡（只在 inspire tab 使用）
+  const scrollY = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler((event) => {
+    scrollY.value = event.contentOffset.y;
   });
 
   const feedParams: IFeedParams = useMemo(
@@ -219,18 +231,22 @@ export default function HomeScreen() {
 
   const renderShowcaseHeader = useCallback(
     () => (
-      <YStack paddingHorizontal="$4" paddingTop="$4">
-        <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
-        <YStack marginBottom="$3">
-          <ShowcaseSearchBar
-            value={searchValue}
-            onChange={setSearchValue}
-            onSearch={handleSearch}
-          />
+      <>
+        {/* banner overlay 疊在最上層，這裡預留等高的空間避免 tab/search 被蓋住 */}
+        <YStack height={BANNER_HEIGHT} />
+        <YStack paddingHorizontal="$4" paddingTop="$4">
+          <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+          <YStack marginBottom="$3">
+            <ShowcaseSearchBar
+              value={searchValue}
+              onChange={setSearchValue}
+              onSearch={handleSearch}
+            />
+          </YStack>
+          {/* TODO: ShowcaseFilterBar hidden for now */}
+          <ResonanceCarousel />
         </YStack>
-        {/* TODO: ShowcaseFilterBar hidden for now */}
-        <ResonanceCarousel />
-      </YStack>
+      </>
     ),
     [activeTab, searchValue, handleSearch]
   );
@@ -260,8 +276,13 @@ export default function HomeScreen() {
   // ── Main render ──
   if (activeTab === "inspire") {
     if (isShowcaseLoading && orderedFeedItems.length === 0) {
+      // 骨架載入畫面也疊上 banner overlay：renderShowcaseHeader 已預留等高間距，
+      // 避免載入完成切換到 FlatList 時 banner 突然出現造成版面跳動。
       return (
         <SafeAreaView style={styles.container} edges={["top"]}>
+          <RNView style={styles.bannerOverlay} pointerEvents="box-none">
+            <HomeBanner scrollY={scrollY} />
+          </RNView>
           {renderShowcaseHeader()}
           <YStack paddingHorizontal="$4" gap="$3">
             {[1, 2, 3].map((i) => (
@@ -274,7 +295,10 @@ export default function HomeScreen() {
 
     return (
       <SafeAreaView style={styles.container} edges={["top"]}>
-        <FlatList
+        <RNView style={styles.bannerOverlay} pointerEvents="box-none">
+          <HomeBanner scrollY={scrollY} />
+        </RNView>
+        <Animated.FlatList<FeedItem>
           data={orderedFeedItems}
           keyExtractor={feedItemKey}
           renderItem={renderFeedItem}
@@ -282,6 +306,8 @@ export default function HomeScreen() {
           ListFooterComponent={renderFeedFooter}
           ListEmptyComponent={renderFeedEmpty}
           contentContainerStyle={styles.feedContent}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
           onEndReached={() => {
             if (hasMore && !isValidating) loadMore();
           }}
@@ -294,6 +320,21 @@ export default function HomeScreen() {
             />
           }
         />
+      </SafeAreaView>
+    );
+  }
+
+  if (activeTab === "persona") {
+    return (
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+          <YStack paddingHorizontal="$4" paddingTop="$4">
+            <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+          </YStack>
+          <YStack paddingHorizontal="$4">
+            <PersonaProfileMe />
+          </YStack>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -353,4 +394,5 @@ const styles = StyleSheet.create({
     borderColor: "#E8F8FF",
     opacity: 0.6,
   },
+  bannerOverlay: { position: "absolute", top: 0, left: 0, right: 0, zIndex: 20 },
 });
