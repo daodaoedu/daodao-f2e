@@ -1,324 +1,129 @@
 "use client";
 
-import type { MoodType, PracticeSummary, UpdatePracticeRequestType } from "@daodao/api";
-import { updatePractice } from "@daodao/api";
-import {
-  ArrowRightOutlineSvg,
-  BoredSvg,
-  FacebookFilledSvg,
-  FineSvg,
-  FrustratedSvg,
-  HappySvg,
-  HopelessSvg,
-  LineFilledSvg,
-  LinkedinFilledSvg,
-  NeutralSvg,
-  ThreadsFilledSvg,
-  VerifiedSvg,
-  XFilledSvg,
-} from "@daodao/assets";
+import type { PracticeSummary } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
-import { dataUrlToFile, getShareAPI } from "@daodao/shared";
-import { Button } from "@daodao/ui/components/button";
-import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
 import { toast } from "@daodao/ui/components/sonner";
-import { cn } from "@daodao/ui/lib/utils";
-import { Download, ExternalLink, Globe } from "lucide-react";
-import { motion } from "motion/react";
-import type { ComponentType } from "react";
+import { X } from "lucide-react";
+import { AnimatePresence } from "motion/react";
 import { useState } from "react";
-import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import { usePracticeSummaryImage } from "./hooks";
-import { PracticeSummaryCard } from "./practice-summary-card";
+import { FarewellScreen, type FarewellVariant } from "./farewell-screen";
+import { getPracticeStage, isEnded } from "./hooks";
+import { Surface1Summary } from "./surface-1-summary";
+import { Surface2NextIntent } from "./surface-2-next-intent";
+import { Surface3ShareCard } from "./surface-3-share-card";
+import { SurfaceNavChip } from "./surface-nav-chip";
 
 interface PracticeSummaryPageProps {
   summary: PracticeSummary;
 }
 
 /**
- * 心情類型對應的 SVG 組件
- */
-const MoodIconMap: Record<MoodType, ComponentType<{ className?: string }>> = {
-  give_up: HopelessSvg,
-  frustrated: FrustratedSvg,
-  bored: BoredSvg,
-  neutral: NeutralSvg,
-  good: FineSvg,
-  happy: HappySvg,
-};
-
-/**
  * 實踐完成總結頁面元件
- * @description 顯示實踐完成的慶祝頁面、摘要圖片和分享功能
+ * @description 依 Surface 架構切換三個畫面：實踐總結、接下來我想、製作分享卡
  */
 export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
-  const t = useTranslations("practice");
   const router = useRouter();
-  const [isPublic, setIsPublic] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
+  const t = useTranslations("practice");
+  const stage = getPracticeStage(summary);
+  const ended = isEnded(stage);
 
-  // 使用摘要圖片生成 hook
-  const { summaryCardRef, isGenerating, downloadImage, generateImage } = usePracticeSummaryImage({
-    practiceName: summary.practiceName,
-  });
+  const [currentSurface, setCurrentSurface] = useState<1 | 2 | 3>(1);
+  const [reflectionText, setReflectionText] = useState(summary.reflection ?? "");
+  const [selectedCheckInIds, setSelectedCheckInIds] = useState<string[]>(
+    summary.selectedCheckInIds ?? []
+  );
+  const [themeIndex, setThemeIndex] = useState(0);
 
-  const handleBackToHome = () => {
-    router.push("/");
-  };
+  // 追蹤本次會話中「接下來我想」的儲存結果，供離開流程判斷 farewell 文案
+  const [nextIntentStatus, setNextIntentStatus] = useState<"none" | "draft" | "final">("none");
 
-  const handlePublish = async () => {
-    if (isPublic || isPublishing) return;
-    setIsPublishing(true);
-    try {
-      await updatePractice(summary.practiceId, {
-        privacy_status: "public",
-      } as UpdatePracticeRequestType);
-      setIsPublic(true);
-    } catch {
-      toast.error(t("summary_page_publish_failed"));
-    } finally {
-      setIsPublishing(false);
+  const [showFarewell, setShowFarewell] = useState(false);
+  const [farewellVariant, setFarewellVariant] = useState<FarewellVariant>("draft-waiting");
+
+  const handleSurfaceChange = (surface: 1 | 2 | 3) => {
+    if (!ended && surface !== 1) {
+      toast.error(t("summary_nav_locked_toast"));
+      return;
     }
+    setCurrentSurface(surface);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // 準備分享內容
-  const shareText = t("summary_page_share_text", {
-    practiceName: summary.practiceName,
-    checkInCount: String(summary.checkInCount),
-  });
-  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-
-  const shareAPI = getShareAPI({
-    title: t("summary_page_share_og_title", { userName: summary.userName }),
-    text: shareText,
-    url: shareUrl,
-    hashtag: t("summary_page_share_hashtag"),
-  });
-
-  // 處理下載圖片
-  const handleDownloadImage = async () => {
-    await downloadImage();
+  const determineFarewellVariant = (): FarewellVariant => {
+    if (ended && reflectionText.trim()) return "completed";
+    if (nextIntentStatus === "final") return "direction-saved";
+    if (nextIntentStatus === "draft") return "draft-saved";
+    return "draft-waiting";
   };
 
-  const handleNativeShare = async () => {
-    const imageData = await generateImage();
-    const imageFile = imageData
-      ? dataUrlToFile(imageData.src, `${summary.practiceName || "practice"}-summary.png`)
-      : null;
-
-    try {
-      const didShare = await shareAPI.nativeShare?.({
-        files: imageFile ? [imageFile] : [],
-        nativeText: shareText,
-      });
-
-      if (!didShare) {
-        toast.error(t("summary_page_no_share"));
-      }
-    } catch (error) {
-      const isCancelled = error instanceof DOMException && error.name === "AbortError";
-      if (!isCancelled) {
-        toast.error(t("summary_page_share_failed"));
-      }
-    }
+  const handleClose = () => {
+    setFarewellVariant(determineFarewellVariant());
+    setShowFarewell(true);
   };
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
-      <PageHeader leftAction="back" leftLabel="" title="" rightActionTo="/" />
+    <>
+      {/* AnimatePresence 需常駐掛載才能偵測 FarewellScreen 的 exit 動畫，
+          不可放在條件式 return 內（條件式會直接卸載整個元件樹，略過 exit transition） */}
+      <AnimatePresence>
+        {showFarewell && (
+          <FarewellScreen
+            variant={farewellVariant}
+            onNavigateToList={() => router.push("/practices")}
+          />
+        )}
+      </AnimatePresence>
 
-      <BackgroundAnimation />
-
-      {/* 撒花動畫 */}
-      <ConfettiAnimation />
-
-      <main className="relative max-w-[448px] mx-auto px-5 pb-24">
-        {/* Public toggle */}
-        <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-xl p-4 mb-4 border border-[#C1ECFF]">
-          <div className="flex items-center gap-2">
-            <Globe className="size-4 text-logo-cyan" />
-            <div>
-              <p className="text-sm font-medium text-text-dark">
-                {t("summary_page_publish_label")}
-              </p>
-              <p className="text-xs text-text-dark/50">{t("summary_page_publish_desc")}</p>
-            </div>
-          </div>
+      {!showFarewell && (
+        <div className="relative w-screen min-h-screen bg-white">
           <button
             type="button"
-            onClick={handlePublish}
-            disabled={isPublic || isPublishing}
-            className={cn(
-              "px-4 py-1.5 rounded-full text-sm font-medium transition-colors",
-              isPublic
-                ? "bg-[#E6FBF8] text-logo-cyan cursor-default"
-                : "bg-logo-cyan text-white hover:bg-logo-cyan/90"
-            )}
+            onClick={handleClose}
+            aria-label={t("summary_close_aria_label")}
+            className="fixed right-4 top-4 z-40 flex size-9 items-center justify-center rounded-full bg-white text-logo-gray shadow-sm"
           >
-            {isPublic
-              ? t("summary_page_published")
-              : isPublishing
-                ? t("summary_page_publishing")
-                : t("summary_page_publish")}
+            <X className="size-4" />
           </button>
+
+          <SurfaceNavChip
+            currentSurface={currentSurface}
+            stage={stage}
+            onSurfaceChange={handleSurfaceChange}
+          />
+
+          {currentSurface === 1 && (
+            <Surface1Summary
+              summary={summary}
+              stage={stage}
+              reflectionText={reflectionText}
+              onReflectionChange={setReflectionText}
+              onSurfaceChange={handleSurfaceChange}
+            />
+          )}
+
+          {currentSurface === 2 && (
+            <Surface2NextIntent
+              summary={summary}
+              onSurfaceChange={handleSurfaceChange}
+              onIntentSaved={setNextIntentStatus}
+            />
+          )}
+
+          {currentSurface === 3 && (
+            <Surface3ShareCard
+              summary={summary}
+              reflectionText={reflectionText}
+              onReflectionChange={setReflectionText}
+              selectedCheckInIds={selectedCheckInIds}
+              onSelectedChange={setSelectedCheckInIds}
+              themeIndex={themeIndex}
+              onThemeChange={setThemeIndex}
+              onSurfaceChange={handleSurfaceChange}
+            />
+          )}
         </div>
-
-        {/* 慶祝區塊 */}
-        <section className="text-center py-6">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="text-2xl font-bold text-text-dark mb-2">{t("summary_page_complete")}</h1>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <p className="text-text-dark mb-4">{t("summary_page_subtitle")}</p>
-          </motion.div>
-
-          {/* 慶祝人物插圖 */}
-          <motion.div
-            className="flex justify-center my-4"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <VerifiedSvg className="w-[300px] h-[220px]" />
-          </motion.div>
-
-          {/* 鼓勵文字 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            <p className="font-inter text-sm font-normal text-text-dark text-center leading-loose">
-              {summary.encouragementText}
-            </p>
-            <p className="font-inter text-sm font-normal text-text-dark text-center leading-loose mt-1">
-              {t("summary_page_journey")}
-            </p>
-          </motion.div>
-        </section>
-
-        {/* 摘要圖片預覽區塊 */}
-        <motion.section
-          className="mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-        >
-          <div ref={summaryCardRef}>
-            <PracticeSummaryCard summary={summary} />
-          </div>
-        </motion.section>
-
-        {/* 分享功能區塊 */}
-        <motion.section
-          className="mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-        >
-          <h3 className="text-base font-medium text-text-dark text-center mb-4">
-            {t("summary_page_share_title")}
-          </h3>
-          <div className="flex justify-center gap-4 mb-4">
-            <Button
-              type="button"
-              variant="link"
-              size="icon"
-              onClick={shareAPI.lineShare}
-              aria-label={t("summary_page_share_line")}
-            >
-              <LineFilledSvg className="size-10" />
-            </Button>
-            <Button
-              type="button"
-              variant="link"
-              size="icon"
-              onClick={shareAPI.threadsShare}
-              aria-label={t("summary_page_share_threads")}
-            >
-              <ThreadsFilledSvg className="size-10 text-logo-purple" />
-            </Button>
-            <Button
-              type="button"
-              variant="link"
-              size="icon"
-              onClick={shareAPI.facebookShare}
-              aria-label={t("summary_page_share_facebook")}
-            >
-              <FacebookFilledSvg className="size-10 text-logo-blue" />
-            </Button>
-            <Button
-              type="button"
-              variant="link"
-              size="icon"
-              onClick={shareAPI.xShare}
-              aria-label={t("summary_page_share_x")}
-            >
-              <XFilledSvg className="size-10" />
-            </Button>
-            <Button
-              type="button"
-              variant="link"
-              size="icon"
-              onClick={shareAPI.linkedinShare}
-              aria-label={t("summary_page_share_linkedin")}
-            >
-              <LinkedinFilledSvg className="size-10" />
-            </Button>
-            <Button
-              type="button"
-              variant="link"
-              size="icon"
-              className="bg-light-blue rounded-lg"
-              onClick={handleNativeShare}
-              aria-label={t("summary_page_share_other")}
-            >
-              <ExternalLink className="size-7" />
-            </Button>
-          </div>
-
-          {/* 下載圖片按鈕 */}
-          <Button
-            type="button"
-            variant="ctaOrange"
-            className="w-full"
-            onClick={handleDownloadImage}
-            disabled={isGenerating}
-          >
-            <Download className="size-4.5" />
-            {isGenerating ? t("summary_page_generating") : t("summary_page_download")}
-          </Button>
-        </motion.section>
-
-        {/* 回到主頁 */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1 }}
-        >
-          <Button
-            onClick={handleBackToHome}
-            variant="ghost"
-            className="w-full justify-center"
-            animation="none"
-          >
-            {t("summary_page_back_home")}
-            <ArrowRightOutlineSvg className="size-4.5" />
-          </Button>
-        </motion.div>
-      </main>
-    </div>
+      )}
+    </>
   );
 }
-
-export { MoodIconMap };

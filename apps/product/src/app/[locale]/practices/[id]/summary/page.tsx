@@ -4,11 +4,9 @@ import { useCurrentUser, usePracticeById, usePracticeSummary } from "@daodao/api
 import { useTranslations } from "@daodao/i18n";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
-import { endOfDay, isAfter } from "date-fns";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { PracticeSummaryPage } from "@/components/practice/summary";
-import { PracticeStatus } from "@/constants/practice-status";
 
 const TOAST_DISMISSED_KEY = "showcase_public_toast_dismissed";
 
@@ -48,23 +46,6 @@ export default function PracticeSummaryPageRoute() {
   // 判斷當前用戶是否為實踐的擁有者
   const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
 
-  // 判斷實踐是否已到期（completed 狀態或 endDate < now）
-  const isExpired = useMemo(() => {
-    if (!practiceData?.data) return false;
-
-    const { status, endDate } = practiceData.data;
-
-    // 如果狀態是 completed，則視為已到期
-    if (status === PracticeStatus.completed) return true;
-
-    // 如果有結束日期，檢查是否已過期
-    if (endDate) {
-      return isAfter(new Date(), endOfDay(new Date(endDate)));
-    }
-
-    return false;
-  }, [practiceData]);
-
   // task 10.1: 公開/延遲分享練習完成後顯示 toast
   const toastShownRef = useRef(false);
   useEffect(() => {
@@ -89,31 +70,24 @@ export default function PracticeSummaryPageRoute() {
     }
   }, [practiceData]);
 
-  // 權限檢查：非擁有者或實踐未到期時，重定向到實踐詳情頁
+  // 權限檢查：非擁有者時，重定向到實踐詳情頁
+  // 注意：active/ending 狀態也可進入總結頁（UI 鎖定機制控制可用功能）
   useEffect(() => {
-    // 等待資料載入完成
     if (isPracticeLoading || isUserLoading) return;
 
-    // 未登入或不是擁有者，重定向
     if (!currentUserData?.data || !isOwner) {
       router.replace(`/practices/${practiceId}`);
       return;
     }
-
-    // 實踐未到期，重定向
-    if (!isExpired) {
-      router.replace(`/practices/${practiceId}`);
-      return;
-    }
-  }, [isPracticeLoading, isUserLoading, currentUserData, isOwner, isExpired, practiceId, router]);
+  }, [isPracticeLoading, isUserLoading, currentUserData, isOwner, practiceId, router]);
 
   // Loading 狀態
   if (isPracticeLoading || isUserLoading) {
     return <PageShell message={t("loading")} />;
   }
 
-  // 權限不足或實踐未到期（等待重定向）
-  if (!isOwner || !isExpired) {
+  // 權限不足（等待重定向）
+  if (!isOwner) {
     return <PageShell message={t("summary_redirecting")} />;
   }
 
