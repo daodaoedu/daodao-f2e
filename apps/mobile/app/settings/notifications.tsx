@@ -3,10 +3,12 @@ import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
+import { Card, ScrollView, Switch, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { NOTIFICATION_TYPES } from "@/constants/settings";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
+import { throwIfOpenApiError } from "@/utils/api-error";
 
 interface INotificationPref {
   type: string;
@@ -35,9 +37,7 @@ function mapNotificationPreferences(prefsData?: { data?: INotificationPref[] }) 
 function assertPreferenceUpdateSucceeded(
   response: Awaited<ReturnType<typeof updateNotificationPreferences>>
 ) {
-  if (response.error) {
-    throw new Error("Failed to update notification preferences");
-  }
+  throwIfOpenApiError(response, "Failed to update notification preferences");
 }
 
 export default function NotificationSettingsScreen() {
@@ -53,6 +53,8 @@ export default function NotificationSettingsScreen() {
 
   useEffect(() => {
     if (!prefsData) return;
+    const n01Prefs = (prefsData.data ?? []).filter((p) => p.channel === "N01");
+    setGlobalEnabled(n01Prefs.length === 0 || n01Prefs.some((p) => p.isEnabled));
     setPrefs(mapNotificationPreferences(prefsData));
   }, [prefsData]);
 

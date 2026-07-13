@@ -2,17 +2,19 @@ import { MessageCircle } from "@tamagui/lucide-icons";
 import { type Href, useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
-import { Image, Pressable, StyleSheet } from "react-native";
+import { Alert, Image, Pressable, StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { PracticeMenuButton } from "@/components/practice/shared/practice-menu-button";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
 import { PracticeCommentPreview } from "@/components/showcase/practice-comment-preview";
+import { Badge } from "@/components/ui/badge";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { getStatusConfig } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
 import { removeReaction, upsertReaction } from "@/hooks/useReactions";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
 import { useMobileTranslation } from "@/i18n";
+import { extractApiErrorMessage } from "@/utils/api-error";
 
 interface ShowcaseCardProps {
   practice: IShowcasePractice;
@@ -43,6 +45,7 @@ export function ShowcaseCard({
 }: ShowcaseCardProps) {
   const router = useRouter();
   const t = useMobileTranslation("mobile.home");
+  const commonT = useMobileTranslation("common");
   const {
     id,
     title,
@@ -82,11 +85,15 @@ export function ShowcaseCard({
           await upsertReaction("practice", id, type);
         }
         await onReactionUpdated?.();
-      } catch {
+      } catch (error) {
         setInternalReaction(isSelected ? type : null);
+        Alert.alert(
+          commonT("errorTitle"),
+          extractApiErrorMessage(error, commonT("operationFailed"))
+        );
       }
     },
-    [internalReaction, id, onReactionTap, onReactionUpdated]
+    [internalReaction, id, onReactionTap, onReactionUpdated, commonT]
   );
 
   const handleReactionToggle = externalOnReactionToggle ?? internalHandleReactionToggle;
@@ -109,16 +116,15 @@ export function ShowcaseCard({
       {/* Header row */}
       <XStack alignItems="center" gap="$2" marginBottom="$2">
         {statusInfo && (
-          <View
-            style={[
-              styles.badge,
-              { backgroundColor: taskStatus === "completed" ? "#6B7280" : colors.primary.base },
-            ]}
+          <Badge
+            backgroundColor={taskStatus === "completed" ? "#6B7280" : colors.primary.base}
+            paddingHorizontal="$2"
+            paddingVertical="$0.5"
           >
             <Text fontSize={12} color="white">
               {taskStatus === "completed" ? t("filter_completed") : t("filter_in_progress")}
             </Text>
-          </View>
+          </Badge>
         )}
         {startFmt && endFmt && (
           <Text fontSize={12} color="rgba(0,0,0,0.5)" flex={1}>
@@ -227,11 +233,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
-  },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
   },
   avatar: {
     width: 64,

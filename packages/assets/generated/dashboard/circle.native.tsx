@@ -1,0 +1,7 @@
+import { SvgXml, type XmlProps } from "react-native-svg";
+
+const xml = `<svg width="212" height="212" viewBox="0 0 212 212" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="106" cy="106" r="106" fill="#16B9B3"/> </svg>`;
+
+export default function CircleSvg(props: Omit<XmlProps, "xml">) {
+  return <SvgXml xml={xml} {...props} />;
+}

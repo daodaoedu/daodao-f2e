@@ -1,5 +1,6 @@
 import {
-  createPracticeCheckIn,
+  createPracticeCheckInWithFormData,
+  extractApiErrorMessage,
   getPracticeById,
   getPracticeCheckIns,
   useMutate,
@@ -8,10 +9,13 @@ import {
 } from "@daodao/api";
 import { useCallback, useMemo, useRef, useState } from "react";
 import useSWR, { mutate as globalMutate } from "swr";
+import { type MoodType, mapMoodTypeToApiMood } from "@/constants/mood";
 import { PracticeStatus } from "@/constants/practice-status";
 import type { TaskStatus } from "@/constants/task-status";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
+import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import type { ICheckIn, IPractice } from "@/types/practice";
+import { createReactNativeFormDataFile } from "@/utils/form-data-file";
 
 // ============================================================================
 // Types — aligned with product's API response
@@ -67,8 +71,13 @@ type ApiPracticeDetail = IApiPractice & {
   durationDays?: number;
   frequencyMinDays?: number;
   frequencyMaxDays?: number;
+  sessionDurationMinutes?: number;
+  practiceTimePeriods?: string[];
+  resources?: Array<{ id?: string | number; name: string; url?: string }>;
   createdAt?: string;
   updatedAt?: string;
+  // 後端有回傳擁有者，但先前型別未宣告（對齊 product 的 practice.user）
+  user?: { id?: string | null } | null;
 };
 
 type ApiCheckIn = {
@@ -76,10 +85,6 @@ type ApiCheckIn = {
   practiceId: string | number;
   note?: string;
   createdAt: string;
-};
-
-type ApiMutationResult = {
-  error?: unknown;
 };
 
 const mapPracticeDetail = (practice: ApiPracticeDetail | undefined): IPractice | undefined => {
@@ -112,6 +117,21 @@ const mapPracticeDetail = (practice: ApiPracticeDetail | undefined): IPractice |
     lastCheckInAt: practice.lastCheckinAt ?? undefined,
     todayCheckedIn:
       practice.lastCheckinAt?.split("T")[0] === new Date().toISOString().split("T")[0],
+    // 詳情頁對齊 product：保留頻率、時長、執行時機、起訖日、進度等原始欄位
+    frequencyMinDays: practice.frequencyMinDays,
+    frequencyMaxDays: practice.frequencyMaxDays,
+    sessionDurationMinutes: practice.sessionDurationMinutes,
+    practiceTimePeriods: practice.practiceTimePeriods,
+    startDate: practice.startDate ?? null,
+    endDate: practice.endDate ?? null,
+    progressPercentage: practice.progressPercentage,
+    durationDays: practice.durationDays,
+    user: practice.user ?? null,
+    resources: (practice.resources ?? []).map((resource, index) => ({
+      id: String(resource.id ?? resource.url ?? index),
+      name: resource.name,
+      url: resource.url,
+    })),
   };
 };
 
@@ -121,19 +141,6 @@ const mapCheckIn = (checkIn: ApiCheckIn): ICheckIn => ({
   note: checkIn.note,
   createdAt: checkIn.createdAt,
 });
-
-const getMutationErrorMessage = (response: ApiMutationResult): string | null => {
-  if (!response.error) return null;
-
-  if (response.error instanceof Error) return response.error.message;
-  if (typeof response.error === "string") return response.error;
-  if (typeof response.error === "object" && "message" in response.error) {
-    const message = response.error.message;
-    if (typeof message === "string") return message;
-  }
-
-  return "打卡失敗，請稍後再試";
-};
 
 export function usePractices() {
   const {
@@ -147,9 +154,11 @@ export function usePractices() {
 
   const practices = practicesData?.data ?? [];
 
-  const { inProgressTasks, completedTasks } = useMemo(() => {
+  const { inProgressTasks, completedTasks, allTasks } = useMemo(() => {
     const inProgressTasksData: IInProgressTask[] = [];
     const completedTasksData: ICompletedTask[] = [];
+    // 對齊 product：「我的」用單一卡片型別呈現所有狀態的實踐，故所有實踐都轉成同一形狀
+    const allTasksData: IInProgressTask[] = [];
 
     for (const practice of practices) {
       const isInProgress =
@@ -159,22 +168,25 @@ export function usePractices() {
 
       const lastCheckInDate = practice.lastCheckinAt ?? null;
 
+      const unifiedTask: IInProgressTask = {
+        id: practice.id,
+        label: "主題實踐",
+        title: practice.title,
+        description: practice.practiceAction || "",
+        checkInCount: practice.checkInCount,
+        progress: practice.progressPercentage ?? 0,
+        messagesCount: 0,
+        isUnreadMessages: false,
+        theme: practice.themeColor || "#FCDD84",
+        status: mapPracticeStatusToTaskStatus(practice.status as PracticeStatus),
+        lastCheckInDate,
+        startDate: practice.startDate || null,
+        endDate: practice.endDate || null,
+      };
+      allTasksData.push(unifiedTask);
+
       if (isInProgress) {
-        inProgressTasksData.push({
-          id: practice.id,
-          label: "主題實踐",
-          title: practice.title,
-          description: practice.practiceAction || "",
-          checkInCount: practice.checkInCount,
-          progress: practice.progressPercentage ?? 0,
-          messagesCount: 0,
-          isUnreadMessages: false,
-          theme: practice.themeColor || "#FCDD84",
-          status: mapPracticeStatusToTaskStatus(practice.status as PracticeStatus),
-          lastCheckInDate,
-          startDate: practice.startDate || null,
-          endDate: practice.endDate || null,
-        });
+        inProgressTasksData.push(unifiedTask);
       } else if (practice.status === PracticeStatus.completed) {
         completedTasksData.push({
           id: practice.id,
@@ -188,7 +200,11 @@ export function usePractices() {
       }
     }
 
-    return { inProgressTasks: inProgressTasksData, completedTasks: completedTasksData };
+    return {
+      inProgressTasks: inProgressTasksData,
+      completedTasks: completedTasksData,
+      allTasks: allTasksData,
+    };
   }, [practices]);
 
   const stats = useMemo(() => {
@@ -203,6 +219,7 @@ export function usePractices() {
     practices,
     inProgressTasks,
     completedTasks,
+    allTasks,
     stats,
     isLoading: practicesLoading || statsLoading,
     error: practicesError,
@@ -232,11 +249,21 @@ export function usePractice(id: string | undefined) {
 interface ICheckInParams {
   practiceId: string;
   note?: string;
+  /** 前端 MoodType（會 map 成 API mood） */
+  mood?: MoodType;
+  /** 打卡標籤（後端必填至少 1 個） */
+  tags?: string[];
+  /** 本機圖片 URI（expo-image-picker） */
+  mediaUris?: string[];
 }
 
 interface ICheckInResult {
   success: boolean;
   error?: string;
+  /** 打卡後實踐進度 %（API CheckInWithEncouragement） */
+  practiceProgressPercentage?: number;
+  /** 後端鼓勵句 */
+  encouragement?: string;
 }
 
 export function useCheckIns(practiceId: string | undefined) {
@@ -258,6 +285,8 @@ export function useCheckIns(practiceId: string | undefined) {
   return {
     checkIns,
     checkInDates,
+    // 原始回應（含 mood / checkinDate），供心情排行與打卡堆疊使用，對齊 product
+    checkInsData: data?.data,
     isLoading,
     error,
     mutate,
@@ -270,24 +299,47 @@ export function useCheckIn() {
   const mutate = useMutate();
 
   const checkIn = useCallback(
-    async ({ practiceId, note }: ICheckInParams): Promise<ICheckInResult> => {
+    async ({
+      practiceId,
+      note,
+      mood,
+      tags = [],
+      mediaUris = [],
+    }: ICheckInParams): Promise<ICheckInResult> => {
       if (isCheckingRef.current) {
         return { success: false, error: "正在處理中" };
+      }
+
+      if (tags.length === 0) {
+        return { success: false, error: "請至少選擇一個標籤" };
       }
 
       isCheckingRef.current = true;
       setIsChecking(true);
 
       try {
-        const response = await createPracticeCheckIn(practiceId, {
-          note,
-          imageUrls: [],
-          tags: [],
+        // FormData + unauthorizedHandler（Bearer）— 對齊 product / 支援圖片
+        const response = await createPracticeCheckInWithFormData(practiceId, {
+          mood: mapMoodTypeToApiMood(mood ?? null),
+          tags,
+          description: note ?? "",
+          media: mediaUris.map((uri, index) => createReactNativeFormDataFile(uri, index)),
         });
-        const errorMessage = getMutationErrorMessage(response);
-        if (errorMessage) {
-          throw new Error(errorMessage);
-        }
+
+        // 新手任務 D：完成第一次打卡
+        applyOnboardingUpdateFromResponse(response);
+
+        // CheckInWithEncouragement：data 內含 encouragement + practiceProgressPercentage
+        const payload =
+          response && typeof response === "object" && "data" in response
+            ? (response as { data?: Record<string, unknown> }).data
+            : undefined;
+        const practiceProgressPercentage =
+          payload && typeof payload.practiceProgressPercentage === "number"
+            ? payload.practiceProgressPercentage
+            : undefined;
+        const encouragement =
+          payload && typeof payload.encouragement === "string" ? payload.encouragement : undefined;
 
         await Promise.all([
           mutate([
@@ -326,10 +378,12 @@ export function useCheckIn() {
           globalMutate(`/api/v1/practices/${practiceId}`),
           globalMutate(`/api/v1/practices/${practiceId}/checkins`),
         ]);
-        return { success: true };
+        return { success: true, practiceProgressPercentage, encouragement };
       } catch (error) {
-        const message = error instanceof Error ? error.message : "打卡失敗，請稍後再試";
-        return { success: false, error: message };
+        return {
+          success: false,
+          error: extractApiErrorMessage(error, "打卡失敗，請稍後再試"),
+        };
       } finally {
         isCheckingRef.current = false;
         setIsChecking(false);

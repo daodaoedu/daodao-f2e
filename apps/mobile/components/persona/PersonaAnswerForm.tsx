@@ -1,7 +1,8 @@
-import { submitPersonaAnswer } from "@daodao/api";
+import { extractApiErrorMessage, submitPersonaAnswer } from "@daodao/api";
 import { useState } from "react";
 import { Alert } from "react-native";
-import { Button, TextArea, XStack, YStack } from "tamagui";
+import { TextArea, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { useMobileTranslation } from "@/i18n";
 
 interface PersonaAnswerFormProps {
@@ -29,18 +30,19 @@ export function PersonaAnswerForm({
     if (!isChoice && !textAnswer.trim()) return;
     setSubmitting(true);
     try {
-      const res = await submitPersonaAnswer(
+      // openapi 此 path 未宣告 error response，TS 會把 error 收成 never — 執行時仍可能有 error
+      const res = (await submitPersonaAnswer(
         isChoice
           ? { questionId, selectedValue: selected }
           : { questionId, textAnswer: textAnswer.trim() }
-      );
+      )) as { error?: unknown };
       if (res.error) {
-        Alert.alert(t("submitError"));
+        Alert.alert(extractApiErrorMessage(res.error, t("submitError")));
         return;
       }
       onSuccess();
-    } catch {
-      Alert.alert(t("submitError"));
+    } catch (error) {
+      Alert.alert(extractApiErrorMessage(error, t("submitError")));
     } finally {
       setSubmitting(false);
     }

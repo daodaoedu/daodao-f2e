@@ -16,23 +16,35 @@ import {
 // Query Hooks
 // ============================================================================
 
+/** Primitive SWR keys only — avoid thrashing when callers pass inline params objects */
+
 export const useConnections = (params?: IPaginationParams) => {
-  return useSWR(["/api/v1/connections", params], () => getConnections(params), {
-    revalidateOnFocus: false,
-  });
+  const page = params?.page ?? null;
+  const limit = params?.limit ?? null;
+  return useSWR(
+    ["/api/v1/connections", page, limit] as const,
+    () => getConnections(params),
+    {
+      revalidateOnFocus: false,
+    }
+  );
 };
 
 export const useIncomingConnectionRequests = (params?: IPaginationParams) => {
+  const page = params?.page ?? null;
+  const limit = params?.limit ?? null;
   return useSWR(
-    ["/api/v1/connections/requests/incoming", params],
+    ["/api/v1/connections/requests/incoming", page, limit] as const,
     () => getIncomingConnectionRequests(params),
     { revalidateOnFocus: false }
   );
 };
 
 export const useOutgoingConnectionRequests = (params?: IPaginationParams) => {
+  const page = params?.page ?? null;
+  const limit = params?.limit ?? null;
   return useSWR(
-    ["/api/v1/connections/requests/outgoing", params],
+    ["/api/v1/connections/requests/outgoing", page, limit] as const,
     () => getOutgoingConnectionRequests(params),
     { revalidateOnFocus: false }
   );
@@ -40,7 +52,7 @@ export const useOutgoingConnectionRequests = (params?: IPaginationParams) => {
 
 export const useConnectionStatus = (userId?: string | null) => {
   return useSWR(
-    userId ? ["/api/v1/connections/status/{userId}", userId] : null,
+    userId ? (["/api/v1/connections/status/{userId}", userId] as const) : null,
     ([, targetUserId]) => getConnectionStatus(targetUserId),
     { revalidateOnFocus: false }
   );

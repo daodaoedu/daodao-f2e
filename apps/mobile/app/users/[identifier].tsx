@@ -1,6 +1,7 @@
 import {
   ApiError,
   disconnectUser,
+  getUserByIdentifier,
   getUserPractices,
   getUserProfileByIdentifier,
   respondConnectionRequest,
@@ -32,12 +33,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useSWR from "swr";
-import { Avatar, Button, Card, Separator, Text, XStack, YStack } from "tamagui";
+import { Avatar, Card, Separator, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { UserInfoCard } from "@/components/user";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { followTarget, unfollowTarget, useFollowStatus } from "@/hooks/useFollow";
 import { useMobileTranslation } from "@/i18n";
+import { extractApiErrorMessage } from "@/utils/api-error";
 
 type ConnectionStatus = "none" | "outgoing" | "incoming" | "connected";
 
@@ -71,7 +74,7 @@ function getPracticeStatusLabel(status: string, t: (key: string) => string) {
 }
 
 function getErrorMessage(error: unknown, fallback: string) {
-  return error instanceof Error ? error.message : fallback;
+  return extractApiErrorMessage(error, fallback);
 }
 
 export default function UserProfileRoute() {
@@ -83,18 +86,35 @@ export default function UserProfileRoute() {
   const [isMutatingConnection, setIsMutatingConnection] = useState(false);
   const { user: currentUser, isLoading: isCurrentUserLoading } = useCurrentUser();
 
+  // 基本資料 + id：用 getUserByIdentifier（代號 / UUID 皆可），整頁以它為準，不會因 customId 而壞
   const {
-    data,
+    data: basicUserRes,
     error,
     isLoading,
-    mutate: mutateProfile,
+    mutate: mutateBasicUser,
   } = useSWR(
-    identifier ? ["/api/v1/users/profile/{identifier}", identifier] : null,
-    ([, userIdentifier]) => getUserProfileByIdentifier(userIdentifier),
+    identifier ? ["/api/v1/users/identifier", identifier] : null,
+    ([, userIdentifier]) => getUserByIdentifier(userIdentifier),
     { revalidateOnFocus: false }
   );
 
-  const profile = data?.data;
+  // 統計數字：profile endpoint 傳 customId 會 500，故容錯處理，失敗只是沒數字、不影響整頁
+  const { data: profileCountsRes, mutate: mutateProfile } = useSWR(
+    identifier ? ["/api/v1/users/profile/{identifier}", identifier] : null,
+    ([, userIdentifier]) => getUserProfileByIdentifier(userIdentifier),
+    { revalidateOnFocus: false, shouldRetryOnError: false }
+  );
+
+  const basicUser = ((basicUserRes?.data as { data?: unknown } | undefined)?.data ??
+    basicUserRes?.data) as Partial<UserProfileData> | undefined;
+  const profileCounts = profileCountsRes?.data;
+
+  // 合併：基本欄位以 basicUser 為主（代號安全），統計數字用 profileCounts（對齊 product 雙來源做法）
+  const profile = useMemo<UserProfileData | undefined>(() => {
+    if (!basicUser && !profileCounts) return undefined;
+    return { ...profileCounts, ...basicUser } as UserProfileData;
+  }, [basicUser, profileCounts]);
+
   const targetUserId = profile?.id ?? "";
   const isOwnProfile = Boolean(currentUser?.id && targetUserId && currentUser.id === targetUserId);
   const canUseConnectionActions = Boolean(currentUser?.id && targetUserId && !isOwnProfile);
@@ -158,11 +178,12 @@ export default function UserProfileRoute() {
   );
 
   const handleRefresh = useCallback(() => {
+    mutateBasicUser();
     mutateProfile();
     mutateFollowStatus();
     mutatePractices();
     mutateConnectionStatus();
-  }, [mutateConnectionStatus, mutateFollowStatus, mutatePractices, mutateProfile]);
+  }, [mutateBasicUser, mutateConnectionStatus, mutateFollowStatus, mutatePractices, mutateProfile]);
 
   const handleToggleFollow = useCallback(async () => {
     if (!targetUserId || isMutatingFollow) return;

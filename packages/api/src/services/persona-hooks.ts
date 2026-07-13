@@ -5,37 +5,58 @@
  * 提供學習人物誌相關的 React Hooks（用於 Client Components）
  */
 
+import { useMemo } from "react";
 import { useQuery } from "../hooks";
 
 // ============================================================================
 // Query Hooks
 // ============================================================================
 
+/**
+ * 注意：init 必須 useMemo 穩定。
+ * swr-openapi 的 cache key 是 [prefix, path, init]，用 reference 比較；
+ * 每次 render 新建 init 會導致 key 一直變 → 無限 revalidate → isLoading 卡住 → UI 永遠空白。
+ */
+
 export const usePersonaQuestions = (locale?: string, options?: { enabled?: boolean }) => {
   const enabled = options?.enabled ?? true;
-  return useQuery(
-    "/api/v1/persona/questions",
-    enabled ? { params: { query: locale ? { locale } : undefined } } : null
+  const init = useMemo(
+    () => (enabled ? { params: { query: locale ? { locale } : undefined } } : null),
+    [enabled, locale]
   );
+  return useQuery("/api/v1/persona/questions", init);
 };
 
-export const usePersonaCarouselState = (replace?: number, locale?: string) => {
-  return useQuery("/api/v1/persona/carousel-state", {
-    params: {
-      query: {
-        ...(replace != null ? { replace } : {}),
-        ...(locale ? { locale } : {}),
-      },
-    },
-  });
+export const usePersonaCarouselState = (
+  replace?: number,
+  locale?: string,
+  options?: { enabled?: boolean }
+) => {
+  const enabled = options?.enabled ?? true;
+  const init = useMemo(
+    () =>
+      enabled
+        ? {
+            params: {
+              query: {
+                ...(replace != null ? { replace } : {}),
+                ...(locale ? { locale } : {}),
+              },
+            },
+          }
+        : null,
+    [enabled, replace, locale]
+  );
+  return useQuery("/api/v1/persona/carousel-state", init);
 };
 
 export const usePersonaProfileMe = (locale?: string, options?: { enabled?: boolean }) => {
   const enabled = options?.enabled ?? true;
-  return useQuery(
-    "/api/v1/persona/profile/me",
-    enabled ? { params: { query: locale ? { locale } : undefined } } : null
+  const init = useMemo(
+    () => (enabled ? { params: { query: locale ? { locale } : undefined } } : null),
+    [enabled, locale]
   );
+  return useQuery("/api/v1/persona/profile/me", init);
 };
 
 export const usePersonaQuestionAnswers = (
@@ -43,21 +64,26 @@ export const usePersonaQuestionAnswers = (
   options?: { locale?: string; limit?: number; cursor?: number; enabled?: boolean }
 ) => {
   const enabled = options?.enabled ?? true;
-  return useQuery(
-    "/api/v1/persona/questions/{questionId}/answers",
-    enabled
-      ? {
-          params: {
-            path: { questionId },
-            query: {
-              ...(options?.locale ? { locale: options.locale } : {}),
-              ...(options?.limit != null ? { limit: options.limit } : {}),
-              ...(options?.cursor != null ? { cursor: options.cursor } : {}),
+  const locale = options?.locale;
+  const limit = options?.limit;
+  const cursor = options?.cursor;
+  const init = useMemo(
+    () =>
+      enabled
+        ? {
+            params: {
+              path: { questionId },
+              query: {
+                ...(locale ? { locale } : {}),
+                ...(limit != null ? { limit } : {}),
+                ...(cursor != null ? { cursor } : {}),
+              },
             },
-          },
-        }
-      : null
+          }
+        : null,
+    [enabled, questionId, locale, limit, cursor]
   );
+  return useQuery("/api/v1/persona/questions/{questionId}/answers", init);
 };
 
 export const usePersonaProfileUser = (
@@ -65,18 +91,22 @@ export const usePersonaProfileUser = (
   options?: { exclude?: number; enabled?: boolean; locale?: string }
 ) => {
   const enabled = options?.enabled ?? true;
-  return useQuery(
-    "/api/v1/persona/profile/{userId}",
-    enabled
-      ? {
-          params: {
-            path: { userId },
-            query: {
-              ...(options?.exclude != null ? { exclude: options.exclude } : {}),
-              ...(options?.locale ? { locale: options.locale } : {}),
+  const exclude = options?.exclude;
+  const locale = options?.locale;
+  const init = useMemo(
+    () =>
+      enabled
+        ? {
+            params: {
+              path: { userId },
+              query: {
+                ...(exclude != null ? { exclude } : {}),
+                ...(locale ? { locale } : {}),
+              },
             },
-          },
-        }
-      : null
+          }
+        : null,
+    [enabled, userId, exclude, locale]
   );
+  return useQuery("/api/v1/persona/profile/{userId}", init);
 };

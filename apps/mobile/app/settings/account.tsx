@@ -4,7 +4,8 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, Modal, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, Input, ScrollView, Text, XStack, YStack } from "tamagui";
+import { Card, Input, ScrollView, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import {
   AVAILABLE_FIELDS,
   EDUCATION_STAGE_OPTIONS,
@@ -13,15 +14,14 @@ import {
 } from "@/constants/settings";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import { useMobileTranslation } from "@/i18n";
+import { throwIfOpenApiError } from "@/utils/api-error";
 
 type FieldOptionType = { value: string; label: string };
 
 function assertSuccessfulResponse(response: { error?: unknown }, fallbackMessage: string) {
-  if (!response.error) return;
-
-  const error = response.error as { error?: { message?: string }; message?: string };
-  throw new Error(error.error?.message ?? error.message ?? fallbackMessage);
+  throwIfOpenApiError(response, fallbackMessage);
 }
 
 function FieldSelectionModal({
@@ -169,6 +169,8 @@ export default function AccountSettingsScreen() {
 
       const response = await updateCurrentUser(updateData);
       assertSuccessfulResponse(response, t("saveError"));
+      // 新手任務 B：即時標記「公開資訊/帳號/領域偏好」完成
+      applyOnboardingUpdateFromResponse(response.data);
       await mutate();
       Alert.alert(t("successTitle"), t("saveSuccess"), [
         { text: t("confirm"), onPress: () => router.back() },

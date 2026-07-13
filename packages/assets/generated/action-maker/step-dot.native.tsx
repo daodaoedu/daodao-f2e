@@ -1,0 +1,7 @@
+import { SvgXml, type XmlProps } from "react-native-svg";
+
+const xml = `<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="14" cy="14" r="14" fill="url(#paint0_radial_103_1153)"/> <defs> <radialGradient id="paint0_radial_103_1153" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(14 14) rotate(90) scale(14)"> <stop stop-color="white"/> <stop offset="1" stop-color="white" stop-opacity="0"/> </radialGradient> </defs> </svg>`;
+
+export default function StepDotSvg(props: Omit<XmlProps, "xml">) {
+  return <SvgXml xml={xml} {...props} />;
+}

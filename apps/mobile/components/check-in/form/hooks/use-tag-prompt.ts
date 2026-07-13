@@ -1,23 +1,25 @@
 import { getTagPromptsByTags } from "@daodao/api";
 import type { UseFormReturn } from "react-hook-form";
+import { useMobileI18n } from "@/i18n";
 import type { CheckInFormValuesType } from "../schema";
-
-// Mobile default locale (TODO: integrate with i18n when available)
-const DEFAULT_LOCALE = "zh-TW";
 
 /**
  * Hook 用於處理標籤引導句的獲取和更新 description (Mobile)
  */
 export const useTagPrompt = (form: UseFormReturn<CheckInFormValuesType>) => {
+  const { locale } = useMobileI18n();
+
   /**
    * 取得標籤引導句並更新 description
    */
   const fetchAndAddPrompt = async (tagName: string) => {
     try {
+      // API 需要 "en-US" 格式，i18n 使用 "en"，需轉換（對齊 product）
+      const apiLocale = locale === "en" ? "en-US" : "zh-TW";
       const response = await getTagPromptsByTags({
         tags: tagName,
         usageType: "practice_checkin",
-        locale: DEFAULT_LOCALE,
+        locale: apiLocale,
       });
 
       const promptsData = response.data?.data;
@@ -35,8 +37,9 @@ export const useTagPrompt = (form: UseFormReturn<CheckInFormValuesType>) => {
         }
       }
     } catch (error) {
-      // 靜默處理錯誤，不影響標籤選擇
-      console.error("取得標籤引導句失敗:", error);
+      // 靜默處理錯誤，不影響標籤選擇。用 console.log 而非 console.error：
+      // 後者在 dev 會觸發 LogBox 紅色通知，與「靜默」意圖矛盾。
+      console.log("取得標籤引導句失敗:", error);
     }
   };
 

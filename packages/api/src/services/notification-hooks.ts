@@ -5,7 +5,7 @@
  * 通知相關的 React Hooks（用於 Client Components）
  */
 
-import { useQuery } from "../hooks";
+import { EMPTY_QUERY_INIT, useQuery } from "../hooks";
 
 // ============================================================================
 // Query Hooks
@@ -32,5 +32,5 @@ export const useNotifications = (params?: { cursor?: string; limit?: number }) =
 
 /** 取得通知偏好設定 */
 export const useNotificationPreferences = () => {
-  return useQuery("/api/v1/notifications/preferences", {});
+  return useQuery("/api/v1/notifications/preferences", EMPTY_QUERY_INIT);
 };

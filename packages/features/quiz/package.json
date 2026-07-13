@@ -5,7 +5,8 @@
   "description": "Quiz feature module for DaoDao monorepo",
   "main": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./result-detail-map": "./src/utils/result-detail-map.ts"
   },
   "scripts": {
     "build": "tsc",

@@ -4,6 +4,7 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
+    "eas-build-post-install": "pnpm --filter @daodao/config generate:env",
     "dev": "expo start",
     "dev:ios": "expo start --ios",
     "dev:android": "expo start --android",
@@ -20,7 +21,9 @@
   },
   "dependencies": {
     "@daodao/api": "workspace:*",
+    "@daodao/assets": "workspace:*",
     "@daodao/design-tokens": "workspace:*",
+    "@daodao/features-quiz": "workspace:*",
     "@daodao/shared": "workspace:*",
     "@hookform/resolvers": "catalog:",
     "@lottiefiles/dotlottie-react": "^0.13.5",
@@ -58,6 +61,7 @@
     "expo-sharing": "~14.0.8",
     "expo-splash-screen": "~0.30.0",
     "expo-status-bar": "~3.0.9",
+    "expo-updates": "~29.0.18",
     "expo-web-browser": "^15.0.10",
     "lottie-react-native": "^7.3.5",
     "moti": "^0.30.0",

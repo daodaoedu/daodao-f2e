@@ -1,11 +1,13 @@
 import {
   createComment as apiCreateComment,
   deleteComment as apiDeleteComment,
+  extractApiErrorMessage,
   getComments as apiGetComments,
   updateComment as apiUpdateComment,
   type CommentTargetType,
 } from "@daodao/api";
 import useSWR from "swr";
+import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 
 // ── Types ──
 
@@ -44,17 +46,6 @@ function toMobileComment(comment: ApiComment): Comment {
   };
 }
 
-function getErrorMessage(error: unknown): string {
-  if (typeof error === "object" && error !== null && "message" in error) {
-    const message = (error as { message?: unknown }).message;
-    if (typeof message === "string" && message.length > 0) {
-      return message;
-    }
-  }
-
-  return "Request failed";
-}
-
 function parseCommentId(commentId: string): number {
   const numericCommentId = Number(commentId);
 
@@ -77,7 +68,7 @@ export function useComments(targetType: string, targetId: string) {
       });
 
       if (response.error) {
-        throw new Error(getErrorMessage(response.error));
+        throw new Error(extractApiErrorMessage(response.error, "載入留言失敗"));
       }
 
       return {
@@ -104,8 +95,11 @@ export async function createComment(targetType: string, targetId: string, conten
   } as Parameters<typeof apiCreateComment>[0]);
 
   if (response.error) {
-    throw new Error(getErrorMessage(response.error));
+    throw new Error(extractApiErrorMessage(response.error, "留言失敗"));
   }
+
+  // 新手任務 E：即時標記「在靈感頁留言」完成（非靈感頁留言時 server 不回 meta，為 no-op）
+  applyOnboardingUpdateFromResponse(response.data);
 
   return {
     ...response.data,
@@ -117,7 +111,7 @@ export async function updateComment(commentId: string, content: string) {
   const response = await apiUpdateComment(parseCommentId(commentId), { content });
 
   if (response.error) {
-    throw new Error(getErrorMessage(response.error));
+    throw new Error(extractApiErrorMessage(response.error, "更新留言失敗"));
   }
 
   return { success: response.data.success };
@@ -127,7 +121,7 @@ export async function deleteComment(commentId: string) {
   const response = await apiDeleteComment(parseCommentId(commentId));
 
   if (response.error) {
-    throw new Error(getErrorMessage(response.error));
+    throw new Error(extractApiErrorMessage(response.error, "刪除留言失敗"));
   }
 
   return { success: response.data.success };

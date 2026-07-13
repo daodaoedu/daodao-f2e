@@ -1,16 +1,15 @@
-import {
-  CheckCircle2,
-  ChevronRight,
-  MessageSquare,
-  RefreshCw,
-  Sparkles,
-} from "@tamagui/lucide-icons";
+import { getUserProfileByIdentifier } from "@daodao/api";
+import activeShaperJson from "@daodao/assets/images/quiz/active-shaper-1.json";
+import communityConnectorJson from "@daodao/assets/images/quiz/community-connector-1.json";
+import deepExplorerJson from "@daodao/assets/images/quiz/deep-explorer-1.json";
+import liquidIntegratorJson from "@daodao/assets/images/quiz/liquid-integrator-1.json";
+import orderBuilderJson from "@daodao/assets/images/quiz/order-builder-1.json";
+import { ChevronRight, RefreshCw } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
-import LottieView from "lottie-react-native";
-import { useCallback, useMemo, useRef, useState } from "react";
+import LottieView, { type AnimationObject } from "lottie-react-native";
+import { useCallback, useRef, useState } from "react";
 import {
   Animated,
-  FlatList,
   Linking,
   Pressable,
   RefreshControl,
@@ -18,38 +17,66 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, Text, XStack, YStack } from "tamagui";
-import activeShaper1Json from "@/assets/animations/active-shaper-1.json";
-import { CompletedCard, DashboardHeader, FilterPills, InProgressCard } from "@/components/home";
-import { RandomPracticesSection } from "@/components/practice/shared/random-practices-section";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import useSWR from "swr";
+import { Card, Text, XStack, YStack } from "tamagui";
+import {
+  PracticeSection,
+  PracticeTabBar,
+  type PracticeTabType,
+} from "@/components/practice/practice-section";
+import { Button } from "@/components/ui/button";
 import { UserInfoCard } from "@/components/user";
 import { getQuizThemeMessage, getQuizUrl } from "@/constants/quiz-theme";
-import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { usePractices } from "@/hooks/usePractices";
 import { useMobileTranslation } from "@/i18n";
 
 const bannerImage = require("@/assets/images/user-mobile-banner.png");
 const logoImage = require("@/assets/images/logo.png");
 const BANNER_HEIGHT = 420;
 
+// 對齊 product island-header：依測驗結果類型顯示對應島嶼動畫，無結果時預設動動島
+const resultTypeToLottie: Record<string, AnimationObject> = {
+  D: deepExplorerJson,
+  O: orderBuilderJson,
+  A: activeShaperJson,
+  L: liquidIntegratorJson,
+  C: communityConnectorJson,
+};
+
 export default function ProfileScreen() {
   const router = useRouter();
   const t = useMobileTranslation("mobile.profile");
   const homeT = useMobileTranslation("mobile.home");
-  const personaT = useMobileTranslation("persona");
   const { width: screenWidth } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  // ── 主題實踐分頁（對齊 product：rail 是捲動才出現的置頂 sticky bar）──
+  const [activeTab, setActiveTab] = useState<PracticeTabType>("practices");
 
   // ── User data ──
   const { user, isLoading: isUserLoading, mutate: mutateUser } = useCurrentUser();
+
+  // ── Profile 統計（追蹤數 / 連結數 / 近期實踐數 / 地點 / 標語 / 自介 / 社群）──
+  // 對齊 product：這些欄位來自 profile endpoint，非 /me，故另外抓。
+  // 必須用 user.id（UUID / external_id）；傳 customId 後端會拿去 parse UUID 而 500。
+  const profileIdentifier = user?.id ?? null;
+  const { data: profileResponse, mutate: mutateProfile } = useSWR(
+    profileIdentifier ? ["/api/v1/users/profile/{identifier}", profileIdentifier] : null,
+    // wrapFetch 會自動帶 Bearer token；identifier 必須是 UUID（見上方註解）
+    ([, identifier]) => getUserProfileByIdentifier(identifier),
+    { revalidateOnFocus: false }
+  );
+  const profile = profileResponse?.data;
 
   // ── 學習類型 ──
   const resultType = user?.latestQuizResult?.resultType?.toUpperCase() ?? null;
   const learningTypeMessage = getQuizThemeMessage(resultType);
   const isEmptyResult = !learningTypeMessage;
+  const lottieSource: AnimationObject =
+    (resultType ? resultTypeToLottie[resultType] : undefined) ?? activeShaperJson;
 
   // ── Scroll ──
   const SCROLL_THRESHOLD = 167;
@@ -60,60 +87,16 @@ export default function ProfileScreen() {
     extrapolate: "clamp",
   });
 
+  // 置頂分頁列：捲動超過門檻才滑入（對齊 product 的 sticky sub-nav）
+  const tabBarTranslateY = scrollY.interpolate({
+    inputRange: [SCROLL_THRESHOLD - 20, SCROLL_THRESHOLD],
+    outputRange: [-220, 0],
+    extrapolate: "clamp",
+  });
+
   const handleScroll = Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
     useNativeDriver: false,
   });
-
-  // ── Practices ──
-  const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
-  const {
-    stats,
-    inProgressTasks,
-    completedTasks,
-    isLoading: isMyLoading,
-    mutate: mutatePractices,
-  } = usePractices();
-
-  const filteredInProgressTasks = useMemo(() => {
-    if (filterStatus === FilterStatus.completed) return [];
-    if (filterStatus === FilterStatus.all) return inProgressTasks;
-    return inProgressTasks.filter((task) => task.status === filterStatus);
-  }, [inProgressTasks, filterStatus]);
-
-  const hasPractices = inProgressTasks.length > 0 || completedTasks.length > 0;
-  const showInProgress = filterStatus !== FilterStatus.completed;
-  const showCompleted =
-    filterStatus === FilterStatus.all || filterStatus === FilterStatus.completed;
-
-  const dashboardStats = useMemo(
-    () => [
-      {
-        label: homeT("stats_streak_label"),
-        value: String(stats.currentStreak || 0),
-        unit: homeT("stats_days_unit"),
-        icon: (
-          <CheckCircle2
-            size={48}
-            color={colors.text.dark}
-            style={{ transform: [{ rotate: "-12deg" }] }}
-          />
-        ),
-      },
-      {
-        label: homeT("stats_responses_label"),
-        value: String(stats.totalCheckIns || 0),
-        unit: homeT("stats_times_unit"),
-        icon: (
-          <MessageSquare
-            size={48}
-            color={colors.text.dark}
-            style={{ transform: [{ rotate: "-12deg" }] }}
-          />
-        ),
-      },
-    ],
-    [stats, homeT]
-  );
 
   // ── Handlers ──
   // 測驗填答流程僅在 apps/website 實作，App 內導去該網址進行測驗
@@ -129,12 +112,8 @@ export default function ProfileScreen() {
 
   const handleRefresh = useCallback(() => {
     mutateUser();
-    mutatePractices();
-  }, [mutateUser, mutatePractices]);
-
-  const handleOpenFootprints = useCallback(() => {
-    router.push("/me/footprints" as never);
-  }, [router]);
+    mutateProfile();
+  }, [mutateUser, mutateProfile]);
 
   return (
     <RNView style={styles.container}>
@@ -172,7 +151,7 @@ export default function ProfileScreen() {
       <Animated.View
         style={[styles.fixedLottie, { opacity: bannerOpacity, left: screenWidth / 2 - 75 }]}
       >
-        <LottieView source={activeShaper1Json} autoPlay loop style={styles.lottie} />
+        <LottieView source={lottieSource} autoPlay loop style={styles.lottie} />
       </Animated.View>
 
       {/* 固定學習類型卡片 — 隨滾動變淡 */}
@@ -221,6 +200,16 @@ export default function ProfileScreen() {
         </Card>
       </Animated.View>
 
+      {/* 置頂分頁列 — 捲動超過門檻才滑入（對齊 product sticky sub-nav）*/}
+      <Animated.View
+        style={[
+          styles.stickyTabBar,
+          { paddingTop: insets.top + 8, transform: [{ translateY: tabBarTranslateY }] },
+        ]}
+      >
+        <PracticeTabBar activeTab={activeTab} onChange={setActiveTab} />
+      </Animated.View>
+
       {/* 主內容層 */}
       <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <Animated.ScrollView
@@ -241,7 +230,7 @@ export default function ProfileScreen() {
 
           {/* 主要內容區 */}
           <YStack paddingHorizontal="$4" paddingBottom={120} minHeight={300}>
-            {isUserLoading || isMyLoading ? (
+            {isUserLoading ? (
               <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical="$8">
                 <Text color={colors.text.dark}>{homeT("loading")}</Text>
               </YStack>
@@ -249,77 +238,29 @@ export default function ProfileScreen() {
               <>
                 {/* 用戶資料卡片 */}
                 <UserInfoCard
-                  name={user?.name ?? null}
-                  location={user?.locationNameZh ?? user?.location ?? null}
-                  selfIntroduction={user?.selfIntroduction}
-                  photoURL={user?.photoURL}
-                  personalSlogan={user?.personalSlogan}
-                  contactList={user?.contactList}
+                  name={profile?.name ?? user?.name ?? null}
+                  customId={profile?.customId ?? user?.customId}
+                  location={
+                    profile?.locationNameZh ??
+                    profile?.location ??
+                    user?.locationNameZh ??
+                    user?.location ??
+                    null
+                  }
+                  selfIntroduction={profile?.selfIntroduction ?? user?.selfIntroduction}
+                  photoURL={profile?.photoURL ?? user?.photoURL}
+                  personalSlogan={profile?.personalSlogan ?? user?.personalSlogan}
+                  contactList={profile?.contactList ?? user?.contactList}
+                  connectionsCount={profile?.connectionsCount}
+                  followersCount={profile?.followersCount}
+                  hideConnectionsCount={profile?.hideConnectionsCount}
+                  recentPracticeCount={profile?.recentPracticeCount}
+                  editable
+                  onEdit={() => router.push("/settings/public-info" as never)}
                 />
 
-                {/* Dashboard 統計 */}
-                <DashboardHeader stats={dashboardStats} />
-
-                <Button
-                  marginBottom="$4"
-                  backgroundColor={colors.background.light}
-                  borderWidth={1}
-                  borderColor={colors.border.light}
-                  onPress={handleOpenFootprints}
-                >
-                  <XStack alignItems="center" gap="$2">
-                    <MessageSquare size={18} color={colors.logo.cyan} />
-                    <Text color={colors.text.dark}>{t("view_footprints")}</Text>
-                    <ChevronRight size={16} color={colors.text.muted} />
-                  </XStack>
-                </Button>
-
-                <Button
-                  marginBottom="$4"
-                  backgroundColor={colors.background.light}
-                  borderWidth={1}
-                  borderColor={colors.border.light}
-                  onPress={() => router.push("/persona" as never)}
-                >
-                  <XStack alignItems="center" gap="$2">
-                    <Sparkles size={18} color={colors.logo.cyan} />
-                    <Text color={colors.text.dark}>{personaT("tabLabelShort")}</Text>
-                    <ChevronRight size={16} color={colors.text.muted} />
-                  </XStack>
-                </Button>
-
-                {!hasPractices && <RandomPracticesSection compact />}
-
-                {hasPractices && (
-                  <>
-                    <FilterPills activeFilter={filterStatus} onFilterChange={setFilterStatus} />
-
-                    {/* In-progress cards — horizontal scroll */}
-                    {showInProgress && filteredInProgressTasks.length > 0 && (
-                      <FlatList
-                        horizontal
-                        data={filteredInProgressTasks}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => <InProgressCard task={item} />}
-                        contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
-                        showsHorizontalScrollIndicator={false}
-                        style={{ marginBottom: 16 }}
-                      />
-                    )}
-
-                    {/* Completed cards — vertical list */}
-                    {showCompleted && completedTasks.length > 0 && (
-                      <YStack gap="$3" marginBottom="$4">
-                        <Text fontSize={18} fontWeight="500" color={colors.text.dark}>
-                          {homeT("completed")}
-                        </Text>
-                        {completedTasks.map((task) => (
-                          <CompletedCard key={task.id} task={task} />
-                        ))}
-                      </YStack>
-                    )}
-                  </>
-                )}
+                {/* 主題實踐區（含學習人物誌分頁）— 對齊 product PracticeSection */}
+                {user?.id ? <PracticeSection userId={user.id} activeTab={activeTab} /> : null}
               </>
             )}
           </YStack>
@@ -356,6 +297,18 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 2,
     backgroundColor: "transparent",
+  },
+  stickyTabBar: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 20,
+    backgroundColor: colors.background.light,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
   },
   fixedLottie: {
     position: "absolute",

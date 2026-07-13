@@ -5,21 +5,13 @@ import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Alert, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Avatar,
-  Button,
-  Card,
-  Input,
-  ScrollView,
-  Switch,
-  Text,
-  TextArea,
-  XStack,
-  YStack,
-} from "tamagui";
+import { Avatar, Card, Input, ScrollView, Switch, Text, TextArea, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import { useMobileTranslation } from "@/i18n";
+import { extractApiErrorMessage } from "@/utils/api-error";
 
 type LocationOptionType = {
   value: string;
@@ -40,16 +32,7 @@ type ErrorWithDetails = Error & {
 };
 
 function getErrorMessage(error: unknown, fallback: string) {
-  if (error instanceof Error && error.message) return error.message;
-  if (typeof error === "object" && error !== null && "message" in error) {
-    const message = (error as { message?: unknown }).message;
-    if (typeof message === "string" && message) return message;
-  }
-  if (typeof error === "object" && error !== null && "error" in error) {
-    const nested = (error as { error?: { message?: unknown } }).error;
-    if (typeof nested?.message === "string" && nested.message) return nested.message;
-  }
-  return fallback;
+  return extractApiErrorMessage(error, fallback);
 }
 
 function getErrorDetails(error: unknown): Array<{ path?: string; message?: string }> {
@@ -418,6 +401,8 @@ export default function PublicInfoSettingsScreen() {
       if (response.error) {
         throw response.error;
       }
+      // 新手任務 B：即時標記「公開資訊/帳號/領域偏好」完成
+      applyOnboardingUpdateFromResponse(response.data);
       await mutate();
       setSelectedPhotoUri(null);
       setSelectedPhotoFile(null);

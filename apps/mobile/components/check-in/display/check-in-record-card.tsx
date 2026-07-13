@@ -4,6 +4,7 @@ import { LayoutAnimation, Platform, Pressable, UIManager } from "react-native";
 import { Spinner, Text, View, XStack, YStack } from "tamagui";
 import {
   type ApiMoodType,
+  MOOD_EMOJI_SVG,
   MOOD_OPTIONS,
   type MoodType,
   mapApiMoodToMoodType,
@@ -137,6 +138,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
               const stat = moodStats[index];
               const count = stat?.mood === moodOption.id ? stat.count : 0;
               const barHeight = totalMoodCount > 0 ? (count / totalMoodCount) * MAX_BAR_HEIGHT : 0;
+              const MoodIcon = MOOD_EMOJI_SVG[moodOption.id];
 
               return (
                 <YStack key={moodOption.id} alignItems="center" gap="$1">
@@ -156,8 +158,8 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
                       borderRadius={3}
                     />
                   </View>
-                  {/* Emoji */}
-                  <Text fontSize={24}>{moodOption.emoji}</Text>
+                  {/* Mood illustration (對齊 product 用 @daodao/assets 心情插畫) */}
+                  <MoodIcon width={28} height={28} />
                   {/* Count */}
                   <Text
                     fontSize={12}

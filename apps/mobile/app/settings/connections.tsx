@@ -12,7 +12,8 @@ import { ChevronLeft } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Avatar, Button, Card, ScrollView, Text, XStack, YStack } from "tamagui";
+import { Avatar, Card, ScrollView, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 

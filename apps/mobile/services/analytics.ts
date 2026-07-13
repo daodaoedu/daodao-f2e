@@ -151,18 +151,29 @@ class AnalyticsService {
     // Initialize Firebase Analytics (not available in Expo Go)
     if (!isExpoGo) {
       try {
-        const firebaseModule = await import("@react-native-firebase/analytics");
-        firebaseAnalytics = firebaseModule.default;
-        const analyticsInstance = firebaseAnalytics();
-        if (analyticsInstance) {
-          await analyticsInstance.setAnalyticsCollectionEnabled(true);
-          this.firebaseInitialized = true;
-
+        // Firebase auto-initializes a default app from the bundled
+        // GoogleService-Info.plist / google-services.json. When that file is
+        // absent no app is configured, so skip silently like the other
+        // providers instead of letting firebaseAnalytics() throw.
+        const { getApps } = await import("@react-native-firebase/app");
+        if (getApps().length === 0) {
           if (__DEV__) {
-            console.log("[Analytics] Firebase Analytics initialized");
+            console.log("[Analytics] Firebase config file not found, skipping");
           }
-        } else if (__DEV__) {
-          console.warn("[Analytics] Firebase Analytics not available");
+        } else {
+          const firebaseModule = await import("@react-native-firebase/analytics");
+          firebaseAnalytics = firebaseModule.default;
+          const analyticsInstance = firebaseAnalytics();
+          if (analyticsInstance) {
+            await analyticsInstance.setAnalyticsCollectionEnabled(true);
+            this.firebaseInitialized = true;
+
+            if (__DEV__) {
+              console.log("[Analytics] Firebase Analytics initialized");
+            }
+          } else if (__DEV__) {
+            console.warn("[Analytics] Firebase Analytics not available");
+          }
         }
       } catch (error) {
         if (__DEV__) {

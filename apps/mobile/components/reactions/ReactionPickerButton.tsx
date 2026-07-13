@@ -1,13 +1,11 @@
-import { ThumbsUp } from "@tamagui/lucide-icons";
+import LikeOutlineSvg from "@daodao/assets/images/icon/like-outline.svg";
 import { useCallback, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet } from "react-native";
 import { Text, View, XStack } from "tamagui";
-import {
-  PICKER_REACTIONS,
-  REACTION_CONFIG,
-  type ReactionTypeType,
-} from "@/constants/reaction-type";
+import { PICKER_REACTIONS, type ReactionTypeType } from "@/constants/reaction-type";
+import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
+import { LottieEmoji } from "./LottieEmoji";
 
 const LONG_PRESS_DELAY = 400;
 
@@ -19,6 +17,10 @@ interface ReactionEmojiStackProps {
   emojiSize: number;
   overlap: number;
   showCircle?: boolean;
+  /** 有色圓的 box 尺寸（含 border）。summary=32、comment=22（對齊 product size-7 / size-5） */
+  circleSize?: number;
+  /** 白環寬度（RN border 內縮）。summary=2、comment=1 */
+  circleBorderWidth?: number;
 }
 
 function ReactionEmojiStack({
@@ -27,6 +29,8 @@ function ReactionEmojiStack({
   emojiSize,
   overlap,
   showCircle,
+  circleSize = 32,
+  circleBorderWidth = 2,
 }: ReactionEmojiStackProps) {
   return (
     <XStack alignItems="center">
@@ -34,12 +38,20 @@ function ReactionEmojiStack({
         <View
           key={type}
           style={[
-            showCircle && styles.emojiCircle,
-            showCircle && selectedReaction === type && styles.emojiCircleSelected,
+            showCircle && {
+              width: circleSize,
+              height: circleSize,
+              borderRadius: circleSize / 2,
+              backgroundColor: selectedReaction === type ? "#E8FAF9" : "#EAF7FF",
+              alignItems: "center",
+              justifyContent: "center",
+              borderWidth: circleBorderWidth,
+              borderColor: "white",
+            },
             i > 0 && { marginLeft: overlap },
           ]}
         >
-          <Text fontSize={emojiSize}>{REACTION_CONFIG[type]?.emoji ?? "👍"}</Text>
+          <LottieEmoji type={type} size={emojiSize} play={false} />
         </View>
       ))}
     </XStack>
@@ -49,7 +61,12 @@ function ReactionEmojiStack({
 interface ReactionPickerButtonProps {
   selectedReaction: ReactionTypeType | null;
   onToggle: (type: ReactionTypeType) => void;
-  variant?: "summary" | "card";
+  /**
+   * "summary" — 卡片摘要列，大圓 emoji 泡泡 + 「X 與其他 N 人」文字
+   * "card"    — 卡片層級大按鈕
+   * "comment" — 留言層級小按鈕（size-5 圓 / emoji 14 + 總數），對齊 product
+   */
+  variant?: "summary" | "card" | "comment";
   totalCount?: number;
   displayReactions?: ReactionTypeType[];
   firstReactorName?: string;
@@ -93,7 +110,9 @@ export function ReactionPickerButton({
   );
 
   const isSummary = variant === "summary";
+  const isComment = variant === "comment";
   const hasReactions = displayReactions.length > 0 || selectedReaction != null;
+  const commentAccent = selectedReaction != null ? colors.logo.cyan : "#9FB5B8";
 
   const summaryText = (() => {
     if (totalCount <= 0) return null;
@@ -114,7 +133,6 @@ export function ReactionPickerButton({
       {pickerOpen && (
         <Animated.View style={[styles.picker, { opacity: fadeAnim }]}>
           {PICKER_REACTIONS.map((type) => {
-            const config = REACTION_CONFIG[type];
             const isSelected = selectedReaction === type;
             return (
               <Pressable
@@ -122,7 +140,7 @@ export function ReactionPickerButton({
                 onPress={() => handleSelect(type)}
                 style={[styles.pickerItem, isSelected && styles.pickerItemSelected]}
               >
-                <Text fontSize={24}>{config.emoji}</Text>
+                <LottieEmoji type={type} size={24} play />
               </Pressable>
             );
           })}
@@ -151,16 +169,43 @@ export function ReactionPickerButton({
                       : []
                 }
                 selectedReaction={selectedReaction}
-                emojiSize={14}
-                overlap={-6}
+                emojiSize={18}
+                overlap={-10}
                 showCircle
               />
             ) : (
-              <ThumbsUp size={20} color="#9FB5B8" />
+              <LikeOutlineSvg width={24} height={24} color="#9FB5B8" />
             )}
             {summaryText && (
-              <Text fontSize={13} color="#295E5C">
+              <Text fontSize={14} color="#295E5C">
                 {summaryText}
+              </Text>
+            )}
+          </XStack>
+        ) : isComment ? (
+          <XStack alignItems="center" gap="$1">
+            {hasReactions ? (
+              <ReactionEmojiStack
+                reactions={
+                  displayReactions.length > 0
+                    ? displayReactions
+                    : selectedReaction
+                      ? [selectedReaction]
+                      : []
+                }
+                selectedReaction={selectedReaction}
+                emojiSize={14}
+                overlap={-4}
+                showCircle
+                circleSize={22}
+                circleBorderWidth={1}
+              />
+            ) : (
+              <LikeOutlineSvg width={20} height={20} color="#9FB5B8" />
+            )}
+            {totalCount > 0 && (
+              <Text fontSize={12} fontWeight="500" color={commentAccent}>
+                {totalCount}
               </Text>
             )}
           </XStack>
@@ -174,9 +219,9 @@ export function ReactionPickerButton({
                 overlap={-4}
               />
             ) : selectedReaction ? (
-              <Text fontSize={18}>{REACTION_CONFIG[selectedReaction]?.emoji ?? "👍"}</Text>
+              <LottieEmoji type={selectedReaction} size={18} play={false} />
             ) : (
-              <ThumbsUp size={20} color="#9FB5B8" />
+              <LikeOutlineSvg width={20} height={20} color="#9FB5B8" />
             )}
             {totalCount > 0 && (
               <Text fontSize={14} fontWeight="500" color="#295E5C">
@@ -230,19 +275,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   pickerItemSelected: {
-    backgroundColor: "#E8FAF9",
-  },
-  emojiCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#EAF7FF",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "white",
-  },
-  emojiCircleSelected: {
     backgroundColor: "#E8FAF9",
   },
 });

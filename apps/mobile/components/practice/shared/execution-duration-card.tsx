@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
-import { useMobileI18n, useMobileTranslation } from "@/i18n";
+import { useMobileTranslation } from "@/i18n";
 import type { ManualPracticeFormValuesType } from "../create/manual/schema";
 
 // Date utilities
@@ -36,7 +36,6 @@ export const ExecutionDurationCard = ({
   startDate,
   showRemaining = false,
 }: ExecutionDurationCardProps) => {
-  const { locale } = useMobileI18n();
   const t = useMobileTranslation("practice");
   const { days, start, end, remainingDays } = useMemo(() => {
     const d = typeof durationDays === "string" ? Number.parseInt(durationDays, 10) : durationDays;
@@ -48,52 +47,49 @@ export const ExecutionDurationCard = ({
     return { days: d, start: s, end: e, remainingDays: r };
   }, [durationDays, startDate, showRemaining]);
 
-  const formatDate = useCallback(
-    (date: Date): string =>
-      date.toLocaleDateString(locale, {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }),
-    [locale]
-  );
+  const formatDate = useCallback((date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}/${month}/${day}`;
+  }, []);
 
   return (
     <View style={styles.card}>
       {showRemaining ? (
         <YStack>
           <Text fontSize={12} color={colors.text.dark}>
-            {t("remaining_label")}
+            {t("duration_card_remaining")}
           </Text>
           <XStack alignItems="baseline" gap="$0.5">
             <Text fontSize={18} fontWeight="500" color={colors.logo.orange}>
               {remainingDays}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              {t("frequency_unit")}
+              {t("duration_card_days_unit")}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              {t("total_prefix")}
+              {t("duration_card_total")}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
               {days}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              {t("frequency_unit")}
+              {t("duration_card_days_unit")}
             </Text>
           </XStack>
         </YStack>
       ) : (
         <YStack>
           <Text fontSize={12} color={colors.text.dark}>
-            {t("execution_duration_label")}
+            {t("duration_card_title")}
           </Text>
           <XStack alignItems="baseline" gap="$0.5">
             <Text fontSize={18} fontWeight="500" color={colors.logo.orange}>
               {durationDays}
             </Text>
             <Text fontSize={12} color={colors.text.dark}>
-              {t("frequency_unit")}
+              {t("duration_card_days_unit")}
             </Text>
           </XStack>
         </YStack>
@@ -101,9 +97,9 @@ export const ExecutionDurationCard = ({
       {start && (
         <YStack marginTop="$2">
           <Text fontSize={12} color={colors.text.dark}>
-            {t("start_date_label")}
+            {t("duration_card_start")}
           </Text>
-          <Text fontSize={14} color={colors.primary.base}>
+          <Text fontSize={14} color={colors.logo.cyan}>
             {formatDate(start)}
           </Text>
         </YStack>
@@ -111,9 +107,9 @@ export const ExecutionDurationCard = ({
       {end && (
         <YStack marginTop="$2">
           <Text fontSize={12} color={colors.text.dark}>
-            {t("end_date_label")}
+            {t("duration_card_end")}
           </Text>
-          <Text fontSize={14} color={colors.primary.base}>
+          <Text fontSize={14} color={colors.logo.cyan}>
             {formatDate(end)}
           </Text>
         </YStack>
@@ -124,9 +120,12 @@ export const ExecutionDurationCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.basic.white,
-    borderRadius: 12,
-    padding: 16,
-    minHeight: 120,
+    flex: 1,
+    justifyContent: "space-between",
+    // product: bg-very-light-blue
+    backgroundColor: colors.background.veryLightBlue,
+    borderRadius: 8,
+    padding: 12,
+    minHeight: 128,
   },
 });

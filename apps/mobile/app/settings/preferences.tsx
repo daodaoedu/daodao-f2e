@@ -4,15 +4,15 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
+import { ScrollView, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
+import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import { useMobileTranslation } from "@/i18n";
+import { throwIfOpenApiError } from "@/utils/api-error";
 
 function assertSuccessfulResponse(response: { error?: unknown }, fallbackMessage: string) {
-  if (!response.error) return;
-
-  const error = response.error as { error?: { message?: string }; message?: string };
-  throw new Error(error.error?.message ?? error.message ?? fallbackMessage);
+  throwIfOpenApiError(response, fallbackMessage);
 }
 
 interface IPreferenceOption {
@@ -129,6 +129,8 @@ export default function PreferencesSettingsScreen() {
 
       const response = await updateCurrentUserPreferences({ preferences: preferenceItems });
       assertSuccessfulResponse(response, t("saveError"));
+      // 新手任務 B：即時標記「公開資訊/帳號/領域偏好」完成
+      applyOnboardingUpdateFromResponse(response.data);
 
       Alert.alert(t("successTitle"), t("saveSuccess"), [
         { text: t("confirm"), onPress: () => router.back() },

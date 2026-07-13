@@ -9,6 +9,12 @@ import useSWR from "swr";
 import { client, getApiBaseUrl, unauthorizedHandler } from "../client";
 import { useMutate, useQuery } from "../hooks";
 import type { components, paths } from "../types";
+import {
+  buildCreateCheckInFormData,
+  buildUpdateCheckInFormData,
+  extractApiErrorMessage,
+  type ICheckInFormData,
+} from "./check-in-form-data";
 import type {
   IGetMyPracticesParams,
   IGetPracticeCheckInsParams,
@@ -19,6 +25,13 @@ import type {
   PracticeSummary,
 } from "./practice";
 import { copyPractice, getPracticeSummary } from "./practice";
+
+export type {
+  FormDataFilePart,
+  ICheckInFormData,
+  IReactNativeFormDataFile,
+} from "./check-in-form-data";
+export { extractApiErrorMessage } from "./check-in-form-data";
 
 // ============================================================================
 // Types
@@ -303,19 +316,6 @@ export const deletePractice = async (id: string) => {
 export type CreateCheckInRequestType = components["schemas"]["CheckInRequest"];
 
 /**
- * 打卡表單資料類型（用於封裝函數）
- * mood 應該是已經轉換好的 API 格式（ApiMoodType）
- */
-export interface ICheckInFormData {
-  mood: components["schemas"]["CheckInRequest"]["mood"] | undefined;
-  tags: string[];
-  description: string;
-  media: File[];
-  /** 編輯時要保留的既有圖片 URL */
-  existingImageUrls?: string[];
-}
-
-/**
  * 創建實踐打卡記錄的函數（用於 Client Components）
  * @param practiceId 實踐 ID
  * @param data 打卡資料
@@ -340,32 +340,16 @@ type CreateCheckInResponse =
 
 /**
  * 創建實踐打卡記錄（使用 FormData 統一提交）
+ * Web / Mobile 共用；mobile 需先 initMobileClient 以注入 Bearer token
  * @param practiceId 實踐 ID
- * @param data 表單資料（包含圖片檔案）
+ * @param data 表單資料（包含圖片檔案，支援 RN { uri, type, name }）
  * @returns 創建結果
  */
 export const createPracticeCheckInWithFormData = async (
   practiceId: string,
   data: ICheckInFormData
 ): Promise<CreateCheckInResponse> => {
-  const formData = new FormData();
-
-  // 基本欄位
-  if (data.mood) formData.append("mood", data.mood);
-  if (data.description) formData.append("note", data.description);
-
-  // 陣列欄位需轉成 JSON 字串
-  if (data.tags && data.tags.length > 0) {
-    formData.append("tags", JSON.stringify(data.tags));
-  }
-
-  // 圖片檔案（多張）
-  if (data.media && data.media.length > 0) {
-    data.media.forEach((file) => {
-      formData.append("images", file);
-    });
-  }
-
+  const formData = buildCreateCheckInFormData(data);
   const baseUrl = getApiBaseUrl();
   const response = await unauthorizedHandler.wrapFetch(
     `${baseUrl}/api/v1/practices/${practiceId}/checkins`,
@@ -380,7 +364,7 @@ export const createPracticeCheckInWithFormData = async (
     const error = await response.json().catch(() => ({
       error: { message: "打卡失敗" },
     }));
-    throw new Error(error.error?.message || "打卡失敗");
+    throw new Error(extractApiErrorMessage(error, "打卡失敗"));
   }
 
   return response.json();
@@ -398,29 +382,7 @@ export const updatePracticeCheckInWithFormData = async (
   checkInId: string,
   data: Partial<ICheckInFormData>
 ): Promise<CreateCheckInResponse> => {
-  const formData = new FormData();
-
-  // 基本欄位 - 使用 !== undefined 確保空字串也能被發送
-  if (data.mood !== undefined) formData.append("mood", data.mood);
-  if (data.description !== undefined) formData.append("note", data.description);
-
-  // 陣列欄位需轉成 JSON 字串 - 空陣列也要發送以便清除標籤
-  if (data.tags !== undefined) {
-    formData.append("tags", JSON.stringify(data.tags));
-  }
-
-  // 既有圖片 URL（要保留的）— 空陣列代表清空所有圖片
-  if (data.existingImageUrls !== undefined) {
-    formData.append("imageUrls", JSON.stringify(data.existingImageUrls));
-  }
-
-  // 新上傳的圖片檔案（多張）
-  if (data.media && data.media.length > 0) {
-    data.media.forEach((file) => {
-      formData.append("images", file);
-    });
-  }
-
+  const formData = buildUpdateCheckInFormData(data);
   const baseUrl = getApiBaseUrl();
   const response = await unauthorizedHandler.wrapFetch(
     `${baseUrl}/api/v1/practices/${practiceId}/checkins/${checkInId}`,
@@ -435,7 +397,7 @@ export const updatePracticeCheckInWithFormData = async (
     const error = await response.json().catch(() => ({
       error: { message: "更新打卡失敗" },
     }));
-    throw new Error(error.error?.message || "更新打卡失敗");
+    throw new Error(extractApiErrorMessage(error, "更新打卡失敗"));
   }
 
   return response.json();
@@ -576,11 +538,7 @@ export const useArchivePractice = (practiceId: string) => {
     } as UpdatePracticeRequestType);
 
     if (response.error) {
-      const errorMessage =
-        response.error && typeof response.error === "object" && "message" in response.error
-          ? String(response.error.message)
-          : "封存失敗";
-      throw new Error(errorMessage);
+      throw new Error(extractApiErrorMessage(response.error, "封存失敗"));
     }
 
     // 刷新相關的 cache（跳過實踐詳情，因為封存後可能無法訪問）
@@ -601,11 +559,7 @@ export const useArchivePractice = (practiceId: string) => {
     });
 
     if (response.error) {
-      const errorMessage =
-        response.error && typeof response.error === "object" && "message" in response.error
-          ? String(response.error.message)
-          : "復原失敗";
-      throw new Error(errorMessage);
+      throw new Error(extractApiErrorMessage(response.error, "復原失敗"));
     }
 
     // 刷新相關的 cache
@@ -637,11 +591,7 @@ export const useUnarchivePractice = () => {
     });
 
     if (response.error) {
-      const errorMessage =
-        response.error && typeof response.error === "object" && "message" in response.error
-          ? String(response.error.message)
-          : "取消封存失敗";
-      throw new Error(errorMessage);
+      throw new Error(extractApiErrorMessage(response.error, "取消封存失敗"));
     }
 
     // 刷新相關的 cache
@@ -665,11 +615,7 @@ export const useDeletePractice = (practiceId: string) => {
     const response = await deletePractice(practiceId);
 
     if (response.error) {
-      const errorMessage =
-        response.error && typeof response.error === "object" && "message" in response.error
-          ? String(response.error.message)
-          : "刪除失敗";
-      throw new Error(errorMessage);
+      throw new Error(extractApiErrorMessage(response.error, "刪除失敗"));
     }
 
     // 刷新相關的 cache（不需要刷新單個實踐詳情，因為已經刪除了）

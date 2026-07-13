@@ -14,25 +14,32 @@ import {
 // Query Hooks
 // ============================================================================
 
+/**
+ * SWR keys use primitives only — never put the whole `params` object in the key
+ * (inline `{ userId }` from callers would thrash the cache every render).
+ */
+
 export const useFollowers = (params: IGetFollowParams) => {
+  const { userId, page, limit } = params;
   return useSWR(
-    params.userId ? ["/api/v1/users/:id/followers", params] : null,
-    () => getFollowers(params),
+    userId ? (["/api/v1/users/:id/followers", userId, page ?? null, limit ?? null] as const) : null,
+    () => getFollowers({ userId, page, limit }),
     { revalidateOnFocus: false }
   );
 };
 
 export const useFollowing = (params: IGetFollowParams) => {
+  const { userId, page, limit } = params;
   return useSWR(
-    params.userId ? ["/api/v1/users/:id/following", params] : null,
-    () => getFollowing(params),
+    userId ? (["/api/v1/users/:id/following", userId, page ?? null, limit ?? null] as const) : null,
+    () => getFollowing({ userId, page, limit }),
     { revalidateOnFocus: false }
   );
 };
 
 export const useFollowStatus = (targetType: "user" | "practice", targetId: string | undefined) => {
   return useSWR(
-    targetId ? ["/api/v1/follows/check", targetType, targetId] : null,
+    targetId ? (["/api/v1/follows/check", targetType, targetId] as const) : null,
     () => checkFollowStatus(targetType, targetId as string),
     { revalidateOnFocus: false }
   );

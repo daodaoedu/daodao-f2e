@@ -3,7 +3,8 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, Input, ScrollView, Spinner, Text, TextArea, XStack, YStack } from "tamagui";
+import { Card, Input, ScrollView, Spinner, Text, TextArea, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { usePractice } from "@/hooks/usePractices";
 import { useMobileTranslation } from "@/i18n";
@@ -150,7 +151,7 @@ export default function PracticeEditScreen() {
         durationDays: targetDays,
         sessionDurationMinutes,
         tags,
-        privacy_status: privacyStatus,
+        privacyStatus,
         ...buildFrequencyPayload(frequency),
       });
 

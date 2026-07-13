@@ -1,5 +1,6 @@
 import { Share2 } from "@tamagui/lucide-icons";
-import { Button, Text, XStack, YStack } from "tamagui";
+import { Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 import type { ICheckInDisplayData } from "../types";

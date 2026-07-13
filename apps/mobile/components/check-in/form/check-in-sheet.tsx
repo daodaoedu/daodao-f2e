@@ -3,16 +3,19 @@ import { CalendarCheck, Check } from "@tamagui/lucide-icons";
 import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, StyleSheet } from "react-native";
-import { Button, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
 import { DescriptionField } from "./components/description-field";
 import { MediaUploadField } from "./components/media-upload-field";
 import { MoodSelector } from "./components/mood-selector";
+import { ReflectionQuestion } from "./components/reflection-question";
 import { TagSelector } from "./components/tag-selector";
 import { useCheckInImageRender } from "./hooks/use-check-in-image-render";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
+import { useTagPrompt } from "./hooks/use-tag-prompt";
 import { type CheckInFormValuesType, createCheckInFormSchema } from "./schema";
 
 // Export types for external use (avoid naming conflicts with legacy CheckInSheet)
@@ -31,12 +34,7 @@ interface ICheckInSheetContentProps {
 export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetContentProps) => {
   const t = useMobileTranslation("mobile.checkIn");
   const checkInFormSchema = useMemo(() => createCheckInFormSchema(t), [t]);
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<CheckInFormValuesType>({
+  const form = useForm<CheckInFormValuesType>({
     resolver: zodResolver(checkInFormSchema),
     defaultValues: {
       mood: null,
@@ -45,6 +43,13 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
       mediaUris: [],
     },
   });
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = form;
+  const { fetchAndAddPrompt } = useTagPrompt(form);
 
   const { isRendering, startRender, renderCheckInCard } = useCheckInImageRender({
     taskTitle,
@@ -76,8 +81,14 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
     <YStack flex={1}>
       <ScrollView flex={1} contentContainerStyle={styles.scrollContent}>
         <YStack paddingHorizontal="$6">
-          {/* Activity Title */}
-          <Text fontSize={16} fontWeight="500" color={colors.text.dark} marginBottom="$6">
+          {/* Activity Title（對齊 product：text-bg-dark + leading-8） */}
+          <Text
+            fontSize={16}
+            lineHeight={32}
+            fontWeight="500"
+            color={colors.background.dark}
+            marginBottom="$6"
+          >
             {taskTitle}
           </Text>
 
@@ -101,7 +112,7 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
               control={control}
               name="tags"
               render={({ field: { onChange, value } }) => (
-                <TagSelector value={value} onChange={onChange} />
+                <TagSelector value={value} onChange={onChange} onTagSelected={fetchAndAddPrompt} />
               )}
             />
             {errors.tags && (
@@ -114,7 +125,11 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
               control={control}
               name="description"
               render={({ field: { onChange, value } }) => (
-                <DescriptionField value={value} onChange={onChange} />
+                <DescriptionField
+                  value={value}
+                  onChange={onChange}
+                  beforeTextArea={<ReflectionQuestion />}
+                />
               )}
             />
             {errors.description && (
@@ -141,7 +156,7 @@ export const CheckInSheetContent = ({ taskTitle, onComplete }: ICheckInSheetCont
       {/* Complete Button */}
       <YStack
         paddingHorizontal="$6"
-        paddingVertical="$4"
+        paddingVertical="$6"
         borderTopWidth={1}
         borderTopColor={colors.border.light}
         backgroundColor={colors.basic.white}

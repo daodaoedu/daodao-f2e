@@ -4,6 +4,7 @@
  */
 
 import { client, getApiBaseUrl, unauthorizedHandler } from "../client";
+import { extractApiErrorMessage } from "./check-in-form-data";
 import type { components, paths } from "../types";
 
 // ============================================================================
@@ -312,12 +313,21 @@ const sendUserFormDataRequest = async <T>(
     const errorData = await response.json().catch(() => ({
       error: { message: errorMessage },
     }));
-    const error = new Error(errorData.error?.message || errorMessage) as Error & {
+    const error = new Error(extractApiErrorMessage(errorData, errorMessage)) as Error & {
       details?: Array<{ path?: string; message?: string }>;
     };
     // 附加驗證錯誤詳情（供表單使用）
-    if (errorData.error?.details && Array.isArray(errorData.error.details)) {
-      error.details = errorData.error.details;
+    if (
+      errorData &&
+      typeof errorData === "object" &&
+      "error" in errorData &&
+      errorData.error &&
+      typeof errorData.error === "object" &&
+      "details" in errorData.error &&
+      Array.isArray((errorData.error as { details?: unknown }).details)
+    ) {
+      error.details = (errorData.error as { details: Array<{ path?: string; message?: string }> })
+        .details;
     }
     throw error;
   }

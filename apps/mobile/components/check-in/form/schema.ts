@@ -13,7 +13,7 @@ export const createCheckInFormSchema = (t: (key: string) => string) =>
       .default(null)
       .refine((val) => val !== null, { message: t("validation_mood_required") }),
     tags: z.array(z.string()).default([]),
-    description: z.string().max(300, t("validation_description_max")).default(""),
+    description: z.string().max(600, t("validation_description_max")).default(""),
     mediaUris: z.array(z.string()).max(3, t("validation_media_max")).default([]),
   });
 

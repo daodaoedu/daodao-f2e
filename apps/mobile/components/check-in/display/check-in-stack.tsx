@@ -1,19 +1,37 @@
+import CircleSvg from "@daodao/assets/images/dashboard/circle.svg";
+import ClippedCircleSvg from "@daodao/assets/images/dashboard/clipped-circle.svg";
+import HexagonSvg from "@daodao/assets/images/dashboard/hexagon.svg";
+import SemiCircleSvg from "@daodao/assets/images/dashboard/semi-circle.svg";
+import SpeechBubbleSvg from "@daodao/assets/images/dashboard/speech-bubble.svg";
 import { useCallback, useMemo } from "react";
-import { FlatList, type ListRenderItemInfo, Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import { Text, View, YStack } from "tamagui";
-import { type ApiMoodType, MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
+import { type ApiMoodType, MOOD_EMOJI_SVG, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 import type { ICheckInItem } from "../types";
 
-// Shape colors for visual variety
-const SHAPE_COLORS = [
-  colors.practice.green,
-  colors.practice.blue,
-  colors.semantic.error,
-  colors.logo.yellow,
-  colors.logo.orange,
+/**
+ * 形狀資產（對齊 product 的 dashboard 形狀，含各自配色）。
+ * 順序＝circle(綠) / hexagon(藍) / semi-circle(黃) / speech-bubble(橘) / clipped-circle(深橘)。
+ * width/height 取自 SVG viewBox，用於等比縮放。
+ */
+const SHAPE_CONFIGS = [
+  { Component: CircleSvg, width: 212, height: 212 },
+  { Component: HexagonSvg, width: 197, height: 225 },
+  { Component: SemiCircleSvg, width: 268, height: 138 },
+  { Component: SpeechBubbleSvg, width: 260, height: 175 },
+  { Component: ClippedCircleSvg, width: 212, height: 211 },
 ] as const;
+
+// speech-bubble 的內容要往上抬，避開底部的對話尾巴（對齊 product 的 pb-11 處理）
+const SPEECH_BUBBLE_INDEX = 3;
+
+// 每張卡的旋轉角度（限制 -20~20，給堆疊自然感，對齊 product 的角度限制）
+const ROTATIONS = [-8, 6, -5, 9, -4, 7, -10, 5] as const;
+
+// 形狀基準寬（其餘依 viewBox 比例縮放）
+const SHAPE_WIDTH = 160;
 
 interface ICheckInData {
   id: number;
@@ -32,41 +50,29 @@ interface ICheckInStackProps {
 }
 
 /**
- * 將 API 的 checkinDate 格式轉換為顯示格式
- * 從 "2024-01-20" 轉換為 "2024.01.20"
+ * 將 API 的 checkinDate（2024-01-20）轉為顯示格式（2024.01.20）
  */
-const formatCheckInDate = (checkinDate: string): string => {
-  return checkinDate.replace(/-/g, ".");
-};
+const formatCheckInDate = (checkinDate: string): string => checkinDate.replace(/-/g, ".");
 
 /**
  * 打卡堆疊組件 (Mobile)
- * 用於顯示多個打卡記錄，以卡片列表形式呈現
+ * 對齊 product：以 @daodao/assets 的彩色形狀 + 心情插畫堆疊呈現打卡記錄。
+ * （product 用 Matter.js 物理落下；RN 無對應 DOM 幾何 API，改用左右交錯 + 旋轉 + 重疊的靜態堆疊近似其落定樣貌。）
  */
 export const CheckInStack = ({ checkInsData, onCheckInPress }: ICheckInStackProps) => {
   const t = useMobileTranslation("mobile.checkInList");
-  // 將 API 資料轉換為 ICheckInItem[] 格式
+
   const items: ICheckInItem[] = useMemo(() => {
     if (!checkInsData?.data) {
       return [];
     }
-
-    return checkInsData.data
-      .map((checkIn) => {
-        const moodType = mapApiMoodToMoodType(checkIn.mood);
-        // 如果沒有心情類型，跳過這個打卡記錄
-        if (!moodType) {
-          return null;
-        }
-
-        return {
-          id: String(checkIn.id),
-          date: formatCheckInDate(checkIn.checkinDate),
-          mood: moodType,
-          content: checkIn.note || "",
-        };
-      })
-      .filter((item): item is ICheckInItem => item !== null);
+    return checkInsData.data.map((checkIn) => ({
+      id: String(checkIn.id),
+      date: formatCheckInDate(checkIn.checkinDate),
+      // NULL mood fallback 到 neutral，避免整筆被隱藏（對齊 product）
+      mood: mapApiMoodToMoodType(checkIn.mood) ?? MoodType.neutral,
+      content: checkIn.note || "",
+    }));
   }, [checkInsData]);
 
   const handlePress = useCallback(
@@ -76,68 +82,62 @@ export const CheckInStack = ({ checkInsData, onCheckInPress }: ICheckInStackProp
     [onCheckInPress]
   );
 
-  const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<ICheckInItem>) => {
-      const shapeColor = SHAPE_COLORS[index % SHAPE_COLORS.length];
-      const moodOption = MOOD_OPTIONS.find((option) => option.id === item.mood);
-
-      return (
-        <Pressable
-          onPress={() => handlePress(item.id)}
-          style={({ pressed }) => [
-            styles.itemContainer,
-            { backgroundColor: shapeColor },
-            pressed && styles.itemPressed,
-          ]}
-          accessibilityLabel={t("stack_accessibility", { number: index + 1, date: item.date })}
-          accessibilityRole="button"
-        >
-          <YStack flex={1} gap="$2" alignItems="center" justifyContent="center">
-            {/* Emoji */}
-            {moodOption && <Text fontSize={28}>{moodOption.emoji}</Text>}
-
-            {/* Date */}
-            <Text fontSize={12} color={colors.text.dark} fontWeight="500">
-              {item.date}
-            </Text>
-
-            {/* Content preview */}
-            {item.content && (
-              <Text
-                fontSize={12}
-                color={colors.text.dark}
-                numberOfLines={2}
-                textAlign="center"
-                paddingHorizontal="$2"
-              >
-                {item.content}
-              </Text>
-            )}
-          </YStack>
-        </Pressable>
-      );
-    },
-    [handlePress, t]
-  );
-
-  const keyExtractor = useCallback((item: ICheckInItem) => item.id, []);
-
-  // 如果沒有資料，不顯示任何內容
   if (items.length === 0) {
     return null;
   }
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={items}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {items.map((item, index) => {
+        const shapeIndex = index % SHAPE_CONFIGS.length;
+        const shape = SHAPE_CONFIGS[shapeIndex] ?? SHAPE_CONFIGS[0];
+        const ShapeComponent = shape.Component;
+        const width = SHAPE_WIDTH;
+        const height = Math.round((SHAPE_WIDTH * shape.height) / shape.width);
+        const rotation = ROTATIONS[index % ROTATIONS.length];
+        const isLeft = index % 2 === 0;
+        const MoodIcon = MOOD_EMOJI_SVG[item.mood];
+        const contentPaddingBottom = shapeIndex === SPEECH_BUBBLE_INDEX ? Math.round(height * 0.28) : 0;
+
+        return (
+          <Pressable
+            key={item.id}
+            onPress={() => handlePress(item.id)}
+            style={({ pressed }) => [
+              styles.item,
+              {
+                width,
+                height,
+                alignSelf: isLeft ? "flex-start" : "flex-end",
+                marginTop: index === 0 ? 0 : Math.round(-height * 0.22),
+                transform: [{ rotate: `${rotation}deg` }],
+              },
+              pressed && styles.itemPressed,
+            ]}
+            accessibilityLabel={t("stack_accessibility", { number: index + 1, date: item.date })}
+            accessibilityRole="button"
+          >
+            <ShapeComponent width={width} height={height} />
+            <YStack style={[styles.itemContent, { paddingBottom: contentPaddingBottom }]}>
+              <MoodIcon width={30} height={30} />
+              <Text fontSize={12} color={colors.text.dark} fontWeight="500">
+                {item.date}
+              </Text>
+              {item.content ? (
+                <Text
+                  fontSize={12}
+                  color={colors.text.dark}
+                  numberOfLines={2}
+                  textAlign="center"
+                  paddingHorizontal="$3"
+                >
+                  {item.content}
+                </Text>
+              ) : null}
+            </YStack>
+          </Pressable>
+        );
+      })}
     </View>
   );
 };
@@ -145,30 +145,24 @@ export const CheckInStack = ({ checkInsData, onCheckInPress }: ICheckInStackProp
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    maxWidth: 400,
-    alignSelf: "center",
-  },
-  listContent: {
     paddingVertical: 8,
   },
-  row: {
-    justifyContent: "space-between",
-    paddingHorizontal: 8,
-    marginBottom: 12,
+  item: {
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  itemContainer: {
-    width: "48%",
-    aspectRatio: 1,
-    borderRadius: 16,
-    padding: 12,
-    shadowColor: colors.basic.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  itemContent: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
   },
   itemPressed: {
-    opacity: 0.8,
-    transform: [{ scale: 0.98 }],
+    opacity: 0.85,
   },
 });

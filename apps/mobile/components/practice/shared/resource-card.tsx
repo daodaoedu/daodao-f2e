@@ -1,5 +1,6 @@
 import { useExtractOgImage } from "@daodao/api";
-import { BookOpen, Link2, X } from "@tamagui/lucide-icons";
+import BookSvg from "@daodao/assets/images/dashboard/book.svg";
+import { Link2, X } from "@tamagui/lucide-icons";
 import { memo, useCallback, useState } from "react";
 import { Linking, Pressable, StyleSheet } from "react-native";
 import { Image, Spinner, Text, View, XStack } from "tamagui";
@@ -17,12 +18,17 @@ export interface ResourceCardProps {
   onRemove?: () => void;
 }
 
+/**
+ * 對齊 product `practice/shared/resource-card.tsx`：
+ * - border logo-cyan、rounded-lg、白底
+ * - 預覽區 aspect 169/93、無 og 時 light-cyan + BookSvg
+ * - 底部 name + Link2
+ */
 const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
   const t = useMobileTranslation("practice");
   const [imageError, setImageError] = useState(false);
   const { data: ogImageData, isLoading } = useExtractOgImage(resource.url);
 
-  // 決定顯示的圖片：優先使用 og:image，如果沒有或載入失敗則顯示預設圖示
   const ogImageUrl = ogImageData?.ogImageUrl ?? null;
 
   const handlePress = useCallback(async () => {
@@ -46,6 +52,7 @@ const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
     [onRemove]
   );
 
+  // 對齊 product：無 url / loading / error / 無 og → 預設書本圖
   const shouldShowDefaultIcon = !resource.url || imageError || isLoading || !ogImageUrl;
 
   return (
@@ -55,14 +62,17 @@ const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
       accessibilityLabel={t("resource_open_accessibility", { name: resource.name })}
       accessibilityRole="link"
     >
-      {/* Preview Area */}
+      {/* Preview — aspect-169/93 */}
       <View style={styles.previewContainer}>
         {shouldShowDefaultIcon ? (
           <View style={styles.defaultPreview}>
             {isLoading ? (
-              <Spinner color={colors.primary.base} />
+              <Spinner color={colors.logo.cyan} />
             ) : (
-              <BookOpen size={40} color={colors.primary.base} opacity={0.5} />
+              // product: <BookSvg width={100} height={95} className="opacity-50" />
+              <View style={{ opacity: 0.5 }}>
+                <BookSvg width={100} height={95} />
+              </View>
             )}
           </View>
         ) : (
@@ -85,12 +95,12 @@ const ResourceCardComponent = ({ resource, onRemove }: ResourceCardProps) => {
         )}
       </View>
 
-      {/* Info Area */}
-      <XStack alignItems="center" justifyContent="space-between" gap="$1" padding="$2">
+      {/* Info — text-xs p-2 */}
+      <XStack alignItems="center" justifyContent="space-between" gap={4} padding={8}>
         <Text fontSize={12} color={colors.text.dark} numberOfLines={1} flex={1}>
           {resource.name}
         </Text>
-        {resource.url && <Link2 size={16} color={colors.primary.base} />}
+        {resource.url && <Link2 size={16} color={colors.logo.cyan} />}
       </XStack>
     </Pressable>
   );
@@ -106,24 +116,31 @@ export const ResourceCard = memo(ResourceCardComponent, (prevProps, nextProps) =
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 12,
+    // product: rounded-lg border border-logo-cyan bg-white
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: colors.primary.base,
+    borderColor: colors.logo.cyan,
     backgroundColor: colors.basic.white,
     overflow: "hidden",
+    width: "100%",
   },
   cardPressed: {
-    opacity: 0.8,
+    opacity: 0.85,
   },
   previewContainer: {
     position: "relative",
+    // product: aspect-169/93
     aspectRatio: 169 / 93,
-    backgroundColor: colors.basic["200"],
+    backgroundColor: colors.background.gray,
+    overflow: "hidden",
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   defaultPreview: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
+    // product: bg-light-cyan
     backgroundColor: colors.background.lightCyan,
   },
   previewImage: {

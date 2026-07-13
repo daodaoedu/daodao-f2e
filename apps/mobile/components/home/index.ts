@@ -1,3 +1,4 @@
+export { BANNER_CONTENT_HEIGHT, HomeBanner } from "./banner";
 export { BrewingCard } from "./brewing-card";
 export { CompletedCard } from "./completed-card";
 export { DashboardHeader } from "./dashboard-header";

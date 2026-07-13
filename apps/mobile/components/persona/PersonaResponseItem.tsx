@@ -11,6 +11,7 @@ import { colors } from "@/generated/design-tokens";
 import { useComments } from "@/hooks/useComments";
 import { removeReaction, upsertReaction, useReactions } from "@/hooks/useReactions";
 import { useMobileTranslation } from "@/i18n";
+import { runWithErrorAlert } from "@/utils/api-error";
 import { CommentSheet } from "./CommentSheet";
 
 const AVATAR_COLORS = ["#F5A93E", "#16B9B3", "#9B8FE0", "#5BA58C", "#E07B7B", "#F5C842", "#7BB8E0"];
@@ -26,6 +27,7 @@ interface PersonaResponseItemProps {
 
 export function PersonaResponseItem({ item }: PersonaResponseItemProps) {
   const t = useMobileTranslation("persona.detail");
+  const commonT = useMobileTranslation("common");
   const router = useRouter();
   const [expanded, setExpanded] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
@@ -47,13 +49,18 @@ export function PersonaResponseItem({ item }: PersonaResponseItemProps) {
   const { comments } = useComments("persona_answer", answerId);
 
   const handleReactionToggle = async (type: ReactionTypeType) => {
-    const isSelected = currentUserReaction === type;
-    if (isSelected) {
-      await removeReaction("persona_answer", answerId);
-    } else {
-      await upsertReaction("persona_answer", answerId, type);
-    }
-    await mutateReactions();
+    await runWithErrorAlert(
+      async () => {
+        const isSelected = currentUserReaction === type;
+        if (isSelected) {
+          await removeReaction("persona_answer", answerId);
+        } else {
+          await upsertReaction("persona_answer", answerId, type);
+        }
+        await mutateReactions();
+      },
+      { title: commonT("errorTitle"), fallbackMessage: commonT("operationFailed") }
+    );
   };
 
   const handlePressAvatar = () => {
