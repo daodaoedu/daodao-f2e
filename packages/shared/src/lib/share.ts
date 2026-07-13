@@ -57,6 +57,15 @@ export function getShareAPI({
     window.open(_url, "_blank", "noopener,noreferrer");
   };
 
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(formattedUrl);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const nativeShare = async (options?: unknown) => {
     if (!navigator.share) return false;
 
@@ -104,6 +113,7 @@ export function getShareAPI({
   );
 
   return {
+    copyLink,
     facebookShare,
     lineShare,
     linkedinShare,

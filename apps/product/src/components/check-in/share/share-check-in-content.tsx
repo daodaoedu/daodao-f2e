@@ -9,7 +9,7 @@ import { useTranslations } from "@daodao/i18n";
 import { captureElementAsImage, dataUrlToFile, getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
-import { Download, ExternalLink } from "lucide-react";
+import { Download, ExternalLink, Link } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CheckInCard } from "../display/check-in-card";
 import type { ICheckInFormData } from "../types";
@@ -88,6 +88,16 @@ export const ShareCheckInSheetContent = ({
       if (!isCancelled) {
         toast.error(t("share_failed_retry"));
       }
+    }
+  };
+
+  // 複製打卡詳細頁的網頁連結
+  const handleCopyLink = async () => {
+    const didCopy = await shareAPI.copyLink?.();
+    if (didCopy) {
+      toast.success(t("share_link_copied"));
+    } else {
+      toast.error(t("share_link_copy_failed"));
     }
   };
 
@@ -207,6 +217,16 @@ export const ShareCheckInSheetContent = ({
                 aria-label={t("share_to_platform", { platform: "LinkedIn" })}
               >
                 <LinkedInSvg className="size-10" />
+              </Button>
+              <Button
+                type="button"
+                variant="link"
+                size="icon"
+                className="bg-light-blue rounded-lg"
+                onClick={handleCopyLink}
+                aria-label={t("share_copy_link")}
+              >
+                <Link className="size-7" />
               </Button>
               <Button
                 type="button"
