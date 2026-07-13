@@ -14,9 +14,10 @@ import {
   LinkedinFilledSvg,
   NeutralSvg,
   ThreadsFilledSvg,
-  VerifiedSvg,
   XFilledSvg,
 } from "@daodao/assets";
+// VerifiedSvg 不在 barrel 匯出，改用 path import
+import VerifiedSvg from "@daodao/assets/images/landing-page/verified.svg";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { dataUrlToFile, getShareAPI } from "@daodao/shared";

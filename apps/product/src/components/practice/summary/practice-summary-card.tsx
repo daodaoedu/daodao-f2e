@@ -9,13 +9,14 @@ import {
   FrustratedSvg,
   HappySvg,
   HopelessSvg,
-  MascotBasicSvg,
   NeutralSvg,
   StarSvg,
   TitleSvg,
   VectorHalfBlueSvg,
   VectorSvg,
 } from "@daodao/assets";
+// MascotBasicSvg 不在 barrel 匯出（檔案過大且 mobile 未使用），改用 path import
+import MascotBasicSvg from "@daodao/assets/images/icon/mascot-basic.svg";
 import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { type ComponentType, forwardRef } from "react";
