@@ -70,7 +70,14 @@
     },
     "personal": {
       "ios": {
-        "appleTeamId": "G5GY9SQ4F7"
+        "appleTeamId": "G5GY9SQ4F7",
+        "ascAppId": "6789877267"
+      }
+    },
+    "personal-dev": {
+      "ios": {
+        "appleTeamId": "G5GY9SQ4F7",
+        "ascAppId": "6789942778"
       }
     }
   }
