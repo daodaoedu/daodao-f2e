@@ -18,7 +18,7 @@ import { type ManualPracticeFormValues, manualPracticeFormSchema } from "@/compo
 import { Step1 } from "@/components/practice/create/manual/steps/step-1";
 import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";
-import { Step4 } from "@/components/practice/create/manual/steps/step-4";
+import { Step4, type Step4Handle } from "@/components/practice/create/manual/steps/step-4";
 import { Step5 } from "@/components/practice/create/manual/steps/step-5";
 import type { PrivacyStatus } from "@/components/practice/shared/privacy-status-selector";
 import {
@@ -100,6 +100,7 @@ export default function CreateManualPracticePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus>("public");
   const isRestoreDialogOpenRef = useRef(false);
+  const step4Ref = useRef<Step4Handle>(null);
 
   const form = useForm<ManualPracticeFormValues>({
     resolver: zodResolver(manualPracticeFormSchema),
@@ -142,6 +143,12 @@ export default function CreateManualPracticePage() {
         isValid = await form.trigger(["durationMinutes", "executionTiming", "customTiming"]);
         break;
       case 4:
+        // 若使用者填了資源卻沒按「新增」，離開前先自動補進表單，避免靜默遺失。
+        // 回傳 false 代表暫存輸入驗證失敗（如網址無效／重複），停在本步讓使用者處理。
+        if (step4Ref.current?.commitPendingResource() === false) {
+          isValid = false;
+          break;
+        }
         isValid = await form.trigger(["tags", "resources"]);
         break;
       case 5:
@@ -356,7 +363,7 @@ export default function CreateManualPracticePage() {
             {currentStep === 1 && <Step1 form={form} />}
             {currentStep === 2 && <Step2 form={form} />}
             {currentStep === 3 && <Step3 form={form} />}
-            {currentStep === 4 && <Step4 form={form} />}
+            {currentStep === 4 && <Step4 ref={step4Ref} form={form} />}
             {currentStep === 5 && (
               <Step5
                 form={form}

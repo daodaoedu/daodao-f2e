@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@daodao/ui/components/form";
 import { Input } from "@daodao/ui/components/input";
-import { useState } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { ResourceCard } from "@/components/practice/shared";
 import { useTagEditSheet } from "@/hooks/use-tag-edit-sheet";
@@ -24,11 +24,89 @@ interface Step4Props {
   form: UseFormReturn<ManualPracticeFormValues>;
 }
 
-export const Step4 = ({ form }: Step4Props) => {
+/** 供父層在離開 step 4 前，將尚未按「新增」的暫存資源輸入補進表單 */
+export interface Step4Handle {
+  commitPendingResource: () => boolean;
+}
+
+export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
   const t = useTranslations("practice");
   const [resourceName, setResourceName] = useState("");
   const [resourceUrl, setResourceUrl] = useState("");
   const [isFetchingTitle, setIsFetchingTitle] = useState(false);
+
+  /**
+   * 將暫存輸入（尚未按「新增資源」）寫入表單的 resources。
+   * 「新增資源」按鈕、Enter，以及父層離開 step 4 前都會呼叫，
+   * 避免使用者填了資源卻沒按新增就往下一步而被靜默丟棄。
+   * @returns 驗證是否通過（沒有待加入內容也視為通過）
+   */
+  const commitPendingResource = (): boolean => {
+    const trimmedName = resourceName.trim();
+    if (!trimmedName) {
+      return true;
+    }
+
+    const trimmedUrl = resourceUrl.trim();
+    const resources = form.getValues("resources") || [];
+
+    // 如果有輸入 URL，驗證 URL 格式和 HTTPS
+    if (trimmedUrl) {
+      try {
+        const url = new URL(trimmedUrl);
+        if (url.protocol !== "https:") {
+          form.setError("resources", {
+            type: "manual",
+            message: t("step4_url_https_required"),
+          });
+          return false;
+        }
+      } catch {
+        form.setError("resources", {
+          type: "manual",
+          message: t("step4_url_invalid"),
+        });
+        return false;
+      }
+    }
+
+    // 檢查是否已存在相同的資源（有 URL 比 URL，否則比名稱）
+    const isDuplicate = resources.some((resource) => {
+      if (trimmedUrl) {
+        return (
+          resource.url &&
+          resource.url.toLowerCase().replace(/\/$/, "") ===
+            trimmedUrl.toLowerCase().replace(/\/$/, "")
+        );
+      }
+      return resource.name.toLowerCase().trim() === trimmedName.toLowerCase();
+    });
+
+    if (isDuplicate) {
+      form.setError("resources", {
+        type: "manual",
+        message: trimmedUrl
+          ? t("step4_resource_duplicate_url")
+          : t("step4_resource_duplicate_name"),
+      });
+      return false;
+    }
+
+    form.setValue("resources", [
+      ...resources,
+      {
+        id: Date.now().toString(),
+        name: trimmedName,
+        url: trimmedUrl || undefined,
+      },
+    ]);
+    setResourceName("");
+    setResourceUrl("");
+    form.clearErrors("resources");
+    return true;
+  };
+
+  useImperativeHandle(ref, () => ({ commitPendingResource }));
 
   const handleFetchTitle = async () => {
     const trimmedUrl = resourceUrl.trim();
@@ -109,72 +187,6 @@ export const Step4 = ({ form }: Step4Props) => {
         render={({ field }) => {
           const resources = field.value || [];
 
-          const handleAddResource = () => {
-            if (!resourceName.trim()) {
-              return;
-            }
-
-            const trimmedName = resourceName.trim();
-            const trimmedUrl = resourceUrl.trim();
-
-            // 如果有輸入 URL，驗證 URL 格式和 HTTPS
-            if (trimmedUrl) {
-              try {
-                const url = new URL(trimmedUrl);
-                if (url.protocol !== "https:") {
-                  form.setError("resources", {
-                    type: "manual",
-                    message: t("step4_url_https_required"),
-                  });
-                  return;
-                }
-              } catch {
-                form.setError("resources", {
-                  type: "manual",
-                  message: t("step4_url_invalid"),
-                });
-                return;
-              }
-            }
-
-            // 檢查是否已存在相同的資源
-            // 如果有 URL：檢查 URL 是否已存在（URL 是唯一標識）
-            // 如果沒有 URL：檢查名稱是否已存在（名稱是唯一標識）
-            const isDuplicate = resources.some((resource) => {
-              if (trimmedUrl) {
-                // 有 URL 時，比較 URL（忽略大小寫和尾部斜線）
-                return (
-                  resource.url &&
-                  resource.url.toLowerCase().replace(/\/$/, "") ===
-                    trimmedUrl.toLowerCase().replace(/\/$/, "")
-                );
-              }
-              // 沒有 URL 時，比較名稱（忽略大小寫和首尾空白）
-              return resource.name.toLowerCase().trim() === trimmedName.toLowerCase();
-            });
-
-            if (isDuplicate) {
-              form.setError("resources", {
-                type: "manual",
-                message: trimmedUrl
-                  ? t("step4_resource_duplicate_url")
-                  : t("step4_resource_duplicate_name"),
-              });
-              return;
-            }
-
-            const newResource = {
-              id: Date.now().toString(),
-              name: trimmedName,
-              url: trimmedUrl || undefined,
-            };
-
-            field.onChange([...resources, newResource]);
-            setResourceName("");
-            setResourceUrl("");
-            form.clearErrors("resources");
-          };
-
           const handleRemoveResource = (id: string) => {
             field.onChange(resources.filter((r) => r.id !== id));
           };
@@ -198,7 +210,7 @@ export const Step4 = ({ form }: Step4Props) => {
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
-                        handleAddResource();
+                        commitPendingResource();
                       }
                     }}
                   />
@@ -212,7 +224,7 @@ export const Step4 = ({ form }: Step4Props) => {
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
-                          handleAddResource();
+                          commitPendingResource();
                         }
                       }}
                     />
@@ -231,7 +243,7 @@ export const Step4 = ({ form }: Step4Props) => {
                   <FormMessage className="mb-3" />
                   <Button
                     type="button"
-                    onClick={handleAddResource}
+                    onClick={commitPendingResource}
                     className="w-full mb-5"
                     disabled={!resourceName.trim()}
                   >
@@ -257,4 +269,6 @@ export const Step4 = ({ form }: Step4Props) => {
       />
     </div>
   );
-};
+});
+
+Step4.displayName = "Step4";
