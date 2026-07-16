@@ -5086,6 +5086,7 @@
     "step4_url_invalid": "請輸入有效的網址",
     "step4_resource_duplicate_url": "此網址的資源已經添加過了",
     "step4_resource_duplicate_name": "此名稱的資源已經添加過了",
+    "step4_resource_name_required": "請輸入資源名稱",
     "summary_page_complete": "實踐完成",
     "summary_page_subtitle": "你完成了一個尋找可能性的旅程",
     "summary_page_journey": "以下是這趟旅程的總結",

@@ -43,11 +43,20 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
    */
   const commitPendingResource = (): boolean => {
     const trimmedName = resourceName.trim();
+    const trimmedUrl = resourceUrl.trim();
+
     if (!trimmedName) {
+      // 只填了網址沒填名稱：擋下並提示，這筆輸入同樣不該被靜默丟棄
+      if (trimmedUrl) {
+        form.setError("resources", {
+          type: "manual",
+          message: t("step4_resource_name_required"),
+        });
+        return false;
+      }
       return true;
     }
 
-    const trimmedUrl = resourceUrl.trim();
     const resources = form.getValues("resources") || [];
 
     // 如果有輸入 URL，驗證 URL 格式和 HTTPS
@@ -92,14 +101,19 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
       return false;
     }
 
-    form.setValue("resources", [
-      ...resources,
-      {
-        id: Date.now().toString(),
-        name: trimmedName,
-        url: trimmedUrl || undefined,
-      },
-    ]);
+    form.setValue(
+      "resources",
+      [
+        ...resources,
+        {
+          id: Date.now().toString(),
+          name: trimmedName,
+          url: trimmedUrl || undefined,
+        },
+      ],
+      // 頁面用 formState.isDirty 決定是否攔截離頁，setValue 預設不會標記 dirty
+      { shouldDirty: true }
+    );
     setResourceName("");
     setResourceUrl("");
     form.clearErrors("resources");
