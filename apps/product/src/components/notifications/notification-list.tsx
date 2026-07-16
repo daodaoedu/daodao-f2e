@@ -32,7 +32,14 @@ const BACKEND_TYPE_MAP: Record<string, INotificationData["type"]> = {
   ConnectAccepted: NotificationType.agreeConnect,
   PracticeCheckinActivity: NotificationType.updatePracticeCheckin,
   PartnerCheckinActivity: NotificationType.updatePracticeCheckin,
+  PracticeUpdateActivity: NotificationType.updatePractice,
+  PartnerUpdateActivity: NotificationType.updatePractice,
   PracticeCreated: NotificationType.practiceCreated,
+  comment_reply: NotificationType.commentReply,
+  Mention: NotificationType.mention,
+  BuddyRequest: NotificationType.buddyRequest,
+  BuddyRequestFollower: NotificationType.buddyRequestFollower,
+  BuddyAccepted: NotificationType.buddyAccepted,
 };
 
 function normalizeNotificationType(backendType: string): INotificationData["type"] {
