@@ -5086,6 +5086,7 @@
     "step4_url_invalid": "Please enter a valid URL",
     "step4_resource_duplicate_url": "A resource with this URL already exists",
     "step4_resource_duplicate_name": "A resource with this name already exists",
+    "step4_resource_name_required": "Please enter a resource name",
     "summary_page_complete": "Practice Complete",
     "summary_page_subtitle": "You completed a journey of exploring possibilities",
     "summary_page_journey": "Here is a summary of this journey",
