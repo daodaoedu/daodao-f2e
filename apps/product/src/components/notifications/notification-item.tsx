@@ -118,6 +118,32 @@ function NotificationText({ notification }: { notification: INotificationData })
     );
   }
 
+  if (type === NotificationType.commentReply) {
+    return (
+      <p className="text-sm leading-5 line-clamp-2">
+        {name} {t("comment_reply_text")}
+        {content && (
+          <>
+            ：<span className="font-semibold">{content}</span>
+          </>
+        )}
+      </p>
+    );
+  }
+
+  if (type === NotificationType.mention) {
+    return (
+      <p className="text-sm leading-5 line-clamp-2">
+        {name} {t("mention_text")}
+        {content && (
+          <>
+            ：<span className="font-semibold">{content}</span>
+          </>
+        )}
+      </p>
+    );
+  }
+
   if (type === NotificationType.followUser) {
     return (
       <p className="text-sm leading-5 truncate">
@@ -200,7 +226,49 @@ function NotificationText({ notification }: { notification: INotificationData })
     );
   }
 
-  return null;
+  if (type === NotificationType.updatePractice) {
+    return (
+      <p className="text-sm leading-5 line-clamp-2">
+        {name} {t("update_practice_text")}
+        {practiceName}
+      </p>
+    );
+  }
+
+  if (type === NotificationType.buddyRequest) {
+    return (
+      <p className="text-sm leading-5 line-clamp-2">
+        {name} {t("buddy_request_text")}
+        {practiceName}
+        {t("buddy_request_suffix")}
+      </p>
+    );
+  }
+
+  if (type === NotificationType.buddyRequestFollower) {
+    return (
+      <p className="text-sm leading-5 line-clamp-2">
+        {name} {t("buddy_request_follower_text")}
+        {practiceName}
+        {t("buddy_request_follower_suffix")}
+      </p>
+    );
+  }
+
+  if (type === NotificationType.buddyAccepted) {
+    return (
+      <p className="text-sm leading-5 truncate">
+        {name} {t("buddy_accepted_text")}
+      </p>
+    );
+  }
+
+  // 未知類型的通用 fallback，避免通知卡片顯示空白
+  return (
+    <p className="text-sm leading-5 truncate">
+      {name} {t("default_text")}
+    </p>
+  );
 }
 
 // ============================================================================
