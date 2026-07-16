@@ -5762,6 +5762,7 @@
     "showcase_feed_new_practice": "{userName} 發布了新實踐",
     "showcase_feed_checked_in": "{userName} 在 {practiceTitle} 打卡",
     "showcase_feed_cheered": "{actorName} 表達了加油",
+    "showcase_feed_featured": "編輯精選",
     "showcase_data": "數據",
     "showcase_echo": "迴響",
     "showcase_views": "瀏覽",
