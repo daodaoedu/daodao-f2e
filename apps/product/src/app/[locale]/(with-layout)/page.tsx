@@ -268,7 +268,17 @@ export default function HomePage() {
           </div>
 
           {/* 靈感 Tab */}
-          <div className="mt-[28px] mb-[20px]">
+          <header className="px-3 pb-2 pt-4">
+            <p className="text-xs font-medium text-logo-cyan">{t("inspire_eyebrow")}</p>
+            <h1 className="mt-2 text-xl font-bold leading-snug text-text-dark text-balance sm:text-2xl">
+              {t("inspire_title")}
+            </h1>
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-text-dark/50 text-pretty">
+              {t("inspire_subtitle")}
+            </p>
+          </header>
+
+          <div className="mb-5 mt-4">
             <ShowcaseSearchBar
               value={searchValue}
               onChange={setSearchValue}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolvePersonaCloseTarget } from "../persona-close-navigation";
+import { getPersonaQuestionPath, resolvePersonaCloseTarget } from "../persona-close-navigation";
 
 describe("resolvePersonaCloseTarget", () => {
   it("uses back action when history is available", () => {
@@ -13,5 +13,11 @@ describe("resolvePersonaCloseTarget", () => {
   it("does not use /?tab=persona pattern (regression guard)", () => {
     const fallback = resolvePersonaCloseTarget(false);
     expect(fallback).not.toEqual({ action: "push", path: "/?tab=persona" });
+  });
+});
+
+describe("getPersonaQuestionPath", () => {
+  it("routes a submitted carousel answer to the unlocked question detail", () => {
+    expect(getPersonaQuestionPath(42)).toBe("/persona/42");
   });
 });

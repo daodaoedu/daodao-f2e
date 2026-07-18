@@ -21,11 +21,12 @@ import type { MentionCandidate } from "@daodao/features-mention";
 import { useLocale, useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
+import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2, ChevronDown, X } from "lucide-react";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
@@ -36,6 +37,7 @@ import {
 import { CommentSection, ReactionPickerButton } from "@/components/check-in/reactions";
 import type { IComment } from "@/components/check-in/reactions/comment-section";
 import { BackgroundAnimation } from "@/components/layout";
+import { getAvatarColor } from "@/components/persona/avatar-colors";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { resolvePersonaCloseTarget } from "@/utils/persona-close-navigation";
 
@@ -437,7 +439,7 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
   return (
     <div className="-mx-4 -mb-4 mt-3">
       <div className="flex items-center bg-white border-t border-[#E4EAE9] py-1 rounded-b-2xl">
-        <div className="flex-1 flex justify-center rounded-xl hover:bg-gray-50 transition-colors py-1 mx-1">
+        <div className="flex-1 flex justify-center rounded-xl hover:bg-gray-100 transition-colors py-1">
           <ReactionPickerButton
             selectedReactions={selectedReactions}
             onToggle={handleReactionToggle}
@@ -446,7 +448,7 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
           />
         </div>
         <div className="w-px h-5 bg-[#E4EAE9]" />
-        <div className="flex-1 flex justify-center rounded-xl hover:bg-gray-50 transition-colors py-1 mx-1">
+        <div className="flex-1 flex justify-center rounded-xl hover:bg-gray-100 transition-colors py-1">
           <button
             type="button"
             onClick={handleOpenComments}
@@ -463,72 +465,139 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
 
 // ─── Response item ─────────────────────────────────────────────────────────────
 
+type ChoiceDistributionProps = {
+  options: string[];
+  optionCounts: Record<string, number>;
+};
+
+function ChoiceDistribution({ options, optionCounts }: ChoiceDistributionProps) {
+  const t = useTranslations("persona.detail");
+  const totalChoiceCount = Object.values(optionCounts).reduce((sum, count) => sum + count, 0);
+
+  return (
+    <div className="rounded-2xl border border-[#EEF4F4] bg-white p-5">
+      <h3 className="mb-4 text-sm font-semibold text-text-dark/70">{t("choiceDistribution")}</h3>
+      <div className="space-y-4">
+        {options.map((option) => {
+          const count = optionCounts[option] ?? 0;
+          const percentage =
+            totalChoiceCount > 0 ? Math.round((count / totalChoiceCount) * 100) : 0;
+
+          return (
+            <div key={option}>
+              <div className="mb-1.5 flex items-start justify-between gap-4">
+                <span className="text-sm font-medium text-text-dark">{option}</span>
+                <span className="shrink-0 text-xs text-text-dark/45">
+                  {t("optionResult", { count, percentage })}
+                </span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-[#EEF4F4]">
+                <div
+                  className="h-full rounded-full bg-logo-cyan transition-[width] duration-500"
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
   const t = useTranslations("persona.detail");
   const [expanded, setExpanded] = useState(false);
   const answer = item.selectedValue ?? item.textAnswer ?? "";
-  const isLong = answer.length > 70;
+  const isChoiceAnswer = item.selectedValue != null;
+  const isLong = !isChoiceAnswer && answer.length > 70;
   const displayName = item.name ?? "??";
   const initial = displayName[0] ?? "?";
   const profileLink = item.customId || item.userId;
-
-  const AVATAR_COLORS = [
-    "#F5A93E",
-    "#16B9B3",
-    "#9B8FE0",
-    "#5BA58C",
-    "#E07B7B",
-    "#F5C842",
-    "#7BB8E0",
-  ];
-  const colorIndex =
-    displayName.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % AVATAR_COLORS.length;
-  const avatarColor = item.isSelf ? "#16B9B3" : (AVATAR_COLORS[colorIndex] ?? "#16B9B3");
+  const avatarColor = getAvatarColor(displayName, item.isSelf);
 
   return (
     <div
       className={cn(
-        "rounded-2xl p-4 transition-all duration-200",
-        item.isSelf
-          ? "bg-logo-cyan/[0.06] border border-logo-cyan/20"
-          : "bg-white border border-[#EEF4F4]"
+        "flex h-full flex-col rounded-2xl p-4 transition-all duration-200",
+        item.isSelf ? "bg-white border border-logo-cyan/30" : "bg-white border border-[#EEF4F4]"
       )}
-      >
-      <div className="flex items-start gap-3">
+    >
+      <div className="mb-5 flex-1">
+        {item.isSelf && (
+          <div className="mb-3">
+            <span className="text-[11px] text-logo-cyan bg-logo-cyan/10 rounded-full px-2.5 py-1 font-medium leading-none">
+              {t("myAnswer")}
+            </span>
+          </div>
+        )}
+        {isChoiceAnswer ? (
+          <div className="rounded-r-xl border-l-4 border-logo-cyan bg-logo-cyan/[0.06] px-4 py-3">
+            <p className="text-base font-semibold text-text-dark leading-relaxed">{answer}</p>
+          </div>
+        ) : (
+          <>
+            <QuoteSvg className="size-8 mb-2" />
+            <p
+              className={cn(
+                "text-[17px] font-medium text-text-dark leading-relaxed",
+                !expanded && isLong && "line-clamp-4"
+              )}
+            >
+              {answer}
+            </p>
+          </>
+        )}
+        {isLong && (
+          // biome-ignore lint/a11y/useKeyWithClickEvents: expand toggle
+          // biome-ignore lint/a11y/noStaticElementInteractions: expand toggle
+          <div
+            className="mt-2 flex items-center gap-0.5 text-xs text-text-dark/35 hover:text-text-dark/60 transition-colors cursor-pointer w-fit"
+            onClick={() => setExpanded((v) => !v)}
+          >
+            {expanded ? t("collapse") : t("expand")}
+            <ChevronDown
+              className={cn("size-3 transition-transform duration-200", expanded && "rotate-180")}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center gap-3 border-t border-[#E4EAE9] pt-4">
         {item.userId ? (
-          <CustomLink href={`/users/${profileLink}`} className="shrink-0 mt-0.5">
-            {item.photoURL ? (
-              <Image
-                src={item.photoURL}
-                alt={displayName}
-                width={36}
-                height={36}
-                className="size-9 rounded-full object-cover"
-              />
-            ) : (
-              <div
-                className="size-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+          <CustomLink href={`/users/${profileLink}`} className="shrink-0">
+            <Avatar className="size-9">
+              {item.photoURL && (
+                <AvatarImage src={item.photoURL} alt={displayName} className="object-cover" />
+              )}
+              <AvatarFallback
+                className="text-sm font-bold text-white"
                 style={{ background: avatarColor }}
               >
                 {initial}
-              </div>
-            )}
+              </AvatarFallback>
+            </Avatar>
           </CustomLink>
         ) : (
-          <div
-            className="size-9 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 mt-0.5"
-            style={{ background: avatarColor }}
-          >
-            {initial}
-          </div>
+          <Avatar className="size-9">
+            <AvatarFallback
+              className="text-sm font-bold text-white"
+              style={{ background: avatarColor }}
+            >
+              {initial}
+            </AvatarFallback>
+          </Avatar>
         )}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1.5">
+          <div className="flex items-center gap-2">
             {item.userId ? (
-              <CustomLink href={`/users/${profileLink}`} className={cn(
-                "text-sm font-semibold hover:underline",
-                item.isSelf ? "text-logo-cyan" : "text-text-dark"
-              )}>
+              <CustomLink
+                href={`/users/${profileLink}`}
+                className={cn(
+                  "text-sm font-semibold hover:underline",
+                  item.isSelf ? "text-logo-cyan" : "text-text-dark"
+                )}
+              >
                 {displayName}
               </CustomLink>
             ) : (
@@ -541,37 +610,63 @@ function ResponseItem({ item }: { item: PersonaQuestionAnswerItem }) {
                 {displayName}
               </span>
             )}
-            {item.isSelf && (
-              <span className="text-[10px] text-logo-cyan bg-logo-cyan/10 rounded-full px-2 py-0.5 font-medium leading-none">
-                {t("myAnswer")}
-              </span>
-            )}
           </div>
-          <p
-            className={cn(
-              "text-sm text-text-dark/70 leading-relaxed",
-              !expanded && isLong && "line-clamp-2"
-            )}
-          >
-            {answer}
-          </p>
-          {isLong && (
-            // biome-ignore lint/a11y/useKeyWithClickEvents: expand toggle
-            // biome-ignore lint/a11y/noStaticElementInteractions: expand toggle
-            <div
-              className="mt-1.5 flex items-center gap-0.5 text-xs text-text-dark/35 hover:text-text-dark/60 transition-colors cursor-pointer w-fit"
-              onClick={() => setExpanded((v) => !v)}
-            >
-              {expanded ? t("collapse") : t("expand")}
-              <ChevronDown
-                className={cn("size-3 transition-transform duration-200", expanded && "rotate-180")}
-              />
-            </div>
+          {item.customId && (
+            <p className="mt-0.5 text-xs text-text-dark/40 truncate">@{item.customId}</p>
           )}
         </div>
       </div>
       <PersonaAnswerInteractions answerId={item.answerId} />
     </div>
+  );
+}
+
+// ─── Response preview (teaser shown before the viewer answers) ─────────────────
+
+function ResponsePreviewItem({
+  item,
+  onUnlock,
+}: {
+  item: PersonaQuestionAnswerItem;
+  onUnlock: () => void;
+}) {
+  const t = useTranslations("persona.detail");
+  const answer = item.selectedValue ?? item.textAnswer ?? "";
+  const displayName = item.name ?? "??";
+  const initial = displayName[0] ?? "?";
+  const avatarColor = getAvatarColor(displayName);
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      animation="none"
+      className="relative h-auto w-full items-stretch justify-start overflow-hidden whitespace-normal rounded-2xl border border-[#EEF4F4] bg-white p-4 pb-11 text-left transition-all duration-200 hover:border-logo-cyan/40"
+      onClick={onUnlock}
+    >
+      <div className="flex items-start gap-3">
+        <Avatar className="mt-0.5 size-9">
+          {item.photoURL && (
+            <AvatarImage src={item.photoURL} alt={displayName} className="object-cover" />
+          )}
+          <AvatarFallback
+            className="text-sm font-bold text-white"
+            style={{ background: avatarColor }}
+          >
+            {initial}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-text-dark mb-1.5">{displayName}</p>
+          <p className="text-sm text-text-dark/70 leading-relaxed line-clamp-2">{answer}</p>
+        </div>
+      </div>
+      <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-white flex items-end justify-center pb-2">
+        <span className="text-[11px] text-text-dark/55 border border-[#D8ECEC] rounded-full px-3 py-1 bg-white leading-tight">
+          {t("previewUnlockHint")}
+        </span>
+      </div>
+    </Button>
   );
 }
 
@@ -607,6 +702,7 @@ export default function LearningPersonaDetailPage() {
     "sentence_completion"
   );
   const [questionOptions, setQuestionOptions] = useState<string[] | null>(null);
+  const [questionOptionCounts, setQuestionOptionCounts] = useState<Record<string, number>>({});
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [answers, setAnswers] = useState<PersonaQuestionAnswerItem[]>([]);
   const [nextCursor, setNextCursor] = useState<number | undefined>(undefined);
@@ -646,6 +742,7 @@ export default function LearningPersonaDetailPage() {
             setQuestionPrompt(question.prompt);
             setQuestionType(question.questionType);
             setQuestionOptions(question.options);
+            setQuestionOptionCounts(question.optionCounts);
             setTotalCount(question.totalAnswerCount);
           }
         }
@@ -660,6 +757,7 @@ export default function LearningPersonaDetailPage() {
   // Initial load
   useEffect(() => {
     setAnswers([]);
+    setQuestionOptionCounts({});
     setNextCursor(undefined);
     setHasMore(false);
     setAnswersError(false);
@@ -685,6 +783,15 @@ export default function LearningPersonaDetailPage() {
   const isSelfAnswered = answers.some((a) => a.isSelf);
   const isAnswered = isSelfAnswered || answeredInline;
 
+  // Teaser previews for the unanswered state — prefer free-text answers over option-only ones.
+  const previewItems = useMemo(
+    () =>
+      [...answers]
+        .sort((a, b) => Number(Boolean(b.textAnswer)) - Number(Boolean(a.textAnswer)))
+        .slice(0, 2),
+    [answers]
+  );
+
   const handleAnswerSubmit = async (ans: string, isChoice: boolean) => {
     if (!isAuthenticated) {
       login();
@@ -709,6 +816,16 @@ export default function LearningPersonaDetailPage() {
     }
   };
 
+  const handleClose = () => {
+    const canGoBack = typeof window !== "undefined" && window.history.length > 1;
+    const target = resolvePersonaCloseTarget(canGoBack);
+    if (target.action === "back") {
+      router.back();
+    } else {
+      router.push(target.path);
+    }
+  };
+
   if (Number.isNaN(id)) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-very-light-gray">
@@ -723,23 +840,17 @@ export default function LearningPersonaDetailPage() {
       <BackgroundAnimation />
 
       {/* Close button */}
-      <div className="sticky top-0 z-50 flex justify-end px-3 pt-3 pointer-events-none">
-        <button
+      <div className="sticky top-0 z-50 mx-auto flex max-w-[640px] justify-end px-4 pt-3 pointer-events-none">
+        <Button
           type="button"
-          onClick={() => {
-            const canGoBack = typeof window !== "undefined" && window.history.length > 1;
-            const target = resolvePersonaCloseTarget(canGoBack);
-            if (target.action === "back") {
-              router.back();
-            } else {
-              router.push(target.path);
-            }
-          }}
-          className="pointer-events-auto flex items-center justify-center size-10 rounded-full text-text-dark/40 bg-very-light-gray/70 backdrop-blur-sm hover:text-logo-cyan hover:bg-white/80 transition-all"
+          variant="ghost"
+          animation="none"
+          onClick={handleClose}
+          className="pointer-events-auto size-10 rounded-full bg-very-light-gray/70 p-0 text-text-dark/40 backdrop-blur-sm transition-all hover:bg-white/80 hover:text-logo-cyan"
           aria-label={t("close")}
         >
           <X className="size-5" />
-        </button>
+        </Button>
       </div>
 
       <main className="relative z-10 max-w-[640px] px-4 mx-auto pb-16 pt-4">
@@ -798,49 +909,73 @@ export default function LearningPersonaDetailPage() {
                     </div>
                   )}
 
-                  {answers.map((item) => (
-                    <ResponseItem key={item.answerId} item={item} />
-                  ))}
+                  {questionType === "choice" && questionOptions && (
+                    <ChoiceDistribution
+                      options={questionOptions}
+                      optionCounts={questionOptionCounts}
+                    />
+                  )}
 
-                  {hasMore && (
+                  {questionType !== "choice" && (
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                      {answers.map((item) => (
+                        <ResponseItem key={item.answerId} item={item} />
+                      ))}
+                    </div>
+                  )}
+
+                  {questionType !== "choice" && hasMore && (
                     <>
                       {loading && <LoadingDots />}
                       <div ref={sentinelRef} className="h-4" />
                     </>
                   )}
 
-                  {!hasMore && answers.length > 0 && (
+                  {questionType !== "choice" && !hasMore && answers.length > 0 && (
                     <p className="text-center text-xs text-text-dark/30 py-4">
                       {t("allResponsesShown", { count: answers.length })}
                     </p>
                   )}
 
-                  {!hasMore && answers.length === 0 && (
+                  {questionType !== "choice" && !hasMore && answers.length === 0 && (
                     <div className="bg-white rounded-2xl shadow-sm px-5 py-8 text-center">
                       <p className="text-sm text-text-dark/40">{t("emptyResponses")}</p>
                     </div>
                   )}
                 </>
               ) : (
-                /* Not answered yet */
-                <div className="bg-white rounded-2xl shadow-sm px-5 py-8 flex flex-col items-center gap-3 text-center">
-                  <p className="text-sm font-medium text-text-dark/70">{t("lockedResponses")}</p>
-                  {totalCount != null && totalCount > 0 && (
-                    <p className="text-xs text-text-dark/35">
-                      {t("answeredCount", { count: totalCount })}
-                    </p>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCardFlipped(true);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    className="mt-1 text-sm font-medium text-white bg-logo-cyan rounded-full px-5 py-2.5 hover:bg-logo-cyan/90 active:scale-95 transition-all"
-                  >
-                    {t("shareThoughts")}
-                  </button>
-                </div>
+                /* Not answered yet: teaser previews + unlock card */
+                <>
+                  {previewItems.map((item) => (
+                    <ResponsePreviewItem
+                      key={item.answerId}
+                      item={item}
+                      onUnlock={() => {
+                        setCardFlipped(true);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                    />
+                  ))}
+                  <div className="bg-white rounded-2xl shadow-sm px-5 py-8 flex flex-col items-center gap-3 text-center">
+                    <p className="text-sm font-medium text-text-dark/70">{t("lockedResponses")}</p>
+                    {totalCount != null && totalCount > 0 && (
+                      <p className="text-xs text-text-dark/35">
+                        {t("answeredCount", { count: totalCount })}
+                      </p>
+                    )}
+                    <Button
+                      type="button"
+                      animation="none"
+                      onClick={() => {
+                        setCardFlipped(true);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="mt-1 text-sm font-medium text-white bg-logo-cyan rounded-full px-5 py-2.5 hover:bg-logo-cyan/90 active:scale-95 transition-all"
+                    >
+                      {t("shareThoughts")}
+                    </Button>
+                  </div>
+                </>
               )}
             </div>
           </div>
