@@ -26,20 +26,25 @@ import { NotificationItem } from "./notification-item";
 // ============================================================================
 
 const BACKEND_TYPE_MAP: Record<string, INotificationData["type"]> = {
+  Reaction: NotificationType.reaction,
+  Comment: NotificationType.comment,
+  CommentReply: NotificationType.commentReply,
+  Mention: NotificationType.mention,
   UserFollowed: NotificationType.followUser,
   PracticeFollowed: NotificationType.followPractice,
   Connect: NotificationType.connect,
   ConnectAccepted: NotificationType.agreeConnect,
+  ConnectAgreed: NotificationType.connectAgree,
+  ConnectRejected: NotificationType.connectRejected,
+  BuddyRequest: NotificationType.buddyRequest,
+  BuddyRequestFollower: NotificationType.buddyRequestFollower,
+  BuddyAccepted: NotificationType.buddyAccepted,
+  PracticeCreated: NotificationType.practiceCreated,
+  PracticeFinished: NotificationType.updatePracticeFinish,
   PracticeCheckinActivity: NotificationType.updatePracticeCheckin,
   PartnerCheckinActivity: NotificationType.updatePracticeCheckin,
   PracticeUpdateActivity: NotificationType.updatePractice,
   PartnerUpdateActivity: NotificationType.updatePractice,
-  PracticeCreated: NotificationType.practiceCreated,
-  comment_reply: NotificationType.commentReply,
-  Mention: NotificationType.mention,
-  BuddyRequest: NotificationType.buddyRequest,
-  BuddyRequestFollower: NotificationType.buddyRequestFollower,
-  BuddyAccepted: NotificationType.buddyAccepted,
 };
 
 function normalizeNotificationType(backendType: string): INotificationData["type"] {
