@@ -10,7 +10,7 @@
    - `project-rules` — 開發規範（怎麼寫才對）。hook 會在每個 session 首次寫檔時自動注入一次。
    - `codebase-map` — 本 repo 的地圖（東西在哪、常見任務動哪裡、隱藏的前置依賴）。
    - `system-map` — 六個 repo 的全景（誰呼叫誰、types 同步鏈、跨 repo SOP）。**六份內容相同**。
-   - `pre-commit-check` / `format-commit` / `code-review` / `collect-pr-feedback` — 流程 skill。
+   - `pre-commit-check` / `format-commit` / `code-review` / `collect-pr-feedback` / `post-merge-wrapup` — 流程 skill。
 3. **`.claude/hooks/`** — 機械強制層：`pre-write-guard.sh`（擋敏感檔與舊 migration、自動載入規範）、`post-write-format.sh`（寫檔後自動 format）。
 4. **`.claude/settings.json`** — 權限白名單與 hook 註冊。
 
@@ -21,6 +21,8 @@
 - `.claude/hooks/pre-write-guard.sh`、`.claude/hooks/post-write-format.sh`
 - `.claude/settings.json`
 - `.claude/skills/system-map/SKILL.md`
+- `.claude/skills/collect-pr-feedback/SKILL.md`（源頭在 daodao repo，經 `.claude/sync.sh` 同步）
+- `.claude/skills/post-merge-wrapup/SKILL.md`（同上）
 - `.claude/README.md`（本檔）
 
 驗證方式：`md5sum ../daodao-*/.claude/hooks/*.sh`，同名檔案 hash 必須一致。
