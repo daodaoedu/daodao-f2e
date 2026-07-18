@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { Alert, Pressable, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
-import { NotificationType } from "@/constants/notification-type";
+import { NotificationType, type NotificationTypeType } from "@/constants/notification-type";
 import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
 import {
@@ -21,7 +21,7 @@ import { formatRelativeTime } from "@/utils/format-time";
 // Helpers
 // ============================================================================
 
-const BACKEND_TYPE_MAP: Record<string, string> = {
+const BACKEND_TYPE_MAP: Record<string, NotificationTypeType> = {
   Reaction: NotificationType.reaction,
   Comment: NotificationType.comment,
   CommentReply: NotificationType.commentReply,
@@ -43,7 +43,7 @@ const BACKEND_TYPE_MAP: Record<string, string> = {
   PartnerUpdateActivity: NotificationType.updatePractice,
 };
 
-function normalizeType(backendType: string): string {
+function normalizeType(backendType: string): NotificationTypeType | string {
   return BACKEND_TYPE_MAP[backendType] ?? backendType;
 }
 
