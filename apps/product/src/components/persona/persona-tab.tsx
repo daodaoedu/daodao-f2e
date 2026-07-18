@@ -93,18 +93,19 @@ function PersonaStoryCard({ answer, id, index, isLast, prompt }: PersonaStoryCar
   const router = useRouter();
   const isAnswered = answer !== null;
 
-  const { data, isLoading } = usePersonaQuestionAnswers(id, {
+  const { data, isLoading, error } = usePersonaQuestionAnswers(id, {
     locale,
     limit: 3,
   });
 
+  const hasError = Boolean(error);
   const answers = data?.data?.answers ?? [];
   const featuredStory = useMemo(() => getFeaturedStory(answers), [answers]);
   const totalAnswerCount = data?.data?.question?.totalAnswerCount ?? 0;
 
   if (isLoading) return <StoryLoadingCard isLast={isLast} />;
 
-  const storyText = featuredStory?.textAnswer ?? featuredStory?.selectedValue ?? "";
+  const storyText = featuredStory?.textAnswer || featuredStory?.selectedValue || "";
   const displayName = featuredStory?.name ?? t("anonymous");
   const avatarColor = getAvatarColor(displayName);
   const remainingStoryCount = Math.max(0, totalAnswerCount - 1);
@@ -168,7 +169,7 @@ function PersonaStoryCard({ answer, id, index, isLast, prompt }: PersonaStoryCar
           <div className="mt-9 flex min-h-[150px] flex-col items-center justify-center rounded-2xl bg-[#F5F9F9] px-6 text-center">
             <MessageCircle className="size-6 text-logo-cyan/60" />
             <p className="mt-3 text-sm leading-relaxed text-text-dark/55 text-pretty">
-              {t("emptyStory")}
+              {hasError ? tDetail("loadError") : t("emptyStory")}
             </p>
           </div>
         )}

@@ -131,6 +131,7 @@ function CarouselQuestionCard({
         if (cancelled) return;
         if (res.error) {
           console.error("Failed to load persona answer previews");
+          setPreviewsLoaded(true);
           return;
         }
         const data = res.data?.data;
@@ -144,7 +145,10 @@ function CarouselQuestionCard({
           setPreviewsLoaded(true);
         }
       } catch (error) {
-        if (!cancelled) console.error("Failed to load persona answer previews", error);
+        if (!cancelled) {
+          console.error("Failed to load persona answer previews", error);
+          setPreviewsLoaded(true);
+        }
       }
     };
     setPreviewAnswers([]);

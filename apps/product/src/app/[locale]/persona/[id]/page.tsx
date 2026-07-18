@@ -368,6 +368,7 @@ function PersonaAnswerCommentSheetContent({ answerId }: { answerId: number }) {
 
 function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
   const t = useTranslations("persona.detail");
+  const tPersona = useTranslations("persona");
   const targetId = String(answerId);
   const [, startReactionTransition] = useTransition();
   const [pendingReaction, setPendingReaction] = useState<ReactionTypeType | null | undefined>(
@@ -399,20 +400,23 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
       const isSelected = currentUserReaction === type;
       setPendingReaction(isSelected ? null : type);
       startReactionTransition(async () => {
-        if (isSelected) {
-          await removeReaction({ targetType: "persona_answer", targetId });
-        } else {
-          await upsertReaction({
-            targetType: "persona_answer",
-            targetId,
-            reactionType: type as ReactionTypeValue,
-          });
+        const res = isSelected
+          ? await removeReaction({ targetType: "persona_answer", targetId })
+          : await upsertReaction({
+              targetType: "persona_answer",
+              targetId,
+              reactionType: type as ReactionTypeValue,
+            });
+        if (res.error) {
+          toast.error(tPersona("resonance.error"));
+          setPendingReaction(undefined);
+          return;
         }
         await mutateReactions();
         setPendingReaction(undefined);
       });
     },
-    [isAuthenticated, login, currentUserReaction, targetId, mutateReactions]
+    [isAuthenticated, login, currentUserReaction, targetId, mutateReactions, tPersona]
   );
 
   // ── Comment count (for badge) ──────────────────────────────────────────────
@@ -783,10 +787,13 @@ export default function LearningPersonaDetailPage() {
   const isSelfAnswered = answers.some((a) => a.isSelf);
   const isAnswered = isSelfAnswered || answeredInline;
 
-  // Teaser previews for the unanswered state — prefer free-text answers over option-only ones.
+  // Teaser previews for the unanswered state — only free-text answers, never choice-only ones.
+  // Choice picks stay anonymized (aggregate-only) even after unlocking, so the teaser must not
+  // leak an individual respondent's exact selection before that.
   const previewItems = useMemo(
     () =>
-      [...answers]
+      answers
+        .filter((a) => Boolean(a.textAnswer))
         .sort((a, b) => Number(Boolean(b.textAnswer)) - Number(Boolean(a.textAnswer)))
         .slice(0, 2),
     [answers]

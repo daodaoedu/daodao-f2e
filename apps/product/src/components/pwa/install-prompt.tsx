@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@daodao/ui/components/button";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { Download, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -10,7 +11,6 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 // 使用者按掉安裝橫幅後，這段期間內不再顯示。
-const DISMISS_STORAGE_KEY = "pwa-install-dismissed-at";
 const DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 天
 
 // 已安裝並從 PWA 視窗（standalone）開啟時，不顯示安裝橫幅。
@@ -27,15 +27,9 @@ function isStandalone() {
 }
 
 function wasRecentlyDismissed() {
-  try {
-    const raw = localStorage.getItem(DISMISS_STORAGE_KEY);
-    if (!raw) return false;
-    const dismissedAt = Number(raw);
-    if (!Number.isFinite(dismissedAt)) return false;
-    return Date.now() - dismissedAt < DISMISS_TTL_MS;
-  } catch {
-    return false;
-  }
+  const dismissedAt = getStorage<number>(StorageEnum.PwaInstallDismissedAt).get();
+  if (dismissedAt == null || !Number.isFinite(dismissedAt)) return false;
+  return Date.now() - dismissedAt < DISMISS_TTL_MS;
 }
 
 export function PwaInstallPrompt() {
@@ -69,11 +63,7 @@ export function PwaInstallPrompt() {
   }, []);
 
   const handleDismiss = useCallback(() => {
-    try {
-      localStorage.setItem(DISMISS_STORAGE_KEY, String(Date.now()));
-    } catch {
-      // localStorage 不可用時就不記錄，退回原本每次顯示的行為
-    }
+    getStorage<number>(StorageEnum.PwaInstallDismissedAt).set(Date.now());
     setShowBanner(false);
     deferredPromptRef.current = null;
   }, []);
