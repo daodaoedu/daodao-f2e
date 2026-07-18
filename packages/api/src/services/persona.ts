@@ -12,14 +12,14 @@ import type { components, paths } from "../types";
 
 export type PersonaQuestionItem = components["schemas"]["PersonaQuestionItem"];
 export type PersonaAnswerItem = components["schemas"]["PersonaAnswerItem"];
-export type PersonaResonanceData = components["schemas"]["PersonaResonanceData"];
 export type PersonaCarouselState = components["schemas"]["PersonaCarouselState"];
-export type PersonaQuestionAnswerItem = components["schemas"]["PersonaQuestionAnswerItem"];
-export type PersonaQuestionAnswersData = components["schemas"]["PersonaQuestionAnswersData"];
+export type PersonaQuestionAnswerItem = components["schemas"]["QuestionAnswerItem"];
+export type PersonaQuestionAnswersData = components["schemas"]["QuestionAnswersData"];
 
 export type SubmitPersonaAnswerBody = components["schemas"]["SubmitPersonaAnswerBody"];
 export type SubmitPersonaSkipBody = components["schemas"]["SubmitPersonaSkipBody"];
-export type AddPersonaResonanceBody = components["schemas"]["AddPersonaResonanceBody"];
+
+type PersonaLocale = "zh-TW" | "en";
 
 export type GetPersonaQuestionsResponse =
   paths["/api/v1/persona/questions"]["get"]["responses"]["200"]["content"]["application/json"];
@@ -39,7 +39,7 @@ export type GetProfileUserResponse =
 
 export const getPersonaQuestions = async (locale?: string) => {
   return client.GET("/api/v1/persona/questions", {
-    params: { query: locale ? { locale } : undefined },
+    params: { query: locale ? { locale: locale as PersonaLocale } : undefined },
   });
 };
 
@@ -51,22 +51,12 @@ export const submitPersonaSkip = async (body: SubmitPersonaSkipBody) => {
   return client.POST("/api/v1/persona/skips", { body });
 };
 
-export const addPersonaResonance = async (body: AddPersonaResonanceBody) => {
-  return client.POST("/api/v1/persona/resonances", { body });
-};
-
-export const removePersonaResonance = async (answerId: number) => {
-  return client.DELETE("/api/v1/persona/resonances/{answerId}", {
-    params: { path: { answerId } },
-  });
-};
-
 export const getPersonaCarouselState = async (replace?: number, locale?: string) => {
   return client.GET("/api/v1/persona/carousel-state", {
     params: {
       query: {
         ...(replace != null ? { replace } : {}),
-        ...(locale ? { locale } : {}),
+        ...(locale ? { locale: locale as PersonaLocale } : {}),
       },
     },
   });
@@ -78,7 +68,7 @@ export const dismissPersonaCarousel = async () => {
 
 export const getPersonaProfileMe = async (locale?: string) => {
   return client.GET("/api/v1/persona/profile/me", {
-    params: { query: locale ? { locale } : undefined },
+    params: { query: locale ? { locale: locale as PersonaLocale } : undefined },
   });
 };
 
@@ -90,7 +80,7 @@ export const getPersonaQuestionAnswers = async (
     params: {
       path: { questionId },
       query: {
-        ...(options?.locale ? { locale: options.locale } : {}),
+        ...(options?.locale ? { locale: options.locale as PersonaLocale } : {}),
         ...(options?.limit != null ? { limit: options.limit } : {}),
         ...(options?.cursor != null ? { cursor: options.cursor } : {}),
       },
@@ -104,7 +94,7 @@ export const getPersonaProfileUser = async (userId: string, exclude?: number, lo
       path: { userId },
       query: {
         ...(exclude != null ? { exclude } : {}),
-        ...(locale ? { locale } : {}),
+        ...(locale ? { locale: locale as PersonaLocale } : {}),
       },
     },
   });

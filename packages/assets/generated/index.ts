@@ -73,7 +73,6 @@ export { default as HomeOutlineSvg } from "./icon/home-outline";
 export { default as HomeSolidSvg } from "./icon/home-solid";
 export { default as HotSvg } from "./icon/hot";
 export { default as LikeOutlineSvg } from "./icon/like-outline";
-// MascotBasicSvg：檔案過大(~4MB)且 mobile 未使用；需要時 path import icon/mascot-basic
 export { default as MedalOutlineSvg } from "./icon/medal-outline";
 export { default as MedalSolidSvg } from "./icon/medal-solid";
 export { default as MessagesSvg } from "./icon/messages";
@@ -96,8 +95,6 @@ export { default as TitleSvg } from "./icon/title";
 export { default as UserOutlineSvg } from "./icon/user-outline";
 export { default as UserSolidSvg } from "./icon/user-solid";
 export { default as ViewSvg } from "./icon/view";
-// landing-page/* 不 re-export：官網用 public 路徑；進 barrel 會讓 EAS 必須上傳 ~30MB native 組件。
-// 需要時改 import from "@daodao/assets/images/landing-page/..." 或跑 build:svg 後按需加回。
 export { default as ArrowCircleSvg } from "./persona/arrow-circle";
 export { default as QuoteFillSvg } from "./persona/quote-fill";
 export { default as ActiveShaperSvg } from "./quiz/active-shaper";
