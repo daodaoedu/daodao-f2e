@@ -400,20 +400,24 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
       const isSelected = currentUserReaction === type;
       setPendingReaction(isSelected ? null : type);
       startReactionTransition(async () => {
-        const res = isSelected
-          ? await removeReaction({ targetType: "persona_answer", targetId })
-          : await upsertReaction({
-              targetType: "persona_answer",
-              targetId,
-              reactionType: type as ReactionTypeValue,
-            });
-        if (res.error) {
+        try {
+          const res = isSelected
+            ? await removeReaction({ targetType: "persona_answer", targetId })
+            : await upsertReaction({
+                targetType: "persona_answer",
+                targetId,
+                reactionType: type as ReactionTypeValue,
+              });
+          if (res.error) {
+            toast.error(tPersona("resonance.error"));
+            return;
+          }
+          await mutateReactions();
+        } catch {
           toast.error(tPersona("resonance.error"));
+        } finally {
           setPendingReaction(undefined);
-          return;
         }
-        await mutateReactions();
-        setPendingReaction(undefined);
       });
     },
     [isAuthenticated, login, currentUserReaction, targetId, mutateReactions, tPersona]
@@ -791,11 +795,7 @@ export default function LearningPersonaDetailPage() {
   // Choice picks stay anonymized (aggregate-only) even after unlocking, so the teaser must not
   // leak an individual respondent's exact selection before that.
   const previewItems = useMemo(
-    () =>
-      answers
-        .filter((a) => Boolean(a.textAnswer))
-        .sort((a, b) => Number(Boolean(b.textAnswer)) - Number(Boolean(a.textAnswer)))
-        .slice(0, 2),
+    () => answers.filter((a) => Boolean(a.textAnswer)).slice(0, 2),
     [answers]
   );
 

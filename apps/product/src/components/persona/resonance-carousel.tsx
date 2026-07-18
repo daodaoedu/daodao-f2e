@@ -142,8 +142,8 @@ function CarouselQuestionCard({
           );
           setPreviewAnswers(sorted);
           setTotalAnswerCount(data.question?.totalAnswerCount ?? 0);
-          setPreviewsLoaded(true);
         }
+        setPreviewsLoaded(true);
       } catch (error) {
         if (!cancelled) {
           console.error("Failed to load persona answer previews", error);
