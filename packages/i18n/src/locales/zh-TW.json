@@ -5289,6 +5289,9 @@
     "tab_inspire": "靈感",
     "tab_persona": "人物誌",
     "tab_mine": "我的",
+    "inspire_eyebrow": "從他人的實踐開始",
+    "inspire_title": "看看大家如何把想法走成行動",
+    "inspire_subtitle": "瀏覽正在發生的學習與實踐，從真實的進展裡找到自己的下一步。當你準備好了，也可以開始你的版本。",
     "loading": "載入中...",
     "filter_aria_label": "任務篩選",
     "filter_all": "全部",
@@ -5478,6 +5481,7 @@
       "unansweredLabel": "尚未回答",
       "answeredLabel": "已回答",
       "myAnswerLabel": "我的回答",
+      "previewSeeMore": "看全文 →",
       "cancel": "取消",
       "anonymousUser": "匿名使用者",
       "answerAdded": "回答已新增",
@@ -5519,8 +5523,17 @@
       }
     },
     "tab": {
-      "headerTitle": "遇見各式各樣的學習者",
-      "headerSubtitle": "看見別人，認識自己"
+      "eyebrow": "學習故事接力",
+      "headerTitle": "一則一則，遇見不同的學習故事",
+      "headerSubtitle": "從別人的經驗找到新的可能，也讓你的故事被看見。每一次真實分享，都可能成為另一個人前進的靈感。",
+      "storyNumber": "故事 {number}",
+      "anonymous": "一位學習者",
+      "resonanceCount": "{count} 個共鳴",
+      "moreStories": "還有 {count} 則相關故事",
+      "startConversation": "成為第一個接下故事的人",
+      "emptyStory": "還沒有人分享這一題，等你接下第一棒。",
+      "readAndRespond": "讀故事、加入交流",
+      "shareMine": "分享我的故事"
     },
     "userProfile": {
       "loading": "載入中...",
@@ -5532,6 +5545,7 @@
       "error": "共鳴操作失敗，請稍後再試"
     },
     "detail": {
+      "back": "回上一頁",
       "shareThoughts": "分享我的想法",
       "thoughtPlaceholder": "寫下你的想法...",
       "anonymousUser": "匿名用戶",
@@ -5540,6 +5554,8 @@
       "commentSubmitSuccess": "留言成功！",
       "commentsTitle": "留言",
       "myAnswer": "我的回答",
+      "choiceDistribution": "選項分布",
+      "optionResult": "{count} 人 · {percentage}%",
       "collapse": "收起",
       "expand": "展開全文",
       "loadError": "回答載入失敗，請稍後再試",
@@ -5551,6 +5567,7 @@
       "allResponsesShown": "已顯示全部 {count} 則回應",
       "emptyResponses": "還沒有其他人回答這題，你是第一個！",
       "lockedResponses": "回答後即可看到其他人怎麼說",
+      "previewUnlockHint": "回答後看全文",
       "answeredCount": "{count} 人已回答"
     },
     "carousel": {
@@ -5567,11 +5584,13 @@
       "answered": "已回答",
       "communityLabel": "大家的回答是...",
       "unlockHint": "用你的回答來解鎖吧！",
+      "previewUnlockHint": "回答後看全文",
       "error": "操作失敗，請稍後再試",
       "submit": "送出",
       "submitError": "送出失敗，請稍後再試",
       "submitting": "送出中...",
       "textPlaceholder": "分享你的想法...",
+      "quickStartHint": "回答後即可解鎖完整內容，你的回答也會加入人物誌",
       "retry": "重試"
     },
     "answeredLabel": "已回答",

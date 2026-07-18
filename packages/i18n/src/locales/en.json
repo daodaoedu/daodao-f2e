@@ -5289,6 +5289,9 @@
     "tab_inspire": "Inspiration",
     "tab_persona": "Persona",
     "tab_mine": "Mine",
+    "inspire_eyebrow": "Start with how others practice",
+    "inspire_title": "See how people turn ideas into action",
+    "inspire_subtitle": "Explore learning and practice as they happen, and find a next step in real progress. When you are ready, begin your own version.",
     "loading": "Loading...",
     "filter_aria_label": "Filter tasks",
     "filter_all": "All",
@@ -5478,6 +5481,7 @@
       "unansweredLabel": "Not answered",
       "answeredLabel": "Answered",
       "myAnswerLabel": "My answer",
+      "previewSeeMore": "Read more →",
       "cancel": "Cancel",
       "anonymousUser": "Anonymous User",
       "answerAdded": "Answer added",
@@ -5519,8 +5523,17 @@
       }
     },
     "tab": {
-      "headerTitle": "Meet all kinds of learners",
-      "headerSubtitle": "See others, know yourself"
+      "eyebrow": "Learning story relay",
+      "headerTitle": "One story at a time, meet a different learner",
+      "headerSubtitle": "Read someone else's experience and leave your own. Every story can become another learner's inspiration.",
+      "storyNumber": "Story {number}",
+      "anonymous": "A learner",
+      "resonanceCount": "{count} resonances",
+      "moreStories": "{count} more related stories",
+      "startConversation": "Be the first to continue this story",
+      "emptyStory": "No one has shared this one yet. You can be the first.",
+      "readAndRespond": "Read and join in",
+      "shareMine": "Share my story"
     },
     "userProfile": {
       "loading": "Loading...",
@@ -5532,6 +5545,7 @@
       "error": "Failed to resonate, please try again"
     },
     "detail": {
+      "back": "Back",
       "shareThoughts": "Share my thoughts",
       "thoughtPlaceholder": "Write down your thoughts...",
       "anonymousUser": "Anonymous user",
@@ -5540,6 +5554,8 @@
       "commentSubmitSuccess": "Comment posted!",
       "commentsTitle": "Comments",
       "myAnswer": "My answer",
+      "choiceDistribution": "Choice distribution",
+      "optionResult": "{count} people · {percentage}%",
       "collapse": "Collapse",
       "expand": "Read more",
       "loadError": "Failed to load answers, please try again later",
@@ -5551,6 +5567,7 @@
       "allResponsesShown": "Showing all {count} responses",
       "emptyResponses": "No one else has answered this question yet. You're the first!",
       "lockedResponses": "Answer to see what others said",
+      "previewUnlockHint": "Answer to read the rest",
       "answeredCount": "{count} people answered"
     },
     "carousel": {
@@ -5567,11 +5584,13 @@
       "answered": "Answered",
       "communityLabel": "What others said...",
       "unlockHint": "Share your answer to unlock!",
+      "previewUnlockHint": "Answer to read the rest",
       "error": "Operation failed, please try again",
       "submit": "Submit",
       "submitError": "Submission failed, please try again later",
       "submitting": "Submitting...",
       "textPlaceholder": "Share your thoughts...",
+      "quickStartHint": "Answer to unlock the full content. Your response will also be added to your persona.",
       "retry": "Retry"
     },
     "answeredLabel": "Answered",

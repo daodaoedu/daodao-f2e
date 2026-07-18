@@ -1,22 +1,19 @@
 "use client";
 
 import {
-  addPersonaResonance,
-  removePersonaResonance,
+  removeReaction,
+  type ReactionTypeValue,
+  upsertReaction,
   useMutate,
   usePersonaProfileUser,
+  useReactions,
 } from "@daodao/api";
 import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
-import { cn } from "@daodao/ui/lib/utils";
-import { useEffect, useState } from "react";
-
-function getResonanceClass(isResonating: boolean, hasResonated: boolean): string {
-  if (isResonating) return "text-logo-cyan/50";
-  if (hasResonated) return "text-logo-cyan hover:text-logo-cyan/70";
-  return "text-gray-400 hover:text-logo-cyan/70";
-}
+import { useState } from "react";
+import { ReactionPickerButton } from "@/components/check-in/reactions";
+import type { ReactionTypeType } from "@/constants/reaction-type";
 
 interface PersonaProfileUserProps {
   targetUserId: string;
@@ -27,8 +24,6 @@ export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
   const locale = useLocale();
   const mutate = useMutate();
   const [excludeId, setExcludeId] = useState<number | undefined>(undefined);
-  const [resonatingIds, setResonatingIds] = useState<Set<number>>(new Set());
-  const [resonatedIds, setResonatedIds] = useState<Set<number>>(new Set());
 
   const { data, isLoading } = usePersonaProfileUser(targetUserId, { exclude: excludeId, locale });
 
@@ -37,11 +32,20 @@ export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
   const answersNeeded = data?.data?.answersNeeded ?? 0;
 
   const currentQuestion = questions[0] ?? null;
+  const answerId = currentQuestion?.answer?.id;
+  const targetId = answerId != null ? String(answerId) : "";
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reset resonated state when displayed question changes
-  useEffect(() => {
-    setResonatedIds(new Set());
-  }, [currentQuestion?.id]);
+  const { data: reactionsData, mutate: mutateReactions } = useReactions(
+    { targetType: "persona_answer", targetId },
+    { enabled: answerId != null }
+  );
+  const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
+    null) as ReactionTypeType | null;
+  const selectedReactions: ReactionTypeType[] = currentUserReaction ? [currentUserReaction] : [];
+  const totalReactionCount = (reactionsData?.data?.reactions ?? []).reduce(
+    (sum, r) => sum + r.count,
+    0
+  );
 
   const handleSwitchQuestion = () => {
     if (currentQuestion) {
@@ -49,36 +53,28 @@ export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
     }
   };
 
-  const handleResonance = async (answerId: number) => {
-    if (resonatingIds.has(answerId)) return;
-    const hasResonated = resonatedIds.has(answerId);
-    setResonatingIds((prev) => new Set(prev).add(answerId));
+  const handleReactionToggle = async (type: ReactionTypeType) => {
+    if (!targetId) return;
+    const isSelected = currentUserReaction === type;
     try {
-      const res = hasResonated
-        ? await removePersonaResonance(answerId)
-        : await addPersonaResonance({ answerId });
+      const res = isSelected
+        ? await removeReaction({ targetType: "persona_answer", targetId })
+        : await upsertReaction({
+            targetType: "persona_answer",
+            targetId,
+            reactionType: type as ReactionTypeValue,
+          });
       if (res.error) {
         toast.error(t("resonance.error"));
-      } else {
-        setResonatedIds((prev) => {
-          const s = new Set(prev);
-          if (hasResonated) s.delete(answerId);
-          else s.add(answerId);
-          return s;
-        });
-        await mutate([
-          "/api/v1/persona/profile/{userId}",
-          { params: { path: { userId: targetUserId } } },
-        ] as const);
+        return;
       }
+      await mutateReactions();
+      await mutate([
+        "/api/v1/persona/profile/{userId}",
+        { params: { path: { userId: targetUserId } } },
+      ] as const);
     } catch {
       toast.error(t("resonance.error"));
-    } finally {
-      setResonatingIds((prev) => {
-        const s = new Set(prev);
-        s.delete(answerId);
-        return s;
-      });
     }
   };
 
@@ -109,24 +105,12 @@ export function PersonaProfileUser({ targetUserId }: PersonaProfileUserProps) {
 
             {currentQuestion.answer && (
               <div className="flex items-center justify-between mt-3">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() =>
-                    currentQuestion.answer && handleResonance(currentQuestion.answer.id)
-                  }
-                  disabled={resonatingIds.has(currentQuestion.answer.id)}
-                  className={cn(
-                    "text-xs flex items-center gap-1 h-auto p-0",
-                    getResonanceClass(
-                      resonatingIds.has(currentQuestion.answer.id),
-                      resonatedIds.has(currentQuestion.answer.id)
-                    )
-                  )}
-                >
-                  ✦ {currentQuestion.answer.resonanceCount}
-                </Button>
+                <ReactionPickerButton
+                  selectedReactions={selectedReactions}
+                  onToggle={handleReactionToggle}
+                  variant="comment"
+                  totalCount={totalReactionCount > 0 ? totalReactionCount : undefined}
+                />
               </div>
             )}
           </>

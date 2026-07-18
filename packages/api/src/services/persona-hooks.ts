@@ -8,6 +8,8 @@
 import { useMemo } from "react";
 import { useQuery } from "../hooks";
 
+type PersonaLocale = "zh-TW" | "en";
+
 // ============================================================================
 // Query Hooks
 // ============================================================================
@@ -40,7 +42,7 @@ export const usePersonaCarouselState = (
             params: {
               query: {
                 ...(replace != null ? { replace } : {}),
-                ...(locale ? { locale } : {}),
+                ...(locale ? { locale: locale as PersonaLocale } : {}),
               },
             },
           }
@@ -74,7 +76,7 @@ export const usePersonaQuestionAnswers = (
             params: {
               path: { questionId },
               query: {
-                ...(locale ? { locale } : {}),
+                ...(locale ? { locale: locale as PersonaLocale } : {}),
                 ...(limit != null ? { limit } : {}),
                 ...(cursor != null ? { cursor } : {}),
               },
@@ -101,7 +103,7 @@ export const usePersonaProfileUser = (
               path: { userId },
               query: {
                 ...(exclude != null ? { exclude } : {}),
-                ...(locale ? { locale } : {}),
+                ...(locale ? { locale: locale as PersonaLocale } : {}),
               },
             },
           }
