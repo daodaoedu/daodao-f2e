@@ -1,6 +1,6 @@
 import type { FeedReasonType } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
-import { CalendarCheck, Rss, ThumbsUp } from "lucide-react";
+import { CalendarCheck, Rss, Star, ThumbsUp } from "lucide-react";
 
 interface FeedLabelProps {
   feedReason: FeedReasonType;
@@ -16,6 +16,15 @@ export function FeedLabel({
   latestActorName,
 }: FeedLabelProps) {
   const t = useTranslations("app_product");
+
+  if (feedReason === "featured") {
+    return (
+      <div className="flex items-center gap-1.5 text-xs text-text-dark/60 mt-4 mb-4 px-1">
+        <Star className="size-3.5 shrink-0" />
+        <span>{t("showcase_feed_featured")}</span>
+      </div>
+    );
+  }
 
   if (feedReason === "new_practice") {
     return (

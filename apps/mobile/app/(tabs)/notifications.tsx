@@ -28,7 +28,14 @@ const BACKEND_TYPE_MAP: Record<string, string> = {
   ConnectAccepted: NotificationType.agreeConnect,
   PracticeCheckinActivity: NotificationType.updatePracticeCheckin,
   PartnerCheckinActivity: NotificationType.updatePracticeCheckin,
+  PracticeUpdateActivity: NotificationType.updatePractice,
+  PartnerUpdateActivity: NotificationType.updatePractice,
   PracticeCreated: NotificationType.practiceCreated,
+  comment_reply: NotificationType.commentReply,
+  Mention: NotificationType.mention,
+  BuddyRequest: NotificationType.buddyRequest,
+  BuddyRequestFollower: NotificationType.buddyRequestFollower,
+  BuddyAccepted: NotificationType.buddyAccepted,
 };
 
 function normalizeType(backendType: string): string {
@@ -76,6 +83,10 @@ function getNotificationText(
       });
     case NotificationType.comment:
       return t("text_comment", { name, title: practiceTitle, content: item.content ?? "" });
+    case NotificationType.commentReply:
+      return t("text_comment_reply", { name, content: item.content ?? "" });
+    case NotificationType.mention:
+      return t("text_mention", { name, content: item.content ?? "" });
     case NotificationType.followUser:
       return t("text_follow_user", { name });
     case NotificationType.followPractice:
@@ -98,6 +109,14 @@ function getNotificationText(
       return t("text_finish_practice", { name, title: practiceTitle });
     case NotificationType.practiceCreated:
       return t("text_practice_created", { name, title: practiceTitle });
+    case NotificationType.updatePractice:
+      return t("text_update_practice", { name, title: practiceTitle });
+    case NotificationType.buddyRequest:
+      return t("text_buddy_request", { name, title: practiceTitle });
+    case NotificationType.buddyRequestFollower:
+      return t("text_buddy_request_follower", { name, title: practiceTitle });
+    case NotificationType.buddyAccepted:
+      return t("text_buddy_accepted", { name });
     default:
       return t("text_default", { name });
   }
