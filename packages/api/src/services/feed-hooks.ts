@@ -53,7 +53,7 @@ export interface IShowcaseCheckIn {
   }[];
 }
 
-export type FeedReasonType = "new_practice" | "new_release" | "checked_in" | "cheered";
+export type FeedReasonType = "new_practice" | "new_release" | "checked_in" | "cheered" | "featured";
 
 export interface ActivityCardItem {
   type: "activity";

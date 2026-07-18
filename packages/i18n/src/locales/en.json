@@ -5772,6 +5772,7 @@
     "showcase_feed_new_practice": "{userName} published a new practice",
     "showcase_feed_checked_in": "{userName} checked in to {practiceTitle}",
     "showcase_feed_cheered": "{actorName} cheered",
+    "showcase_feed_featured": "Editor's pick",
     "showcase_data": "Data",
     "showcase_echo": "Echoes",
     "showcase_views": "Views",
