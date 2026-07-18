@@ -23,11 +23,11 @@ type PersonaAnswerType = {
 } | null;
 
 type PersonaStoryCardProps = {
-  answer: PersonaAnswerType;
-  id: number;
-  index: number;
-  isLast: boolean;
-  prompt: string;
+  readonly answer: PersonaAnswerType;
+  readonly id: number;
+  readonly index: number;
+  readonly isLast: boolean;
+  readonly prompt: string;
 };
 
 function getFeaturedStory(answers: PersonaQuestionAnswerItem[]) {
@@ -41,7 +41,7 @@ function getFeaturedStory(answers: PersonaQuestionAnswerItem[]) {
     })[0];
 }
 
-function StoryLoadingCard({ isLast }: { isLast: boolean }) {
+function StoryLoadingCard({ isLast }: { readonly isLast: boolean }) {
   return (
     <div className="grid grid-cols-[24px_minmax(0,1fr)] gap-3">
       <div className="flex flex-col items-center">
@@ -70,9 +70,9 @@ function StoryAvatar({
   displayName,
   photoURL,
 }: {
-  avatarColor: string;
-  displayName: string;
-  photoURL: string | null | undefined;
+  readonly avatarColor: string;
+  readonly displayName: string;
+  readonly photoURL: string | null | undefined;
 }) {
   const initial = displayName[0] ?? "?";
 

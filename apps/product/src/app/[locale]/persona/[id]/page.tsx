@@ -474,13 +474,13 @@ function PersonaAnswerInteractions({ answerId }: { answerId: number }) {
 // ─── Response item ─────────────────────────────────────────────────────────────
 
 type ChoiceDistributionProps = {
-  options: string[];
-  optionCounts: Record<string, number>;
+  readonly options: string[];
+  readonly optionCounts: Record<string, number>;
 };
 
 function ChoiceDistribution({ options, optionCounts }: ChoiceDistributionProps) {
   const t = useTranslations("persona.detail");
-  const totalChoiceCount = Object.values(optionCounts).reduce((sum, count) => sum + count, 0);
+  const totalChoiceCount = Object.values(optionCounts ?? {}).reduce((sum, count) => sum + count, 0);
 
   return (
     <div className="rounded-2xl border border-[#EEF4F4] bg-white p-5">
@@ -635,8 +635,8 @@ function ResponsePreviewItem({
   item,
   onUnlock,
 }: {
-  item: PersonaQuestionAnswerItem;
-  onUnlock: () => void;
+  readonly item: PersonaQuestionAnswerItem;
+  readonly onUnlock: () => void;
 }) {
   const t = useTranslations("persona.detail");
   const answer = item.selectedValue ?? item.textAnswer ?? "";

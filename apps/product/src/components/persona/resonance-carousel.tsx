@@ -49,7 +49,7 @@ function ResponseSkeletonCard() {
 
 // ── Preview response card (real answer teaser, truncated with fade) ───────────
 
-function PreviewResponseCard({ answer }: { answer: PersonaQuestionAnswerItem }) {
+function PreviewResponseCard({ answer }: { readonly answer: PersonaQuestionAnswerItem }) {
   const t = useTranslations("persona.carousel");
   const text = answer.selectedValue ?? answer.textAnswer ?? "";
   const displayName = answer.name ?? "??";
