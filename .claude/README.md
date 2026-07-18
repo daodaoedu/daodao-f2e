@@ -14,6 +14,37 @@
 3. **`.claude/hooks/`** — 機械強制層：`pre-write-guard.sh`（擋敏感檔與舊 migration、自動載入規範）、`post-write-format.sh`（寫檔後自動 format）。
 4. **`.claude/settings.json`** — 權限白名單與 hook 註冊。
 
+## 開發流程總覽（從需求到收尾）
+
+完整生命週期分五個階段，每個階段有對應的 skill。粗體為必經步驟，其餘視情況：
+
+```
+① 需求（daodao repo）
+   product-status-check（先驗證功能是否早已上線）
+   → prd-generation（生成 PRD → 五角色補洞 → 優化）
+
+② 規劃（daodao / daodao-server / daodao-ai-backend）
+   openspec-explore（釐清）→ openspec-new-change → openspec-continue-change
+   （其餘 repo 無 openspec：直接以 PRD 拆 task）
+
+③ 實作（各 repo）
+   codebase-map / system-map（不熟先讀）→ project-rules（hook 自動注入）
+   → openspec-apply-change → openspec-verify-change
+
+④ 交付（各 repo）
+   **pre-commit-check**（lint + typecheck + 測試）
+   → **format-commit**（使用者確認後 commit）
+   → push 前詢問「要 review 嗎？」→ code-review（可選）
+   → push 開 PR → collect-pr-feedback（收 CI / AI / 人類 review）
+   → 有 feedback 要修 → 修完回到 pre-commit-check 重走交付流程
+
+⑤ 收尾（各 repo + daodao）
+   PR merged → **post-merge-wrapup**
+   （歸檔 openspec change → 更新 daodao repo docs/product 狀態 → 校準地圖）
+```
+
+各階段銜接規則寫在對應 skill 內（如 prd-generation 的「後續」段、collect-pr-feedback 的步驟 7）。CLAUDE.md / AGENTS.md 只放入口路標，流程細節以 skill 為權威。
+
 ## 複製式共用檔案（改一份要同步六份）
 
 以下檔案在六個 repo 間逐位元相同，任何修改必須同步全部：
