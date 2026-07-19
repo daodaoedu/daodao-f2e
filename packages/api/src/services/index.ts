@@ -62,5 +62,7 @@ export * from "./tag-hooks";
 // User Service
 export * from "./user";
 export * from "./user-hooks";
+// User Island Service
+export * from "./user-island";
 // View Tracking Service
 export * from "./view-tracking-hooks";

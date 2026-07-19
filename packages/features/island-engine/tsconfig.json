@@ -1,0 +1,8 @@
+{
+  "extends": "@daodao/config/base.json",
+  "compilerOptions": {
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*", "dev/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -13,7 +13,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lottie from "lottie-react";
-import { ChevronRight, RefreshCcw } from "lucide-react";
+import { ChevronRight, RefreshCcw, Sailboat } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { PageHeader, type PageHeaderProps } from "../layout/page-header";
 
@@ -22,6 +22,8 @@ gsap.registerPlugin(ScrollTrigger);
 interface IslandHeaderProps {
   resultType: string;
   userId?: string;
+  /** 上島按鈕導向 `/island/[identifier]` 用的識別符（customId 或 userId） */
+  identifier?: string;
 }
 
 const resultTypeToLottiePathMap = new Map<string, () => Promise<object>>([
@@ -37,7 +39,7 @@ const resultTypeToLottiePathMap = new Map<string, () => Promise<object>>([
 /**
  * 「我的小島」標題區組件
  */
-export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
+export function IslandHeader({ resultType, userId, identifier }: IslandHeaderProps) {
   const t = useTranslations("app_product");
   const { user } = useAuth();
   const isOwnProfile = userId !== undefined && user?.id === userId;
@@ -176,6 +178,18 @@ export function IslandHeader({ resultType, userId }: IslandHeaderProps) {
           className="md:hidden object-cover"
         />
         <PageHeader {...pageHeaderProps} />
+        {identifier && (
+          <div className="absolute right-4 top-[64px] md:top-[72px]">
+            <Button
+              variant="orange"
+              className="rounded-full shadow-md"
+              onClick={() => router.push(`/island/${identifier}`)}
+            >
+              <Sailboat className="size-4" />
+              {t("user_enter_island")}
+            </Button>
+          </div>
+        )}
         {isEmptyResult && isOwnProfile && (
           <div className="absolute left-0 right-0 top-[150px] w-[600px] mx-auto overflow-hidden mask-marquee">
             <div className="animate-marquee flex w-max gap-3 will-change-transform">
