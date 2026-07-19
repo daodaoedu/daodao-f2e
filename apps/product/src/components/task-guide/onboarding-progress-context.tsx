@@ -2,7 +2,7 @@
 
 import { useAuth } from "@daodao/auth";
 import { getRequiredEnv } from "@daodao/config";
-import { createContext, type ReactNode, useContext } from "react";
+import { createContext, type ReactNode, useCallback, useContext, useState } from "react";
 import useSWR, { mutate as globalMutate, type KeyedMutator } from "swr";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -29,6 +29,9 @@ interface OnboardingProgressContextValue {
   taskList: OnboardingTaskItem[];
   completedTasks: number;
   isLoading: boolean;
+  isTaskGuideExpanded: boolean;
+  openTaskGuide: () => void;
+  closeTaskGuide: () => void;
   mutate: KeyedMutator<OnboardingStatusResponse>;
 }
 
@@ -51,8 +54,11 @@ const fetcher = async (url: string): Promise<OnboardingStatusResponse> => {
 
 export function OnboardingProgressProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, isTemporary, isLoading: isAuthLoading } = useAuth();
+  const [isTaskGuideExpanded, setIsTaskGuideExpanded] = useState(false);
 
   const shouldFetch = isAuthenticated && !isTemporary && !isAuthLoading;
+  const openTaskGuide = useCallback(() => setIsTaskGuideExpanded(true), []);
+  const closeTaskGuide = useCallback(() => setIsTaskGuideExpanded(false), []);
 
   const { data, isLoading, mutate } = useSWR<OnboardingStatusResponse>(
     shouldFetch ? ONBOARDING_STATUS_KEY : null,
@@ -68,6 +74,9 @@ export function OnboardingProgressProvider({ children }: { children: ReactNode }
         taskList: statusData?.taskList ?? [],
         completedTasks: statusData?.completedTasks ?? 0,
         isLoading,
+        isTaskGuideExpanded,
+        openTaskGuide,
+        closeTaskGuide,
         mutate,
       }}
     >
