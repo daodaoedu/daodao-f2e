@@ -118,7 +118,7 @@ export const createAssetLoader = (options: IAssetLoaderOptions = {}): IAssetLoad
   return {
     load(key: string): Promise<Object3D> {
       const cached = cache.get(key);
-      if (cached) return cached;
+      if (cached !== undefined) return cached;
 
       const entry = getManifestEntry(key);
       if (!entry) {

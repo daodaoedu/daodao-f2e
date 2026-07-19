@@ -565,19 +565,28 @@ export class IslandEngine {
       plantPlacements.push(...computePlantPlacements(terrainData, placement, practice.checkinIds));
     }
     void createPlantsGroup(this.assetLoader, plantPlacements, terrainData.theme).then((group) => {
-      if (this.disposed) return;
+      if (this.disposed) {
+        this.disposeObject(group);
+        return;
+      }
       this.scene.add(group);
     });
 
     void createAmbientCritters(this.assetLoader, islandData.recentCheckinCount, terrainData).then(
       (critters) => {
-        if (this.disposed) return;
+        if (this.disposed) {
+          this.disposeObject(critters.group);
+          return;
+        }
         this.scene.add(critters.group);
         this.updatables.push(critters.updatable);
       }
     );
     void createCentralHub(this.assetLoader, terrainData).then((hub) => {
-      if (this.disposed) return;
+      if (this.disposed) {
+        this.disposeObject(hub.group);
+        return;
+      }
       this.scene.add(hub.group);
       this.colliders.push(...hub.colliders);
       this.campfires.push(hub.campfireLight);
@@ -602,7 +611,10 @@ export class IslandEngine {
    */
   private async initCharacter(): Promise<void> {
     const avatar = await createCharacterAvatar(this.assetLoader, this.islandData.personaType);
-    if (this.disposed) return;
+    if (this.disposed) {
+      this.disposeObject(avatar.root);
+      return;
+    }
     this.characterRoot = avatar.root;
     this.scene.add(avatar.root);
     this.updatables.push(avatar);
@@ -664,7 +676,10 @@ export class IslandEngine {
     // 空島狀態（spec）：一頂帳篷＋熄滅營火，不可點擊；CTA 由 React 殼依 viewerRelation 顯示
     if (this.emptyCampPlacement) {
       void createBuilding(this.assetLoader, this.emptyCampPlacement).then((building) => {
-        if (this.disposed) return;
+        if (this.disposed) {
+          this.disposeObject(building.container);
+          return;
+        }
         this.scene.add(building.container);
         this.colliders.push(building.collider);
       });
@@ -673,7 +688,10 @@ export class IslandEngine {
 
     for (const placement of this.buildingPlacements) {
       void createBuilding(this.assetLoader, placement).then((building) => {
-        if (this.disposed) return;
+        if (this.disposed) {
+          this.disposeObject(building.container);
+          return;
+        }
         this.scene.add(building.container);
         this.clickables.set(building.container, building.practiceId);
         this.colliders.push(building.collider);
@@ -827,8 +845,14 @@ export class IslandEngine {
   }
 
   private disposeObjectMaterial(object: Object3D): void {
-    const mesh = object as { geometry?: { dispose(): void }; material?: unknown };
-    mesh.geometry?.dispose();
+    const mesh = object as {
+      geometry?: { dispose(): void };
+      material?: unknown;
+      isSprite?: boolean;
+    };
+    // Sprite 共用一份 module-scoped 的靜態 BufferGeometry，dispose 會連帶破壞
+    // 其他所有 Sprite（例如目的地島嶼文字標籤）的渲染，故略過。
+    if (!mesh.isSprite) mesh.geometry?.dispose();
     const material = mesh.material;
     if (Array.isArray(material)) {
       for (const item of material) {
