@@ -27,6 +27,7 @@ import { ArrowLeft, Flame, Sailboat, Sparkles } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { IIslandRouteItem } from "./archipelago-navigator";
 import { ArchipelagoNavigator } from "./archipelago-navigator";
+import { IslandDiagnostics } from "./island-diagnostics";
 import { IslandLoading } from "./island-loading";
 import { IslandOwnerPanel } from "./island-owner-panel";
 import { PracticeCampCard } from "./practice-camp-card";
@@ -75,6 +76,8 @@ export default function IslandCanvas({ islandData, identifier }: IslandCanvasPro
   const [activeIdentifier, setActiveIdentifier] = useState(identifier);
   const [returnRoute, setReturnRoute] = useState<IIslandRouteItem | null>(null);
   const [webglFailed, setWebglFailed] = useState(false);
+  // 診斷覆蓋層：網址帶 ?diag=1 才顯示（追 iOS 貼圖全白用，一般使用者看不到）
+  const [showDiag, setShowDiag] = useState(false);
   const [walkable, setWalkable] = useState(false);
   const [introPlaying, setIntroPlaying] = useState(true);
   const [selectedPracticeId, setSelectedPracticeId] = useState<string | null>(null);
@@ -352,6 +355,12 @@ export default function IslandCanvas({ islandData, identifier }: IslandCanvasPro
   selectRouteRef.current = selectRoute;
   sailFreelyRef.current = sailFreely;
 
+  const getDiagnostics = useCallback(() => engineRef.current?.getDiagnostics() ?? null, []);
+
+  useEffect(() => {
+    setShowDiag(new URLSearchParams(window.location.search).get("diag") === "1");
+  }, []);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -450,6 +459,8 @@ export default function IslandCanvas({ islandData, identifier }: IslandCanvasPro
 
       {!walkable && <IslandLoading message={t("loading")} />}
 
+      {showDiag && <IslandDiagnostics getSnapshot={getDiagnostics} />}
+
       {/* 返回個人頁 */}
       <div className="absolute top-4 left-4 z-30">
         <Button
@@ -524,7 +535,7 @@ export default function IslandCanvas({ islandData, identifier }: IslandCanvasPro
 
       {/* 操作提示 */}
       {walkable && !introPlaying && !selectedPracticeId && !isSailing && (
-        <p className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 text-xs text-text-dark/70 bg-white/50 backdrop-blur rounded-full px-4 py-1.5 pointer-events-none">
+        <p className="absolute bottom-4 left-1/2 z-20 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 text-balance rounded-full bg-white/50 px-4 py-1.5 text-center text-xs text-text-dark/70 backdrop-blur pointer-events-none">
           {isMobile ? t("hint_mobile") : t("hint_desktop")}
         </p>
       )}
@@ -569,10 +580,10 @@ export default function IslandCanvas({ islandData, identifier }: IslandCanvasPro
       />
 
       {selectedRoute && !isSailing && (
-        <div className="pointer-events-none absolute bottom-8 left-1/2 z-40 -translate-x-1/2">
-          <div className="flex items-center gap-2 rounded-lg border border-white/70 bg-white/85 px-4 py-2 text-text-dark shadow-md backdrop-blur-md">
-            <Sailboat className="size-5 text-logo-cyan" />
-            <p className="whitespace-nowrap text-sm font-medium">
+        <div className="pointer-events-none absolute bottom-8 left-1/2 z-40 w-[min(24rem,calc(100vw-1.5rem))] -translate-x-1/2">
+          <div className="flex w-full items-center gap-2 rounded-lg border border-white/70 bg-white/85 px-4 py-2 text-text-dark shadow-md backdrop-blur-md">
+            <Sailboat className="size-5 shrink-0 text-logo-cyan" />
+            <p className="text-sm font-medium">
               {t(isMobile ? "routes_boarding_hint_mobile" : "routes_boarding_hint", {
                 name: selectedRoute.name,
               })}
@@ -582,12 +593,12 @@ export default function IslandCanvas({ islandData, identifier }: IslandCanvasPro
       )}
 
       {isSailing && !departingName && (
-        <div className="absolute bottom-8 left-1/2 z-50 -translate-x-1/2">
-          <div className="flex items-center gap-2 rounded-lg border border-white/70 bg-white/85 px-4 py-2 text-text-dark shadow-md backdrop-blur-md">
-            <Sailboat className="size-5 text-logo-cyan" />
-            <div>
-              <p className="whitespace-nowrap text-sm font-medium">{t("routes_free_sailing")}</p>
-              <p className="whitespace-nowrap text-xs text-text-dark/65">
+        <div className="absolute bottom-8 left-1/2 z-50 w-[min(26rem,calc(100vw-1.5rem))] -translate-x-1/2">
+          <div className="flex w-full items-center gap-2 rounded-lg border border-white/70 bg-white/85 px-4 py-2 text-text-dark shadow-md backdrop-blur-md">
+            <Sailboat className="size-5 shrink-0 text-logo-cyan" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium">{t("routes_free_sailing")}</p>
+              <p className="text-xs text-text-dark/65">
                 {isMobile ? t("routes_sailing_hint_mobile") : t("routes_sailing_hint_desktop")}
               </p>
             </div>
@@ -604,14 +615,14 @@ export default function IslandCanvas({ islandData, identifier }: IslandCanvasPro
       )}
 
       {departingName && (
-        <div className="pointer-events-none absolute bottom-8 left-1/2 z-50 -translate-x-1/2">
-          <div className="flex items-center gap-2 rounded-lg border border-white/70 bg-white/85 px-4 py-2 text-text-dark shadow-md backdrop-blur-md">
-            <Sailboat className="size-5 text-logo-cyan" />
-            <div>
-              <p className="whitespace-nowrap text-sm font-medium">
+        <div className="pointer-events-none absolute bottom-8 left-1/2 z-50 w-[min(26rem,calc(100vw-1.5rem))] -translate-x-1/2">
+          <div className="flex w-full items-center gap-2 rounded-lg border border-white/70 bg-white/85 px-4 py-2 text-text-dark shadow-md backdrop-blur-md">
+            <Sailboat className="size-5 shrink-0 text-logo-cyan" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium">
                 {t("routes_departing", { name: departingName })}
               </p>
-              <p className="whitespace-nowrap text-xs text-text-dark/65">
+              <p className="text-xs text-text-dark/65">
                 {isMobile ? t("routes_sailing_hint_mobile") : t("routes_sailing_hint_desktop")}
               </p>
             </div>

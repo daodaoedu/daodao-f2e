@@ -23,6 +23,33 @@ import { FallbackShape, getManifestEntry, type IAssetManifestEntry } from "./man
 
 const DEFAULT_DRACO_DECODER_PATH = "https://www.gstatic.com/draco/versioned/decoders/1.5.7/";
 
+/**
+ * 偵測 iOS / iPadOS（含偽裝成桌面 Safari 的 iPad）
+ */
+const isIOS = (): boolean => {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent ?? "";
+  const platform = navigator.platform ?? "";
+  const byUserAgent = /iPad|iPhone|iPod/.test(ua);
+  const iPadOSDesktopMode = /Mac/.test(platform) && navigator.maxTouchPoints > 1;
+  return byUserAgent || iPadOSDesktopMode;
+};
+
+/**
+ * iOS Safari 17+ 的 GLTFLoader 會走 ImageBitmapLoader，但 iOS WebKit 對 ImageBitmap
+ * 貼圖有已知缺陷：超過記憶體上限時貼圖被拒，模型渲染成全白/全黑（桌面正常、且是間歇性
+ * 的「部分貼圖失敗」）。three 只對 Safari < 17 自動停用 ImageBitmap，17+ 仍會踩雷。
+ * 這裡在 iOS 停用 createImageBitmap，逼 GLTFLoader 退回 ImageLoader（HTMLImageElement）。
+ * 必須在 `new GLTFLoader()` 之前執行——GLTFLoader 在建構時就決定用哪個 loader。
+ * 參考：https://discourse.threejs.org/t/textures-in-gltf-sometimes-display-black-but-only-on-ios/30520
+ */
+const disableImageBitmapForIOS = (): void => {
+  if (typeof window === "undefined") return;
+  if (isIOS() && "createImageBitmap" in window) {
+    (window as unknown as { createImageBitmap?: unknown }).createImageBitmap = undefined;
+  }
+};
+
 export interface IAssetLoaderOptions {
   /** GLB 檔案的 base URL，預設 "/models/island/" */
   baseUrl?: string;
@@ -104,6 +131,8 @@ export const createAssetLoader = (options: IAssetLoaderOptions = {}): IAssetLoad
     url: string
   ): Promise<{ scene: Object3D; animations?: AnimationClip[] }> => {
     if (!gltfLoader) {
+      // iOS 上停用 ImageBitmap，避免 Safari 17+ 貼圖全白（必須在 new GLTFLoader() 之前）
+      disableImageBitmapForIOS();
       gltfLoader = new GLTFLoader();
       dracoLoader = new DRACOLoader();
       dracoLoader.setDecoderPath(options.dracoDecoderPath ?? DEFAULT_DRACO_DECODER_PATH);
