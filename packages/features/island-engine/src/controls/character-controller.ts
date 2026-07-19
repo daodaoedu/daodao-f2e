@@ -109,11 +109,15 @@ export class CharacterController implements IUpdatable {
   private facing = 0;
   private moveTarget: { x: number; z: number } | null = null;
   private stalledTargetSeconds = 0;
+  // 當前 (x, z) 的地面高度，每幀查一次快取，供 syncAvatar/syncCamera 共用，省掉重複 BVH raycast
+  private groundHeight = 0;
 
   constructor(options: ICharacterControllerOptions) {
     this.options = options;
     this.x = options.spawn?.x ?? 0;
     this.z = options.spawn?.z ?? 0;
+    // 先取一次地面高度再 sync，避免第一幀角色卡在 y=0
+    this.groundHeight = options.ground.heightAt(this.x, this.z);
     this.syncAvatar(0);
     if (this.options.cameraEnabled?.() !== false) this.syncCamera();
   }
@@ -238,6 +242,8 @@ export class CharacterController implements IUpdatable {
       this.facing += diff * Math.min(1, deltaSeconds * 10);
     }
 
+    // 每幀查一次地面高度並快取，syncAvatar/syncCamera 共用
+    this.groundHeight = this.options.ground.heightAt(this.x, this.z);
     this.syncAvatar(deltaSeconds);
     if (this.options.cameraEnabled?.() !== false) this.syncCamera();
 
@@ -247,14 +253,14 @@ export class CharacterController implements IUpdatable {
   }
 
   private syncAvatar(_deltaSeconds: number): void {
-    const { avatar, ground } = this.options;
-    avatar.position.set(this.x, ground.heightAt(this.x, this.z), this.z);
+    const { avatar } = this.options;
+    avatar.position.set(this.x, this.groundHeight, this.z);
     avatar.rotation.y = this.facing;
   }
 
   private syncCamera(): void {
     const { camera } = this.options;
-    const characterY = this.options.ground.heightAt(this.x, this.z) + HEAD_HEIGHT;
+    const characterY = this.groundHeight + HEAD_HEIGHT;
     const horizontal = this.distance * Math.cos(this.pitch);
     camera.position.set(
       this.x + Math.sin(this.yaw) * horizontal,

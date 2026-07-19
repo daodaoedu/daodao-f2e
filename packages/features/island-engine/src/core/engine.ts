@@ -163,6 +163,9 @@ export class IslandEngine {
   private readonly moveTargetMarker: Mesh<RingGeometry, MeshBasicMaterial>;
   private selectedPracticeId: string | null = null;
   private prefersReducedMotion = false;
+  // 每幀複用的暫存向量，避免 render loop 內配置新 Vector3 造成 GC 抖動
+  private readonly scratchTarget = new Vector3();
+  private readonly scratchDesiredCamera = new Vector3();
 
   constructor(options: IIslandEngineOptions) {
     this.container = options.container;
@@ -932,14 +935,13 @@ export class IslandEngine {
     sailing.boat.position.y = sailing.baseBoatY + Math.sin(sailing.elapsed * 6) * 0.04;
     this.sailingInput = { moveX: 0, moveZ: 0 };
 
-    const target = sailing.boat.getWorldPosition(new Vector3());
-    const desiredCamera = sailing.harbor.localToWorld(
-      new Vector3(
-        sailing.pose.x - Math.sin(sailing.pose.heading) * 7.5,
-        5.8,
-        sailing.pose.z - Math.cos(sailing.pose.heading) * 7.5
-      )
+    const target = sailing.boat.getWorldPosition(this.scratchTarget);
+    this.scratchDesiredCamera.set(
+      sailing.pose.x - Math.sin(sailing.pose.heading) * 7.5,
+      5.8,
+      sailing.pose.z - Math.cos(sailing.pose.heading) * 7.5
     );
+    const desiredCamera = sailing.harbor.localToWorld(this.scratchDesiredCamera);
     this.camera.position.lerp(desiredCamera, Math.min(1, deltaSeconds * 5));
     this.camera.lookAt(target.x, target.y + 0.8, target.z);
 
@@ -964,7 +966,8 @@ export class IslandEngine {
   private tick = (): void => {
     if (this.disposed) return;
     this.animationFrameId = requestAnimationFrame(this.tick);
-    const delta = this.clock.getDelta();
+    // 分頁背景恢復時 getDelta() 可能回傳好幾秒，clamp 避免角色移動/物理暴衝穿牆
+    const delta = Math.min(0.1, this.clock.getDelta());
     const elapsed = this.clock.elapsedTime;
     this.fpsSampler.push(delta);
     if (this.intro && !this.intro.isDone()) this.intro.update(delta, elapsed);

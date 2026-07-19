@@ -22,7 +22,8 @@ const getCachedUserIsland = cache(async (identifier: string, authToken: string) 
       identifier,
       authToken ? { Cookie: `auth_token=${authToken}` } : undefined
     );
-  } catch {
+  } catch (error) {
+    console.error("[island] getUserIsland failed", { identifier, error });
     return null;
   }
 });
