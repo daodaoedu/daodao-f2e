@@ -6,6 +6,7 @@
  */
 
 import {
+  type AnimationClip,
   BoxGeometry,
   ConeGeometry,
   CylinderGeometry,
@@ -27,7 +28,7 @@ export interface IAssetLoaderOptions {
   baseUrl?: string;
   dracoDecoderPath?: string;
   /** 測試注入點：覆寫實際的 GLTF 載入實作 */
-  loadGltf?: (url: string) => Promise<{ scene: Object3D }>;
+  loadGltf?: (url: string) => Promise<{ scene: Object3D; animations?: AnimationClip[] }>;
 }
 
 export interface IAssetLoader {
@@ -35,6 +36,27 @@ export interface IAssetLoader {
   load(key: string): Promise<Object3D>;
   dispose(): void;
 }
+
+/**
+ * 模型後處理：投射/接收陰影＋材質正規化。
+ * Kenney glTF 匯出常帶 metallicFactor=1，無環境貼圖時背光面全黑——一律歸零。
+ */
+const shadowify = (object: Object3D): void => {
+  object.traverse((child) => {
+    const mesh = child as Mesh;
+    if (mesh.isMesh) {
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      for (const material of materials) {
+        if (material instanceof MeshStandardMaterial) {
+          material.metalness = 0;
+          material.roughness = Math.max(material.roughness, 0.8);
+        }
+      }
+    }
+  });
+};
 
 /**
  * 依 manifest fallback 描述建立簡單幾何體替代物
@@ -58,6 +80,7 @@ export const buildFallbackObject = (entry: IAssetManifestEntry): Object3D => {
   }
   // 底部貼地（幾何體中心在原點，往上抬半高）
   mesh.position.y = height / 2;
+  shadowify(mesh);
 
   const group = new Group();
   group.name = `${entry.key}:fallback`;
@@ -77,7 +100,9 @@ export const createAssetLoader = (options: IAssetLoaderOptions = {}): IAssetLoad
   let gltfLoader: GLTFLoader | null = null;
   let dracoLoader: DRACOLoader | null = null;
 
-  const defaultLoadGltf = (url: string): Promise<{ scene: Object3D }> => {
+  const defaultLoadGltf = (
+    url: string
+  ): Promise<{ scene: Object3D; animations?: AnimationClip[] }> => {
     if (!gltfLoader) {
       gltfLoader = new GLTFLoader();
       dracoLoader = new DRACOLoader();
@@ -105,6 +130,9 @@ export const createAssetLoader = (options: IAssetLoaderOptions = {}): IAssetLoad
           const object = gltf.scene;
           object.name = entry.key;
           object.scale.setScalar(entry.scale);
+          shadowify(object);
+          // rigged 模型的動畫剪輯掛在 userData，供 AnimationMixer 使用
+          object.userData.animations = gltf.animations ?? [];
           return object;
         })
         .catch((error: unknown) => {

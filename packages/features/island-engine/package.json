@@ -8,8 +8,8 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
     "dev:page": "vite dev --config dev/vite.config.ts",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",

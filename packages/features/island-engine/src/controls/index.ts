@@ -49,6 +49,21 @@ export const computeWorldMove = (
   return { dx: dirX * scale, dz: dirZ * scale };
 };
 
-export { CharacterController, type ICharacterControllerOptions } from "./character-controller";
+export {
+  advanceBoatPose,
+  BOAT_FORWARD_SPEED,
+  BOAT_REVERSE_SPEED,
+  BOAT_TURN_SPEED,
+  didBoatReachDock,
+  type IBoatDockTarget,
+  type IBoatNavigationBounds,
+  type IBoatPose,
+} from "./boat-navigation";
+export {
+  CharacterController,
+  computeMoveTowardTarget,
+  type ICharacterControllerOptions,
+  type IMoveTowardTargetResult,
+} from "./character-controller";
 export { createKeyboardMouseInput } from "./keyboard-mouse";
 export { createTouchInput } from "./touch";

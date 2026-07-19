@@ -8,8 +8,10 @@ import {
   Color,
   Group,
   Mesh,
+  MeshBasicMaterial,
   MeshStandardMaterial,
   PlaneGeometry,
+  RingGeometry,
 } from "three";
 import type { ITerrainData } from "./generate";
 
@@ -18,6 +20,8 @@ export interface ITerrainMeshes {
   /** 地形本體（後續 three-mesh-bvh 碰撞、raycast 點擊移動都以此為目標） */
   terrain: Mesh;
   water: Mesh;
+  /** 島邊白色浪圈（引擎 update loop 做呼吸動畫） */
+  foam: Mesh;
 }
 
 /**
@@ -76,21 +80,31 @@ export const buildTerrainMeshes = (data: ITerrainData): ITerrainMeshes => {
   terrain.receiveShadow = true;
 
   const water = new Mesh(
-    new CircleGeometry(size * 1.4, 48),
+    new CircleGeometry(size * 1.4, 64),
     new MeshStandardMaterial({
       color: new Color(theme.water),
       transparent: true,
-      opacity: 0.82,
-      roughness: 0.35,
+      opacity: 0.78,
+      roughness: 0.25,
     })
   );
   water.rotation.x = -Math.PI / 2;
   water.position.y = 0;
   water.name = "island-water";
 
+  // 島邊白色浪圈（spike 視覺定案：緩慢呼吸，動畫在 engine update loop）
+  const foamRadius = theme.islandRadius * 1.02;
+  const foam = new Mesh(
+    new RingGeometry(foamRadius, foamRadius * 1.08, 72),
+    new MeshBasicMaterial({ color: "#FFFFFF", transparent: true, opacity: 0.35 })
+  );
+  foam.rotation.x = -Math.PI / 2;
+  foam.position.y = 0.03;
+  foam.name = "island-foam";
+
   const group = new Group();
   group.name = "island-terrain-group";
-  group.add(terrain, water);
+  group.add(terrain, water, foam);
 
-  return { group, terrain, water };
+  return { group, terrain, water, foam };
 };

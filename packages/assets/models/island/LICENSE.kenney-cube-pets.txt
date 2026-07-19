@@ -1,0 +1,8 @@
+Cube Pets 2.0
+
+Created and distributed by Kenney (www.kenney.nl).
+
+License: Creative Commons Zero (CC0)
+https://creativecommons.org/publicdomain/zero/1.0/
+
+The content may be used for personal, educational, and commercial purposes.

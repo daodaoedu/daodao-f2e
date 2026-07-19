@@ -7,6 +7,7 @@ import { Color, Group, type Mesh, MeshStandardMaterial, type Object3D, PointLigh
 import type { IAssetLoader } from "../assets/loader";
 import { ISLAND_ASSETS } from "../assets/manifest";
 import type { IUpdatable } from "../core/engine";
+import { createRandom, hashSeed } from "../core/random";
 import type { IRadialCollider } from "../physics/ground";
 import { BuildingKind } from "./index";
 import type { IBuildingPlacement } from "./layout";
@@ -35,7 +36,7 @@ const tintObject = (object: Object3D, themeColor: string | null): void => {
     const material = mesh.material;
     if (Array.isArray(material) || !(material instanceof MeshStandardMaterial)) return;
     const cloned = material.clone();
-    cloned.color.lerp(tint, 0.45);
+    cloned.color.lerp(tint, 0.3);
     mesh.material = cloned;
   });
 };
@@ -49,8 +50,17 @@ export interface IBuiltBuilding {
   campfire: PointLight | null;
 }
 
+/** 營地道具池：每個營地依 practice id 抽 1–2 件（宝箱/木桶/木箱/座位圓木） */
+const CAMP_PROP_KEYS = [
+  ISLAND_ASSETS.chest,
+  ISLAND_ASSETS.barrel,
+  ISLAND_ASSETS.crate,
+  ISLAND_ASSETS.log,
+] as const;
+
 /**
  * 建立單棟實踐建築（active 帳篷＋營火 / completed 小木屋）
+ * ＋deterministic 營地道具與主題色旗幟
  */
 export const createBuilding = async (
   loader: IAssetLoader,
@@ -89,6 +99,39 @@ export const createBuilding = async (
     }
   }
 
+  const propSeed =
+    placement.practiceId || `empty:${placement.x.toFixed(2)}:${placement.z.toFixed(2)}`;
+  const propRandom = createRandom(hashSeed(`props:${propSeed}`));
+  const propCount = placement.practiceId ? 2 + Math.floor(propRandom() * 3) : 3;
+  const propPromises: Promise<void>[] = [];
+  for (let i = 0; i < propCount; i++) {
+    const key = CAMP_PROP_KEYS[Math.floor(propRandom() * CAMP_PROP_KEYS.length)];
+    const angle = propRandom() * Math.PI * 2;
+    const distance = 1.7 + propRandom() * 0.9;
+    const rotationY = propRandom() * Math.PI * 2;
+    if (!key) continue;
+    propPromises.push(
+      loader.load(key).then((prop) => {
+        const instance = prop.clone();
+        instance.position.set(Math.cos(angle) * distance, 0, Math.sin(angle) * distance);
+        instance.rotation.y = rotationY;
+        container.add(instance);
+      })
+    );
+  }
+  // 進行中的營地插主題色旗幟
+  if (placement.campfireLit) {
+    propPromises.push(
+      loader.load(ISLAND_ASSETS.flag).then((flag) => {
+        const instance = flag.clone();
+        tintObject(instance, placement.themeColor);
+        instance.position.set(-1.4, 0, -1.0);
+        container.add(instance);
+      })
+    );
+  }
+  await Promise.all(propPromises);
+
   return {
     practiceId: placement.practiceId,
     container,
@@ -97,13 +140,14 @@ export const createBuilding = async (
   };
 };
 
-/** 營火閃爍動畫：讀取外部陣列，建築逐棟進場時往裡 push 即可 */
+/** 營火閃爍動畫：讀取外部陣列，建築逐棟進場時往裡 push 即可（spike 定案的雙頻閃爍） */
 export const createCampfireFlicker = (campfires: readonly PointLight[]): IUpdatable => ({
   update(_deltaSeconds: number, elapsedSeconds: number): void {
     for (let i = 0; i < campfires.length; i++) {
       const light = campfires[i];
       if (!light) continue;
-      light.intensity = 5.4 + Math.sin(elapsedSeconds * 9 + i * 1.7) * 0.9;
+      light.intensity =
+        6 + Math.sin(elapsedSeconds * 9 + i * 1.7) * 1.6 + Math.sin(elapsedSeconds * 23 + i) * 0.9;
     }
   },
 });

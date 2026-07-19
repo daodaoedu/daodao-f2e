@@ -73,7 +73,7 @@ export const generateTerrain = (
   personaType: string | null,
   options: IGenerateTerrainOptions = {}
 ): ITerrainData => {
-  const resolution = options.resolution ?? 96;
+  const resolution = options.resolution ?? 128;
   const theme = getTerrainTheme(personaType);
   const seed = hashSeed(`island:${seedInput}`);
   const size = theme.islandRadius * 2 * 1.6;
@@ -90,6 +90,43 @@ export const generateTerrain = (
   }
 
   return { seed, resolution, size, heights, theme };
+};
+
+/**
+ * 整地：把指定點位周圍的地形壓平到該點高度（smoothstep 混合），
+ * 建築不再陷坡。deterministic——點位本身來自 deterministic 佈局。
+ * 直接改寫 heights，必須在建 mesh / BVH 之前呼叫。
+ */
+export const flattenTerrainAround = (
+  data: ITerrainData,
+  spots: readonly { x: number; z: number }[],
+  flattenRadius = 2.4
+): void => {
+  if (spots.length === 0) return;
+  const { resolution, size, heights } = data;
+  const step = size / (resolution - 1);
+  const half = size / 2;
+
+  const targets = spots.map((spot) => ({
+    ...spot,
+    height: sampleTerrainHeight(data, spot.x, spot.z),
+  }));
+
+  for (let zi = 0; zi < resolution; zi++) {
+    for (let xi = 0; xi < resolution; xi++) {
+      const x = -half + xi * step;
+      const z = -half + zi * step;
+      for (const target of targets) {
+        const distance = Math.hypot(x - target.x, z - target.z);
+        if (distance >= flattenRadius) continue;
+        const t = distance / flattenRadius;
+        const blend = 1 - t * t * (3 - 2 * t); // 中心 1 → 邊緣 0
+        const index = zi * resolution + xi;
+        const current = heights[index] ?? 0;
+        heights[index] = current + (target.height - current) * blend;
+      }
+    }
+  }
 };
 
 /**

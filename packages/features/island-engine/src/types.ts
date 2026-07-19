@@ -56,11 +56,28 @@ export interface IIslandData {
   viewerRelation: ViewerRelationType;
 }
 
-/** 島上物件被點擊/互動時的事件 payload */
-export interface IIslandObjectClickPayload {
-  kind: "practice";
-  practiceId: string;
+export interface IIslandDestination {
+  identifier: string;
+  name: string;
+  photoUrl: string | null;
 }
+
+/** 島上物件被點擊/互動時的事件 payload */
+export type IIslandObjectClickPayload =
+  | {
+      kind: "practice";
+      practiceId: string;
+    }
+  | {
+      kind: "harbor";
+    }
+  | {
+      kind: "owner";
+    }
+  | {
+      kind: "destination";
+      identifier: string;
+    };
 
 export interface IIslandEngineEvents {
   onObjectClick?: (payload: IIslandObjectClickPayload) => void;
@@ -68,6 +85,8 @@ export interface IIslandEngineEvents {
   onReady?: () => void;
   /** 角色與操控就緒，可開始走動（React 殼可據此收掉載入畫面） */
   onWalkable?: () => void;
+  /** 環島空拍 intro 結束或被跳過（React 殼可據此收掉跳過按鈕） */
+  onIntroEnd?: () => void;
 }
 
 export interface IIslandEngineOptions {
@@ -82,5 +101,7 @@ export interface IIslandEngineOptions {
   quality?: "auto" | import("./core/quality").QualityTierType;
   /** GLB 資產 base URL（task 3.3/5.2 接上正式素材） */
   assetBaseUrl?: string;
+  /** 可由島岸航線前往的其他島嶼 */
+  destinations?: readonly IIslandDestination[];
   events?: IIslandEngineEvents;
 }

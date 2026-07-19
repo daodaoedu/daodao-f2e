@@ -6,7 +6,12 @@
 
 import { describe, expect, it } from "vitest";
 import { PersonaType } from "../../types";
-import { generateTerrain, sampleTerrainHeight, terrainHeightAt } from "../generate";
+import {
+  flattenTerrainAround,
+  generateTerrain,
+  sampleTerrainHeight,
+  terrainHeightAt,
+} from "../generate";
 import { getTerrainTheme, NEUTRAL_THEME, TERRAIN_THEMES } from "../themes";
 
 describe("generateTerrain determinism", () => {
@@ -36,6 +41,29 @@ describe("generateTerrain determinism", () => {
     expect(sampleTerrainHeight(data, 0, 0)).toBeGreaterThan(0);
     const edge = data.size / 2;
     expect(sampleTerrainHeight(data, edge, edge)).toBeLessThan(0);
+  });
+});
+
+describe("flattenTerrainAround（整地）", () => {
+  it("整地後點位周圍高度趨於一致且 deterministic", () => {
+    const a = generateTerrain("flatten-test", PersonaType.A);
+    const b = generateTerrain("flatten-test", PersonaType.A);
+    const spot = { x: 3, z: 2 };
+    flattenTerrainAround(a, [spot]);
+    flattenTerrainAround(b, [spot]);
+    expect(Array.from(a.heights)).toEqual(Array.from(b.heights));
+
+    const center = sampleTerrainHeight(a, spot.x, spot.z);
+    // 點位半徑內高度差收斂
+    for (const [dx, dz] of [
+      [0.8, 0],
+      [-0.8, 0.5],
+      [0, -0.9],
+    ] as const) {
+      expect(Math.abs(sampleTerrainHeight(a, spot.x + dx, spot.z + dz) - center)).toBeLessThan(
+        0.25
+      );
+    }
   });
 });
 

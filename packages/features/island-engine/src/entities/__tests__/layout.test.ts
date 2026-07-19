@@ -13,6 +13,8 @@ import {
   AMBIENT_CRITTER_COUNTS,
   computeBuildingPlacements,
   computeEcosystemLevel,
+  computeEmptyCampPlacement,
+  computeEnvironmentPlacements,
   computePlantPlacements,
   PLANT_SPECIES_COUNT,
 } from "../layout";
@@ -117,6 +119,43 @@ describe("computePlantPlacements（task 3.7）", () => {
   });
 });
 
+describe("computeEnvironmentPlacements（環境物件組合）", () => {
+  it("deterministic 且全部在陸地上", () => {
+    const a = computeEnvironmentPlacements(terrain);
+    const b = computeEnvironmentPlacements(terrain);
+    expect(a).toEqual(b);
+    expect(a.length).toBeGreaterThan(500);
+    expect(new Set(a.map((placement) => placement.kind)).size).toBeGreaterThanOrEqual(12);
+    for (const placement of a) {
+      expect(sampleTerrainHeight(terrain, placement.x, placement.z)).toBeGreaterThan(0.2);
+    }
+  });
+
+  it("避開營地位置", () => {
+    const all = computeEnvironmentPlacements(terrain);
+    const anchor = all[0];
+    expect(anchor).toBeDefined();
+    if (!anchor) return;
+    const avoided = computeEnvironmentPlacements(terrain, [{ x: anchor.x, z: anchor.z }]);
+    for (const placement of avoided) {
+      expect(Math.hypot(placement.x - anchor.x, placement.z - anchor.z)).toBeGreaterThanOrEqual(
+        3.4
+      );
+    }
+  });
+});
+
+describe("computeEmptyCampPlacement（空島狀態）", () => {
+  it("deterministic 且落在陸地上、帳篷＋熄滅營火", () => {
+    const a = computeEmptyCampPlacement(terrain);
+    const b = computeEmptyCampPlacement(terrain);
+    expect(a).toEqual(b);
+    expect(a.kind).toBe(BuildingKind.tent);
+    expect(a.campfireLit).toBe(false);
+    expect(sampleTerrainHeight(terrain, a.x, a.z)).toBeGreaterThan(0.2);
+  });
+});
+
 describe("computeEcosystemLevel（近 30 天打卡量 → 熱鬧度）", () => {
   it("分級門檻", () => {
     expect(computeEcosystemLevel(0)).toBe(0);
@@ -126,7 +165,7 @@ describe("computeEcosystemLevel（近 30 天打卡量 → 熱鬧度）", () => {
   });
 
   it("熱鬧度只加不減：等級遞增、無負向視覺參數", () => {
-    expect(AMBIENT_CRITTER_COUNTS[0]).toBe(0);
+    expect(AMBIENT_CRITTER_COUNTS[0]).toBeGreaterThan(0);
     expect(AMBIENT_CRITTER_COUNTS[1]).toBeLessThan(AMBIENT_CRITTER_COUNTS[2]);
     expect(AMBIENT_CRITTER_COUNTS[2]).toBeLessThan(AMBIENT_CRITTER_COUNTS[3]);
   });

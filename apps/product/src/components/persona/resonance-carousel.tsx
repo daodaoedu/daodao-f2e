@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  dismissPersonaCarousel,
   getPersonaQuestionAnswers,
   type PersonaQuestionAnswerItem,
   submitPersonaAnswer,
@@ -306,6 +307,7 @@ export function ResonanceCarousel() {
   const mutate = useMutate();
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [dismissing, setDismissing] = useState(false);
 
   const { data, isLoading } = usePersonaCarouselState(undefined, locale);
   const displayedQuestions = data?.data?.questions ?? [];
@@ -336,6 +338,22 @@ export function ResonanceCarousel() {
     await mutate(["/api/v1/persona/carousel-state"] as const);
   };
 
+  const handleDismiss = async () => {
+    setDismissing(true);
+    try {
+      const res = await dismissPersonaCarousel();
+      if (res.error) {
+        toast.error(t("error"));
+        return;
+      }
+      await mutate(["/api/v1/persona/carousel-state"] as const);
+    } catch {
+      toast.error(t("error"));
+    } finally {
+      setDismissing(false);
+    }
+  };
+
   const previewSlideIndexes = new Set<number>([selectedIndex]);
   const lastQuestionIndex = displayedQuestions.length - 1;
   if (displayedQuestions.length > 1) {
@@ -355,15 +373,27 @@ export function ResonanceCarousel() {
             <Laugh className="size-3.5 shrink-0" />
             <span>{t("title")}</span>
           </div>
-          {displayedQuestions.length > 1 && (
-            <div className="flex items-center gap-2">
-              <CarouselPrevious className="static size-9 translate-y-0 border border-[#E4EAE9] bg-white text-text-dark/55 hover:bg-logo-cyan/[0.06] hover:text-logo-cyan" />
-              <span className="min-w-10 text-center text-xs font-medium text-text-dark/45">
-                {selectedIndex + 1}/{displayedQuestions.length}
-              </span>
-              <CarouselNext className="static size-9 translate-y-0 border border-[#E4EAE9] bg-white text-text-dark/55 hover:bg-logo-cyan/[0.06] hover:text-logo-cyan" />
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {displayedQuestions.length > 1 && (
+              <>
+                <CarouselPrevious className="static size-9 translate-y-0 border border-[#E4EAE9] bg-white text-text-dark/55 hover:bg-logo-cyan/[0.06] hover:text-logo-cyan" />
+                <span className="min-w-10 text-center text-xs font-medium text-text-dark/45">
+                  {selectedIndex + 1}/{displayedQuestions.length}
+                </span>
+                <CarouselNext className="static size-9 translate-y-0 border border-[#E4EAE9] bg-white text-text-dark/55 hover:bg-logo-cyan/[0.06] hover:text-logo-cyan" />
+              </>
+            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleDismiss}
+              disabled={dismissing}
+              className="h-auto p-0 text-xs text-text-dark/40 hover:bg-transparent hover:text-text-dark/60"
+            >
+              {t("dismiss")}
+            </Button>
+          </div>
         </div>
 
         <CarouselContent className="-ml-0 items-stretch">

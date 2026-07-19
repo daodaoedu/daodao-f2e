@@ -2,11 +2,12 @@
  * 操控純函式單元測試（task 3.4）
  */
 
+import { Object3D, PerspectiveCamera } from "three";
 import { describe, expect, it } from "vitest";
 import { findNearestBuilding } from "../../entities/buildings";
 import type { IBuildingPlacement } from "../../entities/layout";
 import { resolveRadialCollisions } from "../../physics/ground";
-import { computeWorldMove } from "../index";
+import { CharacterController, computeMoveTowardTarget, computeWorldMove } from "../index";
 
 describe("computeWorldMove（camera-relative 移動）", () => {
   it("無輸入不移動", () => {
@@ -29,6 +30,31 @@ describe("computeWorldMove（camera-relative 移動）", () => {
     const backward = computeWorldMove(0, -1, Math.PI, 5, 0.1);
     expect(backward.dx).toBeCloseTo(-forward.dx, 5);
     expect(backward.dz).toBeCloseTo(-forward.dz, 5);
+  });
+});
+
+describe("computeMoveTowardTarget（點擊地面移動）", () => {
+  it("朝世界座標目標移動，不受相機方向影響", () => {
+    const result = computeMoveTowardTarget(0, 0, 3, 4, 2, 0.5);
+    expect(result.dx).toBeCloseTo(0.6);
+    expect(result.dz).toBeCloseTo(0.8);
+    expect(result.reached).toBe(false);
+  });
+
+  it("接近終點時不會跨過目標", () => {
+    expect(computeMoveTowardTarget(0, 0, 0.2, 0, 5.2, 1)).toEqual({
+      dx: 0.2,
+      dz: 0,
+      reached: true,
+    });
+  });
+
+  it("已在停止距離內時不再移動", () => {
+    expect(computeMoveTowardTarget(1, 1, 1.05, 1.05, 5.2, 0.016)).toEqual({
+      dx: 0,
+      dz: 0,
+      reached: true,
+    });
   });
 });
 
@@ -72,5 +98,102 @@ describe("findNearestBuilding（走近＋互動鍵）", () => {
 
   it("範圍內沒有建築回傳 null", () => {
     expect(findNearestBuilding(placements, -20, -20)).toBeNull();
+  });
+});
+
+describe("CharacterController.teleport（下船落點）", () => {
+  it("將角色移到碼頭岸邊並同步模型位置", () => {
+    const avatar = new Object3D();
+    const controller = new CharacterController({
+      avatar,
+      camera: new PerspectiveCamera(),
+      input: {
+        consumeFrame: () => ({
+          moveX: 0,
+          moveZ: 0,
+          lookDeltaX: 0,
+          lookDeltaY: 0,
+          zoomDelta: 0,
+          interact: false,
+        }),
+        dispose: () => undefined,
+      },
+      ground: { heightAt: () => 1.25 },
+    });
+
+    controller.teleport(7, -9);
+
+    expect(controller.getPosition()).toEqual({ x: 7, z: -9 });
+    expect(avatar.position.toArray()).toEqual([7, 1.25, -9]);
+  });
+});
+
+describe("CharacterController 點擊移動", () => {
+  const idleFrame = {
+    moveX: 0,
+    moveZ: 0,
+    lookDeltaX: 0,
+    lookDeltaY: 0,
+    zoomDelta: 0,
+    interact: false,
+  };
+
+  it("接受陸地目標、移動角色並回報目標效果", () => {
+    const avatar = new Object3D();
+    const targetChanges: Array<{ x: number; z: number } | null> = [];
+    const controller = new CharacterController({
+      avatar,
+      camera: new PerspectiveCamera(),
+      input: {
+        consumeFrame: () => idleFrame,
+        dispose: () => undefined,
+      },
+      ground: { heightAt: () => 1 },
+      onMoveTargetChange: (target) => targetChanges.push(target),
+    });
+
+    expect(controller.moveTo(3, 4)).toBe(true);
+    controller.update(0.1);
+
+    expect(targetChanges).toEqual([{ x: 3, z: 4 }]);
+    expect(Math.hypot(avatar.position.x, avatar.position.z)).toBeCloseTo(0.52);
+  });
+
+  it("鍵盤移動會取消點擊目標與效果", () => {
+    const targetChanges: Array<{ x: number; z: number } | null> = [];
+    const controller = new CharacterController({
+      avatar: new Object3D(),
+      camera: new PerspectiveCamera(),
+      input: {
+        consumeFrame: () => ({ ...idleFrame, moveX: 1 }),
+        dispose: () => undefined,
+      },
+      ground: { heightAt: () => 1 },
+      onMoveTargetChange: (target) => targetChanges.push(target),
+    });
+
+    controller.moveTo(3, 4);
+    controller.update(0.1);
+
+    expect(targetChanges).toEqual([{ x: 3, z: 4 }, null]);
+  });
+
+  it("拒絕水面與障礙物內的目標", () => {
+    const waterController = new CharacterController({
+      avatar: new Object3D(),
+      camera: new PerspectiveCamera(),
+      input: { consumeFrame: () => idleFrame, dispose: () => undefined },
+      ground: { heightAt: () => 0 },
+    });
+    const blockedController = new CharacterController({
+      avatar: new Object3D(),
+      camera: new PerspectiveCamera(),
+      input: { consumeFrame: () => idleFrame, dispose: () => undefined },
+      ground: { heightAt: () => 1 },
+      colliders: [{ x: 2, z: 2, radius: 1 }],
+    });
+
+    expect(waterController.moveTo(2, 2)).toBe(false);
+    expect(blockedController.moveTo(2, 2)).toBe(false);
   });
 });

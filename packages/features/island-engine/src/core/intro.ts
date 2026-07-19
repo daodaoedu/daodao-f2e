@@ -69,11 +69,11 @@ export class AerialIntro implements IUpdatable {
     const endAngle = Math.atan2(endZ - targetZ, endX - targetX);
     const angle = endAngle + (1 - t) * Math.PI * 1.5;
 
-    const startRadius = islandRadius * 2.2;
+    const startRadius = islandRadius * 1.9;
     const endRadius = Math.hypot(endX - targetX, endZ - targetZ);
     const radius = startRadius + (endRadius - startRadius) * t;
 
-    const startHeight = islandRadius * 1.8;
+    const startHeight = islandRadius * 1.45;
     const height = startHeight + (endY - startHeight) * t;
 
     camera.position.set(
