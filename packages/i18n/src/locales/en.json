@@ -6156,7 +6156,8 @@
         "otherLabel": "Other",
         "otherPlaceholder": "Please specify"
       }
-    }
+    },
+    "user_enter_island": "Visit island"
   },
   "resource": {
     "hot_tags": "Hot Tags",
@@ -6909,44 +6910,20 @@
         "explorer": {
           "name": "Explorer Island",
           "description": "You are a curious explorer who enjoys trying new things.",
-          "traits": [
-            "Curious",
-            "Willing to try",
-            "Independent thinker"
-          ],
-          "recommendations": [
-            "Daily reading",
-            "Coding practice",
-            "Language learning"
-          ]
+          "traits": ["Curious", "Willing to try", "Independent thinker"],
+          "recommendations": ["Daily reading", "Coding practice", "Language learning"]
         },
         "creator": {
           "name": "Creator Island",
           "description": "You are highly creative and good at turning ideas into action.",
-          "traits": [
-            "Creative",
-            "Hands-on",
-            "Artistic"
-          ],
-          "recommendations": [
-            "Writing practice",
-            "Art creation",
-            "Design learning"
-          ]
+          "traits": ["Creative", "Hands-on", "Artistic"],
+          "recommendations": ["Writing practice", "Art creation", "Design learning"]
         },
         "connector": {
           "name": "Connector Island",
           "description": "You build relationships easily and enjoy learning with others.",
-          "traits": [
-            "Communicative",
-            "Team-oriented",
-            "Empathetic"
-          ],
-          "recommendations": [
-            "Community activities",
-            "Language learning",
-            "Team projects"
-          ]
+          "traits": ["Communicative", "Team-oriented", "Empathetic"],
+          "recommendations": ["Community activities", "Language learning", "Team projects"]
         }
       }
     },
@@ -7411,5 +7388,66 @@
     "follow_unfollow_success": "Unfollowed",
     "follow_followers_section": "My Followers",
     "follow_no_followers": "No followers yet"
+  },
+  "island": {
+    "loading": "Building your island…",
+    "skip_intro": "Skip",
+    "hint_desktop": "Click the ground or use WASD to move · Drag to look · Scroll to zoom · E to interact",
+    "hint_mobile": "Joystick to move · Drag to look · Pinch to zoom",
+    "empty_cta": "Start your first practice and light the campfire",
+    "quiz_cta": "Discover your island personality",
+    "webgl_fallback_title": "3D island unavailable",
+    "webgl_fallback_desc": "Your browser doesn't support WebGL. Head back to the profile to see the learning journey.",
+    "back_to_profile": "Back to profile",
+    "owner_label": "{name}'s island",
+    "owner_open_info": "View information about {name}",
+    "owner_sheet_title": "Island owner",
+    "owner_sheet_description": "View the information {name} shares on this island",
+    "owner_close_info": "Close island owner information",
+    "owner_relation_self": "My island",
+    "owner_relation_connection": "Connected partner",
+    "owner_relation_visitor": "Public island",
+    "owner_persona": "Island persona {type}",
+    "owner_active_practices": "Active",
+    "owner_completed_practices": "Completed",
+    "owner_recent_checkins": "Last 30 days",
+    "owner_practices_title": "Practices on this island",
+    "owner_no_practices": "There are no visible practices on this island",
+    "owner_view_profile": "View full profile",
+    "routes_title": "Archipelago map",
+    "routes_open": "Open archipelago map",
+    "routes_current": "Currently docked",
+    "routes_loading": "Finding connected islands",
+    "routes_empty": "No islands to explore right now",
+    "routes_empty_desc": "Check the dock again later; you can still set sail without selecting an island.",
+    "routes_unknown_island": "Unnamed island",
+    "routes_destination": "Mark on the map",
+    "routes_home_destination": "Return to my island",
+    "routes_connection_destination": "Connected island on the map",
+    "routes_explore_destination": "Public island on the map",
+    "routes_departing": "Sailing to {name}'s island…",
+    "routes_free_sailing": "Sail freely and approach any island pier to go ashore",
+    "routes_boarding_hint": "{name}'s island is marked on the map. Go to the pier and press E to sail freely",
+    "routes_boarding_hint_mobile": "{name}'s island is marked on the map. Go to the pier and tap the boat to sail freely",
+    "routes_sailing_hint_desktop": "Use W/S to row and A/D to steer; docking starts automatically near the pier",
+    "routes_sailing_hint_mobile": "Use the joystick to row; docking starts automatically near the pier",
+    "routes_disembark": "Return ashore",
+    "error_title": "Failed to load island data",
+    "error_desc": "The sea fog is too thick to see this island right now",
+    "error_retry": "Retry",
+    "drawer_recent_checkins": "Recent check-ins",
+    "drawer_no_checkins": "No check-ins yet",
+    "drawer_view_practice": "View practice",
+    "drawer_checkin_count": "{count} check-ins so far",
+    "camp_journal_label": "Camp journal",
+    "camp_latest_checkin": "Latest check-in",
+    "camp_checkin_without_note": "A new step was added to this journey",
+    "camp_card_close": "Close practice journal",
+    "camp_expand_details": "Show details",
+    "camp_collapse_details": "Hide details",
+    "status_active": "Active",
+    "status_completed": "Completed",
+    "meta_title": "{name}'s Island",
+    "meta_title_default": "3D Island"
   }
 }

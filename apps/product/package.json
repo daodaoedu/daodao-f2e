@@ -5,7 +5,9 @@
   "scripts": {
     "postinstall": "husky && pnpm typegen",
     "typegen": "next typegen",
+    "predev": "node scripts/sync-island-models.mjs",
     "dev": "next dev --turbopack -p 3001",
+    "prebuild": "node scripts/sync-island-models.mjs",
     "build": "next build",
     "start": "next start -p 3001",
     "lint": "biome lint .",
@@ -23,6 +25,7 @@
     "@daodao/api": "workspace:*",
     "@daodao/assets": "workspace:*",
     "@daodao/auth": "workspace:*",
+    "@daodao/features-island-engine": "workspace:*",
     "@daodao/features-mention": "workspace:*",
     "@daodao/features-quiz": "workspace:*",
     "@daodao/i18n": "workspace:*",

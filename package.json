@@ -32,6 +32,9 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",
+    "@gltf-transform/core": "^4.4.1",
+    "@gltf-transform/extensions": "^4.4.1",
+    "@gltf-transform/functions": "^4.4.1",
     "husky": "^9.1.7",
     "rimraf": "^6.0.1",
     "turbo": "^2.7.2",

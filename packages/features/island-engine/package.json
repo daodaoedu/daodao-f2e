@@ -1,0 +1,36 @@
+{
+  "name": "@daodao/features-island-engine",
+  "version": "0.0.0",
+  "private": true,
+  "description": "3D island engine for DaoDao monorepo (vanilla three.js, zero React deps)",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "dev:page": "vite dev --config dev/vite.config.ts",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "pnpm dlx rimraf dist node_modules"
+  },
+  "dependencies": {
+    "three": "catalog:",
+    "three-mesh-bvh": "catalog:"
+  },
+  "devDependencies": {
+    "@daodao/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/three": "catalog:",
+    "typescript": "catalog:",
+    "vite": "^8.1.5",
+    "vitest": "^4.1.2"
+  }
+}

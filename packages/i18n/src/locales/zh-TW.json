@@ -6156,7 +6156,8 @@
         "otherLabel": "其他",
         "otherPlaceholder": "請填寫其他來源"
       }
-    }
+    },
+    "user_enter_island": "上島"
   },
   "resource": {
     "hot_tags": "熱門標籤",
@@ -6909,44 +6910,20 @@
         "explorer": {
           "name": "探索者島",
           "description": "你是一位好奇心旺盛的探索者，喜歡嘗試新事物",
-          "traits": [
-            "好奇心強",
-            "勇於嘗試",
-            "獨立思考"
-          ],
-          "recommendations": [
-            "每日閱讀",
-            "程式學習",
-            "語言學習"
-          ]
+          "traits": ["好奇心強", "勇於嘗試", "獨立思考"],
+          "recommendations": ["每日閱讀", "程式學習", "語言學習"]
         },
         "creator": {
           "name": "創造者島",
           "description": "你擁有豐富的創造力，善於將想法付諸實踐",
-          "traits": [
-            "創意豐富",
-            "動手能力強",
-            "有藝術天賦"
-          ],
-          "recommendations": [
-            "寫作練習",
-            "藝術創作",
-            "設計學習"
-          ]
+          "traits": ["創意豐富", "動手能力強", "有藝術天賦"],
+          "recommendations": ["寫作練習", "藝術創作", "設計學習"]
         },
         "connector": {
           "name": "連結者島",
           "description": "你善於建立人際關係，喜歡與他人合作學習",
-          "traits": [
-            "善於溝通",
-            "團隊合作",
-            "同理心強"
-          ],
-          "recommendations": [
-            "社群活動",
-            "語言學習",
-            "團隊專案"
-          ]
+          "traits": ["善於溝通", "團隊合作", "同理心強"],
+          "recommendations": ["社群活動", "語言學習", "團隊專案"]
         }
       }
     },
@@ -7411,5 +7388,66 @@
     "follow_unfollow_success": "已取消關注",
     "follow_followers_section": "關注我的",
     "follow_no_followers": "目前還沒有人關注你"
+  },
+  "island": {
+    "loading": "正在打造你的島嶼…",
+    "skip_intro": "跳過",
+    "hint_desktop": "點地面或 WASD 移動．滑鼠拖曳視角．滾輪縮放．E 互動",
+    "hint_mobile": "搖杆移動．單指拖曳視角．雙指縮放",
+    "empty_cta": "開始第一個實踐，點燃營火",
+    "quiz_cta": "探索你的島嶼性格",
+    "webgl_fallback_title": "這裡看不到 3D 島嶼",
+    "webgl_fallback_desc": "你的瀏覽器不支援 WebGL，先回個人頁看看島主的學習足跡吧",
+    "back_to_profile": "回到個人頁",
+    "owner_label": "{name} 的島嶼",
+    "owner_open_info": "查看{name}的島主資訊",
+    "owner_sheet_title": "島主資訊",
+    "owner_sheet_description": "查看{name}在島上公開的資訊",
+    "owner_close_info": "關閉島主資訊",
+    "owner_relation_self": "我的島嶼",
+    "owner_relation_connection": "已連結夥伴",
+    "owner_relation_visitor": "公開島嶼",
+    "owner_persona": "{type} 型島嶼人格",
+    "owner_active_practices": "進行中",
+    "owner_completed_practices": "已完成",
+    "owner_recent_checkins": "近 30 天",
+    "owner_practices_title": "島上的主題實踐",
+    "owner_no_practices": "這座島目前沒有可查看的主題實踐",
+    "owner_view_profile": "查看完整個人頁",
+    "routes_title": "群島海圖",
+    "routes_open": "開啟群島海圖",
+    "routes_current": "目前停靠",
+    "routes_loading": "正在尋找夥伴島嶼",
+    "routes_empty": "暫時找不到可探索的島嶼",
+    "routes_empty_desc": "稍後再回到碼頭看看；不選島嶼也能直接自由出航。",
+    "routes_unknown_island": "未命名島嶼",
+    "routes_destination": "在海圖上標記",
+    "routes_home_destination": "回到我的島嶼",
+    "routes_connection_destination": "海圖上的夥伴島嶼",
+    "routes_explore_destination": "海圖上的公開島嶼",
+    "routes_departing": "正航向{name}的島嶼…",
+    "routes_free_sailing": "自由航行中，靠近任一島嶼碼頭即可上岸",
+    "routes_boarding_hint": "已在海圖標記{name}的島嶼；到碼頭按 E 即可自由出航",
+    "routes_boarding_hint_mobile": "已在海圖標記{name}的島嶼；到碼頭點船即可自由出航",
+    "routes_sailing_hint_desktop": "W/S 前後划行，A/D 控制船頭，接近碼頭會自動靠港",
+    "routes_sailing_hint_mobile": "使用搖杆划船，接近碼頭會自動靠港",
+    "routes_disembark": "返回岸上",
+    "error_title": "島嶼資料載入失敗",
+    "error_desc": "海霧太濃了，暫時看不到這座島",
+    "error_retry": "重試",
+    "drawer_recent_checkins": "最近打卡",
+    "drawer_no_checkins": "還沒有打卡記錄",
+    "drawer_view_practice": "查看實踐",
+    "drawer_checkin_count": "累積 {count} 次打卡",
+    "camp_journal_label": "營火札記",
+    "camp_latest_checkin": "最近打卡",
+    "camp_checkin_without_note": "留下了一次成長足跡",
+    "camp_card_close": "關閉實踐札記",
+    "camp_expand_details": "展開詳情",
+    "camp_collapse_details": "收起詳情",
+    "status_active": "進行中",
+    "status_completed": "已完成",
+    "meta_title": "{name} 的島嶼",
+    "meta_title_default": "3D 島嶼"
   }
 }
