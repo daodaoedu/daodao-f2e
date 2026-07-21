@@ -24,7 +24,7 @@ export function TaskGuideNavAction() {
     hasIncompleteTasks &&
     isTaskGuideAllowedPath(pathname);
 
-  if (!shouldShow) return null;
+  if (!shouldShow) return <li className="flex flex-1 justify-center" />;
 
   return (
     <li className="flex flex-1 justify-center">

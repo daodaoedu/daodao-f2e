@@ -29,9 +29,8 @@ const DEFAULT_DRACO_DECODER_PATH = "https://www.gstatic.com/draco/versioned/deco
 const isIOS = (): boolean => {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent ?? "";
-  const platform = navigator.platform ?? "";
   const byUserAgent = /iPad|iPhone|iPod/.test(ua);
-  const iPadOSDesktopMode = /Mac/.test(platform) && navigator.maxTouchPoints > 1;
+  const iPadOSDesktopMode = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
   return byUserAgent || iPadOSDesktopMode;
 };
 
@@ -45,8 +44,12 @@ const isIOS = (): boolean => {
  */
 const disableImageBitmapForIOS = (): void => {
   if (typeof window === "undefined") return;
-  if (isIOS() && "createImageBitmap" in window) {
-    (window as unknown as { createImageBitmap?: unknown }).createImageBitmap = undefined;
+  if (isIOS()) {
+    try {
+      delete (window as unknown as Record<string, unknown>).createImageBitmap;
+    } catch {
+      (window as unknown as Record<string, unknown>).createImageBitmap = undefined;
+    }
   }
 };
 

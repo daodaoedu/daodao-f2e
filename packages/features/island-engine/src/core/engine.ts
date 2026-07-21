@@ -377,6 +377,12 @@ export class IslandEngine {
    */
   getDiagnostics(): Record<string, string | number | boolean> {
     const gl = this.renderer.getContext();
+    if (!gl) {
+      return {
+        error: "WebGL context not available",
+        contextLost: this.glContextLostCount,
+      };
+    }
     // 蒐集場景內所有唯一的 baseColorTexture（models 靠它上色）
     const maps = new Set<import("three").Texture>();
     this.scene.traverse((child) => {
