@@ -21611,6 +21611,8 @@ export interface paths {
                     location?: string;
                     /** @description 搜尋關鍵字 */
                     search?: string;
+                    /** @description 是否只顯示有主題實踐的用戶 */
+                    hasPractices?: string;
                 };
                 header?: never;
                 path?: never;

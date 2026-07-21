@@ -9,13 +9,15 @@ import { Progress } from "@daodao/ui/components/progress";
 import { cn } from "@daodao/ui/lib/utils";
 import { Check, ListChecks, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { type OnboardingTaskKey, useOnboardingProgress } from "./onboarding-progress-context";
+import { isTaskGuideAllowedPath } from "./task-guide-availability";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const collapsedStorage = getStorage<boolean>(StorageEnum.TaskGuideCollapsed);
-const PANEL_POSITION = "fixed bottom-39 right-5 md:bottom-34 md:right-15 z-40";
+const PANEL_POSITION =
+  "fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-5 md:bottom-34 md:right-15 z-40";
 const TRIGGER_POSITION = "fixed bottom-[152px] right-[26px] md:bottom-[132px] md:right-[66px] z-40";
 function getQuizUrl() {
   const websiteUrl = getRequiredEnv("NEXT_PUBLIC_WEBSITE_URL").replace(/\/$/, "");
@@ -47,12 +49,18 @@ const TASK_PATHS: Record<OnboardingTaskKey, string> = {
 
 export function TaskGuideWidget() {
   const { isAuthenticated, isTemporary } = useAuth();
-  const { taskList, completedTasks, isLoading } = useOnboardingProgress();
+  const {
+    taskList,
+    completedTasks,
+    isLoading,
+    isTaskGuideExpanded: expanded,
+    openTaskGuide,
+    closeTaskGuide,
+  } = useOnboardingProgress();
   const t = useTranslations("onboarding.taskGuide");
   const router = useRouter();
   const pathname = usePathname();
 
-  const [expanded, setExpanded] = useState(false);
   const autoExpandedRef = useRef(false);
 
   useEffect(() => {
@@ -62,20 +70,18 @@ export function TaskGuideWidget() {
     if (total > 0 && completedTasks < total) {
       const collapsed = collapsedStorage.get();
       if (!collapsed) {
-        setExpanded(true);
+        openTaskGuide();
         autoExpandedRef.current = true;
       }
     }
-  }, [isLoading, taskList.length, completedTasks]);
+  }, [isLoading, taskList.length, completedTasks, openTaskGuide]);
 
   const handleCollapse = useCallback(() => {
-    setExpanded(false);
+    closeTaskGuide();
     collapsedStorage.set(true);
-  }, []);
+  }, [closeTaskGuide]);
 
-  const strippedPath = pathname?.replace(/^\/[a-z]{2}(-[a-zA-Z]{2})?(?=\/|$)/, "") || "/";
-  const isAllowedPage =
-    strippedPath === "/" || /^\/(notifications|mine|settings)(\/|$)/.test(strippedPath);
+  const isAllowedPage = isTaskGuideAllowedPath(pathname);
 
   // Gating：未登入 / isTemporary / 非白名單頁面 → 不顯示
   if (!isAuthenticated || isTemporary || !isAllowedPage) return null;
@@ -92,8 +98,11 @@ export function TaskGuideWidget() {
       <Button
         variant="default"
         size="icon"
-        onClick={() => setExpanded(true)}
-        className={cn(TRIGGER_POSITION, "size-12 shadow-[0_10px_24px_rgba(22,185,179,0.22)]")}
+        onClick={openTaskGuide}
+        className={cn(
+          TRIGGER_POSITION,
+          "hidden size-12 shadow-[0_10px_24px_rgba(22,185,179,0.22)] md:inline-flex"
+        )}
         aria-label={t("ariaOpen")}
         title={t("progress", { completed: completedTasks, total })}
       >
@@ -185,7 +194,6 @@ export function TaskGuideWidget() {
           );
         })}
       </ul>
-
     </div>
   );
 }

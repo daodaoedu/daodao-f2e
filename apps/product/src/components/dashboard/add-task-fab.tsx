@@ -27,7 +27,7 @@ export const AddTaskFAB = ({ onAddTask }: AddTaskFABProps) => {
           <Button
             variant="default"
             size="icon"
-            className="fixed bottom-20 right-5 md:bottom-15 md:right-15 size-15 z-40"
+            className="fixed bottom-20 right-5 z-40 hidden size-15 md:bottom-15 md:right-15 md:inline-flex"
             onClick={handleClick}
             aria-label={t("fab_add_task")}
           >

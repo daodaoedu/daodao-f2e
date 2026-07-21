@@ -166,6 +166,8 @@ export class IslandEngine {
   // 每幀複用的暫存向量，避免 render loop 內配置新 Vector3 造成 GC 抖動
   private readonly scratchTarget = new Vector3();
   private readonly scratchDesiredCamera = new Vector3();
+  // 診斷用：WebGL context 遺失次數（iOS Safari 記憶體壓力時可能觸發）
+  private glContextLostCount = 0;
 
   constructor(options: IIslandEngineOptions) {
     this.container = options.container;
@@ -188,6 +190,14 @@ export class IslandEngine {
     this.renderer.toneMapping = ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.15;
     this.container.appendChild(this.renderer.domElement);
+    // 診斷：記錄 WebGL context 遺失（iOS 記憶體超限時貼圖會全部失效）
+    this.renderer.domElement.addEventListener(
+      "webglcontextlost",
+      () => {
+        this.glContextLostCount += 1;
+      },
+      false
+    );
 
     // Scene 與光照（hemisphere 天光＋暖色太陽，spike 參數）
     this.scene = new Scene();
@@ -357,6 +367,65 @@ export class IslandEngine {
   /** 視窗內平均 fps；樣本不足回傳 null（供自動降級判斷，task 4.4） */
   getAverageFps(): number | null {
     return this.fpsSampler.average();
+  }
+
+  /**
+   * 現場診斷快照（暫時性，用於追 iOS Safari 貼圖全白問題）。
+   * 回報 WebGL 能力、資源用量、context 遺失、以及每張 baseColorTexture 是否
+   * 「已解碼」與「已上傳 GPU」——藉此分辨「記憶體超限導致部分貼圖沒上」還是
+   * 「色調/色彩空間把顏色沖淡」兩種假設。
+   */
+  getDiagnostics(): Record<string, string | number | boolean> {
+    const gl = this.renderer.getContext();
+    if (!gl) {
+      return {
+        error: "WebGL context not available",
+        contextLost: this.glContextLostCount,
+      };
+    }
+    // 蒐集場景內所有唯一的 baseColorTexture（models 靠它上色）
+    const maps = new Set<import("three").Texture>();
+    this.scene.traverse((child) => {
+      const mesh = child as Mesh;
+      if (!mesh.isMesh) return;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      for (const material of materials) {
+        const map = (material as { map?: import("three").Texture | null }).map;
+        if (map) maps.add(map);
+      }
+    });
+    // three 內部的 properties map：有 __webglTexture 代表已成功上傳到 GPU
+    const props = (this.renderer as unknown as { properties?: { get(t: object): unknown } })
+      .properties;
+    let decoded = 0;
+    let uploaded = 0;
+    for (const map of maps) {
+      const image = (map as { image?: { width?: number } }).image;
+      if (image && (image.width ?? 0) > 0) decoded += 1;
+      const entry = props?.get(map) as { __webglTexture?: unknown } | undefined;
+      if (entry?.__webglTexture) uploaded += 1;
+    }
+
+    return {
+      webgl2: this.renderer.capabilities.isWebGL2,
+      capMaxTextureUnits: this.renderer.capabilities.maxTextures,
+      maxTexImageUnits: gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) as number,
+      maxTextureSizePx: gl.getParameter(gl.MAX_TEXTURE_SIZE) as number,
+      quality: this.quality,
+      pixelRatio: this.renderer.getPixelRatio(),
+      infoTextures: this.renderer.info.memory.textures,
+      infoGeometries: this.renderer.info.memory.geometries,
+      drawCalls: this.renderer.info.render.calls,
+      triangles: this.renderer.info.render.triangles,
+      modelMaps: maps.size,
+      mapsDecoded: decoded,
+      mapsUploaded: uploaded,
+      contextLost: this.glContextLostCount,
+      toneMapping: this.renderer.toneMapping,
+      toneMappingExposure: this.renderer.toneMappingExposure,
+      outputColorSpace: this.renderer.outputColorSpace,
+      glError: gl.getError(),
+    };
   }
 
   /** 切換品質分級（陰影/pixel ratio 即時生效；antialias 需重建 renderer，先不處理） */
