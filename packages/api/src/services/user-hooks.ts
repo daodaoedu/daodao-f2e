@@ -38,6 +38,7 @@ export const useUsers = (params?: IGetUsersParams) => {
         positionList: params?.positionList ?? undefined,
         location: params?.location ?? undefined,
         search: params?.search ?? undefined,
+        hasPractices: params?.hasPractices !== undefined ? String(params.hasPractices) : undefined,
       },
     },
   });
