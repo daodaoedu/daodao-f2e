@@ -103,6 +103,7 @@ export default function IslandCanvas({ islandData, identifier }: IslandCanvasPro
   const { data: usersResponse, isLoading: usersLoading } = useUsers({
     page: 1,
     pageSize: 30,
+    hasPractices: true,
   });
 
   // 空島/未測驗 CTA 只給島主本人（訪客不顯示，spec「訪客看空島」）
