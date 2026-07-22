@@ -171,14 +171,16 @@ export const lighthouseFocusResponseSchema = apiSuccessSchema(
 );
 
 export const lighthouseOutcomeResponseSchema = apiSuccessSchema(
-  z.object({
-    cohortId: z.number().int().positive(),
-    completedCount: z.number().int().nonnegative(),
-    enrolledCount: z.number().int().nonnegative(),
-    sustainedParticipationCount: z.number().int().nonnegative(),
-    sustainedParticipationRate: z.number().min(0).max(1),
-    computedAt: z.string().datetime(),
-  })
+  z
+    .object({
+      cohortId: z.number().int().positive(),
+      completedCount: z.number().int().nonnegative(),
+      enrolledCount: z.number().int().nonnegative(),
+      sustainedParticipationCount: z.number().int().nonnegative(),
+      sustainedParticipationRate: z.number().min(0).max(1),
+      computedAt: z.string().datetime(),
+    })
+    .nullable()
 );
 
 const cohortFeedCommentPreviewUserSchema = z.object({

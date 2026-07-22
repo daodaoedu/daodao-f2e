@@ -241,6 +241,15 @@ describe("Lighthouse API runtime schemas", () => {
     expect(responses.every((result) => result.success)).toBe(true);
   });
 
+  it("accepts null outcome data when snapshot has not been generated", () => {
+    const result = lighthouseOutcomeResponseSchema.safeParse({
+      success: true,
+      data: null,
+      timestamp,
+    });
+    expect(result.success).toBe(true);
+  });
+
   it("whitelists learner and organization-member response fields", () => {
     const learners = lighthouseCohortMembersResponseSchema.parse({
       success: true,
