@@ -1,19 +1,21 @@
 "use client";
 
+import type { IShowcaseCheckIn } from "@daodao/api";
 import {
   createLighthouseEncouragementDraft,
   sendLighthouseEncouragement,
-  upsertReaction,
   useLighthouseCoachFeed,
   useLighthouseCohort,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
+import { Empty, EmptyDescription } from "@daodao/ui/components/empty";
+import { Spinner } from "@daodao/ui/components/spinner";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
-import { format } from "date-fns";
-import { Heart, MessageCircle, Sparkles } from "lucide-react";
+import { MessageCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { CheckInShowcaseCard } from "@/components/showcase/CheckInShowcaseCard";
 import { CohortErrorState } from "./cohort-error-state";
 
 interface CohortFeedProps {
@@ -21,7 +23,7 @@ interface CohortFeedProps {
   cohortId: number;
 }
 
-function FeedItem({
+function CoachFeedItem({
   programId,
   cohortId,
   item,
@@ -29,29 +31,46 @@ function FeedItem({
   programId: number;
   cohortId: number;
   item: {
-    id: number;
-    practiceId: number;
-    nickname: string | null;
+    id: string;
     checkinDate: string;
     mood: string | null;
-    note: string | null;
+    note: string;
+    tags: string[];
+    imageUrls: string[];
+    createdAt: string;
+    practice: { id: string; title: string };
+    user?: {
+      id: string;
+      name: string;
+      photoUrl: string | null;
+      customId: string | null;
+    };
+    commentCount: number;
+    commentPreview: {
+      id: string;
+      content: string;
+      createdAt: string;
+      user?: {
+        id: string;
+        name: string;
+        photoUrl: string | null;
+        customId: string | null;
+      };
+    }[];
   };
 }) {
   const t = useTranslations("lighthouse");
   const [draft, setDraft] = useState("");
   const [isComposing, setIsComposing] = useState(false);
   const [busy, setBusy] = useState(false);
-  async function react() {
-    const response = await upsertReaction({
-      targetType: "checkin",
-      targetId: String(item.id),
-      reactionType: "encourage",
-    });
-    response.error ? toast.error(t("save_failed")) : toast.success(t("reaction_sent"));
-  }
+
   async function generateDraft() {
     setBusy(true);
-    const response = await createLighthouseEncouragementDraft(programId, cohortId, item.id);
+    const response = await createLighthouseEncouragementDraft(
+      programId,
+      cohortId,
+      Number(item.id),
+    );
     setBusy(false);
     if (response.error || !response.data) {
       toast.error(t("draft_failed"));
@@ -60,10 +79,16 @@ function FeedItem({
     setDraft(response.data.data.draft);
     setIsComposing(true);
   }
+
   async function submit() {
     if (!draft.trim()) return;
     setBusy(true);
-    const response = await sendLighthouseEncouragement(programId, cohortId, item.id, draft.trim());
+    const response = await sendLighthouseEncouragement(
+      programId,
+      cohortId,
+      Number(item.id),
+      draft.trim(),
+    );
     setBusy(false);
     if (response.error) {
       toast.error(t("save_failed"));
@@ -73,41 +98,69 @@ function FeedItem({
     setIsComposing(false);
     toast.success(t("encouragement_sent"));
   }
-  return (
-    <article className="rounded-3xl border border-[#CDEBE8] bg-white p-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="font-semibold">{item.nickname || t("learner")}</h2>
-          <p className="mt-1 text-xs text-[#78928F]">
-            {format(new Date(item.checkinDate), "yyyy/MM/dd")}
-          </p>
-        </div>
-        {item.mood && (
-          <span className="rounded-full bg-[#FFF6E8] px-3 py-1 text-xs text-[#72593C]">
-            {item.mood}
-          </span>
-        )}
-      </div>
-      <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-[#345E5B]">
-        {item.note || t("checkin_without_note")}
-      </p>
-      <div className="mt-5 flex flex-wrap gap-2">
-        <Button size="sm" variant="outline" onClick={react}>
-          <Heart className="size-4" />
-          {t("quick_encouragement")}
-        </Button>
-        <Button size="sm" variant="ghost" onClick={generateDraft} disabled={busy}>
+
+  const showcaseProps: IShowcaseCheckIn = {
+    id: item.id,
+    checkin_date: item.checkinDate,
+    mood: item.mood as IShowcaseCheckIn["mood"],
+    note: item.note,
+    tags: item.tags,
+    image_urls: item.imageUrls,
+    created_at: item.createdAt,
+    practice: item.practice,
+    user: item.user
+      ? {
+          id: item.user.id,
+          name: item.user.name,
+          photo_url: item.user.photoUrl,
+          custom_id: item.user.customId,
+        }
+      : undefined,
+    comment_count: item.commentCount,
+    comment_preview: item.commentPreview.map((c) => ({
+      id: c.id,
+      content: c.content,
+      created_at: c.createdAt,
+      user: c.user
+        ? {
+            id: c.user.id,
+            name: c.user.name,
+            photo_url: c.user.photoUrl,
+            custom_id: c.user.customId,
+          }
+        : undefined,
+    })),
+  };
+
+  const coachFooter = (
+    <>
+      <div className="flex items-center gap-2">
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={generateDraft}
+          disabled={busy}
+        >
           <Sparkles className="size-4" />
           {t("ai_draft")}
         </Button>
-        <Button size="sm" variant="ghost" onClick={() => setIsComposing(true)} disabled={busy}>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => setIsComposing(true)}
+          disabled={busy}
+        >
           <MessageCircle className="size-4" />
           {t("write_comment")}
         </Button>
       </div>
+
       {isComposing && (
-        <div className="mt-4 rounded-2xl bg-[#F0FBF9] p-4">
-          <label htmlFor={`draft-${item.id}`} className="text-sm font-semibold">
+        <div className="mt-3 rounded-xl bg-primary-palest p-4">
+          <label
+            htmlFor={`draft-${item.id}`}
+            className="text-sm font-semibold text-text-dark"
+          >
             {draft ? t("editable_draft") : t("write_comment")}
           </label>
           <Textarea
@@ -118,7 +171,11 @@ function FeedItem({
             onChange={(event) => setDraft(event.target.value)}
           />
           <div className="mt-3 flex gap-2">
-            <Button size="sm" onClick={submit} disabled={busy || !draft.trim()}>
+            <Button
+              size="sm"
+              onClick={submit}
+              disabled={busy || !draft.trim()}
+            >
               <MessageCircle className="size-4" />
               {t("send_comment")}
             </Button>
@@ -136,8 +193,10 @@ function FeedItem({
           </div>
         </div>
       )}
-    </article>
+    </>
   );
+
+  return <CheckInShowcaseCard {...showcaseProps} footer={coachFooter} />;
 }
 
 export function CohortFeed({ programId, cohortId }: CohortFeedProps) {
@@ -145,7 +204,13 @@ export function CohortFeed({ programId, cohortId }: CohortFeedProps) {
   const cohort = useLighthouseCohort(programId, cohortId).data?.data;
   const query = useLighthouseCoachFeed(programId, cohortId);
   const feed = query.data?.data;
-  if (query.isLoading) return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
+
+  if (query.isLoading)
+    return (
+      <div className="flex items-center justify-center px-10 py-12">
+        <Spinner className="size-6" />
+      </div>
+    );
   if (query.error || query.validationError)
     return (
       <CohortErrorState
@@ -154,25 +219,31 @@ export function CohortFeed({ programId, cohortId }: CohortFeedProps) {
         onRetry={() => void query.mutate()}
       />
     );
+
   return (
-    <div className="mx-auto w-full max-w-4xl px-5 py-10 md:px-10">
+    <div className="mx-auto w-full max-w-2xl px-5 py-10 md:px-10">
       <header>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#0D7773]">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-logo-cyan">
           {t("feed_eyebrow")}
         </p>
-        <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em]">
+        <h1 className="mt-3 text-2xl font-bold tracking-tight text-bg-dark">
           {cohort?.displayName ?? t("cohort_nav_feed")}
         </h1>
-        <p className="mt-3 text-[#5A7B79]">{t("feed_description")}</p>
+        <p className="mt-3 text-sm text-basic-400">{t("feed_description")}</p>
       </header>
-      <div className="mt-8 grid gap-4">
-        {!query.isLoading && !feed?.items.length && (
-          <p className="rounded-3xl border border-dashed border-[#B9DCD8] px-6 py-14 text-center text-sm text-[#5A7B79]">
-            {t("feed_empty")}
-          </p>
+      <div className="mt-8 grid gap-5">
+        {!feed?.items.length && (
+          <Empty>
+            <EmptyDescription>{t("feed_empty")}</EmptyDescription>
+          </Empty>
         )}
         {feed?.items.map((item) => (
-          <FeedItem key={item.id} programId={programId} cohortId={cohortId} item={item} />
+          <CoachFeedItem
+            key={item.id}
+            programId={programId}
+            cohortId={cohortId}
+            item={item}
+          />
         ))}
       </div>
     </div>

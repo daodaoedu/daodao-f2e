@@ -6916,20 +6916,44 @@
         "explorer": {
           "name": "探索者島",
           "description": "你是一位好奇心旺盛的探索者，喜歡嘗試新事物",
-          "traits": ["好奇心強", "勇於嘗試", "獨立思考"],
-          "recommendations": ["每日閱讀", "程式學習", "語言學習"]
+          "traits": [
+            "好奇心強",
+            "勇於嘗試",
+            "獨立思考"
+          ],
+          "recommendations": [
+            "每日閱讀",
+            "程式學習",
+            "語言學習"
+          ]
         },
         "creator": {
           "name": "創造者島",
           "description": "你擁有豐富的創造力，善於將想法付諸實踐",
-          "traits": ["創意豐富", "動手能力強", "有藝術天賦"],
-          "recommendations": ["寫作練習", "藝術創作", "設計學習"]
+          "traits": [
+            "創意豐富",
+            "動手能力強",
+            "有藝術天賦"
+          ],
+          "recommendations": [
+            "寫作練習",
+            "藝術創作",
+            "設計學習"
+          ]
         },
         "connector": {
           "name": "連結者島",
           "description": "你善於建立人際關係，喜歡與他人合作學習",
-          "traits": ["善於溝通", "團隊合作", "同理心強"],
-          "recommendations": ["社群活動", "語言學習", "團隊專案"]
+          "traits": [
+            "善於溝通",
+            "團隊合作",
+            "同理心強"
+          ],
+          "recommendations": [
+            "社群活動",
+            "語言學習",
+            "團隊專案"
+          ]
         }
       }
     },
@@ -7728,6 +7752,36 @@
     "write_comment": "寫下回應",
     "send": "送出",
     "comment_sent": "留言已送出",
-    "save_failed": "操作失敗，請稍後再試"
+    "save_failed": "操作失敗，請稍後再試",
+    "cohort_period": "本期期間",
+    "day_progress": "第 {current} 天 / 共 {total} 天",
+    "cohort_ended": "本期已結束",
+    "cohort_not_started": "本期尚未開始",
+    "practices_count": "{count} 個實踐",
+    "active_count": "{count} 進行中",
+    "completed_count": "{count} 已完成",
+    "draft_count": "{count} 草稿",
+    "feed_count": "{count} 則動態",
+    "settings": "設定",
+    "no_practices": "本期還沒有實踐，等待教練為你安排。",
+    "view_practice": "查看實踐",
+    "days_left": "剩餘 {count} 天",
+    "photos": "{count} 張照片",
+    "stat_practices": "實踐",
+    "stat_active": "進行中",
+    "stat_completed": "已完成",
+    "stat_draft": "草稿",
+    "stat_feed": "動態",
+    "stat_unit_count": "個",
+    "stat_unit_updates": "則",
+    "back_to_mine": "回到我的",
+    "settings_privacy": "隱私設定",
+    "settings_privacy_desc": "決定你的實踐成果是否可以被教練匯出報告使用。",
+    "settings_membership": "成員資格",
+    "settings_membership_desc": "退出後，你的實踐會保留在個人空間，但無法再查看本期動態。",
+    "save": "儲存",
+    "exit_confirm_title": "確定要退出本期？",
+    "exit_confirm_action": "退出",
+    "exit_cancel": "取消"
   }
 }

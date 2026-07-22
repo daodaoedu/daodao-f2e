@@ -1,28 +1,31 @@
 "use client";
 
 import {
-  createComment,
   exitCohort,
   setCohortExportConsent,
   updatePractice,
-  upsertReaction,
   useCohortMemberHome,
   useLearnerCohortFeed,
 } from "@daodao/api";
+import type { IShowcaseCheckIn } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
+import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
+import { Checkbox } from "@daodao/ui/components/checkbox";
+import { CustomLink } from "@daodao/ui/components/custom-link";
+import { Empty, EmptyDescription } from "@daodao/ui/components/empty";
+import { Label } from "@daodao/ui/components/label";
 import { toast } from "@daodao/ui/components/sonner";
-import { Textarea } from "@daodao/ui/components/textarea";
-import { Heart, LogOut, Play, Sprout } from "lucide-react";
+import { Spinner } from "@daodao/ui/components/spinner";
+import { useDialog } from "@daodao/ui/hooks/use-dialog";
+import { cn } from "@daodao/ui/lib/utils";
+import { ArrowLeft, ChevronRight, LogOut, Play, Sprout } from "lucide-react";
 import { useEffect, useState } from "react";
-import { PageHeader } from "@/components/layout/page-header";
+import { BackgroundAnimation, Banner } from "@/components/layout";
 import { CohortErrorState } from "@/components/lighthouse/cohort-error-state";
+import { CheckInShowcaseCard } from "@/components/showcase/CheckInShowcaseCard";
 
-// A non-member hitting GET /api/v1/cohorts/{cohortId} gets a 404 whose body is the
-// server error envelope with error.code === "APP_ERROR" (the only app-level failure
-// this endpoint returns besides auth). swr-openapi throws that body, so the HTTP
-// status isn't available — detect the envelope instead.
 function isNotMemberError(error: unknown): boolean {
   if (typeof error !== "object" || error === null || !("error" in error)) return false;
   const inner = (error as { error: unknown }).error;
@@ -34,6 +37,14 @@ function isNotMemberError(error: unknown): boolean {
   );
 }
 
+const statusBadgeVariant: Record<string, "default" | "secondary" | "outline-logo" | "gray"> = {
+  active: "default",
+  completed: "outline-logo",
+  draft: "gray",
+  not_started: "secondary",
+  archived: "gray",
+};
+
 export function CohortMemberPage({ cohortId }: { cohortId: number }) {
   const t = useTranslations("cohort");
   const router = useRouter();
@@ -41,40 +52,74 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
   const feedQuery = useLearnerCohortFeed(cohortId);
   const home = homeQuery.data?.data;
   const feed = feedQuery.data?.data;
-  const [tab, setTab] = useState<"practices" | "feed">("practices");
   const notMember = isNotMemberError(homeQuery.error);
+  const [tab, setTab] = useState<"practices" | "feed" | "settings">("practices");
+  const [pendingConsent, setPendingConsent] = useState<boolean | null>(null);
+  const { openWarningDialog } = useDialog();
+
+  const consentValue = pendingConsent ?? home?.exportOptIn ?? false;
+  const consentDirty = pendingConsent !== null && pendingConsent !== (home?.exportOptIn ?? false);
+
   useEffect(() => {
     if (notMember) router.replace("/mine");
   }, [notMember, router]);
+
   async function activate(id: string) {
-    const response = await updatePractice(id, { status: "active", isDraft: false });
-    if (response.error) {
+    try {
+      const response = await updatePractice(id, { status: "active", isDraft: false });
+      if (response.error) {
+        toast.error(t("activate_failed"));
+        return;
+      }
+      await homeQuery.mutate();
+      toast.success(t("practice_activated"));
+    } catch {
       toast.error(t("activate_failed"));
-      return;
     }
-    await homeQuery.mutate();
-    toast.success(t("practice_activated"));
   }
+
   async function setConsent(consent: boolean) {
-    const response = await setCohortExportConsent(cohortId, consent);
-    if (response.error) {
+    try {
+      const response = await setCohortExportConsent(cohortId, consent);
+      if (response.error) {
+        toast.error(t("save_failed"));
+        return;
+      }
+      await homeQuery.mutate();
+    } catch {
       toast.error(t("save_failed"));
-      return;
     }
-    await homeQuery.mutate();
   }
+
   async function exit() {
-    if (!window.confirm(t("exit_confirm"))) return;
-    const response = await exitCohort(cohortId);
-    if (response.error) {
+    const result = await openWarningDialog({
+      title: t("exit_confirm_title"),
+      message: t("exit_confirm"),
+      buttons: [
+        { label: t("exit_cancel"), value: "cancel", variant: "outline" },
+        { label: t("exit_confirm_action"), value: "confirm", variant: "orange" },
+      ],
+    });
+    if (result.value !== "confirm") return;
+    try {
+      const response = await exitCohort(cohortId);
+      if (response.error) {
+        toast.error(t("exit_failed"));
+        return;
+      }
+      toast.success(t("exit_success"));
+      router.push("/practices");
+    } catch {
       toast.error(t("exit_failed"));
-      return;
     }
-    toast.success(t("exit_success"));
-    router.push("/practices");
   }
+
   if (homeQuery.isLoading || notMember)
-    return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Spinner className="size-6" />
+      </div>
+    );
   if (homeQuery.error || homeQuery.validationError)
     return (
       <CohortErrorState
@@ -83,168 +128,235 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
         onRetry={() => void homeQuery.mutate()}
       />
     );
+
   return (
-    <div className="mx-auto w-full max-w-5xl px-5 py-10 md:px-10">
-      <PageHeader rightAction="close" rightActionTo="/" />
-      <header>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#0D7773]">
-          {home?.organization.name}
-        </p>
-        <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em]">
-          {home?.displayName ?? t("cohort_home")}
-        </h1>
-        <p className="mt-3 text-[#5A7B79]">{t("cohort_home_description")}</p>
-      </header>
-      <div className="mt-7 flex gap-2 rounded-full bg-[#E7FAF7] p-1.5">
-        <button
-          type="button"
-          onClick={() => setTab("practices")}
-          className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold ${tab === "practices" ? "bg-[#0D3036] text-white" : "text-[#456B68]"}`}
-        >
-          {t("my_cohort_practices")}
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("feed")}
-          className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold ${tab === "feed" ? "bg-[#0D3036] text-white" : "text-[#456B68]"}`}
-        >
-          {t("cohort_feed")}
-        </button>
-      </div>
-      {tab === "practices" ? (
-        <section className="mt-5 grid gap-4">
-          <div className="rounded-3xl border border-[#CDEBE8] bg-white p-5">
-            <label className="flex items-center gap-3 text-sm">
-              <input
-                type="checkbox"
-                checked={home?.exportOptIn ?? false}
-                onChange={(event) => void setConsent(event.target.checked)}
-                className="size-4 accent-[#0D7773]"
-              />
-              {t("export_consent")}
-            </label>
+    <div className="relative min-h-screen">
+      <Banner />
+      <BackgroundAnimation />
+
+      <main className="relative z-[25] pb-[72px] bg-very-light-gray">
+        <div className="max-w-[640px] px-4 mx-auto pt-4">
+          {/* Back + Cohort header */}
+          <button
+            type="button"
+            onClick={() => router.push("/mine")}
+            className="flex items-center gap-1 text-sm text-text-dark/60 hover:text-text-dark transition-colors mb-3 cursor-pointer"
+          >
+            <ArrowLeft className="size-4" />
+            {t("back_to_mine")}
+          </button>
+          <div className="mb-4">
+            <p className="text-xs font-medium text-logo-cyan">{home?.organization.name}</p>
+            <h1 className="mt-1 text-lg font-bold text-text-dark">
+              {home?.displayName ?? t("cohort_home")}
+            </h1>
           </div>
-          {home?.practices.map((practice) => (
-            // biome-ignore lint/a11y/useKeyWithClickEvents: card navigates to the practice page
-            <article
-              key={practice.id}
-              className="cursor-pointer rounded-3xl border border-[#CDEBE8] bg-white p-6 transition-colors hover:bg-[#F0FAF8]"
-              onClick={() => router.push(`/practices/${practice.id}`)}
+
+          {/* Tab switcher */}
+          <div className="flex border-b border-[#E5E7EB] mb-4">
+            <button
+              type="button"
+              onClick={() => setTab("practices")}
+              className={cn(
+                "flex-1 py-2 text-sm font-medium transition-all",
+                tab === "practices"
+                  ? "text-text-dark border-b-2 border-logo-cyan -mb-px"
+                  : "text-text-dark/40"
+              )}
             >
-              <div className="flex items-start gap-4">
-                <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
-                  <Sprout className="size-5" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-lg font-semibold">{practice.title}</h2>
-                  <p className="mt-2 text-sm text-[#5A7B79]">{practice.practiceAction}</p>
-                  <p className="mt-2 text-xs text-[#78928F]">
-                    {t(`practice_status_${practice.status}`)}
-                  </p>
-                </div>
-                {practice.status === "draft" && (
-                  <Button
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      void activate(practice.id);
-                    }}
+              {t("my_cohort_practices")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("feed")}
+              className={cn(
+                "flex-1 py-2 text-sm font-medium transition-all",
+                tab === "feed"
+                  ? "text-text-dark border-b-2 border-logo-cyan -mb-px"
+                  : "text-text-dark/40"
+              )}
+            >
+              {t("cohort_feed")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("settings")}
+              className={cn(
+                "flex-1 py-2 text-sm font-medium transition-all",
+                tab === "settings"
+                  ? "text-text-dark border-b-2 border-logo-cyan -mb-px"
+                  : "text-text-dark/40"
+              )}
+            >
+              {t("settings")}
+            </button>
+          </div>
+
+          {/* Content */}
+          {tab === "practices" && (
+            <div className="flex flex-col gap-3">
+              {!home?.practices.length && (
+                <Empty className="rounded-xl bg-white shadow-sm">
+                  <EmptyDescription>{t("no_practices")}</EmptyDescription>
+                </Empty>
+              )}
+              {home?.practices.map((practice) => (
+                <CustomLink
+                  key={practice.id}
+                  href={`/practices/${practice.id}`}
+                  className="block rounded-xl bg-white p-4 shadow-sm transition-all hover:shadow-md hover:ring-2 hover:ring-logo-cyan"
+                >
+                  <div className="flex items-start gap-3">
+                    <span
+                      className={cn(
+                        "grid size-10 shrink-0 place-items-center rounded-lg",
+                        practice.status === "draft"
+                          ? "bg-basic-100 text-basic-400"
+                          : "bg-primary-palest text-logo-cyan"
+                      )}
+                    >
+                      <Sprout className="size-5" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <Badge variant={statusBadgeVariant[practice.status] ?? "gray"} size="sm">
+                        {t(`practice_status_${practice.status}`)}
+                      </Badge>
+                      <h2 className="mt-1.5 text-base font-medium text-text-dark line-clamp-2">
+                        {practice.title}
+                      </h2>
+                      {practice.practiceAction && (
+                        <p className="mt-1 text-xs text-text-dark/60 line-clamp-1">
+                          {practice.practiceAction}
+                        </p>
+                      )}
+                    </div>
+                    {practice.status === "draft" ? (
+                      <Button
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          void activate(practice.id);
+                        }}
+                        className="shrink-0"
+                      >
+                        <Play className="size-3.5" />
+                        {t("activate_practice")}
+                      </Button>
+                    ) : (
+                      <ChevronRight className="size-5 shrink-0 text-light-gray mt-0.5" />
+                    )}
+                  </div>
+                </CustomLink>
+              ))}
+            </div>
+          )}
+          {tab === "feed" && (
+            <div className="flex flex-col gap-3">
+              {!feed?.items.length && (
+                <Empty className="rounded-xl bg-white shadow-sm">
+                  <EmptyDescription>{t("feed_empty")}</EmptyDescription>
+                </Empty>
+              )}
+              {feed?.items.map((item) => (
+                <CheckInShowcaseCard
+                  key={item.id}
+                  id={item.id}
+                  checkin_date={item.checkinDate}
+                  mood={(item.mood ?? "neutral") as IShowcaseCheckIn["mood"]}
+                  note={item.note}
+                  tags={item.tags}
+                  image_urls={item.imageUrls}
+                  created_at={item.createdAt}
+                  practice={item.practice}
+                  user={
+                    item.user
+                      ? {
+                          id: item.user.id,
+                          name: item.user.name,
+                          photo_url: item.user.photoUrl,
+                          custom_id: item.user.customId,
+                        }
+                      : undefined
+                  }
+                  comment_count={item.commentCount}
+                  comment_preview={item.commentPreview.map((c) => ({
+                    id: c.id,
+                    content: c.content,
+                    created_at: c.createdAt,
+                    user: c.user
+                      ? {
+                          id: c.user.id,
+                          name: c.user.name,
+                          photo_url: c.user.photoUrl,
+                          custom_id: c.user.customId,
+                        }
+                      : undefined,
+                  }))}
+                />
+              ))}
+            </div>
+          )}
+          {tab === "settings" && (
+            <div className="flex flex-col gap-4">
+              <div className="rounded-xl bg-white p-5 shadow-sm">
+                <h3 className="text-sm font-semibold text-text-dark">{t("settings_privacy")}</h3>
+                <p className="mt-1 text-xs text-text-dark/50 leading-relaxed">
+                  {t("settings_privacy_desc")}
+                </p>
+                <div className="mt-4 flex items-start gap-3">
+                  <Checkbox
+                    id="export-consent"
+                    checked={consentValue}
+                    onCheckedChange={(checked) => setPendingConsent(checked === true)}
+                    className="mt-0.5"
+                  />
+                  <Label
+                    htmlFor="export-consent"
+                    className="cursor-pointer text-sm text-text-dark leading-relaxed"
                   >
-                    <Play className="size-4" />
-                    {t("activate_practice")}
-                  </Button>
+                    {t("export_consent")}
+                  </Label>
+                </div>
+                {consentDirty && (
+                  <div className="mt-4 flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        void setConsent(consentValue).then(() => setPendingConsent(null));
+                      }}
+                    >
+                      {t("save")}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setPendingConsent(null)}
+                    >
+                      {t("exit_cancel")}
+                    </Button>
+                  </div>
                 )}
               </div>
-            </article>
-          ))}
-          <Button variant="ghost" className="justify-self-start" onClick={exit}>
-            <LogOut className="size-4" />
-            {t("exit_and_keep_personal")}
-          </Button>
-        </section>
-      ) : (
-        <section className="mt-5 grid gap-4">
-          {!feed?.items.length && (
-            <p className="rounded-3xl border border-dashed border-[#B9DCD8] px-6 py-14 text-center text-sm text-[#5A7B79]">
-              {t("feed_empty")}
-            </p>
+              <div className="rounded-xl bg-white p-5 shadow-sm">
+                <h3 className="text-sm font-semibold text-text-dark">{t("settings_membership")}</h3>
+                <p className="mt-1 text-xs text-text-dark/50 leading-relaxed">
+                  {t("settings_membership_desc")}
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-4 text-text-dark/60"
+                  onClick={exit}
+                >
+                  <LogOut className="size-4" />
+                  {t("exit_and_keep_personal")}
+                </Button>
+              </div>
+            </div>
           )}
-          {feed?.items.map((item) => (
-            <LearnerFeedItem key={item.id} item={item} />
-          ))}
-        </section>
-      )}
-    </div>
-  );
-}
-
-function LearnerFeedItem({
-  item,
-}: {
-  item: {
-    id: number;
-    nickname: string | null;
-    mood: string | null;
-    note: string | null;
-    checkinDate: string;
-  };
-}) {
-  const t = useTranslations("cohort");
-  const [comment, setComment] = useState("");
-  async function react() {
-    const response = await upsertReaction({
-      targetType: "checkin",
-      targetId: String(item.id),
-      reactionType: "encourage",
-    });
-    response.error ? toast.error(t("save_failed")) : toast.success(t("reaction_sent"));
-  }
-  async function submit() {
-    if (!comment.trim()) return;
-    const response = await createComment({
-      targetType: "checkin",
-      targetId: String(item.id),
-      content: comment.trim(),
-      visibility: "public",
-    });
-    if (response.error) {
-      toast.error(t("save_failed"));
-      return;
-    }
-    setComment("");
-    toast.success(t("comment_sent"));
-  }
-  return (
-    <article className="rounded-3xl border border-[#CDEBE8] bg-white p-6">
-      <div className="flex justify-between gap-4">
-        <div>
-          <h2 className="font-semibold">{item.nickname || t("learner")}</h2>
-          <p className="mt-1 text-xs text-[#78928F]">
-            {new Date(item.checkinDate).toLocaleDateString()}
-          </p>
         </div>
-        {item.mood && (
-          <span className="rounded-full bg-[#FFF6E8] px-3 py-1 text-xs">{item.mood}</span>
-        )}
-      </div>
-      <p className="mt-4 text-sm leading-6 text-[#456B68]">
-        {item.note || t("checkin_without_note")}
-      </p>
-      <Button size="sm" variant="outline" className="mt-4" onClick={react}>
-        <Heart className="size-4" />
-        {t("encourage")}
-      </Button>
-      <div className="mt-4 flex gap-2">
-        <Textarea
-          value={comment}
-          onChange={(event) => setComment(event.target.value)}
-          placeholder={t("write_comment")}
-          className="min-h-10"
-        />
-        <Button size="sm" onClick={submit}>
-          {t("send")}
-        </Button>
-      </div>
-    </article>
+      </main>
+    </div>
   );
 }
