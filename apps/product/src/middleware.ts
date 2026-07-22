@@ -56,10 +56,10 @@ export default async function middleware(request: NextRequest) {
     const access = await hasLighthouseAccess(request);
     if (access !== "allowed") {
       if (access === "unavailable") {
-        return NextResponse.json(
-          { error: "Lighthouse access verification is temporarily unavailable" },
-          { status: 503, headers: { "Retry-After": "30" } }
-        );
+        const errorUrl = request.nextUrl.clone();
+        errorUrl.pathname = localizedPath(pathname, "/lighthouse/access-required");
+        errorUrl.search = "?reason=unavailable";
+        return NextResponse.redirect(errorUrl);
       }
       const redirectUrl = request.nextUrl.clone();
       if (access === "unauthorized") {

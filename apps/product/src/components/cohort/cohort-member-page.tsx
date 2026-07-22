@@ -73,23 +73,9 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
     toast.success(t("exit_success"));
     router.push("/practices");
   }
-  if (homeQuery.isLoading)
+  if (homeQuery.isLoading || notMember)
     return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
-  if (homeQuery.error) {
-    const status = (homeQuery.error as { status?: number })?.status;
-    if (status === 404 || status === 403) {
-      router.replace("/mine");
-      return null;
-    }
-    return (
-      <CohortErrorState
-        message={t("load_failed")}
-        retryLabel={t("retry")}
-        onRetry={() => void homeQuery.mutate()}
-      />
-    );
-  }
-  if (homeQuery.validationError)
+  if (homeQuery.error || homeQuery.validationError)
     return (
       <CohortErrorState
         message={t("load_failed")}
@@ -139,6 +125,7 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
             </label>
           </div>
           {home?.practices.map((practice) => (
+            // biome-ignore lint/a11y/useKeyWithClickEvents: card navigates to the practice page
             <article
               key={practice.id}
               className="cursor-pointer rounded-3xl border border-[#CDEBE8] bg-white p-6 transition-colors hover:bg-[#F0FAF8]"
@@ -156,7 +143,13 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
                   </p>
                 </div>
                 {practice.status === "draft" && (
-                  <Button size="sm" onClick={(e) => { e.stopPropagation(); void activate(practice.id); }}>
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      void activate(practice.id);
+                    }}
+                  >
                     <Play className="size-4" />
                     {t("activate_practice")}
                   </Button>
