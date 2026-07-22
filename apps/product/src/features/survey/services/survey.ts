@@ -106,6 +106,7 @@ function mapSurvey(raw: RawSurvey): SurveyWithQuestions {
     responseCount: 0,
     createdAt: raw.created_at,
     updatedAt: raw.updated_at,
+    tags: raw.tags,
     questions: raw.questions.map((q) => ({
       ...mapQuestion(q, raw.questions),
       surveyId: String(raw.id),
@@ -135,6 +136,7 @@ function mapListItem(raw: RawListItem): Survey {
     responseCount: raw.response_count,
     createdAt: raw.created_at,
     updatedAt: raw.created_at,
+    tags: raw.tags,
   };
 }
 
@@ -245,7 +247,7 @@ export async function submitResponse(input: SubmitResponseInput): Promise<{ resp
   if (input.startedAt) body.started_at = input.startedAt;
   if (input.sessionKey) body.session_key = input.sessionKey;
   const res = await api<{ success: true; data: { response_id: number } }>(
-    `/surveys/public/${input.surveyId}/responses`,
+    `/surveys/public/${input.externalId}/responses`,
     { method: "POST", body: JSON.stringify(body) }
   );
   return res.data;

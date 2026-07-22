@@ -25,6 +25,7 @@ export interface Survey {
   responseCount: number;
   createdAt: string;
   updatedAt: string;
+  tags?: string[];
 }
 
 export interface SurveyConfig {
