@@ -121,7 +121,7 @@ export function CheckInShowcaseCard({
               taskTitle={practice.title}
               date={checkin_date}
               mood={frontendMood}
-              content={note}
+              content={note ?? ""}
               tags={tags ?? []}
               images={[]}
               titleColor={colors.basic.white}
