@@ -14,9 +14,10 @@ import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
-import { PageHeader } from "@/components/layout/page-header";
 import { Heart, LogOut, Play, Sprout } from "lucide-react";
 import { useState } from "react";
+import { PageHeader } from "@/components/layout/page-header";
+import { CohortErrorState } from "@/components/lighthouse/cohort-error-state";
 
 export function CohortMemberPage({ cohortId }: { cohortId: number }) {
   const t = useTranslations("cohort");
@@ -53,6 +54,16 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
     toast.success(t("exit_success"));
     router.push("/practices");
   }
+  if (homeQuery.isLoading)
+    return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
+  if (homeQuery.error || homeQuery.validationError)
+    return (
+      <CohortErrorState
+        message={t("load_failed")}
+        retryLabel={t("retry")}
+        onRetry={() => void homeQuery.mutate()}
+      />
+    );
   return (
     <div className="mx-auto w-full max-w-5xl px-5 py-10 md:px-10">
       <PageHeader rightAction="close" rightActionTo="/" />

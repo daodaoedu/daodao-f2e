@@ -7522,6 +7522,8 @@
     "create": "Create",
     "close": "Close",
     "loading": "Loading",
+    "load_failed": "Could not load. Please try again.",
+    "retry": "Retry",
     "join_link": "Invitation link",
     "join_qr_code": "QR code for joining this cohort",
     "copy_link": "Copy link",
@@ -7671,6 +7673,8 @@
   },
   "cohort": {
     "loading": "Loading",
+    "load_failed": "Could not load. Please try again.",
+    "retry": "Retry",
     "link_invalid": "This invitation link does not exist or is no longer valid",
     "unavailable_not_published": "This cohort is not open yet",
     "unavailable_expired": "This invitation link has expired",

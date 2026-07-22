@@ -14,6 +14,7 @@ import { Textarea } from "@daodao/ui/components/textarea";
 import { format } from "date-fns";
 import { Heart, MessageCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { CohortErrorState } from "./cohort-error-state";
 
 interface CohortFeedProps {
   programId: number;
@@ -144,6 +145,15 @@ export function CohortFeed({ programId, cohortId }: CohortFeedProps) {
   const cohort = useLighthouseCohort(programId, cohortId).data?.data;
   const query = useLighthouseCoachFeed(programId, cohortId);
   const feed = query.data?.data;
+  if (query.isLoading) return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
+  if (query.error || query.validationError)
+    return (
+      <CohortErrorState
+        message={t("load_failed")}
+        retryLabel={t("retry")}
+        onRetry={() => void query.mutate()}
+      />
+    );
   return (
     <div className="mx-auto w-full max-w-4xl px-5 py-10 md:px-10">
       <header>

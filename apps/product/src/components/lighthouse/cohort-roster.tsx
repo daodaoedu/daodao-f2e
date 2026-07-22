@@ -16,6 +16,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { Link2Off, RefreshCw, Send, Upload, UserMinus } from "lucide-react";
 import { useState } from "react";
+import { CohortErrorState } from "./cohort-error-state";
 import { JoinCode } from "./join-code";
 
 interface CohortRosterProps {
@@ -122,6 +123,25 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
     await cohortQuery.mutate();
     toast.success(t("joining_paused"));
   }
+
+  if (cohortQuery.isLoading || enrollmentQuery.isLoading)
+    return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
+  if (
+    cohortQuery.error ||
+    cohortQuery.validationError ||
+    enrollmentQuery.error ||
+    enrollmentQuery.validationError
+  )
+    return (
+      <CohortErrorState
+        message={t("load_failed")}
+        retryLabel={t("retry")}
+        onRetry={() => {
+          void cohortQuery.mutate();
+          void enrollmentQuery.mutate();
+        }}
+      />
+    );
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-10 md:px-10">

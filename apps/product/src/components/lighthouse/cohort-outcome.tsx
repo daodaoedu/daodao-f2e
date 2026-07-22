@@ -11,6 +11,7 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { Download, Sprout } from "lucide-react";
 import { useState } from "react";
+import { CohortErrorState } from "./cohort-error-state";
 
 interface CohortOutcomeProps {
   programId: number;
@@ -20,7 +21,8 @@ interface CohortOutcomeProps {
 export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
   const t = useTranslations("lighthouse");
   const cohort = useLighthouseCohort(programId, cohortId).data?.data;
-  const outcome = useLighthouseOutcome(programId, cohortId).data?.data;
+  const outcomeQuery = useLighthouseOutcome(programId, cohortId);
+  const outcome = outcomeQuery.data?.data;
   const enrollments = useLighthouseCohortEnrollments(programId, cohortId).data?.data?.filter(
     (item) => item.status === "joined"
   );
@@ -45,6 +47,16 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
     toast.success(t("export_ready"));
   }
   const rate = Math.round((outcome?.sustainedParticipationRate ?? 0) * 100);
+  if (outcomeQuery.isLoading)
+    return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
+  if (outcomeQuery.error || outcomeQuery.validationError)
+    return (
+      <CohortErrorState
+        message={t("load_failed")}
+        retryLabel={t("retry")}
+        onRetry={() => void outcomeQuery.mutate()}
+      />
+    );
   return (
     <div className="mx-auto w-full max-w-5xl px-5 py-10 md:px-10">
       <header>

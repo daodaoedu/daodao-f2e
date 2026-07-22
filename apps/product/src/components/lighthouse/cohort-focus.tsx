@@ -5,6 +5,7 @@ import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { PartyPopper, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { CohortErrorState } from "./cohort-error-state";
 
 interface CohortFocusProps {
   programId: number;
@@ -15,8 +16,19 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
   const t = useTranslations("lighthouse");
   const [tab, setTab] = useState<"encouragement" | "celebrations">("encouragement");
   const cohort = useLighthouseCohort(programId, cohortId).data?.data;
-  const data = useLighthouseFocus(programId, cohortId).data?.data;
+  const query = useLighthouseFocus(programId, cohortId);
+  const data = query.data?.data;
   const items = tab === "encouragement" ? data?.needsEncouragement : data?.celebrations;
+
+  if (query.isLoading) return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
+  if (query.error || query.validationError)
+    return (
+      <CohortErrorState
+        message={t("load_failed")}
+        retryLabel={t("retry")}
+        onRetry={() => void query.mutate()}
+      />
+    );
 
   return (
     <div className="mx-auto w-full max-w-5xl px-5 py-10 md:px-10">

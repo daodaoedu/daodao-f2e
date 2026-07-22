@@ -7522,6 +7522,8 @@
     "create": "建立",
     "close": "收起",
     "loading": "載入中",
+    "load_failed": "載入失敗，請稍後再試",
+    "retry": "重試",
     "join_link": "邀請連結",
     "join_qr_code": "加入本期的 QR code",
     "copy_link": "複製連結",
@@ -7679,6 +7681,8 @@
   },
   "cohort": {
     "loading": "載入中",
+    "load_failed": "載入失敗，請稍後再試",
+    "retry": "重試",
     "link_invalid": "邀請連結不存在或已失效",
     "unavailable_not_published": "本期尚未開放加入",
     "unavailable_expired": "這個邀請連結已過期",

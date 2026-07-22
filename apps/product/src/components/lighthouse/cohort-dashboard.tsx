@@ -3,6 +3,7 @@
 import { useLighthouseCohort, useLighthouseDashboard } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Activity, CalendarCheck, Flame, Rocket, Users } from "lucide-react";
+import { CohortErrorState } from "./cohort-error-state";
 
 interface CohortDashboardProps {
   programId: number;
@@ -18,6 +19,14 @@ export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
   const maxTime = Math.max(1, ...Object.values(data?.timeRhythm ?? {}));
 
   if (query.isLoading) return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
+  if (query.error || query.validationError)
+    return (
+      <CohortErrorState
+        message={t("load_failed")}
+        retryLabel={t("retry")}
+        onRetry={() => void query.mutate()}
+      />
+    );
   if (!data)
     return (
       <div className="mx-auto max-w-4xl px-5 py-16 text-center">
@@ -39,10 +48,26 @@ export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
         <p className="mt-3 text-[#5A7B79]">{t("dashboard_description")}</p>
       </header>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Metric icon={<Users className="size-5 text-[#0D7773]" />} label={t("dashboard_enrolled")} value={data.funnel.enrolled} />
-        <Metric icon={<Rocket className="size-5 text-[#0D7773]" />} label={t("dashboard_activated")} value={data.funnel.activated} />
-        <Metric icon={<Flame className="size-5 text-[#0D7773]" />} label={t("dashboard_active_members")} value={data.funnel.activeMembers} />
-        <Metric icon={<CalendarCheck className="size-5 text-[#0D7773]" />} label={t("dashboard_checkins")} value={data.checkins} />
+        <Metric
+          icon={<Users className="size-5 text-[#0D7773]" />}
+          label={t("dashboard_enrolled")}
+          value={data.funnel.enrolled}
+        />
+        <Metric
+          icon={<Rocket className="size-5 text-[#0D7773]" />}
+          label={t("dashboard_activated")}
+          value={data.funnel.activated}
+        />
+        <Metric
+          icon={<Flame className="size-5 text-[#0D7773]" />}
+          label={t("dashboard_active_members")}
+          value={data.funnel.activeMembers}
+        />
+        <Metric
+          icon={<CalendarCheck className="size-5 text-[#0D7773]" />}
+          label={t("dashboard_checkins")}
+          value={data.checkins}
+        />
       </div>
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
         <section className="rounded-3xl border border-[#CDEBE8] bg-white p-6">
