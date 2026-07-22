@@ -1,10 +1,13 @@
 "use client";
 
 import {
+  archiveLighthouseCohort,
   archiveLighthouseProgram,
   createLighthouseCohort,
   createLighthouseProgram,
+  type LighthouseCohortType,
   setLighthouseTemplateBinding,
+  updateLighthouseCohort,
   updateLighthouseProgram,
   useLighthouseCohorts,
   useLighthouseOrganizations,
@@ -17,9 +20,238 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Input } from "@daodao/ui/components/input";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
-import { AlertTriangle, Archive, ArrowUpRight, CalendarDays, Plus, RadioTower, X } from "lucide-react";
+import {
+  AlertTriangle,
+  Archive,
+  ArrowUpRight,
+  CalendarDays,
+  Plus,
+  RadioTower,
+  Send,
+  X,
+} from "lucide-react";
 import { useRef, useState } from "react";
 import { JoinCode } from "./join-code";
+
+type CohortTemplateSummary = { id: number; title: string; boundCohortIds: number[] };
+
+interface CohortCardProps {
+  programId: number;
+  cohort: LighthouseCohortType;
+  templates?: CohortTemplateSummary[];
+  refresh: () => Promise<unknown>;
+}
+
+function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) {
+  const t = useTranslations("lighthouse");
+  const [editing, setEditing] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  async function handlePublish() {
+    if (!window.confirm(t("cohort_publish_confirm"))) {
+      return;
+    }
+    setBusy(true);
+    const response = await updateLighthouseCohort(programId, cohort.id, { status: "published" });
+    setBusy(false);
+    if (response.error) {
+      toast.error(t("cohort_publish_failed"));
+      return;
+    }
+    await refresh();
+    toast.success(t("cohort_published"));
+  }
+
+  async function handleArchive() {
+    if (!window.confirm(t("cohort_archive_confirm"))) {
+      return;
+    }
+    setBusy(true);
+    const response = await archiveLighthouseCohort(programId, cohort.id);
+    setBusy(false);
+    if (response.error) {
+      toast.error(t("cohort_archive_failed"));
+      return;
+    }
+    await refresh();
+    toast.success(t("cohort_archived"));
+  }
+
+  async function handleEdit(formData: FormData) {
+    const startDate = String(formData.get("startDate") ?? "");
+    const endDate = String(formData.get("endDate") ?? "");
+    if (!startDate || !endDate || new Date(endDate) < new Date(startDate)) {
+      toast.error(t("cohort_date_error"));
+      return;
+    }
+    const capacityValue = String(formData.get("capacity") ?? "");
+    setBusy(true);
+    const response = await updateLighthouseCohort(programId, cohort.id, {
+      displayName: String(formData.get("displayName") ?? "").trim(),
+      startDate,
+      endDate,
+      joinDeadline: String(formData.get("joinDeadline") ?? "") || null,
+      capacity: capacityValue ? Number(capacityValue) : null,
+      inviteMessage: String(formData.get("inviteMessage") ?? "").trim() || null,
+    });
+    setBusy(false);
+    if (response.error) {
+      toast.error(t("save_failed"));
+      return;
+    }
+    await refresh();
+    setEditing(false);
+    toast.success(t("cohort_saved"));
+  }
+
+  const missingTemplates =
+    templates && !templates.some((tpl) => tpl.boundCohortIds.includes(cohort.id));
+
+  if (editing) {
+    return (
+      <form
+        action={handleEdit}
+        className="grid gap-4 rounded-2xl border border-[#CDEBE8] bg-[#F0FBF9] p-5 md:grid-cols-2"
+      >
+        <h4 className="text-sm font-semibold md:col-span-2">{t("cohort_edit_title")}</h4>
+        <label
+          htmlFor={`cohort-edit-name-${cohort.id}`}
+          className="grid gap-1.5 text-sm font-medium"
+        >
+          {t("cohort_display_name")}
+          <Input
+            id={`cohort-edit-name-${cohort.id}`}
+            name="displayName"
+            required
+            defaultValue={cohort.displayName}
+          />
+        </label>
+        <label
+          htmlFor={`cohort-edit-capacity-${cohort.id}`}
+          className="grid gap-1.5 text-sm font-medium"
+        >
+          {t("capacity")}
+          <Input
+            id={`cohort-edit-capacity-${cohort.id}`}
+            name="capacity"
+            type="number"
+            min={1}
+            defaultValue={cohort.capacity ?? ""}
+          />
+        </label>
+        <label
+          htmlFor={`cohort-edit-start-${cohort.id}`}
+          className="grid gap-1.5 text-sm font-medium"
+        >
+          {t("start_date")}
+          <Input
+            id={`cohort-edit-start-${cohort.id}`}
+            name="startDate"
+            type="date"
+            required
+            defaultValue={cohort.startDate.slice(0, 10)}
+          />
+        </label>
+        <label
+          htmlFor={`cohort-edit-end-${cohort.id}`}
+          className="grid gap-1.5 text-sm font-medium"
+        >
+          {t("end_date")}
+          <Input
+            id={`cohort-edit-end-${cohort.id}`}
+            name="endDate"
+            type="date"
+            required
+            defaultValue={cohort.endDate.slice(0, 10)}
+          />
+        </label>
+        <label
+          htmlFor={`cohort-edit-deadline-${cohort.id}`}
+          className="grid gap-1.5 text-sm font-medium"
+        >
+          {t("join_deadline")}
+          <Input
+            id={`cohort-edit-deadline-${cohort.id}`}
+            name="joinDeadline"
+            type="datetime-local"
+            defaultValue={cohort.joinDeadline?.slice(0, 16) ?? ""}
+          />
+        </label>
+        <label
+          htmlFor={`cohort-edit-message-${cohort.id}`}
+          className="grid gap-1.5 text-sm font-medium md:col-span-2"
+        >
+          {t("invite_message")}
+          <Textarea
+            id={`cohort-edit-message-${cohort.id}`}
+            name="inviteMessage"
+            defaultValue={cohort.inviteMessage ?? ""}
+          />
+        </label>
+        <div className="flex gap-2 md:col-span-2">
+          <Button type="submit" disabled={busy}>
+            {t("save")}
+          </Button>
+          <Button type="button" variant="ghost" onClick={() => setEditing(false)} disabled={busy}>
+            {t("cancel")}
+          </Button>
+        </div>
+      </form>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-center">
+      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
+        <CalendarDays className="size-5" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <h4 className="font-semibold">{cohort.displayName}</h4>
+          <span className="rounded-full bg-[#EDF8F6] px-2.5 py-1 font-mono text-[10px] uppercase text-[#0D7773]">
+            {t(`cohort_status_${cohort.status}`)}
+          </span>
+          {missingTemplates && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF6E8] px-2.5 py-1 text-[10px] font-semibold text-[#A95D00]">
+              <AlertTriangle className="size-3" />
+              {t("cohort_no_templates_warning")}
+            </span>
+          )}
+        </div>
+        <p className="mt-1 text-xs text-[#78928F]">
+          {cohort.startDate.slice(0, 10)} — {cohort.endDate.slice(0, 10)} · /{cohort.slug}
+        </p>
+        {cohort.joinToken && <JoinCode joinToken={cohort.joinToken} />}
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {cohort.status === "draft" && (
+          <Button size="sm" onClick={handlePublish} disabled={busy}>
+            <Send className="size-4" />
+            {t("cohort_publish")}
+          </Button>
+        )}
+        {cohort.status !== "archived" && (
+          <Button variant="outline" size="sm" onClick={() => setEditing(true)} disabled={busy}>
+            {t("edit")}
+          </Button>
+        )}
+        {cohort.status === "published" && (
+          <Button variant="ghost" size="sm" onClick={handleArchive} disabled={busy}>
+            <Archive className="size-4" />
+            {t("archive")}
+          </Button>
+        )}
+        <CustomLink
+          href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/dashboard`}
+          className="inline-flex items-center gap-1 text-sm font-semibold text-[#0D7773]"
+        >
+          {t("manage_cohort")}
+          <ArrowUpRight className="size-4" />
+        </CustomLink>
+      </div>
+    </div>
+  );
+}
 
 interface ProgramPanelProps {
   program: {
@@ -284,40 +516,13 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
             </p>
           )}
           {cohorts?.map((cohort) => (
-            <div
+            <CohortCard
               key={cohort.id}
-              className="flex flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-center"
-            >
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
-                <CalendarDays className="size-5" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h4 className="font-semibold">{cohort.displayName}</h4>
-                  <span className="rounded-full bg-[#EDF8F6] px-2.5 py-1 font-mono text-[10px] uppercase text-[#0D7773]">
-                    {t(`cohort_status_${cohort.status}`)}
-                  </span>
-                  {templates &&
-                    !templates.some((tpl) => tpl.boundCohortIds.includes(cohort.id)) && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF6E8] px-2.5 py-1 text-[10px] font-semibold text-[#A95D00]">
-                        <AlertTriangle className="size-3" />
-                        {t("cohort_no_templates_warning")}
-                      </span>
-                    )}
-                </div>
-                <p className="mt-1 text-xs text-[#78928F]">
-                  {cohort.startDate.slice(0, 10)} — {cohort.endDate.slice(0, 10)} · /{cohort.slug}
-                </p>
-                {cohort.joinToken && <JoinCode joinToken={cohort.joinToken} />}
-              </div>
-              <CustomLink
-                href={`/lighthouse/programs/${program.id}/cohorts/${cohort.id}/dashboard`}
-                className="inline-flex items-center gap-1 text-sm font-semibold text-[#0D7773]"
-              >
-                {t("manage_cohort")}
-                <ArrowUpRight className="size-4" />
-              </CustomLink>
-            </div>
+              programId={program.id}
+              cohort={cohort}
+              templates={templates}
+              refresh={mutate}
+            />
           ))}
         </div>
       </div>

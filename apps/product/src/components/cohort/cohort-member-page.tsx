@@ -15,9 +15,24 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { Heart, LogOut, Play, Sprout } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { CohortErrorState } from "@/components/lighthouse/cohort-error-state";
+
+// A non-member hitting GET /api/v1/cohorts/{cohortId} gets a 404 whose body is the
+// server error envelope with error.code === "APP_ERROR" (the only app-level failure
+// this endpoint returns besides auth). swr-openapi throws that body, so the HTTP
+// status isn't available — detect the envelope instead.
+function isNotMemberError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null || !("error" in error)) return false;
+  const inner = (error as { error: unknown }).error;
+  return (
+    typeof inner === "object" &&
+    inner !== null &&
+    "code" in inner &&
+    (inner as { code: unknown }).code === "APP_ERROR"
+  );
+}
 
 export function CohortMemberPage({ cohortId }: { cohortId: number }) {
   const t = useTranslations("cohort");
@@ -27,6 +42,10 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
   const home = homeQuery.data?.data;
   const feed = feedQuery.data?.data;
   const [tab, setTab] = useState<"practices" | "feed">("practices");
+  const notMember = isNotMemberError(homeQuery.error);
+  useEffect(() => {
+    if (notMember) router.replace("/mine");
+  }, [notMember, router]);
   async function activate(id: string) {
     const response = await updatePractice(id, { status: "active", isDraft: false });
     if (response.error) {
@@ -56,7 +75,21 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
   }
   if (homeQuery.isLoading)
     return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
-  if (homeQuery.error || homeQuery.validationError)
+  if (homeQuery.error) {
+    const status = (homeQuery.error as { status?: number })?.status;
+    if (status === 404 || status === 403) {
+      router.replace("/mine");
+      return null;
+    }
+    return (
+      <CohortErrorState
+        message={t("load_failed")}
+        retryLabel={t("retry")}
+        onRetry={() => void homeQuery.mutate()}
+      />
+    );
+  }
+  if (homeQuery.validationError)
     return (
       <CohortErrorState
         message={t("load_failed")}
@@ -106,7 +139,11 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
             </label>
           </div>
           {home?.practices.map((practice) => (
-            <article key={practice.id} className="rounded-3xl border border-[#CDEBE8] bg-white p-6">
+            <article
+              key={practice.id}
+              className="cursor-pointer rounded-3xl border border-[#CDEBE8] bg-white p-6 transition-colors hover:bg-[#F0FAF8]"
+              onClick={() => router.push(`/practices/${practice.id}`)}
+            >
               <div className="flex items-start gap-4">
                 <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
                   <Sprout className="size-5" />
@@ -119,7 +156,7 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
                   </p>
                 </div>
                 {practice.status === "draft" && (
-                  <Button size="sm" onClick={() => void activate(practice.id)}>
+                  <Button size="sm" onClick={(e) => { e.stopPropagation(); void activate(practice.id); }}>
                     <Play className="size-4" />
                     {t("activate_practice")}
                   </Button>

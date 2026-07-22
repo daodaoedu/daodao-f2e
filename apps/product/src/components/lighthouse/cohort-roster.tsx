@@ -260,7 +260,7 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
                     {t("resend")}
                   </Button>
                 )}
-                {enrollment.status === "joined" && enrollment.role === "member" && (
+                {(enrollment.status === "joined" || enrollment.status === "invited") && enrollment.role === "member" && (
                   <Button size="sm" variant="ghost" onClick={() => remove(enrollment.id)}>
                     <UserMinus className="size-4" />
                     {t("remove")}
