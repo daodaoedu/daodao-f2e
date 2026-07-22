@@ -34,7 +34,7 @@ function CoachFeedItem({
     id: string;
     checkinDate: string;
     mood: string | null;
-    note: string;
+    note: string | null;
     tags: string[];
     imageUrls: string[];
     createdAt: string;

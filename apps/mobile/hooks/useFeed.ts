@@ -19,7 +19,7 @@ export interface IShowcaseCheckIn {
   id: string;
   checkin_date: string;
   mood: ApiMoodType;
-  note: string;
+  note: string | null;
   tags: string[];
   image_urls: string[];
   created_at: string;
