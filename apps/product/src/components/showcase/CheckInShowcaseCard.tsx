@@ -21,6 +21,7 @@ import { useCardReactions } from "@/hooks/use-card-reactions";
 type CheckInShowcaseCardProps = IShowcaseCheckIn & {
   batchReactionData?: BatchReactionItem;
   onReactionMutate?: () => void;
+  footer?: React.ReactNode;
 };
 
 type ShowcaseUserProfile = {
@@ -53,6 +54,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
     comment_preview,
     batchReactionData,
     onReactionMutate,
+    footer,
   } = props;
 
   const t = useTranslations("common");
@@ -370,6 +372,19 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {footer && (
+          // biome-ignore lint/a11y/useKeyWithClickEvents: stop card click
+          // biome-ignore lint/a11y/noStaticElementInteractions: stop card click
+          <div
+            className="border-t border-basic-200 pt-3"
+            onClick={(e) => e.stopPropagation()}
+            onPointerDown={() => { suppressNextCardClickRef.current = true; }}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            {footer}
           </div>
         )}
       </div>

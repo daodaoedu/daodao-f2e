@@ -181,22 +181,44 @@ export const lighthouseOutcomeResponseSchema = apiSuccessSchema(
   })
 );
 
+const cohortFeedCommentPreviewUserSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  photoUrl: z.string().nullable(),
+  customId: z.string().nullable(),
+});
+
+const cohortFeedCommentPreviewSchema = z.object({
+  id: z.string(),
+  content: z.string(),
+  createdAt: z.string(),
+  user: cohortFeedCommentPreviewUserSchema.optional(),
+});
+
+const cohortFeedItemSchema = z.object({
+  id: z.string(),
+  checkinDate: z.string(),
+  mood: z.string().nullable(),
+  note: z.string(),
+  tags: z.array(z.string()),
+  imageUrls: z.array(z.string()),
+  createdAt: z.string(),
+  practice: z.object({ id: z.string(), title: z.string() }),
+  user: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      photoUrl: z.string().nullable(),
+      customId: z.string().nullable(),
+    })
+    .optional(),
+  commentCount: z.number().int().nonnegative(),
+  commentPreview: z.array(cohortFeedCommentPreviewSchema),
+});
+
 const cohortFeedDataSchema = z.object({
   perspective: z.enum(["coach", "learner"]),
-  items: z.array(
-    z.object({
-      id: z.number().int().positive(),
-      practiceId: z.number().int().positive(),
-      userId: z.number().int().positive(),
-      nickname: z.string().nullable(),
-      avatar: z.string().nullable(),
-      checkinDate: z.string().datetime(),
-      mood: z.string().nullable(),
-      note: z.string().nullable(),
-      imageUrls: z.array(z.string()),
-      createdAt: z.string().datetime(),
-    })
-  ),
+  items: z.array(cohortFeedItemSchema),
   total: z.number().int().nonnegative(),
   pendingResponseCount: z.number().int().nonnegative(),
 });

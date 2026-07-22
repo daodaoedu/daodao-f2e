@@ -6916,20 +6916,44 @@
         "explorer": {
           "name": "Explorer Island",
           "description": "You are a curious explorer who enjoys trying new things.",
-          "traits": ["Curious", "Willing to try", "Independent thinker"],
-          "recommendations": ["Daily reading", "Coding practice", "Language learning"]
+          "traits": [
+            "Curious",
+            "Willing to try",
+            "Independent thinker"
+          ],
+          "recommendations": [
+            "Daily reading",
+            "Coding practice",
+            "Language learning"
+          ]
         },
         "creator": {
           "name": "Creator Island",
           "description": "You are highly creative and good at turning ideas into action.",
-          "traits": ["Creative", "Hands-on", "Artistic"],
-          "recommendations": ["Writing practice", "Art creation", "Design learning"]
+          "traits": [
+            "Creative",
+            "Hands-on",
+            "Artistic"
+          ],
+          "recommendations": [
+            "Writing practice",
+            "Art creation",
+            "Design learning"
+          ]
         },
         "connector": {
           "name": "Connector Island",
           "description": "You build relationships easily and enjoy learning with others.",
-          "traits": ["Communicative", "Team-oriented", "Empathetic"],
-          "recommendations": ["Community activities", "Language learning", "Team projects"]
+          "traits": [
+            "Communicative",
+            "Team-oriented",
+            "Empathetic"
+          ],
+          "recommendations": [
+            "Community activities",
+            "Language learning",
+            "Team projects"
+          ]
         }
       }
     },
@@ -7728,6 +7752,36 @@
     "write_comment": "Write a response",
     "send": "Send",
     "comment_sent": "Comment posted",
-    "save_failed": "The action failed. Try again."
+    "save_failed": "The action failed. Try again.",
+    "cohort_period": "Cohort Period",
+    "day_progress": "Day {current} of {total}",
+    "cohort_ended": "Cohort ended",
+    "cohort_not_started": "Not started yet",
+    "practices_count": "{count} practices",
+    "active_count": "{count} active",
+    "completed_count": "{count} completed",
+    "draft_count": "{count} draft",
+    "feed_count": "{count} updates",
+    "settings": "Settings",
+    "no_practices": "No practices yet. Your coach will arrange them for you.",
+    "view_practice": "View practice",
+    "days_left": "{count} days left",
+    "photos": "{count} photos",
+    "stat_practices": "Practices",
+    "stat_active": "Active",
+    "stat_completed": "Completed",
+    "stat_draft": "Drafts",
+    "stat_feed": "Updates",
+    "stat_unit_count": "",
+    "stat_unit_updates": "",
+    "back_to_mine": "Back to Mine",
+    "settings_privacy": "Privacy",
+    "settings_privacy_desc": "Control whether your practice results can be exported by your coach.",
+    "settings_membership": "Membership",
+    "settings_membership_desc": "After leaving, your practices stay in your personal space but you can no longer view cohort updates.",
+    "save": "Save",
+    "exit_confirm_title": "Leave this cohort?",
+    "exit_confirm_action": "Leave",
+    "exit_cancel": "Cancel"
   }
 }
