@@ -199,7 +199,7 @@ const cohortFeedItemSchema = z.object({
   id: z.string(),
   checkinDate: z.string(),
   mood: z.string().nullable(),
-  note: z.string(),
+  note: z.string().nullable(),
   tags: z.array(z.string()),
   imageUrls: z.array(z.string()),
   createdAt: z.string(),
