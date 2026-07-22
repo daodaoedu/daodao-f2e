@@ -65,22 +65,30 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
   }, [notMember, router]);
 
   async function activate(id: string) {
-    const response = await updatePractice(id, { status: "active", isDraft: false });
-    if (response.error) {
+    try {
+      const response = await updatePractice(id, { status: "active", isDraft: false });
+      if (response.error) {
+        toast.error(t("activate_failed"));
+        return;
+      }
+      await homeQuery.mutate();
+      toast.success(t("practice_activated"));
+    } catch {
       toast.error(t("activate_failed"));
-      return;
     }
-    await homeQuery.mutate();
-    toast.success(t("practice_activated"));
   }
 
   async function setConsent(consent: boolean) {
-    const response = await setCohortExportConsent(cohortId, consent);
-    if (response.error) {
+    try {
+      const response = await setCohortExportConsent(cohortId, consent);
+      if (response.error) {
+        toast.error(t("save_failed"));
+        return;
+      }
+      await homeQuery.mutate();
+    } catch {
       toast.error(t("save_failed"));
-      return;
     }
-    await homeQuery.mutate();
   }
 
   async function exit() {
@@ -93,13 +101,17 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
       ],
     });
     if (result.value !== "confirm") return;
-    const response = await exitCohort(cohortId);
-    if (response.error) {
+    try {
+      const response = await exitCohort(cohortId);
+      if (response.error) {
+        toast.error(t("exit_failed"));
+        return;
+      }
+      toast.success(t("exit_success"));
+      router.push("/practices");
+    } catch {
       toast.error(t("exit_failed"));
-      return;
     }
-    toast.success(t("exit_success"));
-    router.push("/practices");
   }
 
   if (homeQuery.isLoading || notMember)
@@ -251,7 +263,7 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
                   key={item.id}
                   id={item.id}
                   checkin_date={item.checkinDate}
-                  mood={item.mood as IShowcaseCheckIn["mood"]}
+                  mood={(item.mood ?? "neutral") as IShowcaseCheckIn["mood"]}
                   note={item.note}
                   tags={item.tags}
                   image_urls={item.imageUrls}
