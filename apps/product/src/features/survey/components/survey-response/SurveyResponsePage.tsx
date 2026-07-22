@@ -149,7 +149,7 @@ export function SurveyResponsePage() {
     setSubmitting(true);
     try {
       await submitResponse({
-        surveyId: survey.id,
+        externalId: survey.shareId,
         answers: visibleQuestions.map((q) => ({
           questionId: q.id,
           value: answers[q.id]?.value ?? null,
@@ -187,11 +187,18 @@ export function SurveyResponsePage() {
   if (submitted) return <ThankYouPage message={survey?.config?.successMessage} />;
   if (!survey) return null;
 
+  const isCohortFeedback = survey.tags?.includes("cohort-feedback") ?? false;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Cover / header */}
       <div className="bg-primary/10 border-b">
         <div className="max-w-2xl mx-auto px-6 py-12">
+          {isCohortFeedback && (
+            <p className="mb-3 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              Lighthouse · 期末回饋
+            </p>
+          )}
           <h1 className="text-2xl font-bold text-foreground">{survey.title}</h1>
           {survey.description && (
             <p className="mt-3 text-muted-foreground text-sm whitespace-pre-wrap">

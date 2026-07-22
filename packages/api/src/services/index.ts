@@ -12,6 +12,9 @@ export * from "./auth-hooks";
 // Comments Service
 export * from "./comments";
 export * from "./comments-hooks";
+// Lighthouse Cohort Service
+export * from "./cohort";
+export * from "./cohort-hooks";
 // Connection Service
 export * from "./connection";
 export * from "./connection-hooks";

@@ -1,12 +1,12 @@
 "use client";
 
-import { useMyPracticeStats, useMyPractices } from "@daodao/api";
+import { useMyCohorts, useMyPracticeStats, useMyPractices } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   AddTaskFAB,
@@ -41,6 +41,8 @@ export default function MyPage() {
 
   const { data: allPracticesData, isLoading: isMyLoading } = useMyPractices({ limit: 16 });
   const { data: statsData } = useMyPracticeStats();
+  const { data: myCohortsData } = useMyCohorts();
+  const myCohorts = myCohortsData?.data;
 
   const { inProgressTasks } = useMemo(() => {
     const practices = allPracticesData?.data || [];
@@ -145,6 +147,35 @@ export default function MyPage() {
           ) : (
             <>
               <DashboardHeader stats={stats} />
+              {myCohorts && myCohorts.length > 0 && (
+                <div className="mb-4">
+                  <h2 className="mb-2 text-sm font-semibold text-text-dark">
+                    {t("my_cohorts_title")}
+                  </h2>
+                  <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
+                    {myCohorts.map((cohort) => (
+                      <button
+                        type="button"
+                        key={cohort.cohortId}
+                        onClick={() => router.push(`/cohorts/${cohort.cohortId}`)}
+                        className="flex min-w-[200px] shrink-0 items-center gap-3 rounded-2xl border border-[#CDEBE8] bg-white p-4 text-left transition-colors hover:bg-[#F0FAF8]"
+                      >
+                        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
+                          <Users className="size-5" />
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-text-dark">
+                            {cohort.displayName}
+                          </p>
+                          <p className="truncate text-xs text-text-dark/50">
+                            {t("my_cohorts_org", { org: cohort.organizationName })}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {!hasPractices && <RandomPracticesSection compact />}
               {hasPractices && (
                 <>

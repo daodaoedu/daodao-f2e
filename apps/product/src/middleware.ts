@@ -1,11 +1,12 @@
+import { getEnv } from "@daodao/config";
 import createMiddleware from "@daodao/i18n/middleware";
 import { routing } from "@daodao/i18n/routing";
-import type { NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 /**
- * i18n middleware
- * 注意：路由保護完全依賴 client-side 驗證（使用 useRequireAuth hook 或 AuthGuard 組件）
- * 由於跨域限制，middleware 無法讀取 cookie，因此不在 middleware 層級進行認證檢查
+ * i18n middleware plus the Lighthouse organization-membership gate.
+ * The API is cross-origin, so the browser cookie is forwarded explicitly by
+ * this server-side middleware instead of relying on browser cookie policy.
  */
 const i18nMiddleware = createMiddleware(routing);
 
@@ -14,8 +15,64 @@ const i18nMiddleware = createMiddleware(routing);
 // 觸發條件 curl 重現不出（只在瀏覽器特定 header / cookie 組合下發生），
 // 先在 middleware 層把 Location 中的 :3001 清掉，並 log 觸發 headers 以便日後追根因。
 const INTERNAL_PORT_RE = /:3001(?=\/|$|\?|#)/g;
+const LIGHTHOUSE_PATH_RE = /^\/(?:en\/)?lighthouse(?:\/|$)/;
+const LIGHTHOUSE_ACCESS_REQUIRED_RE = /^\/(?:en\/)?lighthouse\/access-required(?:\/|$)/;
+
+async function hasLighthouseAccess(
+  request: NextRequest
+): Promise<"allowed" | "unauthorized" | "denied" | "unavailable"> {
+  const authToken = request.cookies.get("auth_token")?.value;
+  if (!authToken) return "unauthorized";
+
+  try {
+    const apiBaseUrl = getEnv("NEXT_PUBLIC_API_URL", "https://api.daodao.so")?.replace(/\/$/, "");
+    // Middleware runs on the Edge runtime; openapi-fetch currently uses a Node API,
+    // so this boundary performs the same typed endpoint call with native fetch.
+    const response = await fetch(`${apiBaseUrl}/api/v1/lighthouse/organizations`, {
+      headers: { Cookie: `auth_token=${authToken}` },
+      cache: "no-store",
+    });
+    if (response.status === 401) return "unauthorized";
+    if (response.status === 403) return "denied";
+    if (!response.ok) return "unavailable";
+
+    const payload: unknown = await response.json();
+    if (!payload || typeof payload !== "object" || !("data" in payload)) return "unavailable";
+    if (!Array.isArray(payload.data)) return "unavailable";
+    return payload.data.length > 0 ? "allowed" : "denied";
+  } catch (error) {
+    console.error("[middleware] Lighthouse membership check failed", error);
+    return "unavailable";
+  }
+}
+
+function localizedPath(pathname: string, path: string): string {
+  return pathname.startsWith("/en/") || pathname === "/en" ? `/en${path}` : path;
+}
 
 export default async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  if (LIGHTHOUSE_PATH_RE.test(pathname) && !LIGHTHOUSE_ACCESS_REQUIRED_RE.test(pathname)) {
+    const access = await hasLighthouseAccess(request);
+    if (access !== "allowed") {
+      if (access === "unavailable") {
+        return NextResponse.json(
+          { error: "Lighthouse access verification is temporarily unavailable" },
+          { status: 503, headers: { "Retry-After": "30" } }
+        );
+      }
+      const redirectUrl = request.nextUrl.clone();
+      if (access === "unauthorized") {
+        redirectUrl.pathname = localizedPath(pathname, "/auth/login");
+        redirectUrl.search = `?redirect=${encodeURIComponent(`${pathname}${request.nextUrl.search}`)}`;
+      } else {
+        redirectUrl.pathname = localizedPath(pathname, "/lighthouse/access-required");
+        redirectUrl.search = "";
+      }
+      return NextResponse.redirect(redirectUrl);
+    }
+  }
+
   const response = await i18nMiddleware(request);
 
   const location = response.headers.get("location");

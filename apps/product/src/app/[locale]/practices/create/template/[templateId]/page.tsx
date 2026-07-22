@@ -288,7 +288,7 @@ export default function TemplateDetailPage() {
       toast.error(errorMessage);
       setIsSubmitting(false);
     }
-  }, [isSubmitting, template, router]);
+  }, [isSubmitting, template, router, t]);
 
   // 處理建立按鈕點擊 - 使用 requireAuth 包裝
   const handleCreate = useCallback(() => {
@@ -454,6 +454,28 @@ export default function TemplateDetailPage() {
             </div>
           </div>
         </div>
+
+        {data?.data?.organization && (
+          <aside className="mx-5 mb-4 rounded-2xl border border-white/30 bg-white/15 p-4 text-white backdrop-blur md:mx-auto md:max-w-[448px]">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/70">
+              {t("template_by_organization")}
+            </p>
+            <h2 className="mt-2 text-lg font-semibold">{data.data.organization.name}</h2>
+            {data.data.organization.bio && (
+              <p className="mt-2 text-sm leading-6 text-white/85">{data.data.organization.bio}</p>
+            )}
+            {data.data.organization.externalLink && (
+              <a
+                href={data.data.organization.externalLink}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-logo-cyan"
+              >
+                {t("organization_learn_more")}
+              </a>
+            )}
+          </aside>
+        )}
 
         <div className="bg-white rounded-t-2xl">
           <div className="max-w-[448px] mx-auto pt-4 px-5 pb-28">

@@ -43,7 +43,7 @@ export const CreateSurveySchema = z.object({
 });
 
 export const SubmitResponseSchema = z.object({
-  surveyId: z.string(),
+  externalId: z.string(),
   userId: z.string().optional(),
   sessionId: z.string().optional(),
   answers: z.array(
