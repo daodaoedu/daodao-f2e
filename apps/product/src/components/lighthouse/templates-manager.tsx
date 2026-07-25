@@ -16,7 +16,7 @@ import { Input } from "@daodao/ui/components/input";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { BookOpenText, Link2, Plus, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface TemplateData {
   id: number;
@@ -96,6 +96,9 @@ function TemplateForm({
   const [resourceRows, setResourceRows] = useState<ResourceRow[]>(
     () => initial?.resources?.map((r) => ({ key: r.id, name: r.name, url: r.url ?? "" })) ?? []
   );
+  // key 不能用 rows.length 推導：刪掉中間一列再新增會撞號，
+  // 而這些輸入是 uncontrolled，重複的 key 會讓 React 沿用到別列的 DOM
+  const nextResourceKey = useRef(0);
   return (
     <form
       action={onSubmit}
@@ -241,9 +244,10 @@ function TemplateForm({
             variant="outline"
             size="sm"
             className="mt-2"
-            onClick={() =>
-              setResourceRows((rows) => [...rows, { key: `new-${rows.length}`, name: "", url: "" }])
-            }
+            onClick={() => {
+              const key = `new-${nextResourceKey.current++}`;
+              setResourceRows((rows) => [...rows, { key, name: "", url: "" }]);
+            }}
           >
             <Plus className="size-4" />
             {t("template_resource_add")}
@@ -321,10 +325,18 @@ function ProgramBindings({
         {bound && (
           <label className="flex items-center gap-1.5 text-xs text-[#5A7B79]">
             {t("template_start_date")}
+            {/*
+              用 onBlur 而非 onChange：編輯日期途中 value 會短暫變成空字串，
+              掛在 onChange 會把已存的日期清掉，還會連發請求與 toast
+            */}
             <input
               type="date"
               defaultValue={startDate?.slice(0, 10) ?? ""}
-              onChange={(event) => void setStartDate(cohort.id, event.target.value)}
+              onBlur={(event) => {
+                const next = event.target.value;
+                if (next === (startDate?.slice(0, 10) ?? "")) return;
+                void setStartDate(cohort.id, next);
+              }}
               className="rounded-lg border border-[#CDEBE8] px-2 py-1 text-xs"
             />
           </label>
