@@ -6916,20 +6916,44 @@
         "explorer": {
           "name": "探索者島",
           "description": "你是一位好奇心旺盛的探索者，喜歡嘗試新事物",
-          "traits": ["好奇心強", "勇於嘗試", "獨立思考"],
-          "recommendations": ["每日閱讀", "程式學習", "語言學習"]
+          "traits": [
+            "好奇心強",
+            "勇於嘗試",
+            "獨立思考"
+          ],
+          "recommendations": [
+            "每日閱讀",
+            "程式學習",
+            "語言學習"
+          ]
         },
         "creator": {
           "name": "創造者島",
           "description": "你擁有豐富的創造力，善於將想法付諸實踐",
-          "traits": ["創意豐富", "動手能力強", "有藝術天賦"],
-          "recommendations": ["寫作練習", "藝術創作", "設計學習"]
+          "traits": [
+            "創意豐富",
+            "動手能力強",
+            "有藝術天賦"
+          ],
+          "recommendations": [
+            "寫作練習",
+            "藝術創作",
+            "設計學習"
+          ]
         },
         "connector": {
           "name": "連結者島",
           "description": "你善於建立人際關係，喜歡與他人合作學習",
-          "traits": ["善於溝通", "團隊合作", "同理心強"],
-          "recommendations": ["社群活動", "語言學習", "團隊專案"]
+          "traits": [
+            "善於溝通",
+            "團隊合作",
+            "同理心強"
+          ],
+          "recommendations": [
+            "社群活動",
+            "語言學習",
+            "團隊專案"
+          ]
         }
       }
     },
@@ -7718,6 +7742,8 @@
     "my_cohort_practices": "本期實踐",
     "cohort_feed": "本期動態",
     "export_consent": "我同意將自己的成果納入教練匯出",
+    "export_consent_nudge": "尚未同意將成果納入教練匯出，前往設定調整 →",
+    "draft_editable_hint": "啟用前可以自己調整執行時機、標籤與資源（教練加的項目不可編輯）。",
     "practice_status_draft": "草稿",
     "practice_status_not_started": "尚未開始",
     "practice_status_active": "進行中",
@@ -7768,8 +7794,6 @@
     "save": "儲存",
     "exit_confirm_title": "確定要退出本期？",
     "exit_confirm_action": "退出",
-    "exit_cancel": "取消",
-    "draft_editable_hint": "啟用前可以自己調整執行時機、標籤與資源（教練加的項目不可編輯）。",
-    "export_consent_nudge": "尚未同意將成果納入教練匯出，前往設定調整 →"
+    "exit_cancel": "取消"
   }
 }
