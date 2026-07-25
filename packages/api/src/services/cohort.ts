@@ -26,12 +26,17 @@ type InviteCohortMembersBody = NonNullable<
 type UpdateOrganizationBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}"]["patch"]["requestBody"]
 >["content"]["application/json"];
+/**
+ * 模板資源。server 已支援，但 src/types.ts 要等 server 進 dev 後重跑 `pnpm gen:types`
+ * 才會帶到，所以先在這裡補上；types 重新產生後這段擴充就可以刪掉。
+ */
+type TemplateResourceInput = { name: string; url?: string };
 type CreateOrganizationTemplateBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}/templates"]["post"]["requestBody"]
->["content"]["application/json"];
+>["content"]["application/json"] & { resources?: TemplateResourceInput[] };
 type UpdateOrganizationTemplateBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}"]["patch"]["requestBody"]
->["content"]["application/json"];
+>["content"]["application/json"] & { resources?: TemplateResourceInput[] };
 type AddOrganizationMemberBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}/members"]["post"]["requestBody"]
 >["content"]["application/json"];
@@ -256,6 +261,18 @@ export const lighthouseTemplatesResponseSchema = apiSuccessSchema(
       sessionDurationMinutes: z.number().int().nullable(),
       practiceTimePeriods: z.array(z.string()),
       boundCohortIds: z.array(z.number().int().positive()),
+      // resources 與 bindings 設為 optional，讓前端可以先於後端上線
+      resources: z
+        .array(z.object({ id: z.string(), name: z.string(), url: z.string().nullable() }))
+        .optional(),
+      bindings: z
+        .array(
+          z.object({
+            cohortId: z.number().int().positive(),
+            startDate: nullableDateTimeSchema,
+          })
+        )
+        .optional(),
       generatedDraftCount: z.number().int().nonnegative(),
       createdAt: nullableDateTimeSchema,
       updatedAt: nullableDateTimeSchema,
@@ -315,6 +332,14 @@ export const cohortMemberHomeResponseSchema = apiSuccessSchema(
         practiceAction: z.string().nullable(),
         status: z.enum(["draft", "not_started", "active", "completed", "archived"]),
         creationSource: z.string().nullable(),
+        // 實踐卡需要的欄位。留成 optional 是為了讓前端可以先於後端上線，
+        // 舊版後端只是少了卡片上的日期與打卡數，頁面不會整個掉進驗證錯誤
+        startDate: nullableDateTimeSchema.optional(),
+        endDate: nullableDateTimeSchema.optional(),
+        progressPercentage: z.number().optional(),
+        checkInCount: z.number().int().nonnegative().optional(),
+        lastCheckinAt: nullableDateTimeSchema.optional(),
+        themeColor: z.string().nullable().optional(),
       })
     ),
   })
@@ -471,13 +496,16 @@ export const setLighthouseTemplateBinding = async (
   organizationId: number,
   templateId: number,
   cohortId: number,
-  bound: boolean
+  bound: boolean,
+  /** 該期草稿的開始日（YYYY-MM-DD）；不帶就沿用既有值，null 則清除改用期程開始日 */
+  startDate?: string | null
 ) => {
   const params = { params: { path: { organizationId, templateId, cohortId } } };
   return bound
     ? client.PUT(
         "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/cohorts/{cohortId}",
-        params
+        // body 同樣待 types 重新產生後才會出現在 paths 型別上
+        { ...params, body: (startDate === undefined ? {} : { startDate }) as never }
       )
     : client.DELETE(
         "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/cohorts/{cohortId}",

@@ -30,6 +30,8 @@ interface InProgressTaskCardProps {
   startDate?: string | null;
   endDate?: string | null;
   onEdit?: () => void;
+  /** 草稿按鈕文案；期程指派的草稿是「啟用」而非「繼續編輯」 */
+  draftActionLabel?: string;
 }
 
 export const InProgressTaskCard = ({
@@ -46,6 +48,7 @@ export const InProgressTaskCard = ({
   startDate,
   endDate,
   onEdit,
+  draftActionLabel,
 }: InProgressTaskCardProps) => {
   const t = useTranslations("dashboard");
   const themeName = getThemeNameFromColor(theme);
@@ -161,7 +164,7 @@ export const InProgressTaskCard = ({
           {isDraft ? (
             <Button variant="secondary" onClick={onEdit}>
               <PenLine className="size-4.5 text-logo-cyan" />
-              {t("continue_editing")}
+              {draftActionLabel ?? t("continue_editing")}
             </Button>
           ) : (
             <CheckInButton

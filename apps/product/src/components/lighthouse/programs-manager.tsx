@@ -35,6 +35,13 @@ import { JoinCode } from "./join-code";
 
 type CohortTemplateSummary = { id: number; title: string; boundCohortIds: number[] };
 
+/** 已封存要一眼看得出來，不能和草稿、已發佈長一樣 */
+const COHORT_STATUS_STYLES: Record<LighthouseCohortType["status"], string> = {
+  draft: "bg-[#F1F4F4] text-[#5A7B79]",
+  published: "bg-[#EDF8F6] text-[#0D7773]",
+  archived: "bg-[#FDECEC] text-[#C03A3A]",
+};
+
 interface CohortCardProps {
   programId: number;
   cohort: LighthouseCohortType;
@@ -173,8 +180,8 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
           <Input
             id={`cohort-edit-deadline-${cohort.id}`}
             name="joinDeadline"
-            type="datetime-local"
-            defaultValue={cohort.joinDeadline?.slice(0, 16) ?? ""}
+            type="date"
+            defaultValue={cohort.joinDeadline?.slice(0, 10) ?? ""}
           />
         </label>
         <label
@@ -208,7 +215,9 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <h4 className="font-semibold">{cohort.displayName}</h4>
-          <span className="rounded-full bg-[#EDF8F6] px-2.5 py-1 font-mono text-[10px] uppercase text-[#0D7773]">
+          <span
+            className={`rounded-full px-2.5 py-1 font-mono text-[10px] uppercase ${COHORT_STATUS_STYLES[cohort.status]}`}
+          >
             {t(`cohort_status_${cohort.status}`)}
           </span>
           {missingTemplates && (
@@ -448,11 +457,8 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               className="grid gap-1.5 text-sm font-medium"
             >
               {t("join_deadline")}
-              <Input
-                id={`cohort-deadline-${program.id}`}
-                name="joinDeadline"
-                type="datetime-local"
-              />
+              {/* 後端與 cohorts.join_deadline 都是 DATE，送 datetime-local 會被擋成 400 */}
+              <Input id={`cohort-deadline-${program.id}`} name="joinDeadline" type="date" />
             </label>
             <label
               htmlFor={`cohort-capacity-${program.id}`}
@@ -584,10 +590,7 @@ export function ProgramsManager() {
             <h2 className="text-lg font-semibold">{t("program_create")}</h2>
           </div>
           <Input name="name" required placeholder={t("program_name")} />
-          <Textarea
-            name="description"
-            placeholder={t("program_description")}
-          />
+          <Textarea name="description" placeholder={t("program_description")} />
           <div>
             <Button type="submit" disabled={busy || !organization}>
               {t("create")}

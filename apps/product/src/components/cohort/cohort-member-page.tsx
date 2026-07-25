@@ -1,5 +1,6 @@
 "use client";
 
+import type { IShowcaseCheckIn } from "@daodao/api";
 import {
   exitCohort,
   setCohortExportConsent,
@@ -7,24 +8,26 @@ import {
   useCohortMemberHome,
   useLearnerCohortFeed,
 } from "@daodao/api";
-import type { IShowcaseCheckIn } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
-import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Checkbox } from "@daodao/ui/components/checkbox";
-import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Empty, EmptyDescription } from "@daodao/ui/components/empty";
 import { Label } from "@daodao/ui/components/label";
 import { toast } from "@daodao/ui/components/sonner";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
-import { ArrowLeft, ChevronRight, LogOut, Play, Sprout } from "lucide-react";
+import { ArrowLeft, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
+import { InProgressTaskCard } from "@/components/dashboard";
 import { BackgroundAnimation, Banner } from "@/components/layout";
 import { CohortErrorState } from "@/components/lighthouse/cohort-error-state";
 import { CheckInShowcaseCard } from "@/components/showcase/CheckInShowcaseCard";
+import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
+
+/** 與「我的」頁一致的預設卡片主題色 */
+const DEFAULT_PRACTICE_THEME = "#FCDD84";
 
 function isNotMemberError(error: unknown): boolean {
   if (typeof error !== "object" || error === null || !("error" in error)) return false;
@@ -36,14 +39,6 @@ function isNotMemberError(error: unknown): boolean {
     (inner as { code: unknown }).code === "APP_ERROR"
   );
 }
-
-const statusBadgeVariant: Record<string, "default" | "secondary" | "outline-logo" | "gray"> = {
-  active: "default",
-  completed: "outline-logo",
-  draft: "gray",
-  not_started: "secondary",
-  archived: "gray",
-};
 
 export function CohortMemberPage({ cohortId }: { cohortId: number }) {
   const t = useTranslations("cohort");
@@ -195,60 +190,47 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
           {/* Content */}
           {tab === "practices" && (
             <div className="flex flex-col gap-3">
+              {/* 匯出同意本來只藏在設定分頁，沒特別說沒人會去勾 */}
+              {!consentValue && (
+                <button
+                  type="button"
+                  onClick={() => setTab("settings")}
+                  className="rounded-xl bg-white p-4 text-left text-xs text-text-dark/60 shadow-sm transition-all hover:shadow-md"
+                >
+                  {t("export_consent_nudge")}
+                </button>
+              )}
               {!home?.practices.length && (
                 <Empty className="rounded-xl bg-white shadow-sm">
                   <EmptyDescription>{t("no_practices")}</EmptyDescription>
                 </Empty>
               )}
-              {home?.practices.map((practice) => (
-                <CustomLink
-                  key={practice.id}
-                  href={`/practices/${practice.id}`}
-                  className="block rounded-xl bg-white p-4 shadow-sm transition-all hover:shadow-md hover:ring-2 hover:ring-logo-cyan"
-                >
-                  <div className="flex items-start gap-3">
-                    <span
-                      className={cn(
-                        "grid size-10 shrink-0 place-items-center rounded-lg",
-                        practice.status === "draft"
-                          ? "bg-basic-100 text-basic-400"
-                          : "bg-primary-palest text-logo-cyan"
-                      )}
-                    >
-                      <Sprout className="size-5" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <Badge variant={statusBadgeVariant[practice.status] ?? "gray"} size="sm">
-                        {t(`practice_status_${practice.status}`)}
-                      </Badge>
-                      <h2 className="mt-1.5 text-base font-medium text-text-dark line-clamp-2">
-                        {practice.title}
-                      </h2>
-                      {practice.practiceAction && (
-                        <p className="mt-1 text-xs text-text-dark/60 line-clamp-1">
-                          {practice.practiceAction}
-                        </p>
-                      )}
-                    </div>
-                    {practice.status === "draft" ? (
-                      <Button
-                        size="sm"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          void activate(practice.id);
-                        }}
-                        className="shrink-0"
-                      >
-                        <Play className="size-3.5" />
-                        {t("activate_practice")}
-                      </Button>
-                    ) : (
-                      <ChevronRight className="size-5 shrink-0 text-light-gray mt-0.5" />
-                    )}
-                  </div>
-                </CustomLink>
-              ))}
+              {home?.practices.some((practice) => practice.status === "draft") && (
+                <p className="text-xs text-text-dark/45">{t("draft_editable_hint")}</p>
+              )}
+              {/* 沿用「我的」那張實踐卡，兩邊的實踐長相才會一致 */}
+              {/* 斷點對齊卡片自己的 md:w-full，避免兩欄時擠到固定寬度 */}
+              <div className="grid gap-4 md:grid-cols-2">
+                {home?.practices.map((practice) => (
+                  <InProgressTaskCard
+                    key={practice.id}
+                    id={practice.id}
+                    title={practice.title}
+                    description={practice.practiceAction ?? ""}
+                    checkInCount={practice.checkInCount ?? 0}
+                    progress={practice.progressPercentage ?? 0}
+                    messagesCount={0}
+                    isUnreadMessages={false}
+                    theme={practice.themeColor || DEFAULT_PRACTICE_THEME}
+                    status={mapPracticeStatusToTaskStatus(practice.status)}
+                    lastCheckInDate={practice.lastCheckinAt ?? null}
+                    startDate={practice.startDate ?? null}
+                    endDate={practice.endDate ?? null}
+                    draftActionLabel={t("activate_practice")}
+                    onEdit={() => void activate(practice.id)}
+                  />
+                ))}
+              </div>
             </div>
           )}
           {tab === "feed" && (
@@ -328,11 +310,7 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
                     >
                       {t("save")}
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setPendingConsent(null)}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => setPendingConsent(null)}>
                       {t("exit_cancel")}
                     </Button>
                   </div>
