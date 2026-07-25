@@ -31,9 +31,33 @@ interface TemplateData {
   generatedDraftCount: number;
 }
 
+/**
+ * 以下選項必須與 practice_templates 的 CHECK 約束一致，且與網站建立實踐的流程同一組；
+ * 之前這裡是自由數字輸入，填 10 天 / 20 分鐘會在寫入時炸成 500。
+ */
+const DURATION_DAY_OPTIONS = [7, 14, 21, 30] as const;
+const SESSION_MINUTE_OPTIONS = [15, 30, 45, 60] as const;
+const FREQUENCY_OPTIONS = ["2-4", "3-5", "4-7"] as const;
+const TIME_PERIOD_OPTIONS = ["morning", "commute", "afternoon", "evening", "night"] as const;
+
+const SELECT_CLASS =
+  "mt-2 h-10 w-full rounded-xl border border-[#CDEBE8] bg-white px-3 text-sm text-[#0D3036]";
+
 function numberOrNull(value: FormDataEntryValue | null) {
   const text = String(value ?? "");
   return text ? Number(text) : null;
+}
+
+/** 把既有的 min/max 天數還原成頻率選項；對不上的舊資料原樣保留成一個額外選項 */
+function frequencyValue(initial?: TemplateData) {
+  if (!initial?.frequencyMinDays || !initial.frequencyMaxDays) return "";
+  return `${initial.frequencyMinDays}-${initial.frequencyMaxDays}`;
+}
+
+function parseFrequencyRange(value: string) {
+  const [min, max] = value.split("-");
+  if (!min || !max) return { frequencyMinDays: null, frequencyMaxDays: null };
+  return { frequencyMinDays: Number(min), frequencyMaxDays: Number(max) };
 }
 
 function TemplateForm({
@@ -46,6 +70,11 @@ function TemplateForm({
   busy: boolean;
 }) {
   const t = useTranslations("lighthouse");
+  const currentFrequency = frequencyValue(initial);
+  const legacyFrequency =
+    currentFrequency && !FREQUENCY_OPTIONS.some((range) => range === currentFrequency)
+      ? currentFrequency
+      : null;
   return (
     <form
       action={onSubmit}
@@ -74,58 +103,87 @@ function TemplateForm({
           className="mt-2"
         />
       </div>
-      <label htmlFor="duration" className="grid gap-2">
+      <label htmlFor="duration" className="grid">
         <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#0D7773]">
           03 · {t("template_step_duration")}
         </span>
-        <Input
+        <select
           id="duration"
           name="durationDays"
-          type="number"
-          min={1}
-          defaultValue={initial?.durationDays ?? undefined}
-        />
+          defaultValue={initial?.durationDays ?? ""}
+          className={SELECT_CLASS}
+        >
+          <option value="">{t("not_specified")}</option>
+          {DURATION_DAY_OPTIONS.map((days) => (
+            <option key={days} value={days}>
+              {t("duration_days_option", { days })}
+            </option>
+          ))}
+        </select>
       </label>
-      <div>
-        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#0D7773]">
+      <label htmlFor="frequency" className="grid">
+        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#0D7773]">
           04 · {t("template_step_frequency")}
-        </p>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          <Input
-            name="frequencyMinDays"
-            type="number"
-            min={1}
-            defaultValue={initial?.frequencyMinDays ?? undefined}
-            placeholder={t("minimum")}
-          />
-          <Input
-            name="frequencyMaxDays"
-            type="number"
-            min={1}
-            defaultValue={initial?.frequencyMaxDays ?? undefined}
-            placeholder={t("maximum")}
-          />
-        </div>
-      </div>
-      <div>
-        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#0D7773]">
+        </span>
+        <select
+          id="frequency"
+          name="frequency"
+          defaultValue={currentFrequency}
+          className={SELECT_CLASS}
+        >
+          <option value="">{t("not_specified")}</option>
+          {FREQUENCY_OPTIONS.map((range) => (
+            <option key={range} value={range}>
+              {t("frequency_option", { range })}
+            </option>
+          ))}
+          {legacyFrequency && (
+            <option value={legacyFrequency}>
+              {t("frequency_option", { range: legacyFrequency })}
+            </option>
+          )}
+        </select>
+      </label>
+      <label htmlFor="session-minutes" className="grid">
+        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#0D7773]">
           05 · {t("template_step_context")}
-        </p>
-        <Input
+        </span>
+        <select
+          id="session-minutes"
           name="sessionDurationMinutes"
-          type="number"
-          min={1}
-          defaultValue={initial?.sessionDurationMinutes ?? undefined}
-          placeholder={t("session_minutes")}
-          className="mt-2"
-        />
-      </div>
-      <Input
-        name="practiceTimePeriods"
-        defaultValue={initial?.practiceTimePeriods.join(", ")}
-        placeholder={t("time_periods")}
-        className="self-end"
-      />
+          defaultValue={initial?.sessionDurationMinutes ?? ""}
+          className={SELECT_CLASS}
+        >
+          <option value="">{t("not_specified")}</option>
+          {SESSION_MINUTE_OPTIONS.map((minutes) => (
+            <option key={minutes} value={minutes}>
+              {t("session_minutes_option", { minutes })}
+            </option>
+          ))}
+        </select>
+      </label>
+      <fieldset>
+        <legend className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#0D7773]">
+          06 · {t("template_step_time_periods")}
+        </legend>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {TIME_PERIOD_OPTIONS.map((period) => (
+            <label
+              key={period}
+              className="flex items-center gap-2 rounded-full border border-[#CDEBE8] px-3 py-1.5 text-sm"
+            >
+              <input
+                type="checkbox"
+                name="practiceTimePeriods"
+                value={period}
+                defaultChecked={initial?.practiceTimePeriods.includes(period)}
+                className="size-4 accent-[#0D7773]"
+              />
+              {t(`time_period_${period}` as Parameters<typeof t>[0])}
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <div className="md:col-span-2">
         <Button type="submit" disabled={busy}>
           {initial ? t("save") : t("create")}
@@ -200,13 +258,9 @@ function TemplateCard({
       title: String(formData.get("title") ?? "").trim(),
       practiceAction: String(formData.get("practiceAction") ?? "").trim() || null,
       durationDays: numberOrNull(formData.get("durationDays")),
-      frequencyMinDays: numberOrNull(formData.get("frequencyMinDays")),
-      frequencyMaxDays: numberOrNull(formData.get("frequencyMaxDays")),
+      ...parseFrequencyRange(String(formData.get("frequency") ?? "")),
       sessionDurationMinutes: numberOrNull(formData.get("sessionDurationMinutes")),
-      practiceTimePeriods: String(formData.get("practiceTimePeriods") ?? "")
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean),
+      practiceTimePeriods: formData.getAll("practiceTimePeriods").map(String),
     });
     setBusy(false);
     if (response.error) {
@@ -302,24 +356,15 @@ export function TemplatesManager() {
   const [busy, setBusy] = useState(false);
   async function create(formData: FormData) {
     if (!organization) return;
-    const min = numberOrNull(formData.get("frequencyMinDays"));
-    const max = numberOrNull(formData.get("frequencyMaxDays"));
-    if (min && max && min > max) {
-      toast.error(t("frequency_error"));
-      return;
-    }
+    const frequency = parseFrequencyRange(String(formData.get("frequency") ?? ""));
     setBusy(true);
     const response = await createLighthouseTemplate(organization.id, {
       title: String(formData.get("title") ?? "").trim(),
       practiceAction: String(formData.get("practiceAction") ?? "").trim() || null,
       durationDays: numberOrNull(formData.get("durationDays")),
-      frequencyMinDays: min,
-      frequencyMaxDays: max,
+      ...frequency,
       sessionDurationMinutes: numberOrNull(formData.get("sessionDurationMinutes")),
-      practiceTimePeriods: String(formData.get("practiceTimePeriods") ?? "")
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean),
+      practiceTimePeriods: formData.getAll("practiceTimePeriods").map(String),
     });
     setBusy(false);
     if (response.error) {

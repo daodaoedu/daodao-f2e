@@ -5318,7 +5318,7 @@
     "practice_empty_ideas": "No ideas yet",
     "practice_status_unknown": "Unknown status",
     "load_failed_retry": "Failed to load, tap to retry",
-    "my_cohorts_title": "My Programs",
+    "my_cohorts_title": "My Activities",
     "my_cohorts_org": "by {org}"
   },
   "notification": {
@@ -6916,44 +6916,20 @@
         "explorer": {
           "name": "Explorer Island",
           "description": "You are a curious explorer who enjoys trying new things.",
-          "traits": [
-            "Curious",
-            "Willing to try",
-            "Independent thinker"
-          ],
-          "recommendations": [
-            "Daily reading",
-            "Coding practice",
-            "Language learning"
-          ]
+          "traits": ["Curious", "Willing to try", "Independent thinker"],
+          "recommendations": ["Daily reading", "Coding practice", "Language learning"]
         },
         "creator": {
           "name": "Creator Island",
           "description": "You are highly creative and good at turning ideas into action.",
-          "traits": [
-            "Creative",
-            "Hands-on",
-            "Artistic"
-          ],
-          "recommendations": [
-            "Writing practice",
-            "Art creation",
-            "Design learning"
-          ]
+          "traits": ["Creative", "Hands-on", "Artistic"],
+          "recommendations": ["Writing practice", "Art creation", "Design learning"]
         },
         "connector": {
           "name": "Connector Island",
           "description": "You build relationships easily and enjoy learning with others.",
-          "traits": [
-            "Communicative",
-            "Team-oriented",
-            "Empathetic"
-          ],
-          "recommendations": [
-            "Community activities",
-            "Language learning",
-            "Team projects"
-          ]
+          "traits": ["Communicative", "Team-oriented", "Empathetic"],
+          "recommendations": ["Community activities", "Language learning", "Team projects"]
         }
       }
     },
@@ -7612,8 +7588,8 @@
     "dashboard_empty_copy": "As learners begin practices and check in, a readable rhythm will form here.",
     "dashboard_enrolled": "Joined",
     "dashboard_activated": "Practices activated",
-    "dashboard_active_members": "Moving consistently",
-    "dashboard_checkins": "Check-in flow",
+    "dashboard_active_members": "Moving consistently (this week)",
+    "dashboard_checkins": "Check-in flow (this week)",
     "dashboard_rhythm_heatmap": "Rhythm heatmap",
     "dashboard_rhythm_heatmap_desc": "Each cell is one day — the darker the shade, the more check-ins that day",
     "dashboard_funnel": "Join to activation",
@@ -7664,7 +7640,7 @@
     "template_step_action": "Practice action",
     "template_step_duration": "Duration",
     "template_step_frequency": "Weekly frequency",
-    "template_step_context": "Session and time",
+    "template_step_context": "Session length",
     "template_title": "Template name",
     "template_action": "The concrete action to sustain",
     "minimum": "Minimum days",
@@ -7710,7 +7686,17 @@
     "organization_member_added": "Organization member added",
     "organization_member_add_failed": "Could not add organization member",
     "organization_member_remove_confirm": "Remove this organization member?",
-    "organization_member_remove_failed": "Could not remove organization member"
+    "organization_member_remove_failed": "Could not remove organization member",
+    "not_specified": "Not specified",
+    "duration_days_option": "{days} days",
+    "frequency_option": "{range} times a week",
+    "session_minutes_option": "{minutes} minutes",
+    "template_step_time_periods": "Time of day",
+    "time_period_morning": "Morning",
+    "time_period_commute": "Commute",
+    "time_period_afternoon": "Midday",
+    "time_period_evening": "Evening",
+    "time_period_night": "Before sleep"
   },
   "cohort": {
     "loading": "Loading",
@@ -7782,6 +7768,8 @@
     "save": "Save",
     "exit_confirm_title": "Leave this cohort?",
     "exit_confirm_action": "Leave",
-    "exit_cancel": "Cancel"
+    "exit_cancel": "Cancel",
+    "draft_editable_hint": "Before you activate it you can adjust the time of day, tags and resources (items added by your coach stay locked).",
+    "export_consent_nudge": "You haven't opted in to the coach's outcome export — open settings to change it →"
   }
 }

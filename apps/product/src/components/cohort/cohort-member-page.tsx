@@ -1,5 +1,6 @@
 "use client";
 
+import type { IShowcaseCheckIn } from "@daodao/api";
 import {
   exitCohort,
   setCohortExportConsent,
@@ -7,7 +8,6 @@ import {
   useCohortMemberHome,
   useLearnerCohortFeed,
 } from "@daodao/api";
-import type { IShowcaseCheckIn } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
@@ -195,6 +195,16 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
           {/* Content */}
           {tab === "practices" && (
             <div className="flex flex-col gap-3">
+              {/* 匯出同意本來只藏在設定分頁，沒特別說沒人會去勾 */}
+              {!consentValue && (
+                <button
+                  type="button"
+                  onClick={() => setTab("settings")}
+                  className="rounded-xl bg-white p-4 text-left text-xs text-text-dark/60 shadow-sm transition-all hover:shadow-md"
+                >
+                  {t("export_consent_nudge")}
+                </button>
+              )}
               {!home?.practices.length && (
                 <Empty className="rounded-xl bg-white shadow-sm">
                   <EmptyDescription>{t("no_practices")}</EmptyDescription>
@@ -228,6 +238,9 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
                         <p className="mt-1 text-xs text-text-dark/60 line-clamp-1">
                           {practice.practiceAction}
                         </p>
+                      )}
+                      {practice.status === "draft" && (
+                        <p className="mt-2 text-xs text-text-dark/45">{t("draft_editable_hint")}</p>
                       )}
                     </div>
                     {practice.status === "draft" ? (
@@ -328,11 +341,7 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
                     >
                       {t("save")}
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setPendingConsent(null)}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => setPendingConsent(null)}>
                       {t("exit_cancel")}
                     </Button>
                   </div>

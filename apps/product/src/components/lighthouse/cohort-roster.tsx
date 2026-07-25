@@ -85,10 +85,18 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
   }
 
   async function resend(enrollmentId: number) {
-    const response = await resendLighthouseCohortInvitation(programId, cohortId, enrollmentId);
-    response.error
-      ? toast.error(t("invitation_send_failed"))
-      : toast.success(t("invitation_resent"));
+    // 這裡曾經整段靜默：請求若在 fetch 層 throw，就不會有任何 toast
+    try {
+      const response = await resendLighthouseCohortInvitation(programId, cohortId, enrollmentId);
+      if (response.error) {
+        toast.error(t("invitation_send_failed"));
+        return;
+      }
+      await enrollmentQuery.mutate();
+      toast.success(t("invitation_resent"));
+    } catch {
+      toast.error(t("invitation_send_failed"));
+    }
   }
 
   async function remove(enrollmentId: number) {
@@ -260,12 +268,13 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
                     {t("resend")}
                   </Button>
                 )}
-                {(enrollment.status === "joined" || enrollment.status === "invited") && enrollment.role === "member" && (
-                  <Button size="sm" variant="ghost" onClick={() => remove(enrollment.id)}>
-                    <UserMinus className="size-4" />
-                    {t("remove")}
-                  </Button>
-                )}
+                {(enrollment.status === "joined" || enrollment.status === "invited") &&
+                  enrollment.role === "member" && (
+                    <Button size="sm" variant="ghost" onClick={() => remove(enrollment.id)}>
+                      <UserMinus className="size-4" />
+                      {t("remove")}
+                    </Button>
+                  )}
               </li>
             ))}
           </ul>

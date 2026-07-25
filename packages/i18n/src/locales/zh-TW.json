@@ -5318,7 +5318,7 @@
     "practice_empty_ideas": "還沒有想法",
     "practice_status_unknown": "未知狀態",
     "load_failed_retry": "載入失敗，點擊重試",
-    "my_cohorts_title": "我的計畫",
+    "my_cohorts_title": "我的活動",
     "my_cohorts_org": "來自 {org}"
   },
   "notification": {
@@ -6916,44 +6916,20 @@
         "explorer": {
           "name": "探索者島",
           "description": "你是一位好奇心旺盛的探索者，喜歡嘗試新事物",
-          "traits": [
-            "好奇心強",
-            "勇於嘗試",
-            "獨立思考"
-          ],
-          "recommendations": [
-            "每日閱讀",
-            "程式學習",
-            "語言學習"
-          ]
+          "traits": ["好奇心強", "勇於嘗試", "獨立思考"],
+          "recommendations": ["每日閱讀", "程式學習", "語言學習"]
         },
         "creator": {
           "name": "創造者島",
           "description": "你擁有豐富的創造力，善於將想法付諸實踐",
-          "traits": [
-            "創意豐富",
-            "動手能力強",
-            "有藝術天賦"
-          ],
-          "recommendations": [
-            "寫作練習",
-            "藝術創作",
-            "設計學習"
-          ]
+          "traits": ["創意豐富", "動手能力強", "有藝術天賦"],
+          "recommendations": ["寫作練習", "藝術創作", "設計學習"]
         },
         "connector": {
           "name": "連結者島",
           "description": "你善於建立人際關係，喜歡與他人合作學習",
-          "traits": [
-            "善於溝通",
-            "團隊合作",
-            "同理心強"
-          ],
-          "recommendations": [
-            "社群活動",
-            "語言學習",
-            "團隊專案"
-          ]
+          "traits": ["善於溝通", "團隊合作", "同理心強"],
+          "recommendations": ["社群活動", "語言學習", "團隊專案"]
         }
       }
     },
@@ -7612,8 +7588,8 @@
     "dashboard_empty_copy": "有學員開始實踐與打卡後，這裡會逐步形成可讀的節律。",
     "dashboard_enrolled": "已加入",
     "dashboard_activated": "已啟用實踐",
-    "dashboard_active_members": "持續行動中",
-    "dashboard_checkins": "打卡流動量",
+    "dashboard_active_members": "持續行動中（本週）",
+    "dashboard_checkins": "打卡流動量（本週）",
     "dashboard_rhythm_heatmap": "節律熱度圖",
     "dashboard_rhythm_heatmap_desc": "每格代表一天，顏色越深表示當天打卡次數越多",
     "dashboard_funnel": "加入到啟用",
@@ -7664,7 +7640,7 @@
     "template_step_action": "實踐行動",
     "template_step_duration": "持續天數",
     "template_step_frequency": "每週頻率",
-    "template_step_context": "每次投入與時段",
+    "template_step_context": "每次投入時長",
     "template_title": "模板名稱",
     "template_action": "要持續做的具體行動",
     "minimum": "最少天數",
@@ -7710,7 +7686,17 @@
     "organization_member_added": "組織成員已新增",
     "organization_member_add_failed": "無法新增組織成員",
     "organization_member_remove_confirm": "確定要移除這位組織成員嗎？",
-    "organization_member_remove_failed": "無法移除組織成員"
+    "organization_member_remove_failed": "無法移除組織成員",
+    "not_specified": "未指定",
+    "duration_days_option": "{days} 天",
+    "frequency_option": "每週 {range} 次",
+    "session_minutes_option": "{minutes} 分鐘",
+    "template_step_time_periods": "執行時段",
+    "time_period_morning": "早上",
+    "time_period_commute": "通勤時",
+    "time_period_afternoon": "午休時",
+    "time_period_evening": "晚上",
+    "time_period_night": "睡前"
   },
   "cohort": {
     "loading": "載入中",
@@ -7782,6 +7768,8 @@
     "save": "儲存",
     "exit_confirm_title": "確定要退出本期？",
     "exit_confirm_action": "退出",
-    "exit_cancel": "取消"
+    "exit_cancel": "取消",
+    "draft_editable_hint": "啟用前可以自己調整執行時機、標籤與資源（教練加的項目不可編輯）。",
+    "export_consent_nudge": "尚未同意將成果納入教練匯出，前往設定調整 →"
   }
 }
