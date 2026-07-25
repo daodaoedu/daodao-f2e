@@ -7720,7 +7720,13 @@
     "time_period_commute": "通勤時",
     "time_period_afternoon": "午休時",
     "time_period_evening": "晚上",
-    "time_period_night": "睡前"
+    "time_period_night": "睡前",
+    "template_step_resources": "參考資源",
+    "template_resources_hint": "這些資源會一併帶到學員的草稿裡，最多 5 個。",
+    "template_resource_name": "資源名稱",
+    "template_resource_add": "新增資源",
+    "template_start_date": "開始日",
+    "template_start_date_saved": "開始日已更新"
   },
   "cohort": {
     "loading": "載入中",

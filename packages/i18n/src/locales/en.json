@@ -7720,7 +7720,13 @@
     "time_period_commute": "Commute",
     "time_period_afternoon": "Midday",
     "time_period_evening": "Evening",
-    "time_period_night": "Before sleep"
+    "time_period_night": "Before sleep",
+    "template_step_resources": "Resources",
+    "template_resources_hint": "These are copied into each learner draft. Up to 5.",
+    "template_resource_name": "Resource name",
+    "template_resource_add": "Add resource",
+    "template_start_date": "Start date",
+    "template_start_date_saved": "Start date updated"
   },
   "cohort": {
     "loading": "Loading",

@@ -28,7 +28,25 @@ interface TemplateData {
   sessionDurationMinutes: number | null;
   practiceTimePeriods: string[];
   boundCohortIds: number[];
+  resources?: Array<{ id: string; name: string; url: string | null }>;
+  bindings?: Array<{ cohortId: number; startDate: string | null }>;
   generatedDraftCount: number;
+}
+
+const MAX_TEMPLATE_RESOURCES = 5;
+
+type ResourceRow = { key: string; name: string; url: string };
+
+/** 資源列是動態增減的，用 getAll 依序取回並丟掉沒填名稱的空列 */
+function readResources(formData: FormData) {
+  const names = formData.getAll("resourceName").map(String);
+  const urls = formData.getAll("resourceUrl").map(String);
+  return names.flatMap((name, index) => {
+    const trimmed = name.trim();
+    if (!trimmed) return [];
+    const url = (urls[index] ?? "").trim();
+    return [url ? { name: trimmed, url } : { name: trimmed }];
+  });
 }
 
 /**
@@ -75,6 +93,9 @@ function TemplateForm({
     currentFrequency && !FREQUENCY_OPTIONS.some((range) => range === currentFrequency)
       ? currentFrequency
       : null;
+  const [resourceRows, setResourceRows] = useState<ResourceRow[]>(
+    () => initial?.resources?.map((r) => ({ key: r.id, name: r.name, url: r.url ?? "" })) ?? []
+  );
   return (
     <form
       action={onSubmit}
@@ -184,6 +205,51 @@ function TemplateForm({
           ))}
         </div>
       </fieldset>
+      <fieldset className="md:col-span-2">
+        <legend className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#0D7773]">
+          07 · {t("template_step_resources")}
+        </legend>
+        <p className="mt-1 text-xs text-[#78928F]">{t("template_resources_hint")}</p>
+        <div className="mt-3 grid gap-2">
+          {resourceRows.map((row, index) => (
+            <div key={row.key} className="flex flex-wrap items-center gap-2">
+              <Input
+                name="resourceName"
+                defaultValue={row.name}
+                placeholder={t("template_resource_name")}
+                className="min-w-40 flex-1"
+              />
+              <Input
+                name="resourceUrl"
+                type="url"
+                defaultValue={row.url}
+                placeholder="https://example.com"
+                className="min-w-40 flex-1"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setResourceRows((rows) => rows.filter((_, i) => i !== index))}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+        {resourceRows.length < MAX_TEMPLATE_RESOURCES && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-2"
+            onClick={() =>
+              setResourceRows((rows) => [...rows, { key: `new-${rows.length}`, name: "", url: "" }])
+            }
+          >
+            <Plus className="size-4" />
+            {t("template_resource_add")}
+          </Button>
+        )}
+      </fieldset>
       <div className="md:col-span-2">
         <Button type="submit" disabled={busy}>
           {initial ? t("save") : t("create")}
@@ -198,12 +264,14 @@ function ProgramBindings({
   templateId,
   programId,
   boundIds,
+  bindings,
   refresh,
 }: {
   organizationId: number;
   templateId: number;
   programId: number;
   boundIds: number[];
+  bindings: TemplateData["bindings"];
   refresh: () => Promise<unknown>;
 }) {
   const t = useTranslations("lighthouse");
@@ -222,18 +290,46 @@ function ProgramBindings({
     await refresh();
     toast.success(bound ? t("template_bound") : t("template_unbound"));
   }
+  async function setStartDate(cohortId: number, value: string) {
+    const response = await setLighthouseTemplateBinding(
+      organizationId,
+      templateId,
+      cohortId,
+      true,
+      value || null
+    );
+    if (response.error) {
+      toast.error(t("save_failed"));
+      return;
+    }
+    await refresh();
+    toast.success(t("template_start_date_saved"));
+  }
   return cohorts?.map((cohort) => {
     const bound = boundIds.includes(cohort.id);
+    const startDate = bindings?.find((item) => item.cohortId === cohort.id)?.startDate;
     return (
-      <button
-        key={cohort.id}
-        type="button"
-        onClick={() => void toggle(cohort.id, !bound)}
-        className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${bound ? "border-[#0D7773] bg-[#E7FAF7] text-[#0D5B59]" : "border-[#CDEBE8] text-[#5A7B79]"}`}
-      >
-        {bound ? "✓ " : "+ "}
-        {cohort.displayName}
-      </button>
+      <div key={cohort.id} className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => void toggle(cohort.id, !bound)}
+          className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${bound ? "border-[#0D7773] bg-[#E7FAF7] text-[#0D5B59]" : "border-[#CDEBE8] text-[#5A7B79]"}`}
+        >
+          {bound ? "✓ " : "+ "}
+          {cohort.displayName}
+        </button>
+        {bound && (
+          <label className="flex items-center gap-1.5 text-xs text-[#5A7B79]">
+            {t("template_start_date")}
+            <input
+              type="date"
+              defaultValue={startDate?.slice(0, 10) ?? ""}
+              onChange={(event) => void setStartDate(cohort.id, event.target.value)}
+              className="rounded-lg border border-[#CDEBE8] px-2 py-1 text-xs"
+            />
+          </label>
+        )}
+      </div>
     );
   });
 }
@@ -261,6 +357,7 @@ function TemplateCard({
       ...parseFrequencyRange(String(formData.get("frequency") ?? "")),
       sessionDurationMinutes: numberOrNull(formData.get("sessionDurationMinutes")),
       practiceTimePeriods: formData.getAll("practiceTimePeriods").map(String),
+      resources: readResources(formData),
     });
     setBusy(false);
     if (response.error) {
@@ -337,6 +434,7 @@ function TemplateCard({
               templateId={template.id}
               programId={programId}
               boundIds={template.boundCohortIds}
+              bindings={template.bindings}
               refresh={refresh}
             />
           ))}
@@ -365,6 +463,7 @@ export function TemplatesManager() {
       ...frequency,
       sessionDurationMinutes: numberOrNull(formData.get("sessionDurationMinutes")),
       practiceTimePeriods: formData.getAll("practiceTimePeriods").map(String),
+      resources: readResources(formData),
     });
     setBusy(false);
     if (response.error) {
