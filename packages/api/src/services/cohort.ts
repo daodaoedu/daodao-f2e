@@ -315,6 +315,14 @@ export const cohortMemberHomeResponseSchema = apiSuccessSchema(
         practiceAction: z.string().nullable(),
         status: z.enum(["draft", "not_started", "active", "completed", "archived"]),
         creationSource: z.string().nullable(),
+        // 實踐卡需要的欄位。留成 optional 是為了讓前端可以先於後端上線，
+        // 舊版後端只是少了卡片上的日期與打卡數，頁面不會整個掉進驗證錯誤
+        startDate: nullableDateTimeSchema.optional(),
+        endDate: nullableDateTimeSchema.optional(),
+        progressPercentage: z.number().optional(),
+        checkInCount: z.number().int().nonnegative().optional(),
+        lastCheckinAt: nullableDateTimeSchema.optional(),
+        themeColor: z.string().nullable().optional(),
       })
     ),
   })
