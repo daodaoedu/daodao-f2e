@@ -8,7 +8,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { client } from "../client";
 
-export type ViewTrackingEntityType = "practice" | "resource";
+export type ViewTrackingEntityType = "practice" | "resource" | "persona_question";
 
 type UntypedPostClient = {
   POST: (url: string, init: { body: unknown }) => Promise<unknown>;
@@ -34,6 +34,13 @@ export const useRecordView = () => {
         .POST("/api/v1/resources/{resourceId}/view", {
           params: { path: { resourceId: String(entityId) } },
         })
+        .catch(() => {
+          // fire-and-forget: ignore errors
+        });
+    } else if (entityType === "persona_question") {
+      // 尚未同步進 generated types（server dev branch 合併後才有），先走 untyped client
+      (client as unknown as UntypedPostClient)
+        .POST(`/api/v1/persona/questions/${entityId}/view`, { body: undefined })
         .catch(() => {
           // fire-and-forget: ignore errors
         });
