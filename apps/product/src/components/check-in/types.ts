@@ -25,6 +25,8 @@ export interface ICheckInDisplayData {
   tags: string[];
   images?: string[];
   practiceTitle: string;
+  /** 累計瀏覽數（同一使用者 24h 內只計一次） */
+  viewCount?: number;
 }
 
 /**
