@@ -165,7 +165,15 @@ T+10m   closes_at → client 各自揭曉（D2）→ 補寄 job → 準備下一
 | 幹部手動加開 | 第二批 | 依賴尚不存在的成員面向管理 UI |
 | 成員輪流出題 | 第二批（優先候選） | 持續槓桿：出題人必到場、所有權輪值；需出題通知流程 + 未出題 fallback |
 
-## 7. 參與者通知
+## 7. 報名與成員來源
+
+**報名單位是「團」不是「場」**：持續迴圈的機制（缺席可見、火把、補寄、被期待）全部依賴固定 roster——散客制讓「缺席」失去定義。加入 cohort = 報名整季儀式，不做單場 RSVP。
+
+- **報名流程全沿用既有 cohort join**：邀請連結 `/cohorts/join/:joinToken` → 同意畫面 → 加入（額滿 `FOR UPDATE` 檢查、`join_deadline`、409 已滿）。零新流程。
+- **同意畫面露出儀式約定**（本 change 唯一新增）：`cohortJoinInfo` response 附活動島設定（週期、時窗），同意畫面顯示「本團每週一 21:00 有 10 分鐘 check-in 儀式」——約定感在報名那一刻建立，不是加入後才培養。
+- **怎麼知道**：MVP 靠邀請連結外發（admin/幹部經 email/社群）＋官網/社群行銷。產品內發現（遺跡島公開櫥窗、群島導航露出活動島）列第二批——櫥窗撞隱私取捨（牆上是團內真心話），MVP 遺跡島**團內可見**。
+
+## 8. 參與者通知
 
 **現況管道**：站內鈴鐺（`notification_events` + preference/unsubscribe 齊備）、email（history/trigger/weekly digest 前例）；**Web Push 不存在**（PWA 僅 SW 註冊，無 pushManager/subscription）。
 
@@ -176,18 +184,18 @@ T+10m   closes_at → client 各自揭曉（D2）→ 補寄 job → 準備下一
 | T−24h | 船班預告（題目預告可選） | email **附 `.ics` 行事曆邀請**（把當下提醒外包給 OS，零基礎建設）＋ 站內鈴鐺 |
 | T−0 | 開船 | 站內鈴鐺 ＋ 3D 世界內：個人島港口出現船班（harbor 既有點擊點） |
 | 場中 | — | 已登島者 polling 同步，無需通知 |
-| T+10m | 缺席補寄 | email ＋ 站內鈴鐺（見 §8） |
+| T+10m | 缺席補寄 | email ＋ 站內鈴鐺（見 §9） |
 
 - 通知偏好與退訂沿用既有 `notification_preferences` 機制，新增 island-event 類 type。
 - Web Push（VAPID、subscription 表、iOS 需加入主畫面）列第二批——待數據顯示「預告有讀、當下仍缺席」比例高再投資。
 
-## 8. 缺席補寄 job
+## 9. 缺席補寄 job
 
 - `closes_at` 到點：BullMQ delayed job（排程器建場次時一併排入；場次刪除時撤銷）。
 - 內容（全事實層，proposal 措辭紅線）：題目、參與概況、揭曉牆連結、補答入口、下一班船時間。
 - 對象：joined 成員 − 出席者；走既有 email/通知管道，比照 weekly digest 的模板結構。
 
-## 9. Edge cases
+## 10. Edge cases
 
 | 情境 | 處理 |
 |---|---|
