@@ -73,12 +73,10 @@ export const useRecordView = () => {
             });
           return;
         }
-        default: {
+        default:
           // 新增 ViewTrackingEntityType 卻忘了接上端點時，這行會在編譯期報錯；
           // runtime 靜默略過，避免追蹤問題影響主流程
-          const unhandled: never = entityType;
-          void unhandled;
-        }
+          entityType satisfies never;
       }
     },
     []
