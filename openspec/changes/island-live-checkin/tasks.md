@@ -20,7 +20,7 @@
 - [ ] 2.6 場次排程器：依 cohort 設定 T−24h 自動建場次（題目佇列消耗、fallback 題庫）＋ 船班預告（email 附 `.ics` 行事曆邀請）/開船通知
 - [ ] 2.6b 站內通知：`notification_events` 新增 island-event 類 type，接 preference/unsubscribe 既有機制
 - [ ] 2.7 admin 設定 API：cohort 活動島設定欄位讀寫（開關、週期、時窗、題目佇列）
-- [ ] 2.8 `cohortJoinInfo` response 附活動島儀式資訊（週期、時窗），供同意畫面露出約定
+- [ ] 2.8 `cohortJoinInfo` response 附活動島儀式資訊（週期、時窗、期長），供同意畫面露出約定與總承諾量（例：6 週 × 10 分鐘）
 - [ ] 2.9 測試：不變式（早到/準時/補答三態）、蓋牌裁切、缺席名單推導、排程器建場
 
 ## 3. daodao-ai-backend
