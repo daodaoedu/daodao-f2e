@@ -32,41 +32,53 @@ export const useRecordView = () => {
       entityId: string | number,
       options?: RecordViewOptions
     ) => {
-      if (entityType === "practice") {
-        client
-          .POST("/api/v1/practices/{id}/view", {
-            params: { path: { id: String(entityId) } },
-            body: { entityType: "practice", entityId: String(entityId) },
-          })
-          .catch(() => {
-            // fire-and-forget: ignore errors
-          });
-      } else if (entityType === "resource") {
-        client
-          .POST("/api/v1/resources/{resourceId}/view", {
-            params: { path: { resourceId: String(entityId) } },
-          })
-          .catch(() => {
-            // fire-and-forget: ignore errors
-          });
-      } else if (entityType === "persona_question") {
-        // 尚未同步進 generated types（server dev branch 合併後才有），先走 untyped client
-        (client as unknown as UntypedPostClient)
-          .POST(`/api/v1/persona/questions/${entityId}/view`, { body: undefined })
-          .catch(() => {
-            // fire-and-forget: ignore errors
-          });
-      } else if (entityType === "practice_checkin") {
-        // 打卡的觀看端點掛在所屬 practice 底下，缺 practiceId 就無從記錄
-        if (options?.practiceId == null) return;
-        // 尚未同步進 generated types（server dev branch 合併後才有），先走 untyped client
-        (client as unknown as UntypedPostClient)
-          .POST(`/api/v1/practices/${options.practiceId}/checkins/${entityId}/view`, {
-            body: undefined,
-          })
-          .catch(() => {
-            // fire-and-forget: ignore errors
-          });
+      switch (entityType) {
+        case "practice":
+          client
+            .POST("/api/v1/practices/{id}/view", {
+              params: { path: { id: String(entityId) } },
+              body: { entityType: "practice", entityId: String(entityId) },
+            })
+            .catch(() => {
+              // fire-and-forget: ignore errors
+            });
+          return;
+        case "resource":
+          client
+            .POST("/api/v1/resources/{resourceId}/view", {
+              params: { path: { resourceId: String(entityId) } },
+            })
+            .catch(() => {
+              // fire-and-forget: ignore errors
+            });
+          return;
+        case "persona_question":
+          // 尚未同步進 generated types（server dev branch 合併後才有），先走 untyped client
+          (client as unknown as UntypedPostClient)
+            .POST(`/api/v1/persona/questions/${entityId}/view`, { body: undefined })
+            .catch(() => {
+              // fire-and-forget: ignore errors
+            });
+          return;
+        case "practice_checkin": {
+          // 打卡的觀看端點掛在所屬 practice 底下，缺 practiceId 就無從記錄
+          if (options?.practiceId == null) return;
+          // 尚未同步進 generated types（server dev branch 合併後才有），先走 untyped client
+          (client as unknown as UntypedPostClient)
+            .POST(`/api/v1/practices/${options.practiceId}/checkins/${entityId}/view`, {
+              body: undefined,
+            })
+            .catch(() => {
+              // fire-and-forget: ignore errors
+            });
+          return;
+        }
+        default: {
+          // 新增 ViewTrackingEntityType 卻忘了接上端點時，這行會在編譯期報錯；
+          // runtime 靜默略過，避免追蹤問題影響主流程
+          const unhandled: never = entityType;
+          void unhandled;
+        }
       }
     },
     []
