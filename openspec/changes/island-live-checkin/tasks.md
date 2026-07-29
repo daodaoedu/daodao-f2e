@@ -17,7 +17,8 @@
 - [ ] 2.3 routes + Zod validators + `registry.registerPath`（openapi 自動生成）
 - [ ] 2.4 reaction/comment 允許值加 `island_event_checkin`（TS 常量同步，對應 1.2）
 - [ ] 2.5 缺席補寄：BullMQ delayed job（建場次排入/刪場次撤銷）＋ email 模板（比照 cohort-weekly-digest；措辭紅線：邀請不催討）
-- [ ] 2.6 場次排程器：依 cohort 設定 T−24h 自動建場次（題目佇列消耗、fallback 題庫）＋ 船班預告/開船通知
+- [ ] 2.6 場次排程器：依 cohort 設定 T−24h 自動建場次（題目佇列消耗、fallback 題庫）＋ 船班預告（email 附 `.ics` 行事曆邀請）/開船通知
+- [ ] 2.6b 站內通知：`notification_events` 新增 island-event 類 type，接 preference/unsubscribe 既有機制
 - [ ] 2.7 admin 設定 API：cohort 活動島設定欄位讀寫（開關、週期、時窗、題目佇列）
 - [ ] 2.8 測試：不變式（早到/準時/補答三態）、蓋牌裁切、缺席名單推導、排程器建場
 

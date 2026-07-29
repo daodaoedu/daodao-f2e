@@ -124,13 +124,29 @@ T+10m   closes_at → client 各自揭曉（D2）→ 補寄 job → 準備下一
 | 幹部手動加開 | 第二批 | 依賴尚不存在的成員面向管理 UI |
 | 成員輪流出題 | 第二批（優先候選） | 持續槓桿：出題人必到場、所有權輪值；需出題通知流程 + 未出題 fallback |
 
-## 7. 缺席補寄 job
+## 7. 參與者通知
+
+**現況管道**：站內鈴鐺（`notification_events` + preference/unsubscribe 齊備）、email（history/trigger/weekly digest 前例）；**Web Push 不存在**（PWA 僅 SW 註冊，無 pushManager/subscription）。
+
+**設計原則**：固定節奏本身就是通知——BeReal 需要 push 因為時刻隨機；活動島週期固定、可預期，對即時推播的天然依賴低。要建立的是約定感，不是打斷力。
+
+| 時刻 | 訊息 | 管道 |
+|---|---|---|
+| T−24h | 船班預告（題目預告可選） | email **附 `.ics` 行事曆邀請**（把當下提醒外包給 OS，零基礎建設）＋ 站內鈴鐺 |
+| T−0 | 開船 | 站內鈴鐺 ＋ 3D 世界內：個人島港口出現船班（harbor 既有點擊點） |
+| 場中 | — | 已登島者 polling 同步，無需通知 |
+| T+10m | 缺席補寄 | email ＋ 站內鈴鐺（見 §8） |
+
+- 通知偏好與退訂沿用既有 `notification_preferences` 機制，新增 island-event 類 type。
+- Web Push（VAPID、subscription 表、iOS 需加入主畫面）列第二批——待數據顯示「預告有讀、當下仍缺席」比例高再投資。
+
+## 8. 缺席補寄 job
 
 - `closes_at` 到點：BullMQ delayed job（排程器建場次時一併排入；場次刪除時撤銷）。
 - 內容（全事實層，proposal 措辭紅線）：題目、參與概況、揭曉牆連結、補答入口、下一班船時間。
 - 對象：joined 成員 − 出席者；走既有 email/通知管道，比照 weekly digest 的模板結構。
 
-## 8. Edge cases
+## 9. Edge cases
 
 | 情境 | 處理 |
 |---|---|
