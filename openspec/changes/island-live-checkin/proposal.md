@@ -2,7 +2,7 @@
 
 > Change ID: `island-live-checkin`
 > 建立日期：2026-07-29
-> 影響 repo：daodao-f2e、daodao-server、daodao-storage、（daodao-ai-backend：後期選配—AI 出題）
+> 影響 repo：daodao-f2e、daodao-server、daodao-storage、daodao-admin-ui（場次設定介面）、（daodao-ai-backend：後期選配—AI 出題）
 
 ## Why
 
@@ -26,7 +26,7 @@
 
 | 階段 | 島世界的說法 | 機制 |
 |---|---|---|
-| 活動開始 | 🚢 港口出現往活動島的船班 | 固定週期排程（預設週更），5~10 人小團 |
+| 活動開始 | 🚢 港口出現往活動島的船班 | 固定週期排程（預設週更），5~10 人小團＝既有 cohort；設定由 admin 側配置（cohort 管理本就在 admin），每場全自動 |
 | 進行中 | 登島、看到別人的立牌、回答題目 | 貼便利貼上牆（蓋牌狀態，看得到有人貼、看不到內容） |
 | 倒數 | 🔥 營火漸熄／天色漸暗 | client 以 `closes_at` 自算，純演出 |
 | 截止 | ⛵ 末班船開走 | server 端不變式 `now < closes_at` 才准寫入；遲到者物理上到不了島 |
@@ -77,7 +77,8 @@ server 只給一次 `closes_at`，每支手機以 NTP 校準過的本地時鐘�
 1. **daodao-storage**：`migrate/sql/{下一序號}_add_island_events.sql`——`island_events`（場次、opens_at/closes_at、題目、seed）、`island_event_checkins`（回答、蓋牌狀態不需欄位——由時間推導；含事後補答標記，如 `is_late` 或以時間戳推導）；同步回寫 `schema/`。
 2. **daodao-server**：prisma schema → `prisma:generate` → `schema:drift`；新增 event CRUD、snapshot、check-in（含 `now < closes_at` 不變式；補答走同 endpoint 但標記事後）；Zod validators 註冊 openapi。
 3. **daodao-ai-backend**：MVP 不動（無新 ORM 對映需求則免）；後期選配：依島上動態生成題目。
-4. **daodao-f2e**：等 `sync-openapi` 或手動 `gen:types`；island-engine 新增活動島模式（無主島、立牌、營火倒數、便利貼牆、翻牌演出）；product app 新增場次入口（港口船班）與 check-in 表單。
+4. **daodao-admin-ui**：cohort 管理頁加活動島設定區（開關、週期、時窗、題目佇列）；`src/api/types.ts` 手動同步（system-map：無自動同步）。
+5. **daodao-f2e**：等 `sync-openapi` 或手動 `gen:types`；island-engine 新增活動島模式（無主島、立牌、營火倒數、便利貼牆、翻牌演出）；product app 新增場次入口（港口船班）與 check-in 表單。
 
 ## Out of Scope
 
@@ -85,7 +86,8 @@ server 只給一次 `closes_at`，每支手機以 NTP 校準過的本地時鐘�
 - AI 出題（ai-backend 後期選配）。
 - 投票題結果統計圖、排名題（第二批題型）。
 - mobile（Expo）版活動島。
-- 場次的自訂排程 UI（MVP 用固定週期設定值）。
+- 成員端幹部管理 UI（手動加開場次）——依賴尚不存在的成員面向 cohort 管理介面，第二批。
+- 成員輪流出題——第二批優先候選（持續槓桿：出題人必到場、所有權輪值）。
 
 ## Risks / Notes
 

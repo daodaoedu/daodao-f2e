@@ -93,13 +93,44 @@ UNIQUE (event_id, user_id)               -- 一人一場一張（MVP）
 - check-in 表單（沿用 `use-form-draft` 草稿機制）、倒數 UI、揭曉後牆面瀏覽。
 - polling hook 比照 `packages/api` 既有 service + hooks pattern；`snapshot` types 等 `sync-openapi` 生成。
 
-## 6. 缺席補寄 job
+## 6. 場次發起與設定
 
-- `closes_at` 到點：BullMQ delayed job（建場次時排入；場次刪除時撤銷）。
+**現實約束**：cohort 的建立與設定今天全在 admin 側（`audit_logs` 記 `admin_id`），成員端沒有幹部管理 UI。因此 MVP 的發起設定掛 admin 側，每場全自動，不依賴任何成員手動操作（符合 D4：固定節奏勝過隨興發起）。
+
+### 設定（cohort 屬性，admin 配置）
+
+```
+island_event_enabled    BOOLEAN（開關）
+island_event_schedule   週幾 + 時間（例：週一 21:00）
+island_event_duration   時窗長度，預設 10 分鐘
+題目佇列                 admin 預排清單依序消耗；用完 fallback 官方題庫抽卡
+```
+
+儲存形式（cohorts 加欄位 vs 獨立設定表）留給 migration 實作時依既有 pattern 決定。
+
+### 每場自動生命週期
+
+```
+T−24h   排程器建立場次（題目自佇列取出）→ 船班預告通知
+T−0     opens_at → 開船通知 → 10 分鐘儀式
+T+10m   closes_at → client 各自揭曉（D2）→ 補寄 job → 準備下一場
+```
+
+### 發起模式演進
+
+| 模式 | 狀態 | 備註 |
+|---|---|---|
+| admin 排程（全自動） | **MVP** | 貼既有 admin 側 cohort 管理，成本最低 |
+| 幹部手動加開 | 第二批 | 依賴尚不存在的成員面向管理 UI |
+| 成員輪流出題 | 第二批（優先候選） | 持續槓桿：出題人必到場、所有權輪值；需出題通知流程 + 未出題 fallback |
+
+## 7. 缺席補寄 job
+
+- `closes_at` 到點：BullMQ delayed job（排程器建場次時一併排入；場次刪除時撤銷）。
 - 內容（全事實層，proposal 措辭紅線）：題目、參與概況、揭曉牆連結、補答入口、下一班船時間。
 - 對象：joined 成員 − 出席者；走既有 email/通知管道，比照 weekly digest 的模板結構。
 
-## 7. Edge cases
+## 8. Edge cases
 
 | 情境 | 處理 |
 |---|---|

@@ -17,12 +17,18 @@
 - [ ] 2.3 routes + Zod validators + `registry.registerPath`（openapi 自動生成）
 - [ ] 2.4 reaction/comment 允許值加 `island_event_checkin`（TS 常量同步，對應 1.2）
 - [ ] 2.5 缺席補寄：BullMQ delayed job（建場次排入/刪場次撤銷）＋ email 模板（比照 cohort-weekly-digest；措辭紅線：邀請不催討）
-- [ ] 2.6 cohort 排程設定（MVP 固定週期值）自動開場次
-- [ ] 2.7 測試：不變式（早到/準時/補答三態）、蓋牌裁切、缺席名單推導
+- [ ] 2.6 場次排程器：依 cohort 設定 T−24h 自動建場次（題目佇列消耗、fallback 題庫）＋ 船班預告/開船通知
+- [ ] 2.7 admin 設定 API：cohort 活動島設定欄位讀寫（開關、週期、時窗、題目佇列）
+- [ ] 2.8 測試：不變式（早到/準時/補答三態）、蓋牌裁切、缺席名單推導、排程器建場
 
 ## 3. daodao-ai-backend
 
 - [ ] 3.1 確認新表無 ORM 對映需求（無則跳過）；1.2 的 enum 值若涉及 Py 常量則同步（schema-sync-check 會抓）
+
+## 3.5 daodao-admin-ui
+
+- [ ] 3.5.1 cohort 管理頁活動島設定區（開關、週幾+時間、時窗長度、題目佇列編輯）
+- [ ] 3.5.2 `src/api/types.ts` 手動同步新 API（system-map：admin-ui 無自動 types 同步）
 
 ## 4. daodao-f2e — 引擎（可先行，mock data）
 
