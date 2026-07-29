@@ -35,9 +35,10 @@
 
 ### 缺席重返機制（與末班船成對，缺一不可）
 
-- 缺席者在營火圈留下一支**未點燃的火把**（缺席可見，但不羞辱）。
-- 其他成員可在火把上掛「想你」小紙條。
-- 缺席者回訪遺跡島看得到火把與紙條；**下一班船票直接遞到面前**（重返成本最低化）。
+- 缺席者在營火圈留下一支**未點燃的火把**——事實陳述式的缺席可見，不需任何人動手，也不表演情感。
+- 那場的題目裝進**瓶中信**留在火把旁；缺席者回訪遺跡島可**補答**，貼在牆邊的瓶中信區（明確標示事後，不混入正式牆——末班船守護的共時稀缺性毫髮無傷）。
+- 對補答的回應走**既有 reaction/comment 機制**，自願發生。刻意不做「想你紙條」類的情感模板：被規定的溫暖是假的（零成本＋罐頭＋系統發起），還會讓真的想念無法被辨識。
+- 補答旁直接放**下一班船票**（重返成本最低化）。
 
 ### 活動島（引擎面）
 
@@ -50,7 +51,7 @@
 - 活動場次：`opens_at` / `closes_at` server 權威時間戳；建立、查詢、報名/搭船。
 - **Snapshot endpoint**：回傳完整現況（誰在島上、牆上貼紙、closes_at、揭曉了沒）。這支同時是 polling 的資料源，也是未來任何 realtime 升級的斷線補償機制。
 - Check-in 寫入：驗證 `now < closes_at`，逾時回明確錯誤（f2e 演「末班船開走」）。
-- 火把紙條：缺席名單推導（成員 − 出席者）＋ 留言寫入。
+- 火把與瓶中信：缺席名單推導（成員 − 出席者）；補答寫入（標記為事後，與正式 check-in 區分）；補答的回應沿用既有 reaction/comment。
 
 ## Design Decisions
 
@@ -71,8 +72,8 @@ server 只給一次 `closes_at`，每支手機以 NTP 校準過的本地時鐘�
 
 ## Cross-Repo Scope（依 system-map SOP，順序固定）
 
-1. **daodao-storage**：`migrate/sql/{下一序號}_add_island_events.sql`——`island_events`（場次、opens_at/closes_at、題目、seed）、`island_event_checkins`（回答、蓋牌狀態不需欄位——由時間推導）、`island_event_torch_notes`（想你紙條）；同步回寫 `schema/`。
-2. **daodao-server**：prisma schema → `prisma:generate` → `schema:drift`；新增 event CRUD、snapshot、check-in（含 `now < closes_at` 不變式）、torch notes endpoints；Zod validators 註冊 openapi。
+1. **daodao-storage**：`migrate/sql/{下一序號}_add_island_events.sql`——`island_events`（場次、opens_at/closes_at、題目、seed）、`island_event_checkins`（回答、蓋牌狀態不需欄位——由時間推導；含事後補答標記，如 `is_late` 或以時間戳推導）；同步回寫 `schema/`。
+2. **daodao-server**：prisma schema → `prisma:generate` → `schema:drift`；新增 event CRUD、snapshot、check-in（含 `now < closes_at` 不變式；補答走同 endpoint 但標記事後）；Zod validators 註冊 openapi。
 3. **daodao-ai-backend**：MVP 不動（無新 ORM 對映需求則免）；後期選配：依島上動態生成題目。
 4. **daodao-f2e**：等 `sync-openapi` 或手動 `gen:types`；island-engine 新增活動島模式（無主島、立牌、營火倒數、便利貼牆、翻牌演出）；product app 新增場次入口（港口船班）與 check-in 表單。
 
@@ -89,4 +90,4 @@ server 只給一次 `closes_at`，每支手機以 NTP 校準過的本地時鐘�
 - **3D 多角色效能**：手機上同時渲染 10 個立牌/角色 + 個人島資產，需靠既有 quality tier 降級；立牌可用 billboard 而非全 3D 角色起步。
 - **時鐘偏差**：極少數裝置時鐘不準會導致翻牌時刻不一致；server 的 snapshot 可回傳 `server_now` 供 client 校正偏移。
 - **跨 repo 節奏**：f2e 的表單與引擎演出可先以 mock data 開發（island-engine 零 API 依賴的設計正好支持）；接線等 server 欄位上 dev 後進行。
-- **社群設計風險**：火把/紙條的語氣必須是「被想念」不是「被追蹤」，文案與視覺需與社群夥伴確認。
+- **社群設計風險**：火把的語氣必須是中性的事實陳述，不是「被追蹤」；補答的呈現不可帶補償/懲罰色彩。文案與視覺需與社群夥伴確認。刻意排除任何情感模板（如罐頭「想你」）——被規定的溫暖會讓自願的回饋貶值。
