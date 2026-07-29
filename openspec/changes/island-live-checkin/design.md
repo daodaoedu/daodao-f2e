@@ -3,6 +3,47 @@
 > Change ID: `island-live-checkin`
 > 前置閱讀：`proposal.md`（why 與設計決策 D1–D5 不重複於此）
 
+## 0. 全流程總覽
+
+```mermaid
+flowchart TD
+    subgraph P0["⓪ 設定期（一次性）"]
+        A0["admin 設定 cohort 活動島：開關／週期／時窗／題目佇列"]
+    end
+    subgraph P1["① 預告期（T−24h）"]
+        S1["排程器建場次（佇列取題，空則題庫抽卡）＋排入補寄 job"]
+        N1["📧 email 預告＋.ics 行事曆邀請 ｜ 🔔 站內鈴鐺"]
+        S1 --> N1
+    end
+    subgraph P2["② 儀式期（opens_at ～ closes_at，10 分鐘）"]
+        O1["🔔 開船通知＋個人島港口出現船班"]
+        O2["🚢 搭船登島（驗 cohort 成員）"]
+        O3["snapshot polling 3~5s：立牌出現／蓋牌貼紙只見張數（server 裁切）／serverNow 校時"]
+        O4["✍️ check-in：server 驗 now < closes_at → 貼上牆（蓋牌）"]
+        O5["🔥 營火隨剩餘時間漸熄（client 純演出）"]
+        O1 --> O2 --> O3 --> O4
+        O3 --> O5
+    end
+    subgraph P3["③ 截止與揭曉（closes_at）"]
+        R1["⛵ 末班船開走——遲到者到不了島"]
+        R2["🎆 各 client 依共享時鐘同時翻牌（零網路依賴）"]
+        R3["瀏覽全牆 → 自願 reaction／comment"]
+        R4["🏛 轉為遺跡島（永久可回訪）"]
+        R1 --> R2 --> R3 --> R4
+    end
+    subgraph P4["④ 重返期（缺席者）"]
+        B1["補寄 job：缺席名單＝joined − 出席者"]
+        B2["📧 活動記錄：題目／概況／牆連結／補答入口／下一班船（說發生了什麼，不說你錯過了什麼）"]
+        B3["回訪遺跡島：🔥 未點燃火把＋🍾 瓶中信（題目）"]
+        B4["補答 → 瓶中信區（標示事後）→ 他人自願回應 → 🎫 下一班船票"]
+        B1 --> B2 --> B3 --> B4
+    end
+    P0 --> P1 --> P2 --> P3 --> P4
+    B4 -.->|"持續迴圈：出席→被看見→被回應→遺跡累積→期待下一次"| P1
+```
+
+對應第一性推導：①約定感（固定節奏即通知）；②回饋密度濃縮（死法二）；③稀缺性＝儀式感；④羞恥螺旋解藥（死法三）；立牌與火把讓在場/缺席皆可見（死法一）。
+
 ## 1. 領域模型：掛在 cohort 上
 
 5~10 人小團**直接使用既有 `cohorts`**（成員 = `cohort_enrollments` where status=joined），不自建成員系統。
