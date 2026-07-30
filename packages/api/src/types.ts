@@ -35649,6 +35649,7 @@ export interface components {
          *           "url": "https://react.dev"
          *         }
          *       ],
+         *       "answerCount": 42,
          *       "createdAt": "2024-01-15T10:30:00.000Z"
          *     }
          */
@@ -35731,6 +35732,11 @@ export interface components {
                 /** Format: uri */
                 externalLink: string | null;
             };
+            /**
+             * @description 使用此模板建立實踐的總人次
+             * @example 42
+             */
+            answerCount: number;
             /**
              * @description 建立時間
              * @example 2024-01-15T10:30:00.000Z

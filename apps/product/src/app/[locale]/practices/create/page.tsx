@@ -95,6 +95,7 @@ export default function CreatePracticePage() {
       id: template.id,
       title: template.title,
       description: template.practiceAction || template.suggestedTags.join("、") || template.title,
+      answerCount: template.answerCount ?? 0,
     }));
   }, [data]);
 
@@ -227,6 +228,11 @@ export default function CreatePracticePage() {
                             <p className="text-sm text-text-dark line-clamp-2 flex-1">
                               {practice.description}
                             </p>
+                            {practice.answerCount > 0 && (
+                              <p className="text-xs text-text-dark/50 mt-1">
+                                {t("template_answer_count", { count: practice.answerCount })}
+                              </p>
+                            )}
                           </div>
                           <div className="shrink-0">
                             <ChevronRight className="size-4.5 text-text-dark group-hover:text-logo-cyan transition-colors" />

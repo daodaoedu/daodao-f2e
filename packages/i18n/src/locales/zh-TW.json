@@ -5022,6 +5022,7 @@
     "create_prev": "上一個",
     "create_next": "下一個",
     "create_manual": "我想自己建立",
+    "template_answer_count": "{count} 人實踐中",
     "create_failed": "建立實踐失敗",
     "create_failed_retry": "建立實踐失敗，請稍後再試",
     "manual_preview_title": "預覽",

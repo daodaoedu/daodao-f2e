@@ -5022,6 +5022,7 @@
     "create_prev": "Previous",
     "create_next": "Next",
     "create_manual": "I want to create my own",
+    "template_answer_count": "{count} practicing",
     "create_failed": "Failed to create practice",
     "create_failed_retry": "Failed to create practice, please try again later",
     "manual_preview_title": "Preview",
