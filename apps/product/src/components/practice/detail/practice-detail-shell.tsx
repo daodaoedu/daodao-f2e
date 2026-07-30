@@ -69,6 +69,8 @@ interface IPracticeDetailResource {
   id: string;
   name: string;
   url?: string;
+  /** 指定第幾天使用（1 = 開始日當天；null/undefined 代表整段期間皆可使用） */
+  dayNumber?: number | null;
 }
 
 interface IPracticeDetailCreator {
@@ -234,6 +236,11 @@ function PracticeResourceListCard({
       </div>
 
       <div className="flex-1 min-w-0 py-1 overflow-hidden whitespace-normal">
+        {resource.dayNumber != null && (
+          <span className="inline-block mb-1 rounded-full bg-[#E7FAF7] px-2 py-0.5 text-[11px] font-semibold text-[#0D7773]">
+            {t("resource_day_badge", { day: resource.dayNumber })}
+          </span>
+        )}
         <p className="text-sm font-semibold text-[#295E5C] leading-snug line-clamp-2">
           {resource.name}
         </p>
@@ -872,7 +879,14 @@ export function PracticeDetailShell({
       {activeTab === "resources" && (
         <div className="px-4 pt-4 flex flex-col gap-3 pb-4">
           {practice.resources.length > 0 ? (
-            practice.resources.map((resource) => (
+            // 有指定使用日的資源依天數排前面，沒指定的（整段期間皆可用）排最後
+            [...practice.resources]
+              .sort(
+                (a, b) =>
+                  (a.dayNumber ?? Number.MAX_SAFE_INTEGER) -
+                  (b.dayNumber ?? Number.MAX_SAFE_INTEGER)
+              )
+              .map((resource) => (
               <PracticeResourceListCard
                 key={resource.id}
                 resource={resource}

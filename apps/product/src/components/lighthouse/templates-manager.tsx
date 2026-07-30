@@ -28,35 +28,57 @@ interface TemplateData {
   sessionDurationMinutes: number | null;
   practiceTimePeriods: string[];
   boundCohortIds: number[];
-  resources?: Array<{ id: string; name: string; url: string | null }>;
+  resources?: Array<{ id: string; name: string; url: string | null; dayNumber?: number | null }>;
   bindings?: Array<{ cohortId: number; startDate: string | null }>;
   generatedDraftCount: number;
 }
 
 const MAX_TEMPLATE_RESOURCES = 5;
+const MAX_RESOURCE_DAY = 30;
 
-type ResourceRow = { key: string; name: string; url: string };
+type ResourceRow = { key: string; name: string; url: string; day: string };
 
 /** 資源列是動態增減的，用 getAll 依序取回並丟掉沒填名稱的空列 */
 function readResources(formData: FormData) {
   const names = formData.getAll("resourceName").map(String);
   const urls = formData.getAll("resourceUrl").map(String);
+  const days = formData.getAll("resourceDay").map(String);
   return names.flatMap((name, index) => {
     const trimmed = name.trim();
     if (!trimmed) return [];
     const url = (urls[index] ?? "").trim();
-    return [url ? { name: trimmed, url } : { name: trimmed }];
+    const day = Number(days[index] ?? "");
+    return [
+      {
+        name: trimmed,
+        ...(url && { url }),
+        // 空字串代表整段期間皆可使用；帶 null 才會把既有的指定日清掉
+        dayNumber: Number.isInteger(day) && day >= 1 && day <= MAX_RESOURCE_DAY ? day : null,
+      },
+    ];
   });
 }
 
 /**
  * 以下選項必須與 practice_templates 的 CHECK 約束一致，且與網站建立實踐的流程同一組；
  * 之前這裡是自由數字輸入，填 10 天 / 20 分鐘會在寫入時炸成 500。
+ * 頻率（每週天數）的 CHECK 只要求 max >= min，因此開放 1-7 自由輸入。
  */
 const DURATION_DAY_OPTIONS = [7, 14, 21, 30] as const;
 const SESSION_MINUTE_OPTIONS = [15, 30, 45, 60] as const;
-const FREQUENCY_OPTIONS = ["2-4", "3-5", "4-7"] as const;
 const TIME_PERIOD_OPTIONS = ["morning", "commute", "afternoon", "evening", "night"] as const;
+
+type TimePeriod = (typeof TIME_PERIOD_OPTIONS)[number];
+
+/** checkbox 值本來就出自 TIME_PERIOD_OPTIONS，這裡只是把 FormData 的 string 收斂回 enum */
+function readTimePeriods(formData: FormData) {
+  return formData
+    .getAll("practiceTimePeriods")
+    .map(String)
+    .filter((period): period is TimePeriod =>
+      (TIME_PERIOD_OPTIONS as readonly string[]).includes(period)
+    );
+}
 
 const SELECT_CLASS =
   "mt-2 h-10 w-full rounded-xl border border-[#CDEBE8] bg-white px-3 text-sm text-[#0D3036]";
@@ -66,16 +88,13 @@ function numberOrNull(value: FormDataEntryValue | null) {
   return text ? Number(text) : null;
 }
 
-/** 把既有的 min/max 天數還原成頻率選項；對不上的舊資料原樣保留成一個額外選項 */
-function frequencyValue(initial?: TemplateData) {
-  if (!initial?.frequencyMinDays || !initial.frequencyMaxDays) return "";
-  return `${initial.frequencyMinDays}-${initial.frequencyMaxDays}`;
-}
-
-function parseFrequencyRange(value: string) {
-  const [min, max] = value.split("-");
-  if (!min || !max) return { frequencyMinDays: null, frequencyMaxDays: null };
-  return { frequencyMinDays: Number(min), frequencyMaxDays: Number(max) };
+/** 每週頻率為自由輸入（1-7 天）；min > max 時回傳 null 讓呼叫端擋下送出 */
+function readFrequencyRange(formData: FormData) {
+  const frequencyMinDays = numberOrNull(formData.get("frequencyMinDays"));
+  const frequencyMaxDays = numberOrNull(formData.get("frequencyMaxDays"));
+  if (frequencyMinDays !== null && frequencyMaxDays !== null && frequencyMinDays > frequencyMaxDays)
+    return null;
+  return { frequencyMinDays, frequencyMaxDays };
 }
 
 function TemplateForm({
@@ -88,13 +107,14 @@ function TemplateForm({
   busy: boolean;
 }) {
   const t = useTranslations("lighthouse");
-  const currentFrequency = frequencyValue(initial);
-  const legacyFrequency =
-    currentFrequency && !FREQUENCY_OPTIONS.some((range) => range === currentFrequency)
-      ? currentFrequency
-      : null;
   const [resourceRows, setResourceRows] = useState<ResourceRow[]>(
-    () => initial?.resources?.map((r) => ({ key: r.id, name: r.name, url: r.url ?? "" })) ?? []
+    () =>
+      initial?.resources?.map((r) => ({
+        key: r.id,
+        name: r.name,
+        url: r.url ?? "",
+        day: r.dayNumber ? String(r.dayNumber) : "",
+      })) ?? []
   );
   // key 不能用 rows.length 推導：刪掉中間一列再新增會撞號，
   // 而這些輸入是 uncontrolled，重複的 key 會讓 React 沿用到別列的 DOM
@@ -145,29 +165,35 @@ function TemplateForm({
           ))}
         </select>
       </label>
-      <label htmlFor="frequency" className="grid">
+      <div className="grid">
         <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#0D7773]">
           04 · {t("template_step_frequency")}
         </span>
-        <select
-          id="frequency"
-          name="frequency"
-          defaultValue={currentFrequency}
-          className={SELECT_CLASS}
-        >
-          <option value="">{t("not_specified")}</option>
-          {FREQUENCY_OPTIONS.map((range) => (
-            <option key={range} value={range}>
-              {t("frequency_option", { range })}
-            </option>
-          ))}
-          {legacyFrequency && (
-            <option value={legacyFrequency}>
-              {t("frequency_option", { range: legacyFrequency })}
-            </option>
-          )}
-        </select>
-      </label>
+        <div className="mt-2 flex items-center gap-2">
+          <Input
+            name="frequencyMinDays"
+            type="number"
+            min={1}
+            max={7}
+            defaultValue={initial?.frequencyMinDays ?? ""}
+            placeholder={t("frequency_min_placeholder")}
+            aria-label={t("frequency_min_placeholder")}
+            className="h-10"
+          />
+          <span className="text-sm text-[#5A7B79]">–</span>
+          <Input
+            name="frequencyMaxDays"
+            type="number"
+            min={1}
+            max={7}
+            defaultValue={initial?.frequencyMaxDays ?? ""}
+            placeholder={t("frequency_max_placeholder")}
+            aria-label={t("frequency_max_placeholder")}
+            className="h-10"
+          />
+        </div>
+        <p className="mt-1 text-xs text-[#78928F]">{t("frequency_free_hint")}</p>
+      </div>
       <label htmlFor="session-minutes" className="grid">
         <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#0D7773]">
           05 · {t("template_step_context")}
@@ -229,6 +255,16 @@ function TemplateForm({
                 placeholder="https://example.com"
                 className="min-w-40 flex-1"
               />
+              <Input
+                name="resourceDay"
+                type="number"
+                min={1}
+                max={MAX_RESOURCE_DAY}
+                defaultValue={row.day}
+                placeholder={t("template_resource_day")}
+                aria-label={t("template_resource_day")}
+                className="w-32"
+              />
               <Button
                 variant="ghost"
                 size="sm"
@@ -246,7 +282,7 @@ function TemplateForm({
             className="mt-2"
             onClick={() => {
               const key = `new-${nextResourceKey.current++}`;
-              setResourceRows((rows) => [...rows, { key, name: "", url: "" }]);
+              setResourceRows((rows) => [...rows, { key, name: "", url: "", day: "" }]);
             }}
           >
             <Plus className="size-4" />
@@ -361,14 +397,19 @@ function TemplateCard({
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   async function update(formData: FormData) {
+    const frequency = readFrequencyRange(formData);
+    if (!frequency) {
+      toast.error(t("frequency_error"));
+      return;
+    }
     setBusy(true);
     const response = await updateLighthouseTemplate(organizationId, template.id, {
       title: String(formData.get("title") ?? "").trim(),
       practiceAction: String(formData.get("practiceAction") ?? "").trim() || null,
       durationDays: numberOrNull(formData.get("durationDays")),
-      ...parseFrequencyRange(String(formData.get("frequency") ?? "")),
+      ...frequency,
       sessionDurationMinutes: numberOrNull(formData.get("sessionDurationMinutes")),
-      practiceTimePeriods: formData.getAll("practiceTimePeriods").map(String),
+      practiceTimePeriods: readTimePeriods(formData),
       resources: readResources(formData),
     });
     setBusy(false);
@@ -466,7 +507,11 @@ export function TemplatesManager() {
   const [busy, setBusy] = useState(false);
   async function create(formData: FormData) {
     if (!organization) return;
-    const frequency = parseFrequencyRange(String(formData.get("frequency") ?? ""));
+    const frequency = readFrequencyRange(formData);
+    if (!frequency) {
+      toast.error(t("frequency_error"));
+      return;
+    }
     setBusy(true);
     const response = await createLighthouseTemplate(organization.id, {
       title: String(formData.get("title") ?? "").trim(),
@@ -474,7 +519,7 @@ export function TemplatesManager() {
       durationDays: numberOrNull(formData.get("durationDays")),
       ...frequency,
       sessionDurationMinutes: numberOrNull(formData.get("sessionDurationMinutes")),
-      practiceTimePeriods: formData.getAll("practiceTimePeriods").map(String),
+      practiceTimePeriods: readTimePeriods(formData),
       resources: readResources(formData),
     });
     setBusy(false);
