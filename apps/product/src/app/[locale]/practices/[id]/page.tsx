@@ -63,7 +63,7 @@ interface IPracticeDetailData {
   executionTiming: ExecutionTiming[];
   customTiming: string;
   tags: string[];
-  resources: { id: string; name: string; url?: string }[];
+  resources: { id: string; name: string; url?: string; dayNumber?: number | null }[];
   progress: number;
 }
 
@@ -235,6 +235,7 @@ export default function PracticeDetailPage() {
         id: resource.id,
         name: resource.name,
         url: resource.url,
+        dayNumber: resource.dayNumber,
       })),
       progress: data.progressPercentage ?? 0,
     };

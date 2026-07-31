@@ -103,7 +103,7 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
         return;
       }
       toast.success(t("exit_success"));
-      router.push("/practices");
+      router.push("/mine");
     } catch {
       toast.error(t("exit_failed"));
     }

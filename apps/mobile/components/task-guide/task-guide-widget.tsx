@@ -35,7 +35,8 @@ export function TaskGuideWidget() {
   if (isLoading || taskList.length === 0) return null;
 
   const total = taskList.length;
-  const allCompleted = completedTasks >= total;
+  const allCompleted = total > 0 && completedTasks >= total;
+  if (allCompleted) return null;
 
   const handleTaskPress = (task: OnboardingTaskItem) => {
     if (task.done) return;

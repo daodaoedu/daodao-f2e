@@ -262,8 +262,16 @@ export const lighthouseTemplatesResponseSchema = apiSuccessSchema(
       practiceTimePeriods: z.array(z.string()),
       boundCohortIds: z.array(z.number().int().positive()),
       // resources 與 bindings 設為 optional，讓前端可以先於後端上線
+      // dayNumber 同理用 nullish：後端還沒帶這個欄位時 validation 也不會炸
       resources: z
-        .array(z.object({ id: z.string(), name: z.string(), url: z.string().nullable() }))
+        .array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            url: z.string().nullable(),
+            dayNumber: z.number().int().nullish(),
+          })
+        )
         .optional(),
       bindings: z
         .array(
