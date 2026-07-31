@@ -94,6 +94,8 @@ function readFrequencyRange(formData: FormData) {
   const frequencyMaxDays = numberOrNull(formData.get("frequencyMaxDays"));
   if (frequencyMinDays !== null && frequencyMaxDays !== null && frequencyMinDays > frequencyMaxDays)
     return null;
+  const inRange = (n: number | null) => n === null || (n >= 1 && n <= 7);
+  if (!inRange(frequencyMinDays) || !inRange(frequencyMaxDays)) return null;
   return { frequencyMinDays, frequencyMaxDays };
 }
 
