@@ -8,6 +8,7 @@ import { getStorage, StorageEnum } from "@daodao/shared";
 import { cn } from "@daodao/ui/lib/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AddTaskFAB } from "@/components/dashboard";
+import { HomeTimelineSummary } from "@/components/future-letter";
 import { BackgroundAnimation, Banner } from "@/components/layout";
 import { ResonanceCarousel } from "@/components/persona";
 import {
@@ -236,6 +237,7 @@ export default function HomePage() {
   return (
     <div className="relative min-h-screen">
       <Banner />
+      {user && <HomeTimelineSummary />}
       <BackgroundAnimation />
 
       <main className="relative z-[25] pb-[72px] bg-very-light-gray">

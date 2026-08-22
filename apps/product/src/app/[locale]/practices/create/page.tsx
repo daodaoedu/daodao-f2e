@@ -91,12 +91,15 @@ export default function CreatePracticePage() {
       return [];
     }
 
-    return data.data.map((template: PracticeTemplateType) => ({
-      id: template.id,
-      title: template.title,
-      description: template.practiceAction || template.suggestedTags.join("、") || template.title,
-      answerCount: template.answerCount ?? 0,
-    }));
+    return data.data.map((template: PracticeTemplateType) => {
+      const answerCount = "answerCount" in template ? template.answerCount : 0;
+      return {
+        id: template.id,
+        title: template.title,
+        description: template.practiceAction || template.suggestedTags.join("、") || template.title,
+        answerCount: typeof answerCount === "number" ? answerCount : 0,
+      };
+    });
   }, [data]);
 
   // 將 practices 每 2 個分組

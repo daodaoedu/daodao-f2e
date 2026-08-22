@@ -231,12 +231,15 @@ export default function PracticeDetailPage() {
       executionTiming: finalExecutionTiming,
       customTiming: data.otherContext || "",
       tags: data.tags || [],
-      resources: (data.resources || []).map((resource) => ({
-        id: resource.id,
-        name: resource.name,
-        url: resource.url,
-        dayNumber: resource.dayNumber,
-      })),
+      resources: (data.resources || []).map((resource) => {
+        const dayNumber = "dayNumber" in resource ? resource.dayNumber : null;
+        return {
+          id: resource.id,
+          name: resource.name,
+          url: resource.url,
+          dayNumber: typeof dayNumber === "number" ? dayNumber : null,
+        };
+      }),
       progress: data.progressPercentage ?? 0,
     };
   }, [practiceData]);
@@ -495,7 +498,8 @@ export default function PracticeDetailPage() {
                   id: practiceData.data.user.id,
                   name: practiceData.data.user.name,
                   photoURL: practiceData.data.user.photoURL,
-                  customId: (practiceData.data.user as { customId?: string | null }).customId ?? undefined,
+                  customId:
+                    (practiceData.data.user as { customId?: string | null }).customId ?? undefined,
                   date: creatorDate,
                 }
               : undefined,
