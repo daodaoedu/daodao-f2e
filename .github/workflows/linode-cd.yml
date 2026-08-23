@@ -57,7 +57,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
           ref: ${{ env.BRANCH_NAME }}
 
       - name: Detect file changes
@@ -82,22 +82,31 @@ jobs:
             exit 0
           fi
 
-          # 自動觸發時檢測變更
-          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+          # 自動觸發時檢測變更：比對「上次成功部署的 SHA」到當前 HEAD
+          # 使用 git ref refs/deploy/<branch> 記錄上次部署成功的 commit
+          DEPLOY_REF="refs/deploy/${{ env.BRANCH_NAME }}"
+          
+          if git show-ref --verify --quiet "$DEPLOY_REF"; then
+            # 找到上次部署的 SHA，比對它到 HEAD
+            BASE_SHA=$(git rev-parse "$DEPLOY_REF")
+            HEAD_SHA="HEAD"
+            echo "Comparing changes since last deploy ($BASE_SHA) to HEAD"
+          elif git rev-parse HEAD~1 >/dev/null 2>&1; then
+            # fallback：第一次跑或 ref 不存在，用 HEAD~1
             BASE_SHA="HEAD~1"
             HEAD_SHA="HEAD"
+            echo "No deploy ref found, comparing HEAD~1 to HEAD"
           else
-            # 第一個 commit，build 所有應用
+            # 真正的第一個 commit
             echo "website=true" >> $GITHUB_OUTPUT
             echo "product=true" >> $GITHUB_OUTPUT
             echo "✅ First commit: building all apps"
             exit 0
           fi
 
-          echo "Comparing changes between $BASE_SHA and $HEAD_SHA"
           CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
 
-          echo "Changed files:"
+          echo "Changed files since $BASE_SHA:"
           echo "$CHANGED_FILES"
 
           # 檢查是否需要 build website
@@ -635,6 +644,23 @@ jobs:
 
             echo "=== Deployment completed successfully ==="
           ENDSSH
+
+      - name: Checkout for deploy ref update
+        if: success()
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.BRANCH_NAME }}
+          token: ${{ secrets.GIT_HUB_ACCESS_TOKEN }}
+
+      - name: Update deploy ref
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git update-ref refs/deploy/${{ env.BRANCH_NAME }} ${{ env.COMMIT_SHA }}
+          git push origin refs/deploy/${{ env.BRANCH_NAME }}
+          echo "✅ Updated deploy ref refs/deploy/${{ env.BRANCH_NAME }} to ${{ env.COMMIT_SHA }}"
 
   # ===== 部署後驗證 =====
   verify:

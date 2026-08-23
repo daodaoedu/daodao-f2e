@@ -3,11 +3,11 @@ name: Linode CI
 # ===== 並發控制設定 =====
 # 目的：防止同一分支的多個 CI 檢查同時執行，避免資源浪費
 # group: 針對 PR 使用 head_ref，其他情況使用 ref
-# cancel-in-progress: 當新的 CI 檢查觸發時，自動取消舊的檢查
+# cancel-in-progress: false（讓所有 CI 跑完，CD 有 cancel-in-progress 就夠了）
 # =======================
 concurrency:
   group: linode-ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 # ===== 觸發條件設定 =====
 # 1. push：當推送到 main, dev, feat/** 分支時觸發
