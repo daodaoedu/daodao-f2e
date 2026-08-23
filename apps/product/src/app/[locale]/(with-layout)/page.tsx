@@ -287,7 +287,8 @@ export default function HomePage() {
               onSearch={handleSearch}
             />
           </div>
-          <ResonanceCarousel />
+          {/* Temporarily disabled per product request */}
+          {false && <ResonanceCarousel />}
 
           {isShowcaseLoading && feedItems.length === 0 ? (
             <div className="flex flex-col gap-3">
