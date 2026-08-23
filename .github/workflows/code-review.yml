@@ -274,8 +274,11 @@ jobs:
         run: |
           BODY="$(cat "$RUNNER_TEMP/review-body.md")"
           HEAD_MARKER="<!-- daodao-ai-code-review-head:$HEAD_SHA -->"
+          # 新版 gh CLI 不允許 --slurp 與 --jq 併用，改用管線交給 jq；
+          # 順便用 --arg 傳 marker，避免 shell 內插進 jq 程式。
           COMMENTS="$(gh api --paginate --slurp "repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
-            --jq "add | [.[] | select(.user.login == \"github-actions[bot]\" and (.body | contains(\"$HEAD_MARKER\")))]")"
+            | jq --arg marker "$HEAD_MARKER" \
+              'add | [.[] | select(.user.login == "github-actions[bot]" and (.body | contains($marker)))]')"
           EXISTING=$(printf '%s' "$COMMENTS" | jq 'length')
 
           if [ "$EXISTING" -gt "0" ]; then
