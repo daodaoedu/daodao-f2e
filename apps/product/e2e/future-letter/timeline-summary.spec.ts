@@ -1,5 +1,5 @@
 import { expect, test } from "./fixtures";
-import { deliveryDate, FOOTPRINTS_PATH, HOME_PATH, nodeX, privacySentinel } from "./helpers";
+import { deliveryDate, FOOTPRINTS_PATH, HOME_PATH, nodeY, privacySentinel } from "./helpers";
 
 test("full timeline and homepage summary share ordered date coordinates and state", async ({
   page,
@@ -30,8 +30,10 @@ test("full timeline and homepage summary share ordered date coordinates and stat
   await expect(opened).toBeVisible();
   await expect(today).toBeVisible();
   await expect(scheduled).toBeVisible();
-  expect(await nodeX(opened)).toBeLessThan(await nodeX(today));
-  expect(await nodeX(today)).toBeLessThan(await nodeX(scheduled));
+  // The full footprints timeline stacks vertically: pending future letters at the
+  // top, "today" in the middle, past/delivered events below.
+  expect(await nodeY(scheduled)).toBeLessThan(await nodeY(today));
+  expect(await nodeY(today)).toBeLessThan(await nodeY(opened));
 
   const scheduledDate = await scheduled.getAttribute("data-date");
   expect(scheduledDate).toBeTruthy();

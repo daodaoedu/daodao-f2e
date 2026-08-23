@@ -3,7 +3,7 @@
 import { useAllMyTimeline } from "@daodao/api";
 import { useRouter } from "@daodao/i18n/navigation";
 import { useMemo } from "react";
-import { HorizontalTimeline } from "./horizontal-timeline";
+import { CompactTimelineStrip } from "./compact-timeline-strip";
 import {
   buildTimelineCoordinates,
   getTimelineSummary,
@@ -34,8 +34,8 @@ export function HomeTimelineSummary() {
   };
 
   return (
-    <div className="relative z-[22] -mt-8">
-      <HorizontalTimeline coordinates={summary} summary onNodeClick={navigate} />
+    <div className="relative z-[22] -mt-8 flex justify-center md:pl-44">
+      <CompactTimelineStrip coordinates={summary} onNodeClick={navigate} />
     </div>
   );
 }

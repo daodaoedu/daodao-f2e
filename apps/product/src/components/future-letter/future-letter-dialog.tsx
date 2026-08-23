@@ -256,7 +256,7 @@ export function FutureLetterDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
-      <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto p-6">
+      <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-lg sm:max-w-lg overflow-y-auto p-6">
         <DialogHeader className="items-start pt-0 text-left">
           <DialogTitle className="text-left text-xl font-bold">{t("dialog_title")}</DialogTitle>
           <DialogDescription>{t("dialog_description")}</DialogDescription>
