@@ -8,6 +8,7 @@ import { format, isValid } from "date-fns";
 import * as React from "react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { isBlankContent } from "@/utils/check-in-content";
+import { MOOD_LABEL_CLASSNAME, TAG_CLASSNAME } from "./check-in-card-classnames";
 
 interface ICheckInCardProps {
   taskTitle: string;
@@ -128,7 +129,7 @@ export const CheckInCard = ({
                 {MoodEmoji && (
                   <div className="flex items-center gap-2">
                     <MoodEmoji className="size-6" />
-                    <span className="text-sm text-text-dark">
+                    <span className={MOOD_LABEL_CLASSNAME}>
                       {t("mood_label", { label: moodLabel || moodOption?.label || "" })}
                     </span>
                   </div>
@@ -162,7 +163,9 @@ export const CheckInCard = ({
                 {tags && tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 text-logo-cyan text-sm">
                     {tags.map((tag) => (
-                      <p key={tag} className="min-w-0 break-words"># {tag}</p>
+                      <p key={tag} className={TAG_CLASSNAME}>
+                        # {tag}
+                      </p>
                     ))}
                   </div>
                 )}
