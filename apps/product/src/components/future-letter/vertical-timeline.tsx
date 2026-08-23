@@ -26,6 +26,7 @@ interface VerticalTimelineProps {
   onLetterClick: (letterId: string, date: string) => void;
   onDeleteLetter: (letterId: string) => void;
   focusLetterId?: string;
+  focusDate?: string;
 }
 
 const eventIconClass: Record<FootprintEventCard["kind"], string> = {
@@ -174,7 +175,13 @@ function DeliveredLetterCard({
 
 function EventCardView({ card }: { card: FootprintEventCard }) {
   return (
-    <div className="rounded-2xl border border-border bg-white p-4">
+    <div
+      data-testid="timeline-node"
+      data-kind={card.kind}
+      data-date={card.date.slice(0, 10)}
+      data-node-id={card.id}
+      className="rounded-2xl border border-border bg-white p-4"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-2">
           <span
@@ -239,17 +246,19 @@ export function VerticalTimeline({
   onLetterClick,
   onDeleteLetter,
   focusLetterId,
+  focusDate,
 }: VerticalTimelineProps) {
   const t = useTranslations("future_letter");
   const containerRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    if (!focusLetterId) return;
-    const target = containerRef.current?.querySelector<HTMLElement>(
-      `[data-node-id="letter-${focusLetterId}"]`
-    );
+    if (!focusLetterId && !focusDate) return;
+    const selector = focusLetterId
+      ? `[data-node-id="letter-${focusLetterId}"]`
+      : `[data-date="${focusDate}"]`;
+    const target = containerRef.current?.querySelector<HTMLElement>(selector);
     target?.scrollIntoView({ behavior: "instant", block: "center" });
-  }, [focusLetterId]);
+  }, [focusLetterId, focusDate]);
 
   return (
     <div ref={containerRef} data-testid="future-letter-timeline">
@@ -303,6 +312,8 @@ export function VerticalTimeline({
           <span
             data-testid="timeline-node"
             data-kind="today"
+            data-date={new Date().toISOString().slice(0, 10)}
+            data-node-id="today"
             className="flex size-3 items-center justify-center rounded-full bg-logo-cyan ring-4 ring-logo-cyan/20"
           />
         }

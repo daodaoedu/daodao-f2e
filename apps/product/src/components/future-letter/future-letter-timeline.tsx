@@ -37,6 +37,7 @@ export function FutureLetterTimeline({
   const searchParams = useSearchParams();
   const { openWarningDialog } = useDialog();
   const deepLinkedLetterId = searchParams.get("futureLetterId");
+  const focusDate = searchParams.get("focusDate");
   const [pendingRouteTarget, setPendingRouteTarget] = useState<string | null | undefined>(
     undefined
   );
@@ -122,10 +123,12 @@ export function FutureLetterTimeline({
         toast.error(t("letter_delete_failed"));
         return;
       }
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete("futureLetterId");
-      setPendingRouteTarget(null);
-      router.replace(`/me/footprints?${params.toString()}`, { scroll: false });
+      if (letter.id === deepLinkedLetterId) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("futureLetterId");
+        setPendingRouteTarget(null);
+        router.replace(`/me/footprints?${params.toString()}`, { scroll: false });
+      }
       toast.success(t("letter_deleted"));
       await refresh();
     } catch (error) {
@@ -162,6 +165,7 @@ export function FutureLetterTimeline({
             if (letter) void handleDelete(letter);
           }}
           focusLetterId={deepLinkedLetterId ?? undefined}
+          focusDate={focusDate ?? undefined}
         />
       )}
 

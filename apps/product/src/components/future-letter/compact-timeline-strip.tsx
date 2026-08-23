@@ -1,16 +1,15 @@
 "use client";
 
+import { useLocale } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronsRight } from "lucide-react";
+import { useMemo } from "react";
 import type { TimelineCoordinate } from "./timeline-model";
 
 interface CompactTimelineStripProps {
   coordinates: TimelineCoordinate[];
   onNodeClick?: (node: TimelineCoordinate) => void;
 }
-
-const isFutureLetterKind = (kind: TimelineCoordinate["kind"]) =>
-  kind === "scheduled" || kind === "delivered-unopened" || kind === "opened";
 
 /** Past dots fade smaller/lighter the further back they sit from "today",
  *  matching the reference prototype's 3-tier size/color ramp. */
@@ -21,17 +20,17 @@ function pastDotClass(distanceFromToday: number): string {
 }
 
 export function CompactTimelineStrip({ coordinates, onNodeClick }: CompactTimelineStripProps) {
+  const locale = useLocale();
+  const monthFormatter = useMemo(() => new Intl.DateTimeFormat(locale, { month: "short" }), [locale]);
   const todayIndex = coordinates.findIndex((node) => node.kind === "today");
 
   return (
     <div className="flex items-center gap-1 px-6 py-5" data-testid="home-timeline-summary">
       {coordinates.map((node, index) => {
         const isToday = node.kind === "today";
-        const isFuture = isFutureLetterKind(node.kind) || (todayIndex >= 0 && index > todayIndex);
+        const isFuture = todayIndex >= 0 && index > todayIndex;
         const isPastConnector = todayIndex < 0 || index < todayIndex;
-        const monthShortLabel = node.monthLabel
-          ? `${new Date(node.date).getMonth() + 1}月`
-          : null;
+        const monthShortLabel = node.monthLabel ? monthFormatter.format(new Date(node.date)) : null;
 
         return (
           <div key={node.id} className="flex items-center">
