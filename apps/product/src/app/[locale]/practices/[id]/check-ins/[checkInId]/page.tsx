@@ -8,10 +8,10 @@ import {
 } from "@daodao/api";
 import { Deco4Svg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
-import { useParams } from "@daodao/i18n/navigation";
+import { useParams, useSearchParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { addDays, format, isValid, parse } from "date-fns";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import {
   CheckInButton,
   CheckInDateSelector,
@@ -21,6 +21,7 @@ import {
 import type { ICheckInDisplayData, ICheckInFormData } from "@/components/check-in/types";
 import { PageHeader } from "@/components/layout";
 import { mapApiMoodToMoodType, mapMoodTypeToApiMood } from "@/constants/mood";
+import { getCheckInBackPath } from "@/utils/get-check-in-back-path";
 
 /**
  * 將 API 的 checkinDate 格式轉換為顯示格式
@@ -73,12 +74,14 @@ const generateFullDateRange = (
   return dates;
 };
 
-export default function CheckInDetailPage() {
+function CheckInDetailContent() {
   const t = useTranslations("practice");
   const params = useParams();
+  const searchParams = useSearchParams();
   const practiceId = params.id as string;
   const checkInId = params.checkInId as string;
   const practiceDetailPath = `/practices/${practiceId}`;
+  const closePath = getCheckInBackPath(practiceDetailPath, searchParams.get("from"));
 
   // 獲取 practice 資料
   const { data: practiceData, isLoading: isLoadingPractice } = usePracticeById(practiceId);
@@ -226,7 +229,7 @@ export default function CheckInDetailPage() {
           title={t("checkin_title")}
           variant="light"
           disableLightOn="mobile"
-          rightActionTo={practiceDetailPath}
+          rightActionTo={closePath}
         />
         <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
           <div className="text-center text-white">{t("checkin_loading")}</div>
@@ -244,7 +247,7 @@ export default function CheckInDetailPage() {
           title={t("checkin_title")}
           variant="light"
           disableLightOn="mobile"
-          rightActionTo={practiceDetailPath}
+          rightActionTo={closePath}
         />
         <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
           <div className="text-center text-white">{t("checkin_not_found")}</div>
@@ -292,12 +295,12 @@ export default function CheckInDetailPage() {
         activeDate={activeCheckInDate}
         practiceId={practiceId}
         title={t("checkin_title")}
-        closeActionTo={practiceDetailPath}
+        closeActionTo={closePath}
       />
 
       {/* Desktop 版本的標題列 */}
       <div className="hidden md:block">
-        <PageHeader title={t("checkin_title")} variant="light" rightActionTo={practiceDetailPath} />
+        <PageHeader title={t("checkin_title")} variant="light" rightActionTo={closePath} />
       </div>
 
       <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">
@@ -333,5 +336,13 @@ export default function CheckInDetailPage() {
         </footer>
       )}
     </div>
+  );
+}
+
+export default function CheckInDetailPage() {
+  return (
+    <Suspense>
+      <CheckInDetailContent />
+    </Suspense>
   );
 }

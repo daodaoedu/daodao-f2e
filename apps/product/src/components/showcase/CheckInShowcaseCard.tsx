@@ -112,7 +112,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
       return;
     }
 
-    router.push(`/practices/${practice.id}/check-ins/${id}`);
+    router.push(`/practices/${practice.id}/check-ins/${id}?from=inspire`);
   };
 
   const handleOpenComments = () => {
