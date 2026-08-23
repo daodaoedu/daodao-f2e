@@ -25,12 +25,14 @@ interface FutureLetterTimelineProps {
   onWriteLetter: () => void;
   isWriteLetterDisabled?: boolean;
   refreshToken?: number;
+  draft?: FutureLetterType | null;
 }
 
 export function FutureLetterTimeline({
   onWriteLetter,
   isWriteLetterDisabled = false,
   refreshToken = 0,
+  draft,
 }: FutureLetterTimelineProps) {
   const t = useTranslations("future_letter");
   const router = useRouter();
@@ -144,11 +146,6 @@ export function FutureLetterTimeline({
 
   return (
     <section className="space-y-6">
-      <div>
-        <h2 className="text-lg font-bold text-text-dark">{t("section_title")}</h2>
-        <p className="text-sm text-text-secondary">{t("timeline_quiet_description")}</p>
-      </div>
-
       {isLoading && (
         <p className="py-8 text-center text-sm text-text-secondary">{t("timeline_loading")}</p>
       )}
@@ -166,11 +163,12 @@ export function FutureLetterTimeline({
           }}
           focusLetterId={deepLinkedLetterId ?? undefined}
           focusDate={focusDate ?? undefined}
+          draft={draft}
         />
       )}
 
       {selectedLetter?.status === "scheduled" && (
-        <div className="rounded-2xl border border-dashed border-[#E4B84D] bg-[#FFFDF5] p-5">
+        <div className="mx-auto max-w-md rounded-2xl border border-dashed border-[#E4B84D] bg-[#FFFDF5] p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h3 className="font-bold text-text-dark">{t("sealed_title")}</h3>
@@ -198,7 +196,7 @@ export function FutureLetterTimeline({
       )}
 
       {selectedLetter?.status === "delivered" && !selectedLetter.openedAt && (
-        <div className="rounded-2xl border border-logo-cyan/30 bg-[#F4FBFA] p-6 text-center">
+        <div className="mx-auto max-w-md rounded-2xl border border-logo-cyan/30 bg-[#F4FBFA] p-6 text-center">
           <Mail className="mx-auto size-8 text-logo-cyan" />
           <h3 className="mt-3 font-bold text-text-dark">{t("unopened_title")}</h3>
           <p className="mt-1 text-sm text-text-secondary">{t("unopened_description")}</p>
@@ -223,7 +221,7 @@ export function FutureLetterTimeline({
       )}
 
       {selectedLetter?.status === "delivered" && selectedLetter.openedAt && (
-        <div className="space-y-3">
+        <div className="mx-auto max-w-md space-y-3">
           <LetterDetailCard letter={selectedLetter} />
           <div className="flex justify-end">
             <Button

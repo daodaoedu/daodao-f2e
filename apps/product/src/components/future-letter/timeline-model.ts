@@ -25,6 +25,31 @@ type LetterWithLifecycle = FutureLetterType & {
   openedAt?: string | null;
 };
 
+/** When several events share a calendar day, the day's dot represents the most
+ *  significant one. */
+const EVENT_KIND_PRIORITY: Record<string, number> = {
+  milestone: 2,
+  "learning-dna": 1,
+  "check-in": 0,
+};
+
+/** The timeline is a calendar axis: five check-ins in one day are one footprint,
+ *  not five stacked dots. Letter nodes are exempt — each navigates to its own letter. */
+function collapseEventNodesByDay(nodes: TimelineCoordinate[]): TimelineCoordinate[] {
+  const byDay = new Map<string, TimelineCoordinate>();
+  for (const node of nodes) {
+    const day = node.date.slice(0, 10);
+    const existing = byDay.get(day);
+    if (
+      !existing ||
+      (EVENT_KIND_PRIORITY[node.kind] ?? 0) > (EVENT_KIND_PRIORITY[existing.kind] ?? 0)
+    ) {
+      byDay.set(day, node);
+    }
+  }
+  return [...byDay.values()];
+}
+
 export function buildTimelineCoordinates(
   entries: TimelineEntryType[],
   letters: FutureLetterType[],
@@ -96,9 +121,12 @@ export function buildTimelineCoordinates(
     date: today.toISOString(),
     dateLabel: format(today, "MM/dd"),
   };
-  const sorted = [...eventNodes, todayNode, ...letterNodes].sort(
-    (a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)
-  );
+  const sorted = [
+    ...collapseEventNodesByDay(eventNodes.filter((node) => !node.letterId)),
+    ...eventNodes.filter((node) => node.letterId),
+    todayNode,
+    ...letterNodes,
+  ].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
   let previousMonth = "";
   return sorted.map((node) => {
     const month = format(parseISO(node.date), "yyyy / MM");
@@ -181,7 +209,9 @@ export function buildFootprintTimeline(
   const futureLetters: FootprintLetterCard[] = letters
     .filter((letter) => letter.status === "scheduled" && letter.deliverAt)
     .sort((a, b) => (b.deliverAt as string).localeCompare(a.deliverAt as string))
-    .map((letter) => toLetterCard(letter.id, letter.deliverAt as string, "scheduled", now, lettersById));
+    .map((letter) =>
+      toLetterCard(letter.id, letter.deliverAt as string, "scheduled", now, lettersById)
+    );
 
   const pastGroups: FootprintMonthGroup[] = [];
   const groupsByKey = new Map<string, FootprintMonthGroup>();
