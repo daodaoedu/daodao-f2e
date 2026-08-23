@@ -15,9 +15,9 @@ import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { format, parseISO } from "date-fns";
 import { Mail, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { HorizontalTimeline } from "./horizontal-timeline";
 import { LetterDetailCard } from "./letter-detail-card";
-import { buildTimelineCoordinates, type TimelineCoordinate } from "./timeline-model";
+import { buildFootprintTimeline } from "./timeline-model";
+import { VerticalTimeline } from "./vertical-timeline";
 
 type LifecycleLetter = FutureLetterType & { sentAt?: string | null; openedAt?: string | null };
 
@@ -53,18 +53,13 @@ export function FutureLetterTimeline({
     () => (lettersQuery.data?.flatMap((page) => page.data) ?? []) as LifecycleLetter[],
     [lettersQuery.data]
   );
-  const coordinates = useMemo(
-    () => buildTimelineCoordinates(timelineEntries, letters, new Date()),
+  const { futureLetters, pastGroups } = useMemo(
+    () => buildFootprintTimeline(timelineEntries, letters, new Date()),
     [letters, timelineEntries]
   );
   const selectedLetter =
     pendingRouteTarget === undefined
       ? letters.find((letter) => letter.id === deepLinkedLetterId)
-      : undefined;
-  const focusId = deepLinkedLetterId
-    ? `letter-${deepLinkedLetterId}`
-    : focusDate
-      ? coordinates.find((node) => node.date.startsWith(focusDate))?.id
       : undefined;
 
   const refresh = useCallback(
@@ -83,12 +78,11 @@ export function FutureLetterTimeline({
     if (pendingRouteTarget === deepLinkedLetterId) setPendingRouteTarget(undefined);
   }, [deepLinkedLetterId, pendingRouteTarget]);
 
-  const handleNodeClick = (node: TimelineCoordinate) => {
-    if (!node.letterId) return;
-    setPendingRouteTarget(node.letterId);
+  const handleLetterClick = (letterId: string, date: string) => {
+    setPendingRouteTarget(letterId);
     const params = new URLSearchParams(searchParams.toString());
-    params.set("futureLetterId", node.letterId);
-    params.set("focusDate", node.date.slice(0, 10));
+    params.set("futureLetterId", letterId);
+    params.set("focusDate", date.slice(0, 10));
     router.replace(`/me/footprints?${params.toString()}`, { scroll: false });
   };
 
@@ -129,10 +123,12 @@ export function FutureLetterTimeline({
         toast.error(t("letter_delete_failed"));
         return;
       }
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete("futureLetterId");
-      setPendingRouteTarget(null);
-      router.replace(`/me/footprints?${params.toString()}`, { scroll: false });
+      if (letter.id === deepLinkedLetterId) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("futureLetterId");
+        setPendingRouteTarget(null);
+        router.replace(`/me/footprints?${params.toString()}`, { scroll: false });
+      }
       toast.success(t("letter_deleted"));
       await refresh();
     } catch (error) {
@@ -148,20 +144,9 @@ export function FutureLetterTimeline({
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-text-dark">{t("section_title")}</h2>
-          <p className="text-sm text-text-secondary">{t("timeline_quiet_description")}</p>
-        </div>
-        <Button
-          onClick={onWriteLetter}
-          disabled={isWriteLetterDisabled}
-          variant="outline"
-          className="rounded-full border-logo-cyan text-logo-cyan hover:bg-[#E7FAF7] hover:text-logo-cyan"
-        >
-          <Mail className="size-4" />
-          {t("cta_button")}
-        </Button>
+      <div>
+        <h2 className="text-lg font-bold text-text-dark">{t("section_title")}</h2>
+        <p className="text-sm text-text-secondary">{t("timeline_quiet_description")}</p>
       </div>
 
       {isLoading && (
@@ -169,13 +154,19 @@ export function FutureLetterTimeline({
       )}
       {hasError && <p className="py-8 text-center text-sm text-red">{t("timeline_error")}</p>}
       {!isLoading && !hasError && (
-        <div className="rounded-3xl border border-border bg-white py-3">
-          <HorizontalTimeline
-            coordinates={coordinates}
-            focusId={focusId}
-            onNodeClick={handleNodeClick}
-          />
-        </div>
+        <VerticalTimeline
+          futureLetters={futureLetters}
+          pastGroups={pastGroups}
+          onWriteLetter={onWriteLetter}
+          isWriteLetterDisabled={isWriteLetterDisabled}
+          onLetterClick={handleLetterClick}
+          onDeleteLetter={(letterId) => {
+            const letter = letters.find((item) => item.id === letterId);
+            if (letter) void handleDelete(letter);
+          }}
+          focusLetterId={deepLinkedLetterId ?? undefined}
+          focusDate={focusDate ?? undefined}
+        />
       )}
 
       {selectedLetter?.status === "scheduled" && (

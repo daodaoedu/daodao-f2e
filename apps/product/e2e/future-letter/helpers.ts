@@ -18,3 +18,9 @@ export async function nodeX(locator: Locator): Promise<number> {
   if (!box) throw new Error("Expected timeline node to have a bounding box");
   return box.x + box.width / 2;
 }
+
+export async function nodeY(locator: Locator): Promise<number> {
+  const box = await locator.boundingBox();
+  if (!box) throw new Error("Expected timeline node to have a bounding box");
+  return box.y + box.height / 2;
+}

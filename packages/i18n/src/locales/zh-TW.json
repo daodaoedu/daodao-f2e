@@ -7901,6 +7901,13 @@
     "detail_write_now": "寫下現在的狀態",
     "detail_save": "儲存",
     "detail_edit": "編輯",
-    "collapse_action": "收起"
+    "collapse_action": "收起",
+    "delivered_badge": "已送達",
+    "delivered_at": "送達於 {date}",
+    "sent_at": "{date} 寄出",
+    "sent_at_with_practice": "{date} 寄出．關聯「{practice}」",
+    "write_another": "再寫一封",
+    "letter_menu": "更多操作",
+    "days_remaining": "還有 {days} 天"
   }
 }

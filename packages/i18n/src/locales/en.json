@@ -7901,6 +7901,13 @@
     "detail_write_now": "Write your current state",
     "detail_save": "Save",
     "detail_edit": "Edit",
-    "collapse_action": "Collapse"
+    "collapse_action": "Collapse",
+    "delivered_badge": "Delivered",
+    "delivered_at": "Delivered {date}",
+    "sent_at": "Sent {date}",
+    "sent_at_with_practice": "Sent {date} · linked to \"{practice}\"",
+    "write_another": "Write another",
+    "letter_menu": "More actions",
+    "days_remaining": "{days} days left"
   }
 }
