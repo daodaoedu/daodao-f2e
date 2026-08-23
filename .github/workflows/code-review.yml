@@ -206,12 +206,45 @@ jobs:
               next
             }
             { print }
-          ' "$RUNNER_TEMP/review-body.opencc" > "$RUNNER_TEMP/review-body.normalized"
+          ' "$RUNNER_TEMP/review-body.opencc" > "$RUNNER_TEMP/review-body.tabled"
+
+          # 小模型常見的格式漂移自動修復：嚴重度中文（高/中/低）、檔案欄的
+          # 行號範圍（path:12-34）、L 前綴（path:L12）、cell 內多餘空白。
+          REPAIR_INPUT_FILE="$RUNNER_TEMP/review-body.tabled" node -e '
+            const fs = require("fs");
+            const body = fs.readFileSync(process.env.REPAIR_INPUT_FILE, "utf8");
+            const repaired = body.split("\n").map((line) => {
+              if (!line.startsWith("|")) return line;
+              const cells = line.split("|");
+              if (cells.length < 6) return line;
+              const severity = cells[1].trim();
+              if (severity === "嚴重度" || /^-+$/.test(severity)) return line;
+              cells[1] = ` ${severity
+                .replace(/高|嚴重/, "High")
+                .replace(/中/, "Medium")
+                .replace(/低|輕微/, "Low")} `;
+              const rawFile = cells[2].trim();
+              const hadBackticks = /^`.*`$/.test(rawFile);
+              const file = rawFile
+                .replace(/^`|`$/g, "")
+                .replace(/\s+/g, "")
+                .replace(/:L(\d)/, ":$1")
+                .replace(/:(\d+)[-–—,~](\d+)$/, ":$1");
+              cells[2] = hadBackticks ? ` \`${file}\` ` : ` ${file} `;
+              return cells.join("|");
+            }).join("\n");
+            fs.writeFileSync(process.env.REPAIR_INPUT_FILE.replace(/tabled$/, "normalized"), repaired);
+          '
 
           BODY="$(cat "$RUNNER_TEMP/review-body.normalized")"
           if ! is_valid_review "$BODY"; then
-            echo "::error::Normalized Workers AI review has an invalid schema"
-            exit 1
+            # 模型輸出不合 schema 是模型的問題，不是 PR 的問題：
+            # 降級成 warning、跳過留言，不讓 check 變紅。
+            echo "::warning::Normalized Workers AI review has an invalid schema; skipping review comment"
+            echo "::group::Invalid review body"
+            printf '%s\n' "$BODY"
+            echo "::endgroup::"
+            exit 0
           fi
 
           if ! printf '%s\n' "$HEAD_SHA" | grep -Eq '^[0-9a-f]{40}$'; then
