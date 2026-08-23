@@ -5755,6 +5755,270 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/future-letters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 列出我的未來信 */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 信件狀態篩選 */
+                    status?: "draft" | "scheduled" | "delivered";
+                    /** @description 頁碼 */
+                    page?: number;
+                    /** @description 每頁筆數 */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 信件列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FutureLetterListApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        /** 建立未來信草稿 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateFutureLetter"];
+                };
+            };
+            responses: {
+                /** @description 草稿已建立 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FutureLetterApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/future-letters/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得單封未來信 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 信件 UUID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 信件內容 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FutureLetterApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        /** 刪除未來信 */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 信件 UUID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 信件已刪除 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        /** 更新未來信草稿 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 信件 UUID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateFutureLetter"];
+                };
+            };
+            responses: {
+                /** @description 草稿已更新 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FutureLetterApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/me/future-letters/{id}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 寄出並排程未來信 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 信件 UUID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["SendFutureLetter"];
+                };
+            };
+            responses: {
+                /** @description 信件已排程 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FutureLetterApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/future-letters/{id}/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 開啟已送達的未來信 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 信件 UUID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 信件已開啟並回傳 owner-only 內容 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FutureLetterApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -26266,6 +26530,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得我的學習時間軸 */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 上一頁回傳的不透明複合游標；暫時相容舊版 ISO 時間游標 */
+                    cursor?: string;
+                    /** @description 每頁筆數 */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 混合學習事件流 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TimelineApiResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/user-stats/overview": {
         parameters: {
             query?: never;
@@ -33051,6 +33359,127 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        FutureLetter: {
+            id: string;
+            currentSelf: string | null;
+            message: string | null;
+            /** @enum {string} */
+            status: "draft" | "scheduled" | "delivered" | "deleted";
+            deliverAt: string | null;
+            sentAt: string | null;
+            deliveredAt: string | null;
+            openedAt: string | null;
+            practiceId: string | null;
+            practice: components["schemas"]["FutureLetterPractice"];
+            createdAt: string;
+            updatedAt: string;
+        };
+        FutureLetterPractice: {
+            id: string | null;
+            title: string;
+        } | null;
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        FutureLetterApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            data: components["schemas"]["FutureLetter"] & unknown;
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        FutureLetterListApiResponse: {
+            /** @enum {boolean} */
+            success: true;
+            data: components["schemas"]["FutureLetter"][];
+            pagination: {
+                currentPage: number;
+                totalPages: number;
+                totalItems: number;
+                itemsPerPage: number;
+                hasNext: boolean;
+                hasPrev: boolean;
+            };
+            timestamp: string;
+        };
         /** @description 想法相關的學習資源資訊 */
         IdeaResource: {
             /**
@@ -38435,6 +38864,37 @@ export interface components {
              */
             deletedCount: number;
         };
+        TimelineEntry: {
+            /** @enum {string} */
+            type: "check-in" | "milestone" | "letter" | "learning-dna";
+            title: string;
+            description: string | null;
+            date: string;
+            meta: {
+                [key: string]: string | number | unknown;
+            };
+        };
+        TimelineApiResponse: {
+            /** @enum {boolean} */
+            success: true;
+            data: components["schemas"]["TimelineEntry"][];
+            pagination: {
+                cursors: {
+                    start: string | null;
+                    end: string | null;
+                };
+                hasMore: boolean;
+                count: number;
+                limit: number;
+                hasNext: boolean;
+                hasPrev: boolean;
+                nextCursor: string | null;
+                prevCursor: string | null;
+                totalEstimate: number | null;
+                parentTotalEstimate: number | null;
+            };
+            timestamp: string;
+        };
         /** @description 設置自訂 ID 請求 */
         CustomIdRequest: {
             /**
@@ -40471,6 +40931,57 @@ export interface components {
              * @enum {string}
              */
             action: "accept" | "reject";
+        };
+        CreateFutureLetter: {
+            /**
+             * @description 寫信當下的自己，草稿可空
+             * @default
+             * @example 我正在開始新的學習計畫
+             */
+            currentSelf: string;
+            /**
+             * @description 想對未來的自己說的話，草稿可空
+             * @default
+             * @example 希望你仍然享受學習
+             */
+            message: string;
+            /**
+             * Format: date-time
+             * @description 草稿預填的送達時間
+             * @example 2026-09-01T08:00:00.000Z
+             */
+            deliverAt?: string;
+            /**
+             * Format: uuid
+             * @description 關聯主題實踐的 UUID；null 表示清除關聯
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            practiceId?: string | null;
+        };
+        UpdateFutureLetter: {
+            /** @description 寫信當下的自己，草稿可空 */
+            currentSelf?: string;
+            /** @description 想對未來的自己說的話，草稿可空 */
+            message?: string;
+            /**
+             * Format: date-time
+             * @description 草稿預填的送達時間
+             */
+            deliverAt?: string;
+            /**
+             * Format: uuid
+             * @description 關聯主題實踐的 UUID；null 表示清除關聯
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            practiceId?: string | null;
+        };
+        SendFutureLetter: {
+            /**
+             * Format: date-time
+             * @description 送達時間，必須介於現在 3 到 90 天後（含邊界）
+             * @example 2026-09-01T08:00:00.000Z
+             */
+            deliverAt: string;
         };
         HealthResponse: {
             /**

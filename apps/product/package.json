@@ -18,6 +18,10 @@
     "check:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:e2e": "playwright test --config=../../playwright.config.ts",
+    "test:e2e:future-letter": "playwright test --config=../../playwright.config.ts e2e/future-letter --project=chromium",
+    "test:e2e:future-letter:record": "playwright test --config=../../playwright.config.ts e2e/future-letter --project=chromium",
+    "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
     "clean": "pnpm dlx rimraf .next out node_modules"
   },
   "dependencies": {
@@ -55,12 +59,16 @@
   },
   "devDependencies": {
     "@daodao/config": "workspace:*",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "catalog:",
     "@types/matter-js": "^0.20.2",
     "@types/node": "catalog:",
+    "@types/pg": "^8.23.1",
     "@types/qrcode": "^1.5.6",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "bullmq": "^5.81.3",
+    "pg": "^8.23.0",
     "typescript": "catalog:",
     "vitest": "^4.1.2"
   }

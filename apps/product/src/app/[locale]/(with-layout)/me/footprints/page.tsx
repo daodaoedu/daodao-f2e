@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import { FootprintsList } from "@/components/me/footprints-list";
+import { FootprintsPageContent } from "@/components/me/footprints-page-content";
 
 export default async function FootprintsPage({ params }: PageProps<"/[locale]/me/footprints">) {
   const { locale } = await params;
@@ -12,8 +12,8 @@ export default async function FootprintsPage({ params }: PageProps<"/[locale]/me
 
       <BackgroundAnimation />
 
-      <main className="max-w-[448px] mx-auto px-5 pb-[64px] pt-3 md:pt-12">
-        <FootprintsList />
+      <main className="mx-auto max-w-5xl px-5 pb-[64px] pt-3 md:pt-12">
+        <FootprintsPageContent />
       </main>
     </div>
   );

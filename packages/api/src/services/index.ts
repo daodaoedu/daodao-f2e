@@ -9,12 +9,12 @@ export * from "./admin-hooks";
 // Auth Service
 export * from "./auth";
 export * from "./auth-hooks";
-// Comments Service
-export * from "./comments";
-export * from "./comments-hooks";
 // Lighthouse Cohort Service
 export * from "./cohort";
 export * from "./cohort-hooks";
+// Comments Service
+export * from "./comments";
+export * from "./comments-hooks";
 // Connection Service
 export * from "./connection";
 export * from "./connection-hooks";
@@ -28,6 +28,9 @@ export * from "./follow";
 export * from "./follow-hooks";
 // Footprint Service
 export * from "./footprint-hooks";
+// Future Letter Service
+export * from "./future-letter";
+export * from "./future-letter-hooks";
 // Image Service
 export * from "./image";
 // Location Service
@@ -62,6 +65,9 @@ export * from "./showcase-hooks";
 // Tag Service
 export * from "./tag";
 export * from "./tag-hooks";
+// Timeline Service
+export * from "./timeline";
+export * from "./timeline-hooks";
 // User Service
 export * from "./user";
 export * from "./user-hooks";
