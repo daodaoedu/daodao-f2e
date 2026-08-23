@@ -10,12 +10,20 @@ import { DialogManagerProvider } from "@daodao/ui/components/animate-ui/componen
 import { SheetManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Toaster } from "@daodao/ui/components/sonner";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
+import { Anonymous_Pro } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { PwaInstallPrompt } from "@/components/pwa/install-prompt";
 import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import { OnboardingProgressProvider } from "@/components/task-guide/onboarding-progress-context";
 import { TaskGuideWidget } from "@/components/task-guide/task-guide-widget";
 import { TrackingRefCapture } from "@/components/tracking-ref-capture";
+
+const anonymousPro = Anonymous_Pro({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-anonymous-pro",
+  display: "swap",
+});
 
 interface GlobalProviderProps {
   head?: React.ReactNode;
@@ -42,7 +50,7 @@ function GlobalProvider({
       suppressHydrationWarning
     >
       {head}
-      <body>
+      <body className={anonymousPro.variable}>
         <TrackingRefCapture />
         <RegisterServiceWorker />
         <AnalyticsScripts />

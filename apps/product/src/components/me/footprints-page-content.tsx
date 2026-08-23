@@ -22,6 +22,7 @@ export function FootprintsPageContent() {
         onWriteLetter={openNewLetter}
         isWriteLetterDisabled={isDraftQueryPending}
         refreshToken={timelineVersion}
+        draft={draft}
       />
       <FutureLetterDialog
         open={isLetterDialogOpen}

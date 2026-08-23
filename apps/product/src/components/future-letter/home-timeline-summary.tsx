@@ -34,8 +34,12 @@ export function HomeTimelineSummary() {
   };
 
   return (
-    <div className="relative z-[22] -mt-8 flex justify-center md:pl-44">
-      <CompactTimelineStrip coordinates={summary} onNodeClick={navigate} />
+    <div className="relative z-[22] -mt-8 flex justify-center">
+      <CompactTimelineStrip
+        coordinates={summary}
+        onNodeClick={navigate}
+        onOpen={() => router.push("/me/footprints")}
+      />
     </div>
   );
 }

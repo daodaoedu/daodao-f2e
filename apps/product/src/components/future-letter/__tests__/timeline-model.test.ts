@@ -38,6 +38,46 @@ describe("future letter timeline model", () => {
     expect(coordinates[2]).toMatchObject({ letterId: "scheduled", daysRemaining: 7 });
   });
 
+  it("collapses same-day events into a single dot, keeping the most significant kind", () => {
+    const coordinates = buildTimelineCoordinates(
+      [
+        {
+          type: "check-in",
+          title: "打卡 1",
+          description: null,
+          date: "2026-06-07T03:39:39.709Z",
+          meta: {},
+        },
+        {
+          type: "check-in",
+          title: "打卡 2",
+          description: null,
+          date: "2026-06-07T03:51:42.184Z",
+          meta: {},
+        },
+        {
+          type: "milestone",
+          title: "里程碑",
+          description: null,
+          date: "2026-06-07T04:19:24.867Z",
+          meta: {},
+        },
+        {
+          type: "check-in",
+          title: "隔天打卡",
+          description: null,
+          date: "2026-06-08T03:00:00.000Z",
+          meta: {},
+        },
+      ],
+      [],
+      now
+    );
+
+    expect(coordinates.map((node) => node.kind)).toEqual(["milestone", "check-in", "today"]);
+    expect(coordinates[0]).toMatchObject({ date: "2026-06-07T04:19:24.867Z" });
+  });
+
   it("distinguishes delivered unopened and opened letters", () => {
     const base = {
       currentSelf: "",

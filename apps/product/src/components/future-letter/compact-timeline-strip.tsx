@@ -1,85 +1,285 @@
 "use client";
 
 import { useLocale } from "@daodao/i18n";
-import { cn } from "@daodao/ui/lib/utils";
-import { ChevronsRight } from "lucide-react";
-import { useMemo } from "react";
+import { ChevronRight } from "lucide-react";
+import { type CSSProperties, Fragment, useMemo, useState } from "react";
 import type { TimelineCoordinate } from "./timeline-model";
 
 interface CompactTimelineStripProps {
   coordinates: TimelineCoordinate[];
   onNodeClick?: (node: TimelineCoordinate) => void;
+  /** Clicking anywhere on the strip (outside a specific node) opens the footprints page. */
+  onOpen?: () => void;
 }
 
-/** Past dots fade smaller/lighter the further back they sit from "today",
- *  matching the reference prototype's 3-tier size/color ramp. */
-function pastDotClass(distanceFromToday: number): string {
-  if (distanceFromToday >= 5) return "size-2 bg-[#89DAD7]";
-  if (distanceFromToday >= 3) return "size-[9px] bg-[#0E9E99]";
-  return "size-2.5 bg-[#0E9E99]";
+const SOLID_LINE = "rgba(41,94,92,.6)";
+const DOTTED_LINE = "repeating-linear-gradient(90deg,#C79E0A 0 3px,transparent 3px 6px)";
+
+const KEYFRAMES = `
+@keyframes tealPulse{0%,100%{box-shadow:0 0 0 3px rgba(22,185,179,.25),0 0 0 0 rgba(22,185,179,.5);transform:scale(1)}50%{box-shadow:0 0 0 4px rgba(22,185,179,.18),0 0 0 12px rgba(22,185,179,0);transform:scale(1.12)}}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(224,185,11,.6);opacity:.7;transform:scale(1)}50%{box-shadow:0 0 0 8px rgba(224,185,11,0);opacity:1;transform:scale(1.18)}}
+@keyframes stripFadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+`;
+
+/** Prototype spaces neighbouring dots proportionally: 2px per day + 4px.
+ *  Capped so a long quiet stretch cannot blow the 540px strip apart. */
+function connectorWidth(from: string, to: string): number {
+  const days = Math.max(
+    0,
+    Math.round((new Date(to).getTime() - new Date(from).getTime()) / 86_400_000)
+  );
+  return Math.min(2 * days + 4, 40);
 }
 
-export function CompactTimelineStrip({ coordinates, onNodeClick }: CompactTimelineStripProps) {
+/** Prototype renders dates without zero-padding (8/14, not 08/14). */
+function trimDateLabel(label: string): string {
+  return label.replace(/^0/, "").replace("/0", "/");
+}
+
+/** Past dot ramp: older check-ins sit smaller and lighter, growing darker and
+ *  larger toward "today" — prototype tiers: 8px #89DAD7 / 9px / 10px #0E9E99. */
+function pastDotStyle(distance: number): CSSProperties {
+  const [size, color] =
+    distance >= 5 ? [8, "#89DAD7"] : distance >= 3 ? [9, "#0E9E99"] : [10, "#0E9E99"];
+  return { width: size, height: size, borderRadius: 999, background: color };
+}
+
+export function CompactTimelineStrip({
+  coordinates,
+  onNodeClick,
+  onOpen,
+}: CompactTimelineStripProps) {
   const locale = useLocale();
-  const monthFormatter = useMemo(() => new Intl.DateTimeFormat(locale, { month: "short" }), [locale]);
+  const [hintOpen, setHintOpen] = useState(false);
+  const monthFormatter = useMemo(
+    () => new Intl.DateTimeFormat(locale, { month: "short" }),
+    [locale]
+  );
   const todayIndex = coordinates.findIndex((node) => node.kind === "today");
+  const pastAndToday = todayIndex >= 0 ? coordinates.slice(0, todayIndex + 1) : coordinates;
+  const futureNodes = todayIndex >= 0 ? coordinates.slice(todayIndex + 1) : [];
+
+  const renderNodeButton = (
+    node: TimelineCoordinate,
+    dotStyle: CSSProperties,
+    dateColor: string,
+    options: { animated?: boolean; hint?: boolean; showMonth?: boolean } = {}
+  ) => {
+    const isToday = node.kind === "today";
+    const monthShortLabel =
+      options.showMonth && node.monthLabel ? monthFormatter.format(new Date(node.date)) : null;
+    return (
+      <button
+        type="button"
+        data-testid="timeline-node"
+        data-kind={node.kind}
+        data-date={node.date.slice(0, 10)}
+        data-node-id={node.id}
+        onClick={(event) => {
+          event.stopPropagation();
+          onNodeClick?.(node);
+        }}
+        onMouseEnter={options.hint ? () => setHintOpen(true) : undefined}
+        onMouseLeave={options.hint ? () => setHintOpen(false) : undefined}
+        aria-label={
+          isToday
+            ? "今天"
+            : monthShortLabel
+              ? `${monthShortLabel} ${node.dateLabel}`
+              : node.dateLabel
+        }
+        className="group relative flex flex-none items-center justify-center px-[3px] py-[9px]"
+      >
+        <span
+          style={dotStyle}
+          className={
+            options.animated
+              ? undefined
+              : "transition-transform duration-[180ms] group-hover:scale-[1.35]"
+          }
+        />
+        <span
+          style={{
+            position: "absolute",
+            bottom: "calc(100% - 2px)",
+            fontFamily: "var(--font-anonymous-pro), 'Anonymous Pro', ui-monospace, monospace",
+            fontSize: 10,
+            color: dateColor,
+            whiteSpace: "nowrap",
+            pointerEvents: "none",
+          }}
+          className="opacity-0 transition-opacity duration-[160ms] group-hover:opacity-100"
+        >
+          {isToday ? "今天" : trimDateLabel(node.dateLabel)}
+        </span>
+        {monthShortLabel && (
+          <span
+            style={{
+              position: "absolute",
+              top: "calc(100% - 2px)",
+              fontSize: 10,
+              color: "#7FA3A6",
+              whiteSpace: "nowrap",
+              pointerEvents: "none",
+            }}
+            className="opacity-100 transition-opacity duration-[160ms] group-hover:opacity-0"
+          >
+            {monthShortLabel}
+          </span>
+        )}
+      </button>
+    );
+  };
 
   return (
-    <div className="flex items-center gap-1 px-6 py-5" data-testid="home-timeline-summary">
-      {coordinates.map((node, index) => {
-        const isToday = node.kind === "today";
-        const isFuture = todayIndex >= 0 && index > todayIndex;
-        const isPastConnector = todayIndex < 0 || index < todayIndex;
-        const monthShortLabel = node.monthLabel ? monthFormatter.format(new Date(node.date)) : null;
-
-        return (
-          <div key={node.id} className="flex items-center">
-            {index > 0 && (
-              <div
-                className={cn(
-                  "h-px w-6",
-                  isPastConnector || (todayIndex >= 0 && index === todayIndex)
-                    ? "bg-[#295E5C]/60"
-                    : "border-t border-dashed border-[#C79E0A] bg-transparent"
-                )}
-                aria-hidden="true"
-              />
-            )}
-            <button
-              type="button"
-              data-testid="timeline-node"
-              data-kind={node.kind}
-              data-date={node.date.slice(0, 10)}
-              data-node-id={node.id}
-              onClick={() => onNodeClick?.(node)}
-              aria-label={monthShortLabel ? `${monthShortLabel} ${node.dateLabel}` : node.dateLabel}
-              className="relative flex flex-col items-center justify-center"
-            >
-              <span
-                className={cn(
-                  "rounded-full transition-colors",
-                  isToday
-                    ? "size-3.5 bg-[#0D7C78]"
-                    : isFuture
-                      ? "size-[18px] border-2 border-dashed border-[#C79E0A] bg-[#FFFDF0]"
-                      : pastDotClass(todayIndex >= 0 ? todayIndex - index : 0)
-                )}
-              />
-              {monthShortLabel && !isFuture && (
-                <span className="mt-2 whitespace-nowrap text-[10px] text-[#7FA3A6]">
-                  {monthShortLabel}
-                </span>
-              )}
-            </button>
-          </div>
-        );
-      })}
+    <div
+      className="relative"
+      style={{ width: 540, maxWidth: "82%" }}
+      data-testid="home-timeline-summary"
+    >
+      <style>{KEYFRAMES}</style>
+      {/* biome-ignore lint/a11y/useSemanticElements: contains per-node <button>s, so a native button would nest invalid HTML */}
       <div
-        className="ml-2 border-t border-dashed border-[#C79E0A]"
-        style={{ width: 24 }}
-        aria-hidden="true"
-      />
-      <ChevronsRight className="size-5 shrink-0 text-[#295E5C]/70" aria-hidden="true" />
+        role="button"
+        tabIndex={0}
+        aria-label="我的足跡"
+        onClick={() => onOpen?.()}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onOpen?.();
+          }
+        }}
+        className="flex cursor-pointer items-center transition-transform duration-[220ms] hover:-translate-y-[2px]"
+        style={{ height: 44, gap: 16, padding: "0 22px", borderRadius: 999 }}
+      >
+        <span className="flex min-w-0 flex-1 items-center">
+          {pastAndToday.map((node, index) => {
+            const isToday = node.kind === "today";
+            const distance = todayIndex >= 0 ? todayIndex - index : 0;
+            const prev = index > 0 ? pastAndToday[index - 1] : undefined;
+            return (
+              <Fragment key={node.id}>
+                {prev && (
+                  <span
+                    aria-hidden="true"
+                    style={
+                      isToday
+                        ? { width: 12, flex: "none", height: 0.5, background: SOLID_LINE }
+                        : {
+                            width: connectorWidth(prev.date, node.date),
+                            flex: "none",
+                            height: 1,
+                            background: SOLID_LINE,
+                          }
+                    }
+                  />
+                )}
+                {isToday
+                  ? renderNodeButton(
+                      node,
+                      {
+                        width: 13,
+                        height: 13,
+                        borderRadius: 999,
+                        background: "#0D7C78",
+                        animation: "tealPulse 2.4s ease-in-out infinite",
+                      },
+                      "#0D7C78",
+                      { animated: true }
+                    )
+                  : renderNodeButton(node, pastDotStyle(distance), "#0E9E99", {
+                      showMonth: true,
+                    })}
+              </Fragment>
+            );
+          })}
+          <span
+            aria-hidden="true"
+            style={{ flex: "1 1 0%", minWidth: 0, height: 1, background: DOTTED_LINE }}
+          />
+          {futureNodes.map((node, index) => {
+            const prev = index > 0 ? futureNodes[index - 1] : undefined;
+            return (
+              <Fragment key={node.id}>
+                {prev && (
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      width: connectorWidth(prev.date, node.date),
+                      flex: "none",
+                      height: 1,
+                      background: DOTTED_LINE,
+                    }}
+                  />
+                )}
+                {renderNodeButton(
+                  node,
+                  {
+                    width: 13,
+                    height: 13,
+                    borderRadius: 999,
+                    background: "#F9E41E",
+                    boxShadow: "inset 0 0 0 1.5px #C79E0A",
+                  },
+                  "#A87A22",
+                  { hint: true }
+                )}
+              </Fragment>
+            );
+          })}
+          {futureNodes.length === 0 && (
+            <span
+              aria-hidden="true"
+              onMouseEnter={() => setHintOpen(true)}
+              onMouseLeave={() => setHintOpen(false)}
+              style={{
+                // Prototype is content-box: 13px + 2px dashed border = 17px outer.
+                width: 17,
+                height: 17,
+                flex: "none",
+                borderRadius: 999,
+                border: "2px dashed #C79E0A",
+                background: "#FFFDF0",
+                animation: "breathe 2.4s ease-in-out infinite",
+              }}
+            />
+          )}
+          <span
+            aria-hidden="true"
+            style={{ width: 96, flex: "none", height: 1, background: DOTTED_LINE }}
+          />
+        </span>
+        <span
+          aria-hidden="true"
+          className="flex flex-none items-center"
+          style={{ marginLeft: -8, marginRight: 34, color: "#0F3036" }}
+        >
+          <ChevronRight className="size-[18px]" style={{ marginRight: -9 }} />
+          <ChevronRight className="size-[18px]" />
+        </span>
+      </div>
+      {hintOpen && (
+        <div
+          style={{
+            position: "absolute",
+            right: 76,
+            bottom: 52,
+            padding: "5px 11px",
+            borderRadius: 11,
+            background: "#F9E41E",
+            color: "#0D3036",
+            fontSize: 11.5,
+            fontWeight: 500,
+            whiteSpace: "nowrap",
+            boxShadow: "0 6px 16px rgba(224,185,11,.26)",
+            animation: "stripFadeUp .22s ease-out",
+            pointerEvents: "none",
+          }}
+        >
+          寫信給未來的自己
+        </div>
+      )}
     </div>
   );
 }
