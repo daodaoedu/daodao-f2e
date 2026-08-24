@@ -474,14 +474,14 @@ jobs:
           fi
 
       - name: Set up SSH
-        env:
-          LINODE_SSH_PRIVATE_KEY: ${{ secrets.LINODE_SSH_PRIVATE_KEY }}
-          LINODE_INSTANCE_IP: ${{ secrets.LINODE_INSTANCE_IP }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.LINODE_SSH_PRIVATE_KEY }}
+
+      - name: Add Linode to known_hosts
         run: |
           mkdir -p ~/.ssh
-          printf "%s" "${LINODE_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "${LINODE_INSTANCE_IP}" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "${{ secrets.LINODE_INSTANCE_IP }}" >> ~/.ssh/known_hosts
 
       - name: Create environment files on Linode
         env:
@@ -675,11 +675,14 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.LINODE_SSH_PRIVATE_KEY }}
+
+      - name: Add Linode to known_hosts
         run: |
           mkdir -p ~/.ssh
-          printf "%s" "${{ secrets.LINODE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.LINODE_INSTANCE_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H "${{ secrets.LINODE_INSTANCE_IP }}" >> ~/.ssh/known_hosts
 
       - name: Set Environment Variables
         run: |
