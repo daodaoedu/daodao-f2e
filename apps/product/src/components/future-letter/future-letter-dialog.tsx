@@ -30,7 +30,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { format, parseISO } from "date-fns";
-import { CircleHelp, Trash2 } from "lucide-react";
+import { CircleHelp, Feather, ShieldCheck, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PracticeStatus } from "@/constants/practice-status";
 import {
@@ -263,6 +263,17 @@ export function FutureLetterDialog({
         </DialogHeader>
 
         <div className="mt-5 space-y-5">
+          <div className="rounded-2xl bg-[#F7FBFA] p-4 text-sm text-text-secondary">
+            <p className="flex items-center gap-2 font-bold text-text-dark">
+              <Feather className="size-4 text-logo-cyan" />
+              {t("anti_pressure_title")}
+            </p>
+            <p className="mt-1">{t("anti_pressure_description")}</p>
+            <p className="mt-3 flex items-start gap-2">
+              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-logo-cyan" />
+              {t("privacy_promise")}
+            </p>
+          </div>
 
           <div>
             <label htmlFor="current-self" className="mb-2 block text-sm font-bold text-text-dark">
