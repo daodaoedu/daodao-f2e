@@ -97,18 +97,23 @@ export function HorizontalTimeline({
                 {node.kind === "today" ? t("label_today") : node.dateLabel}
               </span>
               {!summary && node.kind === "scheduled" && (
-                <span className="mt-1 whitespace-nowrap text-[11px] text-[#9A7419]">
-                  {t("scheduled_countdown", { days: node.daysRemaining ?? 0 })}
-                </span>
+                <>
+                  <span className="mt-1 whitespace-nowrap text-[11px] font-medium text-[#9A7419]">
+                    {t("sent_badge")}
+                  </span>
+                  <span className="whitespace-nowrap text-[10px] text-[#9A7419]/70">
+                    {t("scheduled_countdown", { days: node.daysRemaining ?? 0 })}
+                  </span>
+                </>
               )}
               {!summary && node.kind === "delivered-unopened" && (
                 <span className="mt-1 whitespace-nowrap text-[11px] font-medium text-logo-cyan">
-                  {t("unopened_label")}
+                  {t("delivered_badge")}
                 </span>
               )}
               {!summary && node.kind === "opened" && (
-                <span className="mt-1 whitespace-nowrap text-[11px] text-text-secondary">
-                  {t("opened_label")}
+                <span className="mt-1 whitespace-nowrap text-[11px] font-medium text-[#1A6B4A]">
+                  {t("read_badge")}
                 </span>
               )}
             </>
