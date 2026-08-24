@@ -128,7 +128,7 @@ function ScheduledLetterCard({
     >
       <div className="flex items-center gap-2">
         <span className="rounded-full bg-[#F9E41E] px-[10px] py-[2px] text-[11px] font-medium text-[#0D3036]">
-          {t("unopened_label")}
+          {t("sent_badge")}
         </span>
         <span className="text-xs text-[#8A7A2E]" style={MONO}>
           {t("days_remaining", { days: letter.daysRemaining ?? 0 })}
@@ -192,17 +192,17 @@ function DeliveredLetterCard({
       className="w-full rounded-2xl border border-[#F0DFA0] bg-[#FFF9E6] p-4 text-left transition-[transform,box-shadow] duration-[220ms] hover:-translate-y-[3px] hover:shadow-[0_10px_24px_rgba(224,185,11,.18)]"
     >
       <div className="flex items-center gap-2">
-        <span className="rounded-full bg-[#FCDD84] px-[10px] py-[2px] text-[11px] font-medium text-[#0D3036]">
-          {t("delivered_badge")}
+        <span
+          className={cn(
+            "rounded-full px-[10px] py-[2px] text-[11px] font-medium text-[#0D3036]",
+            letter.opened ? "bg-[#D8F0E8] text-[#1A6B4A]" : "bg-[#FCDD84]"
+          )}
+        >
+          {letter.opened ? t("read_badge") : t("delivered_badge")}
         </span>
         <span className="text-xs text-[#8A7A2E]" style={MONO}>
           {t("delivered_at", { date: format(parseISO(letter.date), "MM/dd") })}
         </span>
-        {!letter.opened && (
-          <span className="rounded-full bg-logo-cyan/10 px-[10px] py-[2px] text-[11px] font-medium text-logo-cyan">
-            {t("unopened_label")}
-          </span>
-        )}
       </div>
       <p className="mt-2 flex items-center gap-2 text-[15px] font-medium text-[#0D3036]">
         <Mail className="size-4 shrink-0 text-[#9A7419]" />
