@@ -30,7 +30,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { format, parseISO } from "date-fns";
-import { CircleHelp, Feather, ShieldCheck, Trash2 } from "lucide-react";
+import { CircleHelp, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PracticeStatus } from "@/constants/practice-status";
 import {
@@ -256,24 +256,13 @@ export function FutureLetterDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
-      <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-lg sm:max-w-lg overflow-y-auto p-6">
+      <DialogContent className="max-h-[88vh] w-[min(560px,92vw)] bg-[#F5FFFD] rounded-[28px] border-0 p-6 sm:p-7 overflow-y-auto">
         <DialogHeader className="items-start pt-0 text-left">
-          <DialogTitle className="text-left text-xl font-bold">{t("dialog_title")}</DialogTitle>
-          <DialogDescription>{t("dialog_description")}</DialogDescription>
+          <DialogTitle className="text-left text-[18px] font-bold text-[#0D3036]">{t("dialog_title")}</DialogTitle>
+          <DialogDescription className="text-[13px] text-[#536166]">{t("dialog_description")}</DialogDescription>
         </DialogHeader>
 
-        <div className="mt-4 space-y-5">
-          <div className="rounded-2xl bg-[#F7FBFA] p-4 text-sm text-text-secondary">
-            <p className="flex items-center gap-2 font-bold text-text-dark">
-              <Feather className="size-4 text-logo-cyan" />
-              {t("anti_pressure_title")}
-            </p>
-            <p className="mt-1">{t("anti_pressure_description")}</p>
-            <p className="mt-3 flex items-start gap-2">
-              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-logo-cyan" />
-              {t("privacy_promise")}
-            </p>
-          </div>
+        <div className="mt-5 space-y-5">
 
           <div>
             <label htmlFor="current-self" className="mb-2 block text-sm font-bold text-text-dark">
