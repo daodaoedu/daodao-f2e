@@ -247,6 +247,25 @@ export function FutureLetterDialog({
     }
   };
 
+  const handleSaveDraftClick = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const saved = await saveDraft();
+      if (!saved) return;
+      if (hasFutureLetterContent({ currentSelf, message: messageToFuture })) {
+        toast.success(t("draft_saved"));
+      }
+      skipAutoSaveRef.current = true;
+      await refreshAndClose();
+    } catch (error) {
+      console.error("Failed to save draft", error);
+      toast.error(t("letter_save_failed"));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const deliveryOptions = [
     { value: DeliveryOption.sevenDays, label: t("delivery_7d") },
     { value: DeliveryOption.fourteenDays, label: t("delivery_14d") },
@@ -285,7 +304,7 @@ export function FutureLetterDialog({
               value={currentSelf}
               onChange={(event) => setCurrentSelf(event.target.value)}
               placeholder={t("field_current_self_placeholder")}
-              className="min-h-[100px] resize-y"
+              className="min-h-[80px] resize-y rounded-2xl border-[#C1ECFF] bg-white p-3.5 text-sm leading-[1.8] text-[#295E5C] placeholder:text-[#9FB5B8] focus-visible:border-[#16B9B3] focus-visible:ring-4 focus-visible:ring-[rgba(22,185,179,0.16)] focus-visible:ring-offset-0"
             />
           </div>
 
@@ -307,8 +326,29 @@ export function FutureLetterDialog({
                     <CircleHelp className="size-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="max-w-64 text-sm" side="top">
-                  {t("field_message_help")}
+                <PopoverContent
+                  className="w-[360px] border-0 bg-[#0D3036] p-4 text-[#E7F4F4] shadow-[0_14px_34px_rgba(15,48,54,0.28)] rounded-2xl"
+                  side="top"
+                  align="start"
+                >
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm font-medium text-white">如果不知道從哪裡開始，可以試試</p>
+                      <ul className="mt-2 list-disc space-y-1.5 pl-[18px] text-[13px] leading-[1.7] text-[rgba(231,244,244,0.9)]">
+                        <li>寫一個你只敢跟自己說的理由——你為什麼在做現在做的事</li>
+                        <li>寫一個問題給未來的自己——不是要答案，是想知道他後來過得怎麼樣</li>
+                        <li>寫一句你今天想對自己說、但說不出口的話</li>
+                      </ul>
+                    </div>
+                    <div className="border-t border-white/10 pt-3">
+                      <p className="text-sm font-medium text-[#F9E41E]">不需要做的事</p>
+                      <ul className="mt-2 list-disc space-y-1.5 pl-[18px] text-[13px] leading-[1.7] text-[rgba(231,244,244,0.9)]">
+                        <li>不用寫得像一封「正式的」信，也不用有頭有尾</li>
+                        <li>不用假裝自己很正向、很有動力，或很有把握</li>
+                        <li>不用承諾未來的自己會做到什麼</li>
+                      </ul>
+                    </div>
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>
@@ -316,7 +356,7 @@ export function FutureLetterDialog({
               id="message-to-future"
               value={messageToFuture}
               onChange={(event) => setMessageToFuture(event.target.value)}
-              className="min-h-[120px] resize-y"
+              className="min-h-[80px] resize-y rounded-2xl border-[#C1ECFF] bg-white p-3.5 text-sm leading-[1.8] text-[#295E5C] placeholder:text-[#9FB5B8] focus-visible:border-[#16B9B3] focus-visible:ring-4 focus-visible:ring-[rgba(22,185,179,0.16)] focus-visible:ring-offset-0"
             />
           </div>
 
@@ -391,7 +431,7 @@ export function FutureLetterDialog({
             </Select>
           </div>
 
-          <div className="flex items-center gap-3 pt-2">
+          <div className="flex gap-3 pt-2">
             {draftId && (
               <Button
                 type="button"
@@ -406,9 +446,18 @@ export function FutureLetterDialog({
               </Button>
             )}
             <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              onClick={handleSaveDraftClick}
+              className="rounded-full border-[#DCE9EB] bg-white px-6 text-[#536166] hover:border-[#16B9B3] hover:text-[#16B9B3]"
+            >
+              {t("action_save_draft")}
+            </Button>
+            <Button
               disabled={isSubmitting || hasFutureLetterFormErrors(errors)}
               onClick={handleSend}
-              className="flex-1 rounded-full bg-[#FCDD84] font-bold text-text-dark hover:bg-[#FBCF54]"
+              className="flex-1 rounded-full bg-[#F9E41E] font-medium text-[#0D3036] hover:bg-[#F9E41E]/90"
             >
               {isSubmitting ? t("action_sending") : t("action_send")}
             </Button>
