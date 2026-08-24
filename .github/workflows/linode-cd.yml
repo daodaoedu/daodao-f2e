@@ -479,7 +479,7 @@ jobs:
           LINODE_INSTANCE_IP: ${{ secrets.LINODE_INSTANCE_IP }}
         run: |
           mkdir -p ~/.ssh
-          echo "${LINODE_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
+          printf "%s" "${LINODE_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "${LINODE_INSTANCE_IP}" >> ~/.ssh/known_hosts
 
@@ -523,6 +523,15 @@ jobs:
             export DOCKER_HUB_USERNAME=${DOCKER_HUB_USERNAME}
             export IMAGE_TAG=${IMAGE_TAG}
             export COMMIT_SHA=${COMMIT_SHA}
+
+            if [ -z "\$COMMIT_SHA" ]; then
+              echo "❌ COMMIT_SHA is empty, aborting deployment"
+              exit 1
+            fi
+            if [ -z "\$IMAGE_TAG" ]; then
+              echo "❌ IMAGE_TAG is empty, aborting deployment"
+              exit 1
+            fi
 
             echo "=== Starting deployment for \$APP_ENV environment ==="
 
@@ -659,35 +668,6 @@ jobs:
             echo "=== Deployment completed successfully ==="
           ENDSSH
 
-      - name: Update deploy ref
-        if: success()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: ${{ env.BRANCH_NAME }}
-          COMMIT_SHA: ${{ env.COMMIT_SHA }}
-          REPO: ${{ github.repository }}
-        run: |
-          ref="refs/deploy/${BRANCH_NAME}"
-          sha="${COMMIT_SHA}"
-
-          # 用 GitHub API 更新 ref（不用 git push，避免觸發 workflow 無限迴圈）
-          # 先嘗試 PATCH（ref 已存在），失敗就 POST 建立
-          http_code=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH \
-            -H "Authorization: token ${GITHUB_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${REPO}/git/refs/${ref}" \
-            -d "{\"sha\":\"${sha}\"}")
-
-          if [ "$http_code" = "404" ]; then
-            curl -s -X POST \
-              -H "Authorization: token ${GITHUB_TOKEN}" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/${REPO}/git/refs" \
-              -d "{\"ref\":\"${ref}\",\"sha\":\"${sha}\"}" || echo "⚠️  Failed to create ref (may need write permission)"
-          fi
-
-          echo "✅ Updated deploy ref ${ref} → ${sha}"
-
   # ===== 部署後驗證 =====
   verify:
     runs-on: ubuntu-latest
@@ -697,7 +677,7 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.LINODE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          printf "%s" "${{ secrets.LINODE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.LINODE_INSTANCE_IP }} >> ~/.ssh/known_hosts
 
@@ -786,10 +766,55 @@ jobs:
             echo '=== Deployment Verification Complete ==='
           ENDSSH
 
+  # ===== 更新部署參照點（獨立 job，避免 race condition）=====
+  update-deploy-ref:
+    runs-on: ubuntu-latest
+    needs: [deploy, verify]
+    # 僅在 deploy 成功且 verify 成功（或被跳過但非失敗）時更新；避免部分部署失敗卻前移 ref 導致下次增量檢測遺漏
+    if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result != 'failure' && needs.verify.result != 'cancelled' }}
+    permissions:
+      contents: write
+    steps:
+      - name: Update deploy ref
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+          COMMIT_SHA: ${{ env.COMMIT_SHA }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ -z "${COMMIT_SHA}" ]; then
+            echo "❌ COMMIT_SHA is empty, refusing to update deploy ref"
+            exit 1
+          fi
+          if [ -z "${BRANCH_NAME}" ]; then
+            echo "❌ BRANCH_NAME is empty, refusing to update deploy ref"
+            exit 1
+          fi
+          ref="refs/deploy/${BRANCH_NAME}"
+          sha="${COMMIT_SHA}"
+
+          # 用 GitHub API 更新 ref（不用 git push，避免觸發 workflow 無限迴圈）
+          # 先嘗試 PATCH（ref 已存在），失敗就 POST 建立
+          http_code=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH \
+            -H "Authorization: token ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${REPO}/git/refs/${ref}" \
+            -d "{\"sha\":\"${sha}\"}")
+
+          if [ "$http_code" = "404" ]; then
+            curl -s -X POST \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/git/refs" \
+              -d "{\"ref\":\"${ref}\",\"sha\":\"${sha}\"}" || echo "⚠️  Failed to create ref (may need write permission)"
+          fi
+
+          echo "✅ Updated deploy ref ${ref} → ${sha}"
+
   # ===== Discord 通知 =====
   notify:
     runs-on: ubuntu-latest
-    needs: [detect-changes, build-website, build-product, deploy, verify]
+    needs: [detect-changes, build-website, build-product, deploy, verify, update-deploy-ref]
     if: always()
     steps:
       - name: Send Discord Notification
