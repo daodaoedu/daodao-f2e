@@ -8,3 +8,5 @@ export { InProgressSection } from "./in-progress-section";
 export { InProgressTaskCard } from "./in-progress-task-card";
 export { RecommendationSection } from "./recommendation-section";
 export { StatCard } from "./stat-card";
+export { YourToday } from "./your-today";
+export { ExploreRow } from "./explore-row";

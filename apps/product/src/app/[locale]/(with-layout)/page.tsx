@@ -5,12 +5,11 @@ import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { getStorage, StorageEnum } from "@daodao/shared";
-import { cn } from "@daodao/ui/lib/utils";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AddTaskFAB } from "@/components/dashboard";
+import { AddTaskFAB, ExploreRow, YourToday } from "@/components/dashboard";
 import { HomeTimelineSummary } from "@/components/future-letter";
 import { BackgroundAnimation, Banner } from "@/components/layout";
-import { ResonanceCarousel } from "@/components/persona";
 import {
   ActivityCard,
   BrewingCard,
@@ -242,53 +241,20 @@ export default function HomePage() {
 
       <main className="relative z-[25] pb-[72px] bg-very-light-gray">
         <div className="max-w-[640px] px-4 mx-auto pt-4">
-          {/* Tab Switcher */}
-          <div className="flex border-b border-[#E5E7EB] mb-4">
-            <button
-              type="button"
-              className={cn(
-                "flex-1 py-2 text-sm font-medium transition-all",
-                "text-text-dark border-b-2 border-logo-cyan -mb-px"
-              )}
-            >
-              {t("tab_inspire")}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.replace(HOME_TAB_PATHS.mine)}
-              className={cn("flex-1 py-2 text-sm font-medium transition-all", "text-text-dark/40")}
-            >
-              {t("tab_mine")}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.replace(HOME_TAB_PATHS.persona)}
-              className={cn("flex-1 py-2 text-sm font-medium transition-all", "text-text-dark/40")}
-            >
-              {t("tab_persona")}
-            </button>
-          </div>
+          {/* 你的今天 */}
+          <YourToday />
 
-          {/* 靈感 Tab */}
-          <header className="px-3 pb-2 pt-4">
-            <p className="text-xs font-medium text-logo-cyan">{t("inspire_eyebrow")}</p>
-            <h1 className="mt-2 text-xl font-bold leading-snug text-text-dark text-balance sm:text-2xl">
-              {t("inspire_title")}
-            </h1>
-            <p className="mt-3 max-w-lg text-sm leading-relaxed text-text-dark/50 text-pretty">
-              {t("inspire_subtitle")}
-            </p>
-          </header>
+          {/* 探索列 */}
+          <ExploreRow />
 
-          <div className="mb-5 mt-4">
+          {/* 搜尋 + 篩選 */}
+          <div className="mb-5">
             <ShowcaseSearchBar
               value={searchValue}
               onChange={setSearchValue}
               onSearch={handleSearch}
             />
           </div>
-          {/* Temporarily disabled per product request */}
-          {false && <ResonanceCarousel />}
 
           {isShowcaseLoading && feedItems.length === 0 ? (
             <div className="flex flex-col gap-3">
