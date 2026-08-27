@@ -233,6 +233,20 @@
   --animate-distance-100dvh: 100dvh;
   --animate-distance-full: 100%;
 
+  /* Breathing dot (space cards / nav state indicator) */
+  --animate-breathe: breathe 2.4s ease-in-out infinite;
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(0.72);
+      opacity: 0.55;
+    }
+  }
+
   /* Spin reverse animation (counter-clockwise) */
   --animate-spin-reverse: spin-reverse 1s linear infinite;
   @keyframes spin-reverse {
