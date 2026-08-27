@@ -50,6 +50,7 @@ export const SpaceCard = ({ space }: SpaceCardProps) => {
           {/* 個人實踐/共同挑戰卡才顯示呼吸點；否則留白，不用警示視覺（FR-2.4） */}
           {space.kind !== "event_course" && space.hasActivePractice && (
             <span
+              role="img"
               title={t("has_active_practice")}
               aria-label={t("has_active_practice")}
               className="inline-flex size-[26px] items-center justify-center rounded-full bg-primary-base/12"
@@ -59,6 +60,7 @@ export const SpaceCard = ({ space }: SpaceCardProps) => {
           )}
           {space.kind === "event_course" && (
             <span
+              role="img"
               aria-label={t("members_label", { count: space.memberCount })}
               title={t("members_label", { count: space.memberCount })}
               className="inline-flex items-center gap-2"
