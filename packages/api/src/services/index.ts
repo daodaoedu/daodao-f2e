@@ -9,6 +9,9 @@ export * from "./admin-hooks";
 // Auth Service
 export * from "./auth";
 export * from "./auth-hooks";
+// Group Challenge Service
+export * from "./challenge";
+export * from "./challenge-hooks";
 // Lighthouse Cohort Service
 export * from "./cohort";
 export * from "./cohort-hooks";
