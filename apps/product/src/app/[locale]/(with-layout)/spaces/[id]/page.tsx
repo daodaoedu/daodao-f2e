@@ -156,7 +156,8 @@ export default function EventSpacePage() {
               onClick={() => {
                 void navigator.clipboard
                   .writeText(`${window.location.origin}/spaces/public/${detail.publicToken}`)
-                  .then(() => toast.success(t("link_copied")));
+                  .then(() => toast.success(t("link_copied")))
+                  .catch(() => toast.error(t("copy_public_link")));
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#DCEBEA] px-3 py-1 text-xs text-text-dark transition-colors hover:border-primary-base/50 hover:bg-[#F7FBFA]"
             >

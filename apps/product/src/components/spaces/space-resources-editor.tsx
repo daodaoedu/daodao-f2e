@@ -62,7 +62,9 @@ export const SpaceResourcesEditor = ({ links, onChange, practices }: SpaceResour
   return (
     <div className="flex flex-col gap-2">
       {links.map((link, index) => (
-        <div key={`${index}-${link.url}`} className="flex items-center gap-2">
+        // 列以位置為 key：整列陣列由父層全量覆寫，url 不可入 key（避免輸入時 remount 掉焦點）
+        // biome-ignore lint/suspicious/noArrayIndexKey: rows are replaced wholesale; position is the identity
+        <div key={index} className="flex items-center gap-2">
           <Link2 className="size-4 shrink-0 text-primary-base" />
           <input
             value={link.name}

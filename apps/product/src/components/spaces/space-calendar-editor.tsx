@@ -21,7 +21,10 @@ export function toEditableEvents(block: SpaceBlockType): EditableEvent[] {
 }
 
 function todayDateString(): string {
-  return new Date().toISOString().slice(0, 10);
+  // 以本地日期組字串；toISOString 是 UTC，會讓東八區早上八點前預填到昨天
+  const now = new Date();
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
 export function newEditableEvent(): EditableEvent {

@@ -98,7 +98,9 @@ export const SpaceBlockEditor = ({
     // Flush unsaved edits when the editor unmounts mid-edit (tab switch).
     return () => {
       if (latest.current.editing && latest.current.dirty) {
-        void updateSpaceBlock(spaceId, block.id, contentPayload());
+        updateSpaceBlock(spaceId, block.id, contentPayload()).catch((error: unknown) => {
+          console.error("Failed to flush block edits on unmount", error);
+        });
       }
     };
     // biome-ignore lint/correctness/useExhaustiveDependencies: flush-on-unmount reads refs only
