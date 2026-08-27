@@ -4,7 +4,7 @@ import type { ChallengeSummaryType } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Badge, type BadgeProps } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
-import { Calendar, Flag, Timer, Users } from "lucide-react";
+import { Calendar, Flag, Sparkles, Timer, Users } from "lucide-react";
 import { PracticeTheme, practiceThemeSvgMap } from "@/constants/practice-theme";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 
@@ -12,6 +12,8 @@ interface ChallengeCardProps {
   challenge: ChallengeSummaryType;
   /** 點擊「現在加入」；未登入時由外層導向登入 */
   onJoinClick: (challenge: ChallengeSummaryType) => void;
+  /** 點擊抽卡 icon（有指派卡組且已加入時顯示） */
+  onDrawClick?: (challenge: ChallengeSummaryType) => void;
 }
 
 /** 卡片背景主題：依 id 輪替，讓探索頁有變化又保持穩定 */
@@ -34,7 +36,7 @@ const STATUS_BADGE: Record<ChallengeSummaryType["runStatus"], BadgeProps["varian
  * 樣式對齊 dashboard 的 InProgressTaskCard（POC：探索共同挑戰-standalone）：
  * 主題色背景 + 狀態 Badge + 挑戰旗標 + 「xx 座島」人數文案隨狀態變化。
  */
-export const ChallengeCard = ({ challenge, onJoinClick }: ChallengeCardProps) => {
+export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: ChallengeCardProps) => {
   const t = useTranslations("challenge");
   const themeName = THEME_ROTATION[challenge.id % THEME_ROTATION.length] ?? PracticeTheme.yellow;
   const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
@@ -82,6 +84,20 @@ export const ChallengeCard = ({ challenge, onJoinClick }: ChallengeCardProps) =>
                 {t("cta_joined")}
               </Badge>
             )}
+            {challenge.hasInspirationDeck &&
+              challenge.isJoined &&
+              challenge.runStatus !== "ended" &&
+              onDrawClick && (
+                <button
+                  type="button"
+                  aria-label={t("draw_entry_label")}
+                  title={t("draw_entry_label")}
+                  className="ml-auto inline-flex size-7 cursor-pointer items-center justify-center rounded-full border border-logo-cyan bg-basic-white/80 transition-colors hover:bg-light-blue"
+                  onClick={() => onDrawClick(challenge)}
+                >
+                  <Sparkles className="size-4 text-logo-cyan" />
+                </button>
+              )}
           </div>
 
           <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">{challenge.displayName}</h3>

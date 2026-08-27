@@ -10,7 +10,7 @@ import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { Flag, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
-import { ChallengeCard, JoinChallengeDialog } from "@/components/challenge";
+import { ChallengeCard, InspirationDrawDialog, JoinChallengeDialog } from "@/components/challenge";
 
 /**
  * 探索共同挑戰 standalone 頁（openspec: challenge-discovery）
@@ -25,6 +25,7 @@ export default function ChallengesPage() {
   const { data: currentUser } = useCurrentUser();
   const { data, isLoading, mutate } = useChallenges();
   const [joinTarget, setJoinTarget] = useState<ChallengeSummaryType | null>(null);
+  const [drawTarget, setDrawTarget] = useState<number | null>(null);
 
   const challenges = useMemo(() => data?.data ?? [], [data]);
   const sections = useMemo(
@@ -92,7 +93,12 @@ export default function ChallengesPage() {
           )}
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {section.items.map((challenge) => (
-              <ChallengeCard key={challenge.id} challenge={challenge} onJoinClick={handleJoinClick} />
+              <ChallengeCard
+                key={challenge.id}
+                challenge={challenge}
+                onJoinClick={handleJoinClick}
+                onDrawClick={(target) => setDrawTarget(target.id)}
+              />
             ))}
           </div>
         </section>
@@ -104,6 +110,13 @@ export default function ChallengesPage() {
           if (!open) setJoinTarget(null);
         }}
         onJoined={() => mutate()}
+      />
+
+      <InspirationDrawDialog
+        challengeId={drawTarget}
+        onOpenChange={(open) => {
+          if (!open) setDrawTarget(null);
+        }}
       />
     </main>
   );

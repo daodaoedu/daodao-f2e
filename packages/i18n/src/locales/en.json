@@ -7951,6 +7951,18 @@
     "joined_edit": "Edit my challenge practice",
     "join_failed": "Failed to join. Please try again later.",
     "empty": "No group challenges to join right now. Stay tuned!",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "draw_entry_label": "Draw inspiration card",
+    "draw_dialog_title": "Today's inspiration",
+    "draw_dialog_subtitle": "Up to 3 draws a day — pick one to accompany today's practice",
+    "draw_remaining": "{count} draws left today",
+    "draw_none_left": "All three draws used today. Come back tomorrow!",
+    "draw_button": "Draw a card",
+    "drawing": "Drawing…",
+    "draw_select": "Pick this one",
+    "draw_selected": "Today's pick",
+    "draw_empty_hint": "No draws yet — draw a card to see today's inspiration!",
+    "draw_failed": "Draw failed. Please try again later.",
+    "select_failed": "Failed to select. Please try again later."
   }
 }
