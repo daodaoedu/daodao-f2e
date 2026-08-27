@@ -37,7 +37,10 @@ export function YourToday() {
       .map((p) => {
         const startDate = p.startDate ? new Date(p.startDate) : new Date();
         const endDate = p.endDate ? new Date(p.endDate) : new Date();
-        const totalDays = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / 86400000));
+        const totalDays = Math.max(
+          1,
+          Math.ceil((endDate.getTime() - startDate.getTime()) / 86400000)
+        );
         return {
           id: p.id,
           title: p.title,
@@ -80,21 +83,50 @@ export function YourToday() {
                   href={`/practices/${card.id}`}
                   className="flex items-center gap-3 px-4 py-[14px] rounded-[18px] hover:bg-white/50 transition-colors group"
                 >
-                  <span className={cn(
-                    "shrink-0 flex items-center justify-center size-6 rounded-full",
-                    card.type === "challenge" ? "bg-logo-cyan/10 text-logo-cyan" : "bg-text-dark/10 text-text-dark"
-                  )}>
+                  <span
+                    className={cn(
+                      "shrink-0 flex items-center justify-center size-6 rounded-full",
+                      card.type === "challenge"
+                        ? "bg-logo-cyan/10 text-logo-cyan"
+                        : "bg-text-dark/10 text-text-dark"
+                    )}
+                  >
                     {card.type === "challenge" ? (
-                      <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                      <svg
+                        className="size-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+                        <line x1="4" y1="22" x2="4" y2="15" />
+                      </svg>
                     ) : (
-                      <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      <svg
+                        className="size-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
                     )}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-text-dark truncate">{card.title}</p>
                     <p className="text-[11px] text-text-dark/40">
                       {card.lastCheckInDate
-                        ? t("your_today_days_progress", { current: card.currentDays, total: card.totalDays })
+                        ? t("your_today_days_progress", {
+                            current: card.currentDays,
+                            total: card.totalDays,
+                          })
                         : t("your_today_first_checkin")}
                     </p>
                   </div>

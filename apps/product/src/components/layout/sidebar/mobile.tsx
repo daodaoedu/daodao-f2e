@@ -15,9 +15,7 @@ import type { SidebarProps } from "./type";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const mobileNavItems = menuItems.filter(
-  (item) => item.labelKey !== "nav_manage"
-);
+const mobileNavItems = menuItems.filter((item) => item.labelKey !== "nav_manage");
 
 export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
@@ -83,9 +81,7 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
                     <Icon
                       className={cn(
                         "size-7 shrink-0 transition-colors",
-                        isActive
-                          ? "text-logo-cyan opacity-100"
-                          : "text-light-gray opacity-45"
+                        isActive ? "text-logo-cyan opacity-100" : "text-light-gray opacity-45"
                       )}
                     />
                   )}

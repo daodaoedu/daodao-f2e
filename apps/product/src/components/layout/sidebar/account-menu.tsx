@@ -60,9 +60,7 @@ export function AccountMenu({ isCollapsed }: AccountMenuProps) {
         <span className="shrink-0 flex items-center justify-center size-7 rounded-full bg-logo-cyan text-white text-[13px] font-semibold">
           {initial}
         </span>
-        {!isCollapsed && (
-          <span className="text-sm font-medium truncate">{displayName}</span>
-        )}
+        {!isCollapsed && <span className="text-sm font-medium truncate">{displayName}</span>}
       </button>
 
       {isOpen && (

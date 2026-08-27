@@ -63,7 +63,6 @@ export const menuItems: MenuItem[] = [
     icon: UserOutlineSvg,
     labelKey: "nav_my_island",
     href: (identifier: string) => `/users/${identifier}`,
-    isMatch: (pathname: string, identifier: string) =>
-      pathname.startsWith(`/users/${identifier}`),
+    isMatch: (pathname: string, identifier: string) => pathname.startsWith(`/users/${identifier}`),
   },
 ];

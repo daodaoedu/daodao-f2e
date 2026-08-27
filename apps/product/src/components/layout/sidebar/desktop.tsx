@@ -98,9 +98,7 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
                     <Icon
                       className={cn(
                         "size-6 transition-colors",
-                        isActive
-                          ? "text-logo-cyan opacity-100"
-                          : "text-text-dark opacity-45"
+                        isActive ? "text-logo-cyan opacity-100" : "text-text-dark opacity-45"
                       )}
                     />
                   )}
