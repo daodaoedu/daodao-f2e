@@ -25,3 +25,8 @@ export const useSpaceHomePage = (id: string | undefined) =>
   useQuery("/api/v1/spaces/{id}/home-page", id ? { params: { path: { id } } } : null, {
     revalidateOnFocus: false,
   });
+
+export const usePublicSpace = (token: string | undefined) =>
+  useQuery("/api/v1/spaces/public/{token}", token ? { params: { path: { token } } } : null, {
+    revalidateOnFocus: false,
+  });

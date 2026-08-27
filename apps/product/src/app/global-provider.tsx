@@ -74,6 +74,8 @@ function GlobalProvider({
                       "^/persona(/.*)?$",
                       "^/mine(/.*)?$",
                       "^/survey/r/",
+                      // 空間公開連結（訪客視角，免登入）
+                      "^/spaces/public/",
                       // misc
                       "^/dev/",
                       "^/ux-mockup/",

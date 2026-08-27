@@ -81,5 +81,8 @@ export const publishSpaceBlock = async (
 export const draftSpaceBlock = async (id: string, blockId: number) =>
   client.POST("/api/v1/spaces/{id}/blocks/{blockId}/draft", { params: { path: { id, blockId } } });
 
+export const getPublicSpace = async (token: string) =>
+  client.GET("/api/v1/spaces/public/{token}", { params: { path: { token } } });
+
 export const deleteSpaceBlock = async (id: string, blockId: number) =>
   client.DELETE("/api/v1/spaces/{id}/blocks/{blockId}", { params: { path: { id, blockId } } });

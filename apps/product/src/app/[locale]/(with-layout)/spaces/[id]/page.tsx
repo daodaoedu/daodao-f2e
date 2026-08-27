@@ -2,8 +2,10 @@
 
 import { useSpaceDetail, useSpaceHomePage, useSpacePractices } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
+import { toast } from "@daodao/ui/components/sonner";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { cn } from "@daodao/ui/lib/utils";
+import { Copy, Eye, EyeOff } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { InProgressTask } from "@/components/dashboard";
@@ -38,6 +40,8 @@ export default function EventSpacePage() {
   const [startOpen, setStartOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<SpaceTab | null>(null);
   const [editingBlockIds, setEditingBlockIds] = useState<Set<number>>(new Set());
+  // 訪客視角預覽（FR-1.4）：以成員視角渲染，隱藏編輯入口與非發佈內容
+  const [guestPreview, setGuestPreview] = useState(false);
 
   const handleEditingChange = (blockId: number, editing: boolean) => {
     setEditingBlockIds((current) => {
@@ -52,8 +56,18 @@ export default function EventSpacePage() {
   };
 
   const detail = detailData?.data;
-  const homePage = homePageData?.data ?? null;
-  const isHost = detail?.viewerRole === "host";
+  const rawHomePage = homePageData?.data ?? null;
+  const isHost = detail?.viewerRole === "host" && !guestPreview;
+  // 訪客視角：只留已發佈區塊；頁面為草稿時整頁隱藏（FR-4.3 頁面層級）
+  const homePage =
+    guestPreview && rawHomePage
+      ? rawHomePage.status === "published"
+        ? {
+            ...rawHomePage,
+            blocks: rawHomePage.blocks.filter((block) => block.publishStatus === "published"),
+          }
+        : null
+      : rawHomePage;
   const homeTabVisible = homePage !== null;
   // FR-2.3: 首頁分頁不顯示時直接落在實踐分頁，不出現缺頁提示
   const currentTab: SpaceTab = activeTab ?? (homeTabVisible ? "home" : "practices");
@@ -127,6 +141,47 @@ export default function EventSpacePage() {
           </button>
         }
       />
+
+      {/* Host 工具列（FR-1.4）：公開區塊數、複製公開連結、訪客視角 */}
+      {detail.viewerRole === "host" && (
+        <div className="mb-3 flex items-center gap-2">
+          {!guestPreview && detail.publicBlockCount !== null && (
+            <span className="rounded-full bg-primary-lightest px-2.5 py-1 text-xs text-basic-600">
+              {t("public_block_count", { count: detail.publicBlockCount })}
+            </span>
+          )}
+          {!guestPreview && detail.publicToken && (
+            <button
+              type="button"
+              onClick={() => {
+                void navigator.clipboard
+                  .writeText(`${window.location.origin}/spaces/public/${detail.publicToken}`)
+                  .then(() => toast.success(t("link_copied")));
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#DCEBEA] px-3 py-1 text-xs text-text-dark transition-colors hover:border-primary-base/50 hover:bg-[#F7FBFA]"
+            >
+              <Copy className="size-3.5" />
+              {t("copy_public_link")}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setEditingBlockIds(new Set());
+              setGuestPreview((current) => !current);
+            }}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs transition-colors",
+              guestPreview
+                ? "bg-primary-base text-white"
+                : "border border-[#DCEBEA] text-text-dark hover:border-primary-base/50 hover:bg-[#F7FBFA]"
+            )}
+          >
+            {guestPreview ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+            {guestPreview ? t("guest_view_exit") : t("guest_view")}
+          </button>
+        </div>
+      )}
 
       {/* 分頁列（FR-2.1）：空間首頁 + 實踐（數量） */}
       <div className="mb-4 flex items-center border-b border-[#E5E7EB]">

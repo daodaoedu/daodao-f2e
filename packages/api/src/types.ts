@@ -25545,7 +25545,68 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            data: components["schemas"]["PublicSpace"];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
@@ -43438,6 +43499,59 @@ export interface components {
             lastActivityAt: string | null;
         };
         /** @description The main response data */
+        PublicSpace: {
+            id: string;
+            name: string;
+            subtitle: string | null;
+            memberCount: number;
+            memberAvatars: {
+                nickname: string | null;
+                avatar: string | null;
+            }[];
+            practiceCount: number;
+            homePage: {
+                /** @enum {string} */
+                status: "draft" | "published";
+                blocks: components["schemas"]["SpaceBlock"][];
+            } | null;
+        };
+        SpaceBlock: {
+            id: number;
+            /** @enum {string} */
+            blockType: "text" | "resources" | "calendar";
+            title: string;
+            body: string | null;
+            position: number;
+            isPinned: boolean;
+            /**
+             * @description 有效發佈狀態（排程時間已到視同 published，FR-7.6）
+             * @enum {string}
+             */
+            publishStatus: "draft" | "scheduled" | "published";
+            scheduledAt: string | null;
+            links: {
+                id: number;
+                name: string;
+                url: string;
+                isNameCustomized: boolean;
+                /** @description 對應實踐（FR-8.9 浮層顯示名稱） */
+                practices: {
+                    id: string;
+                    title: string;
+                }[];
+            }[];
+            events: {
+                id: number;
+                title: string;
+                startDate: string;
+                endDate: string | null;
+                startTime: string | null;
+                endTime: string | null;
+                location: string | null;
+                url: string | null;
+            }[];
+        };
+        /** @description The main response data */
         SpaceDetail: {
             id: string;
             name: string;
@@ -43486,42 +43600,6 @@ export interface components {
             /** @description 依檢視者過濾後的區塊；成員看不到草稿與未到時排程（FR-7.2） */
             blocks: components["schemas"]["SpaceBlock"][];
         } | null;
-        SpaceBlock: {
-            id: number;
-            /** @enum {string} */
-            blockType: "text" | "resources" | "calendar";
-            title: string;
-            body: string | null;
-            position: number;
-            isPinned: boolean;
-            /**
-             * @description 有效發佈狀態（排程時間已到視同 published，FR-7.6）
-             * @enum {string}
-             */
-            publishStatus: "draft" | "scheduled" | "published";
-            scheduledAt: string | null;
-            links: {
-                id: number;
-                name: string;
-                url: string;
-                isNameCustomized: boolean;
-                /** @description 對應實踐（FR-8.9 浮層顯示名稱） */
-                practices: {
-                    id: string;
-                    title: string;
-                }[];
-            }[];
-            events: {
-                id: number;
-                title: string;
-                startDate: string;
-                endDate: string | null;
-                startTime: string | null;
-                endTime: string | null;
-                location: string | null;
-                url: string | null;
-            }[];
-        };
         CreateSpaceHomePage: {
             /**
              * @description 起始方式：example（帶範例區塊）或 blank（空白頁）
