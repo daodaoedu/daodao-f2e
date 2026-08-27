@@ -2,39 +2,10 @@
 
 import type { SpaceBlockType } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
+import MarkdownRenderer from "@daodao/ui/components/markdown-renderer";
 import { CalendarDays, FolderOpen, Link2, MapPin } from "lucide-react";
 import { Fragment } from "react";
-
-/** Format YYYY-MM-DD as YYYY/MM/DD (FR-9.2). */
-function formatEventDate(date: string): string {
-  return date.replaceAll("-", "/");
-}
-
-/** Month separator label; includes the year when it crosses years (FR-9.3). */
-function monthLabel(date: string, needsYear: boolean): string {
-  const [year, month] = date.split("-");
-  return needsYear ? `${year} 年 ${Number(month)} 月` : `${Number(month)} 月`;
-}
-
-type EventRow = SpaceBlockType["events"][number];
-
-/** Sort events by start date and insert month separators (FR-9.3). */
-export function groupEventsByMonth(events: EventRow[]): Array<{ label: string; rows: EventRow[] }> {
-  const sorted = [...events].sort((a, b) => a.startDate.localeCompare(b.startDate));
-  const years = new Set(sorted.map((event) => event.startDate.slice(0, 4)));
-  const needsYear = years.size > 1;
-  const groups: Array<{ label: string; rows: EventRow[] }> = [];
-  for (const event of sorted) {
-    const label = monthLabel(event.startDate, needsYear);
-    const last = groups.at(-1);
-    if (last && last.label === label) {
-      last.rows.push(event);
-    } else {
-      groups.push({ label, rows: [event] });
-    }
-  }
-  return groups;
-}
+import { formatEventDate, groupEventsByMonth } from "@/utils/space-calendar";
 
 /** Link pill label: Google Meet gets its own name, everything else 線上連結 (FR-9.2). */
 function linkPillLabel(url: string, onlineLinkText: string): string {
@@ -51,7 +22,10 @@ export const SpaceBlockView = ({ block }: SpaceBlockViewProps) => {
 
   if (block.blockType === "text") {
     return (
-      <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-text-dark">{block.body}</p>
+      <MarkdownRenderer
+        source={block.body ?? ""}
+        className="text-[15px] leading-relaxed text-text-dark"
+      />
     );
   }
 

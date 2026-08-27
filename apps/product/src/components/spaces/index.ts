@@ -1,8 +1,13 @@
-export { groupEventsByMonth, SpaceBlockView } from "./space-block-view";
+export { SpaceBlockEditor } from "./space-block-editor";
+export { SpaceBlockView } from "./space-block-view";
+export { SpaceCalendarEditor } from "./space-calendar-editor";
 export { SpaceCard } from "./space-card";
 export { SpaceCreateSheet } from "./space-create-sheet";
 export { type SpaceCreateKind, SpaceFab } from "./space-fab";
+export { SpaceFormatToolbar } from "./space-format-toolbar";
 export { SpaceHomeCreateButton, SpaceHomeGuide, SpaceHomeTab } from "./space-home-tab";
 export { SpaceMembersDialog } from "./space-members-dialog";
 export { SpacePracticeSection } from "./space-practice-section";
+export { SpaceResourcesEditor } from "./space-resources-editor";
 export { SpaceSubpageHeader } from "./space-subpage-header";
+export { SpaceToc } from "./space-toc";

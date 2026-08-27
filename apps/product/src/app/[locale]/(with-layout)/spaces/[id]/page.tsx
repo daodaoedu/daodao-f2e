@@ -37,6 +37,19 @@ export default function EventSpacePage() {
   const [guideCollapsed, setGuideCollapsed] = useState(false);
   const [startOpen, setStartOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<SpaceTab | null>(null);
+  const [editingBlockIds, setEditingBlockIds] = useState<Set<number>>(new Set());
+
+  const handleEditingChange = (blockId: number, editing: boolean) => {
+    setEditingBlockIds((current) => {
+      const next = new Set(current);
+      if (editing) {
+        next.add(blockId);
+      } else {
+        next.delete(blockId);
+      }
+      return next;
+    });
+  };
 
   const detail = detailData?.data;
   const homePage = homePageData?.data ?? null;
@@ -138,7 +151,11 @@ export default function EventSpacePage() {
         )}
         <button
           type="button"
-          onClick={() => setActiveTab("practices")}
+          onClick={() => {
+            // 切至實踐分頁時結束所有區塊編輯狀態，內容由編輯器 flush 保留（FR-2.5）
+            setEditingBlockIds(new Set());
+            setActiveTab("practices");
+          }}
           className={cn(
             "px-4 py-2 text-sm font-medium transition-all",
             currentTab === "practices"
@@ -170,7 +187,14 @@ export default function EventSpacePage() {
       )}
 
       {currentTab === "home" && homePage ? (
-        <SpaceHomeTab spaceId={spaceId} homePage={homePage} isHost={isHost} />
+        <SpaceHomeTab
+          spaceId={spaceId}
+          homePage={homePage}
+          isHost={isHost}
+          practices={practicesData?.data ?? []}
+          editingIds={editingBlockIds}
+          onEditingChange={handleEditingChange}
+        />
       ) : (
         <SpacePracticeSection tasks={tasks} />
       )}
