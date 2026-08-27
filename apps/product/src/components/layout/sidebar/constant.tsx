@@ -3,17 +3,24 @@ import {
   BellSolidSvg,
   HomeOutlineSvg,
   HomeSolidSvg,
-  MedalOutlineSvg,
-  MedalSolidSvg,
-  SearchOutlineSvg,
-  SearchSolidSvg,
-  SettingOutlineSvg,
-  SettingSolidSvg,
+  ManageOutlineSvg,
+  MessagesOutlineSvg,
+  SpacesOutlineSvg,
   UserOutlineSvg,
   UserSolidSvg,
 } from "@daodao/assets";
 
-export const menuItems = [
+export type MenuItem = {
+  activeIcon: typeof HomeSolidSvg;
+  icon: typeof HomeOutlineSvg;
+  labelKey: string;
+  href: string | ((identifier: string) => string);
+  hidden?: boolean;
+  isMatch: (pathname: string, identifier: string) => boolean;
+  badge?: "breathing-dot" | "unread-count";
+};
+
+export const menuItems: MenuItem[] = [
   {
     activeIcon: HomeSolidSvg,
     icon: HomeOutlineSvg,
@@ -22,20 +29,27 @@ export const menuItems = [
     isMatch: (pathname: string) => pathname === "/",
   },
   {
-    activeIcon: SearchSolidSvg,
-    icon: SearchOutlineSvg,
-    labelKey: "nav_explore",
-    href: "/explore",
-    hidden: true,
-    isMatch: (pathname: string) => pathname === "/explore",
+    activeIcon: SpacesOutlineSvg,
+    icon: SpacesOutlineSvg,
+    labelKey: "nav_spaces",
+    href: "/spaces",
+    badge: "breathing-dot",
+    isMatch: (pathname: string) => pathname.startsWith("/spaces"),
   },
   {
-    activeIcon: MedalSolidSvg,
-    icon: MedalOutlineSvg,
-    labelKey: "nav_growth_map",
-    href: "/growth-map",
-    hidden: true,
-    isMatch: (pathname: string) => pathname === "/growth-map",
+    activeIcon: MessagesOutlineSvg,
+    icon: MessagesOutlineSvg,
+    labelKey: "nav_messages",
+    href: "/messages",
+    badge: "unread-count",
+    isMatch: (pathname: string) => pathname.startsWith("/messages"),
+  },
+  {
+    activeIcon: ManageOutlineSvg,
+    icon: ManageOutlineSvg,
+    labelKey: "nav_manage",
+    href: "/manage",
+    isMatch: (pathname: string) => pathname.startsWith("/manage"),
   },
   {
     activeIcon: BellSolidSvg,
@@ -49,13 +63,7 @@ export const menuItems = [
     icon: UserOutlineSvg,
     labelKey: "nav_my_island",
     href: (identifier: string) => `/users/${identifier}`,
-    isMatch: (pathname: string, identifier: string) => pathname.startsWith(`/users/${identifier}`),
-  },
-  {
-    activeIcon: SettingSolidSvg,
-    icon: SettingOutlineSvg,
-    labelKey: "nav_settings",
-    href: "/settings",
-    isMatch: (pathname: string) => pathname.startsWith("/settings"),
+    isMatch: (pathname: string, identifier: string) =>
+      pathname.startsWith(`/users/${identifier}`),
   },
 ];

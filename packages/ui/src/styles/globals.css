@@ -750,6 +750,18 @@
     font-size: 1.125rem;
   }
 
+  /* Breathing dot animation for sidebar status indicator */
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.25; }
+  }
+  .animate-breathe {
+    animation: breathe 2.4s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-breathe { animation: none; }
+  }
+
   /* Gradient background */
   .bg-gradient-primary-palest {
     background:

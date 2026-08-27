@@ -6,9 +6,11 @@ export default async function WithLayout({ children, params }: LayoutProps<"/[lo
   setRequestLocale(locale);
   return (
     <>
-      {children}
+      <div className="md:pl-[132px]">
+        {children}
+        <Footer />
+      </div>
       <Sidebar />
-      <Footer />
     </>
   );
 }
