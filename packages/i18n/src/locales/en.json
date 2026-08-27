@@ -5277,8 +5277,14 @@
     "empty_description": "You can focus on your current plan, or browse other practices in the Inspiration tab",
     "empty_cta": "Go to Inspiration",
     "completed_title": "Completed",
-    "fab_add_task": "Add task",
+    "fab_add_task": "Create",
     "fab_create_practice": "Create a themed practice",
+    "fab_practice_subtitle": "Start a personal practice or create an activity template",
+    "fab_create_activity": "Create an activity",
+    "fab_activity_subtitle": "Open a space and invite others to join",
+    "fab_create_challenge": "Group challenge",
+    "fab_challenge_subtitle": "A challenge for the whole platform",
+    "fab_team_badge": "Dao Dao Team",
     "checked_in_count": "<bold>{count}</bold> times",
     "checked_in_count_zero": "Start your first check-in!",
     "card_start_date": "{date}",
@@ -5296,6 +5302,17 @@
     "inspire_eyebrow": "Start with how others practice",
     "inspire_title": "See how people turn ideas into action",
     "inspire_subtitle": "Explore learning and practice as they happen, and find a next step in real progress. When you are ready, begin your own version.",
+    "greeting_morning": "Good morning, {name}",
+    "greeting_afternoon": "Good afternoon, {name}",
+    "greeting_evening": "Good evening, {name}",
+    "your_today_collapsed": "{count} practices remaining today",
+    "your_today_expand": "Expand",
+    "your_today_empty": "Where would you like to start today?",
+    "your_today_first_checkin": "Make your first check-in",
+    "your_today_days_progress": "{current}/{total} days",
+    "explore_challenge": "Explore challenges",
+    "explore_activity": "Explore activities",
+    "search_inspire": "Search for inspiration",
     "loading": "Loading...",
     "filter_aria_label": "Filter tasks",
     "filter_all": "All",
@@ -5618,6 +5635,9 @@
     "undo": "Undo",
     "processing": "Processing...",
     "nav_home": "Home",
+    "nav_spaces": "Spaces",
+    "nav_messages": "Messages",
+    "nav_manage": "Manage",
     "nav_explore": "Explore Community",
     "nav_growth_map": "Growth Map",
     "nav_notifications": "Notifications",
@@ -5629,6 +5649,13 @@
     "sidebar_collapse": "Collapse sidebar",
     "back_to_website": "Back to website",
     "back_to_home": "Back to home",
+    "account_menu": "Account menu",
+    "account_settings": "Settings",
+    "account_language": "Language",
+    "account_feedback": "Feedback",
+    "account_roadmap": "Roadmap",
+    "account_bug_report": "Report a bug",
+    "account_logout": "Log out",
     "selection_clear": "Clear selection",
     "field_custom_role": "Other role",
     "field_custom_field": "Other field",
@@ -6918,44 +6945,20 @@
         "explorer": {
           "name": "Explorer Island",
           "description": "You are a curious explorer who enjoys trying new things.",
-          "traits": [
-            "Curious",
-            "Willing to try",
-            "Independent thinker"
-          ],
-          "recommendations": [
-            "Daily reading",
-            "Coding practice",
-            "Language learning"
-          ]
+          "traits": ["Curious", "Willing to try", "Independent thinker"],
+          "recommendations": ["Daily reading", "Coding practice", "Language learning"]
         },
         "creator": {
           "name": "Creator Island",
           "description": "You are highly creative and good at turning ideas into action.",
-          "traits": [
-            "Creative",
-            "Hands-on",
-            "Artistic"
-          ],
-          "recommendations": [
-            "Writing practice",
-            "Art creation",
-            "Design learning"
-          ]
+          "traits": ["Creative", "Hands-on", "Artistic"],
+          "recommendations": ["Writing practice", "Art creation", "Design learning"]
         },
         "connector": {
           "name": "Connector Island",
           "description": "You build relationships easily and enjoy learning with others.",
-          "traits": [
-            "Communicative",
-            "Team-oriented",
-            "Empathetic"
-          ],
-          "recommendations": [
-            "Community activities",
-            "Language learning",
-            "Team projects"
-          ]
+          "traits": ["Communicative", "Team-oriented", "Empathetic"],
+          "recommendations": ["Community activities", "Language learning", "Team projects"]
         }
       }
     },

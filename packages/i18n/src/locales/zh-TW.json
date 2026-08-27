@@ -5277,8 +5277,14 @@
     "empty_description": "你可以先專注於當前的計畫，或到「靈感」分頁看看其他主題實踐",
     "empty_cta": "去看看靈感",
     "completed_title": "已完成",
-    "fab_add_task": "新增任務",
+    "fab_add_task": "新增",
     "fab_create_practice": "建立主題實踐",
+    "fab_practice_subtitle": "開始個人實踐或建立活動模版",
+    "fab_create_activity": "建立活動課程",
+    "fab_activity_subtitle": "開一個空間，邀請其他人一起",
+    "fab_create_challenge": "共同挑戰",
+    "fab_challenge_subtitle": "全站一起參加的挑戰",
+    "fab_team_badge": "島島團隊",
     "checked_in_count": "<bold>{count}</bold> 次",
     "checked_in_count_zero": "開始你的第一次打卡吧！",
     "card_start_date": "{date}",
@@ -5296,6 +5302,17 @@
     "inspire_eyebrow": "從他人的實踐開始",
     "inspire_title": "看看大家如何把想法走成行動",
     "inspire_subtitle": "瀏覽正在發生的學習與實踐，從真實的進展裡找到自己的下一步。當你準備好了，也可以開始你的版本。",
+    "greeting_morning": "早安，{name}",
+    "greeting_afternoon": "午安，{name}",
+    "greeting_evening": "晚安，{name}",
+    "your_today_collapsed": "今天還有 {count} 項練習",
+    "your_today_expand": "展開查看",
+    "your_today_empty": "今天想從哪裡開始？",
+    "your_today_first_checkin": "進行第一次打卡",
+    "your_today_days_progress": "{current}/{total} 天",
+    "explore_challenge": "探索共同挑戰",
+    "explore_activity": "探索活動課程",
+    "search_inspire": "搜尋靈感",
     "loading": "載入中...",
     "filter_aria_label": "任務篩選",
     "filter_all": "全部",
@@ -5618,6 +5635,9 @@
     "undo": "復原",
     "processing": "處理中...",
     "nav_home": "主頁",
+    "nav_spaces": "空間",
+    "nav_messages": "訊息",
+    "nav_manage": "管理",
     "nav_explore": "探索社群",
     "nav_growth_map": "成長地圖",
     "nav_notifications": "最新通知",
@@ -5629,6 +5649,13 @@
     "sidebar_collapse": "收合側邊欄",
     "back_to_website": "回到官網",
     "back_to_home": "回到首頁",
+    "account_menu": "帳號選單",
+    "account_settings": "設定",
+    "account_language": "語言",
+    "account_feedback": "回饋建議",
+    "account_roadmap": "Roadmap",
+    "account_bug_report": "錯誤回報",
+    "account_logout": "登出",
     "selection_clear": "清空選項",
     "field_custom_role": "其他角色",
     "field_custom_field": "其他領域",
@@ -6918,44 +6945,20 @@
         "explorer": {
           "name": "探索者島",
           "description": "你是一位好奇心旺盛的探索者，喜歡嘗試新事物",
-          "traits": [
-            "好奇心強",
-            "勇於嘗試",
-            "獨立思考"
-          ],
-          "recommendations": [
-            "每日閱讀",
-            "程式學習",
-            "語言學習"
-          ]
+          "traits": ["好奇心強", "勇於嘗試", "獨立思考"],
+          "recommendations": ["每日閱讀", "程式學習", "語言學習"]
         },
         "creator": {
           "name": "創造者島",
           "description": "你擁有豐富的創造力，善於將想法付諸實踐",
-          "traits": [
-            "創意豐富",
-            "動手能力強",
-            "有藝術天賦"
-          ],
-          "recommendations": [
-            "寫作練習",
-            "藝術創作",
-            "設計學習"
-          ]
+          "traits": ["創意豐富", "動手能力強", "有藝術天賦"],
+          "recommendations": ["寫作練習", "藝術創作", "設計學習"]
         },
         "connector": {
           "name": "連結者島",
           "description": "你善於建立人際關係，喜歡與他人合作學習",
-          "traits": [
-            "善於溝通",
-            "團隊合作",
-            "同理心強"
-          ],
-          "recommendations": [
-            "社群活動",
-            "語言學習",
-            "團隊專案"
-          ]
+          "traits": ["善於溝通", "團隊合作", "同理心強"],
+          "recommendations": ["社群活動", "語言學習", "團隊專案"]
         }
       }
     },

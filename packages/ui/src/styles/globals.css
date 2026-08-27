@@ -750,6 +750,42 @@
     font-size: 1.125rem;
   }
 
+  /* Breathing dot animation for sidebar status indicator */
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.5);
+      opacity: 0.25;
+    }
+  }
+  .animate-breathe {
+    animation: breathe 2.4s ease-in-out infinite;
+  }
+  @keyframes breathe-amber {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.4);
+      opacity: 0.2;
+    }
+  }
+  .animate-breathe-amber {
+    animation: breathe-amber 2.8s ease-in-out 4;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-breathe,
+    .animate-breathe-amber {
+      animation: none;
+    }
+  }
+
   /* Gradient background */
   .bg-gradient-primary-palest {
     background:
