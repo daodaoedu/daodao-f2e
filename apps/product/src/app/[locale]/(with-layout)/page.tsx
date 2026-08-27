@@ -425,7 +425,7 @@ export default function HomePage() {
         </div>
       </main>
 
-      <AddTaskFAB onAddTask={() => router.push("/practices/create")} />
+      <AddTaskFAB />
     </div>
   );
 }
