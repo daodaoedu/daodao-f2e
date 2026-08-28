@@ -4,6 +4,1744 @@
  */
 
 export interface paths {
+    "/api/v1/admin/challenges/programs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 挑戰主題列表 */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 只列某組織底下的挑戰主題 */
+                    organizationId?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 主題列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                organizationId: number;
+                                organizationName: string;
+                                name: string;
+                                description: string | null;
+                                cohortCount: number;
+                                publishedCohortCount: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            }[];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        put?: never;
+        /** 建立挑戰主題 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @description 所屬組織 ID（通常為島島官方組織） */
+                        organizationId: number;
+                        /** @example 晨間書寫 */
+                        name: string;
+                        description?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description 已建立 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                organizationId: number;
+                                organizationName: string;
+                                name: string;
+                                description: string | null;
+                                cohortCount: number;
+                                publishedCohortCount: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/challenges/programs/{programId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 封存挑戰主題（底下需無未封存的挑戰） */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 挑戰主題（program）ID */
+                    programId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已封存 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                409: components["responses"]["ConflictError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        /** 更新挑戰主題 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 挑戰主題（program）ID */
+                    programId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        name?: string;
+                        description?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description 已更新 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                organizationId: number;
+                                organizationName: string;
+                                name: string;
+                                description: string | null;
+                                cohortCount: number;
+                                publishedCohortCount: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/admin/challenges/programs/{programId}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 複製挑戰主題 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 挑戰主題（program）ID */
+                    programId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已複製 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                organizationId: number;
+                                organizationName: string;
+                                name: string;
+                                description: string | null;
+                                cohortCount: number;
+                                publishedCohortCount: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/challenges/programs/{programId}/cohorts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 主題底下的挑戰（期）列表 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 挑戰主題（program）ID */
+                    programId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 挑戰列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                programId: number;
+                                slug: string;
+                                displayName: string;
+                                /** Format: date-time */
+                                startDate: string;
+                                /** Format: date-time */
+                                endDate: string;
+                                /** Format: date-time */
+                                joinDeadline: string | null;
+                                capacity: number | null;
+                                /** @enum {string} */
+                                status: "draft" | "published" | "archived";
+                                /**
+                                 * @description 挑戰運行狀態：upcoming（未開始）、ongoing（進行中）、ended（已結束）
+                                 * @enum {string}
+                                 */
+                                runStatus: "upcoming" | "ongoing" | "ended";
+                                participantCount: number;
+                                template: {
+                                    id: number;
+                                    title: string;
+                                    durationDays: number | null;
+                                } | null;
+                                decks: {
+                                    id: number;
+                                    name: string;
+                                }[];
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            }[];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        put?: never;
+        /** 建立挑戰（草稿；可同時指定模板與開始日） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 挑戰主題（program）ID */
+                    programId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @example 2026 秋季・21 天晨間書寫 */
+                        displayName: string;
+                        /** @description 固定開始日，所有參與者共用 */
+                        startDate: string;
+                        /** @description 固定結束日；綁定的模板有持續天數時由系統推算，可省略 */
+                        endDate?: string;
+                        /** @description 加入截止日；未設則可加入至結束日 */
+                        joinDeadline?: string | null;
+                        capacity?: number | null;
+                        /** @description 綁定的實踐模板；發佈前必須綁定 */
+                        templateId?: number | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description 已建立 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                programId: number;
+                                slug: string;
+                                displayName: string;
+                                /** Format: date-time */
+                                startDate: string;
+                                /** Format: date-time */
+                                endDate: string;
+                                /** Format: date-time */
+                                joinDeadline: string | null;
+                                capacity: number | null;
+                                /** @enum {string} */
+                                status: "draft" | "published" | "archived";
+                                /**
+                                 * @description 挑戰運行狀態：upcoming（未開始）、ongoing（進行中）、ended（已結束）
+                                 * @enum {string}
+                                 */
+                                runStatus: "upcoming" | "ongoing" | "ended";
+                                participantCount: number;
+                                template: {
+                                    id: number;
+                                    title: string;
+                                    durationDays: number | null;
+                                } | null;
+                                decks: {
+                                    id: number;
+                                    name: string;
+                                }[];
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/challenges/programs/{programId}/cohorts/{cohortId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 封存挑戰 */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 挑戰主題（program）ID */
+                    programId: number;
+                    /** @description 挑戰（cohort）ID */
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已封存 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        /** 更新挑戰（已有人加入後期間與模板鎖定） */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 挑戰主題（program）ID */
+                    programId: number;
+                    /** @description 挑戰（cohort）ID */
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @example 2026 秋季・21 天晨間書寫 */
+                        displayName?: string;
+                        /** @description 固定開始日，所有參與者共用 */
+                        startDate?: string;
+                        /** @description 固定結束日；綁定的模板有持續天數時由系統推算，可省略 */
+                        endDate?: string;
+                        /** @description 加入截止日；未設則可加入至結束日 */
+                        joinDeadline?: string | null;
+                        capacity?: number | null;
+                        /** @description 綁定的實踐模板；發佈前必須綁定 */
+                        templateId?: number | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description 已更新 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                programId: number;
+                                slug: string;
+                                displayName: string;
+                                /** Format: date-time */
+                                startDate: string;
+                                /** Format: date-time */
+                                endDate: string;
+                                /** Format: date-time */
+                                joinDeadline: string | null;
+                                capacity: number | null;
+                                /** @enum {string} */
+                                status: "draft" | "published" | "archived";
+                                /**
+                                 * @description 挑戰運行狀態：upcoming（未開始）、ongoing（進行中）、ended（已結束）
+                                 * @enum {string}
+                                 */
+                                runStatus: "upcoming" | "ongoing" | "ended";
+                                participantCount: number;
+                                template: {
+                                    id: number;
+                                    title: string;
+                                    durationDays: number | null;
+                                } | null;
+                                decks: {
+                                    id: number;
+                                    name: string;
+                                }[];
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                409: components["responses"]["ConflictError"];
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/admin/challenges/programs/{programId}/cohorts/{cohortId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 發佈／下架挑戰（發佈前需綁定模板） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 挑戰主題（program）ID */
+                    programId: number;
+                    /** @description 挑戰（cohort）ID */
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description published＝發佈至探索共同挑戰頁；draft＝下架
+                         * @enum {string}
+                         */
+                        status: "draft" | "published";
+                    };
+                };
+            };
+            responses: {
+                /** @description 已更新 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                programId: number;
+                                slug: string;
+                                displayName: string;
+                                /** Format: date-time */
+                                startDate: string;
+                                /** Format: date-time */
+                                endDate: string;
+                                /** Format: date-time */
+                                joinDeadline: string | null;
+                                capacity: number | null;
+                                /** @enum {string} */
+                                status: "draft" | "published" | "archived";
+                                /**
+                                 * @description 挑戰運行狀態：upcoming（未開始）、ongoing（進行中）、ended（已結束）
+                                 * @enum {string}
+                                 */
+                                runStatus: "upcoming" | "ongoing" | "ended";
+                                participantCount: number;
+                                template: {
+                                    id: number;
+                                    title: string;
+                                    durationDays: number | null;
+                                } | null;
+                                decks: {
+                                    id: number;
+                                    name: string;
+                                }[];
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                409: components["responses"]["ConflictError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/challenges/programs/{programId}/cohorts/{cohortId}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 複製挑戰為草稿 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 挑戰主題（program）ID */
+                    programId: number;
+                    /** @description 挑戰（cohort）ID */
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已複製 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                programId: number;
+                                slug: string;
+                                displayName: string;
+                                /** Format: date-time */
+                                startDate: string;
+                                /** Format: date-time */
+                                endDate: string;
+                                /** Format: date-time */
+                                joinDeadline: string | null;
+                                capacity: number | null;
+                                /** @enum {string} */
+                                status: "draft" | "published" | "archived";
+                                /**
+                                 * @description 挑戰運行狀態：upcoming（未開始）、ongoing（進行中）、ended（已結束）
+                                 * @enum {string}
+                                 */
+                                runStatus: "upcoming" | "ongoing" | "ended";
+                                participantCount: number;
+                                template: {
+                                    id: number;
+                                    title: string;
+                                    durationDays: number | null;
+                                } | null;
+                                decks: {
+                                    id: number;
+                                    name: string;
+                                }[];
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/challenges/programs/{programId}/cohorts/{cohortId}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 參與者列表（依加入時間排序） */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 挑戰主題（program）ID */
+                    programId: number;
+                    /** @description 挑戰（cohort）ID */
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 參與者 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                enrollmentId: number;
+                                userId: number;
+                                nickname: string | null;
+                                /** Format: date-time */
+                                joinedAt: string | null;
+                                practiceId: string | null;
+                                checkinCount: number;
+                            }[];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/challenges/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 組織模板列表 */
+        get: {
+            parameters: {
+                query: {
+                    /** @description 組織 ID（模板隸屬組織） */
+                    organizationId: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 模板列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                /** Format: uuid */
+                                externalId: string;
+                                organizationId: number;
+                                title: string;
+                                practiceAction: string | null;
+                                durationDays: number | null;
+                                frequencyMinDays: number | null;
+                                frequencyMaxDays: number | null;
+                                sessionDurationMinutes: number | null;
+                                practiceTimePeriods: string[];
+                                boundCohortIds: number[];
+                                bindings: {
+                                    cohortId: number;
+                                    /** Format: date-time */
+                                    startDate: string | null;
+                                }[];
+                                resources: {
+                                    id: string;
+                                    name: string;
+                                    url: string | null;
+                                    dayNumber: number | null;
+                                }[];
+                                generatedDraftCount: number;
+                                /** Format: date-time */
+                                createdAt: string | null;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            }[];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        put?: never;
+        /** 建立組織模板 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        title: string;
+                        practiceAction?: string | null;
+                        durationDays?: 7 | 14 | 21 | 30 | unknown;
+                        frequencyMinDays?: number | null;
+                        frequencyMaxDays?: number | null;
+                        sessionDurationMinutes?: 15 | 30 | 45 | 60 | unknown;
+                        /** @default [] */
+                        practiceTimePeriods?: ("morning" | "afternoon" | "evening" | "night" | "commute")[];
+                        resources?: components["schemas"]["PracticeResourceInput"][];
+                        organizationId: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description 已建立 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                /** Format: uuid */
+                                externalId: string;
+                                organizationId: number;
+                                title: string;
+                                practiceAction: string | null;
+                                durationDays: number | null;
+                                frequencyMinDays: number | null;
+                                frequencyMaxDays: number | null;
+                                sessionDurationMinutes: number | null;
+                                practiceTimePeriods: string[];
+                                boundCohortIds: number[];
+                                bindings: {
+                                    cohortId: number;
+                                    /** Format: date-time */
+                                    startDate: string | null;
+                                }[];
+                                resources: {
+                                    id: string;
+                                    name: string;
+                                    url: string | null;
+                                    dayNumber: number | null;
+                                }[];
+                                generatedDraftCount: number;
+                                /** Format: date-time */
+                                createdAt: string | null;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/challenges/templates/{templateId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 刪除未綁定過的模板 */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 模板 ID */
+                    templateId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已刪除 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                409: components["responses"]["ConflictError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        /** 更新組織模板 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 模板 ID */
+                    templateId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        title?: string;
+                        practiceAction?: string | null;
+                        durationDays?: 7 | 14 | 21 | 30 | unknown;
+                        frequencyMinDays?: number | null;
+                        frequencyMaxDays?: number | null;
+                        sessionDurationMinutes?: 15 | 30 | 45 | 60 | unknown;
+                        /** @default [] */
+                        practiceTimePeriods?: ("morning" | "afternoon" | "evening" | "night" | "commute")[];
+                        resources?: components["schemas"]["PracticeResourceInput"][];
+                    };
+                };
+            };
+            responses: {
+                /** @description 已更新 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                /** Format: uuid */
+                                externalId: string;
+                                organizationId: number;
+                                title: string;
+                                practiceAction: string | null;
+                                durationDays: number | null;
+                                frequencyMinDays: number | null;
+                                frequencyMaxDays: number | null;
+                                sessionDurationMinutes: number | null;
+                                practiceTimePeriods: string[];
+                                boundCohortIds: number[];
+                                bindings: {
+                                    cohortId: number;
+                                    /** Format: date-time */
+                                    startDate: string | null;
+                                }[];
+                                resources: {
+                                    id: string;
+                                    name: string;
+                                    url: string | null;
+                                    dayNumber: number | null;
+                                }[];
+                                generatedDraftCount: number;
+                                /** Format: date-time */
+                                createdAt: string | null;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        trace?: never;
+    };
     "/api/v1/admin/inspiration-decks": {
         parameters: {
             query?: never;
@@ -31324,6 +33062,1088 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * @description 實踐資源輸入資料
+         * @example {
+         *       "name": "React 官方文檔",
+         *       "url": "https://react.dev/",
+         *       "dayNumber": 3
+         *     }
+         */
+        PracticeResourceInput: {
+            /**
+             * @description 實踐資源名稱
+             * @example React 官方文檔
+             * @example React 官方文檔
+             * @example 《你不知道的 JavaScript》
+             * @example Vue.js 教學影片
+             */
+            name: string;
+            /**
+             * Format: uri
+             * @description 資源連結
+             * @example https://react.dev/
+             * @example https://react.dev/
+             * @example https://javascript.info/
+             * @example https://vuejs.org/guide/
+             */
+            url?: string | "";
+            /**
+             * @description 指定第幾天使用此資源（1 = 開始日當天；不填代表整段實踐期間皆可使用）
+             * @example 3
+             */
+            dayNumber?: number | null;
+        };
+        /**
+         * @description 實踐資源回應資料
+         * @example {
+         *       "id": "123e4567-e89b-12d3-a456-426614174000",
+         *       "name": "React 官方文檔",
+         *       "url": "https://react.dev/",
+         *       "dayNumber": 3
+         *     }
+         */
+        PracticeResource: {
+            /**
+             * Format: uuid
+             * @description 資源唯一識別碼
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            id: string;
+            /**
+             * @description 資源名稱
+             * @example React 官方文檔
+             * @example React 官方文檔
+             * @example 《你不知道的 JavaScript》
+             */
+            name: string;
+            /**
+             * Format: uri
+             * @description 資源網址
+             * @example https://react.dev/
+             * @example https://react.dev/
+             * @example https://javascript.info/
+             */
+            url?: string;
+            /**
+             * @description 指定第幾天使用此資源（null 代表整段實踐期間皆可使用）
+             * @example 3
+             */
+            dayNumber?: number | null;
+        };
+        CreatePracticeRequest: {
+            /**
+             * @description 實踐活動標題
+             * @example 每日閱讀 30 分鐘
+             * @example 每日閱讀 30 分鐘
+             * @example 學習 React Hooks
+             * @example 每天運動 20 分鐘
+             */
+            title: string;
+            /**
+             * @description 具體的實踐行動描述
+             * @example 閱讀技術書籍或文章
+             * @example 閱讀技術書籍或文章
+             * @example 完成線上課程一個章節
+             * @example 跑步或健身
+             */
+            practiceAction?: string;
+            /**
+             * Format: date
+             * @description 實踐開始日期（不可超過 14 天後）
+             * @example 2024-01-15
+             * @example 2024-01-15
+             * @example 2024-03-01
+             * @example 2024-06-01
+             */
+            startDate?: string;
+            /**
+             * @description 實踐持續天數
+             * @example 14
+             * @example 7
+             * @example 14
+             * @example 21
+             * @example 30
+             */
+            durationDays?: number;
+            /**
+             * @description 每週最低打卡天數
+             * @example 4
+             * @example 1
+             * @example 3
+             * @example 4
+             * @example 5
+             */
+            frequencyMinDays?: number;
+            /**
+             * @description 每週最高打卡天數
+             * @example 7
+             * @example 5
+             * @example 6
+             * @example 7
+             */
+            frequencyMaxDays?: number;
+            /**
+             * @description 每次實踐時長（分鐘）
+             * @example 30
+             * @example 15
+             * @example 30
+             * @example 60
+             * @example 90
+             */
+            sessionDurationMinutes?: number;
+            /**
+             * @description 偏好實踐時段
+             * @default []
+             * @example [
+             *       "morning",
+             *       "evening"
+             *     ]
+             * @example [
+             *       "morning"
+             *     ]
+             * @example [
+             *       "afternoon",
+             *       "evening"
+             *     ]
+             * @example [
+             *       "morning",
+             *       "night"
+             *     ]
+             */
+            practiceTimePeriods: ("morning" | "afternoon" | "evening" | "night" | "commute")[];
+            /**
+             * @description 其他補充說明
+             * @example 希望養成每天閱讀的習慣
+             */
+            otherContext?: string;
+            /**
+             * @description 相關標籤（最多 10 個）
+             * @default []
+             * @example [
+             *       "閱讀",
+             *       "學習"
+             *     ]
+             * @example [
+             *       "閱讀",
+             *       "學習"
+             *     ]
+             * @example [
+             *       "運動",
+             *       "健康"
+             *     ]
+             * @example [
+             *       "程式",
+             *       "前端",
+             *       "React"
+             *     ]
+             */
+            tags: string[];
+            /**
+             * @description 相關學習資源（最多 5 個）
+             * @example [
+             *       {
+             *         "name": "React 官方文檔",
+             *         "url": "https://react.dev/"
+             *       }
+             *     ]
+             */
+            resources?: components["schemas"]["PracticeResourceInput"][];
+            /**
+             * @description 是否存為草稿
+             * @default false
+             * @example false
+             */
+            isDraft: boolean;
+            /**
+             * @description 隱私狀態（private: 私人, public: 即時公開, delayed: 完成後分享）
+             * @example public
+             * @enum {string}
+             */
+            privacyStatus?: "private" | "public" | "delayed";
+            /**
+             * @description 實踐建立方式（用於 Onboarding 任務 C 記錄）
+             * @example self_created
+             * @enum {string}
+             */
+            creationMethod?: "self_created" | "copied" | "action_generator";
+        };
+        /**
+         * @description 實踐活動簽到記錄
+         * @example {
+         *       "mood": "happy",
+         *       "note": "今天閱讀了第三章，學到了很多新概念",
+         *       "imageUrls": [],
+         *       "ogImageUrl": null,
+         *       "tags": [
+         *         "專注",
+         *         "有收穫"
+         *       ]
+         *     }
+         */
+        CheckInRequest: {
+            /**
+             * @description 學習心情 (give_up: 想放棄, frustrated: 挫折, bored: 無聊, neutral: 普通, good: 不錯, happy: 開心)
+             * @example happy
+             * @example give_up
+             * @example frustrated
+             * @example bored
+             * @example neutral
+             * @example good
+             * @example happy
+             * @enum {string}
+             */
+            mood?: "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
+            /**
+             * @description 詳細描述（最多600字）
+             * @example 今天閱讀了第三章，學到了很多新概念
+             * @example 今天閱讀了第三章，學到了很多新概念
+             * @example 完成了 30 分鐘的練習
+             */
+            note?: string;
+            /**
+             * @description 打卡圖片 URL（最多3張）
+             * @default []
+             * @example []
+             * @example []
+             * @example [
+             *       "https://example.com/image1.jpg"
+             *     ]
+             */
+            imageUrls: string[];
+            /**
+             * Format: uri
+             * @description OG 圖片 URL（用於社群分享）
+             * @example null
+             */
+            ogImageUrl?: string | null;
+            /**
+             * @description 打卡標籤（必填，至少1個，最多10個）
+             * @example [
+             *       "專注",
+             *       "有收穫"
+             *     ]
+             * @example [
+             *       "專注",
+             *       "有收穫"
+             *     ]
+             * @example [
+             *       "閱讀",
+             *       "冥想",
+             *       "運動"
+             *     ]
+             */
+            tags: string[];
+        };
+        /**
+         * @description 更新簽到記錄請求
+         * @example {
+         *       "mood": "happy",
+         *       "note": "今天閱讀了第三章，學到了很多新概念",
+         *       "imageUrls": [],
+         *       "ogImageUrl": null,
+         *       "tags": [
+         *         "專注",
+         *         "有收穫"
+         *       ]
+         *     }
+         */
+        UpdateCheckInRequest: {
+            /**
+             * @description 學習心情 (give_up: 想放棄, frustrated: 挫折, bored: 無聊, neutral: 普通, good: 不錯, happy: 開心)
+             * @example happy
+             * @example give_up
+             * @example frustrated
+             * @example bored
+             * @example neutral
+             * @example good
+             * @example happy
+             * @enum {string}
+             */
+            mood?: "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
+            /**
+             * @description 詳細描述（最多600字）
+             * @example 今天閱讀了第三章，學到了很多新概念
+             */
+            note?: string;
+            /**
+             * @description 打卡圖片 URL（最多3張）
+             * @example [
+             *       "https://example.com/image1.jpg"
+             *     ]
+             */
+            imageUrls?: string[];
+            /**
+             * Format: uri
+             * @description OG 圖片 URL（用於社群分享）
+             * @example null
+             */
+            ogImageUrl?: string | null;
+            /**
+             * @description 打卡標籤（最多10個）
+             * @example [
+             *       "專注",
+             *       "有收穫"
+             *     ]
+             */
+            tags?: string[];
+        };
+        /**
+         * @description 用戶基本資訊
+         * @example {
+         *       "id": "123e4567-e89b-12d3-a456-426614174000",
+         *       "name": "學習者小明",
+         *       "photoURL": "https://example.com/avatar/123.jpg",
+         *       "roleList": [
+         *         "normal_student",
+         *         "educator"
+         *       ],
+         *       "educationStage": "university",
+         *       "tagList": [
+         *         "前端",
+         *         "React"
+         *       ],
+         *       "selfIntroduction": "熱愛學習的開發者",
+         *       "customId": "xiaoming"
+         *     }
+         */
+        UserBasicInfo: {
+            /**
+             * @description 用戶外部 UUID
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            id: string;
+            /**
+             * @description 用戶名稱
+             * @example 學習者小明
+             */
+            name: string;
+            /**
+             * Format: uri
+             * @description 用戶頭像 URL
+             * @example https://example.com/avatar/123.jpg
+             */
+            photoURL: string | null;
+            /**
+             * @description 用戶角色列表
+             * @example [
+             *       "normal_student",
+             *       "educator"
+             *     ]
+             */
+            roleList?: string[];
+            /**
+             * @description 教育階段
+             * @example university
+             */
+            educationStage?: string | null;
+            /**
+             * @description 用戶標籤列表
+             * @example [
+             *       "前端",
+             *       "React"
+             *     ]
+             */
+            tagList?: string[];
+            /**
+             * @description 自我介紹
+             * @example 熱愛學習的開發者
+             */
+            selfIntroduction?: string | null;
+            /**
+             * @description 用戶自訂 ID（用於個人頁面網址）
+             * @example xiaoming
+             */
+            customId?: string | null;
+        };
+        /**
+         * @description 實踐活動統計資訊
+         * @example {
+         *       "likeCount": 25,
+         *       "viewCount": 150,
+         *       "favoriteCount": 12,
+         *       "shareCount": 8,
+         *       "commentCount": 3
+         *     }
+         */
+        PracticeStats: {
+            /**
+             * @description 點讚數量
+             * @example 25
+             */
+            likeCount: number;
+            /**
+             * @description 瀏覽數量
+             * @example 150
+             */
+            viewCount: number;
+            /**
+             * @description 收藏數量
+             * @example 12
+             */
+            favoriteCount: number;
+            /**
+             * @description 分享數量
+             * @example 8
+             */
+            shareCount: number;
+            /**
+             * @description 評論數量
+             * @example 3
+             */
+            commentCount: number;
+        };
+        /**
+         * @description 實踐使用的資源
+         * @example {
+         *       "id": "123e4567-e89b-12d3-a456-426614174000",
+         *       "name": "React 官方文檔",
+         *       "url": "https://react.dev/",
+         *       "dayNumber": 3
+         *     }
+         */
+        PracticeResourceEntity: {
+            /**
+             * Format: uuid
+             * @description 資源外部 UUID
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            id: string;
+            /**
+             * @description 資源名稱
+             * @example React 官方文檔
+             */
+            name: string;
+            /**
+             * Format: uri
+             * @description 資源網址
+             * @example https://react.dev/
+             */
+            url?: string;
+            /**
+             * @description 指定第幾天使用此資源（null 代表整段實踐期間皆可使用）
+             * @example 3
+             */
+            dayNumber?: number | null;
+        };
+        /**
+         * @description 實踐活動詳細資訊
+         * @example {
+         *       "id": "123e4567-e89b-12d3-a456-426614174000",
+         *       "title": "每日閱讀 30 分鐘",
+         *       "practiceAction": "閱讀技術書籍或文章",
+         *       "startDate": "2024-01-15",
+         *       "endDate": "2024-01-29",
+         *       "durationDays": 14,
+         *       "frequencyMinDays": 4,
+         *       "frequencyMaxDays": 7,
+         *       "sessionDurationMinutes": 30,
+         *       "practiceTimePeriods": [
+         *         "morning",
+         *         "evening"
+         *       ],
+         *       "status": "active",
+         *       "hasResources": true,
+         *       "resources": [
+         *         {
+         *           "id": "123e4567-e89b-12d3-a456-426614174000",
+         *           "name": "React 官方文檔",
+         *           "url": "https://react.dev/"
+         *         }
+         *       ],
+         *       "progressPercentage": 50,
+         *       "firstCheckinAt": "2024-01-15T08:30:00.000Z",
+         *       "lastCheckinAt": "2024-01-20T09:00:00.000Z",
+         *       "checkInCount": 2,
+         *       "themeColor": "#FCDD84",
+         *       "createdAt": "2024-01-15T10:30:00.000Z",
+         *       "updatedAt": "2024-01-20T15:45:00.000Z",
+         *       "user": {
+         *         "id": "123e4567-e89b-12d3-a456-426614174000",
+         *         "name": "學習者小明",
+         *         "photoURL": "https://example.com/avatar/123.jpg",
+         *         "roleList": [
+         *           "normal_student",
+         *           "educator"
+         *         ],
+         *         "educationStage": "university",
+         *         "tagList": [
+         *           "前端",
+         *           "React"
+         *         ],
+         *         "selfIntroduction": "熱愛學習的開發者"
+         *       },
+         *       "tags": [
+         *         "閱讀",
+         *         "學習"
+         *       ],
+         *       "stats": {
+         *         "likeCount": 25,
+         *         "viewCount": 150,
+         *         "favoriteCount": 12,
+         *         "shareCount": 8,
+         *         "commentCount": 3
+         *       }
+         *     }
+         */
+        PracticeEntity: {
+            /**
+             * Format: uuid
+             * @description 實踐活動外部 UUID
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            id: string;
+            /**
+             * @description 實踐活動標題
+             * @example 每日閱讀 30 分鐘
+             */
+            title: string;
+            /**
+             * @description 是否為共同挑戰實踐（名稱／期間／隱私由挑戰統一設定、不可複製）
+             * @example false
+             */
+            isChallenge?: boolean;
+            /**
+             * @description 實踐行動描述
+             * @example 閱讀技術書籍或文章
+             */
+            practiceAction?: string;
+            /**
+             * Format: date
+             * @description 開始日期 (YYYY-MM-DD)
+             * @example 2024-01-15
+             */
+            startDate?: string;
+            /**
+             * Format: date
+             * @description 結束日期 (YYYY-MM-DD)
+             * @example 2024-01-29
+             */
+            endDate?: string;
+            /**
+             * @description 持續天數
+             * @example 14
+             */
+            durationDays?: number;
+            /**
+             * @description 每週最低打卡天數
+             * @example 4
+             */
+            frequencyMinDays?: number;
+            /**
+             * @description 每週最高打卡天數
+             * @example 7
+             */
+            frequencyMaxDays?: number;
+            /**
+             * @description 每次實踐時長（分鐘）
+             * @example 30
+             */
+            sessionDurationMinutes?: number;
+            /**
+             * @description 偏好實踐時段
+             * @example [
+             *       "morning",
+             *       "evening"
+             *     ]
+             */
+            practiceTimePeriods: string[];
+            /** @description 其他說明 */
+            otherContext?: string;
+            /**
+             * @description 實踐活動狀態 (draft: 草稿, not_started: 未開始, active: 進行中, completed: 已完成, archived: 已封存)
+             * @example not_started
+             * @example draft
+             * @example not_started
+             * @example active
+             * @example completed
+             * @example archived
+             * @enum {string}
+             */
+            status: "draft" | "not_started" | "active" | "completed" | "archived";
+            /**
+             * @description 是否有相關資源
+             * @example true
+             */
+            hasResources: boolean;
+            /**
+             * @description 使用的資源列表
+             * @example [
+             *       {
+             *         "id": "123e4567-e89b-12d3-a456-426614174000",
+             *         "name": "React 官方文檔",
+             *         "url": "https://react.dev/"
+             *       }
+             *     ]
+             */
+            resources?: components["schemas"]["PracticeResourceEntity"][];
+            /**
+             * @description 進度百分比
+             * @example 50
+             */
+            progressPercentage: number;
+            /**
+             * Format: date-time
+             * @description 首次打卡時間
+             */
+            firstCheckinAt?: string;
+            /**
+             * Format: date-time
+             * @description 最近打卡時間
+             */
+            lastCheckinAt?: string;
+            /**
+             * @description 已打卡次數
+             * @example 2
+             */
+            checkInCount: number;
+            /**
+             * @description 主題色（HEX 格式）
+             * @example #FCDD84
+             */
+            themeColor?: string;
+            /**
+             * Format: date-time
+             * @description 創建時間
+             * @example 2024-01-15T10:30:00.000Z
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description 更新時間
+             * @example 2024-01-20T15:45:00.000Z
+             */
+            updatedAt?: string;
+            user: components["schemas"]["UserBasicInfo"];
+            /**
+             * @description 相關標籤
+             * @example [
+             *       "閱讀",
+             *       "學習"
+             *     ]
+             */
+            tags: string[];
+            stats: components["schemas"]["PracticeStats"];
+        };
+        /**
+         * @description 簽到記錄詳細資訊
+         * @example {
+         *       "id": 456,
+         *       "practiceId": 123,
+         *       "userId": 789,
+         *       "checkinDate": "2024-01-20",
+         *       "mood": "happy",
+         *       "note": "今天閱讀了第三章",
+         *       "imageUrls": [],
+         *       "ogImageUrl": null,
+         *       "tags": [
+         *         "專注",
+         *         "有收穫"
+         *       ],
+         *       "createdAt": "2024-01-20T15:45:00.000Z",
+         *       "updatedAt": "2024-01-20T15:45:00.000Z"
+         *     }
+         */
+        CheckInEntity: {
+            /**
+             * @description 簽到記錄內部 ID
+             * @example 456
+             */
+            id: number;
+            /**
+             * @description 關聯的實踐活動內部 ID
+             * @example 123
+             */
+            practiceId: number;
+            /**
+             * @description 簽到用戶內部 ID
+             * @example 789
+             */
+            userId: number;
+            /**
+             * Format: date
+             * @description 簽到日期
+             * @example 2024-01-20
+             */
+            checkinDate: string;
+            /**
+             * @description 簽到心情 (give_up: 想放棄, frustrated: 挫折, bored: 無聊, neutral: 普通, good: 不錯, happy: 開心)
+             * @example happy
+             * @enum {string}
+             */
+            mood?: "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
+            /**
+             * @description 詳細描述
+             * @example 今天閱讀了第三章
+             */
+            note?: string;
+            /**
+             * @description 打卡圖片 URL（最多3張）
+             * @example []
+             */
+            imageUrls: string[];
+            /**
+             * Format: uri
+             * @description OG 圖片 URL（用於社群分享）
+             * @example null
+             */
+            ogImageUrl: string | null;
+            /**
+             * @description 打卡標籤
+             * @example [
+             *       "專注",
+             *       "有收穫"
+             *     ]
+             */
+            tags: string[];
+            /**
+             * Format: date-time
+             * @description 創建時間
+             * @example 2024-01-20T15:45:00.000Z
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description 更新時間
+             * @example 2024-01-20T15:45:00.000Z
+             */
+            updatedAt?: string;
+        };
+        /**
+         * @description 用戶實踐統計
+         * @example {
+         *       "totalPractices": 12,
+         *       "activePractices": 3,
+         *       "completedPractices": 7,
+         *       "totalCheckIns": 245,
+         *       "averageStreak": 8.5,
+         *       "maxStreak": 25
+         *     }
+         */
+        PracticeUserStats: {
+            /**
+             * @description 總實踐數
+             * @example 12
+             */
+            totalPractices: number;
+            /**
+             * @description 活躍實踐數
+             * @example 3
+             */
+            activePractices: number;
+            /**
+             * @description 已完成實踐數
+             * @example 7
+             */
+            completedPractices: number;
+            /**
+             * @description 總簽到次數
+             * @example 245
+             */
+            totalCheckIns: number;
+            /**
+             * @description 平均連續天數
+             * @example 8.5
+             */
+            averageStreak: number;
+            /**
+             * @description 最大連續天數
+             * @example 25
+             */
+            maxStreak: number;
+        };
+        /**
+         * @description 實踐模板
+         * @example {
+         *       "id": "tpl-reading-daily",
+         *       "title": "每日閱讀 30 分鐘",
+         *       "practiceAction": "閱讀",
+         *       "categories": [
+         *         "reading"
+         *       ],
+         *       "frequencyMinDays": 1,
+         *       "frequencyMaxDays": 2,
+         *       "durationDays": 30,
+         *       "sessionDurationMinutes": 30,
+         *       "practiceTimePeriods": [
+         *         "morning",
+         *         "evening"
+         *       ],
+         *       "suggestedTags": [
+         *         "閱讀",
+         *         "習慣養成",
+         *         "自我成長"
+         *       ],
+         *       "resources": [
+         *         {
+         *           "id": "123e4567-e89b-12d3-a456-426614174000",
+         *           "name": "React 官方文檔",
+         *           "url": "https://react.dev"
+         *         }
+         *       ],
+         *       "answerCount": 42,
+         *       "createdAt": "2024-01-15T10:30:00.000Z"
+         *     }
+         */
+        PracticeTemplate: {
+            /**
+             * @description 模板 ID（UUID 或預設模板 ID）
+             * @example tpl-reading-daily
+             */
+            id: string;
+            /**
+             * @description 模板標題
+             * @example 每日閱讀 30 分鐘
+             */
+            title: string;
+            /**
+             * @description 具體實踐行動描述
+             * @example 閱讀
+             */
+            practiceAction?: string;
+            /**
+             * @description 模板分類列表
+             * @example [
+             *       "reading"
+             *     ]
+             */
+            categories: string[];
+            /**
+             * @description 每週最低打卡天數
+             * @example 1
+             */
+            frequencyMinDays: number | null;
+            /**
+             * @description 每週最高打卡天數
+             * @example 2
+             */
+            frequencyMaxDays: number | null;
+            /**
+             * @description 建議持續天數
+             * @example 30
+             */
+            durationDays: number | null;
+            /**
+             * @description 每次實踐時長（分鐘）
+             * @example 30
+             */
+            sessionDurationMinutes: number | null;
+            /**
+             * @description 建議實踐時段
+             * @example [
+             *       "morning",
+             *       "evening"
+             *     ]
+             */
+            practiceTimePeriods: string[];
+            /**
+             * @description 建議標籤
+             * @example [
+             *       "閱讀",
+             *       "習慣養成",
+             *       "自我成長"
+             *     ]
+             */
+            suggestedTags: string[];
+            /**
+             * @description 模板關聯的資源列表
+             * @example [
+             *       {
+             *         "id": "123e4567-e89b-12d3-a456-426614174000",
+             *         "name": "React 官方文檔",
+             *         "url": "https://react.dev"
+             *       }
+             *     ]
+             */
+            resources?: components["schemas"]["PracticeResource"][];
+            /** @description 模板所屬組織；官方模板不提供此欄位 */
+            organization?: {
+                id: number;
+                name: string;
+                bio: string | null;
+                /** Format: uri */
+                externalLink: string | null;
+            };
+            /**
+             * @description 使用此模板建立實踐的總人次
+             * @example 42
+             */
+            answerCount: number;
+            /**
+             * @description 建立時間
+             * @example 2024-01-15T10:30:00.000Z
+             */
+            createdAt: string;
+        };
+        /**
+         * @description 創建實踐模板的請求資料
+         * @example {
+         *       "title": "每日閱讀 30 分鐘",
+         *       "practiceAction": "閱讀",
+         *       "categories": [
+         *         "reading"
+         *       ],
+         *       "frequencyMinDays": 1,
+         *       "frequencyMaxDays": 2,
+         *       "durationDays": 30,
+         *       "sessionDurationMinutes": 30,
+         *       "practiceTimePeriods": [
+         *         "morning",
+         *         "evening"
+         *       ],
+         *       "suggestedTags": [
+         *         "閱讀",
+         *         "習慣養成",
+         *         "自我成長"
+         *       ]
+         *     }
+         */
+        CreatePracticeTemplateRequest: {
+            /**
+             * @description 模板標題
+             * @example 每日閱讀 30 分鐘
+             */
+            title: string;
+            /**
+             * @description 具體實踐行動描述
+             * @example 閱讀
+             */
+            practiceAction?: string;
+            /**
+             * @description 模板分類列表
+             * @default []
+             * @example [
+             *       "reading"
+             *     ]
+             */
+            categories: string[];
+            /**
+             * @description 每週最低打卡天數
+             * @example 1
+             */
+            frequencyMinDays?: number;
+            /**
+             * @description 每週最高打卡天數
+             * @example 2
+             */
+            frequencyMaxDays?: number;
+            /**
+             * @description 建議持續天數
+             * @example 30
+             */
+            durationDays?: number;
+            /**
+             * @description 每次實踐時長（分鐘）
+             * @example 30
+             */
+            sessionDurationMinutes?: number;
+            /**
+             * @description 建議實踐時段
+             * @default []
+             * @example [
+             *       "morning",
+             *       "evening"
+             *     ]
+             */
+            practiceTimePeriods: ("morning" | "afternoon" | "evening" | "night" | "commute")[];
+            /**
+             * @description 建議標籤
+             * @default []
+             * @example [
+             *       "閱讀",
+             *       "習慣養成",
+             *       "自我成長"
+             *     ]
+             */
+            suggestedTags: string[];
+        };
+        /** @description 打卡鼓勵句 */
+        Encouragement: {
+            /** @description 鼓勵句 ID */
+            id: number;
+            /**
+             * @description 鼓勵句內容
+             * @example 太棒了！你做到了！
+             */
+            message: string;
+            /**
+             * @description 分類
+             * @example general
+             */
+            category?: string;
+        };
+        /** @description 標籤引導句 */
+        TagPrompt: {
+            /** @description 引導句 ID */
+            id: number;
+            /**
+             * @description 標籤名稱
+             * @example 閱讀
+             */
+            tagName: string;
+            /**
+             * @description 引導句內容
+             * @example 今天讀了什麼書？有什麼收穫嗎？
+             */
+            prompt: string;
+            /**
+             * @description 使用場景
+             * @example checkin
+             */
+            usageType: string;
+        };
+        /**
+         * @description 打卡回應（含鼓勵句）
+         * @example {
+         *       "id": 456,
+         *       "practiceId": 123,
+         *       "userId": 789,
+         *       "checkinDate": "2024-01-20",
+         *       "mood": "happy",
+         *       "note": "今天閱讀了第三章",
+         *       "imageUrls": [],
+         *       "ogImageUrl": null,
+         *       "tags": [
+         *         "專注",
+         *         "有收穫"
+         *       ],
+         *       "createdAt": "2024-01-20T15:45:00.000Z",
+         *       "updatedAt": "2024-01-20T15:45:00.000Z"
+         *     }
+         */
+        CheckInWithEncouragement: components["schemas"]["CheckInEntity"] & {
+            /**
+             * @description 鼓勵句
+             * @example 太棒了！你做到了！
+             */
+            encouragement: string;
+            /**
+             * @description 實踐進度百分比
+             * @example 50
+             */
+            practiceProgressPercentage: number;
+            /**
+             * @description 實踐活動狀態 (draft: 草稿, not_started: 未開始, active: 進行中, completed: 已完成, archived: 已封存)
+             * @example not_started
+             * @example draft
+             * @example not_started
+             * @example active
+             * @example completed
+             * @example archived
+             * @enum {string}
+             */
+            practiceStatus: "draft" | "not_started" | "active" | "completed" | "archived";
+            /**
+             * @description 是否首次打卡
+             * @example false
+             */
+            isFirstCheckIn: boolean;
+            /**
+             * @description 是否達成目標
+             * @example false
+             */
+            hasReachedTarget: boolean;
+        };
         PracticeStatsQuery: {
             /**
              * @description 開始日期
@@ -36979,1083 +39799,6 @@ export interface components {
              * @example true
              */
             isEnabled: boolean;
-        };
-        /**
-         * @description 實踐資源輸入資料
-         * @example {
-         *       "name": "React 官方文檔",
-         *       "url": "https://react.dev/",
-         *       "dayNumber": 3
-         *     }
-         */
-        PracticeResourceInput: {
-            /**
-             * @description 實踐資源名稱
-             * @example React 官方文檔
-             * @example React 官方文檔
-             * @example 《你不知道的 JavaScript》
-             * @example Vue.js 教學影片
-             */
-            name: string;
-            /**
-             * Format: uri
-             * @description 資源連結
-             * @example https://react.dev/
-             * @example https://react.dev/
-             * @example https://javascript.info/
-             * @example https://vuejs.org/guide/
-             */
-            url?: string | "";
-            /**
-             * @description 指定第幾天使用此資源（1 = 開始日當天；不填代表整段實踐期間皆可使用）
-             * @example 3
-             */
-            dayNumber?: number | null;
-        };
-        /**
-         * @description 實踐資源回應資料
-         * @example {
-         *       "id": "123e4567-e89b-12d3-a456-426614174000",
-         *       "name": "React 官方文檔",
-         *       "url": "https://react.dev/",
-         *       "dayNumber": 3
-         *     }
-         */
-        PracticeResource: {
-            /**
-             * Format: uuid
-             * @description 資源唯一識別碼
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            id: string;
-            /**
-             * @description 資源名稱
-             * @example React 官方文檔
-             * @example React 官方文檔
-             * @example 《你不知道的 JavaScript》
-             */
-            name: string;
-            /**
-             * Format: uri
-             * @description 資源網址
-             * @example https://react.dev/
-             * @example https://react.dev/
-             * @example https://javascript.info/
-             */
-            url?: string;
-            /**
-             * @description 指定第幾天使用此資源（null 代表整段實踐期間皆可使用）
-             * @example 3
-             */
-            dayNumber?: number | null;
-        };
-        CreatePracticeRequest: {
-            /**
-             * @description 實踐活動標題
-             * @example 每日閱讀 30 分鐘
-             * @example 每日閱讀 30 分鐘
-             * @example 學習 React Hooks
-             * @example 每天運動 20 分鐘
-             */
-            title: string;
-            /**
-             * @description 具體的實踐行動描述
-             * @example 閱讀技術書籍或文章
-             * @example 閱讀技術書籍或文章
-             * @example 完成線上課程一個章節
-             * @example 跑步或健身
-             */
-            practiceAction?: string;
-            /**
-             * Format: date
-             * @description 實踐開始日期（不可超過 14 天後）
-             * @example 2024-01-15
-             * @example 2024-01-15
-             * @example 2024-03-01
-             * @example 2024-06-01
-             */
-            startDate?: string;
-            /**
-             * @description 實踐持續天數
-             * @example 14
-             * @example 7
-             * @example 14
-             * @example 21
-             * @example 30
-             */
-            durationDays?: number;
-            /**
-             * @description 每週最低打卡天數
-             * @example 4
-             * @example 1
-             * @example 3
-             * @example 4
-             * @example 5
-             */
-            frequencyMinDays?: number;
-            /**
-             * @description 每週最高打卡天數
-             * @example 7
-             * @example 5
-             * @example 6
-             * @example 7
-             */
-            frequencyMaxDays?: number;
-            /**
-             * @description 每次實踐時長（分鐘）
-             * @example 30
-             * @example 15
-             * @example 30
-             * @example 60
-             * @example 90
-             */
-            sessionDurationMinutes?: number;
-            /**
-             * @description 偏好實踐時段
-             * @default []
-             * @example [
-             *       "morning",
-             *       "evening"
-             *     ]
-             * @example [
-             *       "morning"
-             *     ]
-             * @example [
-             *       "afternoon",
-             *       "evening"
-             *     ]
-             * @example [
-             *       "morning",
-             *       "night"
-             *     ]
-             */
-            practiceTimePeriods: ("morning" | "afternoon" | "evening" | "night" | "commute")[];
-            /**
-             * @description 其他補充說明
-             * @example 希望養成每天閱讀的習慣
-             */
-            otherContext?: string;
-            /**
-             * @description 相關標籤（最多 10 個）
-             * @default []
-             * @example [
-             *       "閱讀",
-             *       "學習"
-             *     ]
-             * @example [
-             *       "閱讀",
-             *       "學習"
-             *     ]
-             * @example [
-             *       "運動",
-             *       "健康"
-             *     ]
-             * @example [
-             *       "程式",
-             *       "前端",
-             *       "React"
-             *     ]
-             */
-            tags: string[];
-            /**
-             * @description 相關學習資源（最多 5 個）
-             * @example [
-             *       {
-             *         "name": "React 官方文檔",
-             *         "url": "https://react.dev/"
-             *       }
-             *     ]
-             */
-            resources?: components["schemas"]["PracticeResourceInput"][];
-            /**
-             * @description 是否存為草稿
-             * @default false
-             * @example false
-             */
-            isDraft: boolean;
-            /**
-             * @description 隱私狀態（private: 私人, public: 即時公開, delayed: 完成後分享）
-             * @example public
-             * @enum {string}
-             */
-            privacyStatus?: "private" | "public" | "delayed";
-            /**
-             * @description 實踐建立方式（用於 Onboarding 任務 C 記錄）
-             * @example self_created
-             * @enum {string}
-             */
-            creationMethod?: "self_created" | "copied" | "action_generator";
-        };
-        /**
-         * @description 實踐活動簽到記錄
-         * @example {
-         *       "mood": "happy",
-         *       "note": "今天閱讀了第三章，學到了很多新概念",
-         *       "imageUrls": [],
-         *       "ogImageUrl": null,
-         *       "tags": [
-         *         "專注",
-         *         "有收穫"
-         *       ]
-         *     }
-         */
-        CheckInRequest: {
-            /**
-             * @description 學習心情 (give_up: 想放棄, frustrated: 挫折, bored: 無聊, neutral: 普通, good: 不錯, happy: 開心)
-             * @example happy
-             * @example give_up
-             * @example frustrated
-             * @example bored
-             * @example neutral
-             * @example good
-             * @example happy
-             * @enum {string}
-             */
-            mood?: "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
-            /**
-             * @description 詳細描述（最多600字）
-             * @example 今天閱讀了第三章，學到了很多新概念
-             * @example 今天閱讀了第三章，學到了很多新概念
-             * @example 完成了 30 分鐘的練習
-             */
-            note?: string;
-            /**
-             * @description 打卡圖片 URL（最多3張）
-             * @default []
-             * @example []
-             * @example []
-             * @example [
-             *       "https://example.com/image1.jpg"
-             *     ]
-             */
-            imageUrls: string[];
-            /**
-             * Format: uri
-             * @description OG 圖片 URL（用於社群分享）
-             * @example null
-             */
-            ogImageUrl?: string | null;
-            /**
-             * @description 打卡標籤（必填，至少1個，最多10個）
-             * @example [
-             *       "專注",
-             *       "有收穫"
-             *     ]
-             * @example [
-             *       "專注",
-             *       "有收穫"
-             *     ]
-             * @example [
-             *       "閱讀",
-             *       "冥想",
-             *       "運動"
-             *     ]
-             */
-            tags: string[];
-        };
-        /**
-         * @description 更新簽到記錄請求
-         * @example {
-         *       "mood": "happy",
-         *       "note": "今天閱讀了第三章，學到了很多新概念",
-         *       "imageUrls": [],
-         *       "ogImageUrl": null,
-         *       "tags": [
-         *         "專注",
-         *         "有收穫"
-         *       ]
-         *     }
-         */
-        UpdateCheckInRequest: {
-            /**
-             * @description 學習心情 (give_up: 想放棄, frustrated: 挫折, bored: 無聊, neutral: 普通, good: 不錯, happy: 開心)
-             * @example happy
-             * @example give_up
-             * @example frustrated
-             * @example bored
-             * @example neutral
-             * @example good
-             * @example happy
-             * @enum {string}
-             */
-            mood?: "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
-            /**
-             * @description 詳細描述（最多600字）
-             * @example 今天閱讀了第三章，學到了很多新概念
-             */
-            note?: string;
-            /**
-             * @description 打卡圖片 URL（最多3張）
-             * @example [
-             *       "https://example.com/image1.jpg"
-             *     ]
-             */
-            imageUrls?: string[];
-            /**
-             * Format: uri
-             * @description OG 圖片 URL（用於社群分享）
-             * @example null
-             */
-            ogImageUrl?: string | null;
-            /**
-             * @description 打卡標籤（最多10個）
-             * @example [
-             *       "專注",
-             *       "有收穫"
-             *     ]
-             */
-            tags?: string[];
-        };
-        /**
-         * @description 用戶基本資訊
-         * @example {
-         *       "id": "123e4567-e89b-12d3-a456-426614174000",
-         *       "name": "學習者小明",
-         *       "photoURL": "https://example.com/avatar/123.jpg",
-         *       "roleList": [
-         *         "normal_student",
-         *         "educator"
-         *       ],
-         *       "educationStage": "university",
-         *       "tagList": [
-         *         "前端",
-         *         "React"
-         *       ],
-         *       "selfIntroduction": "熱愛學習的開發者",
-         *       "customId": "xiaoming"
-         *     }
-         */
-        UserBasicInfo: {
-            /**
-             * @description 用戶外部 UUID
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            id: string;
-            /**
-             * @description 用戶名稱
-             * @example 學習者小明
-             */
-            name: string;
-            /**
-             * Format: uri
-             * @description 用戶頭像 URL
-             * @example https://example.com/avatar/123.jpg
-             */
-            photoURL: string | null;
-            /**
-             * @description 用戶角色列表
-             * @example [
-             *       "normal_student",
-             *       "educator"
-             *     ]
-             */
-            roleList?: string[];
-            /**
-             * @description 教育階段
-             * @example university
-             */
-            educationStage?: string | null;
-            /**
-             * @description 用戶標籤列表
-             * @example [
-             *       "前端",
-             *       "React"
-             *     ]
-             */
-            tagList?: string[];
-            /**
-             * @description 自我介紹
-             * @example 熱愛學習的開發者
-             */
-            selfIntroduction?: string | null;
-            /**
-             * @description 用戶自訂 ID（用於個人頁面網址）
-             * @example xiaoming
-             */
-            customId?: string | null;
-        };
-        /**
-         * @description 實踐活動統計資訊
-         * @example {
-         *       "likeCount": 25,
-         *       "viewCount": 150,
-         *       "favoriteCount": 12,
-         *       "shareCount": 8,
-         *       "commentCount": 3
-         *     }
-         */
-        PracticeStats: {
-            /**
-             * @description 點讚數量
-             * @example 25
-             */
-            likeCount: number;
-            /**
-             * @description 瀏覽數量
-             * @example 150
-             */
-            viewCount: number;
-            /**
-             * @description 收藏數量
-             * @example 12
-             */
-            favoriteCount: number;
-            /**
-             * @description 分享數量
-             * @example 8
-             */
-            shareCount: number;
-            /**
-             * @description 評論數量
-             * @example 3
-             */
-            commentCount: number;
-        };
-        /**
-         * @description 實踐使用的資源
-         * @example {
-         *       "id": "123e4567-e89b-12d3-a456-426614174000",
-         *       "name": "React 官方文檔",
-         *       "url": "https://react.dev/",
-         *       "dayNumber": 3
-         *     }
-         */
-        PracticeResourceEntity: {
-            /**
-             * Format: uuid
-             * @description 資源外部 UUID
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            id: string;
-            /**
-             * @description 資源名稱
-             * @example React 官方文檔
-             */
-            name: string;
-            /**
-             * Format: uri
-             * @description 資源網址
-             * @example https://react.dev/
-             */
-            url?: string;
-            /**
-             * @description 指定第幾天使用此資源（null 代表整段實踐期間皆可使用）
-             * @example 3
-             */
-            dayNumber?: number | null;
-        };
-        /**
-         * @description 實踐活動詳細資訊
-         * @example {
-         *       "id": "123e4567-e89b-12d3-a456-426614174000",
-         *       "title": "每日閱讀 30 分鐘",
-         *       "practiceAction": "閱讀技術書籍或文章",
-         *       "startDate": "2024-01-15",
-         *       "endDate": "2024-01-29",
-         *       "durationDays": 14,
-         *       "frequencyMinDays": 4,
-         *       "frequencyMaxDays": 7,
-         *       "sessionDurationMinutes": 30,
-         *       "practiceTimePeriods": [
-         *         "morning",
-         *         "evening"
-         *       ],
-         *       "status": "active",
-         *       "hasResources": true,
-         *       "resources": [
-         *         {
-         *           "id": "123e4567-e89b-12d3-a456-426614174000",
-         *           "name": "React 官方文檔",
-         *           "url": "https://react.dev/"
-         *         }
-         *       ],
-         *       "progressPercentage": 50,
-         *       "firstCheckinAt": "2024-01-15T08:30:00.000Z",
-         *       "lastCheckinAt": "2024-01-20T09:00:00.000Z",
-         *       "checkInCount": 2,
-         *       "themeColor": "#FCDD84",
-         *       "createdAt": "2024-01-15T10:30:00.000Z",
-         *       "updatedAt": "2024-01-20T15:45:00.000Z",
-         *       "user": {
-         *         "id": "123e4567-e89b-12d3-a456-426614174000",
-         *         "name": "學習者小明",
-         *         "photoURL": "https://example.com/avatar/123.jpg",
-         *         "roleList": [
-         *           "normal_student",
-         *           "educator"
-         *         ],
-         *         "educationStage": "university",
-         *         "tagList": [
-         *           "前端",
-         *           "React"
-         *         ],
-         *         "selfIntroduction": "熱愛學習的開發者"
-         *       },
-         *       "tags": [
-         *         "閱讀",
-         *         "學習"
-         *       ],
-         *       "stats": {
-         *         "likeCount": 25,
-         *         "viewCount": 150,
-         *         "favoriteCount": 12,
-         *         "shareCount": 8,
-         *         "commentCount": 3
-         *       }
-         *     }
-         */
-        PracticeEntity: {
-            /**
-             * Format: uuid
-             * @description 實踐活動外部 UUID
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            id: string;
-            /**
-             * @description 實踐活動標題
-             * @example 每日閱讀 30 分鐘
-             */
-            title: string;
-            /**
-             * @description 實踐行動描述
-             * @example 閱讀技術書籍或文章
-             */
-            practiceAction?: string;
-            /**
-             * Format: date
-             * @description 開始日期 (YYYY-MM-DD)
-             * @example 2024-01-15
-             */
-            startDate?: string;
-            /**
-             * Format: date
-             * @description 結束日期 (YYYY-MM-DD)
-             * @example 2024-01-29
-             */
-            endDate?: string;
-            /**
-             * @description 持續天數
-             * @example 14
-             */
-            durationDays?: number;
-            /**
-             * @description 每週最低打卡天數
-             * @example 4
-             */
-            frequencyMinDays?: number;
-            /**
-             * @description 每週最高打卡天數
-             * @example 7
-             */
-            frequencyMaxDays?: number;
-            /**
-             * @description 每次實踐時長（分鐘）
-             * @example 30
-             */
-            sessionDurationMinutes?: number;
-            /**
-             * @description 偏好實踐時段
-             * @example [
-             *       "morning",
-             *       "evening"
-             *     ]
-             */
-            practiceTimePeriods: string[];
-            /** @description 其他說明 */
-            otherContext?: string;
-            /**
-             * @description 實踐活動狀態 (draft: 草稿, not_started: 未開始, active: 進行中, completed: 已完成, archived: 已封存)
-             * @example not_started
-             * @example draft
-             * @example not_started
-             * @example active
-             * @example completed
-             * @example archived
-             * @enum {string}
-             */
-            status: "draft" | "not_started" | "active" | "completed" | "archived";
-            /**
-             * @description 是否有相關資源
-             * @example true
-             */
-            hasResources: boolean;
-            /**
-             * @description 使用的資源列表
-             * @example [
-             *       {
-             *         "id": "123e4567-e89b-12d3-a456-426614174000",
-             *         "name": "React 官方文檔",
-             *         "url": "https://react.dev/"
-             *       }
-             *     ]
-             */
-            resources?: components["schemas"]["PracticeResourceEntity"][];
-            /**
-             * @description 進度百分比
-             * @example 50
-             */
-            progressPercentage: number;
-            /**
-             * Format: date-time
-             * @description 首次打卡時間
-             */
-            firstCheckinAt?: string;
-            /**
-             * Format: date-time
-             * @description 最近打卡時間
-             */
-            lastCheckinAt?: string;
-            /**
-             * @description 已打卡次數
-             * @example 2
-             */
-            checkInCount: number;
-            /**
-             * @description 主題色（HEX 格式）
-             * @example #FCDD84
-             */
-            themeColor?: string;
-            /**
-             * Format: date-time
-             * @description 創建時間
-             * @example 2024-01-15T10:30:00.000Z
-             */
-            createdAt: string;
-            /**
-             * Format: date-time
-             * @description 更新時間
-             * @example 2024-01-20T15:45:00.000Z
-             */
-            updatedAt?: string;
-            user: components["schemas"]["UserBasicInfo"];
-            /**
-             * @description 相關標籤
-             * @example [
-             *       "閱讀",
-             *       "學習"
-             *     ]
-             */
-            tags: string[];
-            stats: components["schemas"]["PracticeStats"];
-        };
-        /**
-         * @description 簽到記錄詳細資訊
-         * @example {
-         *       "id": 456,
-         *       "practiceId": 123,
-         *       "userId": 789,
-         *       "checkinDate": "2024-01-20",
-         *       "mood": "happy",
-         *       "note": "今天閱讀了第三章",
-         *       "imageUrls": [],
-         *       "ogImageUrl": null,
-         *       "tags": [
-         *         "專注",
-         *         "有收穫"
-         *       ],
-         *       "createdAt": "2024-01-20T15:45:00.000Z",
-         *       "updatedAt": "2024-01-20T15:45:00.000Z"
-         *     }
-         */
-        CheckInEntity: {
-            /**
-             * @description 簽到記錄內部 ID
-             * @example 456
-             */
-            id: number;
-            /**
-             * @description 關聯的實踐活動內部 ID
-             * @example 123
-             */
-            practiceId: number;
-            /**
-             * @description 簽到用戶內部 ID
-             * @example 789
-             */
-            userId: number;
-            /**
-             * Format: date
-             * @description 簽到日期
-             * @example 2024-01-20
-             */
-            checkinDate: string;
-            /**
-             * @description 簽到心情 (give_up: 想放棄, frustrated: 挫折, bored: 無聊, neutral: 普通, good: 不錯, happy: 開心)
-             * @example happy
-             * @enum {string}
-             */
-            mood?: "give_up" | "frustrated" | "bored" | "neutral" | "good" | "happy";
-            /**
-             * @description 詳細描述
-             * @example 今天閱讀了第三章
-             */
-            note?: string;
-            /**
-             * @description 打卡圖片 URL（最多3張）
-             * @example []
-             */
-            imageUrls: string[];
-            /**
-             * Format: uri
-             * @description OG 圖片 URL（用於社群分享）
-             * @example null
-             */
-            ogImageUrl: string | null;
-            /**
-             * @description 打卡標籤
-             * @example [
-             *       "專注",
-             *       "有收穫"
-             *     ]
-             */
-            tags: string[];
-            /**
-             * Format: date-time
-             * @description 創建時間
-             * @example 2024-01-20T15:45:00.000Z
-             */
-            createdAt: string;
-            /**
-             * Format: date-time
-             * @description 更新時間
-             * @example 2024-01-20T15:45:00.000Z
-             */
-            updatedAt?: string;
-        };
-        /**
-         * @description 用戶實踐統計
-         * @example {
-         *       "totalPractices": 12,
-         *       "activePractices": 3,
-         *       "completedPractices": 7,
-         *       "totalCheckIns": 245,
-         *       "averageStreak": 8.5,
-         *       "maxStreak": 25
-         *     }
-         */
-        PracticeUserStats: {
-            /**
-             * @description 總實踐數
-             * @example 12
-             */
-            totalPractices: number;
-            /**
-             * @description 活躍實踐數
-             * @example 3
-             */
-            activePractices: number;
-            /**
-             * @description 已完成實踐數
-             * @example 7
-             */
-            completedPractices: number;
-            /**
-             * @description 總簽到次數
-             * @example 245
-             */
-            totalCheckIns: number;
-            /**
-             * @description 平均連續天數
-             * @example 8.5
-             */
-            averageStreak: number;
-            /**
-             * @description 最大連續天數
-             * @example 25
-             */
-            maxStreak: number;
-        };
-        /**
-         * @description 實踐模板
-         * @example {
-         *       "id": "tpl-reading-daily",
-         *       "title": "每日閱讀 30 分鐘",
-         *       "practiceAction": "閱讀",
-         *       "categories": [
-         *         "reading"
-         *       ],
-         *       "frequencyMinDays": 1,
-         *       "frequencyMaxDays": 2,
-         *       "durationDays": 30,
-         *       "sessionDurationMinutes": 30,
-         *       "practiceTimePeriods": [
-         *         "morning",
-         *         "evening"
-         *       ],
-         *       "suggestedTags": [
-         *         "閱讀",
-         *         "習慣養成",
-         *         "自我成長"
-         *       ],
-         *       "resources": [
-         *         {
-         *           "id": "123e4567-e89b-12d3-a456-426614174000",
-         *           "name": "React 官方文檔",
-         *           "url": "https://react.dev"
-         *         }
-         *       ],
-         *       "answerCount": 42,
-         *       "createdAt": "2024-01-15T10:30:00.000Z"
-         *     }
-         */
-        PracticeTemplate: {
-            /**
-             * @description 模板 ID（UUID 或預設模板 ID）
-             * @example tpl-reading-daily
-             */
-            id: string;
-            /**
-             * @description 模板標題
-             * @example 每日閱讀 30 分鐘
-             */
-            title: string;
-            /**
-             * @description 具體實踐行動描述
-             * @example 閱讀
-             */
-            practiceAction?: string;
-            /**
-             * @description 模板分類列表
-             * @example [
-             *       "reading"
-             *     ]
-             */
-            categories: string[];
-            /**
-             * @description 每週最低打卡天數
-             * @example 1
-             */
-            frequencyMinDays: number | null;
-            /**
-             * @description 每週最高打卡天數
-             * @example 2
-             */
-            frequencyMaxDays: number | null;
-            /**
-             * @description 建議持續天數
-             * @example 30
-             */
-            durationDays: number | null;
-            /**
-             * @description 每次實踐時長（分鐘）
-             * @example 30
-             */
-            sessionDurationMinutes: number | null;
-            /**
-             * @description 建議實踐時段
-             * @example [
-             *       "morning",
-             *       "evening"
-             *     ]
-             */
-            practiceTimePeriods: string[];
-            /**
-             * @description 建議標籤
-             * @example [
-             *       "閱讀",
-             *       "習慣養成",
-             *       "自我成長"
-             *     ]
-             */
-            suggestedTags: string[];
-            /**
-             * @description 模板關聯的資源列表
-             * @example [
-             *       {
-             *         "id": "123e4567-e89b-12d3-a456-426614174000",
-             *         "name": "React 官方文檔",
-             *         "url": "https://react.dev"
-             *       }
-             *     ]
-             */
-            resources?: components["schemas"]["PracticeResource"][];
-            /** @description 模板所屬組織；官方模板不提供此欄位 */
-            organization?: {
-                id: number;
-                name: string;
-                bio: string | null;
-                /** Format: uri */
-                externalLink: string | null;
-            };
-            /**
-             * @description 使用此模板建立實踐的總人次
-             * @example 42
-             */
-            answerCount: number;
-            /**
-             * @description 建立時間
-             * @example 2024-01-15T10:30:00.000Z
-             */
-            createdAt: string;
-        };
-        /**
-         * @description 創建實踐模板的請求資料
-         * @example {
-         *       "title": "每日閱讀 30 分鐘",
-         *       "practiceAction": "閱讀",
-         *       "categories": [
-         *         "reading"
-         *       ],
-         *       "frequencyMinDays": 1,
-         *       "frequencyMaxDays": 2,
-         *       "durationDays": 30,
-         *       "sessionDurationMinutes": 30,
-         *       "practiceTimePeriods": [
-         *         "morning",
-         *         "evening"
-         *       ],
-         *       "suggestedTags": [
-         *         "閱讀",
-         *         "習慣養成",
-         *         "自我成長"
-         *       ]
-         *     }
-         */
-        CreatePracticeTemplateRequest: {
-            /**
-             * @description 模板標題
-             * @example 每日閱讀 30 分鐘
-             */
-            title: string;
-            /**
-             * @description 具體實踐行動描述
-             * @example 閱讀
-             */
-            practiceAction?: string;
-            /**
-             * @description 模板分類列表
-             * @default []
-             * @example [
-             *       "reading"
-             *     ]
-             */
-            categories: string[];
-            /**
-             * @description 每週最低打卡天數
-             * @example 1
-             */
-            frequencyMinDays?: number;
-            /**
-             * @description 每週最高打卡天數
-             * @example 2
-             */
-            frequencyMaxDays?: number;
-            /**
-             * @description 建議持續天數
-             * @example 30
-             */
-            durationDays?: number;
-            /**
-             * @description 每次實踐時長（分鐘）
-             * @example 30
-             */
-            sessionDurationMinutes?: number;
-            /**
-             * @description 建議實踐時段
-             * @default []
-             * @example [
-             *       "morning",
-             *       "evening"
-             *     ]
-             */
-            practiceTimePeriods: ("morning" | "afternoon" | "evening" | "night" | "commute")[];
-            /**
-             * @description 建議標籤
-             * @default []
-             * @example [
-             *       "閱讀",
-             *       "習慣養成",
-             *       "自我成長"
-             *     ]
-             */
-            suggestedTags: string[];
-        };
-        /** @description 打卡鼓勵句 */
-        Encouragement: {
-            /** @description 鼓勵句 ID */
-            id: number;
-            /**
-             * @description 鼓勵句內容
-             * @example 太棒了！你做到了！
-             */
-            message: string;
-            /**
-             * @description 分類
-             * @example general
-             */
-            category?: string;
-        };
-        /** @description 標籤引導句 */
-        TagPrompt: {
-            /** @description 引導句 ID */
-            id: number;
-            /**
-             * @description 標籤名稱
-             * @example 閱讀
-             */
-            tagName: string;
-            /**
-             * @description 引導句內容
-             * @example 今天讀了什麼書？有什麼收穫嗎？
-             */
-            prompt: string;
-            /**
-             * @description 使用場景
-             * @example checkin
-             */
-            usageType: string;
-        };
-        /**
-         * @description 打卡回應（含鼓勵句）
-         * @example {
-         *       "id": 456,
-         *       "practiceId": 123,
-         *       "userId": 789,
-         *       "checkinDate": "2024-01-20",
-         *       "mood": "happy",
-         *       "note": "今天閱讀了第三章",
-         *       "imageUrls": [],
-         *       "ogImageUrl": null,
-         *       "tags": [
-         *         "專注",
-         *         "有收穫"
-         *       ],
-         *       "createdAt": "2024-01-20T15:45:00.000Z",
-         *       "updatedAt": "2024-01-20T15:45:00.000Z"
-         *     }
-         */
-        CheckInWithEncouragement: components["schemas"]["CheckInEntity"] & {
-            /**
-             * @description 鼓勵句
-             * @example 太棒了！你做到了！
-             */
-            encouragement: string;
-            /**
-             * @description 實踐進度百分比
-             * @example 50
-             */
-            practiceProgressPercentage: number;
-            /**
-             * @description 實踐活動狀態 (draft: 草稿, not_started: 未開始, active: 進行中, completed: 已完成, archived: 已封存)
-             * @example not_started
-             * @example draft
-             * @example not_started
-             * @example active
-             * @example completed
-             * @example archived
-             * @enum {string}
-             */
-            practiceStatus: "draft" | "not_started" | "active" | "completed" | "archived";
-            /**
-             * @description 是否首次打卡
-             * @example false
-             */
-            isFirstCheckIn: boolean;
-            /**
-             * @description 是否達成目標
-             * @example false
-             */
-            hasReachedTarget: boolean;
         };
         /** @description 創建新學習成果的請求資料 */
         CreateOutcomeRequest: {

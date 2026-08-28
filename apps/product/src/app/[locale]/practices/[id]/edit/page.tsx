@@ -97,6 +97,9 @@ export default function EditPracticePage() {
 
   const { data: practiceData, isLoading, error } = usePracticeById(practiceId);
 
+  // 共同挑戰實踐：名稱、期間、隱私由挑戰統一設定（FR-CC-05、FR-CC-10），server 端亦會拒絕這些欄位
+  const isChallenge = practiceData?.data?.isChallenge === true;
+
   // 檢查實踐是否已經開始（狀態為 active）
   const isPracticeStarted = useMemo(() => {
     return practiceData?.data?.status === PracticeStatus.active;
@@ -229,9 +232,15 @@ export default function EditPracticePage() {
     setIsSubmitting(true);
 
     try {
+      const converted = convertFormValuesToApiRequest(values) as Record<string, unknown>;
+      if (isChallenge) {
+        for (const lockedField of ["title", "startDate", "durationDays"]) {
+          delete converted[lockedField];
+        }
+      }
       const apiRequest = {
-        ...convertFormValuesToApiRequest(values),
-        privacyStatus,
+        ...converted,
+        ...(isChallenge ? {} : { privacyStatus }),
       } as UpdatePracticeRequestType;
 
       const response = await updatePractice(practiceId, apiRequest);
@@ -326,15 +335,26 @@ export default function EditPracticePage() {
         {/* Form */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <Step1 form={form} />
-            <Step2 form={form} disabled={isPracticeStarted} minStartDate={minStartDate} />
+            {isChallenge && (
+              <p className="rounded-lg bg-logo-cyan/10 px-4 py-3 text-sm text-text-dark">
+                {t("edit_challenge_locked")}
+              </p>
+            )}
+            <Step1 form={form} nameDisabled={isChallenge} />
+            <Step2
+              form={form}
+              disabled={isPracticeStarted || isChallenge}
+              minStartDate={minStartDate}
+            />
             <Step3 form={form} />
             <Step4 form={form} />
 
             {/* Privacy Status */}
-            <div className="bg-white rounded-lg p-4 shadow-sm">
-              <PrivacyStatusSelector value={privacyStatus} onChange={setPrivacyStatus} />
-            </div>
+            {!isChallenge && (
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <PrivacyStatusSelector value={privacyStatus} onChange={setPrivacyStatus} />
+              </div>
+            )}
 
             {/* Save Button */}
             <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray">

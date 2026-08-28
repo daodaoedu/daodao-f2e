@@ -482,6 +482,7 @@ export default function PracticeDetailPage() {
         practice={{
           id: practiceId,
           title: practice.title,
+          isChallenge: practiceData?.data?.isChallenge === true,
           status: practiceData?.data?.status,
           actionDescription: practice.actionDescription,
           frequency: practice.frequency,
@@ -550,6 +551,7 @@ export default function PracticeDetailPage() {
                 variant="orange"
                 className="w-full sm:max-w-[288px]"
                 practiceId={practiceId}
+                isChallenge={practiceData?.data?.isChallenge === true}
                 practiceStatus={practiceData?.data?.status}
                 lastCheckInDate={checkInsData?.data?.[0]?.createdAt || undefined}
                 startDate={practice.startDate}
