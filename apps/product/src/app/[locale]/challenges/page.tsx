@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  type ChallengeSummaryType,
-  useChallenges,
-  useCurrentUser,
-} from "@daodao/api";
+import { type ChallengeSummaryType, useChallenges, useCurrentUser } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { Spinner } from "@daodao/ui/components/spinner";

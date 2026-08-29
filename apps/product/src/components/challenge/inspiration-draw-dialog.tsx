@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  drawInspirationCard,
-  selectInspirationDraw,
-  useTodayDraws,
-} from "@daodao/api";
+import { drawInspirationCard, selectInspirationDraw, useTodayDraws } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
@@ -34,7 +30,10 @@ const extractErrorMessage = (error: unknown, fallback: string): string =>
  *
  * 每日最多 3 抽（排除本日已抽與曾選定，由後端保證）；抽完可選定一張為今日卡片，可重選。
  */
-export const InspirationDrawDialog = ({ challengeId, onOpenChange }: InspirationDrawDialogProps) => {
+export const InspirationDrawDialog = ({
+  challengeId,
+  onOpenChange,
+}: InspirationDrawDialogProps) => {
   const t = useTranslations("challenge");
   const [isBusy, setIsBusy] = useState(false);
   const { data, mutate } = useTodayDraws(challengeId ?? undefined, challengeId !== null);
