@@ -215,6 +215,20 @@ if run_validator is_valid_review "$REPAIRED"; then
   fail "strict validator accepted a repaired table that still has an unverifiable file cell"
 fi
 
+# 誤判知識庫：CI 與本機 skill 共用同一份 jsonl 與腳本；CI 從 base ref 載入、filter 在 strict validator 之前
+KNOWLEDGE="$SCRIPT_DIR/review-knowledge.cjs"
+[ -f "$KNOWLEDGE" ] || fail "review-knowledge.cjs missing"
+node "$KNOWLEDGE" test --db "$SCRIPT_DIR/../review-knowledge/false-positives.jsonl" >/dev/null || fail "review-knowledge fixtures failed"
+grep -Fq 'git show "$BASE_SHA:.github/scripts/review-knowledge.cjs"' "$WORKFLOW" \
+  || fail "workflow does not load review-knowledge from the trusted base"
+grep -Fq -- '--rawfile known_fp "$RUNNER_TEMP/known-fp.md"' "$WORKFLOW" \
+  || fail "review prompt does not receive the known false-positive block"
+FILTER_LINE=$(grep -n 'review-knowledge.cjs" filter' "$WORKFLOW" | head -1 | cut -d: -f1)
+STRICT_LINE_FOR_FILTER=$(grep -n 'if ! is_valid_review "\$BODY"' "$WORKFLOW" | head -1 | cut -d: -f1)
+[ -n "$FILTER_LINE" ] && [ "$FILTER_LINE" -lt "$STRICT_LINE_FOR_FILTER" ] \
+  || fail "review-knowledge filter does not run before strict validation"
+grep -Fq 'review-knowledge.cjs' "$SKILL" || fail "manual review skill does not consume the shared review-knowledge"
+
 grep -Fq '純刪除 authentication、authorization、validation 或 safety guard' "$WORKFLOW" \
   || fail "review prompt does not require deletion-only guard regression findings"
 grep -Fq '每一列 finding 的檔案欄都必須是可核對的 path:line' "$WORKFLOW" \
