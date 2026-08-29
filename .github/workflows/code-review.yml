@@ -210,9 +210,38 @@ jobs:
 
           # 小模型常見的格式漂移自動修復：嚴重度中文（高/中/低）、檔案欄的
           # 行號範圍（path:12-34）、L 前綴（path:L12）、cell 內多餘空白。
-          REPAIR_INPUT_FILE="$RUNNER_TEMP/review-body.tabled" node -e '
+          # 檔案欄只有 path 沒有 :line 時（模型最常見的漏寫，會讓整份 review 被丟掉），
+          # 從完整 diff 找該檔第一個新增行的行號補上；找不到就原樣留給 strict validator 拒絕。
+          REPAIR_INPUT_FILE="$RUNNER_TEMP/review-body.tabled" \
+          REPAIR_DIFF_FILE="$RUNNER_TEMP/review-full.diff" node -e '
             const fs = require("fs");
             const body = fs.readFileSync(process.env.REPAIR_INPUT_FILE, "utf8");
+            const firstAddedLine = new Map();
+            let diffText = "";
+            try { diffText = fs.readFileSync(process.env.REPAIR_DIFF_FILE, "utf8"); } catch (_) {}
+            let current = null;
+            let newLine = 0;
+            for (const raw of diffText.split("\n")) {
+              const fileMatch = raw.match(/^\+\+\+ b\/(.+)$/);
+              if (fileMatch) { current = fileMatch[1]; continue; }
+              if (raw.startsWith("--- ") || raw.startsWith("diff --git ")) { if (raw.startsWith("diff --git ")) current = null; continue; }
+              const hunk = raw.match(/^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
+              if (hunk) { newLine = Number(hunk[1]); continue; }
+              if (!current) continue;
+              if (raw.startsWith("+")) {
+                if (!firstAddedLine.has(current)) firstAddedLine.set(current, newLine);
+                newLine++;
+              } else if (!raw.startsWith("-") && !raw.startsWith("\\")) {
+                newLine++;
+              }
+            }
+            // 回傳 diff 裡的完整路徑 + 第一個新增行；只寫 basename 時經唯一後綴比對展開成完整路徑，
+            // 否則 strict validator 仍會因為 path 對不上 diff 而拒絕。
+            const resolveLocation = (file) => {
+              if (firstAddedLine.has(file)) return { path: file, line: firstAddedLine.get(file) };
+              const suffixMatches = [...firstAddedLine.keys()].filter((p) => p.endsWith("/" + file));
+              return suffixMatches.length === 1 ? { path: suffixMatches[0], line: firstAddedLine.get(suffixMatches[0]) } : null;
+            };
             const repaired = body.split("\n").map((line) => {
               if (!line.startsWith("|")) return line;
               const cells = line.split("|");
@@ -225,11 +254,15 @@ jobs:
                 .replace(/低|輕微/, "Low")} `;
               const rawFile = cells[2].trim();
               const hadBackticks = /^`.*`$/.test(rawFile);
-              const file = rawFile
+              let file = rawFile
                 .replace(/^`|`$/g, "")
                 .replace(/\s+/g, "")
                 .replace(/:L(\d)/, ":$1")
                 .replace(/:(\d+)[-–—,~](\d+)$/, ":$1");
+              if (file && !/:\d+$/.test(file)) {
+                const location = resolveLocation(file);
+                if (location !== null) file = `${location.path}:${location.line}`;
+              }
               cells[2] = hadBackticks ? ` \`${file}\` ` : ` ${file} `;
               return cells.join("|");
             }).join("\n");
