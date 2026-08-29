@@ -124,7 +124,7 @@ function CohortCard({ cohort, refresh }: CohortCardProps) {
         <span className="sr-only">{t("manage_cohort")}</span>
       </CustomLink>
 
-      <div className="relative flex items-start justify-between gap-3">
+      <div className="pointer-events-none relative flex items-start justify-between gap-3">
         <div className="min-w-0">
           <span
             className={cn(
@@ -146,7 +146,7 @@ function CohortCard({ cohort, refresh }: CohortCardProps) {
                 asChild
                 variant="outline"
                 size="icon"
-                className="relative z-10 size-7 rounded-full border-[#CDEBE8] text-[#0D7773]"
+                className="pointer-events-auto relative z-10 size-7 rounded-full border-[#CDEBE8] text-[#0D7773]"
               >
                 <CustomLink href={editHref} aria-label={t("cohort_edit")} title={t("cohort_edit")}>
                   <Pencil className="size-3.5" aria-hidden="true" />
@@ -159,7 +159,7 @@ function CohortCard({ cohort, refresh }: CohortCardProps) {
             {t("overview_program_label")}：{cohort.programName}
           </p>
         </div>
-        <div className="relative z-10 flex shrink-0 items-center gap-1">
+        <div className="pointer-events-auto relative z-10 flex shrink-0 items-center gap-1">
           <CustomLink
             href={manageHref}
             className="grid size-8 place-items-center rounded-full text-[#0D7773] hover:bg-[#EDF8F6]"
@@ -202,11 +202,11 @@ function CohortCard({ cohort, refresh }: CohortCardProps) {
         </div>
       </div>
 
-      <div className="relative mt-5 flex flex-wrap items-center justify-between gap-3">
+      <div className="pointer-events-none relative mt-5 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-[#456B68]">
           {t("overview_joined_count", { count: cohort.joinedCount })}
         </p>
-        <div className="relative z-10 flex items-center gap-2">
+        <div className="pointer-events-auto relative z-10 flex items-center gap-2">
           {cohort.status === "draft" && (
             <Button size="sm" onClick={handlePublish} disabled={busy}>
               <Send className="size-4" aria-hidden="true" />
