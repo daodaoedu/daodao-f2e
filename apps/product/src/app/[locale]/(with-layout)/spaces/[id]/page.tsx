@@ -19,6 +19,7 @@ import {
 } from "@/components/spaces";
 import type { PracticeStatus } from "@/constants/practice-status";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
+import { copyToClipboard } from "@/utils/copy-to-clipboard";
 
 type SpaceTab = "home" | "practices";
 
@@ -154,15 +155,11 @@ export default function EventSpacePage() {
             <button
               type="button"
               onClick={() => {
-                // navigator.clipboard 在非安全上下文（http）或舊瀏覽器為 undefined，需先檢查
-                if (!navigator.clipboard?.writeText) {
-                  toast.error(t("copy_public_link"));
-                  return;
-                }
-                void navigator.clipboard
-                  .writeText(`${window.location.origin}/spaces/public/${detail.publicToken}`)
-                  .then(() => toast.success(t("link_copied")))
-                  .catch(() => toast.error(t("copy_public_link")));
+                void copyToClipboard(
+                  `${window.location.origin}/spaces/public/${detail.publicToken}`
+                ).then((ok) =>
+                  ok ? toast.success(t("link_copied")) : toast.error(t("copy_public_link"))
+                );
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-[#DCEBEA] px-3 py-1 text-xs text-text-dark transition-colors hover:border-primary-base/50 hover:bg-[#F7FBFA]"
             >
