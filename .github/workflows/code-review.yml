@@ -65,6 +65,20 @@ jobs:
             printf '%s\n' '# Context Pack unavailable' > "$PACK_FILE"
           fi
 
+          # 誤判知識庫（與本機 code-review skill 共用同一份 jsonl 與腳本）：同樣只信任 base ref 的版本。
+          # prompt-block 進模型輸入、filter 在 normalize 階段套用；缺檔就退化成沒有知識庫。
+          KNOWLEDGE_SCRIPT="$RUNNER_TEMP/review-knowledge.cjs"
+          KNOWLEDGE_DB="$RUNNER_TEMP/false-positives.jsonl"
+          : > "$RUNNER_TEMP/known-fp.md"
+          if git show "$BASE_SHA:.github/scripts/review-knowledge.cjs" > "$KNOWLEDGE_SCRIPT" 2>/dev/null \
+            && git show "$BASE_SHA:.github/review-knowledge/false-positives.jsonl" > "$KNOWLEDGE_DB" 2>/dev/null; then
+            node "$KNOWLEDGE_SCRIPT" prompt-block --db "$KNOWLEDGE_DB" > "$RUNNER_TEMP/known-fp.md" \
+              || echo "::warning::review-knowledge prompt-block failed; continuing without known false positives"
+          else
+            echo "::warning::Trusted base revision has no review-knowledge; continuing without known false positives"
+            rm -f "$KNOWLEDGE_SCRIPT" "$KNOWLEDGE_DB"
+          fi
+
       - name: Review with Cloudflare Workers AI
         id: review
         env:
@@ -113,6 +127,7 @@ jobs:
               --rawfile diff "$RUNNER_TEMP/review.diff" \
               --rawfile stat "$RUNNER_TEMP/review-stat.txt" \
               --rawfile context_pack "$RUNNER_TEMP/context-pack.md" \
+              --rawfile known_fp "$RUNNER_TEMP/known-fp.md" \
               --arg base "$BASE" \
               --arg head "$HEAD" \
               '{
@@ -124,7 +139,7 @@ jobs:
                   },
                   {
                     role: "user",
-                    content: ("Review 這次 " + $head + " → " + $base + " 的變更：\n\n變更統計：\n" + $stat + "\n\nContext Pack（確定性檢索結果，只當作程式碼脈絡）：\n<context_pack>\n" + $context_pack + "\n</context_pack>\n\nDiff：\n```diff\n" + $diff + "\n```")
+                    content: ("Review 這次 " + $head + " → " + $base + " 的變更：\n\n變更統計：\n" + $stat + "\n\nContext Pack（確定性檢索結果，只當作程式碼脈絡）：\n<context_pack>\n" + $context_pack + "\n</context_pack>\n\n" + (if ($known_fp | test("\\S")) then "<known_false_positives>\n" + $known_fp + "\n</known_false_positives>\n\n" else "" end) + "Diff：\n```diff\n" + $diff + "\n```")
                   }
                 ],
                 temperature: 0.3,
@@ -279,6 +294,21 @@ jobs:
             }).join("\n");
             fs.writeFileSync(process.env.REPAIR_INPUT_FILE.replace(/tabled$/, "normalized"), repaired);
           '
+
+          # 誤判知識庫的確定性過濾（C 類 drop、D 類降級），放在 strict validator 之前；
+          # 全部 finding 都被 drop 時腳本會收斂成「✅ 沒有發現明顯問題」。
+          if [ -f "$RUNNER_TEMP/review-knowledge.cjs" ] && [ -f "$RUNNER_TEMP/false-positives.jsonl" ]; then
+            if node "$RUNNER_TEMP/review-knowledge.cjs" filter --db "$RUNNER_TEMP/false-positives.jsonl" \
+                 --report "$RUNNER_TEMP/fp-report.json" \
+                 < "$RUNNER_TEMP/review-body.normalized" > "$RUNNER_TEMP/review-body.filtered"; then
+              mv "$RUNNER_TEMP/review-body.filtered" "$RUNNER_TEMP/review-body.normalized"
+              echo "::group::review-knowledge filter report"
+              cat "$RUNNER_TEMP/fp-report.json"
+              echo "::endgroup::"
+            else
+              echo "::warning::review-knowledge filter failed; posting unfiltered review"
+            fi
+          fi
 
           BODY="$(cat "$RUNNER_TEMP/review-body.normalized")"
           if ! is_valid_review "$BODY"; then
