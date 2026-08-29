@@ -136,6 +136,24 @@ if run_validator is_valid_review "$UNKNOWN_SEVERITY_FINDING"; then
   fail "strict validator accepted an unsupported finding severity"
 fi
 
+# review diff 必須排除生成物與 lockfile，否則 12000 bytes 的上限會被 openapi 生成物占滿
+for excluded in 'openapi.json' 'openapi.yaml' 'generated/**' 'pnpm-lock.yaml'; do
+  grep -Fq ":(exclude,glob)**/$excluded" "$WORKFLOW" || fail "review diff does not exclude generated file $excluded"
+done
+grep -Fq -- '--stat -- . "${GENERATED_EXCLUDES[@]}"' "$WORKFLOW" || fail "review stat does not apply the generated-file excludes"
+EXCLUDE_TMP=$(mktemp -d)
+(
+  cd "$EXCLUDE_TMP" && git init -q && git config user.email t@t && git config user.name t
+  mkdir -p src generated && printf 'a\n' > src/a.ts && printf '{}\n' > openapi.json && printf 'x\n' > generated/types.ts
+  git add -A && git commit -qm base
+  printf 'b\n' > src/a.ts && printf '{"x":1}\n' > openapi.json && printf 'y\n' > generated/types.ts
+  git add -A && git commit -qm change
+  git diff HEAD~1..HEAD -- '*.ts' '*.json' ':(exclude,glob)**/openapi.json' ':(exclude,glob)**/generated/**' > diff.txt
+  grep -q 'src/a.ts' diff.txt || { echo "exclude pathspec dropped real source"; exit 1; }
+  ! grep -q 'openapi.json\|generated/types.ts' diff.txt || { echo "exclude pathspec kept generated files"; exit 1; }
+) || fail "generated-file exclude pathspec does not behave as expected"
+rm -rf "$EXCLUDE_TMP"
+
 # 修復器：檔案欄漏寫 :line 時，從完整 diff 補第一個新增行；diff 裡沒有的檔案原樣保留
 extract_repair_script() {
   awk '
@@ -177,6 +195,8 @@ cat > "$REPAIR_TMP/review-body.tabled" <<'BODY'
 | 🟡 Medium | `083_new.sql` | 缺少守衛 | 補上 |
 | 🟢 Low | `src/auth.ts:12-15` | 命名 | 改名 |
 | 🟢 Low | `src/missing.ts` | 不在 diff | 略 |
+| 🟡 Medium | `src/auth.ts` (新增的 check 函式) | 括號說明 | 略 |
+| 🟡 Medium | src/auth.ts:≈+40(新增的 check) | 非數字行號尾巴 | 略 |
 
 ### 總結
 
@@ -188,6 +208,8 @@ rm -rf "$REPAIR_TMP"
 printf '%s\n' "$REPAIRED" | grep -Fq '| `src/auth.ts:39` |' || fail "repair did not resolve a bare path to its first added line"
 printf '%s\n' "$REPAIRED" | grep -Fq '| `migrate/sql/083_new.sql:1` |' || fail "repair did not resolve a bare basename via unique suffix match"
 printf '%s\n' "$REPAIRED" | grep -Fq '| `src/auth.ts:12` |' || fail "repair broke the existing line-range normalization"
+[ "$(printf '%s\n' "$REPAIRED" | grep -Fc '| `src/auth.ts:39` |')" -eq 2 ] || fail "repair did not strip a parenthesised explanation after the path token"
+printf '%s\n' "$REPAIRED" | grep -Fq '| src/auth.ts:39 |' || fail "repair did not strip a non-numeric line suffix like :≈+40(…)"
 printf '%s\n' "$REPAIRED" | grep -Fq '| `src/missing.ts` |' || fail "repair invented a line for a file outside the diff"
 if run_validator is_valid_review "$REPAIRED"; then
   fail "strict validator accepted a repaired table that still has an unverifiable file cell"
