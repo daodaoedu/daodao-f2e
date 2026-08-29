@@ -62,9 +62,9 @@ function CohortPulse({ programId, cohort }: CohortPulseProps) {
 
 function ProgramCohorts({ programId }: { programId: number }) {
   const { cohorts } = useLighthouseCohorts(programId);
-  return cohorts?.filter((cohort) => cohort.status === "published").map((cohort) => (
-    <CohortPulse key={cohort.id} programId={programId} cohort={cohort} />
-  ));
+  return cohorts
+    ?.filter((cohort) => cohort.status === "published")
+    .map((cohort) => <CohortPulse key={cohort.id} programId={programId} cohort={cohort} />);
 }
 
 export function LighthouseOverview() {

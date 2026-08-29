@@ -6945,20 +6945,44 @@
         "explorer": {
           "name": "Explorer Island",
           "description": "You are a curious explorer who enjoys trying new things.",
-          "traits": ["Curious", "Willing to try", "Independent thinker"],
-          "recommendations": ["Daily reading", "Coding practice", "Language learning"]
+          "traits": [
+            "Curious",
+            "Willing to try",
+            "Independent thinker"
+          ],
+          "recommendations": [
+            "Daily reading",
+            "Coding practice",
+            "Language learning"
+          ]
         },
         "creator": {
           "name": "Creator Island",
           "description": "You are highly creative and good at turning ideas into action.",
-          "traits": ["Creative", "Hands-on", "Artistic"],
-          "recommendations": ["Writing practice", "Art creation", "Design learning"]
+          "traits": [
+            "Creative",
+            "Hands-on",
+            "Artistic"
+          ],
+          "recommendations": [
+            "Writing practice",
+            "Art creation",
+            "Design learning"
+          ]
         },
         "connector": {
           "name": "Connector Island",
           "description": "You build relationships easily and enjoy learning with others.",
-          "traits": ["Communicative", "Team-oriented", "Empathetic"],
-          "recommendations": ["Community activities", "Language learning", "Team projects"]
+          "traits": [
+            "Communicative",
+            "Team-oriented",
+            "Empathetic"
+          ],
+          "recommendations": [
+            "Community activities",
+            "Language learning",
+            "Team projects"
+          ]
         }
       }
     },
@@ -7490,7 +7514,7 @@
     "coach_workspace": "Coach workspace",
     "navigation_label": "Lighthouse navigation",
     "nav_overview": "Overview",
-    "nav_programs": "Programs and cohorts",
+    "nav_programs": "Programs & cohorts",
     "nav_templates": "Template library",
     "nav_organization": "Organization settings",
     "principle_label": "Working principle",
@@ -7507,7 +7531,7 @@
     "membership_required_description": "Lighthouse is available to coaches who belong to an organization. Ask an organization manager to add you, then return here.",
     "membership_back_home": "Back to home",
     "programs_eyebrow": "PROGRAMS / COHORTS",
-    "programs_title": "Programs and cohorts",
+    "programs_title": "Programs & cohorts",
     "programs_description": "Organize a long-running theme as a program, then open a cohort for each journey.",
     "program_create": "Create program",
     "program_created": "Program created",
@@ -7573,7 +7597,7 @@
     "cohort_nav_feed": "Activity",
     "cohort_nav_outcome": "Outcomes",
     "roster_eyebrow": "COHORT ROSTER",
-    "roster_title": "Cohort roster",
+    "roster_title": "Roster",
     "roster_description": "Invite learners, track their status, and maintain access to this cohort.",
     "invite_people": "Invite learners",
     "email_list": "Email list",
@@ -7584,12 +7608,12 @@
     "invitation_send_failed": "Could not send invitations. Try again.",
     "invitation_sent": "Invitations queued",
     "invitation_resent": "Invitation sent again",
-    "preview_result": "Import preview",
+    "preview_result": "Preview result",
     "send_invitations": "Send invitations",
     "valid": "Ready",
-    "join_governance": "Invitation link",
+    "join_governance": "Invite link",
     "joining_is_paused": "Joining by link is currently paused.",
-    "reset_join_link": "Reset link",
+    "reset_join_link": "Reset invite link",
     "pause_joining": "Pause joining",
     "join_link_rotate_confirm": "The old link will stop working immediately. Continue?",
     "join_link_rotated": "Invitation link reset; the old link no longer works",
@@ -7608,7 +7632,7 @@
     "member_remove_confirm": "This learner's practices will become personal practices. Continue?",
     "member_remove_failed": "Could not remove the learner",
     "member_removed": "Learner removed",
-    "overview_active_cohorts": "This week's cohort rhythm",
+    "overview_active_cohorts": "All cohorts",
     "overview_checkins_to_respond": "check-ins to respond to",
     "overview_people_to_encourage": "people to encourage",
     "dashboard_eyebrow": "COHORT RHYTHM",
@@ -7735,7 +7759,13 @@
     "template_resource_day": "Day (optional)",
     "template_resource_add": "Add resource",
     "template_start_date": "Start date",
-    "template_start_date_saved": "Start date updated"
+    "template_start_date_saved": "Start date updated",
+    "back_home": "Back to home",
+    "sidebar_collapse": "Collapse sidebar",
+    "sidebar_expand": "Expand sidebar",
+    "cohort_back_to_programs": "Back to programs & cohorts",
+    "cohort_edit": "Edit cohort settings",
+    "coming_soon": "{section} is still being planned."
   },
   "cohort": {
     "loading": "Loading",

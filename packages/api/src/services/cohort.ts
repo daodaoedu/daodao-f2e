@@ -84,6 +84,7 @@ export const lighthouseCohortSchema: z.ZodType<LighthouseCohortType> = z.object(
   startDate: z.string(),
   endDate: z.string(),
   joinToken: z.string().nullable(),
+  joinPaused: z.boolean(),
   joinDeadline: z.string().nullable(),
   capacity: z.number().int().nullable(),
   inviteMessage: z.string().nullable(),

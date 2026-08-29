@@ -30,6 +30,7 @@ import {
   Send,
   X,
 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { JoinCode } from "./join-code";
 
@@ -51,7 +52,9 @@ interface CohortCardProps {
 
 function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) {
   const t = useTranslations("lighthouse");
-  const [editing, setEditing] = useState(false);
+  const searchParams = useSearchParams();
+  // 場次管理頁的「編輯」鉛筆會帶 ?edit=<cohortId> 過來，直接展開該場次的編輯表單
+  const [editing, setEditing] = useState(searchParams.get("edit") === String(cohort.id));
   const [busy, setBusy] = useState(false);
 
   async function handlePublish() {
@@ -208,7 +211,10 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-center">
+    <div
+      id={`cohort-${cohort.id}`}
+      className="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-center"
+    >
       <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
         <CalendarDays className="size-5" />
       </span>

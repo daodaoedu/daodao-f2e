@@ -1,6 +1,6 @@
 "use client";
 
-import { useLighthouseCohort, useLighthouseDashboard } from "@daodao/api";
+import { useLighthouseDashboard } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Activity, CalendarCheck, Flame, Rocket, Users } from "lucide-react";
 import { CohortErrorState } from "./cohort-error-state";
@@ -12,7 +12,6 @@ interface CohortDashboardProps {
 
 export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
   const t = useTranslations("lighthouse");
-  const cohort = useLighthouseCohort(programId, cohortId).data?.data;
   const query = useLighthouseDashboard(programId, cohortId);
   const data = query.data?.data;
   const maxHeat = Math.max(1, ...Object.values(data?.rhythmHeatmap ?? {}));
@@ -37,16 +36,7 @@ export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
     );
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-5 py-10 md:px-10">
-      <header>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#0D7773]">
-          {t("dashboard_eyebrow")}
-        </p>
-        <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em]">
-          {cohort?.displayName ?? t("cohort_nav_dashboard")}
-        </h1>
-        <p className="mt-3 text-[#5A7B79]">{t("dashboard_description")}</p>
-      </header>
+    <div className="mx-auto w-full max-w-6xl px-5 py-8 md:px-10">
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Metric
           icon={<Users className="size-5 text-[#0D7773]" />}

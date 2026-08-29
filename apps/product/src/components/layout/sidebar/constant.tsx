@@ -48,8 +48,9 @@ export const menuItems: MenuItem[] = [
     activeIcon: ManageOutlineSvg,
     icon: ManageOutlineSvg,
     labelKey: "nav_manage",
-    href: "/manage",
-    isMatch: (pathname: string) => pathname.startsWith("/manage"),
+    href: "/lighthouse",
+    isMatch: (pathname: string) =>
+      pathname.startsWith("/lighthouse") || pathname.startsWith("/manage"),
   },
   {
     activeIcon: BellSolidSvg,

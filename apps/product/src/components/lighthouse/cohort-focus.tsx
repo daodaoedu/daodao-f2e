@@ -1,6 +1,6 @@
 "use client";
 
-import { useLighthouseCohort, useLighthouseFocus } from "@daodao/api";
+import { useLighthouseFocus } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { PartyPopper, Sparkles } from "lucide-react";
@@ -15,7 +15,6 @@ interface CohortFocusProps {
 export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
   const t = useTranslations("lighthouse");
   const [tab, setTab] = useState<"encouragement" | "celebrations">("encouragement");
-  const cohort = useLighthouseCohort(programId, cohortId).data?.data;
   const query = useLighthouseFocus(programId, cohortId);
   const data = query.data?.data;
   const items = tab === "encouragement" ? data?.needsEncouragement : data?.celebrations;
@@ -31,16 +30,8 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
     );
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-5 py-10 md:px-10">
-      <header>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#0D7773]">
-          {t("focus_eyebrow")}
-        </p>
-        <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em]">
-          {cohort?.displayName ?? t("cohort_nav_focus")}
-        </h1>
-        <p className="mt-3 text-[#5A7B79]">{t("focus_description")}</p>
-      </header>
+    <div className="mx-auto w-full max-w-5xl px-5 py-8 md:px-10">
+      <p className="text-[#5A7B79]">{t("focus_description")}</p>
       <div className="mt-8 flex gap-2 rounded-full bg-[#E7FAF7] p-1.5">
         <button
           type="button"

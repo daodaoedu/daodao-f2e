@@ -1,11 +1,7 @@
-import { useTranslations } from "@daodao/i18n";
+import { redirect } from "next/navigation";
 
-export default function ManagePage() {
-  const t = useTranslations("app_product");
-  return (
-    <div className="min-h-screen max-w-[640px] mx-auto px-4 pt-8 pb-[72px]">
-      <h1 className="text-xl font-semibold text-text-dark">{t("nav_manage")}</h1>
-      <p className="mt-2 text-sm text-light-gray">即將推出</p>
-    </div>
-  );
+/** 主頁 sidebar 的「管理」入口：燈塔就是管理模組（FRD 3.0），舊 /manage 網址一律導過去 */
+export default async function ManagePage({ params }: PageProps<"/[locale]/manage">) {
+  const { locale } = await params;
+  redirect(`/${locale}/lighthouse`);
 }

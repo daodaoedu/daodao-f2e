@@ -152,17 +152,7 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
     );
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-5 py-10 md:px-10">
-      <header>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#0D7773]">
-          {t("roster_eyebrow")}
-        </p>
-        <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em]">
-          {cohort?.displayName ?? t("roster_title")}
-        </h1>
-        <p className="mt-3 text-[#5A7B79]">{t("roster_description")}</p>
-      </header>
-
+    <div className="mx-auto w-full max-w-6xl px-5 py-8 md:px-10">
       <section className="mt-8 grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
         <form
           action={previewInvitations}
