@@ -150,21 +150,87 @@ export const lighthouseCohortEnrollmentsResponseSchema = apiSuccessSchema(
   )
 );
 
+const dateOnlySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const nonNegativeInt = z.number().int().nonnegative();
+/** 儀表板（FRD 3.3）：即時查詢，所有區塊都吃 practiceTitle / from / to 篩選 */
 export const lighthouseDashboardResponseSchema = apiSuccessSchema(
   z.object({
-    snapshotKind: z.enum(["weekly", "realtime"]),
     computedAt: z.string().datetime(),
-    rhythmHeatmap: z.record(z.string(), z.number().nonnegative()),
-    tagDistribution: z.array(z.object({ tag: z.string(), count: z.number().int().nonnegative() })),
-    commonBlockers: z.record(z.string(), z.number().int().nonnegative()),
-    funnel: z.object({
-      enrolled: z.number().int().nonnegative(),
-      activated: z.number().int().nonnegative(),
-      activeMembers: z.number().int().nonnegative(),
+    range: z.object({ from: dateOnlySchema, to: dateOnlySchema }),
+    practiceTitle: z.string().nullable(),
+    practices: z.array(
+      z.object({
+        title: z.string(),
+        startDate: z.string().nullable(),
+        endDate: z.string().nullable(),
+      })
+    ),
+    kpi: z.object({
+      enrolled: nonNegativeInt,
+      activated: nonNegativeInt,
+      activeThisWeek: nonNegativeInt,
     }),
-    timeRhythm: z.record(z.string(), z.number().int().nonnegative()),
-    checkins: z.number().int().nonnegative(),
-    exited: z.number().int().nonnegative(),
+    checkins: nonNegativeInt,
+    practiceOverview: z.array(
+      z.object({
+        title: z.string(),
+        startDate: z.string().nullable(),
+        endDate: z.string().nullable(),
+        startedCount: nonNegativeInt,
+        checkinCount: nonNegativeInt,
+        avgCheckinPeople: z.number().nonnegative(),
+        avgCheckinLength: nonNegativeInt,
+      })
+    ),
+    heatmap: z.record(z.string(), nonNegativeInt),
+    tagDistribution: z.array(z.object({ tag: z.string(), count: nonNegativeInt })),
+    moodDistribution: z.array(
+      z.object({
+        mood: z.enum(["happy", "good", "neutral", "bored", "frustrated", "give_up"]),
+        count: nonNegativeInt,
+      })
+    ),
+    trend: z.object({
+      days: z.array(z.object({ date: dateOnlySchema, count: nonNegativeInt })),
+      thisWeek: nonNegativeInt,
+      lastWeek: nonNegativeInt,
+      delta: z.number().int(),
+    }),
+    hourHistogram: z.record(z.string(), nonNegativeInt),
+  })
+);
+export type LighthouseDashboardQuery = { practiceTitle?: string; from?: string; to?: string };
+export type LighthouseParticipantsSort =
+  | "nickname"
+  | "startDate"
+  | "checkinCount"
+  | "commentCount"
+  | "viewCount"
+  | "reactionCount";
+export type LighthouseParticipantsQuery = LighthouseDashboardQuery & {
+  search?: string;
+  sort?: LighthouseParticipantsSort;
+  order?: "asc" | "desc";
+};
+/** 參與者明細表（FR-DB-09）：一列＝參與者 × 實踐 */
+export const lighthouseParticipantsResponseSchema = apiSuccessSchema(
+  z.object({
+    range: z.object({ from: dateOnlySchema, to: dateOnlySchema }),
+    total: nonNegativeInt,
+    items: z.array(
+      z.object({
+        userId: z.number().int(),
+        nickname: z.string().nullable(),
+        email: z.string().nullable(),
+        practiceId: z.number().int(),
+        practiceTitle: z.string(),
+        startDate: z.string().nullable(),
+        checkinCount: nonNegativeInt,
+        commentCount: nonNegativeInt,
+        viewCount: nonNegativeInt,
+        reactionCount: nonNegativeInt,
+      })
+    ),
   })
 );
 

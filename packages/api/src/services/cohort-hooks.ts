@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import type { z } from "zod";
 import { EMPTY_QUERY_INIT, useQuery } from "../hooks";
+import type { LighthouseDashboardQuery, LighthouseParticipantsQuery } from "./cohort";
 import {
   cohortJoinInfoResponseSchema,
   cohortMemberHomeResponseSchema,
@@ -19,6 +20,7 @@ import {
   lighthouseOrganizationMembersResponseSchema,
   lighthouseOrganizationResponseSchema,
   lighthouseOutcomeResponseSchema,
+  lighthouseParticipantsResponseSchema,
   lighthouseProgramListResponseSchema,
   lighthouseTemplatesResponseSchema,
   myCohortsResponseSchema,
@@ -112,12 +114,37 @@ export const useLighthouseCohortEnrollments = (programId?: number, cohortId?: nu
   return useValidatedResponse(query, lighthouseCohortEnrollmentsResponseSchema);
 };
 
-export const useLighthouseDashboard = (programId?: number, cohortId?: number) => {
-  const query = useQuery(
+const compactQuery = <T extends Record<string, unknown>>(query: T): Partial<T> =>
+  Object.fromEntries(
+    Object.entries(query).filter(([, value]) => value !== undefined && value !== "")
+  ) as Partial<T>;
+
+export const useLighthouseDashboard = (
+  programId?: number,
+  cohortId?: number,
+  query: LighthouseDashboardQuery = {}
+) => {
+  const result = useQuery(
     "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/dashboard",
-    programId && cohortId ? { params: { path: { programId, cohortId } } } : null
+    programId && cohortId
+      ? { params: { path: { programId, cohortId }, query: compactQuery(query) } }
+      : null
   );
-  return useValidatedResponse(query, lighthouseDashboardResponseSchema);
+  return useValidatedResponse(result, lighthouseDashboardResponseSchema);
+};
+
+export const useLighthouseParticipants = (
+  programId?: number,
+  cohortId?: number,
+  query: LighthouseParticipantsQuery = {}
+) => {
+  const result = useQuery(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants",
+    programId && cohortId
+      ? { params: { path: { programId, cohortId }, query: compactQuery(query) } }
+      : null
+  );
+  return useValidatedResponse(result, lighthouseParticipantsResponseSchema);
 };
 
 export const useLighthouseFocus = (programId?: number, cohortId?: number) => {
