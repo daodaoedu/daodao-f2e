@@ -7,7 +7,6 @@ import {
   cohortJoinInfoResponseSchema,
   cohortMemberHomeResponseSchema,
   learnerCohortFeedResponseSchema,
-  myCohortsResponseSchema,
   lighthouseCoachFeedResponseSchema,
   lighthouseCohortEnrollmentsResponseSchema,
   lighthouseCohortListResponseSchema,
@@ -15,12 +14,14 @@ import {
   lighthouseCohortResponseSchema,
   lighthouseDashboardResponseSchema,
   lighthouseFocusResponseSchema,
+  lighthouseOrganizationCohortListResponseSchema,
   lighthouseOrganizationListResponseSchema,
   lighthouseOrganizationMembersResponseSchema,
   lighthouseOrganizationResponseSchema,
   lighthouseOutcomeResponseSchema,
   lighthouseProgramListResponseSchema,
   lighthouseTemplatesResponseSchema,
+  myCohortsResponseSchema,
 } from "./cohort";
 
 function useValidatedResponse<TQuery extends { data?: unknown }, TSchema extends z.ZodTypeAny>(
@@ -68,6 +69,19 @@ export const useLighthouseCohorts = (programId?: number) => {
     programId ? { params: { path: { programId } } } : null
   );
   const validated = useValidatedResponse(query, lighthouseCohortListResponseSchema);
+  return {
+    ...validated,
+    cohorts: validated.data?.data,
+  };
+};
+
+/** 總覽卡片：組織底下所有場次（含草稿與封存），一次取回不必逐系列 N+1 */
+export const useLighthouseOrganizationCohorts = (organizationId?: number) => {
+  const query = useQuery(
+    "/api/v1/lighthouse/organizations/{organizationId}/cohorts",
+    organizationId ? { params: { path: { organizationId } } } : null
+  );
+  const validated = useValidatedResponse(query, lighthouseOrganizationCohortListResponseSchema);
   return {
     ...validated,
     cohorts: validated.data?.data,

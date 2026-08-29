@@ -76,7 +76,7 @@ export const lighthouseProgramSchema: z.ZodType<LighthouseProgramType> = z.objec
   updatedAt: nullableDateTimeSchema,
 });
 
-export const lighthouseCohortSchema: z.ZodType<LighthouseCohortType> = z.object({
+const lighthouseCohortShape = {
   id: z.number().int().positive(),
   programId: z.number().int().positive(),
   slug: z.string(),
@@ -91,7 +91,9 @@ export const lighthouseCohortSchema: z.ZodType<LighthouseCohortType> = z.object(
   status: z.enum(["draft", "published", "archived"]),
   createdAt: z.string().datetime(),
   updatedAt: nullableDateTimeSchema,
-});
+} satisfies z.ZodRawShape;
+export const lighthouseCohortSchema: z.ZodType<LighthouseCohortType> =
+  z.object(lighthouseCohortShape);
 
 export const lighthouseOrganizationListResponseSchema: z.ZodType<OrganizationListResponse> =
   apiSuccessSchema(z.array(lighthouseOrganizationSchema));
@@ -105,6 +107,20 @@ export const lighthouseCohortListResponseSchema: z.ZodType<CohortListResponse> =
 );
 
 export const lighthouseCohortResponseSchema = apiSuccessSchema(lighthouseCohortSchema);
+/** 總覽用：組織底下所有系列的全部場次，附系列名稱與已加入人數（FR-OV-02） */
+type OrganizationCohortListResponse =
+  paths["/api/v1/lighthouse/organizations/{organizationId}/cohorts"]["get"]["responses"][200]["content"]["application/json"];
+export const lighthouseOrganizationCohortSchema: z.ZodType<
+  OrganizationCohortListResponse["data"][number]
+> = z.object({
+  ...lighthouseCohortShape,
+  programName: z.string(),
+  joinedCount: z.number().int().nonnegative(),
+});
+export const lighthouseOrganizationCohortListResponseSchema = apiSuccessSchema(
+  z.array(lighthouseOrganizationCohortSchema)
+);
+export type LighthouseOrganizationCohortType = OrganizationCohortListResponse["data"][number];
 
 export const lighthouseCohortMembersResponseSchema = apiSuccessSchema(
   z.array(
@@ -400,6 +416,23 @@ export const updateLighthouseCohort = async (
 export const archiveLighthouseCohort = async (programId: number, cohortId: number) =>
   client.DELETE("/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}", {
     params: { path: { programId, cohortId } },
+  });
+
+/** 複製場次為草稿（含模板綁定，不含名單；FR-OV-03） */
+export const duplicateLighthouseCohort = async (programId: number, cohortId: number) =>
+  client.POST("/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/duplicate", {
+    params: { path: { programId, cohortId } },
+  });
+
+/** 重新開放透過連結加入；沿用原連結（FR-RS-02） */
+export const resumeLighthouseJoining = async (programId: number, cohortId: number) =>
+  client.POST("/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/join-token/resume", {
+    params: { path: { programId, cohortId } },
+  });
+
+export const getLighthouseOrganizationCohorts = async (organizationId: number) =>
+  client.GET("/api/v1/lighthouse/organizations/{organizationId}/cohorts", {
+    params: { path: { organizationId } },
   });
 
 export const inviteLighthouseCohortMembers = async (

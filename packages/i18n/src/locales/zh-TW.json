@@ -6945,44 +6945,20 @@
         "explorer": {
           "name": "探索者島",
           "description": "你是一位好奇心旺盛的探索者，喜歡嘗試新事物",
-          "traits": [
-            "好奇心強",
-            "勇於嘗試",
-            "獨立思考"
-          ],
-          "recommendations": [
-            "每日閱讀",
-            "程式學習",
-            "語言學習"
-          ]
+          "traits": ["好奇心強", "勇於嘗試", "獨立思考"],
+          "recommendations": ["每日閱讀", "程式學習", "語言學習"]
         },
         "creator": {
           "name": "創造者島",
           "description": "你擁有豐富的創造力，善於將想法付諸實踐",
-          "traits": [
-            "創意豐富",
-            "動手能力強",
-            "有藝術天賦"
-          ],
-          "recommendations": [
-            "寫作練習",
-            "藝術創作",
-            "設計學習"
-          ]
+          "traits": ["創意豐富", "動手能力強", "有藝術天賦"],
+          "recommendations": ["寫作練習", "藝術創作", "設計學習"]
         },
         "connector": {
           "name": "連結者島",
           "description": "你善於建立人際關係，喜歡與他人合作學習",
-          "traits": [
-            "善於溝通",
-            "團隊合作",
-            "同理心強"
-          ],
-          "recommendations": [
-            "社群活動",
-            "語言學習",
-            "團隊專案"
-          ]
+          "traits": ["善於溝通", "團隊合作", "同理心強"],
+          "recommendations": ["社群活動", "語言學習", "團隊專案"]
         }
       }
     },
@@ -7765,7 +7741,15 @@
     "sidebar_expand": "展開側邊欄",
     "cohort_back_to_programs": "返回系列與場次",
     "cohort_edit": "編輯場次設定",
-    "coming_soon": "{section} 還在規劃中。"
+    "coming_soon": "{section} 還在規劃中。",
+    "cohort_duplicate": "複製",
+    "cohort_duplicated": "已建立副本「{name}」（草稿）",
+    "cohort_duplicate_failed": "無法複製場次，請稍後再試",
+    "cohort_actions": "更多操作",
+    "overview_joined_count": "{count} 位已加入",
+    "overview_program_label": "系列",
+    "overview_empty": "還沒有任何場次，先到「系列與場次」建立一個。",
+    "confirm": "確定"
   },
   "cohort": {
     "loading": "載入中",

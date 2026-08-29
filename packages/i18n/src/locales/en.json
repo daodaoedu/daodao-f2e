@@ -6945,44 +6945,20 @@
         "explorer": {
           "name": "Explorer Island",
           "description": "You are a curious explorer who enjoys trying new things.",
-          "traits": [
-            "Curious",
-            "Willing to try",
-            "Independent thinker"
-          ],
-          "recommendations": [
-            "Daily reading",
-            "Coding practice",
-            "Language learning"
-          ]
+          "traits": ["Curious", "Willing to try", "Independent thinker"],
+          "recommendations": ["Daily reading", "Coding practice", "Language learning"]
         },
         "creator": {
           "name": "Creator Island",
           "description": "You are highly creative and good at turning ideas into action.",
-          "traits": [
-            "Creative",
-            "Hands-on",
-            "Artistic"
-          ],
-          "recommendations": [
-            "Writing practice",
-            "Art creation",
-            "Design learning"
-          ]
+          "traits": ["Creative", "Hands-on", "Artistic"],
+          "recommendations": ["Writing practice", "Art creation", "Design learning"]
         },
         "connector": {
           "name": "Connector Island",
           "description": "You build relationships easily and enjoy learning with others.",
-          "traits": [
-            "Communicative",
-            "Team-oriented",
-            "Empathetic"
-          ],
-          "recommendations": [
-            "Community activities",
-            "Language learning",
-            "Team projects"
-          ]
+          "traits": ["Communicative", "Team-oriented", "Empathetic"],
+          "recommendations": ["Community activities", "Language learning", "Team projects"]
         }
       }
     },
@@ -7765,7 +7741,15 @@
     "sidebar_expand": "Expand sidebar",
     "cohort_back_to_programs": "Back to programs & cohorts",
     "cohort_edit": "Edit cohort settings",
-    "coming_soon": "{section} is still being planned."
+    "coming_soon": "{section} is still being planned.",
+    "cohort_duplicate": "Duplicate",
+    "cohort_duplicated": "Copy “{name}” created as draft",
+    "cohort_duplicate_failed": "Could not duplicate the cohort",
+    "cohort_actions": "More actions",
+    "overview_joined_count": "{count} joined",
+    "overview_program_label": "Program",
+    "overview_empty": "No cohorts yet — create one under Programs & cohorts.",
+    "confirm": "Confirm"
   },
   "cohort": {
     "loading": "Loading",
