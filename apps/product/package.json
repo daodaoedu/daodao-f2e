@@ -2,6 +2,7 @@
   "name": "@daodao/product",
   "version": "0.0.0",
   "private": true,
+  "packageManager": "pnpm@10.20.0",
   "scripts": {
     "postinstall": "husky && pnpm typegen",
     "typegen": "next typegen",

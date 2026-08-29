@@ -154,6 +154,11 @@ export default function EventSpacePage() {
             <button
               type="button"
               onClick={() => {
+                // navigator.clipboard 在非安全上下文（http）或舊瀏覽器為 undefined，需先檢查
+                if (!navigator.clipboard?.writeText) {
+                  toast.error(t("copy_public_link"));
+                  return;
+                }
                 void navigator.clipboard
                   .writeText(`${window.location.origin}/spaces/public/${detail.publicToken}`)
                   .then(() => toast.success(t("link_copied")))
