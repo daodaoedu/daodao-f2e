@@ -264,6 +264,7 @@ export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
         cohortId={cohortId}
         practices={data.practices.map((practice) => practice.title)}
         defaultRange={data.range}
+        appliedRange={range}
         practiceTitle={practiceTitle}
       />
     </div>

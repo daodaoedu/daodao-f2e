@@ -179,7 +179,7 @@ export const lighthouseDashboardResponseSchema = apiSuccessSchema(
         startedCount: nonNegativeInt,
         checkinCount: nonNegativeInt,
         avgCheckinPeople: z.number().nonnegative(),
-        avgCheckinLength: nonNegativeInt,
+        avgCheckinLength: z.number().nonnegative(),
       })
     ),
     heatmap: z.record(z.string(), nonNegativeInt),

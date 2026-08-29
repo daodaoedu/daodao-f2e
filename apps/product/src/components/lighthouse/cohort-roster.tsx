@@ -256,7 +256,7 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
               variant="outline"
               className="border-[#CDEBE8] bg-white"
               onClick={copyJoinLink}
-              disabled={!joinUrl}
+              disabled={!joinUrl || !joinOpen}
             >
               <Copy className="size-4" aria-hidden="true" />
               {t("copy_link")}

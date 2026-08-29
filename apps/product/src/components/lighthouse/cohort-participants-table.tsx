@@ -19,6 +19,8 @@ interface CohortParticipantsTableProps {
   cohortId: number;
   practices: string[];
   defaultRange: { from: string; to: string };
+  /** 儀表板頂部套用的日期範圍（使用者改了範圍時，表格未另設就跟著用） */
+  appliedRange?: { from?: string; to?: string };
   /** 儀表板頂部的實踐 chip 同步套用（FR-DB-01） */
   practiceTitle?: string;
 }
@@ -63,6 +65,7 @@ export function CohortParticipantsTable({
   cohortId,
   practices,
   defaultRange,
+  appliedRange,
   practiceTitle,
 }: CohortParticipantsTableProps) {
   const t = useTranslations("lighthouse");
@@ -88,8 +91,8 @@ export function CohortParticipantsTable({
   const query = useLighthouseParticipants(programId, cohortId, {
     search: search || undefined,
     practiceTitle: practice === ALL ? undefined : practice,
-    from: from || undefined,
-    to: to || undefined,
+    from: from || appliedRange?.from || undefined,
+    to: to || appliedRange?.to || undefined,
     sort,
     order,
   });
@@ -163,7 +166,7 @@ export function CohortParticipantsTable({
         <Input
           type="date"
           aria-label={t("dashboard_range_from")}
-          value={from || defaultRange.from}
+          value={from || appliedRange?.from || defaultRange.from}
           onChange={(event) => setFrom(event.target.value)}
           className="h-9 w-[150px] text-xs"
         />
@@ -173,7 +176,7 @@ export function CohortParticipantsTable({
         <Input
           type="date"
           aria-label={t("dashboard_range_to")}
-          value={to || defaultRange.to}
+          value={to || appliedRange?.to || defaultRange.to}
           onChange={(event) => setTo(event.target.value)}
           className="h-9 w-[150px] text-xs"
         />

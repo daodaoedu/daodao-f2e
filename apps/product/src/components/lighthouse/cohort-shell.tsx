@@ -22,6 +22,7 @@ export function CohortShell({ programId, cohortId, children }: CohortShellProps)
   const base = `/lighthouse/programs/${programId}/cohorts/${cohortId}`;
   const cohort = useLighthouseCohort(programId, cohortId);
   const cohortName = cohort.data?.data.displayName;
+  const isArchived = cohort.data?.data.status === "archived";
 
   return (
     <div>
@@ -62,14 +63,16 @@ export function CohortShell({ programId, cohortId, children }: CohortShellProps)
           <h1 className="text-2xl font-semibold tracking-[-0.04em] md:text-3xl">
             {cohortName ?? (cohort.isLoading ? t("loading") : t("cohorts_title"))}
           </h1>
-          <CustomLink
-            href={`/lighthouse/programs?edit=${cohortId}#cohort-${cohortId}`}
-            aria-label={t("cohort_edit")}
-            title={t("cohort_edit")}
-            className="grid size-8 place-items-center rounded-full border border-[#CDEBE8] bg-white text-[#0D7773] hover:bg-[#EDF8F6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan"
-          >
-            <Pencil className="size-3.5" aria-hidden="true" />
-          </CustomLink>
+          {!isArchived && (
+            <CustomLink
+              href={`/lighthouse/programs?edit=${cohortId}#cohort-${cohortId}`}
+              aria-label={t("cohort_edit")}
+              title={t("cohort_edit")}
+              className="grid size-8 place-items-center rounded-full border border-[#CDEBE8] bg-white text-[#0D7773] hover:bg-[#EDF8F6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan"
+            >
+              <Pencil className="size-3.5" aria-hidden="true" />
+            </CustomLink>
+          )}
         </div>
       </header>
 
