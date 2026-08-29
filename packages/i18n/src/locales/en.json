@@ -7749,7 +7749,17 @@
     "overview_joined_count": "{count} joined",
     "overview_program_label": "Program",
     "overview_empty": "No cohorts yet — create one under Programs & cohorts.",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "joining_resume": "Reopen joining",
+    "joining_resumed": "Joining reopened with the same link",
+    "roster_summary": "{count} joined · {pending} pending",
+    "roster_summary_no_pending": "{count} joined",
+    "joined_on": "joined {date}",
+    "preview_state_new": "New",
+    "preview_state_invited": "Already invited",
+    "preview_state_joined": "Already joined",
+    "preview_state_rejoin": "Left before, will re-invite",
+    "preview_state_invalid": "Invalid email"
   },
   "cohort": {
     "loading": "Loading",

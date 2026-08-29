@@ -7599,7 +7599,7 @@
     "enrollment_role_owner": "帶領人",
     "enrollment_role_assistant": "共同管理者",
     "enrollment_role_member": "參與者",
-    "enrollment_status_invited": "已邀請",
+    "enrollment_status_invited": "待確認",
     "enrollment_status_joined": "已加入",
     "enrollment_status_exited": "已退出",
     "enrollment_status_removed": "已移除",
@@ -7749,7 +7749,17 @@
     "overview_joined_count": "{count} 位已加入",
     "overview_program_label": "系列",
     "overview_empty": "還沒有任何場次，先到「系列與場次」建立一個。",
-    "confirm": "確定"
+    "confirm": "確定",
+    "joining_resume": "重新開放加入",
+    "joining_resumed": "已重新開放透過連結加入，沿用原連結",
+    "roster_summary": "{count} 人・{pending} 位待回覆邀請",
+    "roster_summary_no_pending": "{count} 人",
+    "joined_on": "{date} 加入",
+    "preview_state_new": "新邀請",
+    "preview_state_invited": "已邀請",
+    "preview_state_joined": "已加入",
+    "preview_state_rejoin": "曾退出，將重新邀請",
+    "preview_state_invalid": "格式錯誤"
   },
   "cohort": {
     "loading": "載入中",
