@@ -28,7 +28,15 @@ jobs:
           git cat-file -e "$BASE_SHA^{commit}"
           git cat-file -e "$HEAD_SHA^{commit}"
           MERGE_BASE="$(git merge-base "$BASE_SHA" "$HEAD_SHA")"
-          git diff "$MERGE_BASE..$HEAD_SHA" -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.py' '*.sql' '*.sh' '*.yml' '*.yaml' '*.json' '*.toml' '*.conf' > "$FULL_DIFF"
+          # 生成物與 lockfile 不進 review：review diff 只有 12000 bytes 上限，openapi.json /
+          # generated/openapi-types.ts 動輒數萬行，會把真正的程式碼變更全部擠掉，模型只看到生成物
+          # 就寫出對不上 diff 的檔案欄，整份 review 被丟掉。--stat 一併排除，避免摘要仍被生成物占滿。
+          GENERATED_EXCLUDES=(
+            ':(exclude,glob)**/openapi.json' ':(exclude,glob)**/openapi.yaml'
+            ':(exclude,glob)**/generated/**' ':(exclude,glob)**/packages/api/src/types.ts'
+            ':(exclude,glob)**/pnpm-lock.yaml' ':(exclude,glob)**/package-lock.json' ':(exclude,glob)**/yarn.lock'
+          )
+          git diff "$MERGE_BASE..$HEAD_SHA" -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.py' '*.sql' '*.sh' '*.yml' '*.yaml' '*.json' '*.toml' '*.conf' "${GENERATED_EXCLUDES[@]}" > "$FULL_DIFF"
           LC_ALL=C awk -v cap=12000 '
             { bytes = length($0) + 1 }
             !full && used + bytes <= cap { print; used += bytes; next }
@@ -37,7 +45,7 @@ jobs:
           if [ "$(wc -c < "$FULL_DIFF" | tr -d ' ')" -gt "$(wc -c < "$REVIEW_DIFF" | tr -d ' ')" ]; then
             printf '\n[Diff truncated at a complete line after 12000 bytes]\n' >> "$REVIEW_DIFF"
           fi
-          git diff "$MERGE_BASE..$HEAD_SHA" --stat | tail -5 > "$RUNNER_TEMP/review-stat.txt"
+          git diff "$MERGE_BASE..$HEAD_SHA" --stat -- . "${GENERATED_EXCLUDES[@]}" | tail -5 > "$RUNNER_TEMP/review-stat.txt"
 
       - name: Build deterministic context pack
         env:
@@ -253,12 +261,15 @@ jobs:
                 .replace(/中/, "Medium")
                 .replace(/低|輕微/, "Low")} `;
               const rawFile = cells[2].trim();
-              const hadBackticks = /^`.*`$/.test(rawFile);
-              let file = rawFile
-                .replace(/^`|`$/g, "")
-                .replace(/\s+/g, "")
+              const hadBackticks = rawFile.startsWith("`");
+              // 只取開頭的路徑 token：fallback 模型會寫成 `path` (新增的 …) 或 path:≈+200(…)，
+              // 括號、空白之後的說明與非數字的行號尾巴全部丟掉，讓下面的行號補全有機會救回來。
+              let file = rawFile.replace(/`/g, "").trim();
+              file = (file.match(/^[^\s(（]+/) || [file])[0]
                 .replace(/:L(\d)/, ":$1")
                 .replace(/:(\d+)[-–—,~](\d+)$/, ":$1");
+              const colon = file.indexOf(":");
+              if (colon !== -1 && !/^:\d+$/.test(file.slice(colon))) file = file.slice(0, colon);
               if (file && !/:\d+$/.test(file)) {
                 const location = resolveLocation(file);
                 if (location !== null) file = `${location.path}:${location.line}`;
