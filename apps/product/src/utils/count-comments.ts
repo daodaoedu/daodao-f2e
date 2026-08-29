@@ -1,7 +1,7 @@
 import {
   type ApiCommentNode,
   isApiCommentNode,
-} from "@/components/check-in/display/check-in-detail";
+} from "@/components/check-in/display/api-comment-node";
 
 export function countTotalComments(comments: ApiCommentNode[]): number {
   return comments.reduce((total, comment) => {

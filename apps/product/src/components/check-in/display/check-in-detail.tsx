@@ -49,9 +49,12 @@ import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
 import { countTotalComments } from "@/utils/count-comments";
 import { formatRelativeTime } from "@/utils/format-time";
 import type { ICheckInDisplayData, ICheckInFormData } from "../types";
+import { type ApiCommentNode, isApiCommentNode } from "./api-comment-node";
 import { CheckInCard } from "./check-in-card";
 
 export type { ICheckInDisplayData as CheckInData };
+export type { ApiCommentNode } from "./api-comment-node";
+export { isApiCommentNode } from "./api-comment-node";
 
 interface ICheckInDetailProps {
   checkInData: ICheckInDisplayData;
@@ -92,24 +95,6 @@ export function formatCommentTime(createdAt?: string, options: CommentFormatOpti
   const parsed = parseISO(createdAt);
   if (!isValid(parsed)) return justNowLabel;
   return formatDistanceToNow(parsed, { addSuffix: true, locale });
-}
-
-export type ApiCommentNode = {
-  id: number | string;
-  userId?: number | null;
-  content?: string | null;
-  createdAt?: string;
-  replies?: unknown[];
-  user?: {
-    id?: string | null;
-    name?: string | null;
-    photoURL?: string | null;
-    customId?: string | null;
-  } | null;
-};
-
-export function isApiCommentNode(v: unknown): v is ApiCommentNode {
-  return typeof v === "object" && v !== null && "id" in v;
 }
 
 export function mapReply(reply: ApiCommentNode, options: CommentFormatOptions = {}): ICommentReply {
