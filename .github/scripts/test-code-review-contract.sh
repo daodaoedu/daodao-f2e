@@ -136,6 +136,63 @@ if run_validator is_valid_review "$UNKNOWN_SEVERITY_FINDING"; then
   fail "strict validator accepted an unsupported finding severity"
 fi
 
+# 修復器：檔案欄漏寫 :line 時，從完整 diff 補第一個新增行；diff 裡沒有的檔案原樣保留
+extract_repair_script() {
+  awk '
+    /REPAIR_DIFF_FILE="\$RUNNER_TEMP\/review-full.diff" node -e '"'"'$/ { capture = 1; next }
+    capture && /^          '"'"'$/ { exit }
+    capture { print }
+  ' "$WORKFLOW"
+}
+REPAIR_SCRIPT="$(extract_repair_script)"
+[ -n "$REPAIR_SCRIPT" ] || fail "repair script not found in workflow"
+REPAIR_TMP=$(mktemp -d)
+cat > "$REPAIR_TMP/review-full.diff" <<'DIFF'
+diff --git a/src/auth.ts b/src/auth.ts
+--- a/src/auth.ts
++++ b/src/auth.ts
+@@ -38,4 +38,6 @@ export function check() {
+   const a = 1;
+-  const b = 2;
++  const b = 3;
++  const c = 4;
+   return a;
+ }
+diff --git a/migrate/sql/083_new.sql b/migrate/sql/083_new.sql
+new file mode 100644
+--- /dev/null
++++ b/migrate/sql/083_new.sql
+@@ -0,0 +1,2 @@
++ALTER TABLE practices DROP CONSTRAINT x;
++ALTER TABLE practices ADD CONSTRAINT y CHECK (1 = 1);
+DIFF
+cat > "$REPAIR_TMP/review-body.tabled" <<'BODY'
+## Code Review
+
+### 問題
+
+| 嚴重度 | 檔案 | 問題 | 建議 |
+|---|---|---|---|
+| 🔴 High | `src/auth.ts` | 權限檢查可被繞過 | 補上檢查 |
+| 🟡 Medium | `083_new.sql` | 缺少守衛 | 補上 |
+| 🟢 Low | `src/auth.ts:12-15` | 命名 | 改名 |
+| 🟢 Low | `src/missing.ts` | 不在 diff | 略 |
+
+### 總結
+
+需要修正。
+BODY
+REPAIR_INPUT_FILE="$REPAIR_TMP/review-body.tabled" REPAIR_DIFF_FILE="$REPAIR_TMP/review-full.diff" node -e "$REPAIR_SCRIPT"
+REPAIRED="$(cat "$REPAIR_TMP/review-body.normalized")"
+rm -rf "$REPAIR_TMP"
+printf '%s\n' "$REPAIRED" | grep -Fq '| `src/auth.ts:39` |' || fail "repair did not resolve a bare path to its first added line"
+printf '%s\n' "$REPAIRED" | grep -Fq '| `migrate/sql/083_new.sql:1` |' || fail "repair did not resolve a bare basename via unique suffix match"
+printf '%s\n' "$REPAIRED" | grep -Fq '| `src/auth.ts:12` |' || fail "repair broke the existing line-range normalization"
+printf '%s\n' "$REPAIRED" | grep -Fq '| `src/missing.ts` |' || fail "repair invented a line for a file outside the diff"
+if run_validator is_valid_review "$REPAIRED"; then
+  fail "strict validator accepted a repaired table that still has an unverifiable file cell"
+fi
+
 grep -Fq '純刪除 authentication、authorization、validation 或 safety guard' "$WORKFLOW" \
   || fail "review prompt does not require deletion-only guard regression findings"
 grep -Fq '每一列 finding 的檔案欄都必須是可核對的 path:line' "$WORKFLOW" \
@@ -156,9 +213,10 @@ STRICT_LINE=$(grep -n 'if ! is_valid_review "\$BODY"' "$WORKFLOW" | head -1 | cu
 grep -q '<!-- daodao-ai-code-review -->' "$WORKFLOW" || fail "review marker is missing"
 grep -q '<!-- daodao-ai-code-review-head:\$HEAD_SHA -->' "$WORKFLOW" || fail "head-specific review marker is missing"
 grep -Fq "grep -Eq '^[0-9a-f]{40}$'" "$WORKFLOW" || fail "head marker does not enforce the consumer's exact SHA contract"
-grep -q 'contains(\\\"\$HEAD_MARKER\\\")' "$WORKFLOW" || fail "comment lookup does not use the exact head marker"
-grep -Fq '.user.login == \"github-actions[bot]\"' "$WORKFLOW" || fail "comment lookup does not verify marker ownership"
-if grep -q 'select(.body | startswith(\"## Code Review\"))' "$WORKFLOW"; then
+grep -Fq -- '--arg marker "$HEAD_MARKER"' "$WORKFLOW" || fail "comment lookup does not pass the exact head marker to jq"
+grep -Fq 'contains($marker)' "$WORKFLOW" || fail "comment lookup does not use the exact head marker"
+grep -Fq '.user.login == "github-actions[bot]"' "$WORKFLOW" || fail "comment lookup does not verify marker ownership"
+if grep -Fq 'select(.body | startswith("## Code Review"))' "$WORKFLOW"; then
   fail "comment lookup still claims unmarked Code Review comments"
 fi
 
