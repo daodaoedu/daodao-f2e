@@ -6,10 +6,12 @@ import MarkdownRenderer from "@daodao/ui/components/markdown-renderer";
 import { CalendarDays, FolderOpen, Link2, MapPin } from "lucide-react";
 import { Fragment } from "react";
 import { formatEventDate, groupEventsByMonth } from "@/utils/space-calendar";
+import { hostMatches, parseUrl } from "@/utils/space-link-name";
 
 /** Link pill label: Google Meet gets its own name, everything else 線上連結 (FR-9.2). */
 function linkPillLabel(url: string, onlineLinkText: string): string {
-  return url.includes("meet.google.com") ? "Google Meet" : onlineLinkText;
+  const host = parseUrl(url)?.hostname;
+  return host && hostMatches(host, "meet.google.com") ? "Google Meet" : onlineLinkText;
 }
 
 interface SpaceBlockViewProps {

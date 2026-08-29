@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { groupEventsByMonth } from "@/utils/space-calendar";
-import { autoNameForUrl } from "@/utils/space-link-name";
+import { autoNameForUrl, hostMatches } from "@/utils/space-link-name";
 
 describe("autoNameForUrl (FR-8.4/8.5)", () => {
   it("maps well-known services to readable names", () => {
@@ -8,6 +8,14 @@ describe("autoNameForUrl (FR-8.4/8.5)", () => {
     expect(autoNameForUrl("https://meet.google.com/abc-defg-hij")).toBe("Google Meet");
     expect(autoNameForUrl("https://www.notion.so/workspace/page")).toBe("Notion");
     expect(autoNameForUrl("https://youtu.be/xyz")).toBe("YouTube");
+  });
+
+  it("matches services on the hostname only, not on URL substrings", () => {
+    expect(autoNameForUrl("https://evil.com/?next=hackmd.io")).toBe("evil.com");
+    expect(autoNameForUrl("https://hackmd.io.evil.com/note")).toBe("note");
+    expect(autoNameForUrl("https://evil.com/meet.google.com/abc")).toBe("abc");
+    expect(autoNameForUrl("https://docs.google.com/other/thing")).toBe("thing");
+    expect(autoNameForUrl("https://team.notion.site/page")).toBe("Notion");
   });
 
   it("annotates PDF links (FR-8.5)", () => {
@@ -19,6 +27,20 @@ describe("autoNameForUrl (FR-8.4/8.5)", () => {
   it("falls back to a cleaned filename, then the domain", () => {
     expect(autoNameForUrl("https://example.com/reading-list_2026")).toBe("reading list 2026");
     expect(autoNameForUrl("https://www.example.com/")).toBe("example.com");
+  });
+});
+
+describe("hostMatches", () => {
+  it("accepts the domain itself and its subdomains", () => {
+    expect(hostMatches("meet.google.com", "meet.google.com")).toBe(true);
+    expect(hostMatches("www.notion.so", "notion.so")).toBe(true);
+    expect(hostMatches("MEET.GOOGLE.COM", "meet.google.com")).toBe(true);
+  });
+
+  it("rejects look-alike hosts", () => {
+    expect(hostMatches("meet.google.com.evil.com", "meet.google.com")).toBe(false);
+    expect(hostMatches("notmeet.google.com", "meet.google.com")).toBe(false);
+    expect(hostMatches("evil.com", "meet.google.com")).toBe(false);
   });
 });
 
