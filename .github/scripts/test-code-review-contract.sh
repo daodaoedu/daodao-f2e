@@ -136,6 +136,99 @@ if run_validator is_valid_review "$UNKNOWN_SEVERITY_FINDING"; then
   fail "strict validator accepted an unsupported finding severity"
 fi
 
+# review diff 必須排除生成物與 lockfile，否則 12000 bytes 的上限會被 openapi 生成物占滿
+for excluded in 'openapi.json' 'openapi.yaml' 'generated/**' 'pnpm-lock.yaml'; do
+  grep -Fq ":(exclude,glob)**/$excluded" "$WORKFLOW" || fail "review diff does not exclude generated file $excluded"
+done
+grep -Fq -- '--stat -- . "${GENERATED_EXCLUDES[@]}"' "$WORKFLOW" || fail "review stat does not apply the generated-file excludes"
+EXCLUDE_TMP=$(mktemp -d)
+(
+  cd "$EXCLUDE_TMP" && git init -q && git config user.email t@t && git config user.name t
+  mkdir -p src generated && printf 'a\n' > src/a.ts && printf '{}\n' > openapi.json && printf 'x\n' > generated/types.ts
+  git add -A && git commit -qm base
+  printf 'b\n' > src/a.ts && printf '{"x":1}\n' > openapi.json && printf 'y\n' > generated/types.ts
+  git add -A && git commit -qm change
+  git diff HEAD~1..HEAD -- '*.ts' '*.json' ':(exclude,glob)**/openapi.json' ':(exclude,glob)**/generated/**' > diff.txt
+  grep -q 'src/a.ts' diff.txt || { echo "exclude pathspec dropped real source"; exit 1; }
+  ! grep -q 'openapi.json\|generated/types.ts' diff.txt || { echo "exclude pathspec kept generated files"; exit 1; }
+) || fail "generated-file exclude pathspec does not behave as expected"
+rm -rf "$EXCLUDE_TMP"
+
+# 修復器：檔案欄漏寫 :line 時，從完整 diff 補第一個新增行；diff 裡沒有的檔案原樣保留
+extract_repair_script() {
+  awk '
+    /REPAIR_DIFF_FILE="\$RUNNER_TEMP\/review-full.diff" node -e '"'"'$/ { capture = 1; next }
+    capture && /^          '"'"'$/ { exit }
+    capture { print }
+  ' "$WORKFLOW"
+}
+REPAIR_SCRIPT="$(extract_repair_script)"
+[ -n "$REPAIR_SCRIPT" ] || fail "repair script not found in workflow"
+REPAIR_TMP=$(mktemp -d)
+cat > "$REPAIR_TMP/review-full.diff" <<'DIFF'
+diff --git a/src/auth.ts b/src/auth.ts
+--- a/src/auth.ts
++++ b/src/auth.ts
+@@ -38,4 +38,6 @@ export function check() {
+   const a = 1;
+-  const b = 2;
++  const b = 3;
++  const c = 4;
+   return a;
+ }
+diff --git a/migrate/sql/083_new.sql b/migrate/sql/083_new.sql
+new file mode 100644
+--- /dev/null
++++ b/migrate/sql/083_new.sql
+@@ -0,0 +1,2 @@
++ALTER TABLE practices DROP CONSTRAINT x;
++ALTER TABLE practices ADD CONSTRAINT y CHECK (1 = 1);
+DIFF
+cat > "$REPAIR_TMP/review-body.tabled" <<'BODY'
+## Code Review
+
+### 問題
+
+| 嚴重度 | 檔案 | 問題 | 建議 |
+|---|---|---|---|
+| 🔴 High | `src/auth.ts` | 權限檢查可被繞過 | 補上檢查 |
+| 🟡 Medium | `083_new.sql` | 缺少守衛 | 補上 |
+| 🟢 Low | `src/auth.ts:12-15` | 命名 | 改名 |
+| 🟢 Low | `src/missing.ts` | 不在 diff | 略 |
+| 🟡 Medium | `src/auth.ts` (新增的 check 函式) | 括號說明 | 略 |
+| 🟡 Medium | src/auth.ts:≈+40(新增的 check) | 非數字行號尾巴 | 略 |
+
+### 總結
+
+需要修正。
+BODY
+REPAIR_INPUT_FILE="$REPAIR_TMP/review-body.tabled" REPAIR_DIFF_FILE="$REPAIR_TMP/review-full.diff" node -e "$REPAIR_SCRIPT"
+REPAIRED="$(cat "$REPAIR_TMP/review-body.normalized")"
+rm -rf "$REPAIR_TMP"
+printf '%s\n' "$REPAIRED" | grep -Fq '| `src/auth.ts:39` |' || fail "repair did not resolve a bare path to its first added line"
+printf '%s\n' "$REPAIRED" | grep -Fq '| `migrate/sql/083_new.sql:1` |' || fail "repair did not resolve a bare basename via unique suffix match"
+printf '%s\n' "$REPAIRED" | grep -Fq '| `src/auth.ts:12` |' || fail "repair broke the existing line-range normalization"
+[ "$(printf '%s\n' "$REPAIRED" | grep -Fc '| `src/auth.ts:39` |')" -eq 2 ] || fail "repair did not strip a parenthesised explanation after the path token"
+printf '%s\n' "$REPAIRED" | grep -Fq '| src/auth.ts:39 |' || fail "repair did not strip a non-numeric line suffix like :≈+40(…)"
+printf '%s\n' "$REPAIRED" | grep -Fq '| `src/missing.ts` |' || fail "repair invented a line for a file outside the diff"
+if run_validator is_valid_review "$REPAIRED"; then
+  fail "strict validator accepted a repaired table that still has an unverifiable file cell"
+fi
+
+# 誤判知識庫：CI 與本機 skill 共用同一份 jsonl 與腳本；CI 從 base ref 載入、filter 在 strict validator 之前
+KNOWLEDGE="$SCRIPT_DIR/review-knowledge.cjs"
+[ -f "$KNOWLEDGE" ] || fail "review-knowledge.cjs missing"
+node "$KNOWLEDGE" test --db "$SCRIPT_DIR/../review-knowledge/false-positives.jsonl" >/dev/null || fail "review-knowledge fixtures failed"
+grep -Fq 'git show "$BASE_SHA:.github/scripts/review-knowledge.cjs"' "$WORKFLOW" \
+  || fail "workflow does not load review-knowledge from the trusted base"
+grep -Fq -- '--rawfile known_fp "$RUNNER_TEMP/known-fp.md"' "$WORKFLOW" \
+  || fail "review prompt does not receive the known false-positive block"
+FILTER_LINE=$(grep -n 'review-knowledge.cjs" filter' "$WORKFLOW" | head -1 | cut -d: -f1)
+STRICT_LINE_FOR_FILTER=$(grep -n 'if ! is_valid_review "\$BODY"' "$WORKFLOW" | head -1 | cut -d: -f1)
+[ -n "$FILTER_LINE" ] && [ "$FILTER_LINE" -lt "$STRICT_LINE_FOR_FILTER" ] \
+  || fail "review-knowledge filter does not run before strict validation"
+grep -Fq 'review-knowledge.cjs' "$SKILL" || fail "manual review skill does not consume the shared review-knowledge"
+
 grep -Fq '純刪除 authentication、authorization、validation 或 safety guard' "$WORKFLOW" \
   || fail "review prompt does not require deletion-only guard regression findings"
 grep -Fq '每一列 finding 的檔案欄都必須是可核對的 path:line' "$WORKFLOW" \
@@ -156,9 +249,10 @@ STRICT_LINE=$(grep -n 'if ! is_valid_review "\$BODY"' "$WORKFLOW" | head -1 | cu
 grep -q '<!-- daodao-ai-code-review -->' "$WORKFLOW" || fail "review marker is missing"
 grep -q '<!-- daodao-ai-code-review-head:\$HEAD_SHA -->' "$WORKFLOW" || fail "head-specific review marker is missing"
 grep -Fq "grep -Eq '^[0-9a-f]{40}$'" "$WORKFLOW" || fail "head marker does not enforce the consumer's exact SHA contract"
-grep -q 'contains(\\\"\$HEAD_MARKER\\\")' "$WORKFLOW" || fail "comment lookup does not use the exact head marker"
-grep -Fq '.user.login == \"github-actions[bot]\"' "$WORKFLOW" || fail "comment lookup does not verify marker ownership"
-if grep -q 'select(.body | startswith(\"## Code Review\"))' "$WORKFLOW"; then
+grep -Fq -- '--arg marker "$HEAD_MARKER"' "$WORKFLOW" || fail "comment lookup does not pass the exact head marker to jq"
+grep -Fq 'contains($marker)' "$WORKFLOW" || fail "comment lookup does not use the exact head marker"
+grep -Fq '.user.login == "github-actions[bot]"' "$WORKFLOW" || fail "comment lookup does not verify marker ownership"
+if grep -Fq 'select(.body | startswith("## Code Review"))' "$WORKFLOW"; then
   fail "comment lookup still claims unmarked Code Review comments"
 fi
 
