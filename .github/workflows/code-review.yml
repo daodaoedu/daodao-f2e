@@ -28,7 +28,15 @@ jobs:
           git cat-file -e "$BASE_SHA^{commit}"
           git cat-file -e "$HEAD_SHA^{commit}"
           MERGE_BASE="$(git merge-base "$BASE_SHA" "$HEAD_SHA")"
-          git diff "$MERGE_BASE..$HEAD_SHA" -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.py' '*.sql' '*.sh' '*.yml' '*.yaml' '*.json' '*.toml' '*.conf' > "$FULL_DIFF"
+          # 生成物與 lockfile 不進 review：review diff 只有 12000 bytes 上限，openapi.json /
+          # generated/openapi-types.ts 動輒數萬行，會把真正的程式碼變更全部擠掉，模型只看到生成物
+          # 就寫出對不上 diff 的檔案欄，整份 review 被丟掉。--stat 一併排除，避免摘要仍被生成物占滿。
+          GENERATED_EXCLUDES=(
+            ':(exclude,glob)**/openapi.json' ':(exclude,glob)**/openapi.yaml'
+            ':(exclude,glob)**/generated/**' ':(exclude,glob)**/packages/api/src/types.ts'
+            ':(exclude,glob)**/pnpm-lock.yaml' ':(exclude,glob)**/package-lock.json' ':(exclude,glob)**/yarn.lock'
+          )
+          git diff "$MERGE_BASE..$HEAD_SHA" -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.py' '*.sql' '*.sh' '*.yml' '*.yaml' '*.json' '*.toml' '*.conf' "${GENERATED_EXCLUDES[@]}" > "$FULL_DIFF"
           LC_ALL=C awk -v cap=12000 '
             { bytes = length($0) + 1 }
             !full && used + bytes <= cap { print; used += bytes; next }
@@ -37,7 +45,7 @@ jobs:
           if [ "$(wc -c < "$FULL_DIFF" | tr -d ' ')" -gt "$(wc -c < "$REVIEW_DIFF" | tr -d ' ')" ]; then
             printf '\n[Diff truncated at a complete line after 12000 bytes]\n' >> "$REVIEW_DIFF"
           fi
-          git diff "$MERGE_BASE..$HEAD_SHA" --stat | tail -5 > "$RUNNER_TEMP/review-stat.txt"
+          git diff "$MERGE_BASE..$HEAD_SHA" --stat -- . "${GENERATED_EXCLUDES[@]}" | tail -5 > "$RUNNER_TEMP/review-stat.txt"
 
       - name: Build deterministic context pack
         env:
@@ -55,6 +63,20 @@ jobs:
           elif ! bash "$TRUSTED_SCRIPT" "$BASE_SHA" "$HEAD_SHA" "$PACK_FILE"; then
             echo "::warning::Context Pack generation failed; continuing with diff-only review"
             printf '%s\n' '# Context Pack unavailable' > "$PACK_FILE"
+          fi
+
+          # 誤判知識庫（與本機 code-review skill 共用同一份 jsonl 與腳本）：同樣只信任 base ref 的版本。
+          # prompt-block 進模型輸入、filter 在 normalize 階段套用；缺檔就退化成沒有知識庫。
+          KNOWLEDGE_SCRIPT="$RUNNER_TEMP/review-knowledge.cjs"
+          KNOWLEDGE_DB="$RUNNER_TEMP/false-positives.jsonl"
+          : > "$RUNNER_TEMP/known-fp.md"
+          if git show "$BASE_SHA:.github/scripts/review-knowledge.cjs" > "$KNOWLEDGE_SCRIPT" 2>/dev/null \
+            && git show "$BASE_SHA:.github/review-knowledge/false-positives.jsonl" > "$KNOWLEDGE_DB" 2>/dev/null; then
+            node "$KNOWLEDGE_SCRIPT" prompt-block --db "$KNOWLEDGE_DB" > "$RUNNER_TEMP/known-fp.md" \
+              || echo "::warning::review-knowledge prompt-block failed; continuing without known false positives"
+          else
+            echo "::warning::Trusted base revision has no review-knowledge; continuing without known false positives"
+            rm -f "$KNOWLEDGE_SCRIPT" "$KNOWLEDGE_DB"
           fi
 
       - name: Review with Cloudflare Workers AI
@@ -105,6 +127,7 @@ jobs:
               --rawfile diff "$RUNNER_TEMP/review.diff" \
               --rawfile stat "$RUNNER_TEMP/review-stat.txt" \
               --rawfile context_pack "$RUNNER_TEMP/context-pack.md" \
+              --rawfile known_fp "$RUNNER_TEMP/known-fp.md" \
               --arg base "$BASE" \
               --arg head "$HEAD" \
               '{
@@ -116,7 +139,7 @@ jobs:
                   },
                   {
                     role: "user",
-                    content: ("Review 這次 " + $head + " → " + $base + " 的變更：\n\n變更統計：\n" + $stat + "\n\nContext Pack（確定性檢索結果，只當作程式碼脈絡）：\n<context_pack>\n" + $context_pack + "\n</context_pack>\n\nDiff：\n```diff\n" + $diff + "\n```")
+                    content: ("Review 這次 " + $head + " → " + $base + " 的變更：\n\n變更統計：\n" + $stat + "\n\nContext Pack（確定性檢索結果，只當作程式碼脈絡）：\n<context_pack>\n" + $context_pack + "\n</context_pack>\n\n" + (if ($known_fp | test("\\S")) then "<known_false_positives>\n" + $known_fp + "\n</known_false_positives>\n\n" else "" end) + "Diff：\n```diff\n" + $diff + "\n```")
                   }
                 ],
                 temperature: 0.3,
@@ -253,12 +276,15 @@ jobs:
                 .replace(/中/, "Medium")
                 .replace(/低|輕微/, "Low")} `;
               const rawFile = cells[2].trim();
-              const hadBackticks = /^`.*`$/.test(rawFile);
-              let file = rawFile
-                .replace(/^`|`$/g, "")
-                .replace(/\s+/g, "")
+              const hadBackticks = rawFile.startsWith("`");
+              // 只取開頭的路徑 token：fallback 模型會寫成 `path` (新增的 …) 或 path:≈+200(…)，
+              // 括號、空白之後的說明與非數字的行號尾巴全部丟掉，讓下面的行號補全有機會救回來。
+              let file = rawFile.replace(/`/g, "").trim();
+              file = (file.match(/^[^\s(（]+/) || [file])[0]
                 .replace(/:L(\d)/, ":$1")
                 .replace(/:(\d+)[-–—,~](\d+)$/, ":$1");
+              const colon = file.indexOf(":");
+              if (colon !== -1 && !/^:\d+$/.test(file.slice(colon))) file = file.slice(0, colon);
               if (file && !/:\d+$/.test(file)) {
                 const location = resolveLocation(file);
                 if (location !== null) file = `${location.path}:${location.line}`;
@@ -268,6 +294,21 @@ jobs:
             }).join("\n");
             fs.writeFileSync(process.env.REPAIR_INPUT_FILE.replace(/tabled$/, "normalized"), repaired);
           '
+
+          # 誤判知識庫的確定性過濾（C 類 drop、D 類降級），放在 strict validator 之前；
+          # 全部 finding 都被 drop 時腳本會收斂成「✅ 沒有發現明顯問題」。
+          if [ -f "$RUNNER_TEMP/review-knowledge.cjs" ] && [ -f "$RUNNER_TEMP/false-positives.jsonl" ]; then
+            if node "$RUNNER_TEMP/review-knowledge.cjs" filter --db "$RUNNER_TEMP/false-positives.jsonl" \
+                 --report "$RUNNER_TEMP/fp-report.json" \
+                 < "$RUNNER_TEMP/review-body.normalized" > "$RUNNER_TEMP/review-body.filtered"; then
+              mv "$RUNNER_TEMP/review-body.filtered" "$RUNNER_TEMP/review-body.normalized"
+              echo "::group::review-knowledge filter report"
+              cat "$RUNNER_TEMP/fp-report.json"
+              echo "::endgroup::"
+            else
+              echo "::warning::review-knowledge filter failed; posting unfiltered review"
+            fi
+          fi
 
           BODY="$(cat "$RUNNER_TEMP/review-body.normalized")"
           if ! is_valid_review "$BODY"; then
