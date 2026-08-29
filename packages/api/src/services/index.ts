@@ -62,6 +62,9 @@ export * from "./roadmap";
 export * from "./roadmap-hooks";
 // Showcase Service
 export * from "./showcase-hooks";
+// Space Service
+export * from "./space";
+export * from "./space-hooks";
 // Tag Service
 export * from "./tag";
 export * from "./tag-hooks";
