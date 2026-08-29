@@ -57,3 +57,7 @@ PR 作者回覆 bot 的 Code Review 留言時，用一行 `/fp <第幾條> <A-F>
 ## 每筆欄位
 
 `id`、`date`、`source`、`engine`、`repo`、`pr`、`pattern`、`severity`、`file`、`finding`（原文摘要）、`why`（為什麼錯，附證據）、`evidence`、`action`、可選 `sample`／`expected`。
+
+## 延伸閱讀
+
+知識庫解不了的三個問題（A 類跨檔案脈絡、記錄靠人、關鍵字過濾脆弱）在文獻與開源專案的對應解法與落地順序：[docs/automation/review-false-positive-research.md](../../docs/automation/review-false-positive-research.md)。
