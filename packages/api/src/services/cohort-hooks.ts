@@ -3,7 +3,11 @@
 import { useMemo } from "react";
 import type { z } from "zod";
 import { EMPTY_QUERY_INIT, useQuery } from "../hooks";
-import type { LighthouseDashboardQuery, LighthouseParticipantsQuery } from "./cohort";
+import type {
+  LighthouseDashboardQuery,
+  LighthouseMessageCategory,
+  LighthouseParticipantsQuery,
+} from "./cohort";
 import {
   cohortJoinInfoResponseSchema,
   cohortMemberHomeResponseSchema,
@@ -15,11 +19,14 @@ import {
   lighthouseCohortResponseSchema,
   lighthouseDashboardResponseSchema,
   lighthouseFocusResponseSchema,
+  lighthouseMessageListResponseSchema,
+  lighthouseMessageTemplateListResponseSchema,
   lighthouseOrganizationCohortListResponseSchema,
   lighthouseOrganizationListResponseSchema,
   lighthouseOrganizationMembersResponseSchema,
   lighthouseOrganizationResponseSchema,
   lighthouseOutcomeResponseSchema,
+  lighthouseParticipantCheckinsResponseSchema,
   lighthouseParticipantsResponseSchema,
   lighthouseProgramListResponseSchema,
   lighthouseTemplatesResponseSchema,
@@ -153,6 +160,50 @@ export const useLighthouseFocus = (programId?: number, cohortId?: number) => {
     programId && cohortId ? { params: { path: { programId, cohortId } } } : null
   );
   return useValidatedResponse(query, lighthouseFocusResponseSchema);
+};
+
+/** 打卡紀錄抽屜：某參與者 × 某實踐（FR-TF-04）；userId / practiceId 未定時不打 */
+export const useLighthouseParticipantCheckins = (
+  programId?: number,
+  cohortId?: number,
+  userId?: number,
+  practiceId?: number
+) => {
+  const query = useQuery(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants/{userId}/practices/{practiceId}/checkins",
+    programId && cohortId && userId && practiceId
+      ? { params: { path: { programId, cohortId, userId, practiceId } } }
+      : null
+  );
+  return useValidatedResponse(query, lighthouseParticipantCheckinsResponseSchema);
+};
+
+/** 與某參與者的訊息往來（FR-TF-05） */
+export const useLighthouseParticipantMessages = (
+  programId?: number,
+  cohortId?: number,
+  userId?: number
+) => {
+  const query = useQuery(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants/{userId}/messages",
+    programId && cohortId && userId ? { params: { path: { programId, cohortId, userId } } } : null
+  );
+  return useValidatedResponse(query, lighthouseMessageListResponseSchema);
+};
+
+/** 組織的訊息範本（FR-TF-06） */
+export const useLighthouseMessageTemplates = (
+  organizationId?: number,
+  category?: LighthouseMessageCategory
+) => {
+  const query = useQuery(
+    "/api/v1/lighthouse/organizations/{organizationId}/message-templates",
+    organizationId
+      ? { params: { path: { organizationId }, query: category ? { category } : {} } }
+      : null
+  );
+  const validated = useValidatedResponse(query, lighthouseMessageTemplateListResponseSchema);
+  return { ...validated, templates: validated.data?.data };
 };
 
 export const useLighthouseOutcome = (programId?: number, cohortId?: number) => {
