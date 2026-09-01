@@ -70,6 +70,7 @@ function GlobalProvider({
                       "^/practices/[^/]+$",
                       "^/practices/[^/]+/check-ins/",
                       "^/challenges(/.*)?$",
+                      "^/activities(/.*)?$",
                       "^/roadmap(/.*)?$",
                       "^/resource(/.*)?$",
                       "^/persona(/.*)?$",

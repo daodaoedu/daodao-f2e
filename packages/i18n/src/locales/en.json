@@ -8248,5 +8248,24 @@
     "toc_label": "Block outline",
     "loading": "Loading…",
     "practice_count_label": "{count} practices"
+  },
+  "explore_activities": {
+    "meta_title": "Explore Activities & Courses",
+    "page_title": "Explore Activities & Courses",
+    "page_subtitle": "Activities and courses started by fellow islanders — see what's open to join",
+    "filter_all": "All",
+    "filter_open": "Open",
+    "filter_online": "Online",
+    "filter_offline": "In person",
+    "section_open_title": "Recruiting now",
+    "section_ongoing_title": "Ongoing",
+    "section_ongoing_subtitle": "Already started, but always welcoming new members",
+    "tag_invite": "Invite only",
+    "tag_public": "Public",
+    "card_cta": "View",
+    "host_members": "{host} · {count} islands",
+    "empty": "No activities match this filter",
+    "cta_prompt": "Want to start your own activity?",
+    "cta_button": "Open a space"
   }
 }

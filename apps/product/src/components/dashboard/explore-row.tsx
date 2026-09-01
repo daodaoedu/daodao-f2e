@@ -9,9 +9,9 @@ export function ExploreRow() {
 
   return (
     <div className="flex items-center gap-2 text-[13px] text-text-dark/65 mb-5">
-      <ExploreLink href="/explore/challenges" label={t("explore_challenge")} />
+      <ExploreLink href="/challenges" label={t("explore_challenge")} />
       <span className="text-text-dark/20">·</span>
-      <ExploreLink href="/explore/activities" label={t("explore_activity")} />
+      <ExploreLink href="/activities" label={t("explore_activity")} />
     </div>
   );
 }
@@ -23,6 +23,7 @@ function ExploreLink({ href, label }: { href: string; label: string }) {
       className="inline-flex items-center gap-1 hover:text-text-dark transition-colors group"
     >
       <svg
+        aria-hidden="true"
         className="size-3.5"
         viewBox="0 0 24 24"
         fill="none"
