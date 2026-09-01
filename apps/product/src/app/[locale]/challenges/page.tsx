@@ -4,7 +4,7 @@ import { type ChallengeSummaryType, useChallenges, useCurrentUser } from "@daoda
 import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { Spinner } from "@daodao/ui/components/spinner";
-import { Flag, Sparkles } from "lucide-react";
+import { Box, Flag, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChallengeCard, InspirationDrawDialog, JoinChallengeDialog } from "@/components/challenge";
 
@@ -31,18 +31,24 @@ export default function ChallengesPage() {
           key: "upcoming" as const,
           title: t("section_upcoming"),
           subtitle: t("section_upcoming_subtitle"),
+          Icon: Star,
+          iconClassName: "text-logo-cyan",
           items: challenges.filter((challenge) => challenge.runStatus === "upcoming"),
         },
         {
           key: "ongoing" as const,
           title: t("section_ongoing"),
           subtitle: null,
+          Icon: Flag,
+          iconClassName: "text-logo-cyan",
           items: challenges.filter((challenge) => challenge.runStatus === "ongoing"),
         },
         {
           key: "ended" as const,
           title: t("section_ended"),
           subtitle: t("section_ended_subtitle"),
+          Icon: Box,
+          iconClassName: "text-text-dark/55",
           items: challenges.filter((challenge) => challenge.runStatus === "ended"),
         },
       ].filter((section) => section.items.length > 0),
@@ -80,7 +86,7 @@ export default function ChallengesPage() {
       {sections.map((section) => (
         <section key={section.key}>
           <div className="flex items-center gap-2">
-            <Sparkles className="size-4.5 text-logo-cyan" />
+            <section.Icon className={`size-4.5 ${section.iconClassName}`} />
             <h2 className="m-0 text-lg font-bold text-bg-dark">{section.title}</h2>
             <span className="text-sm text-text-dark/40">· {section.items.length}</span>
           </div>

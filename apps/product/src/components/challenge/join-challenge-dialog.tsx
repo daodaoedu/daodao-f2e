@@ -12,7 +12,7 @@ import {
 } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
-import { Calendar, Flag, Timer } from "lucide-react";
+import { Calendar, Flag, Info, Timer } from "lucide-react";
 import { useState } from "react";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 
@@ -71,7 +71,7 @@ export const JoinChallengeDialog = ({
                 <Flag className="size-4.5 text-logo-cyan" />
                 {t("join_dialog_title")}
               </DialogTitle>
-              <DialogDescription>{t("join_note")}</DialogDescription>
+              <DialogDescription>{t("join_hint")}</DialogDescription>
             </DialogHeader>
 
             {challenge && (
@@ -98,7 +98,10 @@ export const JoinChallengeDialog = ({
               </div>
             )}
 
-            <p className="text-xs text-text-dark">{t("join_hint")}</p>
+            <div className="flex items-center gap-2 rounded-2xl bg-very-light-blue p-3">
+              <Info className="size-4 shrink-0 text-logo-cyan" />
+              <p className="text-xs text-text-dark">{t("join_note")}</p>
+            </div>
 
             <Button className="w-full" disabled={isJoining} onClick={handleJoin}>
               {isJoining ? t("joining") : t("join_confirm")}

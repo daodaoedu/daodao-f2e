@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChallengeSummaryType } from "@daodao/api";
+import { DefaultAvatarSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { Badge, type BadgeProps } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -123,8 +124,19 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
             )}
           </div>
 
-          <span className="flex items-center gap-1 text-xs text-text-dark">
-            <Users className="size-3.5 shrink-0" />
+          <span className="flex items-center gap-2 text-xs text-text-dark">
+            {challenge.participantCount > 0 ? (
+              <span className="flex shrink-0 items-center">
+                {Array.from({ length: Math.min(3, challenge.participantCount) }).map((_, index) => (
+                  <DefaultAvatarSvg
+                    key={index}
+                    className={`size-5 rounded-full shadow-[0_0_0_2px_white] ${index > 0 ? "-ml-1.75" : ""}`}
+                  />
+                ))}
+              </span>
+            ) : (
+              <Users className="size-3.5 shrink-0" />
+            )}
             {participantsLabel}
           </span>
         </div>
@@ -142,6 +154,17 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
           </span>
         )}
       </div>
+
+      {daysProgress !== null && (
+        <div className="absolute right-5 bottom-1.5 left-5 z-10">
+          <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/75 shadow-[inset_0_0_0_1px_rgba(15,48,54,0.08)]">
+            <div
+              className="h-full bg-logo-cyan"
+              style={{ width: `${Math.round((daysProgress.elapsed / daysProgress.total) * 100)}%` }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -8250,5 +8250,24 @@
     "toc_label": "區塊目錄",
     "loading": "載入中…",
     "practice_count_label": "{count} 個實踐"
+  },
+  "explore_activities": {
+    "meta_title": "探索活動課程",
+    "page_title": "探索活動課程",
+    "page_subtitle": "由島民發起的活動與課程，看看有沒有想加入的",
+    "filter_all": "全部",
+    "filter_open": "開放報名",
+    "filter_online": "線上",
+    "filter_offline": "實體",
+    "section_open_title": "正在招募",
+    "section_ongoing_title": "持續進行",
+    "section_ongoing_subtitle": "已經開始，但隨時歡迎加入",
+    "tag_invite": "邀請制",
+    "tag_public": "公開",
+    "card_cta": "看看",
+    "host_members": "{host} ・ {count} 位島民",
+    "empty": "目前沒有符合條件的活動",
+    "cta_prompt": "也想辦一場自己的活動嗎？",
+    "cta_button": "開一個空間"
   }
 }
