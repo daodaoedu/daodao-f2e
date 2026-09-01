@@ -84,6 +84,8 @@ interface IPracticeDetailCreator {
 interface IPracticeDetailViewModel {
   id: string;
   title: string;
+  /** 共同挑戰實踐：不可複製（FR-CC-09），加入挑戰是唯一途徑 */
+  isChallenge?: boolean;
   status?: PracticeStatus;
   actionDescription: string;
   frequency: Frequency;
@@ -640,7 +642,7 @@ export function PracticeDetailShell({
 
           <div className="px-4">
             <div className="border-t border-[#E4EAE9] mb-3" />
-            {!isOwner && (
+            {!isOwner && !practice.isChallenge && (
               <Button
                 type="button"
                 variant="outline"
@@ -887,14 +889,14 @@ export function PracticeDetailShell({
                   (b.dayNumber ?? Number.MAX_SAFE_INTEGER)
               )
               .map((resource) => (
-              <PracticeResourceListCard
-                key={resource.id}
-                resource={resource}
-                isOwner={isOwner}
-                onEditPractice={onEditPractice}
-                onDeleteResource={onDeleteResource}
-              />
-            ))
+                <PracticeResourceListCard
+                  key={resource.id}
+                  resource={resource}
+                  isOwner={isOwner}
+                  onEditPractice={onEditPractice}
+                  onDeleteResource={onDeleteResource}
+                />
+              ))
           ) : (
             <div className="text-sm text-[#9FB5B8] py-4">{t("no_resources")}</div>
           )}

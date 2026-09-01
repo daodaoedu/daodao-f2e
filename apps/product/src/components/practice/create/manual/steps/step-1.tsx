@@ -16,9 +16,11 @@ import type { ManualPracticeFormValues } from "../schema";
 
 interface Step1Props {
   form: UseFormReturn<ManualPracticeFormValues>;
+  /** 鎖定名稱（共同挑戰實踐的名稱由挑戰統一設定，FR-CC-10） */
+  nameDisabled?: boolean;
 }
 
-export const Step1 = ({ form }: Step1Props) => {
+export const Step1 = ({ form, nameDisabled = false }: Step1Props) => {
   const t = useTranslations("practice");
   const descriptionLength = form.watch("actionDescription")?.length || 0;
 
@@ -38,6 +40,7 @@ export const Step1 = ({ form }: Step1Props) => {
                 placeholder={t("manual_step_name_placeholder")}
                 className="w-full"
                 maxLength={20}
+                disabled={nameDisabled}
                 invalid={!!form.formState.errors.name}
               />
             </FormControl>
