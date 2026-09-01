@@ -119,8 +119,7 @@ export default function CheckInDetailPage() {
         tags: checkIn.tags || [],
         images: checkIn.imageUrls || [],
         practiceTitle: practiceData.data.title,
-        // viewCount 尚未同步進 generated types（server dev branch 合併後才有）
-        viewCount: (checkIn as { viewCount?: number }).viewCount ?? 0,
+        viewCount: checkIn.viewCount,
       };
 
       map.set(String(checkIn.id), displayData);

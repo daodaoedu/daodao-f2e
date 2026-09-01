@@ -35694,6 +35694,210 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ideas/{id}/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 記錄想法瀏覽
+         * @description 記錄登入使用者瀏覽指定想法的事件（同一使用者對同一想法 24h 內去重），回傳該想法目前的累計瀏覽數。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 想法的唯一識別 ID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 瀏覽事件記錄成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RecordIdeaViewResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/persona/questions/{questionId}/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 記錄人物誌題目觀看
+         * @description 記錄登入使用者觀看指定人物誌題目的事件（同一使用者對同一題 24h 內去重），回傳該題目前的累計觀看數。後台「人物誌填寫統計」以此計算曝光與回答轉換率。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 問題 ID */
+                    questionId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 記錄成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["QuestionViewApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/practices/{id}/checkins/{checkInId}/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 記錄打卡紀錄瀏覽
+         * @description 記錄登入使用者瀏覽指定打卡紀錄的事件（同一使用者對同一筆打卡 24h 內去重），回傳該打卡目前的累計瀏覽數。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 實踐 ID（UUID 格式） */
+                    id: string;
+                    /** @description 簽到記錄 ID */
+                    checkInId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 瀏覽事件記錄成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /**
+                             * @description The main response data
+                             * @example {
+                             *       "viewCount": 24
+                             *     }
+                             */
+                            data: {
+                                /** @description 該打卡紀錄的總瀏覽數 */
+                                viewCount: number;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -36377,7 +36581,8 @@ export interface components {
          *         "有收穫"
          *       ],
          *       "createdAt": "2024-01-20T15:45:00.000Z",
-         *       "updatedAt": "2024-01-20T15:45:00.000Z"
+         *       "updatedAt": "2024-01-20T15:45:00.000Z",
+         *       "viewCount": 24
          *     }
          */
         CheckInEntity: {
@@ -36444,6 +36649,11 @@ export interface components {
              * @example 2024-01-20T15:45:00.000Z
              */
             updatedAt?: string;
+            /**
+             * @description 累計瀏覽數（同一使用者 24h 內只計一次）
+             * @example 24
+             */
+            viewCount: number;
         };
         /**
          * @description 用戶實踐統計
@@ -36744,7 +36954,8 @@ export interface components {
          *         "有收穫"
          *       ],
          *       "createdAt": "2024-01-20T15:45:00.000Z",
-         *       "updatedAt": "2024-01-20T15:45:00.000Z"
+         *       "updatedAt": "2024-01-20T15:45:00.000Z",
+         *       "viewCount": 24
          *     }
          */
         CheckInWithEncouragement: components["schemas"]["CheckInEntity"] & {
@@ -47220,6 +47431,16 @@ export interface components {
              *     ]
              */
             tags: string[];
+            /**
+             * @description 累計瀏覽數（同一使用者 24h 內只計一次）
+             * @example 24
+             */
+            viewCount: number;
+            /**
+             * @description 留言數
+             * @example 3
+             */
+            commentCount: number;
         };
         /** @description 學習足跡項目 */
         MyLearningFootprintItem: {
@@ -48867,6 +49088,197 @@ export interface components {
         CreateWishResult: {
             /** @description 建立的許願 id */
             id: number;
+        };
+        /**
+         * @description 記錄想法瀏覽的成功回應
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        RecordIdeaViewResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: {
+                /**
+                 * @description 該想法目前的累計瀏覽數
+                 * @example 42
+                 */
+                viewCount: number;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        QuestionViewApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            data: components["schemas"]["QuestionViewData"];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /** @description The main response data */
+        QuestionViewData: {
+            /**
+             * @description 此題目目前的累計觀看數
+             * @example 42
+             */
+            viewCount: number;
         };
     };
     responses: {

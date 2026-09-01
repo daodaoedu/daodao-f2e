@@ -193,9 +193,8 @@ export function usePractices() {
           label: "主題實踐",
           title: practice.title,
           description: practice.practiceAction || "",
-          // viewCount / commentCount 尚未同步進 generated types（server dev branch 合併後才有）
-          viewCount: (practice as { viewCount?: number }).viewCount ?? 0,
-          commentCount: (practice as { commentCount?: number }).commentCount ?? 0,
+          viewCount: practice.viewCount,
+          commentCount: practice.commentCount,
           tags: practice.tags || [],
         });
       }

@@ -14,6 +14,10 @@ export type ViewTrackingEntityType =
   | "persona_question"
   | "practice_checkin";
 
+/**
+ * 供尚未出現在 OpenAPI spec 的端點使用（目前為 /progress 與 /time-spent，
+ * server 端尚未註冊到 spec）。已進 spec 的端點一律走 typed client。
+ */
 type UntypedPostClient = {
   POST: (url: string, init: { body: unknown }) => Promise<unknown>;
 };
@@ -53,9 +57,10 @@ export const useRecordView = () => {
             });
           return;
         case "persona_question":
-          // 尚未同步進 generated types（server dev branch 合併後才有），先走 untyped client
-          (client as unknown as UntypedPostClient)
-            .POST(`/api/v1/persona/questions/${entityId}/view`, { body: undefined })
+          client
+            .POST("/api/v1/persona/questions/{questionId}/view", {
+              params: { path: { questionId: Number(entityId) } },
+            })
             .catch(() => {
               // fire-and-forget: ignore errors
             });
@@ -63,10 +68,14 @@ export const useRecordView = () => {
         case "practice_checkin": {
           // 打卡的觀看端點掛在所屬 practice 底下，缺 practiceId 就無從記錄
           if (options?.practiceId == null) return;
-          // 尚未同步進 generated types（server dev branch 合併後才有），先走 untyped client
-          (client as unknown as UntypedPostClient)
-            .POST(`/api/v1/practices/${options.practiceId}/checkins/${entityId}/view`, {
-              body: undefined,
+          client
+            .POST("/api/v1/practices/{id}/checkins/{checkInId}/view", {
+              params: {
+                path: {
+                  id: String(options.practiceId),
+                  checkInId: String(entityId),
+                },
+              },
             })
             .catch(() => {
               // fire-and-forget: ignore errors
