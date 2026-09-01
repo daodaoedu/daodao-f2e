@@ -32,12 +32,21 @@ export interface StepTagsResourcesHandle {
 
 type TFunction = ReturnType<typeof useTranslations<"practice">>;
 
-const normalizeUrl = (url: string) => url.trim().toLowerCase().replace(/\/$/, "");
+const normalizeUrl = (raw: string) => {
+  const url = raw.trim().replace(/\/$/, "");
+  try {
+    const parsed = new URL(url);
+    return parsed.origin.toLowerCase() + parsed.pathname + parsed.search + parsed.hash;
+  } catch {
+    return url.toLowerCase();
+  }
+};
 
+let resourceIdCounter = 0;
 const newResourceId = () =>
   typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
     ? crypto.randomUUID()
-    : Date.now().toString();
+    : `res-${Date.now()}-${++resourceIdCounter}`;
 
 /** 驗證連結格式；回傳錯誤訊息或 null（空字串由呼叫端決定是否允許） */
 const validateUrl = (url: string, t: TFunction): string | null => {
@@ -223,6 +232,9 @@ export const StepTagsResources = forwardRef<StepTagsResourcesHandle, StepTagsRes
         const urlError = validateUrl(draft.url, t);
         if (urlError) return urlError;
         if (isDuplicateUrl(resources, draft.url, id)) return t("wizard_resource_duplicate_url");
+      }
+      if (!draft.url && isDuplicateName(resources, draft.name, id)) {
+        return t("wizard_resource_duplicate_name");
       }
       setResources(
         resources.map((r) =>

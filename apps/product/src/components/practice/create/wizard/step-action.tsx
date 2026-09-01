@@ -49,6 +49,8 @@ export const StepAction = ({ form }: StepActionProps) => {
     setIsEditing(false);
   };
 
+  const cancelEditing = () => setIsEditing(false);
+
   return (
     <div className="space-y-6">
       <FormField
@@ -101,9 +103,12 @@ export const StepAction = ({ form }: StepActionProps) => {
                 placeholder={t("wizard_name_placeholder")}
                 onChange={(event) => setDraft(event.target.value)}
                 onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === "Escape") {
+                  if (event.key === "Enter") {
                     event.preventDefault();
                     finishEditing();
+                  } else if (event.key === "Escape") {
+                    event.preventDefault();
+                    cancelEditing();
                   }
                 }}
                 className="flex-1"

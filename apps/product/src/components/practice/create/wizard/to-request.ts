@@ -99,8 +99,10 @@ export const toCreatePracticeRequest = (
   values: WizardFormValues,
   opts: ToRequestOptions
 ): CreatePracticeRequestType => {
-  const [segment] = getEffectiveSegments(values, opts.nameFallback);
-  return segmentToPracticeRequest(values, segment as EffectiveSegment, opts);
+  const segments = getEffectiveSegments(values, opts.nameFallback);
+  const segment = segments[0];
+  if (!segment) throw new Error("No segment resolved from form values");
+  return segmentToPracticeRequest(values, segment, opts);
 };
 
 /** 拆段個人實踐（2–3 段，單一 request） */
@@ -139,8 +141,10 @@ export const toCreateTemplateRequest = (
   values: WizardFormValues,
   opts: Pick<ToRequestOptions, "nameFallback">
 ): CreatePracticeTemplateRequestType => {
-  const [segment] = getEffectiveSegments(values, opts.nameFallback);
-  return segmentToTemplateRequest(values, segment as EffectiveSegment);
+  const segments = getEffectiveSegments(values, opts.nameFallback);
+  const segment = segments[0];
+  if (!segment) throw new Error("No segment resolved from form values");
+  return segmentToTemplateRequest(values, segment);
 };
 
 /** 拆段模版 */

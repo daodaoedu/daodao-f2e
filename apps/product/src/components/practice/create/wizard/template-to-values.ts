@@ -35,7 +35,9 @@ export const resourcesFromTemplate = (
     const id = String(resource.id);
     if (seen.has(id)) continue;
     seen.add(id);
-    result.push({ id, name: resource.name, url: resource.url ?? "", segmentIndexes: [] });
+    const rawUrl = resource.url ?? "";
+    const safeUrl = rawUrl.startsWith("https://") ? rawUrl : "";
+    result.push({ id, name: resource.name, url: safeUrl, segmentIndexes: [] });
   }
   return result;
 };

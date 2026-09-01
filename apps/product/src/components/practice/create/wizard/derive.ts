@@ -1,7 +1,7 @@
 /**
  * 由精靈表單值推導的衍生資料（純函式，供 Step 2 / Step 4 / 送出共用）
  */
-import { parse } from "date-fns";
+import { isValid, parse } from "date-fns";
 import { ExecutionTiming } from "@/constants/practice-form";
 import {
   allocateSegmentDays,
@@ -28,7 +28,7 @@ export interface EffectiveSegment {
 export const parseIsoDate = (iso: string): Date | null => {
   if (!iso) return null;
   const d = parse(iso, "yyyy-MM-dd", new Date());
-  return Number.isNaN(d.getTime()) ? null : d;
+  return isValid(d) ? d : null;
 };
 
 /** 顯示用名稱：手動覆寫 > 由行動推導 > fallback（「我的實踐」由呼叫端傳入 i18n 值） */
