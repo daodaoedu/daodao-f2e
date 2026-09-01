@@ -6877,7 +6877,7 @@ export interface paths {
                                 inviteMessage: string | null;
                                 canJoin: boolean;
                                 /** @enum {string|null} */
-                                unavailableReason: "not_published" | "expired" | "full" | null;
+                                unavailableReason: "not_published" | "expired" | "full" | "paused" | null;
                                 visibilityNotice: string;
                                 organization: {
                                     name: string;
@@ -13572,6 +13572,8 @@ export interface paths {
                                 endDate: string;
                                 /** Format: uuid */
                                 joinToken: string | null;
+                                /** @description 是否暫停透過邀請連結加入（token 保留，重新開放沿用原連結） */
+                                joinPaused: boolean;
                                 /** Format: date-time */
                                 joinDeadline: string | null;
                                 capacity: number | null;
@@ -13698,6 +13700,8 @@ export interface paths {
                                 endDate: string;
                                 /** Format: uuid */
                                 joinToken: string | null;
+                                /** @description 是否暫停透過邀請連結加入（token 保留，重新開放沿用原連結） */
+                                joinPaused: boolean;
                                 /** Format: date-time */
                                 joinDeadline: string | null;
                                 capacity: number | null;
@@ -13819,6 +13823,8 @@ export interface paths {
                                 endDate: string;
                                 /** Format: uuid */
                                 joinToken: string | null;
+                                /** @description 是否暫停透過邀請連結加入（token 保留，重新開放沿用原連結） */
+                                joinPaused: boolean;
                                 /** Format: date-time */
                                 joinDeadline: string | null;
                                 capacity: number | null;
@@ -13968,6 +13974,8 @@ export interface paths {
                                 endDate: string;
                                 /** Format: uuid */
                                 joinToken: string | null;
+                                /** @description 是否暫停透過邀請連結加入（token 保留，重新開放沿用原連結） */
+                                joinPaused: boolean;
                                 /** Format: date-time */
                                 joinDeadline: string | null;
                                 capacity: number | null;
@@ -14095,6 +14103,11 @@ export interface paths {
                                     valid: boolean;
                                     reason: string | null;
                                     enrollmentId: number | null;
+                                    /**
+                                     * @description 預覽時的名單狀態：new 新邀請、invited 已邀請、joined 已加入、rejoin 曾退出將重新邀請、invalid 格式錯誤
+                                     * @enum {string}
+                                     */
+                                    state?: "new" | "invited" | "joined" | "rejoin" | "invalid";
                                 }[];
                             };
                             /**
@@ -14175,6 +14188,11 @@ export interface paths {
                                     valid: boolean;
                                     reason: string | null;
                                     enrollmentId: number | null;
+                                    /**
+                                     * @description 預覽時的名單狀態：new 新邀請、invited 已邀請、joined 已加入、rejoin 曾退出將重新邀請、invalid 格式錯誤
+                                     * @enum {string}
+                                     */
+                                    state?: "new" | "invited" | "joined" | "rejoin" | "invalid";
                                 }[];
                             };
                             /**
@@ -14652,6 +14670,7 @@ export interface paths {
                                 cohortId: number;
                                 /** Format: uuid */
                                 joinToken: string | null;
+                                joinPaused: boolean;
                             };
                             /**
                              * Format: date-time
@@ -14758,6 +14777,7 @@ export interface paths {
                                 cohortId: number;
                                 /** Format: uuid */
                                 joinToken: string | null;
+                                joinPaused: boolean;
                             };
                             /**
                              * Format: date-time
@@ -14818,6 +14838,364 @@ export interface paths {
                 403: components["responses"]["ForbiddenError"];
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/join-token/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 重新開放連結加入（沿用原連結） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    programId: number;
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已重新開放 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                cohortId: number;
+                                /** Format: uuid */
+                                joinToken: string | null;
+                                joinPaused: boolean;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 複製場次為草稿（含模板綁定，不含名單） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    programId: number;
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 副本已建立 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                programId: number;
+                                slug: string;
+                                displayName: string;
+                                /** Format: date-time */
+                                startDate: string;
+                                /** Format: date-time */
+                                endDate: string;
+                                /** Format: uuid */
+                                joinToken: string | null;
+                                /** @description 是否暫停透過邀請連結加入（token 保留，重新開放沿用原連結） */
+                                joinPaused: boolean;
+                                /** Format: date-time */
+                                joinDeadline: string | null;
+                                capacity: number | null;
+                                inviteMessage: string | null;
+                                /** @enum {string} */
+                                status: "draft" | "published" | "archived";
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                409: components["responses"]["ConflictError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/organizations/{organizationId}/cohorts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得組織底下所有系列的全部場次（總覽用，含草稿與封存） */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 場次列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                programId: number;
+                                slug: string;
+                                displayName: string;
+                                /** Format: date-time */
+                                startDate: string;
+                                /** Format: date-time */
+                                endDate: string;
+                                /** Format: uuid */
+                                joinToken: string | null;
+                                /** @description 是否暫停透過邀請連結加入（token 保留，重新開放沿用原連結） */
+                                joinPaused: boolean;
+                                /** Format: date-time */
+                                joinDeadline: string | null;
+                                capacity: number | null;
+                                inviteMessage: string | null;
+                                /** @enum {string} */
+                                status: "draft" | "published" | "archived";
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                                /** @description 所屬系列名稱 */
+                                programName: string;
+                                /** @description 已加入的參與者人數（不含帶領人） */
+                                joinedCount: number;
+                            }[];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -15460,10 +15838,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 取得期儀表板統計 */
+        /** 取得場次儀表板統計（可依實踐與日期範圍篩選） */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description 只看這個實踐（以實踐名稱分組）；不帶＝全部實踐 */
+                    practiceTitle?: string;
+                    /** @description 打卡日期範圍起（含），預設場次開始日 */
+                    from?: string;
+                    /** @description 打卡日期範圍迄（含），預設今天或場次結束日 */
+                    to?: string;
+                };
                 header?: never;
                 path: {
                     programId: number;
@@ -15487,30 +15872,205 @@ export interface paths {
                             success: true;
                             /** @description The main response data */
                             data: {
-                                /** @enum {string} */
-                                snapshotKind: "weekly" | "realtime";
                                 /** Format: date-time */
                                 computedAt: string;
-                                rhythmHeatmap: {
+                                range: {
+                                    from: string;
+                                    to: string;
+                                };
+                                /** @description 目前套用的實踐篩選；null＝全部實踐 */
+                                practiceTitle: string | null;
+                                /** @description 實踐篩選 chip 列（FR-DB-01） */
+                                practices: {
+                                    title: string;
+                                    /** Format: date-time */
+                                    startDate: string | null;
+                                    /** Format: date-time */
+                                    endDate: string | null;
+                                }[];
+                                kpi: {
+                                    /** @description 已加入 */
+                                    enrolled: number;
+                                    /** @description 已開始：至少一則打卡的參與者數 */
+                                    activated: number;
+                                    /** @description 持續行動中（本週） */
+                                    activeThisWeek: number;
+                                };
+                                /** @description 範圍內打卡總數 */
+                                checkins: number;
+                                /** @description 實踐總覽表（FR-DB-03），不受 practiceTitle 影響 */
+                                practiceOverview: {
+                                    title: string;
+                                    /** Format: date-time */
+                                    startDate: string | null;
+                                    /** Format: date-time */
+                                    endDate: string | null;
+                                    startedCount: number;
+                                    checkinCount: number;
+                                    /** @description 有打卡的日子裡，平均每天打卡人數 */
+                                    avgCheckinPeople: number;
+                                    /** @description 平均打卡字數 */
+                                    avgCheckinLength: number;
+                                }[];
+                                /** @description 每日打卡數（FR-DB-04），key 為 YYYY-MM-DD */
+                                heatmap: {
                                     [key: string]: number;
                                 };
                                 tagDistribution: {
                                     tag: string;
                                     count: number;
                                 }[];
-                                commonBlockers: {
+                                moodDistribution: {
+                                    /** @enum {string} */
+                                    mood: "happy" | "good" | "neutral" | "bored" | "frustrated" | "give_up";
+                                    count: number;
+                                }[];
+                                trend: {
+                                    /** @description 近 14 天逐日打卡數 */
+                                    days: {
+                                        date: string;
+                                        count: number;
+                                    }[];
+                                    thisWeek: number;
+                                    lastWeek: number;
+                                    delta: number;
+                                };
+                                /** @description 24 小時制打卡時段（Asia/Taipei） */
+                                hourHistogram: {
                                     [key: string]: number;
                                 };
-                                funnel: {
-                                    enrolled: number;
-                                    activated: number;
-                                    activeMembers: number;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
                                 };
-                                timeRhythm: {
+                                /** @description Count of items per category */
+                                categoryCounts?: {
                                     [key: string]: number;
                                 };
-                                checkins: number;
-                                exited: number;
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得參與者明細表（參與者 × 實踐，含打卡／留言／瀏覽／迴響數） */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 只看這個實踐（以實踐名稱分組）；不帶＝全部實踐 */
+                    practiceTitle?: string;
+                    /** @description 打卡日期範圍起（含），預設場次開始日 */
+                    from?: string;
+                    /** @description 打卡日期範圍迄（含），預設今天或場次結束日 */
+                    to?: string;
+                    /** @description 姓名或 email 模糊搜尋 */
+                    search?: string;
+                    /** @description 排序欄位 */
+                    sort?: "nickname" | "startDate" | "checkinCount" | "commentCount" | "viewCount" | "reactionCount";
+                    order?: "asc" | "desc";
+                };
+                header?: never;
+                path: {
+                    programId: number;
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 參與者明細 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                range: {
+                                    from: string;
+                                    to: string;
+                                };
+                                total: number;
+                                items: {
+                                    userId: number;
+                                    nickname: string | null;
+                                    email: string | null;
+                                    practiceId: number;
+                                    practiceTitle: string;
+                                    /** Format: date-time */
+                                    startDate: string | null;
+                                    checkinCount: number;
+                                    commentCount: number;
+                                    viewCount: number;
+                                    reactionCount: number;
+                                }[];
                             };
                             /**
                              * Format: date-time
@@ -15617,19 +16177,42 @@ export interface paths {
                                     userId: number;
                                     nickname: string | null;
                                     avatar: string | null;
+                                    /** @description 該參與者在本場次的實踐；點擊可開打卡紀錄抽屜 */
+                                    practiceId: number;
+                                    practiceTitle: string;
+                                    /** @description 帶領人已對此參與者送出的訊息數；0 顯示「尚未送出」 */
+                                    messageCount: number;
                                     /** Format: date-time */
                                     lastCheckinAt: string;
+                                    /**
+                                     * Format: date-time
+                                     * @description 最後打卡日（checkin_date）
+                                     */
+                                    lastCheckinDate: string;
                                     lastCheckinPreview: string | null;
+                                    /** @description 距離上次打卡的天數，純事實不帶警示 */
                                     interruptedDays: number;
                                 }[];
                                 celebrations: {
                                     userId: number;
                                     nickname: string | null;
                                     avatar: string | null;
+                                    /** @description 該參與者在本場次的實踐；點擊可開打卡紀錄抽屜 */
+                                    practiceId: number;
+                                    practiceTitle: string;
+                                    /** @description 帶領人已對此參與者送出的訊息數；0 顯示「尚未送出」 */
+                                    messageCount: number;
                                     /** @enum {string} */
                                     moment: "first_checkin" | "return_after_break" | "month_milestone";
+                                    /** @description 值得慶祝的時刻文案 */
+                                    momentDescription: string;
                                     /** Format: date-time */
                                     occurredAt: string;
+                                    /**
+                                     * Format: date-time
+                                     * @description 首次打卡日
+                                     */
+                                    firstCheckinAt: string;
                                 }[];
                             };
                             /**
@@ -15694,6 +16277,673 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants/{userId}/practices/{practiceId}/checkins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 打卡紀錄抽屜：某參與者某實踐的所有打卡 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    programId: number;
+                    cohortId: number;
+                    /** @description 參與者 users.id */
+                    userId: number;
+                    /** @description 該參與者在本場次的 practices.id */
+                    practiceId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 打卡紀錄 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                participant: {
+                                    userId: number;
+                                    nickname: string | null;
+                                    avatar: string | null;
+                                };
+                                practice: {
+                                    id: number;
+                                    title: string;
+                                    /** Format: date-time */
+                                    startDate: string | null;
+                                    /** Format: date-time */
+                                    endDate: string | null;
+                                };
+                                total: number;
+                                items: {
+                                    id: number;
+                                    /** Format: date-time */
+                                    checkinDate: string;
+                                    mood: string | null;
+                                    note: string | null;
+                                    imageUrls: string[];
+                                    /** Format: date-time */
+                                    createdAt: string | null;
+                                }[];
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants/{userId}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 訊息紀錄：帶領人與某參與者的往來 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    programId: number;
+                    cohortId: number;
+                    /** @description 參與者 users.id */
+                    userId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 訊息紀錄 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                participant: {
+                                    userId: number;
+                                    nickname: string | null;
+                                    avatar: string | null;
+                                };
+                                total: number;
+                                items: {
+                                    id: number;
+                                    cohortId: number;
+                                    recipientUserId: number | null;
+                                    senderUserId: number | null;
+                                    senderNickname: string | null;
+                                    practiceId: number | null;
+                                    practiceTitle: string | null;
+                                    templateId: number | null;
+                                    /**
+                                     * @description encourage 鼓勵、celebrate 慶祝
+                                     * @example encourage
+                                     * @enum {string}
+                                     */
+                                    category: "encourage" | "celebrate";
+                                    body: string;
+                                    /** Format: date-time */
+                                    sentAt: string;
+                                }[];
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        put?: never;
+        /** 送出鼓勵／慶祝訊息給參與者 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    programId: number;
+                    cohortId: number;
+                    /** @description 參與者 users.id */
+                    userId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description encourage 鼓勵、celebrate 慶祝
+                         * @example encourage
+                         * @enum {string}
+                         */
+                        category: "encourage" | "celebrate";
+                        /**
+                         * @description 訊息內容
+                         * @example 看到你這週又回來打卡了，真好。
+                         */
+                        body: string;
+                        /** @description 訊息來源列對應的實踐；可不帶 */
+                        practiceId?: number | null;
+                        /** @description 若由範本帶入，記錄範本 id */
+                        templateId?: number | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description 訊息已送出 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                cohortId: number;
+                                recipientUserId: number | null;
+                                senderUserId: number | null;
+                                senderNickname: string | null;
+                                practiceId: number | null;
+                                practiceTitle: string | null;
+                                templateId: number | null;
+                                /**
+                                 * @description encourage 鼓勵、celebrate 慶祝
+                                 * @example encourage
+                                 * @enum {string}
+                                 */
+                                category: "encourage" | "celebrate";
+                                body: string;
+                                /** Format: date-time */
+                                sentAt: string;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/organizations/{organizationId}/message-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得組織的訊息範本 */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description encourage 鼓勵、celebrate 慶祝 */
+                    category?: "encourage" | "celebrate";
+                };
+                header?: never;
+                path: {
+                    organizationId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 範本列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                organizationId: number;
+                                createdBy: number | null;
+                                /**
+                                 * @description encourage 鼓勵、celebrate 慶祝
+                                 * @example encourage
+                                 * @enum {string}
+                                 */
+                                category: "encourage" | "celebrate";
+                                title: string;
+                                body: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            }[];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        put?: never;
+        /** 存成訊息範本 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description encourage 鼓勵、celebrate 慶祝
+                         * @example encourage
+                         * @enum {string}
+                         */
+                        category: "encourage" | "celebrate";
+                        /**
+                         * @description 範本名稱（下拉選單顯示）
+                         * @example 節奏很穩
+                         */
+                        title: string;
+                        /**
+                         * @description 範本內容
+                         * @example 看到你連續打卡一週了，節奏抓得很穩，繼續加油！
+                         */
+                        body: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 範本已建立 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                organizationId: number;
+                                createdBy: number | null;
+                                /**
+                                 * @description encourage 鼓勵、celebrate 慶祝
+                                 * @example encourage
+                                 * @enum {string}
+                                 */
+                                category: "encourage" | "celebrate";
+                                title: string;
+                                body: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/organizations/{organizationId}/message-templates/{templateId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 刪除訊息範本（軟刪） */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                    templateId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 範本已刪除 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;

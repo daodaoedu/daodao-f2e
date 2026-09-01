@@ -76,7 +76,7 @@ export const lighthouseProgramSchema: z.ZodType<LighthouseProgramType> = z.objec
   updatedAt: nullableDateTimeSchema,
 });
 
-export const lighthouseCohortSchema: z.ZodType<LighthouseCohortType> = z.object({
+const lighthouseCohortShape = {
   id: z.number().int().positive(),
   programId: z.number().int().positive(),
   slug: z.string(),
@@ -84,13 +84,16 @@ export const lighthouseCohortSchema: z.ZodType<LighthouseCohortType> = z.object(
   startDate: z.string(),
   endDate: z.string(),
   joinToken: z.string().nullable(),
+  joinPaused: z.boolean(),
   joinDeadline: z.string().nullable(),
   capacity: z.number().int().nullable(),
   inviteMessage: z.string().nullable(),
   status: z.enum(["draft", "published", "archived"]),
   createdAt: z.string().datetime(),
   updatedAt: nullableDateTimeSchema,
-});
+} satisfies z.ZodRawShape;
+export const lighthouseCohortSchema: z.ZodType<LighthouseCohortType> =
+  z.object(lighthouseCohortShape);
 
 export const lighthouseOrganizationListResponseSchema: z.ZodType<OrganizationListResponse> =
   apiSuccessSchema(z.array(lighthouseOrganizationSchema));
@@ -104,6 +107,20 @@ export const lighthouseCohortListResponseSchema: z.ZodType<CohortListResponse> =
 );
 
 export const lighthouseCohortResponseSchema = apiSuccessSchema(lighthouseCohortSchema);
+/** 總覽用：組織底下所有系列的全部場次，附系列名稱與已加入人數（FR-OV-02） */
+type OrganizationCohortListResponse =
+  paths["/api/v1/lighthouse/organizations/{organizationId}/cohorts"]["get"]["responses"][200]["content"]["application/json"];
+export const lighthouseOrganizationCohortSchema: z.ZodType<
+  OrganizationCohortListResponse["data"][number]
+> = z.object({
+  ...lighthouseCohortShape,
+  programName: z.string(),
+  joinedCount: z.number().int().nonnegative(),
+});
+export const lighthouseOrganizationCohortListResponseSchema = apiSuccessSchema(
+  z.array(lighthouseOrganizationCohortSchema)
+);
+export type LighthouseOrganizationCohortType = OrganizationCohortListResponse["data"][number];
 
 export const lighthouseCohortMembersResponseSchema = apiSuccessSchema(
   z.array(
@@ -133,21 +150,87 @@ export const lighthouseCohortEnrollmentsResponseSchema = apiSuccessSchema(
   )
 );
 
+const dateOnlySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const nonNegativeInt = z.number().int().nonnegative();
+/** 儀表板（FRD 3.3）：即時查詢，所有區塊都吃 practiceTitle / from / to 篩選 */
 export const lighthouseDashboardResponseSchema = apiSuccessSchema(
   z.object({
-    snapshotKind: z.enum(["weekly", "realtime"]),
     computedAt: z.string().datetime(),
-    rhythmHeatmap: z.record(z.string(), z.number().nonnegative()),
-    tagDistribution: z.array(z.object({ tag: z.string(), count: z.number().int().nonnegative() })),
-    commonBlockers: z.record(z.string(), z.number().int().nonnegative()),
-    funnel: z.object({
-      enrolled: z.number().int().nonnegative(),
-      activated: z.number().int().nonnegative(),
-      activeMembers: z.number().int().nonnegative(),
+    range: z.object({ from: dateOnlySchema, to: dateOnlySchema }),
+    practiceTitle: z.string().nullable(),
+    practices: z.array(
+      z.object({
+        title: z.string(),
+        startDate: z.string().nullable(),
+        endDate: z.string().nullable(),
+      })
+    ),
+    kpi: z.object({
+      enrolled: nonNegativeInt,
+      activated: nonNegativeInt,
+      activeThisWeek: nonNegativeInt,
     }),
-    timeRhythm: z.record(z.string(), z.number().int().nonnegative()),
-    checkins: z.number().int().nonnegative(),
-    exited: z.number().int().nonnegative(),
+    checkins: nonNegativeInt,
+    practiceOverview: z.array(
+      z.object({
+        title: z.string(),
+        startDate: z.string().nullable(),
+        endDate: z.string().nullable(),
+        startedCount: nonNegativeInt,
+        checkinCount: nonNegativeInt,
+        avgCheckinPeople: z.number().nonnegative(),
+        avgCheckinLength: z.number().nonnegative(),
+      })
+    ),
+    heatmap: z.record(z.string(), nonNegativeInt),
+    tagDistribution: z.array(z.object({ tag: z.string(), count: nonNegativeInt })),
+    moodDistribution: z.array(
+      z.object({
+        mood: z.enum(["happy", "good", "neutral", "bored", "frustrated", "give_up"]),
+        count: nonNegativeInt,
+      })
+    ),
+    trend: z.object({
+      days: z.array(z.object({ date: dateOnlySchema, count: nonNegativeInt })),
+      thisWeek: nonNegativeInt,
+      lastWeek: nonNegativeInt,
+      delta: z.number().int(),
+    }),
+    hourHistogram: z.record(z.string(), nonNegativeInt),
+  })
+);
+export type LighthouseDashboardQuery = { practiceTitle?: string; from?: string; to?: string };
+export type LighthouseParticipantsSort =
+  | "nickname"
+  | "startDate"
+  | "checkinCount"
+  | "commentCount"
+  | "viewCount"
+  | "reactionCount";
+export type LighthouseParticipantsQuery = LighthouseDashboardQuery & {
+  search?: string;
+  sort?: LighthouseParticipantsSort;
+  order?: "asc" | "desc";
+};
+/** 參與者明細表（FR-DB-09）：一列＝參與者 × 實踐 */
+export const lighthouseParticipantsResponseSchema = apiSuccessSchema(
+  z.object({
+    range: z.object({ from: dateOnlySchema, to: dateOnlySchema }),
+    total: nonNegativeInt,
+    items: z.array(
+      z.object({
+        userId: z.number().int(),
+        nickname: z.string().nullable(),
+        email: z.string().nullable(),
+        practiceId: z.number().int(),
+        practiceTitle: z.string(),
+        startDate: z.string().nullable(),
+        checkinCount: nonNegativeInt,
+        commentCount: nonNegativeInt,
+        viewCount: nonNegativeInt,
+        reactionCount: nonNegativeInt,
+      })
+    ),
   })
 );
 
@@ -155,13 +238,18 @@ const lighthouseFocusPersonSchema = z.object({
   userId: z.number().int().positive(),
   nickname: z.string().nullable(),
   avatar: z.string().nullable(),
+  practiceId: z.number().int().positive(),
+  practiceTitle: z.string(),
+  messageCount: z.number().int().nonnegative(),
 });
 
+/** 今日焦點（FRD 3.5）：以參與者 × 實踐為列 */
 export const lighthouseFocusResponseSchema = apiSuccessSchema(
   z.object({
     needsEncouragement: z.array(
       lighthouseFocusPersonSchema.extend({
         lastCheckinAt: z.string().datetime(),
+        lastCheckinDate: z.string(),
         lastCheckinPreview: z.string().nullable(),
         interruptedDays: z.number().int().nonnegative(),
       })
@@ -169,10 +257,88 @@ export const lighthouseFocusResponseSchema = apiSuccessSchema(
     celebrations: z.array(
       lighthouseFocusPersonSchema.extend({
         moment: z.enum(["first_checkin", "return_after_break", "month_milestone"]),
+        momentDescription: z.string(),
         occurredAt: z.string().datetime(),
+        firstCheckinAt: z.string().datetime(),
       })
     ),
   })
+);
+export type LighthouseFocusEncouragementType = z.infer<
+  typeof lighthouseFocusResponseSchema
+>["data"]["needsEncouragement"][number];
+export type LighthouseFocusCelebrationType = z.infer<
+  typeof lighthouseFocusResponseSchema
+>["data"]["celebrations"][number];
+
+const lighthouseParticipantSchema = z.object({
+  userId: z.number().int().positive(),
+  nickname: z.string().nullable(),
+  avatar: z.string().nullable(),
+});
+/** 打卡紀錄抽屜（FR-TF-04） */
+export const lighthouseParticipantCheckinsResponseSchema = apiSuccessSchema(
+  z.object({
+    participant: lighthouseParticipantSchema,
+    practice: z.object({
+      id: z.number().int(),
+      title: z.string(),
+      startDate: z.string().nullable(),
+      endDate: z.string().nullable(),
+    }),
+    total: z.number().int().nonnegative(),
+    items: z.array(
+      z.object({
+        id: z.number().int(),
+        checkinDate: z.string(),
+        mood: z.string().nullable(),
+        note: z.string().nullable(),
+        imageUrls: z.array(z.string()),
+        createdAt: z.string().datetime().nullable(),
+      })
+    ),
+  })
+);
+export const lighthouseMessageCategorySchema = z.enum(["encourage", "celebrate"]);
+export type LighthouseMessageCategory = z.infer<typeof lighthouseMessageCategorySchema>;
+export const lighthouseMessageSchema = z.object({
+  id: z.number().int(),
+  cohortId: z.number().int(),
+  recipientUserId: z.number().int().nullable(),
+  senderUserId: z.number().int().nullable(),
+  senderNickname: z.string().nullable(),
+  practiceId: z.number().int().nullable(),
+  practiceTitle: z.string().nullable(),
+  templateId: z.number().int().nullable(),
+  category: lighthouseMessageCategorySchema,
+  body: z.string(),
+  sentAt: z.string().datetime(),
+});
+/** 訊息紀錄（FR-TF-05） */
+export const lighthouseMessageListResponseSchema = apiSuccessSchema(
+  z.object({
+    participant: lighthouseParticipantSchema,
+    total: z.number().int().nonnegative(),
+    items: z.array(lighthouseMessageSchema),
+  })
+);
+export const lighthouseMessageResponseSchema = apiSuccessSchema(lighthouseMessageSchema);
+export const lighthouseMessageTemplateSchema = z.object({
+  id: z.number().int(),
+  organizationId: z.number().int(),
+  createdBy: z.number().int().nullable(),
+  category: lighthouseMessageCategorySchema,
+  title: z.string(),
+  body: z.string(),
+  createdAt: z.string().datetime(),
+  updatedAt: nullableDateTimeSchema,
+});
+/** 訊息範本（FR-TF-06） */
+export const lighthouseMessageTemplateListResponseSchema = apiSuccessSchema(
+  z.array(lighthouseMessageTemplateSchema)
+);
+export const lighthouseMessageTemplateResponseSchema = apiSuccessSchema(
+  lighthouseMessageTemplateSchema
 );
 
 export const lighthouseOutcomeResponseSchema = apiSuccessSchema(
@@ -399,6 +565,59 @@ export const updateLighthouseCohort = async (
 export const archiveLighthouseCohort = async (programId: number, cohortId: number) =>
   client.DELETE("/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}", {
     params: { path: { programId, cohortId } },
+  });
+
+/** 複製場次為草稿（含模板綁定，不含名單；FR-OV-03） */
+export const duplicateLighthouseCohort = async (programId: number, cohortId: number) =>
+  client.POST("/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/duplicate", {
+    params: { path: { programId, cohortId } },
+  });
+
+/** 重新開放透過連結加入；沿用原連結（FR-RS-02） */
+export const resumeLighthouseJoining = async (programId: number, cohortId: number) =>
+  client.POST("/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/join-token/resume", {
+    params: { path: { programId, cohortId } },
+  });
+
+type SendCohortMessageBody = NonNullable<
+  paths["/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants/{userId}/messages"]["post"]["requestBody"]
+>["content"]["application/json"];
+type CreateMessageTemplateBody = NonNullable<
+  paths["/api/v1/lighthouse/organizations/{organizationId}/message-templates"]["post"]["requestBody"]
+>["content"]["application/json"];
+
+/** 送出鼓勵／慶祝訊息給參與者（FR-TF-06） */
+export const sendLighthouseMessage = async (
+  programId: number,
+  cohortId: number,
+  userId: number,
+  body: SendCohortMessageBody
+) =>
+  client.POST(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants/{userId}/messages",
+    { params: { path: { programId, cohortId, userId } }, body }
+  );
+
+export const createLighthouseMessageTemplate = async (
+  organizationId: number,
+  body: CreateMessageTemplateBody
+) =>
+  client.POST("/api/v1/lighthouse/organizations/{organizationId}/message-templates", {
+    params: { path: { organizationId } },
+    body,
+  });
+
+export const deleteLighthouseMessageTemplate = async (organizationId: number, templateId: number) =>
+  client.DELETE(
+    "/api/v1/lighthouse/organizations/{organizationId}/message-templates/{templateId}",
+    {
+      params: { path: { organizationId, templateId } },
+    }
+  );
+
+export const getLighthouseOrganizationCohorts = async (organizationId: number) =>
+  client.GET("/api/v1/lighthouse/organizations/{organizationId}/cohorts", {
+    params: { path: { organizationId } },
   });
 
 export const inviteLighthouseCohortMembers = async (

@@ -10,8 +10,8 @@ import {
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Empty, EmptyDescription } from "@daodao/ui/components/empty";
-import { Spinner } from "@daodao/ui/components/spinner";
 import { toast } from "@daodao/ui/components/sonner";
+import { Spinner } from "@daodao/ui/components/spinner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { MessageCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
@@ -66,11 +66,7 @@ function CoachFeedItem({
 
   async function generateDraft() {
     setBusy(true);
-    const response = await createLighthouseEncouragementDraft(
-      programId,
-      cohortId,
-      Number(item.id),
-    );
+    const response = await createLighthouseEncouragementDraft(programId, cohortId, Number(item.id));
     setBusy(false);
     if (response.error || !response.data) {
       toast.error(t("draft_failed"));
@@ -87,7 +83,7 @@ function CoachFeedItem({
       programId,
       cohortId,
       Number(item.id),
-      draft.trim(),
+      draft.trim()
     );
     setBusy(false);
     if (response.error) {
@@ -135,21 +131,11 @@ function CoachFeedItem({
   const coachFooter = (
     <>
       <div className="flex items-center gap-2">
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={generateDraft}
-          disabled={busy}
-        >
+        <Button size="sm" variant="ghost" onClick={generateDraft} disabled={busy}>
           <Sparkles className="size-4" />
           {t("ai_draft")}
         </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => setIsComposing(true)}
-          disabled={busy}
-        >
+        <Button size="sm" variant="ghost" onClick={() => setIsComposing(true)} disabled={busy}>
           <MessageCircle className="size-4" />
           {t("write_comment")}
         </Button>
@@ -157,10 +143,7 @@ function CoachFeedItem({
 
       {isComposing && (
         <div className="mt-3 rounded-xl bg-primary-palest p-4">
-          <label
-            htmlFor={`draft-${item.id}`}
-            className="text-sm font-semibold text-text-dark"
-          >
+          <label htmlFor={`draft-${item.id}`} className="text-sm font-semibold text-text-dark">
             {draft ? t("editable_draft") : t("write_comment")}
           </label>
           <Textarea
@@ -171,11 +154,7 @@ function CoachFeedItem({
             onChange={(event) => setDraft(event.target.value)}
           />
           <div className="mt-3 flex gap-2">
-            <Button
-              size="sm"
-              onClick={submit}
-              disabled={busy || !draft.trim()}
-            >
+            <Button size="sm" onClick={submit} disabled={busy || !draft.trim()}>
               <MessageCircle className="size-4" />
               {t("send_comment")}
             </Button>
@@ -238,12 +217,7 @@ export function CohortFeed({ programId, cohortId }: CohortFeedProps) {
           </Empty>
         )}
         {feed?.items.map((item) => (
-          <CoachFeedItem
-            key={item.id}
-            programId={programId}
-            cohortId={cohortId}
-            item={item}
-          />
+          <CoachFeedItem key={item.id} programId={programId} cohortId={cohortId} item={item} />
         ))}
       </div>
     </div>

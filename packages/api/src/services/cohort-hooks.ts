@@ -3,11 +3,15 @@
 import { useMemo } from "react";
 import type { z } from "zod";
 import { EMPTY_QUERY_INIT, useQuery } from "../hooks";
+import type {
+  LighthouseDashboardQuery,
+  LighthouseMessageCategory,
+  LighthouseParticipantsQuery,
+} from "./cohort";
 import {
   cohortJoinInfoResponseSchema,
   cohortMemberHomeResponseSchema,
   learnerCohortFeedResponseSchema,
-  myCohortsResponseSchema,
   lighthouseCoachFeedResponseSchema,
   lighthouseCohortEnrollmentsResponseSchema,
   lighthouseCohortListResponseSchema,
@@ -15,12 +19,18 @@ import {
   lighthouseCohortResponseSchema,
   lighthouseDashboardResponseSchema,
   lighthouseFocusResponseSchema,
+  lighthouseMessageListResponseSchema,
+  lighthouseMessageTemplateListResponseSchema,
+  lighthouseOrganizationCohortListResponseSchema,
   lighthouseOrganizationListResponseSchema,
   lighthouseOrganizationMembersResponseSchema,
   lighthouseOrganizationResponseSchema,
   lighthouseOutcomeResponseSchema,
+  lighthouseParticipantCheckinsResponseSchema,
+  lighthouseParticipantsResponseSchema,
   lighthouseProgramListResponseSchema,
   lighthouseTemplatesResponseSchema,
+  myCohortsResponseSchema,
 } from "./cohort";
 
 function useValidatedResponse<TQuery extends { data?: unknown }, TSchema extends z.ZodTypeAny>(
@@ -74,6 +84,19 @@ export const useLighthouseCohorts = (programId?: number) => {
   };
 };
 
+/** 總覽卡片：組織底下所有場次（含草稿與封存），一次取回不必逐系列 N+1 */
+export const useLighthouseOrganizationCohorts = (organizationId?: number) => {
+  const query = useQuery(
+    "/api/v1/lighthouse/organizations/{organizationId}/cohorts",
+    organizationId ? { params: { path: { organizationId } } } : null
+  );
+  const validated = useValidatedResponse(query, lighthouseOrganizationCohortListResponseSchema);
+  return {
+    ...validated,
+    cohorts: validated.data?.data,
+  };
+};
+
 export const useLighthouseCohort = (programId?: number, cohortId?: number) => {
   const query = useQuery(
     "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}",
@@ -98,12 +121,37 @@ export const useLighthouseCohortEnrollments = (programId?: number, cohortId?: nu
   return useValidatedResponse(query, lighthouseCohortEnrollmentsResponseSchema);
 };
 
-export const useLighthouseDashboard = (programId?: number, cohortId?: number) => {
-  const query = useQuery(
+const compactQuery = <T extends Record<string, unknown>>(query: T): Partial<T> =>
+  Object.fromEntries(
+    Object.entries(query).filter(([, value]) => value !== undefined && value !== "")
+  ) as Partial<T>;
+
+export const useLighthouseDashboard = (
+  programId?: number,
+  cohortId?: number,
+  query: LighthouseDashboardQuery = {}
+) => {
+  const result = useQuery(
     "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/dashboard",
-    programId && cohortId ? { params: { path: { programId, cohortId } } } : null
+    programId && cohortId
+      ? { params: { path: { programId, cohortId }, query: compactQuery(query) } }
+      : null
   );
-  return useValidatedResponse(query, lighthouseDashboardResponseSchema);
+  return useValidatedResponse(result, lighthouseDashboardResponseSchema);
+};
+
+export const useLighthouseParticipants = (
+  programId?: number,
+  cohortId?: number,
+  query: LighthouseParticipantsQuery = {}
+) => {
+  const result = useQuery(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants",
+    programId && cohortId
+      ? { params: { path: { programId, cohortId }, query: compactQuery(query) } }
+      : null
+  );
+  return useValidatedResponse(result, lighthouseParticipantsResponseSchema);
 };
 
 export const useLighthouseFocus = (programId?: number, cohortId?: number) => {
@@ -112,6 +160,50 @@ export const useLighthouseFocus = (programId?: number, cohortId?: number) => {
     programId && cohortId ? { params: { path: { programId, cohortId } } } : null
   );
   return useValidatedResponse(query, lighthouseFocusResponseSchema);
+};
+
+/** 打卡紀錄抽屜：某參與者 × 某實踐（FR-TF-04）；userId / practiceId 未定時不打 */
+export const useLighthouseParticipantCheckins = (
+  programId?: number,
+  cohortId?: number,
+  userId?: number,
+  practiceId?: number
+) => {
+  const query = useQuery(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants/{userId}/practices/{practiceId}/checkins",
+    programId && cohortId && userId && practiceId
+      ? { params: { path: { programId, cohortId, userId, practiceId } } }
+      : null
+  );
+  return useValidatedResponse(query, lighthouseParticipantCheckinsResponseSchema);
+};
+
+/** 與某參與者的訊息往來（FR-TF-05） */
+export const useLighthouseParticipantMessages = (
+  programId?: number,
+  cohortId?: number,
+  userId?: number
+) => {
+  const query = useQuery(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants/{userId}/messages",
+    programId && cohortId && userId ? { params: { path: { programId, cohortId, userId } } } : null
+  );
+  return useValidatedResponse(query, lighthouseMessageListResponseSchema);
+};
+
+/** 組織的訊息範本（FR-TF-06） */
+export const useLighthouseMessageTemplates = (
+  organizationId?: number,
+  category?: LighthouseMessageCategory
+) => {
+  const query = useQuery(
+    "/api/v1/lighthouse/organizations/{organizationId}/message-templates",
+    organizationId
+      ? { params: { path: { organizationId }, query: category ? { category } : {} } }
+      : null
+  );
+  const validated = useValidatedResponse(query, lighthouseMessageTemplateListResponseSchema);
+  return { ...validated, templates: validated.data?.data };
 };
 
 export const useLighthouseOutcome = (programId?: number, cohortId?: number) => {

@@ -1,8 +1,5 @@
-import { CohortFeed } from "@/components/lighthouse/cohort-feed";
+import { CohortComingSoon } from "@/components/lighthouse/cohort-coming-soon";
 
-export default async function LighthouseCohortFeedPage({
-  params,
-}: PageProps<"/[locale]/lighthouse/programs/[programId]/cohorts/[cohortId]/feed">) {
-  const { programId, cohortId } = await params;
-  return <CohortFeed programId={Number(programId)} cohortId={Number(cohortId)} />;
+export default function LighthouseCohortFeedPage() {
+  return <CohortComingSoon section="feed" />;
 }

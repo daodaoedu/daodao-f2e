@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ApiCommentNode } from "@/components/check-in/display/check-in-detail";
+import type { ApiCommentNode } from "@/components/check-in/display/api-comment-node";
 import { countTotalComments } from "../count-comments";
 
 describe("countTotalComments", () => {
