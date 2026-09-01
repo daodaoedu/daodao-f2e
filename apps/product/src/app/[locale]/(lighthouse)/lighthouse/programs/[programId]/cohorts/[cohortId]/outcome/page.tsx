@@ -1,8 +1,5 @@
-import { CohortOutcome } from "@/components/lighthouse/cohort-outcome";
+import { CohortComingSoon } from "@/components/lighthouse/cohort-coming-soon";
 
-export default async function LighthouseCohortOutcomePage({
-  params,
-}: PageProps<"/[locale]/lighthouse/programs/[programId]/cohorts/[cohortId]/outcome">) {
-  const { programId, cohortId } = await params;
-  return <CohortOutcome programId={Number(programId)} cohortId={Number(cohortId)} />;
+export default function LighthouseCohortOutcomePage() {
+  return <CohortComingSoon section="outcome" />;
 }

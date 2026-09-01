@@ -4,6 +4,7 @@ import {
   useCurrentUser,
   usePracticeById,
   usePracticeCheckIns,
+  useRecordView,
   useUpdatePracticeCheckIn,
 } from "@daodao/api";
 import { Deco4Svg } from "@daodao/assets";
@@ -11,7 +12,7 @@ import { useTranslations } from "@daodao/i18n";
 import { useParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { addDays, format, isValid, parse } from "date-fns";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   CheckInButton,
   CheckInDateSelector,
@@ -83,6 +84,14 @@ export default function CheckInDetailPage() {
   // 獲取 practice 資料
   const { data: practiceData, isLoading: isLoadingPractice } = usePracticeById(practiceId);
 
+  const recordView = useRecordView();
+
+  // 記錄打卡觀看（fire-and-forget，未登入時後端回 401，錯誤已被吞掉）
+  useEffect(() => {
+    if (!practiceId || !checkInId) return;
+    recordView("practice_checkin", checkInId, { practiceId });
+  }, [practiceId, checkInId, recordView]);
+
   const { data: currentUserData, isLoading: isLoadingCurrentUser } = useCurrentUser();
 
   // 更新打卡記錄
@@ -110,6 +119,8 @@ export default function CheckInDetailPage() {
         tags: checkIn.tags || [],
         images: checkIn.imageUrls || [],
         practiceTitle: practiceData.data.title,
+        // viewCount 尚未同步進 generated types（server dev branch 合併後才有）
+        viewCount: (checkIn as { viewCount?: number }).viewCount ?? 0,
       };
 
       map.set(String(checkIn.id), displayData);

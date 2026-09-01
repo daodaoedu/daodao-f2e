@@ -33,6 +33,8 @@ export enum StorageEnum {
   TaskGuideCollapsed = "TaskGuideCollapsed",
   /** 用於記錄 PWA 安裝橫幅被關閉的時間點的 localStorage */
   PwaInstallDismissedAt = "PwaInstallDismissedAt",
+  /** 用於記錄燈塔側邊欄是否收合的 localStorage */
+  LighthouseSidebarCollapsed = "LighthouseSidebarCollapsed",
 }
 
 const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
@@ -48,6 +50,7 @@ const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   RegistrationFlow: "localStorage",
   TaskGuideCollapsed: "sessionStorage",
   PwaInstallDismissedAt: "localStorage",
+  LighthouseSidebarCollapsed: "localStorage",
 };
 
 export interface StorageInstance<T> {
