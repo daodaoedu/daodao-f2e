@@ -1,564 +1,67 @@
 "use client";
 
-import {
-  type CreatePracticeRequestType,
-  createPractice,
-  getRandomPracticeTemplates,
-  type PracticeTemplateType,
-  usePracticeTemplateById,
-  usePracticeTemplateCategories,
-} from "@daodao/api";
-import { ArrowRightOutlineSvg, CompassSvg, Deco4Svg } from "@daodao/assets";
+import { usePracticeTemplateById } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
-import { useRouter } from "@daodao/i18n/navigation";
-import { Badge } from "@daodao/ui/components/badge";
-import { Button } from "@daodao/ui/components/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@daodao/ui/components/dropdown-menu";
-import { toast } from "@daodao/ui/components/sonner";
-import { cn } from "@daodao/ui/lib/utils";
-import { format } from "date-fns";
-import { ChevronDown, Loader, RefreshCcw } from "lucide-react";
+import { Loader } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { PageHeader } from "@/components/layout";
-import {
-  ExecutionDurationCard,
-  ExecutionTimingCard,
-  type ManualPracticeFormValues,
-  PracticeOverviewCard,
-  ResourceCard,
-} from "@/components/practice";
-import {
-  applyOnboardingUpdateFromResponse,
-  refreshOnboardingStatus,
-} from "@/components/task-guide/onboarding-progress-context";
-import { practiceCategoryMetadataMap } from "@/constants/practice-category";
-import {
-  DURATION_DAYS_NUMBER_OPTIONS,
-  DurationDays,
-  DurationDaysNumberToStringMap,
-  type ExecutionTiming,
-  Frequency,
-  mapExecutionTimingToPracticeTimePeriods,
-  PracticeTimePeriodToExecutionTimingMap,
-  parseFrequency,
-} from "@/constants/practice-form";
+import { PracticeWizard, WizardMode } from "@/components/practice/create/wizard";
+import { templateToWizardValues } from "@/components/practice/create/wizard/template-to-values";
 
-// 將 API 的 practiceTimePeriods 映射到 executionTiming
-const mapPracticeTimePeriodsToExecutionTiming = (periods: string[]): ExecutionTiming[] => {
-  const mapped = periods
-    .map((period) => PracticeTimePeriodToExecutionTimingMap[period])
-    .filter((timing): timing is ExecutionTiming => timing !== undefined);
-
-  return mapped.length > 0 ? mapped : [];
-};
-
-// 將 API 的 frequencyMinDays 和 frequencyMaxDays 映射到 frequency
-const mapFrequencyToFormValue = (minDays: number | null, maxDays: number | null): Frequency => {
-  if (minDays === null || maxDays === null) {
-    return Frequency.threeToFive; // 預設值
-  }
-
-  // 根據範圍映射到對應的選項
-  if (minDays >= 2 && maxDays <= 4) {
-    return Frequency.twoToFour;
-  }
-  if (minDays >= 3 && maxDays <= 5) {
-    return Frequency.threeToFive;
-  }
-  if (minDays >= 4 && maxDays <= 7) {
-    return Frequency.fourToSeven;
-  }
-
-  // 預設值
-  return Frequency.threeToFive;
-};
-
-// 將 API 的 durationDays 映射到表單的 durationDays (字串)
-const mapDurationDaysToString = (days: number | null): DurationDays => {
-  if (days === null) {
-    return DurationDays.thirty; // 預設值
-  }
-
-  // 找到最接近的選項
-  const closest = DURATION_DAYS_NUMBER_OPTIONS.reduce((prev, curr) =>
-    Math.abs(curr - days) < Math.abs(prev - days) ? curr : prev
-  );
-
-  // 將數字轉換為對應的字串常數
-  return DurationDaysNumberToStringMap[closest];
-};
-
-// 將 API 的 PracticeTemplate 轉換成 ManualPracticeFormValues
-const convertTemplateToFormValues = (template: PracticeTemplateType): ManualPracticeFormValues => {
-  // 預設開始日期為今天
-  const today = new Date();
-  const startDate = format(today, "yyyy-MM-dd");
-
-  return {
-    // Step 1
-    name: template.title,
-    actionDescription: template.practiceAction || template.title,
-    durationMinutes: template.sessionDurationMinutes ?? 30,
-
-    // Step 2
-    startDate,
-    durationDays: mapDurationDaysToString(template.durationDays),
-    frequency: mapFrequencyToFormValue(template.frequencyMinDays, template.frequencyMaxDays),
-
-    // Step 3
-    executionTiming: mapPracticeTimePeriodsToExecutionTiming(template.practiceTimePeriods),
-    customTiming: "",
-
-    // Step 4
-    tags: template.suggestedTags || [],
-    resources: (template.resources || [])
-      .filter((resource, index, self) => index === self.findIndex((r) => r.id === resource.id))
-      .map((resource) => ({
-        id: resource.id,
-        name: resource.name,
-        url: resource.url,
-      })),
-  };
-};
-
-// 將表單資料轉換成 API 請求格式
-const convertFormValuesToApiRequest = (
-  values: ManualPracticeFormValues
-): CreatePracticeRequestType => {
-  const frequency = parseFrequency(values.frequency as Frequency);
-  const practiceTimePeriods = mapExecutionTimingToPracticeTimePeriods(
-    values.executionTiming as ExecutionTiming[]
-  );
-
-  const request: Record<string, unknown> = {
-    title: values.name,
-    durationDays: parseInt(values.durationDays, 10),
-    frequencyMinDays: frequency.minDays,
-    frequencyMaxDays: frequency.maxDays,
-    sessionDurationMinutes: values.durationMinutes,
-  };
-
-  if (values.actionDescription) {
-    request.practiceAction = values.actionDescription;
-  }
-
-  if (values.startDate) {
-    request.startDate = values.startDate;
-  }
-
-  if (practiceTimePeriods.length > 0) {
-    request.practiceTimePeriods = practiceTimePeriods;
-  }
-
-  if (values.tags && values.tags.length > 0) {
-    request.tags = values.tags;
-  }
-
-  if (values.resources && values.resources.length > 0) {
-    request.resources = values.resources.map((resource) => ({
-      name: resource.name,
-      url: resource.url || undefined,
-    }));
-  }
-
-  if (values.customTiming) {
-    request.otherContext = values.customTiming;
-  }
-
-  return request as CreatePracticeRequestType;
-};
-
+/**
+ * 由模版建立個人實踐：載入模版 → 轉成精靈初始值 → 走四步驟流程（帶 templateId）
+ */
 export default function TemplateDetailPage() {
   const t = useTranslations("practice");
-  const router = useRouter();
   const params = useParams();
   const templateId = params.templateId as string;
 
-  // 取得認證狀態
   const { requireAuth } = useAuth();
-
-  // 取得模板詳情
   const { data, error, isLoading } = usePracticeTemplateById(templateId);
 
-  // 將 API 回應轉換成表單格式
-  const template = useMemo(() => {
-    if (!data?.data) {
-      return null;
-    }
-    return convertTemplateToFormValues(data.data);
+  const initialValues = useMemo(() => {
+    if (!data?.data) return null;
+    return templateToWizardValues(data.data);
   }, [data]);
 
-  // 取得可選的模板分類
-  const { data: categoriesData } = usePracticeTemplateCategories();
-
-  // 將 API 分類 ID 轉成含 label 與 icon 的選項
-  const categoryOptions = useMemo(() => {
-    if (!categoriesData?.data) {
-      return [];
-    }
-    return categoriesData.data.map((categoryId: string) => {
-      const metadata = practiceCategoryMetadataMap[categoryId];
-      return {
-        id: categoryId,
-        label: metadata ? t(metadata.labelKey as Parameters<typeof t>[0]) : categoryId,
-        icon: metadata?.icon ?? CompassSvg,
-      };
-    });
-  }, [categoriesData, t]);
-
-  // 目前模板所屬分類：優先取已知分類，否則取第一個
-  const currentCategory = useMemo(() => {
-    const categories = data?.data?.categories;
-    if (!categories || categories.length === 0) {
-      return undefined;
-    }
-    return categories.find((category) => category in practiceCategoryMetadataMap) ?? categories[0];
-  }, [data]);
-
-  // 下拉選單觸發鈕顯示的分類名稱，未知分類時退回原本的「主題實踐」標題
-  const currentCategoryLabel = useMemo(() => {
-    if (!currentCategory) return t("create_title");
-    const metadata = practiceCategoryMetadataMap[currentCategory];
-    return metadata ? t(metadata.labelKey as Parameters<typeof t>[0]) : currentCategory;
-  }, [currentCategory, t]);
-
-  const [showActions, setShowActions] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowActions(true);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // 建立實踐的核心邏輯
-  const doCreatePractice = useCallback(async () => {
-    if (isSubmitting || !template) {
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const apiRequest = convertFormValuesToApiRequest(template);
-
-      const response = await createPractice(apiRequest);
-
-      if (response.error) {
-        const errorMessage =
-          response.error && typeof response.error === "object" && "message" in response.error
-            ? String(response.error.message)
-            : t("create_failed");
-        console.error("Failed to create practice:", errorMessage);
-        toast.error(errorMessage);
-        setIsSubmitting(false);
-        return;
-      }
-
-      if (!applyOnboardingUpdateFromResponse(response.data)) {
-        refreshOnboardingStatus();
-      }
-
-      // 取得新建立的實踐 ID
-      const practiceId = response.data?.data?.id;
-
-      // 提交成功後導航到成功頁面
-      if (practiceId) {
-        router.push(
-          `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}&practiceId=${encodeURIComponent(practiceId)}`
-        );
-      } else {
-        router.push(
-          `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}`
-        );
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t("create_failed_retry");
-      console.error("Failed to create practice:", err);
-      toast.error(errorMessage);
-      setIsSubmitting(false);
-    }
-  }, [isSubmitting, template, router, t]);
-
-  // 處理建立按鈕點擊 - 使用 requireAuth 包裝
-  const handleCreate = useCallback(() => {
-    requireAuth(doCreatePractice, {
-      redirectUrl: typeof window !== "undefined" ? window.location.href : undefined,
-      source: "app",
-    });
-  }, [requireAuth, doCreatePractice]);
-
-  // 取得指定分類的隨機模板並導向；未指定分類則跨全部分類
-  const goToRandomTemplate = useCallback(
-    async (category?: string) => {
-      setIsRefreshing(true);
-      try {
-        const response = await getRandomPracticeTemplates({ count: 1, category });
-
-        const nextTemplate = response.data?.data?.[0];
-
-        if (!nextTemplate) {
-          // 如果沒有模板，導航回列表頁面
-          router.push("/practices/create");
-          return;
-        }
-
-        router.replace(`/practices/create/template/${nextTemplate.id}`);
-      } catch (error) {
-        // 發生錯誤時導航回列表頁面
-        console.error("Failed to fetch random templates:", error);
-        router.push("/practices/create");
-      } finally {
-        setIsRefreshing(false);
-      }
+  // 未登入時先要求登入，登入後再送出（沿用舊頁行為）
+  const submitGuard = useCallback(
+    (run: () => Promise<void>) => {
+      requireAuth(run, {
+        redirectUrl: typeof window !== "undefined" ? window.location.href : undefined,
+        source: "app",
+      });
     },
-    [router]
+    [requireAuth]
   );
 
-  // 換一個：在目前分類內重新抽一個模板
-  const handleRefresh = useCallback(
-    () => goToRandomTemplate(currentCategory),
-    [goToRandomTemplate, currentCategory]
-  );
-
-  // 切換分類：抽取所選分類的一個模板
-  const handleSelectCategory = useCallback(
-    (categoryId: string) => goToRandomTemplate(categoryId),
-    [goToRandomTemplate]
-  );
-
-  // Loading 狀態
   if (isLoading) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan flex items-center justify-center">
-        <Loader className="size-8 animate-spin text-white" />
+      <div className="relative z-10 flex min-h-screen w-screen items-center justify-center overflow-hidden overflow-y-auto bg-white">
+        <Loader className="size-8 animate-spin text-logo-cyan" />
       </div>
     );
   }
 
-  // Error 狀態
-  if (error || !template) {
+  if (error || !initialValues) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
-        <PageHeader leftAction="back" leftLabel="" variant="light" />
-        <div className="flex flex-col items-center justify-center min-h-[60vh] px-5">
-          <p className="text-white mb-4">{t("template_load_error")}</p>
+      <div className="relative z-10 min-h-screen w-screen overflow-hidden overflow-y-auto bg-white">
+        <PageHeader leftAction="back" leftLabel="" />
+        <div className="flex min-h-[60vh] flex-col items-center justify-center px-5">
+          <p className="mb-4 text-text-dark">{t("template_load_error")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
-      <Deco4Svg className="absolute top-0 right-0" width={270} height={484} />
-
-      {/* Top Navigation */}
-      <PageHeader leftAction="back" leftLabel="" variant="light" />
-
-      <main className="relative max-w-[600px] md:max-w-[680px] mx-auto pb-8">
-        {/* Category Label */}
-        <div className="py-4">
-          <div className="max-w-[448px] mx-auto px-5">
-            {categoryOptions.length > 0 ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Badge
-                    variant="secondary"
-                    size="sm"
-                    className="text-xs md:text-sm mb-2 cursor-pointer gap-1 hover:bg-white/90 transition-colors"
-                  >
-                    {currentCategoryLabel}
-                    <ChevronDown className="size-3 opacity-70" />
-                  </Badge>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" sideOffset={0} className="mt-0.5 w-44">
-                  {categoryOptions.map((category) => {
-                    const Icon = category.icon;
-                    const isSelected = currentCategory === category.id;
-                    return (
-                      <DropdownMenuItem
-                        key={category.id}
-                        onClick={() => handleSelectCategory(category.id)}
-                        className={cn(
-                          "gap-2 min-h-[44px] text-text-dark",
-                          isSelected && "font-medium text-logo-cyan"
-                        )}
-                      >
-                        <Icon className="size-4 shrink-0" />
-                        {category.label}
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Badge variant="secondary" size="sm" className="text-xs md:text-sm mb-2">
-                {currentCategoryLabel}
-              </Badge>
-            )}
-            <div className="flex md:flex-col md:gap-3">
-              <div className="flex flex-1 items-start gap-1">
-                <div className="flex-1">
-                  <h1 className="text-2xl leading-normal md:text-4xl font-medium text-white mb-1">
-                    {template.name}
-                  </h1>
-                  <p className="text-sm text-white">{template.actionDescription}</p>
-                </div>
-                {/* Mobile：右側 */}
-                <div className="shrink-0 md:hidden">
-                  <Button
-                    variant="white"
-                    onClick={handleRefresh}
-                    disabled={!showActions || isRefreshing}
-                    className="group text-sm font-normal h-[35px] px-3 transition-opacity duration-500 ease-out"
-                  >
-                    {isRefreshing ? (
-                      <Loader className="size-4.5 animate-spin" />
-                    ) : showActions ? (
-                      <RefreshCcw className="size-4.5 group-hover:animate-spin-reverse" />
-                    ) : (
-                      <Loader className="size-4.5 animate-spin" />
-                    )}
-                    {t("template_swap")}
-                  </Button>
-                </div>
-              </div>
-              {/* Desktop：副標題の下 */}
-              <div className="hidden md:block">
-                <Button
-                  variant="white"
-                  onClick={handleRefresh}
-                  disabled={!showActions || isRefreshing}
-                  className="group text-sm font-normal h-[35px] px-3 transition-opacity duration-500 ease-out"
-                >
-                  {isRefreshing ? (
-                    <Loader className="size-4.5 animate-spin" />
-                  ) : showActions ? (
-                    <RefreshCcw className="size-4.5 group-hover:animate-spin-reverse" />
-                  ) : (
-                    <Loader className="size-4.5 animate-spin" />
-                  )}
-                  {t("template_swap")}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {data?.data?.organization && (
-          <aside className="mx-5 mb-4 rounded-2xl border border-white/30 bg-white/15 p-4 text-white backdrop-blur md:mx-auto md:max-w-[448px]">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/70">
-              {t("template_by_organization")}
-            </p>
-            <h2 className="mt-2 text-lg font-semibold">{data.data.organization.name}</h2>
-            {data.data.organization.bio && (
-              <p className="mt-2 text-sm leading-6 text-white/85">{data.data.organization.bio}</p>
-            )}
-            {data.data.organization.externalLink && (
-              <a
-                href={data.data.organization.externalLink}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-logo-cyan"
-              >
-                {t("organization_learn_more")}
-              </a>
-            )}
-          </aside>
-        )}
-
-        <div className="bg-white rounded-t-2xl">
-          <div className="max-w-[448px] mx-auto pt-4 px-5 pb-28">
-            {/* Course Overview Card */}
-            <div className="relative mb-3.5">
-              {/* Compass Icon */}
-              <div className="absolute -top-14 -right-1 z-10">
-                <CompassSvg width={109} height={114} />
-              </div>
-
-              <PracticeOverviewCard
-                actionDescription={template.actionDescription}
-                frequency={template.frequency}
-                durationMinutes={template.durationMinutes}
-                tags={template.tags}
-              />
-            </div>
-
-            {/* Execution Timing and Duration Cards */}
-            <div className="grid grid-cols-2 gap-4 mb-3.5">
-              {/* Execution Timing Card */}
-              <ExecutionTimingCard
-                executionTiming={template.executionTiming}
-                customTiming={template.customTiming}
-              />
-
-              {/* Execution Duration Card */}
-              <ExecutionDurationCard
-                durationDays={template.durationDays}
-                startDate={template.startDate}
-              />
-            </div>
-
-            {/* Recommended Resources Section */}
-            {Array.isArray(template.resources) && template.resources.length > 0 && (
-              <div>
-                <h2 className="text-sm text-center font-medium text-white mt-4 mb-3.5">
-                  {t("template_resources_title")}
-                </h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {template.resources?.map((resource) => (
-                    <ResourceCard
-                      key={resource.id}
-                      resource={{
-                        id: resource.id,
-                        name: resource.name,
-                        url: resource.url,
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Action Button */}
-        <footer
-          className={cn(
-            "fixed bottom-0 left-0 right-0 flex justify-center p-6 bg-very-light-gray transition-transform duration-500 ease-out border-t border-light-gray",
-            showActions ? "translate-y-0" : "translate-y-full"
-          )}
-        >
-          <Button
-            onClick={handleCreate}
-            disabled={isSubmitting}
-            variant="orange"
-            className="w-full sm:max-w-[288px]"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader className="size-4.5 animate-spin" />
-                {t("template_creating")}
-              </>
-            ) : (
-              <>
-                {t("template_looks_good")}
-                <ArrowRightOutlineSvg className="size-4.5" />
-              </>
-            )}
-          </Button>
-        </footer>
-      </main>
-    </div>
+    <PracticeWizard
+      mode={WizardMode.personal}
+      initialValues={initialValues}
+      templateId={templateId}
+      submitGuard={submitGuard}
+    />
   );
 }

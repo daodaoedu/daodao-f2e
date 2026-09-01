@@ -283,6 +283,35 @@ export const createPractice = async (data: CreatePracticeRequestType) => {
   });
 };
 
+export type BatchCreatePracticeRequestType = components["schemas"]["BatchCreatePracticeRequest"];
+export type CreatePracticeTemplateRequestType =
+  components["schemas"]["CreatePracticeTemplateRequest"];
+export type BatchCreatePracticeTemplateRequestType =
+  components["schemas"]["BatchCreatePracticeTemplateRequest"];
+
+/** 拆段批次建立實踐（2–3 段、同一交易） */
+export const batchCreatePractices = async (data: BatchCreatePracticeRequestType) => {
+  return client.POST("/api/v1/practices/batch", {
+    body: data,
+  });
+};
+
+/** 建立實踐模板 */
+export const createPracticeTemplate = async (data: CreatePracticeTemplateRequestType) => {
+  return client.POST("/api/v1/practices/templates", {
+    body: data,
+  });
+};
+
+/** 拆段批次建立實踐模板 */
+export const batchCreatePracticeTemplates = async (
+  data: BatchCreatePracticeTemplateRequestType
+) => {
+  return client.POST("/api/v1/practices/templates/batch", {
+    body: data,
+  });
+};
+
 /**
  * 更新實踐的函數（用於 Client Components）
  */

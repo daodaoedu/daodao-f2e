@@ -19,6 +19,8 @@ export enum StorageEnum {
   OAuthNonce = "OAuthNonce",
   /** 用於存儲手動建立實踐表單草稿的 sessionStorage */
   ManualPracticeDraft = "ManualPracticeDraft",
+  /** 四步驟實踐建立精靈（#141）草稿的 sessionStorage；欄位結構與舊版不相容故另開 key */
+  PracticeWizardDraft = "PracticeWizardDraft",
   /** 用於存儲 Action Maker 流程進度的 sessionStorage */
   ActionMaker = "ActionMaker",
   /** 用於跨 tab 通知 OAuth 完成（Android Chrome Custom Tab 場景） */
@@ -41,6 +43,7 @@ const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   Whitelist: "localStorage",
   OAuthNonce: "localStorage",
   ManualPracticeDraft: "sessionStorage",
+  PracticeWizardDraft: "sessionStorage",
   ActionMaker: "sessionStorage",
   AuthSignal: "localStorage",
   HomeFeedAnchor: "sessionStorage",

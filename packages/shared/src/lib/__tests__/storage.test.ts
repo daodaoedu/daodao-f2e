@@ -24,11 +24,13 @@ describe("StorageEnum", () => {
     expect(keys).toContain("Whitelist");
     expect(keys).toContain("OAuthNonce");
     expect(keys).toContain("ManualPracticeDraft");
+    expect(keys).toContain("PracticeWizardDraft");
     expect(keys).toContain("ActionMaker");
     expect(keys).toContain("AuthSignal");
     expect(keys).toContain("HomeFeedAnchor");
     expect(keys).toContain("RegistrationFlow");
     expect(keys).toContain("TaskGuideCollapsed");
-    expect(keys).toHaveLength(10);
+    expect(keys).toContain("PwaInstallDismissedAt");
+    expect(keys).toHaveLength(12);
   });
 });

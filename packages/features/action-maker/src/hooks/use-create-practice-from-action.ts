@@ -4,6 +4,9 @@ import { createPractice } from "@daodao/api";
 import { useCallback, useState } from "react";
 import type { IActionMakerResult } from "../types";
 
+/** server 建立實踐時 practiceAction 上限（與 daodao-server createPracticeSchema 對齊） */
+const PRACTICE_ACTION_MAX_LENGTH = 50;
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://server.daodao.so";
 
 interface UseCreatePracticeReturn {
@@ -35,7 +38,8 @@ export function useCreatePracticeFromAction(): UseCreatePracticeReturn {
 
         const { data, error } = await createPractice({
           title: result.action.title ?? "",
-          practiceAction: result.action.description ?? undefined,
+          practiceAction:
+            result.action.description?.slice(0, PRACTICE_ACTION_MAX_LENGTH) || undefined,
           otherContext: customContext || undefined,
           tags: [result.category],
           practiceTimePeriods: result.triggerTimingPeriods,
