@@ -304,7 +304,7 @@ export const CheckInDetail = ({
 }: ICheckInDetailProps) => {
   const t = useTranslations("check_in");
   const locale = useLocale();
-  const { date, mood, content, tags, images, practiceTitle } = checkInData;
+  const { date, mood, content, tags, images, practiceTitle, viewCount } = checkInData;
   const checkInId = checkInData.id;
 
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
@@ -391,7 +391,7 @@ export const CheckInDetail = ({
       title: t("browse_activity"),
       content: (
         <BrowseActivityContent
-          viewCount={0}
+          viewCount={viewCount ?? 0}
           commentCount={commentCount}
           followers={followers}
           onClose={() => {}}
@@ -401,7 +401,7 @@ export const CheckInDetail = ({
       closeOnEscape: true,
       showCloseButton: true,
     });
-  }, [reactionsListData, commentCount, openSheet, locale, t]);
+  }, [reactionsListData, commentCount, openSheet, locale, t, viewCount]);
 
   // ── Edit / Share ───────────────────────────────────────────────────────────
   const { openEditCheckInSheet } = useEditCheckInSheet({

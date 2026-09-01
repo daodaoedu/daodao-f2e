@@ -14,6 +14,7 @@ import {
   useCurrentUser,
   useMentionCandidates,
   useReactions,
+  useRecordView,
 } from "@daodao/api";
 import { DialogOutlineSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
@@ -723,6 +724,13 @@ export default function LearningPersonaDetailPage() {
   const [answeredInline, setAnsweredInline] = useState(false);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const recordView = useRecordView();
+
+  // 記錄題目觀看（後台以此算曝光→回答轉換率）。未登入時後端會 401，直接略過。
+  useEffect(() => {
+    if (Number.isNaN(id) || !isAuthenticated) return;
+    recordView("persona_question", id);
+  }, [id, isAuthenticated, recordView]);
 
   const fetchAnswers = useCallback(
     async (cursor?: number) => {
