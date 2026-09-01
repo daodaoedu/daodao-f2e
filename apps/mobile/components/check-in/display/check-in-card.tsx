@@ -232,7 +232,7 @@ export const CheckInCard = ({
   );
 
   return (
-    <YStack width={350} marginHorizontal="auto">
+    <YStack width="100%" maxWidth={350} marginHorizontal="auto">
       {/* 實踐標題 */}
       <YStack paddingHorizontal="$2" paddingBottom="$5" alignItems="center">
         <Text

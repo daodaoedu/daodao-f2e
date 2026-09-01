@@ -21,7 +21,7 @@ export const CheckInDetail = ({ checkInData, onShare, onImagePress }: ICheckInDe
   const { date, mood, content, tags, images, practiceTitle } = checkInData;
 
   return (
-    <YStack width={350} marginHorizontal="auto">
+    <YStack width="100%" maxWidth={350} marginHorizontal="auto">
       <CheckInCard
         taskTitle={practiceTitle}
         date={date}

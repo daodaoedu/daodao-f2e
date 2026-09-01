@@ -57,15 +57,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 1
           ref: ${{ env.BRANCH_NAME }}
+
+      - name: Fetch deploy ref
+        env:
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+        run: |
+          git fetch --depth 1 origin "refs/deploy/${BRANCH_NAME}:refs/deploy/${BRANCH_NAME}" 2>/dev/null || echo "Deploy ref not found yet (first deploy)"
 
       - name: Detect file changes
         id: changes
+        env:
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+          EVENT_NAME: ${{ github.event_name }}
+          APP_INPUT: ${{ inputs.app }}
         run: |
           # 手動觸發時根據 input 決定
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            APP_INPUT="${{ inputs.app }}"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             if [ "$APP_INPUT" = "all" ]; then
               echo "website=true" >> $GITHUB_OUTPUT
               echo "product=true" >> $GITHUB_OUTPUT
@@ -82,22 +91,31 @@ jobs:
             exit 0
           fi
 
-          # 自動觸發時檢測變更
-          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+          # 自動觸發時檢測變更：比對「上次成功部署的 SHA」到當前 HEAD
+          # 使用 git ref refs/deploy/<branch> 記錄上次部署成功的 commit
+          DEPLOY_REF="refs/deploy/${BRANCH_NAME}"
+
+          if git show-ref --verify --quiet "$DEPLOY_REF"; then
+            # 找到上次部署的 SHA，比對它到 HEAD
+            BASE_SHA=$(git rev-parse "$DEPLOY_REF")
+            HEAD_SHA="HEAD"
+            echo "Comparing changes since last deploy ($BASE_SHA) to HEAD"
+          elif git rev-parse HEAD~1 >/dev/null 2>&1; then
+            # fallback：第一次跑或 ref 不存在，用 HEAD~1
             BASE_SHA="HEAD~1"
             HEAD_SHA="HEAD"
+            echo "No deploy ref found, comparing HEAD~1 to HEAD"
           else
-            # 第一個 commit，build 所有應用
+            # 真正的第一個 commit
             echo "website=true" >> $GITHUB_OUTPUT
             echo "product=true" >> $GITHUB_OUTPUT
             echo "✅ First commit: building all apps"
             exit 0
           fi
 
-          echo "Comparing changes between $BASE_SHA and $HEAD_SHA"
           CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
 
-          echo "Changed files:"
+          echo "Changed files since $BASE_SHA:"
           echo "$CHANGED_FILES"
 
           # 檢查是否需要 build website
@@ -436,6 +454,8 @@ jobs:
     if: ${{ always() && (needs.build-website.result == 'success' || needs.build-product.result == 'success') }}
     environment: ${{ needs.build-website.outputs.image-tag == 'prod' && 'production' || 'development' }}
     timeout-minutes: 20
+    permissions:
+      contents: write
     steps:
       - name: Debug - Check secrets
         run: |
@@ -454,11 +474,14 @@ jobs:
           fi
 
       - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.LINODE_SSH_PRIVATE_KEY }}
+
+      - name: Add Linode to known_hosts
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.LINODE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.LINODE_INSTANCE_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H "${{ secrets.LINODE_INSTANCE_IP }}" >> ~/.ssh/known_hosts
 
       - name: Create environment files on Linode
         env:
@@ -500,6 +523,15 @@ jobs:
             export DOCKER_HUB_USERNAME=${DOCKER_HUB_USERNAME}
             export IMAGE_TAG=${IMAGE_TAG}
             export COMMIT_SHA=${COMMIT_SHA}
+
+            if [ -z "\$COMMIT_SHA" ]; then
+              echo "❌ COMMIT_SHA is empty, aborting deployment"
+              exit 1
+            fi
+            if [ -z "\$IMAGE_TAG" ]; then
+              echo "❌ IMAGE_TAG is empty, aborting deployment"
+              exit 1
+            fi
 
             echo "=== Starting deployment for \$APP_ENV environment ==="
 
@@ -643,11 +675,14 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.LINODE_SSH_PRIVATE_KEY }}
+
+      - name: Add Linode to known_hosts
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.LINODE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.LINODE_INSTANCE_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H "${{ secrets.LINODE_INSTANCE_IP }}" >> ~/.ssh/known_hosts
 
       - name: Set Environment Variables
         run: |
@@ -734,10 +769,55 @@ jobs:
             echo '=== Deployment Verification Complete ==='
           ENDSSH
 
+  # ===== 更新部署參照點（獨立 job，避免 race condition）=====
+  update-deploy-ref:
+    runs-on: ubuntu-latest
+    needs: [deploy, verify]
+    # 僅在 deploy 成功且 verify 成功（或被跳過但非失敗）時更新；避免部分部署失敗卻前移 ref 導致下次增量檢測遺漏
+    if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result != 'failure' && needs.verify.result != 'cancelled' }}
+    permissions:
+      contents: write
+    steps:
+      - name: Update deploy ref
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+          COMMIT_SHA: ${{ env.COMMIT_SHA }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ -z "${COMMIT_SHA}" ]; then
+            echo "❌ COMMIT_SHA is empty, refusing to update deploy ref"
+            exit 1
+          fi
+          if [ -z "${BRANCH_NAME}" ]; then
+            echo "❌ BRANCH_NAME is empty, refusing to update deploy ref"
+            exit 1
+          fi
+          ref="refs/deploy/${BRANCH_NAME}"
+          sha="${COMMIT_SHA}"
+
+          # 用 GitHub API 更新 ref（不用 git push，避免觸發 workflow 無限迴圈）
+          # 先嘗試 PATCH（ref 已存在），失敗就 POST 建立
+          http_code=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH \
+            -H "Authorization: token ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${REPO}/git/refs/${ref}" \
+            -d "{\"sha\":\"${sha}\"}")
+
+          if [ "$http_code" = "404" ]; then
+            curl -s -X POST \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/git/refs" \
+              -d "{\"ref\":\"${ref}\",\"sha\":\"${sha}\"}" || echo "⚠️  Failed to create ref (may need write permission)"
+          fi
+
+          echo "✅ Updated deploy ref ${ref} → ${sha}"
+
   # ===== Discord 通知 =====
   notify:
     runs-on: ubuntu-latest
-    needs: [detect-changes, build-website, build-product, deploy, verify]
+    needs: [detect-changes, build-website, build-product, deploy, verify, update-deploy-ref]
     if: always()
     steps:
       - name: Send Discord Notification

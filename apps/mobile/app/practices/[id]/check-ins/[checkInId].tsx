@@ -192,7 +192,7 @@ function EditCheckInModal({
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
-      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
         <YStack flex={1} backgroundColor="$background">
           <XStack padding="$4" alignItems="center" justifyContent="space-between">
             <Button size="$3" chromeless onPress={onClose} disabled={isSaving}>
@@ -442,7 +442,7 @@ export default function CheckInDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
         <YStack flex={1} alignItems="center" justifyContent="center" backgroundColor="$background">
           <Spinner size="large" color={colors.primary.base} />
         </YStack>
@@ -452,7 +452,7 @@ export default function CheckInDetailScreen() {
 
   if (error || !practice || !checkIn) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
         <YStack flex={1} backgroundColor="$background">
           <XStack padding="$4" alignItems="center" gap="$3">
             <Button
@@ -488,7 +488,7 @@ export default function CheckInDetailScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.logo.cyan }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.logo.cyan }} edges={["top", "bottom"]}>
       <YStack flex={1} backgroundColor={colors.logo.cyan}>
         {/* 頂部半透明青色 nav：標題置中 + X 關閉 + 日期選擇器 */}
         <CheckInDateSelector

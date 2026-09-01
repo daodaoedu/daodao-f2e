@@ -25,6 +25,8 @@ interface ICheckInCardProps {
   bottomActions?: React.ReactNode;
   /** 是否為本人的打卡（true 才顯示空白提示） */
   showEmptyHint?: boolean;
+  /** 截圖模式：移除高度限制與滾動，確保完整截圖 */
+  isCapture?: boolean;
 }
 
 /**
@@ -44,6 +46,7 @@ export const CheckInCard = ({
   afterTitle,
   bottomActions,
   showEmptyHint = false,
+  isCapture = false,
 }: ICheckInCardProps) => {
   const t = useTranslations("check_in");
   const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
@@ -94,7 +97,10 @@ export const CheckInCard = ({
           <main
             ref={mainRef}
             onScroll={handleScroll}
-            className="pt-4.5 bg-white max-h-[400px] overflow-y-auto scrollbar-hide px-5"
+            className={cn(
+              "pt-4.5 bg-white scrollbar-hide px-5",
+              !isCapture && "max-h-[400px] overflow-y-auto"
+            )}
           >
             <div
               className={images && images.filter(Boolean).length > 0 ? "pb-24" : "pb-8"}
@@ -156,7 +162,7 @@ export const CheckInCard = ({
                 {tags && tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 text-logo-cyan text-sm">
                     {tags.map((tag) => (
-                      <p key={tag}># {tag}</p>
+                      <p key={tag} className="min-w-0 break-words"># {tag}</p>
                     ))}
                   </div>
                 )}
@@ -226,7 +232,7 @@ export const CheckInCard = ({
           </main>
 
           {/* 底部漸層遮罩（捲動到底時消失） */}
-          {!isScrolledToBottom && (
+          {!isCapture && !isScrolledToBottom && (
             <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-white/0 to-white pointer-events-none z-10" />
           )}
         </div>

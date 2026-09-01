@@ -6,6 +6,9 @@ node_modules/
 # Testing
 coverage/
 *.log
+playwright-report/
+test-results/
+artifacts/future-letter-playwright/
 
 # Next.js
 .next/

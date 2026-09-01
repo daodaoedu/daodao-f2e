@@ -83,9 +83,9 @@ export function HomeBanner() {
           <Text fontSize={14} color={colors.text.dark} textAlign="center">
             {slogan}
           </Text>
-        </View>
-        <View style={styles.lottie}>
-          <LottieView source={lottie} autoPlay loop style={styles.lottieInner} />
+          <View style={styles.lottie}>
+            <LottieView source={lottie} autoPlay loop style={styles.lottieInner} />
+          </View>
         </View>
       </View>
 
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   bubble: {
-    maxWidth: "72%",
+    maxWidth: "58%",
     backgroundColor: "rgba(255,255,255,0.7)",
     borderColor: "#fff",
     borderWidth: 1,
@@ -127,7 +127,8 @@ const styles = StyleSheet.create({
   },
   lottie: {
     position: "absolute",
-    right: 8,
+    left: "100%",
+    bottom: -32,
     width: 84,
     height: 84,
     transform: [{ rotate: "3deg" }],

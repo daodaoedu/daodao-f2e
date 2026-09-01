@@ -141,6 +141,7 @@ export const ShareCheckInSheetContent = ({
             tags={checkInData.tags}
             images={images}
             showTape={false}
+            isCapture
           />
         </div>
       </div>

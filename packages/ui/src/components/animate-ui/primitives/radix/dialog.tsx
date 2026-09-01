@@ -62,9 +62,9 @@ function DialogOverlay({
     <DialogPrimitive.Overlay data-slot="dialog-overlay" asChild forceMount>
       <motion.div
         key="dialog-overlay"
-        initial={{ opacity: 0, filter: "blur(4px)" }}
-        animate={{ opacity: 1, filter: "blur(0px)" }}
-        exit={{ opacity: 0, filter: "blur(4px)" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         transition={transition}
         {...props}
       />
@@ -92,10 +92,6 @@ function DialogContent({
   transition = { type: "spring", stiffness: 150, damping: 25 },
   ...props
 }: DialogContentProps) {
-  const initialRotation = from === "bottom" || from === "left" ? "20deg" : "-20deg";
-  const isVertical = from === "top" || from === "bottom";
-  const rotateAxis = isVertical ? "rotateX" : "rotateY";
-
   return (
     <DialogPrimitive.Content
       asChild
@@ -111,18 +107,15 @@ function DialogContent({
         data-slot="dialog-content"
         initial={{
           opacity: 0,
-          filter: "blur(4px)",
-          transform: `perspective(500px) ${rotateAxis}(${initialRotation}) scale(0.8)`,
+          transform: "scale(0.96)",
         }}
         animate={{
           opacity: 1,
-          filter: "blur(0px)",
-          transform: `perspective(500px) ${rotateAxis}(0deg) scale(1)`,
+          transform: "scale(1)",
         }}
         exit={{
           opacity: 0,
-          filter: "blur(4px)",
-          transform: `perspective(500px) ${rotateAxis}(${initialRotation}) scale(0.8)`,
+          transform: "scale(0.96)",
         }}
         transition={transition}
         {...props}

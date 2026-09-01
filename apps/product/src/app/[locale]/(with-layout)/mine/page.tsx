@@ -216,7 +216,7 @@ export default function MyPage() {
         </div>
       </main>
 
-      <AddTaskFAB onAddTask={() => router.push("/practices/create")} />
+      <AddTaskFAB />
     </div>
   );
 }
