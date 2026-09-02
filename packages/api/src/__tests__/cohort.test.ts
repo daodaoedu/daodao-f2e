@@ -87,6 +87,8 @@ describe("Lighthouse API runtime schemas", () => {
           startDate: "2026-07-01",
           endDate: "2026-08-31",
           joinToken: null,
+          joinPaused: false,
+          visibility: "private",
           joinDeadline: null,
           capacity: 30,
           inviteMessage: null,

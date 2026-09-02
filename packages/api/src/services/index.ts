@@ -3,6 +3,9 @@
  * 統一導出所有 domain-specific 的 API 服務
  */
 
+// Activity (探索活動) Service
+export * from "./activity";
+export * from "./activity-hooks";
 // Admin Service
 export * from "./admin";
 export * from "./admin-hooks";

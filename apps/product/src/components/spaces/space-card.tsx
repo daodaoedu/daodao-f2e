@@ -26,7 +26,10 @@ export const SpaceCard = ({ space }: SpaceCardProps) => {
       ? "/spaces/personal"
       : space.kind === "challenge"
         ? "/spaces/challenge"
-        : `/spaces/${space.id}`;
+        : // 活動課程卡的 id 是 cohortId，導向既有學員頁（design D4）；缺 id 時退回空間列表
+          space.id
+          ? `/cohorts/${space.id}`
+          : "/spaces";
 
   return (
     <li>

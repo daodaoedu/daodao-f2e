@@ -10,11 +10,11 @@ import { useQuery } from "../hooks";
 
 /** 探索共同挑戰列表（公開；登入時附 isJoined）；60 秒輪詢讓「xx 座島已加入」保持新鮮 */
 export const useChallenges = () =>
-  useQuery(
-    "/api/v1/challenges",
-    {},
-    { revalidateOnFocus: false, refreshInterval: 60_000 }
-  );
+  useQuery("/api/v1/challenges", {}, { revalidateOnFocus: false, refreshInterval: 60_000 });
+
+/** 我參加的共同挑戰（空間共同挑戰子頁） */
+export const useMyChallenges = () =>
+  useQuery("/api/v1/me/challenges", {}, { revalidateOnFocus: false });
 
 /** 挑戰詳情 */
 export const useChallenge = (challengeId: number | undefined) =>
