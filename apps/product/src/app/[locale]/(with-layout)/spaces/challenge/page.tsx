@@ -13,7 +13,7 @@ export default function ChallengeSpacePage() {
   const t = useTranslations("space");
 
   return (
-    <div className="mx-auto min-h-screen max-w-[640px] px-4 pb-[72px] pt-6">
+    <div className="mx-auto min-h-screen max-w-[640px] px-4 pb-[72px] pt-[68px] md:pt-6">
       <SpaceSubpageHeader title={t("challenge_name")} subtitle={t("challenge_host")} />
       <div className="mb-4 flex items-center gap-3 rounded-2xl border border-[#CDEBE8] bg-[#F0FAF8] px-4 py-3.5">
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-primary-base">

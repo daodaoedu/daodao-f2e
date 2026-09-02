@@ -83,7 +83,7 @@ export const PageHeader = ({
   return (
     <div
       className={cn(
-        "relative max-w-[600px] mx-auto grid grid-cols-3 items-center px-5 py-4 md:pt-16",
+        "relative max-w-[600px] mx-auto grid grid-cols-3 items-center px-5 pt-[68px] pb-4 md:pt-16",
         className
       )}
     >

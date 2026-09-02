@@ -27,7 +27,7 @@ export default function SpacesPage() {
   };
 
   return (
-    <div className="mx-auto min-h-screen max-w-[640px] px-4 pb-[72px] pt-8">
+    <div className="mx-auto min-h-screen max-w-[640px] px-4 pb-[72px] pt-[68px] md:pt-8">
       <p className="mx-1 mb-3 text-[13px] text-text-dark/55">
         {t("space_count", { count: spaces?.total ?? 0 })}
       </p>
