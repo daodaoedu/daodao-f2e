@@ -8223,7 +8223,10 @@
     "online_link": "Online link",
     "toc_label": "Block outline",
     "loading": "Loading…",
-    "practice_count_label": "{count} practices"
+    "practice_count_label": "{count} practices",
+    "challenge_empty": "You haven't joined any shared challenge yet",
+    "challenge_open_practice": "Open my challenge practice",
+    "challenge_section_title": "Challenges I joined"
   },
   "explore_activities": {
     "meta_title": "Explore activities",

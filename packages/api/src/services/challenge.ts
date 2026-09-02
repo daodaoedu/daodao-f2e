@@ -15,6 +15,8 @@ type ChallengeJoinResponse =
   paths["/api/v1/challenges/{challengeId}/join"]["post"]["responses"][201]["content"]["application/json"];
 type TodayDrawsResponse =
   paths["/api/v1/challenges/{challengeId}/draws/today"]["get"]["responses"][200]["content"]["application/json"];
+type MyChallengesResponse =
+  paths["/api/v1/me/challenges"]["get"]["responses"][200]["content"]["application/json"];
 type DrawResponse =
   paths["/api/v1/challenges/{challengeId}/draws"]["post"]["responses"][201]["content"]["application/json"];
 
@@ -24,6 +26,7 @@ export type ChallengeJoinResultType = ChallengeJoinResponse["data"];
 export type ChallengeTodayDrawsType = TodayDrawsResponse["data"];
 export type ChallengeDrawResultType = DrawResponse["data"];
 export type ChallengeRunStatusType = ChallengeSummaryType["runStatus"];
+export type MyChallengeType = MyChallengesResponse["data"][number];
 
 // ============================================================================
 // Client Functions
@@ -31,6 +34,9 @@ export type ChallengeRunStatusType = ChallengeSummaryType["runStatus"];
 
 /** 探索共同挑戰列表（公開；登入時附 isJoined） */
 export const getChallenges = async () => client.GET("/api/v1/challenges");
+
+/** 我參加的共同挑戰（含已結束），附自動複製的實踐 id */
+export const getMyChallenges = async () => client.GET("/api/v1/me/challenges");
 
 /** 挑戰詳情（公開，含已結束的歷史足跡） */
 export const getChallenge = async (challengeId: number) =>
