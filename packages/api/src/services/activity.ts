@@ -9,11 +9,7 @@ import type { paths } from "../types";
 
 type ActivityListResponse =
   paths["/api/v1/activities"]["get"]["responses"][200]["content"]["application/json"];
-type ActivityDetailResponse =
-  paths["/api/v1/activities/{cohortId}"]["get"]["responses"][200]["content"]["application/json"];
-
 export type ActivitySummaryType = ActivityListResponse["data"][number];
-export type ActivityDetailType = ActivityDetailResponse["data"];
 export type ActivityRunStatusType = ActivitySummaryType["runStatus"];
 
 // ============================================================================
@@ -22,9 +18,3 @@ export type ActivityRunStatusType = ActivitySummaryType["runStatus"];
 
 /** 探索活動列表（公開；只含組織公開、已發佈且未結束的期；登入時附 isJoined） */
 export const getActivities = async () => client.GET("/api/v1/activities");
-
-/** 活動詳情（公開；已結束仍可查看） */
-export const getActivity = async (cohortId: number) =>
-  client.GET("/api/v1/activities/{cohortId}", {
-    params: { path: { cohortId } },
-  });

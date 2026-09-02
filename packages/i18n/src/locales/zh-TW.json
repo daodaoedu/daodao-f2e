@@ -8253,6 +8253,8 @@
     "empty": "目前沒有公開的活動課程",
     "loading": "載入中",
     "cta_prompt": "也想辦一場自己的活動嗎？",
-    "cta_button": "前往你的空間"
+    "cta_button": "前往你的空間",
+    "cta_unavailable": "暫不開放加入",
+    "empty_open": "目前沒有開放加入中的活動，切到「全部」看看其他活動"
   }
 }

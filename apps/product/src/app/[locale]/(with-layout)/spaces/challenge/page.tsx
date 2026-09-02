@@ -4,6 +4,7 @@ import { type MyChallengeType, useChallenges, useMyChallenges } from "@daodao/ap
 import { useTranslations } from "@daodao/i18n";
 import { Link, useRouter } from "@daodao/i18n/navigation";
 import { Spinner } from "@daodao/ui/components/spinner";
+import { addDays, isAfter, parseISO } from "date-fns";
 import { ChevronRight, Compass } from "lucide-react";
 import { useMemo } from "react";
 import { ChallengeCard } from "@/components/challenge";
@@ -23,10 +24,10 @@ export default function ChallengeSpacePage() {
 
   const mine = useMemo(() => mineData?.data ?? [], [mineData]);
   const hasUpcoming = useMemo(() => {
-    const limit = Date.now() + UPCOMING_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+    const limit = addDays(new Date(), UPCOMING_WINDOW_DAYS);
     return (exploreData?.data ?? []).some(
       (challenge) =>
-        challenge.runStatus === "upcoming" && new Date(challenge.startDate).getTime() <= limit
+        challenge.runStatus === "upcoming" && !isAfter(parseISO(challenge.startDate), limit)
     );
   }, [exploreData]);
 

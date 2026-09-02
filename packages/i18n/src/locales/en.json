@@ -8251,6 +8251,8 @@
     "empty": "No public activities right now",
     "loading": "Loading",
     "cta_prompt": "Want to host your own activity?",
-    "cta_button": "Go to your spaces"
+    "cta_button": "Go to your spaces",
+    "cta_unavailable": "Not open for joining",
+    "empty_open": "Nothing is open to join right now. Switch to All to see other activities"
   }
 }

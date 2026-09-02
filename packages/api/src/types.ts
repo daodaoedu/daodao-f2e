@@ -6389,7 +6389,7 @@ export interface paths {
                                  * @description 不可加入原因；可加入時為 null
                                  * @enum {string|null}
                                  */
-                                unavailableReason: "ended" | "expired" | "full" | null;
+                                unavailableReason: "ended" | "expired" | "full" | "paused" | null;
                                 /** @description 當前使用者是否已加入；未登入一律 false */
                                 isJoined: boolean;
                                 /** @description 是否有指派靈感卡卡組（顯示抽卡 icon） */
@@ -6542,7 +6542,7 @@ export interface paths {
                                  * @description 不可加入原因；可加入時為 null
                                  * @enum {string|null}
                                  */
-                                unavailableReason: "ended" | "expired" | "full" | null;
+                                unavailableReason: "ended" | "expired" | "full" | "paused" | null;
                                 /** @description 當前使用者是否已加入；未登入一律 false */
                                 isJoined: boolean;
                                 /** @description 是否有指派靈感卡卡組（顯示抽卡 icon） */
@@ -11453,7 +11453,7 @@ export interface paths {
                                  * @description 不可加入原因；可加入時為 null
                                  * @enum {string|null}
                                  */
-                                unavailableReason: "ended" | "expired" | "full" | null;
+                                unavailableReason: "ended" | "expired" | "full" | "paused" | null;
                                 /** @description 當前使用者是否已加入；未登入一律 false */
                                 isJoined: boolean;
                                 /** @description 是否有指派靈感卡卡組（顯示抽卡 icon） */
@@ -49451,7 +49451,7 @@ export interface components {
              */
             host: string;
             /**
-             * @description 成員數
+             * @description 成員數；共同挑戰卡為代表挑戰（進行中且最近開始的一檔）的參與人數
              * @example 12
              */
             memberCount: number;
@@ -49468,7 +49468,7 @@ export interface components {
              */
             hasActivePractice: boolean;
             /**
-             * @description 空間內實踐數
+             * @description 我在此空間的實踐數（personal 為全部實踐、challenge 為我的挑戰實踐、event_course 為我在該期的實踐）
              * @example 3
              */
             practiceCount: number;

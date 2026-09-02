@@ -66,7 +66,9 @@ export default function ExploreActivitiesPage() {
           <Spinner aria-label={t("loading")} />
         </div>
       ) : isEmpty ? (
-        <p className="py-10 text-center text-sm text-text-dark">{t("empty")}</p>
+        <p className="py-10 text-center text-sm text-text-dark">
+          {filter === "open" && activities.length > 0 ? t("empty_open") : t("empty")}
+        </p>
       ) : (
         <>
           {sections.upcoming.length > 0 && (

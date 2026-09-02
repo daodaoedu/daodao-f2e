@@ -29,17 +29,33 @@ const STATUS_BADGE: Record<ActivitySummaryType["runStatus"], BadgeProps["variant
   ended: "outline-logo",
 };
 
-/** 依可否加入決定 CTA 的文案與目的地：加入 → 既有邀請流程；已加入 → 學員頁；其餘停用 */
-const resolveCta = (activity: ActivitySummaryType) => {
-  if (activity.isJoined) return { key: "cta_view" as const, href: `/cohorts/${activity.id}` };
-  if (activity.canJoin && activity.joinToken)
-    return { key: "cta_join" as const, href: `/cohorts/join/${activity.joinToken}` };
-  const key =
-    activity.unavailableReason === "full"
-      ? ("cta_full" as const)
-      : activity.unavailableReason === "paused"
-        ? ("cta_paused" as const)
-        : ("cta_expired" as const);
+const UNAVAILABLE_CTA: Record<
+  NonNullable<ActivitySummaryType["unavailableReason"]>,
+  "cta_full" | "cta_paused" | "cta_expired"
+> = {
+  full: "cta_full",
+  paused: "cta_paused",
+  expired: "cta_expired",
+  ended: "cta_expired",
+};
+
+type CtaKey =
+  | "cta_join"
+  | "cta_view"
+  | "cta_unavailable"
+  | (typeof UNAVAILABLE_CTA)[keyof typeof UNAVAILABLE_CTA];
+
+/** 依可否加入決定 CTA 的文案與目的地：已加入 → 學員頁；可加入且有 token → 既有邀請流程；其餘停用並說明原因 */
+const resolveCta = (activity: ActivitySummaryType): { key: CtaKey; href: string | null } => {
+  if (activity.isJoined) return { key: "cta_view", href: `/cohorts/${activity.id}` };
+  if (activity.canJoin) {
+    return activity.joinToken
+      ? { key: "cta_join", href: `/cohorts/join/${activity.joinToken}` }
+      : { key: "cta_unavailable", href: null };
+  }
+  const key = activity.unavailableReason
+    ? UNAVAILABLE_CTA[activity.unavailableReason]
+    : "cta_unavailable";
   return { key, href: null };
 };
 
@@ -89,7 +105,7 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
                 {t("card_start_date", { date: formattedStartDate })}
               </span>
             )}
-            {daysProgress !== null && (
+            {daysProgress !== null && activity.runStatus === "ongoing" && (
               <span className="flex items-center gap-1">
                 <Timer className="size-3.5 shrink-0" />
                 {t("card_days_progress", {
@@ -142,7 +158,7 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
         </span>
       </div>
 
-      {daysProgress !== null && (
+      {daysProgress !== null && activity.runStatus === "ongoing" && (
         <div className="absolute right-5 bottom-1.5 left-5 z-10">
           <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/75 shadow-[inset_0_0_0_1px_rgba(15,48,54,0.08)]">
             <div
