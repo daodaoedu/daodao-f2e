@@ -3,13 +3,15 @@
  * 統一導出所有 domain-specific 的 API 服務
  */
 
+// Group Challenge Service
+export * from "./activity";
+export * from "./activity-hooks";
 // Admin Service
 export * from "./admin";
 export * from "./admin-hooks";
 // Auth Service
 export * from "./auth";
 export * from "./auth-hooks";
-// Group Challenge Service
 export * from "./challenge";
 export * from "./challenge-hooks";
 // Lighthouse Cohort Service

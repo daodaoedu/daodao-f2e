@@ -89,6 +89,7 @@ const lighthouseCohortShape = {
   capacity: z.number().int().nullable(),
   inviteMessage: z.string().nullable(),
   status: z.enum(["draft", "published", "archived"]),
+  visibility: z.enum(["private", "public"]),
   createdAt: z.string().datetime(),
   updatedAt: nullableDateTimeSchema,
 } satisfies z.ZodRawShape;

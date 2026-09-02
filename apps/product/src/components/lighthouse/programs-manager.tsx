@@ -25,6 +25,7 @@ import {
   Archive,
   ArrowUpRight,
   CalendarDays,
+  Globe,
   Plus,
   RadioTower,
   Send,
@@ -103,6 +104,7 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
       joinDeadline: String(formData.get("joinDeadline") ?? "") || null,
       capacity: capacityValue ? Number(capacityValue) : null,
       inviteMessage: String(formData.get("inviteMessage") ?? "").trim() || null,
+      visibility: formData.get("visibility") === "on" ? "public" : "private",
     });
     setBusy(false);
     if (response.error) {
@@ -198,6 +200,18 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
             defaultValue={cohort.inviteMessage ?? ""}
           />
         </label>
+        <div className="grid gap-1.5 md:col-span-2">
+          <label className="flex items-center gap-3 text-sm font-medium">
+            <input
+              name="visibility"
+              type="checkbox"
+              className="size-4 accent-[#0D7773]"
+              defaultChecked={cohort.visibility === "public"}
+            />
+            {t("cohort_visibility_public")}
+          </label>
+          <p className="text-xs text-[#78928F]">{t("cohort_visibility_hint")}</p>
+        </div>
         <div className="flex gap-2 md:col-span-2">
           <Button type="submit" disabled={busy}>
             {t("save")}
@@ -226,6 +240,12 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
           >
             {t(`cohort_status_${cohort.status}`)}
           </span>
+          {cohort.visibility === "public" && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#E7FAF7] px-2.5 py-1 text-[10px] font-semibold text-[#0D7773]">
+              <Globe className="size-3" />
+              {t("cohort_visibility_badge")}
+            </span>
+          )}
           {missingTemplates && (
             <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF6E8] px-2.5 py-1 text-[10px] font-semibold text-[#A95D00]">
               <AlertTriangle className="size-3" />
@@ -341,6 +361,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       capacity: capacityValue ? Number(capacityValue) : null,
       inviteMessage: String(formData.get("inviteMessage") ?? "").trim() || null,
       status: formData.get("publish") === "on" ? "published" : "draft",
+      visibility: formData.get("visibility") === "on" ? "public" : "private",
     });
     if (response.error || !response.data) {
       setBusy(false);
@@ -512,6 +533,13 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               <input name="publish" type="checkbox" className="size-4 accent-[#0D7773]" />
               {t("publish_now")}
             </label>
+            <div className="grid gap-1.5 md:col-span-2">
+              <label className="flex items-center gap-3 text-sm font-medium">
+                <input name="visibility" type="checkbox" className="size-4 accent-[#0D7773]" />
+                {t("cohort_visibility_public")}
+              </label>
+              <p className="text-xs text-[#78928F]">{t("cohort_visibility_hint")}</p>
+            </div>
             <div className="md:col-span-2">
               <Button type="submit" disabled={busy}>
                 {t("cohort_create")}

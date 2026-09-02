@@ -7,7 +7,19 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { Compass, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
-import type { IExploreTopicRecommendation } from "@/hooks/use-challenges";
+
+export interface IExploreTopicRecommendation {
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  reason: string;
+  authorName: string;
+  authorAvatarChar: string;
+  authorAvatarColor: string;
+  templateId?: string;
+  practiceId?: string;
+}
 
 const DEFAULT_VISIBLE_COUNT = 3;
 
