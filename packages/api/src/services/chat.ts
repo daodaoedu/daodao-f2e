@@ -113,7 +113,8 @@ export const searchChatMessages = async (roomId: number, q: string) =>
   });
 
 /** 標記已讀 */
-export const markChatRoomRead = async (roomId: number) =>
+export const markChatRoomRead = async (roomId: number, lastReadMessageId?: number) =>
   client.PUT("/api/v1/chat-rooms/{roomId}/read", {
     params: { path: { roomId } },
+    ...(lastReadMessageId != null && { body: { lastReadMessageId } }),
   });

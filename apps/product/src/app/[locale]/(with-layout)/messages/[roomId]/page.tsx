@@ -25,12 +25,13 @@ export default function ChatRoomPage() {
 
   const messages = messagesData?.messages ?? [];
 
-  // Mark room as read on mount
+  // Mark room as read on mount and when messages update
   useEffect(() => {
-    if (roomId) {
-      void markChatRoomRead(roomId);
+    const lastMessage = messages[messages.length - 1];
+    if (roomId && lastMessage) {
+      void markChatRoomRead(roomId, lastMessage.id);
     }
-  }, [roomId]);
+  }, [roomId, messages]);
 
   const handleReply = useCallback((message: ChatMessageType) => {
     setReplyTo(message);
@@ -42,8 +43,7 @@ export default function ChatRoomPage() {
 
   const handleMessageSent = useCallback(() => {
     void mutateMessages();
-    void markChatRoomRead(roomId);
-  }, [mutateMessages, roomId]);
+  }, [mutateMessages]);
 
   if (roomLoading) {
     return (
