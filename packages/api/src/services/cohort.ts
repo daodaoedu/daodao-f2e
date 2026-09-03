@@ -76,11 +76,19 @@ export const lighthouseProgramSchema: z.ZodType<LighthouseProgramType> = z.objec
   updatedAt: nullableDateTimeSchema,
 });
 
+const cohortSessionShape = {
+  id: z.number().int(),
+  sessionDate: z.string(),
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable(),
+} satisfies z.ZodRawShape;
+
 const lighthouseCohortShape = {
   id: z.number().int().positive(),
   programId: z.number().int().positive(),
   slug: z.string(),
   displayName: z.string(),
+  tagline: z.string().nullable(),
   startDate: z.string(),
   endDate: z.string(),
   joinToken: z.string().nullable(),
@@ -88,6 +96,20 @@ const lighthouseCohortShape = {
   joinDeadline: z.string().nullable(),
   capacity: z.number().int().nullable(),
   inviteMessage: z.string().nullable(),
+  showInviteMessageOnSignup: z.boolean(),
+  interactionModes: z.array(z.enum(["sync", "async", "physical"])),
+  meetingUrl: z.string().nullable(),
+  location: z.string().nullable(),
+  sessions: z.array(z.object(cohortSessionShape)),
+  feeType: z.enum(["free", "paid"]),
+  feeAmount: z.number().nullable(),
+  signupMethod: z.enum(["island_form", "external"]),
+  externalSignupUrl: z.string().nullable(),
+  isPrivate: z.boolean(),
+  checkinDefaultPrivate: z.boolean(),
+  hostCommentDefaultPrivate: z.boolean(),
+  hasHomePage: z.boolean(),
+  signupQuestionCount: z.number().int(),
   status: z.enum(["draft", "published", "archived"]),
   visibility: z.enum(["private", "public"]),
   createdAt: z.string().datetime(),
@@ -461,9 +483,25 @@ export const cohortJoinInfoResponseSchema = apiSuccessSchema(
     displayName: z.string(),
     startDate: z.string().datetime(),
     endDate: z.string().datetime(),
+    tagline: z.string().nullable(),
+    interactionModes: z.array(z.enum(["sync", "async", "physical"])),
+    location: z.string().nullable(),
+    sessions: z.array(z.object(cohortSessionShape)),
+    feeType: z.enum(["free", "paid"]),
+    feeAmount: z.number().nullable(),
+    signupMethod: z.enum(["island_form", "external"]),
+    externalSignupUrl: z.string().nullable(),
+    capacity: z.number().int().nullable(),
+    joinDeadline: z.string().datetime().nullable(),
+    participantCount: z.number().int(),
     inviteMessage: z.string().nullable(),
     canJoin: z.boolean(),
-    unavailableReason: z.enum(["not_published", "expired", "full"]).nullable(),
+    unavailableReason: z.enum(["not_published", "expired", "full", "paused"]).nullable(),
+    privacy: z.object({
+      isPrivate: z.boolean(),
+      checkinDefaultPrivate: z.boolean(),
+      hostCommentDefaultPrivate: z.boolean(),
+    }),
     visibilityNotice: z.string(),
     organization: z.object({
       name: z.string(),
@@ -494,6 +532,17 @@ export const cohortMemberHomeResponseSchema = apiSuccessSchema(
     displayName: z.string(),
     startDate: z.string().datetime(),
     endDate: z.string().datetime(),
+    tagline: z.string().nullable(),
+    interactionModes: z.array(z.enum(["sync", "async", "physical"])),
+    meetingUrl: z.string().nullable(),
+    location: z.string().nullable(),
+    sessions: z.array(z.object(cohortSessionShape)),
+    feeType: z.enum(["free", "paid"]),
+    privacy: z.object({
+      isPrivate: z.boolean(),
+      checkinDefaultPrivate: z.boolean(),
+      hostCommentDefaultPrivate: z.boolean(),
+    }),
     exportOptIn: z.boolean(),
     organization: z.object({
       name: z.string(),
@@ -507,8 +556,6 @@ export const cohortMemberHomeResponseSchema = apiSuccessSchema(
         practiceAction: z.string().nullable(),
         status: z.enum(["draft", "not_started", "active", "completed", "archived"]),
         creationSource: z.string().nullable(),
-        // 實踐卡需要的欄位。留成 optional 是為了讓前端可以先於後端上線，
-        // 舊版後端只是少了卡片上的日期與打卡數，頁面不會整個掉進驗證錯誤
         startDate: nullableDateTimeSchema.optional(),
         endDate: nullableDateTimeSchema.optional(),
         progressPercentage: z.number().optional(),
@@ -544,6 +591,11 @@ export const updateLighthouseProgram = async (programId: number, body: UpdatePro
 
 export const archiveLighthouseProgram = async (programId: number) =>
   client.DELETE("/api/v1/lighthouse/programs/{programId}", {
+    params: { path: { programId } },
+  });
+
+export const duplicateLighthouseProgram = async (programId: number) =>
+  client.POST("/api/v1/lighthouse/programs/{programId}/duplicate", {
     params: { path: { programId } },
   });
 
