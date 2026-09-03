@@ -35,7 +35,7 @@ function connectorWidth(from: string, to: string): number {
  *  (proportionally to that width, never below `minWidth`) so the strip fits a
  *  narrow mobile viewport instead of overflowing past the right edge. */
 function shrinkableWidth(width: number, minWidth = 6): CSSProperties {
-  return { flex: `0 1 ${width}px`, minWidth };
+  return { flex: `0 1 ${width}px`, minWidth: Math.min(minWidth, width) };
 }
 
 /** Prototype renders dates without zero-padding (8/14, not 08/14). */
