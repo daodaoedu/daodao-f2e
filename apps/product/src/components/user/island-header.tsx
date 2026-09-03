@@ -191,7 +191,7 @@ export function IslandHeader({ resultType, userId, identifier }: IslandHeaderPro
           </div>
         )}
         {isEmptyResult && isOwnProfile && (
-          <div className="absolute left-0 right-0 top-[150px] w-[600px] mx-auto overflow-hidden mask-marquee">
+          <div className="absolute left-0 right-0 top-[150px] w-full max-w-[600px] mx-auto overflow-hidden mask-marquee">
             <div className="animate-marquee flex w-max gap-3 will-change-transform">
               {/* 第一份內容 */}
               {Array.from(resultTypeToLottiePathMap.keys()).map((key) => {

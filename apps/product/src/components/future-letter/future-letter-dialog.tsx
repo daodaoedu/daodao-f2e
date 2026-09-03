@@ -327,7 +327,7 @@ export function FutureLetterDialog({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-[360px] border-0 bg-[#0D3036] p-4 text-[#E7F4F4] shadow-[0_14px_34px_rgba(15,48,54,0.28)] rounded-2xl"
+                  className="w-[min(360px,calc(100vw-32px))] border-0 bg-[#0D3036] p-4 text-[#E7F4F4] shadow-[0_14px_34px_rgba(15,48,54,0.28)] rounded-2xl"
                   side="top"
                   align="start"
                 >

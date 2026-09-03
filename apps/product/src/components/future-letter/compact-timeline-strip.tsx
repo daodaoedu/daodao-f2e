@@ -31,6 +31,13 @@ function connectorWidth(from: string, to: string): number {
   return Math.min(2 * days + 4, 40);
 }
 
+/** Connectors take their prototype width when there is room, but may shrink
+ *  (proportionally to that width, never below `minWidth`) so the strip fits a
+ *  narrow mobile viewport instead of overflowing past the right edge. */
+function shrinkableWidth(width: number, minWidth = 6): CSSProperties {
+  return { flex: `0 1 ${width}px`, minWidth: Math.min(minWidth, width) };
+}
+
 /** Prototype renders dates without zero-padding (8/14, not 08/14). */
 function trimDateLabel(label: string): string {
   return label.replace(/^0/, "").replace("/0", "/");
@@ -133,8 +140,7 @@ export function CompactTimelineStrip({
 
   return (
     <div
-      className="relative"
-      style={{ width: 540, maxWidth: "82%" }}
+      className="relative w-[540px] max-w-[calc(100%-32px)] md:max-w-[82%]"
       data-testid="home-timeline-summary"
     >
       <style>{KEYFRAMES}</style>
@@ -150,8 +156,8 @@ export function CompactTimelineStrip({
             onOpen?.();
           }
         }}
-        className="flex cursor-pointer items-center transition-transform duration-[220ms] hover:-translate-y-[2px]"
-        style={{ height: 44, gap: 16, padding: "0 22px", borderRadius: 999 }}
+        className="flex cursor-pointer items-center px-3 transition-transform duration-[220ms] hover:-translate-y-[2px] md:px-[22px]"
+        style={{ height: 44, gap: 16, borderRadius: 999 }}
       >
         <span className="flex min-w-0 flex-1 items-center">
           {pastAndToday.map((node, index) => {
@@ -165,10 +171,9 @@ export function CompactTimelineStrip({
                     aria-hidden="true"
                     style={
                       isToday
-                        ? { width: 12, flex: "none", height: 0.5, background: SOLID_LINE }
+                        ? { ...shrinkableWidth(12), height: 0.5, background: SOLID_LINE }
                         : {
-                            width: connectorWidth(prev.date, node.date),
-                            flex: "none",
+                            ...shrinkableWidth(connectorWidth(prev.date, node.date)),
                             height: 1,
                             background: SOLID_LINE,
                           }
@@ -206,8 +211,7 @@ export function CompactTimelineStrip({
                   <span
                     aria-hidden="true"
                     style={{
-                      width: connectorWidth(prev.date, node.date),
-                      flex: "none",
+                      ...shrinkableWidth(connectorWidth(prev.date, node.date)),
                       height: 1,
                       background: DOTTED_LINE,
                     }}
@@ -247,13 +251,13 @@ export function CompactTimelineStrip({
           )}
           <span
             aria-hidden="true"
-            style={{ width: 96, flex: "none", height: 1, background: DOTTED_LINE }}
+            style={{ ...shrinkableWidth(96, 20), height: 1, background: DOTTED_LINE }}
           />
         </span>
         <span
           aria-hidden="true"
-          className="flex flex-none items-center"
-          style={{ marginLeft: -8, marginRight: 34, color: "#0F3036" }}
+          className="-ml-2 mr-2 flex flex-none items-center md:mr-[34px]"
+          style={{ color: "#0F3036" }}
         >
           <ChevronRight className="size-[18px]" style={{ marginRight: -9 }} />
           <ChevronRight className="size-[18px]" />
