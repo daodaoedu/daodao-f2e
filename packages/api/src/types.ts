@@ -11,10 +11,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 探索活動列表（公開，列出組織公開、已發佈且未結束的燈塔期） */
+        /** 探索活動列表（公開，含已結束；列出組織公開、已發佈的燈塔期） */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description 依互動方式篩選 */
+                    mode?: "sync" | "async" | "physical";
+                };
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -45,6 +48,8 @@ export interface paths {
                                  * @example 2026 秋季讀書會
                                  */
                                 displayName: string;
+                                /** @description 一句話簡介 */
+                                tagline: string | null;
                                 /**
                                  * @description 所屬系列名稱
                                  * @example 線上讀書會
@@ -57,6 +62,17 @@ export interface paths {
                                  * @example 島島阿學
                                  */
                                 organizationName: string;
+                                /** @description 發起人資訊 */
+                                host: {
+                                    /** @description 發起人 user ID；皆無法解析時為 null */
+                                    userId: number | null;
+                                    /** @description 發起人名稱（nickname 或組織名稱 fallback） */
+                                    name: string;
+                                    /** @description 發起人頭像 URL */
+                                    avatar: string | null;
+                                    /** @description 發起人 identifier（custom_id 或 external_id） */
+                                    identifier: string | null;
+                                };
                                 /**
                                  * Format: date-time
                                  * @description 開始日
@@ -79,6 +95,27 @@ export interface paths {
                                  * @example 12
                                  */
                                 participantCount: number;
+                                /** @description 互動方式 */
+                                interactionModes: ("sync" | "async" | "physical")[];
+                                /** @description 活動地點 */
+                                location: string | null;
+                                /**
+                                 * @description 收費類型
+                                 * @enum {string}
+                                 */
+                                feeType: "free" | "paid";
+                                /** @description 費用金額 */
+                                feeAmount: number | null;
+                                /**
+                                 * @description 報名方式
+                                 * @enum {string}
+                                 */
+                                signupMethod: "island_form" | "external";
+                                /**
+                                 * @description 有效綁定的實踐模版數
+                                 * @example 3
+                                 */
+                                templateCount: number;
                                 /**
                                  * @description 活動運行狀態：upcoming（未開始）、ongoing（進行中）、ended（已結束）
                                  * @enum {string}
@@ -164,6 +201,128 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/activities/hosts/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 發起人快覽（公開） */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 發起人 user ID */
+                    userId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 發起人快覽資訊 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 使用者 ID */
+                                userId: number;
+                                /** @description 名稱（nickname） */
+                                name: string;
+                                /** @description 頭像 URL */
+                                avatar: string | null;
+                                /** @description custom_id 或 external_id */
+                                identifier: string | null;
+                                /** @description 自我介紹 */
+                                selfIntroduction: string | null;
+                                /** @description 組織名稱 */
+                                organizationName: string;
+                                /** @description 主持的活動數（所有已發佈燈塔期） */
+                                hostedActivityCount: number;
+                                /** @description 共學人數（去重，排除本人） */
+                                learnedWithCount: number;
+                                /**
+                                 * @description 加入年份
+                                 * @example 2024
+                                 */
+                                joinedYear: number;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/activities/{cohortId}": {
         parameters: {
             query?: never;
@@ -208,6 +367,8 @@ export interface paths {
                                  * @example 2026 秋季讀書會
                                  */
                                 displayName: string;
+                                /** @description 一句話簡介 */
+                                tagline: string | null;
                                 /**
                                  * @description 所屬系列名稱
                                  * @example 線上讀書會
@@ -220,6 +381,17 @@ export interface paths {
                                  * @example 島島阿學
                                  */
                                 organizationName: string;
+                                /** @description 發起人資訊 */
+                                host: {
+                                    /** @description 發起人 user ID；皆無法解析時為 null */
+                                    userId: number | null;
+                                    /** @description 發起人名稱（nickname 或組織名稱 fallback） */
+                                    name: string;
+                                    /** @description 發起人頭像 URL */
+                                    avatar: string | null;
+                                    /** @description 發起人 identifier（custom_id 或 external_id） */
+                                    identifier: string | null;
+                                };
                                 /**
                                  * Format: date-time
                                  * @description 開始日
@@ -242,6 +414,27 @@ export interface paths {
                                  * @example 12
                                  */
                                 participantCount: number;
+                                /** @description 互動方式 */
+                                interactionModes: ("sync" | "async" | "physical")[];
+                                /** @description 活動地點 */
+                                location: string | null;
+                                /**
+                                 * @description 收費類型
+                                 * @enum {string}
+                                 */
+                                feeType: "free" | "paid";
+                                /** @description 費用金額 */
+                                feeAmount: number | null;
+                                /**
+                                 * @description 報名方式
+                                 * @enum {string}
+                                 */
+                                signupMethod: "island_form" | "external";
+                                /**
+                                 * @description 有效綁定的實踐模版數
+                                 * @example 3
+                                 */
+                                templateCount: number;
                                 /**
                                  * @description 活動運行狀態：upcoming（未開始）、ongoing（進行中）、ended（已結束）
                                  * @enum {string}
@@ -261,6 +454,15 @@ export interface paths {
                                  * @description 加入連結 token（導向 /cohorts/join/{joinToken}）；僅 canJoin 時回傳，否則 null
                                  */
                                 joinToken: string | null;
+                                /** @description 聚會時段 */
+                                sessions: {
+                                    id: number;
+                                    sessionDate: string;
+                                    startTime: string | null;
+                                    endTime: string | null;
+                                }[];
+                                /** @description 外部報名連結 */
+                                externalSignupUrl: string | null;
                                 organization: {
                                     /** @description 主辦組織名稱 */
                                     name: string;
@@ -7067,6 +7269,1138 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/chat-rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 我的聊天室列表 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 聊天室列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 全部聊天室的總未讀數 */
+                            totalUnread: number;
+                            /** @description 聊天室列表 */
+                            items: {
+                                /** @description 聊天室 ID */
+                                id: number;
+                                /** @description 關聯的 cohort ID */
+                                cohortId: number;
+                                /** @description 聊天室名稱（cohort display_name） */
+                                name: string;
+                                /** @description 圖示文字（名稱首字） */
+                                iconLabel: string;
+                                /** @description 色彩種子（roomId） */
+                                colorSeed: number;
+                                /** @description 組織名稱 */
+                                organizationName: string;
+                                /**
+                                 * @description 可寫狀態
+                                 * @enum {string}
+                                 */
+                                contentState: "writable" | "read_only";
+                                /** @description 成員數 */
+                                memberCount: number;
+                                /** @description 未讀數 */
+                                unreadCount: number;
+                                /** @description 最後一則訊息 */
+                                lastMessage: {
+                                    /** @description 訊息 ID */
+                                    id: number;
+                                    /** @description 訊息類型 */
+                                    kind: string;
+                                    /** @description 內容預覽 */
+                                    bodyPreview: string;
+                                    /** @description 作者暱稱 */
+                                    authorName: string | null;
+                                    /** @description 是否為自己的訊息 */
+                                    isMine: boolean;
+                                    /** @description 建立時間（ISO） */
+                                    createdAt: string;
+                                } | null;
+                                /** @description 最近活動時間（ISO） */
+                                lastActivityAt: string;
+                            }[];
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat-rooms/{roomId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 聊天室詳情 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 聊天室詳情 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 聊天室 ID */
+                            id: number;
+                            /** @description 關聯的 cohort ID */
+                            cohortId: number;
+                            /** @description 聊天室名稱（cohort display_name） */
+                            name: string;
+                            /** @description 圖示文字（名稱首字） */
+                            iconLabel: string;
+                            /** @description 色彩種子（roomId） */
+                            colorSeed: number;
+                            /** @description 組織名稱 */
+                            organizationName: string;
+                            /**
+                             * @description 可寫狀態
+                             * @enum {string}
+                             */
+                            contentState: "writable" | "read_only";
+                            /** @description 成員數 */
+                            memberCount: number;
+                            /** @description 未讀數 */
+                            unreadCount: number;
+                            /** @description 最後一則訊息 */
+                            lastMessage: {
+                                /** @description 訊息 ID */
+                                id: number;
+                                /** @description 訊息類型 */
+                                kind: string;
+                                /** @description 內容預覽 */
+                                bodyPreview: string;
+                                /** @description 作者暱稱 */
+                                authorName: string | null;
+                                /** @description 是否為自己的訊息 */
+                                isMine: boolean;
+                                /** @description 建立時間（ISO） */
+                                createdAt: string;
+                            } | null;
+                            /** @description 最近活動時間（ISO） */
+                            lastActivityAt: string;
+                            /**
+                             * @description 當前使用者角色
+                             * @enum {string}
+                             */
+                            viewerRole: "host" | "member";
+                            /** @description 置頂訊息數 */
+                            pinnedCount: number;
+                            /** @description 前 3 位成員預覽 */
+                            memberPreview: {
+                                /** @description 暱稱 */
+                                nickname: string | null;
+                                /** @description 頭像 URL */
+                                avatar: string | null;
+                            }[];
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat-rooms/{roomId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 聊天室成員列表 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成員列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 使用者 ID */
+                            userId: number;
+                            /** @description 暱稱 */
+                            nickname: string | null;
+                            /** @description 頭像 URL */
+                            avatar: string | null;
+                            /** @description 是否為帶領人 */
+                            isHost: boolean;
+                            /** @description 是否在線 */
+                            isOnline: boolean;
+                            /** @description 自我介紹 */
+                            bio: string | null;
+                        }[];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat-rooms/{roomId}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 歷史訊息（before 分頁）或增量輪詢（after+since） */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 取此 ID 之前的訊息（歷史分頁） */
+                    before?: number;
+                    /** @description 取此 ID 之後的新訊息（增量輪詢） */
+                    after?: number;
+                    /** @description ISO 時間戳，搭配 after 使用，回傳 changed/deletedIds */
+                    since?: string;
+                    /** @description 每頁筆數（預設 50，上限 100） */
+                    limit?: number;
+                };
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 訊息列表或增量回應 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 新訊息 */
+                            messages: {
+                                /** @description 訊息 ID */
+                                id: number;
+                                /** @description 聊天室 ID */
+                                roomId: number;
+                                /**
+                                 * @description 訊息類型
+                                 * @enum {string}
+                                 */
+                                kind: "text" | "system";
+                                /** @description 訊息內容 */
+                                body: string;
+                                /** @description 系統訊息元資料 */
+                                metadata: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @description 作者（系統訊息為 null） */
+                                author: {
+                                    /** @description 作者 ID */
+                                    userId: number;
+                                    /** @description 暱稱 */
+                                    nickname: string | null;
+                                    /** @description 頭像 URL */
+                                    avatar: string | null;
+                                    /** @description 是否為帶領人 */
+                                    isHost: boolean;
+                                } | null;
+                                /** @description 引用回覆（無引用為 null） */
+                                replyTo: {
+                                    /** @description 被引用訊息 ID */
+                                    id: number;
+                                    /** @description 被引用訊息的作者暱稱 */
+                                    authorName: string | null;
+                                    /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                    bodyPreview: string | null;
+                                    /** @description 被引用訊息是否已刪除 */
+                                    isDeleted: boolean;
+                                } | null;
+                                /** @description 按讚數 */
+                                likeCount: number;
+                                /** @description 我是否已按讚 */
+                                likedByMe: boolean;
+                                /** @description 是否已置頂 */
+                                isPinned: boolean;
+                                /** @description 置頂時間（ISO） */
+                                pinnedAt: string | null;
+                                /** @description 編輯時間（ISO） */
+                                editedAt: string | null;
+                                /** @description 建立時間（ISO） */
+                                createdAt: string;
+                                /** @description 更新時間（ISO） */
+                                updatedAt: string;
+                            }[];
+                            /** @description 已變更的既有訊息 */
+                            changed: {
+                                /** @description 訊息 ID */
+                                id: number;
+                                /** @description 聊天室 ID */
+                                roomId: number;
+                                /**
+                                 * @description 訊息類型
+                                 * @enum {string}
+                                 */
+                                kind: "text" | "system";
+                                /** @description 訊息內容 */
+                                body: string;
+                                /** @description 系統訊息元資料 */
+                                metadata: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @description 作者（系統訊息為 null） */
+                                author: {
+                                    /** @description 作者 ID */
+                                    userId: number;
+                                    /** @description 暱稱 */
+                                    nickname: string | null;
+                                    /** @description 頭像 URL */
+                                    avatar: string | null;
+                                    /** @description 是否為帶領人 */
+                                    isHost: boolean;
+                                } | null;
+                                /** @description 引用回覆（無引用為 null） */
+                                replyTo: {
+                                    /** @description 被引用訊息 ID */
+                                    id: number;
+                                    /** @description 被引用訊息的作者暱稱 */
+                                    authorName: string | null;
+                                    /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                    bodyPreview: string | null;
+                                    /** @description 被引用訊息是否已刪除 */
+                                    isDeleted: boolean;
+                                } | null;
+                                /** @description 按讚數 */
+                                likeCount: number;
+                                /** @description 我是否已按讚 */
+                                likedByMe: boolean;
+                                /** @description 是否已置頂 */
+                                isPinned: boolean;
+                                /** @description 置頂時間（ISO） */
+                                pinnedAt: string | null;
+                                /** @description 編輯時間（ISO） */
+                                editedAt: string | null;
+                                /** @description 建立時間（ISO） */
+                                createdAt: string;
+                                /** @description 更新時間（ISO） */
+                                updatedAt: string;
+                            }[];
+                            /** @description 已刪除的訊息 ID */
+                            deletedIds: number[];
+                            /** @description 置頂訊息數 */
+                            pinnedCount: number;
+                            /** @description 成員數 */
+                            memberCount: number;
+                            /** @description 伺服器時間（ISO） */
+                            serverTime: string;
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        /** 發送訊息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description 訊息內容
+                         * @example 大家好！
+                         */
+                        body: string;
+                        /**
+                         * @description 引用回覆的訊息 ID
+                         * @example 42
+                         */
+                        replyToMessageId?: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description 訊息已發送 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 訊息 ID */
+                            id: number;
+                            /** @description 聊天室 ID */
+                            roomId: number;
+                            /**
+                             * @description 訊息類型
+                             * @enum {string}
+                             */
+                            kind: "text" | "system";
+                            /** @description 訊息內容 */
+                            body: string;
+                            /** @description 系統訊息元資料 */
+                            metadata: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @description 作者（系統訊息為 null） */
+                            author: {
+                                /** @description 作者 ID */
+                                userId: number;
+                                /** @description 暱稱 */
+                                nickname: string | null;
+                                /** @description 頭像 URL */
+                                avatar: string | null;
+                                /** @description 是否為帶領人 */
+                                isHost: boolean;
+                            } | null;
+                            /** @description 引用回覆（無引用為 null） */
+                            replyTo: {
+                                /** @description 被引用訊息 ID */
+                                id: number;
+                                /** @description 被引用訊息的作者暱稱 */
+                                authorName: string | null;
+                                /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                bodyPreview: string | null;
+                                /** @description 被引用訊息是否已刪除 */
+                                isDeleted: boolean;
+                            } | null;
+                            /** @description 按讚數 */
+                            likeCount: number;
+                            /** @description 我是否已按讚 */
+                            likedByMe: boolean;
+                            /** @description 是否已置頂 */
+                            isPinned: boolean;
+                            /** @description 置頂時間（ISO） */
+                            pinnedAt: string | null;
+                            /** @description 編輯時間（ISO） */
+                            editedAt: string | null;
+                            /** @description 建立時間（ISO） */
+                            createdAt: string;
+                            /** @description 更新時間（ISO） */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat-rooms/{roomId}/messages/{messageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 刪除訊息 */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                    /** @description 訊息 ID */
+                    messageId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 訊息已刪除 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        /** 編輯訊息 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                    /** @description 訊息 ID */
+                    messageId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description 編輯後的訊息內容
+                         * @example 修正：大家好！
+                         */
+                        body: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 訊息已編輯 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 訊息 ID */
+                            id: number;
+                            /** @description 聊天室 ID */
+                            roomId: number;
+                            /**
+                             * @description 訊息類型
+                             * @enum {string}
+                             */
+                            kind: "text" | "system";
+                            /** @description 訊息內容 */
+                            body: string;
+                            /** @description 系統訊息元資料 */
+                            metadata: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @description 作者（系統訊息為 null） */
+                            author: {
+                                /** @description 作者 ID */
+                                userId: number;
+                                /** @description 暱稱 */
+                                nickname: string | null;
+                                /** @description 頭像 URL */
+                                avatar: string | null;
+                                /** @description 是否為帶領人 */
+                                isHost: boolean;
+                            } | null;
+                            /** @description 引用回覆（無引用為 null） */
+                            replyTo: {
+                                /** @description 被引用訊息 ID */
+                                id: number;
+                                /** @description 被引用訊息的作者暱稱 */
+                                authorName: string | null;
+                                /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                bodyPreview: string | null;
+                                /** @description 被引用訊息是否已刪除 */
+                                isDeleted: boolean;
+                            } | null;
+                            /** @description 按讚數 */
+                            likeCount: number;
+                            /** @description 我是否已按讚 */
+                            likedByMe: boolean;
+                            /** @description 是否已置頂 */
+                            isPinned: boolean;
+                            /** @description 置頂時間（ISO） */
+                            pinnedAt: string | null;
+                            /** @description 編輯時間（ISO） */
+                            editedAt: string | null;
+                            /** @description 建立時間（ISO） */
+                            createdAt: string;
+                            /** @description 更新時間（ISO） */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/chat-rooms/{roomId}/messages/{messageId}/like": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** 按讚 */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                    /** @description 訊息 ID */
+                    messageId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 按讚結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 按讚數 */
+                            likeCount: number;
+                            /** @description 我是否已按讚 */
+                            likedByMe: boolean;
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        post?: never;
+        /** 取消按讚 */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                    /** @description 訊息 ID */
+                    messageId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 取消按讚結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 按讚數 */
+                            likeCount: number;
+                            /** @description 我是否已按讚 */
+                            likedByMe: boolean;
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat-rooms/{roomId}/messages/{messageId}/pin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** 置頂訊息 */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                    /** @description 訊息 ID */
+                    messageId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 置頂結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 訊息 ID */
+                            id: number;
+                            /** @description 聊天室 ID */
+                            roomId: number;
+                            /**
+                             * @description 訊息類型
+                             * @enum {string}
+                             */
+                            kind: "text" | "system";
+                            /** @description 訊息內容 */
+                            body: string;
+                            /** @description 系統訊息元資料 */
+                            metadata: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @description 作者（系統訊息為 null） */
+                            author: {
+                                /** @description 作者 ID */
+                                userId: number;
+                                /** @description 暱稱 */
+                                nickname: string | null;
+                                /** @description 頭像 URL */
+                                avatar: string | null;
+                                /** @description 是否為帶領人 */
+                                isHost: boolean;
+                            } | null;
+                            /** @description 引用回覆（無引用為 null） */
+                            replyTo: {
+                                /** @description 被引用訊息 ID */
+                                id: number;
+                                /** @description 被引用訊息的作者暱稱 */
+                                authorName: string | null;
+                                /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                bodyPreview: string | null;
+                                /** @description 被引用訊息是否已刪除 */
+                                isDeleted: boolean;
+                            } | null;
+                            /** @description 按讚數 */
+                            likeCount: number;
+                            /** @description 我是否已按讚 */
+                            likedByMe: boolean;
+                            /** @description 是否已置頂 */
+                            isPinned: boolean;
+                            /** @description 置頂時間（ISO） */
+                            pinnedAt: string | null;
+                            /** @description 編輯時間（ISO） */
+                            editedAt: string | null;
+                            /** @description 建立時間（ISO） */
+                            createdAt: string;
+                            /** @description 更新時間（ISO） */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        post?: never;
+        /** 取消置頂 */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                    /** @description 訊息 ID */
+                    messageId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 取消置頂結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 訊息 ID */
+                            id: number;
+                            /** @description 聊天室 ID */
+                            roomId: number;
+                            /**
+                             * @description 訊息類型
+                             * @enum {string}
+                             */
+                            kind: "text" | "system";
+                            /** @description 訊息內容 */
+                            body: string;
+                            /** @description 系統訊息元資料 */
+                            metadata: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @description 作者（系統訊息為 null） */
+                            author: {
+                                /** @description 作者 ID */
+                                userId: number;
+                                /** @description 暱稱 */
+                                nickname: string | null;
+                                /** @description 頭像 URL */
+                                avatar: string | null;
+                                /** @description 是否為帶領人 */
+                                isHost: boolean;
+                            } | null;
+                            /** @description 引用回覆（無引用為 null） */
+                            replyTo: {
+                                /** @description 被引用訊息 ID */
+                                id: number;
+                                /** @description 被引用訊息的作者暱稱 */
+                                authorName: string | null;
+                                /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                bodyPreview: string | null;
+                                /** @description 被引用訊息是否已刪除 */
+                                isDeleted: boolean;
+                            } | null;
+                            /** @description 按讚數 */
+                            likeCount: number;
+                            /** @description 我是否已按讚 */
+                            likedByMe: boolean;
+                            /** @description 是否已置頂 */
+                            isPinned: boolean;
+                            /** @description 置頂時間（ISO） */
+                            pinnedAt: string | null;
+                            /** @description 編輯時間（ISO） */
+                            editedAt: string | null;
+                            /** @description 建立時間（ISO） */
+                            createdAt: string;
+                            /** @description 更新時間（ISO） */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat-rooms/{roomId}/pins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 置頂訊息列表 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 置頂訊息 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 訊息 ID */
+                            id: number;
+                            /** @description 聊天室 ID */
+                            roomId: number;
+                            /**
+                             * @description 訊息類型
+                             * @enum {string}
+                             */
+                            kind: "text" | "system";
+                            /** @description 訊息內容 */
+                            body: string;
+                            /** @description 系統訊息元資料 */
+                            metadata: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @description 作者（系統訊息為 null） */
+                            author: {
+                                /** @description 作者 ID */
+                                userId: number;
+                                /** @description 暱稱 */
+                                nickname: string | null;
+                                /** @description 頭像 URL */
+                                avatar: string | null;
+                                /** @description 是否為帶領人 */
+                                isHost: boolean;
+                            } | null;
+                            /** @description 引用回覆（無引用為 null） */
+                            replyTo: {
+                                /** @description 被引用訊息 ID */
+                                id: number;
+                                /** @description 被引用訊息的作者暱稱 */
+                                authorName: string | null;
+                                /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                bodyPreview: string | null;
+                                /** @description 被引用訊息是否已刪除 */
+                                isDeleted: boolean;
+                            } | null;
+                            /** @description 按讚數 */
+                            likeCount: number;
+                            /** @description 我是否已按讚 */
+                            likedByMe: boolean;
+                            /** @description 是否已置頂 */
+                            isPinned: boolean;
+                            /** @description 置頂時間（ISO） */
+                            pinnedAt: string | null;
+                            /** @description 編輯時間（ISO） */
+                            editedAt: string | null;
+                            /** @description 建立時間（ISO） */
+                            createdAt: string;
+                            /** @description 更新時間（ISO） */
+                            updatedAt: string;
+                        }[];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat-rooms/{roomId}/messages/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 搜尋訊息 */
+        get: {
+            parameters: {
+                query: {
+                    /** @description 搜尋關鍵字（1-100 字） */
+                    q: string;
+                };
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 搜尋結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 結果總數 */
+                            total: number;
+                            /** @description 搜尋結果 */
+                            items: {
+                                /** @description 訊息 ID */
+                                id: number;
+                                /** @description 建立時間（ISO） */
+                                createdAt: string;
+                            }[];
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat-rooms/{roomId}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** 標記已讀 */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 聊天室 ID */
+                    roomId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description 已讀到的最新訊息 ID
+                         * @example 200
+                         */
+                        lastReadMessageId: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description 已讀結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description 已讀到的訊息 ID */
+                            lastReadMessageId: number;
+                            /** @description 剩餘未讀數 */
+                            unreadCount: number;
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+                409: components["responses"]["ConflictError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/cities": {
         parameters: {
             query?: never;
@@ -7207,10 +8541,52 @@ export interface paths {
                                 startDate: string;
                                 /** Format: date-time */
                                 endDate: string;
+                                /** @description 一句話簡介 */
+                                tagline: string | null;
+                                /** @description 互動方式 */
+                                interactionModes: ("sync" | "async" | "physical")[];
+                                /** @description 活動地點 */
+                                location: string | null;
+                                /** @description 聚會時段 */
+                                sessions: {
+                                    id: number;
+                                    sessionDate: string;
+                                    startTime: string | null;
+                                    endTime: string | null;
+                                }[];
+                                /** @enum {string} */
+                                feeType: "free" | "paid";
+                                /** @description 費用金額 */
+                                feeAmount: number | null;
+                                /** @enum {string} */
+                                signupMethod: "island_form" | "external";
+                                /** @description 外部報名連結 */
+                                externalSignupUrl: string | null;
+                                /** @description 人數上限 */
+                                capacity: number | null;
+                                /**
+                                 * Format: date-time
+                                 * @description 加入截止日
+                                 */
+                                joinDeadline: string | null;
+                                /** @description 已加入人數 */
+                                participantCount: number;
                                 inviteMessage: string | null;
                                 canJoin: boolean;
                                 /** @enum {string|null} */
                                 unavailableReason: "not_published" | "expired" | "full" | "paused" | null;
+                                /**
+                                 * CohortPrivacy
+                                 * @description 隱私設定
+                                 */
+                                privacy: {
+                                    /** @description 私密活動 */
+                                    isPrivate: boolean;
+                                    /** @description 參與者打卡預設私密 */
+                                    checkinDefaultPrivate: boolean;
+                                    /** @description 發起人留言預設私密 */
+                                    hostCommentDefaultPrivate: boolean;
+                                };
                                 visibilityNotice: string;
                                 organization: {
                                     name: string;
@@ -7422,6 +8798,35 @@ export interface paths {
                                 startDate: string;
                                 /** Format: date-time */
                                 endDate: string;
+                                /** @description 一句話簡介 */
+                                tagline: string | null;
+                                /** @description 互動方式 */
+                                interactionModes: ("sync" | "async" | "physical")[];
+                                /** @description 會議連結（僅已加入成員可見） */
+                                meetingUrl: string | null;
+                                /** @description 活動地點 */
+                                location: string | null;
+                                /** @description 聚會時段 */
+                                sessions: {
+                                    id: number;
+                                    sessionDate: string;
+                                    startTime: string | null;
+                                    endTime: string | null;
+                                }[];
+                                /** @enum {string} */
+                                feeType: "free" | "paid";
+                                /**
+                                 * CohortPrivacy
+                                 * @description 隱私設定
+                                 */
+                                privacy: {
+                                    /** @description 私密活動 */
+                                    isPrivate: boolean;
+                                    /** @description 參與者打卡預設私密 */
+                                    checkinDefaultPrivate: boolean;
+                                    /** @description 發起人留言預設私密 */
+                                    hostCommentDefaultPrivate: boolean;
+                                };
                                 exportOptIn: boolean;
                                 organization: {
                                     name: string;
@@ -13935,7 +15340,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** 封存系列 */
+        /** 封存系列（級聯封存全部場次） */
         delete: {
             parameters: {
                 query?: never;
@@ -13948,15 +15353,81 @@ export interface paths {
             requestBody?: never;
             responses: {
                 /** @description 系列已封存 */
-                204: {
+                200: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 系列 ID */
+                                programId: number;
+                                /** @description 本次級聯封存的場次數量 */
+                                archivedCohortCount: number;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
                 };
                 401: components["responses"]["UnauthorizedError"];
                 403: components["responses"]["ForbiddenError"];
-                409: components["responses"]["ConflictError"];
             };
         };
         options?: never;
@@ -14066,6 +15537,117 @@ export interface paths {
         };
         trace?: never;
     };
+    "/api/v1/lighthouse/programs/{programId}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 複製系列（不含場次） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    programId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 副本已建立 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                organizationId: number;
+                                name: string;
+                                description: string | null;
+                                /** Format: date-time */
+                                deletedAt: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/lighthouse/programs/{programId}/cohorts": {
         parameters: {
             query?: never;
@@ -14103,6 +15685,8 @@ export interface paths {
                                 programId: number;
                                 slug: string;
                                 displayName: string;
+                                /** @description 一句話簡介 */
+                                tagline: string | null;
                                 /** Format: date-time */
                                 startDate: string;
                                 /** Format: date-time */
@@ -14115,6 +15699,62 @@ export interface paths {
                                 joinDeadline: string | null;
                                 capacity: number | null;
                                 inviteMessage: string | null;
+                                showInviteMessageOnSignup: boolean;
+                                /** @description 互動方式 */
+                                interactionModes: ("sync" | "async" | "physical")[];
+                                /** @description 會議連結 */
+                                meetingUrl: string | null;
+                                /** @description 活動地點 */
+                                location: string | null;
+                                /** @description 聚會時段 */
+                                sessions: {
+                                    /**
+                                     * @description 聚會日期
+                                     * @example 2026-10-01
+                                     */
+                                    sessionDate: string;
+                                    /**
+                                     * @description 開始時間（HH:MM），可為 null
+                                     * @example 14:00
+                                     */
+                                    startTime: string | null;
+                                    /**
+                                     * @description 結束時間（HH:MM），可為 null
+                                     * @example 16:00
+                                     */
+                                    endTime: string | null;
+                                    /**
+                                     * @description 聚會時段 ID
+                                     * @example 1
+                                     */
+                                    id: number;
+                                }[];
+                                /**
+                                 * @description 收費類型：free（免費）、paid（付費）
+                                 * @example free
+                                 * @enum {string}
+                                 */
+                                feeType: "free" | "paid";
+                                /** @description 費用金額 */
+                                feeAmount: number | null;
+                                /**
+                                 * @description 報名方式：island_form（島島表單）、external（外部連結）
+                                 * @example island_form
+                                 * @enum {string}
+                                 */
+                                signupMethod: "island_form" | "external";
+                                /** @description 外部報名連結 */
+                                externalSignupUrl: string | null;
+                                /** @description 私密活動 */
+                                isPrivate: boolean;
+                                /** @description 參與者打卡預設私密 */
+                                checkinDefaultPrivate: boolean;
+                                /** @description 發起人留言預設私密 */
+                                hostCommentDefaultPrivate: boolean;
+                                /** @description 是否已建立活動主頁 */
+                                hasHomePage: boolean;
+                                /** @description 報名問題數量 */
+                                signupQuestionCount: number;
                                 /** @enum {string} */
                                 status: "draft" | "published" | "archived";
                                 /**
@@ -14205,11 +15845,91 @@ export interface paths {
                         slug: string;
                         /** @example 2026 夏季期 */
                         displayName: string;
+                        /**
+                         * @description 一句話簡介（≤80 字）
+                         * @example 一起學習、一起成長
+                         */
+                        tagline?: string;
                         startDate: string;
                         endDate: string;
+                        /** @description 加入截止日；null 表示可加入至結束日 */
                         joinDeadline?: string | null;
+                        /** @description 人數上限；null 表示不限 */
                         capacity?: number | null;
                         inviteMessage?: string | null;
+                        /**
+                         * @description 在報名頁面顯示邀請訊息
+                         * @default false
+                         */
+                        showInviteMessageOnSignup?: boolean;
+                        /**
+                         * @description 互動方式（至少選一）
+                         * @example [
+                         *       "sync"
+                         *     ]
+                         */
+                        interactionModes?: ("sync" | "async" | "physical")[];
+                        /**
+                         * Format: uri
+                         * @description 會議連結
+                         */
+                        meetingUrl?: string | null;
+                        /** @description 活動地點 */
+                        location?: string | null;
+                        /** @description 聚會時段（上限 50 筆） */
+                        sessions?: {
+                            /**
+                             * @description 聚會日期
+                             * @example 2026-10-01
+                             */
+                            sessionDate: string;
+                            /**
+                             * @description 開始時間（HH:MM），可為 null
+                             * @example 14:00
+                             */
+                            startTime: string | null;
+                            /**
+                             * @description 結束時間（HH:MM），可為 null
+                             * @example 16:00
+                             */
+                            endTime: string | null;
+                        }[];
+                        /**
+                         * @description 收費類型：free（免費）、paid（付費）
+                         * @default free
+                         * @example free
+                         * @enum {string}
+                         */
+                        feeType?: "free" | "paid";
+                        /** @description 費用金額（NT$）；free 時清為 null */
+                        feeAmount?: number | null;
+                        /**
+                         * @description 報名方式：island_form（島島表單）、external（外部連結）
+                         * @default island_form
+                         * @example island_form
+                         * @enum {string}
+                         */
+                        signupMethod?: "island_form" | "external";
+                        /**
+                         * Format: uri
+                         * @description 外部報名連結
+                         */
+                        externalSignupUrl?: string | null;
+                        /**
+                         * @description 私密活動
+                         * @default true
+                         */
+                        isPrivate?: boolean;
+                        /**
+                         * @description 參與者打卡預設私密
+                         * @default false
+                         */
+                        checkinDefaultPrivate?: boolean;
+                        /**
+                         * @description 發起人留言預設私密
+                         * @default false
+                         */
+                        hostCommentDefaultPrivate?: boolean;
                         /**
                          * @description 探索活動頁可見性：private（僅邀請連結）、public（列於探索活動頁，任何人可取得加入連結）
                          * @default private
@@ -14244,6 +15964,8 @@ export interface paths {
                                 programId: number;
                                 slug: string;
                                 displayName: string;
+                                /** @description 一句話簡介 */
+                                tagline: string | null;
                                 /** Format: date-time */
                                 startDate: string;
                                 /** Format: date-time */
@@ -14256,6 +15978,62 @@ export interface paths {
                                 joinDeadline: string | null;
                                 capacity: number | null;
                                 inviteMessage: string | null;
+                                showInviteMessageOnSignup: boolean;
+                                /** @description 互動方式 */
+                                interactionModes: ("sync" | "async" | "physical")[];
+                                /** @description 會議連結 */
+                                meetingUrl: string | null;
+                                /** @description 活動地點 */
+                                location: string | null;
+                                /** @description 聚會時段 */
+                                sessions: {
+                                    /**
+                                     * @description 聚會日期
+                                     * @example 2026-10-01
+                                     */
+                                    sessionDate: string;
+                                    /**
+                                     * @description 開始時間（HH:MM），可為 null
+                                     * @example 14:00
+                                     */
+                                    startTime: string | null;
+                                    /**
+                                     * @description 結束時間（HH:MM），可為 null
+                                     * @example 16:00
+                                     */
+                                    endTime: string | null;
+                                    /**
+                                     * @description 聚會時段 ID
+                                     * @example 1
+                                     */
+                                    id: number;
+                                }[];
+                                /**
+                                 * @description 收費類型：free（免費）、paid（付費）
+                                 * @example free
+                                 * @enum {string}
+                                 */
+                                feeType: "free" | "paid";
+                                /** @description 費用金額 */
+                                feeAmount: number | null;
+                                /**
+                                 * @description 報名方式：island_form（島島表單）、external（外部連結）
+                                 * @example island_form
+                                 * @enum {string}
+                                 */
+                                signupMethod: "island_form" | "external";
+                                /** @description 外部報名連結 */
+                                externalSignupUrl: string | null;
+                                /** @description 私密活動 */
+                                isPrivate: boolean;
+                                /** @description 參與者打卡預設私密 */
+                                checkinDefaultPrivate: boolean;
+                                /** @description 發起人留言預設私密 */
+                                hostCommentDefaultPrivate: boolean;
+                                /** @description 是否已建立活動主頁 */
+                                hasHomePage: boolean;
+                                /** @description 報名問題數量 */
+                                signupQuestionCount: number;
                                 /** @enum {string} */
                                 status: "draft" | "published" | "archived";
                                 /**
@@ -14373,6 +16151,8 @@ export interface paths {
                                 programId: number;
                                 slug: string;
                                 displayName: string;
+                                /** @description 一句話簡介 */
+                                tagline: string | null;
                                 /** Format: date-time */
                                 startDate: string;
                                 /** Format: date-time */
@@ -14385,6 +16165,62 @@ export interface paths {
                                 joinDeadline: string | null;
                                 capacity: number | null;
                                 inviteMessage: string | null;
+                                showInviteMessageOnSignup: boolean;
+                                /** @description 互動方式 */
+                                interactionModes: ("sync" | "async" | "physical")[];
+                                /** @description 會議連結 */
+                                meetingUrl: string | null;
+                                /** @description 活動地點 */
+                                location: string | null;
+                                /** @description 聚會時段 */
+                                sessions: {
+                                    /**
+                                     * @description 聚會日期
+                                     * @example 2026-10-01
+                                     */
+                                    sessionDate: string;
+                                    /**
+                                     * @description 開始時間（HH:MM），可為 null
+                                     * @example 14:00
+                                     */
+                                    startTime: string | null;
+                                    /**
+                                     * @description 結束時間（HH:MM），可為 null
+                                     * @example 16:00
+                                     */
+                                    endTime: string | null;
+                                    /**
+                                     * @description 聚會時段 ID
+                                     * @example 1
+                                     */
+                                    id: number;
+                                }[];
+                                /**
+                                 * @description 收費類型：free（免費）、paid（付費）
+                                 * @example free
+                                 * @enum {string}
+                                 */
+                                feeType: "free" | "paid";
+                                /** @description 費用金額 */
+                                feeAmount: number | null;
+                                /**
+                                 * @description 報名方式：island_form（島島表單）、external（外部連結）
+                                 * @example island_form
+                                 * @enum {string}
+                                 */
+                                signupMethod: "island_form" | "external";
+                                /** @description 外部報名連結 */
+                                externalSignupUrl: string | null;
+                                /** @description 私密活動 */
+                                isPrivate: boolean;
+                                /** @description 參與者打卡預設私密 */
+                                checkinDefaultPrivate: boolean;
+                                /** @description 發起人留言預設私密 */
+                                hostCommentDefaultPrivate: boolean;
+                                /** @description 是否已建立活動主頁 */
+                                hasHomePage: boolean;
+                                /** @description 報名問題數量 */
+                                signupQuestionCount: number;
                                 /** @enum {string} */
                                 status: "draft" | "published" | "archived";
                                 /**
@@ -14501,11 +16337,53 @@ export interface paths {
                     "application/json": {
                         slug?: string;
                         displayName?: string;
+                        /** @description 一句話簡介 */
+                        tagline?: string | null;
                         startDate?: string;
                         endDate?: string;
                         joinDeadline?: string | null;
                         capacity?: number | null;
                         inviteMessage?: string | null;
+                        showInviteMessageOnSignup?: boolean;
+                        interactionModes?: ("sync" | "async" | "physical")[];
+                        /** Format: uri */
+                        meetingUrl?: string | null;
+                        location?: string | null;
+                        sessions?: {
+                            /**
+                             * @description 聚會日期
+                             * @example 2026-10-01
+                             */
+                            sessionDate: string;
+                            /**
+                             * @description 開始時間（HH:MM），可為 null
+                             * @example 14:00
+                             */
+                            startTime: string | null;
+                            /**
+                             * @description 結束時間（HH:MM），可為 null
+                             * @example 16:00
+                             */
+                            endTime: string | null;
+                        }[];
+                        /**
+                         * @description 收費類型：free（免費）、paid（付費）
+                         * @example free
+                         * @enum {string}
+                         */
+                        feeType?: "free" | "paid";
+                        feeAmount?: number | null;
+                        /**
+                         * @description 報名方式：island_form（島島表單）、external（外部連結）
+                         * @example island_form
+                         * @enum {string}
+                         */
+                        signupMethod?: "island_form" | "external";
+                        /** Format: uri */
+                        externalSignupUrl?: string | null;
+                        isPrivate?: boolean;
+                        checkinDefaultPrivate?: boolean;
+                        hostCommentDefaultPrivate?: boolean;
                         /**
                          * @description 探索活動頁可見性：private（僅邀請連結）、public（列於探索活動頁，任何人可取得加入連結）
                          * @example private
@@ -14536,6 +16414,8 @@ export interface paths {
                                 programId: number;
                                 slug: string;
                                 displayName: string;
+                                /** @description 一句話簡介 */
+                                tagline: string | null;
                                 /** Format: date-time */
                                 startDate: string;
                                 /** Format: date-time */
@@ -14548,6 +16428,62 @@ export interface paths {
                                 joinDeadline: string | null;
                                 capacity: number | null;
                                 inviteMessage: string | null;
+                                showInviteMessageOnSignup: boolean;
+                                /** @description 互動方式 */
+                                interactionModes: ("sync" | "async" | "physical")[];
+                                /** @description 會議連結 */
+                                meetingUrl: string | null;
+                                /** @description 活動地點 */
+                                location: string | null;
+                                /** @description 聚會時段 */
+                                sessions: {
+                                    /**
+                                     * @description 聚會日期
+                                     * @example 2026-10-01
+                                     */
+                                    sessionDate: string;
+                                    /**
+                                     * @description 開始時間（HH:MM），可為 null
+                                     * @example 14:00
+                                     */
+                                    startTime: string | null;
+                                    /**
+                                     * @description 結束時間（HH:MM），可為 null
+                                     * @example 16:00
+                                     */
+                                    endTime: string | null;
+                                    /**
+                                     * @description 聚會時段 ID
+                                     * @example 1
+                                     */
+                                    id: number;
+                                }[];
+                                /**
+                                 * @description 收費類型：free（免費）、paid（付費）
+                                 * @example free
+                                 * @enum {string}
+                                 */
+                                feeType: "free" | "paid";
+                                /** @description 費用金額 */
+                                feeAmount: number | null;
+                                /**
+                                 * @description 報名方式：island_form（島島表單）、external（外部連結）
+                                 * @example island_form
+                                 * @enum {string}
+                                 */
+                                signupMethod: "island_form" | "external";
+                                /** @description 外部報名連結 */
+                                externalSignupUrl: string | null;
+                                /** @description 私密活動 */
+                                isPrivate: boolean;
+                                /** @description 參與者打卡預設私密 */
+                                checkinDefaultPrivate: boolean;
+                                /** @description 發起人留言預設私密 */
+                                hostCommentDefaultPrivate: boolean;
+                                /** @description 是否已建立活動主頁 */
+                                hasHomePage: boolean;
+                                /** @description 報名問題數量 */
+                                signupQuestionCount: number;
                                 /** @enum {string} */
                                 status: "draft" | "published" | "archived";
                                 /**
@@ -14560,6 +16496,8 @@ export interface paths {
                                 createdAt: string;
                                 /** Format: date-time */
                                 updatedAt: string | null;
+                                /** @description 切換隱私時影響的實踐數量 */
+                                affectedPracticeCount?: number;
                             };
                             /**
                              * Format: date-time
@@ -15563,6 +17501,8 @@ export interface paths {
                                 programId: number;
                                 slug: string;
                                 displayName: string;
+                                /** @description 一句話簡介 */
+                                tagline: string | null;
                                 /** Format: date-time */
                                 startDate: string;
                                 /** Format: date-time */
@@ -15575,6 +17515,62 @@ export interface paths {
                                 joinDeadline: string | null;
                                 capacity: number | null;
                                 inviteMessage: string | null;
+                                showInviteMessageOnSignup: boolean;
+                                /** @description 互動方式 */
+                                interactionModes: ("sync" | "async" | "physical")[];
+                                /** @description 會議連結 */
+                                meetingUrl: string | null;
+                                /** @description 活動地點 */
+                                location: string | null;
+                                /** @description 聚會時段 */
+                                sessions: {
+                                    /**
+                                     * @description 聚會日期
+                                     * @example 2026-10-01
+                                     */
+                                    sessionDate: string;
+                                    /**
+                                     * @description 開始時間（HH:MM），可為 null
+                                     * @example 14:00
+                                     */
+                                    startTime: string | null;
+                                    /**
+                                     * @description 結束時間（HH:MM），可為 null
+                                     * @example 16:00
+                                     */
+                                    endTime: string | null;
+                                    /**
+                                     * @description 聚會時段 ID
+                                     * @example 1
+                                     */
+                                    id: number;
+                                }[];
+                                /**
+                                 * @description 收費類型：free（免費）、paid（付費）
+                                 * @example free
+                                 * @enum {string}
+                                 */
+                                feeType: "free" | "paid";
+                                /** @description 費用金額 */
+                                feeAmount: number | null;
+                                /**
+                                 * @description 報名方式：island_form（島島表單）、external（外部連結）
+                                 * @example island_form
+                                 * @enum {string}
+                                 */
+                                signupMethod: "island_form" | "external";
+                                /** @description 外部報名連結 */
+                                externalSignupUrl: string | null;
+                                /** @description 私密活動 */
+                                isPrivate: boolean;
+                                /** @description 參與者打卡預設私密 */
+                                checkinDefaultPrivate: boolean;
+                                /** @description 發起人留言預設私密 */
+                                hostCommentDefaultPrivate: boolean;
+                                /** @description 是否已建立活動主頁 */
+                                hasHomePage: boolean;
+                                /** @description 報名問題數量 */
+                                signupQuestionCount: number;
                                 /** @enum {string} */
                                 status: "draft" | "published" | "archived";
                                 /**
@@ -15691,6 +17687,8 @@ export interface paths {
                                 programId: number;
                                 slug: string;
                                 displayName: string;
+                                /** @description 一句話簡介 */
+                                tagline: string | null;
                                 /** Format: date-time */
                                 startDate: string;
                                 /** Format: date-time */
@@ -15703,6 +17701,62 @@ export interface paths {
                                 joinDeadline: string | null;
                                 capacity: number | null;
                                 inviteMessage: string | null;
+                                showInviteMessageOnSignup: boolean;
+                                /** @description 互動方式 */
+                                interactionModes: ("sync" | "async" | "physical")[];
+                                /** @description 會議連結 */
+                                meetingUrl: string | null;
+                                /** @description 活動地點 */
+                                location: string | null;
+                                /** @description 聚會時段 */
+                                sessions: {
+                                    /**
+                                     * @description 聚會日期
+                                     * @example 2026-10-01
+                                     */
+                                    sessionDate: string;
+                                    /**
+                                     * @description 開始時間（HH:MM），可為 null
+                                     * @example 14:00
+                                     */
+                                    startTime: string | null;
+                                    /**
+                                     * @description 結束時間（HH:MM），可為 null
+                                     * @example 16:00
+                                     */
+                                    endTime: string | null;
+                                    /**
+                                     * @description 聚會時段 ID
+                                     * @example 1
+                                     */
+                                    id: number;
+                                }[];
+                                /**
+                                 * @description 收費類型：free（免費）、paid（付費）
+                                 * @example free
+                                 * @enum {string}
+                                 */
+                                feeType: "free" | "paid";
+                                /** @description 費用金額 */
+                                feeAmount: number | null;
+                                /**
+                                 * @description 報名方式：island_form（島島表單）、external（外部連結）
+                                 * @example island_form
+                                 * @enum {string}
+                                 */
+                                signupMethod: "island_form" | "external";
+                                /** @description 外部報名連結 */
+                                externalSignupUrl: string | null;
+                                /** @description 私密活動 */
+                                isPrivate: boolean;
+                                /** @description 參與者打卡預設私密 */
+                                checkinDefaultPrivate: boolean;
+                                /** @description 發起人留言預設私密 */
+                                hostCommentDefaultPrivate: boolean;
+                                /** @description 是否已建立活動主頁 */
+                                hasHomePage: boolean;
+                                /** @description 報名問題數量 */
+                                signupQuestionCount: number;
                                 /** @enum {string} */
                                 status: "draft" | "published" | "archived";
                                 /**

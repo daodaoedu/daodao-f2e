@@ -12,6 +12,9 @@ export * from "./admin-hooks";
 // Auth Service
 export * from "./auth";
 export * from "./auth-hooks";
+// Chat (群組聊天) Service
+export * from "./chat";
+export * from "./chat-hooks";
 // Group Challenge Service
 export * from "./challenge";
 export * from "./challenge-hooks";

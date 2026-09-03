@@ -7,7 +7,7 @@ import { Link } from "@daodao/i18n/navigation";
 import { Badge, type BadgeProps } from "@daodao/ui/components/badge";
 import { buttonVariants } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
-import { Calendar, Timer, Users } from "lucide-react";
+import { Calendar, MapPin, Timer, Users } from "lucide-react";
 import { PracticeTheme, practiceThemeSvgMap } from "@/constants/practice-theme";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 
@@ -60,11 +60,13 @@ const resolveCta = (activity: ActivitySummaryType): { key: CtaKey; href: string 
 };
 
 /**
- * 探索活動卡片：主題色背景 + 狀態 Badge + 主辦組織 + 開始日／天數進度 + 參與人數。
+ * 探索活動卡片：主題色背景 + 狀態 Badge + 發起人頭像與暱稱 + 開始日／天數進度 + 參與人數 + 地點。
+ * 已結束的活動卡片降低不透明度。
  * 加入走既有 /cohorts/join/[joinToken] 流程（design D2），不另開加入端點。
  */
 export const ActivityCard = ({ activity }: ActivityCardProps) => {
   const t = useTranslations("explore_activities");
+  const isEnded = activity.runStatus === "ended";
   const themeName = THEME_ROTATION[activity.id % THEME_ROTATION.length] ?? PracticeTheme.blue;
   const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.blue];
   const formattedStartDate = formatCardDate(activity.startDate);
@@ -72,7 +74,13 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
   const cta = resolveCta(activity);
 
   return (
-    <div className="relative h-[239px] w-full overflow-hidden rounded-[12px] text-left">
+    <Link
+      href={`/activities/${activity.id}`}
+      className={cn(
+        "relative block h-[239px] w-full overflow-hidden rounded-[12px] text-left transition-opacity",
+        isEnded && "opacity-55 grayscale-[30%]"
+      )}
+    >
       <Theme
         className="absolute inset-0 h-full w-full rounded-[12px]"
         preserveAspectRatio="xMidYMid slice"
@@ -81,11 +89,9 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
       <div className="absolute inset-0 z-10 flex flex-col p-5 pb-4">
         <div className="flex min-h-0 flex-1 flex-col gap-2">
           <div className="flex items-center gap-1.5">
-            {activity.runStatus !== "ended" && (
-              <Badge variant={STATUS_BADGE[activity.runStatus]} size="sm" className="w-fit">
-                {t(`status_${activity.runStatus}`)}
-              </Badge>
-            )}
+            <Badge variant={STATUS_BADGE[activity.runStatus]} size="sm" className="w-fit">
+              {t(`status_${activity.runStatus}`)}
+            </Badge>
             {activity.isJoined && (
               <Badge variant="outline-logo" size="sm" className="w-fit">
                 {t("cta_joined")}
@@ -95,8 +101,32 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
 
           <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">{activity.displayName}</h3>
           <p className="line-clamp-2 text-xs text-text-dark">
-            {activity.description ?? activity.programName}
+            {activity.tagline ?? activity.description ?? activity.programName}
           </p>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs text-text-dark">
+            {/* Host info */}
+            <span className="flex items-center gap-1">
+              {activity.host.avatar ? (
+                <img
+                  src={activity.host.avatar}
+                  alt={activity.host.name}
+                  className="size-4 rounded-full object-cover"
+                />
+              ) : (
+                <DefaultAvatarSvg className="size-4 rounded-full" />
+              )}
+              {t("card_host", { name: activity.host.name })}
+            </span>
+
+            {/* Location */}
+            {activity.location && (
+              <span className="flex items-center gap-1">
+                <MapPin className="size-3.5 shrink-0" />
+                {activity.location}
+              </span>
+            )}
+          </div>
 
           <div className="flex items-center gap-2 text-xs text-text-dark">
             {formattedStartDate !== null && (
@@ -121,7 +151,7 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
               <span className="flex shrink-0 items-center">
                 {Array.from({ length: Math.min(3, activity.participantCount) }).map((_, index) => (
                   <DefaultAvatarSvg
-                    key={index}
+                    key={`avatar-${index}`}
                     className={`size-5 rounded-full shadow-[0_0_0_2px_white] ${index > 0 ? "-ml-1.75" : ""}`}
                   />
                 ))}
@@ -138,12 +168,11 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
 
         <span className="mt-3 block shrink-0">
           {cta.href ? (
-            <Link
-              href={cta.href}
+            <span
               className={cn(buttonVariants({ variant: "secondary" }), "w-full sm:max-w-[288px]")}
             >
               {t(cta.key)}
-            </Link>
+            </span>
           ) : (
             <span
               aria-disabled="true"
@@ -168,6 +197,6 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
           </div>
         </div>
       )}
-    </div>
+    </Link>
   );
 };

@@ -19,6 +19,7 @@ import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Input } from "@daodao/ui/components/input";
 import { toast } from "@daodao/ui/components/sonner";
+import { Switch } from "@daodao/ui/components/switch";
 import { Textarea } from "@daodao/ui/components/textarea";
 import {
   AlertTriangle,
@@ -26,14 +27,17 @@ import {
   ArrowUpRight,
   CalendarDays,
   Globe,
+  Minus,
   Plus,
   RadioTower,
   Send,
   X,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { JoinCode } from "./join-code";
+
+type SessionEntry = { id: string; sessionDate: string; startTime: string; endTime: string };
 
 type CohortTemplateSummary = { id: number; title: string; boundCohortIds: number[] };
 
@@ -57,6 +61,51 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
   // 場次管理頁的「編輯」鉛筆會帶 ?edit=<cohortId> 過來，直接展開該場次的編輯表單
   const [editing, setEditing] = useState(searchParams.get("edit") === String(cohort.id));
   const [busy, setBusy] = useState(false);
+
+  // -- 新欄位的 controlled state（編輯表單用） --
+  const [editSessions, setEditSessions] = useState<SessionEntry[]>(() =>
+    (cohort.sessions ?? []).map((s, i) => ({
+      id: String(s.id ?? i),
+      sessionDate: s.sessionDate?.slice(0, 10) ?? "",
+      startTime: s.startTime ?? "",
+      endTime: s.endTime ?? "",
+    }))
+  );
+  const [editInteractionModes, setEditInteractionModes] = useState<string[]>(
+    cohort.interactionModes ?? []
+  );
+  const [editFeeType, setEditFeeType] = useState<"free" | "paid">(cohort.feeType ?? "free");
+  const [editSignupMethod, setEditSignupMethod] = useState<"island_form" | "external">(
+    cohort.signupMethod ?? "island_form"
+  );
+  const [editIsPrivate, setEditIsPrivate] = useState(cohort.isPrivate ?? false);
+  const [editCheckinPrivate, setEditCheckinPrivate] = useState(cohort.checkinDefaultPrivate ?? false);
+  const [editHostCommentPrivate, setEditHostCommentPrivate] = useState(
+    cohort.hostCommentDefaultPrivate ?? false
+  );
+
+  const addEditSession = useCallback(() => {
+    setEditSessions((prev) => [
+      ...prev,
+      { id: `new-${Date.now()}`, sessionDate: "", startTime: "", endTime: "" },
+    ]);
+  }, []);
+  const removeEditSession = useCallback((id: string) => {
+    setEditSessions((prev) => prev.filter((s) => s.id !== id));
+  }, []);
+  const updateEditSession = useCallback(
+    (id: string, field: keyof SessionEntry, value: string) => {
+      setEditSessions((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, [field]: value } : s))
+      );
+    },
+    []
+  );
+  const toggleEditInteractionMode = useCallback((mode: string) => {
+    setEditInteractionModes((prev) =>
+      prev.includes(mode) ? prev.filter((m) => m !== mode) : [...prev, mode]
+    );
+  }, []);
 
   async function handlePublish() {
     if (!window.confirm(t("cohort_publish_confirm"))) {
@@ -96,16 +145,39 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
       return;
     }
     const capacityValue = String(formData.get("capacity") ?? "");
+    const feeAmountValue = String(formData.get("feeAmount") ?? "");
     setBusy(true);
     const response = await updateLighthouseCohort(programId, cohort.id, {
       displayName: String(formData.get("displayName") ?? "").trim(),
+      tagline: String(formData.get("tagline") ?? "").trim() || null,
       startDate,
       endDate,
       joinDeadline: String(formData.get("joinDeadline") ?? "") || null,
       capacity: capacityValue ? Number(capacityValue) : null,
       inviteMessage: String(formData.get("inviteMessage") ?? "").trim() || null,
       visibility: formData.get("visibility") === "on" ? "public" : "private",
-    });
+      interactionModes: editInteractionModes as ("sync" | "async" | "physical")[],
+      meetingUrl: String(formData.get("meetingUrl") ?? "").trim() || null,
+      location: String(formData.get("location") ?? "").trim() || null,
+      sessions: editSessions
+        .filter((s) => s.sessionDate)
+        .map((s) => ({
+          sessionDate: s.sessionDate,
+          startTime: s.startTime || null,
+          endTime: s.endTime || null,
+        })),
+      feeType: editFeeType,
+      feeAmount: editFeeType === "paid" && feeAmountValue ? Number(feeAmountValue) : null,
+      signupMethod: editSignupMethod,
+      externalSignupUrl:
+        editSignupMethod === "external"
+          ? String(formData.get("externalSignupUrl") ?? "").trim() || null
+          : null,
+      showInviteMessageOnSignup: formData.get("showInviteMessageOnSignup") === "on",
+      isPrivate: editIsPrivate,
+      checkinDefaultPrivate: editCheckinPrivate,
+      hostCommentDefaultPrivate: editHostCommentPrivate,
+    } as Parameters<typeof updateLighthouseCohort>[2]);
     setBusy(false);
     if (response.error) {
       toast.error(t("save_failed"));
@@ -136,6 +208,18 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
             name="displayName"
             required
             defaultValue={cohort.displayName}
+          />
+        </label>
+        <label
+          htmlFor={`cohort-edit-tagline-${cohort.id}`}
+          className="grid gap-1.5 text-sm font-medium"
+        >
+          {t("cohort_tagline")}
+          <Input
+            id={`cohort-edit-tagline-${cohort.id}`}
+            name="tagline"
+            placeholder={t("cohort_tagline_placeholder")}
+            defaultValue={cohort.tagline ?? ""}
           />
         </label>
         <label
@@ -189,6 +273,112 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
             defaultValue={cohort.joinDeadline?.slice(0, 10) ?? ""}
           />
         </label>
+
+        {/* 互動方式 */}
+        <fieldset className="md:col-span-2">
+          <legend className="text-sm font-medium">{t("cohort_interaction_modes")}</legend>
+          <div className="mt-2 flex flex-wrap gap-4">
+            {(["sync", "async", "physical"] as const).map((mode) => (
+              <label key={mode} className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  className="size-4 accent-[#0D7773]"
+                  checked={editInteractionModes.includes(mode)}
+                  onChange={() => toggleEditInteractionMode(mode)}
+                />
+                {t(`cohort_interaction_mode_${mode}`)}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <label
+          htmlFor={`cohort-edit-meeting-${cohort.id}`}
+          className="grid gap-1.5 text-sm font-medium"
+        >
+          {t("cohort_meeting_url")}
+          <Input
+            id={`cohort-edit-meeting-${cohort.id}`}
+            name="meetingUrl"
+            type="url"
+            placeholder={t("cohort_meeting_url_placeholder")}
+            defaultValue={cohort.meetingUrl ?? ""}
+          />
+        </label>
+        <label
+          htmlFor={`cohort-edit-location-${cohort.id}`}
+          className="grid gap-1.5 text-sm font-medium"
+        >
+          {t("cohort_location")}
+          <Input
+            id={`cohort-edit-location-${cohort.id}`}
+            name="location"
+            placeholder={t("cohort_location_placeholder")}
+            defaultValue={cohort.location ?? ""}
+          />
+        </label>
+
+        {/* 聚會時段 */}
+        <fieldset className="md:col-span-2">
+          <legend className="text-sm font-medium">{t("cohort_sessions_title")}</legend>
+          <div className="mt-2 grid gap-2">
+            {editSessions.map((session) => (
+              <div key={session.id} className="flex flex-wrap items-end gap-2">
+                {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                <label className="grid gap-1 text-xs">
+                  {t("cohort_session_date")}
+                  <Input
+                    type="date"
+                    className="h-9 w-[140px] text-xs"
+                    value={session.sessionDate}
+                    onChange={(e) => updateEditSession(session.id, "sessionDate", e.target.value)}
+                  />
+                </label>
+                {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                <label className="grid gap-1 text-xs">
+                  {t("cohort_session_start_time")}
+                  <Input
+                    type="time"
+                    className="h-9 w-[110px] text-xs"
+                    value={session.startTime}
+                    onChange={(e) => updateEditSession(session.id, "startTime", e.target.value)}
+                  />
+                </label>
+                {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                <label className="grid gap-1 text-xs">
+                  {t("cohort_session_end_time")}
+                  <Input
+                    type="time"
+                    className="h-9 w-[110px] text-xs"
+                    value={session.endTime}
+                    onChange={(e) => updateEditSession(session.id, "endTime", e.target.value)}
+                  />
+                </label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-9 text-[#C03A3A]"
+                  onClick={() => removeEditSession(session.id)}
+                  aria-label={t("cohort_session_remove")}
+                >
+                  <Minus className="size-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-fit border-[#CDEBE8]"
+              onClick={addEditSession}
+            >
+              <Plus className="size-4" />
+              {t("cohort_session_add")}
+            </Button>
+          </div>
+        </fieldset>
+
         <label
           htmlFor={`cohort-edit-message-${cohort.id}`}
           className="grid gap-1.5 text-sm font-medium md:col-span-2"
@@ -200,6 +390,123 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
             defaultValue={cohort.inviteMessage ?? ""}
           />
         </label>
+
+        {/* 費用設定 */}
+        <fieldset className="md:col-span-2">
+          <legend className="text-sm font-medium">{t("cohort_fee_title")}</legend>
+          <div className="mt-2 flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="feeTypeRadio"
+                className="size-4 accent-[#0D7773]"
+                checked={editFeeType === "free"}
+                onChange={() => setEditFeeType("free")}
+              />
+              {t("cohort_fee_type_free")}
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="feeTypeRadio"
+                className="size-4 accent-[#0D7773]"
+                checked={editFeeType === "paid"}
+                onChange={() => setEditFeeType("paid")}
+              />
+              {t("cohort_fee_type_paid")}
+            </label>
+            {editFeeType === "paid" && (
+              <Input
+                name="feeAmount"
+                type="number"
+                min={0}
+                className="h-9 w-[120px]"
+                placeholder={t("cohort_fee_amount")}
+                defaultValue={cohort.feeAmount ?? ""}
+              />
+            )}
+          </div>
+        </fieldset>
+
+        {/* 報名設定 */}
+        <fieldset className="md:col-span-2">
+          <legend className="text-sm font-medium">{t("cohort_signup_title")}</legend>
+          <div className="mt-2 grid gap-2">
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="signupMethodRadio"
+                  className="size-4 accent-[#0D7773]"
+                  checked={editSignupMethod === "island_form"}
+                  onChange={() => setEditSignupMethod("island_form")}
+                />
+                {t("cohort_signup_method_island_form")}
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="signupMethodRadio"
+                  className="size-4 accent-[#0D7773]"
+                  checked={editSignupMethod === "external"}
+                  onChange={() => setEditSignupMethod("external")}
+                />
+                {t("cohort_signup_method_external")}
+              </label>
+            </div>
+            {editSignupMethod === "external" && (
+              <Input
+                name="externalSignupUrl"
+                type="url"
+                placeholder={t("cohort_external_signup_url_placeholder")}
+                defaultValue={cohort.externalSignupUrl ?? ""}
+              />
+            )}
+            <label className="flex items-center gap-3 text-sm">
+              <input
+                name="showInviteMessageOnSignup"
+                type="checkbox"
+                className="size-4 accent-[#0D7773]"
+                defaultChecked={cohort.showInviteMessageOnSignup ?? false}
+              />
+              {t("cohort_show_invite_message_on_signup")}
+            </label>
+          </div>
+        </fieldset>
+
+        {/* 隱私設定 */}
+        <fieldset className="md:col-span-2">
+          <legend className="text-sm font-medium">{t("cohort_privacy_title")}</legend>
+          <div className="mt-2 grid gap-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm">{t("cohort_is_private")}</p>
+                <p className="text-xs text-[#78928F]">{t("cohort_is_private_hint")}</p>
+              </div>
+              <Switch checked={editIsPrivate} onCheckedChange={setEditIsPrivate} />
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm">{t("cohort_checkin_default_private")}</p>
+                <p className="text-xs text-[#78928F]">{t("cohort_checkin_default_private_hint")}</p>
+              </div>
+              <Switch checked={editCheckinPrivate} onCheckedChange={setEditCheckinPrivate} />
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm">{t("cohort_host_comment_default_private")}</p>
+                <p className="text-xs text-[#78928F]">
+                  {t("cohort_host_comment_default_private_hint")}
+                </p>
+              </div>
+              <Switch
+                checked={editHostCommentPrivate}
+                onCheckedChange={setEditHostCommentPrivate}
+              />
+            </div>
+          </div>
+        </fieldset>
+
         <div className="grid gap-1.5 md:col-span-2">
           <label className="flex items-center gap-3 text-sm font-medium">
             <input
@@ -308,6 +615,40 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
   const [creatingCohort, setCreatingCohort] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  // -- 建立表單用的 controlled state --
+  const [createSessions, setCreateSessions] = useState<SessionEntry[]>([]);
+  const [createInteractionModes, setCreateInteractionModes] = useState<string[]>([]);
+  const [createFeeType, setCreateFeeType] = useState<"free" | "paid">("free");
+  const [createSignupMethod, setCreateSignupMethod] = useState<"island_form" | "external">(
+    "island_form"
+  );
+  const [createIsPrivate, setCreateIsPrivate] = useState(false);
+  const [createCheckinPrivate, setCreateCheckinPrivate] = useState(false);
+  const [createHostCommentPrivate, setCreateHostCommentPrivate] = useState(false);
+
+  const addCreateSession = useCallback(() => {
+    setCreateSessions((prev) => [
+      ...prev,
+      { id: `new-${Date.now()}`, sessionDate: "", startTime: "", endTime: "" },
+    ]);
+  }, []);
+  const removeCreateSession = useCallback((id: string) => {
+    setCreateSessions((prev) => prev.filter((s) => s.id !== id));
+  }, []);
+  const updateCreateSession = useCallback(
+    (id: string, field: keyof SessionEntry, value: string) => {
+      setCreateSessions((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, [field]: value } : s))
+      );
+    },
+    []
+  );
+  const toggleCreateInteractionMode = useCallback((mode: string) => {
+    setCreateInteractionModes((prev) =>
+      prev.includes(mode) ? prev.filter((m) => m !== mode) : [...prev, mode]
+    );
+  }, []);
+
   async function handleProgramUpdate(formData: FormData) {
     setBusy(true);
     const response = await updateLighthouseProgram(program.id, {
@@ -351,10 +692,12 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       return;
     }
     const capacityValue = String(formData.get("capacity") ?? "");
+    const feeAmountValue = String(formData.get("feeAmount") ?? "");
     setBusy(true);
     const response = await createLighthouseCohort(program.id, {
       slug: String(formData.get("slug") ?? "").trim(),
       displayName: String(formData.get("displayName") ?? "").trim(),
+      tagline: String(formData.get("tagline") ?? "").trim() || undefined,
       startDate,
       endDate,
       joinDeadline: String(formData.get("joinDeadline") ?? "") || null,
@@ -362,7 +705,28 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       inviteMessage: String(formData.get("inviteMessage") ?? "").trim() || null,
       status: formData.get("publish") === "on" ? "published" : "draft",
       visibility: formData.get("visibility") === "on" ? "public" : "private",
-    });
+      interactionModes: createInteractionModes as ("sync" | "async" | "physical")[],
+      meetingUrl: String(formData.get("meetingUrl") ?? "").trim() || undefined,
+      location: String(formData.get("location") ?? "").trim() || undefined,
+      sessions: createSessions
+        .filter((s) => s.sessionDate)
+        .map((s) => ({
+          sessionDate: s.sessionDate,
+          startTime: s.startTime || undefined,
+          endTime: s.endTime || undefined,
+        })),
+      feeType: createFeeType,
+      feeAmount: createFeeType === "paid" && feeAmountValue ? Number(feeAmountValue) : undefined,
+      signupMethod: createSignupMethod,
+      externalSignupUrl:
+        createSignupMethod === "external"
+          ? String(formData.get("externalSignupUrl") ?? "").trim() || undefined
+          : undefined,
+      showInviteMessageOnSignup: formData.get("showInviteMessageOnSignup") === "on",
+      isPrivate: createIsPrivate,
+      checkinDefaultPrivate: createCheckinPrivate,
+      hostCommentDefaultPrivate: createHostCommentPrivate,
+    } as Parameters<typeof createLighthouseCohort>[1]);
     if (response.error || !response.data) {
       setBusy(false);
       toast.error(t("cohort_create_failed"));
@@ -376,6 +740,14 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       )
     );
     selectedTemplatesRef.current.clear();
+    // 重置建立表單的 controlled state
+    setCreateSessions([]);
+    setCreateInteractionModes([]);
+    setCreateFeeType("free");
+    setCreateSignupMethod("island_form");
+    setCreateIsPrivate(false);
+    setCreateCheckinPrivate(false);
+    setCreateHostCommentPrivate(false);
     setBusy(false);
     await mutate();
     setCreatingCohort(false);
@@ -466,6 +838,17 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               />
             </label>
             <label
+              htmlFor={`cohort-tagline-${program.id}`}
+              className="grid gap-1.5 text-sm font-medium md:col-span-2"
+            >
+              {t("cohort_tagline")}
+              <Input
+                id={`cohort-tagline-${program.id}`}
+                name="tagline"
+                placeholder={t("cohort_tagline_placeholder")}
+              />
+            </label>
+            <label
               htmlFor={`cohort-start-${program.id}`}
               className="grid gap-1.5 text-sm font-medium"
             >
@@ -494,6 +877,116 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               {t("capacity")}
               <Input id={`cohort-capacity-${program.id}`} name="capacity" type="number" min={1} />
             </label>
+
+            {/* 互動方式 */}
+            <fieldset className="md:col-span-2">
+              <legend className="text-sm font-medium">{t("cohort_interaction_modes")}</legend>
+              <div className="mt-2 flex flex-wrap gap-4">
+                {(["sync", "async", "physical"] as const).map((mode) => (
+                  <label key={mode} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="size-4 accent-[#0D7773]"
+                      checked={createInteractionModes.includes(mode)}
+                      onChange={() => toggleCreateInteractionMode(mode)}
+                    />
+                    {t(`cohort_interaction_mode_${mode}`)}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <label
+              htmlFor={`cohort-meeting-${program.id}`}
+              className="grid gap-1.5 text-sm font-medium"
+            >
+              {t("cohort_meeting_url")}
+              <Input
+                id={`cohort-meeting-${program.id}`}
+                name="meetingUrl"
+                type="url"
+                placeholder={t("cohort_meeting_url_placeholder")}
+              />
+            </label>
+            <label
+              htmlFor={`cohort-location-${program.id}`}
+              className="grid gap-1.5 text-sm font-medium"
+            >
+              {t("cohort_location")}
+              <Input
+                id={`cohort-location-${program.id}`}
+                name="location"
+                placeholder={t("cohort_location_placeholder")}
+              />
+            </label>
+
+            {/* 聚會時段 */}
+            <fieldset className="md:col-span-2">
+              <legend className="text-sm font-medium">{t("cohort_sessions_title")}</legend>
+              <div className="mt-2 grid gap-2">
+                {createSessions.map((session) => (
+                  <div key={session.id} className="flex flex-wrap items-end gap-2">
+                    {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                    <label className="grid gap-1 text-xs">
+                      {t("cohort_session_date")}
+                      <Input
+                        type="date"
+                        className="h-9 w-[140px] text-xs"
+                        value={session.sessionDate}
+                        onChange={(e) =>
+                          updateCreateSession(session.id, "sessionDate", e.target.value)
+                        }
+                      />
+                    </label>
+                    {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                    <label className="grid gap-1 text-xs">
+                      {t("cohort_session_start_time")}
+                      <Input
+                        type="time"
+                        className="h-9 w-[110px] text-xs"
+                        value={session.startTime}
+                        onChange={(e) =>
+                          updateCreateSession(session.id, "startTime", e.target.value)
+                        }
+                      />
+                    </label>
+                    {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                    <label className="grid gap-1 text-xs">
+                      {t("cohort_session_end_time")}
+                      <Input
+                        type="time"
+                        className="h-9 w-[110px] text-xs"
+                        value={session.endTime}
+                        onChange={(e) =>
+                          updateCreateSession(session.id, "endTime", e.target.value)
+                        }
+                      />
+                    </label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-9 text-[#C03A3A]"
+                      onClick={() => removeCreateSession(session.id)}
+                      aria-label={t("cohort_session_remove")}
+                    >
+                      <Minus className="size-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-fit border-[#CDEBE8]"
+                  onClick={addCreateSession}
+                >
+                  <Plus className="size-4" />
+                  {t("cohort_session_add")}
+                </Button>
+              </div>
+            </fieldset>
+
             <label
               htmlFor={`cohort-message-${program.id}`}
               className="grid gap-1.5 text-sm font-medium md:col-span-2"
@@ -501,6 +994,125 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               {t("invite_message")}
               <Textarea id={`cohort-message-${program.id}`} name="inviteMessage" />
             </label>
+
+            {/* 費用設定 */}
+            <fieldset className="md:col-span-2">
+              <legend className="text-sm font-medium">{t("cohort_fee_title")}</legend>
+              <div className="mt-2 flex items-center gap-4">
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="feeTypeRadio"
+                    className="size-4 accent-[#0D7773]"
+                    checked={createFeeType === "free"}
+                    onChange={() => setCreateFeeType("free")}
+                  />
+                  {t("cohort_fee_type_free")}
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="feeTypeRadio"
+                    className="size-4 accent-[#0D7773]"
+                    checked={createFeeType === "paid"}
+                    onChange={() => setCreateFeeType("paid")}
+                  />
+                  {t("cohort_fee_type_paid")}
+                </label>
+                {createFeeType === "paid" && (
+                  <Input
+                    name="feeAmount"
+                    type="number"
+                    min={0}
+                    className="h-9 w-[120px]"
+                    placeholder={t("cohort_fee_amount")}
+                  />
+                )}
+              </div>
+            </fieldset>
+
+            {/* 報名設定 */}
+            <fieldset className="md:col-span-2">
+              <legend className="text-sm font-medium">{t("cohort_signup_title")}</legend>
+              <div className="mt-2 grid gap-2">
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="radio"
+                      name="signupMethodRadio"
+                      className="size-4 accent-[#0D7773]"
+                      checked={createSignupMethod === "island_form"}
+                      onChange={() => setCreateSignupMethod("island_form")}
+                    />
+                    {t("cohort_signup_method_island_form")}
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="radio"
+                      name="signupMethodRadio"
+                      className="size-4 accent-[#0D7773]"
+                      checked={createSignupMethod === "external"}
+                      onChange={() => setCreateSignupMethod("external")}
+                    />
+                    {t("cohort_signup_method_external")}
+                  </label>
+                </div>
+                {createSignupMethod === "external" && (
+                  <Input
+                    name="externalSignupUrl"
+                    type="url"
+                    placeholder={t("cohort_external_signup_url_placeholder")}
+                  />
+                )}
+                <label className="flex items-center gap-3 text-sm">
+                  <input
+                    name="showInviteMessageOnSignup"
+                    type="checkbox"
+                    className="size-4 accent-[#0D7773]"
+                  />
+                  {t("cohort_show_invite_message_on_signup")}
+                </label>
+              </div>
+            </fieldset>
+
+            {/* 隱私設定 */}
+            <fieldset className="md:col-span-2">
+              <legend className="text-sm font-medium">{t("cohort_privacy_title")}</legend>
+              <div className="mt-2 grid gap-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm">{t("cohort_is_private")}</p>
+                    <p className="text-xs text-[#78928F]">{t("cohort_is_private_hint")}</p>
+                  </div>
+                  <Switch checked={createIsPrivate} onCheckedChange={setCreateIsPrivate} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm">{t("cohort_checkin_default_private")}</p>
+                    <p className="text-xs text-[#78928F]">
+                      {t("cohort_checkin_default_private_hint")}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={createCheckinPrivate}
+                    onCheckedChange={setCreateCheckinPrivate}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm">{t("cohort_host_comment_default_private")}</p>
+                    <p className="text-xs text-[#78928F]">
+                      {t("cohort_host_comment_default_private_hint")}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={createHostCommentPrivate}
+                    onCheckedChange={setCreateHostCommentPrivate}
+                  />
+                </div>
+              </div>
+            </fieldset>
+
             {templates && templates.length > 0 && (
               <fieldset className="md:col-span-2">
                 <legend className="text-sm font-medium">{t("cohort_select_templates")}</legend>
