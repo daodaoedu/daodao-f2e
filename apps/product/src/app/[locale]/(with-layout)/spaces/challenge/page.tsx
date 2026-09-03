@@ -32,7 +32,7 @@ export default function ChallengeSpacePage() {
   }, [exploreData]);
 
   return (
-    <div className="mx-auto min-h-screen max-w-[640px] px-4 pb-[72px] pt-6">
+    <div className="mx-auto min-h-screen max-w-[640px] px-4 pb-[72px] pt-[68px] md:pt-6">
       <SpaceSubpageHeader title={t("challenge_name")} subtitle={t("challenge_host")} />
       <Link
         href="/challenges"
