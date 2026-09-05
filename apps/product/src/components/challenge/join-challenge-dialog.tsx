@@ -14,6 +14,12 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { Calendar, Flag, Info, Timer } from "lucide-react";
 import { useState } from "react";
+import {
+  ChallengeFlagIcon,
+  ChallengeProgressBar,
+  ChallengeStatusBadge,
+  getChallengeThemeSvg,
+} from "@/components/challenge/challenge-visual";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 
 interface JoinChallengeDialogProps {
@@ -40,6 +46,8 @@ export const JoinChallengeDialog = ({
   const daysProgress = challenge
     ? calculateDaysProgress(challenge.startDate, challenge.endDate)
     : null;
+  const formattedStartDate = challenge ? formatCardDate(challenge.startDate) : null;
+  const Theme = challenge ? getChallengeThemeSvg(challenge.id) : null;
 
   const handleJoin = async () => {
     if (!challenge || isJoining) return;
@@ -74,27 +82,48 @@ export const JoinChallengeDialog = ({
               <DialogDescription>{t("join_hint")}</DialogDescription>
             </DialogHeader>
 
-            {challenge && (
-              <div className="flex flex-col gap-2 rounded-lg bg-very-light-blue/50 p-4">
-                <h3 className="text-lg font-medium text-bg-dark">{challenge.displayName}</h3>
-                {challenge.description && (
-                  <p className="text-sm text-text-dark">{challenge.description}</p>
-                )}
-                <div className="flex items-center gap-3 text-xs text-text-dark">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="size-3.5 shrink-0" />
-                    {formatCardDate(challenge.startDate)}
-                  </span>
-                  {daysProgress !== null && (
-                    <span className="flex items-center gap-1">
-                      <Timer className="size-3.5 shrink-0" />
-                      {t("card_days_progress", {
-                        current: daysProgress.elapsed,
-                        total: daysProgress.total,
-                      })}
-                    </span>
-                  )}
+            {challenge && Theme && (
+              <div className="relative h-[239px] w-full overflow-hidden rounded-[12px] text-left">
+                <Theme
+                  className="absolute inset-0 h-full w-full rounded-[12px]"
+                  preserveAspectRatio="xMidYMid slice"
+                />
+                <div className="absolute inset-0 z-10 flex flex-col p-5 pb-6">
+                  <div className="flex min-h-0 flex-1 flex-col gap-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <ChallengeStatusBadge runStatus={challenge.runStatus} />
+                      <ChallengeFlagIcon />
+                    </div>
+
+                    <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">
+                      {challenge.displayName}
+                    </h3>
+                    {challenge.description && (
+                      <p className="line-clamp-2 text-xs text-text-dark">
+                        {challenge.description}
+                      </p>
+                    )}
+
+                    <div className="flex items-center gap-2 text-xs text-text-dark">
+                      {formattedStartDate !== null && (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="size-3.5 shrink-0" />
+                          {t("card_start_date", { date: formattedStartDate })}
+                        </span>
+                      )}
+                      {daysProgress !== null && (
+                        <span className="flex items-center gap-1">
+                          <Timer className="size-3.5 shrink-0" />
+                          {t("card_days_progress", {
+                            current: daysProgress.elapsed,
+                            total: daysProgress.total,
+                          })}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
+                <ChallengeProgressBar daysProgress={daysProgress} />
               </div>
             )}
 
