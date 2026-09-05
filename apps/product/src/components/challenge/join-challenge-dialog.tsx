@@ -13,7 +13,7 @@ import {
 } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
-import { Calendar, CalendarCheck, Flag, Info, Timer } from "lucide-react";
+import { Calendar, CalendarCheck, Info, Timer } from "lucide-react";
 import { useState } from "react";
 import {
   ChallengeFlagIcon,
@@ -77,12 +77,10 @@ export const JoinChallengeDialog = ({
       <DialogContent className="max-w-md">
         {joinedPracticeId === null ? (
           <>
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Flag className="size-4.5 text-logo-cyan" />
-                {t("join_dialog_title")}
+            <DialogHeader className="pt-6 text-left">
+              <DialogTitle className="text-left text-xs font-medium text-logo-cyan">
+                {t("join_hint")}
               </DialogTitle>
-              <DialogDescription>{t("join_hint")}</DialogDescription>
             </DialogHeader>
 
             {challenge && Theme && (
