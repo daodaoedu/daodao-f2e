@@ -144,8 +144,21 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
       toast.error(t("cohort_date_error"));
       return;
     }
+    if (editInteractionModes.length === 0) {
+      toast.error(t("cohort_interaction_modes_error"));
+      return;
+    }
     const capacityValue = String(formData.get("capacity") ?? "");
     const feeAmountValue = String(formData.get("feeAmount") ?? "");
+    if (editFeeType === "paid" && !feeAmountValue) {
+      toast.error(t("cohort_fee_amount_error"));
+      return;
+    }
+    const externalSignupUrlValue = String(formData.get("externalSignupUrl") ?? "").trim();
+    if (editSignupMethod === "external" && !externalSignupUrlValue) {
+      toast.error(t("cohort_external_signup_url_error"));
+      return;
+    }
     setBusy(true);
     const response = await updateLighthouseCohort(programId, cohort.id, {
       displayName: String(formData.get("displayName") ?? "").trim(),
@@ -171,7 +184,7 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
       signupMethod: editSignupMethod,
       externalSignupUrl:
         editSignupMethod === "external"
-          ? String(formData.get("externalSignupUrl") ?? "").trim() || null
+          ? externalSignupUrlValue || null
           : null,
       showInviteMessageOnSignup: formData.get("showInviteMessageOnSignup") === "on",
       isPrivate: editIsPrivate,
@@ -420,6 +433,7 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
                 name="feeAmount"
                 type="number"
                 min={0}
+                required
                 className="h-9 w-[120px]"
                 placeholder={t("cohort_fee_amount")}
                 defaultValue={cohort.feeAmount ?? ""}
@@ -458,6 +472,7 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
               <Input
                 name="externalSignupUrl"
                 type="url"
+                required
                 placeholder={t("cohort_external_signup_url_placeholder")}
                 defaultValue={cohort.externalSignupUrl ?? ""}
               />
@@ -691,8 +706,21 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       toast.error(t("cohort_date_error"));
       return;
     }
+    if (createInteractionModes.length === 0) {
+      toast.error(t("cohort_interaction_modes_error"));
+      return;
+    }
     const capacityValue = String(formData.get("capacity") ?? "");
     const feeAmountValue = String(formData.get("feeAmount") ?? "");
+    if (createFeeType === "paid" && !feeAmountValue) {
+      toast.error(t("cohort_fee_amount_error"));
+      return;
+    }
+    const externalSignupUrlValue = String(formData.get("externalSignupUrl") ?? "").trim();
+    if (createSignupMethod === "external" && !externalSignupUrlValue) {
+      toast.error(t("cohort_external_signup_url_error"));
+      return;
+    }
     setBusy(true);
     const response = await createLighthouseCohort(program.id, {
       slug: String(formData.get("slug") ?? "").trim(),
@@ -720,7 +748,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       signupMethod: createSignupMethod,
       externalSignupUrl:
         createSignupMethod === "external"
-          ? String(formData.get("externalSignupUrl") ?? "").trim() || undefined
+          ? externalSignupUrlValue || undefined
           : undefined,
       showInviteMessageOnSignup: formData.get("showInviteMessageOnSignup") === "on",
       isPrivate: createIsPrivate,
@@ -1024,6 +1052,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
                     name="feeAmount"
                     type="number"
                     min={0}
+                    required
                     className="h-9 w-[120px]"
                     placeholder={t("cohort_fee_amount")}
                   />
@@ -1061,6 +1090,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
                   <Input
                     name="externalSignupUrl"
                     type="url"
+                    required
                     placeholder={t("cohort_external_signup_url_placeholder")}
                   />
                 )}
