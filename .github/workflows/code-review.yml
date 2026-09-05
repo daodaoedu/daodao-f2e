@@ -92,8 +92,8 @@ jobs:
             exit 0
           fi
 
-          PRIMARY_MODEL="@cf/google/gemma-4-26b-a4b-it"
-          FALLBACK_MODEL="@cf/openai/gpt-oss-120b"
+          PRIMARY_MODEL="@cf/moonshotai/kimi-k2.7-code"
+          FALLBACK_MODEL="@cf/qwen/qwen3.8-27b"
 
           extract_response() {
             jq -r 'if .choices[0].finish_reason == "stop"
