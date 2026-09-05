@@ -92,8 +92,8 @@ jobs:
             exit 0
           fi
 
-          PRIMARY_MODEL="@cf/moonshotai/kimi-k2.7-code"
-          FALLBACK_MODEL="@cf/qwen/qwen3.8-27b"
+          PRIMARY_MODEL="@cf/qwen/qwen3.8-27b"
+          FALLBACK_MODEL="@cf/google/gemma-4-26b-a4b-it"
 
           extract_response() {
             jq -r 'if .choices[0].finish_reason == "stop"
@@ -263,7 +263,13 @@ jobs:
             const resolveLocation = (file) => {
               if (firstAddedLine.has(file)) return { path: file, line: firstAddedLine.get(file) };
               const suffixMatches = [...firstAddedLine.keys()].filter((p) => p.endsWith("/" + file));
-              return suffixMatches.length === 1 ? { path: suffixMatches[0], line: firstAddedLine.get(suffixMatches[0]) } : null;
+              if (suffixMatches.length === 1) return { path: suffixMatches[0], line: firstAddedLine.get(suffixMatches[0]) };
+              // 目錄前綴比對：模型只寫了目錄（如 apps/product/src/app/[locale]/）時，
+              // 找 diff 裡同目錄底下唯一的變更檔；有多個就不猜。
+              const dir = file.endsWith("/") ? file : file + "/";
+              const prefixMatches = [...firstAddedLine.keys()].filter((p) => p.startsWith(dir));
+              if (prefixMatches.length === 1) return { path: prefixMatches[0], line: firstAddedLine.get(prefixMatches[0]) };
+              return null;
             };
             const repaired = body.split("\n").map((line) => {
               if (!line.startsWith("|")) return line;
