@@ -1,6 +1,7 @@
 "use client";
 
 import { type ChallengeSummaryType, joinChallenge } from "@daodao/api";
+import { ArrowRightOutlineSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import {
@@ -12,7 +13,7 @@ import {
 } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
-import { Calendar, Flag, Info, Timer } from "lucide-react";
+import { Calendar, CalendarCheck, Flag, Info, Timer } from "lucide-react";
 import { useState } from "react";
 import {
   ChallengeFlagIcon,
@@ -95,14 +96,21 @@ export const JoinChallengeDialog = ({
                       <ChallengeFlagIcon />
                     </div>
 
-                    <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">
-                      {challenge.displayName}
-                    </h3>
-                    {challenge.description && (
-                      <p className="line-clamp-2 text-xs text-text-dark">
-                        {challenge.description}
-                      </p>
-                    )}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex flex-col gap-2">
+                        <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">
+                          {challenge.displayName}
+                        </h3>
+                        {challenge.description && (
+                          <p className="line-clamp-2 text-xs text-text-dark">
+                            {challenge.description}
+                          </p>
+                        )}
+                      </div>
+                      <span className="flex size-10 shrink-0 items-center justify-center self-center">
+                        <ArrowRightOutlineSvg className="size-6 text-text-dark/60" />
+                      </span>
+                    </div>
 
                     <div className="flex items-center gap-2 text-xs text-text-dark">
                       {formattedStartDate !== null && (
@@ -121,7 +129,21 @@ export const JoinChallengeDialog = ({
                         </span>
                       )}
                     </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1 text-xs text-text-dark">
+                        <CalendarCheck className="size-3.5 shrink-0" />
+                        {t("join_preview_upcoming")}
+                      </span>
+                    </div>
                   </div>
+
+                  <span className="mt-2 flex shrink-0 justify-end">
+                    <span className="inline-flex h-7 items-center justify-center gap-1.5 rounded-full bg-basic-white px-3 text-xs text-text-dark/45 shadow-sm">
+                      <CalendarCheck className="size-4 text-logo-cyan/50" />
+                      {t("join_preview_checkin")}
+                    </span>
+                  </span>
                 </div>
                 <ChallengeProgressBar daysProgress={daysProgress} />
               </div>
