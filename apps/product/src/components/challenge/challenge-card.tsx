@@ -3,10 +3,14 @@
 import type { ChallengeSummaryType } from "@daodao/api";
 import { ArrowRightOutlineSvg, DefaultAvatarSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
-import { Badge, type BadgeProps } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
-import { Calendar, Flag, Sparkles, Timer, Users } from "lucide-react";
-import { PracticeTheme, practiceThemeSvgMap } from "@/constants/practice-theme";
+import { Calendar, Check, Sparkles, Timer, Users } from "lucide-react";
+import {
+  ChallengeFlagIcon,
+  ChallengeProgressBar,
+  ChallengeStatusBadge,
+  getChallengeThemeSvg,
+} from "@/components/challenge/challenge-visual";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 
 interface ChallengeCardProps {
@@ -17,20 +21,6 @@ interface ChallengeCardProps {
   onDrawClick?: (challenge: ChallengeSummaryType) => void;
 }
 
-/** 卡片背景主題：依 id 輪替，讓探索頁有變化又保持穩定 */
-const THEME_ROTATION = [
-  PracticeTheme.yellow,
-  PracticeTheme.blue,
-  PracticeTheme.pink,
-  PracticeTheme.green,
-] as const;
-
-const STATUS_BADGE: Record<ChallengeSummaryType["runStatus"], BadgeProps["variant"]> = {
-  upcoming: "very-light-blue",
-  ongoing: "default",
-  ended: "outline-logo",
-};
-
 /**
  * 共同挑戰卡片（探索共同挑戰頁）
  *
@@ -39,8 +29,7 @@ const STATUS_BADGE: Record<ChallengeSummaryType["runStatus"], BadgeProps["varian
  */
 export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: ChallengeCardProps) => {
   const t = useTranslations("challenge");
-  const themeName = THEME_ROTATION[challenge.id % THEME_ROTATION.length] ?? PracticeTheme.yellow;
-  const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
+  const Theme = getChallengeThemeSvg(challenge.id);
   const formattedStartDate = formatCardDate(challenge.startDate);
   const daysProgress = calculateDaysProgress(challenge.startDate, challenge.endDate);
 
@@ -51,7 +40,7 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
         ? t("participants_ongoing", { count: challenge.participantCount })
         : t("participants_upcoming", { count: challenge.participantCount });
 
-  const showJoinButton = !challenge.isJoined && challenge.runStatus !== "ended";
+  const showCta = challenge.runStatus !== "ended";
   const joinDisabled = !challenge.canJoin;
   const joinLabel = challenge.canJoin
     ? t("cta_join")
@@ -69,22 +58,8 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
       <div className="absolute inset-0 p-5 pb-6 z-10 flex flex-col">
         <div className="flex-1 min-h-0 flex flex-col gap-1.5">
           <div className="flex items-center gap-1.5">
-            <Badge variant={STATUS_BADGE[challenge.runStatus]} size="sm" className="w-fit">
-              {t(`status_${challenge.runStatus}`)}
-            </Badge>
-            <span
-              role="img"
-              aria-label={t("challenge_tag")}
-              title={t("challenge_tag")}
-              className="inline-flex items-center justify-center size-6 rounded-full border border-logo-cyan bg-light-blue"
-            >
-              <Flag className="size-3.5 text-text-dark/75" />
-            </span>
-            {challenge.isJoined && (
-              <Badge variant="outline-logo" size="sm" className="w-fit">
-                {t("cta_joined")}
-              </Badge>
-            )}
+            <ChallengeStatusBadge runStatus={challenge.runStatus} />
+            <ChallengeFlagIcon />
             {challenge.hasInspirationDeck &&
               challenge.isJoined &&
               challenge.runStatus !== "ended" &&
@@ -141,31 +116,29 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
           </span>
         </div>
 
-        {showJoinButton && (
+        {showCta && (
           <span className="mt-2 shrink-0 flex justify-end">
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={joinDisabled}
-              onClick={() => onJoinClick(challenge)}
-            >
-              {joinLabel}
-              <ArrowRightOutlineSvg className="size-3.5 opacity-70" />
-            </Button>
+            {challenge.isJoined ? (
+              <span className="inline-flex h-7 items-center justify-center gap-1.5 rounded-full bg-basic-white px-3 text-xs text-text-dark/45 shadow-sm">
+                <Check className="size-3.5 text-logo-cyan/50" />
+                {t("cta_joined")}
+              </span>
+            ) : (
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={joinDisabled}
+                onClick={() => onJoinClick(challenge)}
+              >
+                {joinLabel}
+                <ArrowRightOutlineSvg className="size-3.5 opacity-70" />
+              </Button>
+            )}
           </span>
         )}
       </div>
 
-      {daysProgress !== null && (
-        <div className="absolute right-5 bottom-1.5 left-5 z-10">
-          <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/75 shadow-[inset_0_0_0_1px_rgba(15,48,54,0.08)]">
-            <div
-              className="h-full bg-logo-cyan"
-              style={{ width: `${Math.round((daysProgress.elapsed / daysProgress.total) * 100)}%` }}
-            />
-          </div>
-        </div>
-      )}
+      <ChallengeProgressBar daysProgress={daysProgress} />
     </div>
   );
 };
