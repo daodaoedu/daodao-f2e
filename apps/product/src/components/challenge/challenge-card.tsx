@@ -3,9 +3,8 @@
 import type { ChallengeSummaryType } from "@daodao/api";
 import { ArrowRightOutlineSvg, DefaultAvatarSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
-import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
-import { Calendar, Sparkles, Timer, Users } from "lucide-react";
+import { Calendar, Check, Sparkles, Timer, Users } from "lucide-react";
 import {
   ChallengeFlagIcon,
   ChallengeProgressBar,
@@ -41,7 +40,7 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
         ? t("participants_ongoing", { count: challenge.participantCount })
         : t("participants_upcoming", { count: challenge.participantCount });
 
-  const showJoinButton = !challenge.isJoined && challenge.runStatus !== "ended";
+  const showCta = challenge.runStatus !== "ended";
   const joinDisabled = !challenge.canJoin;
   const joinLabel = challenge.canJoin
     ? t("cta_join")
@@ -61,11 +60,6 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
           <div className="flex items-center gap-1.5">
             <ChallengeStatusBadge runStatus={challenge.runStatus} />
             <ChallengeFlagIcon />
-            {challenge.isJoined && (
-              <Badge variant="outline-logo" size="sm" className="w-fit">
-                {t("cta_joined")}
-              </Badge>
-            )}
             {challenge.hasInspirationDeck &&
               challenge.isJoined &&
               challenge.runStatus !== "ended" &&
@@ -122,17 +116,24 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
           </span>
         </div>
 
-        {showJoinButton && (
+        {showCta && (
           <span className="mt-2 shrink-0 flex justify-end">
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={joinDisabled}
-              onClick={() => onJoinClick(challenge)}
-            >
-              {joinLabel}
-              <ArrowRightOutlineSvg className="size-3.5 opacity-70" />
-            </Button>
+            {challenge.isJoined ? (
+              <span className="inline-flex h-7 items-center justify-center gap-1.5 rounded-full bg-basic-white px-3 text-xs text-text-dark/45 shadow-sm">
+                <Check className="size-3.5 text-logo-cyan/50" />
+                {t("cta_joined")}
+              </span>
+            ) : (
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={joinDisabled}
+                onClick={() => onJoinClick(challenge)}
+              >
+                {joinLabel}
+                <ArrowRightOutlineSvg className="size-3.5 opacity-70" />
+              </Button>
+            )}
           </span>
         )}
       </div>

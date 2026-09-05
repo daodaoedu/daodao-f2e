@@ -1,6 +1,6 @@
 "use client";
 
-import { type ChallengeSummaryType, joinChallenge } from "@daodao/api";
+import { type ChallengeSummaryType, joinChallenge, useChallenge } from "@daodao/api";
 import { ArrowRightOutlineSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
@@ -49,6 +49,8 @@ export const JoinChallengeDialog = ({
     : null;
   const formattedStartDate = challenge ? formatCardDate(challenge.startDate) : null;
   const Theme = challenge ? getChallengeThemeSvg(challenge.id) : null;
+  const { data: detailData } = useChallenge(challenge?.id);
+  const practiceAction = detailData?.data.template?.practiceAction ?? null;
 
   const handleJoin = async () => {
     if (!challenge || isJoining) return;
@@ -147,6 +149,10 @@ export const JoinChallengeDialog = ({
                 </div>
                 <ChallengeProgressBar daysProgress={daysProgress} />
               </div>
+            )}
+
+            {practiceAction && (
+              <p className="text-xs text-text-dark/60 leading-relaxed">{practiceAction}</p>
             )}
 
             <div className="flex items-center gap-2 rounded-2xl bg-very-light-blue p-3">
