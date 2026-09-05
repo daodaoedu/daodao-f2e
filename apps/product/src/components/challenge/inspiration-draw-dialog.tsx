@@ -6,124 +6,219 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
 } from "@daodao/ui/components/animate-ui/components/radix/dialog";
-import { Badge } from "@daodao/ui/components/badge";
-import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
-import { Sparkles } from "lucide-react";
-import { useState } from "react";
+import { Check, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface InspirationDrawDialogProps {
-  /** 抽卡對象挑戰；null 表示關閉 */
   challengeId: number | null;
   onOpenChange: (open: boolean) => void;
 }
 
+type ViewState = "deck" | "shuffling" | "drawn";
+
 const extractErrorMessage = (error: unknown, fallback: string): string =>
   (error as { error?: { message?: string } })?.error?.message ?? fallback;
 
-/**
- * 靈感卡抽卡彈窗（openspec: challenge-inspiration-deck）
- *
- * 每日最多 3 抽（排除本日已抽與曾選定，由後端保證）；抽完可選定一張為今日卡片，可重選。
- */
 export const InspirationDrawDialog = ({
   challengeId,
   onOpenChange,
 }: InspirationDrawDialogProps) => {
   const t = useTranslations("challenge");
   const [isBusy, setIsBusy] = useState(false);
+  const [viewState, setViewState] = useState<ViewState>("deck");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const prevChallengeId = useRef<number | null>(null);
   const { data, mutate } = useTodayDraws(challengeId ?? undefined, challengeId !== null);
   const today = data?.data;
+  const draws = today?.draws ?? [];
+  const canDraw = today !== undefined && today.remaining > 0;
+  const activeDraw = draws[activeIndex];
 
-  const handleDraw = async () => {
-    if (challengeId === null || isBusy) return;
+  useEffect(() => {
+    if (challengeId === null) {
+      setViewState("deck");
+      setActiveIndex(0);
+      prevChallengeId.current = null;
+    } else if (challengeId !== prevChallengeId.current) {
+      prevChallengeId.current = challengeId;
+      setViewState(draws.length > 0 ? "drawn" : "deck");
+      setActiveIndex(Math.max(0, draws.length - 1));
+    } else if (draws.length > 0 && viewState === "deck") {
+      setViewState("drawn");
+      setActiveIndex(draws.length - 1);
+    }
+  }, [challengeId, draws.length, viewState]);
+
+  const handleDraw = useCallback(async () => {
+    if (challengeId === null || isBusy || !canDraw) return;
     setIsBusy(true);
+    setViewState("shuffling");
+    await new Promise((r) => setTimeout(r, 800));
     const response = await drawInspirationCard(challengeId);
     setIsBusy(false);
     if (response.error) {
       toast.error(extractErrorMessage(response.error, t("draw_failed")));
+      setViewState(draws.length > 0 ? "drawn" : "deck");
       return;
     }
-    mutate();
-  };
+    try {
+      await mutate();
+    } catch {
+      // SWR revalidation failed but the draw was consumed; show drawn state
+    }
+    setViewState("drawn");
+    setActiveIndex(draws.length);
+  }, [challengeId, isBusy, canDraw, draws.length, mutate, t]);
 
-  const handleSelect = async (drawId: number) => {
-    if (challengeId === null || isBusy) return;
-    setIsBusy(true);
-    const response = await selectInspirationDraw(challengeId, drawId);
-    setIsBusy(false);
-    if (response.error) {
-      toast.error(extractErrorMessage(response.error, t("select_failed")));
-      return;
-    }
-    mutate();
-  };
+  const handleSelect = useCallback(
+    async (drawId: number) => {
+      if (challengeId === null || isBusy) return;
+      setIsBusy(true);
+      const response = await selectInspirationDraw(challengeId, drawId);
+      setIsBusy(false);
+      if (response.error) {
+        toast.error(extractErrorMessage(response.error, t("select_failed")));
+        return;
+      }
+      mutate();
+    },
+    [challengeId, isBusy, mutate, t]
+  );
+
+  const hintText =
+    today === undefined
+      ? ""
+      : today.remaining > 0
+        ? t("draw_remaining", { count: today.remaining })
+        : t("draw_none_left");
 
   return (
     <Dialog open={challengeId !== null} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="size-4.5 text-logo-cyan" />
-            {t("draw_dialog_title")}
-          </DialogTitle>
-          <DialogDescription>{t("draw_dialog_subtitle")}</DialogDescription>
-        </DialogHeader>
+      <DialogContent
+        className="max-w-[420px] rounded-[28px] border-none p-7 text-center shadow-[0_20px_50px_rgba(15,48,54,0.25)]"
+        showCloseButton={false}
+      >
+        <style>{`
+          @keyframes shuffleA { 0%,100% { transform:translate(-14px,6px) rotate(-9deg); } 50% { transform:translate(14px,-6px) rotate(7deg); } }
+          @keyframes shuffleB { 0%,100% { transform:translate(12px,-4px) rotate(8deg); } 50% { transform:translate(-12px,5px) rotate(-6deg); } }
+        `}</style>
 
-        <div className="flex flex-col gap-3">
-          {today && today.draws.length === 0 && (
-            <p className="py-4 text-center text-sm text-text-dark">{t("draw_empty_hint")}</p>
-          )}
+        <button
+          type="button"
+          aria-label={t("draw_close")}
+          className="absolute top-4 right-4 inline-flex size-9 cursor-pointer items-center justify-center rounded-full bg-transparent text-text-dark transition-colors hover:bg-light-blue"
+          onClick={() => onOpenChange(false)}
+        >
+          <X className="size-[18px]" />
+        </button>
 
-          {today?.draws.map((draw) => (
-            <div
-              key={draw.drawId}
-              className={cn(
-                "flex items-center justify-between gap-3 rounded-lg border p-4",
-                draw.isSelected
-                  ? "border-logo-cyan bg-light-blue"
-                  : "border-very-light-gray bg-basic-white"
-              )}
+        <p className="m-0 text-xs font-medium text-logo-cyan">{t("challenge_tag")}</p>
+        <DialogTitle className="mt-2 m-0 text-xl font-bold text-text-dark">
+          {t("draw_dialog_title")}
+        </DialogTitle>
+        <DialogDescription className="sr-only">
+          {t("draw_dialog_subtitle")}
+        </DialogDescription>
+
+        <div className="relative mx-auto mt-5 mb-1 flex h-[236px] w-full items-center justify-center">
+          {viewState === "deck" && (
+            <button
+              type="button"
+              aria-label={t("draw_button")}
+              className="relative h-[220px] w-[160px] cursor-pointer border-none bg-transparent p-0 disabled:cursor-default disabled:opacity-50"
+              onClick={handleDraw}
+              disabled={!canDraw}
             >
-              <p className="text-sm text-bg-dark">{draw.content}</p>
-              {draw.isSelected ? (
-                <Badge variant="outline-logo" size="sm" className="shrink-0">
-                  {t("draw_selected")}
-                </Badge>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="shrink-0"
-                  disabled={isBusy}
-                  onClick={() => handleSelect(draw.drawId)}
-                >
-                  {t("draw_select")}
-                </Button>
-              )}
-            </div>
-          ))}
-
-          {today && (
-            <p className="text-center text-xs text-text-dark">
-              {today.remaining > 0
-                ? t("draw_remaining", { count: today.remaining })
-                : t("draw_none_left")}
-            </p>
+              <span className="absolute inset-0 rounded-[20px] border-2 border-logo-cyan/35 bg-[oklch(0.962_0.032_211.1)] -rotate-[8deg]" />
+              <span className="absolute inset-0 rounded-[20px] border-2 border-logo-cyan/50 bg-[oklch(0.9_0.068_190.3)] rotate-[4deg]" />
+              <span className="absolute inset-0 flex items-center justify-center rounded-[20px] bg-logo-cyan shadow-[0_10px_24px_rgba(15,48,54,0.18)]">
+                <span className="block size-24 rounded-t-full bg-white/[0.28]" />
+              </span>
+            </button>
           )}
 
-          <Button
-            className="w-full"
-            disabled={isBusy || (today !== undefined && today.remaining === 0)}
-            onClick={handleDraw}
-          >
-            <Sparkles className="size-4.5" />
-            {isBusy ? t("drawing") : t("draw_button")}
-          </Button>
+          {viewState === "shuffling" && (
+            <div className="relative h-[220px] w-[160px]">
+              <span className="absolute inset-0 rounded-[20px] bg-[oklch(0.9_0.068_190.3)] [animation:shuffleA_520ms_ease-in-out_infinite]" />
+              <span className="absolute inset-0 rounded-[20px] bg-logo-cyan [animation:shuffleB_520ms_ease-in-out_infinite]" />
+            </div>
+          )}
+
+          {viewState === "drawn" && activeDraw && (
+            <div className="flex h-[220px] w-[200px] flex-col items-center justify-center rounded-[20px] border-2 border-logo-cyan/25 bg-basic-white px-5 py-7 shadow-[0_8px_20px_rgba(15,48,54,0.1)]">
+              {activeDraw.isSelected ? (
+                <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-logo-cyan px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                  <Check className="size-[11px]" strokeWidth={3.5} />
+                  {t("draw_today_action")}
+                </span>
+              ) : (
+                <span className="mx-auto mb-3.5 block h-7 w-14 rounded-t-full bg-logo-cyan/25" />
+              )}
+              <p className="m-0 text-center text-lg font-semibold leading-relaxed text-text-dark [text-wrap:pretty]">
+                {activeDraw.content}
+              </p>
+            </div>
+          )}
+
+          {viewState === "drawn" && !activeDraw && draws.length === 0 && (
+            <p className="text-sm text-text-dark/50">{t("draw_empty_hint")}</p>
+          )}
+        </div>
+
+        {draws.length > 1 && viewState === "drawn" && (
+          <nav className="mb-2.5 flex justify-center gap-1.5" aria-label={t("draw_switcher_label")}>
+            {draws.map((draw, i) => (
+              <button
+                key={draw.drawId}
+                type="button"
+                aria-label={`${i + 1}`}
+                aria-current={i === activeIndex ? "true" : undefined}
+                className={cn(
+                  "size-2.5 cursor-pointer rounded-full border-none p-0 transition-colors",
+                  i === activeIndex ? "bg-logo-cyan" : "bg-logo-cyan/25"
+                )}
+                onClick={() => setActiveIndex(i)}
+              />
+            ))}
+          </nav>
+        )}
+
+        <p className="mb-4.5 text-center text-[13px] text-text-dark/50">{hintText}</p>
+
+        <div className="flex flex-wrap justify-center gap-2">
+          {viewState === "drawn" && activeDraw && !activeDraw.isSelected && (
+            <button
+              type="button"
+              className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border-none bg-logo-cyan px-5 font-[inherit] text-base text-white transition-[filter] hover:brightness-[1.06] disabled:opacity-50"
+              disabled={isBusy}
+              onClick={() => handleSelect(activeDraw.drawId)}
+            >
+              {t("draw_select")}
+            </button>
+          )}
+          {canDraw && viewState === "drawn" && (
+            <button
+              type="button"
+              className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border-none bg-logo-cyan px-5 font-[inherit] text-base text-white transition-[filter] hover:brightness-[1.06] disabled:opacity-50"
+              disabled={isBusy}
+              onClick={handleDraw}
+            >
+              {isBusy ? t("drawing") : t("draw_again")}
+            </button>
+          )}
+          {viewState === "deck" && canDraw && (
+            <button
+              type="button"
+              className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border-none bg-logo-cyan px-5 font-[inherit] text-base text-white transition-[filter] hover:brightness-[1.06]"
+              onClick={handleDraw}
+            >
+              {t("draw_button")}
+            </button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

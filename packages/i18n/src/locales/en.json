@@ -8147,8 +8147,11 @@
     "cta_joined": "Joined",
     "cta_full": "Full",
     "cta_closed": "Enrollment closed",
+    "cta_checkin": "Check in",
+    "cta_view_summary": "View summary",
     "join_preview_upcoming": "Starting soon",
     "join_preview_checkin": "Check in",
+    "join_dialog_title": "Join group challenge",
     "join_note": "Check-ins in a group challenge are fully public; only participants can comment.",
     "join_hint": "This will show up in your challenges once you join",
     "join_confirm": "Join this challenge",
@@ -8170,7 +8173,11 @@
     "draw_selected": "Today's pick",
     "draw_empty_hint": "No draws yet — draw a card to see today's inspiration!",
     "draw_failed": "Draw failed. Please try again later.",
-    "select_failed": "Failed to select. Please try again later."
+    "select_failed": "Failed to select. Please try again later.",
+    "draw_close": "Close",
+    "draw_today_action": "Today's action",
+    "draw_again": "Draw another",
+    "draw_switcher_label": "Today's drawn cards"
   },
   "space": {
     "page_title": "Your spaces",
@@ -8278,7 +8285,12 @@
     "practice_count_label": "{count} practices",
     "challenge_empty": "You haven't joined any shared challenge yet",
     "challenge_open_practice": "Open my challenge practice",
-    "challenge_section_title": "Challenges I joined"
+    "challenge_section_title": "Challenges I joined",
+    "challenge_filter_all": "All",
+    "challenge_filter_ongoing": "In Progress",
+    "challenge_filter_upcoming": "Upcoming",
+    "challenge_filter_ended": "Completed",
+    "challenge_filter_empty": "No challenges match this filter"
   },
   "explore_activities": {
     "meta_title": "Explore activities",

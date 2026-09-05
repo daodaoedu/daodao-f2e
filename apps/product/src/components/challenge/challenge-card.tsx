@@ -4,11 +4,12 @@ import type { ChallengeSummaryType } from "@daodao/api";
 import { ArrowRightOutlineSvg, DefaultAvatarSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
-import { Calendar, Check, Sparkles, Timer, Users } from "lucide-react";
+import { Calendar, CalendarCheck, Check, Timer, Users } from "lucide-react";
 import {
   ChallengeFlagIcon,
   ChallengeProgressBar,
   ChallengeStatusBadge,
+  InspirationDeckIcon,
   getChallengeThemeSvg,
 } from "@/components/challenge/challenge-visual";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
@@ -40,7 +41,7 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
         ? t("participants_ongoing", { count: challenge.participantCount })
         : t("participants_upcoming", { count: challenge.participantCount });
 
-  const showCta = challenge.runStatus !== "ended";
+  const showJoinButton = !challenge.isJoined && challenge.runStatus !== "ended";
   const joinDisabled = !challenge.canJoin;
   const joinLabel = challenge.canJoin
     ? t("cta_join")
@@ -60,20 +61,6 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
           <div className="flex items-center gap-1.5">
             <ChallengeStatusBadge runStatus={challenge.runStatus} />
             <ChallengeFlagIcon />
-            {challenge.hasInspirationDeck &&
-              challenge.isJoined &&
-              challenge.runStatus !== "ended" &&
-              onDrawClick && (
-                <button
-                  type="button"
-                  aria-label={t("draw_entry_label")}
-                  title={t("draw_entry_label")}
-                  className="ml-auto inline-flex size-7 cursor-pointer items-center justify-center rounded-full border border-logo-cyan bg-basic-white/80 transition-colors hover:bg-light-blue"
-                  onClick={() => onDrawClick(challenge)}
-                >
-                  <Sparkles className="size-4 text-logo-cyan" />
-                </button>
-              )}
           </div>
 
           <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">{challenge.displayName}</h3>
@@ -116,26 +103,53 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
           </span>
         </div>
 
-        {showCta && (
+        {showJoinButton ? (
           <span className="mt-2 shrink-0 flex justify-end">
-            {challenge.isJoined ? (
-              <span className="inline-flex h-7 items-center justify-center gap-1.5 rounded-full bg-basic-white px-3 text-xs text-text-dark/45 shadow-sm">
-                <Check className="size-3.5 text-logo-cyan/50" />
-                {t("cta_joined")}
-              </span>
-            ) : (
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={joinDisabled}
-                onClick={() => onJoinClick(challenge)}
-              >
-                {joinLabel}
-                <ArrowRightOutlineSvg className="size-3.5 opacity-70" />
-              </Button>
-            )}
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={joinDisabled}
+              onClick={() => onJoinClick(challenge)}
+            >
+              {joinLabel}
+              <ArrowRightOutlineSvg className="size-3.5 opacity-70" />
+            </Button>
           </span>
-        )}
+        ) : challenge.isJoined ? (
+          <span className="mt-2 shrink-0 flex items-center justify-end gap-2">
+            {challenge.hasInspirationDeck &&
+              challenge.runStatus !== "ended" &&
+              onDrawClick && (
+                <button
+                  type="button"
+                  aria-label={t("draw_entry_label")}
+                  title={t("draw_entry_label")}
+                  className="inline-flex size-7 cursor-pointer items-center justify-center rounded-full bg-basic-white shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_20%,transparent)] transition-shadow hover:shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_40%,transparent)]"
+                  onClick={() => onDrawClick(challenge)}
+                >
+                  <InspirationDeckIcon />
+                </button>
+              )}
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full bg-basic-white px-3 py-1 text-[13px] shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_20%,transparent)] ${
+                challenge.runStatus === "upcoming"
+                  ? "text-text-dark/45"
+                  : "text-text-dark"
+              }`}
+            >
+              <CalendarCheck
+                className={`size-4 ${
+                  challenge.runStatus === "upcoming"
+                    ? "text-logo-cyan/50"
+                    : "text-logo-cyan"
+                }`}
+              />
+              {challenge.runStatus === "ended"
+                ? t("cta_view_summary")
+                : t("cta_checkin")}
+            </span>
+          </span>
+        ) : null}
       </div>
 
       <ChallengeProgressBar daysProgress={daysProgress} />

@@ -54,6 +54,17 @@ export const ChallengeFlagIcon = () => {
   );
 };
 
+/** 靈感卡牌堆 icon（POC 的三張旋轉小卡片） */
+export const InspirationDeckIcon = () => (
+  <>
+    <span className="absolute h-3 w-[9px] rounded-[3px] border-[1.4px] border-logo-cyan/40 bg-basic-white -translate-x-[3px] translate-y-px -rotate-[14deg]" />
+    <span className="absolute h-3 w-[9px] rounded-[3px] border-[1.4px] border-logo-cyan/65 bg-basic-white -translate-y-px -rotate-2" />
+    <span className="absolute flex h-3 w-[9px] items-end justify-center rounded-[3px] border-[1.4px] border-logo-cyan bg-logo-cyan translate-x-1 translate-y-0.5 rotate-[11deg]">
+      <span className="mb-0.5 block h-[2.5px] w-[5px] rounded-t-full bg-white/75" />
+    </span>
+  </>
+);
+
 /** 挑戰期間進度條，貼齊卡片容器（外層需為 position:relative）底部 */
 export const ChallengeProgressBar = ({
   daysProgress,

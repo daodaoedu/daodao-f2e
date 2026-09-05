@@ -3,31 +3,41 @@
 import { type MyChallengeType, useChallenges, useMyChallenges } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Link, useRouter } from "@daodao/i18n/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@daodao/ui/components/dropdown-menu";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { addDays, isAfter, parseISO } from "date-fns";
-import { ChevronRight, Compass } from "lucide-react";
-import { useMemo } from "react";
-import { ChallengeCard } from "@/components/challenge";
+import { ChevronDown, ChevronRight, Compass } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ChallengeCard, InspirationDrawDialog } from "@/components/challenge";
 import { SpaceSubpageHeader } from "@/components/spaces";
 
+type FilterKey = "all" | "ongoing" | "upcoming" | "ended";
+
+const FILTER_OPTIONS: FilterKey[] = ["all", "ongoing", "upcoming", "ended"];
 const UPCOMING_WINDOW_DAYS = 14;
 
-/**
- * 共同挑戰子頁 (FRD 4 / daodao #174)：列出我參加的挑戰（含已結束），
- * 每張卡可打開加入時自動複製的實踐；探索 banner 依未來兩週是否有新挑戰切換 tagline。
- */
 export default function ChallengeSpacePage() {
   const t = useTranslations("space");
   const router = useRouter();
   const { data: mineData, isLoading } = useMyChallenges();
   const { data: exploreData } = useChallenges();
+  const [filter, setFilter] = useState<FilterKey>("ongoing");
+  const [drawTarget, setDrawTarget] = useState<number | null>(null);
 
   const mine = useMemo(() => mineData?.data ?? [], [mineData]);
+  const filtered = useMemo(
+    () => (filter === "all" ? mine : mine.filter((c) => c.runStatus === filter)),
+    [mine, filter]
+  );
   const hasUpcoming = useMemo(() => {
     const limit = addDays(new Date(), UPCOMING_WINDOW_DAYS);
     return (exploreData?.data ?? []).some(
-      (challenge) =>
-        challenge.runStatus === "upcoming" && !isAfter(parseISO(challenge.startDate), limit)
+      (c) => c.runStatus === "upcoming" && !isAfter(parseISO(c.startDate), limit)
     );
   }, [exploreData]);
 
@@ -52,27 +62,60 @@ export default function ChallengeSpacePage() {
         <ChevronRight className="size-[18px] shrink-0 text-text-dark/40" />
       </Link>
 
-      <h3 className="mb-3 text-sm font-semibold text-text-dark">{t("challenge_section_title")}</h3>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-text-dark">{t("challenge_section_title")}</h3>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-primary-base bg-primary-base px-3 py-1 text-sm text-white"
+            >
+              {t(`challenge_filter_${filter}`)}
+              <ChevronDown className="size-3.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-28">
+            {FILTER_OPTIONS.map((key) => (
+              <DropdownMenuItem
+                key={key}
+                onClick={() => setFilter(key)}
+                className={filter === key ? "font-semibold text-primary-base" : ""}
+              >
+                {t(`challenge_filter_${key}`)}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       {isLoading ? (
         <div className="flex justify-center py-16">
           <Spinner aria-label={t("loading")} />
         </div>
-      ) : mine.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-[#DCEBEA] px-4 py-10 text-center text-sm text-text-dark/60">
-          {t("challenge_empty")}
+          {mine.length === 0 ? t("challenge_empty") : t("challenge_filter_empty")}
         </p>
       ) : (
         <ul className="m-0 flex list-none flex-col gap-4 p-0">
-          {mine.map((challenge) => (
+          {filtered.map((challenge) => (
             <MyChallengeItem
               key={challenge.id}
               challenge={challenge}
               onJoinClick={() => router.push("/challenges")}
+              onDrawClick={(id) => setDrawTarget(id)}
               openLabel={t("challenge_open_practice")}
             />
           ))}
         </ul>
       )}
+
+      <InspirationDrawDialog
+        challengeId={drawTarget}
+        onOpenChange={(open) => {
+          if (!open) setDrawTarget(null);
+        }}
+      />
     </div>
   );
 }
@@ -80,15 +123,21 @@ export default function ChallengeSpacePage() {
 function MyChallengeItem({
   challenge,
   onJoinClick,
+  onDrawClick,
   openLabel,
 }: {
   challenge: MyChallengeType;
   onJoinClick: () => void;
+  onDrawClick: (id: number) => void;
   openLabel: string;
 }) {
   return (
     <li className="flex flex-col gap-2">
-      <ChallengeCard challenge={challenge} onJoinClick={onJoinClick} />
+      <ChallengeCard
+        challenge={challenge}
+        onJoinClick={onJoinClick}
+        onDrawClick={() => onDrawClick(challenge.id)}
+      />
       {challenge.practiceId && (
         <Link
           href={`/practices/${challenge.practiceId}`}
