@@ -119,4 +119,40 @@ MAX_HITS=10000 PER_FILE_LINES=5000 PACK_BYTES=700 "$RETRIEVE" main fix/postmessa
 [ "$(wc -c < "$SMALL_PACK" | tr -d ' ')" -le 700 ] || fail "context pack 超過 PACK_BYTES"
 iconv -f UTF-8 -t UTF-8 "$SMALL_PACK" >/dev/null || fail "context pack 截出非法 UTF-8"
 
+# 斷言 8：migration diff 的跨表 FK 引用——被引用但不在 diff 內的表要附上定義，
+# 本次 diff 自己建立的表不用另外附（重演 daodao-storage #215 review 誤判：
+# reviewer 看不到 FK 指向的既有表，誤判欄位/約束跨表引用有誤）
+git checkout -q main
+mkdir -p schema migrate/sql
+cat > schema/010_create_table_users.sql <<'EOF'
+CREATE TABLE "users" (
+    "id" SERIAL PRIMARY KEY,
+    "email" VARCHAR(255) NOT NULL,
+    "privacy_status" VARCHAR(20) NOT NULL DEFAULT 'public'
+);
+EOF
+git add -A && git commit -qm "base: users table"
+
+git checkout -qb fix/add-posts-table
+cat > migrate/sql/002_add_posts.sql <<'EOF'
+CREATE TABLE "posts" (
+    "id" SERIAL PRIMARY KEY,
+    "user_id" INT NOT NULL,
+    "body" TEXT NOT NULL,
+
+    CONSTRAINT "fk_posts_user"
+        FOREIGN KEY ("user_id") REFERENCES "users"("id")
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
+EOF
+git add -A && git commit -qm "feat: add posts table referencing users"
+
+PACK_SQL="$("$RETRIEVE" main fix/add-posts-table)"
+
+fail_sql() { echo "❌ $1"; echo "---- pack ----"; printf '%s\n' "$PACK_SQL"; exit 1; }
+
+printf '%s' "$PACK_SQL" | grep -q '`users`（定義於' || fail_sql "pack 缺少被 FK 引用但不在 diff 內的 users 表定義"
+printf '%s' "$PACK_SQL" | grep -q 'privacy_status' || fail_sql "pack 沒有把 users 表的實際欄位（privacy_status）附進去"
+printf '%s' "$PACK_SQL" | grep -q '`posts`（定義於' && fail_sql "本次 diff 自己建立的 posts 表不該被當成「不在 diff 內」又附一次"
+
 echo "✅ retrieve-context fixture 回歸測試通過"

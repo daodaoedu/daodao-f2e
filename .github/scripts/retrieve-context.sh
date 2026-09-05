@@ -247,6 +247,48 @@ EOF
   echo
 }
 
+# ── 3b. migration/schema diff 跨表引用但不在本次 diff 的表定義 ─────────
+# 動機：cross-table 誤判（reviewer 只看得到 diff 裡的表，看不到 FK 指向的表）
+# 屬結構性、可靠地從 REFERENCES 子句解析，涵蓋率不含自由文字註解提到的表名。
+section_referenced_tables() {
+  echo "## 3b. migration/schema diff 跨表引用的表定義（不在本次 diff 內）"
+  echo
+
+  if ! printf '%s\n' "$CHANGED_FILES" | grep -qE '(^|/)(schema|migrate/sql)/.*\.sql$'; then
+    echo "（本次 diff 未觸及 schema/migration SQL，略過）"
+    echo
+    return 0
+  fi
+
+  local created referenced
+  created="$(printf '%s\n' "$ADDED_LINES" \
+    | grep -oiE 'CREATE TABLE( IF NOT EXISTS)? "[A-Za-z_][A-Za-z0-9_]*"' \
+    | grep -oE '"[A-Za-z_][A-Za-z0-9_]*"$' | tr -d '"' | sort -u || true)"
+  referenced="$(printf '%s\n' "$ADDED_LINES" \
+    | grep -oiE 'REFERENCES "[A-Za-z_][A-Za-z0-9_]*"' \
+    | grep -oE '"[A-Za-z_][A-Za-z0-9_]*"$' | tr -d '"' | sort -u || true)"
+
+  local tbl any=0 def_file
+  while IFS= read -r tbl; do
+    [ -z "$tbl" ] && continue
+    printf '%s\n' "$created" | grep -qxF "$tbl" && continue
+    def_file="$(search "CREATE TABLE( IF NOT EXISTS)? \\\"${tbl}\\\"" \
+      | awk -F: '$1 ~ /(^|\/)schema\// { print $1 }' | sort -u | awk 'NR==1')"
+    [ -z "$def_file" ] && continue
+    printf -- '- `%s`（定義於 `%s`）：\n' "$tbl" "$def_file"
+    awk -v needle="\"$tbl\"" '
+      /CREATE TABLE/ && index($0, needle) > 0 { on=1 }
+      on { print "      " $0 }
+      on && /^\);/ { exit }
+    ' "$def_file" | awk 'NR<=25{print} NR==26{print "      …（截斷）"}'
+    any=1
+  done <<EOF
+$referenced
+EOF
+  [ "$any" = 0 ] && echo "（無跨表引用需要補充，或引用的表本次已在 diff 內建立）"
+  echo
+}
+
 # ── 4. 精簡 repo map ───────────────────────────────────────────────────
 section_repo_map() {
   echo "## 4. 精簡 repo map"
@@ -272,6 +314,7 @@ build_pack() {
   section_symbol_callers
   section_importers
   section_call_patterns
+  section_referenced_tables
   section_inflight
   section_repo_map
 }
