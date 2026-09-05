@@ -5,11 +5,13 @@ import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogTitle,
 } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { Check, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface InspirationDrawDialogProps {
   challengeId: number | null;
@@ -29,6 +31,7 @@ export const InspirationDrawDialog = ({
   const [isBusy, setIsBusy] = useState(false);
   const [viewState, setViewState] = useState<ViewState>("deck");
   const [activeIndex, setActiveIndex] = useState(0);
+  const prevChallengeId = useRef<number | null>(null);
   const { data, mutate } = useTodayDraws(challengeId ?? undefined, challengeId !== null);
   const today = data?.data;
   const draws = today?.draws ?? [];
@@ -39,6 +42,11 @@ export const InspirationDrawDialog = ({
     if (challengeId === null) {
       setViewState("deck");
       setActiveIndex(0);
+      prevChallengeId.current = null;
+    } else if (challengeId !== prevChallengeId.current) {
+      prevChallengeId.current = challengeId;
+      setViewState(draws.length > 0 ? "drawn" : "deck");
+      setActiveIndex(Math.max(0, draws.length - 1));
     } else if (draws.length > 0 && viewState === "deck") {
       setViewState("drawn");
       setActiveIndex(draws.length - 1);
@@ -57,7 +65,11 @@ export const InspirationDrawDialog = ({
       setViewState(draws.length > 0 ? "drawn" : "deck");
       return;
     }
-    await mutate();
+    try {
+      await mutate();
+    } catch {
+      // SWR revalidation failed but the draw was consumed; show drawn state
+    }
     setViewState("drawn");
     setActiveIndex(draws.length);
   }, [challengeId, isBusy, canDraw, draws.length, mutate, t]);
@@ -86,7 +98,10 @@ export const InspirationDrawDialog = ({
 
   return (
     <Dialog open={challengeId !== null} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[420px] rounded-[28px] border-none p-7 text-center shadow-[0_20px_50px_rgba(15,48,54,0.25)]">
+      <DialogContent
+        className="max-w-[420px] rounded-[28px] border-none p-7 text-center shadow-[0_20px_50px_rgba(15,48,54,0.25)]"
+        showCloseButton={false}
+      >
         <style>{`
           @keyframes shuffleA { 0%,100% { transform:translate(-14px,6px) rotate(-9deg); } 50% { transform:translate(14px,-6px) rotate(7deg); } }
           @keyframes shuffleB { 0%,100% { transform:translate(12px,-4px) rotate(8deg); } 50% { transform:translate(-12px,5px) rotate(-6deg); } }
@@ -102,7 +117,12 @@ export const InspirationDrawDialog = ({
         </button>
 
         <p className="m-0 text-xs font-medium text-logo-cyan">{t("challenge_tag")}</p>
-        <h2 className="mt-2 m-0 text-xl font-bold text-text-dark">{t("draw_dialog_title")}</h2>
+        <DialogTitle className="mt-2 m-0 text-xl font-bold text-text-dark">
+          {t("draw_dialog_title")}
+        </DialogTitle>
+        <DialogDescription className="sr-only">
+          {t("draw_dialog_subtitle")}
+        </DialogDescription>
 
         <div className="relative mx-auto mt-5 mb-1 flex h-[236px] w-full items-center justify-center">
           {viewState === "deck" && (
@@ -150,12 +170,13 @@ export const InspirationDrawDialog = ({
         </div>
 
         {draws.length > 1 && viewState === "drawn" && (
-          <div className="mb-2.5 flex justify-center gap-1.5" role="group" aria-label={t("draw_switcher_label")}>
+          <nav className="mb-2.5 flex justify-center gap-1.5" aria-label={t("draw_switcher_label")}>
             {draws.map((draw, i) => (
               <button
                 key={draw.drawId}
                 type="button"
                 aria-label={`${i + 1}`}
+                aria-current={i === activeIndex ? "true" : undefined}
                 className={cn(
                   "size-2.5 cursor-pointer rounded-full border-none p-0 transition-colors",
                   i === activeIndex ? "bg-logo-cyan" : "bg-logo-cyan/25"
@@ -163,7 +184,7 @@ export const InspirationDrawDialog = ({
                 onClick={() => setActiveIndex(i)}
               />
             ))}
-          </div>
+          </nav>
         )}
 
         <p className="mb-4.5 text-center text-[13px] text-text-dark/50">{hintText}</p>
