@@ -74,10 +74,10 @@ export const JoinChallengeDialog = ({
 
   return (
     <Dialog open={challenge !== null} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-[420px] sm:max-w-[420px] gap-4 rounded-[28px] p-6">
         {joinedPracticeId === null ? (
           <>
-            <DialogHeader className="pt-6 text-left">
+            <DialogHeader className="pt-0 text-left">
               <DialogTitle className="text-left text-xs font-medium text-logo-cyan">
                 {t("join_hint")}
               </DialogTitle>
@@ -164,7 +164,7 @@ export const JoinChallengeDialog = ({
           </>
         ) : (
           <>
-            <DialogHeader>
+            <DialogHeader className="pt-0">
               <DialogTitle>{t("joined_heading")}</DialogTitle>
               <DialogDescription>{t("joined_body")}</DialogDescription>
             </DialogHeader>
