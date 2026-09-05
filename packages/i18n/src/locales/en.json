@@ -8278,7 +8278,12 @@
     "practice_count_label": "{count} practices",
     "challenge_empty": "You haven't joined any shared challenge yet",
     "challenge_open_practice": "Open my challenge practice",
-    "challenge_section_title": "Challenges I joined"
+    "challenge_section_title": "Challenges I joined",
+    "challenge_filter_all": "All",
+    "challenge_filter_ongoing": "In Progress",
+    "challenge_filter_upcoming": "Upcoming",
+    "challenge_filter_ended": "Completed",
+    "challenge_filter_empty": "No challenges match this filter"
   },
   "explore_activities": {
     "meta_title": "Explore activities",

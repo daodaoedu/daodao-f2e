@@ -8280,7 +8280,12 @@
     "practice_count_label": "{count} 個實踐",
     "challenge_empty": "你還沒有參加任何共同挑戰",
     "challenge_open_practice": "打開我的挑戰實踐",
-    "challenge_section_title": "我參加的挑戰"
+    "challenge_section_title": "我參加的挑戰",
+    "challenge_filter_all": "全部",
+    "challenge_filter_ongoing": "進行中",
+    "challenge_filter_upcoming": "未開始",
+    "challenge_filter_ended": "已完成",
+    "challenge_filter_empty": "沒有符合篩選條件的挑戰"
   },
   "explore_activities": {
     "meta_title": "探索活動課程",
