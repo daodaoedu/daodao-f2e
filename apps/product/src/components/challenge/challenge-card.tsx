@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChallengeSummaryType } from "@daodao/api";
-import { DefaultAvatarSvg } from "@daodao/assets";
+import { ArrowRightOutlineSvg, DefaultAvatarSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { Badge, type BadgeProps } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
@@ -66,8 +66,8 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
         preserveAspectRatio="xMidYMid slice"
       />
 
-      <div className="absolute inset-0 p-5 pb-4 z-10 flex flex-col">
-        <div className="flex-1 min-h-0 flex flex-col gap-2">
+      <div className="absolute inset-0 p-5 pb-6 z-10 flex flex-col">
+        <div className="flex-1 min-h-0 flex flex-col gap-1.5">
           <div className="flex items-center gap-1.5">
             <Badge variant={STATUS_BADGE[challenge.runStatus]} size="sm" className="w-fit">
               {t(`status_${challenge.runStatus}`)}
@@ -142,14 +142,15 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
         </div>
 
         {showJoinButton && (
-          <span className="mt-3 shrink-0 block">
+          <span className="mt-2 shrink-0 flex justify-end">
             <Button
               variant="secondary"
-              className="w-full sm:max-w-[288px]"
+              size="sm"
               disabled={joinDisabled}
               onClick={() => onJoinClick(challenge)}
             >
               {joinLabel}
+              <ArrowRightOutlineSvg className="size-3.5 opacity-70" />
             </Button>
           </span>
         )}
