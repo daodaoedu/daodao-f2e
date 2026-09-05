@@ -4,11 +4,12 @@ import type { ChallengeSummaryType } from "@daodao/api";
 import { ArrowRightOutlineSvg, DefaultAvatarSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
-import { Calendar, CalendarCheck, Check, Sparkles, Timer, Users } from "lucide-react";
+import { Calendar, CalendarCheck, Check, Timer, Users } from "lucide-react";
 import {
   ChallengeFlagIcon,
   ChallengeProgressBar,
   ChallengeStatusBadge,
+  InspirationDeckIcon,
   getChallengeThemeSvg,
 } from "@/components/challenge/challenge-visual";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
@@ -126,7 +127,7 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
                   className="inline-flex size-7 cursor-pointer items-center justify-center rounded-full bg-basic-white shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_20%,transparent)] transition-shadow hover:shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_40%,transparent)]"
                   onClick={() => onDrawClick(challenge)}
                 >
-                  <Sparkles className="size-4 text-logo-cyan" />
+                  <InspirationDeckIcon />
                 </button>
               )}
             <span

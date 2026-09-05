@@ -8175,7 +8175,11 @@
     "draw_selected": "今日選定",
     "draw_empty_hint": "還沒抽過，抽一張看看今天的靈感吧！",
     "draw_failed": "抽卡失敗，請稍後再試",
-    "select_failed": "選定失敗，請稍後再試"
+    "select_failed": "選定失敗，請稍後再試",
+    "draw_close": "關閉",
+    "draw_today_action": "今天的行動",
+    "draw_again": "再抽一張",
+    "draw_switcher_label": "今天抽到的卡"
   },
   "space": {
     "page_title": "你的空間",

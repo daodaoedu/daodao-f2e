@@ -8173,7 +8173,11 @@
     "draw_selected": "Today's pick",
     "draw_empty_hint": "No draws yet — draw a card to see today's inspiration!",
     "draw_failed": "Draw failed. Please try again later.",
-    "select_failed": "Failed to select. Please try again later."
+    "select_failed": "Failed to select. Please try again later.",
+    "draw_close": "Close",
+    "draw_today_action": "Today's action",
+    "draw_again": "Draw another",
+    "draw_switcher_label": "Today's drawn cards"
   },
   "space": {
     "page_title": "Your spaces",
