@@ -130,20 +130,18 @@ export const lighthouseCohortListResponseSchema: z.ZodType<CohortListResponse> =
 );
 
 export const lighthouseCohortResponseSchema = apiSuccessSchema(lighthouseCohortSchema);
-/** 總覽用：組織底下所有系列的全部場次，附系列名稱與已加入人數（FR-OV-02） */
-type OrganizationCohortListResponse =
-  paths["/api/v1/lighthouse/organizations/{organizationId}/cohorts"]["get"]["responses"][200]["content"]["application/json"];
-export const lighthouseOrganizationCohortSchema: z.ZodType<
-  OrganizationCohortListResponse["data"][number]
-> = z.object({
+/** 總覽用：組織底下所有系列的全部場次，附系列名稱、已加入人數與焦點摘要（FR-OV-02） */
+export const lighthouseOrganizationCohortSchema = z.object({
   ...lighthouseCohortShape,
   programName: z.string(),
   joinedCount: z.number().int().nonnegative(),
+  encourageCount: z.number().int().nonnegative(),
+  celebrateCount: z.number().int().nonnegative(),
 });
 export const lighthouseOrganizationCohortListResponseSchema = apiSuccessSchema(
   z.array(lighthouseOrganizationCohortSchema)
 );
-export type LighthouseOrganizationCohortType = OrganizationCohortListResponse["data"][number];
+export type LighthouseOrganizationCohortType = z.infer<typeof lighthouseOrganizationCohortSchema>;
 
 export const lighthouseCohortMembersResponseSchema = apiSuccessSchema(
   z.array(
