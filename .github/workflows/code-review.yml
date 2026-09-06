@@ -92,8 +92,8 @@ jobs:
             exit 0
           fi
 
-          PRIMARY_MODEL="@cf/moonshot/kimi-k2.7-code"
-          FALLBACK_MODEL="@cf/deepseek/deepseek-v4-flash-0731"
+          PRIMARY_MODEL="@cf/moonshotai/kimi-k2.7-code"
+          FALLBACK_MODEL="@cf/deepseek-ai/deepseek-v4-flash-0731"
 
           extract_response() {
             jq -r 'if .choices[0].finish_reason == "stop"
