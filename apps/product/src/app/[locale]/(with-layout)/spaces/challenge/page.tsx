@@ -11,7 +11,7 @@ import {
 } from "@daodao/ui/components/dropdown-menu";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { addDays, isAfter, parseISO } from "date-fns";
-import { ChevronDown, ChevronRight, Compass } from "lucide-react";
+import { ChevronDown, ChevronRight, Flag } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChallengeCard, InspirationDrawDialog } from "@/components/challenge";
 import { SpaceSubpageHeader } from "@/components/spaces";
@@ -43,23 +43,23 @@ export default function ChallengeSpacePage() {
 
   return (
     <div className="mx-auto min-h-screen max-w-[640px] px-4 pb-[72px] pt-[68px] md:pt-6">
-      <SpaceSubpageHeader title={t("challenge_name")} subtitle={t("challenge_host")} />
+      <SpaceSubpageHeader title={t("challenge_name")} variant="banner" />
       <Link
         href="/challenges"
-        className="mb-4 flex items-center gap-3 rounded-2xl border border-[#CDEBE8] bg-[#F0FAF8] px-4 py-3.5 transition-colors hover:border-primary-base/55"
+        className="mb-4 flex items-center gap-3 rounded-[14px] border border-[#F5E6B8] bg-[#FDF8EC] px-4 py-3.5 transition-colors hover:border-[#E8D49A]"
       >
-        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-primary-base">
-          <Compass className="size-5" />
+        <span className="grid size-8 shrink-0 place-items-center rounded-[10px] border border-[#F5E6B8] bg-white">
+          <Flag className="size-4 text-[#D4A843]" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold text-text-dark">
+          <span className="block text-[15px] font-semibold text-text-dark">
             {t("explore_challenge_title")}
           </span>
-          <span className="mt-0.5 block text-xs text-text-dark/55">
+          <span className="mt-0.5 block text-[13px] text-text-dark/55">
             {hasUpcoming ? t("explore_challenge_upcoming") : t("explore_challenge_none")}
           </span>
         </span>
-        <ChevronRight className="size-[18px] shrink-0 text-text-dark/40" />
+        <ChevronRight className="size-[18px] shrink-0 text-[#D4A843]" />
       </Link>
 
       <div className="mb-3 flex items-center justify-between">
@@ -97,7 +97,7 @@ export default function ChallengeSpacePage() {
           {mine.length === 0 ? t("challenge_empty") : t("challenge_filter_empty")}
         </p>
       ) : (
-        <ul className="m-0 flex list-none flex-col gap-4 p-0">
+        <ul className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2">
           {filtered.map((challenge) => (
             <MyChallengeItem
               key={challenge.id}

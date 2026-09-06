@@ -86,6 +86,13 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
             )}
           </div>
 
+          {"checkInCount" in challenge && typeof challenge.checkInCount === "number" && (
+            <span className="flex items-center gap-1 text-xs text-text-dark">
+              <CalendarCheck className="size-3.5 shrink-0 text-logo-cyan" />
+              {t("card_checkin_count", { count: challenge.checkInCount })}
+            </span>
+          )}
+
           <span className="flex items-center gap-2 text-xs text-text-dark">
             {challenge.participantCount > 0 ? (
               <span className="flex shrink-0 items-center">

@@ -12868,6 +12868,11 @@ export interface paths {
                                  * @description 加入時自動複製的實踐 external_id；無綁定模板或已刪除時為 null
                                  */
                                 practiceId: string | null;
+                                /**
+                                 * @description 該使用者在此挑戰實踐的打卡次數
+                                 * @example 7
+                                 */
+                                checkInCount: number;
                             }[];
                             /**
                              * Format: date-time

@@ -8142,6 +8142,7 @@
     "challenge_tag": "共同挑戰",
     "card_start_date": "{date}",
     "card_days_progress": "{current}/{total} 天",
+    "card_checkin_count": "{count} 次",
     "participants_upcoming": "{count} 座島已加入",
     "participants_ongoing": "{count} 座島正在走",
     "participants_ended": "{count} 座島一起完成",

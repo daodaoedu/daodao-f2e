@@ -25,5 +25,5 @@ export function formatCardDate(date: string | null | undefined): string | null {
   if (!date) return null;
   const parsed = parseISO(date);
   if (!isValid(parsed)) return null;
-  return format(parsed, "MM/dd");
+  return format(parsed, "yyyy/MM/dd");
 }

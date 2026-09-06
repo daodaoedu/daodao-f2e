@@ -8140,6 +8140,7 @@
     "challenge_tag": "Group challenge",
     "card_start_date": "{date}",
     "card_days_progress": "{current}/{total} days",
+    "card_checkin_count": "{count} check-ins",
     "participants_upcoming": "{count} islands joined",
     "participants_ongoing": "{count} islands walking",
     "participants_ended": "{count} islands completed together",

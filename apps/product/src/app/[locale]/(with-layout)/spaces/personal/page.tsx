@@ -34,7 +34,7 @@ export default function PersonalSpacePage() {
 
   return (
     <div className="mx-auto min-h-screen max-w-[640px] px-4 pb-[72px] pt-[68px] md:pt-6">
-      <SpaceSubpageHeader title={t("personal_name")} subtitle={t("personal_host")} />
+      <SpaceSubpageHeader title={t("personal_name")} variant="banner" />
       {isLoading ? (
         <div className="flex justify-center py-16">
           <Spinner aria-label={t("loading")} />
