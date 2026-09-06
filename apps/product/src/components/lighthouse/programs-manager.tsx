@@ -41,6 +41,7 @@ import {
   Pencil,
   Plus,
   RadioTower,
+  Search,
   Send,
   X,
 } from "lucide-react";
@@ -76,6 +77,7 @@ interface CohortSetupPanelProps {
     isPrivate: boolean;
     checkinDefaultPrivate: boolean;
     hostCommentDefaultPrivate: boolean;
+    visibility: "public" | "private";
     selectedTemplateIds?: number[];
     publishNow?: boolean;
   }) => Promise<void>;
@@ -122,6 +124,9 @@ function CohortSetupPanel({
   const [taglineValue, setTaglineValue] = useState(cohort?.tagline ?? "");
   const [capacityUnlimited, setCapacityUnlimited] = useState(!cohort?.capacity);
   const [interactionDropdownOpen, setInteractionDropdownOpen] = useState(false);
+  const [templateSearch, setTemplateSearch] = useState("");
+  const [visibility, setVisibility] = useState<"public" | "private">(cohort?.visibility ?? "private");
+  const [showInviteOnSignup, setShowInviteOnSignup] = useState(cohort?.showInviteMessageOnSignup ?? false);
 
   useEffect(() => {
     panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -148,6 +153,18 @@ function CohortSetupPanel({
     );
   }, []);
 
+  function handleIsPrivateChange(checked: boolean) {
+    setIsPrivate(checked);
+    if (!checked) {
+      setCheckinPrivate(false);
+      setHostCommentPrivate(false);
+    }
+  }
+
+  const filteredTemplates = templates?.filter((tpl) =>
+    tpl.title.toLowerCase().includes(templateSearch.toLowerCase())
+  ) ?? [];
+
   async function handleFormAction(formData: FormData) {
     await onSubmit(formData, {
       interactionModes,
@@ -157,6 +174,7 @@ function CohortSetupPanel({
       isPrivate,
       checkinDefaultPrivate: checkinPrivate,
       hostCommentDefaultPrivate: hostCommentPrivate,
+      visibility,
       selectedTemplateIds: Array.from(selectedTemplatesRef.current),
       publishNow,
     });
@@ -417,33 +435,51 @@ function CohortSetupPanel({
 
       {/* Tab: templates */}
       <div className={activeTab !== "templates" ? "hidden" : ""} role="tabpanel">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">{t("cohort_select_templates")}</p>
+            <p className="mt-0.5 text-xs text-[#78928F]">{t("cohort_select_templates_hint")}</p>
+          </div>
+          <p className="text-xs text-[#78928F]">{t("cohort_templates_linked_count", { count: selectedTemplatesRef.current.size })}</p>
+        </div>
         {templates && templates.length > 0 ? (
-          <fieldset>
-            <legend className="text-sm font-medium">{t("cohort_select_templates")}</legend>
-            <p className="mt-1 text-xs text-[#78928F]">{t("cohort_select_templates_hint")}</p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              {templates.map((tpl) => {
-                const bound = cohort ? tpl.boundCohortIds.includes(cohort.id) : true;
-                return (
-                  <label key={tpl.id} className="flex items-center gap-3 rounded-xl border border-[#DDEFED] px-4 py-3 text-sm">
-                    <input
-                      type="checkbox"
-                      defaultChecked={bound}
-                      className="size-4 accent-[#0D7773]"
-                      onChange={(e) => {
-                        if (e.target.checked) selectedTemplatesRef.current.add(tpl.id);
-                        else selectedTemplatesRef.current.delete(tpl.id);
-                      }}
-                      ref={(el) => {
-                        if (el && bound) selectedTemplatesRef.current.add(tpl.id);
-                      }}
-                    />
-                    {tpl.title}
-                  </label>
-                );
-              })}
+          <>
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#78928F]" />
+              <Input
+                placeholder={t("cohort_template_search_placeholder")}
+                value={templateSearch}
+                onChange={(e) => setTemplateSearch(e.target.value)}
+                className="pl-9"
+              />
             </div>
-          </fieldset>
+            {filteredTemplates.length > 0 ? (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {filteredTemplates.map((tpl) => {
+                  const bound = cohort ? tpl.boundCohortIds.includes(cohort.id) : true;
+                  return (
+                    <label key={tpl.id} className="flex items-center gap-3 rounded-xl border border-[#DDEFED] px-4 py-3 text-sm">
+                      <input
+                        type="checkbox"
+                        defaultChecked={bound}
+                        className="size-4 accent-[#0D7773]"
+                        onChange={(e) => {
+                          if (e.target.checked) selectedTemplatesRef.current.add(tpl.id);
+                          else selectedTemplatesRef.current.delete(tpl.id);
+                        }}
+                        ref={(el) => {
+                          if (el && bound) selectedTemplatesRef.current.add(tpl.id);
+                        }}
+                      />
+                      {tpl.title}
+                    </label>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="py-8 text-center text-sm text-[#5A7B79]">{t("cohort_templates_search_empty")}</p>
+            )}
+          </>
         ) : (
           <p className="py-8 text-center text-sm text-[#5A7B79]">{t("cohort_no_templates_available")}</p>
         )}
@@ -458,51 +494,73 @@ function CohortSetupPanel({
 
       {/* Tab: privacy */}
       <div className={activeTab !== "privacy" ? "hidden" : ""} role="tabpanel">
-        <fieldset>
-          <legend className="text-sm font-medium">{t("cohort_privacy_title")}</legend>
-          <div className="mt-3 grid gap-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm">{t("cohort_is_private")}</p>
-                <p className="text-xs text-[#78928F]">{t("cohort_is_private_hint")}</p>
-              </div>
-              <Switch checked={isPrivate} onCheckedChange={setIsPrivate} />
+        <p className="mb-1 text-sm font-medium">{t("cohort_privacy_title")}</p>
+        <p className="mb-3 text-xs text-[#78928F]">{t("cohort_privacy_description")}</p>
+        <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+          <div className="rounded-xl border border-[#DDEFED] p-4">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-medium">{t("cohort_is_private")}</p>
+              <Switch checked={isPrivate} onCheckedChange={handleIsPrivateChange} />
             </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm">{t("cohort_checkin_default_private")}</p>
-                <p className="text-xs text-[#78928F]">{t("cohort_checkin_default_private_hint")}</p>
-              </div>
-              <Switch checked={checkinPrivate} onCheckedChange={setCheckinPrivate} />
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm">{t("cohort_host_comment_default_private")}</p>
-                <p className="text-xs text-[#78928F]">{t("cohort_host_comment_default_private_hint")}</p>
-              </div>
-              <Switch checked={hostCommentPrivate} onCheckedChange={setHostCommentPrivate} />
-            </div>
+            <p className="mt-1 text-xs text-[#78928F]">{t("cohort_is_private_hint")}</p>
           </div>
-        </fieldset>
-        <div className="mt-4 grid gap-1.5">
-          <label className="flex items-center gap-3 text-sm font-medium">
-            <input name="visibility" type="checkbox" className="size-4 accent-[#0D7773]" defaultChecked={cohort?.visibility === "public"} />
-            {t("cohort_visibility_public")}
-          </label>
-          <p className="text-xs text-[#78928F]">{t("cohort_visibility_hint")}</p>
+          <div className={`rounded-xl border border-[#DDEFED] p-4 transition-opacity ${!isPrivate ? "opacity-50" : ""}`}>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-medium">{t("cohort_checkin_default_private")}</p>
+              <Switch checked={checkinPrivate} onCheckedChange={setCheckinPrivate} disabled={!isPrivate} />
+            </div>
+            <p className="mt-1 text-xs text-[#78928F]">
+              {isPrivate ? t("cohort_checkin_default_private_hint") : t("cohort_privacy_disabled_hint")}
+            </p>
+          </div>
+          <div className={`rounded-xl border border-[#DDEFED] p-4 transition-opacity ${!isPrivate ? "opacity-50" : ""}`}>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-medium">{t("cohort_host_comment_default_private")}</p>
+              <Switch checked={hostCommentPrivate} onCheckedChange={setHostCommentPrivate} disabled={!isPrivate} />
+            </div>
+            <p className="mt-1 text-xs text-[#78928F]">
+              {isPrivate ? t("cohort_host_comment_default_private_hint") : t("cohort_privacy_disabled_hint")}
+            </p>
+          </div>
+          <div className="rounded-xl border border-[#DDEFED] p-4">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-medium">{t("cohort_visibility_public")}</p>
+              <Switch checked={visibility === "public"} onCheckedChange={(checked) => setVisibility(checked ? "public" : "private")} />
+            </div>
+            <p className="mt-1 text-xs text-[#78928F]">{t("cohort_visibility_hint")}</p>
+          </div>
         </div>
       </div>
 
       {/* Tab: signup */}
       <div className={activeTab !== "signup" ? "hidden" : ""} role="tabpanel">
-        <label htmlFor={`${prefix}-message`} className="grid gap-1.5 text-sm font-medium">
-          {t("invite_message")}
-          <Textarea id={`${prefix}-message`} name="inviteMessage" defaultValue={cohort?.inviteMessage ?? ""} />
-        </label>
-        <label className="mt-3 flex items-center gap-3 text-sm">
-          <input name="showInviteMessageOnSignup" type="checkbox" className="size-4 accent-[#0D7773]" defaultChecked={cohort?.showInviteMessageOnSignup ?? false} />
+        <label className="mb-2 flex items-center gap-3 text-sm">
+          <input
+            name="showInviteMessageOnSignup"
+            type="checkbox"
+            className="size-4 accent-[#0D7773]"
+            checked={showInviteOnSignup}
+            onChange={(e) => setShowInviteOnSignup(e.target.checked)}
+          />
           {t("cohort_show_invite_message_on_signup")}
         </label>
+        <label htmlFor={`${prefix}-message`} className="grid gap-1.5 text-sm font-medium">
+          {t("invite_message")}
+          <Textarea
+            id={`${prefix}-message`}
+            name="inviteMessage"
+            rows={3}
+            disabled={!showInviteOnSignup}
+            placeholder={showInviteOnSignup ? t("cohort_invite_message_placeholder") : t("cohort_invite_message_disabled_placeholder")}
+            defaultValue={cohort?.inviteMessage ?? ""}
+          />
+        </label>
+        <div className="mt-6 rounded-xl border border-dashed border-[#B9DCD8] p-5 text-center">
+          <p className="text-sm text-[#5A7B79]">{t("cohort_signup_questions_coming_soon")}</p>
+        </div>
+        <div className="mt-4 rounded-xl border border-dashed border-[#B9DCD8] p-5 text-center">
+          <p className="text-sm text-[#5A7B79]">{t("cohort_signup_preview_coming_soon")}</p>
+        </div>
       </div>
 
       {/* Bottom action bar */}
@@ -612,7 +670,7 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
         joinDeadline: String(formData.get("joinDeadline") ?? "") || null,
         capacity: capacityValue ? Number(capacityValue) : null,
         inviteMessage: String(formData.get("inviteMessage") ?? "").trim() || null,
-        visibility: formData.get("visibility") === "on" ? "public" : "private",
+        visibility: extras.visibility,
         interactionModes: extras.interactionModes as ("sync" | "async" | "physical")[],
         meetingUrl: String(formData.get("meetingUrl") ?? "").trim() || null,
         location: String(formData.get("location") ?? "").trim() || null,
@@ -622,7 +680,7 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
         feeType: extras.feeType,
         feeAmount: extras.feeType === "paid" && feeAmountValue ? Number(feeAmountValue) : null,
         signupMethod: extras.signupMethod,
-        externalSignupUrl: extras.signupMethod === "external" ? externalUrl || null : null,
+        externalSignupUrl: extras.signupMethod === "external" || extras.feeType === "paid" ? externalUrl || null : null,
         showInviteMessageOnSignup: formData.get("showInviteMessageOnSignup") === "on",
         isPrivate: extras.isPrivate,
         checkinDefaultPrivate: extras.checkinDefaultPrivate,
@@ -876,7 +934,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         capacity: capacityValue ? Number(capacityValue) : null,
         inviteMessage: String(formData.get("inviteMessage") ?? "").trim() || null,
         status: extras.publishNow ? "published" : "draft",
-        visibility: formData.get("visibility") === "on" ? "public" : "private",
+        visibility: extras.visibility,
         interactionModes: extras.interactionModes as ("sync" | "async" | "physical")[],
         meetingUrl: String(formData.get("meetingUrl") ?? "").trim() || undefined,
         location: String(formData.get("location") ?? "").trim() || undefined,
@@ -886,7 +944,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         feeType: extras.feeType,
         feeAmount: extras.feeType === "paid" && feeAmountValue ? Number(feeAmountValue) : undefined,
         signupMethod: extras.signupMethod,
-        externalSignupUrl: extras.signupMethod === "external" ? externalUrl || undefined : undefined,
+        externalSignupUrl: extras.signupMethod === "external" || extras.feeType === "paid" ? externalUrl || undefined : undefined,
         showInviteMessageOnSignup: formData.get("showInviteMessageOnSignup") === "on",
         isPrivate: extras.isPrivate,
         checkinDefaultPrivate: extras.checkinDefaultPrivate,
