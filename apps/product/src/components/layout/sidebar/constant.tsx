@@ -34,7 +34,8 @@ export const menuItems: MenuItem[] = [
     labelKey: "nav_spaces",
     href: "/spaces",
     badge: "breathing-dot",
-    isMatch: (pathname: string) => pathname.startsWith("/spaces"),
+    isMatch: (pathname: string) =>
+      pathname.startsWith("/spaces") || pathname.startsWith("/activities"),
   },
   {
     activeIcon: MessagesOutlineSvg,

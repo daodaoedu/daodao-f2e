@@ -1,154 +1,237 @@
 "use client";
 
-import { type ActivitySummaryType, useActivities } from "@daodao/api";
+import { type ActivitySummaryType, useActivities, useLighthouseOrganizations } from "@daodao/api";
+import { useAuthContext } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { Spinner } from "@daodao/ui/components/spinner";
-import { cn } from "@daodao/ui/lib/utils";
-import { Archive, Compass, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
 import { ActivityCard } from "@/components/activity/activity-card";
+import { ExploreFilters } from "@/components/activity/explore-filters";
+import { ExploreGuestHeader } from "@/components/activity/explore-guest-header";
+import { ExploreSearch } from "@/components/activity/explore-search";
+import { HostPreviewDialog } from "@/components/activity/host-preview-dialog";
+import { PageHeader, Sidebar } from "@/components/layout";
+import {
+  type ActivityFeeFilter,
+  type ActivityStatusFilter,
+  searchActivities,
+} from "@/constants/activity-filter";
 
-type ModeFilterKey = "all" | "sync" | "async" | "physical";
+const SECTION_TITLE_KEY: Record<ActivityStatusFilter, string> = {
+  all: "section_title_all",
+  open: "section_title_open",
+  ongoing: "section_title_ongoing",
+  ended: "section_title_ended",
+};
 
-const MODE_FILTERS: ModeFilterKey[] = ["all", "sync", "async", "physical"];
-
-/** 已結束 section 最多顯示的筆數 */
-const ENDED_DISPLAY_LIMIT = 24;
-
-/**
- * 探索活動課程頁（公開）：資料來自 GET /api/v1/activities，
- * 支持互動方式篩選（全部／線上同步／線上非同步／實體），
- * 依運行狀態分「即將開始／進行中／已結束」三個 section。
- */
 export default function ExploreActivitiesPage() {
   const t = useTranslations("explore_activities");
-  const [modeFilter, setModeFilter] = useState<ModeFilterKey>("all");
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuthContext();
 
-  const mode = modeFilter === "all" ? undefined : modeFilter;
-  const { data, isLoading } = useActivities(mode);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<ActivityStatusFilter>("all");
+  const [feeFilter, setFeeFilter] = useState<ActivityFeeFilter>(null);
 
-  const activities = useMemo(() => data?.data ?? [], [data]);
-  const meta = data?.meta as Record<string, unknown> | undefined;
-  const endedTruncated = meta?.endedTruncated === true;
+  const [hostDialogUserId, setHostDialogUserId] = useState<number | null>(null);
+  const [hostDialogOpen, setHostDialogOpen] = useState(false);
 
-  const sections = useMemo(() => {
-    const byStatus = (status: ActivitySummaryType["runStatus"]) =>
-      activities.filter((activity) => activity.runStatus === status);
-    const ended = byStatus("ended");
-    return {
-      upcoming: byStatus("upcoming"),
-      ongoing: byStatus("ongoing"),
-      ended: ended.slice(0, ENDED_DISPLAY_LIMIT),
-    };
-  }, [activities]);
+  const { data, isLoading: dataLoading } = useActivities();
+  const activities = useMemo(() => (data?.data ?? []) as ActivitySummaryType[], [data]);
+  const meta = data?.meta as { endedTruncated?: boolean } | undefined;
 
-  const isEmpty =
-    sections.upcoming.length === 0 &&
-    sections.ongoing.length === 0 &&
-    sections.ended.length === 0;
+  const filtered = useMemo(
+    () => searchActivities(activities, searchQuery, statusFilter, feeFilter),
+    [activities, searchQuery, statusFilter, feeFilter]
+  );
+
+  const handleHostClick = useCallback((userId: number) => {
+    setHostDialogUserId(userId);
+    setHostDialogOpen(true);
+  }, []);
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  const content = (
+    <ExploreContent
+      t={t}
+      isAuthenticated={isAuthenticated}
+      filtered={filtered}
+      dataLoading={dataLoading}
+      activitiesEmpty={activities.length === 0}
+      statusFilter={statusFilter}
+      feeFilter={feeFilter}
+      searchQuery={searchQuery}
+      meta={meta}
+      onStatusChange={setStatusFilter}
+      onFeeChange={setFeeFilter}
+      onSearchChange={setSearchQuery}
+      onSearchClear={() => setSearchQuery("")}
+      onHostClick={handleHostClick}
+    />
+  );
 
   return (
-    <main className="mx-auto flex w-full max-w-[640px] flex-col gap-10 px-4 pt-8 pb-18">
-      <header className="flex flex-col gap-2">
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-bg-dark">
-          <Compass className="size-6 text-logo-cyan" />
-          {t("page_title")}
-        </h1>
-        <p className="text-sm text-text-dark">{t("page_subtitle")}</p>
-      </header>
-
-      {/* 互動方式篩選 tab */}
-      <div className="flex flex-wrap items-center gap-2">
-        {MODE_FILTERS.map((key) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setModeFilter(key)}
-            className={cn(
-              "h-[30px] cursor-pointer rounded-full border px-3.5 text-sm whitespace-nowrap transition-colors",
-              modeFilter === key
-                ? "border-logo-cyan bg-logo-cyan text-white"
-                : "border-[#DCEBEA] bg-white text-text-dark/75 hover:border-logo-cyan/50"
-            )}
-          >
-            {t(`filter_${key}`)}
-          </button>
-        ))}
-      </div>
-
-      {isLoading ? (
-        <div className="flex justify-center py-16">
-          <Spinner aria-label={t("loading")} />
-        </div>
-      ) : isEmpty ? (
-        <p className="py-10 text-center text-sm text-text-dark">{t("empty")}</p>
+    <>
+      {isAuthenticated ? (
+        <>
+          <div className="md:pl-[132px]">
+            <PageHeader
+              leftAction="back"
+              onLeftAction={() => router.push("/spaces")}
+              rightActionTo="/spaces"
+              title={t("page_title")}
+            />
+            {content}
+          </div>
+          <Sidebar />
+        </>
       ) : (
         <>
-          {/* 即將開始 */}
-          {sections.upcoming.length > 0 && (
-            <section>
-              <div className="flex items-center gap-2">
-                <Sparkles className="size-4.5 text-logo-cyan" />
-                <h2 className="m-0 text-lg font-bold text-bg-dark">{t("section_open_title")}</h2>
-                <span className="text-sm text-text-dark/40">· {sections.upcoming.length}</span>
-              </div>
-              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {sections.upcoming.map((activity) => (
-                  <ActivityCard key={activity.id} activity={activity} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* 進行中 */}
-          {sections.ongoing.length > 0 && (
-            <section>
-              <div className="flex items-center gap-2">
-                <h2 className="m-0 text-lg font-bold text-bg-dark">{t("section_ongoing_title")}</h2>
-                <span className="text-sm text-text-dark/40">· {sections.ongoing.length}</span>
-              </div>
-              <p className="mt-1.5 text-sm text-text-dark/70">{t("section_ongoing_subtitle")}</p>
-              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {sections.ongoing.map((activity) => (
-                  <ActivityCard key={activity.id} activity={activity} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* 已結束 */}
-          {sections.ended.length > 0 && (
-            <section>
-              <div className="flex items-center gap-2">
-                <Archive className="size-4.5 text-text-dark/40" />
-                <h2 className="m-0 text-lg font-bold text-bg-dark">{t("section_ended_title")}</h2>
-                <span className="text-sm text-text-dark/40">· {sections.ended.length}</span>
-              </div>
-              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {sections.ended.map((activity) => (
-                  <ActivityCard key={activity.id} activity={activity} />
-                ))}
-              </div>
-              {endedTruncated && (
-                <p className="mt-4 text-center text-sm text-text-dark/50">
-                  {t("section_ended_truncated")}
-                </p>
-              )}
-            </section>
-          )}
+          <ExploreGuestHeader />
+          <div className="mx-auto max-w-[760px] px-4 pt-8 pb-6">
+            <h1 className="text-center text-2xl font-bold text-bg-dark">{t("page_title")}</h1>
+            <p className="mt-2 text-center text-sm text-text-dark/60">{t("page_subtitle")}</p>
+          </div>
+          {content}
         </>
       )}
 
-      <div className="flex flex-wrap items-center justify-center gap-2.5 rounded-[20px] border border-dashed border-[#D4E5E4] bg-white px-6 py-5.5">
-        <span className="text-[13.5px] text-text-dark/65">{t("cta_prompt")}</span>
-        <Link
-          href="/spaces"
-          className="inline-flex h-8 items-center rounded-full bg-logo-cyan px-4 text-[13px] font-semibold text-white transition-colors hover:bg-logo-cyan/90"
-        >
-          {t("cta_button")}
-        </Link>
-      </div>
+      <HostPreviewDialog
+        userId={hostDialogUserId}
+        open={hostDialogOpen}
+        onOpenChange={setHostDialogOpen}
+      />
+    </>
+  );
+}
+
+interface ExploreContentProps {
+  t: ReturnType<typeof useTranslations<"explore_activities">>;
+  isAuthenticated: boolean;
+  filtered: ActivitySummaryType[];
+  dataLoading: boolean;
+  activitiesEmpty: boolean;
+  statusFilter: ActivityStatusFilter;
+  feeFilter: ActivityFeeFilter;
+  searchQuery: string;
+  meta?: { endedTruncated?: boolean };
+  onStatusChange: (f: ActivityStatusFilter) => void;
+  onFeeChange: (f: ActivityFeeFilter) => void;
+  onSearchChange: (v: string) => void;
+  onSearchClear: () => void;
+  onHostClick: (userId: number) => void;
+}
+
+function ExploreContent({
+  t,
+  isAuthenticated,
+  filtered,
+  dataLoading,
+  activitiesEmpty,
+  statusFilter,
+  feeFilter,
+  searchQuery,
+  meta,
+  onStatusChange,
+  onFeeChange,
+  onSearchChange,
+  onSearchClear,
+  onHostClick,
+}: ExploreContentProps) {
+  return (
+    <main className="mx-auto flex w-full max-w-[760px] flex-col gap-6 px-4 pt-6 pb-20">
+      <ExploreSearch value={searchQuery} onChange={onSearchChange} onClear={onSearchClear} />
+
+      <ExploreFilters
+        statusFilter={statusFilter}
+        onStatusChange={onStatusChange}
+        feeFilter={feeFilter}
+        onFeeChange={onFeeChange}
+      />
+
+      {dataLoading ? (
+        <div className="flex justify-center py-16">
+          <Spinner aria-label={t("loading")} />
+        </div>
+      ) : (
+        <>
+          <div className="flex items-baseline gap-2">
+            <h2 className="text-[17px] font-bold text-text-dark">
+              {t(SECTION_TITLE_KEY[statusFilter])}
+            </h2>
+            <span className="text-[13px] text-text-dark/45">{filtered.length}</span>
+          </div>
+
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 rounded-[20px] border border-dashed border-[#D4E5E4] bg-white px-6 py-12">
+              <p className="text-sm font-medium text-text-dark/70">
+                {activitiesEmpty ? t("empty_no_data") : t("empty_title")}
+              </p>
+              {!activitiesEmpty && (
+                <p className="text-[13px] text-text-dark/50">{t("empty_hint")}</p>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {filtered.map((activity) => (
+                  <ActivityCard
+                    key={activity.id}
+                    activity={activity}
+                    onHostClick={activity.host.userId ? onHostClick : undefined}
+                  />
+                ))}
+              </div>
+
+              {statusFilter === "ended" && meta?.endedTruncated && (
+                <p className="text-center text-sm text-text-dark/50">{t("ended_truncated")}</p>
+              )}
+            </>
+          )}
+
+          <BottomCta t={t} isAuthenticated={isAuthenticated} />
+        </>
+      )}
     </main>
+  );
+}
+
+function BottomCta({
+  t,
+  isAuthenticated,
+}: {
+  t: ReturnType<typeof useTranslations<"explore_activities">>;
+  isAuthenticated: boolean;
+}) {
+  const { data: orgs } = useLighthouseOrganizations();
+  const hasLighthouseOrg = (orgs?.data ?? []).length > 0;
+
+  const ctaHref = isAuthenticated
+    ? hasLighthouseOrg
+      ? "/lighthouse/programs"
+      : "/spaces"
+    : "/auth/login?redirect=/activities";
+
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2.5 rounded-[20px] border border-dashed border-[#D4E5E4] bg-white px-6 py-5.5">
+      <span className="text-[13.5px] text-text-dark/65">
+        {isAuthenticated ? t("cta_user_prompt") : t("cta_guest_prompt")}
+      </span>
+      <Link
+        href={ctaHref}
+        className="inline-flex h-8 items-center rounded-full bg-logo-cyan px-4 text-[13px] font-semibold text-white transition-colors hover:bg-logo-cyan/90"
+      >
+        {isAuthenticated ? t("cta_user_button") : t("cta_guest_button")}
+      </Link>
+    </div>
   );
 }
