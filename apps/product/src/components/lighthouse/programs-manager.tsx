@@ -69,18 +69,21 @@ interface CohortSetupPanelProps {
   programId: number;
   organizationId: number;
   templates?: CohortTemplateSummary[];
-  onSubmit: (formData: FormData, extras: {
-    interactionModes: string[];
-    sessions: SessionEntry[];
-    feeType: "free" | "paid";
-    signupMethod: "island_form" | "external";
-    isPrivate: boolean;
-    checkinDefaultPrivate: boolean;
-    hostCommentDefaultPrivate: boolean;
-    visibility: "public" | "private";
-    selectedTemplateIds?: number[];
-    publishNow?: boolean;
-  }) => Promise<void>;
+  onSubmit: (
+    formData: FormData,
+    extras: {
+      interactionModes: string[];
+      sessions: SessionEntry[];
+      feeType: "free" | "paid";
+      signupMethod: "island_form" | "external";
+      isPrivate: boolean;
+      checkinDefaultPrivate: boolean;
+      hostCommentDefaultPrivate: boolean;
+      visibility: "public" | "private";
+      selectedTemplateIds?: number[];
+      publishNow?: boolean;
+    }
+  ) => Promise<void>;
   onClose: () => void;
   busy: boolean;
 }
@@ -89,7 +92,7 @@ function CohortSetupPanel({
   mode,
   cohort,
   programId,
-  organizationId,
+  organizationId: _organizationId,
   templates,
   onSubmit,
   onClose,
@@ -125,8 +128,12 @@ function CohortSetupPanel({
   const [capacityUnlimited, setCapacityUnlimited] = useState(!cohort?.capacity);
   const [interactionDropdownOpen, setInteractionDropdownOpen] = useState(false);
   const [templateSearch, setTemplateSearch] = useState("");
-  const [visibility, setVisibility] = useState<"public" | "private">(cohort?.visibility ?? "private");
-  const [showInviteOnSignup, setShowInviteOnSignup] = useState(cohort?.showInviteMessageOnSignup ?? false);
+  const [visibility, setVisibility] = useState<"public" | "private">(
+    cohort?.visibility ?? "private"
+  );
+  const [showInviteOnSignup, setShowInviteOnSignup] = useState(
+    cohort?.showInviteMessageOnSignup ?? false
+  );
 
   useEffect(() => {
     panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -137,7 +144,12 @@ function CohortSetupPanel({
       const last = prev[prev.length - 1];
       return [
         ...prev,
-        { id: `new-${Date.now()}`, sessionDate: "", startTime: last?.startTime ?? "", endTime: last?.endTime ?? "" },
+        {
+          id: `new-${Date.now()}`,
+          sessionDate: "",
+          startTime: last?.startTime ?? "",
+          endTime: last?.endTime ?? "",
+        },
       ];
     });
   }, []);
@@ -148,9 +160,7 @@ function CohortSetupPanel({
     setSessions((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
   }, []);
   const toggleInteractionMode = useCallback((m: string) => {
-    setInteractionModes((prev) =>
-      prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]
-    );
+    setInteractionModes((prev) => (prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]));
   }, []);
 
   function handleIsPrivateChange(checked: boolean) {
@@ -161,9 +171,9 @@ function CohortSetupPanel({
     }
   }
 
-  const filteredTemplates = templates?.filter((tpl) =>
-    tpl.title.toLowerCase().includes(templateSearch.toLowerCase())
-  ) ?? [];
+  const filteredTemplates =
+    templates?.filter((tpl) => tpl.title.toLowerCase().includes(templateSearch.toLowerCase())) ??
+    [];
 
   async function handleFormAction(formData: FormData) {
     await onSubmit(formData, {
@@ -237,12 +247,23 @@ function CohortSetupPanel({
         <div className="grid gap-4 md:grid-cols-2">
           <label htmlFor={`${prefix}-name`} className="grid gap-1.5 text-sm font-medium">
             {t("cohort_display_name")}
-            <Input id={`${prefix}-name`} name="displayName" required defaultValue={cohort?.displayName ?? ""} />
+            <Input
+              id={`${prefix}-name`}
+              name="displayName"
+              required
+              defaultValue={cohort?.displayName ?? ""}
+            />
           </label>
           {mode === "create" && (
             <label htmlFor={`${prefix}-slug`} className="grid gap-1.5 text-sm font-medium">
               {t("cohort_slug")}
-              <Input id={`${prefix}-slug`} name="slug" required pattern="[a-z0-9-]+" placeholder="2026-summer" />
+              <Input
+                id={`${prefix}-slug`}
+                name="slug"
+                required
+                pattern="[a-z0-9-]+"
+                placeholder="2026-summer"
+              />
             </label>
           )}
           <div className="grid gap-1.5 text-sm font-medium md:col-span-2">
@@ -257,22 +278,41 @@ function CohortSetupPanel({
             />
             <div className="flex items-center justify-between">
               <p className="text-xs text-[#78928F]">{t("cohort_tagline_description")}</p>
-              <p className={`text-xs ${taglineValue.length > 80 ? "text-[#C03A3A] font-medium" : "text-[#78928F]"}`}>
+              <p
+                className={`text-xs ${taglineValue.length > 80 ? "text-[#C03A3A] font-medium" : "text-[#78928F]"}`}
+              >
                 {taglineValue.length} / 80
               </p>
             </div>
           </div>
           <label htmlFor={`${prefix}-start`} className="grid gap-1.5 text-sm font-medium">
             {t("start_date")}
-            <Input id={`${prefix}-start`} name="startDate" type="date" required defaultValue={cohort?.startDate?.slice(0, 10) ?? ""} />
+            <Input
+              id={`${prefix}-start`}
+              name="startDate"
+              type="date"
+              required
+              defaultValue={cohort?.startDate?.slice(0, 10) ?? ""}
+            />
           </label>
           <label htmlFor={`${prefix}-end`} className="grid gap-1.5 text-sm font-medium">
             {t("end_date")}
-            <Input id={`${prefix}-end`} name="endDate" type="date" required defaultValue={cohort?.endDate?.slice(0, 10) ?? ""} />
+            <Input
+              id={`${prefix}-end`}
+              name="endDate"
+              type="date"
+              required
+              defaultValue={cohort?.endDate?.slice(0, 10) ?? ""}
+            />
           </label>
           <label htmlFor={`${prefix}-deadline`} className="grid gap-1.5 text-sm font-medium">
             {t("join_deadline")}
-            <Input id={`${prefix}-deadline`} name="joinDeadline" type="date" defaultValue={cohort?.joinDeadline?.slice(0, 10) ?? ""} />
+            <Input
+              id={`${prefix}-deadline`}
+              name="joinDeadline"
+              type="date"
+              defaultValue={cohort?.joinDeadline?.slice(0, 10) ?? ""}
+            />
           </label>
           <div className="grid gap-1.5 text-sm font-medium">
             <label htmlFor={`${prefix}-capacity`}>{t("capacity")}</label>
@@ -314,7 +354,9 @@ function CohortSetupPanel({
                   ? interactionModes.map((m) => t(`cohort_interaction_mode_${m}`)).join("、")
                   : t("cohort_interaction_modes_placeholder")}
               </span>
-              <ChevronDown className={`size-4 text-[#78928F] transition-transform ${interactionDropdownOpen ? "rotate-180" : ""}`} />
+              <ChevronDown
+                className={`size-4 text-[#78928F] transition-transform ${interactionDropdownOpen ? "rotate-180" : ""}`}
+              />
             </button>
             {interactionDropdownOpen && (
               <div className="absolute left-0 right-0 top-full z-10 mt-1 overflow-hidden rounded-xl border border-[#CDEBE8] bg-white shadow-lg">
@@ -333,7 +375,9 @@ function CohortSetupPanel({
                     />
                     <div>
                       <p className="text-sm font-medium">{t(`cohort_interaction_mode_${mode}`)}</p>
-                      <p className="text-xs text-[#78928F]">{t(`cohort_interaction_mode_${mode}_desc`)}</p>
+                      <p className="text-xs text-[#78928F]">
+                        {t(`cohort_interaction_mode_${mode}_desc`)}
+                      </p>
                     </div>
                   </label>
                 ))}
@@ -344,49 +388,88 @@ function CohortSetupPanel({
           {interactionModes.includes("sync") && (
             <label htmlFor={`${prefix}-meeting`} className="grid gap-1.5 text-sm font-medium">
               {t("cohort_meeting_url")}
-              <Input id={`${prefix}-meeting`} name="meetingUrl" type="url" placeholder={t("cohort_meeting_url_placeholder")} defaultValue={cohort?.meetingUrl ?? ""} />
+              <Input
+                id={`${prefix}-meeting`}
+                name="meetingUrl"
+                type="url"
+                placeholder={t("cohort_meeting_url_placeholder")}
+                defaultValue={cohort?.meetingUrl ?? ""}
+              />
             </label>
           )}
           {interactionModes.includes("physical") && (
             <label htmlFor={`${prefix}-location`} className="grid gap-1.5 text-sm font-medium">
               {t("cohort_location")}
-              <Input id={`${prefix}-location`} name="location" placeholder={t("cohort_location_placeholder")} defaultValue={cohort?.location ?? ""} />
+              <Input
+                id={`${prefix}-location`}
+                name="location"
+                placeholder={t("cohort_location_placeholder")}
+                defaultValue={cohort?.location ?? ""}
+              />
             </label>
           )}
 
           {/* 聚會時段 */}
           {(interactionModes.includes("sync") || interactionModes.includes("physical")) && (
-          <fieldset className="md:col-span-2">
-            <legend className="text-sm font-medium">{t("cohort_sessions_title")}</legend>
-            <div className="mt-2 grid gap-2">
-              {sessions.map((session) => (
-                <div key={session.id} className="flex flex-wrap items-end gap-2">
-                  {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
-                  <label className="grid gap-1 text-xs">
-                    {t("cohort_session_date")}
-                    <Input type="date" className="h-9 w-[140px] text-xs" value={session.sessionDate} onChange={(e) => updateSession(session.id, "sessionDate", e.target.value)} />
-                  </label>
-                  {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
-                  <label className="grid gap-1 text-xs">
-                    {t("cohort_session_start_time")}
-                    <Input type="time" className="h-9 w-[110px] text-xs" value={session.startTime} onChange={(e) => updateSession(session.id, "startTime", e.target.value)} />
-                  </label>
-                  {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
-                  <label className="grid gap-1 text-xs">
-                    {t("cohort_session_end_time")}
-                    <Input type="time" className="h-9 w-[110px] text-xs" value={session.endTime} onChange={(e) => updateSession(session.id, "endTime", e.target.value)} />
-                  </label>
-                  <Button type="button" variant="ghost" size="icon" className="size-9 text-[#C03A3A]" onClick={() => removeSession(session.id)} aria-label={t("cohort_session_remove")}>
-                    <Minus className="size-4" />
-                  </Button>
-                </div>
-              ))}
-              <Button type="button" variant="outline" size="sm" className="w-fit border-[#CDEBE8]" onClick={addSession}>
-                <Plus className="size-4" />
-                {t("cohort_session_add")}
-              </Button>
-            </div>
-          </fieldset>
+            <fieldset className="md:col-span-2">
+              <legend className="text-sm font-medium">{t("cohort_sessions_title")}</legend>
+              <div className="mt-2 grid gap-2">
+                {sessions.map((session) => (
+                  <div key={session.id} className="flex flex-wrap items-end gap-2">
+                    {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                    <label className="grid gap-1 text-xs">
+                      {t("cohort_session_date")}
+                      <Input
+                        type="date"
+                        className="h-9 w-[140px] text-xs"
+                        value={session.sessionDate}
+                        onChange={(e) => updateSession(session.id, "sessionDate", e.target.value)}
+                      />
+                    </label>
+                    {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                    <label className="grid gap-1 text-xs">
+                      {t("cohort_session_start_time")}
+                      <Input
+                        type="time"
+                        className="h-9 w-[110px] text-xs"
+                        value={session.startTime}
+                        onChange={(e) => updateSession(session.id, "startTime", e.target.value)}
+                      />
+                    </label>
+                    {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                    <label className="grid gap-1 text-xs">
+                      {t("cohort_session_end_time")}
+                      <Input
+                        type="time"
+                        className="h-9 w-[110px] text-xs"
+                        value={session.endTime}
+                        onChange={(e) => updateSession(session.id, "endTime", e.target.value)}
+                      />
+                    </label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-9 text-[#C03A3A]"
+                      onClick={() => removeSession(session.id)}
+                      aria-label={t("cohort_session_remove")}
+                    >
+                      <Minus className="size-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-fit border-[#CDEBE8]"
+                  onClick={addSession}
+                >
+                  <Plus className="size-4" />
+                  {t("cohort_session_add")}
+                </Button>
+              </div>
+            </fieldset>
           )}
 
           {/* 費用設定 */}
@@ -403,13 +486,27 @@ function CohortSetupPanel({
               </select>
               {feeType === "paid" && (
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
                   <label className="grid gap-1.5 text-sm font-medium">
                     {t("cohort_fee_amount")} (NT$/人)
-                    <Input name="feeAmount" type="number" min={0} required defaultValue={cohort?.feeAmount ?? ""} />
+                    <Input
+                      name="feeAmount"
+                      type="number"
+                      min={0}
+                      required
+                      defaultValue={cohort?.feeAmount ?? ""}
+                    />
                   </label>
+                  {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
                   <label className="grid gap-1.5 text-sm font-medium">
                     {t("cohort_external_signup_url_label")}
-                    <Input name="externalSignupUrl" type="url" required placeholder="https://" defaultValue={cohort?.externalSignupUrl ?? ""} />
+                    <Input
+                      name="externalSignupUrl"
+                      type="url"
+                      required
+                      placeholder="https://"
+                      defaultValue={cohort?.externalSignupUrl ?? ""}
+                    />
                   </label>
                 </div>
               )}
@@ -424,7 +521,13 @@ function CohortSetupPanel({
                     <option value="external">{t("cohort_signup_method_external")}</option>
                   </select>
                   {signupMethod === "external" && (
-                    <Input name="externalSignupUrl" type="url" required placeholder="https://" defaultValue={cohort?.externalSignupUrl ?? ""} />
+                    <Input
+                      name="externalSignupUrl"
+                      type="url"
+                      required
+                      placeholder="https://"
+                      defaultValue={cohort?.externalSignupUrl ?? ""}
+                    />
                   )}
                 </div>
               )}
@@ -440,7 +543,9 @@ function CohortSetupPanel({
             <p className="text-sm font-medium">{t("cohort_select_templates")}</p>
             <p className="mt-0.5 text-xs text-[#78928F]">{t("cohort_select_templates_hint")}</p>
           </div>
-          <p className="text-xs text-[#78928F]">{t("cohort_templates_linked_count", { count: selectedTemplatesRef.current.size })}</p>
+          <p className="text-xs text-[#78928F]">
+            {t("cohort_templates_linked_count", { count: selectedTemplatesRef.current.size })}
+          </p>
         </div>
         {templates && templates.length > 0 ? (
           <>
@@ -458,7 +563,10 @@ function CohortSetupPanel({
                 {filteredTemplates.map((tpl) => {
                   const bound = cohort ? tpl.boundCohortIds.includes(cohort.id) : true;
                   return (
-                    <label key={tpl.id} className="flex items-center gap-3 rounded-xl border border-[#DDEFED] px-4 py-3 text-sm">
+                    <label
+                      key={tpl.id}
+                      className="flex items-center gap-3 rounded-xl border border-[#DDEFED] px-4 py-3 text-sm"
+                    >
                       <input
                         type="checkbox"
                         defaultChecked={bound}
@@ -477,11 +585,15 @@ function CohortSetupPanel({
                 })}
               </div>
             ) : (
-              <p className="py-8 text-center text-sm text-[#5A7B79]">{t("cohort_templates_search_empty")}</p>
+              <p className="py-8 text-center text-sm text-[#5A7B79]">
+                {t("cohort_templates_search_empty")}
+              </p>
             )}
           </>
         ) : (
-          <p className="py-8 text-center text-sm text-[#5A7B79]">{t("cohort_no_templates_available")}</p>
+          <p className="py-8 text-center text-sm text-[#5A7B79]">
+            {t("cohort_no_templates_available")}
+          </p>
         )}
       </div>
 
@@ -496,7 +608,10 @@ function CohortSetupPanel({
       <div className={activeTab !== "privacy" ? "hidden" : ""} role="tabpanel">
         <p className="mb-1 text-sm font-medium">{t("cohort_privacy_title")}</p>
         <p className="mb-3 text-xs text-[#78928F]">{t("cohort_privacy_description")}</p>
-        <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+        <div
+          className="grid gap-3"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}
+        >
           <div className="rounded-xl border border-[#DDEFED] p-4">
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-medium">{t("cohort_is_private")}</p>
@@ -504,28 +619,47 @@ function CohortSetupPanel({
             </div>
             <p className="mt-1 text-xs text-[#78928F]">{t("cohort_is_private_hint")}</p>
           </div>
-          <div className={`rounded-xl border border-[#DDEFED] p-4 transition-opacity ${!isPrivate ? "opacity-50" : ""}`}>
+          <div
+            className={`rounded-xl border border-[#DDEFED] p-4 transition-opacity ${!isPrivate ? "opacity-50" : ""}`}
+          >
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-medium">{t("cohort_checkin_default_private")}</p>
-              <Switch checked={checkinPrivate} onCheckedChange={setCheckinPrivate} disabled={!isPrivate} />
+              <Switch
+                checked={checkinPrivate}
+                onCheckedChange={setCheckinPrivate}
+                disabled={!isPrivate}
+              />
             </div>
             <p className="mt-1 text-xs text-[#78928F]">
-              {isPrivate ? t("cohort_checkin_default_private_hint") : t("cohort_privacy_disabled_hint")}
+              {isPrivate
+                ? t("cohort_checkin_default_private_hint")
+                : t("cohort_privacy_disabled_hint")}
             </p>
           </div>
-          <div className={`rounded-xl border border-[#DDEFED] p-4 transition-opacity ${!isPrivate ? "opacity-50" : ""}`}>
+          <div
+            className={`rounded-xl border border-[#DDEFED] p-4 transition-opacity ${!isPrivate ? "opacity-50" : ""}`}
+          >
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-medium">{t("cohort_host_comment_default_private")}</p>
-              <Switch checked={hostCommentPrivate} onCheckedChange={setHostCommentPrivate} disabled={!isPrivate} />
+              <Switch
+                checked={hostCommentPrivate}
+                onCheckedChange={setHostCommentPrivate}
+                disabled={!isPrivate}
+              />
             </div>
             <p className="mt-1 text-xs text-[#78928F]">
-              {isPrivate ? t("cohort_host_comment_default_private_hint") : t("cohort_privacy_disabled_hint")}
+              {isPrivate
+                ? t("cohort_host_comment_default_private_hint")
+                : t("cohort_privacy_disabled_hint")}
             </p>
           </div>
           <div className="rounded-xl border border-[#DDEFED] p-4">
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-medium">{t("cohort_visibility_public")}</p>
-              <Switch checked={visibility === "public"} onCheckedChange={(checked) => setVisibility(checked ? "public" : "private")} />
+              <Switch
+                checked={visibility === "public"}
+                onCheckedChange={(checked) => setVisibility(checked ? "public" : "private")}
+              />
             </div>
             <p className="mt-1 text-xs text-[#78928F]">{t("cohort_visibility_hint")}</p>
           </div>
@@ -551,7 +685,11 @@ function CohortSetupPanel({
             name="inviteMessage"
             rows={3}
             disabled={!showInviteOnSignup}
-            placeholder={showInviteOnSignup ? t("cohort_invite_message_placeholder") : t("cohort_invite_message_disabled_placeholder")}
+            placeholder={
+              showInviteOnSignup
+                ? t("cohort_invite_message_placeholder")
+                : t("cohort_invite_message_disabled_placeholder")
+            }
             defaultValue={cohort?.inviteMessage ?? ""}
           />
         </label>
@@ -566,10 +704,10 @@ function CohortSetupPanel({
       {/* Bottom action bar */}
       <div className="mt-5 flex items-center justify-end gap-3">
         {mode === "create" && (
-          <label className="flex items-center gap-2 text-sm">
+          <span className="flex items-center gap-2 text-sm">
             <Switch checked={publishNow} onCheckedChange={setPublishNow} />
             {t("publish_now")}
-          </label>
+          </span>
         )}
         <Button type="submit" disabled={busy}>
           {mode === "create" ? t("cohort_create") : t("save")}
@@ -676,11 +814,18 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
         location: String(formData.get("location") ?? "").trim() || null,
         sessions: extras.sessions
           .filter((s) => s.sessionDate)
-          .map((s) => ({ sessionDate: s.sessionDate, startTime: s.startTime || null, endTime: s.endTime || null })),
+          .map((s) => ({
+            sessionDate: s.sessionDate,
+            startTime: s.startTime || null,
+            endTime: s.endTime || null,
+          })),
         feeType: extras.feeType,
         feeAmount: extras.feeType === "paid" && feeAmountValue ? Number(feeAmountValue) : null,
         signupMethod: extras.signupMethod,
-        externalSignupUrl: extras.signupMethod === "external" || extras.feeType === "paid" ? externalUrl || null : null,
+        externalSignupUrl:
+          extras.signupMethod === "external" || extras.feeType === "paid"
+            ? externalUrl || null
+            : null,
         showInviteMessageOnSignup: formData.get("showInviteMessageOnSignup") === "on",
         isPrivate: extras.isPrivate,
         checkinDefaultPrivate: extras.checkinDefaultPrivate,
@@ -940,11 +1085,18 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         location: String(formData.get("location") ?? "").trim() || undefined,
         sessions: extras.sessions
           .filter((s) => s.sessionDate)
-          .map((s) => ({ sessionDate: s.sessionDate, startTime: s.startTime || undefined, endTime: s.endTime || undefined })),
+          .map((s) => ({
+            sessionDate: s.sessionDate,
+            startTime: s.startTime || undefined,
+            endTime: s.endTime || undefined,
+          })),
         feeType: extras.feeType,
         feeAmount: extras.feeType === "paid" && feeAmountValue ? Number(feeAmountValue) : undefined,
         signupMethod: extras.signupMethod,
-        externalSignupUrl: extras.signupMethod === "external" || extras.feeType === "paid" ? externalUrl || undefined : undefined,
+        externalSignupUrl:
+          extras.signupMethod === "external" || extras.feeType === "paid"
+            ? externalUrl || undefined
+            : undefined,
         showInviteMessageOnSignup: formData.get("showInviteMessageOnSignup") === "on",
         isPrivate: extras.isPrivate,
         checkinDefaultPrivate: extras.checkinDefaultPrivate,
