@@ -5,6 +5,8 @@ import {
   archiveLighthouseProgram,
   createLighthouseCohort,
   createLighthouseProgram,
+  duplicateLighthouseCohort,
+  duplicateLighthouseProgram,
   type LighthouseCohortType,
   setLighthouseTemplateBinding,
   updateLighthouseCohort,
@@ -17,6 +19,12 @@ import {
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@daodao/ui/components/dropdown-menu";
 import { Input } from "@daodao/ui/components/input";
 import { toast } from "@daodao/ui/components/sonner";
 import { Switch } from "@daodao/ui/components/switch";
@@ -26,8 +34,10 @@ import {
   Archive,
   ArrowUpRight,
   CalendarDays,
-  Globe,
+  Copy,
   Minus,
+  MoreVertical,
+  Pencil,
   Plus,
   RadioTower,
   Send,
@@ -79,7 +89,9 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
     cohort.signupMethod ?? "island_form"
   );
   const [editIsPrivate, setEditIsPrivate] = useState(cohort.isPrivate ?? false);
-  const [editCheckinPrivate, setEditCheckinPrivate] = useState(cohort.checkinDefaultPrivate ?? false);
+  const [editCheckinPrivate, setEditCheckinPrivate] = useState(
+    cohort.checkinDefaultPrivate ?? false
+  );
   const [editHostCommentPrivate, setEditHostCommentPrivate] = useState(
     cohort.hostCommentDefaultPrivate ?? false
   );
@@ -93,14 +105,9 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
   const removeEditSession = useCallback((id: string) => {
     setEditSessions((prev) => prev.filter((s) => s.id !== id));
   }, []);
-  const updateEditSession = useCallback(
-    (id: string, field: keyof SessionEntry, value: string) => {
-      setEditSessions((prev) =>
-        prev.map((s) => (s.id === id ? { ...s, [field]: value } : s))
-      );
-    },
-    []
-  );
+  const updateEditSession = useCallback((id: string, field: keyof SessionEntry, value: string) => {
+    setEditSessions((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
+  }, []);
   const toggleEditInteractionMode = useCallback((mode: string) => {
     setEditInteractionModes((prev) =>
       prev.includes(mode) ? prev.filter((m) => m !== mode) : [...prev, mode]
@@ -135,6 +142,18 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
     }
     await refresh();
     toast.success(t("cohort_archived"));
+  }
+
+  async function handleDuplicate() {
+    setBusy(true);
+    const response = await duplicateLighthouseCohort(programId, cohort.id);
+    setBusy(false);
+    if (response.error) {
+      toast.error(t("cohort_duplicate_failed"));
+      return;
+    }
+    toast.success(t("cohort_duplicated", { name: response.data.data.displayName }));
+    await refresh();
   }
 
   async function handleEdit(formData: FormData) {
@@ -182,10 +201,7 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
       feeType: editFeeType,
       feeAmount: editFeeType === "paid" && feeAmountValue ? Number(feeAmountValue) : null,
       signupMethod: editSignupMethod,
-      externalSignupUrl:
-        editSignupMethod === "external"
-          ? externalSignupUrlValue || null
-          : null,
+      externalSignupUrl: editSignupMethod === "external" ? externalSignupUrlValue || null : null,
       showInviteMessageOnSignup: formData.get("showInviteMessageOnSignup") === "on",
       isPrivate: editIsPrivate,
       checkinDefaultPrivate: editCheckinPrivate,
@@ -549,7 +565,7 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
   return (
     <div
       id={`cohort-${cohort.id}`}
-      className="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-center"
+      className="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-start"
     >
       <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
         <CalendarDays className="size-5" />
@@ -562,12 +578,6 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
           >
             {t(`cohort_status_${cohort.status}`)}
           </span>
-          {cohort.visibility === "public" && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#E7FAF7] px-2.5 py-1 text-[10px] font-semibold text-[#0D7773]">
-              <Globe className="size-3" />
-              {t("cohort_visibility_badge")}
-            </span>
-          )}
           {missingTemplates && (
             <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF6E8] px-2.5 py-1 text-[10px] font-semibold text-[#A95D00]">
               <AlertTriangle className="size-3" />
@@ -576,35 +586,95 @@ function CohortCard({ programId, cohort, templates, refresh }: CohortCardProps) 
           )}
         </div>
         <p className="mt-1 text-xs text-[#78928F]">
-          {cohort.startDate.slice(0, 10)} — {cohort.endDate.slice(0, 10)} · /{cohort.slug}
+          {cohort.startDate.slice(0, 10)} — {cohort.endDate.slice(0, 10)} · /{cohort.slug} ·{" "}
+          {cohort.isPrivate ? t("cohort_info_private") : t("cohort_info_public_activity")} ·{" "}
+          {cohort.feeType === "paid"
+            ? t("cohort_info_fee_paid", { amount: cohort.feeAmount ?? 0 })
+            : t("cohort_info_fee_free")}
         </p>
-        {cohort.joinToken && <JoinCode joinToken={cohort.joinToken} />}
+        {cohort.joinToken && (
+          <div className="mt-2">
+            <JoinCode joinToken={cohort.joinToken} />
+            {cohort.status === "published" && (
+              <CustomLink
+                href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/roster`}
+                className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#CDEBE8] px-3 py-1.5 text-xs font-medium text-[#0D5B59] hover:bg-[#EDF8F6]"
+              >
+                <Send className="size-3.5" aria-hidden="true" />
+                {t("cohort_invite_by_email")}
+              </CustomLink>
+            )}
+          </div>
+        )}
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex shrink-0 items-center gap-1">
         {cohort.status === "draft" && (
-          <Button size="sm" onClick={handlePublish} disabled={busy}>
-            <Send className="size-4" />
-            {t("cohort_publish")}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8"
+            onClick={handlePublish}
+            disabled={busy}
+            aria-label={t("cohort_publish")}
+            title={t("cohort_publish")}
+          >
+            <Send className="size-4" aria-hidden="true" />
           </Button>
         )}
         {cohort.status !== "archived" && (
-          <Button variant="outline" size="sm" onClick={() => setEditing(true)} disabled={busy}>
-            {t("edit")}
-          </Button>
-        )}
-        {cohort.status === "published" && (
-          <Button variant="ghost" size="sm" onClick={handleArchive} disabled={busy}>
-            <Archive className="size-4" />
-            {t("archive")}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8"
+            onClick={() => setEditing(true)}
+            disabled={busy}
+            aria-label={t("edit")}
+            title={t("edit")}
+          >
+            <Pencil className="size-4" aria-hidden="true" />
           </Button>
         )}
         <CustomLink
           href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/dashboard`}
-          className="inline-flex items-center gap-1 text-sm font-semibold text-[#0D7773]"
+          className="grid size-8 place-items-center rounded-full text-[#0D7773] hover:bg-[#EDF8F6]"
+          aria-label={t("manage_cohort")}
+          title={t("manage_cohort")}
         >
-          {t("manage_cohort")}
-          <ArrowUpRight className="size-4" />
+          <ArrowUpRight className="size-4" aria-hidden="true" />
         </CustomLink>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              aria-label={t("cohort_actions")}
+              title={t("cohort_actions")}
+              disabled={busy}
+            >
+              <MoreVertical className="size-4" aria-hidden="true" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-36 rounded-xl border-[#CDEBE8]">
+            <DropdownMenuItem onClick={handleDuplicate} disabled={busy} className="gap-2">
+              <Copy className="size-4" aria-hidden="true" />
+              {t("cohort_duplicate")}
+            </DropdownMenuItem>
+            {cohort.status !== "archived" && (
+              <DropdownMenuItem
+                onClick={handleArchive}
+                disabled={busy}
+                className="gap-2 text-[#C03A3A]"
+              >
+                <Archive className="size-4" aria-hidden="true" />
+                {t("archive")}
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
@@ -652,9 +722,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
   }, []);
   const updateCreateSession = useCallback(
     (id: string, field: keyof SessionEntry, value: string) => {
-      setCreateSessions((prev) =>
-        prev.map((s) => (s.id === id ? { ...s, [field]: value } : s))
-      );
+      setCreateSessions((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
     },
     []
   );
@@ -697,6 +765,18 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
     }
     await refreshPrograms();
     toast.success(t("program_archived"));
+  }
+
+  async function handleProgramDuplicate() {
+    setBusy(true);
+    const response = await duplicateLighthouseProgram(program.id);
+    setBusy(false);
+    if (response.error) {
+      toast.error(t("program_duplicate_failed"));
+      return;
+    }
+    toast.success(t("program_duplicated"));
+    await refreshPrograms();
   }
 
   async function handleCohortCreate(formData: FormData) {
@@ -747,9 +827,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       feeAmount: createFeeType === "paid" && feeAmountValue ? Number(feeAmountValue) : undefined,
       signupMethod: createSignupMethod,
       externalSignupUrl:
-        createSignupMethod === "external"
-          ? externalSignupUrlValue || undefined
-          : undefined,
+        createSignupMethod === "external" ? externalSignupUrlValue || undefined : undefined,
       showInviteMessageOnSignup: formData.get("showInviteMessageOnSignup") === "on",
       isPrivate: createIsPrivate,
       checkinDefaultPrivate: createCheckinPrivate,
@@ -819,14 +897,43 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
           </div>
         )}
         {!editing && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
               {t("edit")}
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleArchive} disabled={busy}>
-              <Archive className="size-4" />
-              {t("archive")}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-8"
+                  aria-label={t("cohort_actions")}
+                  title={t("cohort_actions")}
+                  disabled={busy}
+                >
+                  <MoreVertical className="size-4" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-36 rounded-xl border-[#CDEBE8]">
+                <DropdownMenuItem
+                  onClick={handleProgramDuplicate}
+                  disabled={busy}
+                  className="gap-2"
+                >
+                  <Copy className="size-4" aria-hidden="true" />
+                  {t("program_duplicate")}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleArchive}
+                  disabled={busy}
+                  className="gap-2 text-[#C03A3A]"
+                >
+                  <Archive className="size-4" aria-hidden="true" />
+                  {t("archive")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
       </div>
@@ -985,9 +1092,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
                         type="time"
                         className="h-9 w-[110px] text-xs"
                         value={session.endTime}
-                        onChange={(e) =>
-                          updateCreateSession(session.id, "endTime", e.target.value)
-                        }
+                        onChange={(e) => updateCreateSession(session.id, "endTime", e.target.value)}
                       />
                     </label>
                     <Button
