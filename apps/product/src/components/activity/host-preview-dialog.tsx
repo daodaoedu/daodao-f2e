@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { Spinner } from "@daodao/ui/components/spinner";
-import { CalendarDays, ExternalLink, MessageCircle, X } from "lucide-react";
+import { ExternalLink, MessageCircle, X } from "lucide-react";
 
 interface HostPreviewDialogProps {
   userId: number | null;

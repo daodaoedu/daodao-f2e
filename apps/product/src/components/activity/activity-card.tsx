@@ -135,12 +135,11 @@ export const ActivityCard = ({ activity, onHostClick }: ActivityCardProps) => {
             {onHostClick && activity.host.userId ? (
               <button
                 type="button"
-                role="button"
                 className="cursor-pointer text-text-dark/70 underline-offset-2 hover:underline"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  onHostClick(activity.host.userId!);
+                  if (activity.host.userId) onHostClick(activity.host.userId);
                 }}
               >
                 {activity.host.name}
