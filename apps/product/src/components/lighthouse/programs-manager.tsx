@@ -34,6 +34,7 @@ import {
   Archive,
   ArrowUpRight,
   CalendarDays,
+  ChevronDown,
   Copy,
   Minus,
   MoreVertical,
@@ -118,16 +119,22 @@ function CohortSetupPanel({
     cohort?.hostCommentDefaultPrivate ?? false
   );
   const [publishNow, setPublishNow] = useState(false);
+  const [taglineValue, setTaglineValue] = useState(cohort?.tagline ?? "");
+  const [capacityUnlimited, setCapacityUnlimited] = useState(!cohort?.capacity);
+  const [interactionDropdownOpen, setInteractionDropdownOpen] = useState(false);
 
   useEffect(() => {
     panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
   const addSession = useCallback(() => {
-    setSessions((prev) => [
-      ...prev,
-      { id: `new-${Date.now()}`, sessionDate: "", startTime: "", endTime: "" },
-    ]);
+    setSessions((prev) => {
+      const last = prev[prev.length - 1];
+      return [
+        ...prev,
+        { id: `new-${Date.now()}`, sessionDate: "", startTime: last?.startTime ?? "", endTime: last?.endTime ?? "" },
+      ];
+    });
   }, []);
   const removeSession = useCallback((id: string) => {
     setSessions((prev) => prev.filter((s) => s.id !== id));
@@ -220,10 +227,23 @@ function CohortSetupPanel({
               <Input id={`${prefix}-slug`} name="slug" required pattern="[a-z0-9-]+" placeholder="2026-summer" />
             </label>
           )}
-          <label htmlFor={`${prefix}-tagline`} className="grid gap-1.5 text-sm font-medium md:col-span-2">
-            {t("cohort_tagline")}
-            <Input id={`${prefix}-tagline`} name="tagline" placeholder={t("cohort_tagline_placeholder")} defaultValue={cohort?.tagline ?? ""} />
-          </label>
+          <div className="grid gap-1.5 text-sm font-medium md:col-span-2">
+            <label htmlFor={`${prefix}-tagline`}>{t("cohort_tagline")}</label>
+            <Textarea
+              id={`${prefix}-tagline`}
+              name="tagline"
+              rows={3}
+              placeholder={t("cohort_tagline_placeholder")}
+              value={taglineValue}
+              onChange={(e) => setTaglineValue(e.target.value)}
+            />
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-[#78928F]">{t("cohort_tagline_description")}</p>
+              <p className={`text-xs ${taglineValue.length > 80 ? "text-[#C03A3A] font-medium" : "text-[#78928F]"}`}>
+                {taglineValue.length} / 80
+              </p>
+            </div>
+          </div>
           <label htmlFor={`${prefix}-start`} className="grid gap-1.5 text-sm font-medium">
             {t("start_date")}
             <Input id={`${prefix}-start`} name="startDate" type="date" required defaultValue={cohort?.startDate?.slice(0, 10) ?? ""} />
@@ -236,39 +256,88 @@ function CohortSetupPanel({
             {t("join_deadline")}
             <Input id={`${prefix}-deadline`} name="joinDeadline" type="date" defaultValue={cohort?.joinDeadline?.slice(0, 10) ?? ""} />
           </label>
-          <label htmlFor={`${prefix}-capacity`} className="grid gap-1.5 text-sm font-medium">
-            {t("capacity")}
-            <Input id={`${prefix}-capacity`} name="capacity" type="number" min={1} defaultValue={cohort?.capacity ?? ""} />
-          </label>
+          <div className="grid gap-1.5 text-sm font-medium">
+            <label htmlFor={`${prefix}-capacity`}>{t("capacity")}</label>
+            <div className="flex items-center gap-2">
+              <Input
+                id={`${prefix}-capacity`}
+                name="capacity"
+                type="number"
+                min={1}
+                disabled={capacityUnlimited}
+                placeholder={capacityUnlimited ? t("cohort_capacity_unlimited") : ""}
+                defaultValue={capacityUnlimited ? "" : (cohort?.capacity ?? "")}
+                className="flex-1"
+              />
+              <button
+                type="button"
+                onClick={() => setCapacityUnlimited(!capacityUnlimited)}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                  capacityUnlimited
+                    ? "bg-[#16B9B3] text-white"
+                    : "bg-[#F1F4F4] text-[#5A7B79] hover:bg-[#E7FAF7]"
+                }`}
+              >
+                {t("cohort_capacity_unlimited")}
+              </button>
+            </div>
+          </div>
 
           {/* 互動方式 */}
-          <fieldset className="md:col-span-2">
-            <legend className="text-sm font-medium">{t("cohort_interaction_modes")}</legend>
-            <div className="mt-2 flex flex-wrap gap-4">
-              {(["sync", "async", "physical"] as const).map((m) => (
-                <label key={m} className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    className="size-4 accent-[#0D7773]"
-                    checked={interactionModes.includes(m)}
-                    onChange={() => toggleInteractionMode(m)}
-                  />
-                  {t(`cohort_interaction_mode_${m}`)}
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <div className="relative md:col-span-2">
+            <p className="mb-1.5 text-sm font-medium">{t("cohort_interaction_modes")}</p>
+            <button
+              type="button"
+              onClick={() => setInteractionDropdownOpen(!interactionDropdownOpen)}
+              className="flex w-full items-center justify-between rounded-lg border border-[#CDEBE8] bg-white px-3 py-2.5 text-sm text-left"
+            >
+              <span className={interactionModes.length ? "text-[#0D3036]" : "text-[#78928F]"}>
+                {interactionModes.length
+                  ? interactionModes.map((m) => t(`cohort_interaction_mode_${m}`)).join("、")
+                  : t("cohort_interaction_modes_placeholder")}
+              </span>
+              <ChevronDown className={`size-4 text-[#78928F] transition-transform ${interactionDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
+            {interactionDropdownOpen && (
+              <div className="absolute left-0 right-0 top-full z-10 mt-1 overflow-hidden rounded-xl border border-[#CDEBE8] bg-white shadow-lg">
+                {(["sync", "async", "physical"] as const).map((mode) => (
+                  <label
+                    key={mode}
+                    className={`flex cursor-pointer items-start gap-3 px-4 py-3 ${
+                      interactionModes.includes(mode) ? "bg-[#F0FBF9]" : "hover:bg-[#FAFCFC]"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 size-4 accent-[#16B9B3]"
+                      checked={interactionModes.includes(mode)}
+                      onChange={() => toggleInteractionMode(mode)}
+                    />
+                    <div>
+                      <p className="text-sm font-medium">{t(`cohort_interaction_mode_${mode}`)}</p>
+                      <p className="text-xs text-[#78928F]">{t(`cohort_interaction_mode_${mode}_desc`)}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
 
-          <label htmlFor={`${prefix}-meeting`} className="grid gap-1.5 text-sm font-medium">
-            {t("cohort_meeting_url")}
-            <Input id={`${prefix}-meeting`} name="meetingUrl" type="url" placeholder={t("cohort_meeting_url_placeholder")} defaultValue={cohort?.meetingUrl ?? ""} />
-          </label>
-          <label htmlFor={`${prefix}-location`} className="grid gap-1.5 text-sm font-medium">
-            {t("cohort_location")}
-            <Input id={`${prefix}-location`} name="location" placeholder={t("cohort_location_placeholder")} defaultValue={cohort?.location ?? ""} />
-          </label>
+          {interactionModes.includes("sync") && (
+            <label htmlFor={`${prefix}-meeting`} className="grid gap-1.5 text-sm font-medium">
+              {t("cohort_meeting_url")}
+              <Input id={`${prefix}-meeting`} name="meetingUrl" type="url" placeholder={t("cohort_meeting_url_placeholder")} defaultValue={cohort?.meetingUrl ?? ""} />
+            </label>
+          )}
+          {interactionModes.includes("physical") && (
+            <label htmlFor={`${prefix}-location`} className="grid gap-1.5 text-sm font-medium">
+              {t("cohort_location")}
+              <Input id={`${prefix}-location`} name="location" placeholder={t("cohort_location_placeholder")} defaultValue={cohort?.location ?? ""} />
+            </label>
+          )}
 
           {/* 聚會時段 */}
+          {(interactionModes.includes("sync") || interactionModes.includes("physical")) && (
           <fieldset className="md:col-span-2">
             <legend className="text-sm font-medium">{t("cohort_sessions_title")}</legend>
             <div className="mt-2 grid gap-2">
@@ -300,41 +369,46 @@ function CohortSetupPanel({
               </Button>
             </div>
           </fieldset>
+          )}
 
           {/* 費用設定 */}
           <fieldset className="md:col-span-2">
             <legend className="text-sm font-medium">{t("cohort_fee_title")}</legend>
-            <div className="mt-2 flex items-center gap-4">
-              <label className="flex items-center gap-2 text-sm">
-                <input type="radio" name={`${prefix}-feeType`} className="size-4 accent-[#0D7773]" checked={feeType === "free"} onChange={() => setFeeType("free")} />
-                {t("cohort_fee_type_free")}
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input type="radio" name={`${prefix}-feeType`} className="size-4 accent-[#0D7773]" checked={feeType === "paid"} onChange={() => setFeeType("paid")} />
-                {t("cohort_fee_type_paid")}
-              </label>
+            <div className="mt-2">
+              <select
+                value={feeType}
+                onChange={(e) => setFeeType(e.target.value as "free" | "paid")}
+                className="rounded-lg border border-[#CDEBE8] bg-white px-3 py-2 text-sm"
+              >
+                <option value="free">{t("cohort_fee_type_free")}</option>
+                <option value="paid">{t("cohort_fee_type_paid")}</option>
+              </select>
               {feeType === "paid" && (
-                <Input name="feeAmount" type="number" min={0} required className="h-9 w-[120px]" placeholder={t("cohort_fee_amount")} defaultValue={cohort?.feeAmount ?? ""} />
+                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    {t("cohort_fee_amount")} (NT$/人)
+                    <Input name="feeAmount" type="number" min={0} required defaultValue={cohort?.feeAmount ?? ""} />
+                  </label>
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    {t("cohort_external_signup_url_label")}
+                    <Input name="externalSignupUrl" type="url" required placeholder="https://" defaultValue={cohort?.externalSignupUrl ?? ""} />
+                  </label>
+                </div>
               )}
-            </div>
-          </fieldset>
-
-          {/* 報名方式 */}
-          <fieldset className="md:col-span-2">
-            <legend className="text-sm font-medium">{t("cohort_signup_title")}</legend>
-            <div className="mt-2 grid gap-2">
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="radio" name={`${prefix}-signupMethod`} className="size-4 accent-[#0D7773]" checked={signupMethod === "island_form"} onChange={() => setSignupMethod("island_form")} />
-                  {t("cohort_signup_method_island_form")}
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="radio" name={`${prefix}-signupMethod`} className="size-4 accent-[#0D7773]" checked={signupMethod === "external"} onChange={() => setSignupMethod("external")} />
-                  {t("cohort_signup_method_external")}
-                </label>
-              </div>
-              {signupMethod === "external" && (
-                <Input name="externalSignupUrl" type="url" required placeholder={t("cohort_external_signup_url_placeholder")} defaultValue={cohort?.externalSignupUrl ?? ""} />
+              {feeType === "free" && (
+                <div className="mt-3 grid gap-2">
+                  <select
+                    value={signupMethod}
+                    onChange={(e) => setSignupMethod(e.target.value as "island_form" | "external")}
+                    className="rounded-lg border border-[#CDEBE8] bg-white px-3 py-2 text-sm"
+                  >
+                    <option value="island_form">{t("cohort_signup_method_island_form")}</option>
+                    <option value="external">{t("cohort_signup_method_external")}</option>
+                  </select>
+                  {signupMethod === "external" && (
+                    <Input name="externalSignupUrl" type="url" required placeholder="https://" defaultValue={cohort?.externalSignupUrl ?? ""} />
+                  )}
+                </div>
               )}
             </div>
           </fieldset>
