@@ -82,8 +82,8 @@ jobs:
       - name: Review with Cloudflare Workers AI
         id: review
         env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_WORKERS_AI_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_AI_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CODE_REVIEW_CF_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CODE_REVIEW_CF_API_TOKEN }}
           BASE: ${{ github.event.pull_request.base.ref }}
           HEAD: ${{ github.event.pull_request.head.ref }}
         run: |
@@ -92,8 +92,8 @@ jobs:
             exit 0
           fi
 
-          PRIMARY_MODEL="@cf/qwen/qwen3.8-27b"
-          FALLBACK_MODEL="@cf/google/gemma-4-26b-a4b-it"
+          PRIMARY_MODEL="@cf/moonshot/kimi-k2.7-code"
+          FALLBACK_MODEL="@cf/deepseek/deepseek-v4-flash-0731"
 
           extract_response() {
             jq -r 'if .choices[0].finish_reason == "stop"
