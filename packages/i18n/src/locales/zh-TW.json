@@ -7804,6 +7804,8 @@
     "cohort_actions": "更多操作",
     "overview_joined_count": "{count} 位已加入",
     "overview_program_label": "系列",
+    "overview_stat_celebrate": "值得慶祝",
+    "overview_stat_encourage": "位需要鼓勵",
     "overview_empty": "還沒有任何場次，先到「系列與場次」建立一個。",
     "confirm": "確定",
     "joining_resume": "重新開放加入",
