@@ -148,7 +148,7 @@ function CohortSetupPanel({
       return [
         ...prev,
         {
-          id: `new-${Date.now()}`,
+          id: crypto.randomUUID(),
           sessionDate: "",
           startTime: last?.startTime ?? "",
           endTime: last?.endTime ?? "",
