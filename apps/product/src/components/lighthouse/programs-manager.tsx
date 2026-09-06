@@ -136,8 +136,11 @@ function CohortSetupPanel({
   );
 
   useEffect(() => {
-    panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
+    panelRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: mode === "edit" ? "start" : "nearest",
+    });
+  }, [mode]);
 
   const addSession = useCallback(() => {
     setSessions((prev) => {
@@ -612,57 +615,59 @@ function CohortSetupPanel({
           className="grid gap-3"
           style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}
         >
-          <div className="rounded-xl border border-[#DDEFED] p-4">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-sm font-medium">{t("cohort_is_private")}</p>
-              <Switch checked={isPrivate} onCheckedChange={handleIsPrivateChange} />
-            </div>
-            <p className="mt-1 text-xs text-[#78928F]">{t("cohort_is_private_hint")}</p>
-          </div>
-          <div
-            className={`rounded-xl border border-[#DDEFED] p-4 transition-opacity ${!isPrivate ? "opacity-50" : ""}`}
-          >
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-sm font-medium">{t("cohort_checkin_default_private")}</p>
-              <Switch
-                checked={checkinPrivate}
-                onCheckedChange={setCheckinPrivate}
-                disabled={!isPrivate}
-              />
-            </div>
-            <p className="mt-1 text-xs text-[#78928F]">
-              {isPrivate
+          {[
+            {
+              label: t("cohort_is_private"),
+              hint: t("cohort_is_private_hint"),
+              checked: isPrivate,
+              onChange: handleIsPrivateChange,
+              disabled: false,
+              dimmed: false,
+            },
+            {
+              label: t("cohort_checkin_default_private"),
+              hint: isPrivate
                 ? t("cohort_checkin_default_private_hint")
-                : t("cohort_privacy_disabled_hint")}
-            </p>
-          </div>
-          <div
-            className={`rounded-xl border border-[#DDEFED] p-4 transition-opacity ${!isPrivate ? "opacity-50" : ""}`}
-          >
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-sm font-medium">{t("cohort_host_comment_default_private")}</p>
-              <Switch
-                checked={hostCommentPrivate}
-                onCheckedChange={setHostCommentPrivate}
-                disabled={!isPrivate}
-              />
-            </div>
-            <p className="mt-1 text-xs text-[#78928F]">
-              {isPrivate
+                : t("cohort_privacy_disabled_hint"),
+              checked: checkinPrivate,
+              onChange: setCheckinPrivate,
+              disabled: !isPrivate,
+              dimmed: !isPrivate,
+            },
+            {
+              label: t("cohort_host_comment_default_private"),
+              hint: isPrivate
                 ? t("cohort_host_comment_default_private_hint")
-                : t("cohort_privacy_disabled_hint")}
-            </p>
-          </div>
-          <div className="rounded-xl border border-[#DDEFED] p-4">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-sm font-medium">{t("cohort_visibility_public")}</p>
-              <Switch
-                checked={visibility === "public"}
-                onCheckedChange={(checked) => setVisibility(checked ? "public" : "private")}
-              />
+                : t("cohort_privacy_disabled_hint"),
+              checked: hostCommentPrivate,
+              onChange: setHostCommentPrivate,
+              disabled: !isPrivate,
+              dimmed: !isPrivate,
+            },
+            {
+              label: t("cohort_visibility_public"),
+              hint: t("cohort_visibility_hint"),
+              checked: visibility === "public",
+              onChange: (v: boolean) => setVisibility(v ? "public" : "private"),
+              disabled: false,
+              dimmed: false,
+            },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className={`rounded-xl border border-[#DDEFED] p-4 transition-opacity ${item.dimmed ? "opacity-50" : ""}`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium">{item.label}</p>
+                <Switch
+                  checked={item.checked}
+                  onCheckedChange={item.onChange}
+                  disabled={item.disabled}
+                />
+              </div>
+              <p className="mt-1 text-xs text-[#78928F]">{item.hint}</p>
             </div>
-            <p className="mt-1 text-xs text-[#78928F]">{t("cohort_visibility_hint")}</p>
-          </div>
+          ))}
         </div>
       </div>
 
