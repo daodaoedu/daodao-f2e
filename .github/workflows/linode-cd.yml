@@ -511,6 +511,7 @@ jobs:
           DEPLOY_WEBSITE: ${{ needs.build-website.result == 'success' }}
           DEPLOY_PRODUCT: ${{ needs.build-product.result == 'success' }}
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
           GIT_HUB_USERNAME: ${{ secrets.GIT_HUB_USERNAME }}
           GIT_HUB_ACCESS_TOKEN: ${{ secrets.GIT_HUB_ACCESS_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -521,6 +522,7 @@ jobs:
             export COMPOSE_FILE=docker-compose.yaml
             export APP_ENV=${APP_ENV}
             export DOCKER_HUB_USERNAME=${DOCKER_HUB_USERNAME}
+            export DOCKER_HUB_ACCESS_TOKEN=${DOCKER_HUB_ACCESS_TOKEN}
             export IMAGE_TAG=${IMAGE_TAG}
             export COMMIT_SHA=${COMMIT_SHA}
 
@@ -586,6 +588,9 @@ jobs:
             fi
 
             echo "✅ Using environment file: \${ENV_FILE}"
+
+            # ===== 登入 Docker Hub =====
+            echo "\${DOCKER_HUB_ACCESS_TOKEN}" | docker login -u "\${DOCKER_HUB_USERNAME}" --password-stdin
 
             # ===== 部署 Website =====
             if [ "${DEPLOY_WEBSITE}" = "true" ]; then
