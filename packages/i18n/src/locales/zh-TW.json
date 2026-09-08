@@ -5815,6 +5815,14 @@
     "archived_restore_failed": "復原失敗",
     "archived_restored": "已復原封存",
     "archived_unarchive_failed": "取消封存失敗",
+    "archived_delete": "刪除",
+    "archived_delete_title": "確定要刪除嗎？",
+    "archived_delete_message": "刪除後將無法復原，此操作不可撤銷。",
+    "archived_delete_confirm": "確定刪除",
+    "archived_delete_cancel": "取消",
+    "archived_deleted": "已成功刪除",
+    "archived_delete_failed": "刪除失敗",
+    "archived_type_practice": "主題實踐",
     "interaction_public_practices": "公開我的實踐",
     "interaction_public_practices_desc": "開啟後，你的實踐將可以被搜尋展示",
     "interaction_public_enabled": "已公開你的實踐",
@@ -7022,44 +7030,20 @@
         "explorer": {
           "name": "探索者島",
           "description": "你是一位好奇心旺盛的探索者，喜歡嘗試新事物",
-          "traits": [
-            "好奇心強",
-            "勇於嘗試",
-            "獨立思考"
-          ],
-          "recommendations": [
-            "每日閱讀",
-            "程式學習",
-            "語言學習"
-          ]
+          "traits": ["好奇心強", "勇於嘗試", "獨立思考"],
+          "recommendations": ["每日閱讀", "程式學習", "語言學習"]
         },
         "creator": {
           "name": "創造者島",
           "description": "你擁有豐富的創造力，善於將想法付諸實踐",
-          "traits": [
-            "創意豐富",
-            "動手能力強",
-            "有藝術天賦"
-          ],
-          "recommendations": [
-            "寫作練習",
-            "藝術創作",
-            "設計學習"
-          ]
+          "traits": ["創意豐富", "動手能力強", "有藝術天賦"],
+          "recommendations": ["寫作練習", "藝術創作", "設計學習"]
         },
         "connector": {
           "name": "連結者島",
           "description": "你善於建立人際關係，喜歡與他人合作學習",
-          "traits": [
-            "善於溝通",
-            "團隊合作",
-            "同理心強"
-          ],
-          "recommendations": [
-            "社群活動",
-            "語言學習",
-            "團隊專案"
-          ]
+          "traits": ["善於溝通", "團隊合作", "同理心強"],
+          "recommendations": ["社群活動", "語言學習", "團隊專案"]
         }
       }
     },

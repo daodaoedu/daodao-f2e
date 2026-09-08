@@ -5815,6 +5815,14 @@
     "archived_restore_failed": "Failed to restore",
     "archived_restored": "Archive restored",
     "archived_unarchive_failed": "Failed to unarchive",
+    "archived_delete": "Delete",
+    "archived_delete_title": "Delete permanently?",
+    "archived_delete_message": "This action cannot be undone.",
+    "archived_delete_confirm": "Delete",
+    "archived_delete_cancel": "Cancel",
+    "archived_deleted": "Successfully deleted",
+    "archived_delete_failed": "Failed to delete",
+    "archived_type_practice": "Practice",
     "interaction_public_practices": "Make My Practices Public",
     "interaction_public_practices_desc": "When enabled, your practices can be searched and displayed",
     "interaction_public_enabled": "Your practices are now public",
@@ -7022,44 +7030,20 @@
         "explorer": {
           "name": "Explorer Island",
           "description": "You are a curious explorer who enjoys trying new things.",
-          "traits": [
-            "Curious",
-            "Willing to try",
-            "Independent thinker"
-          ],
-          "recommendations": [
-            "Daily reading",
-            "Coding practice",
-            "Language learning"
-          ]
+          "traits": ["Curious", "Willing to try", "Independent thinker"],
+          "recommendations": ["Daily reading", "Coding practice", "Language learning"]
         },
         "creator": {
           "name": "Creator Island",
           "description": "You are highly creative and good at turning ideas into action.",
-          "traits": [
-            "Creative",
-            "Hands-on",
-            "Artistic"
-          ],
-          "recommendations": [
-            "Writing practice",
-            "Art creation",
-            "Design learning"
-          ]
+          "traits": ["Creative", "Hands-on", "Artistic"],
+          "recommendations": ["Writing practice", "Art creation", "Design learning"]
         },
         "connector": {
           "name": "Connector Island",
           "description": "You build relationships easily and enjoy learning with others.",
-          "traits": [
-            "Communicative",
-            "Team-oriented",
-            "Empathetic"
-          ],
-          "recommendations": [
-            "Community activities",
-            "Language learning",
-            "Team projects"
-          ]
+          "traits": ["Communicative", "Team-oriented", "Empathetic"],
+          "recommendations": ["Community activities", "Language learning", "Team projects"]
         }
       }
     },
