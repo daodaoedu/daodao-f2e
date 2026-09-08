@@ -10,6 +10,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import { ChatUnreadBadge } from "./chat-unread-badge";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
@@ -78,12 +79,15 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
                   {isNotifications ? (
                     <NotificationBell isActive={isActive} className="[&_svg]:size-7" />
                   ) : (
-                    <Icon
-                      className={cn(
-                        "size-7 shrink-0 transition-colors",
-                        isActive ? "text-logo-cyan opacity-100" : "text-light-gray opacity-45"
-                      )}
-                    />
+                    <span className="relative inline-flex">
+                      <Icon
+                        className={cn(
+                          "size-7 shrink-0 transition-colors",
+                          isActive ? "text-logo-cyan opacity-100" : "text-light-gray opacity-45"
+                        )}
+                      />
+                      {item.badge === "unread-count" && <ChatUnreadBadge />}
+                    </span>
                   )}
                 </CustomLink>
               </li>

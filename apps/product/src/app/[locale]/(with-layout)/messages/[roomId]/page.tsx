@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatMessageType } from "@daodao/api";
-import { markChatRoomRead, useChatMessages, useChatRoom } from "@daodao/api";
+import { markChatRoomRead, useChatMessageHistory, useChatRoom } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useParams } from "next/navigation";
@@ -20,7 +20,7 @@ export default function ChatRoomPage() {
     data: messagesData,
     isLoading: messagesLoading,
     mutate: mutateMessages,
-  } = useChatMessages(roomId || null);
+  } = useChatMessageHistory(roomId || null);
   const [replyTo, setReplyTo] = useState<ChatMessageType | null>(null);
 
   const messages = messagesData?.messages ?? [];
@@ -61,8 +61,6 @@ export default function ChatRoomPage() {
     );
   }
 
-  const isReadOnly = room.contentState === "read_only";
-
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
@@ -90,7 +88,6 @@ export default function ChatRoomPage() {
           replyTo={replyTo}
           onClearReply={handleClearReply}
           onMessageSent={handleMessageSent}
-          disabled={isReadOnly}
         />
       </div>
     </div>

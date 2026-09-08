@@ -7019,20 +7019,44 @@
         "explorer": {
           "name": "探索者島",
           "description": "你是一位好奇心旺盛的探索者，喜歡嘗試新事物",
-          "traits": ["好奇心強", "勇於嘗試", "獨立思考"],
-          "recommendations": ["每日閱讀", "程式學習", "語言學習"]
+          "traits": [
+            "好奇心強",
+            "勇於嘗試",
+            "獨立思考"
+          ],
+          "recommendations": [
+            "每日閱讀",
+            "程式學習",
+            "語言學習"
+          ]
         },
         "creator": {
           "name": "創造者島",
           "description": "你擁有豐富的創造力，善於將想法付諸實踐",
-          "traits": ["創意豐富", "動手能力強", "有藝術天賦"],
-          "recommendations": ["寫作練習", "藝術創作", "設計學習"]
+          "traits": [
+            "創意豐富",
+            "動手能力強",
+            "有藝術天賦"
+          ],
+          "recommendations": [
+            "寫作練習",
+            "藝術創作",
+            "設計學習"
+          ]
         },
         "connector": {
           "name": "連結者島",
           "description": "你善於建立人際關係，喜歡與他人合作學習",
-          "traits": ["善於溝通", "團隊合作", "同理心強"],
-          "recommendations": ["社群活動", "語言學習", "團隊專案"]
+          "traits": [
+            "善於溝通",
+            "團隊合作",
+            "同理心強"
+          ],
+          "recommendations": [
+            "社群活動",
+            "語言學習",
+            "團隊專案"
+          ]
         }
       }
     },
@@ -8428,6 +8452,33 @@
     "message_edited": "已編輯",
     "loading": "載入中...",
     "send_failed": "發送失敗，請稍後再試",
-    "read_only": "此聊天室為唯讀"
+    "search_placeholder": "搜尋訊息...",
+    "search_results": "{count} 則結果",
+    "search_no_results": "沒有符合的訊息",
+    "search_result_position": "第 {current} / {total} 則",
+    "pin_banner": "{name} 置頂了一則訊息",
+    "pin_panel_title": "置頂訊息",
+    "pin_panel_count": "置頂訊息 · {count}",
+    "pin_panel_empty": "尚無置頂訊息",
+    "pin_action": "置頂",
+    "unpin_action": "取消置頂",
+    "member_panel_title": "成員",
+    "member_panel_count": "成員 · {count}",
+    "member_online": "在線",
+    "delete_confirm_title": "刪除訊息",
+    "delete_confirm_message": "確定要刪除這則訊息嗎？",
+    "delete_confirm": "刪除",
+    "delete_cancel": "取消",
+    "edit_action": "編輯",
+    "delete_action": "刪除",
+    "more_actions": "更多",
+    "edit_mode_label": "編輯訊息",
+    "system_member_joined": "{name} 加入了聊天室",
+    "deleted_user": "已離開的島民",
+    "date_today": "今天",
+    "date_yesterday": "昨天",
+    "filter_placeholder": "搜尋聊天室...",
+    "filter_no_results": "沒有符合的聊天室",
+    "host_badge": "帶領人"
   }
 }

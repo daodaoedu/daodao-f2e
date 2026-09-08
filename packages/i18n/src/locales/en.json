@@ -7019,20 +7019,44 @@
         "explorer": {
           "name": "Explorer Island",
           "description": "You are a curious explorer who enjoys trying new things.",
-          "traits": ["Curious", "Willing to try", "Independent thinker"],
-          "recommendations": ["Daily reading", "Coding practice", "Language learning"]
+          "traits": [
+            "Curious",
+            "Willing to try",
+            "Independent thinker"
+          ],
+          "recommendations": [
+            "Daily reading",
+            "Coding practice",
+            "Language learning"
+          ]
         },
         "creator": {
           "name": "Creator Island",
           "description": "You are highly creative and good at turning ideas into action.",
-          "traits": ["Creative", "Hands-on", "Artistic"],
-          "recommendations": ["Writing practice", "Art creation", "Design learning"]
+          "traits": [
+            "Creative",
+            "Hands-on",
+            "Artistic"
+          ],
+          "recommendations": [
+            "Writing practice",
+            "Art creation",
+            "Design learning"
+          ]
         },
         "connector": {
           "name": "Connector Island",
           "description": "You build relationships easily and enjoy learning with others.",
-          "traits": ["Communicative", "Team-oriented", "Empathetic"],
-          "recommendations": ["Community activities", "Language learning", "Team projects"]
+          "traits": [
+            "Communicative",
+            "Team-oriented",
+            "Empathetic"
+          ],
+          "recommendations": [
+            "Community activities",
+            "Language learning",
+            "Team projects"
+          ]
         }
       }
     },
@@ -8394,6 +8418,33 @@
     "message_edited": "edited",
     "loading": "Loading...",
     "send_failed": "Failed to send, please try again",
-    "read_only": "This chat room is read-only"
+    "search_placeholder": "Search messages...",
+    "search_results": "{count} results",
+    "search_no_results": "No matching messages",
+    "search_result_position": "{current} / {total}",
+    "pin_banner": "{name} pinned a message",
+    "pin_panel_title": "Pinned Messages",
+    "pin_panel_count": "Pinned · {count}",
+    "pin_panel_empty": "No pinned messages",
+    "pin_action": "Pin",
+    "unpin_action": "Unpin",
+    "member_panel_title": "Members",
+    "member_panel_count": "Members · {count}",
+    "member_online": "Online",
+    "delete_confirm_title": "Delete Message",
+    "delete_confirm_message": "Are you sure you want to delete this message?",
+    "delete_confirm": "Delete",
+    "delete_cancel": "Cancel",
+    "edit_action": "Edit",
+    "delete_action": "Delete",
+    "more_actions": "More",
+    "edit_mode_label": "Edit message",
+    "system_member_joined": "{name} joined the chat",
+    "deleted_user": "Former member",
+    "date_today": "Today",
+    "date_yesterday": "Yesterday",
+    "filter_placeholder": "Search rooms...",
+    "filter_no_results": "No matching rooms",
+    "host_badge": "Host"
   }
 }
