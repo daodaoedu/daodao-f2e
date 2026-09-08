@@ -12,6 +12,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { AccountMenu } from "./account-menu";
 import { BreathingDot } from "./breathing-dot";
+import { ChatUnreadBadge } from "./chat-unread-badge";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 
@@ -103,6 +104,7 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
                     />
                   )}
                   {item.badge === "breathing-dot" && <BreathingDot />}
+                  {item.badge === "unread-count" && <ChatUnreadBadge />}
                 </span>
                 {!isCollapsed && (
                   <span

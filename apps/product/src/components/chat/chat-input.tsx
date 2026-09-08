@@ -1,37 +1,33 @@
 "use client";
 
 import type { ChatMessageType } from "@daodao/api";
-import { sendChatMessage } from "@daodao/api";
+import { editChatMessage, sendChatMessage } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useCompositionState } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
-import { Send, X } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
-
-// ============================================================================
-// Types
-// ============================================================================
+import { Pencil, Send, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ChatInputProps {
   roomId: number;
   replyTo?: ChatMessageType | null;
+  editingMessage?: ChatMessageType | null;
   onClearReply?: () => void;
+  onClearEdit?: () => void;
   onMessageSent?: () => void;
-  disabled?: boolean;
+  onMessageEdited?: () => void;
 }
-
-// ============================================================================
-// Component
-// ============================================================================
 
 export function ChatInput({
   roomId,
   replyTo,
+  editingMessage,
   onClearReply,
+  onClearEdit,
   onMessageSent,
-  disabled = false,
+  onMessageEdited,
 }: ChatInputProps) {
   const t = useTranslations("messages");
   const [value, setValue] = useState("");
@@ -39,26 +35,69 @@ export function ChatInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { isComposing, compositionProps } = useCompositionState();
 
+  useEffect(() => {
+    if (editingMessage) {
+      setValue(editingMessage.body);
+      textareaRef.current?.focus();
+    }
+  }, [editingMessage]);
+
+  const resetInput = useCallback(() => {
+    setValue("");
+    if (textareaRef.current) textareaRef.current.style.height = "auto";
+  }, []);
+
   const handleSubmit = useCallback(async () => {
     const trimmed = value.trim();
     if (!trimmed || sending) return;
 
     setSending(true);
     try {
-      await sendChatMessage(roomId, trimmed, replyTo?.id);
-      setValue("");
-      onClearReply?.();
-      onMessageSent?.();
-      // Reset textarea height
-      if (textareaRef.current) {
-        textareaRef.current.style.height = "auto";
+      if (editingMessage) {
+        const response = await editChatMessage(roomId, editingMessage.id, trimmed);
+        if (response.error) {
+          const msg =
+            response.error && typeof response.error === "object" && "message" in response.error
+              ? String(response.error.message)
+              : t("send_failed");
+          toast.error(msg);
+          return;
+        }
+        resetInput();
+        onClearEdit?.();
+        onMessageEdited?.();
+      } else {
+        const response = await sendChatMessage(roomId, trimmed, replyTo?.id);
+        if (response.error) {
+          const msg =
+            response.error && typeof response.error === "object" && "message" in response.error
+              ? String(response.error.message)
+              : t("send_failed");
+          toast.error(msg);
+          return;
+        }
+        resetInput();
+        onClearReply?.();
+        onMessageSent?.();
       }
     } catch {
       toast.error(t("send_failed"));
     } finally {
       setSending(false);
     }
-  }, [value, sending, roomId, replyTo?.id, onClearReply, onMessageSent, t]);
+  }, [
+    value,
+    sending,
+    roomId,
+    editingMessage,
+    replyTo?.id,
+    onClearReply,
+    onClearEdit,
+    onMessageSent,
+    onMessageEdited,
+    resetInput,
+    t,
+  ]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -67,8 +106,12 @@ export function ChatInput({
         e.preventDefault();
         void handleSubmit();
       }
+      if (e.key === "Escape" && editingMessage) {
+        onClearEdit?.();
+        resetInput();
+      }
     },
-    [isComposing, handleSubmit]
+    [isComposing, handleSubmit, editingMessage, onClearEdit, resetInput]
   );
 
   const handleInput = useCallback(() => {
@@ -78,18 +121,34 @@ export function ChatInput({
     textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
   }, []);
 
-  if (disabled) {
-    return (
-      <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-[#E4EAE9] px-4 py-3">
-        <p className="text-sm text-text-dark/40 text-center">{t("read_only")}</p>
-      </div>
-    );
-  }
+  const handleCancelEdit = useCallback(() => {
+    onClearEdit?.();
+    resetInput();
+  }, [onClearEdit, resetInput]);
 
   return (
     <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-[#E4EAE9]">
+      {/* Edit mode banner */}
+      {editingMessage && (
+        <div className="flex items-center gap-2 px-4 pt-2 pb-1">
+          <Pencil className="size-3.5 text-amber-500 shrink-0" />
+          <div className="flex-1 min-w-0 border-l-2 border-amber-400 pl-2">
+            <p className="text-[11px] font-medium text-text-dark/60">{t("edit_mode_label")}</p>
+            <p className="text-xs text-text-dark/40 truncate">{editingMessage.body}</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleCancelEdit}
+            className="size-6 shrink-0"
+          >
+            <X className="size-4" />
+          </Button>
+        </div>
+      )}
+
       {/* Reply preview */}
-      {replyTo && (
+      {replyTo && !editingMessage && (
         <div className="flex items-center gap-2 px-4 pt-2 pb-1">
           <div className="flex-1 min-w-0 border-l-2 border-logo-cyan/40 pl-2">
             <p className="text-[11px] font-medium text-text-dark/60">
@@ -97,12 +156,7 @@ export function ChatInput({
             </p>
             <p className="text-xs text-text-dark/40 truncate">{replyTo.body}</p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClearReply}
-            className="size-6 shrink-0"
-          >
+          <Button variant="ghost" size="icon" onClick={onClearReply} className="size-6 shrink-0">
             <X className="size-4" />
           </Button>
         </div>
@@ -131,9 +185,9 @@ export function ChatInput({
           onClick={() => void handleSubmit()}
           disabled={!value.trim() || sending}
           className="shrink-0 size-10 rounded-full bg-logo-cyan hover:bg-logo-cyan/80 disabled:opacity-40"
-          aria-label={t("send")}
+          aria-label={editingMessage ? t("edit_action") : t("send")}
         >
-          <Send className="size-4" />
+          {editingMessage ? <Pencil className="size-4" /> : <Send className="size-4" />}
         </Button>
       </div>
     </div>

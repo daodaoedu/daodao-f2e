@@ -7309,11 +7309,6 @@ export interface paths {
                                 colorSeed: number;
                                 /** @description 組織名稱 */
                                 organizationName: string;
-                                /**
-                                 * @description 可寫狀態
-                                 * @enum {string}
-                                 */
-                                contentState: "writable" | "read_only";
                                 /** @description 成員數 */
                                 memberCount: number;
                                 /** @description 未讀數 */
@@ -7394,11 +7389,6 @@ export interface paths {
                             colorSeed: number;
                             /** @description 組織名稱 */
                             organizationName: string;
-                            /**
-                             * @description 可寫狀態
-                             * @enum {string}
-                             */
-                            contentState: "writable" | "read_only";
                             /** @description 成員數 */
                             memberCount: number;
                             /** @description 未讀數 */
@@ -17778,6 +17768,10 @@ export interface paths {
                                 programName: string;
                                 /** @description 已加入的參與者人數（不含帶領人） */
                                 joinedCount: number;
+                                /** @description 需要鼓勵的參與者×實踐數（>3天未打卡） */
+                                encourageCount: number;
+                                /** @description 值得慶祝的時刻數 */
+                                celebrateCount: number;
                             }[];
                             /**
                              * Format: date-time

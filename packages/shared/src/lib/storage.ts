@@ -35,6 +35,8 @@ export enum StorageEnum {
   PwaInstallDismissedAt = "PwaInstallDismissedAt",
   /** 用於記錄燈塔側邊欄是否收合的 localStorage */
   LighthouseSidebarCollapsed = "LighthouseSidebarCollapsed",
+  /** 用於記錄聊天室置頂 banner 被收起的狀態 { [roomId]: lastSeenPinnedMessageId } */
+  ChatPinBannerDismissed = "ChatPinBannerDismissed",
 }
 
 const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
@@ -51,6 +53,7 @@ const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   TaskGuideCollapsed: "sessionStorage",
   PwaInstallDismissedAt: "localStorage",
   LighthouseSidebarCollapsed: "localStorage",
+  ChatPinBannerDismissed: "localStorage",
 };
 
 export interface StorageInstance<T> {
