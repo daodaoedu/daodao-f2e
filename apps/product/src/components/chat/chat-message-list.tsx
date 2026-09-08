@@ -4,37 +4,41 @@ import type { ChatMessageType } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useEffect, useRef } from "react";
+import type { TimelineItem } from "@/hooks/use-chat-timeline";
 import { ChatMessageItem } from "./chat-message-item";
 
-// ============================================================================
-// Types
-// ============================================================================
-
 interface ChatMessageListProps {
-  messages: ChatMessageType[];
+  timeline: TimelineItem[];
   isLoading: boolean;
+  isHost: boolean;
+  currentUserId: number;
   onReply?: (message: ChatMessageType) => void;
-  onLikeToggle?: () => void;
+  onEdit?: (message: ChatMessageType) => void;
+  onMutate?: () => void;
 }
 
-// ============================================================================
-// Component
-// ============================================================================
-
-export function ChatMessageList({ messages, isLoading, onReply, onLikeToggle }: ChatMessageListProps) {
+export function ChatMessageList({
+  timeline,
+  isLoading,
+  isHost,
+  currentUserId,
+  onReply,
+  onEdit,
+  onMutate,
+}: ChatMessageListProps) {
   const t = useTranslations("messages");
   const bottomRef = useRef<HTMLDivElement>(null);
-  const prevMessageCountRef = useRef(0);
+  const prevCountRef = useRef(0);
 
-  // Scroll to bottom on initial load and when new messages arrive
   useEffect(() => {
-    if (messages.length > 0 && messages.length !== prevMessageCountRef.current) {
+    const msgCount = timeline.filter((i) => i.type === "message").length;
+    if (msgCount > 0 && msgCount !== prevCountRef.current) {
       bottomRef.current?.scrollIntoView({
-        behavior: prevMessageCountRef.current === 0 ? "instant" : "smooth",
+        behavior: prevCountRef.current === 0 ? "instant" : "smooth",
       });
-      prevMessageCountRef.current = messages.length;
+      prevCountRef.current = msgCount;
     }
-  }, [messages.length]);
+  }, [timeline]);
 
   if (isLoading) {
     return (
@@ -44,7 +48,7 @@ export function ChatMessageList({ messages, isLoading, onReply, onLikeToggle }: 
     );
   }
 
-  if (messages.length === 0) {
+  if (timeline.length === 0) {
     return (
       <div className="flex items-center justify-center py-20 text-text-dark/40">
         <p className="text-sm">{t("empty")}</p>
@@ -54,14 +58,30 @@ export function ChatMessageList({ messages, isLoading, onReply, onLikeToggle }: 
 
   return (
     <div className="flex flex-col py-2">
-      {messages.map((message) => (
-        <ChatMessageItem
-          key={message.id}
-          message={message}
-          onReply={onReply}
-          onLikeToggle={onLikeToggle}
-        />
-      ))}
+      {timeline.map((item) => {
+        if (item.type === "date-separator") {
+          return (
+            <div key={`date-${item.date}`} className="flex justify-center py-3">
+              <span className="text-[11px] text-text-dark/40 bg-[#F2F7F7] rounded-full px-3 py-1">
+                {item.date}
+              </span>
+            </div>
+          );
+        }
+        return (
+          <ChatMessageItem
+            key={item.message.id}
+            message={item.message}
+            isGroupStart={item.isGroupStart}
+            isGroupEnd={item.isGroupEnd}
+            isHost={isHost}
+            currentUserId={currentUserId}
+            onReply={onReply}
+            onEdit={onEdit}
+            onMutate={onMutate}
+          />
+        );
+      })}
       <div ref={bottomRef} />
     </div>
   );

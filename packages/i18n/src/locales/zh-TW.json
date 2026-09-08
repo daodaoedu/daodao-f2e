@@ -8479,6 +8479,7 @@
     "date_yesterday": "昨天",
     "filter_placeholder": "搜尋聊天室...",
     "filter_no_results": "沒有符合的聊天室",
-    "host_badge": "帶領人"
+    "host_badge": "帶領人",
+    "empty_conversation": "選擇一個聊天室開始對話"
   }
 }

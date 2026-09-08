@@ -8445,6 +8445,7 @@
     "date_yesterday": "Yesterday",
     "filter_placeholder": "Search rooms...",
     "filter_no_results": "No matching rooms",
-    "host_badge": "Host"
+    "host_badge": "Host",
+    "empty_conversation": "Select a chat room to start"
   }
 }

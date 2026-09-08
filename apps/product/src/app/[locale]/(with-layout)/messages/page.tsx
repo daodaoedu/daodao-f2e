@@ -1,14 +1,15 @@
 "use client";
 
 import { useTranslations } from "@daodao/i18n";
-import { ChatRoomList } from "@/components/chat/chat-room-list";
+import { ChatLayout } from "@/components/chat/chat-layout";
 
 export default function MessagesPage() {
   const t = useTranslations("messages");
   return (
-    <div className="min-h-screen max-w-[640px] mx-auto px-4 pt-[68px] md:pt-8 pb-[72px]">
-      <h1 className="text-xl font-semibold text-text-dark mb-4">{t("title")}</h1>
-      <ChatRoomList />
-    </div>
+    <ChatLayout>
+      <div className="flex flex-1 items-center justify-center text-text-dark/40">
+        <p className="text-sm">{t("empty_conversation")}</p>
+      </div>
+    </ChatLayout>
   );
 }

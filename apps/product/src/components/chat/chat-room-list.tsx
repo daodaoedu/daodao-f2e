@@ -3,9 +3,11 @@
 import { useMyChatRooms } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
-import { Badge } from "@daodao/ui/components/badge";
-import { cn } from "@daodao/ui/lib/utils";
 import { useLocale } from "@daodao/i18n";
+import { Badge } from "@daodao/ui/components/badge";
+import { Input } from "@daodao/ui/components/input";
+import { cn } from "@daodao/ui/lib/utils";
+import { useState } from "react";
 import { formatRelativeTime } from "@/utils/format-time";
 
 // ============================================================================
@@ -51,9 +53,10 @@ interface ChatRoomItemProps {
     lastActivityAt: string;
   };
   locale: string;
+  isActive: boolean;
 }
 
-function ChatRoomItem({ room, locale }: ChatRoomItemProps) {
+function ChatRoomItem({ room, locale, isActive }: ChatRoomItemProps) {
   const t = useTranslations("messages");
 
   const lastMessagePreview = room.lastMessage
@@ -71,33 +74,47 @@ function ChatRoomItem({ room, locale }: ChatRoomItemProps) {
   return (
     <Link
       href={`/messages/${room.id}`}
-      className="flex items-center gap-3 rounded-xl bg-white p-3 hover:bg-gray-50 transition-colors"
+      className={cn(
+        "flex items-center gap-3 rounded-xl p-3 transition-colors",
+        isActive
+          ? "bg-logo-cyan/10 ring-1 ring-logo-cyan/30"
+          : "bg-white hover:bg-gray-50",
+      )}
     >
-      {/* Room Icon */}
       <div
         className={cn(
           "flex size-12 shrink-0 items-center justify-center rounded-full text-lg font-semibold text-text-dark",
-          getRoomColor(room.colorSeed)
+          getRoomColor(room.colorSeed),
         )}
       >
         {room.iconLabel}
       </div>
 
-      {/* Text Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-text-dark truncate">{room.name}</h3>
-          <span className="text-xs text-text-dark/50 shrink-0">{timeDisplay}</span>
+          <h3 className="text-sm font-semibold text-text-dark truncate">
+            {room.name}
+          </h3>
+          <span className="text-xs text-text-dark/50 shrink-0">
+            {timeDisplay}
+          </span>
         </div>
-        <p className="text-xs text-text-dark/60 truncate">{room.organizationName}</p>
+        <p className="text-xs text-text-dark/60 truncate">
+          {room.organizationName}
+        </p>
         {lastMessagePreview && (
-          <p className="text-sm text-text-dark/70 truncate mt-0.5">{lastMessagePreview}</p>
+          <p className="text-sm text-text-dark/70 truncate mt-0.5">
+            {lastMessagePreview}
+          </p>
         )}
       </div>
 
-      {/* Unread Badge */}
       {room.unreadCount > 0 && (
-        <Badge variant="alert" size="xs" className="shrink-0 min-w-[20px] text-center">
+        <Badge
+          variant="alert"
+          size="xs"
+          className="shrink-0 min-w-[20px] text-center"
+        >
           {room.unreadCount > 99 ? "99+" : room.unreadCount}
         </Badge>
       )}
@@ -126,17 +143,28 @@ function ChatRoomSkeleton() {
 // Main
 // ============================================================================
 
-export function ChatRoomList() {
+interface ChatRoomListProps {
+  activeRoomId?: number;
+}
+
+export function ChatRoomList({ activeRoomId }: ChatRoomListProps) {
   const t = useTranslations("messages");
   const locale = useLocale();
   const { data, isLoading } = useMyChatRooms();
+  const [filter, setFilter] = useState("");
 
   const rooms = data?.items ?? [];
   const totalUnread = data?.totalUnread ?? 0;
 
+  const filtered = filter
+    ? rooms.filter((r) =>
+        r.name.toLowerCase().includes(filter.toLowerCase()),
+      )
+    : rooms;
+
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 p-3">
         {[...Array(4)].map((_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: skeleton
           <ChatRoomSkeleton key={i} />
@@ -147,7 +175,7 @@ export function ChatRoomList() {
 
   if (rooms.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-text-dark/50">
+      <div className="flex flex-col items-center justify-center flex-1 text-text-dark/50 px-4">
         <p className="text-base">{t("empty")}</p>
         <p className="text-sm mt-1">{t("empty_description")}</p>
       </div>
@@ -155,21 +183,45 @@ export function ChatRoomList() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Total Unread Header */}
-      {totalUnread > 0 && (
-        <div className="flex items-center gap-2">
+    <div className="flex flex-col flex-1 overflow-hidden">
+      {/* Header: title + unread count */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <h2 className="text-lg font-semibold text-text-dark">{t("title")}</h2>
+        {totalUnread > 0 && (
           <Badge variant="alert" size="sm">
             {t("total_unread", { count: totalUnread })}
           </Badge>
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* Filter */}
+      <div className="px-4 pb-2">
+        <Input
+          placeholder={t("filter_placeholder")}
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="h-8 text-sm"
+        />
+      </div>
 
       {/* Room List */}
-      <div className="flex flex-col gap-1">
-        {rooms.map((room) => (
-          <ChatRoomItem key={room.id} room={room} locale={locale} />
-        ))}
+      <div className="flex-1 overflow-y-auto px-3 pb-3">
+        {filtered.length === 0 ? (
+          <p className="text-sm text-text-dark/50 text-center py-8">
+            {t("filter_no_results")}
+          </p>
+        ) : (
+          <div className="flex flex-col gap-1">
+            {filtered.map((room) => (
+              <ChatRoomItem
+                key={room.id}
+                room={room}
+                locale={locale}
+                isActive={room.id === activeRoomId}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
