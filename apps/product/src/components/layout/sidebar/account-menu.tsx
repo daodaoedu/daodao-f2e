@@ -2,7 +2,18 @@
 
 import { useAuth, useAuthContext } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
+import {
+  Archive,
+  Bug,
+  ExternalLink,
+  Globe,
+  HeartHandshake,
+  LogOut,
+  Map,
+  Settings,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface AccountMenuProps {
@@ -42,7 +53,7 @@ export function AccountMenu({ isCollapsed }: AccountMenuProps) {
     };
   }, [isOpen]);
 
-  const menuItemClass =
+  const itemClass =
     "flex items-center gap-2 w-full px-[18px] py-[9px] text-sm text-text-dark hover:bg-[#F0F9F8] transition-colors text-left";
 
   return (
@@ -65,7 +76,7 @@ export function AccountMenu({ isCollapsed }: AccountMenuProps) {
 
       {isOpen && (
         <div
-          className="absolute bottom-[calc(100%+8px)] left-[10px] min-w-[196px] bg-white border border-[#E4EAE9] rounded-2xl shadow-[0_14px_34px_rgba(15,48,54,0.16)] overflow-hidden"
+          className="absolute bottom-[calc(100%+8px)] left-[10px] min-w-[196px] bg-white border border-[#E4EAE9] rounded-2xl shadow-[0_14px_34px_rgba(15,48,54,0.16)] overflow-hidden animate-[dd-menu-in_140ms_ease-out]"
           role="menu"
         >
           {email && (
@@ -73,49 +84,72 @@ export function AccountMenu({ isCollapsed }: AccountMenuProps) {
               {email}
             </div>
           )}
-          <nav>
-            <a href="/settings" className={menuItemClass} role="menuitem">
+          <nav className="py-1">
+            <CustomLink
+              href="/settings"
+              className={itemClass}
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+            >
+              <Settings className="size-4 shrink-0 opacity-50" />
               {t("account_settings")}
-            </a>
-            <button type="button" className={menuItemClass} role="menuitem" disabled>
+            </CustomLink>
+
+            <div className={cn(itemClass, "cursor-default")} role="menuitem">
+              <Globe className="size-4 shrink-0 opacity-50" />
               {t("account_language")}
-            </button>
-            <button type="button" className={menuItemClass} role="menuitem" disabled>
-              {t("account_feedback")}
-            </button>
+            </div>
+
+            <CustomLink
+              href="/settings/follow-hub"
+              className={itemClass}
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+            >
+              <HeartHandshake className="size-4 shrink-0 opacity-50" />
+              {t("account_follow_hub")}
+            </CustomLink>
+
             <a
-              href="/roadmap"
-              className={menuItemClass}
+              href="https://app.daodao.so/roadmap"
+              className={itemClass}
               role="menuitem"
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t("account_roadmap")}
-              <svg
-                className="size-3.5 ml-auto opacity-40"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
+              <Map className="size-4 shrink-0 opacity-50" />
+              {t("account_roadmap_suggestion")}
+              <ExternalLink className="size-3.5 ml-auto opacity-40" />
             </a>
-            <button type="button" className={menuItemClass} role="menuitem" disabled>
+
+            <CustomLink
+              href="/settings/bug-report"
+              className={itemClass}
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+            >
+              <Bug className="size-4 shrink-0 opacity-50" />
               {t("account_bug_report")}
-            </button>
+            </CustomLink>
+
+            <CustomLink
+              href="/settings/archived"
+              className={itemClass}
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+            >
+              <Archive className="size-4 shrink-0 opacity-50" />
+              {t("account_archived")}
+            </CustomLink>
           </nav>
           <div className="border-t border-[#EEF3F3]">
             <button
               type="button"
-              className={menuItemClass}
+              className={itemClass}
               role="menuitem"
               onClick={() => logout()}
             >
+              <LogOut className="size-4 shrink-0 opacity-50" />
               {t("account_logout")}
             </button>
           </div>

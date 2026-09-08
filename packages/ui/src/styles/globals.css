@@ -792,4 +792,24 @@
       linear-gradient(270deg, oklch(0.984 0.009 197 / 0) 20%, oklch(0.984 0.009 197) 88%),
       oklch(0.711 0.12 190.6 / 0.3);
   }
+
+  @keyframes dd-menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes dd-sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
 }
