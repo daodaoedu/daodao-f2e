@@ -1,7 +1,7 @@
 "use client";
 
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import { SettingsList } from "@/components/settings";
+import { SettingsList, SettingsUserCard } from "@/components/settings";
 
 export default function SettingsPage() {
   return (
@@ -11,6 +11,7 @@ export default function SettingsPage() {
       <BackgroundAnimation />
 
       <main className="max-w-[448px] mx-auto px-5 pb-[64px] pt-3 md:pt-12">
+        <SettingsUserCard />
         <SettingsList />
       </main>
     </div>

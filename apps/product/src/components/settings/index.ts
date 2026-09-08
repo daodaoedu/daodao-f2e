@@ -5,3 +5,4 @@ export { InteractionSettings } from "./interaction/interaction-settings";
 export * from "./preferences";
 export * from "./public-info";
 export { SettingsList } from "./settings-list";
+export { SettingsUserCard } from "./settings-user-card";
