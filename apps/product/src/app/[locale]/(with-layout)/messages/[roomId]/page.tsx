@@ -3,11 +3,11 @@
 import type { ChatMessageType } from "@daodao/api";
 import {
   markChatRoomRead,
-  useCurrentUser,
   useChatMessageDelta,
   useChatMessageHistory,
   useChatPins,
   useChatRoom,
+  useCurrentUser,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Spinner } from "@daodao/ui/components/spinner";
@@ -20,6 +20,7 @@ import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { MemberPanel } from "@/components/chat/member-panel";
 import { PinBanner } from "@/components/chat/pin-banner";
 import { PinPanel } from "@/components/chat/pin-panel";
+import { SearchBar } from "@/components/chat/search-bar";
 import { useChatTimeline } from "@/hooks/use-chat-timeline";
 
 export default function ChatRoomPage() {
@@ -40,10 +41,11 @@ export default function ChatRoomPage() {
 
   const historyMessages: ChatMessageType[] = useMemo(
     () => historyData?.messages ?? [],
-    [historyData],
+    [historyData]
   );
 
-  const latestId = historyMessages.length > 0 ? historyMessages[historyMessages.length - 1]!.id : null;
+  const latestId =
+    historyMessages.length > 0 ? historyMessages[historyMessages.length - 1]!.id : null;
   const sinceRef = useRef<string | null>(null);
   useEffect(() => {
     if (historyData && !sinceRef.current) {
@@ -123,6 +125,13 @@ export default function ChatRoomPage() {
             onToggleMembers={() => togglePanel("members")}
             onTogglePins={() => togglePanel("pins")}
           />
+          {showSearch && (
+            <SearchBar
+              roomId={roomId}
+              isOpen={showSearch}
+              onClose={() => setShowSearch(false)}
+            />
+          )}
           <PinBanner roomId={roomId} onOpenPinPanel={() => togglePanel("pins")} />
           <div className="flex-1 overflow-y-auto">
             <ChatMessageList
@@ -150,11 +159,7 @@ export default function ChatRoomPage() {
             onClose={() => setShowPins(false)}
             isHost={isHost}
           />
-          <MemberPanel
-            roomId={roomId}
-            isOpen={showMembers}
-            onClose={() => setShowMembers(false)}
-          />
+          <MemberPanel roomId={roomId} isOpen={showMembers} onClose={() => setShowMembers(false)} />
         </div>
       )}
     </ChatLayout>

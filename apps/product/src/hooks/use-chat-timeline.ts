@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
-import { format } from "date-fns";
 import type { ChatMessageType } from "@daodao/api";
+import { format } from "date-fns";
+import { useMemo } from "react";
 import { CHAT_GROUP_GAP_MS } from "@/constants/chat";
 
 // ─── Types ───────────────────────────────────────────────
@@ -35,8 +35,7 @@ function canGroup(a: ChatMessageType, b: ChatMessageType): boolean {
   if (a.kind !== "text" || b.kind !== "text") return false;
   if (a.author?.userId !== b.author?.userId) return false;
   if (!a.author || !b.author) return false;
-  const gap =
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  const gap = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   return gap < CHAT_GROUP_GAP_MS;
 }
 
@@ -44,7 +43,7 @@ function canGroup(a: ChatMessageType, b: ChatMessageType): boolean {
 
 export function useChatTimeline(
   historyMessages: ChatMessageType[],
-  delta: DeltaData | null,
+  delta: DeltaData | null
 ): TimelineItem[] {
   return useMemo(() => {
     const map = new Map<number, ChatMessageType>();
@@ -76,13 +75,9 @@ export function useChatTimeline(
       const next = i < sorted.length - 1 ? sorted[i + 1] : undefined;
 
       const groupedWithPrev =
-        prev !== undefined &&
-        toTaipeiDateKey(prev.createdAt) === dateKey &&
-        canGroup(prev, msg);
+        prev !== undefined && toTaipeiDateKey(prev.createdAt) === dateKey && canGroup(prev, msg);
       const groupedWithNext =
-        next !== undefined &&
-        toTaipeiDateKey(next.createdAt) === dateKey &&
-        canGroup(msg, next);
+        next !== undefined && toTaipeiDateKey(next.createdAt) === dateKey && canGroup(msg, next);
 
       items.push({
         type: "message",

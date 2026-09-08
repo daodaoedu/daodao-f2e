@@ -4,8 +4,8 @@ import { useTranslations } from "@daodao/i18n";
 import { useIsMobile } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
-import { useRouter } from "next/navigation";
 import { ArrowLeft, Pin, Search, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { getChatRoomColor } from "@/constants/chat";
 
 interface ChatHeaderProps {
@@ -50,7 +50,7 @@ export function ChatHeader({
 
         <div
           className={cn(
-            "flex size-11 shrink-0 items-center justify-center rounded-full text-base font-semibold text-text-dark",
+            "flex size-11 shrink-0 items-center justify-center rounded-full text-base font-semibold text-text-dark"
           )}
           style={{ backgroundColor: getChatRoomColor(colorSeed) }}
         >

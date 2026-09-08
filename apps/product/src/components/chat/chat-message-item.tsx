@@ -8,8 +8,7 @@ import {
   unlikeChatMessage,
   unpinChatMessage,
 } from "@daodao/api";
-import { useTranslations } from "@daodao/i18n";
-import { useLocale } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
 import {
@@ -33,8 +32,15 @@ import { useCallback, useState } from "react";
 import { formatRelativeTime } from "@/utils/format-time";
 
 const AVATAR_COLORS = [
-  "bg-[#FFD6C8]", "bg-[#C8FFE4]", "bg-[#C8DCFF]", "bg-[#FFC8F0]",
-  "bg-[#FEFFC8]", "bg-[#C8FFF2]", "bg-[#E4C8FF]", "bg-[#FFE4C8]", "bg-[#C8F0FF]",
+  "bg-[#FFD6C8]",
+  "bg-[#C8FFE4]",
+  "bg-[#C8DCFF]",
+  "bg-[#FFC8F0]",
+  "bg-[#FEFFC8]",
+  "bg-[#C8FFF2]",
+  "bg-[#E4C8FF]",
+  "bg-[#FFE4C8]",
+  "bg-[#C8F0FF]",
 ];
 
 function getAvatarColor(name: string): string {
@@ -112,8 +118,10 @@ export function ChatMessageItem({
     try {
       const response = await deleteChatMessage(message.roomId, message.id);
       if (response.error) {
-        const msg = response.error && typeof response.error === "object" && "message" in response.error
-          ? String(response.error.message) : t("send_failed");
+        const msg =
+          response.error && typeof response.error === "object" && "message" in response.error
+            ? String(response.error.message)
+            : t("send_failed");
         toast.error(msg);
         return;
       }
@@ -140,14 +148,16 @@ export function ChatMessageItem({
       className={cn(
         "relative flex gap-2.5 items-start group px-4 hover:bg-[#F7FBFB] transition-colors",
         isGroupStart ? "pt-2" : "pt-0.5",
-        isGroupEnd ? "pb-1.5" : "pb-0.5",
+        isGroupEnd ? "pb-1.5" : "pb-0.5"
       )}
     >
       {/* Avatar — only show on group start */}
       {isGroupStart ? (
         <Avatar className="size-9 shrink-0 mt-0.5">
           {author?.avatar && <AvatarImage src={author.avatar} alt={authorName} />}
-          <AvatarFallback className={cn("text-sm font-medium text-text-dark", getAvatarColor(authorName))}>
+          <AvatarFallback
+            className={cn("text-sm font-medium text-text-dark", getAvatarColor(authorName))}
+          >
             {authorName.slice(0, 1) || "?"}
           </AvatarFallback>
         </Avatar>
@@ -183,7 +193,9 @@ export function ChatMessageItem({
               <p className="text-xs text-text-dark/40 italic">{t("reply_to_deleted")}</p>
             ) : (
               <>
-                <p className="text-[11px] font-medium text-text-dark/60">{message.replyTo.authorName}</p>
+                <p className="text-[11px] font-medium text-text-dark/60">
+                  {message.replyTo.authorName}
+                </p>
                 <p className="text-xs text-text-dark/50 truncate">{message.replyTo.bodyPreview}</p>
               </>
             )}
@@ -191,7 +203,9 @@ export function ChatMessageItem({
         )}
 
         {/* Body */}
-        <p className="text-sm text-text-dark leading-5 whitespace-pre-wrap break-words">{message.body}</p>
+        <p className="text-sm text-text-dark leading-5 whitespace-pre-wrap break-words">
+          {message.body}
+        </p>
 
         {/* Like pill (always visible when count > 0) */}
         {likeCount > 0 && (
@@ -200,7 +214,9 @@ export function ChatMessageItem({
             onClick={handleLikeToggle}
             className={cn(
               "inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-xs transition-colors",
-              liked ? "bg-red-50 text-red-400" : "bg-gray-100 text-text-dark/40 hover:bg-red-50 hover:text-red-400",
+              liked
+                ? "bg-red-50 text-red-400"
+                : "bg-gray-100 text-text-dark/40 hover:bg-red-50 hover:text-red-400"
             )}
           >
             <Heart className={cn("size-3", liked && "fill-current")} />
@@ -212,7 +228,9 @@ export function ChatMessageItem({
       {/* Hover action bar */}
       <div className="absolute -top-3 right-3 flex items-center gap-0.5 bg-white border border-gray-200 rounded-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
         <Button variant="ghost" size="icon" className="size-7" onClick={handleLikeToggle}>
-          <Heart className={cn("size-3.5", liked ? "fill-red-400 text-red-400" : "text-gray-400")} />
+          <Heart
+            className={cn("size-3.5", liked ? "fill-red-400 text-red-400" : "text-gray-400")}
+          />
         </Button>
         {onReply && (
           <Button variant="ghost" size="icon" className="size-7" onClick={() => onReply(message)}>
@@ -234,12 +252,19 @@ export function ChatMessageItem({
             <DropdownMenuContent align="end" className="min-w-[140px]">
               {canPin && (
                 <DropdownMenuItem onClick={handlePin}>
-                  {message.isPinned ? <PinOff className="size-4 mr-2" /> : <Pin className="size-4 mr-2" />}
+                  {message.isPinned ? (
+                    <PinOff className="size-4 mr-2" />
+                  ) : (
+                    <Pin className="size-4 mr-2" />
+                  )}
                   {message.isPinned ? t("unpin_action") : t("pin_action")}
                 </DropdownMenuItem>
               )}
               {canDelete && (
-                <DropdownMenuItem onClick={handleDelete} className="text-red-500 focus:text-red-500">
+                <DropdownMenuItem
+                  onClick={handleDelete}
+                  className="text-red-500 focus:text-red-500"
+                >
                   <Trash2 className="size-4 mr-2" />
                   {t("delete_action")}
                 </DropdownMenuItem>

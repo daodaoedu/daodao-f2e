@@ -1,9 +1,8 @@
 "use client";
 
 import { useMyChatRooms } from "@daodao/api";
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
-import { useLocale } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { Input } from "@daodao/ui/components/input";
 import { cn } from "@daodao/ui/lib/utils";
@@ -76,15 +75,13 @@ function ChatRoomItem({ room, locale, isActive }: ChatRoomItemProps) {
       href={`/messages/${room.id}`}
       className={cn(
         "flex items-center gap-3 rounded-xl p-3 transition-colors",
-        isActive
-          ? "bg-logo-cyan/10 ring-1 ring-logo-cyan/30"
-          : "bg-white hover:bg-gray-50",
+        isActive ? "bg-logo-cyan/10 ring-1 ring-logo-cyan/30" : "bg-white hover:bg-gray-50"
       )}
     >
       <div
         className={cn(
           "flex size-12 shrink-0 items-center justify-center rounded-full text-lg font-semibold text-text-dark",
-          getRoomColor(room.colorSeed),
+          getRoomColor(room.colorSeed)
         )}
       >
         {room.iconLabel}
@@ -92,29 +89,17 @@ function ChatRoomItem({ room, locale, isActive }: ChatRoomItemProps) {
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-text-dark truncate">
-            {room.name}
-          </h3>
-          <span className="text-xs text-text-dark/50 shrink-0">
-            {timeDisplay}
-          </span>
+          <h3 className="text-sm font-semibold text-text-dark truncate">{room.name}</h3>
+          <span className="text-xs text-text-dark/50 shrink-0">{timeDisplay}</span>
         </div>
-        <p className="text-xs text-text-dark/60 truncate">
-          {room.organizationName}
-        </p>
+        <p className="text-xs text-text-dark/60 truncate">{room.organizationName}</p>
         {lastMessagePreview && (
-          <p className="text-sm text-text-dark/70 truncate mt-0.5">
-            {lastMessagePreview}
-          </p>
+          <p className="text-sm text-text-dark/70 truncate mt-0.5">{lastMessagePreview}</p>
         )}
       </div>
 
       {room.unreadCount > 0 && (
-        <Badge
-          variant="alert"
-          size="xs"
-          className="shrink-0 min-w-[20px] text-center"
-        >
+        <Badge variant="alert" size="xs" className="shrink-0 min-w-[20px] text-center">
           {room.unreadCount > 99 ? "99+" : room.unreadCount}
         </Badge>
       )}
@@ -157,9 +142,7 @@ export function ChatRoomList({ activeRoomId }: ChatRoomListProps) {
   const totalUnread = data?.totalUnread ?? 0;
 
   const filtered = filter
-    ? rooms.filter((r) =>
-        r.name.toLowerCase().includes(filter.toLowerCase()),
-      )
+    ? rooms.filter((r) => r.name.toLowerCase().includes(filter.toLowerCase()))
     : rooms;
 
   if (isLoading) {
@@ -207,9 +190,7 @@ export function ChatRoomList({ activeRoomId }: ChatRoomListProps) {
       {/* Room List */}
       <div className="flex-1 overflow-y-auto px-3 pb-3">
         {filtered.length === 0 ? (
-          <p className="text-sm text-text-dark/50 text-center py-8">
-            {t("filter_no_results")}
-          </p>
+          <p className="text-sm text-text-dark/50 text-center py-8">{t("filter_no_results")}</p>
         ) : (
           <div className="flex flex-col gap-1">
             {filtered.map((room) => (

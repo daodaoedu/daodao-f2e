@@ -35,13 +35,9 @@ function MemberItem({ member }: { member: ChatMemberType }) {
           <span className="text-sm font-medium text-text-dark truncate">
             {member.nickname ?? t("deleted_user")}
           </span>
-          {member.isHost && (
-            <Shield className="size-3.5 shrink-0 text-amber-500" />
-          )}
+          {member.isHost && <Shield className="size-3.5 shrink-0 text-amber-500" />}
         </div>
-        {member.bio && (
-          <p className="text-xs text-text-dark/50 truncate">{member.bio}</p>
-        )}
+        {member.bio && <p className="text-xs text-text-dark/50 truncate">{member.bio}</p>}
       </div>
     </div>
   );
@@ -61,31 +57,24 @@ export function MemberPanel({ roomId, isOpen, onClose }: MemberPanelProps) {
   return (
     <>
       {isOpen && (
-        <div
-          className="absolute inset-0 bg-black/20 z-10"
+        <button
+          type="button"
+          className="absolute inset-0 bg-black/20 z-10 cursor-default"
           onClick={onClose}
-          onKeyDown={(e) => e.key === "Escape" && onClose()}
-          role="button"
-          tabIndex={-1}
           aria-label="Close"
         />
       )}
       <div
         className={cn(
           "absolute right-0 top-0 h-full w-[240px] bg-white shadow-lg z-20 flex flex-col transition-transform duration-200",
-          isOpen ? "translate-x-0" : "translate-x-full",
+          isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <h3 className="text-sm font-medium text-text-dark">
             {t("member_panel_count", { count: memberList.length })}
           </h3>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-7"
-            onClick={onClose}
-          >
+          <Button variant="ghost" size="icon" className="size-7" onClick={onClose}>
             <X className="size-4" />
           </Button>
         </div>

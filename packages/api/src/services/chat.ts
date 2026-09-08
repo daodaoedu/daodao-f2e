@@ -53,11 +53,7 @@ export const getChatMessages = async (
   });
 
 /** 發送訊息 */
-export const sendChatMessage = async (
-  roomId: number,
-  body: string,
-  replyToMessageId?: number
-) =>
+export const sendChatMessage = async (roomId: number, body: string, replyToMessageId?: number) =>
   client.POST("/api/v1/chat-rooms/{roomId}/messages", {
     params: { path: { roomId } },
     body: { body, replyToMessageId },

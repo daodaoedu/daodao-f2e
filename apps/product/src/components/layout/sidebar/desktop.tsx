@@ -10,9 +10,9 @@ import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
-import { ChatUnreadBadge } from "./chat-unread-badge";
 import { AccountMenu } from "./account-menu";
 import { BreathingDot } from "./breathing-dot";
+import { ChatUnreadBadge } from "./chat-unread-badge";
 import { menuItems } from "./constant";
 import type { SidebarProps } from "./type";
 

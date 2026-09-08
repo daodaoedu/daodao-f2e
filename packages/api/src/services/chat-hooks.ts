@@ -17,11 +17,9 @@ export const useMyChatRooms = () =>
 
 /** 聊天室詳情 */
 export const useChatRoom = (roomId: number | null) =>
-  useQuery(
-    "/api/v1/chat-rooms/{roomId}",
-    roomId ? { params: { path: { roomId } } } : null,
-    { revalidateOnFocus: false }
-  );
+  useQuery("/api/v1/chat-rooms/{roomId}", roomId ? { params: { path: { roomId } } } : null, {
+    revalidateOnFocus: false,
+  });
 
 /** 聊天室成員列表 */
 export const useChatMembers = (roomId: number | null) =>
@@ -47,19 +45,15 @@ export const useChatMessageDelta = (
 ) =>
   useQuery(
     "/api/v1/chat-rooms/{roomId}/messages",
-    roomId && after && since
-      ? { params: { path: { roomId }, query: { after, since } } }
-      : null,
+    roomId && after && since ? { params: { path: { roomId }, query: { after, since } } } : null,
     { refreshInterval: 5_000, refreshWhenHidden: false, revalidateOnFocus: true }
   );
 
 /** 釘選訊息列表 */
 export const useChatPins = (roomId: number | null) =>
-  useQuery(
-    "/api/v1/chat-rooms/{roomId}/pins",
-    roomId ? { params: { path: { roomId } } } : null,
-    { revalidateOnFocus: false }
-  );
+  useQuery("/api/v1/chat-rooms/{roomId}/pins", roomId ? { params: { path: { roomId } } } : null, {
+    revalidateOnFocus: false,
+  });
 
 /** 訊息搜尋；roomId 與 q 齊備才啟用 */
 export const useChatSearch = (roomId: number | null, q: string | null) =>

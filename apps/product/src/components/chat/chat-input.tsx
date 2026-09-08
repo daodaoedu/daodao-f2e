@@ -56,8 +56,10 @@ export function ChatInput({
       if (editingMessage) {
         const response = await editChatMessage(roomId, editingMessage.id, trimmed);
         if (response.error) {
-          const msg = response.error && typeof response.error === "object" && "message" in response.error
-            ? String(response.error.message) : t("send_failed");
+          const msg =
+            response.error && typeof response.error === "object" && "message" in response.error
+              ? String(response.error.message)
+              : t("send_failed");
           toast.error(msg);
           return;
         }
@@ -67,8 +69,10 @@ export function ChatInput({
       } else {
         const response = await sendChatMessage(roomId, trimmed, replyTo?.id);
         if (response.error) {
-          const msg = response.error && typeof response.error === "object" && "message" in response.error
-            ? String(response.error.message) : t("send_failed");
+          const msg =
+            response.error && typeof response.error === "object" && "message" in response.error
+              ? String(response.error.message)
+              : t("send_failed");
           toast.error(msg);
           return;
         }
@@ -81,7 +85,19 @@ export function ChatInput({
     } finally {
       setSending(false);
     }
-  }, [value, sending, roomId, editingMessage, replyTo?.id, onClearReply, onClearEdit, onMessageSent, onMessageEdited, resetInput, t]);
+  }, [
+    value,
+    sending,
+    roomId,
+    editingMessage,
+    replyTo?.id,
+    onClearReply,
+    onClearEdit,
+    onMessageSent,
+    onMessageEdited,
+    resetInput,
+    t,
+  ]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -95,7 +111,7 @@ export function ChatInput({
         resetInput();
       }
     },
-    [isComposing, handleSubmit, editingMessage, onClearEdit, resetInput],
+    [isComposing, handleSubmit, editingMessage, onClearEdit, resetInput]
   );
 
   const handleInput = useCallback(() => {
@@ -117,9 +133,7 @@ export function ChatInput({
         <div className="flex items-center gap-2 px-4 pt-2 pb-1">
           <Pencil className="size-3.5 text-amber-500 shrink-0" />
           <div className="flex-1 min-w-0 border-l-2 border-amber-400 pl-2">
-            <p className="text-[11px] font-medium text-text-dark/60">
-              {t("edit_mode_label")}
-            </p>
+            <p className="text-[11px] font-medium text-text-dark/60">{t("edit_mode_label")}</p>
             <p className="text-xs text-text-dark/40 truncate">{editingMessage.body}</p>
           </div>
           <Button
@@ -142,12 +156,7 @@ export function ChatInput({
             </p>
             <p className="text-xs text-text-dark/40 truncate">{replyTo.body}</p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClearReply}
-            className="size-6 shrink-0"
-          >
+          <Button variant="ghost" size="icon" onClick={onClearReply} className="size-6 shrink-0">
             <X className="size-4" />
           </Button>
         </div>
@@ -168,7 +177,7 @@ export function ChatInput({
           className={cn(
             "flex-1 resize-none overflow-hidden rounded-xl border border-[#E4EAE9] bg-[#F7FBFB] px-4 py-2.5 text-sm text-text-dark",
             "placeholder:text-text-dark/30 focus:outline-none focus:border-logo-cyan transition-colors",
-            "min-h-[40px] max-h-[120px]",
+            "min-h-[40px] max-h-[120px]"
           )}
         />
         <Button

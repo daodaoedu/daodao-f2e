@@ -4,11 +4,11 @@ import type { ChatPinnedMessageType } from "@daodao/api";
 import { unpinChatMessage, useChatPins } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
+import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { format } from "date-fns";
 import { Pin, X } from "lucide-react";
 import { useCallback } from "react";
-import { toast } from "@daodao/ui/components/sonner";
 
 interface PinPanelProps {
   roomId: number;
@@ -90,19 +90,17 @@ export function PinPanel({ roomId, isOpen, onClose, isHost }: PinPanelProps) {
   return (
     <>
       {isOpen && (
-        <div
-          className="absolute inset-0 bg-black/20 z-10"
+        <button
+          type="button"
+          className="absolute inset-0 bg-black/20 z-10 cursor-default"
           onClick={onClose}
-          onKeyDown={(e) => e.key === "Escape" && onClose()}
-          role="button"
-          tabIndex={-1}
           aria-label="Close"
         />
       )}
       <div
         className={cn(
           "absolute right-0 top-0 h-full w-[320px] bg-white shadow-lg z-20 flex flex-col transition-transform duration-200",
-          isOpen ? "translate-x-0" : "translate-x-full",
+          isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
@@ -112,20 +110,13 @@ export function PinPanel({ roomId, isOpen, onClose, isHost }: PinPanelProps) {
               {t("pin_panel_count", { count: pinList.length })}
             </h3>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-7"
-            onClick={onClose}
-          >
+          <Button variant="ghost" size="icon" className="size-7" onClick={onClose}>
             <X className="size-4" />
           </Button>
         </div>
         <div className="flex-1 overflow-y-auto">
           {pinList.length === 0 ? (
-            <p className="text-sm text-text-dark/40 text-center py-8">
-              {t("pin_panel_empty")}
-            </p>
+            <p className="text-sm text-text-dark/40 text-center py-8">{t("pin_panel_empty")}</p>
           ) : (
             pinList.map((pin) => (
               <PinnedItem

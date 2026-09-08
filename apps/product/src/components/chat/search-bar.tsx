@@ -14,12 +14,7 @@ interface SearchBarProps {
   onNavigateToMessage?: (messageId: number) => void;
 }
 
-export function SearchBar({
-  roomId,
-  isOpen,
-  onClose,
-  onNavigateToMessage,
-}: SearchBarProps) {
+export function SearchBar({ roomId, isOpen, onClose, onNavigateToMessage }: SearchBarProps) {
   const t = useTranslations("messages");
   const [inputValue, setInputValue] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState<string | null>(null);
@@ -41,10 +36,7 @@ export function SearchBar({
     return () => clearTimeout(timer);
   }, [inputValue]);
 
-  const { data: searchData } = useChatSearch(
-    isOpen ? roomId : null,
-    debouncedQuery,
-  );
+  const { data: searchData } = useChatSearch(isOpen ? roomId : null, debouncedQuery);
   const results = searchData?.items ?? [];
   const total = searchData?.total ?? 0;
 
@@ -85,7 +77,7 @@ export function SearchBar({
         onClose();
       }
     },
-    [results.length, handleNext, onClose],
+    [results.length, handleNext, onClose]
   );
 
   const handleClose = useCallback(() => {
@@ -132,7 +124,9 @@ export function SearchBar({
             onClick={handlePrev}
             disabled={currentIndex <= 0}
           >
-            <ChevronUp className={cn("size-4", currentIndex <= 0 ? "text-gray-300" : "text-gray-500")} />
+            <ChevronUp
+              className={cn("size-4", currentIndex <= 0 ? "text-gray-300" : "text-gray-500")}
+            />
           </Button>
           <Button
             variant="ghost"
@@ -141,18 +135,18 @@ export function SearchBar({
             onClick={handleNext}
             disabled={currentIndex >= total - 1}
           >
-            <ChevronDown className={cn("size-4", currentIndex >= total - 1 ? "text-gray-300" : "text-gray-500")} />
+            <ChevronDown
+              className={cn(
+                "size-4",
+                currentIndex >= total - 1 ? "text-gray-300" : "text-gray-500"
+              )}
+            />
           </Button>
         </div>
       )}
 
       {/* Close */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="size-7 shrink-0"
-        onClick={handleClose}
-      >
+      <Button variant="ghost" size="icon" className="size-7 shrink-0" onClick={handleClose}>
         <X className="size-4 text-gray-400" />
       </Button>
     </div>

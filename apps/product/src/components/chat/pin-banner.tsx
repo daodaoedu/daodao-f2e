@@ -12,8 +12,7 @@ interface PinBannerProps {
   onOpenPinPanel: () => void;
 }
 
-const dismissedStorage =
-  getStorage<Record<number, number>>(StorageEnum.ChatPinBannerDismissed);
+const dismissedStorage = getStorage<Record<number, number>>(StorageEnum.ChatPinBannerDismissed);
 
 export function PinBanner({ roomId, onOpenPinPanel }: PinBannerProps) {
   const t = useTranslations("messages");
@@ -33,16 +32,14 @@ export function PinBanner({ roomId, onOpenPinPanel }: PinBannerProps) {
       const stored = dismissedStorage.get() ?? {};
       dismissedStorage.set({ ...stored, [roomId]: latestPinId });
     },
-    [roomId, latestPinId],
+    [roomId, latestPinId]
   );
 
   if (!latestPin || isDismissed) return null;
 
   const authorName = latestPin.author?.nickname ?? t("deleted_user");
   const bodyPreview =
-    latestPin.body.length > 60
-      ? `${latestPin.body.slice(0, 60)}...`
-      : latestPin.body;
+    latestPin.body.length > 60 ? `${latestPin.body.slice(0, 60)}...` : latestPin.body;
 
   return (
     <button
