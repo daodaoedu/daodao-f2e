@@ -8,13 +8,13 @@ import {
   Archive,
   Bug,
   ExternalLink,
-  Globe,
   HeartHandshake,
   LogOut,
-  Map,
+  Map as MapIcon,
   Settings,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { LanguagePillToggle } from "./language-pill-toggle";
 
 interface AccountMenuProps {
   isCollapsed: boolean;
@@ -95,9 +95,8 @@ export function AccountMenu({ isCollapsed }: AccountMenuProps) {
               {t("account_settings")}
             </CustomLink>
 
-            <div className={cn(itemClass, "cursor-default")} role="menuitem">
-              <Globe className="size-4 shrink-0 opacity-50" />
-              {t("account_language")}
+            <div className={cn(itemClass, "cursor-default")}>
+              <LanguagePillToggle />
             </div>
 
             <CustomLink
@@ -117,7 +116,7 @@ export function AccountMenu({ isCollapsed }: AccountMenuProps) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Map className="size-4 shrink-0 opacity-50" />
+              <MapIcon className="size-4 shrink-0 opacity-50" />
               {t("account_roadmap_suggestion")}
               <ExternalLink className="size-3.5 ml-auto opacity-40" />
             </a>
@@ -143,12 +142,7 @@ export function AccountMenu({ isCollapsed }: AccountMenuProps) {
             </CustomLink>
           </nav>
           <div className="border-t border-[#EEF3F3]">
-            <button
-              type="button"
-              className={itemClass}
-              role="menuitem"
-              onClick={() => logout()}
-            >
+            <button type="button" className={itemClass} role="menuitem" onClick={() => logout()}>
               <LogOut className="size-4 shrink-0 opacity-50" />
               {t("account_logout")}
             </button>

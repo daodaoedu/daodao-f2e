@@ -8,13 +8,13 @@ import {
   Archive,
   Bug,
   ExternalLink,
-  Globe,
   HeartHandshake,
   LogOut,
   Map as MapIcon,
   Settings,
 } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
+import { LanguagePillToggle } from "./language-pill-toggle";
 
 interface MobileBottomSheetProps {
   isOpen: boolean;
@@ -98,8 +98,7 @@ export function MobileBottomSheet({ isOpen, onClose }: MobileBottomSheetProps) {
           </CustomLink>
 
           <div className={cn(itemClass, "cursor-default")}>
-            <Globe className="size-[18px] shrink-0 opacity-50" />
-            {t("account_language")}
+            <LanguagePillToggle />
           </div>
 
           <CustomLink href="/settings/follow-hub" className={itemClass} onClick={onClose}>
