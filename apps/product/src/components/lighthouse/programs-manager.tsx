@@ -1092,8 +1092,8 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
           .filter((s) => s.sessionDate)
           .map((s) => ({
             sessionDate: s.sessionDate,
-            startTime: s.startTime || undefined,
-            endTime: s.endTime || undefined,
+            startTime: s.startTime || null,
+            endTime: s.endTime || null,
           })),
         feeType: extras.feeType,
         feeAmount: extras.feeType === "paid" && feeAmountValue ? Number(feeAmountValue) : undefined,
