@@ -7638,6 +7638,7 @@
     "cohort_interaction_modes_error": "請至少選擇一種互動方式",
     "cohort_fee_amount_error": "付費活動請填寫費用金額",
     "cohort_external_signup_url_error": "外部連結報名請填寫外部報名連結",
+    "cohort_slug_error": "網址代稱只能使用小寫英文、數字與單一連字號，不可以連字號開頭或結尾（例：2026-summer）",
     "cohort_display_name": "場次名稱",
     "cohort_slug": "網址代稱",
     "start_date": "開始日期",

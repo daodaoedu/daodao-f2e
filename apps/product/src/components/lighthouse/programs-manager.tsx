@@ -46,7 +46,8 @@ import {
   X,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { type CohortFieldErrorKey, resolveCohortApiError } from "@/utils/cohort-api-error";
 import { JoinCode } from "./join-code";
 
 type SessionEntry = { id: string; sessionDate: string; startTime: string; endTime: string };
@@ -62,6 +63,26 @@ const COHORT_STATUS_STYLES: Record<LighthouseCohortType["status"], string> = {
 
 type SetupTab = "basic" | "templates" | "home" | "privacy" | "signup";
 const SETUP_TABS: SetupTab[] = ["basic", "templates", "home", "privacy", "signup"];
+/** 與 server createCohortSchema 一致：小寫英數，單一連字號分隔，不可首尾或連續連字號 */
+const COHORT_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/** HTML pattern 屬性版本（Chrome 以 v flag 編譯，字元類別結尾的 `-` 會被判定為無效正則而整個忽略） */
+const COHORT_SLUG_HTML_PATTERN = "[a-z0-9]+(-[a-z0-9]+)*";
+
+type CohortErrorTranslator = (
+  key: CohortFieldErrorKey | "cohort_create_failed" | "save_failed"
+) => string;
+
+/** 把場次 API 錯誤轉成 toast 文字：已知欄位走 i18n、其他顯示 server 訊息、最後才退回通用訊息 */
+function cohortErrorMessage(
+  t: CohortErrorTranslator,
+  error: unknown,
+  fallbackKey: "cohort_create_failed" | "save_failed"
+): string {
+  const resolved = resolveCohortApiError(error);
+  if (resolved.type === "i18n") return t(resolved.key);
+  if (resolved.type === "message") return resolved.message;
+  return t(fallbackKey);
+}
 
 interface CohortSetupPanelProps {
   mode: "create" | "edit";
@@ -178,8 +199,11 @@ function CohortSetupPanel({
     templates?.filter((tpl) => tpl.title.toLowerCase().includes(templateSearch.toLowerCase())) ??
     [];
 
-  async function handleFormAction(formData: FormData) {
-    await onSubmit(formData, {
+  // 用 onSubmit 而不是 form action：React 19 的 action 完成後會 reset 表單，
+  // 送出失敗（400/409）時使用者填的內容會全部消失，只能從頭再填一次（#188）
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await onSubmit(new FormData(event.currentTarget), {
       interactionModes,
       sessions,
       feeType,
@@ -199,7 +223,7 @@ function CohortSetupPanel({
   return (
     <form
       ref={panelRef}
-      action={handleFormAction}
+      onSubmit={handleSubmit}
       className="scroll-mt-24 rounded-2xl border border-[#CDEBE8] bg-[#F0FBF9] p-5"
     >
       <div className="mb-4 flex items-center justify-between">
@@ -254,6 +278,7 @@ function CohortSetupPanel({
               id={`${prefix}-name`}
               name="displayName"
               required
+              maxLength={100}
               defaultValue={cohort?.displayName ?? ""}
             />
           </label>
@@ -264,7 +289,9 @@ function CohortSetupPanel({
                 id={`${prefix}-slug`}
                 name="slug"
                 required
-                pattern="[a-z0-9-]+"
+                maxLength={50}
+                pattern={COHORT_SLUG_HTML_PATTERN}
+                title={t("cohort_slug_error")}
                 placeholder="2026-summer"
               />
             </label>
@@ -406,6 +433,7 @@ function CohortSetupPanel({
               <Input
                 id={`${prefix}-location`}
                 name="location"
+                maxLength={200}
                 placeholder={t("cohort_location_placeholder")}
                 defaultValue={cohort?.location ?? ""}
               />
@@ -495,7 +523,7 @@ function CohortSetupPanel({
                     <Input
                       name="feeAmount"
                       type="number"
-                      min={0}
+                      min={1}
                       required
                       defaultValue={cohort?.feeAmount ?? ""}
                     />
@@ -838,7 +866,7 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
       } as Parameters<typeof updateLighthouseCohort>[2]);
       setBusy(false);
       if (response.error) {
-        toast.error(t("save_failed"));
+        toast.error(cohortErrorMessage(t, response.error, "save_failed"));
         return;
       }
       await refresh();
@@ -1073,9 +1101,14 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         toast.error(t("cohort_external_signup_url_error"));
         return;
       }
+      const slug = String(formData.get("slug") ?? "").trim();
+      if (!COHORT_SLUG_PATTERN.test(slug)) {
+        toast.error(t("cohort_slug_error"));
+        return;
+      }
       setBusy(true);
       const response = await createLighthouseCohort(program.id, {
-        slug: String(formData.get("slug") ?? "").trim(),
+        slug,
         displayName: String(formData.get("displayName") ?? "").trim(),
         tagline: String(formData.get("tagline") ?? "").trim() || undefined,
         startDate,
@@ -1109,7 +1142,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       } as Parameters<typeof createLighthouseCohort>[1]);
       if (response.error || !response.data) {
         setBusy(false);
-        toast.error(t("cohort_create_failed"));
+        toast.error(cohortErrorMessage(t, response.error, "cohort_create_failed"));
         return;
       }
       const newCohortId = (response.data as { data: { id: number } }).data.id;
