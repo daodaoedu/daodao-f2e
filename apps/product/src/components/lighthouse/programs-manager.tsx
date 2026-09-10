@@ -62,6 +62,10 @@ const COHORT_STATUS_STYLES: Record<LighthouseCohortType["status"], string> = {
 
 type SetupTab = "basic" | "templates" | "home" | "privacy" | "signup";
 const SETUP_TABS: SetupTab[] = ["basic", "templates", "home", "privacy", "signup"];
+/** 與 server createCohortSchema 一致：小寫英數，單一連字號分隔，不可首尾或連續連字號 */
+const COHORT_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/** HTML pattern 屬性版本（Chrome 以 v flag 編譯，字元類別結尾的 `-` 會被判定為無效正則而整個忽略） */
+const COHORT_SLUG_HTML_PATTERN = "[a-z0-9]+(-[a-z0-9]+)*";
 
 interface CohortSetupPanelProps {
   mode: "create" | "edit";
@@ -254,6 +258,7 @@ function CohortSetupPanel({
               id={`${prefix}-name`}
               name="displayName"
               required
+              maxLength={100}
               defaultValue={cohort?.displayName ?? ""}
             />
           </label>
@@ -264,7 +269,9 @@ function CohortSetupPanel({
                 id={`${prefix}-slug`}
                 name="slug"
                 required
-                pattern="[a-z0-9-]+"
+                maxLength={50}
+                pattern={COHORT_SLUG_HTML_PATTERN}
+                title={t("cohort_slug_error")}
                 placeholder="2026-summer"
               />
             </label>
@@ -406,6 +413,7 @@ function CohortSetupPanel({
               <Input
                 id={`${prefix}-location`}
                 name="location"
+                maxLength={200}
                 placeholder={t("cohort_location_placeholder")}
                 defaultValue={cohort?.location ?? ""}
               />
@@ -495,7 +503,7 @@ function CohortSetupPanel({
                     <Input
                       name="feeAmount"
                       type="number"
-                      min={0}
+                      min={1}
                       required
                       defaultValue={cohort?.feeAmount ?? ""}
                     />
@@ -1073,9 +1081,14 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         toast.error(t("cohort_external_signup_url_error"));
         return;
       }
+      const slug = String(formData.get("slug") ?? "").trim();
+      if (!COHORT_SLUG_PATTERN.test(slug)) {
+        toast.error(t("cohort_slug_error"));
+        return;
+      }
       setBusy(true);
       const response = await createLighthouseCohort(program.id, {
-        slug: String(formData.get("slug") ?? "").trim(),
+        slug,
         displayName: String(formData.get("displayName") ?? "").trim(),
         tagline: String(formData.get("tagline") ?? "").trim() || undefined,
         startDate,

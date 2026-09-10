@@ -7638,6 +7638,7 @@
     "cohort_interaction_modes_error": "Select at least one interaction mode.",
     "cohort_fee_amount_error": "Enter a fee amount for paid cohorts.",
     "cohort_external_signup_url_error": "Enter an external signup URL for external signup.",
+    "cohort_slug_error": "The URL slug may only contain lowercase letters, numbers, and single hyphens, and cannot start or end with a hyphen (e.g. 2026-summer).",
     "cohort_display_name": "Cohort name",
     "cohort_slug": "URL slug",
     "start_date": "Start date",
