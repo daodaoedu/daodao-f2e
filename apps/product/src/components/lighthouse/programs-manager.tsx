@@ -47,8 +47,8 @@ import {
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { JoinCode } from "./join-code";
 import { type CohortFieldErrorKey, resolveCohortApiError } from "@/utils/cohort-api-error";
+import { JoinCode } from "./join-code";
 
 type SessionEntry = { id: string; sessionDate: string; startTime: string; endTime: string };
 
