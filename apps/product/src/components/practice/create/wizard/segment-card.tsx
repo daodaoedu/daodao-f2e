@@ -17,9 +17,10 @@ import {
   SelectValue,
 } from "@daodao/ui/components/select";
 import { Textarea } from "@daodao/ui/components/textarea";
+import { cn } from "@daodao/ui/lib/utils";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { formatDateRange, normalizeFrequency } from "@/lib/practice-create";
+import { normalizeFrequency } from "@/lib/practice-create";
 import { type EffectiveSegment, isTimingPreset } from "./derive";
 import {
   isFrequencyPreset,
@@ -39,6 +40,12 @@ import {
   TIMING_PRESETS,
   type WizardFormValues,
 } from "./schema";
+import {
+  WIZARD_INPUT,
+  WIZARD_INPUT_SM,
+  WIZARD_LINK_COLOR,
+  WIZARD_SELECT_SM,
+} from "./wizard-styles";
 
 export interface SegmentCardProps {
   form: UseFormReturn<WizardFormValues>;
@@ -46,13 +53,17 @@ export interface SegmentCardProps {
   effective: EffectiveSegment;
 }
 
-const labelClass = "block text-sm font-medium text-text-dark mb-2";
+const labelClass = "mb-1 block text-xs font-normal leading-[1.4] text-text-dark";
+const customInputClass = cn(
+  "mt-1.5 h-[34px] px-2.5 py-1.5 text-[13px] focus-visible:px-2.5 focus-visible:py-1.5",
+  WIZARD_INPUT
+);
 
 /** 下拉顯示值：「其他…」展開中 → sentinel；否則為預設值或空（顯示 placeholder） */
 const resolveSelectValue = (isOther: boolean, presetValue: string): string =>
   isOther ? SELECT_OTHER_VALUE : presetValue;
 
-/** 拆段時的逐段欄位卡片：名稱 / 行動 / 天數 / 頻率 / 時間 / 時機 */
+/** 拆段時的逐段欄位卡片：名稱 / 行動 / 天數 / 頻率 / 時間 / 時機。POC：欄位預填繼承值，清空後由預覽回退 */
 export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
   const t = useTranslations("practice");
   const globalFrequency = form.watch("frequency");
@@ -61,6 +72,10 @@ export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
   const frequencyOverride = form.watch(`segments.${index}.frequency`) ?? "";
   const minutesOverride = form.watch(`segments.${index}.minutes`) ?? null;
   const timingOverride = form.watch(`segments.${index}.timing`) ?? "";
+
+  // 名稱／行動：未曾編輯前顯示繼承值（POC 預填），開始輸入後顯示原始值，清空即留空
+  const [nameTouched, setNameTouched] = useState(false);
+  const [actionTouched, setActionTouched] = useState(false);
 
   // 「其他…」展開狀態：以既有覆寫是否為非預設值初始化，選單切回預設時關閉
   const [frequencyOther, setFrequencyOther] = useState(
@@ -77,9 +92,11 @@ export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
     timingOverride !== "" && !isTimingPreset(timingOverride)
   );
 
+  // POC：未覆寫時下拉直接顯示繼承的全域頻率（非 placeholder）
+  const inheritedFrequency = isFrequencyPreset(globalFrequency) ? globalFrequency : "";
   const frequencySelectValue = resolveSelectValue(
     frequencyOther,
-    isFrequencyPreset(frequencyOverride) ? frequencyOverride : ""
+    isFrequencyPreset(frequencyOverride) ? frequencyOverride : inheritedFrequency
   );
   const minutesSelectValue = resolveSelectValue(
     minutesOther,
@@ -107,75 +124,43 @@ export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
     }
   };
 
+  const rangeText =
+    effective.start && effective.end
+      ? `${formatFull(effective.start)} – ${formatFull(effective.end)}`
+      : "";
+
   return (
-    <div className="rounded-lg border border-bg-gray bg-white p-4 space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-logo-cyan text-sm font-medium text-white">
+    <div className="rounded-[12px] border border-bg-gray bg-white p-3.5">
+      <div className="mb-2.5 flex items-center gap-2">
+        <span
+          className={cn(
+            "inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-light-blue text-xs",
+            WIZARD_LINK_COLOR
+          )}
+        >
           <span aria-hidden>{index + 1}</span>
           <span className="sr-only">{t("wizard_segment_badge", { index: index + 1 })}</span>
         </span>
-        {effective.start && effective.end && (
-          <span className="text-sm text-text-dark">
-            {formatDateRange(effective.start, effective.end)}
-          </span>
-        )}
+        {rangeText && <span className="text-[13px] text-light-gray">{rangeText}</span>}
       </div>
 
-      <FormField
-        control={form.control}
-        name={`segments.${index}.name`}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className={labelClass}>{t("wizard_segment_name")}</FormLabel>
-            <FormControl>
-              <Input
-                {...field}
-                value={field.value ?? ""}
-                maxLength={NAME_MAX_LENGTH}
-                placeholder={effective.name}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name={`segments.${index}.action`}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className={labelClass}>{t("wizard_segment_action")}</FormLabel>
-            <FormControl>
-              <Textarea
-                {...field}
-                value={field.value ?? ""}
-                rows={2}
-                className="min-h-16 resize-y"
-                maxLength={ACTION_MAX_LENGTH}
-                placeholder={effective.action}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="flex flex-col gap-2.5">
         <FormField
           control={form.control}
-          name={`segments.${index}.days`}
+          name={`segments.${index}.name`}
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className={labelClass}>{t("wizard_segment_days")}</FormLabel>
+            <FormItem className="space-y-0">
+              <FormLabel className={labelClass}>{t("wizard_segment_name")}</FormLabel>
               <FormControl>
                 <Input
-                  ref={field.ref}
-                  name={field.name}
-                  onBlur={field.onBlur}
-                  inputMode="numeric"
-                  value={field.value === null ? String(effective.days) : String(field.value)}
-                  onChange={(event) => field.onChange(sanitizeDaysInput(event.target.value).value)}
+                  {...field}
+                  value={nameTouched ? (field.value ?? "") : field.value || effective.name}
+                  maxLength={NAME_MAX_LENGTH}
+                  className={WIZARD_INPUT_SM}
+                  onChange={(event) => {
+                    setNameTouched(true);
+                    field.onChange(event.target.value);
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -185,11 +170,61 @@ export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
 
         <FormField
           control={form.control}
-          name={`segments.${index}.frequency`}
+          name={`segments.${index}.action`}
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className={labelClass}>{t("wizard_segment_frequency")}</FormLabel>
-              <div className="space-y-2">
+            <FormItem className="space-y-0">
+              <FormLabel className={labelClass}>{t("wizard_segment_action")}</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  value={actionTouched ? (field.value ?? "") : field.value || effective.action}
+                  rows={2}
+                  className={cn(
+                    "min-h-[60px] resize-none px-2.5 py-2 text-sm leading-normal focus-visible:px-2.5 focus-visible:py-2",
+                    WIZARD_INPUT
+                  )}
+                  maxLength={ACTION_MAX_LENGTH}
+                  onChange={(event) => {
+                    setActionTouched(true);
+                    field.onChange(event.target.value);
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name={`segments.${index}.days`}
+          render={({ field }) => (
+            <FormItem className="space-y-0">
+              <FormLabel className={labelClass}>{t("wizard_segment_days")}</FormLabel>
+              <FormControl>
+                <Input
+                  ref={field.ref}
+                  name={field.name}
+                  onBlur={field.onBlur}
+                  inputMode="numeric"
+                  className={WIZARD_INPUT_SM}
+                  value={field.value === null ? String(effective.days) : String(field.value)}
+                  onChange={(event) => field.onChange(sanitizeDaysInput(event.target.value).value)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* 每週頻率 ＋ 每次執行時間並排（POC） */}
+        <div className="flex gap-2.5">
+          <FormField
+            control={form.control}
+            name={`segments.${index}.frequency`}
+            render={({ field }) => (
+              <FormItem className="min-w-0 flex-1 space-y-0">
+                <FormLabel className={labelClass}>{t("wizard_segment_frequency")}</FormLabel>
                 <Select
                   value={frequencySelectValue}
                   onValueChange={(value) => {
@@ -208,6 +243,7 @@ export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
                     <SelectTrigger
                       invalid={!!form.formState.errors.segments?.[index]?.frequency}
                       onBlur={field.onBlur}
+                      className={WIZARD_SELECT_SM}
                     >
                       <SelectValue placeholder={frequencyPlaceholder} />
                     </SelectTrigger>
@@ -229,6 +265,7 @@ export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
                     placeholder={t("wizard_segment_frequency_placeholder")}
                     aria-label={t("wizard_segment_frequency")}
                     invalid={!!form.formState.errors.segments?.[index]?.frequency}
+                    className={customInputClass}
                     onChange={(event) =>
                       setFrequencyText(sanitizeFrequencyInput(event.target.value))
                     }
@@ -241,19 +278,17 @@ export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
                     }}
                   />
                 )}
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name={`segments.${index}.minutes`}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={labelClass}>{t("wizard_segment_minutes")}</FormLabel>
-              <div className="space-y-2">
+          <FormField
+            control={form.control}
+            name={`segments.${index}.minutes`}
+            render={({ field }) => (
+              <FormItem className="min-w-0 flex-1 space-y-0">
+                <FormLabel className={labelClass}>{t("wizard_segment_minutes")}</FormLabel>
                 <Select
                   value={minutesSelectValue}
                   onValueChange={(value) => {
@@ -272,7 +307,7 @@ export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
                   }}
                 >
                   <FormControl>
-                    <SelectTrigger onBlur={field.onBlur}>
+                    <SelectTrigger onBlur={field.onBlur} className={WIZARD_SELECT_SM}>
                       <SelectValue placeholder={minutesPlaceholder} />
                     </SelectTrigger>
                   </FormControl>
@@ -292,6 +327,7 @@ export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
                     value={minutesText}
                     placeholder={t("wizard_segment_minutes_placeholder")}
                     aria-label={t("wizard_segment_minutes")}
+                    className={customInputClass}
                     onChange={(event) => {
                       const next = sanitizeMinutesInput(event.target.value);
                       setMinutesText(next.text);
@@ -299,56 +335,55 @@ export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
                     }}
                   />
                 )}
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
           name={`segments.${index}.timing`}
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-0">
               <FormLabel className={labelClass}>{t("wizard_segment_timing")}</FormLabel>
-              <div className="space-y-2">
-                <Select
-                  value={timingSelectValue}
-                  onValueChange={(value) => {
-                    if (value === SELECT_OTHER_VALUE) {
-                      setTimingOther(true);
-                      if (isTimingPreset(field.value ?? "")) field.onChange("");
-                      return;
-                    }
-                    setTimingOther(false);
-                    field.onChange(value);
-                  }}
-                >
-                  <FormControl>
-                    <SelectTrigger onBlur={field.onBlur}>
-                      <SelectValue placeholder={t("wizard_select_timing")} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {TIMING_PRESETS.map((preset) => (
-                      <SelectItem key={preset} value={preset}>
-                        {t(TIMING_LABEL_KEYS[preset])}
-                      </SelectItem>
-                    ))}
-                    <SelectItem value={SELECT_OTHER_VALUE}>{t("wizard_select_other")}</SelectItem>
-                  </SelectContent>
-                </Select>
-                {timingOther && (
-                  <Input
-                    value={field.value ?? ""}
-                    maxLength={SEGMENT_TIMING_MAX_LENGTH}
-                    placeholder={t("wizard_segment_timing_placeholder")}
-                    aria-label={t("wizard_segment_timing")}
-                    onChange={(event) => field.onChange(event.target.value)}
-                    onBlur={field.onBlur}
-                  />
-                )}
-              </div>
+              <Select
+                value={timingSelectValue}
+                onValueChange={(value) => {
+                  if (value === SELECT_OTHER_VALUE) {
+                    setTimingOther(true);
+                    if (isTimingPreset(field.value ?? "")) field.onChange("");
+                    return;
+                  }
+                  setTimingOther(false);
+                  field.onChange(value);
+                }}
+              >
+                <FormControl>
+                  <SelectTrigger onBlur={field.onBlur} className={WIZARD_SELECT_SM}>
+                    <SelectValue placeholder={t("wizard_select_timing")} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {TIMING_PRESETS.map((preset) => (
+                    <SelectItem key={preset} value={preset}>
+                      {t(TIMING_LABEL_KEYS[preset])}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value={SELECT_OTHER_VALUE}>{t("wizard_select_other")}</SelectItem>
+                </SelectContent>
+              </Select>
+              {timingOther && (
+                <Input
+                  value={field.value ?? ""}
+                  maxLength={SEGMENT_TIMING_MAX_LENGTH}
+                  placeholder={t("wizard_segment_timing_placeholder")}
+                  aria-label={t("wizard_segment_timing")}
+                  className={customInputClass}
+                  onChange={(event) => field.onChange(event.target.value)}
+                  onBlur={field.onBlur}
+                />
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -357,3 +392,7 @@ export const SegmentCard = ({ form, index, effective }: SegmentCardProps) => {
     </div>
   );
 };
+
+const pad = (n: number) => String(n).padStart(2, "0");
+/** POC 段落區間格式：YYYY/MM/DD – YYYY/MM/DD（前後皆完整年份） */
+const formatFull = (d: Date) => `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}`;

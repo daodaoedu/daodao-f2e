@@ -53,17 +53,20 @@ function DialogOverlay({ className, ...props }: DialogOverlayProps) {
 
 type DialogContentProps = DialogContentPrimitiveProps & {
   showCloseButton?: boolean;
+  /** 覆寫遮罩樣式（例如不同透明度） */
+  overlayClassName?: string;
 };
 
 function DialogContent({
   className,
   children,
   showCloseButton = true,
+  overlayClassName,
   ...props
 }: DialogContentProps) {
   return (
     <DialogPortalPrimitive>
-      <DialogOverlay />
+      <DialogOverlay className={overlayClassName} />
       <DialogContentPrimitive
         className={cn(
           "bg-background fixed top-[50%] left-[50%] z-50 grid w-full max-w-screen translate-x-[-50%] translate-y-[-50%] rounded-3xl border shadow-lg sm:max-w-[350px]",
