@@ -48,6 +48,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { JoinCode } from "./join-code";
+import { type CohortFieldErrorKey, resolveCohortApiError } from "@/utils/cohort-api-error";
 
 type SessionEntry = { id: string; sessionDate: string; startTime: string; endTime: string };
 
@@ -66,6 +67,22 @@ const SETUP_TABS: SetupTab[] = ["basic", "templates", "home", "privacy", "signup
 const COHORT_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** HTML pattern 屬性版本（Chrome 以 v flag 編譯，字元類別結尾的 `-` 會被判定為無效正則而整個忽略） */
 const COHORT_SLUG_HTML_PATTERN = "[a-z0-9]+(-[a-z0-9]+)*";
+
+type CohortErrorTranslator = (
+  key: CohortFieldErrorKey | "cohort_create_failed" | "save_failed"
+) => string;
+
+/** 把場次 API 錯誤轉成 toast 文字：已知欄位走 i18n、其他顯示 server 訊息、最後才退回通用訊息 */
+function cohortErrorMessage(
+  t: CohortErrorTranslator,
+  error: unknown,
+  fallbackKey: "cohort_create_failed" | "save_failed"
+): string {
+  const resolved = resolveCohortApiError(error);
+  if (resolved.type === "i18n") return t(resolved.key);
+  if (resolved.type === "message") return resolved.message;
+  return t(fallbackKey);
+}
 
 interface CohortSetupPanelProps {
   mode: "create" | "edit";
@@ -846,7 +863,7 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
       } as Parameters<typeof updateLighthouseCohort>[2]);
       setBusy(false);
       if (response.error) {
-        toast.error(t("save_failed"));
+        toast.error(cohortErrorMessage(t, response.error, "save_failed"));
         return;
       }
       await refresh();
@@ -1122,7 +1139,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       } as Parameters<typeof createLighthouseCohort>[1]);
       if (response.error || !response.data) {
         setBusy(false);
-        toast.error(t("cohort_create_failed"));
+        toast.error(cohortErrorMessage(t, response.error, "cohort_create_failed"));
         return;
       }
       const newCohortId = (response.data as { data: { id: number } }).data.id;
