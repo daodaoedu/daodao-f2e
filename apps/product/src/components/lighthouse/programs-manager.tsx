@@ -46,7 +46,7 @@ import {
   X,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { JoinCode } from "./join-code";
 import { type CohortFieldErrorKey, resolveCohortApiError } from "@/utils/cohort-api-error";
 
@@ -199,8 +199,11 @@ function CohortSetupPanel({
     templates?.filter((tpl) => tpl.title.toLowerCase().includes(templateSearch.toLowerCase())) ??
     [];
 
-  async function handleFormAction(formData: FormData) {
-    await onSubmit(formData, {
+  // 用 onSubmit 而不是 form action：React 19 的 action 完成後會 reset 表單，
+  // 送出失敗（400/409）時使用者填的內容會全部消失，只能從頭再填一次（#188）
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await onSubmit(new FormData(event.currentTarget), {
       interactionModes,
       sessions,
       feeType,
@@ -220,7 +223,7 @@ function CohortSetupPanel({
   return (
     <form
       ref={panelRef}
-      action={handleFormAction}
+      onSubmit={handleSubmit}
       className="scroll-mt-24 rounded-2xl border border-[#CDEBE8] bg-[#F0FBF9] p-5"
     >
       <div className="mb-4 flex items-center justify-between">
