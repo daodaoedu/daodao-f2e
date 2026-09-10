@@ -227,21 +227,25 @@ export const PracticeWizard = ({
         refreshOnboardingStatus();
       }
 
-      const firstStart = getEffectiveSegments(values, nameFallback)[0]?.start ?? null;
-      setCreatedStartDate(firstStart ? format(firstStart, "yyyy/MM/dd") : undefined);
-      const names = extractCreatedNames(response.data);
-      setCreatedNames(
-        names.length > 0 ? names : getEffectiveSegments(values, nameFallback).map((s) => s.name)
-      );
-      setIsDone(true);
-      window.scrollTo(0, 0);
-      setIsDoneOpen(true);
+      showCompletion(values, response.data);
     } catch (error) {
       console.error("Failed to create practice:", error);
       toast.error(error instanceof Error ? error.message : t("wizard_create_failed"));
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  /** 建立成功後：記下名稱與第一段開始日、開啟完成彈窗 */
+  const showCompletion = (values: WizardFormValues, data: unknown) => {
+    const effective = getEffectiveSegments(values, nameFallback);
+    const firstStart = effective[0]?.start ?? null;
+    setCreatedStartDate(firstStart ? format(firstStart, "yyyy/MM/dd") : undefined);
+    const names = extractCreatedNames(data);
+    setCreatedNames(names.length > 0 ? names : effective.map((s) => s.name));
+    setIsDone(true);
+    window.scrollTo(0, 0);
+    setIsDoneOpen(true);
   };
 
   const handleInvalid = (errors: FieldErrors<WizardFormValues>) => {
@@ -286,6 +290,8 @@ export const PracticeWizard = ({
   const segmentCount = isSegmented && segmentsLength > 0 ? segmentsLength : 1;
 
   const isPreview = currentStep === PREVIEW_STEP;
+  const createTitle = isPersonal ? t("wizard_title_create") : t("wizard_title_create_template");
+  const headerTitle = isPreview ? t("wizard_title_preview") : createTitle;
   const showSummary = currentStep === 2 || currentStep === 3;
 
   let finishLabel: string;
@@ -305,17 +311,7 @@ export const PracticeWizard = ({
     <div className="relative z-10 min-h-screen w-screen overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <PageHeader
-        title={
-          isPreview
-            ? t("wizard_title_preview")
-            : isPersonal
-              ? t("wizard_title_create")
-              : t("wizard_title_create_template")
-        }
-        rightActionTo="/"
-        rightLabel={t("wizard_close")}
-      />
+      <PageHeader title={headerTitle} rightActionTo="/" rightLabel={t("wizard_close")} />
 
       <main className="relative mx-auto max-w-[448px] px-5 pb-28">
         {!isPreview && (

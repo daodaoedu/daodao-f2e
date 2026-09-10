@@ -80,7 +80,6 @@ export const CompletionDialog = ({
 }: CompletionDialogProps) => {
   const copy = useDialogCopy(mode, names.length, startDateText);
   const prefersReducedMotion = useReducedMotion();
-  const anim = (name: string) => `animate-[${name}] motion-reduce:animate-none`;
 
   return (
     <Dialog
@@ -114,7 +113,7 @@ export const CompletionDialog = ({
           <BgRadialSvg
             className={cn(
               "h-[222px] w-60 opacity-70",
-              anim("wizard-breathe_5s_0.3s_ease-in-out_infinite")
+              "animate-[wizard-breathe_5s_0.3s_ease-in-out_infinite] motion-reduce:animate-none"
             )}
           />
         </div>
@@ -124,23 +123,26 @@ export const CompletionDialog = ({
           aria-hidden="true"
           className={cn(
             "relative mx-auto mb-4 h-12 w-24",
-            anim("wizard-rise_0.4s_0.06s_ease-out_both")
+            "animate-[wizard-rise_0.4s_0.06s_ease-out_both] motion-reduce:animate-none"
           )}
         >
           <div
             className={cn(
               "absolute bottom-0 left-1/2 size-[118px] -translate-x-1/2 rounded-full border-2 border-logo-cyan",
-              anim("wizard-ripple_2.6s_0.5s_ease-out_infinite")
+              "animate-[wizard-ripple_2.6s_0.5s_ease-out_infinite] motion-reduce:animate-none"
             )}
           />
           <div
-            className={cn("absolute inset-0", anim("wizard-bob_3.4s_0.5s_ease-in-out_infinite"))}
+            className={cn(
+              "absolute inset-0",
+              "animate-[wizard-bob_3.4s_0.5s_ease-in-out_infinite] motion-reduce:animate-none"
+            )}
           >
             <div className="h-12 w-24 rounded-t-full bg-logo-cyan" />
             <div
               className={cn(
                 "absolute -top-3.5 -right-2.5 size-[22px] rounded-full bg-[oklch(0.9_0.19_96)]",
-                anim("wizard-twinkle_2.2s_0.8s_ease-in-out_infinite")
+                "animate-[wizard-twinkle_2.2s_0.8s_ease-in-out_infinite] motion-reduce:animate-none"
               )}
             />
           </div>
@@ -150,7 +152,7 @@ export const CompletionDialog = ({
           <DialogTitle
             className={cn(
               "mb-2 text-[22px] font-semibold leading-[1.4] text-bg-dark",
-              anim("wizard-rise_0.4s_0.1s_ease-out_both")
+              "animate-[wizard-rise_0.4s_0.1s_ease-out_both] motion-reduce:animate-none"
             )}
           >
             {copy.title}
@@ -159,7 +161,7 @@ export const CompletionDialog = ({
             <DialogDescription
               className={cn(
                 "mb-4 text-sm leading-[1.7] text-text-dark",
-                anim("wizard-rise_0.4s_0.14s_ease-out_both")
+                "animate-[wizard-rise_0.4s_0.14s_ease-out_both] motion-reduce:animate-none"
               )}
             >
               {copy.body}
@@ -173,7 +175,7 @@ export const CompletionDialog = ({
           <ul
             className={cn(
               "mb-5 flex flex-col gap-1.5",
-              anim("wizard-rise_0.4s_0.18s_ease-out_both")
+              "animate-[wizard-rise_0.4s_0.18s_ease-out_both] motion-reduce:animate-none"
             )}
             aria-label={copy.title}
           >

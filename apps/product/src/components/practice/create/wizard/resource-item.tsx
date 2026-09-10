@@ -32,7 +32,7 @@ export interface ResourceItemProps {
 }
 
 const editInputClass = cn(
-  "h-8 px-2.5 py-1 text-sm focus-visible:px-2.5 focus-visible:py-1 rounded-[6px]",
+  "h-8 px-2.5 py-1 text-sm focus-visible:px-2.5 focus-visible:py-1",
   WIZARD_INPUT,
   "rounded-[6px]"
 );
