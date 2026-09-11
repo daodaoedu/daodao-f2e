@@ -360,19 +360,6 @@ export const lighthouseMessageTemplateResponseSchema = apiSuccessSchema(
   lighthouseMessageTemplateSchema
 );
 
-export const lighthouseOutcomeResponseSchema = apiSuccessSchema(
-  z
-    .object({
-      cohortId: z.number().int().positive(),
-      completedCount: z.number().int().nonnegative(),
-      enrolledCount: z.number().int().nonnegative(),
-      sustainedParticipationCount: z.number().int().nonnegative(),
-      sustainedParticipationRate: z.number().min(0).max(1),
-      computedAt: z.string().datetime(),
-    })
-    .nullable()
-);
-
 const cohortFeedCommentPreviewUserSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -915,6 +902,87 @@ export const lighthouseAiCredentialTestResponseSchema = apiSuccessSchema(
   lighthouseAiCredentialSchema.extend({ ok: z.boolean(), message: z.string() })
 );
 
+export const LIGHTHOUSE_OUTCOME_PHASES = ["not_started", "in_progress", "ended"] as const;
+export type LighthouseOutcomePhase = (typeof LIGHTHOUSE_OUTCOME_PHASES)[number];
+export const LIGHTHOUSE_SUMMARY_MODES = ["platform", "own"] as const;
+export type LighthouseSummaryMode = (typeof LIGHTHOUSE_SUMMARY_MODES)[number];
+export const lighthouseOutcomeSummaryVersionSchema = z.object({
+  id: z.number().int(),
+  version: z.number().int().positive(),
+  source: z.enum(["platform_ai", "own_ai", "manual"]),
+  content: z.string(),
+  provider: z.string().nullable(),
+  modelName: z.string().nullable(),
+  generatedAt: nullableDateTimeSchema,
+  createdBy: z.object({ id: z.number().int(), nickname: z.string().nullable() }).nullable(),
+  createdAt: z.string().datetime(),
+  isCurrent: z.boolean(),
+});
+export type LighthouseOutcomeSummaryVersion = z.infer<typeof lighthouseOutcomeSummaryVersionSchema>;
+export const lighthouseOutcomeSchema = z.object({
+  cohortId: z.number().int().positive(),
+  cohort: z.object({
+    displayName: z.string(),
+    programName: z.string(),
+    startDate: z.string().datetime(),
+    endDate: z.string().datetime(),
+  }),
+  phase: z.enum(LIGHTHOUSE_OUTCOME_PHASES),
+  finalizedAt: nullableDateTimeSchema,
+  overview: z.object({
+    participants: z.number().int().nonnegative(),
+    activatedPractices: z.number().int().nonnegative(),
+    checkins: z.number().int().nonnegative(),
+    comments: z.number().int().nonnegative(),
+  }),
+  ai: z.object({
+    platformAvailable: z.boolean(),
+    ownKey: z.object({
+      status: lighthouseAiCredentialStatusSchema,
+      provider: z.enum(LIGHTHOUSE_AI_PROVIDERS),
+      keyLast4: z.string().nullable(),
+    }),
+    platformDailyLimit: z.number().int().positive(),
+    platformUsedToday: z.number().int().nonnegative(),
+  }),
+  summary: z.object({
+    current: lighthouseOutcomeSummaryVersionSchema.nullable(),
+    versions: z.array(lighthouseOutcomeSummaryVersionSchema),
+  }),
+  practiceOutcomes: z.array(
+    z.object({
+      title: z.string(),
+      participants: z.number().int().nonnegative(),
+      started: z.number().int().nonnegative(),
+      completed: z.number().int().nonnegative(),
+      checkins: z.number().int().nonnegative(),
+      comments: z.number().int().nonnegative(),
+    })
+  ),
+  participantProgress: z.array(
+    z.object({
+      userId: z.number().int(),
+      nickname: z.string().nullable(),
+      avatar: z.string().nullable(),
+      practiceId: z.number().int(),
+      practiceTitle: z.string(),
+      practiceStatus: z.string(),
+      completedCount: z.number().int().nonnegative(),
+      targetCount: z.number().int().nonnegative(),
+      progressPercentage: z.number().int().nonnegative(),
+      checkinCount: z.number().int().nonnegative(),
+      responseCount: z.number().int().nonnegative(),
+      lastActivityAt: nullableDateTimeSchema,
+    })
+  ),
+  generatedAt: z.string().datetime(),
+});
+export type LighthouseOutcome = z.infer<typeof lighthouseOutcomeSchema>;
+export const lighthouseOutcomeResponseSchema = apiSuccessSchema(lighthouseOutcomeSchema);
+export const lighthouseOutcomeSummaryResponseSchema = apiSuccessSchema(
+  lighthouseOutcomeSummaryVersionSchema
+);
+
 export const getLighthouseAiCredential = async (organizationId: number) =>
   client.GET("/api/v1/lighthouse/organizations/{organizationId}/ai-credentials", {
     params: { path: { organizationId } },
@@ -938,3 +1006,36 @@ export const testLighthouseAiCredential = async (organizationId: number) =>
   client.POST("/api/v1/lighthouse/organizations/{organizationId}/ai-credentials/test", {
     params: { path: { organizationId } },
   });
+
+// ---------------------------------------------------------------------------
+// 成果摘要與匯出稽核（FR-OUT-03/04/07）
+// ---------------------------------------------------------------------------
+export const generateLighthouseOutcomeSummary = async (
+  programId: number,
+  cohortId: number,
+  mode: LighthouseSummaryMode
+) =>
+  client.POST("/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/outcome/summary", {
+    params: { path: { programId, cohortId } },
+    body: { mode },
+  });
+
+export const saveLighthouseOutcomeSummary = async (
+  programId: number,
+  cohortId: number,
+  content: string
+) =>
+  client.PUT("/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/outcome/summary", {
+    params: { path: { programId, cohortId } },
+    body: { content },
+  });
+
+export const recordLighthouseOutcomeExport = async (
+  programId: number,
+  cohortId: number,
+  filename?: string
+) =>
+  client.POST(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/outcome/report-exported",
+    { params: { path: { programId, cohortId } }, body: filename ? { filename } : {} }
+  );
