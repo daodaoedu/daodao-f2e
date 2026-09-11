@@ -43,7 +43,7 @@ export function ConfirmDialog({
   const t = useTranslations("lighthouse");
   return (
     <Dialog open={open} onOpenChange={(next) => !busy && onOpenChange(next)}>
-      <DialogContent className="w-[min(440px,92vw)] rounded-[28px] border-0 bg-white p-6">
+      <DialogContent className="w-[min(440px,92vw)] sm:max-w-none rounded-[28px] border-0 bg-white p-6">
         <DialogHeader className="items-start text-left">
           <DialogTitle className="text-left text-xl font-semibold text-[#0D3036]">
             {title}

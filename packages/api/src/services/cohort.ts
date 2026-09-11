@@ -26,17 +26,12 @@ type InviteCohortMembersBody = NonNullable<
 type UpdateOrganizationBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}"]["patch"]["requestBody"]
 >["content"]["application/json"];
-/**
- * 模板資源。server 已支援，但 src/types.ts 要等 server 進 dev 後重跑 `pnpm gen:types`
- * 才會帶到，所以先在這裡補上；types 重新產生後這段擴充就可以刪掉。
- */
-type TemplateResourceInput = { name: string; url?: string };
-type CreateOrganizationTemplateBody = NonNullable<
+export type CreateOrganizationTemplateBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}/templates"]["post"]["requestBody"]
->["content"]["application/json"] & { resources?: TemplateResourceInput[] };
-type UpdateOrganizationTemplateBody = NonNullable<
+>["content"]["application/json"];
+export type UpdateOrganizationTemplateBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}"]["patch"]["requestBody"]
->["content"]["application/json"] & { resources?: TemplateResourceInput[] };
+>["content"]["application/json"];
 type AddOrganizationMemberBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}/members"]["post"]["requestBody"]
 >["content"]["application/json"];
@@ -437,46 +432,52 @@ export const lighthouseOrganizationMembersResponseSchema = apiSuccessSchema(
   )
 );
 
-export const lighthouseTemplatesResponseSchema = apiSuccessSchema(
-  z.array(
+export const LIGHTHOUSE_TEMPLATE_STATUSES = ["draft", "ready"] as const;
+export type LighthouseTemplateStatus = (typeof LIGHTHOUSE_TEMPLATE_STATUSES)[number];
+export const lighthouseTemplateBindingSchema = z.object({
+  cohortId: z.number().int().positive(),
+  cohortName: z.string(),
+  cohortStatus: z.string(),
+  cohortStartDate: z.string().datetime(),
+  startDate: nullableDateTimeSchema,
+  endDate: nullableDateTimeSchema,
+  locked: z.boolean(),
+});
+export const lighthouseTemplateSchema = z.object({
+  id: z.number().int().positive(),
+  externalId: z.string().uuid(),
+  organizationId: z.number().int().positive(),
+  title: z.string(),
+  practiceAction: z.string().nullable(),
+  durationDays: z.number().int().nullable(),
+  frequencyMinDays: z.number().int().nullable(),
+  frequencyMaxDays: z.number().int().nullable(),
+  sessionDurationMinutes: z.number().int().nullable(),
+  practiceTimePeriods: z.array(z.string()),
+  timingOther: z.string().nullable(),
+  status: z.enum(LIGHTHOUSE_TEMPLATE_STATUSES),
+  archivedAt: nullableDateTimeSchema,
+  tags: z.array(z.string()),
+  boundCohortIds: z.array(z.number().int().positive()),
+  bindings: z.array(lighthouseTemplateBindingSchema),
+  resources: z.array(
     z.object({
-      id: z.number().int().positive(),
-      externalId: z.string().uuid(),
-      organizationId: z.number().int().positive(),
-      title: z.string(),
-      practiceAction: z.string().nullable(),
-      durationDays: z.number().int().nullable(),
-      frequencyMinDays: z.number().int().nullable(),
-      frequencyMaxDays: z.number().int().nullable(),
-      sessionDurationMinutes: z.number().int().nullable(),
-      practiceTimePeriods: z.array(z.string()),
-      boundCohortIds: z.array(z.number().int().positive()),
-      // resources 與 bindings 設為 optional，讓前端可以先於後端上線
-      // dayNumber 同理用 nullish：後端還沒帶這個欄位時 validation 也不會炸
-      resources: z
-        .array(
-          z.object({
-            id: z.string(),
-            name: z.string(),
-            url: z.string().nullable(),
-            dayNumber: z.number().int().nullish(),
-          })
-        )
-        .optional(),
-      bindings: z
-        .array(
-          z.object({
-            cohortId: z.number().int().positive(),
-            startDate: nullableDateTimeSchema,
-          })
-        )
-        .optional(),
-      generatedDraftCount: z.number().int().nonnegative(),
-      createdAt: nullableDateTimeSchema,
-      updatedAt: nullableDateTimeSchema,
+      id: z.string(),
+      name: z.string(),
+      url: z.string().nullable(),
+      dayNumber: z.number().int().nullish(),
     })
-  )
+  ),
+  generatedDraftCount: z.number().int().nonnegative(),
+  createdAt: nullableDateTimeSchema,
+  updatedAt: nullableDateTimeSchema,
+});
+export type LighthouseTemplate = z.infer<typeof lighthouseTemplateSchema>;
+export type LighthouseTemplateBinding = z.infer<typeof lighthouseTemplateBindingSchema>;
+export const lighthouseTemplatesResponseSchema = apiSuccessSchema(
+  z.array(lighthouseTemplateSchema)
 );
+export const lighthouseTemplateResponseSchema = apiSuccessSchema(lighthouseTemplateSchema);
 
 export const cohortJoinInfoResponseSchema = apiSuccessSchema(
   z.object({
@@ -785,8 +786,7 @@ export const setLighthouseTemplateBinding = async (
   return bound
     ? client.PUT(
         "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/cohorts/{cohortId}",
-        // body 同樣待 types 重新產生後才會出現在 paths 型別上
-        { ...params, body: (startDate === undefined ? {} : { startDate }) as never }
+        { ...params, body: startDate === undefined ? {} : { startDate } }
       )
     : client.DELETE(
         "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/cohorts/{cohortId}",
