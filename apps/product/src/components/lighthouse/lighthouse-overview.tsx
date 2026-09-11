@@ -91,7 +91,9 @@ export function LighthouseOverview() {
   const t = useTranslations("lighthouse");
   const { organizations } = useLighthouseOrganizations();
   const organizationId = organizations?.[0]?.id;
-  const { cohorts, isLoading } = useLighthouseOrganizationCohorts(organizationId);
+  const { cohorts: allCohorts, isLoading } = useLighthouseOrganizationCohorts(organizationId);
+  // 封存中的場次改由「封存」頁列出（FR-ARC-04 主要列表需排除封存項目）
+  const cohorts = allCohorts?.filter((cohort) => cohort.status !== "archived");
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-10 md:px-10 md:py-14">

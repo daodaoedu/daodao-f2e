@@ -4,7 +4,14 @@ import { useTranslations } from "@daodao/i18n";
 import { usePathname } from "@daodao/i18n/navigation";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
-import { BookOpenText, Building2, ChevronLeft, LayoutDashboard, RadioTower } from "lucide-react";
+import {
+  Archive,
+  BookOpenText,
+  Building2,
+  ChevronLeft,
+  LayoutDashboard,
+  RadioTower,
+} from "lucide-react";
 
 interface LighthouseShellProps {
   children: React.ReactNode;
@@ -20,6 +27,7 @@ const navigationItems = [
     icon: Building2,
     exact: false,
   },
+  { href: "/lighthouse/archive", labelKey: "nav_archive", icon: Archive, exact: false },
 ] as const;
 
 export function LighthouseShell({ children }: LighthouseShellProps) {
@@ -107,9 +115,7 @@ export function LighthouseShell({ children }: LighthouseShellProps) {
         </nav>
       </header>
 
-      <main className="min-h-screen md:pl-64">
-        {children}
-      </main>
+      <main className="min-h-screen md:pl-64">{children}</main>
     </div>
   );
 }

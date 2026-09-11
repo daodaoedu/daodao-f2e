@@ -63,7 +63,9 @@ export const lighthouseOrganizationSchema: z.ZodType<LighthouseOrganizationType>
   status: z.enum(["active", "suspended"]),
   approvedBy: z.number().int().nullable(),
   approvedAt: nullableDateTimeSchema,
+  timezone: z.string(),
   createdAt: z.string().datetime(),
+  updatedAt: nullableDateTimeSchema,
 });
 
 export const lighthouseProgramSchema: z.ZodType<LighthouseProgramType> = z.object({
@@ -71,6 +73,7 @@ export const lighthouseProgramSchema: z.ZodType<LighthouseProgramType> = z.objec
   organizationId: z.number().int().positive(),
   name: z.string(),
   description: z.string().nullable(),
+  archivedAt: nullableDateTimeSchema,
   deletedAt: nullableDateTimeSchema,
   createdAt: z.string().datetime(),
   updatedAt: nullableDateTimeSchema,
@@ -818,4 +821,120 @@ export const setCohortExportConsent = async (cohortId: number, consent: boolean)
   client.PUT("/api/v1/cohorts/{cohortId}/export-consent", {
     params: { path: { cohortId } },
     body: { consent },
+  });
+
+// ---------------------------------------------------------------------------
+// 封存區（FRD frd-templates-org-archive.md §3.3）
+// ---------------------------------------------------------------------------
+export const LIGHTHOUSE_ARCHIVE_TYPES = ["templates", "cohorts", "programs"] as const;
+export type LighthouseArchiveType = (typeof LIGHTHOUSE_ARCHIVE_TYPES)[number];
+
+export const lighthouseArchiveItemSchema = z.object({
+  type: z.enum(["template", "cohort", "program"]),
+  id: z.number().int().positive(),
+  name: z.string(),
+  archivedAt: nullableDateTimeSchema,
+  archivedBy: z.object({ id: z.number().int(), name: z.string() }).nullable(),
+  archivedFromStatus: z.string().nullable(),
+  archivedReason: z.string().nullable(),
+  parentName: z.string().nullable(),
+  parentArchived: z.boolean(),
+});
+export type LighthouseArchiveItem = z.infer<typeof lighthouseArchiveItemSchema>;
+export const lighthouseArchiveResponseSchema = apiSuccessSchema(
+  z.object({ type: z.enum(LIGHTHOUSE_ARCHIVE_TYPES), items: z.array(lighthouseArchiveItemSchema) })
+);
+
+export const getLighthouseArchive = async (organizationId: number, type: LighthouseArchiveType) =>
+  client.GET("/api/v1/lighthouse/organizations/{organizationId}/archive", {
+    params: { path: { organizationId }, query: { type } },
+  });
+
+export const restoreLighthouseArchiveItem = async (
+  organizationId: number,
+  type: LighthouseArchiveType,
+  itemId: number
+) =>
+  client.POST("/api/v1/lighthouse/organizations/{organizationId}/archive/{type}/{itemId}/restore", {
+    params: { path: { organizationId, type, itemId } },
+  });
+
+export const deleteLighthouseArchiveItem = async (
+  organizationId: number,
+  type: LighthouseArchiveType,
+  itemId: number
+) =>
+  client.DELETE("/api/v1/lighthouse/organizations/{organizationId}/archive/{type}/{itemId}", {
+    params: { path: { organizationId, type, itemId } },
+  });
+
+export const duplicateLighthouseTemplate = async (organizationId: number, templateId: number) =>
+  client.POST(
+    "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/duplicate",
+    { params: { path: { organizationId, templateId } } }
+  );
+
+export const archiveLighthouseTemplate = async (organizationId: number, templateId: number) =>
+  client.POST("/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/archive", {
+    params: { path: { organizationId, templateId } },
+  });
+
+// ---------------------------------------------------------------------------
+// 組織自帶 AI API key（FR-ORG-03、FR-OUT-02/08）；API 永遠不回明文 key
+// ---------------------------------------------------------------------------
+export const LIGHTHOUSE_AI_PROVIDERS = [
+  "openai",
+  "anthropic",
+  "gemini",
+  "groq",
+  "openrouter",
+] as const;
+export type LighthouseAiProvider = (typeof LIGHTHOUSE_AI_PROVIDERS)[number];
+export const lighthouseAiCredentialStatusSchema = z.enum([
+  "unset",
+  "set",
+  "verified",
+  "invalid",
+  "disabled",
+]);
+export type LighthouseAiCredentialStatus = z.infer<typeof lighthouseAiCredentialStatusSchema>;
+
+export const lighthouseAiCredentialSchema = z.object({
+  organizationId: z.number().int().positive(),
+  provider: z.enum(LIGHTHOUSE_AI_PROVIDERS),
+  status: lighthouseAiCredentialStatusSchema,
+  keyLast4: z.string().nullable(),
+  lastTestedAt: nullableDateTimeSchema,
+  lastTestError: z.string().nullable(),
+  updatedAt: nullableDateTimeSchema,
+  updatedBy: z.number().int().nullable(),
+});
+export type LighthouseAiCredential = z.infer<typeof lighthouseAiCredentialSchema>;
+export const lighthouseAiCredentialResponseSchema = apiSuccessSchema(lighthouseAiCredentialSchema);
+export const lighthouseAiCredentialTestResponseSchema = apiSuccessSchema(
+  lighthouseAiCredentialSchema.extend({ ok: z.boolean(), message: z.string() })
+);
+
+export const getLighthouseAiCredential = async (organizationId: number) =>
+  client.GET("/api/v1/lighthouse/organizations/{organizationId}/ai-credentials", {
+    params: { path: { organizationId } },
+  });
+
+export const setLighthouseAiCredential = async (
+  organizationId: number,
+  body: { provider: LighthouseAiProvider; apiKey: string }
+) =>
+  client.PUT("/api/v1/lighthouse/organizations/{organizationId}/ai-credentials", {
+    params: { path: { organizationId } },
+    body,
+  });
+
+export const clearLighthouseAiCredential = async (organizationId: number) =>
+  client.DELETE("/api/v1/lighthouse/organizations/{organizationId}/ai-credentials", {
+    params: { path: { organizationId } },
+  });
+
+export const testLighthouseAiCredential = async (organizationId: number) =>
+  client.POST("/api/v1/lighthouse/organizations/{organizationId}/ai-credentials/test", {
+    params: { path: { organizationId } },
   });
