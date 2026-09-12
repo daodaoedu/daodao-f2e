@@ -1,0 +1,59 @@
+name: Branch Base Check
+
+# Always trigger on every PR — never use on.paths for required checks.
+# The repository default branch is shared with the config-sync target selection.
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions: {}
+
+jobs:
+  check:
+    name: Branch flow rules
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch naming and base
+        env:
+          HEAD: ${{ github.event.pull_request.head.ref }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          CHANGED: ${{ github.event.pull_request.changed_files }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          BRANCH_RE='^(feat|fix|refactor|perf|test|docs|chore|ci|build|hotfix|release|auto|claude|codex|dependabot|renovate)/.+'
+
+          if [[ ! "$HEAD" =~ $BRANCH_RE ]]; then
+            echo "::error::分支名 '$HEAD' 不符慣例（type/description，type ∈ feat|fix|refactor|perf|test|docs|chore|ci|build|hotfix|release|auto|claude|codex|dependabot|renovate）"
+            exit 1
+          fi
+
+          if [[ -z "$DEFAULT_BRANCH" ]]; then
+            echo "::error::Missing repository default branch"
+            exit 1
+          fi
+
+          # Normal PRs use dev or main according to the repository, just like sync.
+          ALLOWED_BASES="$DEFAULT_BRANCH"
+          # Release/hotfix branches may target the existing production names.
+          if [[ "$HEAD" =~ ^(hotfix|release)/ ]]; then
+            ALLOWED_BASES="$DEFAULT_BRANCH main production prod"
+          fi
+
+          BASE_OK=false
+          for allowed in $ALLOWED_BASES; do
+            if [[ "$BASE" == "$allowed" ]]; then
+              BASE_OK=true
+              break
+            fi
+          done
+
+          if [[ "$BASE_OK" != "true" ]]; then
+            echo "::error::PR base 是 '$BASE'，但 '$HEAD' 型別的 PR 只允許 base 為: $ALLOWED_BASES"
+            exit 1
+          fi
+
+          if (( CHANGED > 60 )); then
+            echo "::warning::此 PR 變更 $CHANGED 個檔案（>60）——請確認沒有帶入非本題檔案或 base 選錯"
+          fi
+
+          echo "✅ branch base check passed: $HEAD → $BASE ($CHANGED files)"

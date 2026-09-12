@@ -4,17 +4,14 @@ concurrency:
   group: mobile-ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
+# Always trigger on PRs — internal skip handles non-mobile changes.
+# This avoids the GitHub required-check anti-pattern where on.paths
+# causes "Expected — waiting" on PRs that don't touch mobile files.
 on:
   pull_request:
     branches:
       - dev
       - prod
-    paths:
-      - 'apps/mobile/**'
-      - 'packages/design-tokens/**'
-      - 'packages/shared/**'
-      - 'packages/api/**'
-      - 'pnpm-lock.yaml'
 
   push:
     branches:
@@ -33,6 +30,8 @@ jobs:
   check:
     name: TypeScript & Lint Check
     runs-on: ubuntu-latest
+    outputs:
+      relevant: ${{ steps.changes.outputs.relevant }}
 
     steps:
       - name: Checkout
@@ -40,22 +39,42 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+      - name: Check for relevant changes
+        if: github.event_name == 'pull_request'
+        id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CHANGED=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
+          # 改到這支 workflow 本身也要跑，才驗得到 CI 設定的修正
+          if echo "$CHANGED" | grep -qE '^(apps/mobile/|packages/design-tokens/|packages/shared/|packages/api/|pnpm-lock\.yaml|\.github/workflows/mobile-ci\.yml)'; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "relevant=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ No mobile-relevant changes; skipping"
+          fi
+
       - name: Setup pnpm
+        if: github.event_name != 'pull_request' || steps.changes.outputs.relevant == 'true'
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
 
       - name: Setup Node.js
+        if: github.event_name != 'pull_request' || steps.changes.outputs.relevant == 'true'
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install dependencies
+        if: github.event_name != 'pull_request' || steps.changes.outputs.relevant == 'true'
         run: pnpm install
 
       - name: Generate config env
+        if: github.event_name != 'pull_request' || steps.changes.outputs.relevant == 'true'
         run: pnpm --filter @daodao/config generate:env
 
       - name: Run checks in parallel
+        if: github.event_name != 'pull_request' || steps.changes.outputs.relevant == 'true'
         run: |
           pnpm --filter @daodao/mobile typecheck &
           pnpm --filter @daodao/mobile lint &
@@ -65,6 +84,7 @@ jobs:
     name: EAS Build Check
     runs-on: ubuntu-latest
     needs: [check]
+    if: ${{ needs.check.outputs.relevant != 'false' }}
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -77,10 +97,13 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
 
+      # 最新 eas-cli 的相依 @oclif/plugin-autocomplete@3.3.0 要求 Node >= 22，
+      # expo-github-action 用 yarn global 安裝時會因 engines 檢查失敗；此 job 只驗證 EAS 設定，
+      # 不影響 app 執行環境，故單獨用 Node 22（其他 job 仍依 .nvmrc）
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version: '22.18.0'
           cache: 'pnpm'
 
       - name: Setup Expo
