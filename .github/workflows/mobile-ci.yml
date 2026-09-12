@@ -99,7 +99,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          # EAS CLI dependencies require Node 22; application checks keep .nvmrc.
+          node-version: '22.18.0'
           cache: 'pnpm'
 
       - name: Setup Expo

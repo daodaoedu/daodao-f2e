@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   cohortJoinInfoResponseSchema,
   cohortMemberHomeResponseSchema,
@@ -14,6 +14,14 @@ import {
   lighthouseProgramListResponseSchema,
   lighthouseTemplatesResponseSchema,
 } from "../services/cohort";
+
+// Schema tests must run before config generation in a clean CI checkout.
+vi.mock("@daodao/config", () => ({
+  getRequiredEnv: (key: string) => {
+    if (key === "NEXT_PUBLIC_API_URL") return "https://api.example.com";
+    throw new Error(`Unexpected config key: ${key}`);
+  },
+}));
 
 const timestamp = "2026-07-22T08:00:00.000Z";
 
