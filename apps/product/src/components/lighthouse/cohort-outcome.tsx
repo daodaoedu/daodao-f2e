@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  type LighthouseOutcome,
-  recordLighthouseOutcomeExport,
-  useLighthouseOutcome,
-} from "@daodao/api";
-import { useTranslations } from "@daodao/i18n";
+import { type LighthouseOutcome, useLighthouseOutcome } from "@daodao/api";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { FileText } from "lucide-react";
@@ -37,6 +33,7 @@ export function outcomeReportFilename(displayName: string, now = new Date()): st
  */
 export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
   const t = useTranslations("lighthouse");
+  const locale = useLocale();
   const query = useLighthouseOutcome(programId, cohortId);
   const outcome = query.data?.data;
 
@@ -51,14 +48,10 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
       />
     );
 
+  // 匯出的 audit 由報告頁按「列印／另存 PDF」時才記（避免只開分頁沒匯出也留紀錄、或記兩次）
   function openReport() {
-    void recordLighthouseOutcomeExport(
-      programId,
-      cohortId,
-      `${outcomeReportFilename(outcome?.cohort.displayName ?? "")}.pdf`
-    );
     window.open(
-      `/zh-TW/lighthouse/programs/${programId}/cohorts/${cohortId}/outcome/report`,
+      `/${locale}/lighthouse/programs/${programId}/cohorts/${cohortId}/outcome/report`,
       "_blank",
       "noopener"
     );

@@ -20,6 +20,8 @@ interface CohortActivityDetailDialogProps {
   programId: number;
   cohortId: number;
   item: LighthouseActivityItem | null;
+  /** 組織時區（API range.timezone），日期時間依此顯示 */
+  timezone: string;
   onClose: () => void;
 }
 
@@ -28,6 +30,7 @@ export function CohortActivityDetailDialog({
   programId,
   cohortId,
   item,
+  timezone,
   onClose,
 }: CohortActivityDetailDialogProps) {
   const t = useTranslations("lighthouse");
@@ -65,7 +68,7 @@ export function CohortActivityDetailDialog({
         <header className="flex items-start justify-between gap-3 bg-[#F7FCFB] px-5 py-4">
           <div className="min-w-0">
             <p className="font-mono text-[11px] text-[#0D7773]">
-              {item ? formatActivityDateTime(item.occurredAt) : ""}
+              {item ? formatActivityDateTime(item.occurredAt, timezone) : ""}
             </p>
             <DialogTitle className="mt-1 truncate text-xl font-semibold text-[#0D3036]">
               {item?.member.nickname ?? t("learner")}
@@ -102,7 +105,7 @@ export function CohortActivityDetailDialog({
             <div className="rounded-2xl bg-[#F7FCFB] px-4 py-3 text-sm">
               <p className="text-xs font-semibold text-[#0D7773]">
                 {t("activity_detail_target", {
-                  time: formatActivityDateTime(detail.target.occurredAt),
+                  time: formatActivityDateTime(detail.target.occurredAt, timezone),
                 })}
               </p>
               <p className="mt-1 text-[#456B68]">{detail.target.summary}</p>

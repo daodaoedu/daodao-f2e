@@ -49,6 +49,8 @@ export interface TemplateDraft {
   minutes: string;
   timing: Timing;
   timingOther: string;
+  /** 編輯器只呈現第一個時機；其餘既有時機原樣保留，儲存時一併帶回（避免改別的欄位就把它們清掉） */
+  extraTimePeriods: TemplateTiming[];
   tags: string[];
   resources: TemplateResourceDraft[];
 }
@@ -73,6 +75,7 @@ const EMPTY_DRAFT: TemplateDraft = {
   minutes: "30",
   timing: "",
   timingOther: "",
+  extraTimePeriods: [],
   tags: [],
   resources: [],
 };
@@ -92,11 +95,17 @@ function draftFromTemplate(template: LighthouseTemplate): TemplateDraft {
         ? (timing as TemplateTiming)
         : "",
     timingOther: template.timingOther ?? "",
+    extraTimePeriods: template.practiceTimePeriods
+      .slice(1)
+      .filter((period): period is TemplateTiming =>
+        (TIMING_OPTIONS as readonly string[]).includes(period)
+      ),
     tags: template.tags,
     resources: template.resources.map((resource) => ({
       key: resource.id,
       name: resource.name,
       url: resource.url ?? "",
+      dayNumber: resource.dayNumber ?? null,
     })),
   };
 }
@@ -199,12 +208,15 @@ export function TemplateEditorDialog({
       frequencyMaxDays: frequency?.max ?? null,
       sessionDurationMinutes:
         draft.minutes.trim() && Number.isInteger(minutesNumber) ? minutesNumber : null,
-      practiceTimePeriods: timingIsPeriod ? [draft.timing as TemplateTiming] : [],
+      practiceTimePeriods: timingIsPeriod
+        ? [draft.timing as TemplateTiming, ...draft.extraTimePeriods]
+        : draft.extraTimePeriods,
       timingOther: draft.timing === "other" ? draft.timingOther.trim() || null : null,
       tags: draft.tags,
       resources: draft.resources.map((resource) => ({
         name: resource.name,
         ...(resource.url ? { url: resource.url } : {}),
+        ...(resource.dayNumber != null ? { dayNumber: resource.dayNumber } : {}),
       })),
       status,
     };

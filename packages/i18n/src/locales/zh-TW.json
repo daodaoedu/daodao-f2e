@@ -7829,6 +7829,7 @@
     "organization_ai_key_label": "API key",
     "organization_ai_key_replace_placeholder": "輸入新的 key 以更換",
     "organization_ai_key_empty": "請先輸入 API key 再測試。",
+    "organization_ai_key_provider_changed": "已切換 AI 服務，請輸入該服務的 API key 後再測試。",
     "organization_ai_key_testing": "測試連線中…",
     "organization_ai_key_testing_button": "測試中…",
     "organization_ai_key_test": "測試連線",

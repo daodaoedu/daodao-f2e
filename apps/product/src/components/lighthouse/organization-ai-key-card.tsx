@@ -48,12 +48,13 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
   const configured = Boolean(credential && credential.status !== "unset");
   const activeProvider = provider ?? credential?.provider ?? "openai";
 
-  async function save() {
+  /** 回傳是否真的保存成功；test() 依此決定要不要接著測（保存失敗就不測舊 key） */
+  async function save(): Promise<boolean> {
     const trimmed = apiKey.trim();
     if (!trimmed) {
       setTestState("empty");
       setTestMessage(t("organization_ai_key_empty"));
-      return;
+      return false;
     }
     setBusy(true);
     const response = await setLighthouseAiCredential(organizationId, {
@@ -63,22 +64,28 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
     setBusy(false);
     if (response.error) {
       toast.error(t("organization_ai_key_save_failed"));
-      return;
+      return false;
     }
     setApiKey("");
     setTestState("idle");
     setTestMessage(null);
     await credentialQuery.mutate();
     toast.success(t("organization_ai_key_saved"));
+    return true;
   }
 
   async function test() {
     // 尚未保存的輸入先存再測，讓「輸入 → 測試連線」一步到位（TP-ORG-04）
     if (apiKey.trim()) {
-      await save();
+      if (!(await save())) return;
     } else if (!configured) {
       setTestState("empty");
       setTestMessage(t("organization_ai_key_empty"));
+      return;
+    } else if (credential?.provider && activeProvider !== credential.provider) {
+      // 只改了 AI 服務、沒輸入新 key：既存 key 屬於原 provider，要先輸入該服務的 key 才能測
+      setTestState("empty");
+      setTestMessage(t("organization_ai_key_provider_changed"));
       return;
     }
     setBusy(true);

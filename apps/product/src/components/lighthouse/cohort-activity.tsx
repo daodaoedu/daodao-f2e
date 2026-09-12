@@ -18,7 +18,12 @@ import { Input } from "@daodao/ui/components/input";
 import { cn } from "@daodao/ui/lib/utils";
 import { Info, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityTypeBadge, formatActivityDate, formatActivityTime } from "./cohort-activity-badge";
+import {
+  ActivityTypeBadge,
+  DEFAULT_ACTIVITY_TIMEZONE,
+  formatActivityDate,
+  formatActivityTime,
+} from "./cohort-activity-badge";
 import { CohortActivityDetailDialog } from "./cohort-activity-detail-dialog";
 import { CohortErrorState } from "./cohort-error-state";
 
@@ -80,16 +85,17 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
     });
   }, [data]);
 
+  const timezone = data?.range.timezone ?? DEFAULT_ACTIVITY_TIMEZONE;
   const grouped = useMemo(() => {
     const groups: Array<{ day: string; items: LighthouseActivityItem[] }> = [];
     for (const item of data?.items ?? []) {
-      const day = formatActivityDate(item.occurredAt);
+      const day = formatActivityDate(item.occurredAt, timezone);
       const last = groups[groups.length - 1];
       if (last && last.day === day) last.items.push(item);
       else groups.push({ day, items: [item] });
     }
     return groups;
-  }, [data?.items]);
+  }, [data?.items, timezone]);
 
   if (feed.error || feed.validationError)
     return (
@@ -332,7 +338,7 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
                     )}
                   >
                     <span className="font-mono text-[#78928F]">
-                      {formatActivityTime(item.occurredAt)}
+                      {formatActivityTime(item.occurredAt, timezone)}
                     </span>
                     <span>
                       <ActivityTypeBadge item={item} />
@@ -388,6 +394,7 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
         programId={programId}
         cohortId={cohortId}
         item={detail}
+        timezone={timezone}
         onClose={() => setDetail(null)}
       />
     </div>

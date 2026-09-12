@@ -57,7 +57,7 @@ export function CohortOutcomeReport({ programId, cohortId }: CohortOutcomeReport
     <div className="mx-auto w-full max-w-4xl px-5 py-8 md:px-10" data-testid="outcome-report">
       <style>{`
         @media print {
-          aside, header, nav, [data-report-actions] { display: none !important; }
+          aside, header:not([data-report-header]), nav, [data-report-actions] { display: none !important; }
           main { padding: 0 !important; }
           body { background: #fff !important; }
           [data-testid="outcome-report"] { max-width: none; padding: 0; }
@@ -82,7 +82,7 @@ export function CohortOutcomeReport({ programId, cohortId }: CohortOutcomeReport
         </Button>
       </div>
 
-      <header className="border-b border-[#CDEBE8] pb-5">
+      <header className="border-b border-[#CDEBE8] pb-5" data-report-header>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#0D7773]">
           {t("outcome_report_eyebrow")}
         </p>

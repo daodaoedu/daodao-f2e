@@ -58,7 +58,13 @@ export function inferResourceName(url: string): string | null {
   const host = parsed.hostname.toLowerCase().replace(/^www\./, "");
   const known = KNOWN_HOSTS.find(([pattern]) => pattern.test(host));
   if (known) return known[1];
-  const segment = decodeURIComponent(parsed.pathname.split("/").filter(Boolean).pop() ?? "");
+  const rawSegment = parsed.pathname.split("/").filter(Boolean).pop() ?? "";
+  let segment = rawSegment;
+  try {
+    segment = decodeURIComponent(rawSegment);
+  } catch {
+    // 例如 https://example.com/% 這類不合法的百分號跳脫：退回原字串，不讓 URIError 卡住新增流程
+  }
   if (segment && segment.length <= 40 && !/^[0-9a-f]{16,}$/i.test(segment)) {
     return `${segment}｜${host}`;
   }

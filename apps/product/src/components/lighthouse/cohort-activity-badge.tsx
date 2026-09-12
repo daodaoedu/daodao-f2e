@@ -30,28 +30,34 @@ export function ActivityTypeBadge({
   );
 }
 
-export function formatActivityDateTime(value: string): string {
+/** 預設時區；實際顯示以 API 回傳的組織時區（data.range.timezone）為準 */
+export const DEFAULT_ACTIVITY_TIMEZONE = "Asia/Taipei";
+
+export function formatActivityDateTime(
+  value: string,
+  timeZone = DEFAULT_ACTIVITY_TIMEZONE
+): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
-  return `${formatActivityDate(value)} ${formatActivityTime(value)}`;
+  return `${formatActivityDate(value, timeZone)} ${formatActivityTime(value, timeZone)}`;
 }
 
-export function formatActivityDate(value: string): string {
+export function formatActivityDate(value: string, timeZone = DEFAULT_ACTIVITY_TIMEZONE): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return new Intl.DateTimeFormat("zh-TW", {
-    timeZone: "Asia/Taipei",
+    timeZone,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
   }).format(date);
 }
 
-export function formatActivityTime(value: string): string {
+export function formatActivityTime(value: string, timeZone = DEFAULT_ACTIVITY_TIMEZONE): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return new Intl.DateTimeFormat("zh-TW", {
-    timeZone: "Asia/Taipei",
+    timeZone,
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,

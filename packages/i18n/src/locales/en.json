@@ -7829,6 +7829,7 @@
     "organization_ai_key_label": "API key",
     "organization_ai_key_replace_placeholder": "Enter a new key to replace it",
     "organization_ai_key_empty": "Enter an API key before testing.",
+    "organization_ai_key_provider_changed": "Provider changed. Enter an API key for this provider before testing.",
     "organization_ai_key_testing": "Testing connection…",
     "organization_ai_key_testing_button": "Testing…",
     "organization_ai_key_test": "Test connection",

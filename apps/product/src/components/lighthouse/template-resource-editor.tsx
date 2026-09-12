@@ -16,6 +16,8 @@ export interface TemplateResourceDraft {
   key: string;
   name: string;
   url: string;
+  /** 既有資源的指定天數；編輯器不改它，只在儲存時原樣帶回，避免被清掉 */
+  dayNumber?: number | null;
 }
 
 interface TemplateResourceEditorProps {
