@@ -140,7 +140,9 @@ export function ArchiveManager() {
                 </p>
               )}
             </div>
-            <span className="font-mono text-sm text-[#0D7773]">{formatDate(item.archivedAt)}</span>
+            <span className="font-mono text-sm text-[#0D7773]">
+              {formatDate(item.archivedAt, organization?.timezone)}
+            </span>
             <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
@@ -182,9 +184,15 @@ export function ArchiveManager() {
   );
 }
 
-function formatDate(value: string | null): string {
+/** 以組織時區顯示封存日期；用 UTC 日期會讓台灣凌晨封存的項目顯示成前一天 */
+function formatDate(value: string | null, timeZone?: string | null): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return date.toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: timeZone || "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
 }
