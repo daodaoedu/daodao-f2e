@@ -34,8 +34,21 @@ env:
   PNPM_VERSION: 10
 
 jobs:
+  workflow-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install workflow test dependency
+        run: python -m pip install PyYAML==6.0.2
+      - name: Test quality gate failure propagation
+        run: python -m unittest discover -s .github/scripts/__tests__ -p 'test_*.py' -v
+
   # ===== 主要測試與品質檢查階段 =====
   test:
+    needs: workflow-tests
     runs-on: ubuntu-latest
     steps:
       # ===== 代碼檢出 =====
@@ -61,7 +74,7 @@ jobs:
       - name: Get pnpm store directory
         shell: bash
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
 
       # ===== pnpm 依賴快取 =====
       - name: Setup pnpm cache
@@ -76,19 +89,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # ===== 並行品質檢查 =====
-      - name: Run checks in parallel
-        run: |
-          echo "🔍 Running TypeScript type checking..."
-          pnpm run typecheck &
+      # ===== 品質檢查（依序執行，避免記憶體競爭並保留各指令退出碼） =====
+      - name: Run typecheck
+        run: pnpm run typecheck
 
-          echo "📝 Running linting..."
-          pnpm run lint &
+      - name: Run lint
+        run: pnpm run lint
 
-          echo "🧪 Running tests..."
-          pnpm test &
-
-          wait
+      - name: Run tests
+        run: pnpm test
 
 
   # ===== CI 成功通知 =====

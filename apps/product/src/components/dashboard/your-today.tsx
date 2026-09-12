@@ -93,6 +93,7 @@ export function YourToday() {
                   >
                     {card.type === "challenge" ? (
                       <svg
+                        aria-hidden="true"
                         className="size-3.5"
                         viewBox="0 0 24 24"
                         fill="none"
@@ -106,6 +107,7 @@ export function YourToday() {
                       </svg>
                     ) : (
                       <svg
+                        aria-hidden="true"
                         className="size-3.5"
                         viewBox="0 0 24 24"
                         fill="none"

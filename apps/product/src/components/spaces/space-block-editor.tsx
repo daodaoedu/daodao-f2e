@@ -278,7 +278,8 @@ export const SpaceBlockEditor = ({
           />
         )}
         {block.blockType === "resources" && (
-          <div onBlur={() => void saveContent()}>
+          <fieldset className="min-w-0" onBlur={() => void saveContent()}>
+            <legend className="sr-only">{t("block_resources")}</legend>
             <SpaceResourcesEditor
               links={links}
               onChange={(next) => {
@@ -287,10 +288,11 @@ export const SpaceBlockEditor = ({
               }}
               practices={practices}
             />
-          </div>
+          </fieldset>
         )}
         {block.blockType === "calendar" && (
-          <div onBlur={() => void saveContent()}>
+          <fieldset className="min-w-0" onBlur={() => void saveContent()}>
+            <legend className="sr-only">{t("block_calendar")}</legend>
             <SpaceCalendarEditor
               events={events}
               onChange={(next) => {
@@ -298,7 +300,7 @@ export const SpaceBlockEditor = ({
                 markDirty();
               }}
             />
-          </div>
+          </fieldset>
         )}
 
         {/* 區塊底部：狀態徽章與排程（FR-7.1/7.4） */}

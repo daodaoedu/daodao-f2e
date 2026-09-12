@@ -2,6 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { IReactionCountItem, IShowcasePractice } from "../services/showcase-hooks";
 import { reactToPractice } from "../services/showcase-hooks";
 
+// Generated config takes precedence over process.env, so mock the config boundary.
+vi.mock("@daodao/config", () => ({
+  getRequiredEnv: (key: string) => {
+    if (key === "NEXT_PUBLIC_API_URL") return "https://api.daodao.so";
+    if (key === "NEXT_PUBLIC_AI_API_URL") return "https://ai.example.com";
+    throw new Error(`Unexpected config key: ${key}`);
+  },
+}));
+
 // ============================================================================
 // 12.9 BrewingCard 資料合約測試
 // 驗證 is_brewing=true 的練習不暴露打卡心得內容
@@ -101,13 +110,12 @@ describe("reactToPractice API 呼叫（12.10）", () => {
   let mockFetch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.daodao.so");
     mockFetch = vi.fn().mockResolvedValue({ ok: true });
     vi.stubGlobal("fetch", mockFetch);
   });
 
   afterEach(() => {
-    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 
