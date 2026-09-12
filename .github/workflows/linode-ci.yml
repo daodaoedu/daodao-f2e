@@ -74,7 +74,7 @@ jobs:
       - name: Get pnpm store directory
         shell: bash
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
 
       # ===== pnpm 依賴快取 =====
       - name: Setup pnpm cache
@@ -89,27 +89,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # ===== 並行品質檢查 =====
-      - name: Run checks in parallel
-        shell: bash
-        run: |
-          echo "🔍 Running TypeScript type checking..."
-          pnpm run typecheck &
-          typecheck_pid=$!
+      # ===== 品質檢查（依序執行，避免記憶體競爭並保留各指令退出碼） =====
+      - name: Run typecheck
+        run: pnpm run typecheck
 
-          echo "📝 Running linting..."
-          pnpm run lint &
-          lint_pid=$!
+      - name: Run lint
+        run: pnpm run lint
 
-          echo "🧪 Running tests..."
-          pnpm test &
-          test_pid=$!
-
-          check_result=0
-          wait "$typecheck_pid" || check_result=1
-          wait "$lint_pid" || check_result=1
-          wait "$test_pid" || check_result=1
-          exit "$check_result"
+      - name: Run tests
+        run: pnpm test
 
 
   # ===== CI 成功通知 =====

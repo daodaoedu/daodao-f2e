@@ -48,6 +48,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { type CohortFieldErrorKey, resolveCohortApiError } from "@/utils/cohort-api-error";
+import { ConfirmDialog } from "./confirm-dialog";
 import { JoinCode } from "./join-code";
 
 type SessionEntry = { id: string; sessionDate: string; startTime: string; endTime: string };
@@ -782,19 +783,18 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
     toast.success(t("cohort_published"));
   }
 
+  const [confirmArchive, setConfirmArchive] = useState(false);
   async function handleArchive() {
-    if (!window.confirm(t("cohort_archive_confirm"))) {
-      return;
-    }
     setBusy(true);
     const response = await archiveLighthouseCohort(programId, cohort.id);
     setBusy(false);
+    setConfirmArchive(false);
     if (response.error) {
       toast.error(t("cohort_archive_failed"));
       return;
     }
     await refresh();
-    toast.success(t("cohort_archived"));
+    toast.success(t("cohort_archived_to_archive"));
   }
 
   async function handleDuplicate() {
@@ -997,7 +997,7 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
             </DropdownMenuItem>
             {cohort.status !== "archived" && (
               <DropdownMenuItem
-                onClick={handleArchive}
+                onClick={() => setConfirmArchive(true)}
                 disabled={busy}
                 className="gap-2 text-[#C03A3A]"
               >
@@ -1008,6 +1008,16 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      <ConfirmDialog
+        open={confirmArchive}
+        title={t("cohort_archive_title")}
+        description={t("cohort_archive_confirm")}
+        confirmLabel={t("archive")}
+        destructive
+        busy={busy}
+        onConfirm={handleArchive}
+        onOpenChange={setConfirmArchive}
+      />
     </div>
   );
 }
@@ -1025,6 +1035,8 @@ interface ProgramPanelProps {
 function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
   const t = useTranslations("lighthouse");
   const { cohorts, isLoading, mutate } = useLighthouseCohorts(program.id);
+  // 封存中的場次改由「封存」頁列出（FR-ARC-04）
+  const visibleCohorts = cohorts?.filter((cohort) => cohort.status !== "archived");
   const templatesQuery = useLighthouseTemplates(program.organizationId);
   const templates = templatesQuery.data?.data;
   const [editing, setEditing] = useState(false);
@@ -1047,23 +1059,20 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
     toast.success(t("program_saved"));
   }
 
+  const [confirmArchive, setConfirmArchive] = useState(false);
+  // 後端會把系列底下的場次一起封存（FR-ARC-04），恢復系列時只復活這些被級聯封存的場次
+  const activeCohortCount = cohorts?.filter((cohort) => cohort.status !== "archived").length ?? 0;
   async function handleArchive() {
-    if (cohorts?.length) {
-      toast.error(t("program_archive_blocked"));
-      return;
-    }
-    if (!window.confirm(t("program_archive_confirm"))) {
-      return;
-    }
     setBusy(true);
     const response = await archiveLighthouseProgram(program.id);
     setBusy(false);
+    setConfirmArchive(false);
     if (response.error) {
-      toast.error(t("program_archive_blocked"));
+      toast.error(t("program_archive_failed"));
       return;
     }
     await refreshPrograms();
-    toast.success(t("program_archived"));
+    toast.success(t("program_archived_to_archive"));
   }
 
   async function handleProgramDuplicate() {
@@ -1225,7 +1234,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
                   {t("program_duplicate")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={handleArchive}
+                  onClick={() => setConfirmArchive(true)}
                   disabled={busy}
                   className="gap-2 text-[#C03A3A]"
                 >
@@ -1237,6 +1246,20 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        open={confirmArchive}
+        title={t("program_archive_title")}
+        description={
+          activeCohortCount > 0
+            ? t("program_archive_cascade_message", { count: activeCohortCount })
+            : t("program_archive_confirm")
+        }
+        confirmLabel={t("archive")}
+        destructive
+        busy={busy}
+        onConfirm={handleArchive}
+        onOpenChange={setConfirmArchive}
+      />
 
       <div className="px-6 py-6">
         <div className="flex items-center justify-between gap-4">
@@ -1263,12 +1286,12 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
 
         <div className="mt-5 grid gap-3">
           {isLoading && <p className="text-sm text-[#5A7B79]">{t("loading")}</p>}
-          {!isLoading && !cohorts?.length && (
+          {!isLoading && !visibleCohorts?.length && (
             <p className="rounded-2xl border border-dashed border-[#B9DCD8] px-5 py-8 text-center text-sm text-[#5A7B79]">
               {t("cohorts_empty")}
             </p>
           )}
-          {cohorts?.map((cohort) => (
+          {visibleCohorts?.map((cohort) => (
             <CohortCard
               key={cohort.id}
               programId={program.id}
@@ -1317,7 +1340,7 @@ export function ProgramsManager() {
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#0D7773]">
             {t("programs_eyebrow")}
           </p>
-          <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em] md:text-3xl">
+          <h1 className="mt-3 text-2xl font-semibold leading-[1.45] tracking-[-0.04em] md:text-3xl">
             {t("programs_title")}
           </h1>
           <p className="mt-3 max-w-2xl text-[#5A7B79]">{t("programs_description")}</p>

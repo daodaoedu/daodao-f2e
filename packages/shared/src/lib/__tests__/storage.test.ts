@@ -1,42 +1,33 @@
 import { describe, expect, it } from "vitest";
 import { getStorageKey, StorageEnum } from "../storage";
 
+const expectedStorageKeys: Record<keyof typeof StorageEnum, string> = {
+  Quiz: "_quiz",
+  UserInfo: "_userinfo",
+  Whitelist: "_whitelist",
+  OAuthNonce: "_oauthnonce",
+  ManualPracticeDraft: "_manualpracticedraft",
+  PracticeWizardDraft: "_practicewizarddraft",
+  ActionMaker: "_actionmaker",
+  AuthSignal: "_authsignal",
+  HomeFeedAnchor: "_homefeedanchor",
+  RegistrationFlow: "_registrationflow",
+  TaskGuideCollapsed: "_taskguidecollapsed",
+  PwaInstallDismissedAt: "_pwainstalldismissedat",
+  LighthouseSidebarCollapsed: "_lighthousesidebarcollapsed",
+  ChatPinBannerDismissed: "_chatpinbannerdismissed",
+};
+
 describe("getStorageKey", () => {
-  it("prefixes with underscore and lowercases the enum value", () => {
-    expect(getStorageKey(StorageEnum.Quiz)).toBe("_quiz");
-    expect(getStorageKey(StorageEnum.UserInfo)).toBe("_userinfo");
-    expect(getStorageKey(StorageEnum.Whitelist)).toBe("_whitelist");
-    expect(getStorageKey(StorageEnum.OAuthNonce)).toBe("_oauthnonce");
-    expect(getStorageKey(StorageEnum.ManualPracticeDraft)).toBe("_manualpracticedraft");
-    expect(getStorageKey(StorageEnum.ActionMaker)).toBe("_actionmaker");
-    expect(getStorageKey(StorageEnum.AuthSignal)).toBe("_authsignal");
-    expect(getStorageKey(StorageEnum.HomeFeedAnchor)).toBe("_homefeedanchor");
-    expect(getStorageKey(StorageEnum.RegistrationFlow)).toBe("_registrationflow");
-    expect(getStorageKey(StorageEnum.TaskGuideCollapsed)).toBe("_taskguidecollapsed");
-    expect(getStorageKey(StorageEnum.LighthouseSidebarCollapsed)).toBe(
-      "_lighthousesidebarcollapsed"
-    );
-    expect(getStorageKey(StorageEnum.ChatPinBannerDismissed)).toBe("_chatpinbannerdismissed");
+  it.each(
+    Object.entries(expectedStorageKeys)
+  )("maps %s to its stable browser-storage key", (enumKey, expectedKey) => {
+    expect(getStorageKey(StorageEnum[enumKey as keyof typeof StorageEnum])).toBe(expectedKey);
   });
 });
 
 describe("StorageEnum", () => {
   it("contains all expected keys", () => {
-    const keys = Object.keys(StorageEnum);
-    expect(keys).toContain("Quiz");
-    expect(keys).toContain("UserInfo");
-    expect(keys).toContain("Whitelist");
-    expect(keys).toContain("OAuthNonce");
-    expect(keys).toContain("ManualPracticeDraft");
-    expect(keys).toContain("PracticeWizardDraft");
-    expect(keys).toContain("ActionMaker");
-    expect(keys).toContain("AuthSignal");
-    expect(keys).toContain("HomeFeedAnchor");
-    expect(keys).toContain("RegistrationFlow");
-    expect(keys).toContain("TaskGuideCollapsed");
-    expect(keys).toContain("PwaInstallDismissedAt");
-    expect(keys).toContain("LighthouseSidebarCollapsed");
-    expect(keys).toContain("ChatPinBannerDismissed");
-    expect(keys).toHaveLength(14);
+    expect(Object.keys(StorageEnum)).toEqual(Object.keys(expectedStorageKeys));
   });
 });

@@ -1,9 +1,6 @@
-"""Exercise the real CI shell with a mocked package manager."""
+"""Guard the Linode CI quality gate against false-green shell patterns."""
 
-import os
 from pathlib import Path
-import subprocess
-import tempfile
 import unittest
 
 import yaml
@@ -14,49 +11,27 @@ WORKFLOW = ROOT / ".github/workflows/linode-ci.yml"
 
 
 class QualityGateTests(unittest.TestCase):
-    def test_quality_checks_propagate_failures_and_wait_for_every_check(self):
+    def test_quality_checks_are_sequential_and_exit_transparent(self):
         workflow = yaml.safe_load(WORKFLOW.read_text())
-        steps = workflow["jobs"]["test"]["steps"]
-        check = next(step for step in steps if step.get("name") == "Run checks in parallel")
-        self.assertNotIn("if", check)
-        self.assertFalse(check.get("continue-on-error", False))
-        self.assertFalse(workflow["jobs"]["test"].get("continue-on-error", False))
+        test_job = workflow["jobs"]["test"]
+        steps = test_job["steps"]
+        expected_commands = {
+            "Run typecheck": "pnpm run typecheck",
+            "Run lint": "pnpm run lint",
+            "Run tests": "pnpm test",
+        }
 
-        for failed_check in ("", "typecheck", "lint", "test"):
-            with self.subTest(failed_check=failed_check or "all pass"):
-                with tempfile.TemporaryDirectory(prefix="ci-quality-gate-") as directory:
-                    directory = Path(directory)
-                    log = directory / "completed"
-                    pnpm = directory / "pnpm"
-                    pnpm.write_text(
-                        '#!/bin/bash\n'
-                        'check="$1"\n'
-                        'if [ "$check" = run ]; then check="$2"; fi\n'
-                        'case "$check" in typecheck|lint|test) ;; *) exit 99 ;; esac\n'
-                        'if [ "$check" != "$FAILED_CHECK" ]; then sleep 0.1; fi\n'
-                        'printf "%s\\n" "$check" >> "$CHECK_LOG"\n'
-                        'if [ "$check" = "$FAILED_CHECK" ]; then exit 42; fi\n'
-                    )
-                    pnpm.chmod(0o755)
-                    result = subprocess.run(
-                        ["bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", check["run"]],
-                        cwd=directory,
-                        env={
-                            **os.environ,
-                            "PATH": f"{directory}:{os.environ['PATH']}",
-                            "FAILED_CHECK": failed_check,
-                            "CHECK_LOG": str(log),
-                        },
-                        capture_output=True,
-                        text=True,
-                        timeout=10,
-                    )
-                    self.assertEqual(
-                        result.returncode == 0,
-                        not failed_check,
-                        f"{failed_check or 'success'}: {result.stdout}\n{result.stderr}",
-                    )
-                    self.assertCountEqual(log.read_text().splitlines(), ["typecheck", "lint", "test"])
+        self.assertFalse(test_job.get("continue-on-error", False))
+        quality_steps = [step for step in steps if step.get("name") in expected_commands]
+        self.assertEqual([step["name"] for step in quality_steps], list(expected_commands))
+
+        for step in quality_steps:
+            with self.subTest(step=step["name"]):
+                command = step["run"]
+                self.assertEqual(command, expected_commands[step["name"]])
+                self.assertFalse(step.get("continue-on-error", False))
+                self.assertNotIn("&", command)
+                self.assertNotIn("wait", command)
 
 
 if __name__ == "__main__":
