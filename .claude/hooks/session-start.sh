@@ -4,7 +4,7 @@ set -uo pipefail
 
 PROJECT_ROOT="${CLAUDE_WORKING_DIRECTORY:-$(pwd)}"
 
-echo "🏗️  島島阿學 Dev Harness v0.1.0"
+echo "🏗️  daodao-guard v0.1.0"
 echo ""
 
 # === 1. 偵測工作位置 ===
