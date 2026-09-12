@@ -9,8 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@daodao/ui/components/animate-ui/components/radix/dialog";
+
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
+import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -43,7 +45,13 @@ export function ConfirmDialog({
   const t = useTranslations("lighthouse");
   return (
     <Dialog open={open} onOpenChange={(next) => !busy && onOpenChange(next)}>
-      <DialogContent className="w-[min(440px,92vw)] sm:max-w-none rounded-[28px] border-0 bg-white p-6">
+      <DialogContent
+        overlayClassName="bg-[#0F3036]/30"
+        className={cn(
+          "w-[min(440px,92vw)] sm:max-w-none rounded-[28px] border-0 bg-white p-6",
+          LIGHTHOUSE_SCOPE
+        )}
+      >
         <DialogHeader className="items-start text-left">
           <DialogTitle className="text-left text-xl font-semibold text-[#0D3036]">
             {title}

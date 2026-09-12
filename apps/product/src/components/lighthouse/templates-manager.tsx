@@ -6,6 +6,7 @@ import {
   useLighthouseOrganizations,
   useLighthouseTemplates,
 } from "@daodao/api";
+
 import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
@@ -17,9 +18,11 @@ import {
 } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { Button } from "@daodao/ui/components/button";
 import { Input } from "@daodao/ui/components/input";
+import { cn } from "@daodao/ui/lib/utils";
 import { BookOpenText, Plus, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { templateMatches } from "@/utils/template-library";
+import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 import { TemplateCard } from "./template-card";
 import { TemplateEditorDialog, type TemplateSaveKind } from "./template-editor-dialog";
 
@@ -163,7 +166,13 @@ export function TemplatesManager() {
       )}
 
       <Dialog open={complete !== null} onOpenChange={(open) => !open && setComplete(null)}>
-        <DialogContent className="w-[min(420px,92vw)] sm:max-w-none rounded-3xl border-0 bg-white p-6">
+        <DialogContent
+          overlayClassName="bg-[#0F3036]/30"
+          className={cn(
+            "w-[min(420px,92vw)] sm:max-w-none rounded-3xl border-0 bg-white p-6",
+            LIGHTHOUSE_SCOPE
+          )}
+        >
           <DialogHeader className="items-start text-left">
             <DialogTitle className="text-left text-xl font-semibold text-[#0D3036]">
               {complete?.kind === "draft"

@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   RadioTower,
 } from "lucide-react";
+import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 
 interface LighthouseShellProps {
   children: React.ReactNode;
@@ -115,7 +116,7 @@ export function LighthouseShell({ children }: LighthouseShellProps) {
         </nav>
       </header>
 
-      <main className="min-h-screen md:pl-64">{children}</main>
+      <main className={cn("min-h-screen md:pl-64", LIGHTHOUSE_SCOPE)}>{children}</main>
     </div>
   );
 }

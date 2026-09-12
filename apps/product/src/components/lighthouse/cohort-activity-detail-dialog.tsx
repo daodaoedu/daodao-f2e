@@ -5,6 +5,7 @@ import {
   type LighthouseActivityDetail,
   type LighthouseActivityItem,
 } from "@daodao/api";
+
 import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
@@ -12,9 +13,11 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@daodao/ui/components/animate-ui/components/radix/dialog";
+import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ActivityTypeBadge, formatActivityDateTime } from "./cohort-activity-badge";
+import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 
 interface CohortActivityDetailDialogProps {
   programId: number;
@@ -61,7 +64,11 @@ export function CohortActivityDetailDialog({
   return (
     <Dialog open={item !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className="w-[min(560px,94vw)] gap-0 overflow-hidden rounded-3xl border-0 bg-white p-0 sm:max-w-none"
+        overlayClassName="bg-[#0F3036]/30"
+        className={cn(
+          "w-[min(560px,94vw)] gap-0 overflow-hidden rounded-3xl border-0 bg-white p-0 sm:max-w-none",
+          LIGHTHOUSE_SCOPE
+        )}
         data-testid="activity-detail"
         showCloseButton={false}
       >

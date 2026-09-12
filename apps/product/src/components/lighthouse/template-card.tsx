@@ -7,6 +7,7 @@ import {
   type LighthouseTemplate,
   setLighthouseTemplateBinding,
 } from "@daodao/api";
+
 import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
@@ -28,6 +29,7 @@ import { Archive, ChevronDown, Copy, Link2, Lock, MoreVertical, Pencil } from "l
 import { useState } from "react";
 import { addDays, formatSlashDate, isCohortStarted } from "@/utils/template-library";
 import { ConfirmDialog } from "./confirm-dialog";
+import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 
 interface TemplateCardProps {
   organizationId: number;
@@ -386,7 +388,13 @@ export function TemplateCard({
       </section>
 
       <Dialog open={allOpen} onOpenChange={setAllOpen}>
-        <DialogContent className="w-[min(620px,94vw)] sm:max-w-none rounded-3xl border-0 bg-white p-6">
+        <DialogContent
+          overlayClassName="bg-[#0F3036]/30"
+          className={cn(
+            "w-[min(620px,94vw)] sm:max-w-none rounded-3xl border-0 bg-white p-6",
+            LIGHTHOUSE_SCOPE
+          )}
+        >
           <DialogHeader className="items-start text-left">
             <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#0D7773]">
               {t("template_bindings_title")}

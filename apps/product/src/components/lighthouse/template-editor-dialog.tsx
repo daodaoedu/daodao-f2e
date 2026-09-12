@@ -6,6 +6,7 @@ import {
   type LighthouseTemplate,
   updateLighthouseTemplate,
 } from "@daodao/api";
+
 import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
@@ -36,6 +37,7 @@ import {
   type TemplateTiming,
   TIMING_OPTIONS,
 } from "@/utils/template-library";
+import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 import { type TemplateResourceDraft, TemplateResourceEditor } from "./template-resource-editor";
 
 type Timing = "" | TemplateTiming | "other";
@@ -274,7 +276,11 @@ export function TemplateEditorDialog({
   return (
     <Dialog open={open} onOpenChange={(next) => !busy && onOpenChange(next)}>
       <DialogContent
-        className="flex max-h-[min(720px,calc(100vh-32px))] w-[min(680px,94vw)] sm:max-w-none flex-col gap-0 overflow-hidden rounded-3xl border-0 bg-white p-0"
+        overlayClassName="bg-[#0F3036]/30"
+        className={cn(
+          "flex max-h-[calc(100vh-48px)] w-[min(680px,94vw)] sm:max-w-none flex-col gap-0 overflow-hidden rounded-3xl border-0 bg-white p-0",
+          LIGHTHOUSE_SCOPE
+        )}
         data-testid="template-editor"
       >
         <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-[#DDEFED] bg-[#F7FCFB] px-5 py-4">
@@ -632,8 +638,11 @@ export function TemplateEditorDialog({
         <footer className="flex items-center justify-between gap-3 border-t border-[#DDEFED] bg-white px-5 py-4">
           <Button
             type="button"
-            variant="ghost"
-            className={cn("rounded-full text-[#0D7773]", !hasAnyContent(draft) && "opacity-55")}
+            variant="outline"
+            className={cn(
+              "rounded-full border-[#CDEBE8] text-[#0D7773]",
+              !hasAnyContent(draft) && "opacity-55"
+            )}
             disabled={busy}
             onClick={() => void submit("draft")}
           >
