@@ -204,10 +204,10 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
       </div>
 
       <div
-        className="flex flex-wrap items-center gap-2.5 rounded-[20px] border border-[#CDEBE8] bg-white p-3.5"
+        className="flex flex-wrap items-center gap-2.5 rounded-[20px] border border-[#CDEBE8] bg-white p-3.5 lg:flex-nowrap"
         data-testid="activity-filters"
       >
-        <div className="relative min-w-[220px] flex-1">
+        <div className="relative min-w-[200px] flex-1">
           <Search
             className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#78928F]"
             aria-hidden="true"
@@ -221,7 +221,7 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
             className="h-[38px] rounded-full pl-9"
           />
         </div>
-        <div className="flex items-center gap-1.5 rounded-full border border-[#CDEBE8] px-3 py-1 text-xs text-[#456B68]">
+        <div className="flex shrink-0 items-center gap-1 rounded-full border border-[#CDEBE8] px-2.5 py-1 text-xs text-[#456B68]">
           <span>{t("activity_period")}</span>
           <input
             type="date"
@@ -253,7 +253,7 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
           value={type}
           onChange={(event) => setType(event.target.value as LighthouseActivityType | "")}
           aria-label={t("activity_type_label")}
-          className="h-[38px] rounded-full border border-[#CDEBE8] bg-white px-3 text-sm text-[#0D3036]"
+          className="h-[38px] shrink-0 rounded-full border border-[#CDEBE8] bg-white px-3 text-sm text-[#0D3036]"
         >
           <option value="">{t("activity_type_all")}</option>
           {LIGHTHOUSE_ACTIVITY_TYPES.map((option) => (
@@ -266,7 +266,7 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
           value={practiceTitle}
           onChange={(event) => setPracticeTitle(event.target.value)}
           aria-label={t("activity_practice_label")}
-          className="h-[38px] max-w-[220px] rounded-full border border-[#CDEBE8] bg-white px-3 text-sm text-[#0D3036]"
+          className="h-[38px] w-[150px] shrink-0 rounded-full border border-[#CDEBE8] bg-white px-3 text-sm text-[#0D3036]"
         >
           <option value="">{t("activity_practice_all")}</option>
           {data?.practices.map((practice) => (
@@ -275,7 +275,7 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
             </option>
           ))}
         </select>
-        <label className="flex items-center gap-2 rounded-full border border-[#CDEBE8] px-3 py-2 text-sm text-[#456B68]">
+        <label className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-[#CDEBE8] px-3 py-2 text-sm text-[#456B68]">
           <input
             type="checkbox"
             checked={hasText}
@@ -301,11 +301,11 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
             {t("activity_count", { count: total })}
           </p>
         </div>
-        <div className="mt-4 overflow-x-auto px-6 pb-5">
+        <div className="mt-4 overflow-x-auto rounded-b-3xl">
           <div className="min-w-[760px]">
             <div
               className={cn(
-                "grid gap-3 rounded-t-xl bg-[#F7FCFB] px-4 py-2.5 text-[11px] font-medium text-[#78928F]",
+                "grid gap-3 border-b border-[#EEF6F5] bg-[#F7FCFB] px-[18px] py-2.5 text-[11px] font-medium text-[#78928F]",
                 ROW_GRID
               )}
             >
@@ -316,11 +316,11 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
               <span>{t("col_summary")}</span>
             </div>
             {feed.isLoading && !data && (
-              <p className="px-4 py-8 text-sm text-[#78928F]">{t("loading")}</p>
+              <p className="px-[18px] py-8 text-sm text-[#78928F]">{t("loading")}</p>
             )}
             {data && data.items.length === 0 && (
               <p
-                className="px-4 py-9 text-center text-sm text-[#78928F]"
+                className="px-[18px] py-9 text-center text-sm text-[#78928F]"
                 data-testid="activity-empty"
               >
                 {t("activity_empty")}
@@ -328,12 +328,14 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
             )}
             {grouped.map((group) => (
               <div key={group.day}>
-                <p className="px-4 pt-3 pb-1 text-[11px] font-medium text-[#78928F]">{group.day}</p>
+                <p className="px-[18px] pt-3 pb-1 text-[11px] font-medium text-[#78928F]">
+                  {group.day}
+                </p>
                 {group.items.map((item) => (
                   <div
                     key={`${item.type}-${item.id}`}
                     className={cn(
-                      "grid items-center gap-3 border-b border-[#EEF6F5] px-4 py-3 text-[13px] last:border-b-0",
+                      "grid items-center gap-3 border-b border-[#EEF6F5] px-[18px] py-3.5 text-[13px] last:border-b-0",
                       ROW_GRID
                     )}
                   >
@@ -343,7 +345,7 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
                     <span>
                       <ActivityTypeBadge item={item} />
                     </span>
-                    <strong className="truncate font-semibold text-[#0D3036]">
+                    <strong className="truncate font-bold text-[#0D3036]">
                       {item.member.nickname ?? t("learner")}
                     </strong>
                     <span className="truncate text-[#0D5B59]">{item.practice.title}</span>

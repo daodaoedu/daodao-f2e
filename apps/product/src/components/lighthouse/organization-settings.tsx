@@ -88,7 +88,7 @@ export function OrganizationSettings() {
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#0D7773]">
           {t("organization_eyebrow")}
         </p>
-        <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em]">
+        <h1 className="mt-3 text-2xl font-semibold leading-[1.45] tracking-[-0.04em] md:text-3xl">
           {t("organization_title")}
         </h1>
         <p className="mt-3 text-[#5A7B79]">{t("organization_description")}</p>

@@ -36,7 +36,7 @@ export function LighthouseShell({ children }: LighthouseShellProps) {
 
   return (
     <div className="min-h-screen bg-[#F5FFFD] text-[#0D3036]">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-[#CDEBE8] bg-white/95 px-5 py-5 md:flex md:flex-col">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-[#CDEBE8] bg-white/95 px-5 py-7 md:flex md:flex-col">
         <div className="flex items-center gap-3 px-1">
           <CustomLink
             href="/"
@@ -63,7 +63,7 @@ export function LighthouseShell({ children }: LighthouseShellProps) {
                     href={item.href}
                     aria-current={isActive ? "page" : undefined}
                     className={cn(
-                      "relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan",
+                      "relative flex items-center gap-3 rounded-[12px] px-4 py-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan",
                       "before:absolute before:-left-5 before:h-5 before:w-1 before:rounded-r-full before:bg-transparent before:transition-all",
                       isActive
                         ? "bg-[#E7FAF7] text-[#0D5B59] before:h-9 before:bg-[#16B9B3]"

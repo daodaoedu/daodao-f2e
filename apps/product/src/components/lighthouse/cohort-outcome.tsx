@@ -79,10 +79,10 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
         className="rounded-3xl border border-[#CDEBE8] bg-white p-6"
         aria-labelledby="outcome-export-title"
       >
-        <h2 id="outcome-export-title" className="text-xl font-semibold tracking-[-0.02em]">
+        <h2 id="outcome-export-title" className="text-lg font-semibold tracking-[-0.02em]">
           {t("outcome_export_title")}
         </h2>
-        <p className="mt-1 text-sm text-[#5A7B79]">{t("outcome_export_description")}</p>
+        <p className="mt-1 text-[13px] text-[#78928F]">{t("outcome_export_description")}</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Button
             type="button"
@@ -175,7 +175,7 @@ export function OutcomeOverview({ outcome }: { outcome: LighthouseOutcome }) {
         >
           <p
             className={cn(
-              "text-[22px] font-semibold",
+              "text-[22px] font-bold",
               card.amber ? "text-[#A95D00]" : "text-[#0D7773]"
             )}
           >

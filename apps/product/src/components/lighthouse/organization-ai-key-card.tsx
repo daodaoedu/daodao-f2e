@@ -157,7 +157,7 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
           {configured && credential?.keyLast4 ? ` · …${credential.keyLast4}` : ""}
         </span>
       </div>
-      <p className="mt-3 text-sm text-[#5A7B79]">{t("organization_ai_key_description")}</p>
+      <p className="mt-3 text-[13px] text-[#78928F]">{t("organization_ai_key_description")}</p>
 
       <div className="mt-5 grid gap-3">
         <div className="grid max-w-xs gap-2">

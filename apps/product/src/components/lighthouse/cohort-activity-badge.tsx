@@ -20,7 +20,7 @@ export function ActivityTypeBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold",
+        "inline-flex items-center rounded-full px-2.5 py-1 text-[13px] leading-[19px] font-normal",
         TONES[item.type],
         className
       )}

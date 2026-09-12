@@ -129,7 +129,7 @@ export function TemplateResourceEditor({ resources, onChange }: TemplateResource
 
   return (
     <div className="rounded-2xl bg-[#F7FCFB] p-4">
-      <h4 className="text-sm font-semibold">{t("template_resources_title")}</h4>
+      <h4 className="text-sm font-semibold text-[#0D3036]">{t("template_resources_title")}</h4>
       <p className="mt-1 text-xs text-[#78928F]">{t("template_resources_hint")}</p>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row">
         <Input

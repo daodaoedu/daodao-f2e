@@ -23,16 +23,16 @@ export function CohortOutcomeTables({ outcome, plain = false }: CohortOutcomeTab
       aria-labelledby="outcome-practices-title"
     >
       <div className={cn("px-6 pt-6", plain && "px-0 pt-0")}>
-        <h2 id="outcome-practices-title" className="text-xl font-semibold tracking-[-0.02em]">
+        <h2 id="outcome-practices-title" className="text-lg font-semibold tracking-[-0.02em]">
           {t("outcome_practices_title")}
         </h2>
-        <p className="mt-1 text-sm text-[#5A7B79]">{t("outcome_practices_description")}</p>
+        <p className="mt-1 text-[13px] text-[#78928F]">{t("outcome_practices_description")}</p>
       </div>
-      <div className={cn("mt-4 overflow-x-auto", !plain && "px-6")}>
+      <div className="mt-4 overflow-x-auto">
         <div className="min-w-[760px]">
           <div
             className={cn(
-              "grid gap-3 rounded-t-xl bg-[#F7FCFB] px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-[#78928F]",
+              "grid gap-3 border-b border-[#EEF6F5] bg-[#F7FCFB] px-[18px] py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-[#78928F]",
               PRACTICE_GRID
             )}
           >
@@ -44,17 +44,17 @@ export function CohortOutcomeTables({ outcome, plain = false }: CohortOutcomeTab
             <span>{t("outcome_col_comments")}</span>
           </div>
           {outcome.practiceOutcomes.length === 0 && (
-            <p className="px-4 py-6 text-sm text-[#78928F]">{t("outcome_practices_empty")}</p>
+            <p className="px-[18px] py-6 text-sm text-[#78928F]">{t("outcome_practices_empty")}</p>
           )}
           {outcome.practiceOutcomes.map((row) => (
             <div
               key={row.title}
               className={cn(
-                "grid items-center gap-3 border-b border-[#EEF6F5] px-4 py-3 text-sm last:border-b-0",
+                "grid items-center gap-3 border-b border-[#EEF6F5] px-[18px] py-3.5 text-sm last:border-b-0",
                 PRACTICE_GRID
               )}
             >
-              <span className="truncate font-medium text-[#0D3036]">{row.title}</span>
+              <span className="truncate font-bold text-[#0D3036]">{row.title}</span>
               <span>{row.participants}</span>
               <span>{row.started}</span>
               <span>{row.completed}</span>
@@ -73,17 +73,17 @@ export function CohortOutcomeTables({ outcome, plain = false }: CohortOutcomeTab
       >
         <div>
           <h3 className="text-[15px] font-semibold">{t("outcome_participants_title")}</h3>
-          <p className="mt-1 text-sm text-[#5A7B79]">{t("outcome_participants_description")}</p>
+          <p className="mt-1 text-[13px] text-[#78928F]">{t("outcome_participants_description")}</p>
         </div>
         <span className="shrink-0 self-start rounded-full bg-white px-3 py-1 text-xs font-medium text-[#456B68]">
           {t("outcome_no_ai_badge")}
         </span>
       </div>
-      <div className={cn("overflow-x-auto pb-6", !plain && "px-6")}>
+      <div className={cn("overflow-x-auto", !plain && "rounded-b-3xl")}>
         <div className="min-w-[880px]">
           <div
             className={cn(
-              "grid gap-3 px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-[#78928F]",
+              "grid gap-3 border-b border-[#EEF6F5] bg-[#F7FCFB] px-[18px] py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-[#78928F]",
               PARTICIPANT_GRID
             )}
           >
@@ -95,7 +95,9 @@ export function CohortOutcomeTables({ outcome, plain = false }: CohortOutcomeTab
             <span>{t("outcome_col_last_activity")}</span>
           </div>
           {outcome.participantProgress.length === 0 && (
-            <p className="px-4 py-6 text-sm text-[#78928F]">{t("outcome_participants_empty")}</p>
+            <p className="px-[18px] py-6 text-sm text-[#78928F]">
+              {t("outcome_participants_empty")}
+            </p>
           )}
           {outcome.participantProgress.map((row) => {
             const percent =
@@ -106,11 +108,11 @@ export function CohortOutcomeTables({ outcome, plain = false }: CohortOutcomeTab
               <div
                 key={`${row.userId}-${row.practiceId}`}
                 className={cn(
-                  "grid items-center gap-3 border-b border-[#EEF6F5] px-4 py-3 text-sm last:border-b-0",
+                  "grid items-center gap-3 border-b border-[#EEF6F5] px-[18px] py-3.5 text-sm last:border-b-0",
                   PARTICIPANT_GRID
                 )}
               >
-                <span className="truncate font-medium text-[#0D3036]">
+                <span className="truncate font-bold text-[#0D3036]">
                   {row.nickname ?? t("learner")}
                 </span>
                 <span className="truncate text-[#0D5B59]">{row.practiceTitle}</span>

@@ -60,7 +60,7 @@ export function CohortShell({ programId, cohortId, children }: CohortShellProps)
           {t("cohort_back_to_programs")}
         </CustomLink>
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-[-0.04em] md:text-3xl">
+          <h1 className="text-2xl font-semibold leading-[1.45] tracking-[-0.04em] md:text-3xl">
             {cohortName ?? (cohort.isLoading ? t("loading") : t("cohorts_title"))}
           </h1>
           {!isArchived && (

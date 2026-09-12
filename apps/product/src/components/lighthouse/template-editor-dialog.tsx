@@ -325,7 +325,7 @@ export function TemplateEditorDialog({
             <div className="space-y-5">
               <div>
                 <div className="flex items-center justify-between">
-                  <label htmlFor="template-action" className="text-sm font-medium">
+                  <label htmlFor="template-action" className="text-sm font-medium text-[#456B68]">
                     {t("template_action_label")} <span className="text-[#D86060]">*</span>
                   </label>
                   <span className="text-xs text-[#78928F]">
@@ -391,7 +391,7 @@ export function TemplateEditorDialog({
             <div className="space-y-5">
               <SummaryBox name={displayName} action={draft.action} />
               <fieldset>
-                <legend className="text-sm font-medium">
+                <legend className="text-sm font-medium text-[#456B68]">
                   {t("template_days_label")} <span className="text-[#D86060]">*</span>
                 </legend>
                 <div className="mt-2 grid grid-cols-4 gap-2">
@@ -422,7 +422,7 @@ export function TemplateEditorDialog({
                 {errors.days && <p className="mt-1 text-xs text-[#C03A3A]">{errors.days}</p>}
               </fieldset>
               <fieldset>
-                <legend className="text-sm font-medium">
+                <legend className="text-sm font-medium text-[#456B68]">
                   {t("template_frequency_label")} <span className="text-[#D86060]">*</span>
                 </legend>
                 <div className="mt-2 grid grid-cols-3 gap-2">
@@ -452,7 +452,9 @@ export function TemplateEditorDialog({
                 )}
               </fieldset>
               <fieldset>
-                <legend className="text-sm font-medium">{t("template_minutes_label")}</legend>
+                <legend className="text-sm font-medium text-[#456B68]">
+                  {t("template_minutes_label")}
+                </legend>
                 <div className="mt-2 grid grid-cols-4 gap-2">
                   {MINUTES_QUICK_OPTIONS.map((option) => (
                     <QuickOption
@@ -481,7 +483,7 @@ export function TemplateEditorDialog({
                 {errors.minutes && <p className="mt-1 text-xs text-[#C03A3A]">{errors.minutes}</p>}
               </fieldset>
               <div>
-                <label htmlFor="template-timing" className="text-sm font-medium">
+                <label htmlFor="template-timing" className="text-sm font-medium text-[#456B68]">
                   {t("template_timing_label")}
                 </label>
                 <select
@@ -500,7 +502,10 @@ export function TemplateEditorDialog({
                 </select>
                 {draft.timing === "other" && (
                   <div className="mt-3">
-                    <label htmlFor="template-timing-other" className="text-sm font-medium">
+                    <label
+                      htmlFor="template-timing-other"
+                      className="text-sm font-medium text-[#456B68]"
+                    >
                       {t("template_timing_other_label")}
                     </label>
                     <Input
@@ -524,7 +529,7 @@ export function TemplateEditorDialog({
             <div className="space-y-5">
               <SummaryBox name={displayName} action={draft.action} />
               <div>
-                <label htmlFor="template-tags" className="text-sm font-medium">
+                <label htmlFor="template-tags" className="text-sm font-medium text-[#456B68]">
                   {t("template_tags_label")}
                 </label>
                 <Input
@@ -547,7 +552,7 @@ export function TemplateEditorDialog({
                       <li key={tag}>
                         <button
                           type="button"
-                          className="rounded-md bg-[#E7FAF7] px-2 py-1 text-xs text-[#456B68] hover:bg-[#D5F2EE]"
+                          className="inline-flex h-[29px] items-center rounded-full border border-[#CDEBE8] bg-white px-3 text-xs font-semibold text-[#0D5B59] hover:bg-[#F5FFFD]"
                           onClick={() => patch({ tags: draft.tags.filter((item) => item !== tag) })}
                           aria-label={t("template_tag_remove", { tag })}
                         >
@@ -570,7 +575,7 @@ export function TemplateEditorDialog({
               <h3 className="text-2xl font-semibold tracking-[-0.02em]">
                 {displayName || t("template_untitled")}
               </h3>
-              <div className="rounded-2xl border border-[#CDEBE8] p-5">
+              <div className="rounded-xl border border-[#EDF8F6] p-5 shadow-[0_10px_24px_rgba(15,48,54,0.06)]">
                 <p className="text-base font-medium">
                   {draft.action.trim() || t("template_no_action")}
                 </p>
@@ -584,7 +589,7 @@ export function TemplateEditorDialog({
                   {draft.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded bg-[#E7FAF7] px-2 py-1 text-xs text-[#456B68]"
+                      className="inline-flex h-[29px] items-center rounded-full border border-[#CDEBE8] bg-white px-3 text-xs font-semibold text-[#0D5B59]"
                     >
                       {tag}
                     </span>
@@ -593,10 +598,15 @@ export function TemplateEditorDialog({
               </div>
               {draft.resources.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-semibold">{t("template_resources_title")}</h4>
-                  <ul className="mt-2 space-y-1.5 text-sm">
+                  <h4 className="text-sm font-semibold text-[#0D3036]">
+                    {t("template_resources_title")}
+                  </h4>
+                  <ul className="mt-2 space-y-2 text-sm">
                     {draft.resources.map((resource) => (
-                      <li key={resource.key} className="truncate">
+                      <li
+                        key={resource.key}
+                        className="flex h-12 items-center truncate rounded-lg border border-[#DDEFED] px-3.5"
+                      >
                         {resource.url ? (
                           <a
                             href={resource.url}
@@ -687,10 +697,10 @@ function QuickOption({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "h-10 rounded-xl border text-sm font-medium transition-colors",
+        "h-[42px] rounded-[10px] border text-sm font-semibold transition-colors",
         active
-          ? "border-[#16B9B3] bg-[#F0FBF9] text-[#0D7773]"
-          : "border-[#CDEBE8] text-[#456B68] hover:bg-[#F5FFFD]"
+          ? "border-[#16B9B3] bg-white text-[#0D7773]"
+          : "border-[#DDEFED] text-[#456B68] hover:bg-[#F5FFFD]"
       )}
     >
       {children}

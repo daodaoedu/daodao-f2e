@@ -113,15 +113,15 @@ export function CohortOutcomeSummary({
     >
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
-          <h2 id="outcome-summary-title" className="text-xl font-semibold tracking-[-0.02em]">
+          <h2 id="outcome-summary-title" className="text-lg font-semibold tracking-[-0.02em]">
             {t("outcome_summary_title")}
           </h2>
-          <p className="mt-1 text-sm text-[#5A7B79]">
+          <p className="mt-1 text-[13px] text-[#78928F]">
             {t("outcome_summary_description")}{" "}
             {mode === "own" ? t("outcome_ai_mode_own_text") : t("outcome_ai_mode_platform_text")}
           </p>
         </div>
-        <label className="flex shrink-0 items-center gap-2 text-sm text-[#456B68]">
+        <label className="grid shrink-0 gap-1.5 text-xs text-[#456B68]">
           {t("outcome_ai_mode_label")}
           <select
             value={mode}

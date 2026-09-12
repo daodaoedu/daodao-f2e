@@ -74,7 +74,9 @@ export function ArchiveManager() {
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#0D7773]">
           {t("archive_eyebrow")}
         </p>
-        <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em]">{t("archive_title")}</h1>
+        <h1 className="mt-3 text-2xl font-semibold leading-[1.45] tracking-[-0.04em] md:text-3xl">
+          {t("archive_title")}
+        </h1>
       </header>
 
       <div className="mt-6 flex flex-wrap gap-2" role="tablist" aria-label={t("archive_title")}>
@@ -88,10 +90,10 @@ export function ArchiveManager() {
               aria-selected={active}
               onClick={() => switchType(item)}
               className={cn(
-                "rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan",
+                "h-[34px] rounded-full border px-4 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan",
                 active
-                  ? "bg-[#0D3036] text-white"
-                  : "bg-[#EDF8F6] text-[#345E5B] hover:bg-[#E0F3F0]"
+                  ? "border-[#0D3036] bg-[#0D3036] text-white"
+                  : "border-[#CDEBE8] bg-white text-[#345E5B] hover:bg-[#F5FFFD]"
               )}
             >
               {t(`archive_tab_${item}`)}
@@ -109,8 +111,8 @@ export function ArchiveManager() {
         </output>
       )}
 
-      <section className="mt-5 overflow-x-auto rounded-3xl border border-[#CDEBE8] bg-white">
-        <div className="grid min-w-[520px] grid-cols-[minmax(180px,1fr)_minmax(120px,0.45fr)_minmax(132px,0.35fr)] border-b border-[#DDEFED] px-5 py-3 text-xs font-medium uppercase tracking-[0.12em] text-[#78928F]">
+      <section className="mt-5 overflow-x-auto rounded-[20px] border border-[#CDEBE8] bg-white">
+        <div className="grid min-w-[520px] grid-cols-[minmax(180px,1fr)_minmax(120px,0.45fr)_minmax(132px,0.35fr)] gap-3 border-b border-[#DDEFED] bg-[#F7FCFB] px-5 py-3 text-xs font-medium uppercase tracking-[0.12em] text-[#78928F]">
           <span>{t("archive_col_name")}</span>
           <span>{t("archive_col_date")}</span>
           <span>{t("archive_col_actions")}</span>
@@ -124,10 +126,10 @@ export function ArchiveManager() {
         {items.map((item) => (
           <div
             key={`${item.type}-${item.id}`}
-            className="grid min-w-[520px] grid-cols-[minmax(180px,1fr)_minmax(120px,0.45fr)_minmax(132px,0.35fr)] items-center border-b border-[#EEF6F5] px-5 py-4 last:border-b-0"
+            className="grid min-w-[520px] grid-cols-[minmax(180px,1fr)_minmax(120px,0.45fr)_minmax(132px,0.35fr)] items-center gap-3 border-b border-[#EEF6F5] px-5 py-4 last:border-b-0"
           >
             <div className="min-w-0">
-              <p className="truncate font-medium text-[#0D3036]">{item.name}</p>
+              <p className="truncate text-sm font-bold text-[#0D3036]">{item.name}</p>
               {item.parentName && (
                 <p className="mt-1 truncate text-xs text-[#78928F]">
                   {t("archive_parent", { name: item.parentName })}
@@ -140,7 +142,7 @@ export function ArchiveManager() {
                 </p>
               )}
             </div>
-            <span className="font-mono text-sm text-[#0D7773]">
+            <span className="font-mono text-xs text-[#0D7773]">
               {formatDate(item.archivedAt, organization?.timezone)}
             </span>
             <div className="flex flex-wrap gap-2">
@@ -189,7 +191,8 @@ function formatDate(value: string | null, timeZone?: string | null): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat("en-CA", {
+  // 與模板卡「最後更新」同格式（YYYY/MM/DD）
+  return new Intl.DateTimeFormat("zh-TW", {
     timeZone: timeZone || "Asia/Taipei",
     year: "numeric",
     month: "2-digit",
