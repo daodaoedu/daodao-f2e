@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PreToolUse hook (Layer 2): 敏感檔案保護 + Profile-based 品質攔截
-# 設計參考 Mai CLI Dev Harness 的四層 Hook Pipeline
+# 四層 Hook Pipeline 品質攔截
 set -euo pipefail
 
 HOOKS_DIR="$(cd "$(dirname "$0")" && pwd)"
