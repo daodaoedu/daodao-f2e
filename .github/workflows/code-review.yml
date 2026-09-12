@@ -4,9 +4,16 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+# 同一 PR 只保留最新 push 的 review，取消前一個（避免 stale review 堆積）
+concurrency:
+  group: code-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   review:
     name: AI Code Review
+    # Draft PR 跳過 AI review（節省 runner 時間；mark ready 時 synchronize 再跑）
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -89,6 +96,7 @@ jobs:
         run: |
           if [ -z "$CLOUDFLARE_ACCOUNT_ID" ] || [ -z "$CLOUDFLARE_API_TOKEN" ]; then
             echo "::warning::Workers AI secrets are unavailable; skipping code review"
+            echo "review_skipped=secrets_unavailable" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -169,6 +177,7 @@ jobs:
           if [ -z "$BODY" ] || ! is_review_candidate "$BODY"; then
             echo "::warning::Workers AI failed to generate a code review"
             echo "$RESPONSE" | jq -c '{model, error}' 2>/dev/null || true
+            echo "review_skipped=model_failed" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -337,6 +346,32 @@ jobs:
               ;;
           esac
           echo "normalized=true" >> "$GITHUB_OUTPUT"
+
+      - name: Post review-incomplete notice
+        if: steps.review.outputs.review_skipped != '' && steps.review.outputs.generated != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+          SKIP_REASON: ${{ steps.review.outputs.review_skipped }}
+        run: |
+          MARKER="<!-- daodao-ai-code-review-incomplete -->"
+          REASON="$SKIP_REASON"
+          case "$REASON" in
+            secrets_unavailable) MSG="Workers AI secrets 未設定" ;;
+            model_failed) MSG="主模型與備援模型皆未產出有效 review" ;;
+            *) MSG="原因不明：$REASON" ;;
+          esac
+          BODY="## Code Review\n\n$MARKER\n\n⚠️ **Review 未完成** — $MSG\n\n此 PR 尚未通過 AI code review。請 re-run 或手動 review。"
+          # 找並更新既有的 incomplete notice（避免每次 push 都留一條）
+          EXISTING_ID=$(gh api "repos/$REPOSITORY/issues/$PR_NUMBER/comments" --paginate --jq \
+            "[.[] | select(.user.login == \"github-actions[bot]\" and (.body | contains(\"$MARKER\"))) | .id] | first // empty")
+          if [ -n "$EXISTING_ID" ]; then
+            gh api "repos/$REPOSITORY/issues/comments/$EXISTING_ID" --method PATCH -f body="$(printf '%b' "$BODY")"
+          else
+            gh api "repos/$REPOSITORY/issues/$PR_NUMBER/comments" --method POST -f body="$(printf '%b' "$BODY")"
+          fi
+          echo "::warning::Review incomplete ($REASON) — notice posted on PR"
 
       - name: Post review comment
         if: steps.normalize.outputs.normalized == 'true'

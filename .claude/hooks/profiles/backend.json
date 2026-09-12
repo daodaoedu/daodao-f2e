@@ -1,0 +1,39 @@
+{
+  "name": "backend",
+  "pathPatterns": ["\\.(ts|js)$"],
+  "excludePathPatterns": ["node_modules/", "dist/", "generated/", "apps/", "packages/"],
+  "block": [],
+  "warn": [
+    {
+      "id": "raw-sql-interpolation",
+      "pathPattern": "\\.(ts|js)$",
+      "pattern": "(SELECT|INSERT|UPDATE|DELETE|WHERE).*[$][{]",
+      "excludePathPattern": "migrate/sql/|\\.test\\.",
+      "message": "疑似 SQL 字串插值，請用參數化查詢（$1, $2）避免 SQL injection"
+    },
+    {
+      "id": "console-log",
+      "pathPattern": "\\.(ts|js)$",
+      "pattern": "console[.](log|debug|info)[(]",
+      "excludePathPattern": "\\.test\\.|__tests__/|scripts/|bin/",
+      "message": "正式碼應用 logger，不用 console.log"
+    },
+    {
+      "id": "as-any",
+      "pathPattern": "\\.(ts)$",
+      "pattern": "as\\s+any\\b",
+      "excludePathPattern": "\\.test\\.|__tests__/",
+      "message": "避免 `as any` 型別斷言，考慮用更精確的型別"
+    },
+    {
+      "id": "todo-fixme",
+      "pathPattern": "\\.(ts|js)$",
+      "pattern": "(TODO|FIXME|HACK|XXX)[^[]",
+      "message": "TODO/FIXME 應附上負責人標記，例如 TODO[xiaoxu]"
+    }
+  ],
+  "size": {
+    "warnLines": 400
+  },
+  "notes": "ADR: backend 全部先 warn，累積 ledger 數據後再決定升級 block"
+}

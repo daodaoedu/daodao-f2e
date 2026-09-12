@@ -1,0 +1,36 @@
+{
+  "name": "high-risk",
+  "description": "高風險變更分類器 — Stop hook 用來提醒需要額外審查的變更類型",
+  "categories": [
+    {
+      "id": "migration",
+      "pathPattern": "migrate/sql/|prisma/migrations/",
+      "label": "🗄️ DB Migration",
+      "reviewNote": "需確認 rollback 策略、既有資料影響、idempotent 性"
+    },
+    {
+      "id": "api-route",
+      "pathPattern": "routes/|controllers/|\\.routes\\.",
+      "label": "🔌 API 路由",
+      "reviewNote": "需確認認證中介層、rate limit、backward compatibility"
+    },
+    {
+      "id": "auth-permission",
+      "pathPattern": "auth|permission|middleware/auth|guard",
+      "label": "🔒 認證/授權",
+      "reviewNote": "安全敏感變更，需額外 review"
+    },
+    {
+      "id": "env-config",
+      "pathPattern": "\\.env\\.example|docker-compose|wrangler",
+      "label": "⚙️ 環境/配置",
+      "reviewNote": "需確認各環境（dev/staging/prod）的影響"
+    },
+    {
+      "id": "ci-workflow",
+      "pathPattern": "\\.github/workflows/",
+      "label": "🔄 CI/CD",
+      "reviewNote": "需確認不影響既有 pipeline；有 workflow_dispatch 的跑 dry-run"
+    }
+  ]
+}

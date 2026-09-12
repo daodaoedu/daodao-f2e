@@ -1,0 +1,51 @@
+{
+  "name": "frontend",
+  "pathPatterns": ["\\.(tsx?|vue)$", "apps/", "packages/"],
+  "excludePathPatterns": ["\\.d\\.ts$", "node_modules/", "dist/", "generated/"],
+  "block": [
+    {
+      "id": "no-any",
+      "pathPattern": "\\.(tsx?)$",
+      "pattern": ":\\s*any\\b",
+      "excludePathPattern": "\\.d\\.ts$|\\.test\\.",
+      "message": "禁止使用 `any` 型別，請用具體型別或 `unknown`"
+    },
+    {
+      "id": "no-ts-ignore-bare",
+      "pathPattern": "\\.(tsx?)$",
+      "pattern": "@ts-ignore$|@ts-ignore[^a-z]",
+      "message": "禁止裸 @ts-ignore，請用 @ts-expect-error 並附說明"
+    }
+  ],
+  "warn": [
+    {
+      "id": "console-log",
+      "pathPattern": "\\.(tsx?|vue)$",
+      "pattern": "console[.](log|debug|info)[(]",
+      "excludePathPattern": "\\.test\\.|__tests__/|scripts/",
+      "message": "正式碼不應有 console.log，僅限除錯用途"
+    },
+    {
+      "id": "hardcoded-localhost",
+      "pathPattern": "\\.(tsx?|vue)$",
+      "pattern": "(localhost|127[.]0[.]0[.]1):[0-9]{4}",
+      "excludePathPattern": "\\.env|\\.test\\.|generated/|config/",
+      "message": "疑似硬編碼本地 URL，應用環境變數"
+    },
+    {
+      "id": "inline-style",
+      "pathPattern": "\\.(tsx|vue)$",
+      "pattern": "style=\\{\\{",
+      "message": "偏好用 Tailwind class 或 CSS module，避免 inline style"
+    },
+    {
+      "id": "fat-component",
+      "pathPattern": "\\.(tsx|vue)$",
+      "pattern": null,
+      "message": "元件超過 300 行，考慮拆分"
+    }
+  ],
+  "size": {
+    "warnLines": 300
+  }
+}
