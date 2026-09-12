@@ -86,9 +86,10 @@ export function CohortOutcomeReport({ programId, cohortId }: CohortOutcomeReport
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#0D7773]">
           {t("outcome_report_eyebrow")}
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+        {/* 場次 shell 已有 h1（場次名稱），報告標題用 h2 避免同頁兩個 h1 */}
+        <h2 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
           {outcome.cohort.displayName}
-        </h1>
+        </h2>
         <p className="mt-1 text-sm text-[#5A7B79]">
           {outcome.cohort.programName} · {outcome.cohort.startDate.slice(0, 10)} —{" "}
           {outcome.cohort.endDate.slice(0, 10)}
