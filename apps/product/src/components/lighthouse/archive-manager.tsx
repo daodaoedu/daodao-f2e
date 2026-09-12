@@ -150,7 +150,7 @@ export function ArchiveManager() {
                 type="button"
                 size="sm"
                 variant="outline"
-                className="rounded-full border-[#0D7773] text-[#0D7773]"
+                className="h-[30px] rounded-full border-[#0D7773] px-3 text-xs font-semibold text-[#0D7773]"
                 disabled={busyId === item.id || item.parentArchived}
                 title={item.parentArchived ? t("archive_restore_parent_first") : undefined}
                 onClick={() => void restore(item)}
@@ -161,7 +161,7 @@ export function ArchiveManager() {
                 type="button"
                 size="sm"
                 variant="outline"
-                className="rounded-full border-[#C03A3A] text-[#C03A3A] hover:bg-[#FCEDED]"
+                className="h-[30px] rounded-full border-[#C03A3A] px-3 text-xs font-semibold text-[#C03A3A] hover:bg-[#FCEDED]"
                 disabled={busyId === item.id}
                 onClick={() => setPending(item)}
               >

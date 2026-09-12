@@ -205,7 +205,7 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
           <Button
             type="button"
             variant="outline"
-            className="rounded-full border-[#0D7773] text-[#0D7773]"
+            className="rounded-full border-[#0D7773] text-[13px] font-semibold text-[#0D7773]"
             disabled={busy}
             onClick={() => void test()}
           >

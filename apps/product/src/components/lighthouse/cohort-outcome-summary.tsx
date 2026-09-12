@@ -203,7 +203,7 @@ export function CohortOutcomeSummary({
             <Button
               type="button"
               variant="outline"
-              className="rounded-full border-[#CDEBE8]"
+              className="h-[37px] rounded-full border-[#CDEBE8] text-[13px] font-semibold"
               disabled={busy !== null}
               onClick={() => setEditing(false)}
             >
@@ -211,7 +211,7 @@ export function CohortOutcomeSummary({
             </Button>
             <Button
               type="button"
-              className="rounded-full bg-[#16B9B3] hover:bg-[#0FA5A0]"
+              className="h-[37px] rounded-full bg-[#16B9B3] text-[13px] font-semibold hover:bg-[#0FA5A0]"
               disabled={busy !== null || !draft.trim()}
               onClick={() => void save()}
             >
@@ -223,7 +223,7 @@ export function CohortOutcomeSummary({
             <Button
               type="button"
               variant="outline"
-              className="rounded-full border-[#CDEBE8]"
+              className="h-[37px] rounded-full border-[#CDEBE8] text-[13px] font-semibold"
               disabled={!canGenerate}
               title={platformUnavailable ? t("outcome_platform_unavailable") : undefined}
               onClick={() => void generate()}
@@ -237,7 +237,7 @@ export function CohortOutcomeSummary({
             </Button>
             <Button
               type="button"
-              className="rounded-full bg-[#16B9B3] hover:bg-[#0FA5A0]"
+              className="h-[37px] rounded-full bg-[#16B9B3] text-[13px] font-semibold hover:bg-[#0FA5A0]"
               disabled={busy !== null}
               onClick={startEdit}
             >

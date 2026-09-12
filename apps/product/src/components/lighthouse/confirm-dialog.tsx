@@ -66,7 +66,7 @@ export function ConfirmDialog({
           <Button
             type="button"
             variant="outline"
-            className="rounded-full border-[#CDEBE8]"
+            className="rounded-full border-[#CDEBE8] font-normal"
             disabled={busy}
             onClick={() => onOpenChange(false)}
           >
