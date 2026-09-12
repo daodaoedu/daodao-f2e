@@ -2,7 +2,7 @@
 
 import { useTranslations } from "@daodao/i18n";
 import { Bold, Italic, Link2, List } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface SpaceFormatToolbarProps {
   /** The last-focused body textarea; formatting applies to its selection. */
@@ -48,6 +48,12 @@ export const SpaceFormatToolbar = ({ getTarget }: SpaceFormatToolbarProps) => {
   const t = useTranslations("space");
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
+  const linkInputRef = useRef<HTMLInputElement>(null);
+  const linkButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (linkOpen) linkInputRef.current?.focus({ preventScroll: true });
+  }, [linkOpen]);
 
   const withTarget = (apply: (textarea: HTMLTextAreaElement) => void) => {
     const target = getTarget();
@@ -58,6 +64,8 @@ export const SpaceFormatToolbar = ({ getTarget }: SpaceFormatToolbarProps) => {
     const url = linkUrl.trim();
     if (url) {
       withTarget((textarea) => applyWrap(textarea, "[", `](${url})`));
+    } else {
+      linkButtonRef.current?.focus({ preventScroll: true });
     }
     setLinkUrl("");
     setLinkOpen(false);
@@ -95,6 +103,8 @@ export const SpaceFormatToolbar = ({ getTarget }: SpaceFormatToolbarProps) => {
       <button
         type="button"
         aria-label={t("format_link")}
+        aria-expanded={linkOpen}
+        ref={linkButtonRef}
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => setLinkOpen((open) => !open)}
         className="rounded-full p-1.5 text-text-dark/70 transition-colors hover:bg-[#F0F9F8]"
@@ -103,15 +113,21 @@ export const SpaceFormatToolbar = ({ getTarget }: SpaceFormatToolbarProps) => {
       </button>
       {linkOpen && (
         <input
-          autoFocus
+          ref={linkInputRef}
+          aria-label={t("link_prompt")}
           value={linkUrl}
           placeholder={t("link_prompt")}
           onChange={(event) => setLinkUrl(event.target.value)}
           onKeyDown={(event) => {
-            if (event.key === "Enter") insertLink();
+            if (event.key === "Enter") {
+              event.preventDefault();
+              insertLink();
+            }
             if (event.key === "Escape") {
+              event.preventDefault();
               setLinkUrl("");
               setLinkOpen(false);
+              linkButtonRef.current?.focus({ preventScroll: true });
             }
           }}
           className="w-44 rounded-full border border-[#DCEBEA] px-3 py-1 text-xs text-text-dark focus:border-primary-base focus:outline-none"

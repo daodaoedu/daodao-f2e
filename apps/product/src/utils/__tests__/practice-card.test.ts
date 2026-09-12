@@ -101,11 +101,11 @@ describe("formatCardDate", () => {
     expect(formatCardDate(undefined)).toBeNull();
   });
 
-  it("formats ISO date to MM/DD", () => {
-    expect(formatCardDate("2026-01-15")).toBe("01/15");
+  it("formats ISO date to yyyy/MM/dd", () => {
+    expect(formatCardDate("2026-01-15")).toBe("2026/01/15");
   });
 
   it("formats single-digit month and day with leading zeros", () => {
-    expect(formatCardDate("2026-03-07")).toBe("03/07");
+    expect(formatCardDate("2026-03-07")).toBe("2026/03/07");
   });
 });

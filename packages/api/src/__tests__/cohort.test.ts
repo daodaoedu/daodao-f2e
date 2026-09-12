@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   cohortJoinInfoResponseSchema,
   cohortMemberHomeResponseSchema,
@@ -14,6 +14,14 @@ import {
   lighthouseProgramListResponseSchema,
   lighthouseTemplatesResponseSchema,
 } from "../services/cohort";
+
+// Schema tests must run before config generation in a clean CI checkout.
+vi.mock("@daodao/config", () => ({
+  getRequiredEnv: (key: string) => {
+    if (key === "NEXT_PUBLIC_API_URL") return "https://api.example.com";
+    throw new Error(`Unexpected config key: ${key}`);
+  },
+}));
 
 const timestamp = "2026-07-22T08:00:00.000Z";
 
@@ -84,6 +92,7 @@ describe("Lighthouse API runtime schemas", () => {
           programId: 10,
           slug: "summer-2026",
           displayName: "夏季同行",
+          tagline: null,
           startDate: "2026-07-01",
           endDate: "2026-08-31",
           joinToken: null,
@@ -92,6 +101,20 @@ describe("Lighthouse API runtime schemas", () => {
           joinDeadline: null,
           capacity: 30,
           inviteMessage: null,
+          showInviteMessageOnSignup: false,
+          interactionModes: ["async"],
+          meetingUrl: null,
+          location: null,
+          sessions: [],
+          feeType: "free",
+          feeAmount: null,
+          signupMethod: "island_form",
+          externalSignupUrl: null,
+          isPrivate: true,
+          checkinDefaultPrivate: false,
+          hostCommentDefaultPrivate: false,
+          hasHomePage: true,
+          signupQuestionCount: 0,
           status: "published",
           createdAt: timestamp,
           updatedAt: null,
@@ -131,15 +154,28 @@ describe("Lighthouse API runtime schemas", () => {
       lighthouseDashboardResponseSchema.safeParse({
         success: true,
         data: {
-          snapshotKind: "weekly",
           computedAt: timestamp,
-          rhythmHeatmap: { "2026-07-22": 2 },
+          range: { from: "2026-07-01", to: "2026-07-22" },
+          practiceTitle: null,
+          practices: [{ title: "每日覆盤", startDate: "2026-07-01", endDate: "2026-07-30" }],
+          heatmap: { "2026-07-22": 2 },
           tagDistribution: [{ tag: "行動", count: 2 }],
-          commonBlockers: { stuck: 1 },
-          funnel: { enrolled: 10, activated: 8, activeMembers: 7 },
-          timeRhythm: { "08": 2 },
+          kpi: { enrolled: 10, activated: 8, activeThisWeek: 7 },
+          practiceOverview: [
+            {
+              title: "每日覆盤",
+              startDate: "2026-07-01",
+              endDate: "2026-07-30",
+              startedCount: 8,
+              checkinCount: 12,
+              avgCheckinPeople: 4,
+              avgCheckinLength: 20,
+            },
+          ],
+          moodDistribution: [{ mood: "good", count: 2 }],
+          trend: { days: [{ date: "2026-07-22", count: 2 }], thisWeek: 8, lastWeek: 4, delta: 4 },
+          hourHistogram: { "08": 2 },
           checkins: 12,
-          exited: 1,
         },
         timestamp,
       }),
@@ -151,7 +187,11 @@ describe("Lighthouse API runtime schemas", () => {
               userId: 7,
               nickname: "小島",
               avatar: null,
+              practiceId: 30,
+              practiceTitle: "每日覆盤",
+              messageCount: 1,
               lastCheckinAt: timestamp,
+              lastCheckinDate: "2026-07-22",
               lastCheckinPreview: "今天先做十分鐘",
               interruptedDays: 3,
             },
@@ -161,8 +201,13 @@ describe("Lighthouse API runtime schemas", () => {
               userId: 8,
               nickname: null,
               avatar: null,
+              practiceId: 31,
+              practiceTitle: "每日閱讀",
+              messageCount: 0,
               moment: "first_checkin",
+              momentDescription: "完成第一次打卡",
               occurredAt: timestamp,
+              firstCheckinAt: timestamp,
             },
           ],
         },
@@ -210,6 +255,22 @@ describe("Lighthouse API runtime schemas", () => {
           startDate: timestamp,
           endDate: timestamp,
           inviteMessage: null,
+          tagline: null,
+          interactionModes: ["async"],
+          location: null,
+          sessions: [],
+          feeType: "free",
+          feeAmount: null,
+          signupMethod: "island_form",
+          externalSignupUrl: null,
+          capacity: 30,
+          joinDeadline: null,
+          participantCount: 10,
+          privacy: {
+            isPrivate: true,
+            checkinDefaultPrivate: false,
+            hostCommentDefaultPrivate: false,
+          },
           canJoin: true,
           unavailableReason: null,
           visibilityNotice: "打卡對教練與同期學員可見",
@@ -225,6 +286,17 @@ describe("Lighthouse API runtime schemas", () => {
           startDate: timestamp,
           endDate: timestamp,
           exportOptIn: false,
+          tagline: null,
+          interactionModes: ["async"],
+          meetingUrl: null,
+          location: null,
+          sessions: [],
+          feeType: "free",
+          privacy: {
+            isPrivate: true,
+            checkinDefaultPrivate: false,
+            hostCommentDefaultPrivate: false,
+          },
           organization: { name: "島島", bio: null, externalLink: null },
           practices: [
             {
@@ -240,7 +312,10 @@ describe("Lighthouse API runtime schemas", () => {
       }),
     ];
 
-    expect(responses.every((result) => result.success)).toBe(true);
+    for (const result of responses) {
+      expect(result.error?.issues).toBeUndefined();
+      expect(result.success).toBe(true);
+    }
   });
 
   it("accepts null outcome data when snapshot has not been generated", () => {
