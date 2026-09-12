@@ -13,6 +13,10 @@ describe("getStorageKey", () => {
     expect(getStorageKey(StorageEnum.HomeFeedAnchor)).toBe("_homefeedanchor");
     expect(getStorageKey(StorageEnum.RegistrationFlow)).toBe("_registrationflow");
     expect(getStorageKey(StorageEnum.TaskGuideCollapsed)).toBe("_taskguidecollapsed");
+    expect(getStorageKey(StorageEnum.LighthouseSidebarCollapsed)).toBe(
+      "_lighthousesidebarcollapsed"
+    );
+    expect(getStorageKey(StorageEnum.ChatPinBannerDismissed)).toBe("_chatpinbannerdismissed");
   });
 });
 
@@ -31,6 +35,8 @@ describe("StorageEnum", () => {
     expect(keys).toContain("RegistrationFlow");
     expect(keys).toContain("TaskGuideCollapsed");
     expect(keys).toContain("PwaInstallDismissedAt");
-    expect(keys).toHaveLength(12);
+    expect(keys).toContain("LighthouseSidebarCollapsed");
+    expect(keys).toContain("ChatPinBannerDismissed");
+    expect(keys).toHaveLength(14);
   });
 });
