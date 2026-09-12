@@ -13,7 +13,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { Building2, Plus, UserMinus, Users } from "lucide-react";
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 import { ConfirmDialog } from "./confirm-dialog";
 import { OrganizationAiKeyCard } from "./organization-ai-key-card";
 
@@ -36,8 +36,12 @@ export function OrganizationSettings() {
   const [removing, setRemoving] = useState<{ userId: number; name: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function save(formData: FormData) {
+  // 用 onSubmit 而不是 React 19 的 form action：action 結束後 React 會重置 uncontrolled 欄位，
+  // 驗證失敗／API 失敗時使用者剛打的內容會被清空（FR-ORG-01 要求失敗時不得清空輸入）
+  async function save(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (!organization) return;
+    const formData = new FormData(event.currentTarget);
     const name = String(formData.get("name") ?? "").trim();
     const bio = String(formData.get("bio") ?? "").trim();
     const externalLink = String(formData.get("externalLink") ?? "").trim();
@@ -96,7 +100,7 @@ export function OrganizationSettings() {
       {organization && (
         <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <form
-            action={save}
+            onSubmit={(event) => void save(event)}
             className="rounded-3xl border border-[#CDEBE8] bg-white p-6"
             onChange={() => saveState !== "saving" && setSaveState("idle")}
           >
