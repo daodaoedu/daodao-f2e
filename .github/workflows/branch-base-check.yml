@@ -1,10 +1,12 @@
 name: Branch Base Check
 
 # Always trigger on every PR — never use on.paths for required checks.
-# Internal skip logic handles docs-only or non-code PRs.
+# The repository default branch is shared with the config-sync target selection.
 on:
   pull_request:
-    types: [opened, edited, reopened]
+    types: [opened, edited, reopened, synchronize]
+
+permissions: {}
 
 jobs:
   check:
@@ -16,6 +18,7 @@ jobs:
           HEAD: ${{ github.event.pull_request.head.ref }}
           BASE: ${{ github.event.pull_request.base.ref }}
           CHANGED: ${{ github.event.pull_request.changed_files }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           BRANCH_RE='^(feat|fix|refactor|perf|test|docs|chore|ci|build|hotfix|release|auto|claude|codex|dependabot|renovate)/.+'
 
@@ -24,11 +27,16 @@ jobs:
             exit 1
           fi
 
-          # sub-repo 的 PR base 必須是 dev（main 只收 release/hotfix）
-          ALLOWED_BASES="dev"
-          # hotfix 和 release 可以直接進 main
+          if [[ -z "$DEFAULT_BRANCH" ]]; then
+            echo "::error::Missing repository default branch"
+            exit 1
+          fi
+
+          # Normal PRs use dev or main according to the repository, just like sync.
+          ALLOWED_BASES="$DEFAULT_BRANCH"
+          # Release/hotfix branches may target the existing production names.
           if [[ "$HEAD" =~ ^(hotfix|release)/ ]]; then
-            ALLOWED_BASES="dev main production"
+            ALLOWED_BASES="$DEFAULT_BRANCH main production prod"
           fi
 
           BASE_OK=false
