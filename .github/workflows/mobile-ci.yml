@@ -46,7 +46,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           CHANGED=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
-          if echo "$CHANGED" | grep -qE '^(apps/mobile/|packages/design-tokens/|packages/shared/|packages/api/|pnpm-lock\.yaml)'; then
+          # 改到這支 workflow 本身也要跑，才驗得到 CI 設定的修正
+          if echo "$CHANGED" | grep -qE '^(apps/mobile/|packages/design-tokens/|packages/shared/|packages/api/|pnpm-lock\.yaml|\.github/workflows/mobile-ci\.yml)'; then
             echo "relevant=true" >> "$GITHUB_OUTPUT"
           else
             echo "relevant=false" >> "$GITHUB_OUTPUT"
@@ -96,10 +97,13 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
 
+      # 最新 eas-cli 的相依 @oclif/plugin-autocomplete@3.3.0 要求 Node >= 22，
+      # expo-github-action 用 yarn global 安裝時會因 engines 檢查失敗；此 job 只驗證 EAS 設定，
+      # 不影響 app 執行環境，故單獨用 Node 22（其他 job 仍依 .nvmrc）
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version: '22'
           cache: 'pnpm'
 
       - name: Setup Expo
