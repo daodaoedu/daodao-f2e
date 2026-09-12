@@ -1,10 +1,13 @@
 import type { IReactionCountItem } from "@daodao/api";
-import { format, parseISO } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { PICKER_REACTIONS, REACTION_CONFIG } from "@/constants/reaction-type";
 
-export const formatShowcaseDate = (dateStr?: string | null): string | null =>
-  dateStr ? format(parseISO(dateStr), "yyyy/MM/dd") : null;
+export const formatShowcaseDate = (dateStr?: string | null): string | null => {
+  if (!dateStr) return null;
+  const date = parseISO(dateStr);
+  return isValid(date) ? format(date, "yyyy/MM/dd") : null;
+};
 
 export interface CheerDisplay {
   emojis: string[];
