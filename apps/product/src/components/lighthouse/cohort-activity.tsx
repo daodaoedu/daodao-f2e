@@ -69,6 +69,17 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
   const feed = useLighthouseActivities(programId, cohortId, query);
   const data = feed.data?.data;
 
+  // API 會把區間夾回可選範圍、反向區間自動對調（TP-ACT-02）；把正規化後的值同步回日期輸入框
+  useEffect(() => {
+    if (!data) return;
+    setRange((current) => {
+      const from = current.from ?? data.range.from;
+      const to = current.to ?? data.range.to;
+      if (from === data.range.from && to === data.range.to) return current;
+      return { from: data.range.from, to: data.range.to };
+    });
+  }, [data]);
+
   const grouped = useMemo(() => {
     const groups: Array<{ day: string; items: LighthouseActivityItem[] }> = [];
     for (const item of data?.items ?? []) {

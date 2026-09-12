@@ -168,7 +168,9 @@ export function TemplatesManager() {
             <DialogTitle className="text-left text-xl font-semibold text-[#0D3036]">
               {complete?.kind === "draft"
                 ? t("template_complete_draft_title")
-                : t("template_complete_title")}
+                : complete?.kind === "updated"
+                  ? t("template_complete_updated_title")
+                  : t("template_complete_title")}
             </DialogTitle>
             <DialogDescription className="text-left text-sm text-[#5A7B79]">
               {complete?.kind === "draft"

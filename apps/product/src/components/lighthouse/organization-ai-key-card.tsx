@@ -117,15 +117,18 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
   const statusLabel = configured
     ? t("organization_ai_key_status_set")
     : t("organization_ai_key_status_unset");
+  // 輸入修改後（尚未測試／儲存）清掉上一筆連線結果，只提示需重新測試（TP-ORG-04）
   const hint =
     testMessage ??
-    (credential?.status === "verified"
-      ? t("organization_ai_key_verified_at", { time: formatTime(credential.lastTestedAt) })
-      : credential?.status === "invalid"
-        ? credential.lastTestError
-          ? t("organization_ai_key_last_failed", { reason: credential.lastTestError })
-          : t("organization_ai_key_test_failed")
-        : t("organization_ai_key_untested"));
+    (apiKey.trim()
+      ? t("organization_ai_key_untested")
+      : credential?.status === "verified"
+        ? t("organization_ai_key_verified_at", { time: formatTime(credential.lastTestedAt) })
+        : credential?.status === "invalid"
+          ? credential.lastTestError
+            ? t("organization_ai_key_last_failed", { reason: credential.lastTestError })
+            : t("organization_ai_key_test_failed")
+          : t("organization_ai_key_untested"));
 
   return (
     <section className="rounded-3xl border border-[#CDEBE8] bg-white p-6">

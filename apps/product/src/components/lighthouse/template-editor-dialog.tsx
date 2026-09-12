@@ -148,6 +148,14 @@ export function TemplateEditorDialog({
 
   function patch(next: Partial<TemplateDraft>) {
     setDraft((current) => ({ ...current, ...next }));
+    // 使用者修正欄位後立刻清掉該欄位的錯誤，不必等再按一次下一步
+    setErrors((current) => {
+      const keys = Object.keys(next).filter((key) => key in current);
+      if (keys.length === 0) return current;
+      const cleared = { ...current };
+      for (const key of keys) delete cleared[key];
+      return cleared;
+    });
   }
 
   function validateStep(target: number): boolean {

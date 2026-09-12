@@ -183,7 +183,10 @@ export function TemplateResourceEditor({ resources, onChange }: TemplateResource
         type="button"
         className="mt-2 text-xs text-[#0D7773] underline-offset-2 hover:underline"
         onClick={() => {
+          // 手動切換模式時清掉另一模式的輸入，避免隱藏的連結被帶進手動新增（重複連結誤判）
           setManualMode((value) => !value);
+          setLink("");
+          setManualName("");
           setError(null);
         }}
       >

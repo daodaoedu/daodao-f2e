@@ -60,6 +60,7 @@ export function CohortActivityDetailDialog({
       <DialogContent
         className="w-[min(560px,94vw)] gap-0 overflow-hidden rounded-3xl border-0 bg-white p-0 sm:max-w-none"
         data-testid="activity-detail"
+        showCloseButton={false}
       >
         <header className="flex items-start justify-between gap-3 bg-[#F7FCFB] px-5 py-4">
           <div className="min-w-0">
@@ -76,8 +77,8 @@ export function CohortActivityDetailDialog({
           <button
             type="button"
             className="grid size-8 shrink-0 place-items-center rounded-full text-[#5A7B79] hover:bg-[#EDF8F6]"
-            aria-label={t("close")}
-            title={t("close")}
+            aria-label={t("close_dialog")}
+            title={t("close_dialog")}
             onClick={onClose}
           >
             <X className="size-4" aria-hidden="true" />
