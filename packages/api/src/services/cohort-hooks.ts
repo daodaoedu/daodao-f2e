@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import type { z } from "zod";
 import { EMPTY_QUERY_INIT, useQuery } from "../hooks";
 import type {
+  LighthouseActivityQuery,
   LighthouseArchiveType,
   LighthouseDashboardQuery,
   LighthouseMessageCategory,
@@ -13,6 +14,7 @@ import {
   cohortJoinInfoResponseSchema,
   cohortMemberHomeResponseSchema,
   learnerCohortFeedResponseSchema,
+  lighthouseActivityResponseSchema,
   lighthouseAiCredentialResponseSchema,
   lighthouseArchiveResponseSchema,
   lighthouseCoachFeedResponseSchema,
@@ -292,4 +294,18 @@ export const useLighthouseAiCredential = (organizationId?: number) => {
     organizationId ? { params: { path: { organizationId } } } : null
   );
   return useValidatedResponse(query, lighthouseAiCredentialResponseSchema);
+};
+
+export const useLighthouseActivities = (
+  programId?: number,
+  cohortId?: number,
+  query: LighthouseActivityQuery = {}
+) => {
+  const result = useQuery(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/activities",
+    programId && cohortId
+      ? { params: { path: { programId, cohortId }, query: compactQuery(query) } }
+      : null
+  );
+  return useValidatedResponse(result, lighthouseActivityResponseSchema);
 };

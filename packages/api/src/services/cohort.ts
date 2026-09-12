@@ -1039,3 +1039,84 @@ export const recordLighthouseOutcomeExport = async (
     "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/outcome/report-exported",
     { params: { path: { programId, cohortId } }, body: filename ? { filename } : {} }
   );
+
+// ---------------------------------------------------------------------------
+// 場次動態（FRD frd-activity-outcome-org.md §3.1）：打卡／留言回應／節奏變化合併
+// ---------------------------------------------------------------------------
+export const LIGHTHOUSE_ACTIVITY_TYPES = ["checkin", "comment", "rhythm"] as const;
+export type LighthouseActivityType = (typeof LIGHTHOUSE_ACTIVITY_TYPES)[number];
+export type LighthouseActivityQuery = {
+  from?: string;
+  to?: string;
+  type?: LighthouseActivityType;
+  practiceTitle?: string;
+  q?: string;
+  hasText?: boolean;
+  limit?: number;
+  offset?: number;
+};
+export const lighthouseActivityItemSchema = z.object({
+  id: z.string(),
+  type: z.enum(LIGHTHOUSE_ACTIVITY_TYPES),
+  typeLabel: z.string(),
+  occurredAt: z.string().datetime(),
+  member: z.object({
+    userId: z.number().int(),
+    nickname: z.string().nullable(),
+    avatar: z.string().nullable(),
+  }),
+  practice: z.object({ id: z.number().int(), title: z.string() }),
+  summary: z.string(),
+  hasText: z.boolean(),
+  meta: z.record(z.string(), z.unknown()),
+});
+export type LighthouseActivityItem = z.infer<typeof lighthouseActivityItemSchema>;
+export const lighthouseActivityResponseSchema = apiSuccessSchema(
+  z.object({
+    range: z.object({
+      from: z.string(),
+      to: z.string(),
+      min: z.string(),
+      max: z.string(),
+      timezone: z.string(),
+    }),
+    filters: z.object({
+      type: z.enum(LIGHTHOUSE_ACTIVITY_TYPES).nullable(),
+      practiceTitle: z.string().nullable(),
+      q: z.string().nullable(),
+      hasText: z.boolean(),
+    }),
+    practices: z.array(z.object({ title: z.string() })),
+    stats: z.object({
+      checkins: z.number().int().nonnegative(),
+      comments: z.number().int().nonnegative(),
+      rhythm: z.number().int().nonnegative(),
+      total: z.number().int().nonnegative(),
+    }),
+    total: z.number().int().nonnegative(),
+    items: z.array(lighthouseActivityItemSchema),
+  })
+);
+export type LighthouseActivityFeed = z.infer<typeof lighthouseActivityResponseSchema>["data"];
+export const lighthouseActivityDetailSchema = lighthouseActivityItemSchema.extend({
+  detail: z.string().nullable(),
+  images: z.array(z.string()),
+  target: z
+    .object({ checkinId: z.number().int(), summary: z.string(), occurredAt: z.string().datetime() })
+    .nullable(),
+});
+export type LighthouseActivityDetail = z.infer<typeof lighthouseActivityDetailSchema>;
+export const lighthouseActivityDetailResponseSchema = apiSuccessSchema(
+  lighthouseActivityDetailSchema
+);
+
+export const getLighthouseActivityDetail = async (
+  programId: number,
+  cohortId: number,
+  type: LighthouseActivityType,
+  activityId: string
+) =>
+  client.GET(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/activities/{type}/{activityId}",
+    { params: { path: { programId, cohortId, type, activityId } } }
+  );

@@ -13,7 +13,7 @@ interface CohortShellProps {
   children: React.ReactNode;
 }
 
-/** FR-CT-01：儀表板、名單、今日焦點為本版功能；動態、成果保留頁籤但顯示「還在規劃中」 */
+/** 場次頁籤：儀表板、名單、今日焦點、動態、成果（#189 起動態與成果為正式頁面） */
 const sections = ["dashboard", "roster", "focus", "feed", "outcome"] as const;
 
 export function CohortShell({ programId, cohortId, children }: CohortShellProps) {
