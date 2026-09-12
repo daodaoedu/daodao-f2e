@@ -141,7 +141,7 @@ export function TemplatesManager() {
       )}
 
       {organization && filtered.length > 0 && (
-        <div className="mt-8 grid gap-5 lg:grid-cols-2">
+        <div className="mt-8 grid items-start gap-5 lg:grid-cols-2">
           {filtered.map((template) => (
             <TemplateCard
               key={template.id}
