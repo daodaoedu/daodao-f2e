@@ -2,6 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FeedbackState } from "../services/recommendation-hooks";
 import { submitRecommendationFeedback } from "../services/recommendation-hooks";
 
+// Generated config takes precedence over process.env, so mock the config boundary.
+vi.mock("@daodao/config", () => ({
+  getRequiredEnv: (key: string) => {
+    if (key === "NEXT_PUBLIC_AI_API_URL") return "https://ai.example.com";
+    if (key === "NEXT_PUBLIC_API_URL") return "https://api.example.com";
+    throw new Error(`Unexpected config key: ${key}`);
+  },
+}));
+
 // ============================================================================
 // submitRecommendationFeedback 契約測試
 // ============================================================================
@@ -10,12 +19,10 @@ describe("submitRecommendationFeedback", () => {
   const mockBaseUrl = "https://ai.example.com";
 
   beforeEach(() => {
-    vi.stubEnv("NEXT_PUBLIC_AI_API_URL", mockBaseUrl);
     vi.stubGlobal("fetch", vi.fn());
   });
 
   afterEach(() => {
-    vi.unstubAllEnvs();
     vi.unstubAllGlobals();
   });
 

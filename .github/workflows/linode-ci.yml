@@ -34,8 +34,21 @@ env:
   PNPM_VERSION: 10
 
 jobs:
+  workflow-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install workflow test dependency
+        run: python -m pip install PyYAML==6.0.2
+      - name: Test quality gate failure propagation
+        run: python -m unittest discover -s .github/scripts/__tests__ -p 'test_*.py' -v
+
   # ===== 主要測試與品質檢查階段 =====
   test:
+    needs: workflow-tests
     runs-on: ubuntu-latest
     steps:
       # ===== 代碼檢出 =====
@@ -78,17 +91,25 @@ jobs:
 
       # ===== 並行品質檢查 =====
       - name: Run checks in parallel
+        shell: bash
         run: |
           echo "🔍 Running TypeScript type checking..."
           pnpm run typecheck &
+          typecheck_pid=$!
 
           echo "📝 Running linting..."
           pnpm run lint &
+          lint_pid=$!
 
           echo "🧪 Running tests..."
           pnpm test &
+          test_pid=$!
 
-          wait
+          check_result=0
+          wait "$typecheck_pid" || check_result=1
+          wait "$lint_pid" || check_result=1
+          wait "$test_pid" || check_result=1
+          exit "$check_result"
 
 
   # ===== CI 成功通知 =====
