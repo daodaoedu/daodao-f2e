@@ -4,8 +4,8 @@
  */
 
 import { client, getApiBaseUrl, unauthorizedHandler } from "../client";
-import { extractApiErrorMessage } from "./check-in-form-data";
 import type { components, paths } from "../types";
+import { extractApiErrorMessage } from "./check-in-form-data";
 
 // ============================================================================
 // Types
@@ -328,8 +328,9 @@ const sendUserFormDataRequest = async <T>(
       "details" in errorData.error &&
       Array.isArray((errorData.error as { details?: unknown }).details)
     ) {
-      error.details = (errorData.error as { details: Array<{ path?: string; message?: string }> })
-        .details;
+      error.details = (
+        errorData.error as { details: Array<{ path?: string; message?: string }> }
+      ).details;
     }
     throw error;
   }
@@ -400,6 +401,13 @@ export const deleteUser = async (id: string) => {
     params: {
       path: { id },
     },
+  });
+};
+
+/** Check name availability before submitting onboarding. */
+export const checkNameAvailability = async (name: string) => {
+  return client.GET("/api/v1/users/name/check", {
+    params: { query: { name } },
   });
 };
 
