@@ -75,10 +75,17 @@ jobs:
 
       - name: Run checks in parallel
         if: github.event_name != 'pull_request' || steps.changes.outputs.relevant == 'true'
+        shell: bash
         run: |
           pnpm --filter @daodao/mobile typecheck &
+          typecheck_pid=$!
           pnpm --filter @daodao/mobile lint &
-          wait
+          lint_pid=$!
+
+          check_result=0
+          wait "$typecheck_pid" || check_result=1
+          wait "$lint_pid" || check_result=1
+          exit "$check_result"
 
   eas-build-check:
     name: EAS Build Check
