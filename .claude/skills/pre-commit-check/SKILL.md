@@ -3,15 +3,20 @@ name: pre-commit-check
 description: commit 前執行格式化檢查與靜態分析，自動修復可修的錯誤
 ---
 
+先讀 [AI 檢核與人工審核共用流程](../../../docs/automation/ai-human-review-workflow.md)，依當前客戶端可用工具執行；先完成適用檢核與修訂，再交人審核決策。
+
+
 # Pre-Commit Check
 
 commit 前的品質檢查。發現錯誤時先嘗試自動修復，修不了的再報告給使用者。
+
+先確認 staged 範圍與相關未提交差異；只修本次授權檔案，格式工具會改其他檔案時改用可限制路徑的方式。驗證後 diff 有改變就重跑受影響檢查，不把舊版本結果當新版本通過。
 
 ## 步驟 0：判斷指令入口（依 repo 而異）
 
 - 有 `Makefile`（daodao-ai-backend、daodao-admin-ui）→ 用 `make check` / `make format` / `make lint`
 - pnpm/npm 專案（daodao-f2e、daodao-server、daodao-worker 等）→ 用 package.json scripts：
-  `pnpm format:check` / `pnpm format` / `pnpm lint` / `pnpm typecheck`（以該 repo 實際存在的 script 為準，先 `grep '"scripts"' -A 15 package.json` 確認）
+  `pnpm format:check` / `pnpm format` / `pnpm lint` / `pnpm typecheck`（以該 repo 實際存在的 script 為準，先 `rg '"scripts"' -A 15 package.json` 確認）
 - monorepo root（無 Makefile）→ 只跑 `pnpm vitest run bin/`（如有變更 bin/）
 
 ## 步驟 1：執行格式化檢查
@@ -45,4 +50,4 @@ format/lint 過了 ≠ 行為對了。依 staged 變更的類型跑對應驗證�
 ## 步驟 4：回報結果
 
 - 全部通過 → 告知使用者可以 commit，並附一行「已跑驗證：<清單>」
-- 有無法自動修復的錯誤 → 列出錯誤，詢問使用者如何處理
+- 有無法修復的錯誤 → AI 先定位原因、檢查可行修法與影響，附建議及阻塞證據；只有產品取捨、必要資訊或額外授權才交人決策，不要求人重新除錯

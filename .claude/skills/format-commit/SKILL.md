@@ -3,6 +3,9 @@ name: format-commit
 description: Use when committing changes - drafts a Why/How commit message from git diff and conversation context, shows it once for approval, then executes git commit. Only asks the user when the reasoning genuinely can't be inferred.
 ---
 
+先讀 [AI 檢核與人工審核共用流程](../../../docs/automation/ai-human-review-workflow.md)，依當前客戶端可用工具執行；先完成適用檢核與修訂，再交人審核決策。
+
+
 # Format Commit Message
 
 協助產生符合專案格式的 commit message，包含 `## Why is this necessary?` 和 `## How does it address?` 區塊。**先起草、一次給使用者確認**，不要逐項發問。
@@ -68,7 +71,7 @@ description: Use when committing changes - drafts a Why/How commit message from 
 
 使用者這時可以：直接說可以 → 執行；指出要改的地方 → 改完再貼一次不用重問已確定的部分；若對話中已有明確指示（commit type、要強調的原因）直接採用。
 
-確認後執行 `git commit -m "$(cat <<'EOF' ... EOF)"`。
+確認後將完整訊息寫入檔案，以 `git commit -F <message-file>` 執行；提交前核對 staged 範圍仍與受審內容一致，不夾帶他人變更。
 
 ## 何時才用 AskUserQuestion
 
