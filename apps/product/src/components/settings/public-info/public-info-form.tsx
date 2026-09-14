@@ -165,17 +165,17 @@ export const PublicInfoForm = () => {
       // 調用 FormData API 更新用戶資訊（包含圖片上傳）
       const response = await updateCurrentUserWithFormData(updateData, avatarFile || undefined);
 
+      // 立即重置表單狀態，在 SWR refetch 之前解除導航阻擋
+      form.reset(form.getValues());
+      setAvatarFile(null);
+      toast.success(t("public_info_updated"));
+
       // 刷新用戶資料
       await mutate(["/api/v1/users/me"] as const);
       globalMutate("/api/v1/users/settings-summary");
       if (!applyOnboardingUpdateFromResponse(response)) {
         refreshOnboardingStatus();
       }
-
-      // 成功
-      toast.success(t("public_info_updated"));
-      form.reset(form.getValues()); // 重置 dirty 狀態
-      setAvatarFile(null); // 清除頭像檔案
     } catch (error) {
       console.error("Failed to update user:", error);
 
@@ -226,7 +226,7 @@ export const PublicInfoForm = () => {
     }
   };
 
-  useNavigationBlockerEffect(form.formState.isDirty);
+  useNavigationBlockerEffect(form.formState.isDirty || !!avatarFile);
 
   // 載入中狀態
   if (isLoading) {
