@@ -20,7 +20,7 @@ import {
 } from "@daodao/api";
 import type { MentionCandidate } from "@daodao/features-mention";
 import { useLocale, useTranslations } from "@daodao/i18n";
-import { useParams, useRouter } from "@daodao/i18n/navigation";
+import { useParams, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { format, isValid, parseISO } from "date-fns";
 import { X } from "lucide-react";
@@ -38,6 +38,7 @@ import { BackgroundAnimation } from "@/components/layout";
 import { PracticeDetailShell } from "@/components/practice";
 import { applyOnboardingUpdateFromResponse } from "@/components/task-guide/onboarding-progress-context";
 import { HOME_TAB_PATHS } from "@/constants/home-navigation";
+import { getBackPath } from "@/utils/get-back-path";
 import {
   type DurationDays,
   DurationDays as DurationDaysConst,
@@ -135,7 +136,9 @@ export default function PracticeDetailPage() {
   );
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const practiceId = params.id as string;
+  const backPath = getBackPath(searchParams.get("from"));
   const {
     data: practiceData,
     isLoading,
@@ -287,11 +290,17 @@ export default function PracticeDetailPage() {
   }, [practicesListData, practiceId]);
 
   const handlePrevious = () => {
-    if (previousPracticeId) router.push(`/practices/${previousPracticeId}`);
+    if (previousPracticeId) {
+      const from = searchParams.get("from");
+      router.push(`/practices/${previousPracticeId}${from ? `?from=${from}` : ""}`);
+    }
   };
 
   const handleNext = () => {
-    if (nextPracticeId) router.push(`/practices/${nextPracticeId}`);
+    if (nextPracticeId) {
+      const from = searchParams.get("from");
+      router.push(`/practices/${nextPracticeId}${from ? `?from=${from}` : ""}`);
+    }
   };
 
   const handleEdit = () => {
@@ -418,7 +427,7 @@ export default function PracticeDetailPage() {
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.replace(HOME_TAB_PATHS.mine)}
+            onClick={() => router.replace(backPath)}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label={t("close")}
           >
@@ -439,7 +448,7 @@ export default function PracticeDetailPage() {
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.replace(HOME_TAB_PATHS.mine)}
+            onClick={() => router.replace(backPath)}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label={t("close")}
           >
@@ -469,7 +478,7 @@ export default function PracticeDetailPage() {
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
         <button
           type="button"
-          onClick={() => router.replace(HOME_TAB_PATHS.mine)}
+          onClick={() => router.replace(backPath)}
           className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
           aria-label={t("close")}
         >
