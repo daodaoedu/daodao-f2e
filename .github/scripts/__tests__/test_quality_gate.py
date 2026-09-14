@@ -71,8 +71,3 @@ class QualityGateTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-class TestBenchmarkEnforcementAcceptance(unittest.TestCase):
-    def test_required_check_blocks_failure(self):
-
-        self.fail("intentional benchmark enforcement acceptance failure")
