@@ -44,7 +44,7 @@ export const wizardOptionState = (selected: boolean) =>
 
 /** 資源卡片（Step 3 與預覽共用） */
 export const WIZARD_RESOURCE_CARD =
-  "flex items-center gap-3 rounded-[8px] border border-bg-gray bg-white px-3.5 py-3";
+  "flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-[8px] border border-bg-gray bg-white px-3.5 py-3";
 export const WIZARD_RESOURCE_LINK = `min-w-0 flex-1 truncate text-sm leading-normal hover:underline ${WIZARD_LINK_COLOR}`;
 export const WIZARD_RESOURCE_PLAIN =
   "min-w-0 flex-1 truncate text-sm leading-normal text-text-dark";
