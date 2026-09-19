@@ -1,7 +1,16 @@
 {
   "name": "frontend",
-  "pathPatterns": ["\\.(tsx?|vue)$", "apps/", "packages/"],
-  "excludePathPatterns": ["\\.d\\.ts$", "node_modules/", "dist/", "generated/"],
+  "pathPatterns": [
+    "\\.(tsx?|vue)$",
+    "apps/",
+    "packages/"
+  ],
+  "excludePathPatterns": [
+    "\\.d\\.ts$",
+    "node_modules/",
+    "dist/",
+    "generated/"
+  ],
   "block": [
     {
       "id": "no-any",
@@ -43,6 +52,13 @@
       "pathPattern": "\\.(tsx|vue)$",
       "pattern": null,
       "message": "元件超過 300 行，考慮拆分"
+    },
+    {
+      "id": "html-pattern-attr",
+      "pathPattern": "\\.(tsx|vue)$",
+      "pattern": "\\bpattern\\s*=\\s*[\"'{]",
+      "excludePathPattern": "\\.test\\.|__tests__/|generated/",
+      "message": "HTML pattern 屬性由瀏覽器以 v flag 編譯，無效時整個忽略、前端驗證失效（#188）。規則須與 server openapi pattern 同源；發 PR 前跑 scripts/check-validation-parity.py，並在核心旅程矩陣用錯誤輸入實測"
     }
   ],
   "size": {
