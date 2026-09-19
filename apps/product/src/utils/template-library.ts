@@ -10,6 +10,8 @@ export const TEMPLATE_MINUTES_MAX = 240;
 export const TEMPLATE_TIMING_OTHER_MAX = 20;
 export const TEMPLATE_RESOURCES_MAX = 5;
 export const TEMPLATE_TAGS_MAX = 10;
+/** 與 server organization-template.validators.ts ORG_TEMPLATE_TAG_LENGTH_MAX 同值 */
+export const TEMPLATE_TAG_LENGTH_MAX = 30;
 export const DURATION_QUICK_OPTIONS = [7, 14, 21, 30] as const;
 export const FREQUENCY_QUICK_OPTIONS = ["1-3", "3-5", "5-7"] as const;
 export const MINUTES_QUICK_OPTIONS = [15, 30, 45, 60] as const;

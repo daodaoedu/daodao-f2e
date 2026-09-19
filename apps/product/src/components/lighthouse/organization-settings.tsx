@@ -14,10 +14,12 @@ import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { Building2, Plus, UserMinus, Users } from "lucide-react";
 import { type FormEvent, useState } from "react";
+import { apiErrorMessage } from "@/utils/cohort-api-error";
 import { ConfirmDialog } from "./confirm-dialog";
 import { OrganizationAiKeyCard } from "./organization-ai-key-card";
 
 type SaveState = "idle" | "saving" | "saved" | "failed";
+const ORGANIZATION_NAME_MAX = 100;
 const ORGANIZATION_BIO_MAX = 2000;
 
 /**
@@ -64,7 +66,7 @@ export function OrganizationSettings() {
     });
     if (response.error) {
       setSaveState("failed");
-      toast.error(t("save_failed"));
+      toast.error(apiErrorMessage(response.error, t("save_failed")));
       return;
     }
     await organizationsQuery.mutate();
@@ -79,7 +81,7 @@ export function OrganizationSettings() {
     setBusy(false);
     setRemoving(null);
     if (response.error) {
-      toast.error(t("organization_member_remove_failed"));
+      toast.error(apiErrorMessage(response.error, t("organization_member_remove_failed")));
       return;
     }
     await membersQuery.mutate();
@@ -112,7 +114,13 @@ export function OrganizationSettings() {
             </div>
             <label htmlFor="organization-name" className="mt-6 grid gap-2 text-sm font-medium">
               {t("organization_name")}
-              <Input id="organization-name" name="name" required defaultValue={organization.name} />
+              <Input
+                id="organization-name"
+                name="name"
+                required
+                maxLength={ORGANIZATION_NAME_MAX}
+                defaultValue={organization.name}
+              />
             </label>
             <label htmlFor="organization-bio" className="mt-4 grid gap-2 text-sm font-medium">
               {t("organization_bio")}

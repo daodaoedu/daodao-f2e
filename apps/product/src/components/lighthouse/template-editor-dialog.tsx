@@ -21,6 +21,7 @@ import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { apiErrorMessage } from "@/utils/cohort-api-error";
 import {
   DURATION_QUICK_OPTIONS,
   deriveTemplateName,
@@ -31,6 +32,7 @@ import {
   TEMPLATE_ACTION_MAX,
   TEMPLATE_DAYS_MAX,
   TEMPLATE_MINUTES_MAX,
+  TEMPLATE_TAG_LENGTH_MAX,
   TEMPLATE_TAGS_MAX,
   TEMPLATE_TIMING_OTHER_MAX,
   TEMPLATE_TITLE_MAX,
@@ -241,7 +243,7 @@ export function TemplateEditorDialog({
       : await createLighthouseTemplate(organizationId, body);
     setBusy(false);
     if (response.error) {
-      toast.error(response.error.error?.message ?? t("save_failed"));
+      toast.error(apiErrorMessage(response.error, t("save_failed")));
       return;
     }
     onSaved(response.data.data, status === "draft" ? "draft" : template ? "updated" : "created");
@@ -250,7 +252,7 @@ export function TemplateEditorDialog({
   function addTag(raw: string) {
     const pieces = raw
       .split(/[、,，]/)
-      .map((piece) => piece.trim())
+      .map((piece) => piece.trim().slice(0, TEMPLATE_TAG_LENGTH_MAX))
       .filter(Boolean);
     if (pieces.length === 0) return;
     patch({

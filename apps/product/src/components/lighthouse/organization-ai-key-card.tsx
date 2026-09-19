@@ -22,6 +22,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { KeyRound } from "lucide-react";
 import { useState } from "react";
+import { apiErrorMessage } from "@/utils/cohort-api-error";
 import { ConfirmDialog } from "./confirm-dialog";
 
 interface OrganizationAiKeyCardProps {
@@ -63,7 +64,7 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
     });
     setBusy(false);
     if (response.error) {
-      toast.error(t("organization_ai_key_save_failed"));
+      toast.error(apiErrorMessage(response.error, t("organization_ai_key_save_failed")));
       return false;
     }
     setApiKey("");
@@ -95,7 +96,7 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
     setBusy(false);
     if (response.error) {
       setTestState("failed");
-      setTestMessage(response.error.error?.message ?? t("organization_ai_key_test_failed"));
+      setTestMessage(apiErrorMessage(response.error, t("organization_ai_key_test_failed")));
       await credentialQuery.mutate();
       return;
     }
@@ -111,7 +112,7 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
     setBusy(false);
     setConfirmClear(false);
     if (response.error) {
-      toast.error(t("organization_ai_key_clear_failed"));
+      toast.error(apiErrorMessage(response.error, t("organization_ai_key_clear_failed")));
       return;
     }
     setApiKey("");

@@ -47,7 +47,11 @@ import {
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { type CohortFieldErrorKey, resolveCohortApiError } from "@/utils/cohort-api-error";
+import {
+  apiErrorMessage,
+  type CohortFieldErrorKey,
+  resolveCohortApiError,
+} from "@/utils/cohort-api-error";
 import { ConfirmDialog } from "./confirm-dialog";
 import { JoinCode } from "./join-code";
 
@@ -776,7 +780,7 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
     const response = await updateLighthouseCohort(programId, cohort.id, { status: "published" });
     setBusy(false);
     if (response.error) {
-      toast.error(t("cohort_publish_failed"));
+      toast.error(apiErrorMessage(response.error, t("cohort_publish_failed")));
       return;
     }
     await refresh();
@@ -790,7 +794,8 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
     setBusy(false);
     setConfirmArchive(false);
     if (response.error) {
-      toast.error(t("cohort_archive_failed"));
+      toast.error(apiErrorMessage(response.error, t("cohort_archive_failed")));
+      await refresh();
       return;
     }
     await refresh();
@@ -802,7 +807,7 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
     const response = await duplicateLighthouseCohort(programId, cohort.id);
     setBusy(false);
     if (response.error) {
-      toast.error(t("cohort_duplicate_failed"));
+      toast.error(apiErrorMessage(response.error, t("cohort_duplicate_failed")));
       return;
     }
     toast.success(t("cohort_duplicated", { name: response.data.data.displayName }));
@@ -1068,7 +1073,8 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
     setBusy(false);
     setConfirmArchive(false);
     if (response.error) {
-      toast.error(t("program_archive_failed"));
+      toast.error(apiErrorMessage(response.error, t("program_archive_failed")));
+      await refreshPrograms();
       return;
     }
     await refreshPrograms();

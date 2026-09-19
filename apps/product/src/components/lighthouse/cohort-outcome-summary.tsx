@@ -14,6 +14,7 @@ import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { AlertCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { apiErrorMessage } from "@/utils/cohort-api-error";
 
 interface CohortOutcomeSummaryProps {
   programId: number;
@@ -27,6 +28,9 @@ interface CohortOutcomeSummaryProps {
  * - AI 使用：平台 AI／自己的 AI API；自帶 key 未設定或無效時阻擋並提示到組織設定
  * - 產生／重新產生會新增一個版本（不覆蓋舊草稿）；人工編輯也是新版本，空白不可儲存
  */
+/** 與 server cohort-outcome.validators.ts SUMMARY_CONTENT_MAX 同值 */
+const SUMMARY_CONTENT_MAX = 5000;
+
 export function CohortOutcomeSummary({
   programId,
   cohortId,
@@ -56,7 +60,7 @@ export function CohortOutcomeSummary({
     const response = await generateLighthouseOutcomeSummary(programId, cohortId, mode);
     setBusy(null);
     if (response.error) {
-      const message = response.error.error?.message ?? t("outcome_summary_generate_failed");
+      const message = apiErrorMessage(response.error, t("outcome_summary_generate_failed"));
       setError(message);
       toast.error(message);
       return;
@@ -81,7 +85,7 @@ export function CohortOutcomeSummary({
     const response = await saveLighthouseOutcomeSummary(programId, cohortId, content);
     setBusy(null);
     if (response.error) {
-      const message = response.error.error?.message ?? t("save_failed");
+      const message = apiErrorMessage(response.error, t("save_failed"));
       setError(message);
       toast.error(message);
       return;
@@ -175,6 +179,7 @@ export function CohortOutcomeSummary({
         {editing ? (
           <Textarea
             rows={6}
+            maxLength={SUMMARY_CONTENT_MAX}
             value={draft}
             onChange={(event) => {
               setDraft(event.target.value);

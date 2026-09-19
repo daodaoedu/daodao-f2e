@@ -14,6 +14,7 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useState } from "react";
+import { apiErrorMessage } from "@/utils/cohort-api-error";
 import { ConfirmDialog } from "./confirm-dialog";
 
 const RESTORE_NOTICE_MS = 3000;
@@ -47,7 +48,9 @@ export function ArchiveManager() {
     const response = await restoreLighthouseArchiveItem(organization.id, type, item.id);
     setBusyId(null);
     if (response.error) {
-      toast.error(response.error.error?.message ?? t("archive_restore_failed"));
+      toast.error(apiErrorMessage(response.error, t("archive_restore_failed")));
+      // 409（別人已恢復／刪除）代表列表過期，重抓讓失效的列消失
+      await archiveQuery.mutate();
       return;
     }
     await archiveQuery.mutate();
@@ -60,7 +63,9 @@ export function ArchiveManager() {
     const response = await deleteLighthouseArchiveItem(organization.id, type, pending.id);
     setBusyId(null);
     if (response.error) {
-      toast.error(response.error.error?.message ?? t("archive_delete_failed"));
+      toast.error(apiErrorMessage(response.error, t("archive_delete_failed")));
+      setPending(null);
+      await archiveQuery.mutate();
       return;
     }
     setPending(null);
