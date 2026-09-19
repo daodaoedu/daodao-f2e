@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveCohortApiError } from "../cohort-api-error";
+import { apiErrorMessage, resolveCohortApiError } from "../cohort-api-error";
 
 describe("resolveCohortApiError", () => {
   it("maps a 400 detail on a known field to its i18n key", () => {
@@ -69,5 +69,31 @@ describe("resolveCohortApiError", () => {
     expect(resolveCohortApiError(null)).toEqual({ type: "fallback" });
     expect(resolveCohortApiError("boom")).toEqual({ type: "fallback" });
     expect(resolveCohortApiError({ error: { message: "   " } })).toEqual({ type: "fallback" });
+  });
+});
+
+describe("apiErrorMessage", () => {
+  it("shows the 400 detail (field + message) instead of the generic 驗證失敗", () => {
+    const error = {
+      success: false,
+      error: {
+        type: "bad_request",
+        message: "驗證失敗",
+        details: [{ path: "tags.0", message: "Too big: expected string to have <=30 characters" }],
+      },
+    };
+    expect(apiErrorMessage(error, "儲存失敗")).toBe(
+      "Too big: expected string to have <=30 characters"
+    );
+  });
+
+  it("shows the server message for 409 / 422 without details", () => {
+    const error = { error: { code: "APP_ERROR", message: "模板已封存，請先從封存區恢復再編輯" } };
+    expect(apiErrorMessage(error, "儲存失敗")).toBe("模板已封存，請先從封存區恢復再編輯");
+  });
+
+  it("falls back to the given text when nothing usable is in the error", () => {
+    expect(apiErrorMessage(null, "儲存失敗")).toBe("儲存失敗");
+    expect(apiErrorMessage({ error: { message: " " } }, "儲存失敗")).toBe("儲存失敗");
   });
 });

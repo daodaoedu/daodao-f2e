@@ -26,17 +26,12 @@ type InviteCohortMembersBody = NonNullable<
 type UpdateOrganizationBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}"]["patch"]["requestBody"]
 >["content"]["application/json"];
-/**
- * 模板資源。server 已支援，但 src/types.ts 要等 server 進 dev 後重跑 `pnpm gen:types`
- * 才會帶到，所以先在這裡補上；types 重新產生後這段擴充就可以刪掉。
- */
-type TemplateResourceInput = { name: string; url?: string };
-type CreateOrganizationTemplateBody = NonNullable<
+export type CreateOrganizationTemplateBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}/templates"]["post"]["requestBody"]
->["content"]["application/json"] & { resources?: TemplateResourceInput[] };
-type UpdateOrganizationTemplateBody = NonNullable<
+>["content"]["application/json"];
+export type UpdateOrganizationTemplateBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}"]["patch"]["requestBody"]
->["content"]["application/json"] & { resources?: TemplateResourceInput[] };
+>["content"]["application/json"];
 type AddOrganizationMemberBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}/members"]["post"]["requestBody"]
 >["content"]["application/json"];
@@ -63,7 +58,9 @@ export const lighthouseOrganizationSchema: z.ZodType<LighthouseOrganizationType>
   status: z.enum(["active", "suspended"]),
   approvedBy: z.number().int().nullable(),
   approvedAt: nullableDateTimeSchema,
+  timezone: z.string(),
   createdAt: z.string().datetime(),
+  updatedAt: nullableDateTimeSchema,
 });
 
 export const lighthouseProgramSchema: z.ZodType<LighthouseProgramType> = z.object({
@@ -71,6 +68,7 @@ export const lighthouseProgramSchema: z.ZodType<LighthouseProgramType> = z.objec
   organizationId: z.number().int().positive(),
   name: z.string(),
   description: z.string().nullable(),
+  archivedAt: nullableDateTimeSchema,
   deletedAt: nullableDateTimeSchema,
   createdAt: z.string().datetime(),
   updatedAt: nullableDateTimeSchema,
@@ -362,19 +360,6 @@ export const lighthouseMessageTemplateResponseSchema = apiSuccessSchema(
   lighthouseMessageTemplateSchema
 );
 
-export const lighthouseOutcomeResponseSchema = apiSuccessSchema(
-  z
-    .object({
-      cohortId: z.number().int().positive(),
-      completedCount: z.number().int().nonnegative(),
-      enrolledCount: z.number().int().nonnegative(),
-      sustainedParticipationCount: z.number().int().nonnegative(),
-      sustainedParticipationRate: z.number().min(0).max(1),
-      computedAt: z.string().datetime(),
-    })
-    .nullable()
-);
-
 const cohortFeedCommentPreviewUserSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -434,46 +419,52 @@ export const lighthouseOrganizationMembersResponseSchema = apiSuccessSchema(
   )
 );
 
-export const lighthouseTemplatesResponseSchema = apiSuccessSchema(
-  z.array(
+export const LIGHTHOUSE_TEMPLATE_STATUSES = ["draft", "ready"] as const;
+export type LighthouseTemplateStatus = (typeof LIGHTHOUSE_TEMPLATE_STATUSES)[number];
+export const lighthouseTemplateBindingSchema = z.object({
+  cohortId: z.number().int().positive(),
+  cohortName: z.string(),
+  cohortStatus: z.string(),
+  cohortStartDate: z.string().datetime(),
+  startDate: nullableDateTimeSchema,
+  endDate: nullableDateTimeSchema,
+  locked: z.boolean(),
+});
+export const lighthouseTemplateSchema = z.object({
+  id: z.number().int().positive(),
+  externalId: z.string().uuid(),
+  organizationId: z.number().int().positive(),
+  title: z.string(),
+  practiceAction: z.string().nullable(),
+  durationDays: z.number().int().nullable(),
+  frequencyMinDays: z.number().int().nullable(),
+  frequencyMaxDays: z.number().int().nullable(),
+  sessionDurationMinutes: z.number().int().nullable(),
+  practiceTimePeriods: z.array(z.string()),
+  timingOther: z.string().nullable(),
+  status: z.enum(LIGHTHOUSE_TEMPLATE_STATUSES),
+  archivedAt: nullableDateTimeSchema,
+  tags: z.array(z.string()),
+  boundCohortIds: z.array(z.number().int().positive()),
+  bindings: z.array(lighthouseTemplateBindingSchema),
+  resources: z.array(
     z.object({
-      id: z.number().int().positive(),
-      externalId: z.string().uuid(),
-      organizationId: z.number().int().positive(),
-      title: z.string(),
-      practiceAction: z.string().nullable(),
-      durationDays: z.number().int().nullable(),
-      frequencyMinDays: z.number().int().nullable(),
-      frequencyMaxDays: z.number().int().nullable(),
-      sessionDurationMinutes: z.number().int().nullable(),
-      practiceTimePeriods: z.array(z.string()),
-      boundCohortIds: z.array(z.number().int().positive()),
-      // resources 與 bindings 設為 optional，讓前端可以先於後端上線
-      // dayNumber 同理用 nullish：後端還沒帶這個欄位時 validation 也不會炸
-      resources: z
-        .array(
-          z.object({
-            id: z.string(),
-            name: z.string(),
-            url: z.string().nullable(),
-            dayNumber: z.number().int().nullish(),
-          })
-        )
-        .optional(),
-      bindings: z
-        .array(
-          z.object({
-            cohortId: z.number().int().positive(),
-            startDate: nullableDateTimeSchema,
-          })
-        )
-        .optional(),
-      generatedDraftCount: z.number().int().nonnegative(),
-      createdAt: nullableDateTimeSchema,
-      updatedAt: nullableDateTimeSchema,
+      id: z.string(),
+      name: z.string(),
+      url: z.string().nullable(),
+      dayNumber: z.number().int().nullish(),
     })
-  )
+  ),
+  generatedDraftCount: z.number().int().nonnegative(),
+  createdAt: nullableDateTimeSchema,
+  updatedAt: nullableDateTimeSchema,
+});
+export type LighthouseTemplate = z.infer<typeof lighthouseTemplateSchema>;
+export type LighthouseTemplateBinding = z.infer<typeof lighthouseTemplateBindingSchema>;
+export const lighthouseTemplatesResponseSchema = apiSuccessSchema(
+  z.array(lighthouseTemplateSchema)
 );
+export const lighthouseTemplateResponseSchema = apiSuccessSchema(lighthouseTemplateSchema);
 
 export const cohortJoinInfoResponseSchema = apiSuccessSchema(
   z.object({
@@ -782,8 +773,7 @@ export const setLighthouseTemplateBinding = async (
   return bound
     ? client.PUT(
         "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/cohorts/{cohortId}",
-        // body 同樣待 types 重新產生後才會出現在 paths 型別上
-        { ...params, body: (startDate === undefined ? {} : { startDate }) as never }
+        { ...params, body: startDate === undefined ? {} : { startDate } }
       )
     : client.DELETE(
         "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/cohorts/{cohortId}",
@@ -819,3 +809,314 @@ export const setCohortExportConsent = async (cohortId: number, consent: boolean)
     params: { path: { cohortId } },
     body: { consent },
   });
+
+// ---------------------------------------------------------------------------
+// 封存區（FRD frd-templates-org-archive.md §3.3）
+// ---------------------------------------------------------------------------
+export const LIGHTHOUSE_ARCHIVE_TYPES = ["templates", "cohorts", "programs"] as const;
+export type LighthouseArchiveType = (typeof LIGHTHOUSE_ARCHIVE_TYPES)[number];
+
+export const lighthouseArchiveItemSchema = z.object({
+  type: z.enum(["template", "cohort", "program"]),
+  id: z.number().int().positive(),
+  name: z.string(),
+  archivedAt: nullableDateTimeSchema,
+  archivedBy: z.object({ id: z.number().int(), name: z.string() }).nullable(),
+  archivedFromStatus: z.string().nullable(),
+  archivedReason: z.string().nullable(),
+  parentName: z.string().nullable(),
+  parentArchived: z.boolean(),
+});
+export type LighthouseArchiveItem = z.infer<typeof lighthouseArchiveItemSchema>;
+export const lighthouseArchiveResponseSchema = apiSuccessSchema(
+  z.object({ type: z.enum(LIGHTHOUSE_ARCHIVE_TYPES), items: z.array(lighthouseArchiveItemSchema) })
+);
+
+export const getLighthouseArchive = async (organizationId: number, type: LighthouseArchiveType) =>
+  client.GET("/api/v1/lighthouse/organizations/{organizationId}/archive", {
+    params: { path: { organizationId }, query: { type } },
+  });
+
+export const restoreLighthouseArchiveItem = async (
+  organizationId: number,
+  type: LighthouseArchiveType,
+  itemId: number
+) =>
+  client.POST("/api/v1/lighthouse/organizations/{organizationId}/archive/{type}/{itemId}/restore", {
+    params: { path: { organizationId, type, itemId } },
+  });
+
+export const deleteLighthouseArchiveItem = async (
+  organizationId: number,
+  type: LighthouseArchiveType,
+  itemId: number
+) =>
+  client.DELETE("/api/v1/lighthouse/organizations/{organizationId}/archive/{type}/{itemId}", {
+    params: { path: { organizationId, type, itemId } },
+  });
+
+export const duplicateLighthouseTemplate = async (organizationId: number, templateId: number) =>
+  client.POST(
+    "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/duplicate",
+    { params: { path: { organizationId, templateId } } }
+  );
+
+export const archiveLighthouseTemplate = async (organizationId: number, templateId: number) =>
+  client.POST("/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/archive", {
+    params: { path: { organizationId, templateId } },
+  });
+
+// ---------------------------------------------------------------------------
+// 組織自帶 AI API key（FR-ORG-03、FR-OUT-02/08）；API 永遠不回明文 key
+// ---------------------------------------------------------------------------
+export const LIGHTHOUSE_AI_PROVIDERS = [
+  "openai",
+  "anthropic",
+  "gemini",
+  "groq",
+  "openrouter",
+] as const;
+export type LighthouseAiProvider = (typeof LIGHTHOUSE_AI_PROVIDERS)[number];
+export const lighthouseAiCredentialStatusSchema = z.enum([
+  "unset",
+  "set",
+  "verified",
+  "invalid",
+  "disabled",
+]);
+export type LighthouseAiCredentialStatus = z.infer<typeof lighthouseAiCredentialStatusSchema>;
+
+export const lighthouseAiCredentialSchema = z.object({
+  organizationId: z.number().int().positive(),
+  provider: z.enum(LIGHTHOUSE_AI_PROVIDERS),
+  status: lighthouseAiCredentialStatusSchema,
+  keyLast4: z.string().nullable(),
+  lastTestedAt: nullableDateTimeSchema,
+  lastTestError: z.string().nullable(),
+  updatedAt: nullableDateTimeSchema,
+  updatedBy: z.number().int().nullable(),
+});
+export type LighthouseAiCredential = z.infer<typeof lighthouseAiCredentialSchema>;
+export const lighthouseAiCredentialResponseSchema = apiSuccessSchema(lighthouseAiCredentialSchema);
+export const lighthouseAiCredentialTestResponseSchema = apiSuccessSchema(
+  lighthouseAiCredentialSchema.extend({ ok: z.boolean(), message: z.string() })
+);
+
+export const LIGHTHOUSE_OUTCOME_PHASES = ["not_started", "in_progress", "ended"] as const;
+export type LighthouseOutcomePhase = (typeof LIGHTHOUSE_OUTCOME_PHASES)[number];
+export const LIGHTHOUSE_SUMMARY_MODES = ["platform", "own"] as const;
+export type LighthouseSummaryMode = (typeof LIGHTHOUSE_SUMMARY_MODES)[number];
+export const lighthouseOutcomeSummaryVersionSchema = z.object({
+  id: z.number().int(),
+  version: z.number().int().positive(),
+  source: z.enum(["platform_ai", "own_ai", "manual"]),
+  content: z.string(),
+  provider: z.string().nullable(),
+  modelName: z.string().nullable(),
+  generatedAt: nullableDateTimeSchema,
+  createdBy: z.object({ id: z.number().int(), nickname: z.string().nullable() }).nullable(),
+  createdAt: z.string().datetime(),
+  isCurrent: z.boolean(),
+});
+export type LighthouseOutcomeSummaryVersion = z.infer<typeof lighthouseOutcomeSummaryVersionSchema>;
+export const lighthouseOutcomeSchema = z.object({
+  cohortId: z.number().int().positive(),
+  cohort: z.object({
+    displayName: z.string(),
+    programName: z.string(),
+    startDate: z.string().datetime(),
+    endDate: z.string().datetime(),
+  }),
+  phase: z.enum(LIGHTHOUSE_OUTCOME_PHASES),
+  finalizedAt: nullableDateTimeSchema,
+  overview: z.object({
+    participants: z.number().int().nonnegative(),
+    activatedPractices: z.number().int().nonnegative(),
+    checkins: z.number().int().nonnegative(),
+    comments: z.number().int().nonnegative(),
+  }),
+  ai: z.object({
+    platformAvailable: z.boolean(),
+    ownKey: z.object({
+      status: lighthouseAiCredentialStatusSchema,
+      provider: z.enum(LIGHTHOUSE_AI_PROVIDERS),
+      keyLast4: z.string().nullable(),
+    }),
+    platformDailyLimit: z.number().int().positive(),
+    platformUsedToday: z.number().int().nonnegative(),
+  }),
+  summary: z.object({
+    current: lighthouseOutcomeSummaryVersionSchema.nullable(),
+    versions: z.array(lighthouseOutcomeSummaryVersionSchema),
+  }),
+  practiceOutcomes: z.array(
+    z.object({
+      title: z.string(),
+      participants: z.number().int().nonnegative(),
+      started: z.number().int().nonnegative(),
+      completed: z.number().int().nonnegative(),
+      checkins: z.number().int().nonnegative(),
+      comments: z.number().int().nonnegative(),
+    })
+  ),
+  participantProgress: z.array(
+    z.object({
+      userId: z.number().int(),
+      nickname: z.string().nullable(),
+      avatar: z.string().nullable(),
+      practiceId: z.number().int(),
+      practiceTitle: z.string(),
+      practiceStatus: z.string(),
+      completedCount: z.number().int().nonnegative(),
+      targetCount: z.number().int().nonnegative(),
+      progressPercentage: z.number().int().nonnegative(),
+      checkinCount: z.number().int().nonnegative(),
+      responseCount: z.number().int().nonnegative(),
+      lastActivityAt: nullableDateTimeSchema,
+    })
+  ),
+  generatedAt: z.string().datetime(),
+});
+export type LighthouseOutcome = z.infer<typeof lighthouseOutcomeSchema>;
+export const lighthouseOutcomeResponseSchema = apiSuccessSchema(lighthouseOutcomeSchema);
+export const lighthouseOutcomeSummaryResponseSchema = apiSuccessSchema(
+  lighthouseOutcomeSummaryVersionSchema
+);
+
+export const getLighthouseAiCredential = async (organizationId: number) =>
+  client.GET("/api/v1/lighthouse/organizations/{organizationId}/ai-credentials", {
+    params: { path: { organizationId } },
+  });
+
+export const setLighthouseAiCredential = async (
+  organizationId: number,
+  body: { provider: LighthouseAiProvider; apiKey: string }
+) =>
+  client.PUT("/api/v1/lighthouse/organizations/{organizationId}/ai-credentials", {
+    params: { path: { organizationId } },
+    body,
+  });
+
+export const clearLighthouseAiCredential = async (organizationId: number) =>
+  client.DELETE("/api/v1/lighthouse/organizations/{organizationId}/ai-credentials", {
+    params: { path: { organizationId } },
+  });
+
+export const testLighthouseAiCredential = async (organizationId: number) =>
+  client.POST("/api/v1/lighthouse/organizations/{organizationId}/ai-credentials/test", {
+    params: { path: { organizationId } },
+  });
+
+// ---------------------------------------------------------------------------
+// 成果摘要與匯出稽核（FR-OUT-03/04/07）
+// ---------------------------------------------------------------------------
+export const generateLighthouseOutcomeSummary = async (
+  programId: number,
+  cohortId: number,
+  mode: LighthouseSummaryMode
+) =>
+  client.POST("/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/outcome/summary", {
+    params: { path: { programId, cohortId } },
+    body: { mode },
+  });
+
+export const saveLighthouseOutcomeSummary = async (
+  programId: number,
+  cohortId: number,
+  content: string
+) =>
+  client.PUT("/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/outcome/summary", {
+    params: { path: { programId, cohortId } },
+    body: { content },
+  });
+
+export const recordLighthouseOutcomeExport = async (
+  programId: number,
+  cohortId: number,
+  filename?: string
+) =>
+  client.POST(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/outcome/report-exported",
+    { params: { path: { programId, cohortId } }, body: filename ? { filename } : {} }
+  );
+
+// ---------------------------------------------------------------------------
+// 場次動態（FRD frd-activity-outcome-org.md §3.1）：打卡／留言回應／節奏變化合併
+// ---------------------------------------------------------------------------
+export const LIGHTHOUSE_ACTIVITY_TYPES = ["checkin", "comment", "rhythm"] as const;
+export type LighthouseActivityType = (typeof LIGHTHOUSE_ACTIVITY_TYPES)[number];
+export type LighthouseActivityQuery = {
+  from?: string;
+  to?: string;
+  type?: LighthouseActivityType;
+  practiceTitle?: string;
+  q?: string;
+  hasText?: boolean;
+  limit?: number;
+  offset?: number;
+};
+export const lighthouseActivityItemSchema = z.object({
+  id: z.string(),
+  type: z.enum(LIGHTHOUSE_ACTIVITY_TYPES),
+  typeLabel: z.string(),
+  occurredAt: z.string().datetime(),
+  member: z.object({
+    userId: z.number().int(),
+    nickname: z.string().nullable(),
+    avatar: z.string().nullable(),
+  }),
+  practice: z.object({ id: z.number().int(), title: z.string() }),
+  summary: z.string(),
+  hasText: z.boolean(),
+  meta: z.record(z.string(), z.unknown()),
+});
+export type LighthouseActivityItem = z.infer<typeof lighthouseActivityItemSchema>;
+export const lighthouseActivityResponseSchema = apiSuccessSchema(
+  z.object({
+    range: z.object({
+      from: z.string(),
+      to: z.string(),
+      min: z.string(),
+      max: z.string(),
+      timezone: z.string(),
+    }),
+    filters: z.object({
+      type: z.enum(LIGHTHOUSE_ACTIVITY_TYPES).nullable(),
+      practiceTitle: z.string().nullable(),
+      q: z.string().nullable(),
+      hasText: z.boolean(),
+    }),
+    practices: z.array(z.object({ title: z.string() })),
+    stats: z.object({
+      checkins: z.number().int().nonnegative(),
+      comments: z.number().int().nonnegative(),
+      rhythm: z.number().int().nonnegative(),
+      total: z.number().int().nonnegative(),
+    }),
+    total: z.number().int().nonnegative(),
+    items: z.array(lighthouseActivityItemSchema),
+  })
+);
+export type LighthouseActivityFeed = z.infer<typeof lighthouseActivityResponseSchema>["data"];
+export const lighthouseActivityDetailSchema = lighthouseActivityItemSchema.extend({
+  detail: z.string().nullable(),
+  images: z.array(z.string()),
+  target: z
+    .object({ checkinId: z.number().int(), summary: z.string(), occurredAt: z.string().datetime() })
+    .nullable(),
+});
+export type LighthouseActivityDetail = z.infer<typeof lighthouseActivityDetailSchema>;
+export const lighthouseActivityDetailResponseSchema = apiSuccessSchema(
+  lighthouseActivityDetailSchema
+);
+
+export const getLighthouseActivityDetail = async (
+  programId: number,
+  cohortId: number,
+  type: LighthouseActivityType,
+  activityId: string
+) =>
+  client.GET(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/activities/{type}/{activityId}",
+    { params: { path: { programId, cohortId, type, activityId } } }
+  );

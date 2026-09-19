@@ -4,6 +4,8 @@ import { useMemo } from "react";
 import type { z } from "zod";
 import { EMPTY_QUERY_INIT, useQuery } from "../hooks";
 import type {
+  LighthouseActivityQuery,
+  LighthouseArchiveType,
   LighthouseDashboardQuery,
   LighthouseMessageCategory,
   LighthouseParticipantsQuery,
@@ -12,6 +14,9 @@ import {
   cohortJoinInfoResponseSchema,
   cohortMemberHomeResponseSchema,
   learnerCohortFeedResponseSchema,
+  lighthouseActivityResponseSchema,
+  lighthouseAiCredentialResponseSchema,
+  lighthouseArchiveResponseSchema,
   lighthouseCoachFeedResponseSchema,
   lighthouseCohortEnrollmentsResponseSchema,
   lighthouseCohortListResponseSchema,
@@ -270,4 +275,37 @@ export const useLearnerCohortFeed = (cohortId: number) => {
     params: { path: { cohortId }, query: { limit: 50 } },
   });
   return useValidatedResponse(query, learnerCohortFeedResponseSchema);
+};
+
+export const useLighthouseArchive = (
+  organizationId?: number,
+  type: LighthouseArchiveType = "templates"
+) => {
+  const query = useQuery(
+    "/api/v1/lighthouse/organizations/{organizationId}/archive",
+    organizationId ? { params: { path: { organizationId }, query: { type } } } : null
+  );
+  return useValidatedResponse(query, lighthouseArchiveResponseSchema);
+};
+
+export const useLighthouseAiCredential = (organizationId?: number) => {
+  const query = useQuery(
+    "/api/v1/lighthouse/organizations/{organizationId}/ai-credentials",
+    organizationId ? { params: { path: { organizationId } } } : null
+  );
+  return useValidatedResponse(query, lighthouseAiCredentialResponseSchema);
+};
+
+export const useLighthouseActivities = (
+  programId?: number,
+  cohortId?: number,
+  query: LighthouseActivityQuery = {}
+) => {
+  const result = useQuery(
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/activities",
+    programId && cohortId
+      ? { params: { path: { programId, cohortId }, query: compactQuery(query) } }
+      : null
+  );
+  return useValidatedResponse(result, lighthouseActivityResponseSchema);
 };

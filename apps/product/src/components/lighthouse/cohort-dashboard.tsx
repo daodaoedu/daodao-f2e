@@ -457,7 +457,12 @@ function CohortInfoPanel({
     interactionModes: string[];
     meetingUrl: string | null;
     location: string | null;
-    sessions: { id: number; sessionDate: string; startTime: string | null; endTime: string | null }[];
+    sessions: {
+      id: number;
+      sessionDate: string;
+      startTime: string | null;
+      endTime: string | null;
+    }[];
     feeType: string;
     feeAmount: number | null;
     signupMethod: string;
@@ -486,9 +491,7 @@ function CohortInfoPanel({
 
   return (
     <section className="mb-5 rounded-3xl border border-[#CDEBE8] bg-white p-6">
-      {cohort.tagline && (
-        <p className="mb-4 text-sm italic text-[#456B68]">{cohort.tagline}</p>
-      )}
+      {cohort.tagline && <p className="mb-4 text-sm italic text-[#456B68]">{cohort.tagline}</p>}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {/* 互動方式 */}
         {cohort.interactionModes.length > 0 && (

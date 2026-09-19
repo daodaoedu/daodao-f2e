@@ -54,3 +54,21 @@ export function resolveCohortApiError(error: unknown): CohortApiErrorResolution 
   const message = readString(inner, "message") ?? readString(error, "message");
   return message ? { type: "message", message } : { type: "fallback" };
 }
+
+/**
+ * 通用版：把任何 lighthouse API 錯誤轉成可直接 toast 的文字。
+ * 400 有 details 時顯示第一條欄位訊息（server 的 zod message 已是給人看的中文，不再加 path 前綴），
+ * 否則顯示 server message，都沒有才退回 fallback。
+ * 模板庫／組織設定／AI key／成果摘要等沒有欄位 i18n 對照的表單用這個，避免 #188 那種「驗證失敗」通用訊息。
+ */
+export function apiErrorMessage(error: unknown, fallback: string): string {
+  if (!isRecord(error)) return fallback;
+  const inner = isRecord(error.error) ? error.error : error;
+  const details = Array.isArray(inner.details) ? inner.details : [];
+  for (const detail of details) {
+    if (!isRecord(detail)) continue;
+    const message = readString(detail, "message");
+    if (message) return message;
+  }
+  return readString(inner, "message") ?? readString(error, "message") ?? fallback;
+}

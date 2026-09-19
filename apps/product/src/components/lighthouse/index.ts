@@ -1,5 +1,5 @@
+export { CohortActivity } from "./cohort-activity";
 export { CohortDashboard } from "./cohort-dashboard";
-export { CohortFeed } from "./cohort-feed";
 export { CohortFocus } from "./cohort-focus";
 export { CohortOutcome } from "./cohort-outcome";
 export { CohortRoster } from "./cohort-roster";

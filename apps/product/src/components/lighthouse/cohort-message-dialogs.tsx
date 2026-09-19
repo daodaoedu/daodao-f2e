@@ -8,6 +8,7 @@ import {
   useLighthouseMessageTemplates,
   useLighthouseParticipantMessages,
 } from "@daodao/api";
+
 import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
@@ -31,6 +32,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { format, parseISO } from "date-fns";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 
 type Person = {
   userId: number;
@@ -56,7 +58,9 @@ export function CohortMessageHistoryDialog({ programId, cohortId, person, onClos
 
   return (
     <Dialog open={person !== null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-[min(480px,92vw)] rounded-[28px] border-0 bg-white p-6">
+      <DialogContent
+        className={cn("w-[min(480px,92vw)] rounded-[28px] border-0 bg-white p-6", LIGHTHOUSE_SCOPE)}
+      >
         <DialogHeader className="items-start text-left">
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#0D7773]">
             {t("col_messages")}
@@ -192,7 +196,9 @@ export function CohortMessageComposeDialog({
 
   return (
     <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-[min(480px,92vw)] rounded-[28px] border-0 bg-white p-6">
+      <DialogContent
+        className={cn("w-[min(480px,92vw)] rounded-[28px] border-0 bg-white p-6", LIGHTHOUSE_SCOPE)}
+      >
         <DialogHeader className="items-start text-left">
           <DialogTitle className="text-left text-xl font-semibold text-[#0D3036]">
             {t("message_compose_title", { name })}
