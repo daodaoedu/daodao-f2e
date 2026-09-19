@@ -1,0 +1,47 @@
+name: PR Evidence Gate
+
+# 每個 PR 都跑（required check 不可用 on.paths）。本 workflow 由 daodaoedu/daodao 的
+# sync-claude-config 同步到各 sub-repo；規則本體在 .github/scripts/check-pr-evidence.sh。
+#
+# 檢查 PR body「## 驗證證據」：驗證報告連結 + 核心旅程矩陣（正常列 + 錯誤路徑列，全 ✅），
+# 或「核心旅程不適用：<原因>」。#171→#188 的教訓：畫面驗過不等於使用者能完成任務。
+#
+# 模式：repo variable PR_EVIDENCE_GATE_MODE = warn（預設，advisory）| block。
+# 依 ADR-0001 先 warn 累積 ledger 數據，再升 block 並加入 ruleset required checks。
+#
+# 安全：用 pull_request_target，腳本從預設分支以 GitHub API 下載（不做 actions/checkout，
+# 避免 SonarCloud S7631 把 pull_request_target + checkout 一律標成 high）。絕不 checkout 或執行
+# PR head 的程式碼——否則 PR 改一行 check-pr-evidence.sh 成 exit 0 就能過 required check。
+# PR body 與 label 只從 event payload 讀，屬資料不屬指令。
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize, labeled, unlabeled]
+
+permissions: {}
+
+jobs:
+  evidence:
+    name: PR evidence（驗證報告 + 核心旅程）
+    runs-on: ubuntu-latest
+    permissions:
+      # 只為了用 API 讀取預設分支上的受信任腳本
+      contents: read
+    steps:
+      - name: Fetch trusted gate script from default branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          mkdir -p .github/scripts
+          gh api "repos/${GITHUB_REPOSITORY}/contents/.github/scripts/check-pr-evidence.sh?ref=${DEFAULT_BRANCH}" \
+            -H "Accept: application/vnd.github.raw" > .github/scripts/check-pr-evidence.sh
+          [ -s .github/scripts/check-pr-evidence.sh ] || { echo "::error::無法從 ${DEFAULT_BRANCH} 取得 check-pr-evidence.sh"; exit 1; }
+
+      - name: Check PR body evidence section
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          MODE: ${{ vars.PR_EVIDENCE_GATE_MODE || 'warn' }}
+        run: bash .github/scripts/check-pr-evidence.sh

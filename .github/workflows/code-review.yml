@@ -13,7 +13,8 @@ jobs:
   review:
     name: AI Code Review
     # Draft PR 跳過 AI review（節省 runner 時間；mark ready 時 synchronize 再跑）
-    if: ${{ !github.event.pull_request.draft }}
+    # sync-claude-config 開的同步 PR 也跳過：內容是 daodao root 已 review 過的共享檔案，八個 repo 各審一次只會重複同樣的 findings
+    if: ${{ !github.event.pull_request.draft && !startsWith(github.head_ref, 'chore/sync-claude-config-') }}
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
