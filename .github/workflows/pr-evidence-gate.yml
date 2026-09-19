@@ -9,8 +9,9 @@ name: PR Evidence Gate
 # 模式：repo variable PR_EVIDENCE_GATE_MODE = warn（預設，advisory）| block。
 # 依 ADR-0001 先 warn 累積 ledger 數據，再升 block 並加入 ruleset required checks。
 #
-# 安全：與 branch-guard.yml 相同，用 pull_request_target 從預設分支 checkout 受信任的腳本，
-# 絕不 checkout 或執行 PR head 的程式碼——否則 PR 改一行 check-pr-evidence.sh 成 exit 0 就能過 required check。
+# 安全：用 pull_request_target，腳本從預設分支以 GitHub API 下載（不做 actions/checkout，
+# 避免 SonarCloud S7631 把 pull_request_target + checkout 一律標成 high）。絕不 checkout 或執行
+# PR head 的程式碼——否則 PR 改一行 check-pr-evidence.sh 成 exit 0 就能過 required check。
 # PR body 與 label 只從 event payload 讀，屬資料不屬指令。
 on:
   pull_request_target:
@@ -23,15 +24,18 @@ jobs:
     name: PR evidence（驗證報告 + 核心旅程）
     runs-on: ubuntu-latest
     permissions:
-      # 只為了讀取預設分支上的受信任腳本
+      # 只為了用 API 讀取預設分支上的受信任腳本
       contents: read
     steps:
-      - name: Checkout trusted default branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.repository.default_branch }}
-          fetch-depth: 1
-          persist-credentials: false
+      - name: Fetch trusted gate script from default branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          mkdir -p .github/scripts
+          gh api "repos/${GITHUB_REPOSITORY}/contents/.github/scripts/check-pr-evidence.sh?ref=${DEFAULT_BRANCH}" \
+            -H "Accept: application/vnd.github.raw" > .github/scripts/check-pr-evidence.sh
+          [ -s .github/scripts/check-pr-evidence.sh ] || { echo "::error::無法從 ${DEFAULT_BRANCH} 取得 check-pr-evidence.sh"; exit 1; }
 
       - name: Check PR body evidence section
         env:
