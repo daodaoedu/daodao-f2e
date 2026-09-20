@@ -8,7 +8,7 @@ export default function AccountSettingsPage() {
   const t = useTranslations("app_product");
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto">
       <PageHeader leftAction="back" leftLabel="" title={t("settings_account")} />
 
       <BackgroundAnimation />
