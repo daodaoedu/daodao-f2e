@@ -11,6 +11,9 @@ permissions: {}
 jobs:
   check:
     name: Branch flow rules
+    # 這支是 sync-claude-config 發到 8 個 sub-repo 的共用範本；root 自己由 branch-guard.yml
+    # （pull_request_target + trusted script）跑同一套規則，不在 root 重複執行
+    if: github.repository != 'daodaoedu/daodao'
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch naming and base

@@ -52,7 +52,7 @@ PR 作者回覆 bot 的 Code Review 留言時，用一行 `/fp <第幾條> <A-F>
 /fp 3 C 自承 diff 被截斷
 ```
 
-`collect-pr-feedback` skill 步驟 3 讀到這種行就呼叫 `record --source ci`；`review-evals.ts` 週報另計各樣態比例（待接）。
+`collect-pr-feedback` skill 步驟 3 讀到這種行就呼叫 `record --source ci`。（原規劃由 `review-evals.ts` 週報另計各樣態比例；該週報已於 2026-09 退役，樣態統計需另找載體。）
 
 ## 每筆欄位
 
