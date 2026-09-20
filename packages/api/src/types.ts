@@ -5147,19 +5147,11 @@ export interface paths {
                     /** @description 每頁數量 */
                     limit?: string;
                     /** @description 排序欄位 */
-                    sortBy?: "createdAt" | "lastLoginAt" | "lastActiveAt" | "name" | "email" | "registrationFlow" | "creationMethod" | "daysToComplete";
+                    sortBy?: "createdAt" | "lastLoginAt" | "lastActiveAt" | "name" | "email";
                     /** @description 排序方向 */
                     sortOrder?: "asc" | "desc";
                     /** @description 篩選學習風格人物誌（最新一次測驗結果） */
                     personaType?: "L" | "C" | "A" | "D" | "O";
-                    /** @description 篩選 Onboarding Badge 完成狀態 */
-                    badgeGranted?: "true" | "false";
-                    /** @description 篩選用戶來源 */
-                    userSource?: "S1" | "S2" | "S3";
-                    /** @description 篩選註冊來源。僅接受 landing_page/quiz/action_maker；違規值會回傳 400 + VALIDATION_ERROR。 */
-                    registrationFlow?: "landing_page" | "quiz" | "action_maker";
-                    /** @description 篩選任務建立方式。僅接受 self_created/copied/action_generator；違規值會回傳 400 + VALIDATION_ERROR。 */
-                    creationMethod?: "self_created" | "copied" | "action_generator";
                     /** @description 篩選註冊起始日期（含） */
                     createdFrom?: string;
                     /** @description 篩選註冊結束日期（含） */
@@ -5550,6 +5542,159 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/dev-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * dev 環境測試登入（僅 dev 掛載）
+         * @description 只在 NODE_ENV 為 dev／development 且已設定 DEV_LOGIN_SECRET 時存在，需帶 x-dev-login-secret header。供部署後冒煙取得 temp／正式用戶身份，prod 無此路由。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description 與 server 的 DEV_LOGIN_SECRET 相同的值 */
+                    "x-dev-login-secret": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: email
+                         * @description 測試帳號 email
+                         * @example qa+230@daodao.so
+                         */
+                        email: string;
+                        /**
+                         * @description temp：模擬剛完成 Google 登入、尚未註冊的臨時用戶；user：以 email 取得既有正式用戶身份
+                         * @enum {string}
+                         */
+                        mode: "temp" | "user";
+                        /**
+                         * @description temp 模式建立臨時用戶時的顯示名稱；省略時用 email 帳號部分
+                         * @example 冒煙 QA
+                         */
+                        name?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 登入成功，已設定 auth_token cookie */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DevLoginResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                /** @description 超過 dev-login 專用限流（60 次／15 分鐘） */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates failed API response
+                             * @enum {boolean}
+                             */
+                            success: false;
+                            /**
+                             * @description Null data for error responses
+                             * @enum {object|null}
+                             */
+                            data: never | null;
+                            /** @description Error information object */
+                            error: {
+                                /**
+                                 * @description Error code for programmatic handling
+                                 * @enum {string}
+                                 */
+                                code: "VALIDATION_ERROR" | "INVALID_TOKEN" | "TOKEN_EXPIRED" | "DATABASE_ERROR" | "FILE_UPLOAD_ERROR" | "APP_ERROR" | "INTERNAL_SERVER_ERROR" | "USER_NOT_FOUND" | "RESOURCE_NOT_FOUND" | "UNAUTHORIZED" | "FORBIDDEN" | "CONFLICT" | "BAD_REQUEST";
+                                /** @description Human-readable error message */
+                                message: string;
+                                /** @description Additional error details */
+                                details?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                500: components["responses"]["InternalServerError"];
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -14333,68 +14478,6 @@ export interface paths {
                 };
                 401: components["responses"]["UnauthorizedError"];
                 500: components["responses"]["InternalServerError"];
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/onboarding/status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 取得 Onboarding 進度
-         * @description 回傳當前用戶的 Onboarding 任務清單、完成數量與 Badge 狀態。任務順序依 user_source（S1/S2/S3）排列。
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Onboarding 狀態 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {boolean} */
-                            success: true;
-                            data: {
-                                taskList: {
-                                    /**
-                                     * @example A
-                                     * @enum {string}
-                                     */
-                                    taskKey: "A" | "B" | "C" | "D" | "E";
-                                    /** @example false */
-                                    done: boolean;
-                                    /** @example /practices/123e4567-e89b-12d3-a456-426614174000 */
-                                    ctaHref?: string;
-                                }[];
-                                /** @example 2 */
-                                completedTasks: number;
-                                /** @example false */
-                                badgeGranted: boolean;
-                            };
-                            timestamp: string;
-                        };
-                    };
-                };
-                401: components["responses"]["UnauthorizedError"];
-                404: components["responses"]["NotFoundError"];
             };
         };
         put?: never;
@@ -24319,7 +24402,7 @@ export interface paths {
                          */
                         privacyStatus?: "private" | "public" | "delayed";
                         /**
-                         * @description 實踐建立方式（用於 Onboarding 任務 C 記錄）
+                         * @description 實踐建立方式（寫入 practices.creation_source，供分析用）
                          * @example self_created
                          * @enum {string}
                          */
@@ -41039,7 +41122,7 @@ export interface components {
              */
             privacyStatus?: "private" | "public" | "delayed";
             /**
-             * @description 實踐建立方式（用於 Onboarding 任務 C 記錄）
+             * @description 實踐建立方式（寫入 practices.creation_source，供分析用）
              * @example self_created
              * @enum {string}
              */
@@ -42176,7 +42259,7 @@ export interface components {
              * @example createdAt
              * @enum {string}
              */
-            sortBy: "createdAt" | "lastLoginAt" | "lastActiveAt" | "name" | "email" | "registrationFlow" | "creationMethod" | "daysToComplete";
+            sortBy: "createdAt" | "lastLoginAt" | "lastActiveAt" | "name" | "email";
             /**
              * @description 排序方向
              * @default desc
@@ -42190,30 +42273,6 @@ export interface components {
              * @enum {string}
              */
             personaType?: "L" | "C" | "A" | "D" | "O";
-            /**
-             * @description 篩選 Onboarding Badge 完成狀態
-             * @example true
-             * @enum {string}
-             */
-            badgeGranted?: "true" | "false";
-            /**
-             * @description 篩選用戶來源
-             * @example S1
-             * @enum {string}
-             */
-            userSource?: "S1" | "S2" | "S3";
-            /**
-             * @description 篩選註冊來源。僅接受 landing_page/quiz/action_maker；違規值會回傳 400 + VALIDATION_ERROR。
-             * @example landing_page
-             * @enum {string}
-             */
-            registrationFlow?: "landing_page" | "quiz" | "action_maker";
-            /**
-             * @description 篩選任務建立方式。僅接受 self_created/copied/action_generator；違規值會回傳 400 + VALIDATION_ERROR。
-             * @example self_created
-             * @enum {string}
-             */
-            creationMethod?: "self_created" | "copied" | "action_generator";
             /**
              * @description 篩選註冊起始日期（含）
              * @example 2024-01-01
@@ -42375,33 +42434,6 @@ export interface components {
              * @enum {string|null}
              */
             personaType: "L" | "C" | "A" | "D" | "O" | null;
-            /**
-             * @description 是否完成 Onboarding Badge
-             * @example true
-             */
-            badgeGranted: boolean | null;
-            /**
-             * @description 用戶來源（S1/S2/S3）
-             * @example S1
-             */
-            userSource: string | null;
-            /**
-             * @description 註冊來源。若後端回傳無法對應枚舉值，將回傳 400 + VALIDATION_ERROR。
-             * @example landing_page
-             * @enum {string|null}
-             */
-            registrationFlow: "landing_page" | "quiz" | "action_maker" | null;
-            /**
-             * @description 任務建立方式。若後端回傳無法對應枚舉值，將回傳 400 + VALIDATION_ERROR。
-             * @example self_created
-             * @enum {string|null}
-             */
-            creationMethod: "self_created" | "copied" | "action_generator" | null;
-            /**
-             * @description 完成天數
-             * @example 7
-             */
-            daysToComplete: number | null;
             /** @description 用戶標籤列表 */
             tags: {
                 id: number;
@@ -42441,10 +42473,6 @@ export interface components {
              * @enum {string|null}
              */
             personaType: "L" | "C" | "A" | "D" | "O" | null;
-            /** @description 是否完成 Onboarding Badge */
-            badgeGranted: boolean | null;
-            /** @description 用戶來源 */
-            userSource: string | null;
         };
         LoginHistoryRecord: {
             /**
@@ -52070,6 +52098,107 @@ export interface components {
              */
             success: true;
             data: components["schemas"]["EmailHistoryResponseData"] & unknown;
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description dev 測試登入成功回應
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        DevLoginResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: {
+                user: {
+                    /** @description temp 模式為 temp_users.id 字串；user 模式為 external_id */
+                    id: string;
+                    /** Format: email */
+                    email: string;
+                    name?: string | null;
+                    nickname?: string | null;
+                };
+                isTemporary: boolean;
+                /** @description 與 auth_token cookie 相同的 JWT，供非瀏覽器客戶端使用 */
+                token: string;
+            };
             /**
              * Format: date-time
              * @description ISO 8601 timestamp of the response

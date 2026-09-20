@@ -36,7 +36,6 @@ import {
 import type { IComment } from "@/components/check-in/reactions";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeDetailShell } from "@/components/practice";
-import { applyOnboardingUpdateFromResponse } from "@/components/task-guide/onboarding-progress-context";
 import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 import {
   type DurationDays,

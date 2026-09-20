@@ -1,10 +1,6 @@
 import { useCreatePracticeCheckIn } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
-import {
-  applyOnboardingUpdateFromResponse,
-  refreshOnboardingStatus,
-} from "@/components/task-guide/onboarding-progress-context";
 import { mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import type { ICheckInFormData } from "../../types";
@@ -49,9 +45,6 @@ export const useCheckInSubmit = ({
 
       // 使用封裝好的函數創建打卡記錄（自動處理圖片上傳和 cache 刷新）
       const response = await createCheckIn(apiFormData);
-      if (!applyOnboardingUpdateFromResponse(response)) {
-        refreshOnboardingStatus();
-      }
 
       // 關閉 loading toast
       toast.dismiss(loadingToast);

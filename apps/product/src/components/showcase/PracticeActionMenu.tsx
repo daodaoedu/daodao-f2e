@@ -16,15 +16,11 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { Archive, Copy, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { refreshOnboardingStatus } from "@/components/task-guide/onboarding-progress-context";
 import {
   ArchivePracticeResult,
   useArchivePracticeDialog,
 } from "@/hooks/use-archive-practice-dialog";
-import {
-  DeletePracticeResult,
-  useDeletePracticeDialog,
-} from "@/hooks/use-delete-practice-dialog";
+import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
 
 interface PracticeActionMenuProps {
   practiceId: string;
@@ -135,7 +131,6 @@ export function PracticeActionMenu({
               try {
                 setIsCopying(true);
                 const { id: newId } = await copyPractice(practiceId);
-                refreshOnboardingStatus();
                 router.push(`/practices/copy-success?practiceId=${newId}`);
               } catch {
                 toast.error(practiceT("copy_failed"));

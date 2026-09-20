@@ -13,7 +13,6 @@ import { type MoodType, mapMoodTypeToApiMood } from "@/constants/mood";
 import { PracticeStatus } from "@/constants/practice-status";
 import type { TaskStatus } from "@/constants/task-status";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
-import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import type { ICheckIn, IPractice } from "@/types/practice";
 import { createReactNativeFormDataFile } from "@/utils/form-data-file";
 
@@ -326,9 +325,6 @@ export function useCheckIn() {
           description: note ?? "",
           media: mediaUris.map((uri, index) => createReactNativeFormDataFile(uri, index)),
         });
-
-        // 新手任務 D：完成第一次打卡
-        applyOnboardingUpdateFromResponse(response);
 
         // CheckInWithEncouragement：data 內含 encouragement + practiceProgressPercentage
         const payload =

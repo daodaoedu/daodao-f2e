@@ -12,7 +12,6 @@ const expectedStorageKeys: Record<keyof typeof StorageEnum, string> = {
   AuthSignal: "_authsignal",
   HomeFeedAnchor: "_homefeedanchor",
   RegistrationFlow: "_registrationflow",
-  TaskGuideCollapsed: "_taskguidecollapsed",
   PwaInstallDismissedAt: "_pwainstalldismissedat",
   LighthouseSidebarCollapsed: "_lighthousesidebarcollapsed",
   ChatPinBannerDismissed: "_chatpinbannerdismissed",

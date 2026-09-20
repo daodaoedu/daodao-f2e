@@ -12,10 +12,6 @@ import { format, parse } from "date-fns";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
-import {
-  applyOnboardingUpdateFromResponse,
-  refreshOnboardingStatus,
-} from "@/components/task-guide/onboarding-progress-context";
 import { FieldSelectionSection } from "./field-selection-section";
 import { PersonalInfoSection } from "./personal-info-section";
 import {
@@ -149,9 +145,6 @@ export const AccountForm = () => {
       toast.success(t("save_success"));
       form.reset(form.getValues()); // 重置 dirty 狀態
       mutate("/api/v1/users/settings-summary");
-      if (!applyOnboardingUpdateFromResponse(response.data)) {
-        refreshOnboardingStatus();
-      }
 
       // 延遲後返回設定首頁，讓使用者看到成功訊息
       setTimeout(() => {

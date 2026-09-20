@@ -1,13 +1,12 @@
 import {
   createComment as apiCreateComment,
   deleteComment as apiDeleteComment,
-  extractApiErrorMessage,
   getComments as apiGetComments,
   updateComment as apiUpdateComment,
   type CommentTargetType,
+  extractApiErrorMessage,
 } from "@daodao/api";
 import useSWR from "swr";
-import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 
 // ── Types ──
 
@@ -97,9 +96,6 @@ export async function createComment(targetType: string, targetId: string, conten
   if (response.error) {
     throw new Error(extractApiErrorMessage(response.error, "留言失敗"));
   }
-
-  // 新手任務 E：即時標記「在靈感頁留言」完成（非靈感頁留言時 server 不回 meta，為 no-op）
-  applyOnboardingUpdateFromResponse(response.data);
 
   return {
     ...response.data,
