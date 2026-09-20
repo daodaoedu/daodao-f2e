@@ -25,18 +25,18 @@ on:
 env:
   HUSKY: 0
 
-# 顯式最小權限：這支用 `gh pr diff` 判斷是否碰到 mobile 檔案，只需要讀。
-# repo 的 Actions 預設權限要從 write 收成 read（design-review F-01），
-# 沒有顯式宣告的 workflow 會跟著降級，所以先在這裡宣告清楚。
-permissions:
-  contents: read
-  pull-requests: read
-
 jobs:
   # ===== 合併 typecheck + lint 為同一 job，避免重複 install =====
   check:
     name: TypeScript & Lint Check
     runs-on: ubuntu-latest
+    # 顯式最小權限：這個 job 用 `gh pr diff` 判斷是否碰到 mobile 檔案，只需要讀。
+    # repo 的 Actions 預設權限要從 write 收成 read（design-review F-01），先宣告清楚。
+    # 宣告在 job 而非 workflow 層：其他 job 不需要 PR 讀取權，範圍不該被放大
+    # （SonarCloud S7637：Move this read permission from workflow level to job level）。
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       relevant: ${{ steps.changes.outputs.relevant }}
 
@@ -97,6 +97,9 @@ jobs:
   eas-build-check:
     name: EAS Build Check
     runs-on: ubuntu-latest
+    # 只 checkout 與跑 EAS（用 EXPO_TOKEN），不需要 PR 讀取權
+    permissions:
+      contents: read
     needs: [check]
     if: ${{ needs.check.outputs.relevant != 'false' }}
     env:
