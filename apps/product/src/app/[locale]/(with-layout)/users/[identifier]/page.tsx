@@ -155,7 +155,7 @@ export default async function UserProfilePage({
   const personalSlogan = profileData?.personalSlogan ?? userData.personalSlogan ?? undefined;
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-[#B8E8FD]">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-[#B8E8FD]">
       <IslandHeader resultType={resultType} userId={userId} identifier={identifier} />
 
       <main className="max-w-[640px] mx-auto px-5 pb-[64px]">

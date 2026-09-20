@@ -5,7 +5,7 @@ import { SettingsList, SettingsUserCard } from "@/components/settings";
 
 export default function SettingsPage() {
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto">
       <PageHeader leftAction="back" leftLabel="" title="" />
 
       <BackgroundAnimation />
