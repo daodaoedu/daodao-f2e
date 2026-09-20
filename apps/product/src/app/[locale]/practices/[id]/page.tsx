@@ -406,7 +406,7 @@ export default function PracticeDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
@@ -427,7 +427,7 @@ export default function PracticeDetailPage() {
 
   if (error || !practice) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
@@ -457,7 +457,7 @@ export default function PracticeDetailPage() {
   }
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
         <button
           type="button"
