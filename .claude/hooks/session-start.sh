@@ -65,15 +65,30 @@ if [ -d "$PROJECTS_DIR" ]; then
     branch=$(cd "$repo_dir" && git branch --show-current 2>/dev/null || echo "?")
     is_dirty=$(cd "$repo_dir" && git status --porcelain 2>/dev/null | head -1)
 
-    if [ "$branch" != "dev" ] || [ -n "$is_dirty" ]; then
-      dirty_repos="$dirty_repos\n   ⚠️  $repo_name: branch=$branch"
+    # 預期分支＝該 repo 的 default branch，不是一律 dev：worker 與 infra 的預設是 main，
+    # 硬編成 dev 會讓它們每個 session 都被誤報，久了整段就被當背景噪音
+    # （2026-09-20：infra 長期顯示 ⚠️ branch=main，其實完全正常）。
+    expected=$(cd "$repo_dir" && git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||')
+    if [ -n "$expected" ] && [ "$branch" != "$expected" ]; then
+      # origin/HEAD 是本機快取，遠端改過預設分支就會過期（admin-ui 本機仍寫 main，實際是 dev）。
+      # 只在不一致時付一次網路成本重抓，確認真的異常才提醒。
+      (cd "$repo_dir" && git remote set-head origin -a >/dev/null 2>&1) || true
+      expected=$(cd "$repo_dir" && git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||')
+    fi
+    [ -n "$expected" ] || expected="dev"
+
+    if [ "$branch" != "$expected" ] || [ -n "$is_dirty" ]; then
+      # 注意：全形括號緊接 $branch 會被 bash 併進變數名，一定要加大括號
+      dirty_repos="$dirty_repos\n   ⚠️  ${repo_name}: branch=${branch}"
+      # 只有分支真的不對才提預期值；相符時多印一個「（預期 dev）」只是噪音
+      [ "$branch" != "$expected" ] && dirty_repos="${dirty_repos}（預期 ${expected}）"
       [ -n "$is_dirty" ] && dirty_repos="$dirty_repos (dirty)"
     fi
   done
 
   if [ -n "$dirty_repos" ]; then
     echo ""
-    echo "⚠️  projects/ 異常狀態（預期全在 dev）："
+    echo "⚠️  projects/ 異常狀態（預期＝各 repo 的 default branch）："
     echo -e "$dirty_repos"
   fi
 fi
