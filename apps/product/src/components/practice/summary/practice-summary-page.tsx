@@ -126,7 +126,7 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
   };
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <PageHeader leftAction="back" leftLabel="" title="" rightActionTo="/" />
 
       <BackgroundAnimation />
