@@ -8,9 +8,12 @@
 #   4. pr-deferred-unlinked     task.md「## Deferred items」每項都有子 issue（#n）或「待開卡：<原因>」
 #   5. pr-body-evidence-missing PR body 有「## 驗證證據」且含報告連結或不適用聲明
 #   6. pr-fe-pattern-invalid    UI repo 手寫 HTML pattern 用 v flag 編不過（#188 的根因）；UNMATCHED 只 warn 留痕
+#   7. pr-verify-unchecked      task.md「## 驗證」還有 `- [ ]` 未驗項目或「需要手動驗證」清單（#166：6 頁寫「需 OAuth 登入」就發 PR）
+#   8. pr-layout-probe-missing  UI repo 缺「### 版面探針」表、表裡有 ❌、或沒有「版面探針不適用：<原因>」（#233：settings 每頁多 132px）
 #
 # 依據：ADR-0001 gates over guidelines——「skill 文件寫必做」擋不住忘記，改成機器攔。
-# 教訓：#189（POC 比對漏做）、#171→#188（畫面驗過了、使用者建不了場次；deferred 項目只留在 comment）。
+# 教訓：#189（POC 比對漏做）、#171→#188（畫面驗過了、使用者建不了場次；deferred 項目只留在 comment）、
+#       #166→#233（「需登入才能驗」的頁面沒驗就 merge，evidence 截圖是登入牆；settings 橫向溢出 132px 六個月沒人量到）。
 # 逃生口：DEV_TASK_SKIP_GATE="<原因>"（全部閘門）或 DEV_TASK_SKIP_POC_GATE="<原因>"（相容舊名），都寫進 gate ledger 留痕。
 set -euo pipefail
 
@@ -255,6 +258,63 @@ EOF
       log_gate_event "pr-fe-rule-unmatched" "$task_dir/$repo_dir" "warn" "dev-task"
     fi
   fi
+  fi
+fi
+
+# --- 閘門 7：「## 驗證」不能留未驗項目（#166：task.md 列了 6 頁「需要手動驗證（需 Google OAuth 登入）」照樣發 PR）---
+verify_body=$(section_body "$task_md" '^## 驗證' '^## ')
+unchecked=$(printf '%s\n' "$verify_body" | grep -E '^[[:space:]]*[-*] \[ \]' | grep -v '豁免[：:]' || true)
+manual_rows=""
+if printf '%s\n' "$verify_body" | grep -qE '需要手動驗證|待手動驗證'; then
+  # 標題底下到下一個標題前的所有實質列都算：表格資料列（排除分隔列與表頭）或 bullet 清單列
+  manual_rows=$(printf '%s\n' "$verify_body" | awk '
+    /需要手動驗證|待手動驗證/ { f = 1; next }
+    f && /^[[:space:]]*#/ { exit }
+    f && /^[[:space:]]*\|/ && !/^[[:space:]]*\|[[:space:]|:-]*$/ && !/^[[:space:]]*\|[[:space:]]*(項目|頁面|路徑|route|Route)[[:space:]]*\|/ { print; next }
+    f && /^[[:space:]]*[-*] / { print }
+  ' || true)
+fi
+if [ -n "$unchecked" ] || [ -n "$manual_rows" ]; then
+  gate_fail "pr-verify-unchecked" "$task_md" "$(cat <<EOF
+❌ task.md「## 驗證」還有沒驗完的項目就要發 PR：
+$(printf '%s\n' "$unchecked" "$manual_rows" | sed '/^$/d; s/^/   /')
+   每一項不是驗掉（打勾 + 截圖），就是由使用者明確豁免：在該行尾加「（豁免：<使用者說的原因>）」。
+   「需要登入才能看」不是豁免理由——用 dev-login 端點（browser-verify.md §3a），登入牆截圖不算證據。
+EOF
+)"
+fi
+
+# --- 閘門 8：UI repo 必須跑過版面探針（#233：settings 十五頁 w-screen 疊在 md:pl-[132px] 上，每頁多 132px，六個月沒人量到）---
+if [ "$is_ui_repo" = 1 ]; then
+  if grep -qE '^版面探針不適用[：:]' "$task_md"; then
+    probe_na=$(grep -m1 -E '^版面探針不適用[：:]' "$task_md" | sed -E 's/^版面探針不適用[：:][[:space:]]*//')
+    if [ -z "$probe_na" ] || echo "$probe_na" | grep -qE '^<.*>$'; then
+      gate_fail "pr-layout-probe-missing" "$task_md" \
+        "❌ task.md 寫了「版面探針不適用」但沒有具體原因。UI repo 的 diff 沒碰任何頁面／版面時才適用，要寫清楚（例如「只改 i18n 字串，無 tsx／css 變更」）"
+    fi
+    log_gate_event "pr-layout-probe-na" "$task_md" "pass" "dev-task"
+  else
+    probe_rows=$(section_body "$task_md" '^### 版面探針' '^(#|##|###) ' | grep -E '^\|' | grep -vE '^\|[[:space:]-]*\|' | grep -v '^| 寬度' || true)
+    probe_problem=""
+    if ! grep -q '^### 版面探針' "$task_md"; then
+      probe_problem="task.md 沒有「### 版面探針」區塊"
+    elif [ -z "$probe_rows" ]; then
+      probe_problem="「### 版面探針」表是空的"
+    elif printf '%s\n' "$probe_rows" | grep -q '❌'; then
+      probe_problem="探針表還有 ❌：
+$(printf '%s\n' "$probe_rows" | grep '❌' | cut -c1-160 | sed 's/^/   /')"
+    fi
+    if [ -n "$probe_problem" ]; then
+      gate_fail "pr-layout-probe-missing" "$task_md" "$(cat <<EOF
+❌ 版面探針沒過：$probe_problem
+   在 ${task_dir}/${repo_dir}/apps/product（f2e）或 ${task_dir}/${repo_dir}（admin-ui）底下跑：
+     node <daodao-root>/.claude/skills/dev-task/references/layout-probe.mjs --base http://localhost:<port> \\
+       --routes <任務碰到的每條 route> --cookie "auth_token=<dev-login token>" --out $task_dir/evidence/verify-layout-probe
+   把產出的 verify-layout-probe.md 貼進 task.md「## 驗證」底下；❌ 先修再重跑。
+   diff 沒碰任何頁面／版面時，在「## 驗證」底下寫一行：版面探針不適用：<具體原因>
+EOF
+)"
+    fi
   fi
 fi
 
