@@ -63,7 +63,8 @@ function findMonorepoDb(start) {
   let dir = path.resolve(start);
   for (let i = 0; i < 8; i++) {
     const candidate = path.join(dir, ".github", "review-knowledge", "false-positives.jsonl");
-    if (fs.existsSync(candidate) && fs.existsSync(path.join(dir, "openspec"))) return candidate;
+    // 子 repo 會同步一份唯讀副本，用 .gitmodules 辨識 monorepo root（openspec/ 已退役，不再當標記）
+    if (fs.existsSync(candidate) && fs.existsSync(path.join(dir, ".gitmodules"))) return candidate;
     const parent = path.dirname(dir);
     if (parent === dir) break;
     dir = parent;
