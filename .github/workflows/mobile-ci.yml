@@ -25,6 +25,13 @@ on:
 env:
   HUSKY: 0
 
+# 顯式最小權限：這支用 `gh pr diff` 判斷是否碰到 mobile 檔案，只需要讀。
+# repo 的 Actions 預設權限要從 write 收成 read（design-review F-01），
+# 沒有顯式宣告的 workflow 會跟著降級，所以先在這裡宣告清楚。
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   # ===== 合併 typecheck + lint 為同一 job，避免重複 install =====
   check:
