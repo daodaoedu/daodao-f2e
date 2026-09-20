@@ -10,12 +10,17 @@ import { describe, expect, it } from "vitest";
  *
  * 真的需要 100vw 的（例如全螢幕遮罩）登記在 ALLOWED，並寫明**該檔預期的出現次數**——
  * 只登記檔名會讓同一個檔案裡的頁面 wrapper 偷偷改回 `w-screen` 也不被發現。
+ *
+ * 範圍：只掃 `apps/product/src`。`apps/mobile`（React Native，無 Tailwind w-screen）不適用；
+ * `apps/website` 與 `packages/ui` 目前乾淨但未納入本 guard，要一起防守時各自加一份。
  */
 const ALLOWED: Array<{ file: string; count: number; reason: string }> = [];
 // 目前 0 筆：22 處頁面 wrapper 已全部改為 w-full（daodao#239）
 
 const SRC = path.resolve(__dirname, "..");
-const W_SCREEN = /\bw-screen\b/g;
+const SELF = path.relative(SRC, __filename);
+// 前面不能是 `-` 或字元，否則 `max-w-screen`（合法的 Tailwind）會被誤判
+const W_SCREEN = /(?<![-\w])w-screen\b/g;
 
 const walk = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {
@@ -28,7 +33,7 @@ const walk = (dir: string): string[] =>
 const scan = (): Map<string, number> => {
   const counts = new Map<string, number>();
   for (const file of walk(SRC)) {
-    if (file.includes(`${path.sep}__tests__${path.sep}`)) continue;
+    if (path.relative(SRC, file) === SELF) continue; // 只跳過 guard 自己，其他測試檔一樣要掃
     const hits = readFileSync(file, "utf8").match(W_SCREEN)?.length ?? 0;
     if (hits > 0) counts.set(path.relative(SRC, file), hits);
   }
