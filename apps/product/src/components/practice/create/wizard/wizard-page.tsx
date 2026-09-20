@@ -20,10 +20,6 @@ import { format } from "date-fns";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type FieldErrors, type Path, useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import {
-  applyOnboardingUpdateFromResponse,
-  refreshOnboardingStatus,
-} from "@/components/task-guide/onboarding-progress-context";
 import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
 import { CompletionDialog } from "./completion-dialog";
 import { getBaseName, getEffectiveSegments } from "./derive";
@@ -223,9 +219,6 @@ export const PracticeWizard = ({
       }
 
       clearDraft();
-      if (isPersonal && !applyOnboardingUpdateFromResponse(response.data)) {
-        refreshOnboardingStatus();
-      }
 
       showCompletion(values, response.data);
     } catch (error) {

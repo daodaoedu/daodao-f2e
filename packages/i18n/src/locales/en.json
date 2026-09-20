@@ -4764,26 +4764,6 @@
       "availabilityFailed": "Unable to check availability. Please try again.",
       "submitFailed": "Submission failed, please try again later"
     },
-    "taskGuide": {
-      "title": "Beginner Tasks",
-      "celebration": {
-        "title": "All done!"
-      },
-      "progress": "{completed}/{total} done",
-      "ariaOpen": "Expand onboarding task list",
-      "ariaCollapse": "Collapse",
-      "ariaClose": "Close",
-      "tasks": {
-        "A": "Complete the learning style quiz",
-        "B": "Complete public info, account, and preferences",
-        "C": "Create your first practice",
-        "D": "Complete your first check-in",
-        "E": "Leave a comment on inspirations"
-      },
-      "taskDescriptions": {
-        "B": "Complete all three sections: public info, account settings, and preferences"
-      }
-    },
     "validation": {
       "birthDateRequired": "Please select your birthday",
       "birthDateAge": "Dao Dao is currently available only to users aged 16 or older",

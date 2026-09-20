@@ -12,10 +12,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
-import {
-  applyOnboardingUpdateFromResponse,
-  refreshOnboardingStatus,
-} from "@/components/task-guide/onboarding-progress-context";
 import { PreferenceSection } from "./preference-section";
 import { createPreferencesFormSchema, type PreferencesFormValues } from "./schema";
 
@@ -200,9 +196,6 @@ export const PreferencesForm = () => {
       toast.success(t("save_success"));
       form.reset(form.getValues()); // 重置 dirty 狀態
       mutate("/api/v1/users/settings-summary");
-      if (!applyOnboardingUpdateFromResponse(response.data)) {
-        refreshOnboardingStatus();
-      }
 
       // 延遲後返回設定首頁，讓使用者看到成功訊息
       setTimeout(() => {

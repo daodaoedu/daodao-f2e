@@ -2,7 +2,6 @@ import { createPracticeCheckInWithFormData, extractApiErrorMessage, useMutate } 
 import { Alert } from "react-native";
 import { mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
-import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import { useMobileTranslation } from "@/i18n";
 import { createReactNativeFormDataFile } from "@/utils/form-data-file";
 import type { ICheckInFormData } from "../../types";
@@ -47,9 +46,6 @@ export const useCheckInSubmit = ({
         description: data.description ?? "",
         media,
       });
-
-      // 新手任務 D：即時標記「完成第一次打卡」完成
-      applyOnboardingUpdateFromResponse(response);
 
       // 刷新打卡列表的 cache
       await mutate([
