@@ -66,62 +66,16 @@
       "Bash(git clean -f:*)"
     ]
   },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/pre-write-guard.sh"
-          },
-          {
-            "type": "command",
-            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/test-integrity-guard.py\""
-          }
-        ]
+  "enabledPlugins": {
+    "daodao@daodao": true
+  },
+  "extraKnownMarketplaces": {
+    "daodao": {
+      "source": {
+        "source": "url",
+        "url": "https://github.com/daodaoedu/daodao/releases/latest/download/marketplace.json"
       },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/pre-pr-gate.sh"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/post-write-format.sh"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/session-start.sh"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/stop-quality-gate.sh",
-            "timeout": 10000
-          }
-        ]
-      }
-    ]
+      "autoUpdate": true
+    }
   }
 }

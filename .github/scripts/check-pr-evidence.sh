@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PR body 驗證證據閘門（CI 版；本機 hook 版是 .claude/hooks/pre-pr-gate.sh 閘門 5）
+# PR body 驗證證據閘門（CI 版；本機 hook 版是 plugin/hooks/pre-pr-gate.sh 閘門 5）
 #
 # 讀 PR body 的「## 驗證證據」區塊，要求：
 #   1. 區塊存在
@@ -76,7 +76,7 @@ level="warning"; [ "$MODE" = "block" ] && level="error"
 for p in "${problems[@]}"; do
   echo "::${level}::pr-evidence-gate: $p"
 done
-echo "格式見 daodaoedu/daodao .claude/skills/dev-task/references/journey-matrix.md；例外請加 label evidence-exempt 並在 PR 說明原因。"
+echo "格式見 daodaoedu/daodao plugin/skills/dev-task/references/journey-matrix.md；例外請加 label evidence-exempt 並在 PR 說明原因。"
 if [ "$MODE" = "block" ]; then
   exit 1
 fi
