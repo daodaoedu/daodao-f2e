@@ -231,7 +231,7 @@ export default function CheckInDetailPage() {
   // Loading 狀態
   if (isLoadingPractice || isLoadingCheckIns || isLoadingCurrentUser) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
         <PageHeader
           title={t("checkin_title")}
@@ -249,7 +249,7 @@ export default function CheckInDetailPage() {
   // Error 或找不到 check-in 的狀態
   if (!checkInData || !practiceData?.data) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
         <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
         <PageHeader
           title={t("checkin_title")}
@@ -292,7 +292,7 @@ export default function CheckInDetailPage() {
   };
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
       <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
 
       {/* 日期選擇器（mobile 版本整合標題列） */}
