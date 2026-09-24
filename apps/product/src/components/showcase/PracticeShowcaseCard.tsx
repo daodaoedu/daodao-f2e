@@ -123,7 +123,7 @@ export function PracticeShowcaseCard({
     // biome-ignore lint/a11y/noStaticElementInteractions: card click for navigation
     <div
       className="bg-white rounded-xl p-5 cursor-pointer shadow-sm hover:shadow-md hover:ring-2 hover:ring-logo-cyan transition-all duration-200"
-      onClick={() => router.push(`/practices/${id}`)}
+      onClick={() => router.push(`/practices/${id}?from=inspire`)}
     >
       {/* Header row */}
       <div className="flex items-center gap-2 mb-2">
@@ -215,7 +215,7 @@ export function PracticeShowcaseCard({
         />
 
         <Link
-          href={`/practices/${id}?tab=comments`}
+          href={`/practices/${id}?tab=comments&from=inspire`}
           className="flex items-center gap-1.5 text-[#9FB5B8] hover:text-text-dark transition-colors"
         >
           <DialogOutlineSvg className="size-6" />
@@ -259,7 +259,6 @@ export function PracticeShowcaseCard({
                   {commentUserIslandHref ? (
                     <Link
                       href={commentUserIslandHref}
-                      // 預先載入使用者小島頁，降低點擊頭像後的等待體感
                       prefetch
                       aria-label={t("showcase_user_island_aria", { userName: commentUserName })}
                       className="shrink-0"
@@ -273,7 +272,6 @@ export function PracticeShowcaseCard({
                     {commentUserIslandHref ? (
                       <Link
                         href={commentUserIslandHref}
-                        // 預先載入使用者小島頁，降低點擊名稱後的等待體感
                         prefetch
                         className="text-xs font-semibold text-[#295E5C] mr-1.5 hover:underline"
                       >
