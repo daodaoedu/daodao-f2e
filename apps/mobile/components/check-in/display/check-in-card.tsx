@@ -317,7 +317,7 @@ export const CheckInCard = ({
             )}
           </View>
         ) : (
-          <YStack paddingTop="$4" paddingHorizontal="$5" maxHeight={460}>
+          <YStack paddingTop="$4" paddingHorizontal="$5">
             {contentBody}
           </YStack>
         )}
