@@ -26,7 +26,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # 受保護分支要改走 PR，GITHUB_TOKEN 開的 PR 不會觸發 pull_request workflow
+          # （required checks 永遠不出現），所以有 BOT_PAT 時優先用它。
+          token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
@@ -46,19 +48,19 @@ jobs:
       - name: Check for changes
         id: check
         run: |
-          if git diff --quiet apps/mobile/generated/; then
-            echo "has_changes=false" >> $GITHUB_OUTPUT
+          # 用 status --porcelain：git diff 看不到新增的未追蹤生成物
+          if [ -z "$(git status --porcelain -- apps/mobile/generated/)" ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
           else
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Commit and push changes
+      - name: Deliver changes（受保護分支開 PR，其餘直接 push）
         if: steps.check.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add apps/mobile/generated/
-          git commit -m "chore(mobile): auto-generate design tokens
-
-          Co-Authored-By: github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
-          git push
+          bash .github/scripts/commit-changes.sh \
+            "chore(mobile): auto-generate design tokens" \
+            "mobile-tokens" \
+            apps/mobile/generated/

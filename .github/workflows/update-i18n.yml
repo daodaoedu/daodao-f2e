@@ -3,6 +3,10 @@ name: Update i18n
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   update_i18n:
     name: Update i18n Translations
@@ -11,6 +15,9 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
+        with:
+          # 見 generate-mobile-tokens.yml：PR 要能觸發 CI 才有 required checks
+          token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
@@ -29,13 +36,16 @@ jobs:
       - name: Check for i18n changes
         id: check_changes
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add shared/config/locales
-          git diff --cached --quiet || echo "changes=true" >> $GITHUB_OUTPUT
+          # status --porcelain 才看得到新增的 locale 檔
+          [ -z "$(git status --porcelain -- shared/config/locales)" ] \
+            || echo "changes=true" >> "$GITHUB_OUTPUT"
 
-      - name: Commit i18n Changes
+      - name: Deliver i18n changes（受保護分支開 PR，其餘直接 push）
         if: success() && steps.check_changes.outputs.changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
         run: |
-          git commit -m "i18n: update translations"
-          git push
+          bash .github/scripts/commit-changes.sh \
+            "i18n: update translations" \
+            "i18n" \
+            shared/config/locales

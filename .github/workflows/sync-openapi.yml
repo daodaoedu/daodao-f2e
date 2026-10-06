@@ -2,6 +2,7 @@ name: Sync OpenAPI
 
 permissions:
   contents: write
+  pull-requests: write
 
 on:
   workflow_dispatch:
@@ -127,13 +128,18 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add packages/api/src/types.ts packages/api/src/ai-types.ts
-          git diff --cached --quiet || echo "changes=true" >> $GITHUB_OUTPUT
+          # status --porcelain 才看得到首次產生的 ai-types.ts
+          [ -z "$(git status --porcelain -- packages/api/src/types.ts packages/api/src/ai-types.ts)" ] \
+            || echo "changes=true" >> "$GITHUB_OUTPUT"
 
-      - name: Commit and Push
+      - name: Deliver changes（受保護分支開 PR，其餘直接 push）
         if: steps.check_changes.outputs.changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_OPENAPI_PAT }}
+          # schedule／repository_dispatch 的 GITHUB_REF_NAME 是預設分支（dev），符合實際同步目標
+          TARGET_REF: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || 'dev' }}
         run: |
-          git commit -m "chore: sync OpenAPI types from backend"
-          git push
+          bash .github/scripts/commit-changes.sh \
+            "chore: sync OpenAPI types from backend" \
+            "sync-openapi" \
+            packages/api/src/types.ts packages/api/src/ai-types.ts
