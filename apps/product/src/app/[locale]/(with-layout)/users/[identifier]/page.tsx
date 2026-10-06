@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
+import { PageShell } from "@/components/layout";
 import { IslandHeader, UserInfoCard, UserProfileTabs } from "@/components/user";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -155,33 +156,34 @@ export default async function UserProfilePage({
   const personalSlogan = profileData?.personalSlogan ?? userData.personalSlogan ?? undefined;
 
   return (
-    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-[#B8E8FD]">
-      <IslandHeader resultType={resultType} userId={userId} identifier={identifier} />
+    <PageShell
+      header={<IslandHeader resultType={resultType} userId={userId} identifier={identifier} />}
+      background={false}
+      className="bg-[#B8E8FD]"
+      mainClassName="max-w-[640px] pt-0 md:pt-0"
+    >
+      {/* 用戶個人資訊卡片 */}
+      <UserInfoCard
+        name={userData.name || t("unnamed_user")}
+        customId={userData.customId || undefined}
+        location={
+          (locale === "en" ? userData.locationNameEn : userData.locationNameZh) || undefined
+        }
+        selfIntroduction={userData.selfIntroduction || undefined}
+        photoURL={userData.photoURL || undefined}
+        socialLinks={contactList || undefined}
+        personalSlogan={personalSlogan}
+        connectionsCount={connectionsCount}
+        followersCount={followersCount}
+        hideConnectionsCount={hideConnectionsCount}
+        recentPracticeCount={recentPracticeCount}
+        commonCirclesCount={commonCirclesCount}
+        isOwnProfile={isOwnProfile}
+        isAuthenticated={isAuthenticated}
+        targetUserId={userId}
+      />
 
-      <main className="max-w-[640px] mx-auto px-5 pb-[64px]">
-        {/* 用戶個人資訊卡片 */}
-        <UserInfoCard
-          name={userData.name || t("unnamed_user")}
-          customId={userData.customId || undefined}
-          location={
-            (locale === "en" ? userData.locationNameEn : userData.locationNameZh) || undefined
-          }
-          selfIntroduction={userData.selfIntroduction || undefined}
-          photoURL={userData.photoURL || undefined}
-          socialLinks={contactList || undefined}
-          personalSlogan={personalSlogan}
-          connectionsCount={connectionsCount}
-          followersCount={followersCount}
-          hideConnectionsCount={hideConnectionsCount}
-          recentPracticeCount={recentPracticeCount}
-          commonCirclesCount={commonCirclesCount}
-          isOwnProfile={isOwnProfile}
-          isAuthenticated={isAuthenticated}
-          targetUserId={userId}
-        />
-
-        <UserProfileTabs targetUserId={userId} isOwnProfile={isOwnProfile} />
-      </main>
-    </div>
+      <UserProfileTabs targetUserId={userId} isOwnProfile={isOwnProfile} />
+    </PageShell>
   );
 }
