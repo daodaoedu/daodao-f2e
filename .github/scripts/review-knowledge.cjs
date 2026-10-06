@@ -153,6 +153,27 @@ function promptBlock(db) {
   return lines.join("\n");
 }
 
+// ---- id ----
+// 編號取「現有最大值 + 1」。早期用 db.length + 1，兩個 session 各自從同一份檔案
+// append 就會算出同一個編號（實際撞過 FP-0062~0064），而且一旦有斷號就必然重複。
+function nextId(db) {
+  const max = db.reduce((acc, r) => {
+    const n = Number.parseInt(String(r.id || "").replace(/^FP-/, ""), 10);
+    return Number.isFinite(n) && n > acc ? n : acc;
+  }, 0);
+  return `FP-${String(max + 1).padStart(4, "0")}`;
+}
+
+function duplicateIds(db) {
+  const seen = new Set();
+  const dup = new Set();
+  for (const r of db) {
+    if (seen.has(r.id)) dup.add(r.id);
+    seen.add(r.id);
+  }
+  return [...dup].sort();
+}
+
 // ---- record ----
 function record(opt) {
   const required = ["pattern", "source", "engine", "repo", "pr", "finding", "why"];
@@ -162,7 +183,7 @@ function record(opt) {
   if (opt.expected && !["keep", "drop", "downgrade"].includes(opt.expected)) throw new Error("--expected 必須是 keep/drop/downgrade");
   const file = resolveDb(opt.db, { forWrite: true });
   const db = loadDb(file);
-  const id = `FP-${String(db.length + 1).padStart(4, "0")}`;
+  const id = nextId(db);
   const entry = {
     id, date: new Date().toISOString().slice(0, 10),
     source: opt.source, engine: opt.engine, repo: opt.repo, pr: Number(opt.pr),
@@ -178,6 +199,11 @@ function record(opt) {
 
 // ---- test ----
 function runTests(db) {
+  const dup = duplicateIds(db);
+  if (dup.length) {
+    console.error(`❌ 重複的 ID：${dup.join("、")}（每筆紀錄的 id 必須唯一）`);
+    process.exit(1);
+  }
   let n = 0;
   for (const r of db) {
     if (!r.sample || !r.expected) continue;
@@ -219,4 +245,4 @@ function main() {
 if (require.main === module) {
   try { main(); } catch (e) { console.error(`review-knowledge: ${e.message}`); process.exit(1); }
 }
-module.exports = { filterBody, promptBlock, PATTERNS };
+module.exports = { filterBody, promptBlock, nextId, duplicateIds, PATTERNS };
