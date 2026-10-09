@@ -59,6 +59,30 @@ export const getChallengeCardAction = (
 };
 
 /**
+ * 打卡／觀看總結膠囊是否要以「不可點」樣式呈現：未開始（Disable），
+ * 或不知道實踐 id 而沒有連結時——避免看起來可點、點了卻沒反應（daodao#183）。
+ */
+export const isChallengeActionMuted = (action: ChallengeCardAction): boolean =>
+  action.kind === "checkin-disabled" ||
+  ((action.kind === "checkin" || action.kind === "summary") && action.href === null);
+
+/**
+ * 卡片用的「挑戰 id → 自動複製實踐 id」對照：以 `/me/challenges` 為主，
+ * 剛加入（join API 已回傳 practiceId、但列表尚未 revalidate）的挑戰以回傳值補上，
+ * 讓加入後的卡片立即可點。
+ */
+export const buildPracticeIdMap = (
+  mine: ReadonlyArray<{ id: number; practiceId: string | null }>,
+  justJoined: Readonly<Record<number, string | null>>
+): Map<number, string | null> => {
+  const map = new Map<number, string | null>(mine.map((item) => [item.id, item.practiceId]));
+  for (const [id, practiceId] of Object.entries(justJoined)) {
+    if (practiceId && !map.get(Number(id))) map.set(Number(id), practiceId);
+  }
+  return map;
+};
+
+/**
  * 卡片狀態徽章文案 key：已加入的挑戰結束後顯示「已完成」（與篩選選單一致，FR-CC-11），
  * 未加入的已結束挑戰（探索頁「已結束」區）維持「已結束」。
  */

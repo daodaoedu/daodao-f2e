@@ -26,8 +26,11 @@ import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 interface JoinChallengeDialogProps {
   challenge: ChallengeSummaryType | null;
   onOpenChange: (open: boolean) => void;
-  /** 加入成功後讓列表重新整理（isJoined / participantCount） */
-  onJoined?: () => void;
+  /**
+   * 加入成功後讓列表重新整理（isJoined / participantCount）；
+   * 附 join API 回傳的自動複製實踐 id，讓卡片不必等列表 revalidate 就能連到實踐頁
+   */
+  onJoined?: (result: { challengeId: number; practiceId: string | null }) => void;
 }
 
 /**
@@ -63,8 +66,9 @@ export const JoinChallengeDialog = ({
       );
       return;
     }
-    setJoinedPracticeId(response.data?.data.practiceId ?? null);
-    onJoined?.();
+    const practiceId = response.data?.data.practiceId ?? null;
+    setJoinedPracticeId(practiceId);
+    onJoined?.({ challengeId: challenge.id, practiceId });
   };
 
   const handleOpenChange = (open: boolean) => {

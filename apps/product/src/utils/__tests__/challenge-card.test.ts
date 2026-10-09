@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { getChallengeCardAction, getChallengeStatusKey } from "../challenge-card";
+import {
+  buildPracticeIdMap,
+  getChallengeCardAction,
+  getChallengeStatusKey,
+  isChallengeActionMuted,
+} from "../challenge-card";
 
 const PRACTICE_ID = "7f1c2a4e-0000-4000-8000-000000000001";
 
@@ -105,5 +110,90 @@ describe("getChallengeStatusKey", () => {
 
   it("not joined + ended → keeps 已結束 (status_ended)", () => {
     expect(getChallengeStatusKey("ended", false)).toBe("status_ended");
+  });
+});
+
+describe("isChallengeActionMuted", () => {
+  it("linked check-in / summary are not muted", () => {
+    expect(
+      isChallengeActionMuted(getChallengeCardAction({ ...base, runStatus: "ongoing" }, PRACTICE_ID))
+    ).toBe(false);
+    expect(
+      isChallengeActionMuted(getChallengeCardAction({ ...base, runStatus: "ended" }, PRACTICE_ID))
+    ).toBe(false);
+  });
+
+  it("upcoming (disabled) check-in is muted", () => {
+    expect(
+      isChallengeActionMuted(
+        getChallengeCardAction({ ...base, runStatus: "upcoming" }, PRACTICE_ID)
+      )
+    ).toBe(true);
+  });
+
+  // review：沒有 href 的打卡／觀看總結膠囊不能長得像可點
+  it("check-in / summary without href are muted", () => {
+    expect(
+      isChallengeActionMuted(getChallengeCardAction({ ...base, runStatus: "ongoing" }, null))
+    ).toBe(true);
+    expect(
+      isChallengeActionMuted(getChallengeCardAction({ ...base, runStatus: "ended" }, undefined))
+    ).toBe(true);
+  });
+
+  it("join / none actions are never muted by this helper", () => {
+    expect(
+      isChallengeActionMuted(
+        getChallengeCardAction(
+          { isJoined: false, canJoin: true, unavailableReason: null, runStatus: "ongoing" },
+          null
+        )
+      )
+    ).toBe(false);
+    expect(
+      isChallengeActionMuted(
+        getChallengeCardAction(
+          { isJoined: false, canJoin: false, unavailableReason: "ended", runStatus: "ended" },
+          null
+        )
+      )
+    ).toBe(false);
+  });
+});
+
+describe("buildPracticeIdMap", () => {
+  it("uses /me/challenges practice ids", () => {
+    const map = buildPracticeIdMap(
+      [
+        { id: 1, practiceId: "p1" },
+        { id: 2, practiceId: null },
+      ],
+      {}
+    );
+    expect(map.get(1)).toBe("p1");
+    expect(map.get(2)).toBeNull();
+    expect(map.get(3)).toBeUndefined();
+  });
+
+  // review regression：剛加入、/me/challenges 尚未 revalidate 時，用 join API 回傳的 practiceId 讓卡片立即可點
+  it("fills a just-joined challenge from the join response before the list catches up", () => {
+    const map = buildPracticeIdMap([], { 7: "joined-practice" });
+    expect(map.get(7)).toBe("joined-practice");
+  });
+
+  it("keeps the list value once it has one, and ignores a null join result", () => {
+    const map = buildPracticeIdMap(
+      [
+        { id: 7, practiceId: "from-list" },
+        { id: 8, practiceId: null },
+      ],
+      {
+        7: "joined-practice",
+        9: null,
+      }
+    );
+    expect(map.get(7)).toBe("from-list");
+    expect(map.get(8)).toBeNull();
+    expect(map.has(9)).toBe(false);
   });
 });

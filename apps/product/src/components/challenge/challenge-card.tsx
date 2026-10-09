@@ -13,7 +13,7 @@ import {
   getChallengeThemeSvg,
   InspirationDeckIcon,
 } from "@/components/challenge/challenge-visual";
-import { getChallengeCardAction } from "@/utils/challenge-card";
+import { getChallengeCardAction, isChallengeActionMuted } from "@/utils/challenge-card";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 
 interface ChallengeCardProps {
@@ -56,6 +56,8 @@ export const ChallengeCard = ({
   const action = getChallengeCardAction(challenge, practiceId);
   const actionLabel = action.kind === "none" ? null : t(action.labelKey);
   const isLinked = action.href !== null;
+  // 未開始、或不知道實踐 id 而沒有連結：膠囊用不可點樣式，避免「看起來可點、點了沒反應」
+  const isMuted = isChallengeActionMuted(action);
 
   return (
     <div className="group/card relative w-full h-[239px] rounded-[12px] overflow-hidden text-left">
@@ -174,20 +176,18 @@ export const ChallengeCard = ({
             )}
             <span
               data-testid="challenge-card-action"
-              aria-disabled={action.kind === "checkin-disabled" ? true : undefined}
+              aria-disabled={isMuted ? true : undefined}
               className={`inline-flex items-center gap-1.5 rounded-full bg-basic-white px-3 py-1 text-[13px] ${
-                action.kind === "checkin-disabled" ? "text-text-dark/45" : "text-text-dark"
+                isMuted ? "text-text-dark/45" : "text-text-dark"
               } ${
                 // POC：可打卡的膠囊陰影 40%，停用／總結 20%
-                action.kind === "checkin"
+                action.kind === "checkin" && !isMuted
                   ? "shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_40%,transparent)]"
                   : "shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_20%,transparent)]"
               }`}
             >
               <CalendarCheck
-                className={`size-4 ${
-                  action.kind === "checkin-disabled" ? "text-logo-cyan/50" : "text-logo-cyan"
-                }`}
+                className={`size-4 ${isMuted ? "text-logo-cyan/50" : "text-logo-cyan"}`}
               />
               {actionLabel}
             </span>
