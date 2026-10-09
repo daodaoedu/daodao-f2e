@@ -3,15 +3,17 @@
 import type { ChallengeSummaryType } from "@daodao/api";
 import { ArrowRightOutlineSvg, DefaultAvatarSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
+import { Link } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Calendar, CalendarCheck, Check, Timer, Users } from "lucide-react";
 import {
   ChallengeFlagIcon,
   ChallengeProgressBar,
   ChallengeStatusBadge,
-  InspirationDeckIcon,
   getChallengeThemeSvg,
+  InspirationDeckIcon,
 } from "@/components/challenge/challenge-visual";
+import { getChallengeCardAction } from "@/utils/challenge-card";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 
 interface ChallengeCardProps {
@@ -20,6 +22,11 @@ interface ChallengeCardProps {
   onJoinClick: (challenge: ChallengeSummaryType) => void;
   /** 點擊抽卡 icon（有指派卡組且已加入時顯示） */
   onDrawClick?: (challenge: ChallengeSummaryType) => void;
+  /**
+   * 加入時自動複製的實踐 external_id。已加入且進行中／已結束時，整張卡連到該實踐頁
+   * （POC：點卡片進實踐頁打卡）；未知時卡片不可點。
+   */
+  practiceId?: string | null;
 }
 
 /**
@@ -28,7 +35,12 @@ interface ChallengeCardProps {
  * 樣式對齊 dashboard 的 InProgressTaskCard（POC：探索共同挑戰-standalone）：
  * 主題色背景 + 狀態 Badge + 挑戰旗標 + 「xx 座島」人數文案隨狀態變化。
  */
-export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: ChallengeCardProps) => {
+export const ChallengeCard = ({
+  challenge,
+  onJoinClick,
+  onDrawClick,
+  practiceId,
+}: ChallengeCardProps) => {
   const t = useTranslations("challenge");
   const Theme = getChallengeThemeSvg(challenge.id);
   const formattedStartDate = formatCardDate(challenge.startDate);
@@ -41,32 +53,52 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
         ? t("participants_ongoing", { count: challenge.participantCount })
         : t("participants_upcoming", { count: challenge.participantCount });
 
-  const showJoinButton = !challenge.isJoined && challenge.runStatus !== "ended";
-  const joinDisabled = !challenge.canJoin;
-  const joinLabel = challenge.canJoin
-    ? t("cta_join")
-    : challenge.unavailableReason === "full"
-      ? t("cta_full")
-      : t("cta_closed");
+  const action = getChallengeCardAction(challenge, practiceId);
+  const actionLabel = action.kind === "none" ? null : t(action.labelKey);
+  const isLinked = action.href !== null;
 
   return (
-    <div className="relative w-full h-[239px] rounded-[12px] overflow-hidden text-left">
+    <div className="group/card relative w-full h-[239px] rounded-[12px] overflow-hidden text-left">
       <Theme
         className="absolute inset-0 w-full h-full rounded-[12px]"
         preserveAspectRatio="xMidYMid slice"
       />
 
-      <div className="absolute inset-0 p-5 pb-6 z-10 flex flex-col">
+      {/* 整張卡連到實踐頁（stretched link）：內容層 pointer-events-none 讓點擊落到連結，
+          抽卡鈕另外 pointer-events-auto，避免 <button> 巢狀在 <a> 裡 */}
+      {action.href !== null && actionLabel !== null && (
+        <Link
+          href={action.href}
+          aria-label={t("card_link_label", { action: actionLabel, title: challenge.displayName })}
+          className="absolute inset-0 z-[5] rounded-[12px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-logo-cyan"
+        />
+      )}
+
+      <div
+        className={`absolute inset-0 p-5 pb-6 z-10 flex flex-col ${isLinked ? "pointer-events-none" : ""}`}
+      >
         <div className="flex-1 min-h-0 flex flex-col gap-1.5">
           <div className="flex items-center gap-1.5">
-            <ChallengeStatusBadge runStatus={challenge.runStatus} />
+            <ChallengeStatusBadge runStatus={challenge.runStatus} isJoined={challenge.isJoined} />
             <ChallengeFlagIcon />
           </div>
 
-          <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">{challenge.displayName}</h3>
-          {challenge.description && (
-            <p className="line-clamp-2 text-xs text-text-dark">{challenge.description}</p>
-          )}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 flex-col gap-2">
+              <h3 className="line-clamp-1 text-xl font-medium text-bg-dark">
+                {challenge.displayName}
+              </h3>
+              {challenge.description && (
+                <p className="line-clamp-2 text-xs text-text-dark">{challenge.description}</p>
+              )}
+            </div>
+            {/* POC：可點的卡片標題右側有箭頭（點卡片進實踐頁） */}
+            {isLinked && (
+              <span aria-hidden className="flex w-10 shrink-0 items-center justify-center">
+                <ArrowRightOutlineSvg className="size-6 opacity-60" />
+              </span>
+            )}
+          </div>
 
           <div className="flex items-center gap-2 text-xs text-text-dark">
             {formattedStartDate !== null && (
@@ -110,50 +142,54 @@ export const ChallengeCard = ({ challenge, onJoinClick, onDrawClick }: Challenge
           </span>
         </div>
 
-        {showJoinButton ? (
+        {action.kind === "join" ? (
           <span className="mt-2 shrink-0 flex justify-end">
             <Button
               variant="secondary"
               size="sm"
-              disabled={joinDisabled}
+              disabled={action.disabled}
               onClick={() => onJoinClick(challenge)}
             >
-              {joinLabel}
+              {actionLabel}
               <ArrowRightOutlineSvg className="size-3.5 opacity-70" />
             </Button>
           </span>
-        ) : challenge.isJoined ? (
+        ) : action.kind !== "none" ? (
           <span className="mt-2 shrink-0 flex items-center justify-end gap-2">
-            {challenge.hasInspirationDeck &&
-              challenge.runStatus !== "ended" &&
-              onDrawClick && (
-                <button
-                  type="button"
-                  aria-label={t("draw_entry_label")}
-                  title={t("draw_entry_label")}
-                  className="inline-flex size-7 cursor-pointer items-center justify-center rounded-full bg-basic-white shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_20%,transparent)] transition-shadow hover:shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_40%,transparent)]"
-                  onClick={() => onDrawClick(challenge)}
-                >
-                  <InspirationDeckIcon />
-                </button>
-              )}
+            {challenge.hasInspirationDeck && challenge.runStatus !== "ended" && onDrawClick && (
+              <button
+                type="button"
+                aria-label={t("draw_entry_label")}
+                title={t("draw_entry_label")}
+                className={`pointer-events-auto inline-flex size-7 cursor-pointer items-center justify-center rounded-full bg-basic-white transition-shadow hover:shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_40%,transparent)] ${
+                  // POC：進行中的抽卡鈕陰影 40%，未開始 20%
+                  challenge.runStatus === "ongoing"
+                    ? "shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_40%,transparent)]"
+                    : "shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_20%,transparent)]"
+                }`}
+                onClick={() => onDrawClick(challenge)}
+              >
+                <InspirationDeckIcon />
+              </button>
+            )}
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full bg-basic-white px-3 py-1 text-[13px] shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_20%,transparent)] ${
-                challenge.runStatus === "upcoming"
-                  ? "text-text-dark/45"
-                  : "text-text-dark"
+              data-testid="challenge-card-action"
+              aria-disabled={action.kind === "checkin-disabled" ? true : undefined}
+              className={`inline-flex items-center gap-1.5 rounded-full bg-basic-white px-3 py-1 text-[13px] ${
+                action.kind === "checkin-disabled" ? "text-text-dark/45" : "text-text-dark"
+              } ${
+                // POC：可打卡的膠囊陰影 40%，停用／總結 20%
+                action.kind === "checkin"
+                  ? "shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_40%,transparent)]"
+                  : "shadow-[0_4px_0_color-mix(in_srgb,theme(colors.logo-cyan)_20%,transparent)]"
               }`}
             >
               <CalendarCheck
                 className={`size-4 ${
-                  challenge.runStatus === "upcoming"
-                    ? "text-logo-cyan/50"
-                    : "text-logo-cyan"
+                  action.kind === "checkin-disabled" ? "text-logo-cyan/50" : "text-logo-cyan"
                 }`}
               />
-              {challenge.runStatus === "ended"
-                ? t("cta_view_summary")
-                : t("cta_checkin")}
+              {actionLabel}
             </span>
           </span>
         ) : null}

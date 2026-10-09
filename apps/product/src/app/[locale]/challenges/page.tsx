@@ -1,6 +1,11 @@
 "use client";
 
-import { type ChallengeSummaryType, useChallenges, useCurrentUser } from "@daodao/api";
+import {
+  type ChallengeSummaryType,
+  useChallenges,
+  useCurrentUser,
+  useMyChallenges,
+} from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { Spinner } from "@daodao/ui/components/spinner";
@@ -20,10 +25,16 @@ export default function ChallengesPage() {
   const pathname = usePathname();
   const { data: currentUser } = useCurrentUser();
   const { data, isLoading, mutate } = useChallenges();
+  // 探索列表不含自動複製的實踐 id；登入時從「我參加的挑戰」補上，讓已加入的卡片能點進實踐頁打卡
+  const { data: mineData, mutate: mutateMine } = useMyChallenges(Boolean(currentUser));
   const [joinTarget, setJoinTarget] = useState<ChallengeSummaryType | null>(null);
   const [drawTarget, setDrawTarget] = useState<number | null>(null);
 
   const challenges = useMemo(() => data?.data ?? [], [data]);
+  const practiceIdByChallenge = useMemo(
+    () => new Map((mineData?.data ?? []).map((mine) => [mine.id, mine.practiceId])),
+    [mineData]
+  );
   const sections = useMemo(
     () =>
       [
@@ -100,6 +111,7 @@ export default function ChallengesPage() {
                 challenge={challenge}
                 onJoinClick={handleJoinClick}
                 onDrawClick={(target) => setDrawTarget(target.id)}
+                practiceId={practiceIdByChallenge.get(challenge.id)}
               />
             ))}
           </div>
@@ -111,7 +123,10 @@ export default function ChallengesPage() {
         onOpenChange={(open) => {
           if (!open) setJoinTarget(null);
         }}
-        onJoined={() => mutate()}
+        onJoined={() => {
+          mutate();
+          mutateMine();
+        }}
       />
 
       <InspirationDrawDialog
