@@ -1,3 +1,4 @@
+import { practiceEndDate } from "@daodao/shared/lib/practice-period";
 import { useRouter } from "expo-router";
 import { Controller, useWatch } from "react-hook-form";
 import { Text, XStack, YStack } from "tamagui";
@@ -24,8 +25,7 @@ const computeEndDate = (startDate: string, durationDays: string): string => {
   if (!startDate || !durationDays) return "";
   const start = new Date(startDate);
   if (Number.isNaN(start.getTime())) return "";
-  const end = new Date(start);
-  end.setDate(start.getDate() + Number.parseInt(durationDays, 10));
+  const end = practiceEndDate(start, Number.parseInt(durationDays, 10));
   const y = end.getFullYear();
   const m = String(end.getMonth() + 1).padStart(2, "0");
   const d = String(end.getDate()).padStart(2, "0");

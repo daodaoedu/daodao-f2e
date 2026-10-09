@@ -1,3 +1,4 @@
+import { practiceEndDate } from "@daodao/shared/lib/practice-period";
 import { useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
@@ -41,8 +42,10 @@ export const ExecutionDurationCard = ({
     const d = typeof durationDays === "string" ? Number.parseInt(durationDays, 10) : durationDays;
     const today = new Date();
     const s = startDate ? parseDate(startDate) : null;
-    const e = s ? addDays(s, d) : null;
-    const r = showRemaining && e ? Math.min(d, Math.max(0, differenceInDays(e, today))) : d;
+    const e = s ? practiceEndDate(s, d) : null;
+    // 剩餘天數以「結束日隔天」為界，數值與修正結束日前一致
+    const r =
+      showRemaining && e ? Math.min(d, Math.max(0, differenceInDays(addDays(e, 1), today))) : d;
 
     return { days: d, start: s, end: e, remainingDays: r };
   }, [durationDays, startDate, showRemaining]);
