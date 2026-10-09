@@ -43,6 +43,7 @@ export default function ChallengeSpacePage() {
     isAuthenticated,
     isLoading,
     hasError: Boolean(error),
+    hasData: Boolean(mineData),
   });
   const hasUpcoming = useMemo(() => {
     const limit = addDays(new Date(), UPCOMING_WINDOW_DAYS);

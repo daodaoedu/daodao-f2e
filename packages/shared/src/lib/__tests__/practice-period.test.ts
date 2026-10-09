@@ -48,6 +48,13 @@ describe("parseLocalDate", () => {
     expect(parseLocalDate("")).toBeNull();
     expect(parseLocalDate("2026-02-30")).toBeNull();
   });
+
+  // daodao#295 review 3：日期後面接其他字元的格式錯誤字串要拒絕，不可只取前 10 碼
+  it("日期後面接非時間字元的字串回 null", () => {
+    expect(parseLocalDate("2026-10-09abc")).toBeNull();
+    expect(parseLocalDate("2026-10-099")).toBeNull();
+    expect(parseLocalDate("2026-10-09 garbage")).toBeNull();
+  });
 });
 
 // 剩餘天數：今天到結束日（含頭尾）的日曆日數，介於 0 與總天數之間

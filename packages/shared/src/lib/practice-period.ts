@@ -1,6 +1,7 @@
 import { addDays, differenceInCalendarDays } from "date-fns";
 
-const DATE_ONLY_RE = /^(\d{4})-(\d{2})-(\d{2})/;
+// 整串錨定：只接受 YYYY-MM-DD，或後面緊接 T 開頭的 ISO 時間；其他尾巴（"2026-10-09abc"）視為格式錯誤
+const DATE_ONLY_RE = /^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/;
 
 /**
  * 把 API 的日期字串（YYYY-MM-DD，或帶時間的 ISO 字串只取日期部分）解析成「當地日曆日」的午夜。

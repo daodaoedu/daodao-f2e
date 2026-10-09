@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { resolveMyChallengesView } from "../my-challenges-view";
 
-const base = { isAuthLoading: false, isAuthenticated: true, isLoading: false, hasError: false };
+const base = {
+  isAuthLoading: false,
+  isAuthenticated: true,
+  isLoading: false,
+  hasError: false,
+  hasData: false,
+};
 
 describe("resolveMyChallengesView", () => {
   // daodao#295 AC-01：未登入打開「我的共同挑戰」不可一直轉圈，要顯示需要登入
@@ -19,6 +25,11 @@ describe("resolveMyChallengesView", () => {
 
   it("已登入但清單載入失敗時顯示錯誤，不顯示「你還沒有參加任何共同挑戰」", () => {
     expect(resolveMyChallengesView({ ...base, hasError: true })).toBe("error");
+  });
+
+  // daodao#295 review 3：背景重新驗證失敗時 SWR 同時有 error 與先前的 data，不可把已載入的清單換成錯誤
+  it("已有快取清單時背景重新驗證失敗仍顯示清單", () => {
+    expect(resolveMyChallengesView({ ...base, hasError: true, hasData: true })).toBe("ready");
   });
 
   it("登入狀態確認中顯示讀取", () => {
