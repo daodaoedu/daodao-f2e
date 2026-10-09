@@ -677,7 +677,7 @@ function CohortSetupPanel({
                       setTemplateDropOpen(true);
                     }}
                     onFocus={() => setTemplateDropOpen(true)}
-                    className="h-10 rounded-[10px] border-[#CDEBE8] bg-white pl-9 pr-10"
+                    className="h-10 rounded-[10px] border-[#CDEBE8] bg-white pl-9 pr-10 focus-visible:pl-[35px] focus-visible:pr-[39px]"
                   />
                   <Button
                     type="button"
@@ -702,7 +702,7 @@ function CohortSetupPanel({
                   if ((e.target as HTMLElement).closest?.("[data-template-search]"))
                     e.preventDefault();
                 }}
-                className="grid max-h-[236px] w-[var(--radix-popover-trigger-width)] gap-0.5 overflow-auto rounded-xl border-[#DDEFED] p-1.5 shadow-[0_12px_28px_rgba(15,48,54,0.14)]"
+                className="grid max-h-[236px] w-[var(--radix-popover-trigger-width)] gap-0.5 overflow-auto rounded-[12px] border-[#DDEFED] p-1.5 shadow-[0_12px_28px_rgba(15,48,54,0.14)]"
               >
                 {filteredTemplates.length > 0 ? (
                   filteredTemplates.map((tpl) => {
@@ -714,13 +714,13 @@ function CohortSetupPanel({
                         role="menuitemcheckbox"
                         aria-checked={picked}
                         onClick={() => toggleTemplate(tpl.id, !picked)}
-                        className={`flex items-center gap-2.5 rounded-lg px-2.5 py-[9px] text-left hover:bg-[#F1F8F7] ${
-                          picked ? "bg-[#F0FBF9]" : "bg-white"
+                        className={`flex items-center gap-2.5 rounded-[8px] px-2.5 py-[9px] text-left hover:bg-[#F1F8F7] ${
+                          picked ? "bg-[#F7FCFB]" : "bg-white"
                         }`}
                       >
                         <span
                           className={`grid size-[18px] shrink-0 place-items-center rounded-[5px] border ${
-                            picked ? "border-[#0D7773] bg-[#0D7773]" : "border-[#CDEBE8] bg-white"
+                            picked ? "border-[#16B9B3] bg-[#16B9B3]" : "border-[#CDEBE8] bg-white"
                           }`}
                         >
                           <Check
@@ -768,7 +768,7 @@ function CohortSetupPanel({
                             value={start}
                             disabled={templatesLocked}
                             onChange={(e) => setTemplateStartDate(tpl.id, e.target.value)}
-                            className="h-[30px] rounded-lg border border-[#CDEBE8] bg-white px-2 py-1 font-mono text-xs text-[#0D3036] disabled:cursor-not-allowed disabled:bg-[#F6F9F9] disabled:text-[#78928F]"
+                            className="h-[30px] rounded-[8px] border border-[#CDEBE8] bg-white px-2 py-1 font-mono text-xs text-[#0D3036] disabled:cursor-not-allowed disabled:bg-[#F6F9F9] disabled:text-[#78928F]"
                           />
                         </label>
                         {end && (
