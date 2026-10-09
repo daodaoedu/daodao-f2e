@@ -185,19 +185,45 @@ export function uniqueTitle(base: string, existing: Set<string>): string {
  * 只送差異，已綁定的不重送，避免 PUT 覆寫 bound_at。
  */
 export function diffTemplateBindings(
-  templates: { id: number; boundCohortIds: number[] }[],
+  templates: {
+    id: number;
+    boundCohortIds: number[];
+    bindings?: { cohortId: number; startDate: string | null }[];
+  }[],
   cohortId: number,
-  selectedIds: Iterable<number>
-): { bind: number[]; unbind: number[] } {
+  selectedIds: Iterable<number>,
+  /** 使用者改過的開始日（YYYY-MM-DD；null＝沿用場次開始日），只有動過的才在裡面（#272） */
+  startDates: ReadonlyMap<number, string | null> = new Map()
+): {
+  bind: number[];
+  unbind: number[];
+  update: { templateId: number; startDate: string | null }[];
+} {
   const selected = new Set(selectedIds);
   const bind: number[] = [];
   const unbind: number[] = [];
+  const update: { templateId: number; startDate: string | null }[] = [];
   for (const template of templates) {
     const bound = template.boundCohortIds.includes(cohortId);
     if (selected.has(template.id) && !bound) bind.push(template.id);
     if (!selected.has(template.id) && bound) unbind.push(template.id);
+    if (selected.has(template.id) && bound && startDates.has(template.id)) {
+      const current =
+        template.bindings?.find((b) => b.cohortId === cohortId)?.startDate?.slice(0, 10) ?? null;
+      const next = startDates.get(template.id) ?? null;
+      if (next !== current) update.push({ templateId: template.id, startDate: next });
+    }
   }
-  return { bind, unbind };
+  return { bind, unbind, update };
+}
+
+/** 模板在場次中的結束日：開始日 + 天數 − 1；沒有天數或開始日就不顯示（FR-TPL-05） */
+export function templateBindingEndDate(
+  startDate: string | null | undefined,
+  durationDays: number | null | undefined
+): string | null {
+  if (!startDate || !durationDays || durationDays < 1) return null;
+  return addDays(startDate, durationDays - 1);
 }
 
 /**
