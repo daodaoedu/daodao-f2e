@@ -230,6 +230,18 @@ export function templateStartDateOverride(
   return value === cohortStartDate && savedStartDate === null ? null : value;
 }
 
+/**
+ * 新綁定時要送給 server 的開始日（#272）：沒指定就明確送 null（沿用場次開始日）。
+ * 不能送 undefined──server 對曾解綁的模板是 upsert，省略 startDate 會把解綁前的舊日期帶回來，
+ * 但畫面顯示的是場次開始日。
+ */
+export function newBindingStartDate(
+  startDates: ReadonlyMap<number, string | null>,
+  templateId: number
+): string | null {
+  return startDates.get(templateId) ?? null;
+}
+
 /** 模板在場次中的結束日：開始日 + 天數 − 1；沒有天數或開始日就不顯示（FR-TPL-05） */
 export function templateBindingEndDate(
   startDate: string | null | undefined,

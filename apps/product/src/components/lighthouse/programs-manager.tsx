@@ -58,6 +58,7 @@ import {
   diffTemplateBindings,
   formatSlashDate,
   isCohortStarted,
+  newBindingStartDate,
   resolveTemplateSelection,
   templateBindingEndDate,
   templateStartDateOverride,
@@ -110,7 +111,7 @@ async function applyTemplateBindings(
   organizationId: number,
   cohortId: number,
   { bind, unbind, update }: ReturnType<typeof diffTemplateBindings>,
-  /** 新綁定時一併帶上使用者指定的開始日（#272）；沒指定就沿用場次開始日 */
+  /** 新綁定時一併帶上使用者指定的開始日（#272）；沒指定就明確送 null 沿用場次開始日 */
   startDates: ReadonlyMap<number, string | null>
 ): Promise<unknown> {
   try {
@@ -121,7 +122,7 @@ async function applyTemplateBindings(
           templateId,
           cohortId,
           true,
-          startDates.get(templateId) ?? undefined
+          newBindingStartDate(startDates, templateId)
         )
       ),
       ...update.map(({ templateId, startDate }) =>

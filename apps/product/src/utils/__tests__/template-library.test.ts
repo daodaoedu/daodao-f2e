@@ -6,6 +6,7 @@ import {
   formatFrequency,
   inferResourceName,
   isCohortStarted,
+  newBindingStartDate,
   normalizeResourceUrl,
   parseFrequency,
   resolveTemplateSelection,
@@ -197,5 +198,16 @@ describe("templateStartDateOverride", () => {
   it("stores a different date and treats a cleared input as following the cohort", () => {
     expect(templateStartDateOverride("2026-10-12", "2026-10-10", null)).toBe("2026-10-12");
     expect(templateStartDateOverride("", "2026-10-10", "2026-10-12")).toBeNull();
+  });
+});
+
+describe("newBindingStartDate", () => {
+  it("sends an explicit null so a re-bound template doesn't revive its old date (#272 review)", () => {
+    expect(newBindingStartDate(new Map(), 35)).toBeNull();
+    expect(newBindingStartDate(new Map([[35, null]]), 35)).toBeNull();
+  });
+
+  it("sends the date the user picked", () => {
+    expect(newBindingStartDate(new Map([[35, "2026-10-15"]]), 35)).toBe("2026-10-15");
   });
 });
