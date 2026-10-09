@@ -11,6 +11,7 @@ import {
   resolveTemplateSelection,
   templateBindingEndDate,
   templateMatches,
+  templateStartDateOverride,
   todayInTaipei,
   validateResourceUrl,
 } from "../template-library";
@@ -181,5 +182,20 @@ describe("resolveTemplateSelection", () => {
   it("keeps a binding someone else added after the panel opened (#273)", () => {
     const overrides = new Map([[1, true]]);
     expect(resolveTemplateSelection([3, 4], overrides)).toEqual(new Set([1, 3, 4]));
+  });
+});
+
+describe("templateStartDateOverride", () => {
+  it("keeps following the cohort start when the cohort start is re-picked (#272 audit)", () => {
+    expect(templateStartDateOverride("2026-10-10", "2026-10-10", null)).toBeNull();
+  });
+
+  it("keeps an explicit date when the template already had one", () => {
+    expect(templateStartDateOverride("2026-10-10", "2026-10-10", "2026-10-12")).toBe("2026-10-10");
+  });
+
+  it("stores a different date and treats a cleared input as following the cohort", () => {
+    expect(templateStartDateOverride("2026-10-12", "2026-10-10", null)).toBe("2026-10-12");
+    expect(templateStartDateOverride("", "2026-10-10", "2026-10-12")).toBeNull();
   });
 });

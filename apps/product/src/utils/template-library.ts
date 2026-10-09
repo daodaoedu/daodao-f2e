@@ -217,6 +217,19 @@ export function diffTemplateBindings(
   return { bind, unbind, update };
 }
 
+/**
+ * 使用者在場次設定改模板開始日時要記下的值（#272）：null＝沿用場次開始日。
+ * 原本沿用場次開始日、又選回場次開始日時維持沿用，不要變成固定日期（之後改場次開始日才會跟著走）。
+ */
+export function templateStartDateOverride(
+  value: string,
+  cohortStartDate: string,
+  savedStartDate: string | null
+): string | null {
+  if (!value) return null;
+  return value === cohortStartDate && savedStartDate === null ? null : value;
+}
+
 /** 模板在場次中的結束日：開始日 + 天數 − 1；沒有天數或開始日就不顯示（FR-TPL-05） */
 export function templateBindingEndDate(
   startDate: string | null | undefined,

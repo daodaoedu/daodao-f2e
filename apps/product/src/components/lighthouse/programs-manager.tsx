@@ -60,6 +60,7 @@ import {
   isCohortStarted,
   resolveTemplateSelection,
   templateBindingEndDate,
+  templateStartDateOverride,
 } from "@/utils/template-library";
 import { ConfirmDialog } from "./confirm-dialog";
 import { JoinCode } from "./join-code";
@@ -199,14 +200,19 @@ function CohortSetupPanel({
     () => new Map()
   );
   const [templateDropOpen, setTemplateDropOpen] = useState(false);
-  const cohortStartDate = cohort?.startDate?.slice(0, 10) ?? "";
+  // 跟著基本資訊分頁正在編輯的場次開始日走，沒指定開始日的模板列才不會顯示舊日期
+  const [cohortStartDate, setCohortStartDate] = useState(cohort?.startDate?.slice(0, 10) ?? "");
+  function savedTemplateStartDate(tpl: CohortTemplateSummary): string | null {
+    const binding = cohort ? tpl.bindings.find((b) => b.cohortId === cohort.id) : undefined;
+    return binding?.startDate?.slice(0, 10) ?? null;
+  }
   function templateStartDate(tpl: CohortTemplateSummary): string {
     if (startDateOverrides.has(tpl.id)) return startDateOverrides.get(tpl.id) ?? cohortStartDate;
-    const binding = cohort ? tpl.bindings.find((b) => b.cohortId === cohort.id) : undefined;
-    return binding?.startDate?.slice(0, 10) ?? cohortStartDate;
+    return savedTemplateStartDate(tpl) ?? cohortStartDate;
   }
-  function setTemplateStartDate(templateId: number, value: string) {
-    setStartDateOverrides((prev) => new Map(prev).set(templateId, value || null));
+  function setTemplateStartDate(tpl: CohortTemplateSummary, value: string) {
+    const next = templateStartDateOverride(value, cohortStartDate, savedTemplateStartDate(tpl));
+    setStartDateOverrides((prev) => new Map(prev).set(tpl.id, next));
   }
 
   const [sessions, setSessions] = useState<SessionEntry[]>(() =>
@@ -409,6 +415,7 @@ function CohortSetupPanel({
               type="date"
               required
               defaultValue={cohort?.startDate?.slice(0, 10) ?? ""}
+              onChange={(e) => setCohortStartDate(e.target.value)}
             />
           </label>
           <label htmlFor={`${prefix}-end`} className="grid gap-1.5 text-sm font-medium">
@@ -711,8 +718,7 @@ function CohortSetupPanel({
                       <button
                         key={tpl.id}
                         type="button"
-                        role="menuitemcheckbox"
-                        aria-checked={picked}
+                        aria-pressed={picked}
                         onClick={() => toggleTemplate(tpl.id, !picked)}
                         className={`flex items-center gap-2.5 rounded-[8px] px-2.5 py-[9px] text-left hover:bg-[#F1F8F7] ${
                           picked ? "bg-[#F7FCFB]" : "bg-white"
@@ -767,7 +773,7 @@ function CohortSetupPanel({
                             type="date"
                             value={start}
                             disabled={templatesLocked}
-                            onChange={(e) => setTemplateStartDate(tpl.id, e.target.value)}
+                            onChange={(e) => setTemplateStartDate(tpl, e.target.value)}
                             className="h-[30px] rounded-[8px] border border-[#CDEBE8] bg-white px-2 py-1 font-mono text-xs text-[#0D3036] disabled:cursor-not-allowed disabled:bg-[#F6F9F9] disabled:text-[#78928F]"
                           />
                         </label>
@@ -1050,7 +1056,8 @@ function CohortCard({
       );
       if (bindingError) {
         setBusy(false);
-        await refreshTemplates();
+        // 409 多半是場次已開始：一併刷新場次，面板才會鎖住，不會讓使用者一直重試
+        await Promise.all([refresh(), refreshTemplates()]);
         toast.error(
           t("cohort_template_binding_failed", {
             reason: apiErrorMessage(bindingError, t("save_failed")),
