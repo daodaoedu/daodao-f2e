@@ -6,10 +6,13 @@ import {
   formatFrequency,
   inferResourceName,
   isCohortStarted,
+  newBindingStartDate,
   normalizeResourceUrl,
   parseFrequency,
   resolveTemplateSelection,
+  templateBindingEndDate,
   templateMatches,
+  templateStartDateOverride,
   todayInTaipei,
   validateResourceUrl,
 } from "../template-library";
@@ -103,19 +106,64 @@ describe("diffTemplateBindings", () => {
   ];
 
   it("binds newly checked templates on edit (#273)", () => {
-    expect(diffTemplateBindings(templates, 10, [1, 2, 3])).toEqual({ bind: [1], unbind: [] });
+    expect(diffTemplateBindings(templates, 10, [1, 2, 3])).toEqual({
+      bind: [1],
+      unbind: [],
+      update: [],
+    });
   });
 
   it("unbinds templates that were unchecked", () => {
-    expect(diffTemplateBindings(templates, 10, [3])).toEqual({ bind: [], unbind: [2] });
+    expect(diffTemplateBindings(templates, 10, [3])).toEqual({ bind: [], unbind: [2], update: [] });
   });
 
   it("does nothing when the selection matches existing bindings", () => {
-    expect(diffTemplateBindings(templates, 10, [2, 3])).toEqual({ bind: [], unbind: [] });
+    expect(diffTemplateBindings(templates, 10, [2, 3])).toEqual({
+      bind: [],
+      unbind: [],
+      update: [],
+    });
   });
 
   it("only looks at bindings of the given cohort", () => {
-    expect(diffTemplateBindings(templates, 11, [1])).toEqual({ bind: [1], unbind: [3, 4] });
+    expect(diffTemplateBindings(templates, 11, [1])).toEqual({
+      bind: [1],
+      unbind: [3, 4],
+      update: [],
+    });
+  });
+
+  it("updates start dates only for bound templates whose date really changed (#272)", () => {
+    const withDates = [
+      {
+        id: 1,
+        boundCohortIds: [10],
+        bindings: [{ cohortId: 10, startDate: "2026-10-11T00:00:00.000Z" }],
+      },
+      { id: 2, boundCohortIds: [10], bindings: [{ cohortId: 10, startDate: null }] },
+      { id: 3, boundCohortIds: [10], bindings: [{ cohortId: 10, startDate: null }] },
+      { id: 4, boundCohortIds: [] },
+    ];
+    const startDates = new Map<number, string | null>([
+      [1, "2026-10-11"],
+      [2, "2026-10-20"],
+      [3, "2026-10-20"],
+      [4, "2026-10-20"],
+    ]);
+    expect(diffTemplateBindings(withDates, 10, [1, 2, 4], startDates)).toEqual({
+      bind: [4],
+      unbind: [3],
+      update: [{ templateId: 2, startDate: "2026-10-20" }],
+    });
+  });
+});
+
+describe("templateBindingEndDate", () => {
+  it("computes start + days - 1", () => {
+    expect(templateBindingEndDate("2026-02-03", 30)).toBe("2026-03-04");
+    expect(templateBindingEndDate("2026-03-02", 1)).toBe("2026-03-02");
+    expect(templateBindingEndDate("2026-03-02", null)).toBeNull();
+    expect(templateBindingEndDate(null, 30)).toBeNull();
   });
 });
 
@@ -135,5 +183,31 @@ describe("resolveTemplateSelection", () => {
   it("keeps a binding someone else added after the panel opened (#273)", () => {
     const overrides = new Map([[1, true]]);
     expect(resolveTemplateSelection([3, 4], overrides)).toEqual(new Set([1, 3, 4]));
+  });
+});
+
+describe("templateStartDateOverride", () => {
+  it("keeps following the cohort start when the cohort start is re-picked (#272 audit)", () => {
+    expect(templateStartDateOverride("2026-10-10", "2026-10-10", null)).toBeNull();
+  });
+
+  it("keeps an explicit date when the template already had one", () => {
+    expect(templateStartDateOverride("2026-10-10", "2026-10-10", "2026-10-12")).toBe("2026-10-10");
+  });
+
+  it("stores a different date and treats a cleared input as following the cohort", () => {
+    expect(templateStartDateOverride("2026-10-12", "2026-10-10", null)).toBe("2026-10-12");
+    expect(templateStartDateOverride("", "2026-10-10", "2026-10-12")).toBeNull();
+  });
+});
+
+describe("newBindingStartDate", () => {
+  it("sends an explicit null so a re-bound template doesn't revive its old date (#272 review)", () => {
+    expect(newBindingStartDate(new Map(), 35)).toBeNull();
+    expect(newBindingStartDate(new Map([[35, null]]), 35)).toBeNull();
+  });
+
+  it("sends the date the user picked", () => {
+    expect(newBindingStartDate(new Map([[35, "2026-10-15"]]), 35)).toBe("2026-10-15");
   });
 });
