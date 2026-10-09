@@ -7890,6 +7890,7 @@
     "cohort_templates_linked_count": "{count} linked",
     "cohort_template_binding_failed": "Linking templates failed, so the cohort was not saved: {reason}",
     "cohort_template_unbind_confirm": "Unlink {count} template(s) from this cohort? Draft practices already created will be kept.",
+    "cohort_saved_templates_only": "Template links were saved, but the cohort settings failed to save: {reason}",
     "cohort_no_templates_warning": "No templates bound",
     "cohort_date_error": "The end date must be after the start date.",
     "cohort_interaction_modes_error": "Select at least one interaction mode.",

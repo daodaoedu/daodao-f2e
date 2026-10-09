@@ -946,7 +946,10 @@ function CohortCard({
       if (response.error) {
         setBusy(false);
         await refreshTemplates();
-        toast.error(cohortErrorMessage(t, response.error, "save_failed"));
+        const reason = cohortErrorMessage(t, response.error, "save_failed");
+        // 綁定已先送出成功，要講清楚只有場次設定沒存，不然使用者會以為模板也沒連上
+        const bindingsChanged = bindingChanges.bind.length + bindingChanges.unbind.length > 0;
+        toast.error(bindingsChanged ? t("cohort_saved_templates_only", { reason }) : reason);
         return;
       }
       setBusy(false);
