@@ -8,6 +8,7 @@ import {
   isCohortStarted,
   normalizeResourceUrl,
   parseFrequency,
+  resolveTemplateSelection,
   templateMatches,
   todayInTaipei,
   validateResourceUrl,
@@ -115,5 +116,24 @@ describe("diffTemplateBindings", () => {
 
   it("only looks at bindings of the given cohort", () => {
     expect(diffTemplateBindings(templates, 11, [1])).toEqual({ bind: [1], unbind: [3, 4] });
+  });
+});
+
+describe("resolveTemplateSelection", () => {
+  it("starts from the existing bindings", () => {
+    expect(resolveTemplateSelection([2, 3], new Map())).toEqual(new Set([2, 3]));
+  });
+
+  it("applies only the templates the user toggled", () => {
+    const overrides = new Map([
+      [1, true],
+      [2, false],
+    ]);
+    expect(resolveTemplateSelection([2, 3], overrides)).toEqual(new Set([1, 3]));
+  });
+
+  it("keeps a binding someone else added after the panel opened (#273)", () => {
+    const overrides = new Map([[1, true]]);
+    expect(resolveTemplateSelection([3, 4], overrides)).toEqual(new Set([1, 3, 4]));
   });
 });

@@ -52,7 +52,11 @@ import {
   type CohortFieldErrorKey,
   resolveCohortApiError,
 } from "@/utils/cohort-api-error";
-import { diffTemplateBindings, isCohortStarted } from "@/utils/template-library";
+import {
+  diffTemplateBindings,
+  isCohortStarted,
+  resolveTemplateSelection,
+} from "@/utils/template-library";
 import { ConfirmDialog } from "./confirm-dialog";
 import { JoinCode } from "./join-code";
 
@@ -90,21 +94,25 @@ function cohortErrorMessage(
   return t(fallbackKey);
 }
 
-/** 送出模板綁定異動，回傳第一個失敗的 API 錯誤；全部成功回 null */
+/** 送出模板綁定異動，回傳第一個失敗的 API 錯誤（含網路錯誤）；全部成功回 null */
 async function applyTemplateBindings(
   organizationId: number,
   cohortId: number,
   { bind, unbind }: { bind: number[]; unbind: number[] }
 ): Promise<unknown> {
-  const responses = await Promise.all([
-    ...bind.map((templateId) =>
-      setLighthouseTemplateBinding(organizationId, templateId, cohortId, true)
-    ),
-    ...unbind.map((templateId) =>
-      setLighthouseTemplateBinding(organizationId, templateId, cohortId, false)
-    ),
-  ]);
-  return responses.find((response) => response.error)?.error ?? null;
+  try {
+    const responses = await Promise.all([
+      ...bind.map((templateId) =>
+        setLighthouseTemplateBinding(organizationId, templateId, cohortId, true)
+      ),
+      ...unbind.map((templateId) =>
+        setLighthouseTemplateBinding(organizationId, templateId, cohortId, false)
+      ),
+    ]);
+    return responses.find((response) => response.error)?.error ?? null;
+  } catch (error) {
+    return error;
+  }
 }
 
 interface CohortSetupPanelProps {
@@ -145,26 +153,23 @@ function CohortSetupPanel({
   const t = useTranslations("lighthouse");
   const [activeTab, setActiveTab] = useState<SetupTab>("basic");
   const panelRef = useRef<HTMLFormElement>(null);
-  // 使用者動過勾選前，勾選狀態跟著 templates 的既有綁定走（templates 可能比面板晚載入）。
-  // 新增場次預設不綁任何模板：建立時模板分頁是 disabled，不能讓使用者看不到就被綁上全部（#273）
-  const [templateSelection, setTemplateSelection] = useState<Set<number> | null>(null);
-  const selectedTemplateIds =
-    templateSelection ??
-    new Set(
-      cohort
-        ? (templates ?? [])
-            .filter((tpl) => tpl.boundCohortIds.includes(cohort.id))
-            .map((tpl) => tpl.id)
-        : []
-    );
   // 已開始的場次 server 會拒絕變更綁定（FR-TPL-05），直接鎖住勾選
   const templatesLocked = mode === "edit" && !!cohort && isCohortStarted(cohort.startDate);
+  // 只記使用者動過的模板，其餘跟著最新的既有綁定走：templates 可能比面板晚載入，
+  // 也不會把別人剛綁上的模板當成「取消勾選」解綁掉。
+  // 新增場次預設不綁任何模板：建立時模板分頁是 disabled，不能讓使用者看不到就被綁上全部（#273）
+  const [templateOverrides, setTemplateOverrides] = useState<Map<number, boolean>>(() => new Map());
+  const selectedTemplateIds = resolveTemplateSelection(
+    cohort
+      ? (templates ?? [])
+          .filter((tpl) => tpl.boundCohortIds.includes(cohort.id))
+          .map((tpl) => tpl.id)
+      : [],
+    templatesLocked ? new Map() : templateOverrides
+  );
 
   function toggleTemplate(templateId: number, checked: boolean) {
-    const next = new Set(selectedTemplateIds);
-    if (checked) next.add(templateId);
-    else next.delete(templateId);
-    setTemplateSelection(next);
+    setTemplateOverrides((prev) => new Map(prev).set(templateId, checked));
   }
 
   const [sessions, setSessions] = useState<SessionEntry[]>(() =>
@@ -879,7 +884,34 @@ function CohortCard({
         toast.error(t("cohort_external_signup_url_error"));
         return;
       }
+      const bindingChanges = diffTemplateBindings(
+        templates ?? [],
+        cohort.id,
+        extras.selectedTemplateIds ?? []
+      );
+      // 解除未開始場次的模板綁定前要確認（FR-TPL-05）
+      if (
+        bindingChanges.unbind.length > 0 &&
+        !window.confirm(
+          t("cohort_template_unbind_confirm", { count: bindingChanges.unbind.length })
+        )
+      ) {
+        return;
+      }
       setBusy(true);
+      // 模板分頁的勾選不在 cohort payload 裡，要另外對綁定 API 送差異（#273）。
+      // 先送綁定再存場次：開始日改到今天以前，server 就會鎖住綁定（FR-TPL-05）
+      const bindingError = await applyTemplateBindings(organizationId, cohort.id, bindingChanges);
+      if (bindingError) {
+        setBusy(false);
+        await refreshTemplates();
+        toast.error(
+          t("cohort_template_binding_failed", {
+            reason: apiErrorMessage(bindingError, t("save_failed")),
+          })
+        );
+        return;
+      }
       const response = await updateLighthouseCohort(programId, cohort.id, {
         displayName: String(formData.get("displayName") ?? "").trim(),
         tagline: String(formData.get("tagline") ?? "").trim() || null,
@@ -913,25 +945,12 @@ function CohortCard({
       } as Parameters<typeof updateLighthouseCohort>[2]);
       if (response.error) {
         setBusy(false);
+        await refreshTemplates();
         toast.error(cohortErrorMessage(t, response.error, "save_failed"));
         return;
       }
-      // 模板分頁的勾選不在 cohort payload 裡，要另外對綁定 API 送差異（#273）
-      const bindingError = await applyTemplateBindings(
-        organizationId,
-        cohort.id,
-        diffTemplateBindings(templates ?? [], cohort.id, extras.selectedTemplateIds ?? [])
-      );
       setBusy(false);
       await Promise.all([refresh(), refreshTemplates()]);
-      if (bindingError) {
-        toast.error(
-          t("cohort_template_binding_failed", {
-            reason: apiErrorMessage(bindingError, t("save_failed")),
-          })
-        );
-        return;
-      }
       setEditing(false);
       toast.success(t("cohort_saved"));
     },
@@ -1217,26 +1236,13 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         toast.error(cohortErrorMessage(t, response.error, "cohort_create_failed"));
         return;
       }
-      const newCohortId = (response.data as { data: { id: number } }).data.id;
-      const bindingError = await applyTemplateBindings(program.organizationId, newCohortId, {
-        bind: extras.selectedTemplateIds ?? [],
-        unbind: [],
-      });
+      // 新增場次不綁模板（#273 決策）：模板分頁在建立時是 disabled，建好後從編輯或模板庫綁定
       setBusy(false);
-      await Promise.all([mutate(), templatesQuery.mutate()]);
-      // 場次已建立，綁定失敗也要關面板，避免再按一次建出重複場次；改到編輯裡補綁
+      await mutate();
       setCreatingCohort(false);
-      if (bindingError) {
-        toast.error(
-          t("cohort_template_binding_failed", {
-            reason: apiErrorMessage(bindingError, t("save_failed")),
-          })
-        );
-        return;
-      }
       toast.success(t("cohort_created"));
     },
-    [program.id, program.organizationId, mutate, templatesQuery.mutate, t]
+    [program.id, mutate, t]
   );
 
   return (

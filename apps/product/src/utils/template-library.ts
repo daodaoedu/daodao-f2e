@@ -199,3 +199,19 @@ export function diffTemplateBindings(
   }
   return { bind, unbind };
 }
+
+/**
+ * 場次設定的模板勾選：既有綁定套上使用者動過的勾選（#273）。
+ * 只覆蓋使用者動過的模板，其他人剛綁上的模板不會被當成取消勾選而解綁。
+ */
+export function resolveTemplateSelection(
+  boundTemplateIds: Iterable<number>,
+  overrides: ReadonlyMap<number, boolean>
+): Set<number> {
+  const selected = new Set(boundTemplateIds);
+  for (const [templateId, checked] of overrides) {
+    if (checked) selected.add(templateId);
+    else selected.delete(templateId);
+  }
+  return selected;
+}
