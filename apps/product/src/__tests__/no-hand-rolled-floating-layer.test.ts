@@ -48,7 +48,8 @@ const ALLOWED: Array<{ file: string; count: number; reason: string }> = [
 const SRC = path.resolve(__dirname, "..");
 const SELF = path.relative(SRC, __filename);
 // 小寫開頭的 JSX tag（div / ul / motion.div…）到同一個 opening tag 內的 role 屬性；`[^<]` 不跨到下一個 tag
-const HAND_ROLLED = /<[a-z][\w.]*\b[^<]*?\brole=["'](menu|listbox|dialog)["']/g;
+// 已知限制：role 由 spread／條件式帶入、或 role 之前的屬性表達式含 `<` 時抓不到
+const HAND_ROLLED = /<[a-z][\w.]*\b[^<]*?\brole=\{?["'](menu|listbox|dialog)["']/g;
 
 const walk = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {
@@ -74,6 +75,7 @@ describe("判定規則", () => {
   it("原生元素帶 role=menu／listbox／dialog 算手刻浮層", () => {
     expect(countHandRolled(`<div\n  className="absolute bottom-full"\n  role="menu"\n>`)).toBe(1);
     expect(countHandRolled(`<ul role="listbox">`)).toBe(1);
+    expect(countHandRolled(`<div role={"menu"}>`)).toBe(1);
     expect(countHandRolled(`<motion.aside\n  role="dialog"\n  onClick={() => close()}\n>`)).toBe(1);
   });
 
