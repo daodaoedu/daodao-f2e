@@ -46,6 +46,7 @@ export function AccountMenu({ isCollapsed }: AccountMenuProps) {
             isCollapsed && "justify-center px-0"
           )}
           aria-label={t("account_menu")}
+          aria-haspopup="menu"
         >
           <span className="shrink-0 flex items-center justify-center size-7 rounded-full bg-logo-cyan text-white text-[13px] font-semibold">
             {initial}
