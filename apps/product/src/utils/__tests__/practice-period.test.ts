@@ -22,8 +22,10 @@ describe("practiceEndDate", () => {
 describe("practiceRemainingDays", () => {
   const start = new Date(2026, 9, 9);
 
-  it("開始日當天還沒過完，剩餘天數維持既有算法（不因結束日修正而變動）", () => {
-    expect(practiceRemainingDays(start, 14, new Date(2026, 9, 9, 10))).toBe(13);
+  // daodao#295 review 2：與 mobile 統一為「今天到結束日的日曆日數（含頭尾）」；
+  // 舊算法開始日 10 點顯示 13（mobile 顯示 14），兩端不一致
+  it("開始日當天剩總天數（與 mobile 一致）", () => {
+    expect(practiceRemainingDays(start, 14, new Date(2026, 9, 9, 10))).toBe(14);
   });
 
   it("開始前不超過總天數", () => {

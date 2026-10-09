@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations } from "@daodao/i18n";
-import { format, isValid, parse } from "date-fns";
-import { practiceEndDate, practiceRemainingDays } from "@/utils/practice-period";
+import { format } from "date-fns";
+import { parseLocalDate, practiceEndDate, practiceRemainingDays } from "@/utils/practice-period";
 import type { ManualPracticeFormValues } from "../create/manual/schema";
 
 interface ExecutionDurationCardProps {
@@ -20,10 +20,7 @@ export const ExecutionDurationCard = ({
   const days = typeof durationDays === "string" ? Number.parseInt(durationDays, 10) : durationDays;
 
   const today = new Date();
-  const start =
-    startDate && isValid(parse(startDate, "yyyy-MM-dd", today))
-      ? parse(startDate, "yyyy-MM-dd", today)
-      : null;
+  const start = startDate ? parseLocalDate(startDate) : null;
   const end = start ? practiceEndDate(start, days) : null;
   const remainingDays = showRemaining && start ? practiceRemainingDays(start, days, today) : days;
 

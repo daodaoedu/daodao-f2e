@@ -1,27 +1,14 @@
-import { practiceEndDate } from "@daodao/shared/lib/practice-period";
+import {
+  parseLocalDate,
+  practiceEndDate,
+  practiceRemainingDays,
+} from "@daodao/shared/lib/practice-period";
 import { useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 import type { ManualPracticeFormValuesType } from "../create/manual/schema";
-
-// Date utilities
-const parseDate = (dateStr: string): Date | null => {
-  const date = new Date(dateStr);
-  return Number.isNaN(date.getTime()) ? null : date;
-};
-
-const addDays = (date: Date, days: number): Date => {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-};
-
-const differenceInDays = (later: Date, earlier: Date): number => {
-  const diffTime = later.getTime() - earlier.getTime();
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-};
 
 interface ExecutionDurationCardProps {
   durationDays: ManualPracticeFormValuesType["durationDays"] | number;
@@ -41,11 +28,9 @@ export const ExecutionDurationCard = ({
   const { days, start, end, remainingDays } = useMemo(() => {
     const d = typeof durationDays === "string" ? Number.parseInt(durationDays, 10) : durationDays;
     const today = new Date();
-    const s = startDate ? parseDate(startDate) : null;
+    const s = startDate ? parseLocalDate(startDate) : null;
     const e = s ? practiceEndDate(s, d) : null;
-    // 剩餘天數以「結束日隔天」為界，數值與修正結束日前一致
-    const r =
-      showRemaining && e ? Math.min(d, Math.max(0, differenceInDays(addDays(e, 1), today))) : d;
+    const r = showRemaining && s ? practiceRemainingDays(s, d, today) : d;
 
     return { days: d, start: s, end: e, remainingDays: r };
   }, [durationDays, startDate, showRemaining]);

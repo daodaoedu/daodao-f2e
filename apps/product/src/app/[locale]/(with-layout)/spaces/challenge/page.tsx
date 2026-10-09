@@ -27,7 +27,8 @@ export default function ChallengeSpacePage() {
   const t = useTranslations("space");
   const router = useRouter();
   const { isAuthenticated, isLoading: isAuthLoading, login } = useAuth();
-  const { data: mineData, isLoading, error } = useMyChallenges();
+  // 確認已登入才查：未登入時此端點必回 401（daodao#295）
+  const { data: mineData, isLoading, error } = useMyChallenges(!isAuthLoading && isAuthenticated);
   const { data: exploreData } = useChallenges();
   const [filter, setFilter] = useState<FilterKey>("ongoing");
   const [drawTarget, setDrawTarget] = useState<number | null>(null);
