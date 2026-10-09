@@ -14,6 +14,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { addDays, format, isValid, parse } from "date-fns";
 import { useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
+import { practiceEndDate } from "@/utils/practice-period";
 import { DURATION_DAYS_OPTIONS, FREQUENCY_OPTIONS, type ManualPracticeFormValues } from "../schema";
 
 interface Step2Props {
@@ -32,7 +33,7 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
     const start = parse(startDate, "yyyy-MM-dd", new Date());
     if (!isValid(start)) return "";
     const days = Number.parseInt(durationDays, 10);
-    const end = addDays(start, days);
+    const end = practiceEndDate(start, days);
     return format(end, "yyyy/MM/dd");
   }, [startDate, durationDays]);
 

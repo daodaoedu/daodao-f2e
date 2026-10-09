@@ -1,6 +1,7 @@
 "use client";
 
 import { type MyChallengeType, useChallenges, useMyChallenges } from "@daodao/api";
+import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { Link, useRouter } from "@daodao/i18n/navigation";
 import {
@@ -15,6 +16,7 @@ import { ChevronDown, ChevronRight, Flag } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChallengeCard, InspirationDrawDialog } from "@/components/challenge";
 import { SpaceSubpageHeader } from "@/components/spaces";
+import { resolveMyChallengesView } from "@/utils/my-challenges-view";
 
 type FilterKey = "all" | "ongoing" | "upcoming" | "ended";
 
@@ -24,7 +26,8 @@ const UPCOMING_WINDOW_DAYS = 14;
 export default function ChallengeSpacePage() {
   const t = useTranslations("space");
   const router = useRouter();
-  const { data: mineData, isLoading } = useMyChallenges();
+  const { isAuthenticated, isLoading: isAuthLoading, login } = useAuth();
+  const { data: mineData, isLoading, error } = useMyChallenges();
   const { data: exploreData } = useChallenges();
   const [filter, setFilter] = useState<FilterKey>("ongoing");
   const [drawTarget, setDrawTarget] = useState<number | null>(null);
@@ -34,6 +37,12 @@ export default function ChallengeSpacePage() {
     () => (filter === "all" ? mine : mine.filter((c) => c.runStatus === filter)),
     [mine, filter]
   );
+  const view = resolveMyChallengesView({
+    isAuthLoading,
+    isAuthenticated,
+    isLoading,
+    hasError: Boolean(error),
+  });
   const hasUpcoming = useMemo(() => {
     const limit = addDays(new Date(), UPCOMING_WINDOW_DAYS);
     return (exploreData?.data ?? []).some(
@@ -88,10 +97,28 @@ export default function ChallengeSpacePage() {
         </DropdownMenu>
       </div>
 
-      {isLoading ? (
+      {view === "loading" ? (
         <div className="flex justify-center py-16">
           <Spinner aria-label={t("loading")} />
         </div>
+      ) : view === "login-required" ? (
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-[#DCEBEA] px-4 py-10 text-center">
+          <p className="text-sm text-text-dark/60">{t("challenge_login_required")}</p>
+          <button
+            type="button"
+            onClick={() => login("/spaces/challenge")}
+            className="rounded-full bg-primary-base px-6 py-2.5 text-sm font-medium text-white"
+          >
+            {t("challenge_login_action")}
+          </button>
+        </div>
+      ) : view === "error" ? (
+        <p
+          role="alert"
+          className="rounded-2xl border border-dashed border-[#DCEBEA] px-4 py-10 text-center text-sm text-text-dark/60"
+        >
+          {t("challenge_load_error")}
+        </p>
       ) : filtered.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-[#DCEBEA] px-4 py-10 text-center text-sm text-text-dark/60">
           {mine.length === 0 ? t("challenge_empty") : t("challenge_filter_empty")}
