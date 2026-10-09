@@ -185,19 +185,70 @@ export function uniqueTitle(base: string, existing: Set<string>): string {
  * 只送差異，已綁定的不重送，避免 PUT 覆寫 bound_at。
  */
 export function diffTemplateBindings(
-  templates: { id: number; boundCohortIds: number[] }[],
+  templates: {
+    id: number;
+    boundCohortIds: number[];
+    bindings?: { cohortId: number; startDate: string | null }[];
+  }[],
   cohortId: number,
-  selectedIds: Iterable<number>
-): { bind: number[]; unbind: number[] } {
+  selectedIds: Iterable<number>,
+  /** 使用者改過的開始日（YYYY-MM-DD；null＝沿用場次開始日），只有動過的才在裡面（#272） */
+  startDates: ReadonlyMap<number, string | null> = new Map()
+): {
+  bind: number[];
+  unbind: number[];
+  update: { templateId: number; startDate: string | null }[];
+} {
   const selected = new Set(selectedIds);
   const bind: number[] = [];
   const unbind: number[] = [];
+  const update: { templateId: number; startDate: string | null }[] = [];
   for (const template of templates) {
     const bound = template.boundCohortIds.includes(cohortId);
     if (selected.has(template.id) && !bound) bind.push(template.id);
     if (!selected.has(template.id) && bound) unbind.push(template.id);
+    if (selected.has(template.id) && bound && startDates.has(template.id)) {
+      const current =
+        template.bindings?.find((b) => b.cohortId === cohortId)?.startDate?.slice(0, 10) ?? null;
+      const next = startDates.get(template.id) ?? null;
+      if (next !== current) update.push({ templateId: template.id, startDate: next });
+    }
   }
-  return { bind, unbind };
+  return { bind, unbind, update };
+}
+
+/**
+ * 使用者在場次設定改模板開始日時要記下的值（#272）：null＝沿用場次開始日。
+ * 原本沿用場次開始日、又選回場次開始日時維持沿用，不要變成固定日期（之後改場次開始日才會跟著走）。
+ */
+export function templateStartDateOverride(
+  value: string,
+  cohortStartDate: string,
+  savedStartDate: string | null
+): string | null {
+  if (!value) return null;
+  return value === cohortStartDate && savedStartDate === null ? null : value;
+}
+
+/**
+ * 新綁定時要送給 server 的開始日（#272）：沒指定就明確送 null（沿用場次開始日）。
+ * 不能送 undefined──server 對曾解綁的模板是 upsert，省略 startDate 會把解綁前的舊日期帶回來，
+ * 但畫面顯示的是場次開始日。
+ */
+export function newBindingStartDate(
+  startDates: ReadonlyMap<number, string | null>,
+  templateId: number
+): string | null {
+  return startDates.get(templateId) ?? null;
+}
+
+/** 模板在場次中的結束日：開始日 + 天數 − 1；沒有天數或開始日就不顯示（FR-TPL-05） */
+export function templateBindingEndDate(
+  startDate: string | null | undefined,
+  durationDays: number | null | undefined
+): string | null {
+  if (!startDate || !durationDays || durationDays < 1) return null;
+  return addDays(startDate, durationDays - 1);
 }
 
 /**
