@@ -179,3 +179,23 @@ export function uniqueTitle(base: string, existing: Set<string>): string {
   }
   return base;
 }
+
+/**
+ * 場次設定「模板」分頁存檔時要送的綁定異動：勾了但沒綁的要綁、綁了但取消勾的要解綁（#273）。
+ * 只送差異，已綁定的不重送，避免 PUT 覆寫 bound_at。
+ */
+export function diffTemplateBindings(
+  templates: { id: number; boundCohortIds: number[] }[],
+  cohortId: number,
+  selectedIds: Iterable<number>
+): { bind: number[]; unbind: number[] } {
+  const selected = new Set(selectedIds);
+  const bind: number[] = [];
+  const unbind: number[] = [];
+  for (const template of templates) {
+    const bound = template.boundCohortIds.includes(cohortId);
+    if (selected.has(template.id) && !bound) bind.push(template.id);
+    if (!selected.has(template.id) && bound) unbind.push(template.id);
+  }
+  return { bind, unbind };
+}

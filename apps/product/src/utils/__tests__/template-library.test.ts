@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   addDays,
   deriveTemplateName,
+  diffTemplateBindings,
   formatFrequency,
   inferResourceName,
   isCohortStarted,
@@ -89,5 +90,30 @@ describe("search and dates", () => {
     expect(isCohortStarted("2026-09-12T00:00:00.000Z", now)).toBe(true);
     expect(isCohortStarted("2026-09-13T00:00:00.000Z", now)).toBe(false);
     expect(addDays("2026-09-01", 13)).toBe("2026-09-14");
+  });
+});
+
+describe("diffTemplateBindings", () => {
+  const templates = [
+    { id: 1, boundCohortIds: [] },
+    { id: 2, boundCohortIds: [10] },
+    { id: 3, boundCohortIds: [10, 11] },
+    { id: 4, boundCohortIds: [11] },
+  ];
+
+  it("binds newly checked templates on edit (#273)", () => {
+    expect(diffTemplateBindings(templates, 10, [1, 2, 3])).toEqual({ bind: [1], unbind: [] });
+  });
+
+  it("unbinds templates that were unchecked", () => {
+    expect(diffTemplateBindings(templates, 10, [3])).toEqual({ bind: [], unbind: [2] });
+  });
+
+  it("does nothing when the selection matches existing bindings", () => {
+    expect(diffTemplateBindings(templates, 10, [2, 3])).toEqual({ bind: [], unbind: [] });
+  });
+
+  it("only looks at bindings of the given cohort", () => {
+    expect(diffTemplateBindings(templates, 11, [1])).toEqual({ bind: [1], unbind: [3, 4] });
   });
 });

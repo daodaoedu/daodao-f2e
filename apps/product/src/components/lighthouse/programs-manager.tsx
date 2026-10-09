@@ -52,6 +52,7 @@ import {
   type CohortFieldErrorKey,
   resolveCohortApiError,
 } from "@/utils/cohort-api-error";
+import { diffTemplateBindings, isCohortStarted } from "@/utils/template-library";
 import { ConfirmDialog } from "./confirm-dialog";
 import { JoinCode } from "./join-code";
 
@@ -87,6 +88,23 @@ function cohortErrorMessage(
   if (resolved.type === "i18n") return t(resolved.key);
   if (resolved.type === "message") return resolved.message;
   return t(fallbackKey);
+}
+
+/** 送出模板綁定異動，回傳第一個失敗的 API 錯誤；全部成功回 null */
+async function applyTemplateBindings(
+  organizationId: number,
+  cohortId: number,
+  { bind, unbind }: { bind: number[]; unbind: number[] }
+): Promise<unknown> {
+  const responses = await Promise.all([
+    ...bind.map((templateId) =>
+      setLighthouseTemplateBinding(organizationId, templateId, cohortId, true)
+    ),
+    ...unbind.map((templateId) =>
+      setLighthouseTemplateBinding(organizationId, templateId, cohortId, false)
+    ),
+  ]);
+  return responses.find((response) => response.error)?.error ?? null;
 }
 
 interface CohortSetupPanelProps {
@@ -127,7 +145,27 @@ function CohortSetupPanel({
   const t = useTranslations("lighthouse");
   const [activeTab, setActiveTab] = useState<SetupTab>("basic");
   const panelRef = useRef<HTMLFormElement>(null);
-  const selectedTemplatesRef = useRef<Set<number>>(new Set());
+  // 使用者動過勾選前，勾選狀態跟著 templates 的既有綁定走（templates 可能比面板晚載入）。
+  // 新增場次預設不綁任何模板：建立時模板分頁是 disabled，不能讓使用者看不到就被綁上全部（#273）
+  const [templateSelection, setTemplateSelection] = useState<Set<number> | null>(null);
+  const selectedTemplateIds =
+    templateSelection ??
+    new Set(
+      cohort
+        ? (templates ?? [])
+            .filter((tpl) => tpl.boundCohortIds.includes(cohort.id))
+            .map((tpl) => tpl.id)
+        : []
+    );
+  // 已開始的場次 server 會拒絕變更綁定（FR-TPL-05），直接鎖住勾選
+  const templatesLocked = mode === "edit" && !!cohort && isCohortStarted(cohort.startDate);
+
+  function toggleTemplate(templateId: number, checked: boolean) {
+    const next = new Set(selectedTemplateIds);
+    if (checked) next.add(templateId);
+    else next.delete(templateId);
+    setTemplateSelection(next);
+  }
 
   const [sessions, setSessions] = useState<SessionEntry[]>(() =>
     (cohort?.sessions ?? []).map((s, i) => ({
@@ -217,7 +255,7 @@ function CohortSetupPanel({
       checkinDefaultPrivate: checkinPrivate,
       hostCommentDefaultPrivate: hostCommentPrivate,
       visibility,
-      selectedTemplateIds: Array.from(selectedTemplatesRef.current),
+      selectedTemplateIds: Array.from(selectedTemplateIds),
       publishNow,
     });
   }
@@ -577,10 +615,12 @@ function CohortSetupPanel({
         <div className="mb-3 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">{t("cohort_select_templates")}</p>
-            <p className="mt-0.5 text-xs text-[#78928F]">{t("cohort_select_templates_hint")}</p>
+            <p className="mt-0.5 text-xs text-[#78928F]">
+              {templatesLocked ? t("cohort_templates_locked") : t("cohort_select_templates_hint")}
+            </p>
           </div>
           <p className="text-xs text-[#78928F]">
-            {t("cohort_templates_linked_count", { count: selectedTemplatesRef.current.size })}
+            {t("cohort_templates_linked_count", { count: selectedTemplateIds.size })}
           </p>
         </div>
         {templates && templates.length > 0 ? (
@@ -597,7 +637,6 @@ function CohortSetupPanel({
             {filteredTemplates.length > 0 ? (
               <div className="grid gap-2 sm:grid-cols-2">
                 {filteredTemplates.map((tpl) => {
-                  const bound = cohort ? tpl.boundCohortIds.includes(cohort.id) : true;
                   return (
                     <label
                       key={tpl.id}
@@ -605,15 +644,10 @@ function CohortSetupPanel({
                     >
                       <input
                         type="checkbox"
-                        defaultChecked={bound}
+                        checked={selectedTemplateIds.has(tpl.id)}
+                        disabled={templatesLocked}
                         className="size-4 accent-[#0D7773]"
-                        onChange={(e) => {
-                          if (e.target.checked) selectedTemplatesRef.current.add(tpl.id);
-                          else selectedTemplatesRef.current.delete(tpl.id);
-                        }}
-                        ref={(el) => {
-                          if (el && bound) selectedTemplatesRef.current.add(tpl.id);
-                        }}
+                        onChange={(e) => toggleTemplate(tpl.id, e.target.checked)}
                       />
                       {tpl.title}
                     </label>
@@ -764,9 +798,17 @@ interface CohortCardProps {
   cohort: LighthouseCohortType;
   templates?: CohortTemplateSummary[];
   refresh: () => Promise<unknown>;
+  refreshTemplates: () => Promise<unknown>;
 }
 
-function CohortCard({ programId, organizationId, cohort, templates, refresh }: CohortCardProps) {
+function CohortCard({
+  programId,
+  organizationId,
+  cohort,
+  templates,
+  refresh,
+  refreshTemplates,
+}: CohortCardProps) {
   const t = useTranslations("lighthouse");
   const searchParams = useSearchParams();
   const [editing, setEditing] = useState(searchParams.get("edit") === String(cohort.id));
@@ -869,16 +911,31 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
         checkinDefaultPrivate: extras.checkinDefaultPrivate,
         hostCommentDefaultPrivate: extras.hostCommentDefaultPrivate,
       } as Parameters<typeof updateLighthouseCohort>[2]);
-      setBusy(false);
       if (response.error) {
+        setBusy(false);
         toast.error(cohortErrorMessage(t, response.error, "save_failed"));
         return;
       }
-      await refresh();
+      // 模板分頁的勾選不在 cohort payload 裡，要另外對綁定 API 送差異（#273）
+      const bindingError = await applyTemplateBindings(
+        organizationId,
+        cohort.id,
+        diffTemplateBindings(templates ?? [], cohort.id, extras.selectedTemplateIds ?? [])
+      );
+      setBusy(false);
+      await Promise.all([refresh(), refreshTemplates()]);
+      if (bindingError) {
+        toast.error(
+          t("cohort_template_binding_failed", {
+            reason: apiErrorMessage(bindingError, t("save_failed")),
+          })
+        );
+        return;
+      }
       setEditing(false);
       toast.success(t("cohort_saved"));
     },
-    [programId, cohort.id, refresh, t]
+    [programId, organizationId, cohort.id, templates, refresh, refreshTemplates, t]
   );
 
   const missingTemplates =
@@ -1161,18 +1218,25 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         return;
       }
       const newCohortId = (response.data as { data: { id: number } }).data.id;
-      const templateIds = extras.selectedTemplateIds ?? [];
-      await Promise.all(
-        templateIds.map((templateId) =>
-          setLighthouseTemplateBinding(program.organizationId, templateId, newCohortId, true)
-        )
-      );
+      const bindingError = await applyTemplateBindings(program.organizationId, newCohortId, {
+        bind: extras.selectedTemplateIds ?? [],
+        unbind: [],
+      });
       setBusy(false);
-      await mutate();
+      await Promise.all([mutate(), templatesQuery.mutate()]);
+      // 場次已建立，綁定失敗也要關面板，避免再按一次建出重複場次；改到編輯裡補綁
       setCreatingCohort(false);
+      if (bindingError) {
+        toast.error(
+          t("cohort_template_binding_failed", {
+            reason: apiErrorMessage(bindingError, t("save_failed")),
+          })
+        );
+        return;
+      }
       toast.success(t("cohort_created"));
     },
-    [program.id, program.organizationId, mutate, t]
+    [program.id, program.organizationId, mutate, templatesQuery.mutate, t]
   );
 
   return (
@@ -1305,6 +1369,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               cohort={cohort}
               templates={templates}
               refresh={mutate}
+              refreshTemplates={templatesQuery.mutate}
             />
           ))}
         </div>
