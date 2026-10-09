@@ -53,11 +53,17 @@ describe("feedback service — submitBugReport", () => {
       jsonResponse(400, {
         success: false,
         data: null,
-        error: { code: "VALIDATION_ERROR", message: "請求資料格式錯誤", details: { link: "Invalid url" } },
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "請求資料格式錯誤",
+          details: { link: "Invalid url" },
+        },
       })
     );
 
-    const err = await submitBugReport({ area: "ui", description: "x", link: "not a url" }).catch((e) => e);
+    const err = await submitBugReport({ area: "ui", description: "x", link: "not a url" }).catch(
+      (e) => e
+    );
 
     expect(err).toBeInstanceOf(ApiError);
     expect(err.status).toBe(400);
@@ -69,5 +75,15 @@ describe("feedback service — submitBugReport", () => {
     const err = await submitBugReport({ area: "ui", description: "x" }).catch((e) => e);
     expect(err).toBeInstanceOf(ApiError);
     expect(err.status).toBe(404);
+  });
+
+  // code review：2xx 代表回報已寫入；body 空或不是 JSON 時不能變成失敗，否則使用者重送會產生重複回報
+  it.each([
+    ["empty 201", () => new Response(null, { status: 201 })],
+    ["non-JSON 201", () => new Response("Created", { status: 201 })],
+    ["204", () => new Response(null, { status: 204 })],
+  ])("treats a 2xx with an unparsable body as success (%s)", async (_label, makeResponse) => {
+    mockWrapFetch.mockResolvedValue(makeResponse());
+    await expect(submitBugReport({ area: "ui", description: "x" })).resolves.toEqual({ id: null });
   });
 });

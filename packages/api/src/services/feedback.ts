@@ -23,7 +23,8 @@ export interface SubmitBugReportInput {
 }
 
 export interface SubmitBugReportResult {
-  id: number;
+  /** 新回報的 id；server 回 2xx 但 body 無法解析時為 null（回報仍已送出） */
+  id: number | null;
 }
 
 interface ServerErrorBody {
@@ -63,6 +64,9 @@ export const submitBugReport = async (
     );
   }
 
-  const body = (await response.json()) as { data: SubmitBugReportResult };
-  return body.data;
+  // 2xx 代表回報已寫入：body 空或不是 JSON 也視為成功（id 未知），不能讓使用者以為失敗而重送造成重複回報
+  const body = (await response.json().catch(() => null)) as {
+    data?: { id?: number } | null;
+  } | null;
+  return { id: typeof body?.data?.id === "number" ? body.data.id : null };
 };
