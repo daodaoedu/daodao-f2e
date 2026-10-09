@@ -1,5 +1,6 @@
 "use client";
 
+import { BUG_REPORT_AREAS, type BugReportArea, isApiError, submitBugReport } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
@@ -7,8 +8,16 @@ import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle, ImagePlus, X } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 
-const AREA_KEYS = ["ui", "performance", "auth", "data", "other"] as const;
-type Area = (typeof AREA_KEYS)[number];
+const AREA_KEYS = BUG_REPORT_AREAS;
+type Area = BugReportArea;
+
+// server 驗證錯誤 details 的欄位 → 表單上的欄位名稱
+type FieldLabelKey = "bug_area_label" | "bug_description_label" | "bug_link_label";
+const FIELD_LABEL_KEYS: Record<string, FieldLabelKey | undefined> = {
+  area: "bug_area_label",
+  description: "bug_description_label",
+  link: "bug_link_label",
+};
 
 interface PreviewFile {
   file: File;
@@ -65,25 +74,27 @@ export function BugReportForm() {
 
     setIsSubmitting(true);
     try {
-      const formData = new FormData();
-      formData.append("area", area);
-      formData.append("description", description);
-      if (link) formData.append("link", link);
-      formData.append("referrer", window.location.href);
-      formData.append("userAgent", navigator.userAgent);
-      for (const s of screenshots) {
-        formData.append("screenshots", s.file);
-      }
-
-      const res = await fetch("/api/feedback/bug-report", {
-        method: "POST",
-        body: formData,
+      await submitBugReport({
+        area,
+        description,
+        link,
+        referrer: window.location.href,
+        userAgent: navigator.userAgent,
+        screenshots: screenshots.map((s) => s.file),
       });
-
-      if (!res.ok) throw new Error("Submit failed");
       setIsSuccess(true);
-    } catch {
-      toast.error(t("operation_failed_retry"));
+    } catch (error) {
+      // server 拒絕（4xx）時顯示 server 訊息與出錯欄位；網路錯誤或 5xx 顯示通用訊息。表單內容保留不清空
+      if (isApiError(error) && error.status >= 400 && error.status < 500) {
+        const details = (error.data as { details?: Record<string, string> } | undefined)?.details;
+        const fields = Object.keys(details ?? {})
+          .map((key) => FIELD_LABEL_KEYS[key])
+          .filter((key): key is FieldLabelKey => Boolean(key))
+          .map((key) => t(key));
+        toast.error(fields.length > 0 ? `${error.message}：${fields.join("、")}` : error.message);
+      } else {
+        toast.error(t("operation_failed_retry"));
+      }
     } finally {
       setIsSubmitting(false);
     }
