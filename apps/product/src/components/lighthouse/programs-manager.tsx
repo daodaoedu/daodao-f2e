@@ -310,26 +310,26 @@ function CohortSetupPanel({
     <form
       ref={panelRef}
       onSubmit={handleSubmit}
-      className="scroll-mt-24 rounded-2xl border border-[#CDEBE8] bg-[#F0FBF9] p-5"
+      className="scroll-mt-24 rounded-[20px] border border-[#B9DCD8] bg-[#F7FCFB] p-6"
     >
-      <div className="mb-4 flex items-center justify-between">
-        <h4 className="text-sm font-semibold">
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <h4 className="text-[15px] font-semibold">
           {mode === "create" ? t("cohort_create_title") : t("cohort_setup_title")}
         </h4>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="size-7"
+          className="size-[30px] rounded-full border border-[#CDEBE8] bg-white text-[#5A7B79] hover:bg-[#EDF8F6]"
           onClick={onClose}
           aria-label={t("close")}
         >
-          <X className="size-4" />
+          <X className="size-[15px]" />
         </Button>
       </div>
 
       {/* Pill tabs */}
-      <div className="mb-5 flex flex-wrap gap-1.5" role="tablist">
+      <div className="mb-[18px] flex flex-wrap gap-1.5" role="tablist">
         {SETUP_TABS.map((tab) => {
           const disabled = tabDisabled && tab !== "basic";
           return (
@@ -341,12 +341,12 @@ function CohortSetupPanel({
               aria-disabled={disabled}
               title={disabled ? t("cohort_tab_disabled_tooltip") : undefined}
               onClick={() => !disabled && setActiveTab(tab)}
-              className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+              className={`h-8 shrink-0 whitespace-nowrap rounded-full border px-3.5 text-[13px] font-semibold transition-colors ${
                 activeTab === tab
-                  ? "bg-[#16B9B3] text-white"
+                  ? "border-[#16B9B3] bg-[#16B9B3] text-white"
                   : disabled
-                    ? "cursor-not-allowed text-[#5A7B79] opacity-50"
-                    : "text-[#5A7B79] hover:bg-[#F0FBF9]"
+                    ? "cursor-not-allowed border-[#CDEBE8] bg-white text-[#5A7B79] opacity-50"
+                    : "border-[#CDEBE8] bg-white text-[#5A7B79] hover:bg-[#F0FBF9]"
               }`}
             >
               {t(`cohort_tab_${tab}`)}
@@ -909,18 +909,28 @@ function CohortSetupPanel({
       </div>
 
       {/* Bottom action bar */}
-      <div className="mt-5 flex items-center justify-end gap-3">
+      <div className="mt-5 flex items-center justify-end gap-2">
         {mode === "create" && (
-          <span className="flex items-center gap-2 text-sm">
+          <span className="mr-1 flex items-center gap-2 text-sm">
             <Switch checked={publishNow} onCheckedChange={setPublishNow} />
             {t("publish_now")}
           </span>
         )}
-        <Button type="submit" disabled={busy}>
-          {mode === "create" ? t("cohort_create") : t("save")}
-        </Button>
-        <Button type="button" variant="ghost" onClick={onClose} disabled={busy}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onClose}
+          disabled={busy}
+          className="h-auto rounded-full border-[#CDEBE8] bg-white px-[18px] py-[9px] text-sm font-normal text-[#5A7B79] hover:bg-[#F0FBF9] hover:text-[#5A7B79]"
+        >
           {t("cancel")}
+        </Button>
+        <Button
+          type="submit"
+          disabled={busy}
+          className="h-auto rounded-full bg-[#16B9B3] px-5 py-[9px] text-sm font-semibold text-white hover:brightness-[1.04]"
+        >
+          {mode === "create" ? t("cohort_create") : t("save")}
         </Button>
       </div>
     </form>
@@ -1101,145 +1111,147 @@ function CohortCard({
   const missingTemplates =
     templates && !templates.some((tpl) => tpl.boundCohortIds.includes(cohort.id));
 
-  if (editing) {
-    return (
-      <CohortSetupPanel
-        mode="edit"
-        cohort={cohort}
-        programId={programId}
-        organizationId={organizationId}
-        templates={templates}
-        onSubmit={handleEditSubmit}
-        onClose={() => setEditing(false)}
-        busy={busy}
-      />
-    );
-  }
+  const setupPanel = editing ? (
+    <CohortSetupPanel
+      mode="edit"
+      cohort={cohort}
+      programId={programId}
+      organizationId={organizationId}
+      templates={templates}
+      onSubmit={handleEditSubmit}
+      onClose={() => setEditing(false)}
+      busy={busy}
+    />
+  ) : null;
 
+  // 編輯時保留場次卡，設定面板在卡片下方展開（POC：卡片不被取代）
   return (
-    <div
-      id={`cohort-${cohort.id}`}
-      className="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-start"
-    >
-      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
-        <CalendarDays className="size-5" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h4 className="font-semibold">{cohort.displayName}</h4>
-          <span
-            className={`rounded-full px-2.5 py-1 font-mono text-[10px] uppercase ${COHORT_STATUS_STYLES[cohort.status]}`}
-          >
-            {t(`cohort_status_${cohort.status}`)}
-          </span>
-          {missingTemplates && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF6E8] px-2.5 py-1 text-[10px] font-semibold text-[#A95D00]">
-              <AlertTriangle className="size-3" />
-              {t("cohort_no_templates_warning")}
+    <div className="grid gap-3">
+      <div
+        id={`cohort-${cohort.id}`}
+        className="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-start"
+      >
+        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
+          <CalendarDays className="size-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h4 className="font-semibold">{cohort.displayName}</h4>
+            <span
+              className={`rounded-full px-2.5 py-1 font-mono text-[10px] uppercase ${COHORT_STATUS_STYLES[cohort.status]}`}
+            >
+              {t(`cohort_status_${cohort.status}`)}
             </span>
-          )}
-        </div>
-        <p className="mt-1 text-xs text-[#78928F]">
-          {cohort.startDate.slice(0, 10)} — {cohort.endDate.slice(0, 10)} · /{cohort.slug} ·{" "}
-          {cohort.isPrivate ? t("cohort_info_private") : t("cohort_info_public_activity")} ·{" "}
-          {cohort.feeType === "paid"
-            ? t("cohort_info_fee_paid", { amount: cohort.feeAmount ?? 0 })
-            : t("cohort_info_fee_free")}
-        </p>
-        {cohort.joinToken && (
-          <div className="mt-2">
-            <JoinCode joinToken={cohort.joinToken} />
-            {cohort.status === "published" && (
-              <CustomLink
-                href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/roster`}
-                className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#CDEBE8] px-3 py-1.5 text-xs font-medium text-[#0D5B59] hover:bg-[#EDF8F6]"
-              >
-                <Send className="size-3.5" aria-hidden="true" />
-                {t("cohort_invite_by_email")}
-              </CustomLink>
+            {missingTemplates && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF6E8] px-2.5 py-1 text-[10px] font-semibold text-[#A95D00]">
+                <AlertTriangle className="size-3" />
+                {t("cohort_no_templates_warning")}
+              </span>
             )}
           </div>
-        )}
-      </div>
-      <div className="flex shrink-0 items-center gap-1">
-        {cohort.status === "draft" && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-8"
-            onClick={handlePublish}
-            disabled={busy}
-            aria-label={t("cohort_publish")}
-            title={t("cohort_publish")}
-          >
-            <Send className="size-4" aria-hidden="true" />
-          </Button>
-        )}
-        {cohort.status !== "archived" && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-8"
-            onClick={() => setEditing(true)}
-            disabled={busy}
-            aria-label={t("edit")}
-            title={t("edit")}
-          >
-            <Pencil className="size-4" aria-hidden="true" />
-          </Button>
-        )}
-        <CustomLink
-          href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/dashboard`}
-          className="grid size-8 place-items-center rounded-full text-[#0D7773] hover:bg-[#EDF8F6]"
-          aria-label={t("manage_cohort")}
-          title={t("manage_cohort")}
-        >
-          <ArrowUpRight className="size-4" aria-hidden="true" />
-        </CustomLink>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <p className="mt-1 text-xs text-[#78928F]">
+            {cohort.startDate.slice(0, 10)} — {cohort.endDate.slice(0, 10)} · /{cohort.slug} ·{" "}
+            {cohort.isPrivate ? t("cohort_info_private") : t("cohort_info_public_activity")} ·{" "}
+            {cohort.feeType === "paid"
+              ? t("cohort_info_fee_paid", { amount: cohort.feeAmount ?? 0 })
+              : t("cohort_info_fee_free")}
+          </p>
+          {cohort.joinToken && (
+            <div className="mt-2">
+              <JoinCode joinToken={cohort.joinToken} />
+              {cohort.status === "published" && (
+                <CustomLink
+                  href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/roster`}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#CDEBE8] px-3 py-1.5 text-xs font-medium text-[#0D5B59] hover:bg-[#EDF8F6]"
+                >
+                  <Send className="size-3.5" aria-hidden="true" />
+                  {t("cohort_invite_by_email")}
+                </CustomLink>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          {cohort.status === "draft" && (
             <Button
               type="button"
               variant="ghost"
               size="icon"
               className="size-8"
-              aria-label={t("cohort_actions")}
-              title={t("cohort_actions")}
+              onClick={handlePublish}
               disabled={busy}
+              aria-label={t("cohort_publish")}
+              title={t("cohort_publish")}
             >
-              <MoreVertical className="size-4" aria-hidden="true" />
+              <Send className="size-4" aria-hidden="true" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-36 rounded-xl border-[#CDEBE8]">
-            <DropdownMenuItem onClick={handleDuplicate} disabled={busy} className="gap-2">
-              <Copy className="size-4" aria-hidden="true" />
-              {t("cohort_duplicate")}
-            </DropdownMenuItem>
-            {cohort.status !== "archived" && (
-              <DropdownMenuItem
-                onClick={() => setConfirmArchive(true)}
+          )}
+          {cohort.status !== "archived" && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={() => setEditing(true)}
+              disabled={busy}
+              aria-label={t("edit")}
+              title={t("edit")}
+            >
+              <Pencil className="size-4" aria-hidden="true" />
+            </Button>
+          )}
+          <CustomLink
+            href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/dashboard`}
+            className="grid size-8 place-items-center rounded-full text-[#0D7773] hover:bg-[#EDF8F6]"
+            aria-label={t("manage_cohort")}
+            title={t("manage_cohort")}
+          >
+            <ArrowUpRight className="size-4" aria-hidden="true" />
+          </CustomLink>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-8"
+                aria-label={t("cohort_actions")}
+                title={t("cohort_actions")}
                 disabled={busy}
-                className="gap-2 text-[#C03A3A]"
               >
-                <Archive className="size-4" aria-hidden="true" />
-                {t("archive")}
+                <MoreVertical className="size-4" aria-hidden="true" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-36 rounded-xl border-[#CDEBE8]">
+              <DropdownMenuItem onClick={handleDuplicate} disabled={busy} className="gap-2">
+                <Copy className="size-4" aria-hidden="true" />
+                {t("cohort_duplicate")}
               </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+              {cohort.status !== "archived" && (
+                <DropdownMenuItem
+                  onClick={() => setConfirmArchive(true)}
+                  disabled={busy}
+                  className="gap-2 text-[#C03A3A]"
+                >
+                  <Archive className="size-4" aria-hidden="true" />
+                  {t("archive")}
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <ConfirmDialog
+          open={confirmArchive}
+          title={t("cohort_archive_title")}
+          description={t("cohort_archive_confirm")}
+          confirmLabel={t("archive")}
+          destructive
+          busy={busy}
+          onConfirm={handleArchive}
+          onOpenChange={setConfirmArchive}
+        />
       </div>
-      <ConfirmDialog
-        open={confirmArchive}
-        title={t("cohort_archive_title")}
-        description={t("cohort_archive_confirm")}
-        confirmLabel={t("archive")}
-        destructive
-        busy={busy}
-        onConfirm={handleArchive}
-        onOpenChange={setConfirmArchive}
-      />
+      {setupPanel}
     </div>
   );
 }
