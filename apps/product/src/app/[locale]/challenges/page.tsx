@@ -10,9 +10,9 @@ import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { Box, Flag, Star } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChallengeCard, InspirationDrawDialog, JoinChallengeDialog } from "@/components/challenge";
-import { buildPracticeIdMap } from "@/utils/challenge-card";
+import { buildPracticeIdMap, pruneJustJoined } from "@/utils/challenge-card";
 
 /**
  * 探索共同挑戰 standalone 頁（openspec: challenge-discovery）
@@ -40,6 +40,11 @@ export default function ChallengesPage() {
     () => buildPracticeIdMap(mineData?.data ?? [], justJoinedPracticeIds),
     [mineData, justJoinedPracticeIds]
   );
+  // /me/challenges 已有該挑戰項目後，丟掉保留的 join 回傳值，以列表（含明確的 null）為準
+  useEffect(() => {
+    if (!mineData) return;
+    setJustJoinedPracticeIds((prev) => pruneJustJoined(prev, mineData.data));
+  }, [mineData]);
   const sections = useMemo(
     () =>
       [

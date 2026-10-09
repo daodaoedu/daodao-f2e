@@ -70,6 +70,9 @@ export const isChallengeActionMuted = (action: ChallengeCardAction): boolean =>
  * 卡片用的「挑戰 id → 自動複製實踐 id」對照：以 `/me/challenges` 為主，
  * 剛加入（join API 已回傳 practiceId、但列表尚未 revalidate）的挑戰以回傳值補上，
  * 讓加入後的卡片立即可點。
+ *
+ * 只在 `/me/challenges` 還沒有該挑戰的項目時才用 join 回傳值；列表明確回 `practiceId: null`
+ * （無綁定模板或實踐已刪除）是權威值，不可被保留的 join id 蓋掉。
  */
 export const buildPracticeIdMap = (
   mine: ReadonlyArray<{ id: number; practiceId: string | null }>,
@@ -77,9 +80,23 @@ export const buildPracticeIdMap = (
 ): Map<number, string | null> => {
   const map = new Map<number, string | null>(mine.map((item) => [item.id, item.practiceId]));
   for (const [id, practiceId] of Object.entries(justJoined)) {
-    if (practiceId && !map.get(Number(id))) map.set(Number(id), practiceId);
+    if (practiceId && !map.has(Number(id))) map.set(Number(id), practiceId);
   }
   return map;
+};
+
+/**
+ * `/me/challenges` 已有項目（不論 practiceId 是否為 null）的挑戰，丟掉保留的 join 回傳值。
+ * 沒有要丟的就回傳原物件，讓 React state 不必更新。
+ */
+export const pruneJustJoined = (
+  justJoined: Readonly<Record<number, string | null>>,
+  mine: ReadonlyArray<{ id: number; practiceId: string | null }>
+): Readonly<Record<number, string | null>> => {
+  const listed = new Set(mine.map((item) => item.id));
+  const kept = Object.entries(justJoined).filter(([id]) => !listed.has(Number(id)));
+  if (kept.length === Object.keys(justJoined).length) return justJoined;
+  return Object.fromEntries(kept);
 };
 
 /**

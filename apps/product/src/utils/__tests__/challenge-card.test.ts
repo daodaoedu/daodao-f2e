@@ -4,6 +4,7 @@ import {
   getChallengeCardAction,
   getChallengeStatusKey,
   isChallengeActionMuted,
+  pruneJustJoined,
 } from "../challenge-card";
 
 const PRACTICE_ID = "7f1c2a4e-0000-4000-8000-000000000001";
@@ -195,5 +196,46 @@ describe("buildPracticeIdMap", () => {
     expect(map.get(7)).toBe("from-list");
     expect(map.get(8)).toBeNull();
     expect(map.has(9)).toBe(false);
+  });
+
+  // Codex P2：/me/challenges 明確回 practiceId: null（例如實踐在別的分頁被刪）是權威值，
+  // 不可被保留的 join 回傳 id 蓋掉
+  describe("join-response fallback only when /me/challenges has no entry yet", () => {
+    it("entry missing → uses the join-response id (card links)", () => {
+      const map = buildPracticeIdMap([], { 7: "joined-practice" });
+      const action = getChallengeCardAction({ ...base, runStatus: "ongoing" }, map.get(7));
+      expect(action.href).toBe("/practices/joined-practice");
+      expect(isChallengeActionMuted(action)).toBe(false);
+    });
+
+    it("entry with an id → uses the /me/challenges id", () => {
+      const map = buildPracticeIdMap([{ id: 7, practiceId: "from-list" }], {
+        7: "joined-practice",
+      });
+      expect(map.get(7)).toBe("from-list");
+    });
+
+    it("entry with explicit null → no link and a muted pill, even with a retained join id", () => {
+      const map = buildPracticeIdMap([{ id: 7, practiceId: null }], { 7: "joined-practice" });
+      expect(map.get(7)).toBeNull();
+      const action = getChallengeCardAction({ ...base, runStatus: "ongoing" }, map.get(7));
+      expect(action.href).toBeNull();
+      expect(isChallengeActionMuted(action)).toBe(true);
+    });
+  });
+});
+
+describe("pruneJustJoined", () => {
+  it("drops retained join ids once /me/challenges has an entry (id or null)", () => {
+    const pruned = pruneJustJoined({ 7: "a", 8: "b", 9: "c" }, [
+      { id: 7, practiceId: "a" },
+      { id: 8, practiceId: null },
+    ]);
+    expect(pruned).toEqual({ 9: "c" });
+  });
+
+  it("returns the same object when nothing changes (no re-render loop)", () => {
+    const justJoined = { 9: "c" };
+    expect(pruneJustJoined(justJoined, [{ id: 7, practiceId: "a" }])).toBe(justJoined);
   });
 });
