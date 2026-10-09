@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatMemberType } from "@daodao/api";
-import { useChatMembers } from "@daodao/api";
+import { selectChatMembers, useChatMembers } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
@@ -47,7 +47,7 @@ export function MemberPanel({ roomId, isOpen, onClose }: MemberPanelProps) {
   const t = useTranslations("messages");
   const { data: members } = useChatMembers(isOpen ? roomId : null);
 
-  const memberList = Array.isArray(members) ? members : [];
+  const memberList = selectChatMembers(members);
   const sorted = [...memberList].sort((a, b) => {
     if (a.isHost && !b.isHost) return -1;
     if (!a.isHost && b.isHost) return 1;
