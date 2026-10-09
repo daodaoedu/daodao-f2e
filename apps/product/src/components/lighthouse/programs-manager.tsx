@@ -52,6 +52,11 @@ import {
   type CohortFieldErrorKey,
   resolveCohortApiError,
 } from "@/utils/cohort-api-error";
+import {
+  diffTemplateBindings,
+  isCohortStarted,
+  resolveTemplateSelection,
+} from "@/utils/template-library";
 import { ConfirmDialog } from "./confirm-dialog";
 import { JoinCode } from "./join-code";
 
@@ -87,6 +92,27 @@ function cohortErrorMessage(
   if (resolved.type === "i18n") return t(resolved.key);
   if (resolved.type === "message") return resolved.message;
   return t(fallbackKey);
+}
+
+/** 送出模板綁定異動，回傳第一個失敗的 API 錯誤（含網路錯誤）；全部成功回 null */
+async function applyTemplateBindings(
+  organizationId: number,
+  cohortId: number,
+  { bind, unbind }: { bind: number[]; unbind: number[] }
+): Promise<unknown> {
+  try {
+    const responses = await Promise.all([
+      ...bind.map((templateId) =>
+        setLighthouseTemplateBinding(organizationId, templateId, cohortId, true)
+      ),
+      ...unbind.map((templateId) =>
+        setLighthouseTemplateBinding(organizationId, templateId, cohortId, false)
+      ),
+    ]);
+    return responses.find((response) => response.error)?.error ?? null;
+  } catch (error) {
+    return error;
+  }
 }
 
 interface CohortSetupPanelProps {
@@ -127,7 +153,24 @@ function CohortSetupPanel({
   const t = useTranslations("lighthouse");
   const [activeTab, setActiveTab] = useState<SetupTab>("basic");
   const panelRef = useRef<HTMLFormElement>(null);
-  const selectedTemplatesRef = useRef<Set<number>>(new Set());
+  // 已開始的場次 server 會拒絕變更綁定（FR-TPL-05），直接鎖住勾選
+  const templatesLocked = mode === "edit" && !!cohort && isCohortStarted(cohort.startDate);
+  // 只記使用者動過的模板，其餘跟著最新的既有綁定走：templates 可能比面板晚載入，
+  // 也不會把別人剛綁上的模板當成「取消勾選」解綁掉。
+  // 新增場次預設不綁任何模板：建立時模板分頁是 disabled，不能讓使用者看不到就被綁上全部（#273）
+  const [templateOverrides, setTemplateOverrides] = useState<Map<number, boolean>>(() => new Map());
+  const selectedTemplateIds = resolveTemplateSelection(
+    cohort
+      ? (templates ?? [])
+          .filter((tpl) => tpl.boundCohortIds.includes(cohort.id))
+          .map((tpl) => tpl.id)
+      : [],
+    templatesLocked ? new Map() : templateOverrides
+  );
+
+  function toggleTemplate(templateId: number, checked: boolean) {
+    setTemplateOverrides((prev) => new Map(prev).set(templateId, checked));
+  }
 
   const [sessions, setSessions] = useState<SessionEntry[]>(() =>
     (cohort?.sessions ?? []).map((s, i) => ({
@@ -217,7 +260,7 @@ function CohortSetupPanel({
       checkinDefaultPrivate: checkinPrivate,
       hostCommentDefaultPrivate: hostCommentPrivate,
       visibility,
-      selectedTemplateIds: Array.from(selectedTemplatesRef.current),
+      selectedTemplateIds: Array.from(selectedTemplateIds),
       publishNow,
     });
   }
@@ -577,10 +620,12 @@ function CohortSetupPanel({
         <div className="mb-3 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">{t("cohort_select_templates")}</p>
-            <p className="mt-0.5 text-xs text-[#78928F]">{t("cohort_select_templates_hint")}</p>
+            <p className="mt-0.5 text-xs text-[#78928F]">
+              {templatesLocked ? t("cohort_templates_locked") : t("cohort_select_templates_hint")}
+            </p>
           </div>
           <p className="text-xs text-[#78928F]">
-            {t("cohort_templates_linked_count", { count: selectedTemplatesRef.current.size })}
+            {t("cohort_templates_linked_count", { count: selectedTemplateIds.size })}
           </p>
         </div>
         {templates && templates.length > 0 ? (
@@ -597,7 +642,6 @@ function CohortSetupPanel({
             {filteredTemplates.length > 0 ? (
               <div className="grid gap-2 sm:grid-cols-2">
                 {filteredTemplates.map((tpl) => {
-                  const bound = cohort ? tpl.boundCohortIds.includes(cohort.id) : true;
                   return (
                     <label
                       key={tpl.id}
@@ -605,15 +649,10 @@ function CohortSetupPanel({
                     >
                       <input
                         type="checkbox"
-                        defaultChecked={bound}
+                        checked={selectedTemplateIds.has(tpl.id)}
+                        disabled={templatesLocked}
                         className="size-4 accent-[#0D7773]"
-                        onChange={(e) => {
-                          if (e.target.checked) selectedTemplatesRef.current.add(tpl.id);
-                          else selectedTemplatesRef.current.delete(tpl.id);
-                        }}
-                        ref={(el) => {
-                          if (el && bound) selectedTemplatesRef.current.add(tpl.id);
-                        }}
+                        onChange={(e) => toggleTemplate(tpl.id, e.target.checked)}
                       />
                       {tpl.title}
                     </label>
@@ -764,9 +803,17 @@ interface CohortCardProps {
   cohort: LighthouseCohortType;
   templates?: CohortTemplateSummary[];
   refresh: () => Promise<unknown>;
+  refreshTemplates: () => Promise<unknown>;
 }
 
-function CohortCard({ programId, organizationId, cohort, templates, refresh }: CohortCardProps) {
+function CohortCard({
+  programId,
+  organizationId,
+  cohort,
+  templates,
+  refresh,
+  refreshTemplates,
+}: CohortCardProps) {
   const t = useTranslations("lighthouse");
   const searchParams = useSearchParams();
   const [editing, setEditing] = useState(searchParams.get("edit") === String(cohort.id));
@@ -837,7 +884,34 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
         toast.error(t("cohort_external_signup_url_error"));
         return;
       }
+      const bindingChanges = diffTemplateBindings(
+        templates ?? [],
+        cohort.id,
+        extras.selectedTemplateIds ?? []
+      );
+      // 解除未開始場次的模板綁定前要確認（FR-TPL-05）
+      if (
+        bindingChanges.unbind.length > 0 &&
+        !window.confirm(
+          t("cohort_template_unbind_confirm", { count: bindingChanges.unbind.length })
+        )
+      ) {
+        return;
+      }
       setBusy(true);
+      // 模板分頁的勾選不在 cohort payload 裡，要另外對綁定 API 送差異（#273）。
+      // 先送綁定再存場次：開始日改到今天以前，server 就會鎖住綁定（FR-TPL-05）
+      const bindingError = await applyTemplateBindings(organizationId, cohort.id, bindingChanges);
+      if (bindingError) {
+        setBusy(false);
+        await refreshTemplates();
+        toast.error(
+          t("cohort_template_binding_failed", {
+            reason: apiErrorMessage(bindingError, t("save_failed")),
+          })
+        );
+        return;
+      }
       const response = await updateLighthouseCohort(programId, cohort.id, {
         displayName: String(formData.get("displayName") ?? "").trim(),
         tagline: String(formData.get("tagline") ?? "").trim() || null,
@@ -869,16 +943,21 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
         checkinDefaultPrivate: extras.checkinDefaultPrivate,
         hostCommentDefaultPrivate: extras.hostCommentDefaultPrivate,
       } as Parameters<typeof updateLighthouseCohort>[2]);
-      setBusy(false);
       if (response.error) {
-        toast.error(cohortErrorMessage(t, response.error, "save_failed"));
+        setBusy(false);
+        await refreshTemplates();
+        const reason = cohortErrorMessage(t, response.error, "save_failed");
+        // 綁定已先送出成功，要講清楚只有場次設定沒存，不然使用者會以為模板也沒連上
+        const bindingsChanged = bindingChanges.bind.length + bindingChanges.unbind.length > 0;
+        toast.error(bindingsChanged ? t("cohort_saved_templates_only", { reason }) : reason);
         return;
       }
-      await refresh();
+      setBusy(false);
+      await Promise.all([refresh(), refreshTemplates()]);
       setEditing(false);
       toast.success(t("cohort_saved"));
     },
-    [programId, cohort.id, refresh, t]
+    [programId, organizationId, cohort.id, templates, refresh, refreshTemplates, t]
   );
 
   const missingTemplates =
@@ -1160,19 +1239,13 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         toast.error(cohortErrorMessage(t, response.error, "cohort_create_failed"));
         return;
       }
-      const newCohortId = (response.data as { data: { id: number } }).data.id;
-      const templateIds = extras.selectedTemplateIds ?? [];
-      await Promise.all(
-        templateIds.map((templateId) =>
-          setLighthouseTemplateBinding(program.organizationId, templateId, newCohortId, true)
-        )
-      );
+      // 新增場次不綁模板（#273 決策）：模板分頁在建立時是 disabled，建好後從編輯或模板庫綁定
       setBusy(false);
       await mutate();
       setCreatingCohort(false);
       toast.success(t("cohort_created"));
     },
-    [program.id, program.organizationId, mutate, t]
+    [program.id, mutate, t]
   );
 
   return (
@@ -1305,6 +1378,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               cohort={cohort}
               templates={templates}
               refresh={mutate}
+              refreshTemplates={templatesQuery.mutate}
             />
           ))}
         </div>
