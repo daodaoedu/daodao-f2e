@@ -5,6 +5,7 @@ import {
   deleteChatMessage,
   likeChatMessage,
   pinChatMessage,
+  selectChatErrorMessage,
   unlikeChatMessage,
   unpinChatMessage,
 } from "@daodao/api";
@@ -118,11 +119,7 @@ export function ChatMessageItem({
     try {
       const response = await deleteChatMessage(message.roomId, message.id);
       if (response.error) {
-        const msg =
-          response.error && typeof response.error === "object" && "message" in response.error
-            ? String(response.error.message)
-            : t("send_failed");
-        toast.error(msg);
+        toast.error(selectChatErrorMessage(response.error, t("send_failed")));
         return;
       }
       onMutate?.();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useChatSearch } from "@daodao/api";
+import { selectChatSearch, useChatSearch } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
@@ -37,8 +37,7 @@ export function SearchBar({ roomId, isOpen, onClose, onNavigateToMessage }: Sear
   }, [inputValue]);
 
   const { data: searchData } = useChatSearch(isOpen ? roomId : null, debouncedQuery);
-  const results = searchData?.items ?? [];
-  const total = searchData?.total ?? 0;
+  const { items: results, total } = selectChatSearch(searchData);
 
   // Focus input when opened
   useEffect(() => {
