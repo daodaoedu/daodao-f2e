@@ -12,9 +12,9 @@ import { useQuery } from "../hooks";
 export const useChallenges = () =>
   useQuery("/api/v1/challenges", {}, { revalidateOnFocus: false, refreshInterval: 60_000 });
 
-/** 我參加的共同挑戰（空間共同挑戰子頁） */
-export const useMyChallenges = () =>
-  useQuery("/api/v1/me/challenges", {}, { revalidateOnFocus: false });
+/** 我參加的共同挑戰（空間共同挑戰子頁）；`enabled=false`（例如未登入）時不發請求 */
+export const useMyChallenges = (enabled = true) =>
+  useQuery("/api/v1/me/challenges", enabled ? {} : null, { revalidateOnFocus: false });
 
 /** 挑戰詳情 */
 export const useChallenge = (challengeId: number | undefined) =>
