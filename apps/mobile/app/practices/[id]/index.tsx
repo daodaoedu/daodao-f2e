@@ -1,4 +1,5 @@
 import { useCopyPractice } from "@daodao/api";
+import { resolvePracticeDurationDays } from "@daodao/shared/lib/practice-period";
 import DialogOutlineSvg from "@daodao/assets/images/icon/dialog-outline.svg";
 import TagSolidSvg from "@daodao/assets/images/icon/tag-solid.svg";
 import {
@@ -358,7 +359,8 @@ export default function PracticeDetailScreen() {
   const status = practice.status || "in-progress";
   const statusInfo = statusConfig[status] || statusConfig["in-progress"];
   const canViewSummary = status === "completed" || practice.targetDays <= practice.completedDays;
-  const durationDays = practice.durationDays ?? practice.targetDays;
+  // 與網頁同一規則：天數照 API，缺天數時由起訖日推回，都無法判斷就不顯示（daodao#299）
+  const durationDays = resolvePracticeDurationDays(practice);
   const hasStats = Boolean(frequencyLabel) || practice.sessionDurationMinutes != null;
 
   // 依實踐狀態渲染底部主要按鈕（對齊 product：orange variant 膠囊、深色字、無圖示、h-10 高度）
@@ -602,13 +604,15 @@ export default function PracticeDetailScreen() {
                   <View style={{ flex: 1 }}>
                     <ExecutionTimingCard executionTiming={executionTiming} />
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <ExecutionDurationCard
-                      durationDays={durationDays}
-                      startDate={practice.startDate ?? null}
-                      showRemaining
-                    />
-                  </View>
+                  {durationDays !== null && (
+                    <View style={{ flex: 1 }}>
+                      <ExecutionDurationCard
+                        durationDays={durationDays}
+                        startDate={practice.startDate ?? null}
+                        showRemaining
+                      />
+                    </View>
+                  )}
                 </XStack>
               )}
 

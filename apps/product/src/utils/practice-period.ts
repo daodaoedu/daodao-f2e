@@ -5,4 +5,5 @@ export {
   parseLocalDate,
   practiceEndDate,
   practiceRemainingDays,
+  resolvePracticeDurationDays,
 } from "@daodao/shared/lib/practice-period";

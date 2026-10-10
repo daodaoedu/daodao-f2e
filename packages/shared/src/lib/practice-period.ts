@@ -32,6 +32,27 @@ export function practiceEndDate(start: Date, durationDays: number): Date {
 }
 
 /**
+ * 實踐天數以 API 為準：durationDays 是正整數就照用，不限 7／14／21／30（那只是建立流程的選項）。
+ * 從共同挑戰複製出的實踐天數跟著挑戰起訖日，可以是任何天數（daodao#299）。
+ * 沒有 durationDays 時由起訖日（含頭尾）推回；都無法判斷回傳 null，不捏造預設天數。
+ */
+export function resolvePracticeDurationDays(practice: {
+  durationDays?: number | null;
+  startDate?: string | null;
+  endDate?: string | null;
+}): number | null {
+  const { durationDays, startDate, endDate } = practice;
+  if (typeof durationDays === "number" && Number.isInteger(durationDays) && durationDays >= 1) {
+    return durationDays;
+  }
+  const start = startDate ? parseLocalDate(startDate) : null;
+  const end = endDate ? parseLocalDate(endDate) : null;
+  if (!start || !end) return null;
+  const days = differenceInCalendarDays(end, start) + 1;
+  return days >= 1 ? days : null;
+}
+
+/**
  * 剩餘天數：今天到結束日（含頭尾）的日曆日數，限制在 0～總天數。
  * 開始日當天 = 總天數、結束日當天 = 1、結束後 = 0；以日曆日計算，不受當下幾點影響。
  */

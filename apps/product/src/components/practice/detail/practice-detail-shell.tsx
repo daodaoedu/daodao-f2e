@@ -55,7 +55,7 @@ import {
   BrowseActivityContent,
   type IBrowseActivityFollower,
 } from "@/components/practice/shared/browse-activity-content";
-import type { DurationDays, ExecutionTiming, Frequency } from "@/constants/practice-form";
+import type { ExecutionTiming, Frequency } from "@/constants/practice-form";
 import type { PracticeStatus } from "@/constants/practice-status";
 import {
   PICKER_REACTIONS,
@@ -89,7 +89,8 @@ interface IPracticeDetailViewModel {
   actionDescription: string;
   frequency: Frequency;
   durationMinutes: number;
-  durationDays: DurationDays;
+  /** 實踐天數（照 API，可為 1～上限任何天數）；null 代表 API 無法判斷天數 */
+  durationDays: number | null;
   startDate?: string;
   executionTiming: ExecutionTiming[];
   customTiming?: string;
@@ -688,11 +689,13 @@ export function PracticeDetailShell({
                     executionTiming={practice.executionTiming}
                     customTiming={practice.customTiming}
                   />
-                  <ExecutionDurationCard
-                    durationDays={practice.durationDays}
-                    startDate={practice.startDate || ""}
-                    showRemaining
-                  />
+                  {practice.durationDays !== null && (
+                    <ExecutionDurationCard
+                      durationDays={practice.durationDays}
+                      startDate={practice.startDate || ""}
+                      showRemaining
+                    />
+                  )}
                 </div>
               </div>
             </div>
