@@ -17,7 +17,7 @@ const TOAST_DISMISSED_KEY = "showcase_public_toast_dismissed";
  */
 function PageShell({ message }: { message: string }) {
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <PageHeader leftAction="back" leftLabel="" title="" rightActionTo="/" />
       <BackgroundAnimation />
       <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">

@@ -301,7 +301,7 @@ export const PracticeWizard = ({
   }
 
   return (
-    <div className="relative z-10 min-h-screen w-screen overflow-hidden overflow-y-auto bg-white">
+    <div className="relative z-10 min-h-screen w-full overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
       <PageHeader title={headerTitle} rightActionTo="/" rightLabel={t("wizard_close")} />

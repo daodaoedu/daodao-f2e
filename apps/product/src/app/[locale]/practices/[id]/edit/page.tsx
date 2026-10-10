@@ -300,7 +300,7 @@ export default function EditPracticePage() {
   // Loading 狀態
   if (isLoading) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
         <PageHeader leftAction="back" leftLabel="" title={t("edit_title")} rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
@@ -313,7 +313,7 @@ export default function EditPracticePage() {
   // Error 狀態
   if (error || !practiceData?.data) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
         <PageHeader leftAction="back" leftLabel="" title={t("edit_title")} rightActionTo="/" />
         <BackgroundAnimation />
         <main className="max-w-[448px] mx-auto px-5 pb-6 pt-4">
@@ -326,7 +326,7 @@ export default function EditPracticePage() {
   }
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
       <PageHeader title={t("edit_title")} rightActionTo={`/practices/${practiceId}`} />

@@ -41,7 +41,7 @@ export default function CopySuccessPage() {
   const startDate = practice?.startDate ? format(new Date(practice.startDate), "yyyy/MM/dd") : "";
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
       <ConfettiAnimation />
       <main className="relative max-w-[600px] mx-auto min-h-screen flex flex-col items-center justify-center px-5 py-12 gap-6">

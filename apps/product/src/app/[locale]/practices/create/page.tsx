@@ -118,7 +118,7 @@ export default function CreatePracticePage() {
   }, [currentPractices, selectedCategory]);
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-linear-to-br from-[#F5F9E8] via-white to-[#F0F4F8]">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-linear-to-br from-[#F5F9E8] via-white to-[#F0F4F8]">
       <BackgroundAnimation />
 
       <PageHeader rightActionTo="/" />
