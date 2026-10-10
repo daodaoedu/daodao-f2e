@@ -32,6 +32,8 @@ export * from "./email";
 export * from "./email-hooks";
 // Feed Service
 export * from "./feed-hooks";
+
+export * from "./feedback";
 // Follow Service
 export * from "./follow";
 export * from "./follow-hooks";
