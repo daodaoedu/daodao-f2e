@@ -1,14 +1,16 @@
 "use client";
 
+import { BUG_REPORT_AREAS, type BugReportArea, submitBugReport } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle, ImagePlus, X } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
+import { resolveBugReportErrorMessage } from "./bug-report-error";
 
-const AREA_KEYS = ["ui", "performance", "auth", "data", "other"] as const;
-type Area = (typeof AREA_KEYS)[number];
+const AREA_KEYS = BUG_REPORT_AREAS;
+type Area = BugReportArea;
 
 interface PreviewFile {
   file: File;
@@ -65,25 +67,18 @@ export function BugReportForm() {
 
     setIsSubmitting(true);
     try {
-      const formData = new FormData();
-      formData.append("area", area);
-      formData.append("description", description);
-      if (link) formData.append("link", link);
-      formData.append("referrer", window.location.href);
-      formData.append("userAgent", navigator.userAgent);
-      for (const s of screenshots) {
-        formData.append("screenshots", s.file);
-      }
-
-      const res = await fetch("/api/feedback/bug-report", {
-        method: "POST",
-        body: formData,
+      await submitBugReport({
+        area,
+        description,
+        link,
+        referrer: window.location.href,
+        userAgent: navigator.userAgent,
+        screenshots: screenshots.map((s) => s.file),
       });
-
-      if (!res.ok) throw new Error("Submit failed");
       setIsSuccess(true);
-    } catch {
-      toast.error(t("operation_failed_retry"));
+    } catch (error) {
+      // 400／422 顯示 server 訊息與出錯欄位，其他狀態與網路錯誤顯示通用訊息；表單內容保留不清空
+      toast.error(resolveBugReportErrorMessage(error, (key) => t(key)));
     } finally {
       setIsSubmitting(false);
     }
@@ -155,7 +150,10 @@ export function BugReportForm() {
         <p className="text-sm font-medium text-text-dark mb-2">{t("bug_screenshots_label")}</p>
         <div className="flex flex-wrap gap-2">
           {screenshots.map((s, i) => (
-            <div key={s.url} className="relative size-20 rounded-lg overflow-hidden border border-[#E4EAE9]">
+            <div
+              key={s.url}
+              className="relative size-20 rounded-lg overflow-hidden border border-[#E4EAE9]"
+            >
               <img src={s.url} alt="" className="size-full object-cover" />
               <button
                 type="button"
