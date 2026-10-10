@@ -3,6 +3,10 @@
 import type { ChatMessageType } from "@daodao/api";
 import {
   markChatRoomRead,
+  selectChatDelta,
+  selectChatHistory,
+  selectChatPins,
+  selectChatRoom,
   useChatMessageDelta,
   useChatMessageHistory,
   useChatPins,
@@ -30,7 +34,8 @@ export default function ChatRoomPage() {
 
   const { data: userData } = useCurrentUser();
   const currentUserId = userData?.data?.id ? Number(userData.data.id) : 0;
-  const { data: room, isLoading: roomLoading } = useChatRoom(roomId || null);
+  const { data: roomData, isLoading: roomLoading } = useChatRoom(roomId || null);
+  const room = selectChatRoom(roomData);
   const { data: pinsData } = useChatPins(roomId || null);
 
   const {
@@ -40,7 +45,7 @@ export default function ChatRoomPage() {
   } = useChatMessageHistory(roomId || null);
 
   const historyMessages: ChatMessageType[] = useMemo(
-    () => historyData?.messages ?? [],
+    () => selectChatHistory(historyData),
     [historyData]
   );
 
@@ -55,14 +60,7 @@ export default function ChatRoomPage() {
 
   const { data: deltaData } = useChatMessageDelta(roomId || null, latestId, sinceRef.current);
 
-  const delta = useMemo(() => {
-    if (!deltaData) return null;
-    return {
-      messages: deltaData.messages ?? [],
-      changed: deltaData.changed ?? [],
-      deletedIds: deltaData.deletedIds ?? [],
-    };
-  }, [deltaData]);
+  const delta = useMemo(() => selectChatDelta(deltaData), [deltaData]);
 
   const timeline = useChatTimeline(historyMessages, delta);
 
@@ -73,7 +71,7 @@ export default function ChatRoomPage() {
   const [showPins, setShowPins] = useState(false);
 
   const isHost = room?.viewerRole === "host";
-  const pinnedCount = pinsData ? (Array.isArray(pinsData) ? pinsData.length : 0) : 0;
+  const pinnedCount = selectChatPins(pinsData).length;
 
   useEffect(() => {
     const allMessages = timeline.filter((i) => i.type === "message");
@@ -126,14 +124,10 @@ export default function ChatRoomPage() {
             onTogglePins={() => togglePanel("pins")}
           />
           {showSearch && (
-            <SearchBar
-              roomId={roomId}
-              isOpen={showSearch}
-              onClose={() => setShowSearch(false)}
-            />
+            <SearchBar roomId={roomId} isOpen={showSearch} onClose={() => setShowSearch(false)} />
           )}
           <PinBanner roomId={roomId} onOpenPinPanel={() => togglePanel("pins")} />
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto" data-chat-scroll>
             <ChatMessageList
               timeline={timeline}
               isLoading={historyLoading}

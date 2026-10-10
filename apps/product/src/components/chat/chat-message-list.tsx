@@ -33,7 +33,10 @@ export function ChatMessageList({
   useEffect(() => {
     const msgCount = timeline.filter((i) => i.type === "message").length;
     if (msgCount > 0 && msgCount !== prevCountRef.current) {
-      bottomRef.current?.scrollIntoView({
+      // 只捲對話區自己的捲動容器；scrollIntoView 會連 window 一起捲，把聊天室標頭推出畫面
+      const scroller = bottomRef.current?.closest<HTMLElement>("[data-chat-scroll]");
+      scroller?.scrollTo({
+        top: scroller.scrollHeight,
         behavior: prevCountRef.current === 0 ? "instant" : "smooth",
       });
       prevCountRef.current = msgCount;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useChatPins } from "@daodao/api";
+import { selectChatPins, useChatPins } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { getStorage, StorageEnum } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -18,7 +18,7 @@ export function PinBanner({ roomId, onOpenPinPanel }: PinBannerProps) {
   const t = useTranslations("messages");
   const { data: pins } = useChatPins(roomId);
 
-  const latestPin = Array.isArray(pins) ? pins[0] : undefined;
+  const latestPin = selectChatPins(pins)[0];
   const latestPinId = latestPin?.id ?? 0;
 
   const isDismissed = useMemo(() => {

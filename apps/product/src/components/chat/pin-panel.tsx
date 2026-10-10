@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatPinnedMessageType } from "@daodao/api";
-import { unpinChatMessage, useChatPins } from "@daodao/api";
+import { selectChatErrorMessage, selectChatPins, unpinChatMessage, useChatPins } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
@@ -33,11 +33,7 @@ function PinnedItem({
   const handleUnpin = useCallback(async () => {
     const response = await unpinChatMessage(roomId, pin.id);
     if (response.error) {
-      const msg =
-        response.error && typeof response.error === "object" && "message" in response.error
-          ? String(response.error.message)
-          : t("send_failed");
-      toast.error(msg);
+      toast.error(selectChatErrorMessage(response.error, t("send_failed")));
       return;
     }
     onUnpin();
@@ -81,7 +77,7 @@ export function PinPanel({ roomId, isOpen, onClose, isHost }: PinPanelProps) {
   const t = useTranslations("messages");
   const { data: pins, mutate } = useChatPins(roomId);
 
-  const pinList = Array.isArray(pins) ? pins : [];
+  const pinList = selectChatPins(pins);
 
   const handleUnpin = useCallback(() => {
     void mutate();

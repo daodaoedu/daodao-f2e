@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatMessageType } from "@daodao/api";
-import { editChatMessage, sendChatMessage } from "@daodao/api";
+import { editChatMessage, selectChatErrorMessage, sendChatMessage } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useCompositionState } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -56,11 +56,7 @@ export function ChatInput({
       if (editingMessage) {
         const response = await editChatMessage(roomId, editingMessage.id, trimmed);
         if (response.error) {
-          const msg =
-            response.error && typeof response.error === "object" && "message" in response.error
-              ? String(response.error.message)
-              : t("send_failed");
-          toast.error(msg);
+          toast.error(selectChatErrorMessage(response.error, t("send_failed")));
           return;
         }
         resetInput();
@@ -69,11 +65,7 @@ export function ChatInput({
       } else {
         const response = await sendChatMessage(roomId, trimmed, replyTo?.id);
         if (response.error) {
-          const msg =
-            response.error && typeof response.error === "object" && "message" in response.error
-              ? String(response.error.message)
-              : t("send_failed");
-          toast.error(msg);
+          toast.error(selectChatErrorMessage(response.error, t("send_failed")));
           return;
         }
         resetInput();
