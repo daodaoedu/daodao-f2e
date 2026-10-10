@@ -5,7 +5,7 @@ import { DefaultAvatarSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
-import { buttonVariants } from "@daodao/ui/components/button";
+import { Button, buttonVariants } from "@daodao/ui/components/button";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid, parseISO } from "date-fns";
@@ -19,6 +19,7 @@ import {
   Users,
 } from "lucide-react";
 import { useParams } from "next/navigation";
+import { type ActivityDetailCta, resolveActivityDetailCta } from "@/constants/activity-detail-cta";
 
 /** 互動方式 i18n key 對照 */
 const MODE_LABEL: Record<string, string> = {
@@ -117,9 +118,7 @@ export default function ActivityDetailPage() {
           )}
         </div>
         <h1 className="text-2xl font-bold text-bg-dark">{activity.displayName}</h1>
-        {activity.tagline && (
-          <p className="text-sm text-text-dark">{activity.tagline}</p>
-        )}
+        {activity.tagline && <p className="text-sm text-text-dark">{activity.tagline}</p>}
         {!activity.tagline && activity.description && (
           <p className="text-sm text-text-dark">{activity.description}</p>
         )}
@@ -248,34 +247,9 @@ export default function ActivityDetailPage() {
         </div>
       )}
 
-      {/* CTA 按鈕 */}
+      {/* CTA 按鈕：isJoined → 學員頁；可加入 → 加入／外部報名；否則停用並顯示原因 */}
       <div className="sticky bottom-4 z-20">
-        {isEnded ? null : activity.isJoined ? (
-          <Link
-            href={`/cohorts/${activity.id}`}
-            className={cn(buttonVariants({ variant: "default" }), "w-full")}
-          >
-            {t("detail_view_cohort")}
-          </Link>
-        ) : activity.canJoin ? (
-          activity.signupMethod === "external" && activity.externalSignupUrl ? (
-            <a
-              href={activity.externalSignupUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={cn(buttonVariants({ variant: "default" }), "w-full")}
-            >
-              {t("detail_external_signup")}
-            </a>
-          ) : activity.joinToken ? (
-            <Link
-              href={`/cohorts/join/${activity.joinToken}`}
-              className={cn(buttonVariants({ variant: "default" }), "w-full")}
-            >
-              {t("detail_join")}
-            </Link>
-          ) : null
-        ) : null}
+        <DetailCta cta={resolveActivityDetailCta(activity)} t={t} />
       </div>
     </main>
   );
@@ -300,4 +274,47 @@ function DetailRow({
       <div className="pl-5.5">{children}</div>
     </div>
   );
+}
+
+/** 詳情頁 CTA；停用狀態以按鈕文字呈現不可加入的原因 */
+function DetailCta({
+  cta,
+  t,
+}: {
+  cta: ActivityDetailCta;
+  t: ReturnType<typeof useTranslations<"explore_activities">>;
+}) {
+  switch (cta.kind) {
+    case "joined":
+      return (
+        <Link href={cta.href} className={cn(buttonVariants({ variant: "default" }), "w-full")}>
+          {t("detail_view_cohort")}
+        </Link>
+      );
+    case "external":
+      return (
+        <a
+          href={cta.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(buttonVariants({ variant: "default" }), "w-full")}
+        >
+          {t("detail_external_signup")}
+        </a>
+      );
+    case "join":
+      return (
+        <Link href={cta.href} className={cn(buttonVariants({ variant: "default" }), "w-full")}>
+          {t("detail_join")}
+        </Link>
+      );
+    case "disabled":
+      return (
+        <Button variant="default" className="w-full" disabled>
+          {t(cta.reasonKey)}
+        </Button>
+      );
+    default:
+      return null;
+  }
 }
