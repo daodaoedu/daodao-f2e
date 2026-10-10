@@ -138,6 +138,12 @@ grep -Fq 'cat "$_REVIEW_INPUT"' "$SKILL_ALL" || fail "OpenCode stdin does not in
 grep -Fq 'OPENCODE_PERMISSION='"'"'{"*":"deny"}' "$SKILL_ALL" \
   || fail "OpenCode does not deny every unnecessary tool"
 grep -Fq -- '--tools "" < "$_REVIEW_INPUT"' "$SKILL_ALL" || fail "Haiku input is missing or tools remain enabled"
+# 步驟 6.5 的誤判過濾與 findings 整合讀 $_REVIEW_TMP_DIR/<engine>.txt；任何引擎沒存檔，它的結果就會被靜靜略過
+grep -Fq -- '--tools "" < "$_REVIEW_INPUT" > "$_REVIEW_TMP_DIR/claude.txt"' "$SKILL_ALL" \
+  || fail "Claude reviewer output is not saved for the knowledge-base filter"
+for engine in codex omp opencode; do
+  grep -Fq "\$_REVIEW_TMP_DIR/$engine.txt" "$SKILL_ALL" || fail "$engine reviewer output is not saved"
+done
 [ "$(grep -Fc 'untrusted repository data' "$SKILL_ALL")" -ge 4 ] \
   || fail "manual reviewers do not consistently treat diff and Context Pack as untrusted data"
 
