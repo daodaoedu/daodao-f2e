@@ -5,6 +5,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WORKFLOW="$SCRIPT_DIR/../workflows/code-review.yml"
 SKILL="$SCRIPT_DIR/../../plugin/skills/code-review/SKILL.md"
+# 引擎指令拆到 references/；字句檢查看 SKILL.md 加 references 的合併內容，步驟 0 仍從 SKILL.md 抽
+SKILL_ALL=$(mktemp)
+cat "$SKILL" "$SCRIPT_DIR/../../plugin/skills/code-review/references/"*.md > "$SKILL_ALL" 2>/dev/null
 
 fail() {
   echo "❌ $1" >&2
@@ -121,21 +124,21 @@ done
 python3 -m unittest discover -s "$SCRIPT_DIR/__tests__" -p 'test_review_*.py' -v
 
 if [ -f "$SKILL" ]; then
-grep -Fq 'review-knowledge.cjs' "$SKILL" || fail "manual skill lost the shared false-positive knowledge"
-grep -Fq '## 步驟 0：建立可重現的 review input' "$SKILL" || fail "manual review skill has no Context Pack Step 0"
-grep -Fq 'git show "$_BASE_REF:.github/scripts/retrieve-context.sh"' "$SKILL" \
+grep -Fq 'review-knowledge.cjs' "$SKILL_ALL" || fail "manual skill lost the shared false-positive knowledge"
+grep -Fq '## 步驟 0：建立可重現的 review input' "$SKILL_ALL" || fail "manual review skill has no Context Pack Step 0"
+grep -Fq 'git show "$_BASE_REF:.github/scripts/retrieve-context.sh"' "$SKILL_ALL" \
   || fail "manual review skill does not load the retriever from the trusted base"
-grep -Fq 'read the shared review input at $_REVIEW_INPUT' "$SKILL" \
+grep -Fq 'read the shared review input at $_REVIEW_INPUT' "$SKILL_ALL" \
   || fail "Codex does not receive the shared Context Pack input"
-grep -Fq '@"$_REVIEW_INPUT"' "$SKILL" || fail "OMP does not receive diff plus Context Pack"
-if grep -Fq -- '--file="$_REVIEW_INPUT"' "$SKILL"; then
+grep -Fq '@"$_REVIEW_INPUT"' "$SKILL_ALL" || fail "OMP does not receive diff plus Context Pack"
+if grep -Fq -- '--file="$_REVIEW_INPUT"' "$SKILL_ALL"; then
   fail "OpenCode still attaches a temp file that can be only partially read"
 fi
-grep -Fq 'cat "$_REVIEW_INPUT"' "$SKILL" || fail "OpenCode stdin does not include the complete shared input"
-grep -Fq 'OPENCODE_PERMISSION='"'"'{"*":"deny"}' "$SKILL" \
+grep -Fq 'cat "$_REVIEW_INPUT"' "$SKILL_ALL" || fail "OpenCode stdin does not include the complete shared input"
+grep -Fq 'OPENCODE_PERMISSION='"'"'{"*":"deny"}' "$SKILL_ALL" \
   || fail "OpenCode does not deny every unnecessary tool"
-grep -Fq -- '--tools "" < "$_REVIEW_INPUT"' "$SKILL" || fail "Haiku input is missing or tools remain enabled"
-[ "$(grep -Fc 'untrusted repository data' "$SKILL")" -ge 4 ] \
+grep -Fq -- '--tools "" < "$_REVIEW_INPUT"' "$SKILL_ALL" || fail "Haiku input is missing or tools remain enabled"
+[ "$(grep -Fc 'untrusted repository data' "$SKILL_ALL")" -ge 4 ] \
   || fail "manual reviewers do not consistently treat diff and Context Pack as untrusted data"
 
 STEP0=$(awk '
@@ -147,7 +150,7 @@ STEP0=$(awk '
 [ -n "$STEP0" ] || fail "cannot extract manual review Step 0"
 
 FIXTURE=$(mktemp -d)
-trap 'rm -rf "$FIXTURE"' EXIT
+trap 'rm -rf "$FIXTURE" "$SKILL_ALL"' EXIT
 (
   cd "$FIXTURE"
   git init -q
