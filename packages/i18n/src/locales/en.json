@@ -8570,7 +8570,10 @@
     "challenge_filter_ongoing": "In Progress",
     "challenge_filter_upcoming": "Upcoming",
     "challenge_filter_ended": "Completed",
-    "challenge_filter_empty": "No challenges match this filter"
+    "challenge_filter_empty": "No challenges match this filter",
+    "challenge_login_required": "Log in to see the challenges you have joined",
+    "challenge_login_action": "Log in",
+    "challenge_load_error": "We couldn't load your challenges right now. Please try again later."
   },
   "explore_activities": {
     "meta_title": "Explore Activities",

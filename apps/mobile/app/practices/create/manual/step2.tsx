@@ -1,3 +1,4 @@
+import { parseLocalDate, practiceEndDate } from "@daodao/shared/lib/practice-period";
 import { useRouter } from "expo-router";
 import { Controller, useWatch } from "react-hook-form";
 import { Text, XStack, YStack } from "tamagui";
@@ -22,10 +23,10 @@ const toDateString = (date: Date): string => {
 
 const computeEndDate = (startDate: string, durationDays: string): string => {
   if (!startDate || !durationDays) return "";
-  const start = new Date(startDate);
-  if (Number.isNaN(start.getTime())) return "";
-  const end = new Date(start);
-  end.setDate(start.getDate() + Number.parseInt(durationDays, 10));
+  // 用當地日曆日解析，new Date("YYYY-MM-DD") 在負時差時區會變成前一天
+  const start = parseLocalDate(startDate);
+  if (!start) return "";
+  const end = practiceEndDate(start, Number.parseInt(durationDays, 10));
   const y = end.getFullYear();
   const m = String(end.getMonth() + 1).padStart(2, "0");
   const d = String(end.getDate()).padStart(2, "0");
