@@ -1,6 +1,6 @@
 "use client";
 
-import { useMyChatRooms } from "@daodao/api";
+import { selectChatRoomList, useMyChatRooms } from "@daodao/api";
 import { useLocale, useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
@@ -138,8 +138,7 @@ export function ChatRoomList({ activeRoomId }: ChatRoomListProps) {
   const { data, isLoading } = useMyChatRooms();
   const [filter, setFilter] = useState("");
 
-  const rooms = data?.items ?? [];
-  const totalUnread = data?.totalUnread ?? 0;
+  const { items: rooms, totalUnread } = selectChatRoomList(data);
 
   const filtered = filter
     ? rooms.filter((r) => r.name.toLowerCase().includes(filter.toLowerCase()))
