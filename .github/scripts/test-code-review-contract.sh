@@ -11,257 +11,117 @@ fail() {
   exit 1
 }
 
-extract_validator() {
-  local function_name="$1"
-  awk -v function_name="$function_name" '
-    $0 == "          " function_name "() {" { capture = 1 }
-    capture {
-      line = $0
-      sub(/^          /, "", line)
-      print line
-    }
-    capture && /^          }$/ { exit }
-  ' "$WORKFLOW"
-}
-
-run_validator() {
-  local function_name="$1" input="$2" function_body
-  function_body="$(extract_validator "$function_name")"
-  [ -n "$function_body" ] || fail "$function_name not found"
-  eval "$function_body"
-  "$function_name" "$input"
-}
-
-VALID_FINDING='## Code Review
-
-### 問題
-
-| 嚴重度 | 檔案 | 問題 | 建議 |
-|---|---|---|---|
-| 🔴 High | `src/auth.ts:42` | 權限檢查可被繞過 | 補上檢查 |
-
-### 總結
-
-需要修正。'
-
-EMPTY_FINDING='## Code Review
-
-### 問題
-
-| 嚴重度 | 檔案 | 問題 | 建議 |
-|---|---|---|---|
-
-### 總結
-
-沒有問題。'
-
-INVALID_PATH_FINDING='## Code Review
-
-### 問題
-
-| 嚴重度 | 檔案 | 問題 | 建議 |
-|---|---|---|---|
-| 🔴 High | `src/auth.ts` | 權限檢查可被繞過 | 補上檢查 |
-
-### 總結
-
-需要修正。'
-
-MIXED_PATH_FINDING='## Code Review
-
-### 問題
-
-| 嚴重度 | 檔案 | 問題 | 建議 |
-|---|---|---|---|
-| 🔴 High | `src/auth.ts:42` | 權限檢查可被繞過 | 補上檢查 |
-| 🟡 Medium | `src/session.ts` | session 問題 | 修正 |
-
-### 總結
-
-需要修正。'
-
-UNKNOWN_SEVERITY_FINDING='## Code Review
-
-### 問題
-
-| 嚴重度 | 檔案 | 問題 | 建議 |
-|---|---|---|---|
-| 🔴 High | `src/auth.ts:42` | 權限檢查可被繞過 | 補上檢查 |
-| Critical | `src/session.ts:10` | session 問題 | 修正 |
-
-### 總結
-
-需要修正。'
-
-SIMPLIFIED_FINDING='## Code Review
-
-### 问题
-
-| 严重度 | 文件 | 问题 | 建议 |
-|---|---|---|---|
-| 🔴 High | `src/auth.ts:42` | 权限检查可被绕过 | 补上检查 |
-
-### 总结
-
-需要修正。'
-
-for validator in is_review_candidate is_valid_review; do
-  run_validator "$validator" '✅ 沒有發現明顯問題'
-  run_validator "$validator" '✅ 沒有發現明顯問題。'
-  run_validator "$validator" "$VALID_FINDING"
-
-  if run_validator "$validator" $'前文\n✅ 沒有發現明顯問題'; then
-    fail "$validator accepted prefixed clean output"
-  fi
-  if run_validator "$validator" $'✅ 沒有發現明顯問題\n後文'; then
-    fail "$validator accepted suffixed clean output"
-  fi
-  if run_validator "$validator" "$EMPTY_FINDING"; then
-    fail "$validator accepted an empty findings table"
-  fi
+# Executable schema/batch/coverage behavior lives in the shared Python tests.
+# This contract guards the privileged workflow wiring, not implementation text.
+for script in build-review-batches.py run-review-batches.py; do
+  grep -Fq "\$BASE_SHA:.github/scripts/$script" "$WORKFLOW" \
+    || fail "workflow does not load $script from the trusted base"
 done
-
-run_validator is_review_candidate '✅ 没有发现明显问题'
-run_validator is_review_candidate "$SIMPLIFIED_FINDING"
-if run_validator is_valid_review '✅ 没有发现明显问题'; then
-  fail "strict normalized validator accepted a raw Simplified Chinese clean phrase"
+if grep -Eq 'cap=12000|head -c|Diff truncated' "$WORKFLOW"; then
+  fail "workflow still silently truncates the global diff"
 fi
-if run_validator is_valid_review "$INVALID_PATH_FINDING"; then
-  fail "strict validator accepted a finding without path:line evidence"
+if grep -Eq 'python3 +\.github/scripts/(build|run)-review-batches' "$WORKFLOW"; then
+  fail "workflow executes PR checkout review runtime"
 fi
-if run_validator is_valid_review "$MIXED_PATH_FINDING"; then
-  fail "strict validator accepted a table containing one invalid file cell"
-fi
-if run_validator is_valid_review "$UNKNOWN_SEVERITY_FINDING"; then
-  fail "strict validator accepted an unsupported finding severity"
-fi
-
-# review diff 必須排除生成物與 lockfile，否則 12000 bytes 的上限會被 openapi 生成物占滿
-for excluded in 'openapi.json' 'openapi.yaml' 'generated/**' 'pnpm-lock.yaml'; do
-  grep -Fq ":(exclude,glob)**/$excluded" "$WORKFLOW" || fail "review diff does not exclude generated file $excluded"
-done
-grep -Fq -- '--stat -- . "${GENERATED_EXCLUDES[@]}"' "$WORKFLOW" || fail "review stat does not apply the generated-file excludes"
-EXCLUDE_TMP=$(mktemp -d)
-(
-  cd "$EXCLUDE_TMP" && git init -q && git config user.email t@t && git config user.name t
-  mkdir -p src generated && printf 'a\n' > src/a.ts && printf '{}\n' > openapi.json && printf 'x\n' > generated/types.ts
-  git add -A && git commit -qm base
-  printf 'b\n' > src/a.ts && printf '{"x":1}\n' > openapi.json && printf 'y\n' > generated/types.ts
-  git add -A && git commit -qm change
-  git diff HEAD~1..HEAD -- '*.ts' '*.json' ':(exclude,glob)**/openapi.json' ':(exclude,glob)**/generated/**' > diff.txt
-  grep -q 'src/a.ts' diff.txt || { echo "exclude pathspec dropped real source"; exit 1; }
-  ! grep -q 'openapi.json\|generated/types.ts' diff.txt || { echo "exclude pathspec kept generated files"; exit 1; }
-) || fail "generated-file exclude pathspec does not behave as expected"
-rm -rf "$EXCLUDE_TMP"
-
-# 修復器：檔案欄漏寫 :line 時，從完整 diff 補第一個新增行；diff 裡沒有的檔案原樣保留
-extract_repair_script() {
-  awk '
-    /REPAIR_DIFF_FILE="\$RUNNER_TEMP\/review-full.diff" node -e '"'"'$/ { capture = 1; next }
-    capture && /^          '"'"'$/ { exit }
-    capture { print }
-  ' "$WORKFLOW"
-}
-REPAIR_SCRIPT="$(extract_repair_script)"
-[ -n "$REPAIR_SCRIPT" ] || fail "repair script not found in workflow"
-REPAIR_TMP=$(mktemp -d)
-cat > "$REPAIR_TMP/review-full.diff" <<'DIFF'
-diff --git a/src/auth.ts b/src/auth.ts
---- a/src/auth.ts
-+++ b/src/auth.ts
-@@ -38,4 +38,6 @@ export function check() {
-   const a = 1;
--  const b = 2;
-+  const b = 3;
-+  const c = 4;
-   return a;
- }
-diff --git a/migrate/sql/083_new.sql b/migrate/sql/083_new.sql
-new file mode 100644
---- /dev/null
-+++ b/migrate/sql/083_new.sql
-@@ -0,0 +1,2 @@
-+ALTER TABLE practices DROP CONSTRAINT x;
-+ALTER TABLE practices ADD CONSTRAINT y CHECK (1 = 1);
-DIFF
-cat > "$REPAIR_TMP/review-body.tabled" <<'BODY'
-## Code Review
-
-### 問題
-
-| 嚴重度 | 檔案 | 問題 | 建議 |
-|---|---|---|---|
-| 🔴 High | `src/auth.ts` | 權限檢查可被繞過 | 補上檢查 |
-| 🟡 Medium | `083_new.sql` | 缺少守衛 | 補上 |
-| 🟢 Low | `src/auth.ts:12-15` | 命名 | 改名 |
-| 🟢 Low | `src/missing.ts` | 不在 diff | 略 |
-| 🟡 Medium | `src/auth.ts` (新增的 check 函式) | 括號說明 | 略 |
-| 🟡 Medium | src/auth.ts:≈+40(新增的 check) | 非數字行號尾巴 | 略 |
-
-### 總結
-
-需要修正。
-BODY
-REPAIR_INPUT_FILE="$REPAIR_TMP/review-body.tabled" REPAIR_DIFF_FILE="$REPAIR_TMP/review-full.diff" node -e "$REPAIR_SCRIPT"
-REPAIRED="$(cat "$REPAIR_TMP/review-body.normalized")"
-rm -rf "$REPAIR_TMP"
-printf '%s\n' "$REPAIRED" | grep -Fq '| `src/auth.ts:39` |' || fail "repair did not resolve a bare path to its first added line"
-printf '%s\n' "$REPAIRED" | grep -Fq '| `migrate/sql/083_new.sql:1` |' || fail "repair did not resolve a bare basename via unique suffix match"
-printf '%s\n' "$REPAIRED" | grep -Fq '| `src/auth.ts:12` |' || fail "repair broke the existing line-range normalization"
-[ "$(printf '%s\n' "$REPAIRED" | grep -Fc '| `src/auth.ts:39` |')" -eq 2 ] || fail "repair did not strip a parenthesised explanation after the path token"
-printf '%s\n' "$REPAIRED" | grep -Fq '| src/auth.ts:39 |' || fail "repair did not strip a non-numeric line suffix like :≈+40(…)"
-printf '%s\n' "$REPAIRED" | grep -Fq '| `src/missing.ts` |' || fail "repair invented a line for a file outside the diff"
-if run_validator is_valid_review "$REPAIRED"; then
-  fail "strict validator accepted a repaired table that still has an unverifiable file cell"
-fi
-
-# 誤判知識庫：CI 與本機 skill 共用同一份 jsonl 與腳本；CI 從 base ref 載入、filter 在 strict validator 之前
-KNOWLEDGE="$SCRIPT_DIR/review-knowledge.cjs"
-[ -f "$KNOWLEDGE" ] || fail "review-knowledge.cjs missing"
-node "$KNOWLEDGE" test --db "$SCRIPT_DIR/../review-knowledge/false-positives.jsonl" >/dev/null || fail "review-knowledge fixtures failed"
-grep -Fq 'git show "$BASE_SHA:.github/scripts/review-knowledge.cjs"' "$WORKFLOW" \
-  || fail "workflow does not load review-knowledge from the trusted base"
-grep -Fq -- '--rawfile known_fp "$RUNNER_TEMP/known-fp.md"' "$WORKFLOW" \
-  || fail "review prompt does not receive the known false-positive block"
-FILTER_LINE=$(grep -n 'review-knowledge.cjs" filter' "$WORKFLOW" | head -1 | cut -d: -f1)
-STRICT_LINE_FOR_FILTER=$(grep -n 'if ! is_valid_review "\$BODY"' "$WORKFLOW" | head -1 | cut -d: -f1)
-[ -n "$FILTER_LINE" ] && [ "$FILTER_LINE" -lt "$STRICT_LINE_FOR_FILTER" ] \
-  || fail "review-knowledge filter does not run before strict validation"
-grep -Fq 'review-knowledge.cjs' "$SKILL" || fail "manual review skill does not consume the shared review-knowledge"
-
-grep -Fq '純刪除 authentication、authorization、validation 或 safety guard' "$WORKFLOW" \
-  || fail "review prompt does not require deletion-only guard regression findings"
-grep -Fq '每一列 finding 的檔案欄都必須是可核對的 path:line' "$WORKFLOW" \
-  || fail "review prompt does not require path:line evidence per finding"
-
-SECRETS_STEP=$(awk '
-  /^      - name: Review with Cloudflare Workers AI$/ { capture=1 }
-  capture && /^      - name:/ && $0 !~ /Review with Cloudflare Workers AI/ { exit }
-  capture { print }
-' "$WORKFLOW")
-if printf '%s\n' "$SECRETS_STEP" | grep -Eq 'opencc|npm install'; then
-  fail "secret-bearing model step dynamically loads OpenCC"
-fi
-NORMALIZE_LINE=$(grep -n 'review-body.normalized' "$WORKFLOW" | head -1 | cut -d: -f1)
-STRICT_LINE=$(grep -n 'if ! is_valid_review "\$BODY"' "$WORKFLOW" | head -1 | cut -d: -f1)
-[ "$NORMALIZE_LINE" -lt "$STRICT_LINE" ] || fail "strict schema validation runs before OpenCC normalization"
-
-grep -q '<!-- daodao-ai-code-review -->' "$WORKFLOW" || fail "review marker is missing"
-grep -q '<!-- daodao-ai-code-review-head:\$HEAD_SHA -->' "$WORKFLOW" || fail "head-specific review marker is missing"
-grep -Fq "grep -Eq '^[0-9a-f]{40}$'" "$WORKFLOW" || fail "head marker does not enforce the consumer's exact SHA contract"
-grep -Fq -- '--arg marker "$HEAD_MARKER"' "$WORKFLOW" || fail "comment lookup does not pass the exact head marker to jq"
-grep -Fq 'contains($marker)' "$WORKFLOW" || fail "comment lookup does not use the exact head marker"
+grep -Fq 'actions/upload-artifact@v4' "$WORKFLOW" || fail "review coverage artifacts are missing"
+grep -Fq 'daodao-ai-code-review-head:' "$WORKFLOW" || fail "head-specific review marker is missing"
 grep -Fq '.user.login == "github-actions[bot]"' "$WORKFLOW" || fail "comment lookup does not verify marker ownership"
-if grep -Fq 'select(.body | startswith("## Code Review"))' "$WORKFLOW"; then
-  fail "comment lookup still claims unmarked Code Review comments"
-fi
-
-POST_LINE=$(grep -n -- '--method POST' "$WORKFLOW" | tail -1 | cut -d: -f1)
+grep -Fq 'contains($marker)' "$WORKFLOW" || fail "comment lookup does not bind the exact head marker"
 PATCH_LINE=$(grep -n -- '--method PATCH' "$WORKFLOW" | tail -1 | cut -d: -f1)
-[ "$PATCH_LINE" -lt "$POST_LINE" ] || fail "same-head PATCH/new-head POST branches are not present"
-grep -q 'HEAD_SHA: \${{ github.event.pull_request.head.sha }}' "$WORKFLOW" \
-  || fail "workflow does not bind the marker to the event head SHA"
+POST_LINE=$(grep -n -- '--method POST' "$WORKFLOW" | tail -1 | cut -d: -f1)
+[ -n "$PATCH_LINE" ] && [ -n "$POST_LINE" ] && [ "$PATCH_LINE" -lt "$POST_LINE" ] || fail "same-head PATCH/new-head POST branches are not present"
+grep -Fq 'HEAD_SHA: ${{ github.event.pull_request.head.sha }}' "$WORKFLOW" || fail "workflow is not bound to event head SHA"
+# Bootstrap is deliberately incomplete; missing trusted code must never fall back
+# to PR checkout code while provider credentials are available.
+python3 - "$WORKFLOW" <<'PYCONTRACT'
+import re
+import sys
+from pathlib import Path
+workflow = Path(sys.argv[1]).read_text()
+def step(name):
+    match = re.search(r"^      - name: " + re.escape(name) + r"\n(.*?)(?=^      - |\Z)", workflow, re.M | re.S)
+    assert match, f"missing workflow step: {name}"
+    return match.group(1)
+bootstrap = step("Load trusted review runtime")
+assert 'trusted_runtime_missing' in bootstrap and '\"complete\":false' in bootstrap, "bootstrap must report incomplete when trusted runtime is missing"
+assert 'available=false' in bootstrap and 'available=$available' in bootstrap, "bootstrap availability must propagate to later steps"
+assert 'if [ "$available" != true ]' in bootstrap, "missing trusted runtime must produce an explicit notice"
+provider = step("Review bounded batches with Workers AI")
+assert "if: steps.runtime.outputs.available == 'true'" in provider, "provider secrets step must require trusted runtime availability"
+assert 'python3 -I "$RUNNER_TEMP/review-runtime/run-review-batches.py"' in provider, "provider step must execute extracted trusted runtime"
+assert '$GITHUB_WORKSPACE/.github/scripts' not in provider and '$HEAD_SHA:.github/scripts' not in workflow, "PR runtime must not execute with provider secrets"
+assert 'persist-credentials: false' in workflow, "checkout credentials must not persist alongside untrusted PR data"
+assert 'python3 -I "$RUNNER_TEMP/review-runtime/build-review-batches.py"' in workflow, "planner must isolate Python imports from PR checkout"
+post = step("Post coverage-aware review snapshot")
+assert "python3 -I - <<'PY'" in post, "secret-bearing inline Python must isolate PR imports"
+# A PR-controlled pathlib.py/json.py must never execute during trusted review.
+import os
+import subprocess
+import tempfile
+with tempfile.TemporaryDirectory() as fixture:
+    root = Path(fixture)
+    marker = root / 'malicious-import'
+    poison = "open(" + repr(str(marker)) + ", 'w').write('executed')\nraise RuntimeError('PR module executed')\n"
+    (root / 'pathlib.py').write_text(poison)
+    (root / 'json.py').write_text(poison)
+    env = dict(os.environ, PYTHONPATH=str(root))
+    result = subprocess.run([sys.executable, '-I', '-c', 'import pathlib,json; print(json.dumps(str(pathlib.Path.cwd())))'], cwd=root, env=env, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert not marker.exists(), "isolated Python imported a PR-controlled module"
 
+# Execute the actual workflow presentation code, rather than a mirrored helper.
+import json
+match = re.search(r"python3 -I - <<'PY'\n(.*?)^          PY$", post, re.M | re.S)
+assert match, "post inline Python is missing"
+inline = '\n'.join(line[10:] if line.startswith('          ') else line for line in match.group(1).splitlines())
+with tempfile.TemporaryDirectory() as fixture:
+    root = Path(fixture)
+    output = root / 'review-output'
+    output.mkdir()
+    head = 'a' * 40
+    url = 'https://github.com/daodaoedu/daodao/actions/runs/1234'
+    env = dict(os.environ, RUNNER_TEMP=str(root), HEAD_SHA=head, REVIEW_RUN_URL=url)
+    oversized = '## Code Review\n\n' + ('完整證據 coverage. ' * 7000)
+    original = output / 'review-body.md'
+    original.write_text(oversized)
+    (output / 'status.json').write_text(json.dumps({'complete': False, 'reviewed_paths': ['a.py'], 'unreviewed': ['b.py'], 'findings': []}))
+    result = subprocess.run([sys.executable, '-I', '-'], input=inline, env=env, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    comment = (output / 'review-comment-body.md').read_text()
+    assert len(comment) < 50000, "oversized comment exceeds presentation budget"
+    assert 'Review 未完成' in comment and url in comment, "oversized incomplete coverage must retain notice and artifact link"
+    assert f'<!-- daodao-ai-code-review-head:{head} -->' in comment, "summary lost exact head marker"
+    assert original.read_text() == oversized, "presentation cap destroyed full artifact report"
+    normal = '## Code Review\n\nSmall review report.\n'
+    original.write_text(normal)
+    result = subprocess.run([sys.executable, '-I', '-'], input=inline, env=env, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    comment = (output / 'review-comment-body.md').read_text()
+    assert 'Small review report.' in comment and f'<!-- daodao-ai-code-review-head:{head} -->' in comment
+    assert original.read_text() == normal, "normal presentation overwrote original artifact"
+
+PYCONTRACT
+# Historical examples remain prompt context; CI must not erase/downgrade
+# structured findings using the former textual Markdown row filter.
+grep -Fq 'prompt-block --db' "$WORKFLOW" || fail "CI lost historical false-positive prompt context"
+if grep -Fq 'filter --db' "$WORKFLOW"; then
+  fail "CI must not use the old Markdown row filter with structured findings"
+fi
+DECISION_DOC="$SCRIPT_DIR/../../docs/automation/complete-ci-review.md"
+if [ -f "$DECISION_DOC" ]; then
+  grep -Fq '新 CI 刻意不再跑舊 Markdown `filter`' "$DECISION_DOC" || fail "CI filter removal decision is undocumented"
+  grep -Fq '全部刪掉後會改成「沒有發現明顯問題」' "$DECISION_DOC" || fail "filter removal must explain false-clean risk"
+  grep -Fq 'manual review 的既有 knowledge 流程保持不變' "$DECISION_DOC" || fail "decision must distinguish CI from manual review"
+fi
+KNOWLEDGE="$SCRIPT_DIR/review-knowledge.cjs"
+node "$KNOWLEDGE" test --db "$SCRIPT_DIR/../review-knowledge/false-positives.jsonl" >/dev/null || fail "review knowledge fixtures failed"
+for test in test_review_batches.py test_review_runner.py; do
+  [ -f "$SCRIPT_DIR/__tests__/$test" ] || fail "review regression suite missing: $test"
+done
+python3 -m unittest discover -s "$SCRIPT_DIR/__tests__" -p 'test_review_*.py' -v
+
+if [ -f "$SKILL" ]; then
+grep -Fq 'review-knowledge.cjs' "$SKILL" || fail "manual skill lost the shared false-positive knowledge"
 grep -Fq '## 步驟 0：建立可重現的 review input' "$SKILL" || fail "manual review skill has no Context Pack Step 0"
 grep -Fq 'git show "$_BASE_REF:.github/scripts/retrieve-context.sh"' "$SKILL" \
   || fail "manual review skill does not load the retriever from the trusted base"
@@ -329,5 +189,7 @@ trap 'rm -rf "$FIXTURE"' EXIT
   grep -Fq '<context_pack>' "$_REVIEW_INPUT" || fail "shared input has no Context Pack"
   grep -Fq '<git_diff>' "$_REVIEW_INPUT" || fail "shared input has no diff"
 )
+
+fi
 
 echo "✅ code-review workflow contract tests passed"
