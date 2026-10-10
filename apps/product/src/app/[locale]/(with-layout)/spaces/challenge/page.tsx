@@ -137,6 +137,7 @@ function MyChallengeItem({
         challenge={challenge}
         onJoinClick={onJoinClick}
         onDrawClick={() => onDrawClick(challenge.id)}
+        practiceId={challenge.practiceId}
       />
       {challenge.practiceId && (
         <Link

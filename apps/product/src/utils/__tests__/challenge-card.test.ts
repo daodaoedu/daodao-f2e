@@ -1,0 +1,241 @@
+import { describe, expect, it } from "vitest";
+import {
+  buildPracticeIdMap,
+  getChallengeCardAction,
+  getChallengeStatusKey,
+  isChallengeActionMuted,
+  pruneJustJoined,
+} from "../challenge-card";
+
+const PRACTICE_ID = "7f1c2a4e-0000-4000-8000-000000000001";
+
+const base = {
+  isJoined: true,
+  canJoin: false,
+  unavailableReason: null,
+} as const;
+
+describe("getChallengeCardAction", () => {
+  // daodao#183 regression：已加入、進行中的「打卡」膠囊點了沒反應——必須帶得到實踐頁的連結
+  it("joined + ongoing → enabled check-in linking to the copied practice page", () => {
+    expect(getChallengeCardAction({ ...base, runStatus: "ongoing" }, PRACTICE_ID)).toEqual({
+      kind: "checkin",
+      labelKey: "cta_checkin",
+      href: `/practices/${PRACTICE_ID}`,
+    });
+  });
+
+  it("joined + upcoming → disabled check-in with no link (FR-CC-11 打卡 Disable)", () => {
+    expect(getChallengeCardAction({ ...base, runStatus: "upcoming" }, PRACTICE_ID)).toEqual({
+      kind: "checkin-disabled",
+      labelKey: "cta_checkin",
+      href: null,
+    });
+  });
+
+  it("joined + ended → view summary linking to the practice summary page", () => {
+    expect(getChallengeCardAction({ ...base, runStatus: "ended" }, PRACTICE_ID)).toEqual({
+      kind: "summary",
+      labelKey: "cta_view_summary",
+      href: `/practices/${PRACTICE_ID}/summary`,
+    });
+  });
+
+  it("joined but practice id unknown → keeps the pill but without a link", () => {
+    expect(getChallengeCardAction({ ...base, runStatus: "ongoing" }, null)).toEqual({
+      kind: "checkin",
+      labelKey: "cta_checkin",
+      href: null,
+    });
+    expect(getChallengeCardAction({ ...base, runStatus: "ended" }, undefined)).toEqual({
+      kind: "summary",
+      labelKey: "cta_view_summary",
+      href: null,
+    });
+  });
+
+  it("encodes the practice id in the href", () => {
+    const action = getChallengeCardAction({ ...base, runStatus: "ongoing" }, "a/b?c");
+    expect(action.href).toBe("/practices/a%2Fb%3Fc");
+  });
+
+  it("not joined + joinable → join", () => {
+    expect(
+      getChallengeCardAction(
+        { isJoined: false, canJoin: true, unavailableReason: null, runStatus: "upcoming" },
+        null
+      )
+    ).toEqual({ kind: "join", labelKey: "cta_join", disabled: false, href: null });
+  });
+
+  it("not joined + full → disabled join labelled 已額滿", () => {
+    expect(
+      getChallengeCardAction(
+        { isJoined: false, canJoin: false, unavailableReason: "full", runStatus: "ongoing" },
+        null
+      )
+    ).toEqual({ kind: "join", labelKey: "cta_full", disabled: true, href: null });
+  });
+
+  it("not joined + closed → disabled join labelled 報名截止", () => {
+    expect(
+      getChallengeCardAction(
+        { isJoined: false, canJoin: false, unavailableReason: "expired", runStatus: "ongoing" },
+        null
+      )
+    ).toEqual({ kind: "join", labelKey: "cta_closed", disabled: true, href: null });
+  });
+
+  it("not joined + ended → no action", () => {
+    expect(
+      getChallengeCardAction(
+        { isJoined: false, canJoin: false, unavailableReason: "ended", runStatus: "ended" },
+        PRACTICE_ID
+      )
+    ).toEqual({ kind: "none", href: null });
+  });
+});
+
+describe("getChallengeStatusKey", () => {
+  it("upcoming / ongoing map to 未開始 / 進行中 regardless of join state", () => {
+    expect(getChallengeStatusKey("upcoming", true)).toBe("status_upcoming");
+    expect(getChallengeStatusKey("upcoming", false)).toBe("status_upcoming");
+    expect(getChallengeStatusKey("ongoing", true)).toBe("status_ongoing");
+    expect(getChallengeStatusKey("ongoing", false)).toBe("status_ongoing");
+  });
+
+  // daodao#183 regression：已加入的挑戰結束後徽章應為「已完成」，不是「已結束」
+  it("joined + ended → 已完成 (status_completed)", () => {
+    expect(getChallengeStatusKey("ended", true)).toBe("status_completed");
+  });
+
+  it("not joined + ended → keeps 已結束 (status_ended)", () => {
+    expect(getChallengeStatusKey("ended", false)).toBe("status_ended");
+  });
+});
+
+describe("isChallengeActionMuted", () => {
+  it("linked check-in / summary are not muted", () => {
+    expect(
+      isChallengeActionMuted(getChallengeCardAction({ ...base, runStatus: "ongoing" }, PRACTICE_ID))
+    ).toBe(false);
+    expect(
+      isChallengeActionMuted(getChallengeCardAction({ ...base, runStatus: "ended" }, PRACTICE_ID))
+    ).toBe(false);
+  });
+
+  it("upcoming (disabled) check-in is muted", () => {
+    expect(
+      isChallengeActionMuted(
+        getChallengeCardAction({ ...base, runStatus: "upcoming" }, PRACTICE_ID)
+      )
+    ).toBe(true);
+  });
+
+  // review：沒有 href 的打卡／觀看總結膠囊不能長得像可點
+  it("check-in / summary without href are muted", () => {
+    expect(
+      isChallengeActionMuted(getChallengeCardAction({ ...base, runStatus: "ongoing" }, null))
+    ).toBe(true);
+    expect(
+      isChallengeActionMuted(getChallengeCardAction({ ...base, runStatus: "ended" }, undefined))
+    ).toBe(true);
+  });
+
+  it("join / none actions are never muted by this helper", () => {
+    expect(
+      isChallengeActionMuted(
+        getChallengeCardAction(
+          { isJoined: false, canJoin: true, unavailableReason: null, runStatus: "ongoing" },
+          null
+        )
+      )
+    ).toBe(false);
+    expect(
+      isChallengeActionMuted(
+        getChallengeCardAction(
+          { isJoined: false, canJoin: false, unavailableReason: "ended", runStatus: "ended" },
+          null
+        )
+      )
+    ).toBe(false);
+  });
+});
+
+describe("buildPracticeIdMap", () => {
+  it("uses /me/challenges practice ids", () => {
+    const map = buildPracticeIdMap(
+      [
+        { id: 1, practiceId: "p1" },
+        { id: 2, practiceId: null },
+      ],
+      {}
+    );
+    expect(map.get(1)).toBe("p1");
+    expect(map.get(2)).toBeNull();
+    expect(map.get(3)).toBeUndefined();
+  });
+
+  // review regression：剛加入、/me/challenges 尚未 revalidate 時，用 join API 回傳的 practiceId 讓卡片立即可點
+  it("fills a just-joined challenge from the join response before the list catches up", () => {
+    const map = buildPracticeIdMap([], { 7: "joined-practice" });
+    expect(map.get(7)).toBe("joined-practice");
+  });
+
+  it("keeps the list value once it has one, and ignores a null join result", () => {
+    const map = buildPracticeIdMap(
+      [
+        { id: 7, practiceId: "from-list" },
+        { id: 8, practiceId: null },
+      ],
+      {
+        7: "joined-practice",
+        9: null,
+      }
+    );
+    expect(map.get(7)).toBe("from-list");
+    expect(map.get(8)).toBeNull();
+    expect(map.has(9)).toBe(false);
+  });
+
+  // Codex P2：/me/challenges 明確回 practiceId: null（例如實踐在別的分頁被刪）是權威值，
+  // 不可被保留的 join 回傳 id 蓋掉
+  describe("join-response fallback only when /me/challenges has no entry yet", () => {
+    it("entry missing → uses the join-response id (card links)", () => {
+      const map = buildPracticeIdMap([], { 7: "joined-practice" });
+      const action = getChallengeCardAction({ ...base, runStatus: "ongoing" }, map.get(7));
+      expect(action.href).toBe("/practices/joined-practice");
+      expect(isChallengeActionMuted(action)).toBe(false);
+    });
+
+    it("entry with an id → uses the /me/challenges id", () => {
+      const map = buildPracticeIdMap([{ id: 7, practiceId: "from-list" }], {
+        7: "joined-practice",
+      });
+      expect(map.get(7)).toBe("from-list");
+    });
+
+    it("entry with explicit null → no link and a muted pill, even with a retained join id", () => {
+      const map = buildPracticeIdMap([{ id: 7, practiceId: null }], { 7: "joined-practice" });
+      expect(map.get(7)).toBeNull();
+      const action = getChallengeCardAction({ ...base, runStatus: "ongoing" }, map.get(7));
+      expect(action.href).toBeNull();
+      expect(isChallengeActionMuted(action)).toBe(true);
+    });
+  });
+});
+
+describe("pruneJustJoined", () => {
+  it("drops retained join ids once /me/challenges has an entry (id or null)", () => {
+    const pruned = pruneJustJoined({ 7: "a", 8: "b", 9: "c" }, [
+      { id: 7, practiceId: "a" },
+      { id: 8, practiceId: null },
+    ]);
+    expect(pruned).toEqual({ 9: "c" });
+  });
+
+  it("returns the same object when nothing changes (no re-render loop)", () => {
+    const justJoined = { 9: "c" };
+    expect(pruneJustJoined(justJoined, [{ id: 7, practiceId: "a" }])).toBe(justJoined);
+  });
+});
