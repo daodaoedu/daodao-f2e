@@ -13,6 +13,7 @@ import {
 } from "@daodao/ui/components/form";
 import { useCallback } from "react";
 import type { UseFormReturn } from "react-hook-form";
+import { setUserSelectedFields } from "./form-state";
 import type { AccountFormValues } from "./schema";
 import { type FieldOption, useFieldSelectionSheet } from "./use-field-selection-sheet";
 
@@ -55,12 +56,12 @@ export const FieldSelectionSection = ({
     title: label,
     customFieldLabel,
     onComplete: (data) => {
-      form.setValue(fieldName, data.selectedFields);
+      setUserSelectedFields(form.setValue, fieldName, data.selectedFields);
     },
   });
 
   const handleClear = () => {
-    form.setValue(fieldName, []);
+    setUserSelectedFields(form.setValue, fieldName, []);
   };
 
   return (
