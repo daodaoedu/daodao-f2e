@@ -1,4 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// selector 只做回應轉換，不打 API；mock client 避免載入需要 generated/env 的 @daodao/config（CI 沒有產生該檔）
+vi.mock("../client", () => ({ client: {} }));
+
 import {
   selectChatDelta,
   selectChatErrorMessage,
