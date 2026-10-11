@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 import subprocess
 
@@ -32,6 +33,34 @@ def source_lines(data):
 
 def numbered(data):
     return ''.join(f'{i}: {line}\n' for i, line in enumerate(source_lines(data), 1))
+
+
+HUNK_RE = re.compile(r'^@@ -(\d+)(?:,\d+)? \+\d+(?:,\d+)? @@')
+
+
+def before_hunk_lines(diff_text):
+    """Old-side lines the diff shows (context and removed), keyed by their real BEFORE line number."""
+    entries, old_no, in_hunk = [], None, False
+    lines = diff_text.split('\n')
+    if lines and lines[-1] == '':
+        lines.pop()  # trailing newline of the whole diff, not a blank context line
+    for line in lines:
+        match = HUNK_RE.match(line)
+        if match:
+            old_no, in_hunk = int(match.group(1)), True
+            continue
+        if not in_hunk or line.startswith('\\'):
+            continue
+        if line == '':
+            # diff.suppressBlankEmpty prints a blank context line without its leading space
+            entries.append((old_no, ''))
+            old_no += 1
+        elif line[0] in ' -':
+            entries.append((old_no, line[1:]))
+            old_no += 1
+        elif line[0] != '+':
+            in_hunk = False
+    return entries
 
 
 def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total_bytes=400000):
@@ -135,28 +164,59 @@ def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total
                     item.setdefault('reason', 'source-exceeds-batch-budget')
                     continue
                 # --literal-pathspecs prevents glob/metacharacters in Git paths selecting extra files.
-                diff = git(repo, '--literal-pathspecs', 'diff', '--no-ext-diff', '--no-textconv',
+                # Pin diff.suppressBlankEmpty so blank context lines keep their leading space.
+                diff = git(repo, '-c', 'diff.suppressBlankEmpty=false', '--literal-pathspecs', 'diff', '--no-ext-diff', '--no-textconv',
                            '--find-renames', merge, head_sha, '--', old, path)
                 try:
                     diff_text = diff.decode('utf-8')
                 except UnicodeDecodeError:
                     item['reason'] = 'non-utf8-diff'; continue
-                prefix = (f'\nFILE {json.dumps(path, ensure_ascii=True)} STATUS {status}\n'
-                          + 'COMPLETE DIFF\n').encode()
-                payload = bytearray(prefix)
-                diff_section = {'start_byte': len(payload), 'end_byte': len(payload) + len(diff)}
-                payload.extend(diff)
-                source_sections = []
-                for blob in blobs:
-                    payload.extend(blob['header'].encode())
-                    start_byte = len(payload)
-                    payload.extend(blob['content'].encode())
-                    source_sections.append({'start_byte': start_byte, 'end_byte': len(payload),
-                                            'label': blob['label'], 'revision': blob['revision'],
-                                            'path': blob['path'], 'line_count': blob['lines'],
-                                            'sha256': blob['sha256']})
+                def build_unit(unit_blobs, note=''):
+                    prefix = (f'\nFILE {json.dumps(path, ensure_ascii=True)} STATUS {status}\n'
+                              + note + 'COMPLETE DIFF\n').encode()
+                    unit = bytearray(prefix)
+                    diff_part = {'start_byte': len(unit), 'end_byte': len(unit) + len(diff)}
+                    unit.extend(diff)
+                    sections = []
+                    for blob in unit_blobs:
+                        unit.extend(blob['header'].encode())
+                        start_byte = len(unit)
+                        unit.extend(blob['content'].encode())
+                        section = {'start_byte': start_byte, 'end_byte': len(unit),
+                                   'label': blob['label'], 'revision': blob['revision'],
+                                   'path': blob['path'], 'line_count': blob['lines'],
+                                   'sha256': blob['sha256']}
+                        if blob.get('sparse'):
+                            section.update(sparse=True, source_line_count=blob['source_line_count'])
+                        sections.append(section)
+                    return unit, diff_part, sections
+
+                # Tiers (#314): a small edit to a large file must not be skipped just because
+                # BEFORE + HEAD + diff exceed one batch. BEFORE hunks keep removed code citable
+                # with its real line numbers; head-only is the last resort and says so.
+                tiers = [('complete', blobs, '')]
+                before = next((b for b in blobs if b['label'] == 'BEFORE'), None)
+                head_blob = next((b for b in blobs if b['label'] == 'HEAD'), None)
+                if before and head_blob:
+                    hunk = before_hunk_lines(diff_text)
+                    if hunk:
+                        tiers.append(('before-hunks', [head_blob, {
+                            'label': 'BEFORE', 'revision': before['revision'], 'path': before['path'],
+                            'sha256': before['sha256'], 'bytes': before['bytes'], 'lines': len(hunk),
+                            'sparse': True, 'source_line_count': before['lines'],
+                            'header': (f'\nBEFORE HUNKS {json.dumps(before["path"], ensure_ascii=True)} '
+                                       '(only lines shown in the diff, numbered with their original BEFORE line numbers)\n'),
+                            'content': ''.join(f'{n}: {text}\n' for n, text in hunk)}],
+                            'BEFORE SOURCE PARTIAL: only diff hunks of BEFORE are supplied below\n'))
+                    tiers.append(('head-only', [head_blob],
+                                  'BEFORE SOURCE OMITTED: budget; cite HEAD lines only, removed lines appear only in the diff\n'))
+                for level, unit_blobs, note in tiers:
+                    payload, diff_section, source_sections = build_unit(unit_blobs, note)
+                    if len(payload) <= max_batch_bytes:
+                        break
+                item['context_level'] = level
                 item['required_bytes'] = len(payload)
-                item['sources'] = [{k: v for k, v in b.items() if k not in ('header', 'content')} for b in blobs]
+                item['sources'] = [{k: v for k, v in b.items() if k not in ('header', 'content')} for b in unit_blobs]
                 if len(payload) > max_batch_bytes:
                     item['reason'] = 'complete-file-unit-exceeds-batch-budget'; continue
                 if total + len(current) + len(payload) > max_total_bytes:
@@ -169,7 +229,7 @@ def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total
                 item.update(status='planned', file_complete=True, batch_id=batch_id)
                 current_units.append({'path': path, 'start_byte': len(current),
                                       'end_byte': len(current) + len(payload),
-                                      'line_count': max((b['lines'] for b in blobs), default=0),
+                                      'line_count': max((b['lines'] for b in unit_blobs), default=0),
                                       'source_sections': [{**section,
                                           'start_byte': section['start_byte'] + len(current),
                                           'end_byte': section['end_byte'] + len(current)}
