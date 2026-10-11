@@ -223,5 +223,105 @@ class ReviewBatches(unittest.TestCase):
         self.assertEqual(len(result['head']), 40)
 
 
+
+RUNNER_SPEC = importlib.util.spec_from_file_location('runner_for_tiers', Path(__file__).resolve().parents[1] / 'run-review-batches.py')
+runner = importlib.util.module_from_spec(RUNNER_SPEC)
+RUNNER_SPEC.loader.exec_module(runner)
+
+
+class LargeFileTiers(unittest.TestCase):
+    """#314：完整單位放不下時，大檔小改仍要排進批次，且 BEFORE 證據可引用。"""
+
+    setUp = ReviewBatches.setUp
+    git = ReviewBatches.git
+    write = ReviewBatches.write
+    commit = ReviewBatches.commit
+    run_plan = ReviewBatches.run_plan
+
+    def big_file(self, marker):
+        # ~25 KB: 300 lines × ~85 bytes, like plugin/hooks/pre-pr-gate.sh
+        return ''.join(f'line_{i:03d} = "{marker}" + "{"x" * 60}"\n' for i in range(300))
+
+    def test_one_line_change_to_25kb_file_is_reviewed_with_before_hunks(self):
+        self.write('gate.sh', self.big_file('v1') + 'check_security_gate\n')
+        self.base = self.commit()
+        self.write('gate.sh', self.big_file('v1'))  # the safety check line is deleted
+        result = self.run_plan()
+        item = result['files'][0]
+        self.assertEqual(item['status'], 'planned')
+        self.assertEqual(item['context_level'], 'before-hunks')
+        payload = (self.out / result['batches'][0]['payload']).read_text()
+        self.assertIn('BEFORE HUNKS', payload)
+        self.assertIn('301: check_security_gate', payload)  # original BEFORE line number
+        self.assertTrue(result['coverage_complete'])
+
+    def test_rewrite_falls_back_to_head_only(self):
+        self.write('skill.md', self.big_file('old'))
+        self.base = self.commit()
+        self.write('skill.md', 'short new body\n')
+        result = self.run_plan(max_batch_bytes=30000)
+        item = result['files'][0]
+        self.assertEqual(item['status'], 'planned')
+        self.assertEqual(item['context_level'], 'head-only')
+        payload = (self.out / result['batches'][0]['payload']).read_text()
+        self.assertIn('BEFORE SOURCE OMITTED', payload)
+        self.assertNotIn('BEFORE HUNKS', payload)
+
+    def test_small_change_keeps_complete_context(self):
+        self.write('small.py', 'a = 1\nb = 2\n')
+        self.base = self.commit()
+        self.write('small.py', 'a = 1\nb = 3\n')
+        result = self.run_plan()
+        self.assertEqual(result['files'][0]['context_level'], 'complete')
+
+    def test_blank_context_lines_keep_before_numbers_when_suppress_blank_empty(self):
+        # diff.suppressBlankEmpty=true prints blank context lines as "" instead of " "
+        self.git('config', 'diff.suppressBlankEmpty', 'true')
+        head = self.big_file('v1')
+        before = head.replace('line_150', '\ncheck_security_gate\nline_150', 1)  # blank context, then the check
+        self.write('gate.sh', before)
+        self.base = self.commit()
+        expected = before.split('\n').index('check_security_gate') + 1
+        self.write('gate.sh', head.replace('line_150', '\nline_150', 1))  # only the check line is deleted
+        result = self.run_plan()
+        payload = (self.out / result['batches'][0]['payload']).read_text()
+        self.assertEqual(result['files'][0]['context_level'], 'before-hunks')
+        self.assertIn(f'{expected}: check_security_gate', payload)
+
+    def run_runner(self, result, finding):
+        def caller(model, request):
+            body = {'batch_id': result['batches'][0]['id'], 'reviewed_paths': result['batches'][0]['paths'],
+                    'findings': [finding], 'limitations': []}
+            return {'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(body)}}]}
+        return runner.run(self.out / 'manifest.json', self.root / 'review', policy='Trusted policy',
+                          context='Context pack', caller=caller)
+
+    def test_runner_accepts_before_citation_from_hunks_and_rejects_lines_outside(self):
+        self.write('gate.sh', self.big_file('v1') + 'check_security_gate\n')
+        self.base = self.commit()
+        self.write('gate.sh', self.big_file('v1'))
+        result = self.run_plan()
+        ok = {'path': 'gate.sh', 'side': 'BEFORE', 'line': 301, 'severity': 'P1',
+              'description': '刪掉安全檢查', 'evidence': 'check_security_gate'}
+        status = self.run_runner(result, ok)
+        self.assertEqual(status['successful_batches'], 1)
+        self.assertEqual(len(status['findings']), 1)
+        self.assertTrue(any('gate.sh' in x and 'before-hunks' in x for x in status['limitations']))
+        outside = dict(ok, line=5, evidence='line_004')  # BEFORE line 5 is not in any hunk
+        status = self.run_runner(result, outside)
+        self.assertEqual(status['successful_batches'], 0)
+        self.assertEqual(status['findings'], [])
+
+    def test_render_lists_unreviewed_source_files_at_top(self):
+        status = {'complete': False, 'successful_batches': 0, 'planned_batches': 1, 'reviewed_paths': [],
+                  'findings': [], 'errors': [], 'limitations': [],
+                  'unreviewed': [{'path': 'plugin/hooks/pre-pr-gate.sh', 'reason': 'complete-file-unit-exceeds-batch-budget'},
+                                 {'path': 'plugin/out/x/SKILL.md', 'reason': 'generated-platform-mirror'}]}
+        body = runner.render(status)
+        head = body.split('### 問題')[0]
+        self.assertIn('1 個非產物檔案未審查', head)
+        self.assertIn('pre-pr-gate.sh', head)
+        self.assertNotIn('plugin/out/x/SKILL.md', head)
+
 if __name__ == '__main__':
     unittest.main()
