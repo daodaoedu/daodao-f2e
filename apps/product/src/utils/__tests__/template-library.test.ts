@@ -1,4 +1,6 @@
+import { format } from "date-fns";
 import { describe, expect, it } from "vitest";
+import { parseLocalDate, practiceEndDate } from "../practice-period";
 import {
   addDays,
   deriveTemplateName,
@@ -164,6 +166,21 @@ describe("templateBindingEndDate", () => {
     expect(templateBindingEndDate("2026-03-02", 1)).toBe("2026-03-02");
     expect(templateBindingEndDate("2026-03-02", null)).toBeNull();
     expect(templateBindingEndDate(null, 30)).toBeNull();
+  });
+
+  // daodao#277：範本庫顯示的結束日要跟學員實踐頁（practiceEndDate）同一天
+  it("與學員實踐的 practiceEndDate 同一規則", () => {
+    for (const days of [1, 7, 14, 21, 30, 91]) {
+      const start = parseLocalDate("2026-10-20") as Date;
+      expect(templateBindingEndDate("2026-10-20", days)).toBe(
+        format(practiceEndDate(start, days), "yyyy-MM-dd")
+      );
+    }
+  });
+
+  it("天數不是正整數時不顯示結束日", () => {
+    expect(templateBindingEndDate("2026-10-20", 0)).toBeNull();
+    expect(templateBindingEndDate("2026-10-20", 1.5)).toBeNull();
   });
 });
 
