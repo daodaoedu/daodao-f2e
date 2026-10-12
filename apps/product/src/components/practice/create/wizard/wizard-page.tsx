@@ -37,6 +37,7 @@ import { StepRhythm } from "./step-rhythm";
 import { StepTagsResources, type StepTagsResourcesHandle } from "./step-tags-resources";
 import {
   extractCreatedNames,
+  getDonePrimaryRoute,
   getStepForServerPath,
   mapServerPathToFormField,
   parseServerError,
@@ -47,11 +48,6 @@ import {
   toCreatePracticeRequest,
   toCreateTemplateRequest,
 } from "./to-request";
-
-/** 個人實踐列表（「看看我的實踐」） */
-const MY_PRACTICES_ROUTE = "/mine";
-/** 使用者模版管理頁尚未存在（/manage 仍是佔位），先回模版挑選頁 */
-const MY_TEMPLATES_ROUTE = "/practices/create";
 
 const PREVIEW_STEP = WIZARD_TOTAL_STEPS;
 const STEP_NUMBERS = Array.from({ length: WIZARD_TOTAL_STEPS }, (_, i) => i + 1);
@@ -260,7 +256,7 @@ export const PracticeWizard = ({
   // ---------------------------------------------------------------------------
   const handleDonePrimary = () => {
     setIsDoneOpen(false);
-    router.push(isPersonal ? MY_PRACTICES_ROUTE : MY_TEMPLATES_ROUTE);
+    router.push(getDonePrimaryRoute(isPersonal));
   };
 
   const handleDoneSecondary = () => {
