@@ -86,6 +86,19 @@ export const selectChatSearch = (res: ChatSearchResponse | undefined): ChatSearc
   res?.data ?? { total: 0, items: [] };
 
 /** 失敗回應的 server 訊息（{ success: false, error: { message } }）；取不到時用 fallback */
+/**
+ * 是否為當前使用者自己的訊息。
+ * author.userId 是內部 users.id（整數），必須跟聊天室詳情的 viewerUserId 比；
+ * /users/me 的 id 是 external UUID，不能拿來比（daodao#154 J-06c）。
+ */
+export const isOwnChatMessage = (
+  message: Pick<ChatMessageType, "author">,
+  viewerUserId: number | null | undefined
+): boolean =>
+  typeof viewerUserId === "number" &&
+  Number.isInteger(viewerUserId) &&
+  message.author?.userId === viewerUserId;
+
 export const selectChatErrorMessage = (error: unknown, fallback: string): string => {
   if (!error || typeof error !== "object" || !("error" in error)) return fallback;
   const inner = (error as { error?: unknown }).error;
