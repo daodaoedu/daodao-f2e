@@ -54940,7 +54940,7 @@ export interface components {
              */
             id: string | null;
             /**
-             * @description 活動課程卡所屬燈塔系列 id（發起人卡導向管理端 /lighthouse/programs/{programId}/cohorts/{id}）；虛擬空間為 null
+             * @description 活動課程卡所屬燈塔系列 id（canManage 時導向管理端 /lighthouse/programs/{programId}/cohorts/{id}）；虛擬空間為 null
              * @example 3
              */
             programId: number | null;
@@ -54981,6 +54981,11 @@ export interface components {
              * @example false
              */
             isHost: boolean;
+            /**
+             * @description 目前使用者是否為該場次所屬組織成員、可進管理端（前端據此導向 /lighthouse/programs/{programId}/cohorts/{id}/dashboard）
+             * @example false
+             */
+            canManage: boolean;
             /** @description 最近活動時間（排序依據） */
             lastActivityAt: string | null;
         };
