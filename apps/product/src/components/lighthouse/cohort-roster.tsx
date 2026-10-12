@@ -110,14 +110,12 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
   }
 
   async function sendInvitations() {
-    // 已加入者由 server 略過，只寄可寄送的 email（daodao#282）
-    const sendableEmails = preview
-      .filter((item) => item.valid && previewState(item) !== "joined")
-      .map((item) => item.email);
-    if (!sendableEmails.length || sendDisabledReason) return;
+    // 已加入者由 server 略過不重寄（daodao#282），略過數以寄送當下的 server 結果為準
+    const validEmails = preview.filter((item) => item.valid).map((item) => item.email);
+    if (!validEmails.length || sendDisabledReason) return;
     setBusy(true);
     const response = await inviteLighthouseCohortMembers(programId, cohortId, {
-      emails: sendableEmails,
+      emails: validEmails,
       preview: false,
     });
     setBusy(false);
@@ -130,14 +128,11 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
     setPreview([]);
     setSummary(null);
     setCsv("");
-    const skipped = summary?.skippedCount ?? 0;
+    const { queuedCount, skippedCount } = response.data.data;
     toast.success(
-      skipped > 0
-        ? t("invitation_sent_with_skipped", {
-            count: response.data.data.queuedCount,
-            skipped,
-          })
-        : t("invitation_sent_count", { count: response.data.data.queuedCount })
+      skippedCount > 0
+        ? t("invitation_sent_with_skipped", { count: queuedCount, skipped: skippedCount })
+        : t("invitation_sent_count", { count: queuedCount })
     );
   }
 
@@ -151,7 +146,8 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
     try {
       const response = await resendLighthouseCohortInvitation(programId, cohortId, enrollmentId);
       if (response.error) {
-        toast.error(t("invitation_send_failed"));
+        // 409：場次已截止／額滿／未發布或成員已加入，顯示 server 給的原因（daodao#281）
+        toast.error(apiErrorMessage(response.error, t("invitation_send_failed")));
         return;
       }
       await enrollmentQuery.mutate();
