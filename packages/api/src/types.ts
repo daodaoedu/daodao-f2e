@@ -5499,8 +5499,8 @@ export interface paths {
                 query?: {
                     /** @description 郵件類型 */
                     emailType?: string;
-                    /** @description 發送狀態 */
-                    status?: "sent" | "failed" | "pending";
+                    /** @description 發送狀態（skipped：後台停用該模板而未寄出） */
+                    status?: "sent" | "failed" | "pending" | "skipped";
                     /** @description 收件人 email */
                     recipient?: string;
                     /** @description 用戶 ID */
@@ -45823,11 +45823,11 @@ export interface components {
              */
             emailType?: string;
             /**
-             * @description 發送狀態
+             * @description 發送狀態（skipped：後台停用該模板而未寄出）
              * @example sent
              * @enum {string}
              */
-            status?: "sent" | "failed" | "pending";
+            status?: "sent" | "failed" | "pending" | "skipped";
             /**
              * Format: email
              * @description 收件人 email
@@ -45907,11 +45907,11 @@ export interface components {
              */
             subject: string | null;
             /**
-             * @description 發送狀態
+             * @description 發送狀態（skipped：後台停用該模板而未寄出）
              * @example sent
              * @enum {string}
              */
-            status: "sent" | "failed" | "pending";
+            status: "sent" | "failed" | "pending" | "skipped";
             /**
              * @description 發送時間
              * @example 2024-01-15T10:30:00.000Z
@@ -46606,30 +46606,40 @@ export interface components {
             targetId: string;
         };
         /**
-         * @description Standard success response format
+         * @description Paginated response format for page-based pagination
          * @example {
          *       "success": true,
-         *       "data": {
-         *         "id": 123,
-         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
-         *         "name": "JavaScript 基礎教程",
-         *         "description": "從零開始學習 JavaScript 程式設計",
-         *         "status": "published"
-         *       },
-         *       "timestamp": "2024-01-15T10:30:00.000Z"
-         *     }
-         * @example {
-         *       "success": true,
-         *       "data": {
-         *         "userId": 456,
-         *         "username": "john_doe",
-         *         "email": "john@example.com",
-         *         "role": "student"
+         *       "data": [
+         *         {
+         *           "id": 1,
+         *           "title": "React 入門教程",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-10T10:00:00Z"
+         *         },
+         *         {
+         *           "id": 2,
+         *           "title": "Vue.js 進階指南",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-11T10:00:00Z"
+         *         }
+         *       ],
+         *       "pagination": {
+         *         "currentPage": 1,
+         *         "totalPages": 5,
+         *         "totalItems": 50,
+         *         "itemsPerPage": 10,
+         *         "hasNext": true,
+         *         "hasPrev": false
          *       },
          *       "timestamp": "2024-01-15T10:30:00.000Z",
          *       "meta": {
-         *         "cacheHit": true,
-         *         "processingTime": 23.1
+         *         "searchTime": 45,
+         *         "cacheHit": false,
+         *         "categoryCounts": {
+         *           "前端開發": 25,
+         *           "後端開發": 18,
+         *           "資料科學": 7
+         *         }
          *       }
          *     }
          */
@@ -46639,8 +46649,41 @@ export interface components {
              * @enum {boolean}
              */
             success: true;
-            /** @description The main response data */
+            /** @description Array of paginated data items */
             data: components["schemas"]["FollowItem"][];
+            /**
+             * @description Pagination information
+             * @example {
+             *       "currentPage": 1,
+             *       "totalPages": 5,
+             *       "totalItems": 50,
+             *       "itemsPerPage": 10,
+             *       "hasNext": true,
+             *       "hasPrev": false
+             *     }
+             * @example {
+             *       "currentPage": 3,
+             *       "totalPages": 8,
+             *       "totalItems": 156,
+             *       "itemsPerPage": 20,
+             *       "hasNext": true,
+             *       "hasPrev": true
+             *     }
+             */
+            pagination: {
+                /** @description Current page number (1-based) */
+                currentPage: number;
+                /** @description Total number of pages */
+                totalPages: number;
+                /** @description Total number of items across all pages */
+                totalItems: number;
+                /** @description Number of items per page */
+                itemsPerPage: number;
+                /** @description Whether there are more pages after current page */
+                hasNext: boolean;
+                /** @description Whether there are pages before current page */
+                hasPrev: boolean;
+            };
             /**
              * Format: date-time
              * @description ISO 8601 timestamp of the response
@@ -46703,6 +46746,169 @@ export interface components {
             nickname: string | null;
             /** @description 關注時間 ISO 8601 */
             followedAt: string;
+        };
+        /**
+         * @description Paginated response format for page-based pagination
+         * @example {
+         *       "success": true,
+         *       "data": [
+         *         {
+         *           "id": 1,
+         *           "title": "React 入門教程",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-10T10:00:00Z"
+         *         },
+         *         {
+         *           "id": 2,
+         *           "title": "Vue.js 進階指南",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-11T10:00:00Z"
+         *         }
+         *       ],
+         *       "pagination": {
+         *         "currentPage": 1,
+         *         "totalPages": 5,
+         *         "totalItems": 50,
+         *         "itemsPerPage": 10,
+         *         "hasNext": true,
+         *         "hasPrev": false
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "searchTime": 45,
+         *         "cacheHit": false,
+         *         "categoryCounts": {
+         *           "前端開發": 25,
+         *           "後端開發": 18,
+         *           "資料科學": 7
+         *         }
+         *       }
+         *     }
+         */
+        FollowingListApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description Array of paginated data items */
+            data: components["schemas"]["FollowingItem"][];
+            /**
+             * @description Pagination information
+             * @example {
+             *       "currentPage": 1,
+             *       "totalPages": 5,
+             *       "totalItems": 50,
+             *       "itemsPerPage": 10,
+             *       "hasNext": true,
+             *       "hasPrev": false
+             *     }
+             * @example {
+             *       "currentPage": 3,
+             *       "totalPages": 8,
+             *       "totalItems": 156,
+             *       "itemsPerPage": 20,
+             *       "hasNext": true,
+             *       "hasPrev": true
+             *     }
+             */
+            pagination: {
+                /** @description Current page number (1-based) */
+                currentPage: number;
+                /** @description Total number of pages */
+                totalPages: number;
+                /** @description Total number of items across all pages */
+                totalItems: number;
+                /** @description Number of items per page */
+                itemsPerPage: number;
+                /** @description Whether there are more pages after current page */
+                hasNext: boolean;
+                /** @description Whether there are pages before current page */
+                hasPrev: boolean;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        FollowingItem: {
+            /** @enum {string} */
+            targetType: "user";
+            user?: components["schemas"]["FollowingUserProfile"];
+        } | {
+            /** @enum {string} */
+            targetType: "practice";
+            practice?: components["schemas"]["FollowingPracticeProfile"];
+        };
+        FollowingUserProfile: {
+            /** @description 被關注用戶 external_id */
+            id: string;
+            /** @description 暱稱 */
+            name: string;
+            /** @description 頭像 URL */
+            photoURL: string | null;
+            /** @description 個人標語 */
+            bio: string | null;
+            /** @description 自訂 ID（custom_id） */
+            identifier: string | null;
+        };
+        FollowingPracticeProfile: {
+            /** @description 主題實踐 external_id */
+            id: string;
+            /** @description 主題實踐標題 */
+            title: string;
+            /** @description 擁有者暱稱 */
+            ownerName: string;
+            /** @description 擁有者頭像 URL */
+            ownerPhotoURL: string | null;
         };
         /**
          * @description Standard success response format
@@ -53589,7 +53795,7 @@ export interface components {
              */
             endDate?: string;
             /**
-             * @description 持續天數 (1-90天)
+             * @description 持續天數 (1-91天)
              * @example 30
              */
             durationDays?: number;
@@ -54733,6 +54939,11 @@ export interface components {
              * @example 12
              */
             id: string | null;
+            /**
+             * @description 活動課程卡所屬燈塔系列 id（發起人卡導向管理端 /lighthouse/programs/{programId}/cohorts/{id}）；虛擬空間為 null
+             * @example 3
+             */
+            programId: number | null;
             /**
              * @description 空間名稱
              * @example 自我覺察練習
