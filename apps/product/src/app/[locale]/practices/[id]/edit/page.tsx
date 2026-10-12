@@ -33,6 +33,7 @@ import {
   parseFrequency,
 } from "@/constants/practice-form";
 import { PracticeStatus } from "@/constants/practice-status";
+import { isPracticePrivacyLocked, withEditablePrivacy } from "@/utils/practice-privacy-lock";
 
 // API 錯誤響應類型
 interface ApiErrorResponse {
@@ -103,7 +104,7 @@ export default function EditPracticePage() {
   const isCohortPrivacyLocked =
     (practiceData?.data as { isCohortPrivacyLocked?: boolean } | undefined)
       ?.isCohortPrivacyLocked === true;
-  const isPrivacyLocked = isChallenge || isCohortPrivacyLocked;
+  const isPrivacyLocked = isPracticePrivacyLocked({ isChallenge, isCohortPrivacyLocked });
 
   // 檢查實踐是否已經開始（狀態為 active）
   const isPracticeStarted = useMemo(() => {
@@ -245,10 +246,11 @@ export default function EditPracticePage() {
           delete converted[lockedField];
         }
       }
-      const apiRequest = {
-        ...converted,
-        ...(isPrivacyLocked ? {} : { privacyStatus }),
-      } as UpdatePracticeRequestType;
+      const apiRequest = withEditablePrivacy(
+        converted,
+        privacyStatus,
+        isPrivacyLocked
+      ) as UpdatePracticeRequestType;
 
       const response = await updatePractice(practiceId, apiRequest);
 
