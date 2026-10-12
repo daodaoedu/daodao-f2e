@@ -45,6 +45,17 @@ export function CohortJoinPage({ joinToken }: { joinToken: string }) {
       <div className="mx-auto max-w-2xl px-5 py-16">
         <div className="rounded-3xl border border-[#CDEBE8] bg-white p-8 text-center">
           <h1 className="text-xl font-semibold">{t(`unavailable_${info.unavailableReason}`)}</h1>
+          {/* 依原因補一行說明：截止顯示截止日、暫停提示改用邀請信（daodao#281） */}
+          {info.unavailableReason === "expired" && (
+            <p className="mt-2 text-sm text-[#78928F]">
+              {t("unavailable_expired_deadline", {
+                date: (info.joinDeadline ?? info.endDate).slice(0, 10),
+              })}
+            </p>
+          )}
+          {info.unavailableReason === "paused" && (
+            <p className="mt-2 text-sm text-[#78928F]">{t("unavailable_paused_copy")}</p>
+          )}
           <p className="mt-4 text-[#5A7B79]">{info.organization.bio || t("unavailable_copy")}</p>
           {info.organization.externalLink && (
             <a
