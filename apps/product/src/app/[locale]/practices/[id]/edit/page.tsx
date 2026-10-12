@@ -99,6 +99,11 @@ export default function EditPracticePage() {
 
   // 共同挑戰實踐：名稱、期間、隱私由挑戰統一設定（FR-CC-05、FR-CC-10），server 端亦會拒絕這些欄位
   const isChallenge = practiceData?.data?.isChallenge === true;
+  // 燈塔本期實踐：隱私由場次統一設定，server 收到 privacyStatus 會回 400（前端型別待 gen:types 同步）
+  const isCohortPrivacyLocked =
+    (practiceData?.data as { isCohortPrivacyLocked?: boolean } | undefined)
+      ?.isCohortPrivacyLocked === true;
+  const isPrivacyLocked = isChallenge || isCohortPrivacyLocked;
 
   // 檢查實踐是否已經開始（狀態為 active）
   const isPracticeStarted = useMemo(() => {
@@ -242,7 +247,7 @@ export default function EditPracticePage() {
       }
       const apiRequest = {
         ...converted,
-        ...(isChallenge ? {} : { privacyStatus }),
+        ...(isPrivacyLocked ? {} : { privacyStatus }),
       } as UpdatePracticeRequestType;
 
       const response = await updatePractice(practiceId, apiRequest);
@@ -352,10 +357,15 @@ export default function EditPracticePage() {
             <Step4 form={form} />
 
             {/* Privacy Status */}
-            {!isChallenge && (
+            {!isPrivacyLocked && (
               <div className="bg-white rounded-lg p-4 shadow-sm">
                 <PrivacyStatusSelector value={privacyStatus} onChange={setPrivacyStatus} />
               </div>
+            )}
+            {isCohortPrivacyLocked && (
+              <p className="rounded-lg bg-logo-cyan/10 px-4 py-3 text-sm text-text-dark">
+                {t("edit_cohort_privacy_locked")}
+              </p>
             )}
 
             {/* Save Button */}

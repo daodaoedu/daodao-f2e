@@ -4991,6 +4991,7 @@
     "summary_public_toast_dismiss": "不再顯示",
     "edit_title": "編輯實踐",
     "edit_challenge_locked": "這是共同挑戰的實踐：名稱、期間與隱私由挑戰統一設定，這裡只能調整行動內容、頻率與資源。",
+    "edit_cohort_privacy_locked": "這是本期的實踐，打卡隱私由教練統一設定。",
     "edit_save_failed": "儲存失敗，請稍後再試",
     "edit_save_success": "實踐已成功更新",
     "edit_cancel": "取消",
