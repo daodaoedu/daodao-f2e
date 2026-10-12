@@ -169,10 +169,12 @@ export default function EditPracticePage() {
       executionTiming.length > 0 ? executionTiming : [ExecutionTiming.morning];
 
     // 轉換 resources: API 格式 -> 表單格式
+    // isLocked（教練加入的資源）server 已回傳，前端型別待 gen:types 同步後再拿掉轉型
     const resources = (data.resources || []).map((resource) => ({
       id: resource.id,
       name: resource.name,
       url: resource.url || "",
+      isLocked: (resource as { isLocked?: boolean }).isLocked === true,
     }));
 
     return {
