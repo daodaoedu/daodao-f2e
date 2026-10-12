@@ -3,6 +3,7 @@
  * 範本庫、梯次指派的結束日也走同一份（daodao#277）。
  */
 export {
+  isPracticeEnded,
   minEditableStartDate,
   parseLocalDate,
   practiceEndDate,

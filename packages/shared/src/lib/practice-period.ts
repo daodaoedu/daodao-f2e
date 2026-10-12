@@ -56,6 +56,15 @@ export function minEditableStartDate(startDate: string | null | undefined, now: 
 }
 
 /**
+ * 實踐是否已過結束日：結束日當天整天都還在期間內，隔天當地 00:00 起才算到期。
+ * 結束日以 parseLocalDate 解析；沒有結束日或格式錯誤時不算到期（daodao#277）。
+ */
+export function isPracticeEnded(endDate: string | null | undefined, now: Date): boolean {
+  const end = endDate ? parseLocalDate(endDate) : null;
+  return end ? differenceInCalendarDays(now, end) > 0 : false;
+}
+
+/**
  * 實踐天數以 API 為準：durationDays 是正整數就照用，不限 7／14／21／30（那只是建立流程的選項）。
  * 從共同挑戰複製出的實踐天數跟著挑戰起訖日，可以是任何天數（daodao#299）。
  * 沒有 durationDays 時由起訖日（含頭尾）推回；都無法判斷回傳 null，不捏造預設天數。
