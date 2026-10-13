@@ -1,6 +1,7 @@
 /**
  * 送出流程的純函式：server 錯誤解析 → 表單欄位／步驟對應、成功回應 → 建立名稱清單
  */
+import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 import type { WizardFormValues } from "./schema";
 
 export interface ServerErrorDetail {
@@ -149,3 +150,12 @@ export const extractCreatedNames = (response: unknown): string[] => {
     .map((item) => item.title)
     .filter((title): title is string => typeof title === "string");
 };
+
+/** 「看看我的實踐」：新主頁的「你的今天」列出個人實踐，舊 /mine 已不是入口（daodao#211） */
+const MY_PRACTICES_ROUTE = HOME_TAB_PATHS.inspire;
+/** 使用者模版管理頁尚未存在（/manage 仍是佔位），先回模版挑選頁 */
+const MY_TEMPLATES_ROUTE = "/practices/create";
+
+/** 完成彈窗主按鈕的導頁目標 */
+export const getDonePrimaryRoute = (isPersonal: boolean): string =>
+  isPersonal ? MY_PRACTICES_ROUTE : MY_TEMPLATES_ROUTE;
