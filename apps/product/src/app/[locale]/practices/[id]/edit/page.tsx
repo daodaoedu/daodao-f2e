@@ -31,8 +31,8 @@ import {
   PracticeTimePeriodToExecutionTimingMap,
   parseFrequency,
 } from "@/constants/practice-form";
-import { PracticeStatus } from "@/constants/practice-status";
 import { minEditableStartDate } from "@/utils/practice-period";
+import { isPracticeScheduleLocked } from "@/utils/practice-schedule-lock";
 
 // API 錯誤響應類型
 interface ApiErrorResponse {
@@ -100,10 +100,11 @@ export default function EditPracticePage() {
   // 共同挑戰實踐：名稱、期間、隱私由挑戰統一設定（FR-CC-05、FR-CC-10），server 端亦會拒絕這些欄位
   const isChallenge = practiceData?.data?.isChallenge === true;
 
-  // 檢查實踐是否已經開始（狀態為 active）
-  const isPracticeStarted = useMemo(() => {
-    return practiceData?.data?.status === PracticeStatus.active;
-  }, [practiceData?.data?.status]);
+  // 已有打卡記錄才鎖期間與頻率（與 server stripLockedFields 一致）
+  const isPracticeStarted = useMemo(
+    () => isPracticeScheduleLocked(practiceData?.data),
+    [practiceData?.data]
+  );
 
   // 取得日期驗證的最小日期
   // 對於已排程的實踐，應該允許保留原本的開始日期（即使已經過去）
