@@ -74,10 +74,13 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
 
+      # 最新 eas-cli 的相依 @oclif/plugin-autocomplete@3.3.0 要求 Node >= 22，
+      # 用 .nvmrc（20.19.4）會在 Setup Expo 安裝 eas-cli 時失敗。與 mobile-ci 的
+      # EAS job 一致改用 Node 22；只影響 runner 上的 CLI 與 bundling，不影響 app 執行環境。
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version: '22.18.0'
           cache: 'pnpm'
 
       - name: Setup Expo
