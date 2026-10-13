@@ -75,6 +75,8 @@ export interface IFeedParams {
   keyword?: string;
   tags?: string[];
   type?: "all" | "practice" | "checkin";
+  /** 空間篩選（多選取聯集）：personal | challenge | cohort:<cohortId> */
+  spaces?: string[];
 }
 
 // ============================================================================
@@ -104,6 +106,9 @@ export function useFeed(params: IFeedParams) {
     if (params.keyword) searchParams.set("keyword", params.keyword);
     if (params.tags?.length) {
       for (const tag of params.tags) searchParams.append("tags", tag);
+    }
+    if (params.spaces?.length) {
+      for (const space of params.spaces) searchParams.append("spaces", space);
     }
     if (params.type && params.type !== "all") {
       searchParams.set("type", params.type);
