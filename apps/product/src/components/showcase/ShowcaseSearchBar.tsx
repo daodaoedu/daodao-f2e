@@ -54,7 +54,7 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
     "flex items-center bg-white border rounded-full overflow-hidden transition-all duration-300 ease-in-out",
     expanded
       ? "w-full border-[#9fb5b8] px-4 h-10"
-      : "w-10 h-10 border-[#e4eae9] cursor-pointer justify-center"
+      : "w-8 h-8 border-[#e4eae9] cursor-pointer justify-center"
   );
 
   const searchBarContent = (
@@ -62,7 +62,7 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
       <Search
         className={cn(
           "shrink-0 transition-all duration-200",
-          expanded ? "size-4 text-text-dark/40 mr-2" : "size-[18px] text-text-dark/60"
+          expanded ? "size-4 text-text-dark/40 mr-2" : "size-4 text-text-dark/60"
         )}
       />
       <Input
@@ -84,7 +84,8 @@ export function ShowcaseSearchBar({ value, onChange, onSearch }: ShowcaseSearchB
   );
 
   return (
-    <div className="relative">
+    // 展開時在主頁「搜尋 + 篩選」列中佔滿剩餘寬度
+    <div className={cn("relative", expanded && "min-w-0 flex-1")}>
       {expanded ? (
         <div className={searchBarClassName}>
           {searchBarContent}
