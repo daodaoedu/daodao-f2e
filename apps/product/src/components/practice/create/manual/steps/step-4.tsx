@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "@daodao/ui/components/form";
 import { Input } from "@daodao/ui/components/input";
+import { LockIcon } from "lucide-react";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { ResourceCard } from "@/components/practice/shared";
@@ -202,8 +203,9 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
           const resources = field.value || [];
 
           const handleRemoveResource = (id: string) => {
-            field.onChange(resources.filter((r) => r.id !== id));
+            field.onChange(resources.filter((r) => r.id !== id || r.isLocked));
           };
+          const hasLockedResource = resources.some((r) => r.isLocked);
 
           return (
             <FormItem>
@@ -264,12 +266,19 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
                     {t("step4_add_resource")}
                     <ArrowRightOutlineSvg className="size-4.5" />
                   </Button>
+                  {hasLockedResource && (
+                    <p className="flex items-center gap-1 text-xs text-text-dark/60 mb-3">
+                      <LockIcon className="size-3 shrink-0" />
+                      {t("step4_resource_locked_hint")}
+                    </p>
+                  )}
                   {resources.length > 0 && (
                     <div className="grid grid-cols-2 gap-3">
                       {resources.map((resource) => (
                         <ResourceCard
                           key={resource.id}
                           resource={resource}
+                          locked={resource.isLocked}
                           onRemove={() => handleRemoveResource(resource.id)}
                         />
                       ))}
