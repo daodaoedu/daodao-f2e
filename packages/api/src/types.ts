@@ -7627,6 +7627,8 @@ export interface paths {
                                  * @enum {string}
                                  */
                                 viewerRole: "host" | "member";
+                                /** @description 當前使用者的 users.id（與訊息 author.userId 同一種 id），用來判斷本人訊息 */
+                                viewerUserId: number;
                                 /** @description 置頂訊息數 */
                                 pinnedCount: number;
                                 /** @description 前 3 位成員預覽 */
@@ -17764,6 +17766,15 @@ export interface paths {
                                 validCount: number;
                                 errorCount: number;
                                 queuedCount: number;
+                                /** @description 會寄出邀請信的筆數（新邀請、已邀請重寄、曾退出重新邀請） */
+                                sendableCount: number;
+                                /** @description 已加入而略過、不重寄的筆數 */
+                                skippedCount: number;
+                                /**
+                                 * @description 此期目前不可寄送邀請的原因（未發布／已過加入截止日／已額滿）；可寄送時為 null
+                                 * @enum {string|null}
+                                 */
+                                blockedReason: "not_published" | "expired" | "full" | null;
                                 items: {
                                     email: string;
                                     valid: boolean;
@@ -17849,6 +17860,15 @@ export interface paths {
                                 validCount: number;
                                 errorCount: number;
                                 queuedCount: number;
+                                /** @description 會寄出邀請信的筆數（新邀請、已邀請重寄、曾退出重新邀請） */
+                                sendableCount: number;
+                                /** @description 已加入而略過、不重寄的筆數 */
+                                skippedCount: number;
+                                /**
+                                 * @description 此期目前不可寄送邀請的原因（未發布／已過加入截止日／已額滿）；可寄送時為 null
+                                 * @enum {string|null}
+                                 */
+                                blockedReason: "not_published" | "expired" | "full" | null;
                                 items: {
                                     email: string;
                                     valid: boolean;

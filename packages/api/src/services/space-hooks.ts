@@ -4,7 +4,8 @@
 
 import { useQuery } from "../hooks";
 
-export const useMySpaces = () => useQuery("/api/v1/spaces", {}, { revalidateOnFocus: false });
+export const useMySpaces = (enabled = true) =>
+  useQuery("/api/v1/spaces", enabled ? {} : null, { revalidateOnFocus: false });
 
 export const useSpaceDetail = (id: string | undefined) =>
   useQuery("/api/v1/spaces/{id}", id ? { params: { path: { id } } } : null, {
