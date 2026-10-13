@@ -5,7 +5,7 @@ import { BookSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
-import { Link2Icon, X } from "lucide-react";
+import { Link2Icon, LockIcon, X } from "lucide-react";
 import * as React from "react";
 
 export interface ResourceCardData {
@@ -19,9 +19,17 @@ export interface ResourceCardProps {
   className?: string;
   onClick?: () => void;
   onRemove?: () => void;
+  /** 教練加入的資源：不顯示移除鈕，改顯示鎖頭 */
+  locked?: boolean;
 }
 
-const ResourceCardComponent = ({ resource, className, onClick, onRemove }: ResourceCardProps) => {
+const ResourceCardComponent = ({
+  resource,
+  className,
+  onClick,
+  onRemove,
+  locked,
+}: ResourceCardProps) => {
   const t = useTranslations("practice");
   const [imageError, setImageError] = React.useState(false);
   const { data: ogImageData, isLoading } = useExtractOgImage(resource.url);
@@ -57,7 +65,17 @@ const ResourceCardComponent = ({ resource, className, onClick, onRemove }: Resou
             className="object-cover"
           />
         )}
-        {onRemove && (
+        {locked && (
+          <span
+            className="absolute top-2 right-2 size-5 bg-[#295E5C66]/40 text-white rounded-full flex items-center justify-center"
+            role="img"
+            aria-label={t("resource_locked_by_coach")}
+            title={t("resource_locked_by_coach")}
+          >
+            <LockIcon className="size-3" />
+          </span>
+        )}
+        {onRemove && !locked && (
           <button
             type="button"
             onClick={(e) => {
@@ -108,6 +126,7 @@ export const ResourceCard = React.memo(ResourceCardComponent, (prevProps, nextPr
     prevProps.resource.id === nextProps.resource.id &&
     prevProps.resource.name === nextProps.resource.name &&
     prevProps.resource.url === nextProps.resource.url &&
+    prevProps.locked === nextProps.locked &&
     prevProps.className === nextProps.className
   );
 });

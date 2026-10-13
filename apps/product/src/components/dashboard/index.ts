@@ -4,6 +4,8 @@ export { CompletedSection } from "./completed-section";
 export { CompletedTaskCard } from "./completed-task-card";
 export { DashboardHeader } from "./dashboard-header";
 export { ExploreRow } from "./explore-row";
+export * from "./feed-space-filter";
+export { FeedSpaceFilter } from "./feed-space-filter-menu";
 export type { InProgressTask } from "./in-progress-section";
 export { InProgressSection } from "./in-progress-section";
 export { InProgressTaskCard } from "./in-progress-task-card";
