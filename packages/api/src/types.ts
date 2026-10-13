@@ -7627,6 +7627,8 @@ export interface paths {
                                  * @enum {string}
                                  */
                                 viewerRole: "host" | "member";
+                                /** @description 當前使用者的 users.id（與訊息 author.userId 同一種 id），用來判斷本人訊息 */
+                                viewerUserId: number;
                                 /** @description 置頂訊息數 */
                                 pinnedCount: number;
                                 /** @description 前 3 位成員預覽 */
