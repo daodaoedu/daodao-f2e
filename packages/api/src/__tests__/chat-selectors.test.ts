@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("../client", () => ({ client: {} }));
 
 import {
+  chatDeltaAfter,
+  isOwnChatMessage,
   selectChatDelta,
   selectChatErrorMessage,
   selectChatHistory,
@@ -73,7 +75,13 @@ describe("chat response selectors (wire envelope)", () => {
   });
 
   it("room detail: returns the room inside data", () => {
-    const detail = { ...room, viewerRole: "host" as const, pinnedCount: 0, memberPreview: [] };
+    const detail = {
+      ...room,
+      viewerRole: "host" as const,
+      viewerUserId: 2,
+      pinnedCount: 0,
+      memberPreview: [],
+    };
     const res = { success: true as const, data: detail, timestamp };
     expect(selectChatRoom(res)?.name).toBe("QA 272 dev 冒煙");
     expect(selectChatRoom(res)?.viewerRole).toBe("host");
@@ -190,5 +198,43 @@ describe("chat response selectors (wire envelope)", () => {
       "發送失敗"
     );
     expect(selectChatErrorMessage("boom", "發送失敗")).toBe("發送失敗");
+  });
+});
+
+// daodao#154 regression（J-06c）：訊息 author.userId 是內部 users.id（整數），/users/me 的 id 是 UUID。
+// 舊寫法 Number(<UUID>) 得到 NaN，本人訊息永遠認不出來 → 沒有「編輯」、也不靠右。
+// 改用聊天室詳情的 viewerUserId（與 author.userId 同一種 id）判斷。
+describe("isOwnChatMessage", () => {
+  it("matches when the author is the viewer (same internal users.id)", () => {
+    expect(isOwnChatMessage(message, 2)).toBe(true);
+  });
+
+  it("does not match another member's message", () => {
+    expect(isOwnChatMessage(message, 306)).toBe(false);
+  });
+
+  it("never matches while the viewer id is unknown or not a valid id", () => {
+    expect(isOwnChatMessage(message, undefined)).toBe(false);
+    expect(isOwnChatMessage(message, null)).toBe(false);
+    expect(isOwnChatMessage(message, Number("58b915af-c361-4900-a6af-53b082a7f62c"))).toBe(false);
+  });
+
+  it("system messages and deleted accounts (author null) are never own", () => {
+    expect(isOwnChatMessage({ ...message, author: null }, 2)).toBe(false);
+  });
+});
+
+describe("chatDeltaAfter", () => {
+  // daodao#154 regression：空聊天室原本 after 為 null，增量輪詢永遠不啟動，收不到別人的新訊息
+  it("delta after: null before history loads", () => {
+    expect(chatDeltaAfter(false, [])).toBeNull();
+  });
+
+  it("delta after: 0 when the room has no messages, so polling still starts", () => {
+    expect(chatDeltaAfter(true, [])).toBe(0);
+  });
+
+  it("delta after: newest message id (history is oldest → newest)", () => {
+    expect(chatDeltaAfter(true, [{ id: 4 }, { id: 9 }])).toBe(9);
   });
 });

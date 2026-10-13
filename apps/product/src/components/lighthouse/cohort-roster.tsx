@@ -20,6 +20,11 @@ import { cn } from "@daodao/ui/lib/utils";
 import { format } from "date-fns";
 import { Copy, Link2, Link2Off, RefreshCw, Send, Upload, UserMinus } from "lucide-react";
 import { useState } from "react";
+import { apiErrorMessage } from "@/utils/cohort-api-error";
+import {
+  getInvitationSendDisabledReason,
+  type InvitationPreviewSummary,
+} from "@/utils/cohort-invitation";
 import { CohortErrorState } from "./cohort-error-state";
 import { JoinCode, useCopyJoinLink, useJoinUrl } from "./join-code";
 
@@ -66,7 +71,9 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
   const copyJoinLink = useCopyJoinLink(joinUrl);
   const [csv, setCsv] = useState("");
   const [preview, setPreview] = useState<PreviewItem[]>([]);
+  const [summary, setSummary] = useState<InvitationPreviewSummary | null>(null);
   const [busy, setBusy] = useState(false);
+  const sendDisabledReason = summary ? getInvitationSendDisabledReason(summary) : null;
   const joinOpen = Boolean(cohort?.joinToken) && !cohort?.joinPaused;
 
   async function confirm(title: string, message: string, actionLabel: string, danger = false) {
@@ -97,38 +104,50 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
       toast.error(t("invitation_preview_failed"));
       return;
     }
-    setPreview(response.data.data.items);
+    const { items, sendableCount, skippedCount, errorCount, blockedReason } = response.data.data;
+    setPreview(items);
+    setSummary({ sendableCount, skippedCount, errorCount, blockedReason });
   }
 
   async function sendInvitations() {
+    // 已加入者由 server 略過不重寄（daodao#282），略過數以寄送當下的 server 結果為準
     const validEmails = preview.filter((item) => item.valid).map((item) => item.email);
-    if (!validEmails.length) return;
+    if (!validEmails.length || sendDisabledReason) return;
     setBusy(true);
     const response = await inviteLighthouseCohortMembers(programId, cohortId, {
       emails: validEmails,
       preview: false,
     });
     setBusy(false);
-    if (response.error) {
-      toast.error(t("invitation_send_failed"));
+    if (response.error || !response.data) {
+      // 409：期在預覽後變成不可加入，顯示 server 給的原因
+      toast.error(apiErrorMessage(response.error, t("invitation_send_failed")));
       return;
     }
     await enrollmentQuery.mutate();
     setPreview([]);
+    setSummary(null);
     setCsv("");
-    toast.success(t("invitation_sent"));
+    const { queuedCount, skippedCount } = response.data.data;
+    toast.success(
+      skippedCount > 0
+        ? t("invitation_sent_with_skipped", { count: queuedCount, skipped: skippedCount })
+        : t("invitation_sent_count", { count: queuedCount })
+    );
   }
 
   async function handleCsv(file?: File) {
     setCsv(file ? await file.text() : "");
     setPreview([]);
+    setSummary(null);
   }
 
   async function resend(enrollmentId: number) {
     try {
       const response = await resendLighthouseCohortInvitation(programId, cohortId, enrollmentId);
       if (response.error) {
-        toast.error(t("invitation_send_failed"));
+        // 409：場次已截止／額滿／未發布或成員已加入，顯示 server 給的原因（daodao#281）
+        toast.error(apiErrorMessage(response.error, t("invitation_send_failed")));
         return;
       }
       await enrollmentQuery.mutate();
@@ -299,12 +318,33 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
             </h2>
             <Button
               onClick={sendInvitations}
-              disabled={busy || !preview.some((item) => item.valid)}
+              disabled={busy || sendDisabledReason !== null}
+              aria-describedby={sendDisabledReason ? "roster-send-disabled-reason" : undefined}
             >
               <Send className="size-4" aria-hidden="true" />
               {t("send_invitations")}
             </Button>
           </div>
+          {summary && (
+            <p className="mt-2 text-xs text-[#5A7B79]">
+              {t("preview_summary", {
+                sendable: summary.sendableCount,
+                skipped: summary.skippedCount,
+                invalid: summary.errorCount,
+              })}
+            </p>
+          )}
+          {sendDisabledReason && (
+            <p
+              id="roster-send-disabled-reason"
+              aria-live="polite"
+              className="mt-3 rounded-2xl bg-[#FFF6E8] px-4 py-3 text-sm leading-6 text-[#A95D00]"
+            >
+              {t(`invitation_send_disabled_${sendDisabledReason}`, {
+                date: (cohort?.joinDeadline ?? cohort?.endDate ?? "").slice(0, 10),
+              })}
+            </p>
+          )}
           <ul className="mt-4 divide-y divide-[#DDEFED]">
             {preview.map((item) => {
               const state = previewState(item);
