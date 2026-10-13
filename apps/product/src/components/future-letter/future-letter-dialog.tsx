@@ -323,6 +323,10 @@ export function FutureLetterDialog({
                   side="top"
                   align="start"
                   collisionPadding={16}
+                  // The popover is portaled outside the dialog, so the dialog's scroll lock
+                  // would swallow wheel/touch scrolling inside it without these.
+                  onWheel={(event) => event.stopPropagation()}
+                  onTouchMove={(event) => event.stopPropagation()}
                 >
                   <div className="space-y-3">
                     <div>
