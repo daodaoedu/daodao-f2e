@@ -1,13 +1,30 @@
 "use client";
 
-import { type ActivityCardItem, type FeedItem, useFeed, useReactionsBatch } from "@daodao/api";
+import {
+  type ActivityCardItem,
+  type FeedItem,
+  useFeed,
+  useMySpaces,
+  useReactionsBatch,
+} from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { getStorage, StorageEnum } from "@daodao/shared";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AddTaskFAB, ExploreRow, YourToday } from "@/components/dashboard";
+import {
+  AddTaskFAB,
+  buildHomeFeedQuery,
+  buildSpaceFilterOptions,
+  ExploreRow,
+  FeedSpaceFilter,
+  parseSpaceFilterParams,
+  SPACE_FILTER_PARAM,
+  type SpaceFilterValue,
+  sanitizeSpaceSelection,
+  YourToday,
+} from "@/components/dashboard";
 import { HomeTimelineSummary } from "@/components/future-letter";
 import { BackgroundAnimation, Banner } from "@/components/layout";
 import {
@@ -94,13 +111,24 @@ export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("dashboard");
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
 
   const [searchValue, setSearchValue] = useState(searchParams.get("keyword") ?? "");
   const [filters, _setFilters] = useState<ShowcaseFilterState>({
     tags: searchParams.getAll("tags[]"),
   });
   const [keyword, setKeyword] = useState(searchParams.get("keyword") ?? "");
+  const [spaceFilters, setSpaceFilters] = useState<SpaceFilterValue[]>(() =>
+    parseSpaceFilterParams(searchParams.getAll(SPACE_FILTER_PARAM))
+  );
+
+  const { data: mySpacesData, isLoading: isMySpacesLoading } = useMySpaces(!!user);
+  const spaceFilterOptions = useMemo(
+    () => buildSpaceFilterOptions(user ? mySpacesData?.data?.items : undefined),
+    [user, mySpacesData]
+  );
+  const isSpaceFilterOptionsReady =
+    !isAuthLoading && (!user || (!isMySpacesLoading && !!mySpacesData));
 
   // Redirect legacy `/?tab=mine` URLs (old bookmarks/history) to the dedicated /mine route.
   useEffect(() => {
@@ -112,13 +140,8 @@ export default function HomePage() {
   }, [searchParams, router]);
 
   const updateUrlParams = useCallback(
-    (kw: string, f: ShowcaseFilterState) => {
-      const params = new URLSearchParams();
-      if (kw) params.set("keyword", kw);
-      for (const tag of f.tags) {
-        params.append("tags[]", tag);
-      }
-      const qs = params.toString();
+    (kw: string, f: ShowcaseFilterState, spaces: SpaceFilterValue[]) => {
+      const qs = buildHomeFeedQuery({ keyword: kw, tags: f.tags, spaces });
       router.replace(qs ? `?${qs}` : HOME_TAB_PATHS.inspire, { scroll: false });
     },
     [router]
@@ -127,21 +150,45 @@ export default function HomePage() {
   const handleSearch = useCallback(
     (value: string) => {
       setKeyword(value);
-      updateUrlParams(value, filters);
+      updateUrlParams(value, filters, spaceFilters);
     },
-    [filters, updateUrlParams]
+    [filters, spaceFilters, updateUrlParams]
   );
+
+  const handleSpaceFilterChange = useCallback(
+    (next: SpaceFilterValue[]) => {
+      setSpaceFilters(next);
+      updateUrlParams(keyword, filters, next);
+    },
+    [keyword, filters, updateUrlParams]
+  );
+
+  // 上一頁／下一頁或點「主頁」改變網址時，篩選跟著網址走
+  const urlSpaces = searchParams.getAll(SPACE_FILTER_PARAM).join("&");
+  useEffect(() => {
+    const parsed = parseSpaceFilterParams(urlSpaces ? urlSpaces.split("&") : []);
+    setSpaceFilters((prev) => (prev.join("&") === parsed.join("&") ? prev : parsed));
+  }, [urlSpaces]);
+
+  // 網址帶著已不再參與（或未登入看不到）的活動課程時，選項載入後移除
+  useEffect(() => {
+    if (!isSpaceFilterOptionsReady) return;
+    const sanitized = sanitizeSpaceSelection(spaceFilters, spaceFilterOptions);
+    if (sanitized.length !== spaceFilters.length) handleSpaceFilterChange(sanitized);
+  }, [isSpaceFilterOptionsReady, spaceFilterOptions, spaceFilters, handleSpaceFilterChange]);
 
   const feedParams = useMemo(
     () => ({
       keyword: keyword || undefined,
       tags: filters.tags.length > 0 ? filters.tags : undefined,
+      spaces: spaceFilters.length > 0 ? spaceFilters : undefined,
     }),
-    [keyword, filters]
+    [keyword, filters, spaceFilters]
   );
 
   const {
     feedItems,
+    error: feedError,
     isLoading: isShowcaseLoading,
     hasMore,
     loadMore,
@@ -248,12 +295,20 @@ export default function HomePage() {
           <ExploreRow />
 
           {/* 搜尋 + 篩選 */}
-          <div className="mb-5">
+          <div className="mb-5 flex flex-wrap items-center gap-2">
             <ShowcaseSearchBar
               value={searchValue}
               onChange={setSearchValue}
               onSearch={handleSearch}
             />
+            <div className="flex min-w-0 items-center gap-2">
+              <span aria-hidden="true" className="h-4 w-px bg-[oklch(0.891_0_89.9)]" />
+              <FeedSpaceFilter
+                options={spaceFilterOptions}
+                selected={spaceFilters}
+                onChange={handleSpaceFilterChange}
+              />
+            </div>
           </div>
 
           {isShowcaseLoading && feedItems.length === 0 ? (
@@ -414,6 +469,15 @@ export default function HomePage() {
 
                 return null;
               })}
+
+              {spaceFilters.length > 0 &&
+                !isShowcaseLoading &&
+                !feedError &&
+                orderedFeedItems.length === 0 && (
+                  <p className="m-0 py-12 text-center text-sm text-text-dark/50">
+                    {t("feed_space_filter_empty")}
+                  </p>
+                )}
 
               <div ref={sentinelRef} className="h-4" />
 

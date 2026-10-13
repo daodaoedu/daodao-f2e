@@ -1,19 +1,21 @@
 "use client";
 
 import type { ChatMessageType } from "@daodao/api";
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useEffect, useRef } from "react";
 import type { TimelineItem } from "@/hooks/use-chat-timeline";
+import { chatDayLabelParts } from "@/utils/chat-format";
 import { ChatMessageItem } from "./chat-message-item";
 
 interface ChatMessageListProps {
   timeline: TimelineItem[];
   isLoading: boolean;
   isHost: boolean;
-  currentUserId: number;
+  viewerUserId: number | null;
   onReply?: (message: ChatMessageType) => void;
   onEdit?: (message: ChatMessageType) => void;
+  onDelete?: (message: ChatMessageType) => void;
   onMutate?: () => void;
 }
 
@@ -21,12 +23,14 @@ export function ChatMessageList({
   timeline,
   isLoading,
   isHost,
-  currentUserId,
+  viewerUserId,
   onReply,
   onEdit,
+  onDelete,
   onMutate,
 }: ChatMessageListProps) {
   const t = useTranslations("messages");
+  const locale = useLocale();
   const bottomRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
 
@@ -54,19 +58,20 @@ export function ChatMessageList({
   if (timeline.length === 0) {
     return (
       <div className="flex items-center justify-center py-20 text-text-dark/40">
-        <p className="text-sm">{t("empty")}</p>
+        <p className="text-sm">{t("timeline_empty")}</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col py-2">
+    // POC：訊息欄最寬 720px 置中、列間距 4px；日期分隔膠囊
+    <div className="mx-auto flex max-w-[720px] flex-col gap-1">
       {timeline.map((item) => {
         if (item.type === "date-separator") {
           return (
-            <div key={`date-${item.date}`} className="flex justify-center py-3">
-              <span className="text-[11px] text-text-dark/40 bg-[#F2F7F7] rounded-full px-3 py-1">
-                {item.date}
+            <div key={`date-${item.date}`} className="flex justify-center pt-3.5 pb-2.5">
+              <span className="inline-flex items-center whitespace-nowrap rounded-full bg-[oklch(0.962_0.032_211.1)] px-3.5 py-1 text-xs text-[oklch(0.445_0.056_192/0.6)]">
+                {t("date_divider", chatDayLabelParts(item.date, locale))}
               </span>
             </div>
           );
@@ -78,9 +83,10 @@ export function ChatMessageList({
             isGroupStart={item.isGroupStart}
             isGroupEnd={item.isGroupEnd}
             isHost={isHost}
-            currentUserId={currentUserId}
+            viewerUserId={viewerUserId}
             onReply={onReply}
             onEdit={onEdit}
+            onDelete={onDelete}
             onMutate={onMutate}
           />
         );

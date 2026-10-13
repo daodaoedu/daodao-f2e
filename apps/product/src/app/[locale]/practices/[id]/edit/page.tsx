@@ -32,7 +32,8 @@ import {
   PracticeTimePeriodToExecutionTimingMap,
   parseFrequency,
 } from "@/constants/practice-form";
-import { PracticeStatus } from "@/constants/practice-status";
+import { isPracticePrivacyLocked, withEditablePrivacy } from "@/utils/practice-privacy-lock";
+import { isPracticeScheduleLocked } from "@/utils/practice-schedule-lock";
 
 // API 錯誤響應類型
 interface ApiErrorResponse {
@@ -99,11 +100,17 @@ export default function EditPracticePage() {
 
   // 共同挑戰實踐：名稱、期間、隱私由挑戰統一設定（FR-CC-05、FR-CC-10），server 端亦會拒絕這些欄位
   const isChallenge = practiceData?.data?.isChallenge === true;
+  // 燈塔本期實踐：隱私由場次統一設定，server 收到 privacyStatus 會回 400（前端型別待 gen:types 同步）
+  const isCohortPrivacyLocked =
+    (practiceData?.data as { isCohortPrivacyLocked?: boolean } | undefined)
+      ?.isCohortPrivacyLocked === true;
+  const isPrivacyLocked = isPracticePrivacyLocked({ isChallenge, isCohortPrivacyLocked });
 
-  // 檢查實踐是否已經開始（狀態為 active）
-  const isPracticeStarted = useMemo(() => {
-    return practiceData?.data?.status === PracticeStatus.active;
-  }, [practiceData?.data?.status]);
+  // 已有打卡記錄才鎖期間與頻率（與 server stripLockedFields 一致）
+  const isPracticeStarted = useMemo(
+    () => isPracticeScheduleLocked(practiceData?.data),
+    [practiceData?.data]
+  );
 
   // 取得日期驗證的最小日期
   // 對於已排程的實踐，應該允許保留原本的開始日期（即使已經過去）
@@ -169,10 +176,12 @@ export default function EditPracticePage() {
       executionTiming.length > 0 ? executionTiming : [ExecutionTiming.morning];
 
     // 轉換 resources: API 格式 -> 表單格式
+    // isLocked（教練加入的資源）server 已回傳，前端型別待 gen:types 同步後再拿掉轉型
     const resources = (data.resources || []).map((resource) => ({
       id: resource.id,
       name: resource.name,
       url: resource.url || "",
+      isLocked: (resource as { isLocked?: boolean }).isLocked === true,
     }));
 
     return {
@@ -238,10 +247,11 @@ export default function EditPracticePage() {
           delete converted[lockedField];
         }
       }
-      const apiRequest = {
-        ...converted,
-        ...(isChallenge ? {} : { privacyStatus }),
-      } as UpdatePracticeRequestType;
+      const apiRequest = withEditablePrivacy(
+        converted,
+        privacyStatus,
+        isPrivacyLocked
+      ) as UpdatePracticeRequestType;
 
       const response = await updatePractice(practiceId, apiRequest);
 
@@ -350,10 +360,15 @@ export default function EditPracticePage() {
             <Step4 form={form} />
 
             {/* Privacy Status */}
-            {!isChallenge && (
+            {!isPrivacyLocked && (
               <div className="bg-white rounded-lg p-4 shadow-sm">
                 <PrivacyStatusSelector value={privacyStatus} onChange={setPrivacyStatus} />
               </div>
+            )}
+            {isCohortPrivacyLocked && (
+              <p className="rounded-lg bg-logo-cyan/10 px-4 py-3 text-sm text-text-dark">
+                {t("edit_cohort_privacy_locked")}
+              </p>
             )}
 
             {/* Save Button */}

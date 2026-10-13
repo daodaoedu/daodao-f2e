@@ -119,7 +119,7 @@ export const ResourceItem = ({
 
   return (
     <div className={cn(WIZARD_RESOURCE_CARD, showAssign && "flex-col items-stretch gap-2")}>
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-3">
         <BookSvg width={24} height={23} className="shrink-0 opacity-85" aria-hidden="true" />
         {isEditing ? (
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
