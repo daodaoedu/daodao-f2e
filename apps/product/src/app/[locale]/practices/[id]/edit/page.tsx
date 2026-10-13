@@ -8,7 +8,6 @@ import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { startOfDay } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
@@ -32,6 +31,7 @@ import {
   PracticeTimePeriodToExecutionTimingMap,
   parseFrequency,
 } from "@/constants/practice-form";
+import { minEditableStartDate } from "@/utils/practice-period";
 import { isPracticePrivacyLocked, withEditablePrivacy } from "@/utils/practice-privacy-lock";
 import { isPracticeScheduleLocked } from "@/utils/practice-schedule-lock";
 
@@ -114,14 +114,10 @@ export default function EditPracticePage() {
 
   // 取得日期驗證的最小日期
   // 對於已排程的實踐，應該允許保留原本的開始日期（即使已經過去）
-  const minStartDate = useMemo(() => {
-    const today = startOfDay(new Date());
-    const practiceStartDate = practiceData?.data?.startDate
-      ? startOfDay(new Date(practiceData.data.startDate))
-      : today;
-
-    return practiceStartDate < today ? practiceStartDate : today;
-  }, [practiceData?.data?.startDate]);
+  const minStartDate = useMemo(
+    () => minEditableStartDate(practiceData?.data?.startDate, new Date()),
+    [practiceData?.data?.startDate]
+  );
 
   // 使用 minStartDate 來創建 schema
   const formSchema = useMemo(() => {

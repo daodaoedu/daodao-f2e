@@ -28,7 +28,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { Archive, ChevronDown, Copy, Link2, Lock, MoreVertical, Pencil } from "lucide-react";
 import { useState } from "react";
 import { apiErrorMessage } from "@/utils/cohort-api-error";
-import { addDays, formatSlashDate, isCohortStarted } from "@/utils/template-library";
+import { formatSlashDate, isCohortStarted, templateBindingEndDate } from "@/utils/template-library";
 import { ConfirmDialog } from "./confirm-dialog";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 
@@ -76,8 +76,7 @@ export function TemplateCard({
         cohortName: binding.cohortName,
         startDate,
         endDate:
-          binding.endDate?.slice(0, 10) ??
-          (template.durationDays ? addDays(startDate, template.durationDays - 1) : null),
+          binding.endDate?.slice(0, 10) ?? templateBindingEndDate(startDate, template.durationDays),
         locked: binding.locked,
       };
     })

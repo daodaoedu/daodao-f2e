@@ -1,4 +1,4 @@
-import { addDays, differenceInCalendarDays } from "date-fns";
+import { addDays, differenceInCalendarDays, format, startOfDay } from "date-fns";
 
 // 整串錨定：只接受 YYYY-MM-DD，或後面緊接 T 開頭的 ISO 時間；其他尾巴（"2026-10-09abc"）視為格式錯誤
 const DATE_ONLY_RE = /^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/;
@@ -29,6 +29,39 @@ export function parseLocalDate(value: string): Date | null {
  */
 export function practiceEndDate(start: Date, durationDays: number): Date {
   return addDays(start, durationDays - 1);
+}
+
+/**
+ * 日期字串版的結束日（YYYY-MM-DD），範本庫、梯次指派與學員實踐共用同一條規則（daodao#277）。
+ * 沒有開始日、天數不是正整數或日期無效時回傳 null，畫面不顯示結束日。
+ */
+export function practiceEndDateString(
+  startDate: string | null | undefined,
+  durationDays: number | null | undefined
+): string | null {
+  if (!startDate || !durationDays || !Number.isInteger(durationDays) || durationDays < 1)
+    return null;
+  const start = parseLocalDate(startDate);
+  return start ? format(practiceEndDate(start, durationDays), "yyyy-MM-dd") : null;
+}
+
+/**
+ * 編輯實踐時開始日的下限：已排程的實踐保留原開始日（即使已過），否則為今天；皆為當地午夜。
+ * 開始日以 parseLocalDate 解析，不可用 new Date('YYYY-MM-DD')（負時差時區會變成前一天，daodao#277）。
+ */
+export function minEditableStartDate(startDate: string | null | undefined, now: Date): Date {
+  const today = startOfDay(now);
+  const start = startDate ? parseLocalDate(startDate) : null;
+  return start && start < today ? start : today;
+}
+
+/**
+ * 實踐是否已過結束日：結束日當天整天都還在期間內，隔天當地 00:00 起才算到期。
+ * 結束日以 parseLocalDate 解析；沒有結束日或格式錯誤時不算到期（daodao#277）。
+ */
+export function isPracticeEnded(endDate: string | null | undefined, now: Date): boolean {
+  const end = endDate ? parseLocalDate(endDate) : null;
+  return end ? differenceInCalendarDays(now, end) > 0 : false;
 }
 
 /**

@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { parseLocalDate, practiceEndDate, practiceRemainingDays } from "../practice-period";
+import {
+  isPracticeEnded,
+  minEditableStartDate,
+  parseLocalDate,
+  practiceEndDate,
+  practiceEndDateString,
+  practiceRemainingDays,
+} from "../practice-period";
 
 const ymd = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -54,6 +61,72 @@ describe("parseLocalDate", () => {
     expect(parseLocalDate("2026-10-09abc")).toBeNull();
     expect(parseLocalDate("2026-10-099")).toBeNull();
     expect(parseLocalDate("2026-10-09 garbage")).toBeNull();
+  });
+});
+
+// daodao#277：範本庫、梯次指派與學員實踐顯示的結束日要同一天（含開始日當天：開始日 + 天數 − 1）
+describe("practiceEndDateString", () => {
+  for (const tz of ["America/Los_Angeles", "Asia/Taipei", "UTC"]) {
+    it(`${tz}：7 天範本 2026-10-20 起結束於 2026-10-26`, () => {
+      process.env.TZ = tz;
+      expect(practiceEndDateString("2026-10-20", 7)).toBe("2026-10-26");
+    });
+  }
+
+  it("接受帶時間的 ISO 字串（API 綁定日期），只取日期部分", () => {
+    expect(practiceEndDateString("2026-10-20T00:00:00.000Z", 7)).toBe("2026-10-26");
+  });
+
+  it("跨月、跨年", () => {
+    expect(practiceEndDateString("2026-02-03", 30)).toBe("2026-03-04");
+    expect(practiceEndDateString("2026-12-30", 7)).toBe("2027-01-05");
+  });
+
+  it("沒有開始日、天數不是正整數或日期無效時回 null", () => {
+    expect(practiceEndDateString(null, 7)).toBeNull();
+    expect(practiceEndDateString("2026-10-20", null)).toBeNull();
+    expect(practiceEndDateString("2026-10-20", 0)).toBeNull();
+    expect(practiceEndDateString("2026-02-30", 7)).toBeNull();
+  });
+});
+
+// daodao#277：學員編輯頁的開始日下限不可因 new Date('YYYY-MM-DD')（UTC 午夜）在負時差時區變成前一天
+describe("minEditableStartDate", () => {
+  for (const tz of ["America/Los_Angeles", "Asia/Taipei", "UTC"]) {
+    it(`${tz}：已排程的過去開始日保留原日期`, () => {
+      process.env.TZ = tz;
+      const min = minEditableStartDate("2026-10-20", new Date(2026, 9, 25, 9));
+      expect(ymd(min)).toBe("2026-10-20");
+      expect(min.getHours()).toBe(0);
+    });
+
+    it(`${tz}：開始日在未來時下限是今天`, () => {
+      process.env.TZ = tz;
+      expect(ymd(minEditableStartDate("2026-10-30", new Date(2026, 9, 25, 9)))).toBe("2026-10-25");
+    });
+  }
+
+  it("沒有開始日或格式錯誤時下限是今天", () => {
+    expect(ymd(minEditableStartDate(null, new Date(2026, 9, 25, 9)))).toBe("2026-10-25");
+    expect(ymd(minEditableStartDate("bad", new Date(2026, 9, 25, 9)))).toBe("2026-10-25");
+  });
+});
+
+// daodao#277：結束日當天整天都還沒到期；以 new Date('YYYY-MM-DD') 解析會在負時差時區提早一天到期
+describe("isPracticeEnded", () => {
+  for (const tz of ["America/Los_Angeles", "Asia/Taipei", "UTC"]) {
+    it(`${tz}：結束日當天 23:00 未到期，隔天 00:30 到期`, () => {
+      process.env.TZ = tz;
+      expect(isPracticeEnded("2026-10-26", new Date(2026, 9, 26, 23))).toBe(false);
+      expect(isPracticeEnded("2026-10-26", new Date(2026, 9, 27, 0, 30))).toBe(true);
+      // API 的 endDate 可能帶時間（UTC 午夜），只取日期部分
+      expect(isPracticeEnded("2026-10-26T00:00:00.000Z", new Date(2026, 9, 26, 23))).toBe(false);
+    });
+  }
+
+  it("沒有結束日或格式錯誤時不算到期", () => {
+    expect(isPracticeEnded(null, new Date(2026, 9, 27))).toBe(false);
+    expect(isPracticeEnded("bad", new Date(2026, 9, 27))).toBe(false);
   });
 });
 

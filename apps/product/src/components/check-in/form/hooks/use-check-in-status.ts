@@ -1,6 +1,7 @@
 import { useTranslations } from "@daodao/i18n";
 import { useMemo } from "react";
 import { CheckInStatus, type CheckInStatusType } from "@/constants/check-in-status";
+import { isPracticeEnded } from "@/utils/practice-period";
 import type { ICheckInStatusOptions } from "../../types";
 
 /**
@@ -13,14 +14,8 @@ const checkIsExpired = (endDate?: string | null, practiceStatus?: string): boole
   // 如果狀態是 completed，則視為已到期
   if (practiceStatus === "completed") return true;
 
-  // 如果有結束日期，檢查是否已過期
-  if (endDate) {
-    const endDateTime = new Date(endDate);
-    endDateTime.setHours(23, 59, 59, 999); // 設置為當天結束
-    return new Date() > endDateTime;
-  }
-
-  return false;
+  // 結束日當天整天都可打卡；以當地日曆日判斷，負時差時區不提早一天到期（daodao#277）
+  return isPracticeEnded(endDate, new Date());
 };
 
 /**

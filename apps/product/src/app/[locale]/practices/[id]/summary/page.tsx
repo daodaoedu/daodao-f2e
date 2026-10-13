@@ -4,11 +4,11 @@ import { useCurrentUser, usePracticeById, usePracticeSummary } from "@daodao/api
 import { useTranslations } from "@daodao/i18n";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
-import { endOfDay, isAfter } from "date-fns";
 import { useEffect, useMemo, useRef } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { PracticeSummaryPage } from "@/components/practice/summary";
 import { PracticeStatus } from "@/constants/practice-status";
+import { isPracticeEnded } from "@/utils/practice-period";
 
 const TOAST_DISMISSED_KEY = "showcase_public_toast_dismissed";
 
@@ -57,12 +57,8 @@ export default function PracticeSummaryPageRoute() {
     // 如果狀態是 completed，則視為已到期
     if (status === PracticeStatus.completed) return true;
 
-    // 如果有結束日期，檢查是否已過期
-    if (endDate) {
-      return isAfter(new Date(), endOfDay(new Date(endDate)));
-    }
-
-    return false;
+    // 結束日以當地日曆日判斷，負時差時區不提早一天到期（daodao#277）
+    return isPracticeEnded(endDate, new Date());
   }, [practiceData]);
 
   // task 10.1: 公開/延遲分享練習完成後顯示 toast

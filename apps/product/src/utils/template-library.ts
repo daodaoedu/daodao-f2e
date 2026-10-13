@@ -3,6 +3,8 @@
  * 每週頻率解析、搜尋比對、已開始判定。與 UI 分離以便單元測試。
  */
 
+import { practiceEndDateString } from "./practice-period";
+
 export const TEMPLATE_TITLE_MAX = 20;
 export const TEMPLATE_ACTION_MAX = 50;
 export const TEMPLATE_DAYS_MAX = 90;
@@ -242,13 +244,15 @@ export function newBindingStartDate(
   return startDates.get(templateId) ?? null;
 }
 
-/** 模板在場次中的結束日：開始日 + 天數 − 1；沒有天數或開始日就不顯示（FR-TPL-05） */
+/**
+ * 模板在場次中的結束日：開始日 + 天數 − 1；沒有天數或開始日就不顯示（FR-TPL-05）。
+ * 與學員實踐頁共用 practiceEndDateString，同一個範本在各畫面的結束日一致（daodao#277）。
+ */
 export function templateBindingEndDate(
   startDate: string | null | undefined,
   durationDays: number | null | undefined
 ): string | null {
-  if (!startDate || !durationDays || durationDays < 1) return null;
-  return addDays(startDate, durationDays - 1);
+  return practiceEndDateString(startDate, durationDays);
 }
 
 /**

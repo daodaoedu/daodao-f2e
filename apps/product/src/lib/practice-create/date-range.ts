@@ -1,9 +1,8 @@
-import { addDays, format, isSameYear } from "date-fns";
+import { format, isSameYear } from "date-fns";
+import { practiceEndDate } from "@/utils/practice-period";
 
-/** 結束日 = 開始日 + 天數 − 1（首日計入） */
-export function calcEndDate(startDate: Date, durationDays: number): Date {
-  return addDays(startDate, durationDays - 1);
-}
+/** 結束日 = 開始日 + 天數 − 1（首日計入）；與範本庫、學員實踐頁同一份規則（daodao#277） */
+export const calcEndDate = practiceEndDate;
 
 /**
  * 區間文字：YYYY/MM/DD – YYYY/MM/DD；
