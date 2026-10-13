@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("../client", () => ({ client: {} }));
 
 import {
+  chatDeltaAfter,
   isOwnChatMessage,
   selectChatDelta,
   selectChatErrorMessage,
@@ -220,5 +221,20 @@ describe("isOwnChatMessage", () => {
 
   it("system messages and deleted accounts (author null) are never own", () => {
     expect(isOwnChatMessage({ ...message, author: null }, 2)).toBe(false);
+  });
+});
+
+describe("chatDeltaAfter", () => {
+  // daodao#154 regression：空聊天室原本 after 為 null，增量輪詢永遠不啟動，收不到別人的新訊息
+  it("delta after: null before history loads", () => {
+    expect(chatDeltaAfter(false, [])).toBeNull();
+  });
+
+  it("delta after: 0 when the room has no messages, so polling still starts", () => {
+    expect(chatDeltaAfter(true, [])).toBe(0);
+  });
+
+  it("delta after: newest message id (history is oldest → newest)", () => {
+    expect(chatDeltaAfter(true, [{ id: 4 }, { id: 9 }])).toBe(9);
   });
 });

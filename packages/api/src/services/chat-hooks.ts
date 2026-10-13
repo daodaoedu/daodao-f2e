@@ -37,7 +37,10 @@ export const useChatMessageHistory = (roomId: number | null) =>
     { revalidateOnFocus: false }
   );
 
-/** 增量輪詢（5 秒，after + since 模式）；三個參數齊備才啟用 */
+/**
+ * 增量輪詢（5 秒，after + since 模式）；三個參數齊備才啟用。
+ * after 為 0 表示聊天室還沒有訊息，仍要輪詢（daodao#154），用 chatDeltaAfter 計算。
+ */
 export const useChatMessageDelta = (
   roomId: number | null,
   after: number | null,
@@ -45,7 +48,9 @@ export const useChatMessageDelta = (
 ) =>
   useQuery(
     "/api/v1/chat-rooms/{roomId}/messages",
-    roomId && after && since ? { params: { path: { roomId }, query: { after, since } } } : null,
+    roomId && after !== null && since
+      ? { params: { path: { roomId }, query: { after, since } } }
+      : null,
     { refreshInterval: 5_000, refreshWhenHidden: false, revalidateOnFocus: true }
   );
 

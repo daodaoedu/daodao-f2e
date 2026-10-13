@@ -98,6 +98,18 @@ export const isOwnChatMessage = (
   Number.isInteger(viewerUserId) &&
   message.author?.userId === viewerUserId;
 
+/**
+ * 增量輪詢的 after：歷史訊息還沒載入時回 null（先不輪詢）；
+ * 載入後取最新一則的 id，聊天室沒有訊息時回 0，空聊天室也要收到別人的新訊息（daodao#154）。
+ */
+export const chatDeltaAfter = (
+  historyLoaded: boolean,
+  messages: ReadonlyArray<Pick<ChatMessageType, "id">>
+): number | null => {
+  if (!historyLoaded) return null;
+  return messages.length > 0 ? messages[messages.length - 1]!.id : 0;
+};
+
 /** 失敗回應的 server 訊息（{ success: false, error: { message } }）；取不到時用 fallback */
 export const selectChatErrorMessage = (error: unknown, fallback: string): string => {
   if (!error || typeof error !== "object" || !("error" in error)) return fallback;

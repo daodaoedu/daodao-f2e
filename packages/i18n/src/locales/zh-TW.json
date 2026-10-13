@@ -8681,6 +8681,7 @@
     "title": "訊息",
     "total_unread": "{count} 則未讀",
     "empty": "還沒有聊天室",
+    "timeline_empty": "還沒有訊息",
     "empty_description": "加入群組後，聊天室會出現在這裡",
     "last_message_mine": "你：{body}",
     "members_count": "{count} 位成員",
