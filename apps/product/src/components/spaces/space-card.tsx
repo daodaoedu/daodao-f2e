@@ -5,6 +5,7 @@ import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronRight } from "lucide-react";
+import { spaceHref } from "@/lib/spaces/space-href";
 
 /** Card tint/accent pairs per space kind, matching the POC palette. */
 const KIND_STYLES = {
@@ -21,15 +22,7 @@ interface SpaceCardProps {
 export const SpaceCard = ({ space }: SpaceCardProps) => {
   const t = useTranslations("space");
   const styles = KIND_STYLES[space.kind];
-  const href =
-    space.kind === "personal"
-      ? "/spaces/personal"
-      : space.kind === "challenge"
-        ? "/spaces/challenge"
-        : // 活動課程卡的 id 是 cohortId，導向既有學員頁（design D4）；缺 id 時退回空間列表
-          space.id
-          ? `/cohorts/${space.id}`
-          : "/spaces";
+  const href = spaceHref(space);
 
   return (
     <li>

@@ -15,11 +15,12 @@ export function ChatLayout({ roomId, children }: ChatLayoutProps) {
   const showConversation = isMobile ? !!roomId : true;
 
   return (
-    <div className="flex h-[calc(100dvh-68px)] md:h-dvh overflow-hidden">
+    // 手機版：上方留 68px 給固定的 app logo（全站慣例 pt-[68px]），否則返回鈕會被 logo 蓋住
+    <div className="flex h-[calc(100dvh-68px)] overflow-hidden pt-[68px] md:h-dvh md:pt-0">
       {showList && (
         <aside
           className={cn(
-            "flex flex-col border-r border-border bg-white/50",
+            "flex flex-col border-r border-[#E4EAE9] bg-white",
             isMobile ? "w-full" : "w-[288px] shrink-0"
           )}
         >
