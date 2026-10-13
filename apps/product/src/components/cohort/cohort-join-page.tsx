@@ -8,6 +8,7 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { ArrowUpRight, Users } from "lucide-react";
 import { useState } from "react";
+import { resolveJoinConsentCopy } from "@/utils/cohort-join-consent";
 
 export function CohortJoinPage({ joinToken }: { joinToken: string }) {
   const t = useTranslations("cohort");
@@ -71,6 +72,7 @@ export function CohortJoinPage({ joinToken }: { joinToken: string }) {
         </div>
       </div>
     );
+  const consentCopy = resolveJoinConsentCopy(info.privacy);
   return (
     <div className="mx-auto max-w-2xl px-5 py-12">
       <div className="rounded-3xl border border-[#CDEBE8] bg-white p-7 md:p-10">
@@ -92,8 +94,11 @@ export function CohortJoinPage({ joinToken }: { joinToken: string }) {
             onChange={(event) => setConsent(event.target.checked)}
             className="mt-1 size-4 accent-[#0D7773]"
           />
-          <span>{t("visibility_consent")}</span>
+          <span>{t(consentCopy.consentKey)}</span>
         </label>
+        {consentCopy.pendingNoticeKey && (
+          <p className="mt-3 text-xs leading-5 text-[#78928F]">{t(consentCopy.pendingNoticeKey)}</p>
+        )}
         <Button
           className="mt-6 w-full"
           size="huge"
