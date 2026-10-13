@@ -163,6 +163,13 @@ export default function HomePage() {
     [keyword, filters, updateUrlParams]
   );
 
+  // 上一頁／下一頁或點「主頁」改變網址時，篩選跟著網址走
+  const urlSpaces = searchParams.getAll(SPACE_FILTER_PARAM).join("&");
+  useEffect(() => {
+    const parsed = parseSpaceFilterParams(urlSpaces ? urlSpaces.split("&") : []);
+    setSpaceFilters((prev) => (prev.join("&") === parsed.join("&") ? prev : parsed));
+  }, [urlSpaces]);
+
   // 網址帶著已不再參與（或未登入看不到）的活動課程時，選項載入後移除
   useEffect(() => {
     if (!isSpaceFilterOptionsReady) return;

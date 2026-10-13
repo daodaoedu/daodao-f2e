@@ -20,7 +20,10 @@ export type SpaceFilterSummary =
 
 export const SPACE_FILTER_PARAM = "spaces";
 
-const SPACE_FILTER_PATTERN = /^(personal|challenge|cohort:[1-9][0-9]*)$/;
+/** 與 ai-backend GET /v1/feed 的 spaces 上限一致 */
+export const MAX_SPACE_FILTERS = 20;
+
+const SPACE_FILTER_PATTERN = /^(personal|challenge|cohort:[1-9][0-9]{0,18})$/;
 
 const FIXED_OPTIONS: SpaceFilterOption[] = [
   { value: "personal", kind: "personal" },
@@ -34,7 +37,7 @@ export function parseSpaceFilterParams(values: string[]): SpaceFilterValue[] {
       result.push(value as SpaceFilterValue);
     }
   }
-  return result;
+  return result.slice(0, MAX_SPACE_FILTERS);
 }
 
 export function buildSpaceFilterOptions(
@@ -54,7 +57,9 @@ export function toggleSpaceFilter(
   selected: SpaceFilterValue[],
   value: SpaceFilterValue
 ): SpaceFilterValue[] {
-  return selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value];
+  if (selected.includes(value)) return selected.filter((v) => v !== value);
+  if (selected.length >= MAX_SPACE_FILTERS) return selected;
+  return [...selected, value];
 }
 
 /** 移除不在選項內的值（例如網址帶著已退出的活動課程）。 */

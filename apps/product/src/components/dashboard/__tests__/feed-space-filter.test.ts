@@ -3,7 +3,9 @@ import {
   buildHomeFeedQuery,
   buildSpaceFilterOptions,
   getSpaceFilterSummary,
+  MAX_SPACE_FILTERS,
   parseSpaceFilterParams,
+  type SpaceFilterValue,
   sanitizeSpaceSelection,
   toggleSpaceFilter,
 } from "../feed-space-filter";
@@ -21,6 +23,28 @@ describe("parseSpaceFilterParams", () => {
     expect(
       parseSpaceFilterParams(["all", "cohort:", "cohort:abc", "cohort:0", "Personal", ""])
     ).toEqual([]);
+  });
+});
+
+describe("space filter limits (match ai-backend: ≤20 values, cohort id ≤19 digits)", () => {
+  it("rejects cohort ids longer than 19 digits", () => {
+    expect(
+      parseSpaceFilterParams([`cohort:${"9".repeat(20)}`, `cohort:${"9".repeat(19)}`])
+    ).toEqual([`cohort:${"9".repeat(19)}`]);
+  });
+
+  it("keeps at most MAX_SPACE_FILTERS values from the URL", () => {
+    const values = Array.from({ length: 25 }, (_, i) => `cohort:${i + 1}`);
+    expect(parseSpaceFilterParams(values)).toHaveLength(MAX_SPACE_FILTERS);
+  });
+
+  it("does not add beyond the limit but still allows removing", () => {
+    const full = Array.from(
+      { length: MAX_SPACE_FILTERS },
+      (_, i) => `cohort:${i + 1}` as SpaceFilterValue
+    );
+    expect(toggleSpaceFilter(full, "personal")).toBe(full);
+    expect(toggleSpaceFilter(full, "cohort:1")).toHaveLength(MAX_SPACE_FILTERS - 1);
   });
 });
 
