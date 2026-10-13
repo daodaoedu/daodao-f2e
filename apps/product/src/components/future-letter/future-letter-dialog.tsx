@@ -275,25 +275,17 @@ export function FutureLetterDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
-      <DialogContent className="max-h-[88vh] w-[min(560px,92vw)] bg-[#F5FFFD] rounded-[28px] border-0 p-6 sm:p-7 overflow-y-auto">
+      <DialogContent className="max-h-[88vh] w-[min(560px,92vw)] sm:max-w-[560px] bg-[#F5FFFD] rounded-[28px] border-0 p-6 sm:p-7 overflow-y-auto">
         <DialogHeader className="items-start pt-0 text-left">
-          <DialogTitle className="text-left text-[18px] font-bold text-[#0D3036]">{t("dialog_title")}</DialogTitle>
-          <DialogDescription className="text-[13px] text-[#536166]">{t("dialog_description")}</DialogDescription>
+          <DialogTitle className="text-left text-[18px] font-bold text-[#0D3036]">
+            {t("dialog_title")}
+          </DialogTitle>
+          <DialogDescription className="text-[13px] text-[#536166]">
+            {t("dialog_description")}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="mt-5 space-y-5">
-          <div className="rounded-2xl bg-[#F7FBFA] p-4 text-sm text-text-secondary">
-            <p className="flex items-center gap-2 font-bold text-text-dark">
-              <Feather className="size-4 text-logo-cyan" />
-              {t("anti_pressure_title")}
-            </p>
-            <p className="mt-1">{t("anti_pressure_description")}</p>
-            <p className="mt-3 flex items-start gap-2">
-              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-logo-cyan" />
-              {t("privacy_promise")}
-            </p>
-          </div>
-
           <div>
             <label htmlFor="current-self" className="mb-2 block text-sm font-bold text-text-dark">
               {t("field_current_self")}{" "}
@@ -327,26 +319,38 @@ export function FutureLetterDialog({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-[min(360px,calc(100vw-32px))] border-0 bg-[#0D3036] p-4 text-[#E7F4F4] shadow-[0_14px_34px_rgba(15,48,54,0.28)] rounded-2xl"
+                  className="max-h-[var(--radix-popover-content-available-height)] w-[min(360px,calc(100vw-32px))] overflow-y-auto border-0 bg-[#0D3036] p-4 text-[#E7F4F4] shadow-[0_14px_34px_rgba(15,48,54,0.28)] rounded-2xl"
                   side="top"
                   align="start"
+                  collisionPadding={16}
                 >
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-white">如果不知道從哪裡開始，可以試試</p>
+                      <p className="text-sm font-medium text-white">{t("help_tips_title")}</p>
                       <ul className="mt-2 list-disc space-y-1.5 pl-[18px] text-[13px] leading-[1.7] text-[rgba(231,244,244,0.9)]">
-                        <li>寫一個你只敢跟自己說的理由——你為什麼在做現在做的事</li>
-                        <li>寫一個問題給未來的自己——不是要答案，是想知道他後來過得怎麼樣</li>
-                        <li>寫一句你今天想對自己說、但說不出口的話</li>
+                        <li>{t("help_tip_reason")}</li>
+                        <li>{t("help_tip_question")}</li>
+                        <li>{t("help_tip_unsaid")}</li>
                       </ul>
                     </div>
                     <div className="border-t border-white/10 pt-3">
-                      <p className="text-sm font-medium text-[#F9E41E]">不需要做的事</p>
+                      <p className="text-sm font-medium text-[#F9E41E]">{t("help_avoid_title")}</p>
                       <ul className="mt-2 list-disc space-y-1.5 pl-[18px] text-[13px] leading-[1.7] text-[rgba(231,244,244,0.9)]">
-                        <li>不用寫得像一封「正式的」信，也不用有頭有尾</li>
-                        <li>不用假裝自己很正向、很有動力，或很有把握</li>
-                        <li>不用承諾未來的自己會做到什麼</li>
+                        <li>{t("help_avoid_formal")}</li>
+                        <li>{t("help_avoid_positive")}</li>
+                        <li>{t("help_avoid_promise")}</li>
                       </ul>
+                    </div>
+                    <div className="space-y-2 border-t border-white/10 pt-3 text-[13px] leading-[1.7] text-[rgba(231,244,244,0.9)]">
+                      <p className="flex items-center gap-2 text-sm font-medium text-white">
+                        <Feather className="size-4 shrink-0 text-logo-cyan" />
+                        {t("anti_pressure_title")}
+                      </p>
+                      <p>{t("anti_pressure_description")}</p>
+                      <p className="flex items-start gap-2">
+                        <ShieldCheck className="mt-1 size-4 shrink-0 text-logo-cyan" />
+                        {t("privacy_promise")}
+                      </p>
                     </div>
                   </div>
                 </PopoverContent>
