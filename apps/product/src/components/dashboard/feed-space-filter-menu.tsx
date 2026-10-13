@@ -102,7 +102,7 @@ function FilterRow({
         role="menuitemcheckbox"
         checked={checked}
         onCheckedChange={onToggle}
-        className="size-4 rounded-[5px] border-[#D5E2E2] bg-white data-[state=checked]:border-primary-base data-[state=checked]:bg-primary-base [&_svg]:size-[11px] [&_svg]:stroke-[3.5]"
+        className="size-4 rounded-[5px] border-[#D5E2E2] bg-white data-[state=checked]:border-primary-base data-[state=checked]:bg-primary-base [&_svg]:size-[11px] [&_svg_*]:[stroke-width:3.5]"
       />
       <span className="min-w-0 flex-1">{label}</span>
     </label>
