@@ -85,7 +85,6 @@ export const selectChatPins = (
 export const selectChatSearch = (res: ChatSearchResponse | undefined): ChatSearchResultType =>
   res?.data ?? { total: 0, items: [] };
 
-/** 失敗回應的 server 訊息（{ success: false, error: { message } }）；取不到時用 fallback */
 /**
  * 是否為當前使用者自己的訊息。
  * author.userId 是內部 users.id（整數），必須跟聊天室詳情的 viewerUserId 比；
@@ -99,6 +98,7 @@ export const isOwnChatMessage = (
   Number.isInteger(viewerUserId) &&
   message.author?.userId === viewerUserId;
 
+/** 失敗回應的 server 訊息（{ success: false, error: { message } }）；取不到時用 fallback */
 export const selectChatErrorMessage = (error: unknown, fallback: string): string => {
   if (!error || typeof error !== "object" || !("error" in error)) return fallback;
   const inner = (error as { error?: unknown }).error;

@@ -119,14 +119,12 @@ export default function ChatRoomPage() {
             return next;
           }),
         request: () => deleteChatMessage(message.roomId, message.id),
-        onSuccess: () => {
-          void mutateHistory();
-          void mutateRooms();
-        },
+        // 刪掉的可能是置頂訊息：一併重抓置頂（banner、置頂面板、置頂數）
+        onSuccess: handleMutate,
         onError: (error) => toast.error(selectChatErrorMessage(error, t("delete_failed"))),
       });
     },
-    [mutateHistory, mutateRooms, t]
+    [handleMutate, t]
   );
 
   // 刪除前先確認（FR-MSG-018、POC「刪除訊息／無法復原」）；確認後才跑樂觀刪除

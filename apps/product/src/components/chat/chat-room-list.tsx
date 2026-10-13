@@ -149,7 +149,7 @@ export function ChatRoomList({ activeRoomId }: ChatRoomListProps) {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             aria-label={t("filter_placeholder")}
-            className="h-[21px] min-w-0 flex-1 rounded-none border-0 bg-transparent px-[2px] py-0 text-[13px] text-[oklch(0.287_0.041_210.8)] placeholder:text-[oklch(0.445_0.056_192/0.4)] hover:border-0 focus-visible:border-0 focus-visible:px-[2px] focus-visible:py-0focus-visible:ring-0"
+            className="h-[21px] min-w-0 flex-1 rounded-none border-0 bg-transparent px-[2px] py-0 text-[13px] text-[oklch(0.287_0.041_210.8)] placeholder:text-[oklch(0.445_0.056_192/0.4)] hover:border-0 focus-visible:border-0 focus-visible:px-[2px] focus-visible:py-0 focus-visible:ring-0"
           />
           {filter && (
             <Button
