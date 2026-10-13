@@ -8664,6 +8664,7 @@
     "title": "Messages",
     "total_unread": "{count} unread",
     "empty": "No chat rooms yet",
+    "timeline_empty": "No messages yet",
     "empty_description": "Chat rooms will appear here after you join a group",
     "last_message_mine": "You: {body}",
     "members_count": "{count} members",

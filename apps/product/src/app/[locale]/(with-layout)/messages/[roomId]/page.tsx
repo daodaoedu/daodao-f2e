@@ -2,6 +2,7 @@
 
 import type { ChatMessageType } from "@daodao/api";
 import {
+  chatDeltaAfter,
   deleteChatMessage,
   isOwnChatMessage,
   markChatRoomRead,
@@ -56,16 +57,16 @@ export default function ChatRoomPage() {
     [historyData]
   );
 
-  const latestId =
-    historyMessages.length > 0 ? historyMessages[historyMessages.length - 1]!.id : null;
-  const sinceRef = useRef<string | null>(null);
+  const latestId = chatDeltaAfter(historyData !== undefined, historyMessages);
+  // 用 state 而不是 ref：設定後要觸發重繪，增量輪詢才會啟動（空聊天室沒有其他東西會觸發重繪）
+  const [since, setSince] = useState<string | null>(null);
   useEffect(() => {
-    if (historyData && !sinceRef.current) {
-      sinceRef.current = new Date().toISOString();
+    if (historyData) {
+      setSince((prev) => prev ?? new Date().toISOString());
     }
   }, [historyData]);
 
-  const { data: deltaData } = useChatMessageDelta(roomId || null, latestId, sinceRef.current);
+  const { data: deltaData } = useChatMessageDelta(roomId || null, latestId, since);
 
   const delta = useMemo(() => selectChatDelta(deltaData), [deltaData]);
 

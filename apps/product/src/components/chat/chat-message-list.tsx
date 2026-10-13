@@ -58,7 +58,7 @@ export function ChatMessageList({
   if (timeline.length === 0) {
     return (
       <div className="flex items-center justify-center py-20 text-text-dark/40">
-        <p className="text-sm">{t("empty")}</p>
+        <p className="text-sm">{t("timeline_empty")}</p>
       </div>
     );
   }
