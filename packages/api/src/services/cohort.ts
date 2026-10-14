@@ -486,6 +486,11 @@ export const cohortJoinInfoResponseSchema = apiSuccessSchema(
     inviteMessage: z.string().nullable(),
     canJoin: z.boolean(),
     unavailableReason: z.enum(["not_published", "expired", "full", "paused"]).nullable(),
+    // 所有成立的原因（daodao#281）；server 尚未部署此欄位時視為空陣列，前端退回 unavailableReason
+    unavailableReasons: z
+      .array(z.enum(["not_published", "expired", "full", "paused"]))
+      .optional()
+      .default([]),
     privacy: z.object({
       isPrivate: z.boolean(),
       checkinDefaultPrivate: z.boolean(),
