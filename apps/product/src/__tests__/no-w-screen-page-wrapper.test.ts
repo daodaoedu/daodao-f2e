@@ -14,8 +14,24 @@ import { describe, expect, it } from "vitest";
  * 範圍：只掃 `apps/product/src`。`apps/mobile`（React Native，無 Tailwind w-screen）不適用；
  * `apps/website` 與 `packages/ui` 目前乾淨但未納入本 guard，要一起防守時各自加一份。
  */
-const ALLOWED: Array<{ file: string; count: number; reason: string }> = [];
-// 目前 0 筆：22 處頁面 wrapper 已全部改為 w-full（daodao#239）
+const ALLOWED: Array<{ file: string; count: number; reason: string }> = [
+  // 22 處頁面 wrapper 已全部改為 w-full（daodao#239）；以下皆非 className，是 #240 PageShell 的說明與反向斷言
+  {
+    file: "components/layout/page-shell.styles.ts",
+    count: 1,
+    reason: "JSDoc 說明為何用 w-full 而非 w-screen（daodao#240），非 className",
+  },
+  {
+    file: "components/layout/page-shell.tsx",
+    count: 1,
+    reason: "JSDoc 說明 w-screen 疊 md:pl-[132px] 的右偏問題（daodao#240），非 className",
+  },
+  {
+    file: "components/layout/__tests__/page-shell.styles.test.ts",
+    count: 5,
+    reason: "PageShell 的 regression test：註解、測試名稱與 not.toContain('w-screen') 斷言（daodao#240）",
+  },
+];
 
 const SRC = path.resolve(__dirname, "..");
 const SELF = path.relative(SRC, __filename);
