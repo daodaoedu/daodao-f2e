@@ -27,6 +27,7 @@ export function BugReportForm() {
   const [screenshots, setScreenshots] = useState<PreviewFile[]>([]);
   const [link, setLink] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isReadingScreenshots, setIsReadingScreenshots] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,6 +42,8 @@ export function BugReportForm() {
       const remaining = 3 - screenshots.length;
       const newFiles = Array.from(files).slice(0, remaining);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      // 預覽讀檔是非同步的，讀完前先擋住送出，避免截圖還沒進 state 就送出
+      setIsReadingScreenshots(true);
       try {
         const previews = await Promise.all(
           newFiles.map(async (file) => ({
@@ -52,6 +55,8 @@ export function BugReportForm() {
         setScreenshots((prev) => [...prev, ...previews].slice(0, 3));
       } catch {
         toast.error(t("operation_failed_retry"));
+      } finally {
+        setIsReadingScreenshots(false);
       }
     },
     [screenshots.length, t]
@@ -209,7 +214,7 @@ export function BugReportForm() {
       {/* Submit */}
       <Button
         onClick={handleSubmit}
-        disabled={isSubmitting}
+        disabled={isSubmitting || isReadingScreenshots}
         className="w-full h-11 bg-logo-cyan hover:bg-logo-cyan/90 text-white"
       >
         {isSubmitting ? t("bug_submitting") : t("bug_submit")}
