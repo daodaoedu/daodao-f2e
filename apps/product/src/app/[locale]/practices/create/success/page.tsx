@@ -56,7 +56,7 @@ export default function PracticeSuccessPage() {
   }, [practiceId, router, handleBackToIsland]);
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       {/* 背景漸層動畫 */}
       <BackgroundAnimation />
 
