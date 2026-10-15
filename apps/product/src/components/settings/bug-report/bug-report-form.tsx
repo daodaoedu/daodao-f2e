@@ -8,12 +8,15 @@ import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle, ImagePlus, X } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { resolveBugReportErrorMessage } from "./bug-report-error";
+import { createScreenshotPreviewUrl } from "./screenshot-preview";
 
 const AREA_KEYS = BUG_REPORT_AREAS;
 type Area = BugReportArea;
 
 interface PreviewFile {
+  id: string;
   file: File;
+  /** data: URL（見 screenshot-preview.ts，blob: 會被 CSP 擋下） */
   url: string;
 }
 
@@ -24,6 +27,7 @@ export function BugReportForm() {
   const [screenshots, setScreenshots] = useState<PreviewFile[]>([]);
   const [link, setLink] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isReadingScreenshots, setIsReadingScreenshots] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -32,27 +36,34 @@ export function BugReportForm() {
   }, []);
 
   const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
       if (!files) return;
       const remaining = 3 - screenshots.length;
       const newFiles = Array.from(files).slice(0, remaining);
-      const previews = newFiles.map((file) => ({
-        file,
-        url: URL.createObjectURL(file),
-      }));
-      setScreenshots((prev) => [...prev, ...previews]);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      // 預覽讀檔是非同步的，讀完前先擋住送出，避免截圖還沒進 state 就送出
+      setIsReadingScreenshots(true);
+      try {
+        const previews = await Promise.all(
+          newFiles.map(async (file) => ({
+            id: crypto.randomUUID(),
+            file,
+            url: await createScreenshotPreviewUrl(file),
+          }))
+        );
+        setScreenshots((prev) => [...prev, ...previews].slice(0, 3));
+      } catch {
+        toast.error(t("operation_failed_retry"));
+      } finally {
+        setIsReadingScreenshots(false);
+      }
     },
-    [screenshots.length]
+    [screenshots.length, t]
   );
 
   const handleRemoveScreenshot = useCallback((index: number) => {
-    setScreenshots((prev) => {
-      const removed = prev[index];
-      if (removed) URL.revokeObjectURL(removed.url);
-      return prev.filter((_, i) => i !== index);
-    });
+    setScreenshots((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -87,11 +98,10 @@ export function BugReportForm() {
   const handleReset = useCallback(() => {
     setArea(null);
     setDescription("");
-    for (const s of screenshots) URL.revokeObjectURL(s.url);
     setScreenshots([]);
     setLink("");
     setIsSuccess(false);
-  }, [screenshots]);
+  }, []);
 
   if (isSuccess) {
     return (
@@ -151,7 +161,7 @@ export function BugReportForm() {
         <div className="flex flex-wrap gap-2">
           {screenshots.map((s, i) => (
             <div
-              key={s.url}
+              key={s.id}
               className="relative size-20 rounded-lg overflow-hidden border border-[#E4EAE9]"
             >
               <img src={s.url} alt="" className="size-full object-cover" />
@@ -204,7 +214,7 @@ export function BugReportForm() {
       {/* Submit */}
       <Button
         onClick={handleSubmit}
-        disabled={isSubmitting}
+        disabled={isSubmitting || isReadingScreenshots}
         className="w-full h-11 bg-logo-cyan hover:bg-logo-cyan/90 text-white"
       >
         {isSubmitting ? t("bug_submitting") : t("bug_submit")}
