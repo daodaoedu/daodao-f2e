@@ -54,7 +54,7 @@ export default function AuthErrorPage() {
   const canRetry = reason !== "invalid_redirect_uri";
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto">
       <PageHeader leftAction={null} rightActionTo="/" />
 
       <BackgroundAnimation />
