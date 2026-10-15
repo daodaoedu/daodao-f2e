@@ -19,6 +19,7 @@ import { buildPracticeIdMap, pruneJustJoined } from "@/utils/challenge-card";
  *
  * 公開頁：未登入可瀏覽；點「現在加入」才要求登入。
  * 依運行狀態分三區：即將開始／進行中／已結束（版面依 POC 探索共同挑戰-standalone）。
+ * 放在 (with-layout) 下，與其他頁共用側邊導覽（POC 左側 nav，daodao#181）。
  */
 export default function ChallengesPage() {
   const t = useTranslations("challenge");
@@ -85,7 +86,7 @@ export default function ChallengesPage() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-[640px] flex-col gap-10 px-4 pt-8 pb-18">
+    <main className="mx-auto flex w-full max-w-[640px] flex-col gap-10 px-4 pt-[68px] pb-18 md:pt-8">
       <header className="flex flex-col gap-2">
         <h1 className="flex items-center gap-2 text-2xl font-bold text-bg-dark">
           <Flag className="size-6 text-logo-cyan" />

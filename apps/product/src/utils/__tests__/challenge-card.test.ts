@@ -71,7 +71,7 @@ describe("getChallengeCardAction", () => {
   it("not joined + full → disabled join labelled 已額滿", () => {
     expect(
       getChallengeCardAction(
-        { isJoined: false, canJoin: false, unavailableReason: "full", runStatus: "ongoing" },
+        { isJoined: false, canJoin: false, unavailableReason: "full", runStatus: "upcoming" },
         null
       )
     ).toEqual({ kind: "join", labelKey: "cta_full", disabled: true, href: null });
@@ -80,10 +80,27 @@ describe("getChallengeCardAction", () => {
   it("not joined + closed → disabled join labelled 報名截止", () => {
     expect(
       getChallengeCardAction(
-        { isJoined: false, canJoin: false, unavailableReason: "expired", runStatus: "ongoing" },
+        { isJoined: false, canJoin: false, unavailableReason: "expired", runStatus: "upcoming" },
         null
       )
     ).toEqual({ kind: "join", labelKey: "cta_closed", disabled: true, href: null });
+  });
+
+  // daodao#181／#184 regression：FR-EXP-04 只有未開始的挑戰提供「現在加入」，
+  // 進行中且未加入的卡片即使 API 回 canJoin=true 也不得出現加入入口
+  it("not joined + ongoing → no action even when the API still reports canJoin", () => {
+    expect(
+      getChallengeCardAction(
+        { isJoined: false, canJoin: true, unavailableReason: null, runStatus: "ongoing" },
+        null
+      )
+    ).toEqual({ kind: "none", href: null });
+    expect(
+      getChallengeCardAction(
+        { isJoined: false, canJoin: false, unavailableReason: "full", runStatus: "ongoing" },
+        null
+      )
+    ).toEqual({ kind: "none", href: null });
   });
 
   it("not joined + ended → no action", () => {
