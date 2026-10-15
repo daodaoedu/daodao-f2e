@@ -9,8 +9,8 @@ import { Alert, type LayoutChangeEvent, View } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
 import {
   BgFloatIconsLayer,
-  type DecorationAnchor,
   BgRadialLayer,
+  type DecorationAnchor,
 } from "@/components/practice/create/manual/BgRadialDecoration";
 import { ManualStepShell } from "@/components/practice/create/manual/ManualStepShell";
 import type { ManualPracticeFormValuesType } from "@/components/practice/create/manual/schema";
@@ -29,7 +29,6 @@ import {
   parseFrequency,
 } from "@/constants/practice-form";
 import { colors } from "@/generated/design-tokens";
-import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import { useMobileTranslation } from "@/i18n";
 import { useCreatePractice } from "@/providers/CreatePracticeProvider";
 
@@ -152,8 +151,6 @@ export default function Step5Screen() {
       if (response.error) {
         throw new Error(extractApiErrorMessage(response.error, t("create_failed")));
       }
-
-      applyOnboardingUpdateFromResponse(response.data);
 
       const practiceId = response.data?.data?.id;
       resetForm();

@@ -168,7 +168,7 @@ function PinList({
 
         <div>
           <AnimatePresence>
-            {(unpinned.length > 0 || !unpinnedPlaceholder) && (
+            {(unpinned.length > 0 || !unpinnedPlaceholder || labels.unpinned) && (
               <motion.p
                 layout
                 key="all-label"

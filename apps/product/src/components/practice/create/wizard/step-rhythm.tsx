@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "@daodao/i18n";
-import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Calendar } from "@daodao/ui/components/calendar";
 import { Checkbox } from "@daodao/ui/components/checkbox";
@@ -48,16 +47,22 @@ import {
 } from "./schema";
 import { SegmentCard } from "./segment-card";
 import { SplitPromptCard } from "./split-prompt-card";
+import {
+  WIZARD_INPUT,
+  WIZARD_INPUT_LG,
+  WIZARD_LINK_COLOR,
+  WIZARD_OPTION_BASE,
+  WIZARD_TEXT_LINK,
+  wizardOptionState,
+} from "./wizard-styles";
 
 export interface StepRhythmProps {
   form: UseFormReturn<WizardFormValues>;
 }
 
-const labelClass = "text-base font-medium text-text-dark";
-const optionBase =
-  "flex min-h-10 items-center justify-center gap-1 rounded-lg border bg-white px-2 py-3 text-text-dark transition-colors cursor-pointer";
-const optionState = (selected: boolean) =>
-  selected ? "border-logo-cyan text-logo-cyan" : "border-transparent hover:border-bg-gray";
+const labelClass = "text-base font-medium leading-[1.4] text-text-dark";
+const optionBase = WIZARD_OPTION_BASE;
+const optionState = wizardOptionState;
 
 /** Step 2｜節奏設定（開始日期、天數、頻率、時間、時機；含拆段） */
 export const StepRhythm = ({ form }: StepRhythmProps) => {
@@ -146,16 +151,18 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
   const segmentDaysSum = effectiveSegments.reduce((sum, seg) => sum + seg.days, 0);
   const quotaMatches = durationDays !== null && segmentDaysSum === durationDays;
   const segmentsRootError = errors.segments?.message ?? errors.segments?.root?.message;
+  const canDecrease = segments.length > SEGMENTS_MIN;
+  const canIncrease = segments.length < SEGMENTS_MAX;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {mode === WizardMode.personal && (
         <FormField
           control={form.control}
           name="startDate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required className={cn(labelClass, "block mb-3")}>
+              <FormLabel required className={cn(labelClass, "mb-3 block")}>
                 {t("wizard_start_date_label")}
               </FormLabel>
               <FormControl>
@@ -168,7 +175,10 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                     placeholder={t("wizard_start_date_placeholder")}
                     invalid={!!errors.startDate}
                     aria-expanded={calendarOpen}
-                    className="cursor-pointer pr-11"
+                    className={cn(
+                      "h-10 cursor-pointer py-2 pr-10 pl-4 focus-visible:py-2 focus-visible:pr-10 focus-visible:pl-4",
+                      WIZARD_INPUT
+                    )}
                     onClick={() => setCalendarOpen((open) => !open)}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
@@ -180,12 +190,12 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                   />
                   <CalendarIcon
                     aria-hidden
-                    className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-light-gray"
+                    className="pointer-events-none absolute top-1/2 right-4 size-3.5 -translate-y-1/2 text-text-dark"
                   />
                 </div>
               </FormControl>
               {calendarOpen && (
-                <div className="mt-2 rounded-lg border border-bg-gray bg-white">
+                <div className="mt-2.5 rounded-[10px] border border-bg-gray bg-white shadow-[0_8px_24px_rgba(15,48,54,0.10)]">
                   <Calendar
                     mode="single"
                     weekStartsOn={0}
@@ -213,7 +223,7 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
         name="durationDays"
         render={() => (
           <FormItem>
-            <FormLabel required className={cn(labelClass, "block mb-3")}>
+            <FormLabel required className={cn(labelClass, "mb-2 block")}>
               {t("wizard_days_label")}
             </FormLabel>
             <FormControl>
@@ -223,17 +233,17 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                   setDaysText("");
                   applyDurationDays(Number.parseInt(value, 10));
                 }}
-                className="grid grid-cols-4 gap-3"
+                className="grid grid-cols-4 gap-2"
               >
                 {DURATION_DAY_PRESETS.map((preset) => {
                   const isSelected = daysText === "" && durationDays === preset;
                   const inputId = `wizard-days-${preset}`;
-                  const label = `${preset} ${t("wizard_days_unit")}`;
+                  const label = `${preset}${t("wizard_days_unit")}`;
                   return (
                     <label
                       key={preset}
                       htmlFor={inputId}
-                      className={cn(optionBase, optionState(isSelected))}
+                      className={cn(optionBase, optionState(isSelected), "px-2 text-[15px]")}
                     >
                       <RadioGroupItem
                         value={String(preset)}
@@ -241,9 +251,7 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                         className="sr-only"
                         aria-label={label}
                       />
-                      <span className="text-sm sm:text-base font-medium whitespace-nowrap">
-                        {label}
-                      </span>
+                      <span>{label}</span>
                     </label>
                   );
                 })}
@@ -255,7 +263,7 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
               placeholder={t("wizard_days_custom_placeholder")}
               aria-label={t("wizard_days_custom_placeholder")}
               invalid={!!errors.durationDays}
-              className="mt-3"
+              className={cn("mt-2", WIZARD_INPUT_LG)}
               onChange={(event) => {
                 const next = sanitizeDaysInput(event.target.value);
                 setDaysText(next.text);
@@ -263,7 +271,7 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
               }}
             />
             {endDateText && (
-              <p className="text-sm text-text-dark mt-2">
+              <p className="mt-2 text-sm text-text-dark">
                 {t("wizard_end_date", { date: endDateText })}
               </p>
             )}
@@ -283,7 +291,7 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
             name="frequency"
             render={({ field }) => (
               <FormItem>
-                <FormLabel required className={cn(labelClass, "block mb-3")}>
+                <FormLabel required className={cn(labelClass, "mb-2 block")}>
                   {t("wizard_frequency_label")}
                 </FormLabel>
                 <FormControl>
@@ -297,7 +305,7 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                       form.clearErrors("frequency");
                     }}
                     onBlur={field.onBlur}
-                    className="grid grid-cols-3 gap-3"
+                    className="grid grid-cols-3 gap-2"
                   >
                     {FREQUENCY_PRESETS.map((preset) => {
                       const isSelected = frequencyText === "" && field.value === preset;
@@ -307,7 +315,11 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                         <label
                           key={preset}
                           htmlFor={inputId}
-                          className={cn(optionBase, optionState(isSelected))}
+                          className={cn(
+                            optionBase,
+                            optionState(isSelected),
+                            "gap-1 px-2 text-[15px] font-normal"
+                          )}
                         >
                           <RadioGroupItem
                             value={preset}
@@ -328,7 +340,7 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                   placeholder={t("wizard_frequency_custom_placeholder")}
                   aria-label={t("wizard_frequency_custom_placeholder")}
                   invalid={!!errors.frequency}
-                  className="mt-3"
+                  className={cn("mt-2", WIZARD_INPUT_LG)}
                   onChange={(event) => setFrequencyText(event.target.value)}
                   onBlur={commitFrequencyText}
                   onKeyDown={(event) => {
@@ -348,12 +360,12 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
             name="sessionMinutes"
             render={({ field }) => (
               <FormItem>
-                <div className="flex items-center gap-2 mb-3">
+                <div className="mb-3 flex items-center gap-2">
                   <FormLabel className={labelClass}>{t("wizard_minutes_label")}</FormLabel>
                   <span className="text-sm text-light-gray">{t("wizard_optional")}</span>
                 </div>
                 <FormControl>
-                  <div className="grid grid-cols-4 gap-3">
+                  <div className="grid grid-cols-4 gap-2">
                     {MINUTE_PRESETS.map((preset) => {
                       const isSelected = minutesText === "" && field.value === preset;
                       return (
@@ -365,15 +377,14 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                           className={cn(
                             optionBase,
                             optionState(isSelected),
-                            "h-auto w-full shadow-none hover:shadow-none"
+                            "h-auto w-full text-sm shadow-none hover:shadow-none"
                           )}
                           onClick={() => {
                             setMinutesText("");
                             field.onChange(field.value === preset ? null : preset);
                           }}
                         >
-                          <span className="font-medium">{preset}</span>
-                          <span className="text-sm">{t("wizard_minutes_unit")}</span>
+                          {`${preset}${t("wizard_minutes_unit")}`}
                         </Button>
                       );
                     })}
@@ -385,7 +396,7 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                   value={minutesText}
                   placeholder={t("wizard_minutes_custom_placeholder")}
                   aria-label={t("wizard_minutes_custom_placeholder")}
-                  className="mt-3"
+                  className={cn("mt-2", WIZARD_INPUT_LG)}
                   onChange={(event) => {
                     const next = sanitizeMinutesInput(event.target.value);
                     setMinutesText(next.text);
@@ -402,12 +413,12 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
             name="timings"
             render={({ field }) => (
               <FormItem>
-                <div className="flex items-center gap-2 mb-3">
+                <div className="mb-3 flex items-center gap-2">
                   <FormLabel className={labelClass}>{t("wizard_timing_label")}</FormLabel>
                   <span className="text-sm text-light-gray">{t("wizard_optional")}</span>
                 </div>
                 <FormControl>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-2">
                     {TIMING_PRESETS.map((preset) => {
                       const current: ExecutionTiming[] = field.value ?? [];
                       const isSelected = current.includes(preset);
@@ -417,7 +428,7 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                         <label
                           key={preset}
                           htmlFor={inputId}
-                          className={cn(optionBase, optionState(isSelected))}
+                          className={cn(optionBase, optionState(isSelected), "text-sm")}
                         >
                           <Checkbox
                             id={inputId}
@@ -433,9 +444,7 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                             className="sr-only"
                             aria-label={label}
                           />
-                          <span className="text-sm sm:text-base font-medium whitespace-nowrap">
-                            {label}
-                          </span>
+                          <span>{label}</span>
                         </label>
                       );
                     })}
@@ -452,13 +461,14 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
             render={({ field }) => {
               const list: string[] = field.value ?? [];
               return (
-                <FormItem>
+                <FormItem className="!mt-2">
                   <FormControl>
                     <Input
                       value={timingText}
                       maxLength={CUSTOM_TIMING_MAX_LENGTH}
                       placeholder={t("wizard_timing_custom_placeholder")}
                       aria-label={t("wizard_timing_custom_placeholder")}
+                      className={WIZARD_INPUT_LG}
                       onChange={(event) => setTimingText(event.target.value)}
                       onBlur={field.onBlur}
                       onKeyDown={(event) => {
@@ -470,12 +480,14 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                     />
                   </FormControl>
                   {list.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
+                    <div className="mt-2 flex flex-wrap gap-2">
                       {list.map((name) => (
-                        <Badge
+                        <span
                           key={name}
-                          variant="outline-logo"
-                          className="gap-1 py-0 pr-0 pl-3 min-h-10"
+                          className={cn(
+                            "inline-flex items-center gap-1.5 rounded-full border border-logo-cyan bg-light-blue py-[3px] pr-1 pl-3 text-sm leading-normal",
+                            WIZARD_LINK_COLOR
+                          )}
                         >
                           <span>{name}</span>
                           <Button
@@ -483,11 +495,15 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
                             variant="ghost"
                             size="icon"
                             aria-label={t("wizard_timing_remove", { name })}
+                            className={cn(
+                              "size-7 rounded-full hover:bg-white/60",
+                              WIZARD_LINK_COLOR
+                            )}
                             onClick={() => field.onChange(list.filter((item) => item !== name))}
                           >
                             <X className="size-4" />
                           </Button>
-                        </Badge>
+                        </span>
                       ))}
                     </div>
                   )}
@@ -500,37 +516,49 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
       )}
 
       {isSegmented && (
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-text-dark">{t("wizard_split_count_label")}</span>
+        <div>
+          {/* 段數調整器（POC：膠囊 stepper ＋ 右側配額說明） */}
+          <div className="flex items-center gap-4">
+            <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-bg-gray bg-white p-1">
+              <span className="sr-only">{t("wizard_split_count_label")}</span>
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="icon"
                 aria-label={t("wizard_split_decrease")}
-                disabled={segments.length <= SEGMENTS_MIN}
+                disabled={!canDecrease}
+                className={cn(
+                  "size-9 rounded-full hover:bg-light-blue disabled:opacity-100",
+                  canDecrease ? "text-text-dark" : "text-bg-gray"
+                )}
                 onClick={() => changeSegmentCount(segments.length - 1)}
               >
-                <Minus className="size-4" />
+                <Minus className="size-4.5" />
               </Button>
-              <span className="w-6 text-center text-base font-medium text-text-dark">
+              <span className="min-w-[52px] text-center text-base font-medium text-text-dark">
                 {segments.length}
               </span>
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="icon"
                 aria-label={t("wizard_split_increase")}
-                disabled={segments.length >= SEGMENTS_MAX}
+                disabled={!canIncrease}
+                className={cn(
+                  "size-9 rounded-full hover:bg-light-blue disabled:opacity-100",
+                  canIncrease ? "text-text-dark" : "text-bg-gray"
+                )}
                 onClick={() => changeSegmentCount(segments.length + 1)}
               >
-                <Plus className="size-4" />
+                <Plus className="size-4.5" />
               </Button>
             </div>
             {durationDays !== null && (
               <p
-                className={cn("text-sm", quotaMatches ? "text-text-dark" : "text-red")}
+                className={cn(
+                  "min-w-0 flex-1 text-[13px] leading-normal",
+                  quotaMatches ? "text-light-gray" : "text-red"
+                )}
                 role={quotaMatches ? undefined : "alert"}
               >
                 {quotaMatches
@@ -543,29 +571,30 @@ export const StepRhythm = ({ form }: StepRhythmProps) => {
             )}
           </div>
 
-          {effectiveSegments.map((effective) => (
-            <SegmentCard
-              key={effective.index}
-              form={form}
-              index={effective.index}
-              effective={effective}
-            />
-          ))}
+          <div className="mt-3 flex flex-col gap-2.5">
+            {effectiveSegments.map((effective) => (
+              <SegmentCard
+                key={effective.index}
+                form={form}
+                index={effective.index}
+                effective={effective}
+              />
+            ))}
+          </div>
 
           {segmentsRootError && !quotaMatches && (
-            <p className="text-sm text-red" role="alert">
+            <p className="mt-2.5 text-sm text-red" role="alert">
               {String(segmentsRootError)}
             </p>
           )}
 
-          <Button
+          <button
             type="button"
-            variant="link"
-            className="h-10 px-0 text-logo-cyan"
+            className={cn(WIZARD_TEXT_LINK, "mt-1 cursor-pointer text-light-gray")}
             onClick={disableSplit}
           >
             {t("wizard_split_no")}
-          </Button>
+          </button>
         </div>
       )}
     </div>

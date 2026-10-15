@@ -10,10 +10,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate as globalMutate } from "swr";
-import {
-  applyOnboardingUpdateFromResponse,
-  refreshOnboardingStatus,
-} from "@/components/task-guide/onboarding-progress-context";
 import { AvatarUploadSection } from "./avatar-upload-section";
 import { BasicInfoSection } from "./basic-info-section";
 import { IntroductionSection } from "./introduction-section";
@@ -163,14 +159,11 @@ export const PublicInfoForm = () => {
       };
 
       // 調用 FormData API 更新用戶資訊（包含圖片上傳）
-      const response = await updateCurrentUserWithFormData(updateData, avatarFile || undefined);
+      await updateCurrentUserWithFormData(updateData, avatarFile || undefined);
 
       // 刷新用戶資料
       await mutate(["/api/v1/users/me"] as const);
       globalMutate("/api/v1/users/settings-summary");
-      if (!applyOnboardingUpdateFromResponse(response)) {
-        refreshOnboardingStatus();
-      }
 
       // 成功
       toast.success(t("public_info_updated"));

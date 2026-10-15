@@ -4,6 +4,7 @@ import DialogOutlineSvg from "@daodao/assets/images/icon/dialog-outline.svg";
 import FlagOutlineSvg from "@daodao/assets/images/icon/flag-outline.svg";
 import TagSolidSvg from "@daodao/assets/images/icon/tag-solid.svg";
 import TelescopeSvg from "@daodao/assets/images/icon/telescope.svg";
+import { resolvePracticeDurationDays } from "@daodao/shared/lib/practice-period";
 import { ChevronDown, ChevronLeft, ChevronUp, Copy, MoreHorizontal } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -169,13 +170,11 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
   const taskStatus = status === "active" ? "in-progress" : "completed";
 
   // 公開檢視的 prop 沒有 durationDays / progressPercentage，改由起訖日期推導（對齊 owner 卡片呈現）
-  const durationDays = useMemo(() => {
-    if (!startDate || !endDate) return 0;
-    const s = new Date(startDate).getTime();
-    const e = new Date(endDate).getTime();
-    if (Number.isNaN(s) || Number.isNaN(e) || e <= s) return 0;
-    return Math.max(0, Math.ceil((e - s) / (1000 * 60 * 60 * 24)));
-  }, [startDate, endDate]);
+  // 天數含頭尾，與實踐頁、範本庫同一規則（daodao#277）
+  const durationDays = useMemo(
+    () => resolvePracticeDurationDays({ startDate, endDate }) ?? 0,
+    [startDate, endDate]
+  );
 
   const progress = useMemo(() => {
     if (status === "completed") return 100;

@@ -169,6 +169,8 @@ export const createManualPracticeFormSchema = (
               })
               .optional()
               .or(z.literal("")),
+            // 教練加入的資源（燈塔本期草稿）：不可移除，server 也會擋
+            isLocked: z.boolean().optional(),
           })
         )
         .optional(),

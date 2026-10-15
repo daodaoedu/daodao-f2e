@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   extractCreatedNames,
+  getDonePrimaryRoute,
   getStepForServerPath,
   mapServerPathToFormField,
   parseServerError,
@@ -124,5 +125,15 @@ describe("extractCreatedNames", () => {
     ).toEqual(["ok"]);
     expect(extractCreatedNames(undefined)).toEqual([]);
     expect(extractCreatedNames({ data: null })).toEqual([]);
+  });
+});
+
+describe("getDonePrimaryRoute", () => {
+  it("personal practice goes to the new home page, not legacy /mine (daodao#211)", () => {
+    expect(getDonePrimaryRoute(true)).toBe("/");
+  });
+
+  it("template goes back to the template picker", () => {
+    expect(getDonePrimaryRoute(false)).toBe("/practices/create");
   });
 });

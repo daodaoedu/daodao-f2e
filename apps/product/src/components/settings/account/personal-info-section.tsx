@@ -20,6 +20,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { format } from "date-fns";
 import { Calendar, Mail } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
+import { createEducationStageChangeHandler } from "./form-state";
 import type { AccountFormValues } from "./schema";
 
 type SelectOption = {
@@ -102,10 +103,7 @@ export const PersonalInfoSection = ({ form, educationStageOptions }: PersonalInf
             <FormControl>
               <Select
                 value={field.value}
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  field.onBlur();
-                }}
+                onValueChange={createEducationStageChangeHandler(field)}
                 disabled={field.disabled}
               >
                 <SelectTrigger

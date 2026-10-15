@@ -14,8 +14,6 @@ import { Anonymous_Pro } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { PwaInstallPrompt } from "@/components/pwa/install-prompt";
 import { RegisterServiceWorker } from "@/components/pwa/register-sw";
-import { OnboardingProgressProvider } from "@/components/task-guide/onboarding-progress-context";
-import { TaskGuideWidget } from "@/components/task-guide/task-guide-widget";
 import { TrackingRefCapture } from "@/components/tracking-ref-capture";
 
 const anonymousPro = Anonymous_Pro({
@@ -95,12 +93,9 @@ function GlobalProvider({
                     }}
                   >
                     <SheetManagerProvider>
-                      <OnboardingProgressProvider>
-                        <TaskGuideWidget />
-                        <Toaster />
-                        {children}
-                        <PwaInstallPrompt />
-                      </OnboardingProgressProvider>
+                      <Toaster />
+                      {children}
+                      <PwaInstallPrompt />
                     </SheetManagerProvider>
                   </AuthProvider>
                 </DialogManagerProvider>

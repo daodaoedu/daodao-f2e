@@ -1,4 +1,5 @@
 import { usePracticeById, usePracticeSummary } from "@daodao/api";
+import { isPracticeEnded } from "@daodao/shared/lib/practice-period";
 import { ChevronLeft, Download, Home, Share2 } from "@tamagui/lucide-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { type RefObject, useMemo, useRef, useState } from "react";
@@ -15,13 +16,8 @@ import { shareService } from "@/services/share";
 const isCompletedOrExpired = (practice?: { status?: string; endDate?: string | null }) => {
   if (!practice) return false;
   if (practice.status === "completed") return true;
-  if (!practice.endDate) return false;
-
-  const endDate = new Date(practice.endDate);
-  if (Number.isNaN(endDate.getTime())) return false;
-
-  endDate.setHours(23, 59, 59, 999);
-  return Date.now() > endDate.getTime();
+  // 結束日以當地日曆日判斷，負時差時區不提早一天到期（daodao#277）
+  return isPracticeEnded(practice.endDate, new Date());
 };
 
 export default function PracticeSummaryScreen() {

@@ -1,11 +1,11 @@
 "use client";
 
 import type { ChatMemberType } from "@daodao/api";
-import { useChatMembers } from "@daodao/api";
+import { selectChatMembers, useChatMembers } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
-import { cn } from "@daodao/ui/lib/utils";
 import { Shield, X } from "lucide-react";
+import { ChatAvatar } from "./chat-avatar";
 
 interface MemberPanelProps {
   roomId: number;
@@ -13,77 +13,96 @@ interface MemberPanelProps {
   onClose: () => void;
 }
 
+const CLOSE_BUTTON =
+  "size-7 shrink-0 rounded-full text-[oklch(0.445_0.056_192/0.5)] hover:bg-[oklch(0.962_0.032_211.1)] hover:text-[oklch(0.445_0.056_192/0.5)] [&_svg]:size-4";
+
 function MemberItem({ member }: { member: ChatMemberType }) {
   const t = useTranslations("messages");
+  const name = member.nickname ?? t("deleted_user");
 
   return (
-    <div className="flex items-center gap-2.5 px-4 py-2.5">
-      <div className="relative shrink-0">
-        <div className="size-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-600 overflow-hidden">
-          {member.avatar ? (
-            <img src={member.avatar} alt="" className="size-full object-cover" />
-          ) : (
-            (member.nickname ?? "?").charAt(0)
+    <div data-chat-member className="flex items-center gap-2.5 px-5 py-[9px]">
+      <span className="relative inline-flex shrink-0">
+        <ChatAvatar src={member.avatar} alt={name} />
+        {member.isOnline && (
+          <span
+            role="img"
+            aria-label={t("member_online")}
+            className="absolute right-0 bottom-0 size-2.5 rounded-full border-2 border-white bg-[oklch(0.711_0.12_190.6)]"
+          />
+        )}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <span className="truncate text-[13px] font-semibold text-[oklch(0.287_0.041_210.8)]">
+            {name}
+          </span>
+          {member.isHost && (
+            <span
+              role="img"
+              aria-label={t("host_badge")}
+              title={t("host_badge")}
+              className="inline-flex shrink-0 text-[oklch(0.711_0.12_190.6)]"
+            >
+              <Shield className="size-[13px] fill-current stroke-none" />
+            </span>
           )}
         </div>
-        {member.isOnline && (
-          <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-green-500 border-2 border-white" />
+        {member.bio && (
+          <p className="mt-px mb-0 truncate text-[11px] text-[oklch(0.445_0.056_192/0.5)]">
+            {member.bio}
+          </p>
         )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1">
-          <span className="text-sm font-medium text-text-dark truncate">
-            {member.nickname ?? t("deleted_user")}
-          </span>
-          {member.isHost && <Shield className="size-3.5 shrink-0 text-amber-500" />}
-        </div>
-        {member.bio && <p className="text-xs text-text-dark/50 truncate">{member.bio}</p>}
       </div>
     </div>
   );
 }
 
+/** 成員面板（POC 訊息.dc.html：右側 240px、淡遮罩、開啟時才渲染） */
 export function MemberPanel({ roomId, isOpen, onClose }: MemberPanelProps) {
   const t = useTranslations("messages");
   const { data: members } = useChatMembers(isOpen ? roomId : null);
 
-  const memberList = Array.isArray(members) ? members : [];
+  const memberList = selectChatMembers(members);
   const sorted = [...memberList].sort((a, b) => {
     if (a.isHost && !b.isHost) return -1;
     if (!a.isHost && b.isHost) return 1;
     return 0;
   });
 
+  if (!isOpen) return null;
+
   return (
     <>
-      {isOpen && (
-        <button
-          type="button"
-          className="absolute inset-0 bg-black/20 z-10 cursor-default"
-          onClick={onClose}
-          aria-label="Close"
-        />
-      )}
-      <div
-        className={cn(
-          "absolute right-0 top-0 h-full w-[240px] bg-white shadow-lg z-20 flex flex-col transition-transform duration-200",
-          isOpen ? "translate-x-0" : "translate-x-full"
-        )}
+      <button
+        type="button"
+        className="absolute inset-0 z-[19] cursor-pointer border-0 bg-[rgba(15,48,54,0.25)] p-0"
+        onClick={onClose}
+        aria-label={t("member_panel_title")}
+      />
+      <aside
+        aria-label={t("member_panel_title")}
+        data-chat-member-panel
+        className="absolute top-0 right-0 z-20 h-full w-[240px] overflow-y-auto border-l border-[#E4EAE9] bg-white py-5 shadow-[-8px_0_24px_rgba(15,48,54,0.12)]"
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-          <h3 className="text-sm font-medium text-text-dark">
+        <div className="mx-5 mb-3 flex items-center justify-between gap-2">
+          <p className="m-0 text-xs font-semibold text-[oklch(0.445_0.056_192/0.5)]">
             {t("member_panel_count", { count: memberList.length })}
-          </h3>
-          <Button variant="ghost" size="icon" className="size-7" onClick={onClose}>
-            <X className="size-4" />
+          </p>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={CLOSE_BUTTON}
+            onClick={onClose}
+            aria-label={t("delete_cancel")}
+          >
+            <X />
           </Button>
         </div>
-        <div className="flex-1 overflow-y-auto py-1">
-          {sorted.map((member) => (
-            <MemberItem key={member.userId} member={member} />
-          ))}
-        </div>
-      </div>
+        {sorted.map((member) => (
+          <MemberItem key={member.userId} member={member} />
+        ))}
+      </aside>
     </>
   );
 }

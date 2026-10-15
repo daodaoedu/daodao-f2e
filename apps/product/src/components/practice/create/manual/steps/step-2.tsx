@@ -11,9 +11,10 @@ import {
 } from "@daodao/ui/components/form";
 import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
 import { cn } from "@daodao/ui/lib/utils";
-import { addDays, format, isValid, parse } from "date-fns";
+import { addDays, format, isValid } from "date-fns";
 import { useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
+import { parseLocalDate, practiceEndDateString } from "@/utils/practice-period";
 import { DURATION_DAYS_OPTIONS, FREQUENCY_OPTIONS, type ManualPracticeFormValues } from "../schema";
 
 interface Step2Props {
@@ -28,12 +29,9 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
   const durationDays = form.watch("durationDays");
 
   const endDate = useMemo(() => {
-    if (!startDate || !durationDays) return "";
-    const start = parse(startDate, "yyyy-MM-dd", new Date());
-    if (!isValid(start)) return "";
-    const days = Number.parseInt(durationDays, 10);
-    const end = addDays(start, days);
-    return format(end, "yyyy/MM/dd");
+    if (!durationDays) return "";
+    const end = practiceEndDateString(startDate, Number.parseInt(durationDays, 10));
+    return end ? end.replace(/-/g, "/") : "";
   }, [startDate, durationDays]);
 
   return (
@@ -42,7 +40,8 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
         control={form.control}
         name="startDate"
         render={({ field }) => {
-          const date = field.value ? new Date(field.value) : undefined;
+          // 以當地日曆日解析，new Date('YYYY-MM-DD') 在負時差時區會變成前一天（daodao#277）
+          const date = (field.value && parseLocalDate(field.value)) || undefined;
 
           return (
             <FormItem>

@@ -17,9 +17,11 @@ import {
   RESOURCE_NAME_MAX_LENGTH,
   RESOURCES_MAX,
   type WizardFormValues,
+  WizardMode,
   type WizardResource,
 } from "./schema";
 import { resolveResourceName } from "./use-resource-name";
+import { WIZARD_INPUT_MD, WIZARD_TEXT_LINK } from "./wizard-styles";
 
 export interface StepTagsResourcesProps {
   form: UseFormReturn<WizardFormValues>;
@@ -88,11 +90,13 @@ export const StepTagsResources = forwardRef<StepTagsResourcesHandle, StepTagsRes
     const tags = form.watch("tags") ?? [];
     const resources = form.watch("resources") ?? [];
     const isSegmented = form.watch("isSegmented");
+    const isPersonal = form.watch("mode") === WizardMode.personal;
     const segmentCount = isSegmented
       ? getEffectiveSegments(form.getValues(), t("wizard_name_fallback")).length
       : 0;
 
     const { openTagEditSheet } = useTagEditSheet({
+      title: t("wizard_tags_label"),
       initialTags: tags,
       onComplete: (data) => {
         form.setValue("tags", data.selectedTags, { shouldDirty: true });
@@ -322,7 +326,13 @@ export const StepTagsResources = forwardRef<StepTagsResourcesHandle, StepTagsRes
                 {t("wizard_resources_label")}
               </FormLabel>
 
-              <div className="space-y-3">
+              {isPersonal && (
+                <p className="mb-4 rounded-[8px] border border-blue bg-light-blue p-3 text-sm leading-normal whitespace-pre-line text-text-dark">
+                  {t("wizard_resources_hint")}
+                </p>
+              )}
+
+              <div className="space-y-2">
                 {isManual && (
                   <div className="flex gap-2">
                     <Input
@@ -335,9 +345,14 @@ export const StepTagsResources = forwardRef<StepTagsResourcesHandle, StepTagsRes
                         if (inputError) setInputError(null);
                       }}
                       onKeyDown={handleInputKeyDown}
-                      className="min-w-0 flex-1"
+                      className={cn("min-w-0 flex-1", WIZARD_INPUT_MD)}
                     />
-                    <Button type="button" onClick={commitManual} className="shrink-0">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={commitManual}
+                      className={cn("shrink-0", nameInput.trim() === "" && "opacity-50")}
+                    >
                       {t("wizard_resource_manual_add")}
                     </Button>
                   </div>
@@ -360,7 +375,7 @@ export const StepTagsResources = forwardRef<StepTagsResourcesHandle, StepTagsRes
                       if (inputError) setInputError(null);
                     }}
                     onKeyDown={handleInputKeyDown}
-                    className="min-w-0 flex-1"
+                    className={cn("min-w-0 flex-1", WIZARD_INPUT_MD)}
                   />
                   {!isManual && (
                     <Button
@@ -368,7 +383,7 @@ export const StepTagsResources = forwardRef<StepTagsResourcesHandle, StepTagsRes
                       onClick={() => void commitLink()}
                       disabled={isFetching}
                       aria-busy={isFetching}
-                      className={cn("shrink-0", urlEmpty && !isFetching && "opacity-50")}
+                      className={cn("shrink-0 gap-1.5", urlEmpty && !isFetching && "opacity-50")}
                     >
                       {isFetching ? t("wizard_resource_fetching") : t("wizard_resource_add")}
                     </Button>
@@ -381,20 +396,19 @@ export const StepTagsResources = forwardRef<StepTagsResourcesHandle, StepTagsRes
                   </p>
                 )}
 
-                <Button
+                <button
                   type="button"
-                  variant="link"
                   onClick={toggleMode}
-                  className="h-10 px-0 text-sm text-logo-cyan"
+                  className={cn(WIZARD_TEXT_LINK, "cursor-pointer")}
                 >
                   {isManual ? t("wizard_resource_link_switch") : t("wizard_resource_manual_switch")}
-                </Button>
+                </button>
               </div>
 
               <FormMessage className="mt-2" />
 
               {resources.length > 0 && (
-                <ul className="mt-4 space-y-3">
+                <ul className="mt-3 space-y-2">
                   {resources.map((resource) => (
                     <li key={resource.id}>
                       <ResourceItem

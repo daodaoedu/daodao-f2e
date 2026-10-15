@@ -7,6 +7,8 @@ import type { TagEditData } from "@/components/practice/create/manual/tag-edit-c
 import { TagEditSheetContent } from "@/components/practice/create/manual/tag-edit-content";
 
 interface UseTagEditSheetOptions {
+  /** Sheet 標題，預設「編輯標籤」 */
+  title?: string;
   /** 初始標籤 */
   initialTags?: string[];
   /** 初始關鍵字 */
@@ -34,6 +36,7 @@ interface UseTagEditSheetOptions {
  * ```
  */
 export function useTagEditSheet({
+  title,
   initialTags = [],
   initialKeyword = "",
   onComplete,
@@ -45,7 +48,7 @@ export function useTagEditSheet({
 
   const openTagEditSheet = useCallback(() => {
     const { close } = open({
-      title: t("tag_edit_title"),
+      title: title ?? t("tag_edit_title"),
       content: (
         <TagEditSheetContent
           initialTags={initialTags}
@@ -68,7 +71,7 @@ export function useTagEditSheet({
       },
     });
     closeRef.current = close;
-  }, [initialTags, initialKeyword, onComplete, onClose, open, t]);
+  }, [title, initialTags, initialKeyword, onComplete, onClose, open, t]);
 
   return { openTagEditSheet };
 }

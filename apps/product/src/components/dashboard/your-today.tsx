@@ -7,6 +7,7 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
+import { resolvePracticeDurationDays } from "@/utils/practice-period";
 
 function getGreetingKey(): "greeting_morning" | "greeting_afternoon" | "greeting_evening" {
   const hour = new Date().getHours();
@@ -35,12 +36,8 @@ export function YourToday() {
     return practices
       .filter((p) => p.status === "active")
       .map((p) => {
-        const startDate = p.startDate ? new Date(p.startDate) : new Date();
-        const endDate = p.endDate ? new Date(p.endDate) : new Date();
-        const totalDays = Math.max(
-          1,
-          Math.ceil((endDate.getTime() - startDate.getTime()) / 86400000)
-        );
+        // 總天數含頭尾，與實踐頁同一規則（daodao#277）
+        const totalDays = resolvePracticeDurationDays(p) ?? 1;
         return {
           id: p.id,
           title: p.title,
@@ -93,6 +90,7 @@ export function YourToday() {
                   >
                     {card.type === "challenge" ? (
                       <svg
+                        aria-hidden="true"
                         className="size-3.5"
                         viewBox="0 0 24 24"
                         fill="none"
@@ -106,6 +104,7 @@ export function YourToday() {
                       </svg>
                     ) : (
                       <svg
+                        aria-hidden="true"
                         className="size-3.5"
                         viewBox="0 0 24 24"
                         fill="none"

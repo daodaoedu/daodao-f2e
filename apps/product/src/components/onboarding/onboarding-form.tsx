@@ -2,6 +2,7 @@
 
 import {
   checkCustomIdAvailability,
+  checkNameAvailability,
   submitOnboardingFlowResponse,
   useUserMutations,
 } from "@daodao/api";
@@ -13,12 +14,13 @@ import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { clearTrackingRef, getTrackingRef } from "@/lib/tracking-ref";
 import { DynamicStep } from "./dynamic-step";
 import { InterestsSection } from "./interests-section";
 import { OnboardingStepper } from "./onboarding-stepper";
+import { checkProfileAvailability } from "./profile-availability";
 import { ProfileSection } from "./profile-section";
 import { ReferralSection } from "./referral-section";
 import {
@@ -40,6 +42,9 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
   const { isTemporary, refreshAuth, refreshToken } = useAuth();
   const { updateCurrentUserWithFormData, createCurrentUserWithFormData } = useUserMutations();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const validationPending = useRef(false);
+  const submissionPending = useRef(false);
   const [dynamicStepError, setDynamicStepError] = useState<string | null>(null);
 
   // 動態流程：若有啟用的流程，以其步驟取代固定的興趣 + 來源步驟
@@ -50,7 +55,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
   const dynamicStepCount = flowSteps?.length ?? 2;
   const totalSteps = 1 + dynamicStepCount + 1;
 
-  const { currentStep, nextStep, prevStep, isFirstStep, isLastInputStep, isSuccessStep } =
+  const { currentStep, nextStep, prevStep, goToStep, isFirstStep, isLastInputStep, isSuccessStep } =
     useOnboardingStep(totalSteps);
 
   // 當前動態步驟（step 2 → index 0, step 3 → index 1, ...）
@@ -58,7 +63,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
   const currentDynamicStep = flowSteps?.[dynamicStepIndex] ?? null;
 
   const form = useForm<OnboardingFormValues>({
-    resolver: zodResolver(createOnboardingFormSchema(t)),
+    resolver: zodResolver(createOnboardingFormSchema(t, { requireFixedFields: !flowSteps })),
     defaultValues: {
       email: initialEmail || "",
       birthDate: undefined,
@@ -74,20 +79,30 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
     mode: "onChange",
   });
 
-  const validateCustomIdAvailability = async (customId: string): Promise<boolean> => {
-    const response = await checkCustomIdAvailability(customId.trim());
-    if (response.error) {
-      toast.error(t("errors.submitFailed"));
+  const validateProfile = async (values: OnboardingFormValues): Promise<boolean> => {
+    form.clearErrors(["name", "customId"]);
+    const errors = await checkProfileAvailability(values, {
+      name: checkNameAvailability,
+      customId: checkCustomIdAvailability,
+    });
+    // Do not advance using a result for values edited while the request was pending.
+    if (values.name !== form.getValues("name") || values.customId !== form.getValues("customId")) {
       return false;
     }
-    if (!response.data?.data?.available) {
-      form.setError("customId", {
-        type: "server",
-        message: t("steps.profile.usernameUnavailable"),
-      });
-      return false;
+    for (const field of ["name", "customId"] as const) {
+      const error = errors[field];
+      if (error) {
+        const unavailableMessage =
+          field === "name"
+            ? t("steps.profile.nameUnavailable")
+            : t("steps.profile.usernameUnavailable");
+        form.setError(field, {
+          type: "server",
+          message: error === "failed" ? t("errors.availabilityFailed") : unavailableMessage,
+        });
+      }
     }
-    return true;
+    return Object.keys(errors).length === 0;
   };
 
   const validateCurrentStep = async (): Promise<boolean> => {
@@ -102,7 +117,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
           customId: values.customId,
           personalSlogan: values.personalSlogan,
         });
-        return validateCustomIdAvailability(values.customId);
+        return validateProfile(values);
       }
 
       // 動態流程步驟驗證
@@ -144,14 +159,30 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
   };
 
   const handleNext = async () => {
-    const isValid = await validateCurrentStep();
-    if (isValid) nextStep();
+    if (validationPending.current) return;
+    validationPending.current = true;
+    setIsValidating(true);
+    try {
+      const isValid = await validateCurrentStep();
+      if (isValid) nextStep();
+    } finally {
+      validationPending.current = false;
+      setIsValidating(false);
+    }
   };
 
   const handleSubmit = async (values: OnboardingFormValues) => {
+    if (validationPending.current || submissionPending.current) return;
+    // Enter must follow the same step validation as the Next button.
+    if (!isLastInputStep) {
+      await handleNext();
+      return;
+    }
+    submissionPending.current = true;
     setIsSubmitting(true);
 
     try {
+      if (!(await validateCurrentStep())) return;
       const dynamicAnswerMap = values.dynamicAnswers ?? {};
 
       // 預設使用固定流程欄位；動態流程透過 fieldKey 覆蓋
@@ -226,6 +257,9 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
             if (detail.path && detail.message) {
               const fieldName = mapApiPathToFormField(detail.path);
               if (fieldName) {
+                if (["name", "customId", "birthDate", "personalSlogan"].includes(fieldName)) {
+                  goToStep(1);
+                }
                 form.setError(fieldName as keyof OnboardingFormValues, {
                   type: "server",
                   message: detail.message,
@@ -239,6 +273,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
         toast.error(t("errors.submitFailed"));
       }
     } finally {
+      submissionPending.current = false;
       setIsSubmitting(false);
     }
   };
@@ -279,7 +314,17 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form
+        onSubmit={(event) => {
+          if (!isLastInputStep) {
+            event.preventDefault();
+            void handleNext();
+          } else {
+            void form.handleSubmit(handleSubmit)(event);
+          }
+        }}
+        className="space-y-6"
+      >
         <OnboardingStepper currentStep={currentStep} totalSteps={totalSteps} />
 
         {currentStep === 1 && <ProfileSection form={form} />}
@@ -299,12 +344,24 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
           <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-4 p-6 border-t border-light-gray bg-very-light-gray">
             <div className="w-full max-w-[448px] flex gap-4">
               {!isFirstStep && (
-                <Button type="button" variant="ghost" className="flex-1" onClick={prevStep}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="flex-1"
+                  onClick={prevStep}
+                  disabled={isValidating || isSubmitting}
+                >
                   {t("navigation.previous")}
                 </Button>
               )}
               {!isLastInputStep ? (
-                <Button type="button" variant="orange" className="flex-1" onClick={handleNext}>
+                <Button
+                  type="button"
+                  variant="orange"
+                  className="flex-1"
+                  onClick={handleNext}
+                  disabled={isValidating}
+                >
                   {t("navigation.next")}
                 </Button>
               ) : (

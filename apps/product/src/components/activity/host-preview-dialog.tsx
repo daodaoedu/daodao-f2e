@@ -30,6 +30,7 @@ export const HostPreviewDialog = ({ userId, open, onOpenChange }: HostPreviewDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="max-w-[380px] rounded-[20px] p-0"
+        showCloseButton={false}
         onClick={(e) => e.stopPropagation()}
       >
         <DialogTitle className="sr-only">{t("detail_host_label")}</DialogTitle>
@@ -37,6 +38,7 @@ export const HostPreviewDialog = ({ userId, open, onOpenChange }: HostPreviewDia
         <button
           type="button"
           onClick={() => onOpenChange(false)}
+          aria-label={t("host_close")}
           className="absolute right-3 top-3 z-10 flex size-8 items-center justify-center rounded-full bg-white/80 text-text-dark/60 transition-colors hover:text-text-dark"
         >
           <X className="size-4" />

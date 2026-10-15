@@ -54,6 +54,7 @@ export const AddTaskFAB = () => {
           >
             <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-logo-cyan/10">
               <svg
+                aria-hidden="true"
                 className="size-[18px] text-logo-cyan"
                 viewBox="0 0 24 24"
                 fill="none"
@@ -83,6 +84,7 @@ export const AddTaskFAB = () => {
           >
             <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#FFA10B]/10">
               <svg
+                aria-hidden="true"
                 className="size-[18px] text-[#FFA10B]"
                 viewBox="0 0 24 24"
                 fill="none"
@@ -114,6 +116,7 @@ export const AddTaskFAB = () => {
             >
               <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-logo-cyan/5">
                 <svg
+                  aria-hidden="true"
                   className="size-[18px] text-logo-cyan/70"
                   viewBox="0 0 24 24"
                   fill="none"

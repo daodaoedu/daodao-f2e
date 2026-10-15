@@ -5,6 +5,7 @@ import { useTranslations } from "@daodao/i18n";
 import { Badge, type BadgeProps } from "@daodao/ui/components/badge";
 import { Flag } from "lucide-react";
 import { PracticeTheme, practiceThemeSvgMap } from "@/constants/practice-theme";
+import { getChallengeStatusKey } from "@/utils/challenge-card";
 import type { calculateDaysProgress } from "@/utils/practice-card";
 
 /** 卡片背景主題：依 id 輪替，讓探索頁有變化又保持穩定 */
@@ -24,18 +25,21 @@ export const getChallengeThemeSvg = (id: number) => {
 const STATUS_BADGE: Record<ChallengeSummaryType["runStatus"], BadgeProps["variant"]> = {
   upcoming: "very-light-blue",
   ongoing: "default",
-  ended: "outline-logo",
+  ended: "outline-ghost",
 };
 
 export const ChallengeStatusBadge = ({
   runStatus,
+  isJoined = false,
 }: {
   runStatus: ChallengeSummaryType["runStatus"];
+  /** 已加入的挑戰結束後顯示「已完成」；未加入維持「已結束」 */
+  isJoined?: boolean;
 }) => {
   const t = useTranslations("challenge");
   return (
     <Badge variant={STATUS_BADGE[runStatus]} size="sm" className="w-fit">
-      {t(`status_${runStatus}`)}
+      {t(getChallengeStatusKey(runStatus, isJoined))}
     </Badge>
   );
 };
@@ -73,7 +77,7 @@ export const ChallengeProgressBar = ({
 }) => {
   if (daysProgress === null) return null;
   return (
-    <div className="absolute right-5 bottom-1.5 left-5 z-10">
+    <div className="pointer-events-none absolute right-5 bottom-1.5 left-5 z-10">
       <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/75 shadow-[inset_0_0_0_1px_rgba(15,48,54,0.08)]">
         <div
           className="h-full bg-logo-cyan"

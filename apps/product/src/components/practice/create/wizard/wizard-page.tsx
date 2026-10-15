@@ -20,10 +20,6 @@ import { format } from "date-fns";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type FieldErrors, type Path, useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import {
-  applyOnboardingUpdateFromResponse,
-  refreshOnboardingStatus,
-} from "@/components/task-guide/onboarding-progress-context";
 import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
 import { CompletionDialog } from "./completion-dialog";
 import { getBaseName, getEffectiveSegments } from "./derive";
@@ -41,6 +37,7 @@ import { StepRhythm } from "./step-rhythm";
 import { StepTagsResources, type StepTagsResourcesHandle } from "./step-tags-resources";
 import {
   extractCreatedNames,
+  getDonePrimaryRoute,
   getStepForServerPath,
   mapServerPathToFormField,
   parseServerError,
@@ -51,11 +48,6 @@ import {
   toCreatePracticeRequest,
   toCreateTemplateRequest,
 } from "./to-request";
-
-/** 個人實踐列表（「看看我的實踐」） */
-const MY_PRACTICES_ROUTE = "/mine";
-/** 使用者模版管理頁尚未存在（/manage 仍是佔位），先回模版挑選頁 */
-const MY_TEMPLATES_ROUTE = "/practices/create";
 
 const PREVIEW_STEP = WIZARD_TOTAL_STEPS;
 const STEP_NUMBERS = Array.from({ length: WIZARD_TOTAL_STEPS }, (_, i) => i + 1);
@@ -94,6 +86,7 @@ export const PracticeWizard = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdNames, setCreatedNames] = useState<string[]>([]);
+  const [createdStartDate, setCreatedStartDate] = useState<string | undefined>(undefined);
   const [isDoneOpen, setIsDoneOpen] = useState(false);
   const [isDone, setIsDone] = useState(false);
   const isRestoreDialogOpenRef = useRef(false);
@@ -222,23 +215,26 @@ export const PracticeWizard = ({
       }
 
       clearDraft();
-      if (isPersonal && !applyOnboardingUpdateFromResponse(response.data)) {
-        refreshOnboardingStatus();
-      }
 
-      const names = extractCreatedNames(response.data);
-      setCreatedNames(
-        names.length > 0 ? names : getEffectiveSegments(values, nameFallback).map((s) => s.name)
-      );
-      setIsDone(true);
-      window.scrollTo(0, 0);
-      setIsDoneOpen(true);
+      showCompletion(values, response.data);
     } catch (error) {
       console.error("Failed to create practice:", error);
       toast.error(error instanceof Error ? error.message : t("wizard_create_failed"));
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  /** 建立成功後：記下名稱與第一段開始日、開啟完成彈窗 */
+  const showCompletion = (values: WizardFormValues, data: unknown) => {
+    const effective = getEffectiveSegments(values, nameFallback);
+    const firstStart = effective[0]?.start ?? null;
+    setCreatedStartDate(firstStart ? format(firstStart, "yyyy/MM/dd") : undefined);
+    const names = extractCreatedNames(data);
+    setCreatedNames(names.length > 0 ? names : effective.map((s) => s.name));
+    setIsDone(true);
+    window.scrollTo(0, 0);
+    setIsDoneOpen(true);
   };
 
   const handleInvalid = (errors: FieldErrors<WizardFormValues>) => {
@@ -260,7 +256,7 @@ export const PracticeWizard = ({
   // ---------------------------------------------------------------------------
   const handleDonePrimary = () => {
     setIsDoneOpen(false);
-    router.push(isPersonal ? MY_PRACTICES_ROUTE : MY_TEMPLATES_ROUTE);
+    router.push(getDonePrimaryRoute(isPersonal));
   };
 
   const handleDoneSecondary = () => {
@@ -283,6 +279,8 @@ export const PracticeWizard = ({
   const segmentCount = isSegmented && segmentsLength > 0 ? segmentsLength : 1;
 
   const isPreview = currentStep === PREVIEW_STEP;
+  const createTitle = isPersonal ? t("wizard_title_create") : t("wizard_title_create_template");
+  const headerTitle = isPreview ? t("wizard_title_preview") : createTitle;
   const showSummary = currentStep === 2 || currentStep === 3;
 
   let finishLabel: string;
@@ -299,19 +297,15 @@ export const PracticeWizard = ({
   }
 
   return (
-    <div className="relative z-10 min-h-screen w-screen overflow-hidden overflow-y-auto bg-white">
+    <div className="relative z-10 min-h-screen w-full overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <PageHeader
-        title={isPreview ? t("wizard_title_preview") : t("wizard_title_create")}
-        rightActionTo="/"
-        rightLabel={t("wizard_close")}
-      />
+      <PageHeader title={headerTitle} rightActionTo="/" rightLabel={t("wizard_close")} />
 
       <main className="relative mx-auto max-w-[448px] px-5 pb-28">
         {!isPreview && (
-          <div className="mb-10">
-            <div className="text-xs text-text-dark">
+          <div className="mb-12">
+            <div className="text-xs leading-[1.4] text-text-dark">
               {t("wizard_step_of", { current: currentStep, total: WIZARD_TOTAL_STEPS })}
             </div>
             <div className="flex items-center gap-0.5">
@@ -331,8 +325,8 @@ export const PracticeWizard = ({
         <Form {...form}>
           <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
             {showSummary && (
-              <div>
-                <h1 className="mb-1 text-xl font-semibold text-text-dark break-words">
+              <div className="mb-6">
+                <h1 className="mb-1 text-xl font-semibold leading-[1.4] text-text-dark break-words">
                   {displayName}
                 </h1>
                 <p className="text-sm text-text-dark whitespace-pre-wrap break-words">
@@ -376,6 +370,7 @@ export const PracticeWizard = ({
         open={isDoneOpen}
         mode={mode}
         names={createdNames}
+        startDateText={createdStartDate}
         onPrimary={handleDonePrimary}
         onSecondary={handleDoneSecondary}
         onClose={() => setIsDoneOpen(false)}

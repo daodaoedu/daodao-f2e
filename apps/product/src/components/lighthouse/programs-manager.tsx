@@ -26,6 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@daodao/ui/components/dropdown-menu";
 import { Input } from "@daodao/ui/components/input";
+import { Popover, PopoverAnchor, PopoverContent } from "@daodao/ui/components/popover";
 import { toast } from "@daodao/ui/components/sonner";
 import { Switch } from "@daodao/ui/components/switch";
 import { Textarea } from "@daodao/ui/components/textarea";
@@ -34,6 +35,7 @@ import {
   Archive,
   ArrowUpRight,
   CalendarDays,
+  Check,
   ChevronDown,
   Copy,
   Minus,
@@ -46,12 +48,33 @@ import {
   X,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import {
+  apiErrorMessage,
+  type CohortFieldErrorKey,
+  resolveCohortApiError,
+} from "@/utils/cohort-api-error";
+import {
+  diffTemplateBindings,
+  formatSlashDate,
+  isCohortStarted,
+  newBindingStartDate,
+  resolveTemplateSelection,
+  templateBindingEndDate,
+  templateStartDateOverride,
+} from "@/utils/template-library";
+import { ConfirmDialog } from "./confirm-dialog";
 import { JoinCode } from "./join-code";
 
 type SessionEntry = { id: string; sessionDate: string; startTime: string; endTime: string };
 
-type CohortTemplateSummary = { id: number; title: string; boundCohortIds: number[] };
+type CohortTemplateSummary = {
+  id: number;
+  title: string;
+  durationDays: number | null;
+  boundCohortIds: number[];
+  bindings: { cohortId: number; startDate: string | null }[];
+};
 
 /** 已封存要一眼看得出來，不能和草稿、已發佈長一樣 */
 const COHORT_STATUS_STYLES: Record<LighthouseCohortType["status"], string> = {
@@ -62,6 +85,58 @@ const COHORT_STATUS_STYLES: Record<LighthouseCohortType["status"], string> = {
 
 type SetupTab = "basic" | "templates" | "home" | "privacy" | "signup";
 const SETUP_TABS: SetupTab[] = ["basic", "templates", "home", "privacy", "signup"];
+/** 與 server createCohortSchema 一致：小寫英數，單一連字號分隔，不可首尾或連續連字號 */
+const COHORT_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/** HTML pattern 屬性版本（Chrome 以 v flag 編譯，字元類別結尾的 `-` 會被判定為無效正則而整個忽略） */
+const COHORT_SLUG_HTML_PATTERN = "[a-z0-9]+(-[a-z0-9]+)*";
+
+type CohortErrorTranslator = (
+  key: CohortFieldErrorKey | "cohort_create_failed" | "save_failed"
+) => string;
+
+/** 把場次 API 錯誤轉成 toast 文字：已知欄位走 i18n、其他顯示 server 訊息、最後才退回通用訊息 */
+function cohortErrorMessage(
+  t: CohortErrorTranslator,
+  error: unknown,
+  fallbackKey: "cohort_create_failed" | "save_failed"
+): string {
+  const resolved = resolveCohortApiError(error);
+  if (resolved.type === "i18n") return t(resolved.key);
+  if (resolved.type === "message") return resolved.message;
+  return t(fallbackKey);
+}
+
+/** 送出模板綁定異動，回傳第一個失敗的 API 錯誤（含網路錯誤）；全部成功回 null */
+async function applyTemplateBindings(
+  organizationId: number,
+  cohortId: number,
+  { bind, unbind, update }: ReturnType<typeof diffTemplateBindings>,
+  /** 新綁定時一併帶上使用者指定的開始日（#272）；沒指定就明確送 null 沿用場次開始日 */
+  startDates: ReadonlyMap<number, string | null>
+): Promise<unknown> {
+  try {
+    const responses = await Promise.all([
+      ...bind.map((templateId) =>
+        setLighthouseTemplateBinding(
+          organizationId,
+          templateId,
+          cohortId,
+          true,
+          newBindingStartDate(startDates, templateId)
+        )
+      ),
+      ...update.map(({ templateId, startDate }) =>
+        setLighthouseTemplateBinding(organizationId, templateId, cohortId, true, startDate)
+      ),
+      ...unbind.map((templateId) =>
+        setLighthouseTemplateBinding(organizationId, templateId, cohortId, false)
+      ),
+    ]);
+    return responses.find((response) => response.error)?.error ?? null;
+  } catch (error) {
+    return error;
+  }
+}
 
 interface CohortSetupPanelProps {
   mode: "create" | "edit";
@@ -81,6 +156,8 @@ interface CohortSetupPanelProps {
       hostCommentDefaultPrivate: boolean;
       visibility: "public" | "private";
       selectedTemplateIds?: number[];
+      /** 使用者改過的模板開始日（YYYY-MM-DD；null＝沿用場次開始日） */
+      templateStartDates?: ReadonlyMap<number, string | null>;
       publishNow?: boolean;
     }
   ) => Promise<void>;
@@ -101,7 +178,43 @@ function CohortSetupPanel({
   const t = useTranslations("lighthouse");
   const [activeTab, setActiveTab] = useState<SetupTab>("basic");
   const panelRef = useRef<HTMLFormElement>(null);
-  const selectedTemplatesRef = useRef<Set<number>>(new Set());
+  // 已開始的場次 server 會拒絕變更綁定（FR-TPL-05），直接鎖住勾選
+  const templatesLocked = mode === "edit" && !!cohort && isCohortStarted(cohort.startDate);
+  // 只記使用者動過的模板，其餘跟著最新的既有綁定走：templates 可能比面板晚載入，
+  // 也不會把別人剛綁上的模板當成「取消勾選」解綁掉。
+  // 新增場次預設不綁任何模板：建立時模板分頁是 disabled，不能讓使用者看不到就被綁上全部（#273）
+  const [templateOverrides, setTemplateOverrides] = useState<Map<number, boolean>>(() => new Map());
+  const selectedTemplateIds = resolveTemplateSelection(
+    cohort
+      ? (templates ?? [])
+          .filter((tpl) => tpl.boundCohortIds.includes(cohort.id))
+          .map((tpl) => tpl.id)
+      : [],
+    templatesLocked ? new Map() : templateOverrides
+  );
+
+  function toggleTemplate(templateId: number, checked: boolean) {
+    setTemplateOverrides((prev) => new Map(prev).set(templateId, checked));
+  }
+  // 開始日同樣只記使用者動過的，存檔時只送有變的（#272）
+  const [startDateOverrides, setStartDateOverrides] = useState<Map<number, string | null>>(
+    () => new Map()
+  );
+  const [templateDropOpen, setTemplateDropOpen] = useState(false);
+  // 跟著基本資訊分頁正在編輯的場次開始日走，沒指定開始日的模板列才不會顯示舊日期
+  const [cohortStartDate, setCohortStartDate] = useState(cohort?.startDate?.slice(0, 10) ?? "");
+  function savedTemplateStartDate(tpl: CohortTemplateSummary): string | null {
+    const binding = cohort ? tpl.bindings.find((b) => b.cohortId === cohort.id) : undefined;
+    return binding?.startDate?.slice(0, 10) ?? null;
+  }
+  function templateStartDate(tpl: CohortTemplateSummary): string {
+    if (startDateOverrides.has(tpl.id)) return startDateOverrides.get(tpl.id) ?? cohortStartDate;
+    return savedTemplateStartDate(tpl) ?? cohortStartDate;
+  }
+  function setTemplateStartDate(tpl: CohortTemplateSummary, value: string) {
+    const next = templateStartDateOverride(value, cohortStartDate, savedTemplateStartDate(tpl));
+    setStartDateOverrides((prev) => new Map(prev).set(tpl.id, next));
+  }
 
   const [sessions, setSessions] = useState<SessionEntry[]>(() =>
     (cohort?.sessions ?? []).map((s, i) => ({
@@ -178,8 +291,11 @@ function CohortSetupPanel({
     templates?.filter((tpl) => tpl.title.toLowerCase().includes(templateSearch.toLowerCase())) ??
     [];
 
-  async function handleFormAction(formData: FormData) {
-    await onSubmit(formData, {
+  // 用 onSubmit 而不是 form action：React 19 的 action 完成後會 reset 表單，
+  // 送出失敗（400/409）時使用者填的內容會全部消失，只能從頭再填一次（#188）
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await onSubmit(new FormData(event.currentTarget), {
       interactionModes,
       sessions,
       feeType,
@@ -188,7 +304,8 @@ function CohortSetupPanel({
       checkinDefaultPrivate: checkinPrivate,
       hostCommentDefaultPrivate: hostCommentPrivate,
       visibility,
-      selectedTemplateIds: Array.from(selectedTemplatesRef.current),
+      selectedTemplateIds: Array.from(selectedTemplateIds),
+      templateStartDates: templatesLocked ? new Map() : startDateOverrides,
       publishNow,
     });
   }
@@ -199,27 +316,27 @@ function CohortSetupPanel({
   return (
     <form
       ref={panelRef}
-      action={handleFormAction}
-      className="scroll-mt-24 rounded-2xl border border-[#CDEBE8] bg-[#F0FBF9] p-5"
+      onSubmit={handleSubmit}
+      className="scroll-mt-24 rounded-[20px] border border-[#B9DCD8] bg-[#F7FCFB] p-6"
     >
-      <div className="mb-4 flex items-center justify-between">
-        <h4 className="text-sm font-semibold">
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <h4 className="text-[15px] font-semibold">
           {mode === "create" ? t("cohort_create_title") : t("cohort_setup_title")}
         </h4>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="size-7"
+          className="size-[30px] rounded-full border border-[#CDEBE8] bg-white text-[#5A7B79] hover:bg-[#EDF8F6]"
           onClick={onClose}
           aria-label={t("close")}
         >
-          <X className="size-4" />
+          <X className="size-[15px]" />
         </Button>
       </div>
 
       {/* Pill tabs */}
-      <div className="mb-5 flex flex-wrap gap-1.5" role="tablist">
+      <div className="mb-[18px] flex flex-wrap gap-1.5" role="tablist">
         {SETUP_TABS.map((tab) => {
           const disabled = tabDisabled && tab !== "basic";
           return (
@@ -231,12 +348,12 @@ function CohortSetupPanel({
               aria-disabled={disabled}
               title={disabled ? t("cohort_tab_disabled_tooltip") : undefined}
               onClick={() => !disabled && setActiveTab(tab)}
-              className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+              className={`h-8 shrink-0 whitespace-nowrap rounded-full border px-3.5 text-[13px] font-semibold transition-colors ${
                 activeTab === tab
-                  ? "bg-[#16B9B3] text-white"
+                  ? "border-[#16B9B3] bg-[#16B9B3] text-white"
                   : disabled
-                    ? "cursor-not-allowed text-[#5A7B79] opacity-50"
-                    : "text-[#5A7B79] hover:bg-[#F0FBF9]"
+                    ? "cursor-not-allowed border-[#CDEBE8] bg-white text-[#5A7B79] opacity-50"
+                    : "border-[#CDEBE8] bg-white text-[#5A7B79] hover:bg-[#F0FBF9]"
               }`}
             >
               {t(`cohort_tab_${tab}`)}
@@ -254,6 +371,7 @@ function CohortSetupPanel({
               id={`${prefix}-name`}
               name="displayName"
               required
+              maxLength={100}
               defaultValue={cohort?.displayName ?? ""}
             />
           </label>
@@ -264,7 +382,9 @@ function CohortSetupPanel({
                 id={`${prefix}-slug`}
                 name="slug"
                 required
-                pattern="[a-z0-9-]+"
+                maxLength={50}
+                pattern={COHORT_SLUG_HTML_PATTERN}
+                title={t("cohort_slug_error")}
                 placeholder="2026-summer"
               />
             </label>
@@ -296,6 +416,7 @@ function CohortSetupPanel({
               type="date"
               required
               defaultValue={cohort?.startDate?.slice(0, 10) ?? ""}
+              onChange={(e) => setCohortStartDate(e.target.value)}
             />
           </label>
           <label htmlFor={`${prefix}-end`} className="grid gap-1.5 text-sm font-medium">
@@ -406,6 +527,7 @@ function CohortSetupPanel({
               <Input
                 id={`${prefix}-location`}
                 name="location"
+                maxLength={200}
                 placeholder={t("cohort_location_placeholder")}
                 defaultValue={cohort?.location ?? ""}
               />
@@ -495,7 +617,7 @@ function CohortSetupPanel({
                     <Input
                       name="feeAmount"
                       type="number"
-                      min={0}
+                      min={1}
                       required
                       defaultValue={cohort?.feeAmount ?? ""}
                     />
@@ -541,57 +663,144 @@ function CohortSetupPanel({
 
       {/* Tab: templates */}
       <div className={activeTab !== "templates" ? "hidden" : ""} role="tabpanel">
-        <div className="mb-3 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">{t("cohort_select_templates")}</p>
-            <p className="mt-0.5 text-xs text-[#78928F]">{t("cohort_select_templates_hint")}</p>
-          </div>
-          <p className="text-xs text-[#78928F]">
-            {t("cohort_templates_linked_count", { count: selectedTemplatesRef.current.size })}
-          </p>
-        </div>
+        <p className="text-[13px] font-semibold text-[#0D3036]">{t("cohort_select_templates")}</p>
+        <p className="mt-1 text-xs text-[#78928F]">
+          {t("cohort_select_templates_hint", { count: selectedTemplateIds.size })}
+        </p>
+        {templatesLocked && (
+          <p className="mt-2 text-xs text-[#7A6120]">{t("cohort_templates_locked")}</p>
+        )}
         {templates && templates.length > 0 ? (
           <>
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#78928F]" />
-              <Input
-                placeholder={t("cohort_template_search_placeholder")}
-                value={templateSearch}
-                onChange={(e) => setTemplateSearch(e.target.value)}
-                className="pl-9"
-              />
+            <Popover open={templateDropOpen && !templatesLocked} onOpenChange={setTemplateDropOpen}>
+              <PopoverAnchor asChild>
+                <div className="relative mt-3" data-template-search>
+                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#78928F]" />
+                  <Input
+                    placeholder={t("cohort_template_search_placeholder")}
+                    value={templateSearch}
+                    disabled={templatesLocked}
+                    onChange={(e) => {
+                      setTemplateSearch(e.target.value);
+                      setTemplateDropOpen(true);
+                    }}
+                    onFocus={() => setTemplateDropOpen(true)}
+                    className="h-10 rounded-[10px] border-[#CDEBE8] bg-white pl-9 pr-10 focus-visible:pl-[35px] focus-visible:pr-[39px]"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    disabled={templatesLocked}
+                    onClick={() => setTemplateDropOpen((open) => !open)}
+                    aria-label={t("cohort_templates_expand")}
+                    title={t("cohort_templates_expand")}
+                    className="absolute right-1.5 top-1.5 size-7 rounded-full text-[#5A7B79] hover:bg-[#EDF8F6]"
+                  >
+                    <ChevronDown className="size-4" />
+                  </Button>
+                </div>
+              </PopoverAnchor>
+              <PopoverContent
+                align="start"
+                sideOffset={6}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                onInteractOutside={(e) => {
+                  // 點搜尋框本身不要關掉下拉
+                  if ((e.target as HTMLElement).closest?.("[data-template-search]"))
+                    e.preventDefault();
+                }}
+                className="grid max-h-[236px] w-[var(--radix-popover-trigger-width)] gap-0.5 overflow-auto rounded-[12px] border-[#DDEFED] p-1.5 shadow-[0_12px_28px_rgba(15,48,54,0.14)]"
+              >
+                {filteredTemplates.length > 0 ? (
+                  filteredTemplates.map((tpl) => {
+                    const picked = selectedTemplateIds.has(tpl.id);
+                    return (
+                      <button
+                        key={tpl.id}
+                        type="button"
+                        aria-pressed={picked}
+                        onClick={() => toggleTemplate(tpl.id, !picked)}
+                        className={`flex items-center gap-2.5 rounded-[8px] px-2.5 py-[9px] text-left hover:bg-[#F1F8F7] ${
+                          picked ? "bg-[#F7FCFB]" : "bg-white"
+                        }`}
+                      >
+                        <span
+                          className={`grid size-[18px] shrink-0 place-items-center rounded-[5px] border ${
+                            picked ? "border-[#16B9B3] bg-[#16B9B3]" : "border-[#CDEBE8] bg-white"
+                          }`}
+                        >
+                          <Check
+                            className={`size-3 text-white ${picked ? "opacity-100" : "opacity-0"}`}
+                            strokeWidth={3}
+                          />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-sm text-[#0D3036]">{tpl.title}</span>
+                          {tpl.durationDays ? (
+                            <span className="mt-0.5 block text-xs text-[#78928F]">
+                              {t("template_preview_days", { days: tpl.durationDays })}
+                            </span>
+                          ) : null}
+                        </span>
+                      </button>
+                    );
+                  })
+                ) : (
+                  <p className="p-2.5 text-[13px] text-[#78928F]">
+                    {t("cohort_templates_search_empty")}
+                  </p>
+                )}
+              </PopoverContent>
+            </Popover>
+            <div className="mt-3 grid gap-2">
+              {selectedTemplateIds.size > 0 ? (
+                templates
+                  .filter((tpl) => selectedTemplateIds.has(tpl.id))
+                  .map((tpl) => {
+                    const start = templateStartDate(tpl);
+                    const end = templateBindingEndDate(start, tpl.durationDays);
+                    return (
+                      <div
+                        key={tpl.id}
+                        className="flex flex-wrap items-center gap-2.5 rounded-[14px] border border-[#B9DCD8] bg-[#F7FCFB] px-3 py-2.5"
+                      >
+                        <span className="min-w-0 flex-[1_1_160px] truncate text-sm text-[#0D3036]">
+                          {tpl.title}
+                        </span>
+                        <label className="inline-flex shrink-0 items-center gap-1.5 text-xs text-[#5A7B79]">
+                          {t("cohort_templates_start_label")}
+                          <input
+                            type="date"
+                            value={start}
+                            disabled={templatesLocked}
+                            onChange={(e) => setTemplateStartDate(tpl, e.target.value)}
+                            className="h-[30px] rounded-[8px] border border-[#CDEBE8] bg-white px-2 py-1 font-mono text-xs text-[#0D3036] disabled:cursor-not-allowed disabled:bg-[#F6F9F9] disabled:text-[#78928F]"
+                          />
+                        </label>
+                        {end && (
+                          <span className="shrink-0 font-mono text-xs text-[#0D7773]">
+                            {t("cohort_templates_end_label", { date: formatSlashDate(end) })}
+                          </span>
+                        )}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          disabled={templatesLocked}
+                          onClick={() => toggleTemplate(tpl.id, false)}
+                          aria-label={t("cohort_templates_remove", { title: tpl.title })}
+                          className="size-6 shrink-0 rounded-full text-[#5A7B79] hover:bg-[#DCEEEB]"
+                        >
+                          <X className="size-[13px]" strokeWidth={2.5} />
+                        </Button>
+                      </div>
+                    );
+                  })
+              ) : (
+                <span className="text-xs text-[#78928F]">{t("cohort_templates_none_linked")}</span>
+              )}
             </div>
-            {filteredTemplates.length > 0 ? (
-              <div className="grid gap-2 sm:grid-cols-2">
-                {filteredTemplates.map((tpl) => {
-                  const bound = cohort ? tpl.boundCohortIds.includes(cohort.id) : true;
-                  return (
-                    <label
-                      key={tpl.id}
-                      className="flex items-center gap-3 rounded-xl border border-[#DDEFED] px-4 py-3 text-sm"
-                    >
-                      <input
-                        type="checkbox"
-                        defaultChecked={bound}
-                        className="size-4 accent-[#0D7773]"
-                        onChange={(e) => {
-                          if (e.target.checked) selectedTemplatesRef.current.add(tpl.id);
-                          else selectedTemplatesRef.current.delete(tpl.id);
-                        }}
-                        ref={(el) => {
-                          if (el && bound) selectedTemplatesRef.current.add(tpl.id);
-                        }}
-                      />
-                      {tpl.title}
-                    </label>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="py-8 text-center text-sm text-[#5A7B79]">
-                {t("cohort_templates_search_empty")}
-              </p>
-            )}
           </>
         ) : (
           <p className="py-8 text-center text-sm text-[#5A7B79]">
@@ -707,18 +916,28 @@ function CohortSetupPanel({
       </div>
 
       {/* Bottom action bar */}
-      <div className="mt-5 flex items-center justify-end gap-3">
+      <div className="mt-5 flex items-center justify-end gap-2">
         {mode === "create" && (
-          <span className="flex items-center gap-2 text-sm">
+          <span className="mr-1 flex items-center gap-2 text-sm">
             <Switch checked={publishNow} onCheckedChange={setPublishNow} />
             {t("publish_now")}
           </span>
         )}
-        <Button type="submit" disabled={busy}>
-          {mode === "create" ? t("cohort_create") : t("save")}
-        </Button>
-        <Button type="button" variant="ghost" onClick={onClose} disabled={busy}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onClose}
+          disabled={busy}
+          className="h-auto rounded-full border-[#CDEBE8] bg-white px-[18px] py-[9px] text-sm font-normal text-[#5A7B79] hover:bg-[#F0FBF9] hover:text-[#5A7B79]"
+        >
           {t("cancel")}
+        </Button>
+        <Button
+          type="submit"
+          disabled={busy}
+          className="h-auto rounded-full bg-[#16B9B3] px-5 py-[9px] text-sm font-semibold text-white hover:brightness-[1.04]"
+        >
+          {mode === "create" ? t("cohort_create") : t("save")}
         </Button>
       </div>
     </form>
@@ -731,9 +950,17 @@ interface CohortCardProps {
   cohort: LighthouseCohortType;
   templates?: CohortTemplateSummary[];
   refresh: () => Promise<unknown>;
+  refreshTemplates: () => Promise<unknown>;
 }
 
-function CohortCard({ programId, organizationId, cohort, templates, refresh }: CohortCardProps) {
+function CohortCard({
+  programId,
+  organizationId,
+  cohort,
+  templates,
+  refresh,
+  refreshTemplates,
+}: CohortCardProps) {
   const t = useTranslations("lighthouse");
   const searchParams = useSearchParams();
   const [editing, setEditing] = useState(searchParams.get("edit") === String(cohort.id));
@@ -747,26 +974,26 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
     const response = await updateLighthouseCohort(programId, cohort.id, { status: "published" });
     setBusy(false);
     if (response.error) {
-      toast.error(t("cohort_publish_failed"));
+      toast.error(apiErrorMessage(response.error, t("cohort_publish_failed")));
       return;
     }
     await refresh();
     toast.success(t("cohort_published"));
   }
 
+  const [confirmArchive, setConfirmArchive] = useState(false);
   async function handleArchive() {
-    if (!window.confirm(t("cohort_archive_confirm"))) {
-      return;
-    }
     setBusy(true);
     const response = await archiveLighthouseCohort(programId, cohort.id);
     setBusy(false);
+    setConfirmArchive(false);
     if (response.error) {
-      toast.error(t("cohort_archive_failed"));
+      toast.error(apiErrorMessage(response.error, t("cohort_archive_failed")));
+      await refresh();
       return;
     }
     await refresh();
-    toast.success(t("cohort_archived"));
+    toast.success(t("cohort_archived_to_archive"));
   }
 
   async function handleDuplicate() {
@@ -774,7 +1001,7 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
     const response = await duplicateLighthouseCohort(programId, cohort.id);
     setBusy(false);
     if (response.error) {
-      toast.error(t("cohort_duplicate_failed"));
+      toast.error(apiErrorMessage(response.error, t("cohort_duplicate_failed")));
       return;
     }
     toast.success(t("cohort_duplicated", { name: response.data.data.displayName }));
@@ -804,7 +1031,41 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
         toast.error(t("cohort_external_signup_url_error"));
         return;
       }
+      const bindingChanges = diffTemplateBindings(
+        templates ?? [],
+        cohort.id,
+        extras.selectedTemplateIds ?? [],
+        extras.templateStartDates
+      );
+      // 解除未開始場次的模板綁定前要確認（FR-TPL-05）
+      if (
+        bindingChanges.unbind.length > 0 &&
+        !window.confirm(
+          t("cohort_template_unbind_confirm", { count: bindingChanges.unbind.length })
+        )
+      ) {
+        return;
+      }
       setBusy(true);
+      // 模板分頁的勾選不在 cohort payload 裡，要另外對綁定 API 送差異（#273）。
+      // 先送綁定再存場次：開始日改到今天以前，server 就會鎖住綁定（FR-TPL-05）
+      const bindingError = await applyTemplateBindings(
+        organizationId,
+        cohort.id,
+        bindingChanges,
+        extras.templateStartDates ?? new Map()
+      );
+      if (bindingError) {
+        setBusy(false);
+        // 409 多半是場次已開始：一併刷新場次，面板才會鎖住，不會讓使用者一直重試
+        await Promise.all([refresh(), refreshTemplates()]);
+        toast.error(
+          t("cohort_template_binding_failed", {
+            reason: apiErrorMessage(bindingError, t("save_failed")),
+          })
+        );
+        return;
+      }
       const response = await updateLighthouseCohort(programId, cohort.id, {
         displayName: String(formData.get("displayName") ?? "").trim(),
         tagline: String(formData.get("tagline") ?? "").trim() || null,
@@ -836,150 +1097,169 @@ function CohortCard({ programId, organizationId, cohort, templates, refresh }: C
         checkinDefaultPrivate: extras.checkinDefaultPrivate,
         hostCommentDefaultPrivate: extras.hostCommentDefaultPrivate,
       } as Parameters<typeof updateLighthouseCohort>[2]);
-      setBusy(false);
       if (response.error) {
-        toast.error(t("save_failed"));
+        setBusy(false);
+        await refreshTemplates();
+        const reason = cohortErrorMessage(t, response.error, "save_failed");
+        // 綁定已先送出成功，要講清楚只有場次設定沒存，不然使用者會以為模板也沒連上
+        const bindingsChanged =
+          bindingChanges.bind.length + bindingChanges.unbind.length + bindingChanges.update.length >
+          0;
+        toast.error(bindingsChanged ? t("cohort_saved_templates_only", { reason }) : reason);
         return;
       }
-      await refresh();
+      setBusy(false);
+      await Promise.all([refresh(), refreshTemplates()]);
       setEditing(false);
       toast.success(t("cohort_saved"));
     },
-    [programId, cohort.id, refresh, t]
+    [programId, organizationId, cohort.id, templates, refresh, refreshTemplates, t]
   );
 
   const missingTemplates =
     templates && !templates.some((tpl) => tpl.boundCohortIds.includes(cohort.id));
 
-  if (editing) {
-    return (
-      <CohortSetupPanel
-        mode="edit"
-        cohort={cohort}
-        programId={programId}
-        organizationId={organizationId}
-        templates={templates}
-        onSubmit={handleEditSubmit}
-        onClose={() => setEditing(false)}
-        busy={busy}
-      />
-    );
-  }
+  const setupPanel = editing ? (
+    <CohortSetupPanel
+      mode="edit"
+      cohort={cohort}
+      programId={programId}
+      organizationId={organizationId}
+      templates={templates}
+      onSubmit={handleEditSubmit}
+      onClose={() => setEditing(false)}
+      busy={busy}
+    />
+  ) : null;
 
+  // 編輯時保留場次卡，設定面板在卡片下方展開（POC：卡片不被取代）
   return (
-    <div
-      id={`cohort-${cohort.id}`}
-      className="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-start"
-    >
-      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
-        <CalendarDays className="size-5" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h4 className="font-semibold">{cohort.displayName}</h4>
-          <span
-            className={`rounded-full px-2.5 py-1 font-mono text-[10px] uppercase ${COHORT_STATUS_STYLES[cohort.status]}`}
-          >
-            {t(`cohort_status_${cohort.status}`)}
-          </span>
-          {missingTemplates && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF6E8] px-2.5 py-1 text-[10px] font-semibold text-[#A95D00]">
-              <AlertTriangle className="size-3" />
-              {t("cohort_no_templates_warning")}
+    <div className="grid gap-3">
+      <div
+        id={`cohort-${cohort.id}`}
+        className="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-start"
+      >
+        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
+          <CalendarDays className="size-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h4 className="font-semibold">{cohort.displayName}</h4>
+            <span
+              className={`rounded-full px-2.5 py-1 font-mono text-[10px] uppercase ${COHORT_STATUS_STYLES[cohort.status]}`}
+            >
+              {t(`cohort_status_${cohort.status}`)}
             </span>
-          )}
-        </div>
-        <p className="mt-1 text-xs text-[#78928F]">
-          {cohort.startDate.slice(0, 10)} — {cohort.endDate.slice(0, 10)} · /{cohort.slug} ·{" "}
-          {cohort.isPrivate ? t("cohort_info_private") : t("cohort_info_public_activity")} ·{" "}
-          {cohort.feeType === "paid"
-            ? t("cohort_info_fee_paid", { amount: cohort.feeAmount ?? 0 })
-            : t("cohort_info_fee_free")}
-        </p>
-        {cohort.joinToken && (
-          <div className="mt-2">
-            <JoinCode joinToken={cohort.joinToken} />
-            {cohort.status === "published" && (
-              <CustomLink
-                href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/roster`}
-                className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#CDEBE8] px-3 py-1.5 text-xs font-medium text-[#0D5B59] hover:bg-[#EDF8F6]"
-              >
-                <Send className="size-3.5" aria-hidden="true" />
-                {t("cohort_invite_by_email")}
-              </CustomLink>
+            {missingTemplates && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF6E8] px-2.5 py-1 text-[10px] font-semibold text-[#A95D00]">
+                <AlertTriangle className="size-3" />
+                {t("cohort_no_templates_warning")}
+              </span>
             )}
           </div>
-        )}
-      </div>
-      <div className="flex shrink-0 items-center gap-1">
-        {cohort.status === "draft" && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-8"
-            onClick={handlePublish}
-            disabled={busy}
-            aria-label={t("cohort_publish")}
-            title={t("cohort_publish")}
-          >
-            <Send className="size-4" aria-hidden="true" />
-          </Button>
-        )}
-        {cohort.status !== "archived" && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-8"
-            onClick={() => setEditing(true)}
-            disabled={busy}
-            aria-label={t("edit")}
-            title={t("edit")}
-          >
-            <Pencil className="size-4" aria-hidden="true" />
-          </Button>
-        )}
-        <CustomLink
-          href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/dashboard`}
-          className="grid size-8 place-items-center rounded-full text-[#0D7773] hover:bg-[#EDF8F6]"
-          aria-label={t("manage_cohort")}
-          title={t("manage_cohort")}
-        >
-          <ArrowUpRight className="size-4" aria-hidden="true" />
-        </CustomLink>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <p className="mt-1 text-xs text-[#78928F]">
+            {cohort.startDate.slice(0, 10)} — {cohort.endDate.slice(0, 10)} · /{cohort.slug} ·{" "}
+            {cohort.isPrivate ? t("cohort_info_private") : t("cohort_info_public_activity")} ·{" "}
+            {cohort.feeType === "paid"
+              ? t("cohort_info_fee_paid", { amount: cohort.feeAmount ?? 0 })
+              : t("cohort_info_fee_free")}
+          </p>
+          {cohort.joinToken && (
+            <div className="mt-2">
+              <JoinCode joinToken={cohort.joinToken} />
+              {cohort.status === "published" && (
+                <CustomLink
+                  href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/roster`}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#CDEBE8] px-3 py-1.5 text-xs font-medium text-[#0D5B59] hover:bg-[#EDF8F6]"
+                >
+                  <Send className="size-3.5" aria-hidden="true" />
+                  {t("cohort_invite_by_email")}
+                </CustomLink>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          {cohort.status === "draft" && (
             <Button
               type="button"
               variant="ghost"
               size="icon"
               className="size-8"
-              aria-label={t("cohort_actions")}
-              title={t("cohort_actions")}
+              onClick={handlePublish}
               disabled={busy}
+              aria-label={t("cohort_publish")}
+              title={t("cohort_publish")}
             >
-              <MoreVertical className="size-4" aria-hidden="true" />
+              <Send className="size-4" aria-hidden="true" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-36 rounded-xl border-[#CDEBE8]">
-            <DropdownMenuItem onClick={handleDuplicate} disabled={busy} className="gap-2">
-              <Copy className="size-4" aria-hidden="true" />
-              {t("cohort_duplicate")}
-            </DropdownMenuItem>
-            {cohort.status !== "archived" && (
-              <DropdownMenuItem
-                onClick={handleArchive}
+          )}
+          {cohort.status !== "archived" && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={() => setEditing(true)}
+              disabled={busy}
+              aria-label={t("edit")}
+              title={t("edit")}
+            >
+              <Pencil className="size-4" aria-hidden="true" />
+            </Button>
+          )}
+          <CustomLink
+            href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/dashboard`}
+            className="grid size-8 place-items-center rounded-full text-[#0D7773] hover:bg-[#EDF8F6]"
+            aria-label={t("manage_cohort")}
+            title={t("manage_cohort")}
+          >
+            <ArrowUpRight className="size-4" aria-hidden="true" />
+          </CustomLink>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-8"
+                aria-label={t("cohort_actions")}
+                title={t("cohort_actions")}
                 disabled={busy}
-                className="gap-2 text-[#C03A3A]"
               >
-                <Archive className="size-4" aria-hidden="true" />
-                {t("archive")}
+                <MoreVertical className="size-4" aria-hidden="true" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-36 rounded-xl border-[#CDEBE8]">
+              <DropdownMenuItem onClick={handleDuplicate} disabled={busy} className="gap-2">
+                <Copy className="size-4" aria-hidden="true" />
+                {t("cohort_duplicate")}
               </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+              {cohort.status !== "archived" && (
+                <DropdownMenuItem
+                  onClick={() => setConfirmArchive(true)}
+                  disabled={busy}
+                  className="gap-2 text-[#C03A3A]"
+                >
+                  <Archive className="size-4" aria-hidden="true" />
+                  {t("archive")}
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <ConfirmDialog
+          open={confirmArchive}
+          title={t("cohort_archive_title")}
+          description={t("cohort_archive_confirm")}
+          confirmLabel={t("archive")}
+          destructive
+          busy={busy}
+          onConfirm={handleArchive}
+          onOpenChange={setConfirmArchive}
+        />
       </div>
+      {setupPanel}
     </div>
   );
 }
@@ -997,6 +1277,8 @@ interface ProgramPanelProps {
 function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
   const t = useTranslations("lighthouse");
   const { cohorts, isLoading, mutate } = useLighthouseCohorts(program.id);
+  // 封存中的場次改由「封存」頁列出（FR-ARC-04）
+  const visibleCohorts = cohorts?.filter((cohort) => cohort.status !== "archived");
   const templatesQuery = useLighthouseTemplates(program.organizationId);
   const templates = templatesQuery.data?.data;
   const [editing, setEditing] = useState(false);
@@ -1019,23 +1301,21 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
     toast.success(t("program_saved"));
   }
 
+  const [confirmArchive, setConfirmArchive] = useState(false);
+  // 後端會把系列底下的場次一起封存（FR-ARC-04），恢復系列時只復活這些被級聯封存的場次
+  const activeCohortCount = cohorts?.filter((cohort) => cohort.status !== "archived").length ?? 0;
   async function handleArchive() {
-    if (cohorts?.length) {
-      toast.error(t("program_archive_blocked"));
-      return;
-    }
-    if (!window.confirm(t("program_archive_confirm"))) {
-      return;
-    }
     setBusy(true);
     const response = await archiveLighthouseProgram(program.id);
     setBusy(false);
+    setConfirmArchive(false);
     if (response.error) {
-      toast.error(t("program_archive_blocked"));
+      toast.error(apiErrorMessage(response.error, t("program_archive_failed")));
+      await refreshPrograms();
       return;
     }
     await refreshPrograms();
-    toast.success(t("program_archived"));
+    toast.success(t("program_archived_to_archive"));
   }
 
   async function handleProgramDuplicate() {
@@ -1073,9 +1353,14 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         toast.error(t("cohort_external_signup_url_error"));
         return;
       }
+      const slug = String(formData.get("slug") ?? "").trim();
+      if (!COHORT_SLUG_PATTERN.test(slug)) {
+        toast.error(t("cohort_slug_error"));
+        return;
+      }
       setBusy(true);
       const response = await createLighthouseCohort(program.id, {
-        slug: String(formData.get("slug") ?? "").trim(),
+        slug,
         displayName: String(formData.get("displayName") ?? "").trim(),
         tagline: String(formData.get("tagline") ?? "").trim() || undefined,
         startDate,
@@ -1092,8 +1377,8 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
           .filter((s) => s.sessionDate)
           .map((s) => ({
             sessionDate: s.sessionDate,
-            startTime: s.startTime || undefined,
-            endTime: s.endTime || undefined,
+            startTime: s.startTime || null,
+            endTime: s.endTime || null,
           })),
         feeType: extras.feeType,
         feeAmount: extras.feeType === "paid" && feeAmountValue ? Number(feeAmountValue) : undefined,
@@ -1109,22 +1394,16 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       } as Parameters<typeof createLighthouseCohort>[1]);
       if (response.error || !response.data) {
         setBusy(false);
-        toast.error(t("cohort_create_failed"));
+        toast.error(cohortErrorMessage(t, response.error, "cohort_create_failed"));
         return;
       }
-      const newCohortId = (response.data as { data: { id: number } }).data.id;
-      const templateIds = extras.selectedTemplateIds ?? [];
-      await Promise.all(
-        templateIds.map((templateId) =>
-          setLighthouseTemplateBinding(program.organizationId, templateId, newCohortId, true)
-        )
-      );
+      // 新增場次不綁模板（#273 決策）：模板分頁在建立時是 disabled，建好後從編輯或模板庫綁定
       setBusy(false);
       await mutate();
       setCreatingCohort(false);
       toast.success(t("cohort_created"));
     },
-    [program.id, program.organizationId, mutate, t]
+    [program.id, mutate, t]
   );
 
   return (
@@ -1192,7 +1471,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
                   {t("program_duplicate")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={handleArchive}
+                  onClick={() => setConfirmArchive(true)}
                   disabled={busy}
                   className="gap-2 text-[#C03A3A]"
                 >
@@ -1204,6 +1483,20 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        open={confirmArchive}
+        title={t("program_archive_title")}
+        description={
+          activeCohortCount > 0
+            ? t("program_archive_cascade_message", { count: activeCohortCount })
+            : t("program_archive_confirm")
+        }
+        confirmLabel={t("archive")}
+        destructive
+        busy={busy}
+        onConfirm={handleArchive}
+        onOpenChange={setConfirmArchive}
+      />
 
       <div className="px-6 py-6">
         <div className="flex items-center justify-between gap-4">
@@ -1230,12 +1523,12 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
 
         <div className="mt-5 grid gap-3">
           {isLoading && <p className="text-sm text-[#5A7B79]">{t("loading")}</p>}
-          {!isLoading && !cohorts?.length && (
+          {!isLoading && !visibleCohorts?.length && (
             <p className="rounded-2xl border border-dashed border-[#B9DCD8] px-5 py-8 text-center text-sm text-[#5A7B79]">
               {t("cohorts_empty")}
             </p>
           )}
-          {cohorts?.map((cohort) => (
+          {visibleCohorts?.map((cohort) => (
             <CohortCard
               key={cohort.id}
               programId={program.id}
@@ -1243,6 +1536,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               cohort={cohort}
               templates={templates}
               refresh={mutate}
+              refreshTemplates={templatesQuery.mutate}
             />
           ))}
         </div>
@@ -1284,7 +1578,7 @@ export function ProgramsManager() {
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#0D7773]">
             {t("programs_eyebrow")}
           </p>
-          <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em] md:text-3xl">
+          <h1 className="mt-3 text-2xl font-semibold leading-[1.45] tracking-[-0.04em] md:text-3xl">
             {t("programs_title")}
           </h1>
           <p className="mt-3 max-w-2xl text-[#5A7B79]">{t("programs_description")}</p>

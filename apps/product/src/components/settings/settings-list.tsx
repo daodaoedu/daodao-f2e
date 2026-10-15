@@ -1,25 +1,10 @@
 "use client";
 
 import { useSettingsCompletion } from "@daodao/api";
-import { ArrowRightOutlineSvg, TelescopeSvg } from "@daodao/assets";
-import { useLocale, useTranslations } from "@daodao/i18n";
-import { usePathname, useSearchParams } from "@daodao/i18n/navigation";
-import { languageOptions } from "@daodao/i18n/routing";
+import { ArrowRightOutlineSvg } from "@daodao/assets";
+import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
-import {
-  AlertCircle,
-  Archive,
-  Bell,
-  BookOpen,
-  Footprints,
-  Globe,
-  HeartHandshake,
-  LibraryBig,
-  LogOut,
-  MessagesSquare,
-  Settings,
-  SquareUser,
-} from "lucide-react";
+import { AlertCircle, Bell, LibraryBig, LogOut, Settings, SquareUser } from "lucide-react";
 import { useLogoutDialog } from "@/hooks/use-logout-dialog";
 
 type SettingsItem = {
@@ -30,40 +15,7 @@ type SettingsItem = {
   completionKey?: "preferences" | "account" | "publicInfo";
 };
 
-const socialItems: SettingsItem[] = [
-  {
-    id: "footprints",
-    labelKey: "settings_footprints",
-    icon: Footprints,
-    href: "/me/footprints",
-  },
-  {
-    id: "interaction",
-    labelKey: "settings_interaction",
-    icon: MessagesSquare,
-    href: "/settings/interaction",
-  },
-  {
-    id: "following",
-    labelKey: "settings_following",
-    icon: TelescopeSvg,
-    href: "/settings/following",
-  },
-  {
-    id: "connections",
-    labelKey: "settings_connections",
-    icon: HeartHandshake,
-    href: "/settings/connections",
-  },
-];
-
 const settingsItems: SettingsItem[] = [
-  {
-    id: "resources",
-    labelKey: "settings_resources",
-    icon: BookOpen,
-    href: "/resource",
-  },
   {
     id: "preferences",
     labelKey: "settings_preferences",
@@ -91,12 +43,6 @@ const settingsItems: SettingsItem[] = [
     icon: Bell,
     href: "/settings/notifications",
   },
-  {
-    id: "archived",
-    labelKey: "settings_archived",
-    icon: Archive,
-    href: "/settings/archived",
-  },
 ];
 
 function SettingsItemLink({ item, isIncomplete }: { item: SettingsItem; isIncomplete?: boolean }) {
@@ -114,33 +60,6 @@ function SettingsItemLink({ item, isIncomplete }: { item: SettingsItem; isIncomp
       {isIncomplete && <AlertCircle className="size-4 text-orange shrink-0" />}
       <ArrowRightOutlineSvg className="size-4.5 text-bg-dark shrink-0" />
     </CustomLink>
-  );
-}
-
-function LanguageSwitchRow() {
-  const t = useTranslations("app_product");
-  const locale = useLocale();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const nextLocale = languageOptions.find((l) => l.value !== locale);
-
-  if (!nextLocale) return null;
-
-  return (
-    <div className="rounded bg-white overflow-hidden">
-      <CustomLink
-        locale={nextLocale.value}
-        href={{ pathname, query: searchParams?.toString() }}
-        scroll={false}
-        className="flex items-center gap-2 py-4 px-3 hover:bg-light-blue transition-colors"
-        aria-label={t("settings_language")}
-      >
-        <Globe className="size-4.5 text-light-gray shrink-0" />
-        <span className="flex-1 text-base text-text-dark">{t("settings_language")}</span>
-        <span className="text-sm text-text-dark/50">{nextLocale.label}</span>
-        <ArrowRightOutlineSvg className="size-4.5 text-bg-dark shrink-0" />
-      </CustomLink>
-    </div>
   );
 }
 
@@ -168,7 +87,7 @@ export const SettingsList = () => {
         </div>
       )}
       <ul className="flex flex-col gap-2">
-        {[...socialItems, ...settingsItems].map((item) => {
+        {settingsItems.map((item) => {
           const isIncomplete =
             item.completionKey !== undefined &&
             data?.sections !== undefined &&
@@ -183,9 +102,6 @@ export const SettingsList = () => {
           );
         })}
       </ul>
-
-      {/* 語系切換 */}
-      <LanguageSwitchRow />
 
       {/* 登出按鈕 */}
       <button

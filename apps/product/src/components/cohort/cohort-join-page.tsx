@@ -8,6 +8,7 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { ArrowUpRight, Users } from "lucide-react";
 import { useState } from "react";
+import { resolveJoinConsentCopy } from "@/utils/cohort-join-consent";
 
 export function CohortJoinPage({ joinToken }: { joinToken: string }) {
   const t = useTranslations("cohort");
@@ -45,6 +46,17 @@ export function CohortJoinPage({ joinToken }: { joinToken: string }) {
       <div className="mx-auto max-w-2xl px-5 py-16">
         <div className="rounded-3xl border border-[#CDEBE8] bg-white p-8 text-center">
           <h1 className="text-xl font-semibold">{t(`unavailable_${info.unavailableReason}`)}</h1>
+          {/* 依原因補一行說明：截止顯示截止日、暫停提示改用邀請信（daodao#281） */}
+          {info.unavailableReason === "expired" && (
+            <p className="mt-2 text-sm text-[#78928F]">
+              {t("unavailable_expired_deadline", {
+                date: (info.joinDeadline ?? info.endDate).slice(0, 10),
+              })}
+            </p>
+          )}
+          {info.unavailableReason === "paused" && (
+            <p className="mt-2 text-sm text-[#78928F]">{t("unavailable_paused_copy")}</p>
+          )}
           <p className="mt-4 text-[#5A7B79]">{info.organization.bio || t("unavailable_copy")}</p>
           {info.organization.externalLink && (
             <a
@@ -60,6 +72,7 @@ export function CohortJoinPage({ joinToken }: { joinToken: string }) {
         </div>
       </div>
     );
+  const consentCopy = resolveJoinConsentCopy(info.privacy);
   return (
     <div className="mx-auto max-w-2xl px-5 py-12">
       <div className="rounded-3xl border border-[#CDEBE8] bg-white p-7 md:p-10">
@@ -81,8 +94,11 @@ export function CohortJoinPage({ joinToken }: { joinToken: string }) {
             onChange={(event) => setConsent(event.target.checked)}
             className="mt-1 size-4 accent-[#0D7773]"
           />
-          <span>{t("visibility_consent")}</span>
+          <span>{t(consentCopy.consentKey)}</span>
         </label>
+        {consentCopy.pendingNoticeKey && (
+          <p className="mt-3 text-xs leading-5 text-[#78928F]">{t(consentCopy.pendingNoticeKey)}</p>
+        )}
         <Button
           className="mt-6 w-full"
           size="huge"

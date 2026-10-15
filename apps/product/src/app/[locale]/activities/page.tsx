@@ -5,6 +5,7 @@ import { useAuthContext } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { Spinner } from "@daodao/ui/components/spinner";
+import { cn } from "@daodao/ui/lib/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { ActivityCard } from "@/components/activity/activity-card";
@@ -18,6 +19,9 @@ import {
   type ActivityStatusFilter,
   searchActivities,
 } from "@/constants/activity-filter";
+
+/** FR-EX-16(a)：頁面背景 oklch(0.992 0.011 182.9)，即既有 token `--very-light-blue` */
+const PAGE_BACKGROUND = "min-h-screen bg-very-light-blue";
 
 const SECTION_TITLE_KEY: Record<ActivityStatusFilter, string> = {
   all: "section_title_all",
@@ -54,7 +58,7 @@ export default function ExploreActivitiesPage() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className={cn(PAGE_BACKGROUND, "flex items-center justify-center")}>
         <Spinner />
       </div>
     );
@@ -80,7 +84,7 @@ export default function ExploreActivitiesPage() {
   );
 
   return (
-    <>
+    <div className={PAGE_BACKGROUND}>
       {isAuthenticated ? (
         <>
           <div className="md:pl-[132px]">
@@ -97,9 +101,11 @@ export default function ExploreActivitiesPage() {
       ) : (
         <>
           <ExploreGuestHeader />
-          <div className="mx-auto max-w-[760px] px-4 pt-8 pb-6">
-            <h1 className="text-center text-2xl font-bold text-bg-dark">{t("page_title")}</h1>
-            <p className="mt-2 text-center text-sm text-text-dark/60">{t("page_subtitle")}</p>
+          <div className="bg-white">
+            <div className="mx-auto max-w-[760px] px-4 pt-8 pb-6">
+              <h1 className="text-center text-2xl font-bold text-bg-dark">{t("page_title")}</h1>
+              <p className="mt-2 text-center text-sm text-text-dark/60">{t("page_subtitle")}</p>
+            </div>
           </div>
           {content}
         </>
@@ -110,7 +116,7 @@ export default function ExploreActivitiesPage() {
         open={hostDialogOpen}
         onOpenChange={setHostDialogOpen}
       />
-    </>
+    </div>
   );
 }
 

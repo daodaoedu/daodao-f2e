@@ -36,11 +36,8 @@ import {
 import type { IComment } from "@/components/check-in/reactions";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeDetailShell } from "@/components/practice";
-import { applyOnboardingUpdateFromResponse } from "@/components/task-guide/onboarding-progress-context";
 import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 import {
-  type DurationDays,
-  DurationDays as DurationDaysConst,
   type ExecutionTiming,
   ExecutionTiming as ExecutionTimingConst,
   type Frequency,
@@ -52,13 +49,14 @@ import {
   useArchivePracticeDialog,
 } from "@/hooks/use-archive-practice-dialog";
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
+import { resolvePracticeDurationDays } from "@/utils/practice-period";
 
 interface IPracticeDetailData {
   title: string;
   actionDescription: string;
   durationMinutes: number;
   startDate: string;
-  durationDays: DurationDays;
+  durationDays: number | null;
   frequency: Frequency;
   executionTiming: ExecutionTiming[];
   customTiming: string;
@@ -195,14 +193,8 @@ export default function PracticeDetailPage() {
 
     const data = practiceData.data;
 
-    let durationDays: DurationDays = DurationDaysConst.seven;
-    if (data.durationDays === 14) {
-      durationDays = DurationDaysConst.fourteen;
-    } else if (data.durationDays === 21) {
-      durationDays = DurationDaysConst.twentyOne;
-    } else if (data.durationDays === 30) {
-      durationDays = DurationDaysConst.thirty;
-    }
+    // 天數照 API（含共同挑戰複製出的任意天數），不再只認 7／14／21／30（daodao#299）
+    const durationDays = resolvePracticeDurationDays(data);
 
     const frequencyMin = data.frequencyMinDays ?? 0;
     const frequencyMax = data.frequencyMaxDays ?? 0;
@@ -414,7 +406,7 @@ export default function PracticeDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
@@ -435,7 +427,7 @@ export default function PracticeDetailPage() {
 
   if (error || !practice) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
@@ -465,7 +457,7 @@ export default function PracticeDetailPage() {
   }
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
         <button
           type="button"

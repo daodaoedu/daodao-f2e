@@ -8,15 +8,12 @@ import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlockerEffect } from "@daodao/ui/hooks/navigation-blocker";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
-import {
-  applyOnboardingUpdateFromResponse,
-  refreshOnboardingStatus,
-} from "@/components/task-guide/onboarding-progress-context";
 import { FieldSelectionSection } from "./field-selection-section";
+import { toAccountFormValues } from "./form-state";
 import { PersonalInfoSection } from "./personal-info-section";
 import {
   type AccountFormValues,
@@ -50,16 +47,7 @@ export const AccountForm = () => {
   // 當用戶資料載入完成時，更新表單預設值
   useEffect(() => {
     if (userData?.data) {
-      const user = userData.data;
-
-      form.reset({
-        email: user.email || "",
-        birthday: user.birthDay ? parse(user.birthDay, "yyyy-MM-dd", new Date()) : undefined,
-        position: user.positionList || [],
-        educationStage: user.educationStage || "",
-        professionalFields: user.professionalField || [],
-        explorationFields: user.interestList || [],
-      });
+      form.reset(toAccountFormValues(userData.data));
     }
   }, [userData, form.reset]);
 
@@ -149,9 +137,6 @@ export const AccountForm = () => {
       toast.success(t("save_success"));
       form.reset(form.getValues()); // 重置 dirty 狀態
       mutate("/api/v1/users/settings-summary");
-      if (!applyOnboardingUpdateFromResponse(response.data)) {
-        refreshOnboardingStatus();
-      }
 
       // 延遲後返回設定首頁，讓使用者看到成功訊息
       setTimeout(() => {

@@ -2,36 +2,49 @@
 
 import type { ChatMessageType } from "@daodao/api";
 import {
+  chatDeltaAfter,
+  deleteChatMessage,
+  isOwnChatMessage,
   markChatRoomRead,
+  selectChatDelta,
+  selectChatErrorMessage,
+  selectChatHistory,
+  selectChatPins,
+  selectChatRoom,
   useChatMessageDelta,
   useChatMessageHistory,
   useChatPins,
   useChatRoom,
-  useCurrentUser,
+  useMyChatRooms,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
+import { toast } from "@daodao/ui/components/sonner";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChatDeleteConfirmDialog } from "@/components/chat/chat-delete-confirm-dialog";
 import { ChatHeader } from "@/components/chat/chat-header";
 import { ChatInput } from "@/components/chat/chat-input";
 import { ChatLayout } from "@/components/chat/chat-layout";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { MemberPanel } from "@/components/chat/member-panel";
-import { PinBanner } from "@/components/chat/pin-banner";
+import { PinBanner, usePinBannerState } from "@/components/chat/pin-banner";
 import { PinPanel } from "@/components/chat/pin-panel";
 import { SearchBar } from "@/components/chat/search-bar";
 import { useChatTimeline } from "@/hooks/use-chat-timeline";
+import { runOptimisticDelete } from "@/utils/chat-optimistic-delete";
 
 export default function ChatRoomPage() {
   const t = useTranslations("messages");
   const params = useParams<{ roomId: string }>();
   const roomId = Number(params.roomId);
 
-  const { data: userData } = useCurrentUser();
-  const currentUserId = userData?.data?.id ? Number(userData.data.id) : 0;
-  const { data: room, isLoading: roomLoading } = useChatRoom(roomId || null);
-  const { data: pinsData } = useChatPins(roomId || null);
+  const { data: roomData, isLoading: roomLoading } = useChatRoom(roomId || null);
+  const room = selectChatRoom(roomData);
+  // 訊息 author.userId 是內部 users.id；/users/me 只給 UUID，所以用聊天室詳情的 viewerUserId 判斷本人訊息
+  const viewerUserId = room?.viewerUserId ?? null;
+  const { mutate: mutateRooms } = useMyChatRooms();
+  const { data: pinsData, mutate: mutatePins } = useChatPins(roomId || null);
 
   const {
     data: historyData,
@@ -40,31 +53,26 @@ export default function ChatRoomPage() {
   } = useChatMessageHistory(roomId || null);
 
   const historyMessages: ChatMessageType[] = useMemo(
-    () => historyData?.messages ?? [],
+    () => selectChatHistory(historyData),
     [historyData]
   );
 
-  const latestId =
-    historyMessages.length > 0 ? historyMessages[historyMessages.length - 1]!.id : null;
-  const sinceRef = useRef<string | null>(null);
+  const latestId = chatDeltaAfter(historyData !== undefined, historyMessages);
+  // 用 state 而不是 ref：設定後要觸發重繪，增量輪詢才會啟動（空聊天室沒有其他東西會觸發重繪）
+  const [since, setSince] = useState<string | null>(null);
   useEffect(() => {
-    if (historyData && !sinceRef.current) {
-      sinceRef.current = new Date().toISOString();
+    if (historyData) {
+      setSince((prev) => prev ?? new Date().toISOString());
     }
   }, [historyData]);
 
-  const { data: deltaData } = useChatMessageDelta(roomId || null, latestId, sinceRef.current);
+  const { data: deltaData } = useChatMessageDelta(roomId || null, latestId, since);
 
-  const delta = useMemo(() => {
-    if (!deltaData) return null;
-    return {
-      messages: deltaData.messages ?? [],
-      changed: deltaData.changed ?? [],
-      deletedIds: deltaData.deletedIds ?? [],
-    };
-  }, [deltaData]);
+  const delta = useMemo(() => selectChatDelta(deltaData), [deltaData]);
 
-  const timeline = useChatTimeline(historyMessages, delta);
+  // 本機剛刪除的訊息：立刻從時間軸拿掉，不等輪詢；刪除失敗時移出集合、訊息放回
+  const [hiddenIds, setHiddenIds] = useState<ReadonlySet<number>>(() => new Set());
+  const timeline = useChatTimeline(historyMessages, delta, hiddenIds);
 
   const [replyTo, setReplyTo] = useState<ChatMessageType | null>(null);
   const [editingMessage, setEditingMessage] = useState<ChatMessageType | null>(null);
@@ -73,7 +81,7 @@ export default function ChatRoomPage() {
   const [showPins, setShowPins] = useState(false);
 
   const isHost = room?.viewerRole === "host";
-  const pinnedCount = pinsData ? (Array.isArray(pinsData) ? pinsData.length : 0) : 0;
+  const pinnedCount = selectChatPins(pinsData).length;
 
   useEffect(() => {
     const allMessages = timeline.filter((i) => i.type === "message");
@@ -95,7 +103,42 @@ export default function ChatRoomPage() {
 
   const handleMutate = useCallback(() => {
     void mutateHistory();
-  }, [mutateHistory]);
+    // 置頂／取消置頂後，置頂 banner 與標頭置頂鈕要跟著更新
+    void mutatePins();
+    // 聊天室列表的最後一則預覽（POC「你：…」）立即更新，不等 30 秒輪詢
+    void mutateRooms();
+  }, [mutateHistory, mutatePins, mutateRooms]);
+
+  const handleDelete = useCallback(
+    async (message: ChatMessageType) => {
+      await runOptimisticDelete({
+        hide: () => setHiddenIds((prev) => new Set(prev).add(message.id)),
+        restore: () =>
+          setHiddenIds((prev) => {
+            const next = new Set(prev);
+            next.delete(message.id);
+            return next;
+          }),
+        request: () => deleteChatMessage(message.roomId, message.id),
+        // 刪掉的可能是置頂訊息：一併重抓置頂（banner、置頂面板、置頂數）
+        onSuccess: handleMutate,
+        onError: (error) => toast.error(selectChatErrorMessage(error, t("delete_failed"))),
+      });
+    },
+    [handleMutate, t]
+  );
+
+  // 刪除前先確認（FR-MSG-018、POC「刪除訊息／無法復原」）；確認後才跑樂觀刪除
+  const [deleteTarget, setDeleteTarget] = useState<ChatMessageType | null>(null);
+  const [timelinePane, setTimelinePane] = useState<HTMLDivElement | null>(null);
+  const pinBanner = usePinBannerState(roomId);
+  const handleConfirmDelete = useCallback(
+    (message: ChatMessageType) => {
+      setDeleteTarget(null);
+      void handleDelete(message);
+    },
+    [handleDelete]
+  );
 
   const togglePanel = useCallback((panel: "search" | "members" | "pins") => {
     setShowSearch(panel === "search" ? (v) => !v : false);
@@ -116,32 +159,53 @@ export default function ChatRoomPage() {
       ) : (
         <div className="relative flex flex-col flex-1 min-h-0">
           <ChatHeader
+            roomId={roomId}
             name={room.name}
             memberCount={room.memberCount}
-            iconLabel={room.iconLabel}
             colorSeed={room.colorSeed}
             pinnedCount={pinnedCount}
+            pinnedHighlighted={pinBanner.visible}
+            membersOpen={showMembers}
+            searchOpen={showSearch}
             onToggleSearch={() => togglePanel("search")}
             onToggleMembers={() => togglePanel("members")}
             onTogglePins={() => togglePanel("pins")}
           />
           {showSearch && (
-            <SearchBar
-              roomId={roomId}
-              isOpen={showSearch}
-              onClose={() => setShowSearch(false)}
+            <SearchBar roomId={roomId} isOpen={showSearch} onClose={() => setShowSearch(false)} />
+          )}
+          {pinBanner.visible && (
+            <PinBanner
+              pin={pinBanner.latestPin}
+              onOpenPinPanel={() => togglePanel("pins")}
+              onDismiss={pinBanner.dismiss}
             />
           )}
-          <PinBanner roomId={roomId} onOpenPinPanel={() => togglePanel("pins")} />
-          <div className="flex-1 overflow-y-auto">
-            <ChatMessageList
-              timeline={timeline}
-              isLoading={historyLoading}
+          {/* 時間軸區塊：刪除確認框的遮罩只蓋這一塊（POC） */}
+          <div ref={setTimelinePane} className="relative flex min-h-0 flex-1" data-chat-pane>
+            <div className="min-w-0 flex-1 overflow-y-auto px-7 pt-6 pb-2" data-chat-scroll>
+              <ChatMessageList
+                timeline={timeline}
+                isLoading={historyLoading}
+                isHost={isHost}
+                viewerUserId={viewerUserId}
+                onReply={handleReply}
+                onEdit={handleEdit}
+                onDelete={setDeleteTarget}
+                onMutate={handleMutate}
+              />
+            </div>
+            {/* POC：成員／置頂面板與遮罩都在時間軸區塊內 */}
+            <PinPanel
+              roomId={roomId}
+              isOpen={showPins}
+              onClose={() => setShowPins(false)}
               isHost={isHost}
-              currentUserId={currentUserId}
-              onReply={handleReply}
-              onEdit={handleEdit}
-              onMutate={handleMutate}
+            />
+            <MemberPanel
+              roomId={roomId}
+              isOpen={showMembers}
+              onClose={() => setShowMembers(false)}
             />
           </div>
           <ChatInput
@@ -153,13 +217,13 @@ export default function ChatRoomPage() {
             onMessageSent={handleMutate}
             onMessageEdited={handleMutate}
           />
-          <PinPanel
-            roomId={roomId}
-            isOpen={showPins}
-            onClose={() => setShowPins(false)}
-            isHost={isHost}
+          <ChatDeleteConfirmDialog
+            message={deleteTarget}
+            isOwn={deleteTarget !== null && isOwnChatMessage(deleteTarget, viewerUserId)}
+            onCancel={() => setDeleteTarget(null)}
+            onConfirm={handleConfirmDelete}
+            container={timelinePane}
           />
-          <MemberPanel roomId={roomId} isOpen={showMembers} onClose={() => setShowMembers(false)} />
         </div>
       )}
     </ChatLayout>

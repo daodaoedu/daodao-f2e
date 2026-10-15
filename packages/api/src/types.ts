@@ -5147,19 +5147,11 @@ export interface paths {
                     /** @description 每頁數量 */
                     limit?: string;
                     /** @description 排序欄位 */
-                    sortBy?: "createdAt" | "lastLoginAt" | "lastActiveAt" | "name" | "email" | "registrationFlow" | "creationMethod" | "daysToComplete";
+                    sortBy?: "createdAt" | "lastLoginAt" | "lastActiveAt" | "name" | "email";
                     /** @description 排序方向 */
                     sortOrder?: "asc" | "desc";
                     /** @description 篩選學習風格人物誌（最新一次測驗結果） */
                     personaType?: "L" | "C" | "A" | "D" | "O";
-                    /** @description 篩選 Onboarding Badge 完成狀態 */
-                    badgeGranted?: "true" | "false";
-                    /** @description 篩選用戶來源 */
-                    userSource?: "S1" | "S2" | "S3";
-                    /** @description 篩選註冊來源。僅接受 landing_page/quiz/action_maker；違規值會回傳 400 + VALIDATION_ERROR。 */
-                    registrationFlow?: "landing_page" | "quiz" | "action_maker";
-                    /** @description 篩選任務建立方式。僅接受 self_created/copied/action_generator；違規值會回傳 400 + VALIDATION_ERROR。 */
-                    creationMethod?: "self_created" | "copied" | "action_generator";
                     /** @description 篩選註冊起始日期（含） */
                     createdFrom?: string;
                     /** @description 篩選註冊結束日期（含） */
@@ -5507,8 +5499,8 @@ export interface paths {
                 query?: {
                     /** @description 郵件類型 */
                     emailType?: string;
-                    /** @description 發送狀態 */
-                    status?: "sent" | "failed" | "pending";
+                    /** @description 發送狀態（skipped：後台停用該模板而未寄出） */
+                    status?: "sent" | "failed" | "pending" | "skipped";
                     /** @description 收件人 email */
                     recipient?: string;
                     /** @description 用戶 ID */
@@ -5550,6 +5542,159 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/dev-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * dev 環境測試登入（僅 dev 掛載）
+         * @description 只在 NODE_ENV 為 dev／development 且已設定 DEV_LOGIN_SECRET 時存在，需帶 x-dev-login-secret header。供部署後冒煙取得 temp／正式用戶身份，prod 無此路由。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description 與 server 的 DEV_LOGIN_SECRET 相同的值 */
+                    "x-dev-login-secret": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: email
+                         * @description 測試帳號 email
+                         * @example qa+230@daodao.so
+                         */
+                        email: string;
+                        /**
+                         * @description temp：模擬剛完成 Google 登入、尚未註冊的臨時用戶；user：以 email 取得既有正式用戶身份
+                         * @enum {string}
+                         */
+                        mode: "temp" | "user";
+                        /**
+                         * @description temp 模式建立臨時用戶時的顯示名稱；省略時用 email 帳號部分
+                         * @example 冒煙 QA
+                         */
+                        name?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 登入成功，已設定 auth_token cookie */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DevLoginResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                401: components["responses"]["UnauthorizedError"];
+                404: components["responses"]["NotFoundError"];
+                /** @description 超過 dev-login 專用限流（60 次／15 分鐘） */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates failed API response
+                             * @enum {boolean}
+                             */
+                            success: false;
+                            /**
+                             * @description Null data for error responses
+                             * @enum {object|null}
+                             */
+                            data: never | null;
+                            /** @description Error information object */
+                            error: {
+                                /**
+                                 * @description Error code for programmatic handling
+                                 * @enum {string}
+                                 */
+                                code: "VALIDATION_ERROR" | "INVALID_TOKEN" | "TOKEN_EXPIRED" | "DATABASE_ERROR" | "FILE_UPLOAD_ERROR" | "APP_ERROR" | "INTERNAL_SERVER_ERROR" | "USER_NOT_FOUND" | "RESOURCE_NOT_FOUND" | "UNAUTHORIZED" | "FORBIDDEN" | "CONFLICT" | "BAD_REQUEST";
+                                /** @description Human-readable error message */
+                                message: string;
+                                /** @description Additional error details */
+                                details?: {
+                                    [key: string]: string;
+                                };
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                500: components["responses"]["InternalServerError"];
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -7293,44 +7438,104 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 全部聊天室的總未讀數 */
-                            totalUnread: number;
-                            /** @description 聊天室列表 */
-                            items: {
-                                /** @description 聊天室 ID */
-                                id: number;
-                                /** @description 關聯的 cohort ID */
-                                cohortId: number;
-                                /** @description 聊天室名稱（cohort display_name） */
-                                name: string;
-                                /** @description 圖示文字（名稱首字） */
-                                iconLabel: string;
-                                /** @description 色彩種子（roomId） */
-                                colorSeed: number;
-                                /** @description 組織名稱 */
-                                organizationName: string;
-                                /** @description 成員數 */
-                                memberCount: number;
-                                /** @description 未讀數 */
-                                unreadCount: number;
-                                /** @description 最後一則訊息 */
-                                lastMessage: {
-                                    /** @description 訊息 ID */
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 全部聊天室的總未讀數 */
+                                totalUnread: number;
+                                /** @description 聊天室列表 */
+                                items: {
+                                    /** @description 聊天室 ID */
                                     id: number;
-                                    /** @description 訊息類型 */
-                                    kind: string;
-                                    /** @description 內容預覽 */
-                                    bodyPreview: string;
-                                    /** @description 作者暱稱 */
-                                    authorName: string | null;
-                                    /** @description 是否為自己的訊息 */
-                                    isMine: boolean;
-                                    /** @description 建立時間（ISO） */
-                                    createdAt: string;
-                                } | null;
-                                /** @description 最近活動時間（ISO） */
-                                lastActivityAt: string;
-                            }[];
+                                    /** @description 關聯的 cohort ID */
+                                    cohortId: number;
+                                    /** @description 聊天室名稱（cohort display_name） */
+                                    name: string;
+                                    /** @description 圖示文字（名稱首字） */
+                                    iconLabel: string;
+                                    /** @description 色彩種子（roomId） */
+                                    colorSeed: number;
+                                    /** @description 組織名稱 */
+                                    organizationName: string;
+                                    /** @description 成員數 */
+                                    memberCount: number;
+                                    /** @description 未讀數 */
+                                    unreadCount: number;
+                                    /** @description 最後一則訊息 */
+                                    lastMessage: {
+                                        /** @description 訊息 ID */
+                                        id: number;
+                                        /** @description 訊息類型 */
+                                        kind: string;
+                                        /** @description 內容預覽 */
+                                        bodyPreview: string;
+                                        /** @description 作者暱稱 */
+                                        authorName: string | null;
+                                        /** @description 是否為自己的訊息 */
+                                        isMine: boolean;
+                                        /** @description 建立時間（ISO） */
+                                        createdAt: string;
+                                    } | null;
+                                    /** @description 最近活動時間（ISO） */
+                                    lastActivityAt: string;
+                                }[];
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -7377,53 +7582,115 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 聊天室 ID */
-                            id: number;
-                            /** @description 關聯的 cohort ID */
-                            cohortId: number;
-                            /** @description 聊天室名稱（cohort display_name） */
-                            name: string;
-                            /** @description 圖示文字（名稱首字） */
-                            iconLabel: string;
-                            /** @description 色彩種子（roomId） */
-                            colorSeed: number;
-                            /** @description 組織名稱 */
-                            organizationName: string;
-                            /** @description 成員數 */
-                            memberCount: number;
-                            /** @description 未讀數 */
-                            unreadCount: number;
-                            /** @description 最後一則訊息 */
-                            lastMessage: {
-                                /** @description 訊息 ID */
-                                id: number;
-                                /** @description 訊息類型 */
-                                kind: string;
-                                /** @description 內容預覽 */
-                                bodyPreview: string;
-                                /** @description 作者暱稱 */
-                                authorName: string | null;
-                                /** @description 是否為自己的訊息 */
-                                isMine: boolean;
-                                /** @description 建立時間（ISO） */
-                                createdAt: string;
-                            } | null;
-                            /** @description 最近活動時間（ISO） */
-                            lastActivityAt: string;
                             /**
-                             * @description 當前使用者角色
-                             * @enum {string}
+                             * @description Indicates successful API response
+                             * @enum {boolean}
                              */
-                            viewerRole: "host" | "member";
-                            /** @description 置頂訊息數 */
-                            pinnedCount: number;
-                            /** @description 前 3 位成員預覽 */
-                            memberPreview: {
-                                /** @description 暱稱 */
-                                nickname: string | null;
-                                /** @description 頭像 URL */
-                                avatar: string | null;
-                            }[];
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 聊天室 ID */
+                                id: number;
+                                /** @description 關聯的 cohort ID */
+                                cohortId: number;
+                                /** @description 聊天室名稱（cohort display_name） */
+                                name: string;
+                                /** @description 圖示文字（名稱首字） */
+                                iconLabel: string;
+                                /** @description 色彩種子（roomId） */
+                                colorSeed: number;
+                                /** @description 組織名稱 */
+                                organizationName: string;
+                                /** @description 成員數 */
+                                memberCount: number;
+                                /** @description 未讀數 */
+                                unreadCount: number;
+                                /** @description 最後一則訊息 */
+                                lastMessage: {
+                                    /** @description 訊息 ID */
+                                    id: number;
+                                    /** @description 訊息類型 */
+                                    kind: string;
+                                    /** @description 內容預覽 */
+                                    bodyPreview: string;
+                                    /** @description 作者暱稱 */
+                                    authorName: string | null;
+                                    /** @description 是否為自己的訊息 */
+                                    isMine: boolean;
+                                    /** @description 建立時間（ISO） */
+                                    createdAt: string;
+                                } | null;
+                                /** @description 最近活動時間（ISO） */
+                                lastActivityAt: string;
+                                /**
+                                 * @description 當前使用者角色
+                                 * @enum {string}
+                                 */
+                                viewerRole: "host" | "member";
+                                /** @description 當前使用者的 users.id（與訊息 author.userId 同一種 id），用來判斷本人訊息 */
+                                viewerUserId: number;
+                                /** @description 置頂訊息數 */
+                                pinnedCount: number;
+                                /** @description 前 3 位成員預覽 */
+                                memberPreview: {
+                                    /** @description 暱稱 */
+                                    nickname: string | null;
+                                    /** @description 頭像 URL */
+                                    avatar: string | null;
+                                }[];
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -7470,19 +7737,79 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 使用者 ID */
-                            userId: number;
-                            /** @description 暱稱 */
-                            nickname: string | null;
-                            /** @description 頭像 URL */
-                            avatar: string | null;
-                            /** @description 是否為帶領人 */
-                            isHost: boolean;
-                            /** @description 是否在線 */
-                            isOnline: boolean;
-                            /** @description 自我介紹 */
-                            bio: string | null;
-                        }[];
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 使用者 ID */
+                                userId: number;
+                                /** @description 暱稱 */
+                                nickname: string | null;
+                                /** @description 頭像 URL */
+                                avatar: string | null;
+                                /** @description 是否為帶領人 */
+                                isHost: boolean;
+                                /** @description 是否在線 */
+                                isOnline: boolean;
+                                /** @description 自我介紹 */
+                                bio: string | null;
+                            }[];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
                     };
                 };
                 400: components["responses"]["BadRequestError"];
@@ -7537,8 +7864,13 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 新訊息 */
-                            messages: {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description Array of paginated data items */
+                            data: {
                                 /** @description 訊息 ID */
                                 id: number;
                                 /** @description 聊天室 ID */
@@ -7591,68 +7923,351 @@ export interface paths {
                                 /** @description 更新時間（ISO） */
                                 updatedAt: string;
                             }[];
-                            /** @description 已變更的既有訊息 */
-                            changed: {
-                                /** @description 訊息 ID */
-                                id: number;
-                                /** @description 聊天室 ID */
-                                roomId: number;
-                                /**
-                                 * @description 訊息類型
-                                 * @enum {string}
-                                 */
-                                kind: "text" | "system";
-                                /** @description 訊息內容 */
-                                body: string;
-                                /** @description 系統訊息元資料 */
-                                metadata: {
+                            /**
+                             * @description Cursor-based pagination information
+                             * @example {
+                             *       "cursors": {
+                             *         "start": "eyJpZCI6ODUzLCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTIxVDE3OjM3OjE3LjcwMFoifQ==",
+                             *         "end": "eyJpZCI6ODQ5LCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTIxVDE3OjM3OjE3LjY5N1oifQ=="
+                             *       },
+                             *       "hasMore": true,
+                             *       "count": 5,
+                             *       "limit": 5,
+                             *       "hasNext": true,
+                             *       "hasPrev": true,
+                             *       "nextCursor": "eyJpZCI6ODQ5LCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTIxVDE3OjM3OjE3LjY5N1oifQ==",
+                             *       "prevCursor": "eyJpZCI6ODUzLCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTIxVDE3OjM3OjE3LjcwMFoifQ==",
+                             *       "totalEstimate": 5,
+                             *       "parentTotalEstimate": null
+                             *     }
+                             * @example {
+                             *       "cursors": {
+                             *         "start": "eyJpZCI6MTgwLCJjcmVhdGVkQXQiOiIyMDI0LTAxLTE1VDE0OjMwOjAwWiJ9",
+                             *         "end": null
+                             *       },
+                             *       "hasMore": false,
+                             *       "count": 8,
+                             *       "limit": 10,
+                             *       "hasNext": false,
+                             *       "hasPrev": true,
+                             *       "nextCursor": null,
+                             *       "prevCursor": "eyJpZCI6MTgwLCJjcmVhdGVkQXQiOiIyMDI0LTAxLTE1VDE0OjMwOjAwWiJ9",
+                             *       "totalEstimate": 8,
+                             *       "parentTotalEstimate": null
+                             *     }
+                             */
+                            pagination: {
+                                /** @description Cursor boundaries for the current page */
+                                cursors: {
+                                    /** @description Start cursor for the current page */
+                                    start: string | null;
+                                    /** @description End cursor for the current page */
+                                    end: string | null;
+                                };
+                                /** @description Whether there are more items after the current page */
+                                hasMore: boolean;
+                                /** @description Number of items in the current page */
+                                count: number;
+                                /** @description Maximum number of items per page */
+                                limit: number;
+                                /** @description Whether there are more items in the next page */
+                                hasNext: boolean;
+                                /** @description Whether there are items in the previous page */
+                                hasPrev: boolean;
+                                /** @description Cursor to fetch the next page */
+                                nextCursor: string | null;
+                                /** @description Cursor to fetch the previous page */
+                                prevCursor: string | null;
+                                /** @description Estimated total number of items (may be null if unknown) */
+                                totalEstimate: number | null;
+                                /** @description Estimated total number of items in parent context (may be null) */
+                                parentTotalEstimate: number | null;
+                            };
+                            /**
+                             * @description Faceted search aggregations for filtering
+                             * @example {
+                             *       "majorCategory": [
+                             *         {
+                             *           "value": "education_learning",
+                             *           "count": 45
+                             *         },
+                             *         {
+                             *           "value": "nature_environment",
+                             *           "count": 32
+                             *         },
+                             *         {
+                             *           "value": "information_computer_science",
+                             *           "count": 28
+                             *         }
+                             *       ],
+                             *       "subCategory": [
+                             *         {
+                             *           "value": "physics",
+                             *           "count": 15
+                             *         },
+                             *         {
+                             *           "value": "biology",
+                             *           "count": 12
+                             *         },
+                             *         {
+                             *           "value": "mathematics",
+                             *           "count": 10
+                             *         }
+                             *       ]
+                             *     }
+                             */
+                            facets?: {
+                                /** @description Major category facet values (parent_id is NULL) */
+                                majorCategory?: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
+                                /** @description Sub category facet values (parent_id is NOT NULL) */
+                                subCategory?: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
+                            } & {
+                                [key: string]: {
+                                    /** @description Facet value key (used for URL path parameter) */
+                                    value: string;
+                                    /** @description Number of items matching this facet value */
+                                    count: number;
+                                }[];
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
                                     [key: string]: unknown;
-                                } | null;
-                                /** @description 作者（系統訊息為 null） */
-                                author: {
-                                    /** @description 作者 ID */
-                                    userId: number;
-                                    /** @description 暱稱 */
-                                    nickname: string | null;
-                                    /** @description 頭像 URL */
-                                    avatar: string | null;
-                                    /** @description 是否為帶領人 */
-                                    isHost: boolean;
-                                } | null;
-                                /** @description 引用回覆（無引用為 null） */
-                                replyTo: {
-                                    /** @description 被引用訊息 ID */
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        } | {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 新訊息 */
+                                messages: {
+                                    /** @description 訊息 ID */
                                     id: number;
-                                    /** @description 被引用訊息的作者暱稱 */
-                                    authorName: string | null;
-                                    /** @description 被引用訊息的內容預覽（已刪除為 null） */
-                                    bodyPreview: string | null;
-                                    /** @description 被引用訊息是否已刪除 */
-                                    isDeleted: boolean;
-                                } | null;
-                                /** @description 按讚數 */
-                                likeCount: number;
-                                /** @description 我是否已按讚 */
-                                likedByMe: boolean;
-                                /** @description 是否已置頂 */
-                                isPinned: boolean;
-                                /** @description 置頂時間（ISO） */
-                                pinnedAt: string | null;
-                                /** @description 編輯時間（ISO） */
-                                editedAt: string | null;
-                                /** @description 建立時間（ISO） */
-                                createdAt: string;
-                                /** @description 更新時間（ISO） */
-                                updatedAt: string;
-                            }[];
-                            /** @description 已刪除的訊息 ID */
-                            deletedIds: number[];
-                            /** @description 置頂訊息數 */
-                            pinnedCount: number;
-                            /** @description 成員數 */
-                            memberCount: number;
-                            /** @description 伺服器時間（ISO） */
-                            serverTime: string;
+                                    /** @description 聊天室 ID */
+                                    roomId: number;
+                                    /**
+                                     * @description 訊息類型
+                                     * @enum {string}
+                                     */
+                                    kind: "text" | "system";
+                                    /** @description 訊息內容 */
+                                    body: string;
+                                    /** @description 系統訊息元資料 */
+                                    metadata: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @description 作者（系統訊息為 null） */
+                                    author: {
+                                        /** @description 作者 ID */
+                                        userId: number;
+                                        /** @description 暱稱 */
+                                        nickname: string | null;
+                                        /** @description 頭像 URL */
+                                        avatar: string | null;
+                                        /** @description 是否為帶領人 */
+                                        isHost: boolean;
+                                    } | null;
+                                    /** @description 引用回覆（無引用為 null） */
+                                    replyTo: {
+                                        /** @description 被引用訊息 ID */
+                                        id: number;
+                                        /** @description 被引用訊息的作者暱稱 */
+                                        authorName: string | null;
+                                        /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                        bodyPreview: string | null;
+                                        /** @description 被引用訊息是否已刪除 */
+                                        isDeleted: boolean;
+                                    } | null;
+                                    /** @description 按讚數 */
+                                    likeCount: number;
+                                    /** @description 我是否已按讚 */
+                                    likedByMe: boolean;
+                                    /** @description 是否已置頂 */
+                                    isPinned: boolean;
+                                    /** @description 置頂時間（ISO） */
+                                    pinnedAt: string | null;
+                                    /** @description 編輯時間（ISO） */
+                                    editedAt: string | null;
+                                    /** @description 建立時間（ISO） */
+                                    createdAt: string;
+                                    /** @description 更新時間（ISO） */
+                                    updatedAt: string;
+                                }[];
+                                /** @description 已變更的既有訊息 */
+                                changed: {
+                                    /** @description 訊息 ID */
+                                    id: number;
+                                    /** @description 聊天室 ID */
+                                    roomId: number;
+                                    /**
+                                     * @description 訊息類型
+                                     * @enum {string}
+                                     */
+                                    kind: "text" | "system";
+                                    /** @description 訊息內容 */
+                                    body: string;
+                                    /** @description 系統訊息元資料 */
+                                    metadata: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @description 作者（系統訊息為 null） */
+                                    author: {
+                                        /** @description 作者 ID */
+                                        userId: number;
+                                        /** @description 暱稱 */
+                                        nickname: string | null;
+                                        /** @description 頭像 URL */
+                                        avatar: string | null;
+                                        /** @description 是否為帶領人 */
+                                        isHost: boolean;
+                                    } | null;
+                                    /** @description 引用回覆（無引用為 null） */
+                                    replyTo: {
+                                        /** @description 被引用訊息 ID */
+                                        id: number;
+                                        /** @description 被引用訊息的作者暱稱 */
+                                        authorName: string | null;
+                                        /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                        bodyPreview: string | null;
+                                        /** @description 被引用訊息是否已刪除 */
+                                        isDeleted: boolean;
+                                    } | null;
+                                    /** @description 按讚數 */
+                                    likeCount: number;
+                                    /** @description 我是否已按讚 */
+                                    likedByMe: boolean;
+                                    /** @description 是否已置頂 */
+                                    isPinned: boolean;
+                                    /** @description 置頂時間（ISO） */
+                                    pinnedAt: string | null;
+                                    /** @description 編輯時間（ISO） */
+                                    editedAt: string | null;
+                                    /** @description 建立時間（ISO） */
+                                    createdAt: string;
+                                    /** @description 更新時間（ISO） */
+                                    updatedAt: string;
+                                }[];
+                                /** @description 已刪除的訊息 ID */
+                                deletedIds: number[];
+                                /** @description 置頂訊息數 */
+                                pinnedCount: number;
+                                /** @description 成員數 */
+                                memberCount: number;
+                                /** @description 伺服器時間（ISO） */
+                                serverTime: string;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -7700,57 +8315,117 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 訊息 ID */
-                            id: number;
-                            /** @description 聊天室 ID */
-                            roomId: number;
                             /**
-                             * @description 訊息類型
-                             * @enum {string}
+                             * @description Indicates successful API response
+                             * @enum {boolean}
                              */
-                            kind: "text" | "system";
-                            /** @description 訊息內容 */
-                            body: string;
-                            /** @description 系統訊息元資料 */
-                            metadata: {
-                                [key: string]: unknown;
-                            } | null;
-                            /** @description 作者（系統訊息為 null） */
-                            author: {
-                                /** @description 作者 ID */
-                                userId: number;
-                                /** @description 暱稱 */
-                                nickname: string | null;
-                                /** @description 頭像 URL */
-                                avatar: string | null;
-                                /** @description 是否為帶領人 */
-                                isHost: boolean;
-                            } | null;
-                            /** @description 引用回覆（無引用為 null） */
-                            replyTo: {
-                                /** @description 被引用訊息 ID */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 訊息 ID */
                                 id: number;
-                                /** @description 被引用訊息的作者暱稱 */
-                                authorName: string | null;
-                                /** @description 被引用訊息的內容預覽（已刪除為 null） */
-                                bodyPreview: string | null;
-                                /** @description 被引用訊息是否已刪除 */
-                                isDeleted: boolean;
-                            } | null;
-                            /** @description 按讚數 */
-                            likeCount: number;
-                            /** @description 我是否已按讚 */
-                            likedByMe: boolean;
-                            /** @description 是否已置頂 */
-                            isPinned: boolean;
-                            /** @description 置頂時間（ISO） */
-                            pinnedAt: string | null;
-                            /** @description 編輯時間（ISO） */
-                            editedAt: string | null;
-                            /** @description 建立時間（ISO） */
-                            createdAt: string;
-                            /** @description 更新時間（ISO） */
-                            updatedAt: string;
+                                /** @description 聊天室 ID */
+                                roomId: number;
+                                /**
+                                 * @description 訊息類型
+                                 * @enum {string}
+                                 */
+                                kind: "text" | "system";
+                                /** @description 訊息內容 */
+                                body: string;
+                                /** @description 系統訊息元資料 */
+                                metadata: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @description 作者（系統訊息為 null） */
+                                author: {
+                                    /** @description 作者 ID */
+                                    userId: number;
+                                    /** @description 暱稱 */
+                                    nickname: string | null;
+                                    /** @description 頭像 URL */
+                                    avatar: string | null;
+                                    /** @description 是否為帶領人 */
+                                    isHost: boolean;
+                                } | null;
+                                /** @description 引用回覆（無引用為 null） */
+                                replyTo: {
+                                    /** @description 被引用訊息 ID */
+                                    id: number;
+                                    /** @description 被引用訊息的作者暱稱 */
+                                    authorName: string | null;
+                                    /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                    bodyPreview: string | null;
+                                    /** @description 被引用訊息是否已刪除 */
+                                    isDeleted: boolean;
+                                } | null;
+                                /** @description 按讚數 */
+                                likeCount: number;
+                                /** @description 我是否已按讚 */
+                                likedByMe: boolean;
+                                /** @description 是否已置頂 */
+                                isPinned: boolean;
+                                /** @description 置頂時間（ISO） */
+                                pinnedAt: string | null;
+                                /** @description 編輯時間（ISO） */
+                                editedAt: string | null;
+                                /** @description 建立時間（ISO） */
+                                createdAt: string;
+                                /** @description 更新時間（ISO） */
+                                updatedAt: string;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -7842,57 +8517,117 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 訊息 ID */
-                            id: number;
-                            /** @description 聊天室 ID */
-                            roomId: number;
                             /**
-                             * @description 訊息類型
-                             * @enum {string}
+                             * @description Indicates successful API response
+                             * @enum {boolean}
                              */
-                            kind: "text" | "system";
-                            /** @description 訊息內容 */
-                            body: string;
-                            /** @description 系統訊息元資料 */
-                            metadata: {
-                                [key: string]: unknown;
-                            } | null;
-                            /** @description 作者（系統訊息為 null） */
-                            author: {
-                                /** @description 作者 ID */
-                                userId: number;
-                                /** @description 暱稱 */
-                                nickname: string | null;
-                                /** @description 頭像 URL */
-                                avatar: string | null;
-                                /** @description 是否為帶領人 */
-                                isHost: boolean;
-                            } | null;
-                            /** @description 引用回覆（無引用為 null） */
-                            replyTo: {
-                                /** @description 被引用訊息 ID */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 訊息 ID */
                                 id: number;
-                                /** @description 被引用訊息的作者暱稱 */
-                                authorName: string | null;
-                                /** @description 被引用訊息的內容預覽（已刪除為 null） */
-                                bodyPreview: string | null;
-                                /** @description 被引用訊息是否已刪除 */
-                                isDeleted: boolean;
-                            } | null;
-                            /** @description 按讚數 */
-                            likeCount: number;
-                            /** @description 我是否已按讚 */
-                            likedByMe: boolean;
-                            /** @description 是否已置頂 */
-                            isPinned: boolean;
-                            /** @description 置頂時間（ISO） */
-                            pinnedAt: string | null;
-                            /** @description 編輯時間（ISO） */
-                            editedAt: string | null;
-                            /** @description 建立時間（ISO） */
-                            createdAt: string;
-                            /** @description 更新時間（ISO） */
-                            updatedAt: string;
+                                /** @description 聊天室 ID */
+                                roomId: number;
+                                /**
+                                 * @description 訊息類型
+                                 * @enum {string}
+                                 */
+                                kind: "text" | "system";
+                                /** @description 訊息內容 */
+                                body: string;
+                                /** @description 系統訊息元資料 */
+                                metadata: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @description 作者（系統訊息為 null） */
+                                author: {
+                                    /** @description 作者 ID */
+                                    userId: number;
+                                    /** @description 暱稱 */
+                                    nickname: string | null;
+                                    /** @description 頭像 URL */
+                                    avatar: string | null;
+                                    /** @description 是否為帶領人 */
+                                    isHost: boolean;
+                                } | null;
+                                /** @description 引用回覆（無引用為 null） */
+                                replyTo: {
+                                    /** @description 被引用訊息 ID */
+                                    id: number;
+                                    /** @description 被引用訊息的作者暱稱 */
+                                    authorName: string | null;
+                                    /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                    bodyPreview: string | null;
+                                    /** @description 被引用訊息是否已刪除 */
+                                    isDeleted: boolean;
+                                } | null;
+                                /** @description 按讚數 */
+                                likeCount: number;
+                                /** @description 我是否已按讚 */
+                                likedByMe: boolean;
+                                /** @description 是否已置頂 */
+                                isPinned: boolean;
+                                /** @description 置頂時間（ISO） */
+                                pinnedAt: string | null;
+                                /** @description 編輯時間（ISO） */
+                                editedAt: string | null;
+                                /** @description 建立時間（ISO） */
+                                createdAt: string;
+                                /** @description 更新時間（ISO） */
+                                updatedAt: string;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -7936,10 +8671,70 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 按讚數 */
-                            likeCount: number;
-                            /** @description 我是否已按讚 */
-                            likedByMe: boolean;
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 按讚數 */
+                                likeCount: number;
+                                /** @description 我是否已按讚 */
+                                likedByMe: boolean;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -7974,10 +8769,70 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 按讚數 */
-                            likeCount: number;
-                            /** @description 我是否已按讚 */
-                            likedByMe: boolean;
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 按讚數 */
+                                likeCount: number;
+                                /** @description 我是否已按讚 */
+                                likedByMe: boolean;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -8024,57 +8879,117 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 訊息 ID */
-                            id: number;
-                            /** @description 聊天室 ID */
-                            roomId: number;
                             /**
-                             * @description 訊息類型
-                             * @enum {string}
+                             * @description Indicates successful API response
+                             * @enum {boolean}
                              */
-                            kind: "text" | "system";
-                            /** @description 訊息內容 */
-                            body: string;
-                            /** @description 系統訊息元資料 */
-                            metadata: {
-                                [key: string]: unknown;
-                            } | null;
-                            /** @description 作者（系統訊息為 null） */
-                            author: {
-                                /** @description 作者 ID */
-                                userId: number;
-                                /** @description 暱稱 */
-                                nickname: string | null;
-                                /** @description 頭像 URL */
-                                avatar: string | null;
-                                /** @description 是否為帶領人 */
-                                isHost: boolean;
-                            } | null;
-                            /** @description 引用回覆（無引用為 null） */
-                            replyTo: {
-                                /** @description 被引用訊息 ID */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 訊息 ID */
                                 id: number;
-                                /** @description 被引用訊息的作者暱稱 */
-                                authorName: string | null;
-                                /** @description 被引用訊息的內容預覽（已刪除為 null） */
-                                bodyPreview: string | null;
-                                /** @description 被引用訊息是否已刪除 */
-                                isDeleted: boolean;
-                            } | null;
-                            /** @description 按讚數 */
-                            likeCount: number;
-                            /** @description 我是否已按讚 */
-                            likedByMe: boolean;
-                            /** @description 是否已置頂 */
-                            isPinned: boolean;
-                            /** @description 置頂時間（ISO） */
-                            pinnedAt: string | null;
-                            /** @description 編輯時間（ISO） */
-                            editedAt: string | null;
-                            /** @description 建立時間（ISO） */
-                            createdAt: string;
-                            /** @description 更新時間（ISO） */
-                            updatedAt: string;
+                                /** @description 聊天室 ID */
+                                roomId: number;
+                                /**
+                                 * @description 訊息類型
+                                 * @enum {string}
+                                 */
+                                kind: "text" | "system";
+                                /** @description 訊息內容 */
+                                body: string;
+                                /** @description 系統訊息元資料 */
+                                metadata: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @description 作者（系統訊息為 null） */
+                                author: {
+                                    /** @description 作者 ID */
+                                    userId: number;
+                                    /** @description 暱稱 */
+                                    nickname: string | null;
+                                    /** @description 頭像 URL */
+                                    avatar: string | null;
+                                    /** @description 是否為帶領人 */
+                                    isHost: boolean;
+                                } | null;
+                                /** @description 引用回覆（無引用為 null） */
+                                replyTo: {
+                                    /** @description 被引用訊息 ID */
+                                    id: number;
+                                    /** @description 被引用訊息的作者暱稱 */
+                                    authorName: string | null;
+                                    /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                    bodyPreview: string | null;
+                                    /** @description 被引用訊息是否已刪除 */
+                                    isDeleted: boolean;
+                                } | null;
+                                /** @description 按讚數 */
+                                likeCount: number;
+                                /** @description 我是否已按讚 */
+                                likedByMe: boolean;
+                                /** @description 是否已置頂 */
+                                isPinned: boolean;
+                                /** @description 置頂時間（ISO） */
+                                pinnedAt: string | null;
+                                /** @description 編輯時間（ISO） */
+                                editedAt: string | null;
+                                /** @description 建立時間（ISO） */
+                                createdAt: string;
+                                /** @description 更新時間（ISO） */
+                                updatedAt: string;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -8109,57 +9024,117 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 訊息 ID */
-                            id: number;
-                            /** @description 聊天室 ID */
-                            roomId: number;
                             /**
-                             * @description 訊息類型
-                             * @enum {string}
+                             * @description Indicates successful API response
+                             * @enum {boolean}
                              */
-                            kind: "text" | "system";
-                            /** @description 訊息內容 */
-                            body: string;
-                            /** @description 系統訊息元資料 */
-                            metadata: {
-                                [key: string]: unknown;
-                            } | null;
-                            /** @description 作者（系統訊息為 null） */
-                            author: {
-                                /** @description 作者 ID */
-                                userId: number;
-                                /** @description 暱稱 */
-                                nickname: string | null;
-                                /** @description 頭像 URL */
-                                avatar: string | null;
-                                /** @description 是否為帶領人 */
-                                isHost: boolean;
-                            } | null;
-                            /** @description 引用回覆（無引用為 null） */
-                            replyTo: {
-                                /** @description 被引用訊息 ID */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 訊息 ID */
                                 id: number;
-                                /** @description 被引用訊息的作者暱稱 */
-                                authorName: string | null;
-                                /** @description 被引用訊息的內容預覽（已刪除為 null） */
-                                bodyPreview: string | null;
-                                /** @description 被引用訊息是否已刪除 */
-                                isDeleted: boolean;
-                            } | null;
-                            /** @description 按讚數 */
-                            likeCount: number;
-                            /** @description 我是否已按讚 */
-                            likedByMe: boolean;
-                            /** @description 是否已置頂 */
-                            isPinned: boolean;
-                            /** @description 置頂時間（ISO） */
-                            pinnedAt: string | null;
-                            /** @description 編輯時間（ISO） */
-                            editedAt: string | null;
-                            /** @description 建立時間（ISO） */
-                            createdAt: string;
-                            /** @description 更新時間（ISO） */
-                            updatedAt: string;
+                                /** @description 聊天室 ID */
+                                roomId: number;
+                                /**
+                                 * @description 訊息類型
+                                 * @enum {string}
+                                 */
+                                kind: "text" | "system";
+                                /** @description 訊息內容 */
+                                body: string;
+                                /** @description 系統訊息元資料 */
+                                metadata: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @description 作者（系統訊息為 null） */
+                                author: {
+                                    /** @description 作者 ID */
+                                    userId: number;
+                                    /** @description 暱稱 */
+                                    nickname: string | null;
+                                    /** @description 頭像 URL */
+                                    avatar: string | null;
+                                    /** @description 是否為帶領人 */
+                                    isHost: boolean;
+                                } | null;
+                                /** @description 引用回覆（無引用為 null） */
+                                replyTo: {
+                                    /** @description 被引用訊息 ID */
+                                    id: number;
+                                    /** @description 被引用訊息的作者暱稱 */
+                                    authorName: string | null;
+                                    /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                    bodyPreview: string | null;
+                                    /** @description 被引用訊息是否已刪除 */
+                                    isDeleted: boolean;
+                                } | null;
+                                /** @description 按讚數 */
+                                likeCount: number;
+                                /** @description 我是否已按讚 */
+                                likedByMe: boolean;
+                                /** @description 是否已置頂 */
+                                isPinned: boolean;
+                                /** @description 置頂時間（ISO） */
+                                pinnedAt: string | null;
+                                /** @description 編輯時間（ISO） */
+                                editedAt: string | null;
+                                /** @description 建立時間（ISO） */
+                                createdAt: string;
+                                /** @description 更新時間（ISO） */
+                                updatedAt: string;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -8203,58 +9178,118 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 訊息 ID */
-                            id: number;
-                            /** @description 聊天室 ID */
-                            roomId: number;
                             /**
-                             * @description 訊息類型
-                             * @enum {string}
+                             * @description Indicates successful API response
+                             * @enum {boolean}
                              */
-                            kind: "text" | "system";
-                            /** @description 訊息內容 */
-                            body: string;
-                            /** @description 系統訊息元資料 */
-                            metadata: {
-                                [key: string]: unknown;
-                            } | null;
-                            /** @description 作者（系統訊息為 null） */
-                            author: {
-                                /** @description 作者 ID */
-                                userId: number;
-                                /** @description 暱稱 */
-                                nickname: string | null;
-                                /** @description 頭像 URL */
-                                avatar: string | null;
-                                /** @description 是否為帶領人 */
-                                isHost: boolean;
-                            } | null;
-                            /** @description 引用回覆（無引用為 null） */
-                            replyTo: {
-                                /** @description 被引用訊息 ID */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 訊息 ID */
                                 id: number;
-                                /** @description 被引用訊息的作者暱稱 */
-                                authorName: string | null;
-                                /** @description 被引用訊息的內容預覽（已刪除為 null） */
-                                bodyPreview: string | null;
-                                /** @description 被引用訊息是否已刪除 */
-                                isDeleted: boolean;
-                            } | null;
-                            /** @description 按讚數 */
-                            likeCount: number;
-                            /** @description 我是否已按讚 */
-                            likedByMe: boolean;
-                            /** @description 是否已置頂 */
-                            isPinned: boolean;
-                            /** @description 置頂時間（ISO） */
-                            pinnedAt: string | null;
-                            /** @description 編輯時間（ISO） */
-                            editedAt: string | null;
-                            /** @description 建立時間（ISO） */
-                            createdAt: string;
-                            /** @description 更新時間（ISO） */
-                            updatedAt: string;
-                        }[];
+                                /** @description 聊天室 ID */
+                                roomId: number;
+                                /**
+                                 * @description 訊息類型
+                                 * @enum {string}
+                                 */
+                                kind: "text" | "system";
+                                /** @description 訊息內容 */
+                                body: string;
+                                /** @description 系統訊息元資料 */
+                                metadata: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @description 作者（系統訊息為 null） */
+                                author: {
+                                    /** @description 作者 ID */
+                                    userId: number;
+                                    /** @description 暱稱 */
+                                    nickname: string | null;
+                                    /** @description 頭像 URL */
+                                    avatar: string | null;
+                                    /** @description 是否為帶領人 */
+                                    isHost: boolean;
+                                } | null;
+                                /** @description 引用回覆（無引用為 null） */
+                                replyTo: {
+                                    /** @description 被引用訊息 ID */
+                                    id: number;
+                                    /** @description 被引用訊息的作者暱稱 */
+                                    authorName: string | null;
+                                    /** @description 被引用訊息的內容預覽（已刪除為 null） */
+                                    bodyPreview: string | null;
+                                    /** @description 被引用訊息是否已刪除 */
+                                    isDeleted: boolean;
+                                } | null;
+                                /** @description 按讚數 */
+                                likeCount: number;
+                                /** @description 我是否已按讚 */
+                                likedByMe: boolean;
+                                /** @description 是否已置頂 */
+                                isPinned: boolean;
+                                /** @description 置頂時間（ISO） */
+                                pinnedAt: string | null;
+                                /** @description 編輯時間（ISO） */
+                                editedAt: string | null;
+                                /** @description 建立時間（ISO） */
+                                createdAt: string;
+                                /** @description 更新時間（ISO） */
+                                updatedAt: string;
+                            }[];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
                     };
                 };
                 400: components["responses"]["BadRequestError"];
@@ -8303,15 +9338,75 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 結果總數 */
-                            total: number;
-                            /** @description 搜尋結果 */
-                            items: {
-                                /** @description 訊息 ID */
-                                id: number;
-                                /** @description 建立時間（ISO） */
-                                createdAt: string;
-                            }[];
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 結果總數 */
+                                total: number;
+                                /** @description 搜尋結果 */
+                                items: {
+                                    /** @description 訊息 ID */
+                                    id: number;
+                                    /** @description 建立時間（ISO） */
+                                    createdAt: string;
+                                }[];
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -8369,10 +9464,70 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            /** @description 已讀到的訊息 ID */
-                            lastReadMessageId: number;
-                            /** @description 剩餘未讀數 */
-                            unreadCount: number;
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @description 已讀到的訊息 ID */
+                                lastReadMessageId: number;
+                                /** @description 剩餘未讀數 */
+                                unreadCount: number;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -14343,68 +15498,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/onboarding/status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 取得 Onboarding 進度
-         * @description 回傳當前用戶的 Onboarding 任務清單、完成數量與 Badge 狀態。任務順序依 user_source（S1/S2/S3）排列。
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Onboarding 狀態 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {boolean} */
-                            success: true;
-                            data: {
-                                taskList: {
-                                    /**
-                                     * @example A
-                                     * @enum {string}
-                                     */
-                                    taskKey: "A" | "B" | "C" | "D" | "E";
-                                    /** @example false */
-                                    done: boolean;
-                                    /** @example /practices/123e4567-e89b-12d3-a456-426614174000 */
-                                    ctaHref?: string;
-                                }[];
-                                /** @example 2 */
-                                completedTasks: number;
-                                /** @example false */
-                                badgeGranted: boolean;
-                            };
-                            timestamp: string;
-                        };
-                    };
-                };
-                401: components["responses"]["UnauthorizedError"];
-                404: components["responses"]["NotFoundError"];
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/lighthouse/organizations": {
         parameters: {
             query?: never;
@@ -14445,8 +15538,15 @@ export interface paths {
                                 approvedBy: number | null;
                                 /** Format: date-time */
                                 approvedAt: string | null;
+                                /** @description IANA 時區；動態頁最近 7 天與已開始場次判定的基準，預設 Asia/Taipei */
+                                timezone: string;
                                 /** Format: date-time */
                                 createdAt: string;
+                                /**
+                                 * Format: date-time
+                                 * @description 組織資訊最後更新時間
+                                 */
+                                updatedAt: string | null;
                             }[];
                             /**
                              * Format: date-time
@@ -14557,8 +15657,15 @@ export interface paths {
                                 approvedBy: number | null;
                                 /** Format: date-time */
                                 approvedAt: string | null;
+                                /** @description IANA 時區；動態頁最近 7 天與已開始場次判定的基準，預設 Asia/Taipei */
+                                timezone: string;
                                 /** Format: date-time */
                                 createdAt: string;
+                                /**
+                                 * Format: date-time
+                                 * @description 組織資訊最後更新時間
+                                 */
+                                updatedAt: string | null;
                             };
                             /**
                              * Format: date-time
@@ -14665,8 +15772,15 @@ export interface paths {
                                 approvedBy: number | null;
                                 /** Format: date-time */
                                 approvedAt: string | null;
+                                /** @description IANA 時區；動態頁最近 7 天與已開始場次判定的基準，預設 Asia/Taipei */
+                                timezone: string;
                                 /** Format: date-time */
                                 createdAt: string;
+                                /**
+                                 * Format: date-time
+                                 * @description 組織資訊最後更新時間
+                                 */
+                                updatedAt: string | null;
                             }[];
                             /**
                              * Format: date-time
@@ -14794,8 +15908,15 @@ export interface paths {
                                 approvedBy: number | null;
                                 /** Format: date-time */
                                 approvedAt: string | null;
+                                /** @description IANA 時區；動態頁最近 7 天與已開始場次判定的基準，預設 Asia/Taipei */
+                                timezone: string;
                                 /** Format: date-time */
                                 createdAt: string;
+                                /**
+                                 * Format: date-time
+                                 * @description 組織資訊最後更新時間
+                                 */
+                                updatedAt: string | null;
                             };
                             /**
                              * Format: date-time
@@ -15148,6 +16269,11 @@ export interface paths {
                                 organizationId: number;
                                 name: string;
                                 description: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description 封存時間；有值表示在封存區（migration 089 起，deleted_at 改為封存區刪除）
+                                 */
+                                archivedAt: string | null;
                                 /** Format: date-time */
                                 deletedAt: string | null;
                                 /** Format: date-time */
@@ -15253,6 +16379,11 @@ export interface paths {
                                 organizationId: number;
                                 name: string;
                                 description: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description 封存時間；有值表示在封存區（migration 089 起，deleted_at 改為封存區刪除）
+                                 */
+                                archivedAt: string | null;
                                 /** Format: date-time */
                                 deletedAt: string | null;
                                 /** Format: date-time */
@@ -15464,6 +16595,11 @@ export interface paths {
                                 organizationId: number;
                                 name: string;
                                 description: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description 封存時間；有值表示在封存區（migration 089 起，deleted_at 改為封存區刪除）
+                                 */
+                                archivedAt: string | null;
                                 /** Format: date-time */
                                 deletedAt: string | null;
                                 /** Format: date-time */
@@ -15571,6 +16707,11 @@ export interface paths {
                                 organizationId: number;
                                 name: string;
                                 description: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description 封存時間；有值表示在封存區（migration 089 起，deleted_at 改為封存區刪除）
+                                 */
+                                archivedAt: string | null;
                                 /** Format: date-time */
                                 deletedAt: string | null;
                                 /** Format: date-time */
@@ -15758,6 +16899,11 @@ export interface paths {
                                  * @enum {string}
                                  */
                                 visibility: "private" | "public";
+                                /**
+                                 * Format: date-time
+                                 * @description 封存時間；status = archived 時有值
+                                 */
+                                archivedAt?: string | null;
                                 /** Format: date-time */
                                 createdAt: string;
                                 /** Format: date-time */
@@ -16037,6 +17183,11 @@ export interface paths {
                                  * @enum {string}
                                  */
                                 visibility: "private" | "public";
+                                /**
+                                 * Format: date-time
+                                 * @description 封存時間；status = archived 時有值
+                                 */
+                                archivedAt?: string | null;
                                 /** Format: date-time */
                                 createdAt: string;
                                 /** Format: date-time */
@@ -16224,6 +17375,11 @@ export interface paths {
                                  * @enum {string}
                                  */
                                 visibility: "private" | "public";
+                                /**
+                                 * Format: date-time
+                                 * @description 封存時間；status = archived 時有值
+                                 */
+                                archivedAt?: string | null;
                                 /** Format: date-time */
                                 createdAt: string;
                                 /** Format: date-time */
@@ -16487,6 +17643,11 @@ export interface paths {
                                  * @enum {string}
                                  */
                                 visibility: "private" | "public";
+                                /**
+                                 * Format: date-time
+                                 * @description 封存時間；status = archived 時有值
+                                 */
+                                archivedAt?: string | null;
                                 /** Format: date-time */
                                 createdAt: string;
                                 /** Format: date-time */
@@ -16605,6 +17766,15 @@ export interface paths {
                                 validCount: number;
                                 errorCount: number;
                                 queuedCount: number;
+                                /** @description 會寄出邀請信的筆數（新邀請、已邀請重寄、曾退出重新邀請） */
+                                sendableCount: number;
+                                /** @description 已加入而略過、不重寄的筆數 */
+                                skippedCount: number;
+                                /**
+                                 * @description 此期目前不可寄送邀請的原因（未發布／已過加入截止日／已額滿）；可寄送時為 null
+                                 * @enum {string|null}
+                                 */
+                                blockedReason: "not_published" | "expired" | "full" | null;
                                 items: {
                                     email: string;
                                     valid: boolean;
@@ -16690,6 +17860,15 @@ export interface paths {
                                 validCount: number;
                                 errorCount: number;
                                 queuedCount: number;
+                                /** @description 會寄出邀請信的筆數（新邀請、已邀請重寄、曾退出重新邀請） */
+                                sendableCount: number;
+                                /** @description 已加入而略過、不重寄的筆數 */
+                                skippedCount: number;
+                                /**
+                                 * @description 此期目前不可寄送邀請的原因（未發布／已過加入截止日／已額滿）；可寄送時為 null
+                                 * @enum {string|null}
+                                 */
+                                blockedReason: "not_published" | "expired" | "full" | null;
                                 items: {
                                     email: string;
                                     valid: boolean;
@@ -17574,6 +18753,11 @@ export interface paths {
                                  * @enum {string}
                                  */
                                 visibility: "private" | "public";
+                                /**
+                                 * Format: date-time
+                                 * @description 封存時間；status = archived 時有值
+                                 */
+                                archivedAt?: string | null;
                                 /** Format: date-time */
                                 createdAt: string;
                                 /** Format: date-time */
@@ -17760,6 +18944,11 @@ export interface paths {
                                  * @enum {string}
                                  */
                                 visibility: "private" | "public";
+                                /**
+                                 * Format: date-time
+                                 * @description 封存時間；status = archived 時有值
+                                 */
+                                archivedAt?: string | null;
                                 /** Format: date-time */
                                 createdAt: string;
                                 /** Format: date-time */
@@ -17847,10 +19036,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 取得組織私有模板 */
+        /** 取得組織私有模板（排除封存／刪除；q 搜尋名稱、行動、標籤、資源） */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description 搜尋模板名稱、實踐行動、標籤、資源名稱與連結（不分大小寫） */
+                    q?: string;
+                };
                 header?: never;
                 path: {
                     organizationId: number;
@@ -17884,11 +19076,34 @@ export interface paths {
                                 frequencyMaxDays: number | null;
                                 sessionDurationMinutes: number | null;
                                 practiceTimePeriods: string[];
+                                timingOther: string | null;
+                                /**
+                                 * @description draft：儲存草稿；ready：完成新增／更新
+                                 * @enum {string}
+                                 */
+                                status: "draft" | "ready";
+                                /** Format: date-time */
+                                archivedAt: string | null;
+                                tags: string[];
                                 boundCohortIds: number[];
                                 bindings: {
                                     cohortId: number;
+                                    cohortName: string;
+                                    cohortStatus: string;
                                     /** Format: date-time */
+                                    cohortStartDate: string;
+                                    /**
+                                     * Format: date-time
+                                     * @description 模板在此場次的開始日；null 時沿用場次開始日
+                                     */
                                     startDate: string | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description 開始日 + 天數 - 1；模板無天數時為 null
+                                     */
+                                    endDate: string | null;
+                                    /** @description 場次已開始，禁止解除綁定或修改開始日（FR-TPL-05） */
+                                    locked: boolean;
                                 }[];
                                 resources: {
                                     id: string;
@@ -17975,7 +19190,8 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": {
-                        title: string;
+                        /** @description 模板名稱；未填時由實踐行動推導 */
+                        title?: string;
                         practiceAction?: string | null;
                         durationDays?: number | null;
                         frequencyMinDays?: number | null;
@@ -17983,7 +19199,21 @@ export interface paths {
                         sessionDurationMinutes?: number | null;
                         /** @default [] */
                         practiceTimePeriods?: ("morning" | "afternoon" | "evening" | "night" | "commute")[];
-                        resources?: components["schemas"]["PracticeResourceInput"][];
+                        /** @description 自訂執行時段（practice_templates.other_context） */
+                        timingOther?: string | null;
+                        tags?: string[];
+                        resources?: {
+                            name: string;
+                            /** Format: uri */
+                            url?: string;
+                            dayNumber?: number | null;
+                        }[];
+                        /**
+                         * @description draft：儲存草稿；ready：完成新增／更新
+                         * @default ready
+                         * @enum {string}
+                         */
+                        status?: "draft" | "ready";
                     };
                 };
             };
@@ -18013,11 +19243,34 @@ export interface paths {
                                 frequencyMaxDays: number | null;
                                 sessionDurationMinutes: number | null;
                                 practiceTimePeriods: string[];
+                                timingOther: string | null;
+                                /**
+                                 * @description draft：儲存草稿；ready：完成新增／更新
+                                 * @enum {string}
+                                 */
+                                status: "draft" | "ready";
+                                /** Format: date-time */
+                                archivedAt: string | null;
+                                tags: string[];
                                 boundCohortIds: number[];
                                 bindings: {
                                     cohortId: number;
+                                    cohortName: string;
+                                    cohortStatus: string;
                                     /** Format: date-time */
+                                    cohortStartDate: string;
+                                    /**
+                                     * Format: date-time
+                                     * @description 模板在此場次的開始日；null 時沿用場次開始日
+                                     */
                                     startDate: string | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description 開始日 + 天數 - 1；模板無天數時為 null
+                                     */
+                                    endDate: string | null;
+                                    /** @description 場次已開始，禁止解除綁定或修改開始日（FR-TPL-05） */
+                                    locked: boolean;
                                 }[];
                                 resources: {
                                     id: string;
@@ -18106,7 +19359,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** 刪除未綁定過的組織模板 */
+        /** 刪除組織模板（軟刪；仍有有效綁定時 409） */
         delete: {
             parameters: {
                 query?: never;
@@ -18147,6 +19400,7 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": {
+                        /** @description 模板名稱；未填時由實踐行動推導 */
                         title?: string;
                         practiceAction?: string | null;
                         durationDays?: number | null;
@@ -18155,7 +19409,21 @@ export interface paths {
                         sessionDurationMinutes?: number | null;
                         /** @default [] */
                         practiceTimePeriods?: ("morning" | "afternoon" | "evening" | "night" | "commute")[];
-                        resources?: components["schemas"]["PracticeResourceInput"][];
+                        /** @description 自訂執行時段（practice_templates.other_context） */
+                        timingOther?: string | null;
+                        tags?: string[];
+                        resources?: {
+                            name: string;
+                            /** Format: uri */
+                            url?: string;
+                            dayNumber?: number | null;
+                        }[];
+                        /**
+                         * @description draft：儲存草稿；ready：完成新增／更新
+                         * @default ready
+                         * @enum {string}
+                         */
+                        status?: "draft" | "ready";
                     };
                 };
             };
@@ -18185,11 +19453,34 @@ export interface paths {
                                 frequencyMaxDays: number | null;
                                 sessionDurationMinutes: number | null;
                                 practiceTimePeriods: string[];
+                                timingOther: string | null;
+                                /**
+                                 * @description draft：儲存草稿；ready：完成新增／更新
+                                 * @enum {string}
+                                 */
+                                status: "draft" | "ready";
+                                /** Format: date-time */
+                                archivedAt: string | null;
+                                tags: string[];
                                 boundCohortIds: number[];
                                 bindings: {
                                     cohortId: number;
+                                    cohortName: string;
+                                    cohortStatus: string;
                                     /** Format: date-time */
+                                    cohortStartDate: string;
+                                    /**
+                                     * Format: date-time
+                                     * @description 模板在此場次的開始日；null 時沿用場次開始日
+                                     */
                                     startDate: string | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description 開始日 + 天數 - 1；模板無天數時為 null
+                                     */
+                                    endDate: string | null;
+                                    /** @description 場次已開始，禁止解除綁定或修改開始日（FR-TPL-05） */
+                                    locked: boolean;
                                 }[];
                                 resources: {
                                     id: string;
@@ -18465,6 +19756,1381 @@ export interface paths {
                 403: components["responses"]["ForbiddenError"];
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 複製模板（名稱加「（複製）」，含資源與標籤） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                    templateId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已建立副本 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                /** Format: uuid */
+                                externalId: string;
+                                organizationId: number;
+                                title: string;
+                                practiceAction: string | null;
+                                durationDays: number | null;
+                                frequencyMinDays: number | null;
+                                frequencyMaxDays: number | null;
+                                sessionDurationMinutes: number | null;
+                                practiceTimePeriods: string[];
+                                timingOther: string | null;
+                                /**
+                                 * @description draft：儲存草稿；ready：完成新增／更新
+                                 * @enum {string}
+                                 */
+                                status: "draft" | "ready";
+                                /** Format: date-time */
+                                archivedAt: string | null;
+                                tags: string[];
+                                boundCohortIds: number[];
+                                bindings: {
+                                    cohortId: number;
+                                    cohortName: string;
+                                    cohortStatus: string;
+                                    /** Format: date-time */
+                                    cohortStartDate: string;
+                                    /**
+                                     * Format: date-time
+                                     * @description 模板在此場次的開始日；null 時沿用場次開始日
+                                     */
+                                    startDate: string | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description 開始日 + 天數 - 1；模板無天數時為 null
+                                     */
+                                    endDate: string | null;
+                                    /** @description 場次已開始，禁止解除綁定或修改開始日（FR-TPL-05） */
+                                    locked: boolean;
+                                }[];
+                                resources: {
+                                    id: string;
+                                    name: string;
+                                    url: string | null;
+                                    dayNumber: number | null;
+                                }[];
+                                generatedDraftCount: number;
+                                /** Format: date-time */
+                                createdAt: string | null;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 封存模板（移入封存區；已封存回 409） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                    templateId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已封存 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                /** Format: uuid */
+                                externalId: string;
+                                organizationId: number;
+                                title: string;
+                                practiceAction: string | null;
+                                durationDays: number | null;
+                                frequencyMinDays: number | null;
+                                frequencyMaxDays: number | null;
+                                sessionDurationMinutes: number | null;
+                                practiceTimePeriods: string[];
+                                timingOther: string | null;
+                                /**
+                                 * @description draft：儲存草稿；ready：完成新增／更新
+                                 * @enum {string}
+                                 */
+                                status: "draft" | "ready";
+                                /** Format: date-time */
+                                archivedAt: string | null;
+                                tags: string[];
+                                boundCohortIds: number[];
+                                bindings: {
+                                    cohortId: number;
+                                    cohortName: string;
+                                    cohortStatus: string;
+                                    /** Format: date-time */
+                                    cohortStartDate: string;
+                                    /**
+                                     * Format: date-time
+                                     * @description 模板在此場次的開始日；null 時沿用場次開始日
+                                     */
+                                    startDate: string | null;
+                                    /**
+                                     * Format: date-time
+                                     * @description 開始日 + 天數 - 1；模板無天數時為 null
+                                     */
+                                    endDate: string | null;
+                                    /** @description 場次已開始，禁止解除綁定或修改開始日（FR-TPL-05） */
+                                    locked: boolean;
+                                }[];
+                                resources: {
+                                    id: string;
+                                    name: string;
+                                    url: string | null;
+                                    dayNumber: number | null;
+                                }[];
+                                generatedDraftCount: number;
+                                /** Format: date-time */
+                                createdAt: string | null;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                409: components["responses"]["ConflictError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/organizations/{organizationId}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 封存區列表（type=templates|cohorts|programs） */
+        get: {
+            parameters: {
+                query: {
+                    /** @description 封存分類：templates（模板）、cohorts（場次）、programs（系列） */
+                    type: "templates" | "cohorts" | "programs";
+                };
+                header?: never;
+                path: {
+                    organizationId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 封存項目 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /**
+                                 * @description 封存分類：templates（模板）、cohorts（場次）、programs（系列）
+                                 * @enum {string}
+                                 */
+                                type: "templates" | "cohorts" | "programs";
+                                items: {
+                                    /** @enum {string} */
+                                    type: "template" | "cohort" | "program";
+                                    id: number;
+                                    name: string;
+                                    /**
+                                     * Format: date-time
+                                     * @description 封存時間（archived_at）
+                                     */
+                                    archivedAt: string | null;
+                                    /** @description 封存操作人；089 前封存的資料為 null */
+                                    archivedBy: {
+                                        id: number;
+                                        name: string;
+                                    } | null;
+                                    /** @description 場次封存前的狀態；恢復時還原 */
+                                    archivedFromStatus: string | null;
+                                    /** @description 場次：manual（手動）| program_cascade（隨系列封存） */
+                                    archivedReason: string | null;
+                                    /** @description 場次所屬系列名稱 */
+                                    parentName: string | null;
+                                    /** @description 場次所屬系列仍在封存中，需先恢復系列 */
+                                    parentArchived: boolean;
+                                }[];
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/organizations/{organizationId}/archive/{type}/{itemId}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 恢復封存項目（場次還原封存前狀態；系列連同隨系列封存的場次） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                    /** @description 封存分類：templates（模板）、cohorts（場次）、programs（系列） */
+                    type: "templates" | "cohorts" | "programs";
+                    itemId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已恢復 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /** @enum {string} */
+                                type: "template" | "cohort" | "program";
+                                id: number;
+                                name: string;
+                                /** @description 恢復系列時一併復活的場次數（只含隨系列封存的場次） */
+                                restoredCohortCount: number;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                409: components["responses"]["ConflictError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/organizations/{organizationId}/archive/{type}/{itemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 刪除封存項目（軟刪；系列連同其場次） */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                    /** @description 封存分類：templates（模板）、cohorts（場次）、programs（系列） */
+                    type: "templates" | "cohorts" | "programs";
+                    itemId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已刪除 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                409: components["responses"]["ConflictError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/organizations/{organizationId}/ai-credentials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得組織 AI API key 狀態（不回明文） */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description key 狀態 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                organizationId: number;
+                                /**
+                                 * @description AI provider：openai | anthropic | gemini | groq | openrouter
+                                 * @enum {string}
+                                 */
+                                provider: "openai" | "anthropic" | "gemini" | "groq" | "openrouter";
+                                /**
+                                 * @description unset（未設定）| set（已設定未測）| verified（測試成功）| invalid（測試失敗）| disabled（停用）
+                                 * @enum {string}
+                                 */
+                                status: "unset" | "set" | "verified" | "invalid" | "disabled";
+                                /** @description key 末四碼，供辨識；未設定為 null */
+                                keyLast4: string | null;
+                                /** Format: date-time */
+                                lastTestedAt: string | null;
+                                /** @description 最近一次測試連線的錯誤摘要；成功或未測為 null */
+                                lastTestError: string | null;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                                updatedBy: number | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        /** 設定組織 AI API key（加密保存，狀態回到 set） */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description AI provider：openai | anthropic | gemini | groq | openrouter
+                         * @default openai
+                         * @enum {string}
+                         */
+                        provider?: "openai" | "anthropic" | "gemini" | "groq" | "openrouter";
+                        /** @example sk-... */
+                        apiKey: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 已保存 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                organizationId: number;
+                                /**
+                                 * @description AI provider：openai | anthropic | gemini | groq | openrouter
+                                 * @enum {string}
+                                 */
+                                provider: "openai" | "anthropic" | "gemini" | "groq" | "openrouter";
+                                /**
+                                 * @description unset（未設定）| set（已設定未測）| verified（測試成功）| invalid（測試失敗）| disabled（停用）
+                                 * @enum {string}
+                                 */
+                                status: "unset" | "set" | "verified" | "invalid" | "disabled";
+                                /** @description key 末四碼，供辨識；未設定為 null */
+                                keyLast4: string | null;
+                                /** Format: date-time */
+                                lastTestedAt: string | null;
+                                /** @description 最近一次測試連線的錯誤摘要；成功或未測為 null */
+                                lastTestError: string | null;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                                updatedBy: number | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        post?: never;
+        /** 清除組織 AI API key */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 已清除 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                organizationId: number;
+                                /**
+                                 * @description AI provider：openai | anthropic | gemini | groq | openrouter
+                                 * @enum {string}
+                                 */
+                                provider: "openai" | "anthropic" | "gemini" | "groq" | "openrouter";
+                                /**
+                                 * @description unset（未設定）| set（已設定未測）| verified（測試成功）| invalid（測試失敗）| disabled（停用）
+                                 * @enum {string}
+                                 */
+                                status: "unset" | "set" | "verified" | "invalid" | "disabled";
+                                /** @description key 末四碼，供辨識；未設定為 null */
+                                keyLast4: string | null;
+                                /** Format: date-time */
+                                lastTestedAt: string | null;
+                                /** @description 最近一次測試連線的錯誤摘要；成功或未測為 null */
+                                lastTestError: string | null;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                                updatedBy: number | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/organizations/{organizationId}/ai-credentials/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 測試 AI API key 連線（未設定回 409） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 測試結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                organizationId: number;
+                                /**
+                                 * @description AI provider：openai | anthropic | gemini | groq | openrouter
+                                 * @enum {string}
+                                 */
+                                provider: "openai" | "anthropic" | "gemini" | "groq" | "openrouter";
+                                /**
+                                 * @description unset（未設定）| set（已設定未測）| verified（測試成功）| invalid（測試失敗）| disabled（停用）
+                                 * @enum {string}
+                                 */
+                                status: "unset" | "set" | "verified" | "invalid" | "disabled";
+                                /** @description key 末四碼，供辨識；未設定為 null */
+                                keyLast4: string | null;
+                                /** Format: date-time */
+                                lastTestedAt: string | null;
+                                /** @description 最近一次測試連線的錯誤摘要；成功或未測為 null */
+                                lastTestError: string | null;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                                updatedBy: number | null;
+                                /** @description 這次測試連線是否成功 */
+                                ok: boolean;
+                                /** @description 給畫面顯示的結果文案 */
+                                message: string;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                409: components["responses"]["ConflictError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 場次動態（打卡／留言回應／節奏變化合併，含四張統計卡） */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 起始日（場次時區日曆日）；預設今天往前 6 天；超出最近 7 天會被夾回範圍 */
+                    from?: string;
+                    /** @description 結束日；預設今天；早於 from 時自動對調 */
+                    to?: string;
+                    /** @description 類型篩選：checkin（打卡）| comment（留言與回應）| rhythm（節奏變化）；不帶＝全部 */
+                    type?: "checkin" | "comment" | "rhythm";
+                    /** @description 只看這個實踐（與儀表板一樣以實踐名稱分組） */
+                    practiceTitle?: string;
+                    /** @description 關鍵字：比對成員、實踐、摘要、meta 與類型（不比對詳細內容） */
+                    q?: string;
+                    /** @description 只看有文字內容的動態（打卡有筆記、留言／回應） */
+                    hasText?: boolean | null;
+                    limit?: number;
+                    offset?: number | null;
+                };
+                header?: never;
+                path: {
+                    programId: number;
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 動態列表與統計 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                range: {
+                                    from: string;
+                                    to: string;
+                                    /** @description 可選的最早日期（今天往前 6 天） */
+                                    min: string;
+                                    /** @description 可選的最晚日期（今天） */
+                                    max: string;
+                                    timezone: string;
+                                };
+                                filters: {
+                                    /** @enum {string|null} */
+                                    type: "checkin" | "comment" | "rhythm" | null;
+                                    practiceTitle: string | null;
+                                    q: string | null;
+                                    hasText: boolean;
+                                };
+                                /** @description 實踐篩選選項（本場次實踐名稱） */
+                                practices: {
+                                    title: string;
+                                }[];
+                                /** @description 四張統計卡，與 items 套用同一組篩選 */
+                                stats: {
+                                    checkins: number;
+                                    comments: number;
+                                    rhythm: number;
+                                    total: number;
+                                };
+                                /** @description 符合篩選的總筆數（= stats.total） */
+                                total: number;
+                                items: {
+                                    id: string;
+                                    /** @enum {string} */
+                                    type: "checkin" | "comment" | "rhythm";
+                                    /** @description 打卡 | 留言 | 回應 | 節奏變化 */
+                                    typeLabel: string;
+                                    /** Format: date-time */
+                                    occurredAt: string;
+                                    member: {
+                                        userId: number;
+                                        nickname: string | null;
+                                        avatar: string | null;
+                                    };
+                                    practice: {
+                                        id: number;
+                                        title: string;
+                                    };
+                                    /** @description 列表摘要：打卡筆記／留言內容／節奏事件描述；打卡無筆記時為心情文案 */
+                                    summary: string;
+                                    hasText: boolean;
+                                    /** @description 打卡：mood、imageCount、commentCount；留言：isReply、targetCheckinId；節奏：eventType、basisMetrics */
+                                    meta: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/activities/{type}/{activityId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 單筆動態明細 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    programId: number;
+                    cohortId: number;
+                    type: "checkin" | "comment" | "rhythm";
+                    /** @description 打卡／留言為數字 id；節奏事件為 `<event_type>:<practiceId>:<YYYYMMDD>` */
+                    activityId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 明細 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: string;
+                                /** @enum {string} */
+                                type: "checkin" | "comment" | "rhythm";
+                                /** @description 打卡 | 留言 | 回應 | 節奏變化 */
+                                typeLabel: string;
+                                /** Format: date-time */
+                                occurredAt: string;
+                                member: {
+                                    userId: number;
+                                    nickname: string | null;
+                                    avatar: string | null;
+                                };
+                                practice: {
+                                    id: number;
+                                    title: string;
+                                };
+                                /** @description 列表摘要：打卡筆記／留言內容／節奏事件描述；打卡無筆記時為心情文案 */
+                                summary: string;
+                                hasText: boolean;
+                                /** @description 打卡：mood、imageCount、commentCount；留言：isReply、targetCheckinId；節奏：eventType、basisMetrics */
+                                meta: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description 詳細內容：打卡完整筆記／留言全文／節奏事件說明 */
+                                detail: string | null;
+                                /** @description 打卡圖片 */
+                                images: string[];
+                                /** @description 留言／回應所屬的打卡 */
+                                target: {
+                                    checkinId: number;
+                                    summary: string;
+                                    /** Format: date-time */
+                                    occurredAt: string;
+                                } | null;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -19595,7 +22261,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 取得期末正向成果報告 */
+        /** 場次成果（概況、實踐成果、參與者進度、AI 摘要版本、AI 模式可用性） */
         get: {
             parameters: {
                 query?: never;
@@ -19623,12 +22289,137 @@ export interface paths {
                             /** @description The main response data */
                             data: {
                                 cohortId: number;
-                                completedCount: number;
-                                enrolledCount: number;
-                                sustainedParticipationCount: number;
-                                sustainedParticipationRate: number;
+                                cohort: {
+                                    displayName: string;
+                                    programName: string;
+                                    /** Format: date-time */
+                                    startDate: string;
+                                    /** Format: date-time */
+                                    endDate: string;
+                                };
+                                /**
+                                 * @description not_started（尚未開始）| in_progress（進行中資料）| ended（最終成果）
+                                 * @enum {string}
+                                 */
+                                phase: "not_started" | "in_progress" | "ended";
+                                /**
+                                 * Format: date-time
+                                 * @description 期末 final 快照時間；沒有代表尚未結算
+                                 */
+                                finalizedAt: string | null;
+                                overview: {
+                                    participants: number;
+                                    activatedPractices: number;
+                                    checkins: number;
+                                    comments: number;
+                                };
+                                ai: {
+                                    /** @description 平台 AI 是否可用（AI_BACKEND_URL 已設定） */
+                                    platformAvailable: boolean;
+                                    ownKey: {
+                                        /**
+                                         * @description unset（未設定）| set（已設定未測）| verified（測試成功）| invalid（測試失敗）| disabled（停用）
+                                         * @enum {string}
+                                         */
+                                        status: "unset" | "set" | "verified" | "invalid" | "disabled";
+                                        /**
+                                         * @description AI provider：openai | anthropic | gemini | groq | openrouter
+                                         * @enum {string}
+                                         */
+                                        provider: "openai" | "anthropic" | "gemini" | "groq" | "openrouter";
+                                        keyLast4: string | null;
+                                    };
+                                    platformDailyLimit: number;
+                                    platformUsedToday: number;
+                                };
+                                summary: {
+                                    current: {
+                                        id: number;
+                                        version: number;
+                                        /**
+                                         * @description platform_ai（平台 AI）| own_ai（組織自帶 key）| manual（人工編輯）
+                                         * @enum {string}
+                                         */
+                                        source: "platform_ai" | "own_ai" | "manual";
+                                        content: string;
+                                        provider: string | null;
+                                        modelName: string | null;
+                                        /**
+                                         * Format: date-time
+                                         * @description AI 產生時間；人工版本為 null
+                                         */
+                                        generatedAt: string | null;
+                                        /** @description 觸發產生或編輯的人（FR-OUT-04 最後編輯者） */
+                                        createdBy: {
+                                            id: number;
+                                            nickname: string | null;
+                                        } | null;
+                                        /** Format: date-time */
+                                        createdAt: string;
+                                        isCurrent: boolean;
+                                    } | null;
+                                    versions: {
+                                        id: number;
+                                        version: number;
+                                        /**
+                                         * @description platform_ai（平台 AI）| own_ai（組織自帶 key）| manual（人工編輯）
+                                         * @enum {string}
+                                         */
+                                        source: "platform_ai" | "own_ai" | "manual";
+                                        content: string;
+                                        provider: string | null;
+                                        modelName: string | null;
+                                        /**
+                                         * Format: date-time
+                                         * @description AI 產生時間；人工版本為 null
+                                         */
+                                        generatedAt: string | null;
+                                        /** @description 觸發產生或編輯的人（FR-OUT-04 最後編輯者） */
+                                        createdBy: {
+                                            id: number;
+                                            nickname: string | null;
+                                        } | null;
+                                        /** Format: date-time */
+                                        createdAt: string;
+                                        isCurrent: boolean;
+                                    }[];
+                                };
+                                practiceOutcomes: {
+                                    title: string;
+                                    /** @description 有這個實踐的參與者數（含草稿） */
+                                    participants: number;
+                                    /** @description 已啟動（status ≠ draft） */
+                                    started: number;
+                                    /** @description status = completed */
+                                    completed: number;
+                                    checkins: number;
+                                    /** @description 留言與回應 */
+                                    comments: number;
+                                }[];
+                                participantProgress: {
+                                    userId: number;
+                                    nickname: string | null;
+                                    avatar: string | null;
+                                    practiceId: number;
+                                    practiceTitle: string;
+                                    practiceStatus: string;
+                                    /** @description 已完成的打卡次數 */
+                                    completedCount: number;
+                                    /** @description 目標打卡次數：ceil(天數 / 7 × 每週最少次數)；無設定時 0 */
+                                    targetCount: number;
+                                    /** @description 完成率（practices.progress_percentage，可超過 100） */
+                                    progressPercentage: number;
+                                    checkinCount: number;
+                                    /** @description 這位參與者打卡收到的留言與回應數 */
+                                    responseCount: number;
+                                    /**
+                                     * Format: date-time
+                                     * @description 最後一次打卡或收到回應的時間
+                                     */
+                                    lastActivityAt: string | null;
+                                }[];
                                 /** Format: date-time */
-                                computedAt: string;
+                                generatedAt: string;
                             };
                             /**
                              * Format: date-time
@@ -19692,6 +22483,371 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/outcome/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** 人工編輯摘要（新版本 source=manual，不可空白） */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    programId: number;
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        content: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 新版本摘要 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                version: number;
+                                /**
+                                 * @description platform_ai（平台 AI）| own_ai（組織自帶 key）| manual（人工編輯）
+                                 * @enum {string}
+                                 */
+                                source: "platform_ai" | "own_ai" | "manual";
+                                content: string;
+                                provider: string | null;
+                                modelName: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description AI 產生時間；人工版本為 null
+                                 */
+                                generatedAt: string | null;
+                                /** @description 觸發產生或編輯的人（FR-OUT-04 最後編輯者） */
+                                createdBy: {
+                                    id: number;
+                                    nickname: string | null;
+                                } | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                isCurrent: boolean;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        /** 產生／重新產生 AI 成果摘要（新版本；平台 AI 每場次每日 5 次） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    programId: number;
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description platform（平台 AI）| own（組織自帶 AI API key）
+                         * @default platform
+                         * @enum {string}
+                         */
+                        mode?: "platform" | "own";
+                    };
+                };
+            };
+            responses: {
+                /** @description 新版本摘要 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                id: number;
+                                version: number;
+                                /**
+                                 * @description platform_ai（平台 AI）| own_ai（組織自帶 key）| manual（人工編輯）
+                                 * @enum {string}
+                                 */
+                                source: "platform_ai" | "own_ai" | "manual";
+                                content: string;
+                                provider: string | null;
+                                modelName: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description AI 產生時間；人工版本為 null
+                                 */
+                                generatedAt: string | null;
+                                /** @description 觸發產生或編輯的人（FR-OUT-04 最後編輯者） */
+                                createdBy: {
+                                    id: number;
+                                    nickname: string | null;
+                                } | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                isCurrent: boolean;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                409: components["responses"]["ConflictError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/outcome/report-exported": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 記錄成果報告 PDF 匯出（前端列印版產檔後回報，寫稽核） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    programId: number;
+                    cohortId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @description 前端實際下載的檔名，例：場次名稱_成果報告_20260911.pdf */
+                        filename?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 已記錄 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                cohortId: number;
+                                filename: string;
+                                /** Format: date-time */
+                                exportedAt: string;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -20232,8 +23388,15 @@ export interface paths {
                                 approvedBy: number | null;
                                 /** Format: date-time */
                                 approvedAt: string | null;
+                                /** @description IANA 時區；動態頁最近 7 天與已開始場次判定的基準，預設 Asia/Taipei */
+                                timezone: string;
                                 /** Format: date-time */
                                 createdAt: string;
+                                /**
+                                 * Format: date-time
+                                 * @description 組織資訊最後更新時間
+                                 */
+                                updatedAt: string | null;
                             };
                             /**
                              * Format: date-time
@@ -20348,8 +23511,15 @@ export interface paths {
                                 approvedBy: number | null;
                                 /** Format: date-time */
                                 approvedAt: string | null;
+                                /** @description IANA 時區；動態頁最近 7 天與已開始場次判定的基準，預設 Asia/Taipei */
+                                timezone: string;
                                 /** Format: date-time */
                                 createdAt: string;
+                                /**
+                                 * Format: date-time
+                                 * @description 組織資訊最後更新時間
+                                 */
+                                updatedAt: string | null;
                             };
                             /**
                              * Format: date-time
@@ -22260,7 +25430,7 @@ export interface paths {
                          */
                         privacyStatus?: "private" | "public" | "delayed";
                         /**
-                         * @description 實踐建立方式（用於 Onboarding 任務 C 記錄）
+                         * @description 實踐建立方式（寫入 practices.creation_source，供分析用）
                          * @example self_created
                          * @enum {string}
                          */
@@ -37110,6 +40280,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/name/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 檢查使用者名稱可用性
+         * @description 精確比對 nickname，包含非公開帳號。無需登入；提供有效的正式用戶 token 時，本人的名稱視為可用。
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description 要檢查的使用者名稱，精確比對且不移除空白 */
+                    name: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功檢查名稱可用性 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NameAvailabilityResponse"];
+                    };
+                };
+                400: components["responses"]["BadRequestError"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/custom-id/check/{customId}": {
         parameters: {
             query?: never;
@@ -38936,7 +42150,7 @@ export interface components {
              */
             privacyStatus?: "private" | "public" | "delayed";
             /**
-             * @description 實踐建立方式（用於 Onboarding 任務 C 記錄）
+             * @description 實踐建立方式（寫入 practices.creation_source，供分析用）
              * @example self_created
              * @enum {string}
              */
@@ -40073,7 +43287,7 @@ export interface components {
              * @example createdAt
              * @enum {string}
              */
-            sortBy: "createdAt" | "lastLoginAt" | "lastActiveAt" | "name" | "email" | "registrationFlow" | "creationMethod" | "daysToComplete";
+            sortBy: "createdAt" | "lastLoginAt" | "lastActiveAt" | "name" | "email";
             /**
              * @description 排序方向
              * @default desc
@@ -40087,30 +43301,6 @@ export interface components {
              * @enum {string}
              */
             personaType?: "L" | "C" | "A" | "D" | "O";
-            /**
-             * @description 篩選 Onboarding Badge 完成狀態
-             * @example true
-             * @enum {string}
-             */
-            badgeGranted?: "true" | "false";
-            /**
-             * @description 篩選用戶來源
-             * @example S1
-             * @enum {string}
-             */
-            userSource?: "S1" | "S2" | "S3";
-            /**
-             * @description 篩選註冊來源。僅接受 landing_page/quiz/action_maker；違規值會回傳 400 + VALIDATION_ERROR。
-             * @example landing_page
-             * @enum {string}
-             */
-            registrationFlow?: "landing_page" | "quiz" | "action_maker";
-            /**
-             * @description 篩選任務建立方式。僅接受 self_created/copied/action_generator；違規值會回傳 400 + VALIDATION_ERROR。
-             * @example self_created
-             * @enum {string}
-             */
-            creationMethod?: "self_created" | "copied" | "action_generator";
             /**
              * @description 篩選註冊起始日期（含）
              * @example 2024-01-01
@@ -40272,33 +43462,6 @@ export interface components {
              * @enum {string|null}
              */
             personaType: "L" | "C" | "A" | "D" | "O" | null;
-            /**
-             * @description 是否完成 Onboarding Badge
-             * @example true
-             */
-            badgeGranted: boolean | null;
-            /**
-             * @description 用戶來源（S1/S2/S3）
-             * @example S1
-             */
-            userSource: string | null;
-            /**
-             * @description 註冊來源。若後端回傳無法對應枚舉值，將回傳 400 + VALIDATION_ERROR。
-             * @example landing_page
-             * @enum {string|null}
-             */
-            registrationFlow: "landing_page" | "quiz" | "action_maker" | null;
-            /**
-             * @description 任務建立方式。若後端回傳無法對應枚舉值，將回傳 400 + VALIDATION_ERROR。
-             * @example self_created
-             * @enum {string|null}
-             */
-            creationMethod: "self_created" | "copied" | "action_generator" | null;
-            /**
-             * @description 完成天數
-             * @example 7
-             */
-            daysToComplete: number | null;
             /** @description 用戶標籤列表 */
             tags: {
                 id: number;
@@ -40338,10 +43501,6 @@ export interface components {
              * @enum {string|null}
              */
             personaType: "L" | "C" | "A" | "D" | "O" | null;
-            /** @description 是否完成 Onboarding Badge */
-            badgeGranted: boolean | null;
-            /** @description 用戶來源 */
-            userSource: string | null;
         };
         LoginHistoryRecord: {
             /**
@@ -42684,11 +45843,11 @@ export interface components {
              */
             emailType?: string;
             /**
-             * @description 發送狀態
+             * @description 發送狀態（skipped：後台停用該模板而未寄出）
              * @example sent
              * @enum {string}
              */
-            status?: "sent" | "failed" | "pending";
+            status?: "sent" | "failed" | "pending" | "skipped";
             /**
              * Format: email
              * @description 收件人 email
@@ -42768,11 +45927,11 @@ export interface components {
              */
             subject: string | null;
             /**
-             * @description 發送狀態
+             * @description 發送狀態（skipped：後台停用該模板而未寄出）
              * @example sent
              * @enum {string}
              */
-            status: "sent" | "failed" | "pending";
+            status: "sent" | "failed" | "pending" | "skipped";
             /**
              * @description 發送時間
              * @example 2024-01-15T10:30:00.000Z
@@ -43467,30 +46626,40 @@ export interface components {
             targetId: string;
         };
         /**
-         * @description Standard success response format
+         * @description Paginated response format for page-based pagination
          * @example {
          *       "success": true,
-         *       "data": {
-         *         "id": 123,
-         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
-         *         "name": "JavaScript 基礎教程",
-         *         "description": "從零開始學習 JavaScript 程式設計",
-         *         "status": "published"
-         *       },
-         *       "timestamp": "2024-01-15T10:30:00.000Z"
-         *     }
-         * @example {
-         *       "success": true,
-         *       "data": {
-         *         "userId": 456,
-         *         "username": "john_doe",
-         *         "email": "john@example.com",
-         *         "role": "student"
+         *       "data": [
+         *         {
+         *           "id": 1,
+         *           "title": "React 入門教程",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-10T10:00:00Z"
+         *         },
+         *         {
+         *           "id": 2,
+         *           "title": "Vue.js 進階指南",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-11T10:00:00Z"
+         *         }
+         *       ],
+         *       "pagination": {
+         *         "currentPage": 1,
+         *         "totalPages": 5,
+         *         "totalItems": 50,
+         *         "itemsPerPage": 10,
+         *         "hasNext": true,
+         *         "hasPrev": false
          *       },
          *       "timestamp": "2024-01-15T10:30:00.000Z",
          *       "meta": {
-         *         "cacheHit": true,
-         *         "processingTime": 23.1
+         *         "searchTime": 45,
+         *         "cacheHit": false,
+         *         "categoryCounts": {
+         *           "前端開發": 25,
+         *           "後端開發": 18,
+         *           "資料科學": 7
+         *         }
          *       }
          *     }
          */
@@ -43500,8 +46669,41 @@ export interface components {
              * @enum {boolean}
              */
             success: true;
-            /** @description The main response data */
+            /** @description Array of paginated data items */
             data: components["schemas"]["FollowItem"][];
+            /**
+             * @description Pagination information
+             * @example {
+             *       "currentPage": 1,
+             *       "totalPages": 5,
+             *       "totalItems": 50,
+             *       "itemsPerPage": 10,
+             *       "hasNext": true,
+             *       "hasPrev": false
+             *     }
+             * @example {
+             *       "currentPage": 3,
+             *       "totalPages": 8,
+             *       "totalItems": 156,
+             *       "itemsPerPage": 20,
+             *       "hasNext": true,
+             *       "hasPrev": true
+             *     }
+             */
+            pagination: {
+                /** @description Current page number (1-based) */
+                currentPage: number;
+                /** @description Total number of pages */
+                totalPages: number;
+                /** @description Total number of items across all pages */
+                totalItems: number;
+                /** @description Number of items per page */
+                itemsPerPage: number;
+                /** @description Whether there are more pages after current page */
+                hasNext: boolean;
+                /** @description Whether there are pages before current page */
+                hasPrev: boolean;
+            };
             /**
              * Format: date-time
              * @description ISO 8601 timestamp of the response
@@ -43564,6 +46766,169 @@ export interface components {
             nickname: string | null;
             /** @description 關注時間 ISO 8601 */
             followedAt: string;
+        };
+        /**
+         * @description Paginated response format for page-based pagination
+         * @example {
+         *       "success": true,
+         *       "data": [
+         *         {
+         *           "id": 1,
+         *           "title": "React 入門教程",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-10T10:00:00Z"
+         *         },
+         *         {
+         *           "id": 2,
+         *           "title": "Vue.js 進階指南",
+         *           "category": "前端開發",
+         *           "createdAt": "2024-01-11T10:00:00Z"
+         *         }
+         *       ],
+         *       "pagination": {
+         *         "currentPage": 1,
+         *         "totalPages": 5,
+         *         "totalItems": 50,
+         *         "itemsPerPage": 10,
+         *         "hasNext": true,
+         *         "hasPrev": false
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "searchTime": 45,
+         *         "cacheHit": false,
+         *         "categoryCounts": {
+         *           "前端開發": 25,
+         *           "後端開發": 18,
+         *           "資料科學": 7
+         *         }
+         *       }
+         *     }
+         */
+        FollowingListApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description Array of paginated data items */
+            data: components["schemas"]["FollowingItem"][];
+            /**
+             * @description Pagination information
+             * @example {
+             *       "currentPage": 1,
+             *       "totalPages": 5,
+             *       "totalItems": 50,
+             *       "itemsPerPage": 10,
+             *       "hasNext": true,
+             *       "hasPrev": false
+             *     }
+             * @example {
+             *       "currentPage": 3,
+             *       "totalPages": 8,
+             *       "totalItems": 156,
+             *       "itemsPerPage": 20,
+             *       "hasNext": true,
+             *       "hasPrev": true
+             *     }
+             */
+            pagination: {
+                /** @description Current page number (1-based) */
+                currentPage: number;
+                /** @description Total number of pages */
+                totalPages: number;
+                /** @description Total number of items across all pages */
+                totalItems: number;
+                /** @description Number of items per page */
+                itemsPerPage: number;
+                /** @description Whether there are more pages after current page */
+                hasNext: boolean;
+                /** @description Whether there are pages before current page */
+                hasPrev: boolean;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        FollowingItem: {
+            /** @enum {string} */
+            targetType: "user";
+            user?: components["schemas"]["FollowingUserProfile"];
+        } | {
+            /** @enum {string} */
+            targetType: "practice";
+            practice?: components["schemas"]["FollowingPracticeProfile"];
+        };
+        FollowingUserProfile: {
+            /** @description 被關注用戶 external_id */
+            id: string;
+            /** @description 暱稱 */
+            name: string;
+            /** @description 頭像 URL */
+            photoURL: string | null;
+            /** @description 個人標語 */
+            bio: string | null;
+            /** @description 自訂 ID（custom_id） */
+            identifier: string | null;
+        };
+        FollowingPracticeProfile: {
+            /** @description 主題實踐 external_id */
+            id: string;
+            /** @description 主題實踐標題 */
+            title: string;
+            /** @description 擁有者暱稱 */
+            ownerName: string;
+            /** @description 擁有者頭像 URL */
+            ownerPhotoURL: string | null;
         };
         /**
          * @description Standard success response format
@@ -50020,6 +53385,107 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * @description dev 測試登入成功回應
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        DevLoginResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: {
+                user: {
+                    /** @description temp 模式為 temp_users.id 字串；user 模式為 external_id */
+                    id: string;
+                    /** Format: email */
+                    email: string;
+                    name?: string | null;
+                    nickname?: string | null;
+                };
+                isTemporary: boolean;
+                /** @description 與 auth_token cookie 相同的 JWT，供非瀏覽器客戶端使用 */
+                token: string;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
         UpdateBuddyRequestBody: {
             /**
              * @description 對 Buddy 請求的回應動作
@@ -50349,7 +53815,7 @@ export interface components {
              */
             endDate?: string;
             /**
-             * @description 持續天數 (1-90天)
+             * @description 持續天數 (1-91天)
              * @example 30
              */
             durationDays?: number;
@@ -51494,6 +54960,11 @@ export interface components {
              */
             id: string | null;
             /**
+             * @description 活動課程卡所屬燈塔系列 id（canManage 時導向管理端 /lighthouse/programs/{programId}/cohorts/{id}）；虛擬空間為 null
+             * @example 3
+             */
+            programId: number | null;
+            /**
              * @description 空間名稱
              * @example 自我覺察練習
              */
@@ -51530,6 +55001,11 @@ export interface components {
              * @example false
              */
             isHost: boolean;
+            /**
+             * @description 目前使用者是否為該場次所屬組織成員、可進管理端（前端據此導向 /lighthouse/programs/{programId}/cohorts/{id}/dashboard）
+             * @example false
+             */
+            canManage: boolean;
             /** @description 最近活動時間（排序依據） */
             lastActivityAt: string | null;
         };
@@ -51747,6 +55223,106 @@ export interface components {
              * @example 2026-09-01T08:00:00.000Z
              */
             scheduledAt?: string;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        NameAvailabilityResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: {
+                /**
+                 * @description 查詢的使用者名稱
+                 * @example 島島學習者
+                 */
+                name: string;
+                /**
+                 * @description 名稱是否可用，正式登入者自己的名稱亦可用
+                 * @example true
+                 */
+                available: boolean;
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
         };
         /**
          * @description 自訂 ID 可用性檢查回應

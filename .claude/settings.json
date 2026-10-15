@@ -44,7 +44,6 @@
       "Bash(docker logs:*)",
       "Bash(docker compose ps:*)",
       "Bash(docker compose logs:*)",
-      "Bash(openspec:*)",
       "Bash(wrangler:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
@@ -67,28 +66,16 @@
       "Bash(git clean -f:*)"
     ]
   },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/pre-write-guard.sh"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/post-write-format.sh"
-          }
-        ]
-      }
-    ]
+  "enabledPlugins": {
+    "daodao@daodao": true
+  },
+  "extraKnownMarketplaces": {
+    "daodao": {
+      "source": {
+        "source": "url",
+        "url": "https://github.com/daodaoedu/daodao/releases/latest/download/marketplace.json"
+      },
+      "autoUpdate": true
+    }
   }
 }

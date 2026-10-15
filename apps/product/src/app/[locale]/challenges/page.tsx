@@ -1,12 +1,18 @@
 "use client";
 
-import { type ChallengeSummaryType, useChallenges, useCurrentUser } from "@daodao/api";
+import {
+  type ChallengeSummaryType,
+  useChallenges,
+  useCurrentUser,
+  useMyChallenges,
+} from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { Box, Flag, Star } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChallengeCard, InspirationDrawDialog, JoinChallengeDialog } from "@/components/challenge";
+import { buildPracticeIdMap, pruneJustJoined } from "@/utils/challenge-card";
 
 /**
  * 探索共同挑戰 standalone 頁（openspec: challenge-discovery）
@@ -20,10 +26,25 @@ export default function ChallengesPage() {
   const pathname = usePathname();
   const { data: currentUser } = useCurrentUser();
   const { data, isLoading, mutate } = useChallenges();
+  // 探索列表不含自動複製的實踐 id；登入時從「我參加的挑戰」補上，讓已加入的卡片能點進實踐頁打卡
+  const { data: mineData, mutate: mutateMine } = useMyChallenges(Boolean(currentUser));
   const [joinTarget, setJoinTarget] = useState<ChallengeSummaryType | null>(null);
   const [drawTarget, setDrawTarget] = useState<number | null>(null);
+  // 剛加入的挑戰：先用 join API 回傳的 practiceId，避免「已加入但 /me/challenges 尚未更新」時卡片沒有連結
+  const [justJoinedPracticeIds, setJustJoinedPracticeIds] = useState<Record<number, string | null>>(
+    {}
+  );
 
   const challenges = useMemo(() => data?.data ?? [], [data]);
+  const practiceIdByChallenge = useMemo(
+    () => buildPracticeIdMap(mineData?.data ?? [], justJoinedPracticeIds),
+    [mineData, justJoinedPracticeIds]
+  );
+  // /me/challenges 已有該挑戰項目後，丟掉保留的 join 回傳值，以列表（含明確的 null）為準
+  useEffect(() => {
+    if (!mineData) return;
+    setJustJoinedPracticeIds((prev) => pruneJustJoined(prev, mineData.data));
+  }, [mineData]);
   const sections = useMemo(
     () =>
       [
@@ -100,6 +121,7 @@ export default function ChallengesPage() {
                 challenge={challenge}
                 onJoinClick={handleJoinClick}
                 onDrawClick={(target) => setDrawTarget(target.id)}
+                practiceId={practiceIdByChallenge.get(challenge.id)}
               />
             ))}
           </div>
@@ -111,7 +133,11 @@ export default function ChallengesPage() {
         onOpenChange={(open) => {
           if (!open) setJoinTarget(null);
         }}
-        onJoined={() => mutate()}
+        onJoined={({ challengeId, practiceId }) => {
+          // 同步先記下實踐 id，再並行 revalidate 兩份列表；任一份先回來時卡片都已有連結
+          setJustJoinedPracticeIds((prev) => ({ ...prev, [challengeId]: practiceId }));
+          void Promise.all([mutate(), mutateMine()]);
+        }}
       />
 
       <InspirationDrawDialog

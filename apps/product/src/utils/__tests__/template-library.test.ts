@@ -1,0 +1,230 @@
+import { format } from "date-fns";
+import { describe, expect, it } from "vitest";
+import { parseLocalDate, practiceEndDate } from "../practice-period";
+import {
+  addDays,
+  deriveTemplateName,
+  diffTemplateBindings,
+  formatFrequency,
+  inferResourceName,
+  isCohortStarted,
+  newBindingStartDate,
+  normalizeResourceUrl,
+  parseFrequency,
+  resolveTemplateSelection,
+  templateBindingEndDate,
+  templateMatches,
+  templateStartDateOverride,
+  todayInTaipei,
+  validateResourceUrl,
+} from "../template-library";
+
+describe("deriveTemplateName", () => {
+  it("takes the first segment and truncates to 20 characters", () => {
+    expect(deriveTemplateName("圖書館借閱《原子習慣》，每天閱讀 30 頁")).toBe(
+      "圖書館借閱《原子習慣》"
+    );
+    expect(deriveTemplateName("一二三四五六七八九十一二三四五六七八九十廿一")).toHaveLength(20);
+  });
+  it("skips a leading time word and prefers the longest content segment", () => {
+    expect(deriveTemplateName("每天，寫下三件感謝的事，並記錄心情")).toBe("寫下三件感謝的事");
+  });
+  it("returns empty for blank input", () => {
+    expect(deriveTemplateName("  ")).toBe("");
+  });
+});
+
+describe("resources", () => {
+  it("infers names for known hosts and falls back to path｜host", () => {
+    expect(inferResourceName("https://www.books.com.tw/products/0010822522")).toBe("博客來");
+    expect(inferResourceName("https://youtu.be/abc")).toBe("YouTube");
+    expect(inferResourceName("https://daodao.so/practices/1")).toBe("島島阿學");
+    expect(inferResourceName("https://example.com/guides/atomic-habits")).toBe(
+      "atomic-habits｜example.com"
+    );
+    expect(inferResourceName("not a url")).toBeNull();
+  });
+  it("only accepts https URLs", () => {
+    expect(validateResourceUrl("")).toBe("empty");
+    expect(validateResourceUrl("hello")).toBe("invalid");
+    expect(validateResourceUrl("http://example.com")).toBe("https");
+    expect(validateResourceUrl("https://example.com/x")).toBeNull();
+  });
+  it("normalises host case, hash and trailing slashes for dedupe", () => {
+    expect(normalizeResourceUrl("https://Example.com/card/#top")).toBe(
+      normalizeResourceUrl("https://example.com/card")
+    );
+  });
+});
+
+describe("frequency", () => {
+  it("parses ranges and single values within 1-7", () => {
+    expect(parseFrequency("1-3")).toEqual({ min: 1, max: 3 });
+    expect(parseFrequency(" 3 ~ 5 ")).toEqual({ min: 3, max: 5 });
+    expect(parseFrequency("5")).toEqual({ min: 5, max: 5 });
+    expect(parseFrequency("5-3")).toBeNull();
+    expect(parseFrequency("0-8")).toBeNull();
+    expect(parseFrequency("abc")).toBeNull();
+  });
+  it("formats min/max back to the input shape", () => {
+    expect(formatFrequency(1, 3)).toBe("1-3");
+    expect(formatFrequency(5, 5)).toBe("5");
+    expect(formatFrequency(null, null)).toBe("");
+  });
+});
+
+describe("search and dates", () => {
+  const template = {
+    title: "晨間書寫",
+    practiceAction: "每天寫三行",
+    tags: ["反思"],
+    resources: [{ name: "書單", url: "https://example.com/books" }],
+    status: "draft",
+  };
+  it("matches title, action, tags, resource name/url and status label case-insensitively", () => {
+    expect(templateMatches(template, "書寫", "草稿")).toBe(true);
+    expect(templateMatches(template, "三行", "草稿")).toBe(true);
+    expect(templateMatches(template, "反思", "草稿")).toBe(true);
+    expect(templateMatches(template, "BOOKS", "草稿")).toBe(true);
+    expect(templateMatches(template, "草稿", "草稿")).toBe(true);
+    expect(templateMatches(template, "不存在", "草稿")).toBe(false);
+    expect(templateMatches(template, "   ", "草稿")).toBe(true);
+  });
+  it("uses the Taipei calendar day to decide whether a cohort has started", () => {
+    const now = new Date("2026-09-11T17:00:00.000Z"); // 台北 9/12 01:00
+    expect(todayInTaipei(now)).toBe("2026-09-12");
+    expect(isCohortStarted("2026-09-12T00:00:00.000Z", now)).toBe(true);
+    expect(isCohortStarted("2026-09-13T00:00:00.000Z", now)).toBe(false);
+    expect(addDays("2026-09-01", 13)).toBe("2026-09-14");
+  });
+});
+
+describe("diffTemplateBindings", () => {
+  const templates = [
+    { id: 1, boundCohortIds: [] },
+    { id: 2, boundCohortIds: [10] },
+    { id: 3, boundCohortIds: [10, 11] },
+    { id: 4, boundCohortIds: [11] },
+  ];
+
+  it("binds newly checked templates on edit (#273)", () => {
+    expect(diffTemplateBindings(templates, 10, [1, 2, 3])).toEqual({
+      bind: [1],
+      unbind: [],
+      update: [],
+    });
+  });
+
+  it("unbinds templates that were unchecked", () => {
+    expect(diffTemplateBindings(templates, 10, [3])).toEqual({ bind: [], unbind: [2], update: [] });
+  });
+
+  it("does nothing when the selection matches existing bindings", () => {
+    expect(diffTemplateBindings(templates, 10, [2, 3])).toEqual({
+      bind: [],
+      unbind: [],
+      update: [],
+    });
+  });
+
+  it("only looks at bindings of the given cohort", () => {
+    expect(diffTemplateBindings(templates, 11, [1])).toEqual({
+      bind: [1],
+      unbind: [3, 4],
+      update: [],
+    });
+  });
+
+  it("updates start dates only for bound templates whose date really changed (#272)", () => {
+    const withDates = [
+      {
+        id: 1,
+        boundCohortIds: [10],
+        bindings: [{ cohortId: 10, startDate: "2026-10-11T00:00:00.000Z" }],
+      },
+      { id: 2, boundCohortIds: [10], bindings: [{ cohortId: 10, startDate: null }] },
+      { id: 3, boundCohortIds: [10], bindings: [{ cohortId: 10, startDate: null }] },
+      { id: 4, boundCohortIds: [] },
+    ];
+    const startDates = new Map<number, string | null>([
+      [1, "2026-10-11"],
+      [2, "2026-10-20"],
+      [3, "2026-10-20"],
+      [4, "2026-10-20"],
+    ]);
+    expect(diffTemplateBindings(withDates, 10, [1, 2, 4], startDates)).toEqual({
+      bind: [4],
+      unbind: [3],
+      update: [{ templateId: 2, startDate: "2026-10-20" }],
+    });
+  });
+});
+
+describe("templateBindingEndDate", () => {
+  it("computes start + days - 1", () => {
+    expect(templateBindingEndDate("2026-02-03", 30)).toBe("2026-03-04");
+    expect(templateBindingEndDate("2026-03-02", 1)).toBe("2026-03-02");
+    expect(templateBindingEndDate("2026-03-02", null)).toBeNull();
+    expect(templateBindingEndDate(null, 30)).toBeNull();
+  });
+
+  // daodao#277：範本庫顯示的結束日要跟學員實踐頁（practiceEndDate）同一天
+  it("與學員實踐的 practiceEndDate 同一規則", () => {
+    for (const days of [1, 7, 14, 21, 30, 91]) {
+      const start = parseLocalDate("2026-10-20") as Date;
+      expect(templateBindingEndDate("2026-10-20", days)).toBe(
+        format(practiceEndDate(start, days), "yyyy-MM-dd")
+      );
+    }
+  });
+
+  it("天數不是正整數時不顯示結束日", () => {
+    expect(templateBindingEndDate("2026-10-20", 0)).toBeNull();
+    expect(templateBindingEndDate("2026-10-20", 1.5)).toBeNull();
+  });
+});
+
+describe("resolveTemplateSelection", () => {
+  it("starts from the existing bindings", () => {
+    expect(resolveTemplateSelection([2, 3], new Map())).toEqual(new Set([2, 3]));
+  });
+
+  it("applies only the templates the user toggled", () => {
+    const overrides = new Map([
+      [1, true],
+      [2, false],
+    ]);
+    expect(resolveTemplateSelection([2, 3], overrides)).toEqual(new Set([1, 3]));
+  });
+
+  it("keeps a binding someone else added after the panel opened (#273)", () => {
+    const overrides = new Map([[1, true]]);
+    expect(resolveTemplateSelection([3, 4], overrides)).toEqual(new Set([1, 3, 4]));
+  });
+});
+
+describe("templateStartDateOverride", () => {
+  it("keeps following the cohort start when the cohort start is re-picked (#272 audit)", () => {
+    expect(templateStartDateOverride("2026-10-10", "2026-10-10", null)).toBeNull();
+  });
+
+  it("keeps an explicit date when the template already had one", () => {
+    expect(templateStartDateOverride("2026-10-10", "2026-10-10", "2026-10-12")).toBe("2026-10-10");
+  });
+
+  it("stores a different date and treats a cleared input as following the cohort", () => {
+    expect(templateStartDateOverride("2026-10-12", "2026-10-10", null)).toBe("2026-10-12");
+    expect(templateStartDateOverride("", "2026-10-10", "2026-10-12")).toBeNull();
+  });
+});
+
+describe("newBindingStartDate", () => {
+  it("sends an explicit null so a re-bound template doesn't revive its old date (#272 review)", () => {
+    expect(newBindingStartDate(new Map(), 35)).toBeNull();
+    expect(newBindingStartDate(new Map([[35, null]]), 35)).toBeNull();
+  });
+
+  it("sends the date the user picked", () => {
+    expect(newBindingStartDate(new Map([[35, "2026-10-15"]]), 35)).toBe("2026-10-15");
+  });
+});

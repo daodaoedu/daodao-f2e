@@ -3,11 +3,11 @@ name: Linode CI
 # ===== 並發控制設定 =====
 # 目的：防止同一分支的多個 CI 檢查同時執行，避免資源浪費
 # group: 針對 PR 使用 head_ref，其他情況使用 ref
-# cancel-in-progress: false（讓所有 CI 跑完，CD 有 cancel-in-progress 就夠了）
+# cancel-in-progress: true — 同一 PR 的新 push 取消舊的 CI，節省 runner
 # =======================
 concurrency:
   group: linode-ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 # ===== 觸發條件設定 =====
 # 1. push：當推送到 main, dev, feat/** 分支時觸發
@@ -34,8 +34,21 @@ env:
   PNPM_VERSION: 10
 
 jobs:
+  workflow-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install workflow test dependency
+        run: python -m pip install PyYAML==6.0.2
+      - name: Test quality gate failure propagation
+        run: python -m unittest discover -s .github/scripts/__tests__ -p 'test_*.py' -v
+
   # ===== 主要測試與品質檢查階段 =====
   test:
+    needs: workflow-tests
     runs-on: ubuntu-latest
     steps:
       # ===== 代碼檢出 =====
@@ -78,17 +91,25 @@ jobs:
 
       # ===== 並行品質檢查 =====
       - name: Run checks in parallel
+        shell: bash
         run: |
           echo "🔍 Running TypeScript type checking..."
           pnpm run typecheck &
+          typecheck_pid=$!
 
           echo "📝 Running linting..."
           pnpm run lint &
+          lint_pid=$!
 
           echo "🧪 Running tests..."
           pnpm test &
+          test_pid=$!
 
-          wait
+          check_result=0
+          wait "$typecheck_pid" || check_result=1
+          wait "$lint_pid" || check_result=1
+          wait "$test_pid" || check_result=1
+          exit "$check_result"
 
 
   # ===== CI 成功通知 =====

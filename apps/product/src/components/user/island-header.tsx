@@ -178,7 +178,8 @@ export function IslandHeader({ resultType, userId, identifier }: IslandHeaderPro
           className="md:hidden object-cover"
         />
         <PageHeader {...pageHeaderProps} />
-        {identifier && (
+        {/* TODO: 暫時隱藏上島按鈕，待功能完備後移除 false 條件 */}
+        {false && identifier && (
           <div className="absolute right-4 top-[64px] md:top-[72px]">
             <Button
               variant="orange"

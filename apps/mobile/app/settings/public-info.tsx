@@ -9,7 +9,6 @@ import { Avatar, Card, Input, ScrollView, Switch, Text, TextArea, XStack, YStack
 import { Button } from "@/components/ui/button";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { applyOnboardingUpdateFromResponse } from "@/hooks/useOnboardingProgress";
 import { useMobileTranslation } from "@/i18n";
 import { extractApiErrorMessage } from "@/utils/api-error";
 
@@ -401,8 +400,6 @@ export default function PublicInfoSettingsScreen() {
       if (response.error) {
         throw response.error;
       }
-      // 新手任務 B：即時標記「公開資訊/帳號/領域偏好」完成
-      applyOnboardingUpdateFromResponse(response.data);
       await mutate();
       setSelectedPhotoUri(null);
       setSelectedPhotoFile(null);

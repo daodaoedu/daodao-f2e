@@ -15,13 +15,14 @@
       "usernameHint": "僅可使用英文字母和數字，長度 3-15 個字元",
       "usernameValid": "帳號名稱可以使用",
       "usernameInvalid": "帳號名稱必須為 3-15 個字元，僅限使用英文字母和數字",
+      "nameUnavailable": "此名字已被使用",
       "usernameUnavailable": "此帳號名稱已被使用",
       "bio": "個人標語",
       "bioPlaceholder": "用一句話介紹自己"
     },
     "interests": {
       "title": "專業與興趣領域",
-      "professionalFieldsLabel": "你的專業或正在學習的領域（選填，最多 5 個）",
+      "professionalFieldsLabel": "你的專業或正在學習的領域（請選擇 1–5 個）",
       "interestsLabel": "你有興趣探索的領域",
       "interestsRequired": "必選",
       "maxReached": "太棒了！我們已經有足夠資訊為你個人化學習體驗"
@@ -46,27 +47,8 @@
     "submitting": "提交中..."
   },
   "errors": {
+    "availabilityFailed": "暫時無法確認是否可用，請稍後再試",
     "submitFailed": "提交失敗，請稍後再試"
-  },
-  "taskGuide": {
-    "title": "新手入門任務",
-    "celebration": {
-      "title": "恭喜完成！"
-    },
-    "progress": "{completed}/{total} 完成",
-    "ariaOpen": "展開 Onboarding 任務清單",
-    "ariaCollapse": "收合",
-    "ariaClose": "關閉",
-    "tasks": {
-      "A": "完成學習風格測驗",
-      "B": "完成公開資訊、帳號與領域偏好",
-      "C": "建立第一個實踐",
-      "D": "完成第一次打卡",
-      "E": "在靈感頁留下留言"
-    },
-    "taskDescriptions": {
-      "B": "需完成公開資訊、帳號設定與領域偏好三個區塊"
-    }
   },
   "validation": {
     "birthDateRequired": "請選擇生日",

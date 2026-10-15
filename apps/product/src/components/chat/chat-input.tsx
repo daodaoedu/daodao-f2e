@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatMessageType } from "@daodao/api";
-import { editChatMessage, sendChatMessage } from "@daodao/api";
+import { editChatMessage, selectChatErrorMessage, sendChatMessage } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useCompositionState } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -56,11 +56,7 @@ export function ChatInput({
       if (editingMessage) {
         const response = await editChatMessage(roomId, editingMessage.id, trimmed);
         if (response.error) {
-          const msg =
-            response.error && typeof response.error === "object" && "message" in response.error
-              ? String(response.error.message)
-              : t("send_failed");
-          toast.error(msg);
+          toast.error(selectChatErrorMessage(response.error, t("send_failed")));
           return;
         }
         resetInput();
@@ -69,11 +65,7 @@ export function ChatInput({
       } else {
         const response = await sendChatMessage(roomId, trimmed, replyTo?.id);
         if (response.error) {
-          const msg =
-            response.error && typeof response.error === "object" && "message" in response.error
-              ? String(response.error.message)
-              : t("send_failed");
-          toast.error(msg);
+          toast.error(selectChatErrorMessage(response.error, t("send_failed")));
           return;
         }
         resetInput();
@@ -126,69 +118,96 @@ export function ChatInput({
     resetInput();
   }, [onClearEdit, resetInput]);
 
+  const hasContext = !!editingMessage || !!replyTo;
+  const canSend = !!value.trim() && !sending;
+
+  // POC 訊息.dc.html：輸入區最寬 720 置中、圓角輸入框、回覆／編輯提示列接在輸入框上方、下方快捷鍵提示
   return (
-    <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-[#E4EAE9]">
-      {/* Edit mode banner */}
-      {editingMessage && (
-        <div className="flex items-center gap-2 px-4 pt-2 pb-1">
-          <Pencil className="size-3.5 text-amber-500 shrink-0" />
-          <div className="flex-1 min-w-0 border-l-2 border-amber-400 pl-2">
-            <p className="text-[11px] font-medium text-text-dark/60">{t("edit_mode_label")}</p>
-            <p className="text-xs text-text-dark/40 truncate">{editingMessage.body}</p>
+    <div
+      data-chat-composer
+      className="sticky bottom-0 shrink-0 bg-[linear-gradient(to_top,oklch(0.992_0.011_182.9)_55%,transparent)] px-7 pt-3 pb-5"
+    >
+      <div className="mx-auto max-w-[720px]">
+        {/* Edit mode bar */}
+        {editingMessage && (
+          <div className="-mb-px flex items-center gap-2.5 rounded-t-[18px] border border-b-0 border-[#E4EAE9] bg-white px-4 py-2">
+            <Pencil className="size-3.5 shrink-0 text-[oklch(0.711_0.12_190.6)]" aria-hidden />
+            <span className="min-w-0 flex-1 text-xs font-semibold text-[oklch(0.711_0.12_190.6)]">
+              {t("edit_mode_label")}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleCancelEdit}
+              aria-label={t("delete_cancel")}
+              className="size-[26px] shrink-0 rounded-full text-[oklch(0.445_0.056_192/0.45)] hover:bg-[oklch(0.962_0.032_211.1)] [&_svg]:size-3.5"
+            >
+              <X />
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleCancelEdit}
-            className="size-6 shrink-0"
-          >
-            <X className="size-4" />
-          </Button>
-        </div>
-      )}
+        )}
 
-      {/* Reply preview */}
-      {replyTo && !editingMessage && (
-        <div className="flex items-center gap-2 px-4 pt-2 pb-1">
-          <div className="flex-1 min-w-0 border-l-2 border-logo-cyan/40 pl-2">
-            <p className="text-[11px] font-medium text-text-dark/60">
-              {t("reply_to", { name: replyTo.author?.nickname ?? "" })}
-            </p>
-            <p className="text-xs text-text-dark/40 truncate">{replyTo.body}</p>
+        {/* Reply bar */}
+        {replyTo && !editingMessage && (
+          <div className="-mb-px flex items-center gap-2.5 rounded-t-[18px] border border-b-0 border-[#E4EAE9] bg-white px-4 py-2">
+            <span className="h-[26px] w-[3px] shrink-0 rounded-full bg-[oklch(0.711_0.12_190.6)]" />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[11px] font-semibold text-[oklch(0.711_0.12_190.6)]">
+                {t("reply_to", { name: replyTo.author?.nickname ?? "" })}
+              </span>
+              <span className="block truncate text-xs text-[oklch(0.445_0.056_192/0.6)]">
+                {replyTo.body}
+              </span>
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClearReply}
+              aria-label={t("delete_cancel")}
+              className="size-[26px] shrink-0 rounded-full text-[oklch(0.445_0.056_192/0.45)] hover:bg-[oklch(0.962_0.032_211.1)] [&_svg]:size-3.5"
+            >
+              <X />
+            </Button>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClearReply} className="size-6 shrink-0">
-            <X className="size-4" />
-          </Button>
-        </div>
-      )}
+        )}
 
-      {/* Input area */}
-      <div className="flex items-end gap-2 px-4 py-3">
-        <textarea
-          ref={textareaRef}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onInput={handleInput}
-          onCompositionStart={compositionProps.onCompositionStart}
-          onCompositionEnd={compositionProps.onCompositionEnd}
-          placeholder={t("input_placeholder")}
-          rows={1}
+        {/* Composer */}
+        <div
           className={cn(
-            "flex-1 resize-none overflow-hidden rounded-xl border border-[#E4EAE9] bg-[#F7FBFB] px-4 py-2.5 text-sm text-text-dark",
-            "placeholder:text-text-dark/30 focus:outline-none focus:border-logo-cyan transition-colors",
-            "min-h-[40px] max-h-[120px]"
+            "flex items-end gap-2.5 border border-[#E4EAE9] bg-white py-1.5 pr-2 pl-[18px] shadow-[0_2px_8px_rgba(15,48,54,0.05)]",
+            hasContext ? "rounded-[0_0_18px_18px]" : "rounded-[22px]"
           )}
-        />
-        <Button
-          size="icon"
-          onClick={() => void handleSubmit()}
-          disabled={!value.trim() || sending}
-          className="shrink-0 size-10 rounded-full bg-logo-cyan hover:bg-logo-cyan/80 disabled:opacity-40"
-          aria-label={editingMessage ? t("edit_action") : t("send")}
         >
-          {editingMessage ? <Pencil className="size-4" /> : <Send className="size-4" />}
-        </Button>
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onInput={handleInput}
+            onCompositionStart={compositionProps.onCompositionStart}
+            onCompositionEnd={compositionProps.onCompositionEnd}
+            placeholder={t("input_placeholder")}
+            rows={1}
+            className="max-h-[120px] min-w-0 flex-1 resize-none overflow-hidden border-0 bg-transparent py-2 text-sm leading-[1.7] text-[oklch(0.445_0.056_192)] outline-none placeholder:text-[oklch(0.445_0.056_192/0.4)]"
+          />
+          <Button
+            size="icon"
+            onClick={() => void handleSubmit()}
+            disabled={!canSend}
+            className={cn(
+              "mb-px size-[38px] shrink-0 rounded-full border-0 disabled:opacity-100 [&_svg]:size-[18px]",
+              canSend
+                ? "bg-[oklch(0.711_0.12_190.6)] text-white hover:bg-[oklch(0.711_0.12_190.6)]"
+                : "bg-[oklch(0.962_0.032_211.1)] text-[oklch(0.445_0.056_192/0.4)]"
+            )}
+            aria-label={editingMessage ? t("edit_action") : t("send")}
+          >
+            <Send />
+          </Button>
+        </div>
+        <p className="mx-1 mt-2 mb-0 text-[11px] text-[oklch(0.445_0.056_192/0.4)]">
+          {t("input_hint")}
+        </p>
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ import { useTranslations } from "@daodao/i18n";
 import { Popover, PopoverContent, PopoverTrigger } from "@daodao/ui/components/popover";
 import { cn } from "@daodao/ui/lib/utils";
 import { Check, Link2, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { autoNameForUrl } from "@/utils/space-link-name";
 
 type LinkInput = NonNullable<UpdateSpaceBlockRequestType["links"]>[number];
@@ -41,6 +41,18 @@ export const SpaceResourcesEditor = ({ links, onChange, practices }: SpaceResour
   const t = useTranslations("space");
   const [adding, setAdding] = useState(false);
   const [draftUrl, setDraftUrl] = useState("");
+  const draftInputRef = useRef<HTMLInputElement>(null);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+  const cancelledRef = useRef(false);
+
+  useEffect(() => {
+    if (adding) {
+      draftInputRef.current?.focus({ preventScroll: true });
+    } else if (cancelledRef.current) {
+      cancelledRef.current = false;
+      addButtonRef.current?.focus({ preventScroll: true });
+    }
+  }, [adding]);
 
   const updateRow = (index: number, patch: Partial<EditableLink>) => {
     onChange(links.map((link, i) => (i === index ? { ...link, ...patch } : link)));
@@ -150,7 +162,8 @@ export const SpaceResourcesEditor = ({ links, onChange, practices }: SpaceResour
       {adding ? (
         <div>
           <input
-            autoFocus
+            ref={draftInputRef}
+            aria-label={t("link_placeholder")}
             value={draftUrl}
             placeholder={t("link_placeholder")}
             onChange={(event) => setDraftUrl(event.target.value)}
@@ -161,11 +174,15 @@ export const SpaceResourcesEditor = ({ links, onChange, practices }: SpaceResour
                 commitDraft(true);
               }
               if (event.key === "Escape") {
+                event.preventDefault();
+                cancelledRef.current = true;
                 setDraftUrl("");
                 setAdding(false);
               }
             }}
-            onBlur={() => commitDraft(false)}
+            onBlur={() => {
+              if (!cancelledRef.current) commitDraft(false);
+            }}
             className="w-full rounded-lg border border-dashed border-primary-base/60 px-3 py-2 text-sm text-text-dark focus:outline-none"
           />
           <p className="mt-1 text-xs text-text-dark/45">{t("link_hint")}</p>
@@ -173,6 +190,7 @@ export const SpaceResourcesEditor = ({ links, onChange, practices }: SpaceResour
       ) : (
         <button
           type="button"
+          ref={addButtonRef}
           onClick={() => setAdding(true)}
           className="self-start rounded-full px-2 py-1 text-xs text-primary-base transition-colors hover:bg-[#F0F9F8]"
         >

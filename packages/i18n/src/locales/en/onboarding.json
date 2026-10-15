@@ -15,13 +15,14 @@
       "usernameHint": "Only letters and numbers allowed, 3-15 characters",
       "usernameValid": "Username is available",
       "usernameInvalid": "Username must be 3-15 characters, letters and numbers only",
+      "nameUnavailable": "This name is already taken",
       "usernameUnavailable": "This username is already taken",
       "bio": "Personal Tagline",
       "bioPlaceholder": "Introduce yourself in one sentence"
     },
     "interests": {
       "title": "Professional & Interest Fields",
-      "professionalFieldsLabel": "Your professional or learning fields (optional, max 5)",
+      "professionalFieldsLabel": "Your professional or learning fields (select 1–5)",
       "interestsLabel": "Fields you're interested in exploring",
       "interestsRequired": "Required",
       "maxReached": "Great! We have enough info to personalize your learning experience"
@@ -46,27 +47,8 @@
     "submitting": "Submitting..."
   },
   "errors": {
+    "availabilityFailed": "Unable to check availability. Please try again.",
     "submitFailed": "Submission failed, please try again later"
-  },
-  "taskGuide": {
-    "title": "Beginner Tasks",
-    "celebration": {
-      "title": "All done!"
-    },
-    "progress": "{completed}/{total} done",
-    "ariaOpen": "Expand onboarding task list",
-    "ariaCollapse": "Collapse",
-    "ariaClose": "Close",
-    "tasks": {
-      "A": "Complete the learning style quiz",
-      "B": "Complete public info, account, and preferences",
-      "C": "Create your first practice",
-      "D": "Complete your first check-in",
-      "E": "Leave a comment on inspirations"
-    },
-    "taskDescriptions": {
-      "B": "Complete all three sections: public info, account settings, and preferences"
-    }
   },
   "validation": {
     "birthDateRequired": "Please select your birthday",

@@ -1,10 +1,10 @@
 "use client";
 
-import { useMyChatRooms } from "@daodao/api";
+import { selectChatRoomList, useMyChatRooms } from "@daodao/api";
 
 export const ChatUnreadBadge = () => {
   const { data } = useMyChatRooms();
-  const count = data?.totalUnread ?? 0;
+  const count = selectChatRoomList(data).totalUnread;
   if (count === 0) return null;
 
   const label = count > 99 ? "99+" : String(count);

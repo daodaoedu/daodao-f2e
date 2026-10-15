@@ -14,6 +14,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { BackgroundAnimation } from "@/components/layout";
 import { getStatusConfig, mapPracticeStatusToTaskStatus } from "@/constants/task-status";
+import { parseLocalDate } from "@/utils/practice-period";
 
 export default function CopySuccessPage() {
   const t = useTranslations("practice");
@@ -38,10 +39,11 @@ export default function CopySuccessPage() {
     ? getStatusConfig(mapPracticeStatusToTaskStatus(practice.status))
     : null;
 
-  const startDate = practice?.startDate ? format(new Date(practice.startDate), "yyyy/MM/dd") : "";
+  const parsedStartDate = practice?.startDate ? parseLocalDate(practice.startDate) : null;
+  const startDate = parsedStartDate ? format(parsedStartDate, "yyyy/MM/dd") : "";
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
       <ConfettiAnimation />
       <main className="relative max-w-[600px] mx-auto min-h-screen flex flex-col items-center justify-center px-5 py-12 gap-6">

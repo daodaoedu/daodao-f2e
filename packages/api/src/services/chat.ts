@@ -7,22 +7,117 @@ import type { paths } from "../types";
 // Types
 // ============================================================================
 
-type ChatRoomListResponse =
-  paths["/api/v1/me/chat-rooms"]["get"]["responses"][200]["content"]["application/json"];
-type ChatRoomDetailResponse =
-  paths["/api/v1/chat-rooms/{roomId}"]["get"]["responses"][200]["content"]["application/json"];
-type ChatMemberListResponse =
-  paths["/api/v1/chat-rooms/{roomId}/members"]["get"]["responses"][200]["content"]["application/json"];
-type ChatMessageListResponse =
-  paths["/api/v1/chat-rooms/{roomId}/messages"]["get"]["responses"][200]["content"]["application/json"];
-type ChatPinnedMessageListResponse =
-  paths["/api/v1/chat-rooms/{roomId}/pins"]["get"]["responses"][200]["content"]["application/json"];
+type JsonBody<T> = T extends { content: { "application/json": infer B } } ? B : never;
 
-export type ChatRoomType = ChatRoomListResponse["items"][number];
-export type ChatRoomDetailType = ChatRoomDetailResponse;
-export type ChatMemberType = ChatMemberListResponse[number];
-export type ChatMessageType = ChatMessageListResponse["messages"][number];
-export type ChatPinnedMessageType = ChatPinnedMessageListResponse[number];
+// server 回應一律包在 { success, data, ... } 外層；以下型別取 data 內的實際內容
+type ChatRoomListResponse = JsonBody<paths["/api/v1/me/chat-rooms"]["get"]["responses"][200]>;
+type ChatRoomDetailResponse = JsonBody<
+  paths["/api/v1/chat-rooms/{roomId}"]["get"]["responses"][200]
+>;
+type ChatMemberListResponse = JsonBody<
+  paths["/api/v1/chat-rooms/{roomId}/members"]["get"]["responses"][200]
+>;
+/** 歷史分頁（data 為訊息陣列）或增量輪詢（data 為 delta 物件） */
+type ChatMessagesResponse = JsonBody<
+  paths["/api/v1/chat-rooms/{roomId}/messages"]["get"]["responses"][200]
+>;
+type ChatPinnedMessageListResponse = JsonBody<
+  paths["/api/v1/chat-rooms/{roomId}/pins"]["get"]["responses"][200]
+>;
+type ChatSearchResponse = JsonBody<
+  paths["/api/v1/chat-rooms/{roomId}/messages/search"]["get"]["responses"][200]
+>;
+
+type ChatMessageHistoryResponse = Extract<ChatMessagesResponse, { data: unknown[] }>;
+type ChatMessageDeltaResponse = Exclude<ChatMessagesResponse, { data: unknown[] }>;
+
+export type ChatRoomListType = ChatRoomListResponse["data"];
+export type ChatRoomType = ChatRoomListType["items"][number];
+export type ChatRoomDetailType = ChatRoomDetailResponse["data"];
+export type ChatMemberType = ChatMemberListResponse["data"][number];
+export type ChatMessageType = ChatMessageHistoryResponse["data"][number];
+export type ChatMessageDeltaType = Pick<
+  ChatMessageDeltaResponse["data"],
+  "messages" | "changed" | "deletedIds"
+>;
+export type ChatPinnedMessageType = ChatPinnedMessageListResponse["data"][number];
+export type ChatSearchResultType = ChatSearchResponse["data"];
+
+// ============================================================================
+// Response Selectors — 從 SWR 拿到的 envelope 取出畫面要用的資料（daodao#154）
+// ============================================================================
+
+/** 聊天室列表與總未讀；未載入時回空列表 */
+export const selectChatRoomList = (res: ChatRoomListResponse | undefined): ChatRoomListType =>
+  res?.data ?? { totalUnread: 0, items: [] };
+
+/** 聊天室詳情；未載入或失敗時回 undefined */
+export const selectChatRoom = (
+  res: ChatRoomDetailResponse | undefined
+): ChatRoomDetailType | undefined => res?.data;
+
+/** 成員列表 */
+export const selectChatMembers = (res: ChatMemberListResponse | undefined): ChatMemberType[] =>
+  res?.data ?? [];
+
+/**
+ * 歷史訊息，排成舊到新（server 分頁是新到舊）；body 不是歷史分頁形狀時回空陣列。
+ * 頁面用最後一筆當增量輪詢的 after，所以順序不能直接沿用 server 的。
+ */
+export const selectChatHistory = (res: ChatMessagesResponse | undefined): ChatMessageType[] =>
+  res && Array.isArray(res.data) ? [...res.data].sort((a, b) => a.id - b.id) : [];
+
+/** 增量輪詢結果；body 不是 delta 形狀時回 null */
+export const selectChatDelta = (
+  res: ChatMessagesResponse | undefined
+): ChatMessageDeltaType | null => {
+  if (!res || Array.isArray(res.data)) return null;
+  const { messages, changed, deletedIds } = res.data;
+  return { messages: messages ?? [], changed: changed ?? [], deletedIds: deletedIds ?? [] };
+};
+
+/** 置頂訊息列表 */
+export const selectChatPins = (
+  res: ChatPinnedMessageListResponse | undefined
+): ChatPinnedMessageType[] => res?.data ?? [];
+
+/** 室內搜尋結果 */
+export const selectChatSearch = (res: ChatSearchResponse | undefined): ChatSearchResultType =>
+  res?.data ?? { total: 0, items: [] };
+
+/**
+ * 是否為當前使用者自己的訊息。
+ * author.userId 是內部 users.id（整數），必須跟聊天室詳情的 viewerUserId 比；
+ * /users/me 的 id 是 external UUID，不能拿來比（daodao#154 J-06c）。
+ */
+export const isOwnChatMessage = (
+  message: Pick<ChatMessageType, "author">,
+  viewerUserId: number | null | undefined
+): boolean =>
+  typeof viewerUserId === "number" &&
+  Number.isInteger(viewerUserId) &&
+  message.author?.userId === viewerUserId;
+
+/**
+ * 增量輪詢的 after：歷史訊息還沒載入時回 null（先不輪詢）；
+ * 載入後取最新一則的 id，聊天室沒有訊息時回 0，空聊天室也要收到別人的新訊息（daodao#154）。
+ */
+export const chatDeltaAfter = (
+  historyLoaded: boolean,
+  messages: ReadonlyArray<Pick<ChatMessageType, "id">>
+): number | null => {
+  if (!historyLoaded) return null;
+  return messages.length > 0 ? messages[messages.length - 1]!.id : 0;
+};
+
+/** 失敗回應的 server 訊息（{ success: false, error: { message } }）；取不到時用 fallback */
+export const selectChatErrorMessage = (error: unknown, fallback: string): string => {
+  if (!error || typeof error !== "object" || !("error" in error)) return fallback;
+  const inner = (error as { error?: unknown }).error;
+  if (!inner || typeof inner !== "object" || !("message" in inner)) return fallback;
+  const message = (inner as { message?: unknown }).message;
+  return typeof message === "string" && message.trim() ? message : fallback;
+};
 
 // ============================================================================
 // Client Functions

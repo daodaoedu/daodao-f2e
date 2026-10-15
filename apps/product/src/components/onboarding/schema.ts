@@ -15,15 +15,20 @@ type TFunction = ReturnType<typeof useTranslations<"onboarding">>;
 /**
  * 主表單 Schema（送出時驗證）
  *
- * interests / professionalFields / referralSource 允許為空，
+ * 動態流程的 interests / professionalFields / referralSource 允許為空，
  * 因為動態流程模式下這些欄位由 dynamicAnswers 透過 fieldKey 映射填入。
- * 每個步驟的強制填寫在 createOnboardingStepSchemas 裡驗證。
+ * 固定流程重用步驟 Schema，讓 resolver 同步回報必填錯誤。
  */
-export const createOnboardingFormSchema = (t?: TFunction) => {
+export const createOnboardingFormSchema = (
+  t?: TFunction,
+  { requireFixedFields = false }: { requireFixedFields?: boolean } = {}
+) => {
   const msg = (key: string, params?: Record<string, string | number>) => {
     if (t) return t(key as Parameters<TFunction>[0], params as never);
     return key;
   };
+
+  const fixedSchemas = createOnboardingStepSchemas(t);
 
   return z.object({
     // Step 1: Profile
@@ -52,19 +57,24 @@ export const createOnboardingFormSchema = (t?: TFunction) => {
       .max(150, msg("validation.personalSloganMax", { max: 150 })),
 
     // Step 2+: 固定流程欄位（動態流程時可為空，由 fieldKey 映射覆蓋）
-    professionalFields: z.array(z.string()).max(5).default([]),
-    interests: z.array(z.string()).max(5).default([]),
-    referralSource: z.string().default(""),
+    professionalFields: (requireFixedFields
+      ? fixedSchemas.interestsStepSchema.shape.professionalFields
+      : z.array(z.string()).max(5)
+    ).default([]),
+    interests: (requireFixedFields
+      ? fixedSchemas.interestsStepSchema.shape.interests
+      : z.array(z.string()).max(5)
+    ).default([]),
+    referralSource: (requireFixedFields
+      ? fixedSchemas.referralStepSchema.shape.referralSource
+      : z.string()
+    ).default(""),
     otherReferralText: z.string().optional().or(z.literal("")),
 
     // 動態流程步驟回答：key 為 stepId.toString()，value 為選取或輸入的答案陣列
     dynamicAnswers: z.record(z.string(), z.array(z.string())).default({}),
   });
 };
-
-export const onboardingFormSchema = createOnboardingFormSchema();
-
-export type OnboardingFormValues = z.infer<typeof onboardingFormSchema>;
 
 /**
  * 步驟驗證 Schema（用於固定流程逐步驗證，仍維持必填）
@@ -120,3 +130,6 @@ export const createOnboardingStepSchemas = (t?: TFunction) => {
 
 export const { profileStepSchema, interestsStepSchema, referralStepSchema } =
   createOnboardingStepSchemas();
+
+export const onboardingFormSchema = createOnboardingFormSchema();
+export type OnboardingFormValues = z.infer<typeof onboardingFormSchema>;

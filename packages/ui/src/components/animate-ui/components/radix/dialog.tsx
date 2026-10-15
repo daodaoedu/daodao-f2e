@@ -53,17 +53,26 @@ function DialogOverlay({ className, ...props }: DialogOverlayProps) {
 
 type DialogContentProps = DialogContentPrimitiveProps & {
   showCloseButton?: boolean;
+  /** 覆寫遮罩樣式（例如不同透明度） */
+  overlayClassName?: string;
+  /**
+   * 掛載到指定容器（預設 document.body）。只遮住某個區塊時傳該區塊的元素，
+   * 並把遮罩／面板的 `fixed` 換成 `absolute`（容器需 `relative`）。
+   */
+  portalContainer?: HTMLElement | null;
 };
 
 function DialogContent({
   className,
   children,
   showCloseButton = true,
+  overlayClassName,
+  portalContainer,
   ...props
 }: DialogContentProps) {
   return (
-    <DialogPortalPrimitive>
-      <DialogOverlay />
+    <DialogPortalPrimitive container={portalContainer ?? undefined}>
+      <DialogOverlay className={overlayClassName} />
       <DialogContentPrimitive
         className={cn(
           "bg-background fixed top-[50%] left-[50%] z-50 grid w-full max-w-screen translate-x-[-50%] translate-y-[-50%] rounded-3xl border shadow-lg sm:max-w-[350px]",
