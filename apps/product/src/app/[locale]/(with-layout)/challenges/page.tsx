@@ -12,7 +12,11 @@ import { Spinner } from "@daodao/ui/components/spinner";
 import { Box, Flag, Star } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ChallengeCard, InspirationDrawDialog, JoinChallengeDialog } from "@/components/challenge";
+import { PageHeader } from "@/components/layout";
 import { buildPracticeIdMap, pruneJustJoined } from "@/utils/challenge-card";
+
+/** 使用者自己的「共同挑戰」頁（FR-EXP-01 返回／關閉的目的地） */
+const MY_CHALLENGES_PATH = "/spaces/challenge";
 
 /**
  * 探索共同挑戰 standalone 頁（openspec: challenge-discovery）
@@ -86,67 +90,76 @@ export default function ChallengesPage() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-[640px] flex-col gap-10 px-4 pt-[68px] pb-18 md:pt-8">
-      <header className="flex flex-col gap-2">
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-bg-dark">
-          <Flag className="size-6 text-logo-cyan" />
-          {t("page_title")}
-        </h1>
-        <p className="text-sm text-text-dark">{t("page_subtitle")}</p>
+    <div className="min-h-screen bg-very-light-blue">
+      {/* FR-EXP-01：返回、關閉皆回「共同挑戰」頁；有上一頁紀錄時返回優先回上一頁（POC 頁首列） */}
+      <header className="border-b border-[#E4EAE9] bg-basic-white">
+        <PageHeader
+          // 中欄依標題寬度（英文標題較長），避免三等分欄把標題擠成兩行
+          className="grid-cols-[1fr_auto_1fr] pb-4 md:pt-4"
+          leftAction="back"
+          leftLabelHidden
+          onLeftAction={() => {
+            if (window.history.length > 1) router.back();
+            else router.push(MY_CHALLENGES_PATH);
+          }}
+          title={t("page_title")}
+          rightActionTo={MY_CHALLENGES_PATH}
+        />
       </header>
-
-      {isLoading && (
-        <div className="flex justify-center py-16">
-          <Spinner aria-label={t("loading")} />
-        </div>
-      )}
-
-      {!isLoading && sections.length === 0 && (
-        <p className="py-16 text-center text-sm text-text-dark">{t("empty")}</p>
-      )}
-
-      {sections.map((section) => (
-        <section key={section.key}>
-          <div className="flex items-center gap-2">
-            <section.Icon className={`size-4.5 ${section.iconClassName}`} />
-            <h2 className="m-0 text-lg font-bold text-bg-dark">{section.title}</h2>
-            <span className="text-sm text-text-dark/40">· {section.items.length}</span>
+      <main className="mx-auto flex w-full max-w-[640px] flex-col gap-10 px-4 pt-8 pb-18">
+        {isLoading && (
+          <div className="flex justify-center py-16">
+            <Spinner aria-label={t("loading")} />
           </div>
-          {section.subtitle && (
-            <p className="mt-1.5 ml-6.5 text-sm text-text-dark/70">{section.subtitle}</p>
-          )}
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {section.items.map((challenge) => (
-              <ChallengeCard
-                key={challenge.id}
-                challenge={challenge}
-                onJoinClick={handleJoinClick}
-                onDrawClick={(target) => setDrawTarget(target.id)}
-                practiceId={practiceIdByChallenge.get(challenge.id)}
-              />
-            ))}
-          </div>
-        </section>
-      ))}
+        )}
 
-      <JoinChallengeDialog
-        challenge={joinTarget}
-        onOpenChange={(open) => {
-          if (!open) setJoinTarget(null);
-        }}
-        onJoined={({ challengeId, practiceId }) => {
-          // 同步先記下實踐 id，再並行 revalidate 兩份列表；任一份先回來時卡片都已有連結
-          setJustJoinedPracticeIds((prev) => ({ ...prev, [challengeId]: practiceId }));
-          void Promise.all([mutate(), mutateMine()]);
-        }}
-      />
+        {!isLoading && sections.length === 0 && (
+          <p className="py-16 text-center text-sm text-text-dark">{t("empty")}</p>
+        )}
 
-      <InspirationDrawDialog
-        challengeId={drawTarget}
-        onOpenChange={(open) => {
-          if (!open) setDrawTarget(null);
-        }}
-      />
-    </main>
+        {sections.map((section) => (
+          <section key={section.key}>
+            <div className="flex items-center gap-2">
+              <section.Icon className={`size-4.5 ${section.iconClassName}`} />
+              <h2 className="m-0 text-lg font-bold text-bg-dark">{section.title}</h2>
+              <span className="text-sm text-text-dark/40">· {section.items.length}</span>
+            </div>
+            {section.subtitle && (
+              <p className="mt-1.5 ml-6.5 text-sm text-text-dark/70">{section.subtitle}</p>
+            )}
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {section.items.map((challenge) => (
+                <ChallengeCard
+                  key={challenge.id}
+                  challenge={challenge}
+                  onJoinClick={handleJoinClick}
+                  onDrawClick={(target) => setDrawTarget(target.id)}
+                  practiceId={practiceIdByChallenge.get(challenge.id)}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
+
+        <JoinChallengeDialog
+          challenge={joinTarget}
+          onOpenChange={(open) => {
+            if (!open) setJoinTarget(null);
+          }}
+          onJoined={({ challengeId, practiceId }) => {
+            // 同步先記下實踐 id，再並行 revalidate 兩份列表；任一份先回來時卡片都已有連結
+            setJustJoinedPracticeIds((prev) => ({ ...prev, [challengeId]: practiceId }));
+            void Promise.all([mutate(), mutateMine()]);
+          }}
+        />
+
+        <InspirationDrawDialog
+          challengeId={drawTarget}
+          onOpenChange={(open) => {
+            if (!open) setDrawTarget(null);
+          }}
+        />
+      </main>
+    </div>
   );
 }

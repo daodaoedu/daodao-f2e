@@ -13,6 +13,8 @@ export type PageHeaderProps = {
   leftAction?: "back" | null;
   /** 左側動作按鈕的文字，預設為 "返回" */
   leftLabel?: string;
+  /** 左側只顯示箭頭、文字僅供螢幕閱讀器（設計稿只有 icon 時使用） */
+  leftLabelHidden?: boolean;
   /** 左側動作按鈕的點擊處理函數，預設為 router.back() */
   onLeftAction?: () => void;
   /** 中間標題，可選 */
@@ -38,6 +40,7 @@ export type PageHeaderProps = {
 export const PageHeader = ({
   leftAction = null,
   leftLabel,
+  leftLabelHidden = false,
   onLeftAction,
   title,
   rightAction = "close",
@@ -97,7 +100,11 @@ export const PageHeader = ({
             className={cn("px-0 font-normal", isLight && "text-white hover:text-white")}
           >
             <ArrowLeftOutlineSvg className="size-6" />
-            {resolvedLeftLabel}
+            {leftLabelHidden ? (
+              <span className="sr-only">{resolvedLeftLabel}</span>
+            ) : (
+              resolvedLeftLabel
+            )}
           </Button>
         )}
       </div>

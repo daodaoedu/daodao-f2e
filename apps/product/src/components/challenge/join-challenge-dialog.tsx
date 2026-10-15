@@ -78,7 +78,8 @@ export const JoinChallengeDialog = ({
 
   return (
     <Dialog open={challenge !== null} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-[420px] sm:max-w-[420px] gap-4 rounded-[28px] p-6">
+      {/* POC：遮罩四周留 24px，窄螢幕時視窗不貼齊螢幕邊緣 */}
+      <DialogContent className="max-w-[min(420px,calc(100%-48px))] sm:max-w-[420px] gap-4 rounded-[28px] p-6">
         {joinedPracticeId === null ? (
           <>
             <DialogHeader className="pt-0 text-left">
