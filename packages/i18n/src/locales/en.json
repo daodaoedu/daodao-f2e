@@ -8252,7 +8252,7 @@
     "unavailable_copy": "Visit the organization website to learn about upcoming cohorts.",
     "see_next_cohort": "See the next cohort",
     "join_default_message": "Turn something you want to do into a practice you can sustain together.",
-    "visibility_consent_private": "I understand and agree that after joining, my check-ins in this cohort will be visible to the coaches, my fellow members, and the host organization's team, and will not be shown publicly.",
+    "visibility_consent_private": "I understand and agree that after joining, my check-ins in this cohort will be visible to the coaches, the participants in this cohort, and the host organization's team, and will not be shown publicly.",
     "visibility_consent_public": "I understand and agree that this is a public cohort: after joining, my check-ins in this cohort will be visible to everyone.",
     "checkin_default_private_pending": "The coach has turned on “Default check-ins to private.” This setting takes effect once check-in privacy launches; until then, your check-ins remain visible as described above.",
     "agree_and_join": "Agree and join",
