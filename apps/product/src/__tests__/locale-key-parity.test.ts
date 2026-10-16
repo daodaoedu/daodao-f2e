@@ -1,5 +1,5 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
+import enMessages from "@daodao/i18n/locales/en";
+import zhTWMessages from "@daodao/i18n/locales/zh-TW";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -10,12 +10,7 @@ import { describe, expect, it } from "vitest";
  *
  * 兩個 locale 的 key 集合必須一致：在任一邊加 key，另一邊也要加。
  */
-const LOCALES_DIR = path.resolve(__dirname, "../../../../packages/i18n/src/locales");
-
-type Messages = { [key: string]: string | Messages };
-
-const loadLocale = (locale: string): Messages =>
-  JSON.parse(readFileSync(path.join(LOCALES_DIR, `${locale}.json`), "utf8"));
+type Messages = { [key: string]: string | Messages } | string[];
 
 const flattenKeys = (messages: Messages, prefix = ""): string[] =>
   Object.entries(messages).flatMap(([key, value]) =>
@@ -25,8 +20,8 @@ const flattenKeys = (messages: Messages, prefix = ""): string[] =>
   );
 
 describe("locale key parity", () => {
-  const zhKeys = new Set(flattenKeys(loadLocale("zh-TW")));
-  const enKeys = new Set(flattenKeys(loadLocale("en")));
+  const zhKeys = new Set(flattenKeys(zhTWMessages));
+  const enKeys = new Set(flattenKeys(enMessages));
 
   it("every zh-TW key exists in en", () => {
     expect([...zhKeys].filter((key) => !enKeys.has(key))).toEqual([]);

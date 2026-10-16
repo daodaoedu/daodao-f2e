@@ -1,7 +1,7 @@
 import { hasLocale } from "next-intl";
 import type { Messages } from "../index";
-import enMessages from "../locales/en.json";
-import zhTWMessages from "../locales/zh-TW.json";
+import enMessages from "../locales/en";
+import zhTWMessages from "../locales/zh-TW";
 import type { Locale } from "../routing";
 import { routing } from "../routing";
 
