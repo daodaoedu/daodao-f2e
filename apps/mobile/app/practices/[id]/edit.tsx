@@ -1,4 +1,10 @@
 import {
+  buildEditFrequencyPayload,
+  deriveEditFrequency,
+  type EditFrequencyOption,
+  resolveCustomFrequencyRange,
+} from "@daodao/shared/lib/practice-edit-frequency";
+import {
   isPracticePrivacyLocked,
   withEditablePrivacy,
 } from "@daodao/shared/lib/practice-privacy-lock";
@@ -14,11 +20,10 @@ import { usePractice } from "@/hooks/usePractices";
 import { useMobileTranslation } from "@/i18n";
 import { api } from "@/services/api-client";
 
-type FrequencyOption = "daily" | "weekly" | "custom";
 type PrivacyStatus = "private" | "public" | "delayed";
 
 const frequencyOptions: Array<{
-  value: FrequencyOption;
+  value: EditFrequencyOption;
   labelKey: string;
   descriptionKey: string;
 }> = [
@@ -52,21 +57,6 @@ function readString(record: Record<string, unknown>, key: string, fallback = "")
   return typeof value === "string" ? value : fallback;
 }
 
-function deriveFrequency(record: Record<string, unknown>): FrequencyOption {
-  const minDays = readNumber(record, "frequencyMinDays", 0);
-  const maxDays = readNumber(record, "frequencyMaxDays", 0);
-
-  if (minDays === 7 && maxDays === 7) return "daily";
-  if (minDays === 1 && maxDays === 1) return "weekly";
-  return "custom";
-}
-
-function buildFrequencyPayload(frequency: FrequencyOption) {
-  if (frequency === "daily") return { frequencyMinDays: 7, frequencyMaxDays: 7 };
-  if (frequency === "weekly") return { frequencyMinDays: 1, frequencyMaxDays: 1 };
-  return { frequencyMinDays: 3, frequencyMaxDays: 5 };
-}
-
 export default function PracticeEditScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -78,7 +68,7 @@ export default function PracticeEditScreen() {
   const [description, setDescription] = useState("");
   const [targetDays, setTargetDays] = useState(21);
   const [sessionDurationMinutes, setSessionDurationMinutes] = useState(30);
-  const [frequency, setFrequency] = useState<FrequencyOption>("custom");
+  const [frequency, setFrequency] = useState<EditFrequencyOption>("custom");
   const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus>("private");
   const [tagsText, setTagsText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,6 +76,16 @@ export default function PracticeEditScreen() {
   // 隱私由教練（燈塔本期實踐）或挑戰（共同挑戰實踐）統一設定：server 收到 privacyStatus 會回 400。
   // 共同挑戰另鎖名稱與期間，App 尚未處理（與網頁編輯頁不同）
   const isPrivacyLocked = isPracticePrivacyLocked(practice);
+
+  // 原本的頻率：沒動頻率就不送，避免網頁建立的 2–4、4–7 天被蓋成 3–5 天（daodao#359）
+  const originalFrequency = useMemo(
+    () => ({
+      frequencyMinDays: practice?.frequencyMinDays,
+      frequencyMaxDays: practice?.frequencyMaxDays,
+    }),
+    [practice?.frequencyMinDays, practice?.frequencyMaxDays]
+  );
+  const customFrequencyRange = resolveCustomFrequencyRange(originalFrequency);
 
   useEffect(() => {
     if (!practice) return;
@@ -102,7 +102,7 @@ export default function PracticeEditScreen() {
     setDescription(initialDescription);
     setTargetDays(readNumber(record, "durationDays", readNumber(record, "targetDays", 21)));
     setSessionDurationMinutes(readNumber(record, "sessionDurationMinutes", 30));
-    setFrequency(deriveFrequency(record));
+    setFrequency(deriveEditFrequency(practice));
     setPrivacyStatus(readString(record, "privacyStatus", "private") as PrivacyStatus);
     setTagsText(tags.join(", "));
   }, [practice]);
@@ -162,7 +162,7 @@ export default function PracticeEditScreen() {
             durationDays: targetDays,
             sessionDurationMinutes,
             tags,
-            ...buildFrequencyPayload(frequency),
+            ...buildEditFrequencyPayload(frequency, originalFrequency),
           },
           privacyStatus,
           isPrivacyLocked
@@ -294,7 +294,10 @@ export default function PracticeEditScreen() {
                             {t(option.labelKey)}
                           </Text>
                           <Text fontSize={12} color="$color" opacity={0.6}>
-                            {t(option.descriptionKey)}
+                            {/* 「自訂」顯示實際會保留／送出的天數，不是固定 3–5 天（daodao#359） */}
+                            {option.value === "custom"
+                              ? t("mobile_frequency_range", customFrequencyRange)
+                              : t(option.descriptionKey)}
                           </Text>
                         </YStack>
                         {isSelected && <Check size={20} color={colors.primary.base} />}
