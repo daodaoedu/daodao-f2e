@@ -12,9 +12,11 @@ import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 
 export const ConnectionsSettings = () => {
   const t = useTranslations("account_settings");
+  const { errorMessage } = useServerErrorMessage();
   const { data: incomingData, isLoading: loadingIncoming } = useIncomingConnectionRequests();
   const { data: outgoingData, isLoading: loadingOutgoing } = useOutgoingConnectionRequests();
   const { data: connectionsData, isLoading: loadingConnections } = useConnections();
@@ -36,7 +38,7 @@ export const ConnectionsSettings = () => {
       await accept(requestId);
       toast.success(t("conn_accept_success", { name }));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("operation_failed"));
+      toast.error(errorMessage(err, t("operation_failed")));
     }
   };
 
@@ -55,7 +57,7 @@ export const ConnectionsSettings = () => {
       await ignore(requestId);
       toast.success(t("conn_ignore_success"));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("operation_failed"));
+      toast.error(errorMessage(err, t("operation_failed")));
     }
   };
 
@@ -74,7 +76,7 @@ export const ConnectionsSettings = () => {
       await withdraw(requestId);
       toast.success(t("conn_withdraw_success"));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("operation_failed"));
+      toast.error(errorMessage(err, t("operation_failed")));
     }
   };
 
@@ -93,7 +95,7 @@ export const ConnectionsSettings = () => {
       await disconnect(userId);
       toast.success(t("conn_disconnect_success", { name }));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("operation_failed"));
+      toast.error(errorMessage(err, t("operation_failed")));
     }
   };
 

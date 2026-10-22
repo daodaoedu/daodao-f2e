@@ -23,6 +23,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { ArrowDown, ArrowUp, Pencil, Pin, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { SpaceBlockView } from "./space-block-view";
 import { type EditableEvent, SpaceCalendarEditor, toEditableEvents } from "./space-calendar-editor";
 import { type EditableLink, SpaceResourcesEditor, toEditableLinks } from "./space-resources-editor";
@@ -65,6 +66,7 @@ export const SpaceBlockEditor = ({
   onMutated,
 }: SpaceBlockEditorProps) => {
   const t = useTranslations("space");
+  const { errorMessage } = useServerErrorMessage();
   const [title, setTitle] = useState(block.title);
   const [body, setBody] = useState(block.body ?? "");
   const [links, setLinks] = useState<EditableLink[]>(() => toEditableLinks(block));
@@ -87,7 +89,7 @@ export const SpaceBlockEditor = ({
   const saveContent = async (): Promise<boolean> => {
     const response = await updateSpaceBlock(spaceId, block.id, contentPayload());
     if (response.error) {
-      toast.error(response.error.error?.message ?? t("save"));
+      toast.error(errorMessage(response.error, undefined, { status: response.response.status }));
       return false;
     }
     latest.current.dirty = false;
@@ -116,8 +118,7 @@ export const SpaceBlockEditor = ({
     if (saved) {
       const response = await action();
       if (response.error) {
-        const message = (response.error as { error?: { message?: string } }).error?.message;
-        toast.error(message ?? t("save"));
+        toast.error(errorMessage(response.error));
       }
     }
     await onMutated();
@@ -345,7 +346,11 @@ export const SpaceBlockEditor = ({
                   setIsBusy(true);
                   const response = await deleteSpaceBlock(spaceId, block.id);
                   if (response.error) {
-                    toast.error(response.error.error?.message ?? t("delete"));
+                    toast.error(
+                      errorMessage(response.error, undefined, {
+                        status: response.response.status,
+                      })
+                    );
                   }
                   setDeleteOpen(false);
                   setIsBusy(false);

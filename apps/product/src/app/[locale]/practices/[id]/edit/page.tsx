@@ -31,6 +31,7 @@ import {
   PracticeTimePeriodToExecutionTimingMap,
   parseFrequency,
 } from "@/constants/practice-form";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { minEditableStartDate } from "@/utils/practice-period";
 import { isPracticePrivacyLocked, withEditablePrivacy } from "@/utils/practice-privacy-lock";
 import { isPracticeScheduleLocked } from "@/utils/practice-schedule-lock";
@@ -89,6 +90,8 @@ const convertFormValuesToApiRequest = (
 
 export default function EditPracticePage() {
   const t = useTranslations("practice");
+  const { errorMessage: serverErrorMessage, fieldMessage: serverFieldMessage } =
+    useServerErrorMessage();
   const router = useRouter();
   const params = useParams();
   const practiceId = params.id as string;
@@ -255,7 +258,10 @@ export default function EditPracticePage() {
       if (response.error) {
         const errorResponse = response.error as ApiErrorResponse;
         const error = errorResponse.error || errorResponse;
-        let errorMessage = t("edit_save_failed");
+        // server 訊息只有中文，經共用轉換後才顯示（daodao#353）
+        let errorMessage = serverErrorMessage(response.error, t("edit_save_failed"), {
+          status: response.response.status,
+        });
 
         // 處理錯誤訊息
         if (typeof error === "object" && error !== null) {
@@ -269,7 +275,7 @@ export default function EditPracticePage() {
                 // 將錯誤設置到對應的表單欄位（使用 Path 支援嵌套路徑如 resources.0.name）
                 form.setError(detail.path as Path<ManualPracticeFormValues>, {
                   type: "server",
-                  message: detail.message,
+                  message: serverFieldMessage(detail.message),
                 });
               }
             });
@@ -277,11 +283,11 @@ export default function EditPracticePage() {
             // 使用第一個具體錯誤訊息作為 toast 訊息
             const firstDetail = details[0];
             if (firstDetail?.message) {
-              errorMessage = firstDetail.message;
+              errorMessage = serverErrorMessage(response.error, t("edit_save_failed"), {
+                status: response.response.status,
+                detailMessage: firstDetail.message,
+              });
             }
-          } else if ("message" in error && error.message) {
-            // 如果沒有 details，使用頂層 message
-            errorMessage = String(error.message);
           }
         }
 

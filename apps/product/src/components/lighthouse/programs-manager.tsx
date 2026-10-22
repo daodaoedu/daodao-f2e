@@ -50,10 +50,10 @@ import {
 import { useSearchParams } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import {
-  apiErrorMessage,
-  type CohortFieldErrorKey,
-  resolveCohortApiError,
-} from "@/utils/cohort-api-error";
+  type ServerErrorMessageFn,
+  useServerErrorMessage,
+} from "@/lib/server-error/use-server-error-message";
+import { type CohortFieldErrorKey, resolveCohortApiError } from "@/utils/cohort-api-error";
 import {
   diffTemplateBindings,
   formatSlashDate,
@@ -65,6 +65,7 @@ import {
 } from "@/utils/template-library";
 import { ConfirmDialog } from "./confirm-dialog";
 import { JoinCode } from "./join-code";
+import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 type SessionEntry = { id: string; sessionDate: string; startTime: string; endTime: string };
 
@@ -94,16 +95,21 @@ type CohortErrorTranslator = (
   key: CohortFieldErrorKey | "cohort_create_failed" | "save_failed"
 ) => string;
 
-/** 把場次 API 錯誤轉成 toast 文字：已知欄位走 i18n、其他顯示 server 訊息、最後才退回通用訊息 */
+/**
+ * 把場次 API 錯誤轉成 toast 文字：已知欄位走 i18n；其他在 zh-TW 顯示 server 訊息、
+ * 其他語系走共用的 code／status 轉換（daodao#353），最後才退回通用訊息
+ */
 function cohortErrorMessage(
   t: CohortErrorTranslator,
+  serverErrorMessage: ServerErrorMessageFn,
   error: unknown,
   fallbackKey: "cohort_create_failed" | "save_failed"
 ): string {
   const resolved = resolveCohortApiError(error);
   if (resolved.type === "i18n") return t(resolved.key);
-  if (resolved.type === "message") return resolved.message;
-  return t(fallbackKey);
+  return serverErrorMessage(error, t(fallbackKey), {
+    detailMessage: resolved.type === "message" ? resolved.message : undefined,
+  });
 }
 
 /** 送出模板綁定異動，回傳第一個失敗的 API 錯誤（含網路錯誤）；全部成功回 null */
@@ -962,6 +968,8 @@ function CohortCard({
   refreshTemplates,
 }: CohortCardProps) {
   const t = useTranslations("lighthouse");
+  const apiErrorMessage = useLighthouseErrorMessage();
+  const { errorMessage: serverErrorMessage } = useServerErrorMessage();
   const searchParams = useSearchParams();
   const [editing, setEditing] = useState(searchParams.get("edit") === String(cohort.id));
   const [busy, setBusy] = useState(false);
@@ -1100,7 +1108,7 @@ function CohortCard({
       if (response.error) {
         setBusy(false);
         await refreshTemplates();
-        const reason = cohortErrorMessage(t, response.error, "save_failed");
+        const reason = cohortErrorMessage(t, serverErrorMessage, response.error, "save_failed");
         // 綁定已先送出成功，要講清楚只有場次設定沒存，不然使用者會以為模板也沒連上
         const bindingsChanged =
           bindingChanges.bind.length + bindingChanges.unbind.length + bindingChanges.update.length >
@@ -1113,7 +1121,17 @@ function CohortCard({
       setEditing(false);
       toast.success(t("cohort_saved"));
     },
-    [programId, organizationId, cohort.id, templates, refresh, refreshTemplates, t]
+    [
+      programId,
+      organizationId,
+      cohort.id,
+      templates,
+      refresh,
+      refreshTemplates,
+      t,
+      apiErrorMessage,
+      serverErrorMessage,
+    ]
   );
 
   const missingTemplates =
@@ -1276,6 +1294,8 @@ interface ProgramPanelProps {
 
 function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
   const t = useTranslations("lighthouse");
+  const apiErrorMessage = useLighthouseErrorMessage();
+  const { errorMessage: serverErrorMessage } = useServerErrorMessage();
   const { cohorts, isLoading, mutate } = useLighthouseCohorts(program.id);
   // 封存中的場次改由「封存」頁列出（FR-ARC-04）
   const visibleCohorts = cohorts?.filter((cohort) => cohort.status !== "archived");
@@ -1394,7 +1414,9 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       } as Parameters<typeof createLighthouseCohort>[1]);
       if (response.error || !response.data) {
         setBusy(false);
-        toast.error(cohortErrorMessage(t, response.error, "cohort_create_failed"));
+        toast.error(
+          cohortErrorMessage(t, serverErrorMessage, response.error, "cohort_create_failed")
+        );
         return;
       }
       // 新增場次不綁模板（#273 決策）：模板分頁在建立時是 disabled，建好後從編輯或模板庫綁定
@@ -1403,7 +1425,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       setCreatingCohort(false);
       toast.success(t("cohort_created"));
     },
-    [program.id, mutate, t]
+    [program.id, mutate, t, serverErrorMessage]
   );
 
   return (

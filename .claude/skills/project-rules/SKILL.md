@@ -82,15 +82,17 @@ import { format, addDays, parse } from "date-fns";
 
 所有 API 呼叫必須檢查 `response.error`。`openapi-fetch` 不拋異常，錯誤在 `response.error` 裡。
 
+**禁止直接顯示 server 的 `message`**：daodao-server 的錯誤訊息只有中文，英文介面會出現中文（daodao#353）。一律用 `useServerErrorMessage()`（`apps/product/src/lib/server-error/`）轉成當前語系：已知 `error.code` 走 `common.server_error.*`，zh-TW 保留 server 原文，其他語系依 HTTP status 或情境 fallback 顯示。
+
 ```typescript
+const { errorMessage } = useServerErrorMessage();
 const response = await createPractice(apiRequest);
 
 if (response.error) {
-  const errorMessage =
-    response.error && typeof response.error === "object" && "message" in response.error
-      ? String(response.error.message)
-      : "操作失敗";
-  toast.error(errorMessage);
+  console.error("Failed to create practice:", response.error); // server 原文留給 log
+  toast.error(
+    errorMessage(response.error, t("create_failed"), { status: response.response.status })
+  );
   setIsSubmitting(false);
   return; // 必須 return
 }
@@ -100,14 +102,16 @@ clearDraft();
 router.push("/success");
 ```
 
+`packages/api` 的 service 自己 fetch 時，失敗要 `throw apiErrorFromBody(res.status, body, "fallback")`，不要丟只剩 message 的 `new Error(...)`，否則畫面拿不到 status／code。
+
 ### 錯誤處理模式
 
 1. 檢查 `response.error`
-2. 提取錯誤訊息（優先 `response.error.message`）
+2. 用 `errorMessage(error, 情境 fallback, { status })` 取得顯示文字
 3. `toast.error()` 顯示
 4. 重置 loading/submitting 狀態
 5. `return` 避免執行成功邏輯
-6. `console.error()` 記錄
+6. `console.error()` 記錄原始錯誤
 
 ### 驗證錯誤（details 陣列）
 
@@ -118,7 +122,7 @@ if ("details" in error && Array.isArray(error.details)) {
     if (detail.path && detail.message) {
       form.setError(detail.path as keyof FormValues, {
         type: "server",
-        message: detail.message,
+        message: fieldMessage(detail.message), // useServerErrorMessage()；非 zh-TW 顯示「Invalid value」
       });
     }
   });

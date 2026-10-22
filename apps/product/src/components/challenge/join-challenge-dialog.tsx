@@ -21,6 +21,7 @@ import {
   ChallengeStatusBadge,
   getChallengeThemeSvg,
 } from "@/components/challenge/challenge-visual";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 
 interface JoinChallengeDialogProps {
@@ -43,6 +44,7 @@ export const JoinChallengeDialog = ({
   onJoined,
 }: JoinChallengeDialogProps) => {
   const t = useTranslations("challenge");
+  const { errorMessage } = useServerErrorMessage();
   const router = useRouter();
   const [isJoining, setIsJoining] = useState(false);
   const [joinedPracticeId, setJoinedPracticeId] = useState<string | null>(null);
@@ -62,7 +64,7 @@ export const JoinChallengeDialog = ({
     setIsJoining(false);
     if (response.error) {
       toast.error(
-        (response.error as { error?: { message?: string } }).error?.message ?? t("join_failed")
+        errorMessage(response.error, t("join_failed"), { status: response.response.status })
       );
       return;
     }

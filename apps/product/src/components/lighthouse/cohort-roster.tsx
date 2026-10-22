@@ -20,13 +20,13 @@ import { cn } from "@daodao/ui/lib/utils";
 import { format } from "date-fns";
 import { Copy, Link2, Link2Off, RefreshCw, Send, Upload, UserMinus } from "lucide-react";
 import { useState } from "react";
-import { apiErrorMessage } from "@/utils/cohort-api-error";
 import {
   getInvitationSendDisabledReason,
   type InvitationPreviewSummary,
 } from "@/utils/cohort-invitation";
 import { CohortErrorState } from "./cohort-error-state";
 import { JoinCode, useCopyJoinLink, useJoinUrl } from "./join-code";
+import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 interface CohortRosterProps {
   programId: number;
@@ -62,6 +62,7 @@ const previewState = (item: PreviewItem): PreviewState =>
 
 export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
   const t = useTranslations("lighthouse");
+  const apiErrorMessage = useLighthouseErrorMessage();
   const { openWarningDialog } = useDialog();
   const cohortQuery = useLighthouseCohort(programId, cohortId);
   const enrollmentQuery = useLighthouseCohortEnrollments(programId, cohortId);

@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { clearTrackingRef, getTrackingRef } from "@/lib/tracking-ref";
 import { DynamicStep } from "./dynamic-step";
 import { InterestsSection } from "./interests-section";
@@ -38,6 +39,7 @@ interface OnboardingFormProps {
 
 export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
   const t = useTranslations("onboarding");
+  const { errorMessage, fieldMessage } = useServerErrorMessage();
   const schemas = useMemo(() => createOnboardingStepSchemas(t), [t]);
   const { isTemporary, refreshAuth, refreshToken } = useAuth();
   const { updateCurrentUserWithFormData, createCurrentUserWithFormData } = useUserMutations();
@@ -262,16 +264,14 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
                 }
                 form.setError(fieldName as keyof OnboardingFormValues, {
                   type: "server",
-                  message: detail.message,
+                  message: fieldMessage(detail.message),
                 });
               }
             }
           });
         }
-        toast.error(error.message || t("errors.submitFailed"));
-      } else {
-        toast.error(t("errors.submitFailed"));
       }
+      toast.error(errorMessage(error, t("errors.submitFailed")));
     } finally {
       submissionPending.current = false;
       setIsSubmitting(false);

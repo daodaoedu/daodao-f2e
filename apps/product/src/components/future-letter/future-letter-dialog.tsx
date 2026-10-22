@@ -33,6 +33,7 @@ import { format, parseISO } from "date-fns";
 import { CircleHelp, Feather, ShieldCheck, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PracticeStatus } from "@/constants/practice-status";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import {
   DeliveryOption,
   type DeliveryOptionType,
@@ -53,17 +54,6 @@ interface FutureLetterDialogProps {
   onSaved?: () => void | Promise<void>;
 }
 
-function getApiErrorMessage(error: unknown, fallback: string): string {
-  if (!error || typeof error !== "object") return fallback;
-  if ("message" in error && typeof error.message === "string") return error.message;
-  if ("error" in error && error.error && typeof error.error === "object") {
-    if ("message" in error.error && typeof error.error.message === "string") {
-      return error.error.message;
-    }
-  }
-  return fallback;
-}
-
 export function FutureLetterDialog({
   open,
   onOpenChange,
@@ -71,6 +61,7 @@ export function FutureLetterDialog({
   onSaved,
 }: FutureLetterDialogProps) {
   const t = useTranslations("future_letter");
+  const { errorMessage } = useServerErrorMessage();
   const { openWarningDialog } = useDialog();
   const [currentSelf, setCurrentSelf] = useState("");
   const [messageToFuture, setMessageToFuture] = useState("");
@@ -143,7 +134,7 @@ export function FutureLetterDialog({
     if (action === "delete" && draftId) {
       const response = await deleteFutureLetter(draftId);
       if (response.error) {
-        toast.error(getApiErrorMessage(response.error, t("letter_save_failed")));
+        toast.error(errorMessage(response.error, t("letter_save_failed")));
         return false;
       }
       setDraftId(undefined);
@@ -154,7 +145,7 @@ export function FutureLetterDialog({
         ? await updateFutureLetter(draftId, getRequestBody())
         : await createFutureLetter(getRequestBody());
     if (response.error) {
-      toast.error(getApiErrorMessage(response.error, t("letter_save_failed")));
+      toast.error(errorMessage(response.error, t("letter_save_failed")));
       return false;
     }
     const savedId = draftId ?? response.data?.data?.id;
@@ -190,7 +181,7 @@ export function FutureLetterDialog({
         ? await updateFutureLetter(draftId, getRequestBody())
         : await createFutureLetter(getRequestBody());
       if (draftResponse.error) {
-        toast.error(getApiErrorMessage(draftResponse.error, t("letter_send_failed")));
+        toast.error(errorMessage(draftResponse.error, t("letter_send_failed")));
         return;
       }
       const letterId = draftId ?? draftResponse.data?.data?.id;
@@ -202,7 +193,7 @@ export function FutureLetterDialog({
         deliverAt: selectedDeliverAt.toISOString(),
       });
       if (sendResponse.error) {
-        toast.error(getApiErrorMessage(sendResponse.error, t("letter_send_failed")));
+        toast.error(errorMessage(sendResponse.error, t("letter_send_failed")));
         setDraftId(letterId);
         return;
       }

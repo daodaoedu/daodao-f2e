@@ -27,10 +27,10 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { Archive, ChevronDown, Copy, Link2, Lock, MoreVertical, Pencil } from "lucide-react";
 import { useState } from "react";
-import { apiErrorMessage } from "@/utils/cohort-api-error";
 import { formatSlashDate, isCohortStarted, templateBindingEndDate } from "@/utils/template-library";
 import { ConfirmDialog } from "./confirm-dialog";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
+import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 interface TemplateCardProps {
   organizationId: number;
@@ -62,6 +62,7 @@ export function TemplateCard({
   onEdit,
 }: TemplateCardProps) {
   const t = useTranslations("lighthouse");
+  const apiErrorMessage = useLighthouseErrorMessage();
   const [busy, setBusy] = useState(false);
   const [bindOpen, setBindOpen] = useState(false);
   const [allOpen, setAllOpen] = useState(false);

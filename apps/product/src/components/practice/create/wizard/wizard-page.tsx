@@ -21,6 +21,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type FieldErrors, type Path, useForm } from "react-hook-form";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { CompletionDialog } from "./completion-dialog";
 import { getBaseName, getEffectiveSegments } from "./derive";
 import {
@@ -80,6 +81,7 @@ export const PracticeWizard = ({
   submitGuard,
 }: PracticeWizardProps) => {
   const t = useTranslations("practice");
+  const { errorMessage, fieldMessage } = useServerErrorMessage();
   const router = useRouter();
   const isPersonal = mode === WizardMode.personal;
 
@@ -177,14 +179,18 @@ export const PracticeWizard = ({
       if (!detail.path || !detail.message) continue;
       const field = mapServerPathToFormField(detail.path);
       if (field) {
-        form.setError(field as Path<WizardFormValues>, { type: "server", message: detail.message });
+        form.setError(field as Path<WizardFormValues>, {
+          type: "server",
+          message: fieldMessage(detail.message),
+        });
       }
       const step = getStepForServerPath(detail.path);
       if (step !== null && (targetStep === null || step < targetStep)) targetStep = step;
     }
 
+    // zh-TW 顯示第一個欄位的 server 訊息；其他語系不顯示 server 原文（daodao#353）
     const firstMessage = parsed.details.find((d) => d.message)?.message;
-    toast.error(firstMessage ?? parsed.message ?? t("wizard_create_failed"));
+    toast.error(errorMessage(error, t("wizard_create_failed"), { detailMessage: firstMessage }));
     if (targetStep !== null) goToStep(targetStep);
   };
 
@@ -219,7 +225,7 @@ export const PracticeWizard = ({
       showCompletion(values, response.data);
     } catch (error) {
       console.error("Failed to create practice:", error);
-      toast.error(error instanceof Error ? error.message : t("wizard_create_failed"));
+      toast.error(errorMessage(error, t("wizard_create_failed")));
     } finally {
       setIsSubmitting(false);
     }

@@ -3,6 +3,7 @@ import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
 import { mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import type { ICheckInFormData } from "../../types";
 
 interface UseCheckInSubmitOptions {
@@ -22,6 +23,7 @@ export const useCheckInSubmit = ({
   onComplete,
 }: UseCheckInSubmitOptions) => {
   const t = useTranslations("check_in");
+  const { errorMessage } = useServerErrorMessage();
   const { createCheckIn } = useCreatePracticeCheckIn(practiceId);
   const { openSuccessDialog } = useCheckInSuccessDialog({
     title: taskTitle,
@@ -75,9 +77,8 @@ export const useCheckInSubmit = ({
       toast.dismiss(loadingToast);
 
       // 顯示錯誤提示
-      const errorMessage = error instanceof Error ? error.message : t("check_in_failed");
       console.error("Check-in failed:", error);
-      toast.error(errorMessage);
+      toast.error(errorMessage(error, t("check_in_failed")));
       throw error;
     }
   };

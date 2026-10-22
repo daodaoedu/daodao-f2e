@@ -49,6 +49,7 @@ import {
   useArchivePracticeDialog,
 } from "@/hooks/use-archive-practice-dialog";
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { resolvePracticeDurationDays } from "@/utils/practice-period";
 
 interface IPracticeDetailData {
@@ -63,30 +64,6 @@ interface IPracticeDetailData {
   tags: string[];
   resources: { id: string; name: string; url?: string; dayNumber?: number | null }[];
   progress: number;
-}
-
-function getErrorMessage(error: unknown, fallbackMessage: string): string {
-  if (typeof error !== "object" || error === null) {
-    return fallbackMessage;
-  }
-
-  if ("details" in error && Array.isArray(error.details) && error.details.length > 0) {
-    const firstDetail = error.details[0];
-    if (
-      typeof firstDetail === "object" &&
-      firstDetail !== null &&
-      "message" in firstDetail &&
-      typeof firstDetail.message === "string"
-    ) {
-      return firstDetail.message;
-    }
-  }
-
-  if ("message" in error && typeof error.message === "string") {
-    return error.message;
-  }
-
-  return fallbackMessage;
 }
 
 function isMentionCandidateWithNumericId(
@@ -122,6 +99,7 @@ function getCurrentUserPhotoURL(currentUser: unknown): string | undefined {
 
 export default function PracticeDetailPage() {
   const t = useTranslations("practice");
+  const { errorMessage: serverErrorMessage } = useServerErrorMessage();
   const locale = useLocale();
   const commentOptions = useMemo<CommentFormatOptions>(
     () => ({
@@ -297,10 +275,8 @@ export default function PracticeDetailPage() {
           await restorePractice();
           toast.success(t("restore_success"));
         } catch (restoreError) {
-          const errorMessage =
-            restoreError instanceof Error ? restoreError.message : t("restore_failed");
-          console.error("Failed to restore practice:", errorMessage);
-          toast.error(errorMessage);
+          console.error("Failed to restore practice:", restoreError);
+          toast.error(serverErrorMessage(restoreError, t("restore_failed")));
         }
       },
     });
@@ -310,10 +286,8 @@ export default function PracticeDetailPage() {
         await archivePractice();
         router.push("/settings/archived");
       } catch (archiveError) {
-        const errorMessage =
-          archiveError instanceof Error ? archiveError.message : t("archive_failed");
-        console.error("Failed to archive practice:", errorMessage);
-        toast.error(errorMessage);
+        console.error("Failed to archive practice:", archiveError);
+        toast.error(serverErrorMessage(archiveError, t("archive_failed")));
       }
     }
   };
@@ -325,10 +299,8 @@ export default function PracticeDetailPage() {
         await deletePracticeById();
         router.push("/");
       } catch (deleteError) {
-        const errorMessage =
-          deleteError instanceof Error ? deleteError.message : t("delete_failed");
-        console.error("Failed to delete practice:", errorMessage);
-        toast.error(errorMessage);
+        console.error("Failed to delete practice:", deleteError);
+        toast.error(serverErrorMessage(deleteError, t("delete_failed")));
       }
     }
   };
@@ -345,16 +317,15 @@ export default function PracticeDetailPage() {
       });
 
       if (response.error) {
-        const errorMessage = getErrorMessage(response.error, t("comment_failed"));
-        console.error("Failed to create comment:", errorMessage);
-        toast.error(errorMessage);
+        console.error("Failed to create comment:", response.error);
+        toast.error(serverErrorMessage(response.error, t("comment_failed")));
         return;
       }
 
       toast.success(t("comment_success"));
       await Promise.all([mutateComments(), mutatePractice()]);
     },
-    [mutateComments, mutatePractice, practiceId]
+    [mutateComments, mutatePractice, practiceId, serverErrorMessage]
   );
 
   const handleCommentEdit = useCallback(
@@ -370,16 +341,15 @@ export default function PracticeDetailPage() {
         mentionedUserIds: mentionedUserIds?.length ? mentionedUserIds : undefined,
       });
       if (response.error) {
-        const errorMessage = getErrorMessage(response.error, t("update_comment_failed"));
-        console.error("Failed to update comment:", errorMessage);
-        toast.error(errorMessage);
+        console.error("Failed to update comment:", response.error);
+        toast.error(serverErrorMessage(response.error, t("update_comment_failed")));
         return false;
       }
 
       await mutateComments();
       return true;
     },
-    [mutateComments]
+    [mutateComments, serverErrorMessage]
   );
 
   const handleCommentDelete = useCallback(
@@ -392,16 +362,15 @@ export default function PracticeDetailPage() {
 
       const response = await deleteComment(parsedCommentId);
       if (response.error) {
-        const errorMessage = getErrorMessage(response.error, t("delete_comment_failed"));
-        console.error("Failed to delete comment:", errorMessage);
-        toast.error(errorMessage);
+        console.error("Failed to delete comment:", response.error);
+        toast.error(serverErrorMessage(response.error, t("delete_comment_failed")));
         return false;
       }
 
       await mutateComments();
       return true;
     },
-    [mutateComments]
+    [mutateComments, serverErrorMessage]
   );
 
   if (isLoading) {

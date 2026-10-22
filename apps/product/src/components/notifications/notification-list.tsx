@@ -17,6 +17,7 @@ import {
   markNotificationRead,
   useNotifications,
 } from "@/hooks/use-notifications";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { formatRelativeTime } from "@/utils/format-time";
 import type { INotificationData } from "./notification-item";
 import { NotificationItem } from "./notification-item";
@@ -160,6 +161,7 @@ const revalidateAllNotifications = () =>
 
 export function NotificationList() {
   const t = useTranslations("app_product");
+  const { errorMessage } = useServerErrorMessage();
   const locale = useLocale();
   const router = useRouter();
   const { data, isLoading } = useNotifications();
@@ -203,7 +205,7 @@ export function NotificationList() {
         delete next[id];
         return next;
       });
-      toast.error(err instanceof Error ? err.message : t("operation_failed_retry"));
+      toast.error(errorMessage(err, t("operation_failed_retry")));
     }
   };
 
@@ -229,7 +231,7 @@ export function NotificationList() {
         delete next[id];
         return next;
       });
-      toast.error(err instanceof Error ? err.message : t("operation_failed_retry"));
+      toast.error(errorMessage(err, t("operation_failed_retry")));
     }
   };
 

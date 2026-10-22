@@ -22,8 +22,8 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { KeyRound } from "lucide-react";
 import { useState } from "react";
-import { apiErrorMessage } from "@/utils/cohort-api-error";
 import { ConfirmDialog } from "./confirm-dialog";
+import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 interface OrganizationAiKeyCardProps {
   organizationId: number;
@@ -37,6 +37,7 @@ type TestState = "idle" | "testing" | "success" | "failed" | "empty";
  */
 export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardProps) {
   const t = useTranslations("lighthouse");
+  const apiErrorMessage = useLighthouseErrorMessage();
   const credentialQuery = useLighthouseAiCredential(organizationId);
   const credential = credentialQuery.data?.data;
   const [apiKey, setApiKey] = useState("");

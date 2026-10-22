@@ -14,7 +14,7 @@ import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { AlertCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { apiErrorMessage } from "@/utils/cohort-api-error";
+import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 interface CohortOutcomeSummaryProps {
   programId: number;
@@ -38,6 +38,7 @@ export function CohortOutcomeSummary({
   refresh,
 }: CohortOutcomeSummaryProps) {
   const t = useTranslations("lighthouse");
+  const apiErrorMessage = useLighthouseErrorMessage();
   const [mode, setMode] = useState<LighthouseSummaryMode>("platform");
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");

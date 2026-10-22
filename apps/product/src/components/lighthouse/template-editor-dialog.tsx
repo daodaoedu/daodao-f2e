@@ -21,7 +21,6 @@ import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { apiErrorMessage } from "@/utils/cohort-api-error";
 import {
   DURATION_QUICK_OPTIONS,
   deriveTemplateName,
@@ -41,6 +40,7 @@ import {
 } from "@/utils/template-library";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 import { type TemplateResourceDraft, TemplateResourceEditor } from "./template-resource-editor";
+import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 type Timing = "" | TemplateTiming | "other";
 
@@ -137,6 +137,7 @@ export function TemplateEditorDialog({
   onSaved,
 }: TemplateEditorDialogProps) {
   const t = useTranslations("lighthouse");
+  const apiErrorMessage = useLighthouseErrorMessage();
   const [step, setStep] = useState(1);
   const [draft, setDraft] = useState<TemplateDraft>(EMPTY_DRAFT);
   const [errors, setErrors] = useState<Record<string, string>>({});

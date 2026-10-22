@@ -14,14 +14,15 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useState } from "react";
-import { apiErrorMessage } from "@/utils/cohort-api-error";
 import { ConfirmDialog } from "./confirm-dialog";
+import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 const RESTORE_NOTICE_MS = 3000;
 
 /** 封存區（FR-ARC-01~03）：模板／場次／系列三分類、恢復（3 秒提示）、刪除（二次確認） */
 export function ArchiveManager() {
   const t = useTranslations("lighthouse");
+  const apiErrorMessage = useLighthouseErrorMessage();
   const { organizations } = useLighthouseOrganizations();
   const organization = organizations?.[0];
   const [type, setType] = useState<LighthouseArchiveType>("templates");
