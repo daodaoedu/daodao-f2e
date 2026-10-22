@@ -297,8 +297,9 @@ type PracticeCheckIn = NonNullable<PracticeCheckInsResponse["data"]>[number];
 
 /**
  * 分頁取回實踐的全部打卡記錄（供摘要統計用）
- * @description 每頁 100 筆，依第一頁回傳的 totalPages 平行抓剩下的頁；
- *   某頁失敗時略過該頁，用已取得的記錄計算。
+ * @description 每頁 100 筆，依第一頁回傳的 totalPages 平行抓剩下的頁。
+ *   - 第 2 頁之後某頁回錯誤或請求失敗時略過該頁，用其他頁計算（摘要是精選內容，不因單頁失敗整頁報錯）
+ *   - server 只依 checkin_date 排序，同日多筆打卡在 offset 分頁下可能跨頁重複，依 id 去重
  */
 const fetchAllCheckInsForSummary = async (practiceId: string): Promise<PracticeCheckIn[]> => {
   const firstPage = await getPracticeCheckIns(practiceId, { page: 1, limit: CHECKINS_PAGE_SIZE });
@@ -309,12 +310,19 @@ const fetchAllCheckInsForSummary = async (practiceId: string): Promise<PracticeC
   );
   if (totalPages <= 1) return firstItems;
 
-  const restPages = await Promise.all(
+  const restPages = await Promise.allSettled(
     Array.from({ length: totalPages - 1 }, (_, i) =>
       getPracticeCheckIns(practiceId, { page: i + 2, limit: CHECKINS_PAGE_SIZE })
     )
   );
-  return [...firstItems, ...restPages.flatMap((res) => res.data?.data ?? [])];
+  const byId = new Map<PracticeCheckIn["id"], PracticeCheckIn>();
+  for (const checkIn of [
+    ...firstItems,
+    ...restPages.flatMap((res) => (res.status === "fulfilled" ? (res.value.data?.data ?? []) : [])),
+  ]) {
+    if (!byId.has(checkIn.id)) byId.set(checkIn.id, checkIn);
+  }
+  return Array.from(byId.values());
 };
 
 /**

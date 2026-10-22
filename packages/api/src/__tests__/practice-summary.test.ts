@@ -24,7 +24,11 @@ const makeCheckIns = (count: number): CheckIn[] =>
   }));
 
 /** 模擬 server：limit > 100 回 400，否則依 page/limit 切片並附 pagination */
-const setupServer = (checkInCount: number, checkIns: CheckIn[]) => {
+const setupServer = (
+  checkInCount: number,
+  checkIns: CheckIn[],
+  opts: { errorPage?: number; throwPage?: number; pageStartShift?: number } = {}
+) => {
   mockGet.mockImplementation(
     async (path: string, options?: { params?: { query?: { page?: number; limit?: number } } }) => {
       if (path === "/api/v1/practices/{id}") {
@@ -55,11 +59,20 @@ const setupServer = (checkInCount: number, checkIns: CheckIn[]) => {
             response: new Response(null, { status: 400 }),
           };
         }
+        if (page === opts.throwPage) throw new TypeError("Failed to fetch");
+        if (page === opts.errorPage) {
+          return {
+            error: { success: false, error: { message: "取得簽到記錄失敗" } },
+            response: new Response(null, { status: 500 }),
+          };
+        }
         const totalPages = Math.max(1, Math.ceil(checkIns.length / limit));
+        // pageStartShift 模擬同日多筆打卡排序不穩定：第 2 頁起的切片往前位移，與前一頁重疊
+        const start = Math.max(0, (page - 1) * limit - (page > 1 ? (opts.pageStartShift ?? 0) : 0));
         return {
           data: {
             success: true,
-            data: checkIns.slice((page - 1) * limit, page * limit),
+            data: checkIns.slice(start, start + limit),
             pagination: {
               currentPage: page,
               totalPages,
@@ -135,5 +148,27 @@ describe("getPracticeSummary — checkins 請求不超過 server 上限（daodao
 
     expect(checkInRequests()).toHaveLength(1);
     expect(result.data?.topMoods.map((m) => [m.mood, m.count])).toEqual([["good", 22]]);
+  });
+
+  it("後續某頁回錯誤或網路失敗時略過該頁，仍用其他頁產生摘要", async () => {
+    setupServer(250, makeCheckIns(250), { errorPage: 2, throwPage: 3 });
+
+    const result = await getPracticeSummary(PRACTICE_ID);
+
+    expect(result.error).toBeNull();
+    expect(result.data?.topMoods.map((m) => [m.mood, m.count])).toEqual([["good", 100]]);
+    expect(result.data?.checkInCount).toBe(250);
+  });
+
+  it("跨頁重複回傳的同一筆打卡只計一次", async () => {
+    setupServer(150, makeCheckIns(150), { pageStartShift: 5 });
+
+    const result = await getPracticeSummary(PRACTICE_ID);
+
+    // 第 2 頁回 96–150 筆（與第 1 頁重疊 96–100），去重後 good 100、happy 50
+    expect(result.data?.topMoods.map((m) => [m.mood, m.count])).toEqual([
+      ["good", 100],
+      ["happy", 50],
+    ]);
   });
 });
