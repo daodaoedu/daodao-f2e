@@ -37,4 +37,22 @@ describe("withEditablePrivacy", () => {
       privacyStatus: "public",
     });
   });
+
+  // daodao#333：App 編輯頁原本無條件帶 privacyStatus，燈塔本期實踐存檔一律 400
+  it("App 編輯燈塔本期實踐：PUT body 不帶 privacyStatus", () => {
+    const appRequest = {
+      title: "共讀102",
+      practiceAction: "dfdf",
+      durationDays: 7,
+      sessionDurationMinutes: 30,
+      tags: [],
+      frequencyMinDays: 3,
+      frequencyMaxDays: 5,
+    };
+    const detail = { isChallenge: false, isCohortPrivacyLocked: true };
+
+    expect(
+      withEditablePrivacy(appRequest, "private", isPracticePrivacyLocked(detail))
+    ).not.toHaveProperty("privacyStatus");
+  });
 });

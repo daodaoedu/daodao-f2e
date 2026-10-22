@@ -93,3 +93,21 @@ export function practiceRemainingDays(start: Date, durationDays: number, today: 
   const remaining = differenceInCalendarDays(practiceEndDate(start, durationDays), today) + 1;
   return Math.min(durationDays, Math.max(0, remaining));
 }
+
+/**
+ * 依經過時間推算的實踐進度 %（0～100）：期間從開始日當地 00:00 到結束日隔天當地 00:00，結束日整天都在期間內。
+ * 起訖日以 parseLocalDate 解析、天數含頭尾；無條件捨去，結束日當天不會進位成 100%（daodao#335）。
+ * 缺日期、格式錯誤或結束早於開始時回傳 0。
+ */
+export function practiceTimeProgress(
+  startDate: string | null | undefined,
+  endDate: string | null | undefined,
+  now: Date
+): number {
+  const start = startDate ? parseLocalDate(startDate) : null;
+  const durationDays = resolvePracticeDurationDays({ startDate, endDate });
+  if (!start || !durationDays) return 0;
+  const periodEnd = addDays(start, durationDays);
+  const ratio = (now.getTime() - start.getTime()) / (periodEnd.getTime() - start.getTime());
+  return Math.min(100, Math.max(0, Math.floor(ratio * 100)));
+}

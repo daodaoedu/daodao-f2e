@@ -3,6 +3,10 @@
 import { type UpdatePracticeRequestType, updatePractice, usePracticeById } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
+import {
+  isPracticePrivacyLocked,
+  withEditablePrivacy,
+} from "@daodao/shared/lib/practice-privacy-lock";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
@@ -32,8 +36,8 @@ import {
   parseFrequency,
 } from "@/constants/practice-form";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
+import { toEditFormResources, toUpdateResourcesPayload } from "@/utils/practice-edit-resources";
 import { minEditableStartDate } from "@/utils/practice-period";
-import { isPracticePrivacyLocked, withEditablePrivacy } from "@/utils/practice-privacy-lock";
 import { isPracticeScheduleLocked } from "@/utils/practice-schedule-lock";
 
 // API 錯誤響應類型
@@ -76,10 +80,7 @@ const convertFormValuesToApiRequest = (
 
   request.tags = values.tags || [];
 
-  request.resources = (values.resources || []).map((resource) => ({
-    name: resource.name,
-    url: resource.url || undefined,
-  }));
+  request.resources = toUpdateResourcesPayload(values.resources || []);
 
   if (values.customTiming) {
     request.otherContext = values.customTiming;
@@ -124,8 +125,8 @@ export default function EditPracticePage() {
 
   // 使用 minStartDate 來創建 schema
   const formSchema = useMemo(() => {
-    return createManualPracticeFormSchema({ minStartDate });
-  }, [minStartDate]);
+    return createManualPracticeFormSchema({ minStartDate }, t);
+  }, [minStartDate, t]);
 
   // 將 API 資料轉換為表單值
   const formValues: ManualPracticeFormValues | null = useMemo(() => {
@@ -175,13 +176,8 @@ export default function EditPracticePage() {
       executionTiming.length > 0 ? executionTiming : [ExecutionTiming.morning];
 
     // 轉換 resources: API 格式 -> 表單格式
-    // isLocked（教練加入的資源）server 已回傳，前端型別待 gen:types 同步後再拿掉轉型
-    const resources = (data.resources || []).map((resource) => ({
-      id: resource.id,
-      name: resource.name,
-      url: resource.url || "",
-      isLocked: (resource as { isLocked?: boolean }).isLocked === true,
-    }));
+    // isLocked（教練加入的資源）server 已回傳，前端型別待 gen:types 同步；toEditFormResources 以選填欄位讀取
+    const resources = toEditFormResources(data.resources || []);
 
     return {
       name: data.title || "",
