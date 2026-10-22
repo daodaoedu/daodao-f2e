@@ -83,7 +83,8 @@ export default function PracticeEditScreen() {
   const [tagsText, setTagsText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 燈塔本期實踐（隱私由教練統一設定）、共同挑戰實踐：server 收到 privacyStatus 會回 400
+  // 隱私由教練（燈塔本期實踐）或挑戰（共同挑戰實踐）統一設定：server 收到 privacyStatus 會回 400。
+  // 共同挑戰另鎖名稱與期間，App 尚未處理（與網頁編輯頁不同）
   const isPrivacyLocked = isPracticePrivacyLocked(practice);
 
   useEffect(() => {
