@@ -1,3 +1,4 @@
+import { withoutChallengeLockedFields } from "@daodao/shared/lib/practice-challenge-lock";
 import {
   buildEditFrequencyPayload,
   deriveEditFrequency,
@@ -76,8 +77,9 @@ export default function PracticeEditScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 隱私由教練（燈塔本期實踐）或挑戰（共同挑戰實踐）統一設定：server 收到 privacyStatus 會回 400。
-  // 共同挑戰另鎖名稱與期間，App 尚未處理（與網頁編輯頁不同）
   const isPrivacyLocked = isPracticePrivacyLocked(practice);
+  // 共同挑戰另鎖名稱與期間：畫面唯讀、存檔不送（server 收到就回 400，daodao#357）
+  const isChallenge = practice?.isChallenge === true;
 
   // 原本的頻率：沒動頻率就不送，避免網頁建立的 2–4、4–7 天被蓋成 3–5 天（daodao#359）
   const originalFrequency = useMemo(
@@ -158,14 +160,17 @@ export default function PracticeEditScreen() {
       await api.put(
         `/practices/${id}`,
         withEditablePrivacy(
-          {
-            title: trimmedTitle,
-            practiceAction: description.trim(),
-            durationDays: targetDays,
-            sessionDurationMinutes,
-            tags,
-            ...buildEditFrequencyPayload(frequency, originalFrequency),
-          },
+          withoutChallengeLockedFields(
+            {
+              title: trimmedTitle,
+              practiceAction: description.trim(),
+              durationDays: targetDays,
+              sessionDurationMinutes,
+              tags,
+              ...buildEditFrequencyPayload(frequency, originalFrequency),
+            },
+            isChallenge
+          ),
           privacyStatus,
           isPrivacyLocked
         )
@@ -233,6 +238,19 @@ export default function PracticeEditScreen() {
 
         <ScrollView flex={1} contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
           <YStack gap="$4">
+            {isChallenge && (
+              <Card
+                backgroundColor={colors.primary.palest}
+                borderWidth={1}
+                borderColor="$borderColor"
+                padding="$4"
+              >
+                <Text fontSize={14} color="$color">
+                  {t("edit_challenge_locked")}
+                </Text>
+              </Card>
+            )}
+
             <Card
               backgroundColor="$background"
               borderWidth={1}
@@ -248,6 +266,9 @@ export default function PracticeEditScreen() {
                   value={title}
                   onChangeText={setTitle}
                   placeholder={t("mobile_title_placeholder")}
+                  editable={!isChallenge}
+                  disabled={isChallenge}
+                  opacity={isChallenge ? 0.6 : 1}
                 />
               </YStack>
 
@@ -328,6 +349,8 @@ export default function PracticeEditScreen() {
                     backgroundColor={targetDays === days ? colors.primary.base : "$background"}
                     borderWidth={1}
                     borderColor={targetDays === days ? colors.primary.base : "$borderColor"}
+                    disabled={isChallenge}
+                    opacity={isChallenge && targetDays !== days ? 0.5 : 1}
                     onPress={() => setTargetDays(days)}
                   >
                     <Text color={targetDays === days ? colors.basic.white : "$color"}>

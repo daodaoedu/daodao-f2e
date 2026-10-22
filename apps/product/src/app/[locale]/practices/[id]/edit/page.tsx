@@ -3,6 +3,7 @@
 import { type UpdatePracticeRequestType, updatePractice, usePracticeById } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
+import { withoutChallengeLockedFields } from "@daodao/shared/lib/practice-challenge-lock";
 import {
   isPracticePrivacyLocked,
   readPracticePrivacyStatus,
@@ -236,14 +237,8 @@ export default function EditPracticePage() {
     setIsSubmitting(true);
 
     try {
-      const converted = convertFormValuesToApiRequest(values) as Record<string, unknown>;
-      if (isChallenge) {
-        for (const lockedField of ["title", "startDate", "durationDays"]) {
-          delete converted[lockedField];
-        }
-      }
       const apiRequest = withEditablePrivacy(
-        converted,
+        withoutChallengeLockedFields(convertFormValuesToApiRequest(values), isChallenge),
         privacyStatus,
         isPrivacyLocked
       ) as UpdatePracticeRequestType;
