@@ -5,6 +5,7 @@ import type { SpaceListItemType } from "@daodao/api";
  * learners go to the existing learner page (design D4), while organization
  * members — who manage the cohort without an enrollment — go to the
  * lighthouse cohort dashboard (#201). Missing ids fall back safely.
+ * [TEST daodao#368] comment-only change for AI review incremental check.
  */
 export function spaceHref(
   space: Pick<SpaceListItemType, "kind" | "id" | "programId" | "canManage">
