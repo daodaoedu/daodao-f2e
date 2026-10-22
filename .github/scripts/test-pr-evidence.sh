@@ -10,9 +10,9 @@ fail() { echo "❌ $1"; exit 1; }
 
 OUT_FILE=$(mktemp)
 trap 'rm -f "$OUT_FILE"' EXIT
-run() {  # $1=body $2=mode $3=head_ref $4=labels $5=author → exit code；輸出存 $OUT_FILE（$(...) 子 shell 帶不出變數）
+run() {  # $1=body $2=mode $3=head_ref $4=labels $5=author $6=repo → exit code；輸出存 $OUT_FILE（$(...) 子 shell 帶不出變數）
   local code=0
-  BODY="$1" MODE="${2:-block}" HEAD_REF="${3:-feat/x}" LABELS="${4:-}" AUTHOR="${5:-someone}" bash "$CHECK" >"$OUT_FILE" 2>&1 || code=$?
+  BODY="$1" MODE="${2:-block}" HEAD_REF="${3:-feat/x}" LABELS="${4:-}" AUTHOR="${5:-someone}" REPO="${6:-daodaoedu/daodao-f2e}" bash "$CHECK" >"$OUT_FILE" 2>&1 || code=$?
   echo "$code"
 }
 out() { cat "$OUT_FILE"; }
@@ -115,5 +115,52 @@ code=$(run "$(printf '## Summary\nx')" block "docs/update-readme"); expect_pass 
 code=$(run "$(printf '## Summary\nx')" block "feat/x" "bug,evidence-exempt"); expect_pass "evidence-exempt label 豁免" "$code"
 code=$(run "$(printf '## Summary\nx')" block "feat/x" "" "dependabot[bot]"); expect_pass "bot 作者豁免" "$code"
 code=$(run "$(printf '## Summary\nx')" block "feat/x" "bug"); expect_fail "feat/ 無豁免" "$code" "缺「## 驗證證據」"
+
+# closing keyword 指向中央 issue：merge 時 GitHub 自動關卡、跳過 dev 冒煙與 PM 驗收（#333／#335／#337，#364）
+for line in \
+  '- Closes daodaoedu/daodao#333（[daodao#333](https://github.com/daodaoedu/daodao/issues/333)）' \
+  'closes: daodaoedu/daodao#337' \
+  'Fixes daodaoedu/daodao#1' \
+  'FIXED: DaodaoEdu/Daodao#2' \
+  'Resolves https://github.com/daodaoedu/daodao/issues/335' \
+  'Closes [daodao#336](https://github.com/daodaoedu/daodao/issues/336)' \
+  '修正，resolved daodaoedu/daodao#4' \
+  'This will close daodaoedu/daodao#5'; do
+  code=$(run "$line
+$GOOD"); expect_fail "closing keyword：$line" "$code" "closing keyword"
+done
+[[ "$(out)" == *"daodao#5"* ]] || fail "訊息應列出命中的 issue：$(out)"
+
+# 豁免只針對驗證證據，關卡照樣報
+code=$(run "Closes daodaoedu/daodao#333" block "docs/x"); expect_fail "docs/ 前綴仍檢查 closing keyword" "$code" "closing keyword"
+code=$(run "Closes daodaoedu/daodao#333" block "feat/x" "evidence-exempt"); expect_fail "evidence-exempt 仍檢查 closing keyword" "$code" "closing keyword"
+code=$(run "Closes daodaoedu/daodao#333" block "feat/x" "" "dependabot[bot]"); expect_fail "bot 作者仍檢查 closing keyword" "$code" "closing keyword"
+
+# 判斷範圍：#N 在 root 指中央 issue，在 sub-repo 指自己的鏡像 issue
+code=$(run "Closes #12
+$GOOD"); expect_pass "sub-repo 關自己 repo 的 #N" "$code"
+code=$(run "Closes #12
+$GOOD" block "feat/x" "" "someone" "daodaoedu/daodao"); expect_fail "root 關 #N" "$code" "closing keyword"
+code=$(run "Fixes https://github.com/daodaoedu/daodao/issues/12" block "chore/x" "" "someone" "daodaoedu/daodao"); expect_fail "root 關中央 URL" "$code" "closing keyword"
+
+# 不誤報：Refs、其他 repo、程式碼區塊內的範例、字中間的 close
+code=$(run "Refs daodaoedu/daodao#333
+$GOOD"); expect_pass "Refs 不報" "$code"
+code=$(run "Closes daodaoedu/daodao-f2e#1091
+$GOOD"); expect_pass "關 sub-repo issue 不報" "$code"
+code=$(run "不要寫 \`Closes daodaoedu/daodao#N\` 或 \`Fixes daodaoedu/daodao#1\`
+$GOOD"); expect_pass "inline code 範例不報" "$code"
+code=$(run "$(printf '%s\n' '```' 'Closes daodaoedu/daodao#1' '```')
+$GOOD"); expect_pass "fenced code 範例不報" "$code"
+code=$(run "enclosed daodaoedu/daodao#1、prefixes daodaoedu/daodao#2
+$GOOD"); expect_pass "字中間的 close／fix 不報" "$code"
+code=$(run "Refs #12、見 #13
+$GOOD" block "feat/x" "" "someone" "daodaoedu/daodao"); expect_pass "root 的 Refs #N 不報" "$code"
+
+# warn 模式：放行但印 ::warning
+code=$(run "Closes daodaoedu/daodao#333
+$GOOD" warn); expect_pass "closing keyword warn 模式不阻擋" "$code"
+[[ "$(out)" == *"::warning::"*"closing keyword"* ]] || fail "warn 模式應印 closing keyword warning：$(out)"
+printf '✅ %s\n' "closing keyword warn 模式印 warning"
 
 echo "✅ pr-evidence-gate regression tests passed"

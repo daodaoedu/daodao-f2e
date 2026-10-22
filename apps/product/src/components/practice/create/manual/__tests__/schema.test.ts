@@ -72,4 +72,45 @@ describe("createManualPracticeFormSchema messages (daodao#334)", () => {
       { id: "r2", name: "整段可用", url: "", dayNumber: null },
     ]);
   });
+
+  it("accepts custom days, frequency and minutes from the new create flow (daodao#370)", () => {
+    const result = createManualPracticeFormSchema({}, t).safeParse({
+      ...invalidValues,
+      name: "每日閱讀",
+      actionDescription: "讀 10 頁",
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      durationDays: "45",
+      frequency: "1-3",
+      durationMinutes: 25,
+      executionTiming: [],
+      resources: [],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("allows missing days and frequency when the schedule is locked (daodao#370)", () => {
+    // 共同挑戰或已打卡的實踐，天數／頻率欄位鎖住無法填；原值是 null 時仍要能改名稱、標籤等其他欄位
+    const result = createManualPracticeFormSchema({ scheduleLocked: true }, t).safeParse({
+      ...invalidValues,
+      name: "每日閱讀",
+      actionDescription: "讀 10 頁",
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      durationDays: "",
+      frequency: "",
+      durationMinutes: null,
+      resources: [],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("still requires days and frequency (daodao#370)", () => {
+    const result = createManualPracticeFormSchema({}, t).safeParse({
+      ...invalidValues,
+      durationDays: "",
+      frequency: "",
+    });
+    if (result.success) throw new Error("expected validation to fail");
+    const paths = result.error.issues.map((issue) => issue.path.join("."));
+    expect(paths).toEqual(expect.arrayContaining(["durationDays", "frequency"]));
+  });
 });

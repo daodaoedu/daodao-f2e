@@ -55,7 +55,7 @@ import {
   BrowseActivityContent,
   type IBrowseActivityFollower,
 } from "@/components/practice/shared/browse-activity-content";
-import type { ExecutionTiming, Frequency } from "@/constants/practice-form";
+import type { ExecutionTiming } from "@/constants/practice-form";
 import type { PracticeStatus } from "@/constants/practice-status";
 import {
   PICKER_REACTIONS,
@@ -87,7 +87,8 @@ interface IPracticeDetailViewModel {
   isChallenge?: boolean;
   status?: PracticeStatus;
   actionDescription: string;
-  frequency: Frequency;
+  /** 每週頻率，例 "1-3"、"7"（daodao#370） */
+  frequency: string;
   durationMinutes: number;
   /** 實踐天數（照 API，可為 1～上限任何天數）；null 代表 API 無法判斷天數 */
   durationDays: number | null;
@@ -423,7 +424,6 @@ export function PracticeDetailShell({
     ]
   );
   const { open: openSheet, close: closeSheet } = useSheetManager();
-  const { openWarningDialog } = useDialog();
 
   const taskStatus = practice.status ? mapPracticeStatusToTaskStatus(practice.status) : undefined;
   const statusInfo = taskStatus ? getStatusConfig(taskStatus) : undefined;
@@ -551,20 +551,10 @@ export function PracticeDetailShell({
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={async () => {
+                  onClick={() => {
                     setPracticeMenuOpen(false);
-                    const result = await openWarningDialog({
-                      title: t("delete_practice_title"),
-                      message: t("delete_practice_message"),
-                      textAlign: "left",
-                      buttons: [
-                        { label: t("delete_confirm"), value: "confirm", variant: "outline" },
-                        { label: t("cancel_action"), value: "cancel", variant: "orange" },
-                      ],
-                    });
-                    if (result.value === "confirm") {
-                      onDeletePractice();
-                    }
+                    // 確認框由 onDeletePractice（頁面的 useDeletePracticeDialog）負責，這裡不再自帶一層（daodao#369）
+                    onDeletePractice();
                   }}
                   className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
                 >

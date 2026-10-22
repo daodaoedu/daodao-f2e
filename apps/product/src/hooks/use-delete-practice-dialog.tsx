@@ -1,34 +1,28 @@
 "use client";
 
 import { useTranslations } from "@daodao/i18n";
-import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { useCallback } from "react";
 
 export enum DeletePracticeResult {
-  /** 實踐已成功刪除 */
-  Deleted,
+  /** 用戶按了「確定刪除」（尚未送出 DELETE） */
+  Confirmed,
   /** 用戶在對話框取消了操作 */
   Cancelled,
 }
 
 /**
- * 使用全局 DialogManager 來顯示刪除實踐對話框的 Hook
+ * 使用全局 DialogManager 顯示「確定刪除這個實踐？」確認框。
+ *
+ * 只負責確認，不送 DELETE、也不顯示成功提示；呼叫方在 DELETE 成功後才顯示「刪除成功」（daodao#369）。
  *
  * @example
  * ```tsx
  * const { openDeleteDialog } = useDeletePracticeDialog();
- *
- * // 當需要顯示對話框時
- * const result = await openDeleteDialog(practiceId);
- *
- * if (result === DeletePracticeResult.Deleted) {
- *   // 實踐已成功刪除，執行後續處理（如重新載入列表、導航等）
- *   router.push("/practices");
- * } else if (result === DeletePracticeResult.Restored) {
- *   // 用戶點擊了復原，不需要做任何事
- * } else if (result === DeletePracticeResult.Cancelled) {
- *   // 用戶在對話框取消了，不需要做任何事
+ * const result = await openDeleteDialog();
+ * if (result === DeletePracticeResult.Confirmed) {
+ *   await deletePractice();
+ *   toast.success(t("delete_success"));
  * }
  * ```
  */
@@ -37,7 +31,6 @@ export function useDeletePracticeDialog() {
   const { openWarningDialog } = useDialog();
 
   const openDeleteDialog = useCallback(async (): Promise<DeletePracticeResult> => {
-    // 先顯示確認對話框
     const result = await openWarningDialog({
       title: t("delete_dialog_title"),
       message: t("delete_dialog_message"),
@@ -48,16 +41,9 @@ export function useDeletePracticeDialog() {
       ],
     });
 
-    // 如果用戶取消，直接返回
-    if (result.value !== "confirm") {
-      return DeletePracticeResult.Cancelled;
-    }
-
-    // 用戶確認刪除，立即返回並顯示 toast
-    toast.success(t("delete_success"));
-
-    // 立即返回，讓調用方可以立即執行動作
-    return DeletePracticeResult.Deleted;
+    return result.value === "confirm"
+      ? DeletePracticeResult.Confirmed
+      : DeletePracticeResult.Cancelled;
   }, [openWarningDialog, t]);
 
   return { openDeleteDialog };

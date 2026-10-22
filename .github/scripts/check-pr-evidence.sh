@@ -14,29 +14,47 @@
 #   HEAD_REF  head branch 名（chore/docs/ci/build/test/dependabot/renovate 前綴豁免）
 #   LABELS    逗號分隔 label（含 evidence-exempt 豁免）
 #   AUTHOR    PR 作者（*[bot] 豁免）
+#   REPO      owner/repo（github.repository；決定 `#N` 是否指中央 issue）
 #   MODE      block（缺就 exit 1）| warn（預設；只印 ::warning）
+#
+# 另檢查 closing keyword（#364）：PR body 用 close／fix／resolve（含 -s／-d、冒號）指向中央 issue
+# daodaoedu/daodao#N 或其 URL 時，PR merge 進預設分支就會自動關卡，board 內建 workflow 移 Done，
+# 跳過 dev 冒煙與 PM 驗收（#333／#335／#337）。在 daodao root 本身，`#N` 也是中央 issue。
+# 這項不吃上面的豁免（docs／chore PR、evidence-exempt、bot 一樣會關卡），模式同 MODE。
+# 程式碼區塊（``` 與 `…`）裡的範例不算——GitHub 不解析其中的 issue 參照。
 set -euo pipefail
 
 BODY="${BODY:-}"
 HEAD_REF="${HEAD_REF:-}"
 LABELS="${LABELS:-}"
 AUTHOR="${AUTHOR:-}"
+REPO="${REPO:-}"
 MODE="${MODE:-warn}"
-
-exempt() {
-  echo "pr-evidence-gate: 豁免（$1）"
-  exit 0
-}
-
-case "$HEAD_REF" in
-  chore/*|docs/*|ci/*|build/*|test/*|dependabot/*|renovate/*) exempt "分支前綴 ${HEAD_REF%%/*}/" ;;
-esac
-case ",$LABELS," in *,evidence-exempt,*) exempt "label evidence-exempt" ;; esac
-case "$AUTHOR" in *"[bot]") exempt "bot 作者 $AUTHOR" ;; esac
 
 problems=()
 
-if ! printf '%s\n' "$BODY" | grep -q '^## 驗證證據'; then
+central_refs='daodaoedu/daodao#[0-9]+|(\[[^]]*\]\()?https?://github\.com/daodaoedu/daodao/issues/[0-9]+'
+[ "$(printf '%s' "$REPO" | tr '[:upper:]' '[:lower:]')" = "daodaoedu/daodao" ] && central_refs="$central_refs|#[0-9]+"
+closing_hits=$(printf '%s\n' "$BODY" \
+  | LC_ALL=C awk '/^[[:space:]]*(```|~~~)/ { fence = !fence; next } !fence' \
+  | LC_ALL=C sed -E 's/`[^`]*`//g' \
+  | LC_ALL=C grep -oiE "(^|[^[:alnum:]_])(close[sd]?|fix(e[sd])?|resolve[sd]?):?[[:space:]]+(${central_refs})" \
+  | LC_ALL=C sed -E 's/^[^[:alpha:]]*//' | paste -sd ';' - || true)
+if [ -n "$closing_hits" ]; then
+  problems+=("PR body 用 closing keyword 指向中央 issue（${closing_hits}）：merge 時 GitHub 會自動關卡、board 移 Done，跳過 dev 冒煙與 PM 驗收。改寫成獨立一行 Refs daodaoedu/daodao#N（卡片由 PM 驗收後關閉）")
+fi
+
+exempt_reason=""
+case "$HEAD_REF" in
+  chore/*|docs/*|ci/*|build/*|test/*|dependabot/*|renovate/*) exempt_reason="分支前綴 ${HEAD_REF%%/*}/" ;;
+esac
+case ",$LABELS," in *,evidence-exempt,*) exempt_reason="label evidence-exempt" ;; esac
+case "$AUTHOR" in *"[bot]") exempt_reason="bot 作者 $AUTHOR" ;; esac
+
+evidence_problems=${#problems[@]}
+if [ -n "$exempt_reason" ]; then
+  echo "pr-evidence-gate: 驗證證據豁免（${exempt_reason}）"
+elif ! printf '%s\n' "$BODY" | grep -q '^## 驗證證據'; then
   problems+=("PR body 缺「## 驗證證據」區塊（驗證報告連結 + 核心旅程矩陣摘要，或「核心旅程不適用：<原因>」）")
 else
   section=$(printf '%s\n' "$BODY" | awk '/^## 驗證證據/{f=1; next} f && /^## /{exit} f')
@@ -76,7 +94,9 @@ level="warning"; [ "$MODE" = "block" ] && level="error"
 for p in "${problems[@]}"; do
   echo "::${level}::pr-evidence-gate: $p"
 done
-echo "格式見 daodaoedu/daodao plugin/skills/dev-task/references/journey-matrix.md；例外請加 label evidence-exempt 並在 PR 說明原因。"
+if [ "${#problems[@]}" -gt "$evidence_problems" ]; then
+  echo "格式見 daodaoedu/daodao plugin/skills/dev-task/references/journey-matrix.md；例外請加 label evidence-exempt 並在 PR 說明原因。"
+fi
 if [ "$MODE" = "block" ]; then
   exit 1
 fi

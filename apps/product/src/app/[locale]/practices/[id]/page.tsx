@@ -40,8 +40,6 @@ import { PRACTICE_DETAIL_CLOSE_PATH } from "@/constants/home-navigation";
 import {
   type ExecutionTiming,
   ExecutionTiming as ExecutionTimingConst,
-  type Frequency,
-  Frequency as FrequencyConst,
   PracticeTimePeriodToExecutionTimingMap,
 } from "@/constants/practice-form";
 import {
@@ -49,7 +47,9 @@ import {
   useArchivePracticeDialog,
 } from "@/hooks/use-archive-practice-dialog";
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
+import { runDeletePracticeFlow } from "@/lib/practice-delete/run-delete-practice-flow";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
+import { formatFrequencyRange } from "@/utils/practice-edit-schedule";
 import { resolvePracticeDurationDays } from "@/utils/practice-period";
 
 interface IPracticeDetailData {
@@ -58,7 +58,8 @@ interface IPracticeDetailData {
   durationMinutes: number;
   startDate: string;
   durationDays: number | null;
-  frequency: Frequency;
+  /** 每週頻率，例 "1-3"、"7"；"" = 沒有設定 */
+  frequency: string;
   executionTiming: ExecutionTiming[];
   customTiming: string;
   tags: string[];
@@ -149,7 +150,7 @@ export default function PracticeDetailPage() {
 
   const recordView = useRecordView();
   useRecordReadProgress(practiceId);
-  useRecordTimeSpent(practiceId);
+  const { stop: stopTimeSpent } = useRecordTimeSpent(practiceId);
 
   useEffect(() => {
     if (practiceId) {
@@ -174,15 +175,8 @@ export default function PracticeDetailPage() {
     // 天數照 API（含共同挑戰複製出的任意天數），不再只認 7／14／21／30（daodao#299）
     const durationDays = resolvePracticeDurationDays(data);
 
-    const frequencyMin = data.frequencyMinDays ?? 0;
-    const frequencyMax = data.frequencyMaxDays ?? 0;
-    let frequency: Frequency = FrequencyConst.twoToFour;
-    if (frequencyMin === 3 && frequencyMax === 5) {
-      frequency = FrequencyConst.threeToFive;
-    }
-    if (frequencyMin === 4 && frequencyMax === 7) {
-      frequency = FrequencyConst.fourToSeven;
-    }
+    // 頻率照 API 顯示（例 1-3、7），不再只認 3-5、4-7、其他一律 2-4（daodao#370）
+    const frequency = formatFrequencyRange(data.frequencyMinDays, data.frequencyMaxDays);
 
     const executionTiming = (data.practiceTimePeriods || [])
       .map((period: string) => PracticeTimePeriodToExecutionTimingMap[period])
@@ -293,16 +287,20 @@ export default function PracticeDetailPage() {
   };
 
   const handleDelete = async () => {
-    const result = await openDeleteDialog();
-    if (result === DeletePracticeResult.Deleted) {
-      try {
-        await deletePracticeById();
+    await runDeletePracticeFlow({
+      confirm: async () => (await openDeleteDialog()) === DeletePracticeResult.Confirmed,
+      deletePractice: deletePracticeById,
+      onDeleted: () => {
+        // 實踐已不存在，跳頁 unmount 時不要再回報停留時間（會 404）
+        stopTimeSpent();
+        toast.success(t("delete_success"));
         router.push("/");
-      } catch (deleteError) {
+      },
+      onError: (deleteError) => {
         console.error("Failed to delete practice:", deleteError);
         toast.error(serverErrorMessage(deleteError, t("delete_failed")));
-      }
-    }
+      },
+    });
   };
 
   const handleCommentSubmit = useCallback(
