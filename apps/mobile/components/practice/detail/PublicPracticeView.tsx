@@ -4,7 +4,10 @@ import DialogOutlineSvg from "@daodao/assets/images/icon/dialog-outline.svg";
 import FlagOutlineSvg from "@daodao/assets/images/icon/flag-outline.svg";
 import TagSolidSvg from "@daodao/assets/images/icon/tag-solid.svg";
 import TelescopeSvg from "@daodao/assets/images/icon/telescope.svg";
-import { resolvePracticeDurationDays } from "@daodao/shared/lib/practice-period";
+import {
+  practiceTimeProgress,
+  resolvePracticeDurationDays,
+} from "@daodao/shared/lib/practice-period";
 import { ChevronDown, ChevronLeft, ChevronUp, Copy, MoreHorizontal } from "@tamagui/lucide-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -176,13 +179,10 @@ export function PublicPracticeView({ practice, onRefresh }: PublicPracticeViewPr
     [startDate, endDate]
   );
 
+  // 進度以當地日曆日計算、含結束日整天（daodao#335）
   const progress = useMemo(() => {
     if (status === "completed") return 100;
-    if (!startDate || !endDate) return 0;
-    const s = new Date(startDate).getTime();
-    const e = new Date(endDate).getTime();
-    if (Number.isNaN(s) || Number.isNaN(e) || e <= s) return 0;
-    return Math.min(100, Math.max(0, Math.round(((Date.now() - s) / (e - s)) * 100)));
+    return practiceTimeProgress(startDate, endDate, new Date());
   }, [status, startDate, endDate]);
 
   const statusInfo = getStatusConfig(taskStatus);
