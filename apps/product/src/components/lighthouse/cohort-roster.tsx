@@ -20,13 +20,13 @@ import { cn } from "@daodao/ui/lib/utils";
 import { format } from "date-fns";
 import { Copy, Link2, Link2Off, RefreshCw, Send, Upload, UserMinus } from "lucide-react";
 import { useState } from "react";
-import { apiErrorMessage } from "@/utils/cohort-api-error";
 import {
   getInvitationSendDisabledReason,
   type InvitationPreviewSummary,
 } from "@/utils/cohort-invitation";
 import { CohortErrorState } from "./cohort-error-state";
 import { JoinCode, useCopyJoinLink, useJoinUrl } from "./join-code";
+import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 interface CohortRosterProps {
   programId: number;
@@ -62,6 +62,7 @@ const previewState = (item: PreviewItem): PreviewState =>
 
 export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
   const t = useTranslations("lighthouse");
+  const apiErrorMessage = useLighthouseErrorMessage();
   const { openWarningDialog } = useDialog();
   const cohortQuery = useLighthouseCohort(programId, cohortId);
   const enrollmentQuery = useLighthouseCohortEnrollments(programId, cohortId);
@@ -121,7 +122,7 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
     setBusy(false);
     if (response.error || !response.data) {
       // 409：期在預覽後變成不可加入，顯示 server 給的原因
-      toast.error(apiErrorMessage(response.error, t("invitation_send_failed")));
+      toast.error(apiErrorMessage(response, t("invitation_send_failed")));
       return;
     }
     await enrollmentQuery.mutate();
@@ -147,7 +148,7 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
       const response = await resendLighthouseCohortInvitation(programId, cohortId, enrollmentId);
       if (response.error) {
         // 409：場次已截止／額滿／未發布或成員已加入，顯示 server 給的原因（daodao#281）
-        toast.error(apiErrorMessage(response.error, t("invitation_send_failed")));
+        toast.error(apiErrorMessage(response, t("invitation_send_failed")));
         return;
       }
       await enrollmentQuery.mutate();

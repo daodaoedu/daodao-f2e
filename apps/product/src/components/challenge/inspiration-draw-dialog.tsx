@@ -12,6 +12,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { Check, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 
 interface InspirationDrawDialogProps {
   challengeId: number | null;
@@ -20,14 +21,12 @@ interface InspirationDrawDialogProps {
 
 type ViewState = "deck" | "shuffling" | "drawn";
 
-const extractErrorMessage = (error: unknown, fallback: string): string =>
-  (error as { error?: { message?: string } })?.error?.message ?? fallback;
-
 export const InspirationDrawDialog = ({
   challengeId,
   onOpenChange,
 }: InspirationDrawDialogProps) => {
   const t = useTranslations("challenge");
+  const { errorMessage } = useServerErrorMessage();
   const [isBusy, setIsBusy] = useState(false);
   const [viewState, setViewState] = useState<ViewState>("deck");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -61,7 +60,9 @@ export const InspirationDrawDialog = ({
     const response = await drawInspirationCard(challengeId);
     setIsBusy(false);
     if (response.error) {
-      toast.error(extractErrorMessage(response.error, t("draw_failed")));
+      toast.error(
+        errorMessage(response.error, t("draw_failed"), { status: response.response.status })
+      );
       setViewState(draws.length > 0 ? "drawn" : "deck");
       return;
     }
@@ -72,7 +73,7 @@ export const InspirationDrawDialog = ({
     }
     setViewState("drawn");
     setActiveIndex(draws.length);
-  }, [challengeId, isBusy, canDraw, draws.length, mutate, t]);
+  }, [challengeId, isBusy, canDraw, draws.length, mutate, t, errorMessage]);
 
   const handleSelect = useCallback(
     async (drawId: number) => {
@@ -81,12 +82,14 @@ export const InspirationDrawDialog = ({
       const response = await selectInspirationDraw(challengeId, drawId);
       setIsBusy(false);
       if (response.error) {
-        toast.error(extractErrorMessage(response.error, t("select_failed")));
+        toast.error(
+          errorMessage(response.error, t("select_failed"), { status: response.response.status })
+        );
         return;
       }
       mutate();
     },
-    [challengeId, isBusy, mutate, t]
+    [challengeId, isBusy, mutate, t, errorMessage]
   );
 
   const hintText =
@@ -120,9 +123,7 @@ export const InspirationDrawDialog = ({
         <DialogTitle className="mt-2 m-0 text-xl font-bold text-text-dark">
           {t("draw_dialog_title")}
         </DialogTitle>
-        <DialogDescription className="sr-only">
-          {t("draw_dialog_subtitle")}
-        </DialogDescription>
+        <DialogDescription className="sr-only">{t("draw_dialog_subtitle")}</DialogDescription>
 
         <div className="relative mx-auto mt-5 mb-1 flex h-[236px] w-full items-center justify-center">
           {viewState === "deck" && (

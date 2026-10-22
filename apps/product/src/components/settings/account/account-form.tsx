@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { FieldSelectionSection } from "./field-selection-section";
 import { toAccountFormValues } from "./form-state";
 import { PersonalInfoSection } from "./personal-info-section";
@@ -26,6 +27,8 @@ import {
 
 export const AccountForm = () => {
   const t = useTranslations("account_settings");
+  const { errorMessage: serverErrorMessage, fieldMessage: serverFieldMessage } =
+    useServerErrorMessage();
   const productT = useTranslations("app_product");
   const router = useRouter();
   const { data: userData, isLoading, error: userError } = useCurrentUser();
@@ -110,7 +113,7 @@ export const AccountForm = () => {
                 if (formField) {
                   form.setError(formField, {
                     type: "server",
-                    message: detail.message,
+                    message: serverFieldMessage(detail.message),
                   });
                 }
               }
@@ -128,7 +131,13 @@ export const AccountForm = () => {
         }
 
         console.error("Failed to update user:", response.error);
-        toast.error(errorMessage);
+        // zh-TW 維持上面挑出的 server 訊息；其他語系依 code／status 轉換（daodao#353）
+        toast.error(
+          serverErrorMessage(response.error, t("save_error"), {
+            status: response.response.status,
+            detailMessage: errorMessage,
+          })
+        );
         setIsSubmitting(false);
         return;
       }

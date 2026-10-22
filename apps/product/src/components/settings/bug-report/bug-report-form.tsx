@@ -7,6 +7,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle, ImagePlus, X } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { resolveBugReportErrorMessage } from "./bug-report-error";
 import { createScreenshotPreviewUrl } from "./screenshot-preview";
 
@@ -22,6 +23,7 @@ interface PreviewFile {
 
 export function BugReportForm() {
   const t = useTranslations("app_product");
+  const { locale, t: serverT } = useServerErrorMessage();
   const [area, setArea] = useState<Area | null>(null);
   const [description, setDescription] = useState("");
   const [screenshots, setScreenshots] = useState<PreviewFile[]>([]);
@@ -88,12 +90,19 @@ export function BugReportForm() {
       });
       setIsSuccess(true);
     } catch (error) {
-      // 400／422 顯示 server 訊息與出錯欄位，其他狀態與網路錯誤顯示通用訊息；表單內容保留不清空
-      toast.error(resolveBugReportErrorMessage(error, (key) => t(key)));
+      // 400／422 顯示出錯欄位或截圖限制，其他狀態與網路錯誤顯示通用訊息；表單內容保留不清空
+      toast.error(
+        resolveBugReportErrorMessage(error, {
+          locale,
+          t: (key) => t(key),
+          tInvalidFields: (fields) => t("bug_invalid_fields", { fields }),
+          serverT,
+        })
+      );
     } finally {
       setIsSubmitting(false);
     }
-  }, [area, description, link, screenshots, t]);
+  }, [area, description, link, screenshots, t, locale, serverT]);
 
   const handleReset = useCallback(() => {
     setArea(null);

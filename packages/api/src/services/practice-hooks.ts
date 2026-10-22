@@ -7,12 +7,12 @@
 
 import useSWR from "swr";
 import { client, getApiBaseUrl, unauthorizedHandler } from "../client";
+import { apiErrorFromBody } from "../errors";
 import { useMutate, useQuery } from "../hooks";
 import type { components, paths } from "../types";
 import {
   buildCreateCheckInFormData,
   buildUpdateCheckInFormData,
-  extractApiErrorMessage,
   type ICheckInFormData,
 } from "./check-in-form-data";
 import type {
@@ -393,7 +393,7 @@ export const createPracticeCheckInWithFormData = async (
     const error = await response.json().catch(() => ({
       error: { message: "打卡失敗" },
     }));
-    throw new Error(extractApiErrorMessage(error, "打卡失敗"));
+    throw apiErrorFromBody(response.status, error, "打卡失敗");
   }
 
   return response.json();
@@ -426,7 +426,7 @@ export const updatePracticeCheckInWithFormData = async (
     const error = await response.json().catch(() => ({
       error: { message: "更新打卡失敗" },
     }));
-    throw new Error(extractApiErrorMessage(error, "更新打卡失敗"));
+    throw apiErrorFromBody(response.status, error, "更新打卡失敗");
   }
 
   return response.json();
@@ -567,7 +567,7 @@ export const useArchivePractice = (practiceId: string) => {
     } as UpdatePracticeRequestType);
 
     if (response.error) {
-      throw new Error(extractApiErrorMessage(response.error, "封存失敗"));
+      throw apiErrorFromBody(response.response.status, response.error, "封存失敗");
     }
 
     // 刷新相關的 cache（跳過實踐詳情，因為封存後可能無法訪問）
@@ -588,7 +588,7 @@ export const useArchivePractice = (practiceId: string) => {
     });
 
     if (response.error) {
-      throw new Error(extractApiErrorMessage(response.error, "復原失敗"));
+      throw apiErrorFromBody(response.response.status, response.error, "復原失敗");
     }
 
     // 刷新相關的 cache
@@ -620,7 +620,7 @@ export const useUnarchivePractice = () => {
     });
 
     if (response.error) {
-      throw new Error(extractApiErrorMessage(response.error, "取消封存失敗"));
+      throw apiErrorFromBody(response.response.status, response.error, "取消封存失敗");
     }
 
     // 刷新相關的 cache
@@ -644,7 +644,7 @@ export const useDeletePractice = (practiceId: string) => {
     const response = await deletePractice(practiceId);
 
     if (response.error) {
-      throw new Error(extractApiErrorMessage(response.error, "刪除失敗"));
+      throw apiErrorFromBody(response.response.status, response.error, "刪除失敗");
     }
 
     // 刷新相關的 cache（不需要刷新單個實踐詳情，因為已經刪除了）

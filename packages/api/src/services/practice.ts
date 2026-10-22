@@ -4,7 +4,7 @@
  */
 
 import { client } from "../client";
-import { extractApiErrorMessage } from "./check-in-form-data";
+import { apiErrorFromBody } from "../errors";
 import type { paths } from "../types";
 
 // ============================================================================
@@ -462,7 +462,7 @@ type CopyPracticeClient = {
   POST: (
     path: "/api/v1/practices/{id}/copy",
     options: { params: { path: { id: string } } }
-  ) => Promise<{ data?: { data: { id: string } }; error?: unknown }>;
+  ) => Promise<{ data?: { data: { id: string } }; error?: unknown; response: Response }>;
 };
 
 export const copyPractice = async (id: string): Promise<{ id: string }> => {
@@ -472,7 +472,7 @@ export const copyPractice = async (id: string): Promise<{ id: string }> => {
   );
 
   if (response.error) {
-    throw new Error(extractApiErrorMessage(response.error, "複製失敗"));
+    throw apiErrorFromBody(response.response.status, response.error, "複製失敗");
   }
 
   return response.data?.data as { id: string };

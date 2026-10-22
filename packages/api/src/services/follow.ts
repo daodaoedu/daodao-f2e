@@ -1,5 +1,5 @@
 import { getApiBaseUrl, unauthorizedHandler } from "../client";
-import { extractApiErrorMessage } from "./check-in-form-data";
+import { apiErrorFromBody } from "../errors";
 
 // ============================================================================
 // Types
@@ -67,7 +67,7 @@ export const followTarget = async (body: IFollowTarget): Promise<void> => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(extractApiErrorMessage(err, "關注失敗"));
+    throw apiErrorFromBody(res.status, err, "關注失敗");
   }
 };
 
@@ -81,7 +81,7 @@ export const unfollowTarget = async (
   );
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(extractApiErrorMessage(err, "取消關注失敗"));
+    throw apiErrorFromBody(res.status, err, "取消關注失敗");
   }
 };
 

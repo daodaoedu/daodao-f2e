@@ -16,6 +16,7 @@ import {
 import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { ActivityTypeBadge, formatActivityDateTime } from "./cohort-activity-badge";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 
@@ -37,6 +38,7 @@ export function CohortActivityDetailDialog({
   onClose,
 }: CohortActivityDetailDialogProps) {
   const t = useTranslations("lighthouse");
+  const { errorMessage } = useServerErrorMessage();
   const [detail, setDetail] = useState<LighthouseActivityDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,7 +53,9 @@ export function CohortActivityDetailDialog({
       if (cancelled) return;
       setLoading(false);
       if (response.error || !response.data) {
-        setError(response.error?.error?.message ?? t("load_failed"));
+        setError(
+          errorMessage(response.error, t("load_failed"), { status: response.response.status })
+        );
         return;
       }
       setDetail(response.data.data);
@@ -59,7 +63,7 @@ export function CohortActivityDetailDialog({
     return () => {
       cancelled = true;
     };
-  }, [item, programId, cohortId, t]);
+  }, [item, programId, cohortId, t, errorMessage]);
 
   return (
     <Dialog open={item !== null} onOpenChange={(open) => !open && onClose()}>

@@ -399,5 +399,24 @@
     "minutes_ago": "{count} 分鐘前",
     "hours_ago": "{count} 小時前",
     "days_ago": "{count} 天前"
+  },
+  "server_error": {
+    "generic": "操作失敗，請稍後再試",
+    "unauthorized": "請先登入",
+    "session_expired": "登入已過期，請重新登入",
+    "forbidden": "無權限執行此操作",
+    "not_found": "找不到指定的資料，可能已被刪除",
+    "conflict": "資料衝突，請重新整理後再試",
+    "gone": "此內容已超過保留期限",
+    "rate_limited": "請求過於頻繁，請稍後再試",
+    "validation": "請求資料格式錯誤",
+    "invalid_field": "格式不正確",
+    "invalid_reference": "關聯資料不存在，請重新整理後再試",
+    "data_too_long": "資料長度超過限制",
+    "required_field_missing": "請填寫所有必填欄位",
+    "file_upload": "檔案上傳失敗，請確認檔案大小與數量",
+    "file_too_large": "檔案大小超過限制",
+    "file_invalid_type": "不支援的檔案類型",
+    "file_count_exceeded": "檔案數量超過限制"
   }
 }

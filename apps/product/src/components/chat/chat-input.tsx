@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatMessageType } from "@daodao/api";
-import { editChatMessage, selectChatErrorMessage, sendChatMessage } from "@daodao/api";
+import { editChatMessage, sendChatMessage } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useCompositionState } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -9,6 +9,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { Pencil, Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 
 interface ChatInputProps {
   roomId: number;
@@ -30,6 +31,7 @@ export function ChatInput({
   onMessageEdited,
 }: ChatInputProps) {
   const t = useTranslations("messages");
+  const { errorMessage } = useServerErrorMessage();
   const [value, setValue] = useState("");
   const [sending, setSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -56,7 +58,9 @@ export function ChatInput({
       if (editingMessage) {
         const response = await editChatMessage(roomId, editingMessage.id, trimmed);
         if (response.error) {
-          toast.error(selectChatErrorMessage(response.error, t("send_failed")));
+          toast.error(
+            errorMessage(response.error, t("send_failed"), { status: response.response.status })
+          );
           return;
         }
         resetInput();
@@ -65,7 +69,9 @@ export function ChatInput({
       } else {
         const response = await sendChatMessage(roomId, trimmed, replyTo?.id);
         if (response.error) {
-          toast.error(selectChatErrorMessage(response.error, t("send_failed")));
+          toast.error(
+            errorMessage(response.error, t("send_failed"), { status: response.response.status })
+          );
           return;
         }
         resetInput();
@@ -89,6 +95,7 @@ export function ChatInput({
     onMessageEdited,
     resetInput,
     t,
+    errorMessage,
   ]);
 
   const handleKeyDown = useCallback(

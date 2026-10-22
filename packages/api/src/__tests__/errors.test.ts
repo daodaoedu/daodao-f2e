@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ApiError, handleApiError, isApiError } from "../errors";
+import { ApiError, apiErrorFromBody, handleApiError, isApiError } from "../errors";
 
 describe("ApiError", () => {
   it("creates an error with status and message", () => {
@@ -32,6 +32,44 @@ describe("isApiError", () => {
     expect(isApiError(null)).toBe(false);
     expect(isApiError("string")).toBe(false);
     expect(isApiError(undefined)).toBe(false);
+  });
+});
+
+describe("apiErrorFromBody", () => {
+  it("keeps status, code, message and details from the server body", () => {
+    const err = apiErrorFromBody(
+      400,
+      {
+        success: false,
+        error: { code: "VALIDATION_ERROR", message: "請求資料格式錯誤", details: { a: "x" } },
+      },
+      "送出失敗"
+    );
+    expect(err).toBeInstanceOf(ApiError);
+    expect(err.status).toBe(400);
+    expect(err.message).toBe("請求資料格式錯誤");
+    expect(err.data).toEqual({
+      code: "VALIDATION_ERROR",
+      message: "請求資料格式錯誤",
+      details: { a: "x" },
+    });
+  });
+
+  it("maps the rate limiter body (error is the code string)", () => {
+    const err = apiErrorFromBody(
+      429,
+      { success: false, message: "請求過於頻繁", error: "RATE_LIMIT_EXCEEDED" },
+      "失敗"
+    );
+    expect(err.status).toBe(429);
+    expect(err.data).toMatchObject({ code: "RATE_LIMIT_EXCEEDED" });
+  });
+
+  it("uses the fallback message when the body is empty", () => {
+    const err = apiErrorFromBody(502, {}, "撤回失敗");
+    expect(err.status).toBe(502);
+    expect(err.message).toBe("撤回失敗");
+    expect(err.data).toBeUndefined();
   });
 });
 

@@ -20,6 +20,7 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { CalendarRange, FileText, LayoutTemplate, Link2, Megaphone, Type } from "lucide-react";
 import { useRef, useState } from "react";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { SpaceBlockEditor } from "./space-block-editor";
 import { SpaceBlockView } from "./space-block-view";
 import { SpaceFormatToolbar } from "./space-format-toolbar";
@@ -49,6 +50,7 @@ export const SpaceHomeTab = ({
   onEditingChange,
 }: SpaceHomeTabProps) => {
   const t = useTranslations("space");
+  const { errorMessage } = useServerErrorMessage();
   const mutate = useMutate();
   const [isPublishing, setIsPublishing] = useState(false);
   const [isAddingBlock, setIsAddingBlock] = useState(false);
@@ -64,7 +66,7 @@ export const SpaceHomeTab = ({
     const response = await publishSpaceHomePage(spaceId);
     setIsPublishing(false);
     if (response.error) {
-      toast.error(response.error.error?.message ?? t("publish_page"));
+      toast.error(errorMessage(response.error, undefined, { status: response.response.status }));
       return;
     }
     await refresh();
@@ -76,7 +78,7 @@ export const SpaceHomeTab = ({
     const response = await createSpaceBlock(spaceId, { blockType });
     setIsAddingBlock(false);
     if (response.error) {
-      toast.error(response.error.error?.message ?? t("add_block"));
+      toast.error(errorMessage(response.error, undefined, { status: response.response.status }));
       return;
     }
     const created = response.data?.data;
@@ -199,6 +201,7 @@ export const SpaceHomeGuide = ({
   onStartOpenChange,
 }: SpaceHomeGuideProps) => {
   const t = useTranslations("space");
+  const { errorMessage } = useServerErrorMessage();
   const mutate = useMutate();
   const [isCreating, setIsCreating] = useState(false);
 
@@ -207,7 +210,7 @@ export const SpaceHomeGuide = ({
     const response = await createSpaceHomePage(spaceId, { template });
     setIsCreating(false);
     if (response.error) {
-      toast.error(response.error.error?.message ?? t("guide_create"));
+      toast.error(errorMessage(response.error, undefined, { status: response.response.status }));
       return;
     }
     onStartOpenChange(false);

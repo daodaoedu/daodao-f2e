@@ -31,6 +31,7 @@ import {
   SocialPlatform,
   type SocialPlatform as SocialPlatformType,
 } from "@/constants/social-platform";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { getUserConnectionStatus, type UserConnectionStatus } from "./connection-status";
 
 /**
@@ -145,6 +146,7 @@ export function UserInfoCard({
   targetUserId,
 }: UserInfoCardProps) {
   const t = useTranslations("user_profile");
+  const { errorMessage } = useServerErrorMessage();
   const isMobile = useIsMobile();
   const [followLoading, setFollowLoading] = useState(false);
   const [connectLoading, setConnectLoading] = useState(false);
@@ -234,11 +236,11 @@ export function UserInfoCard({
         toast.success(t("follow_success"));
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("operation_failed"));
+      toast.error(errorMessage(err, t("operation_failed")));
     } finally {
       setFollowLoading(false);
     }
-  }, [targetUserId, currentIsFollowing]);
+  }, [targetUserId, currentIsFollowing, errorMessage]);
 
   const handleConnect = useCallback(async () => {
     if (!targetUserId) return;
@@ -284,11 +286,11 @@ export function UserInfoCard({
         toast.success(t("conn_request_sent"));
         return;
       }
-      toast.error(err instanceof Error ? err.message : t("conn_request_failed"));
+      toast.error(errorMessage(err, t("conn_request_failed")));
     } finally {
       setConnectLoading(false);
     }
-  }, [targetUserId, openInfoDialog]);
+  }, [targetUserId, openInfoDialog, errorMessage]);
 
   // 按照定義的順序將物件轉換為陣列並分離有圖示和沒有圖示的連結
   const socialLinksArray = socialLinks

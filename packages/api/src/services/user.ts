@@ -4,8 +4,8 @@
  */
 
 import { client, getApiBaseUrl, unauthorizedHandler } from "../client";
+import { type ApiError, apiErrorFromBody } from "../errors";
 import type { components, paths } from "../types";
-import { extractApiErrorMessage } from "./check-in-form-data";
 
 // ============================================================================
 // Types
@@ -315,7 +315,7 @@ const sendUserFormDataRequest = async <T>(
     const errorData = await response.json().catch(() => ({
       error: { message: errorMessage },
     }));
-    const error = new Error(extractApiErrorMessage(errorData, errorMessage)) as Error & {
+    const error = apiErrorFromBody(response.status, errorData, errorMessage) as ApiError & {
       details?: Array<{ path?: string; message?: string }>;
     };
     // 附加驗證錯誤詳情（供表單使用）

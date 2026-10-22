@@ -399,5 +399,24 @@
     "minutes_ago": "{count} minutes ago",
     "hours_ago": "{count} hours ago",
     "days_ago": "{count} days ago"
+  },
+  "server_error": {
+    "generic": "Something went wrong. Please try again later.",
+    "unauthorized": "Please log in first.",
+    "session_expired": "Your session has expired. Please log in again.",
+    "forbidden": "You don't have permission to do this.",
+    "not_found": "We couldn't find what you were looking for. It may have been removed.",
+    "conflict": "This conflicts with existing data. Please refresh and try again.",
+    "gone": "This content is no longer available.",
+    "rate_limited": "Too many requests. Please try again later.",
+    "validation": "Some of the information is invalid. Please check and try again.",
+    "invalid_field": "Invalid value",
+    "invalid_reference": "Related data no longer exists. Please refresh and try again.",
+    "data_too_long": "The content is too long.",
+    "required_field_missing": "Please fill in all required fields.",
+    "file_upload": "File upload failed. Please check the file size and number of files.",
+    "file_too_large": "The file is too large.",
+    "file_invalid_type": "This file type isn't supported.",
+    "file_count_exceeded": "Too many files."
   }
 }

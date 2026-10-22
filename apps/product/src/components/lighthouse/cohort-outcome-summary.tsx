@@ -14,7 +14,7 @@ import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { AlertCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { apiErrorMessage } from "@/utils/cohort-api-error";
+import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 interface CohortOutcomeSummaryProps {
   programId: number;
@@ -38,6 +38,7 @@ export function CohortOutcomeSummary({
   refresh,
 }: CohortOutcomeSummaryProps) {
   const t = useTranslations("lighthouse");
+  const apiErrorMessage = useLighthouseErrorMessage();
   const [mode, setMode] = useState<LighthouseSummaryMode>("platform");
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
@@ -60,7 +61,7 @@ export function CohortOutcomeSummary({
     const response = await generateLighthouseOutcomeSummary(programId, cohortId, mode);
     setBusy(null);
     if (response.error) {
-      const message = apiErrorMessage(response.error, t("outcome_summary_generate_failed"));
+      const message = apiErrorMessage(response, t("outcome_summary_generate_failed"));
       setError(message);
       toast.error(message);
       return;
@@ -85,7 +86,7 @@ export function CohortOutcomeSummary({
     const response = await saveLighthouseOutcomeSummary(programId, cohortId, content);
     setBusy(null);
     if (response.error) {
-      const message = apiErrorMessage(response.error, t("save_failed"));
+      const message = apiErrorMessage(response, t("save_failed"));
       setError(message);
       toast.error(message);
       return;

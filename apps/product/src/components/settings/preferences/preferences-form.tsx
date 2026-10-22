@@ -12,11 +12,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { PreferenceSection } from "./preference-section";
 import { createPreferencesFormSchema, type PreferencesFormValues } from "./schema";
 
 export const PreferencesForm = () => {
   const t = useTranslations("preferences_settings");
+  const { errorMessage: serverErrorMessage, fieldMessage: serverFieldMessage } =
+    useServerErrorMessage();
   const router = useRouter();
   const {
     data: preferencesData,
@@ -165,7 +168,7 @@ export const PreferencesForm = () => {
                       const typeId = String(item.preferenceTypeId);
                       form.setError(`preferences.${typeId}` as keyof PreferencesFormValues, {
                         type: "server",
-                        message: detail.message,
+                        message: serverFieldMessage(detail.message),
                       });
                     }
                   }
@@ -187,7 +190,13 @@ export const PreferencesForm = () => {
         }
 
         console.error("Failed to update preferences:", response.error);
-        toast.error(errorMessage);
+        // zh-TW 維持上面挑出的 server 訊息；其他語系依 code／status 轉換（daodao#353）
+        toast.error(
+          serverErrorMessage(response.error, t("save_error"), {
+            status: response.response.status,
+            detailMessage: errorMessage,
+          })
+        );
         setIsSubmitting(false);
         return;
       }

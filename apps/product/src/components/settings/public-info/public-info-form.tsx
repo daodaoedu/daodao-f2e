@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate as globalMutate } from "swr";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { AvatarUploadSection } from "./avatar-upload-section";
 import { BasicInfoSection } from "./basic-info-section";
 import { IntroductionSection } from "./introduction-section";
@@ -20,6 +21,8 @@ import { SocialLinksSection } from "./social-links-section";
 export const PublicInfoForm = () => {
   const locale = useLocale();
   const t = useTranslations("app_product");
+  const { errorMessage: serverErrorMessage, fieldMessage: serverFieldMessage } =
+    useServerErrorMessage();
   const { data: userData, isLoading, error: userError } = useCurrentUser();
   const { updateCurrentUserWithFormData } = useUserMutations();
   const mutate = useMutate();
@@ -199,7 +202,7 @@ export const PublicInfoForm = () => {
               if (formField) {
                 form.setError(formField, {
                   type: "server",
-                  message: detail.message,
+                  message: serverFieldMessage(detail.message),
                 });
               }
             }
@@ -213,7 +216,10 @@ export const PublicInfoForm = () => {
         }
       }
 
-      toast.error(errorMessage);
+      // zh-TW 維持上面挑出的 server 訊息；其他語系依 code／status 轉換（daodao#353）
+      toast.error(
+        serverErrorMessage(error, t("update_failed_retry"), { detailMessage: errorMessage })
+      );
     } finally {
       setIsSubmitting(false);
     }
