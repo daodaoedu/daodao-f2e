@@ -36,6 +36,9 @@ def numbered(data):
 
 
 HUNK_RE = re.compile(r'^@@ -(\d+)(?:,\d+)? \+\d+(?:,\d+)? @@')
+RANGE_RE = re.compile(r'^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@')
+# Surrounding lines per hunk for files too large to supply whole; 0 = only the diff's own lines.
+HUNK_RADII = (20, 0)
 
 
 def before_hunk_lines(diff_text):
@@ -63,15 +66,33 @@ def before_hunk_lines(diff_text):
     return entries
 
 
-def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total_bytes=400000):
+def hunk_window_lines(diff_text, label, data, radius):
+    """Source lines around each hunk of one side, keyed by their real line number on that side."""
+    lines = source_lines(data)
+    wanted = set()
+    for line in diff_text.split('\n'):
+        match = RANGE_RE.match(line)
+        if not match:
+            continue
+        start, count = (match.group(1), match.group(2)) if label == 'BEFORE' else (match.group(3), match.group(4))
+        start, count = int(start), 1 if count is None else int(count)
+        # count 0 (pure insertion/deletion on the other side) still anchors around `start`
+        wanted.update(range(max(1, start - radius), min(len(lines), start + max(count, 1) - 1 + radius) + 1))
+    return [(n, lines[n - 1]) for n in sorted(wanted)]
+
+
+def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total_bytes=400000,
+         max_source_bytes=None):
+    # Sources over one batch are reviewed from diff hunks; this cap only bounds Git's diff allocation.
+    max_source_bytes = max_source_bytes or 50 * max_batch_bytes
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     manifest = {'schema_version': 1, 'base': None, 'head': None, 'merge_base': None,
                 'files': [], 'batches': [], 'errors': [],
                 'budgets': {'max_batch_bytes': max_batch_bytes, 'max_batches': max_batches,
-                            'max_total_bytes': max_total_bytes}}
+                            'max_total_bytes': max_total_bytes, 'max_source_bytes': max_source_bytes}}
     try:
-        if min(max_batch_bytes, max_batches, max_total_bytes) <= 0:
+        if min(max_batch_bytes, max_batches, max_total_bytes, max_source_bytes) <= 0:
             raise ValueError('budgets must be positive')
         base_sha = git(repo, 'rev-parse', '--verify', '--end-of-options', base + '^{commit}').decode().strip()
         head_sha = git(repo, 'rev-parse', '--verify', '--end-of-options', head + '^{commit}').decode().strip()
@@ -131,7 +152,7 @@ def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total
                 # will be supplied for an ordinary modification.
                 preflight = list(sources)
                 for _, rev, source in preflight:
-                    if int(git(repo, 'cat-file', '-s', f'{rev}:{source}')) > max_batch_bytes:
+                    if int(git(repo, 'cat-file', '-s', f'{rev}:{source}')) > max_source_bytes:
                         oversized = True
                         item['reason'] = 'source-exceeds-batch-budget'
                         break
@@ -140,7 +161,7 @@ def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total
                 for label, rev, source in sources:
                     object_name = f'{rev}:{source}'
                     size = int(git(repo, 'cat-file', '-s', object_name))
-                    if size > max_batch_bytes:
+                    if size > max_source_bytes:
                         oversized = True
                         break
                     kind = git(repo, 'cat-file', '-t', object_name).decode().strip()
@@ -160,6 +181,7 @@ def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total
                     blobs[-1]['label'] = label
                     blobs[-1]['header'] = label_text
                     blobs[-1]['content'] = content
+                    blobs[-1]['data'] = data
                 if oversized:
                     item.setdefault('reason', 'source-exceeds-batch-budget')
                     continue
@@ -210,15 +232,34 @@ def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total
                             'BEFORE SOURCE PARTIAL: only diff hunks of BEFORE are supplied below\n'))
                     tiers.append(('head-only', [head_blob],
                                   'BEFORE SOURCE OMITTED: budget; cite HEAD lines only, removed lines appear only in the diff\n'))
+                # A source over one batch on its own (e.g. a 450 KB locale file) is reviewed from the
+                # diff plus surrounding lines of each side; only a diff that cannot fit stays unreviewed.
+                for radius in HUNK_RADII:
+                    windows = []
+                    for blob in blobs:
+                        window = hunk_window_lines(diff_text, blob['label'], blob['data'], radius)
+                        if window:
+                            windows.append({
+                                'label': blob['label'], 'revision': blob['revision'], 'path': blob['path'],
+                                'sha256': blob['sha256'], 'bytes': blob['bytes'], 'lines': len(window),
+                                'sparse': True, 'source_line_count': blob['lines'],
+                                'header': (f'\n{blob["label"]} HUNKS {json.dumps(blob["path"], ensure_ascii=True)} '
+                                           f'(only diff hunks plus {radius} surrounding lines, numbered with their '
+                                           f'original {blob["label"]} line numbers)\n'),
+                                'content': ''.join(f'{n}: {text}\n' for n, text in window)})
+                    if windows:
+                        tiers.append(('hunks', windows,
+                                      'SOURCE PARTIAL: file exceeds budget; only listed lines around the diff are supplied\n'))
                 for level, unit_blobs, note in tiers:
                     payload, diff_section, source_sections = build_unit(unit_blobs, note)
                     if len(payload) <= max_batch_bytes:
                         break
                 item['context_level'] = level
                 item['required_bytes'] = len(payload)
-                item['sources'] = [{k: v for k, v in b.items() if k not in ('header', 'content')} for b in unit_blobs]
+                item['sources'] = [{k: v for k, v in b.items() if k not in ('header', 'content', 'data')} for b in unit_blobs]
                 if len(payload) > max_batch_bytes:
-                    item['reason'] = 'complete-file-unit-exceeds-batch-budget'; continue
+                    item['reason'] = ('diff-exceeds-batch-budget' if level == 'hunks'
+                                      else 'complete-file-unit-exceeds-batch-budget'); continue
                 if total + len(current) + len(payload) > max_total_bytes:
                     item['reason'] = 'total-budget-exhausted'; continue
                 if current and len(current) + len(payload) > max_batch_bytes:
