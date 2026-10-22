@@ -35,7 +35,9 @@ export const menuItems: MenuItem[] = [
     href: "/spaces",
     badge: "breathing-dot",
     isMatch: (pathname: string) =>
-      pathname.startsWith("/spaces") || pathname.startsWith("/activities"),
+      pathname.startsWith("/spaces") ||
+      pathname.startsWith("/activities") ||
+      pathname.startsWith("/challenges"),
   },
   {
     activeIcon: MessagesOutlineSvg,

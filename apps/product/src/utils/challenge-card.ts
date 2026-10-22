@@ -8,7 +8,7 @@ type ChallengeCardInput = Pick<
 /**
  * 共同挑戰卡片右下角的動作（FR-CC-11 卡片狀態）
  *
- * - 未加入：現在加入（已額滿／報名截止時停用）；已結束則不顯示
+ * - 未加入、未開始：現在加入（已額滿／報名截止時停用）；進行中、已結束則不顯示（FR-EXP-04）
  * - 已加入、未開始：打卡（Disable，不可點）
  * - 已加入、進行中：打卡 → 連到自動複製的實踐頁打卡
  * - 已加入、已結束：觀看總結 → 連到實踐總結頁
@@ -35,7 +35,8 @@ export const getChallengeCardAction = (
   practiceId: string | null | undefined
 ): ChallengeCardAction => {
   if (!challenge.isJoined) {
-    if (challenge.runStatus === "ended") return { kind: "none", href: null };
+    // FR-EXP-04：只有未開始的挑戰提供加入入口；進行中、已結束一律不顯示（不看 canJoin）
+    if (challenge.runStatus !== "upcoming") return { kind: "none", href: null };
     const labelKey = challenge.canJoin
       ? "cta_join"
       : challenge.unavailableReason === "full"

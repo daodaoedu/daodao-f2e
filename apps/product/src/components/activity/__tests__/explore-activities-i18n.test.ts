@@ -1,6 +1,8 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import enMessages from "@daodao/i18n/locales/en";
+import zhTWMessages from "@daodao/i18n/locales/zh-TW";
 import { describe, expect, it } from "vitest";
 import { ACTIVITY_UNAVAILABLE_REASON_KEY } from "@/constants/activity-detail-cta";
 
@@ -10,7 +12,6 @@ import { ACTIVITY_UNAVAILABLE_REASON_KEY } from "@/constants/activity-detail-cta
 
 const here = dirname(fileURLToPath(import.meta.url));
 const productSrc = resolve(here, "../../..");
-const localesDir = resolve(productSrc, "../../../packages/i18n/src/locales");
 
 const SOURCES = [
   "app/[locale]/activities/page.tsx",
@@ -39,7 +40,7 @@ const usedKeys = (): Set<string> => {
   return keys;
 };
 
-const locales = readdirSync(localesDir).filter((f) => f.endsWith(".json"));
+const locales = Object.entries({ en: enMessages, "zh-TW": zhTWMessages });
 
 describe("explore_activities i18n coverage", () => {
   const keys = usedKeys();
@@ -49,14 +50,14 @@ describe("explore_activities i18n coverage", () => {
     expect(keys.size).toBeGreaterThan(20);
   });
 
-  it.each(locales)("%s defines every explore_activities key in use", (file) => {
-    const ns = JSON.parse(readFileSync(join(localesDir, file), "utf8")).explore_activities ?? {};
+  it.each(locales)("%s defines every explore_activities key in use", (_locale, messages) => {
+    const ns: Record<string, string> = messages.explore_activities;
     const missing = [...keys].filter((k) => typeof ns[k] !== "string");
     expect(missing).toEqual([]);
   });
 
-  it.each(locales)("%s uses ICU single-brace placeholders", (file) => {
-    const ns = JSON.parse(readFileSync(join(localesDir, file), "utf8")).explore_activities ?? {};
+  it.each(locales)("%s uses ICU single-brace placeholders", (_locale, messages) => {
+    const ns = messages.explore_activities;
     const doubleBraced = Object.entries(ns).filter(([, v]) => String(v).includes("{{"));
     expect(doubleBraced).toEqual([]);
   });

@@ -36,7 +36,7 @@ import {
 import type { IComment } from "@/components/check-in/reactions";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeDetailShell } from "@/components/practice";
-import { HOME_TAB_PATHS } from "@/constants/home-navigation";
+import { PRACTICE_DETAIL_CLOSE_PATH } from "@/constants/home-navigation";
 import {
   type ExecutionTiming,
   ExecutionTiming as ExecutionTimingConst,
@@ -406,11 +406,11 @@ export default function PracticeDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.replace(HOME_TAB_PATHS.mine)}
+            onClick={() => router.replace(PRACTICE_DETAIL_CLOSE_PATH)}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label={t("close")}
           >
@@ -427,11 +427,11 @@ export default function PracticeDetailPage() {
 
   if (error || !practice) {
     return (
-      <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.replace(HOME_TAB_PATHS.mine)}
+            onClick={() => router.replace(PRACTICE_DETAIL_CLOSE_PATH)}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label={t("close")}
           >
@@ -457,11 +457,11 @@ export default function PracticeDetailPage() {
   }
 
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
+    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
       <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
         <button
           type="button"
-          onClick={() => router.replace(HOME_TAB_PATHS.mine)}
+          onClick={() => router.replace(PRACTICE_DETAIL_CLOSE_PATH)}
           className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
           aria-label={t("close")}
         >

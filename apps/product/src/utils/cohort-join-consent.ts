@@ -7,7 +7,7 @@ export type JoinConsentCopy = {
 
 /**
  * 加入頁同意文字（cohort 命名空間的 i18n key），對應場次實際的打卡可見範圍（#279）。
- * - isPrivate 決定實踐的 privacy_status：私密 → 打卡只在本期內（教練＋團友）可見；公開 → 所有人可見
+ * - isPrivate 決定實踐的 privacy_status：私密 → 打卡只在本期內（教練＋本期參與者）可見；公開 → 所有人可見
  * - checkinDefaultPrivate 目前只存值、尚未生效（PM 2026-09-03 B1），不能承諾私密，只加註說明
  */
 export function resolveJoinConsentCopy(privacy: JoinPrivacy): JoinConsentCopy {

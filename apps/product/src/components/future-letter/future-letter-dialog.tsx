@@ -275,8 +275,9 @@ export function FutureLetterDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
-      <DialogContent className="max-h-[88vh] w-[min(560px,92vw)] sm:max-w-[560px] bg-[#F5FFFD] rounded-[28px] border-0 p-6 sm:p-7 overflow-y-auto">
-        <DialogHeader className="items-start pt-0 text-left">
+      {/* Header and action row stay fixed; only the form scrolls, so both buttons remain visible on short screens. */}
+      <DialogContent className="flex max-h-[calc(100dvh-24px)] w-[calc(100vw-16px)] max-w-[560px] sm:max-w-[560px] flex-col overflow-hidden bg-[#F5FFFD] rounded-[28px] border-0 p-0">
+        <DialogHeader className="shrink-0 items-start px-5 pt-6 text-left sm:px-7 sm:pt-7">
           <DialogTitle className="text-left text-[18px] font-bold text-[#0D3036]">
             {t("dialog_title")}
           </DialogTitle>
@@ -285,7 +286,7 @@ export function FutureLetterDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-5 space-y-5">
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 pt-5 pb-1 sm:px-7">
           <div>
             <label htmlFor="current-self" className="mb-2 block text-sm font-bold text-text-dark">
               {t("field_current_self")}{" "}
@@ -438,8 +439,10 @@ export function FutureLetterDialog({
               </SelectContent>
             </Select>
           </div>
+        </div>
 
-          <div className="flex gap-3 pt-2">
+        <div className="shrink-0 space-y-3 px-5 pt-4 pb-5 sm:px-7 sm:pb-7">
+          <div className="flex gap-3">
             {draftId && (
               <Button
                 type="button"
