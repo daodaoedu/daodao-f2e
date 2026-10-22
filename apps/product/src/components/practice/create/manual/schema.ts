@@ -121,63 +121,59 @@ export const createManualPracticeFormSchema = (
   const msg = (key: string, params?: Record<string, string | number>) =>
     t(key as Parameters<TFunction>[0], params as never);
 
-  return z
-    .object({
-      // Step 1
-      name: z.string().min(1, msg("validation_name_required")),
-      actionDescription: z
-        .string()
-        .min(1, msg("validation_action_required"))
-        .max(50, msg("validation_action_max"))
-        .default(""),
+  return z.object({
+    // Step 1
+    name: z.string().min(1, msg("validation_name_required")),
+    actionDescription: z
+      .string()
+      .min(1, msg("validation_action_required"))
+      .max(50, msg("validation_action_max"))
+      .default(""),
 
-      // Step 2
-      startDate: createStartDateSchema(minStartDate, t),
-      durationDays: z.nativeEnum(DurationDays, {
-        required_error: msg("validation_duration_required"),
-      }),
-      frequency: z.nativeEnum(Frequency, {
-        required_error: msg("validation_frequency_required"),
-      }),
+    // Step 2
+    startDate: createStartDateSchema(minStartDate, t),
+    // 新建立流程可存任意天數、每週頻率區間（daodao#141），編輯頁要能原值帶入（daodao#370）
+    // 數字字串，例 "45"；輸入框已過濾非數字並夾限
+    durationDays: z.string().min(1, msg("validation_duration_required")),
+    // 正規化頻率，例 "1-3"、"7"
+    frequency: z.string().min(1, msg("validation_frequency_required")),
 
-      // Step 3
-      durationMinutes: z.number(),
-      executionTiming: z.array(z.nativeEnum(ExecutionTiming)),
-      customTiming: z.string(),
+    // Step 3
+    // 每次時間在建立流程是選填，null 代表沒設定
+    durationMinutes: z.number().nullable(),
+    // 執行時機在建立流程是選填（daodao#141），原本沒有時機的實踐也要能存檔（daodao#370）
+    executionTiming: z.array(z.nativeEnum(ExecutionTiming)),
+    customTiming: z.string(),
 
-      // Step 4
-      tags: z
-        .array(z.string())
-        .max(MAX_PRACTICE_TAGS, msg("validation_tags_max", { max: MAX_PRACTICE_TAGS }))
-        .optional(),
-      resources: z
-        .array(
-          z.object({
-            id: z.string(),
-            name: z
-              .string()
-              .min(1, msg("validation_resource_name_required"))
-              .max(100, msg("validation_resource_name_max")),
-            url: z
-              .string()
-              .url(msg("validation_resource_url_invalid"))
-              .refine((val) => !val || val.startsWith("https://"), {
-                message: msg("step4_url_https_required"),
-              })
-              .optional()
-              .or(z.literal("")),
-            // 教練加入的資源（燈塔本期草稿）：不可移除，server 也會擋
-            isLocked: z.boolean().optional(),
-            // 第幾天使用；表單不提供編輯，但存檔要原樣送回，否則 server 重建關聯時會清成整段期間（daodao#332）
-            dayNumber: z.number().int().nullable().optional(),
-          })
-        )
-        .optional(),
-    })
-    .refine((data) => data.executionTiming.length > 0 || data.customTiming.trim().length > 0, {
-      message: msg("validation_execution_timing_required"),
-      path: ["executionTiming"],
-    });
+    // Step 4
+    tags: z
+      .array(z.string())
+      .max(MAX_PRACTICE_TAGS, msg("validation_tags_max", { max: MAX_PRACTICE_TAGS }))
+      .optional(),
+    resources: z
+      .array(
+        z.object({
+          id: z.string(),
+          name: z
+            .string()
+            .min(1, msg("validation_resource_name_required"))
+            .max(100, msg("validation_resource_name_max")),
+          url: z
+            .string()
+            .url(msg("validation_resource_url_invalid"))
+            .refine((val) => !val || val.startsWith("https://"), {
+              message: msg("step4_url_https_required"),
+            })
+            .optional()
+            .or(z.literal("")),
+          // 教練加入的資源（燈塔本期草稿）：不可移除，server 也會擋
+          isLocked: z.boolean().optional(),
+          // 第幾天使用；表單不提供編輯，但存檔要原樣送回，否則 server 重建關聯時會清成整段期間（daodao#332）
+          dayNumber: z.number().int().nullable().optional(),
+        })
+      )
+      .optional(),
+  });
 };
 
 export type ManualPracticeFormValues = z.infer<ReturnType<typeof createManualPracticeFormSchema>>;

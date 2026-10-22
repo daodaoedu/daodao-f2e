@@ -28,16 +28,13 @@ import {
   type PrivacyStatus,
   PrivacyStatusSelector,
 } from "@/components/practice/shared/privacy-status-selector";
-import {
-  DurationDays,
-  ExecutionTiming,
-  Frequency,
-  mapExecutionTimingToPracticeTimePeriods,
-  PracticeTimePeriodToExecutionTimingMap,
-  parseFrequency,
-} from "@/constants/practice-form";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { toEditFormResources, toUpdateResourcesPayload } from "@/utils/practice-edit-resources";
+import {
+  buildScheduleUpdatePayload,
+  type PracticeScheduleSource,
+  toEditScheduleValues,
+} from "@/utils/practice-edit-schedule";
 import { minEditableStartDate } from "@/utils/practice-period";
 import { isPracticeScheduleLocked } from "@/utils/practice-schedule-lock";
 
@@ -51,20 +48,14 @@ interface ApiErrorResponse {
 }
 
 // 將表單資料轉換成 API 請求格式
+// 天數、頻率、每次時間、時機只送有改的欄位：自訂值（例 45 天、每週 1-3 天）沒動就不會被蓋掉（daodao#370）
 const convertFormValuesToApiRequest = (
-  values: ManualPracticeFormValues
+  values: ManualPracticeFormValues,
+  original: PracticeScheduleSource
 ): UpdatePracticeRequestType => {
-  const frequency = parseFrequency(values.frequency as Frequency);
-  const practiceTimePeriods = mapExecutionTimingToPracticeTimePeriods(
-    values.executionTiming as ExecutionTiming[]
-  );
-
   const request: Record<string, unknown> = {
     title: values.name,
-    durationDays: parseInt(values.durationDays, 10),
-    frequencyMinDays: frequency.minDays,
-    frequencyMaxDays: frequency.maxDays,
-    sessionDurationMinutes: values.durationMinutes,
+    ...buildScheduleUpdatePayload(values, original),
   };
 
   if (values.actionDescription) {
@@ -75,17 +66,9 @@ const convertFormValuesToApiRequest = (
     request.startDate = values.startDate;
   }
 
-  if (practiceTimePeriods.length > 0) {
-    request.practiceTimePeriods = practiceTimePeriods;
-  }
-
   request.tags = values.tags || [];
 
   request.resources = toUpdateResourcesPayload(values.resources || []);
-
-  if (values.customTiming) {
-    request.otherContext = values.customTiming;
-  }
 
   return request as UpdatePracticeRequestType;
 };
@@ -138,44 +121,8 @@ export default function EditPracticePage() {
 
     const data = practiceData.data;
 
-    // 轉換 durationDays: number -> DurationDays (字串字面量)
-    let durationDays: DurationDays = DurationDays.seven;
-    if (data.durationDays) {
-      const durationDaysNumber = data.durationDays;
-      if (durationDaysNumber === 7) {
-        durationDays = DurationDays.seven;
-      } else if (durationDaysNumber === 14) {
-        durationDays = DurationDays.fourteen;
-      } else if (durationDaysNumber === 21) {
-        durationDays = DurationDays.twentyOne;
-      } else if (durationDaysNumber === 30) {
-        durationDays = DurationDays.thirty;
-      }
-    }
-
-    // 轉換 frequency: frequencyMinDays + frequencyMaxDays -> Frequency
-    const frequencyMin = data.frequencyMinDays ?? 0;
-    const frequencyMax = data.frequencyMaxDays ?? 0;
-    let frequency: Frequency = Frequency.twoToFour;
-    if (frequencyMin > 0 && frequencyMax > 0) {
-      const frequencyStr = `${frequencyMin}-${frequencyMax}` as Frequency;
-      if (
-        frequencyStr === Frequency.twoToFour ||
-        frequencyStr === Frequency.threeToFive ||
-        frequencyStr === Frequency.fourToSeven
-      ) {
-        frequency = frequencyStr;
-      }
-    }
-
-    // 轉換 executionTiming: practiceTimePeriods -> ExecutionTiming[]
-    const executionTiming: ExecutionTiming[] = (data.practiceTimePeriods || [])
-      .map((period: string) => PracticeTimePeriodToExecutionTimingMap[period])
-      .filter((timing): timing is ExecutionTiming => timing !== undefined);
-
-    // 如果沒有有效的 executionTiming，使用預設值
-    const finalExecutionTiming =
-      executionTiming.length > 0 ? executionTiming : [ExecutionTiming.morning];
+    // 天數、頻率、每次時間、時機照原值帶入，不再只認預設值（daodao#370）
+    const schedule = toEditScheduleValues(data);
 
     // 轉換 resources: API 格式 -> 表單格式
     // isLocked（教練加入的資源）server 已回傳，前端型別待 gen:types 同步；toEditFormResources 以選填欄位讀取
@@ -184,12 +131,8 @@ export default function EditPracticePage() {
     return {
       name: data.title || "",
       actionDescription: data.practiceAction || "",
-      durationMinutes: data.sessionDurationMinutes ?? 30,
       startDate: data.startDate || "",
-      durationDays,
-      frequency,
-      executionTiming: finalExecutionTiming,
-      customTiming: data.otherContext || "",
+      ...schedule,
       tags: data.tags || [],
       resources,
     };
@@ -200,11 +143,11 @@ export default function EditPracticePage() {
     return {
       name: "",
       actionDescription: "",
-      durationMinutes: 30,
+      durationMinutes: null,
       startDate: "",
-      durationDays: DurationDays.seven,
-      frequency: Frequency.twoToFour,
-      executionTiming: [ExecutionTiming.morning],
+      durationDays: "",
+      frequency: "",
+      executionTiming: [],
       customTiming: "",
       tags: [],
       resources: [],
@@ -236,7 +179,10 @@ export default function EditPracticePage() {
     setIsSubmitting(true);
 
     try {
-      const converted = convertFormValuesToApiRequest(values) as Record<string, unknown>;
+      const converted = convertFormValuesToApiRequest(values, practiceData?.data ?? {}) as Record<
+        string,
+        unknown
+      >;
       if (isChallenge) {
         for (const lockedField of ["title", "startDate", "durationDays"]) {
           delete converted[lockedField];

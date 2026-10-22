@@ -72,4 +72,30 @@ describe("createManualPracticeFormSchema messages (daodao#334)", () => {
       { id: "r2", name: "整段可用", url: "", dayNumber: null },
     ]);
   });
+
+  it("accepts custom days, frequency and minutes from the new create flow (daodao#370)", () => {
+    const result = createManualPracticeFormSchema({}, t).safeParse({
+      ...invalidValues,
+      name: "每日閱讀",
+      actionDescription: "讀 10 頁",
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      durationDays: "45",
+      frequency: "1-3",
+      durationMinutes: 25,
+      executionTiming: [],
+      resources: [],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("still requires days and frequency (daodao#370)", () => {
+    const result = createManualPracticeFormSchema({}, t).safeParse({
+      ...invalidValues,
+      durationDays: "",
+      frequency: "",
+    });
+    if (result.success) throw new Error("expected validation to fail");
+    const paths = result.error.issues.map((issue) => issue.path.join("."));
+    expect(paths).toEqual(expect.arrayContaining(["durationDays", "frequency"]));
+  });
 });

@@ -13,7 +13,9 @@ import {
 import { Input } from "@daodao/ui/components/input";
 import { Slider } from "@daodao/ui/components/slider";
 import { cn } from "@daodao/ui/lib/utils";
+import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
+import { sanitizeMinutesInput } from "@/components/practice/create/wizard/rhythm-utils";
 import {
   DURATION_MINUTES_OPTIONS,
   EXECUTION_TIMING_OPTIONS,
@@ -24,60 +26,91 @@ interface Step3Props {
   form: UseFormReturn<ManualPracticeFormValues>;
 }
 
+const MINUTE_PRESETS: readonly number[] = DURATION_MINUTES_OPTIONS.map((option) => option.value);
+
+const customMinutesText = (typing: string | null, value: number | null) =>
+  typing ?? (value == null || MINUTE_PRESETS.includes(value) ? "" : String(value));
+
 export const Step3 = ({ form }: Step3Props) => {
   const t = useTranslations("practice");
+  const [minutesTyping, setMinutesTyping] = useState<string | null>(null);
   return (
     <div className="space-y-4">
       <FormField
         control={form.control}
         name="durationMinutes"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel required className="block text-base font-medium text-text-dark mb-3">
-              {t("form_session_duration")}
-            </FormLabel>
-            <FormControl>
-              <div className="space-y-4">
-                <Slider
-                  defaultValue={[30]}
-                  value={[field.value]}
-                  onValueChange={(value: number[]) => {
-                    field.onChange(value[0]);
-                  }}
-                  min={15}
-                  max={60}
-                  step={15}
-                  className="w-full"
-                  renderTooltip={(value) => (
-                    <div>
-                      {value}
-                      {t("minutes_unit")}
-                    </div>
-                  )}
-                />
-                {/* Labels */}
-                <div className="flex justify-between">
-                  {DURATION_MINUTES_OPTIONS.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => field.onChange(option.value)}
-                      className={cn(
-                        "text-sm transition-colors",
-                        field.value === option.value
-                          ? "text-logo-cyan font-medium"
-                          : "text-light-gray hover:text-text-dark"
-                      )}
-                    >
-                      {t(`${option.labelKey}`)}
-                    </button>
-                  ))}
+        render={({ field }) => {
+          // 不是 15／30／45／60 的分鐘數（例 25）顯示在自訂框，沒設定時不預設 30（daodao#370）
+          const minutesText = customMinutesText(minutesTyping, field.value);
+          return (
+            <FormItem>
+              <FormLabel required className="block text-base font-medium text-text-dark mb-3">
+                {t("form_session_duration")}
+              </FormLabel>
+              <FormControl>
+                <div className="space-y-4">
+                  <Slider
+                    value={field.value != null ? [field.value] : []}
+                    onValueChange={(value: number[]) => {
+                      setMinutesTyping(null);
+                      field.onChange(value[0]);
+                    }}
+                    min={15}
+                    max={60}
+                    step={15}
+                    className="w-full"
+                    renderTooltip={(value) => (
+                      <div>
+                        {value}
+                        {t("minutes_unit")}
+                      </div>
+                    )}
+                  />
+                  {/* Labels */}
+                  <div className="flex justify-between">
+                    {DURATION_MINUTES_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setMinutesTyping(null);
+                          field.onChange(option.value);
+                        }}
+                        className={cn(
+                          "text-sm transition-colors",
+                          minutesText === "" && field.value === option.value
+                            ? "text-logo-cyan font-medium"
+                            : "text-light-gray hover:text-text-dark"
+                        )}
+                      >
+                        {t(`${option.labelKey}`)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
+              </FormControl>
+              <Input
+                inputMode="numeric"
+                maxLength={3}
+                value={minutesText}
+                placeholder={t("wizard_minutes_custom_placeholder")}
+                aria-label={t("wizard_minutes_custom_placeholder")}
+                className="w-full"
+                onChange={(event) => {
+                  const next = sanitizeMinutesInput(event.target.value);
+                  setMinutesTyping(next.text);
+                  // 清空自訂框 = 沒選；存檔時 null 不送，保留原本的分鐘數
+                  field.onChange(next.value);
+                }}
+                onBlur={() => {
+                  setMinutesTyping(null);
+                  field.onBlur();
+                }}
+              />
+              <FormMessage />
+            </FormItem>
+          );
+        }}
       />
 
       <FormField
