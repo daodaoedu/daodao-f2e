@@ -18,6 +18,7 @@ jobs:
     permissions:
       pull-requests: write
       contents: read
+      checks: write
     steps:
       - name: Checkout data revisions
         uses: actions/checkout@v4
@@ -89,7 +90,7 @@ jobs:
           python3 -I "$RUNNER_TEMP/review-runtime/build-review-batches.py" \
             --repo "$GITHUB_WORKSPACE" --base "$BASE_SHA" --head "$HEAD_SHA" \
             --out "$RUNNER_TEMP/review-plan" \
-            --max-batch-bytes 40000 --max-batches 12 --max-total-bytes 400000
+            --max-batch-bytes 40000 --max-batches 24 --max-total-bytes 800000
       - name: Review bounded batches with Workers AI
         if: steps.runtime.outputs.available == 'true'
         env:
@@ -120,26 +121,6 @@ jobs:
           else
             printf '⚠️ Review 未完成：runtime 執行失敗，未產生 coverage report。\n' >> "$GITHUB_STEP_SUMMARY"
           fi
-      - name: Flag incomplete review on the check
-        if: always()
-        run: |
-          # Counts only: changed paths are untrusted and must not reach workflow commands.
-          python3 -I - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-          path = Path(os.environ['RUNNER_TEMP']) / 'review-output' / 'status.json'
-          try:
-              status = json.loads(path.read_text())
-          except (OSError, ValueError):
-              status = {}
-          if status.get('complete') is not True:
-              unreviewed = status.get('unreviewed') or []
-              sources = [x for x in unreviewed if not str(x.get('reason', '') if isinstance(x, dict) else '').startswith('generated')]
-              partial = [x for x in status.get('limitations') or [] if str(x).startswith('部分脈絡')]
-              print('::warning title=AI review 未完成::'
-                    f'{len(sources)} 個非產物檔案未審查、{len(partial)} 個檔案只審部分脈絡；詳見 review 留言與 job summary')
-          PY
       - name: Post coverage-aware review snapshot
         if: always()
         env:
@@ -195,4 +176,83 @@ jobs:
           else
             gh api "repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
               --method POST --input "$RUNNER_TEMP/review-comment.json"
+          fi
+      # Runs after the comment is posted, so failing here never hides the coverage report.
+      # Nothing reviewed (model outage, runtime error) fails the job in every mode: a green check
+      # would claim a review that never happened. Files left unreviewed fail only in block mode;
+      # in warn mode they surface as a neutral check. AI Code Review is not a required check.
+      - name: Flag incomplete review on the check
+        id: coverage
+        if: always()
+        env:
+          MODE: ${{ vars.AI_REVIEW_COVERAGE_MODE || 'warn' }}
+        run: |
+          # Counts only: changed paths are untrusted and must not reach workflow commands.
+          python3 -I - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          path = Path(os.environ['RUNNER_TEMP']) / 'review-output' / 'status.json'
+          try:
+              status = json.loads(path.read_text())
+          except (OSError, ValueError):
+              status = {}
+          if not isinstance(status, dict):
+              status = {}
+          unreviewed = status.get('unreviewed')
+          known = isinstance(unreviewed, list)
+          sources = [x for x in unreviewed or [] if not str(x.get('reason', '') if isinstance(x, dict) else '').startswith('generated')]
+          partial = [x for x in status.get('limitations') or [] if str(x).startswith('部分脈絡')]
+          reviewed = status.get('reviewed_paths') or []
+          bootstrap = status.get('reason') == 'trusted_runtime_missing'
+          attempted = (status.get('planned_batches') or 0) > 0
+          if status.get('complete') is True:
+              state = 'complete'
+          elif not reviewed and ((not known and not bootstrap) or (attempted and sources)):
+              # Model calls or the runtime failed; files that never fit a batch are 'partial' instead.
+              state = 'none'
+          elif sources or partial or bootstrap:
+              state = 'partial'
+          else:
+              state = 'complete'
+          with open(os.environ.get('GITHUB_OUTPUT', os.devnull), 'a') as out:
+              out.write(f'state={state}\nunreviewed={len(sources)}\npartial={len(partial)}\n')
+          if state == 'none':
+              print('::error title=AI review 未執行::'
+                    f'0 個檔案被審查、{len(sources)} 個非產物檔案未審查（模型呼叫或 runtime 失敗）；稍後 re-run 此 job，詳見 review 留言')
+              raise SystemExit(1)
+          if state == 'partial':
+              print('::warning title=AI review 未完成::'
+                    f'{len(sources)} 個非產物檔案未審查、{len(partial)} 個檔案只審部分脈絡；詳見 review 留言與 job summary')
+              if os.environ.get('MODE') == 'block' and sources:
+                  raise SystemExit(1)
+          PY
+      - name: Publish review coverage check
+        if: always() && (steps.coverage.outputs.state == 'partial' || steps.coverage.outputs.state == 'complete')
+        env:
+          STATE: ${{ steps.coverage.outputs.state }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          UNREVIEWED: ${{ steps.coverage.outputs.unreviewed }}
+          PARTIAL: ${{ steps.coverage.outputs.partial }}
+          REVIEW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          # Counts are integers written by the step above; no PR-controlled text reaches the check.
+          printf '%s\n' "$UNREVIEWED" "$PARTIAL" | grep -Eqx '[0-9]+' || exit 1
+          # Always posted, so a later complete re-run of the same head replaces an earlier neutral result.
+          if [ "$STATE" = complete ]; then
+            gh api "repos/$REPOSITORY/check-runs" --method POST \
+              -f name='AI review coverage' -f head_sha="$HEAD_SHA" \
+              -f status=completed -f conclusion=success \
+              -f "output[title]=全部非產物檔案已審查" \
+              -f "output[summary]=報告與 artifact：$REVIEW_RUN_URL" \
+              > /dev/null
+          else
+            gh api "repos/$REPOSITORY/check-runs" --method POST \
+              -f name='AI review coverage' -f head_sha="$HEAD_SHA" \
+              -f status=completed -f conclusion=neutral \
+              -f "output[title]=$UNREVIEWED 個非產物檔案未審查、$PARTIAL 個檔案只審部分脈絡" \
+              -f "output[summary]=AI review 沒有涵蓋全部檔案，綠燈不代表已審完。未審查檔案與原因見 PR 上的 review 留言；報告與 artifact：$REVIEW_RUN_URL" \
+              > /dev/null
           fi

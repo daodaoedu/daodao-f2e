@@ -81,7 +81,40 @@ def hunk_window_lines(diff_text, label, data, radius):
     return [(n, lines[n - 1]) for n in sorted(wanted)]
 
 
-def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total_bytes=400000,
+def describe(item, level, payload, unit_blobs):
+    item['context_level'] = level
+    item['required_bytes'] = len(payload)
+    item['sources'] = [{k: v for k, v in b.items() if k not in ('header', 'content', 'data')} for b in unit_blobs]
+
+
+def budget_downgrade(entry):
+    """Index of the BEFORE-hunks option a complete unit may give way to when batches run out."""
+    options = entry['options']
+    if options[entry['choice']]['level'] != 'complete':
+        return None
+    return next((i for i, o in enumerate(options) if o['level'] == 'before-hunks'), None)
+
+
+def pack(pending, max_batch_bytes, max_batches, max_total_bytes):
+    """First-fit decreasing: biggest units first, each into the first batch with room."""
+    sizes = [len(e['options'][e['choice']]['payload']) for e in pending]
+    bins, used, overflow, total = [], [], {}, 0
+    for index in sorted(range(len(pending)), key=lambda i: (-sizes[i], i)):
+        size = sizes[index]
+        if total + size > max_total_bytes:
+            overflow[index] = 'total-budget-exhausted'
+            continue
+        slot = next((b for b, room in enumerate(used) if room + size <= max_batch_bytes), None)
+        if slot is None:
+            if len(bins) >= max_batches:
+                overflow[index] = 'batch-count-budget-exhausted'
+                continue
+            bins.append([]); used.append(0); slot = len(bins) - 1
+        bins[slot].append(index); used[slot] += size; total += size
+    return bins, overflow
+
+
+def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=24, max_total_bytes=800000,
          max_source_bytes=None):
     # Sources over one batch are reviewed from diff hunks; this cap only bounds Git's diff allocation.
     max_source_bytes = max_source_bytes or 50 * max_batch_bytes
@@ -109,23 +142,9 @@ def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total
             if status.startswith(('R', 'C')):
                 new = parts[i].decode('utf-8', 'surrogateescape'); i += 1
             records.append((status, old, new))
-        total = 0
-        current = bytearray()
-        current_paths = []
-        current_units = []
-
-        def flush():
-            nonlocal current, current_paths, current_units, total
-            if not current:
-                return
-            ident = f'batch-{len(manifest["batches"]) + 1:03d}'
-            filename = ident + '.txt'
-            (out / filename).write_bytes(current)
-            manifest['batches'].append({'id': ident, 'payload': filename, 'bytes': len(current),
-                                       'sha256': hashlib.sha256(current).hexdigest(),
-                                       'paths': current_paths[:], 'units': current_units[:]})
-            total += len(current)
-            current = bytearray(); current_paths = []; current_units = []
+        # Every reviewable file first gets its candidate units (best context first); batches are
+        # packed only after all are known, so later files are not dropped by diff order (#314, f2e#1087).
+        pending = []
 
         for status, old, path in records:
             item = {'path': path, 'old_path': old if old != path else None, 'git_status': status,
@@ -250,38 +269,66 @@ def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=12, max_total
                     if windows:
                         tiers.append(('hunks', windows,
                                       'SOURCE PARTIAL: file exceeds budget; only listed lines around the diff are supplied\n'))
+                options = []
                 for level, unit_blobs, note in tiers:
                     payload, diff_section, source_sections = build_unit(unit_blobs, note)
                     if len(payload) <= max_batch_bytes:
-                        break
-                item['context_level'] = level
-                item['required_bytes'] = len(payload)
-                item['sources'] = [{k: v for k, v in b.items() if k not in ('header', 'content', 'data')} for b in unit_blobs]
-                if len(payload) > max_batch_bytes:
+                        options.append({'level': level, 'payload': payload, 'diff_section': diff_section,
+                                        'source_sections': source_sections, 'blobs': unit_blobs})
+                if not options:
+                    describe(item, level, payload, unit_blobs)
                     item['reason'] = ('diff-exceeds-batch-budget' if level == 'hunks'
                                       else 'complete-file-unit-exceeds-batch-budget'); continue
-                if total + len(current) + len(payload) > max_total_bytes:
-                    item['reason'] = 'total-budget-exhausted'; continue
-                if current and len(current) + len(payload) > max_batch_bytes:
-                    flush()
-                if len(manifest['batches']) >= max_batches:
-                    item['reason'] = 'batch-count-budget-exhausted'; continue
-                batch_id = f'batch-{len(manifest["batches"]) + 1:03d}'
-                item.update(status='planned', file_complete=True, batch_id=batch_id)
-                current_units.append({'path': path, 'start_byte': len(current),
-                                      'end_byte': len(current) + len(payload),
-                                      'line_count': max((b['lines'] for b in unit_blobs), default=0),
-                                      'source_sections': [{**section,
-                                          'start_byte': section['start_byte'] + len(current),
-                                          'end_byte': section['end_byte'] + len(current)}
-                                          for section in source_sections],
-                                      'diff_section': {'start_byte': diff_section['start_byte'] + len(current),
-                                                       'end_byte': diff_section['end_byte'] + len(current)}})
-                current.extend(payload); current_paths.append(path)
+                pending.append({'item': item, 'path': path, 'options': options, 'choice': 0})
             except (subprocess.CalledProcessError, ValueError, OSError) as exc:
                 item.update(status='unreviewed', file_complete=False,
                             reason='file-read-error', diagnostic=str(exc))
-        flush()
+
+        bins, overflow = pack(pending, max_batch_bytes, max_batches, max_total_bytes)
+        # Out of batches: trade complete BEFORE text for BEFORE hunks (HEAD stays whole, removed
+        # lines stay citable), biggest saving first, before leaving any file unreviewed.
+        while overflow:
+            savings = [(len(e['options'][e['choice']]['payload']) - len(e['options'][cheaper]['payload']),
+                        -index, index, cheaper)
+                       for index, e in enumerate(pending)
+                       for cheaper in [budget_downgrade(e)] if cheaper is not None]
+            if not savings:
+                break
+            _, _, index, cheaper = max(savings)
+            pending[index]['choice'] = cheaper
+            bins, overflow = pack(pending, max_batch_bytes, max_batches, max_total_bytes)
+
+        for index, reason in overflow.items():
+            entry = pending[index]
+            option = entry['options'][entry['choice']]
+            describe(entry['item'], option['level'], option['payload'], option['blobs'])
+            entry['item']['reason'] = reason
+        for members in bins:
+            ident = f'batch-{len(manifest["batches"]) + 1:03d}'
+            current, paths, units = bytearray(), [], []
+            for index in sorted(members):
+                entry = pending[index]
+                option = entry['options'][entry['choice']]
+                item, payload = entry['item'], option['payload']
+                describe(item, option['level'], payload, option['blobs'])
+                if entry['choice'] != 0:
+                    item['budget_downgraded_from'] = entry['options'][0]['level']
+                item.update(status='planned', file_complete=True, batch_id=ident)
+                units.append({'path': entry['path'], 'start_byte': len(current),
+                              'end_byte': len(current) + len(payload),
+                              'line_count': max((b['lines'] for b in option['blobs']), default=0),
+                              'source_sections': [{**section,
+                                  'start_byte': section['start_byte'] + len(current),
+                                  'end_byte': section['end_byte'] + len(current)}
+                                  for section in option['source_sections']],
+                              'diff_section': {'start_byte': option['diff_section']['start_byte'] + len(current),
+                                               'end_byte': option['diff_section']['end_byte'] + len(current)}})
+                current.extend(payload); paths.append(entry['path'])
+            filename = ident + '.txt'
+            (out / filename).write_bytes(current)
+            manifest['batches'].append({'id': ident, 'payload': filename, 'bytes': len(current),
+                                       'sha256': hashlib.sha256(current).hexdigest(),
+                                       'paths': paths, 'units': units})
     except (subprocess.CalledProcessError, ValueError, OSError) as exc:
         manifest['errors'].append(str(exc))
     manifest['coverage_complete'] = not manifest['errors'] and all(
@@ -295,8 +342,8 @@ def main():
     for name in ('repo', 'base', 'head', 'out'):
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--max-batch-bytes', type=int, default=40000)
-    parser.add_argument('--max-batches', type=int, default=12)
-    parser.add_argument('--max-total-bytes', type=int, default=400000)
+    parser.add_argument('--max-batches', type=int, default=24)
+    parser.add_argument('--max-total-bytes', type=int, default=800000)
     args = parser.parse_args()
     result = plan(args.repo, args.base, args.head, args.out, args.max_batch_bytes,
                   args.max_batches, args.max_total_bytes)
