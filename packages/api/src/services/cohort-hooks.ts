@@ -259,9 +259,12 @@ export const useMyCohorts = () => {
 };
 
 export const useCohortJoinInfo = (joinToken: string) => {
-  const query = useQuery("/api/v1/cohorts/join/{joinToken}", {
-    params: { path: { joinToken } },
-  });
+  // 回到分頁時重新取：教練可能在頁面開著期間設了截止或暫停加入（daodao#281）
+  const query = useQuery(
+    "/api/v1/cohorts/join/{joinToken}",
+    { params: { path: { joinToken } } },
+    { revalidateOnFocus: true }
+  );
   return useValidatedResponse(query, cohortJoinInfoResponseSchema);
 };
 

@@ -39,7 +39,7 @@ export default function TemplateDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="relative z-10 flex min-h-screen w-screen items-center justify-center overflow-hidden overflow-y-auto bg-white">
+      <div className="relative z-10 flex min-h-screen w-full items-center justify-center overflow-hidden overflow-y-auto bg-white">
         <Loader className="size-8 animate-spin text-logo-cyan" />
       </div>
     );
@@ -47,7 +47,7 @@ export default function TemplateDetailPage() {
 
   if (error || !initialValues) {
     return (
-      <div className="relative z-10 min-h-screen w-screen overflow-hidden overflow-y-auto bg-white">
+      <div className="relative z-10 min-h-screen w-full overflow-hidden overflow-y-auto bg-white">
         <PageHeader leftAction="back" leftLabel="" />
         <div className="flex min-h-[60vh] flex-col items-center justify-center px-5">
           <p className="mb-4 text-text-dark">{t("template_load_error")}</p>

@@ -388,6 +388,40 @@ describe("Lighthouse API runtime schemas", () => {
     expect(responses.every((result) => result.success)).toBe(true);
   });
 
+  it("keeps every unavailable reason on the join info and defaults it for older servers", () => {
+    const joinInfo = {
+      cohortId: 20,
+      displayName: "夏季同行",
+      startDate: timestamp,
+      endDate: timestamp,
+      tagline: null,
+      interactionModes: ["async"],
+      location: null,
+      sessions: [],
+      feeType: "free",
+      feeAmount: null,
+      signupMethod: "island_form",
+      externalSignupUrl: null,
+      capacity: null,
+      joinDeadline: timestamp,
+      participantCount: 0,
+      inviteMessage: null,
+      canJoin: false,
+      unavailableReason: "expired",
+      privacy,
+      visibilityNotice: "打卡對教練與同期學員可見",
+      organization: organizationSummary,
+    };
+    const both = cohortJoinInfoResponseSchema.parse({
+      success: true,
+      data: { ...joinInfo, unavailableReasons: ["expired", "paused"] },
+      timestamp,
+    });
+    expect(both.data.unavailableReasons).toEqual(["expired", "paused"]);
+    const older = cohortJoinInfoResponseSchema.parse({ success: true, data: joinInfo, timestamp });
+    expect(older.data.unavailableReasons).toEqual([]);
+  });
+
   it("parses a full outcome payload and rejects null outcome data", () => {
     const valid = lighthouseOutcomeResponseSchema.safeParse({
       success: true,
