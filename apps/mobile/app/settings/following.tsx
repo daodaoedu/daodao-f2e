@@ -10,12 +10,6 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { unfollowTarget } from "@/hooks/useFollow";
 import { useMobileTranslation } from "@/i18n";
 
-interface IFollowItem {
-  targetType: "user" | "practice";
-  user?: { id: string; identifier?: string; name: string; photoURL?: string; bio?: string };
-  practice?: { id: string; title: string; ownerName: string; ownerPhotoURL?: string };
-}
-
 export default function FollowingSettingsScreen() {
   const router = useRouter();
   const t = useMobileTranslation("mobile.followingSettings");
@@ -26,7 +20,7 @@ export default function FollowingSettingsScreen() {
 
   const { data: followingData, isLoading, mutate } = useFollowing({ userId, limit: 100 });
 
-  const items = (followingData?.data ?? []) as IFollowItem[];
+  const items = followingData?.data ?? [];
   const followedUsers = items.filter((item) => item.targetType === "user" && item.user);
   const followedPractices = items.filter((item) => item.targetType === "practice" && item.practice);
 
