@@ -287,8 +287,43 @@ export const getRandomEncouragement = async () => {
 /** 有效的心情類型列表 */
 const VALID_MOODS: MoodType[] = ["give_up", "frustrated", "bored", "neutral", "good", "happy"];
 
-/** 摘要查詢的打卡記錄上限 */
-const MAX_CHECKINS_FOR_SUMMARY = 200;
+/** 打卡列表每頁筆數，等於 server `checkInQuerySchema.limit` 上限（超過回 400，daodao#297） */
+const CHECKINS_PAGE_SIZE = 100;
+
+/** 摘要分頁抓取的頁數上限（最多 1,000 筆），避免異常資料造成大量請求 */
+const MAX_CHECKIN_PAGES_FOR_SUMMARY = 10;
+
+type PracticeCheckIn = NonNullable<PracticeCheckInsResponse["data"]>[number];
+
+/**
+ * 分頁取回實踐的全部打卡記錄（供摘要統計用）
+ * @description 每頁 100 筆，依第一頁回傳的 totalPages 平行抓剩下的頁。
+ *   - 第 2 頁之後某頁回錯誤或請求失敗時略過該頁，用其他頁計算（摘要是精選內容，不因單頁失敗整頁報錯）
+ *   - server 只依 checkin_date 排序，同日多筆打卡在 offset 分頁下可能跨頁重複，依 id 去重
+ */
+const fetchAllCheckInsForSummary = async (practiceId: string): Promise<PracticeCheckIn[]> => {
+  const firstPage = await getPracticeCheckIns(practiceId, { page: 1, limit: CHECKINS_PAGE_SIZE });
+  const firstItems = firstPage.data?.data ?? [];
+  const totalPages = Math.min(
+    firstPage.data?.pagination?.totalPages ?? 1,
+    MAX_CHECKIN_PAGES_FOR_SUMMARY
+  );
+  if (totalPages <= 1) return firstItems;
+
+  const restPages = await Promise.allSettled(
+    Array.from({ length: totalPages - 1 }, (_, i) =>
+      getPracticeCheckIns(practiceId, { page: i + 2, limit: CHECKINS_PAGE_SIZE })
+    )
+  );
+  const byId = new Map<PracticeCheckIn["id"], PracticeCheckIn>();
+  for (const checkIn of [
+    ...firstItems,
+    ...restPages.flatMap((res) => (res.status === "fulfilled" ? (res.value.data?.data ?? []) : [])),
+  ]) {
+    if (!byId.has(checkIn.id)) byId.set(checkIn.id, checkIn);
+  }
+  return Array.from(byId.values());
+};
 
 /**
  * 驗證心情類型是否有效
@@ -395,15 +430,8 @@ export const getPracticeSummary = async (
     }
     const practice = practiceResponse.data.data;
 
-    // 2. 獲取打卡記錄（使用合理的上限避免效能問題）
-    const checkInLimit = Math.min(
-      practice.checkInCount || MAX_CHECKINS_FOR_SUMMARY,
-      MAX_CHECKINS_FOR_SUMMARY
-    );
-    const checkInsResponse = await getPracticeCheckIns(practiceId, {
-      limit: checkInLimit,
-    });
-    const checkIns = checkInsResponse.data?.data ?? [];
+    // 2. 獲取全部打卡記錄（每頁不超過 server 上限 100，分頁取完）
+    const checkIns = await fetchAllCheckInsForSummary(practiceId);
 
     // 3. 獲取隨機鼓勵句
     let encouragementText = "恭喜你完成了這段旅程！";
