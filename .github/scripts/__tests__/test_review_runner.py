@@ -1,6 +1,9 @@
+import email.message
 import hashlib
 import importlib.util
+import io
 import json
+import urllib.error
 from pathlib import Path
 import tempfile
 import unittest
@@ -257,6 +260,7 @@ class RunnerTests(unittest.TestCase):
         self.assertFalse(status['complete'])
         self.assertIn('no source was truncated', status['errors'][0])
 
+    @patch.object(runner, 'MAX_BATCHES', 12)  # cap raised to 24 for f2e#1087; see test_raised_batch_cap
     def test_batch_budget_no_extra_calls(self):
         for i in range(2, 14):
             self.add_batch(f'batch-{i:03}', f'code{i}.py')
@@ -269,6 +273,20 @@ class RunnerTests(unittest.TestCase):
             return self.response(ident=batch['batch_id'], paths=batch['paths'])
         status = self.run_review(call)
         self.assertEqual(len(calls), 12)
+        self.assertFalse(status['complete'])
+
+    def test_raised_batch_cap(self):
+        self.assertEqual(runner.MAX_BATCHES, 24)
+        for i in range(2, 26):
+            self.add_batch(f'batch-{i:03}', f'code{i}.py')
+        self.write()
+        calls = []
+        def call(model, request):
+            batch = json.loads(json.loads(request)['messages'][1]['content'])['batch']
+            calls.append(batch['batch_id'])
+            return self.response(ident=batch['batch_id'], paths=batch['paths'])
+        status = self.run_review(call)
+        self.assertEqual(len(calls), 24)
         self.assertFalse(status['complete'])
 
     def test_invalid_account_never_requests(self):
@@ -299,6 +317,129 @@ class RunnerTests(unittest.TestCase):
         self.assertFalse(status['complete'])
         self.assertEqual(status['reviewed_paths'], ['code.py'])
         self.assertEqual(status['unreviewed'][0]['path'], 'other.py')
+
+
+class TransportResilience(unittest.TestCase):
+    """#314 後續：f2e#1091／#1092 模型 transport 全失敗卻只留下 HTTPError 類名，查不到原因。"""
+
+    setUp = RunnerTests.setUp
+    tearDown = RunnerTests.tearDown
+    add_batch = RunnerTests.add_batch
+    write = RunnerTests.write
+    response = RunnerTests.response
+    run_review = RunnerTests.run_review
+
+    def http_error(self, code, cf_code=None, retry_after=None):
+        body = json.dumps({'errors': [{'code': cf_code, 'message': 'secret body text'}]}).encode() if cf_code else b'not json'
+        headers = email.message.Message()
+        if retry_after is not None:
+            headers['Retry-After'] = str(retry_after)
+        return urllib.error.HTTPError('https://example.invalid/token-in-url', code, 'Too Many', headers, io.BytesIO(body))
+
+    def add_batches(self, count):
+        for i in range(2, count + 1):
+            self.add_batch(f'batch-{i:03}', f'code{i}.py')
+        self.write()
+
+    def test_http_status_and_provider_code_are_recorded_without_body(self):
+        def call(*args):
+            raise self.http_error(429, cf_code=4006)
+        with patch.object(runner.time, 'sleep'):
+            status = self.run_review(call)
+        error = status['batch_results'][0]['attempt_errors'][0]
+        self.assertIn('transport_failed', error)
+        self.assertIn('HTTP 429', error)
+        self.assertIn('cf 4006', error)
+        dumped = json.dumps(status)
+        self.assertNotIn('secret body text', dumped)
+        self.assertNotIn('token-in-url', dumped)
+
+    def test_retryable_status_is_retried_before_fallback(self):
+        calls = []
+        def call(model, request):
+            calls.append(model)
+            if len(calls) == 1:
+                raise self.http_error(503)
+            return self.response()
+        with patch.object(runner.time, 'sleep') as sleep:
+            status = self.run_review(call)
+        self.assertTrue(status['complete'])
+        self.assertEqual(calls, [runner.PRIMARY, runner.PRIMARY])
+        sleep.assert_called_once()
+
+    def test_non_retryable_status_goes_straight_to_fallback(self):
+        calls = []
+        def call(model, request):
+            calls.append(model)
+            if model == runner.PRIMARY:
+                raise self.http_error(400)
+            return self.response()
+        with patch.object(runner.time, 'sleep') as sleep:
+            status = self.run_review(call)
+        self.assertTrue(status['complete'])
+        self.assertEqual(calls, [runner.PRIMARY, runner.FALLBACK])
+        sleep.assert_not_called()
+
+    def test_provider_outage_stops_calling_and_names_reason(self):
+        self.add_batches(5)
+        calls = []
+        def call(model, request):
+            calls.append(model)
+            raise self.http_error(429)
+        with patch.object(runner.time, 'sleep'):
+            status = self.run_review(call)
+        attempts = 1 + len(runner.RETRY_DELAYS)
+        self.assertEqual(len(calls), runner.OUTAGE_BATCHES * 2 * attempts)
+        skipped = [x for x in status['unreviewed'] if 'provider-unavailable' in x['reason']]
+        self.assertEqual(len(skipped), 5 - runner.OUTAGE_BATCHES)
+        self.assertIn('HTTP 429', skipped[0]['reason'])
+        self.assertEqual(status['successful_batches'], 0)
+
+    def test_input_rejection_is_not_counted_as_provider_outage(self):
+        # 400/413 mean this batch's input was refused, not that the provider is down.
+        self.add_batches(4)
+        calls = []
+        def call(model, request):
+            calls.append(model)
+            raise self.http_error(413)
+        status = self.run_review(call)
+        self.assertEqual(len(calls), 4 * 2)
+        self.assertFalse(any('provider-unavailable' in x['reason'] for x in status['unreviewed']))
+
+    def test_retries_stop_once_time_budget_is_spent(self):
+        now = [0.0]
+        calls = []
+        def call(model, request):
+            calls.append(model)
+            now[0] += 100
+            raise self.http_error(503)
+        with patch.object(runner.time, 'sleep'):
+            status = runner.run(self.path, self.root / 'out', policy='p', context='c', caller=call,
+                                time_budget_seconds=150, clock=lambda: now[0])
+        self.assertEqual(len(calls), 2)  # primary twice, then budget spent: no more retries or fallback
+        self.assertEqual(status['successful_batches'], 0)
+
+    def test_time_budget_skips_remaining_batches_explicitly(self):
+        self.add_batches(4)
+        now = [0.0]
+        def call(model, request):
+            now[0] += 100
+            batch = json.loads(json.loads(request)['messages'][1]['content'])['batch']
+            return self.response(ident=batch['batch_id'], paths=batch['paths'])
+        status = runner.run(self.path, self.root / 'out', policy='p', context='c', caller=call,
+                            time_budget_seconds=150, clock=lambda: now[0])
+        self.assertEqual(status['successful_batches'], 2)
+        skipped = [x for x in status['unreviewed'] if x['reason'] == 'time-budget-exhausted']
+        self.assertEqual(len(skipped), 2)
+
+    def test_render_tells_reader_how_to_cover_unreviewed_files(self):
+        def call(*args):
+            raise self.http_error(503)
+        with patch.object(runner.time, 'sleep'):
+            self.run_review(call)
+        body = (self.root / 'out/review-body.md').read_text()
+        self.assertIn('re-run', body)
+        self.assertIn('code-review', body)
 
 
 if __name__ == '__main__':
