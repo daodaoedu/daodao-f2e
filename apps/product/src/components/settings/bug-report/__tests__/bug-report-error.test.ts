@@ -1,7 +1,15 @@
 import { ApiError } from "@daodao/api";
 import enMessages from "@daodao/i18n/locales/en";
 import zhTWMessages from "@daodao/i18n/locales/zh-TW";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// @daodao/api 會載入 @daodao/config 的 generated/env；CI 的 typecheck 與 test 並行時該檔可能正被重新產生，
+// 純邏輯測試不需要 env，比照 packages/api 測試直接 mock
+vi.mock("@daodao/config", () => ({
+  getEnv: (_key: string, fallback?: string) => fallback,
+  getRequiredEnv: () => "https://api.example.com",
+}));
+
 import type { ServerErrorMessageKey } from "@/lib/server-error/server-error-message";
 import { type BugReportErrorOptions, resolveBugReportErrorMessage } from "../bug-report-error";
 
