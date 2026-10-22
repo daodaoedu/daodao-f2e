@@ -78,3 +78,32 @@ export function getDeliverAt(
 export function hasFutureLetterFormErrors(errors: IFutureLetterFormErrors): boolean {
   return Object.keys(errors).length > 0;
 }
+
+export type LetterDetailView = "sealed" | "unopened" | "opened";
+
+interface LetterDetailSource {
+  id: string;
+  status: string;
+  openedAt?: string | null;
+}
+
+/** Which detail block the footprints page shows for the selected letter. */
+export function getLetterDetailView(
+  letter: LetterDetailSource | null | undefined
+): LetterDetailView | null {
+  if (!letter) return null;
+  if (letter.status === "scheduled") return "sealed";
+  if (letter.status === "delivered") return letter.openedAt ? "opened" : "unopened";
+  return null;
+}
+
+/**
+ * Changes whenever a different detail block is shown, so the page can bring it into view
+ * (the block renders after the whole timeline, far below the clicked card).
+ */
+export function getLetterDetailScrollKey(
+  letter: LetterDetailSource | null | undefined
+): string | null {
+  const view = getLetterDetailView(letter);
+  return letter && view ? `${letter.id}:${view}` : null;
+}
