@@ -16,6 +16,7 @@ import { Check, X } from "lucide-react";
 import type React from "react";
 import type { NotificationTypeType } from "@/constants/notification-type";
 import { NotificationType } from "@/constants/notification-type";
+import { getUserProfilePath } from "@/utils/notification-link";
 
 // ============================================================================
 // Types
@@ -342,7 +343,7 @@ export function NotificationItem({
   onClick,
 }: NotificationItemProps) {
   const { actor, time, isRead } = notification;
-  const actorProfileLink = actor.customId || actor.id;
+  const actorProfileLink = getUserProfilePath(actor);
 
   const isClickable =
     notification.type !== NotificationType.connect &&
@@ -380,7 +381,7 @@ export function NotificationItem({
       {/* 頭像 */}
       {actorProfileLink ? (
         <CustomLink
-          href={`/users/${actorProfileLink}`}
+          href={actorProfileLink}
           className="shrink-0"
           onClick={(e) => e.stopPropagation()}
         >
