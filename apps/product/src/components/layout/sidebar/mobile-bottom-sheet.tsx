@@ -1,5 +1,6 @@
 "use client";
 
+import { ManageOutlineSvg, UserOutlineSvg } from "@daodao/assets";
 import { useAuth, useAuthContext } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -17,11 +18,12 @@ import { useCallback, useEffect, useRef } from "react";
 import { LanguagePillToggle } from "./language-pill-toggle";
 
 interface MobileBottomSheetProps {
+  identifier: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function MobileBottomSheet({ isOpen, onClose }: MobileBottomSheetProps) {
+export function MobileBottomSheet({ identifier, isOpen, onClose }: MobileBottomSheetProps) {
   const t = useTranslations("app_product");
   const { user } = useAuthContext();
   const { logout } = useAuth();
@@ -80,12 +82,12 @@ export function MobileBottomSheet({ isOpen, onClose }: MobileBottomSheetProps) {
         aria-hidden="true"
       />
 
-      <div
-        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl animate-[dd-sheet-in_220ms_ease-out] pb-[env(safe-area-inset-bottom)]"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div className="flex justify-center py-3">
+      <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] overflow-y-auto bg-white rounded-t-2xl animate-[dd-sheet-in_220ms_ease-out] pb-[env(safe-area-inset-bottom)]">
+        <div
+          className="flex justify-center py-3 touch-none"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           <div className="w-9 h-1 rounded-full bg-[#D9E1E0]" />
         </div>
 
@@ -100,6 +102,20 @@ export function MobileBottomSheet({ isOpen, onClose }: MobileBottomSheetProps) {
           <div className={cn(itemClass, "cursor-default")}>
             <LanguagePillToggle />
           </div>
+
+          <CustomLink
+            href={identifier ? `/users/${identifier}` : "/auth/login"}
+            className={itemClass}
+            onClick={onClose}
+          >
+            <UserOutlineSvg className="size-[18px] shrink-0 opacity-50" />
+            {t("nav_my_island")}
+          </CustomLink>
+
+          <CustomLink href="/lighthouse" className={itemClass} onClick={onClose}>
+            <ManageOutlineSvg className="size-[18px] shrink-0 opacity-50" />
+            {t("nav_manage")}
+          </CustomLink>
 
           <CustomLink href="/settings/follow-hub" className={itemClass} onClick={onClose}>
             <HeartHandshake className="size-[18px] shrink-0 opacity-50" />
