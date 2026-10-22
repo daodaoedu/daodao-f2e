@@ -3,6 +3,10 @@
 import { type UpdatePracticeRequestType, updatePractice, usePracticeById } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
+import {
+  isPracticePrivacyLocked,
+  withEditablePrivacy,
+} from "@daodao/shared/lib/practice-privacy-lock";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
@@ -32,7 +36,6 @@ import {
   parseFrequency,
 } from "@/constants/practice-form";
 import { minEditableStartDate } from "@/utils/practice-period";
-import { isPracticePrivacyLocked, withEditablePrivacy } from "@/utils/practice-privacy-lock";
 import { isPracticeScheduleLocked } from "@/utils/practice-schedule-lock";
 
 // API 錯誤響應類型

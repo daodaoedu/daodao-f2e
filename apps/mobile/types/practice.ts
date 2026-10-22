@@ -38,6 +38,10 @@ export interface IPractice {
   resources?: IPracticeResource[];
   /** 實踐擁有者（用於判斷 isOwner，對齊 product 的 practice.user） */
   user?: { id?: string | null } | null;
+  /** 共同挑戰實踐：名稱、期間、隱私由挑戰統一設定 */
+  isChallenge?: boolean;
+  /** 燈塔本期實踐：隱私由教練統一設定，編輯時不可送 privacyStatus */
+  isCohortPrivacyLocked?: boolean;
 }
 
 export interface IPracticeResource {

@@ -1,3 +1,7 @@
+import {
+  isPracticePrivacyLocked,
+  withEditablePrivacy,
+} from "@daodao/shared/lib/practice-privacy-lock";
 import { Check, ChevronLeft, Eye, EyeOff, Lock } from "@tamagui/lucide-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -79,6 +83,9 @@ export default function PracticeEditScreen() {
   const [tagsText, setTagsText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // 燈塔本期實踐（隱私由教練統一設定）、共同挑戰實踐：server 收到 privacyStatus 會回 400
+  const isPrivacyLocked = isPracticePrivacyLocked(practice);
+
   useEffect(() => {
     if (!practice) return;
 
@@ -145,15 +152,21 @@ export default function PracticeEditScreen() {
         .filter(Boolean)
         .slice(0, 5);
 
-      await api.put(`/practices/${id}`, {
-        title: trimmedTitle,
-        practiceAction: description.trim(),
-        durationDays: targetDays,
-        sessionDurationMinutes,
-        tags,
-        privacyStatus,
-        ...buildFrequencyPayload(frequency),
-      });
+      await api.put(
+        `/practices/${id}`,
+        withEditablePrivacy(
+          {
+            title: trimmedTitle,
+            practiceAction: description.trim(),
+            durationDays: targetDays,
+            sessionDurationMinutes,
+            tags,
+            ...buildFrequencyPayload(frequency),
+          },
+          privacyStatus,
+          isPrivacyLocked
+        )
+      );
 
       await mutate();
       Alert.alert(t("edit_save_success"), "", [
@@ -362,46 +375,61 @@ export default function PracticeEditScreen() {
               />
             </Card>
 
-            <Card
-              backgroundColor="$background"
-              borderWidth={1}
-              borderColor="$borderColor"
-              padding="$4"
-              gap="$3"
-            >
-              <Text fontSize={14} fontWeight="500" color="$color">
-                {t("mobile_privacy_label")}
-              </Text>
-              {privacyOptions.map((option) => {
-                const isSelected = privacyStatus === option.value;
-                return (
-                  <Button
-                    key={option.value}
-                    size="$4"
-                    backgroundColor={isSelected ? colors.primary.palest : "$background"}
-                    borderWidth={1}
-                    borderColor={isSelected ? colors.primary.base : "$borderColor"}
-                    onPress={() => setPrivacyStatus(option.value)}
-                  >
-                    <XStack flex={1} alignItems="center" gap="$3">
-                      <option.Icon
-                        size={20}
-                        color={isSelected ? colors.primary.base : colors.basic[400]}
-                      />
-                      <YStack flex={1}>
-                        <Text fontSize={15} fontWeight="500" color="$color">
-                          {t(option.labelKey)}
-                        </Text>
-                        <Text fontSize={12} color="$color" opacity={0.6}>
-                          {t(option.descriptionKey)}
-                        </Text>
-                      </YStack>
-                      {isSelected && <Check size={18} color={colors.primary.base} />}
-                    </XStack>
-                  </Button>
-                );
-              })}
-            </Card>
+            {practice.isCohortPrivacyLocked && (
+              <Card
+                backgroundColor={colors.primary.palest}
+                borderWidth={1}
+                borderColor="$borderColor"
+                padding="$4"
+              >
+                <Text fontSize={14} color="$color">
+                  {t("edit_cohort_privacy_locked")}
+                </Text>
+              </Card>
+            )}
+
+            {!isPrivacyLocked && (
+              <Card
+                backgroundColor="$background"
+                borderWidth={1}
+                borderColor="$borderColor"
+                padding="$4"
+                gap="$3"
+              >
+                <Text fontSize={14} fontWeight="500" color="$color">
+                  {t("mobile_privacy_label")}
+                </Text>
+                {privacyOptions.map((option) => {
+                  const isSelected = privacyStatus === option.value;
+                  return (
+                    <Button
+                      key={option.value}
+                      size="$4"
+                      backgroundColor={isSelected ? colors.primary.palest : "$background"}
+                      borderWidth={1}
+                      borderColor={isSelected ? colors.primary.base : "$borderColor"}
+                      onPress={() => setPrivacyStatus(option.value)}
+                    >
+                      <XStack flex={1} alignItems="center" gap="$3">
+                        <option.Icon
+                          size={20}
+                          color={isSelected ? colors.primary.base : colors.basic[400]}
+                        />
+                        <YStack flex={1}>
+                          <Text fontSize={15} fontWeight="500" color="$color">
+                            {t(option.labelKey)}
+                          </Text>
+                          <Text fontSize={12} color="$color" opacity={0.6}>
+                            {t(option.descriptionKey)}
+                          </Text>
+                        </YStack>
+                        {isSelected && <Check size={18} color={colors.primary.base} />}
+                      </XStack>
+                    </Button>
+                  );
+                })}
+              </Card>
+            )}
           </YStack>
         </ScrollView>
 
