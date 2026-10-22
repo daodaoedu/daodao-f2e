@@ -61,7 +61,7 @@ export function CohortOutcomeSummary({
     const response = await generateLighthouseOutcomeSummary(programId, cohortId, mode);
     setBusy(null);
     if (response.error) {
-      const message = apiErrorMessage(response.error, t("outcome_summary_generate_failed"));
+      const message = apiErrorMessage(response, t("outcome_summary_generate_failed"));
       setError(message);
       toast.error(message);
       return;
@@ -86,7 +86,7 @@ export function CohortOutcomeSummary({
     const response = await saveLighthouseOutcomeSummary(programId, cohortId, content);
     setBusy(null);
     if (response.error) {
-      const message = apiErrorMessage(response.error, t("save_failed"));
+      const message = apiErrorMessage(response, t("save_failed"));
       setError(message);
       toast.error(message);
       return;

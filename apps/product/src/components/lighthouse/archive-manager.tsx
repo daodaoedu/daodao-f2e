@@ -49,7 +49,7 @@ export function ArchiveManager() {
     const response = await restoreLighthouseArchiveItem(organization.id, type, item.id);
     setBusyId(null);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("archive_restore_failed")));
+      toast.error(apiErrorMessage(response, t("archive_restore_failed")));
       // 409（別人已恢復／刪除）代表列表過期，重抓讓失效的列消失
       await archiveQuery.mutate();
       return;
@@ -64,7 +64,7 @@ export function ArchiveManager() {
     const response = await deleteLighthouseArchiveItem(organization.id, type, pending.id);
     setBusyId(null);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("archive_delete_failed")));
+      toast.error(apiErrorMessage(response, t("archive_delete_failed")));
       setPending(null);
       await archiveQuery.mutate();
       return;

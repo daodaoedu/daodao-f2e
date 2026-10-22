@@ -156,6 +156,18 @@ export function parseServerError(error: unknown, status?: number): ParsedServerE
   };
 }
 
+/**
+ * openapi-fetch 的回傳值（`{ error, response }`）拆成 error body 與 HTTP status；
+ * 其他值原樣當成 error、status 為 undefined。
+ */
+export function splitApiResult(value: unknown): { error: unknown; status?: number } {
+  const response = (value as { response?: unknown } | null | undefined)?.response;
+  if (typeof Response !== "undefined" && response instanceof Response) {
+    return { error: (value as { error?: unknown }).error, status: response.status };
+  }
+  return { error: value };
+}
+
 export function resolveServerErrorMessage(
   error: unknown,
   options: ResolveServerErrorOptions

@@ -7,6 +7,7 @@ import {
   resolveServerErrorMessage,
   resolveServerFieldMessage,
   type ServerErrorMessageKey,
+  splitApiResult,
 } from "../server-error-message";
 
 const CJK = /[㐀-鿿]/;
@@ -195,6 +196,25 @@ describe("resolveServerErrorMessage", () => {
     for (const value of Object.values(enMessages.common.server_error)) {
       expect(value).not.toMatch(CJK);
     }
+  });
+});
+
+describe("splitApiResult", () => {
+  it("takes error and HTTP status from an openapi-fetch result", () => {
+    const error = body("APP_ERROR", "無權限");
+    const result = { error, response: new Response(null, { status: 403 }) };
+    expect(splitApiResult(result)).toEqual({ error, status: 403 });
+    // 燈塔 APP_ERROR 403 在 en 要顯示 forbidden，而不是情境 fallback
+    const { error: e, status } = splitApiResult(result);
+    expect(resolveServerErrorMessage(e, { ...en, status, fallback: "Save failed" })).toBe(
+      enMessages.common.server_error.forbidden
+    );
+  });
+
+  it("passes other values through as the error", () => {
+    const error = new Error("網路錯誤");
+    expect(splitApiResult(error)).toEqual({ error });
+    expect(splitApiResult(null)).toEqual({ error: null });
   });
 });
 

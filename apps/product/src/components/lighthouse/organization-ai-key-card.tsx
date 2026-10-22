@@ -65,7 +65,7 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
     });
     setBusy(false);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("organization_ai_key_save_failed")));
+      toast.error(apiErrorMessage(response, t("organization_ai_key_save_failed")));
       return false;
     }
     setApiKey("");
@@ -97,7 +97,7 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
     setBusy(false);
     if (response.error) {
       setTestState("failed");
-      setTestMessage(apiErrorMessage(response.error, t("organization_ai_key_test_failed")));
+      setTestMessage(apiErrorMessage(response, t("organization_ai_key_test_failed")));
       await credentialQuery.mutate();
       return;
     }
@@ -113,7 +113,7 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
     setBusy(false);
     setConfirmClear(false);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("organization_ai_key_clear_failed")));
+      toast.error(apiErrorMessage(response, t("organization_ai_key_clear_failed")));
       return;
     }
     setApiKey("");

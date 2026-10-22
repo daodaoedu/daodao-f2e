@@ -244,7 +244,7 @@ export function TemplateEditorDialog({
       : await createLighthouseTemplate(organizationId, body);
     setBusy(false);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("save_failed")));
+      toast.error(apiErrorMessage(response, t("save_failed")));
       return;
     }
     onSaved(response.data.data, status === "draft" ? "draft" : template ? "updated" : "created");

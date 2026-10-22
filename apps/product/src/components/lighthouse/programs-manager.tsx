@@ -103,11 +103,13 @@ function cohortErrorMessage(
   t: CohortErrorTranslator,
   serverErrorMessage: ServerErrorMessageFn,
   error: unknown,
-  fallbackKey: "cohort_create_failed" | "save_failed"
+  fallbackKey: "cohort_create_failed" | "save_failed",
+  status?: number
 ): string {
   const resolved = resolveCohortApiError(error);
   if (resolved.type === "i18n") return t(resolved.key);
   return serverErrorMessage(error, t(fallbackKey), {
+    status,
     detailMessage: resolved.type === "message" ? resolved.message : undefined,
   });
 }
@@ -982,7 +984,7 @@ function CohortCard({
     const response = await updateLighthouseCohort(programId, cohort.id, { status: "published" });
     setBusy(false);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("cohort_publish_failed")));
+      toast.error(apiErrorMessage(response, t("cohort_publish_failed")));
       return;
     }
     await refresh();
@@ -996,7 +998,7 @@ function CohortCard({
     setBusy(false);
     setConfirmArchive(false);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("cohort_archive_failed")));
+      toast.error(apiErrorMessage(response, t("cohort_archive_failed")));
       await refresh();
       return;
     }
@@ -1009,7 +1011,7 @@ function CohortCard({
     const response = await duplicateLighthouseCohort(programId, cohort.id);
     setBusy(false);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("cohort_duplicate_failed")));
+      toast.error(apiErrorMessage(response, t("cohort_duplicate_failed")));
       return;
     }
     toast.success(t("cohort_duplicated", { name: response.data.data.displayName }));
@@ -1108,7 +1110,13 @@ function CohortCard({
       if (response.error) {
         setBusy(false);
         await refreshTemplates();
-        const reason = cohortErrorMessage(t, serverErrorMessage, response.error, "save_failed");
+        const reason = cohortErrorMessage(
+          t,
+          serverErrorMessage,
+          response.error,
+          "save_failed",
+          response.response.status
+        );
         // 綁定已先送出成功，要講清楚只有場次設定沒存，不然使用者會以為模板也沒連上
         const bindingsChanged =
           bindingChanges.bind.length + bindingChanges.unbind.length + bindingChanges.update.length >
@@ -1330,7 +1338,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
     setBusy(false);
     setConfirmArchive(false);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("program_archive_failed")));
+      toast.error(apiErrorMessage(response, t("program_archive_failed")));
       await refreshPrograms();
       return;
     }
@@ -1415,7 +1423,13 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       if (response.error || !response.data) {
         setBusy(false);
         toast.error(
-          cohortErrorMessage(t, serverErrorMessage, response.error, "cohort_create_failed")
+          cohortErrorMessage(
+            t,
+            serverErrorMessage,
+            response.error,
+            "cohort_create_failed",
+            response.response.status
+          )
         );
         return;
       }

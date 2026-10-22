@@ -120,7 +120,7 @@ export function TemplateCard({
     );
     setBusy(false);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("save_failed")));
+      toast.error(apiErrorMessage(response, t("save_failed")));
       return;
     }
     await refresh();
@@ -139,7 +139,7 @@ export function TemplateCard({
     setBusy(false);
     setUnbinding(null);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("save_failed")));
+      toast.error(apiErrorMessage(response, t("save_failed")));
       return;
     }
     await refresh();
@@ -161,7 +161,7 @@ export function TemplateCard({
     const response = await duplicateLighthouseTemplate(organizationId, template.id);
     setBusy(false);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("save_failed")));
+      toast.error(apiErrorMessage(response, t("save_failed")));
       return;
     }
     await refresh();
@@ -174,7 +174,7 @@ export function TemplateCard({
     setBusy(false);
     setConfirmArchive(false);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("save_failed")));
+      toast.error(apiErrorMessage(response, t("save_failed")));
       // 409（別人已封存）代表列表過期，重抓讓這張卡消失
       await refresh();
       return;

@@ -67,7 +67,7 @@ export function OrganizationSettings() {
     });
     if (response.error) {
       setSaveState("failed");
-      toast.error(apiErrorMessage(response.error, t("save_failed")));
+      toast.error(apiErrorMessage(response, t("save_failed")));
       return;
     }
     await organizationsQuery.mutate();
@@ -82,7 +82,7 @@ export function OrganizationSettings() {
     setBusy(false);
     setRemoving(null);
     if (response.error) {
-      toast.error(apiErrorMessage(response.error, t("organization_member_remove_failed")));
+      toast.error(apiErrorMessage(response, t("organization_member_remove_failed")));
       return;
     }
     await membersQuery.mutate();
