@@ -55,7 +55,7 @@ import {
   BrowseActivityContent,
   type IBrowseActivityFollower,
 } from "@/components/practice/shared/browse-activity-content";
-import type { ExecutionTiming, Frequency } from "@/constants/practice-form";
+import type { ExecutionTiming } from "@/constants/practice-form";
 import type { PracticeStatus } from "@/constants/practice-status";
 import {
   PICKER_REACTIONS,
@@ -87,7 +87,8 @@ interface IPracticeDetailViewModel {
   isChallenge?: boolean;
   status?: PracticeStatus;
   actionDescription: string;
-  frequency: Frequency;
+  /** 每週頻率，例 "1-3"、"7"（daodao#370） */
+  frequency: string;
   durationMinutes: number;
   /** 實踐天數（照 API，可為 1～上限任何天數）；null 代表 API 無法判斷天數 */
   durationDays: number | null;
