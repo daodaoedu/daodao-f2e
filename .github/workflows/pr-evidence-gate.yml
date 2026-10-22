@@ -5,6 +5,8 @@ name: PR Evidence Gate
 #
 # 檢查 PR body「## 驗證證據」：驗證報告連結 + 核心旅程矩陣（正常列 + 錯誤路徑列，全 ✅），
 # 或「核心旅程不適用：<原因>」。#171→#188 的教訓：畫面驗過不等於使用者能完成任務。
+# 另擋 closing keyword 指向中央 issue（Closes daodaoedu/daodao#N；root 內含 Closes #N）：merge 時
+# 會自動關卡、跳過 dev 冒煙與 PM 驗收（#364）。這項不吃分支前綴／label／bot 豁免。
 #
 # 模式：repo variable PR_EVIDENCE_GATE_MODE = warn（預設，advisory）| block。
 # 依 ADR-0001 先 warn 累積 ledger 數據，再升 block 並加入 ruleset required checks。
@@ -43,5 +45,6 @@ jobs:
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
           LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
           AUTHOR: ${{ github.event.pull_request.user.login }}
+          REPO: ${{ github.repository }}
           MODE: ${{ vars.PR_EVIDENCE_GATE_MODE || 'warn' }}
         run: bash .github/scripts/check-pr-evidence.sh
