@@ -16,6 +16,7 @@
     "submit:android": "eas submit --platform android",
     "lint": "biome lint .",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "android": "expo run:android",
     "ios": "expo run:ios"
   },

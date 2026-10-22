@@ -48,7 +48,7 @@ export default function PracticeSummaryScreen() {
     if (!summary) return;
 
     return {
-      title: t("share_title_completed", { name: summary.userName }),
+      title: t("share_title_completed", { title: summary.practiceName }),
       message: t("share_completed_message", {
         title: summary.practiceName,
         count: summary.checkInCount,

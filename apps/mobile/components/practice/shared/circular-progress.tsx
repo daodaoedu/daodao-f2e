@@ -39,7 +39,7 @@ export const CircularProgress = ({
   return (
     <View
       style={[styles.container, { width: size, height: size }]}
-      accessibilityLabel={t("progress_accessibility", { progress: Math.round(value) })}
+      accessibilityLabel={t("progress_accessibility", { percent: Math.round(value) })}
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now: clampedValue }}
     >
