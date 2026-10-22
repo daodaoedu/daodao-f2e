@@ -79,6 +79,7 @@
   "edit_title": "Edit Practice",
   "edit_challenge_locked": "This practice belongs to a group challenge: its name, period and visibility are set by the challenge. You can only adjust the action, frequency and resources here.",
   "edit_cohort_privacy_locked": "This practice belongs to your cohort. Check-in visibility is set by your coach.",
+  "mobile_edit_challenge_locked": "This practice belongs to a group challenge: its name, period and visibility are set by the challenge and can't be changed. You can still adjust the other fields.",
   "edit_save_failed": "Save failed, please try again later",
   "edit_save_success": "Practice updated successfully",
   "edit_cancel": "Cancel",

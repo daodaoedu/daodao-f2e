@@ -246,7 +246,8 @@ export default function PracticeEditScreen() {
                 padding="$4"
               >
                 <Text fontSize={14} color="$color">
-                  {t("edit_challenge_locked")}
+                  {/* App 沒有資源欄位、可改標籤與時長，不沿用網頁的 edit_challenge_locked 文案 */}
+                  {t("mobile_edit_challenge_locked")}
                 </Text>
               </Card>
             )}
