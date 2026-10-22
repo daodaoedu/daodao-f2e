@@ -10,6 +10,7 @@ import { SplitText } from "@daodao/ui/components/split-text";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { getProgressAnimationAction } from "./check-in-progress-animation";
 
 interface UseCheckInSuccessDialogOptions {
   title: string;
@@ -163,18 +164,23 @@ function AlwaysOpenTooltip({
   const [showFireworks, setShowFireworks] = useState(false);
 
   useEffect(() => {
-    if (from >= to) return;
-    if (!shouldStartAnimation) return;
+    const action = getProgressAnimationAction({
+      percentage,
+      from,
+      to,
+      started: shouldStartAnimation,
+      finished: isAnimated,
+    });
+    if (action === "idle") return;
 
     // 當動畫完成時觸發煙火效果
-    if (percentage >= to && !isAnimated) {
+    if (action === "finish") {
+      setPercentage(to);
       setIsAnimated(true);
       setShowFireworks(true);
       onAnimationComplete?.();
+      return;
     }
-
-    // 如果已經完成動畫，不再執行進度更新
-    if (isAnimated) return;
 
     // 執行進度動畫
     const interval = setInterval(
