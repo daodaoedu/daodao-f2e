@@ -7,6 +7,7 @@ import {
   useMyPracticeStats,
   useMyPractices,
 } from "@daodao/api";
+import { readPracticePrivacyStatus } from "@daodao/shared/lib/practice-privacy-lock";
 import { useCallback, useMemo, useRef, useState } from "react";
 import useSWR, { mutate as globalMutate } from "swr";
 import { type MoodType, mapMoodTypeToApiMood } from "@/constants/mood";
@@ -80,6 +81,8 @@ type ApiPracticeDetail = IApiPractice & {
   isChallenge?: boolean;
   // 燈塔本期實踐：隱私由場次統一設定（server 詳情 API 才回傳）
   isCohortPrivacyLocked?: boolean;
+  // 原本的隱私；編輯頁靠它顯示與送出，沒帶出會把公開實踐改回私人（daodao#358）
+  privacyStatus?: string;
 };
 
 type ApiCheckIn = {
@@ -131,6 +134,7 @@ const mapPracticeDetail = (practice: ApiPracticeDetail | undefined): IPractice |
     user: practice.user ?? null,
     isChallenge: practice.isChallenge === true,
     isCohortPrivacyLocked: practice.isCohortPrivacyLocked === true,
+    privacyStatus: readPracticePrivacyStatus(practice),
     resources: (practice.resources ?? []).map((resource, index) => ({
       id: String(resource.id ?? resource.url ?? index),
       name: resource.name,

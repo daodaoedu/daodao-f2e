@@ -42,6 +42,8 @@ export interface IPractice {
   isChallenge?: boolean;
   /** 燈塔本期實踐：隱私由教練統一設定，編輯時不可送 privacyStatus */
   isCohortPrivacyLocked?: boolean;
+  /** 原本的隱私；讀不到時為 undefined，編輯頁不送 privacyStatus（daodao#358） */
+  privacyStatus?: "private" | "public" | "delayed";
 }
 
 export interface IPracticeResource {

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { isPracticePrivacyLocked, withEditablePrivacy } from "../practice-privacy-lock";
+import {
+  isPracticePrivacyLocked,
+  readPracticePrivacyStatus,
+  withEditablePrivacy,
+} from "../practice-privacy-lock";
 
 describe("isPracticePrivacyLocked", () => {
   it("燈塔本期實踐 → 隱私由教練統一設定", () => {
@@ -54,5 +58,25 @@ describe("withEditablePrivacy", () => {
     expect(
       withEditablePrivacy(appRequest, "private", isPracticePrivacyLocked(detail))
     ).not.toHaveProperty("privacyStatus");
+  });
+
+  // daodao#358：詳情讀不到原本隱私時，編輯頁預設 private 並送出，公開實踐存檔後被改成私人
+  it("讀不到原本隱私（undefined）：PUT body 不帶 privacyStatus，server 保留原值", () => {
+    const payload = withEditablePrivacy(request, undefined, false);
+    expect(payload).toEqual(request);
+    expect("privacyStatus" in payload).toBe(false);
+  });
+});
+
+describe("readPracticePrivacyStatus", () => {
+  // daodao#358：App mapPracticeDetail 與網頁編輯頁靠它從詳情回應帶出原本隱私
+  it.each(["public", "private", "delayed"] as const)("詳情回應的 %s 原樣帶出", (status) => {
+    expect(readPracticePrivacyStatus({ privacyStatus: status })).toBe(status);
+  });
+
+  it("沒有欄位或值不認得 → undefined（不要猜成 private）", () => {
+    expect(readPracticePrivacyStatus({})).toBeUndefined();
+    expect(readPracticePrivacyStatus({ privacyStatus: "connections_only" })).toBeUndefined();
+    expect(readPracticePrivacyStatus(undefined)).toBeUndefined();
   });
 });
