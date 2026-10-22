@@ -3,7 +3,7 @@ import { apiErrorFromBody } from "../errors";
 
 // ============================================================================
 // Types
-// (Follow/Connection API は types.ts 生成前のため手動定義)
+// generated types 尚未涵蓋 follow endpoints，手動對齊 server 實際回應（daodao#251）
 // ============================================================================
 
 export interface IFollowTarget {
@@ -14,16 +14,21 @@ export interface IFollowTarget {
 export interface IFollowUserProfile {
   id: string;
   name: string;
-  photoURL?: string;
-  bio?: string;
-  identifier?: string;
+  photoURL?: string | null;
+  bio?: string | null;
+  identifier?: string | null;
+}
+
+/** followers 清單的一筆：由 server `FollowItem` 映射而來，多帶關注時間 */
+export interface IFollowerProfile extends IFollowUserProfile {
+  followedAt: string;
 }
 
 export interface IFollowPracticeProfile {
   id: string;
   title: string;
   ownerName: string;
-  ownerPhotoURL?: string;
+  ownerPhotoURL?: string | null;
 }
 
 export interface IFollowingItem {
@@ -32,18 +37,32 @@ export interface IFollowingItem {
   practice?: IFollowPracticeProfile;
 }
 
+/** server `paginationInfoSchema`（daodao-server src/validators/api-response.validators.ts） */
+export interface IFollowPagination {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+/** server `FollowItem`（daodao-server src/validators/follow.validators.ts）：followers 的原始形狀 */
+export interface IServerFollowerItem {
+  userId: number;
+  externalId: string;
+  nickname: string | null;
+  followedAt: string;
+}
+
 export interface IPaginatedFollowers {
-  data: IFollowUserProfile[];
-  total: number;
-  page: number;
-  limit: number;
+  data: IFollowerProfile[];
+  pagination?: IFollowPagination;
 }
 
 export interface IPaginatedFollowing {
   data: IFollowingItem[];
-  total: number;
-  page: number;
-  limit: number;
+  pagination?: IFollowPagination;
 }
 
 export interface IGetFollowParams {
@@ -97,6 +116,20 @@ export const checkFollowStatus = async (
   return res.json();
 };
 
+/**
+ * followers 的 server item 是 `{ userId, externalId, nickname, followedAt }`，
+ * 跟 following 的 user profile 形狀不同；在這裡映射成 IFollowUserProfile，
+ * 讓消費端用同一套欄位（id 用 externalId，/users/<uuid> 可直接開個人頁）。
+ */
+export const toFollowerProfile = (item: IServerFollowerItem): IFollowerProfile => ({
+  id: item.externalId,
+  name: item.nickname ?? "",
+  photoURL: null,
+  bio: null,
+  identifier: null,
+  followedAt: item.followedAt,
+});
+
 export const getFollowers = async (params: IGetFollowParams): Promise<IPaginatedFollowers> => {
   const query = new URLSearchParams();
   if (params.page) query.set("page", String(params.page));
@@ -106,7 +139,14 @@ export const getFollowers = async (params: IGetFollowParams): Promise<IPaginated
     { credentials: "include" }
   );
   if (!res.ok) throw new Error("載入關注者失敗");
-  return res.json();
+  const body = (await res.json()) as {
+    data?: IServerFollowerItem[];
+    pagination?: IFollowPagination;
+  };
+  return {
+    data: (body.data ?? []).map(toFollowerProfile),
+    pagination: body.pagination,
+  };
 };
 
 export const getFollowing = async (params: IGetFollowParams): Promise<IPaginatedFollowing> => {

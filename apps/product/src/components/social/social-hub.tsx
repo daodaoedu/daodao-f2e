@@ -330,7 +330,7 @@ const FollowingTab = () => {
                 return (
                   <div key={user.id} className="flex items-center gap-3 bg-white rounded-lg p-3">
                     <Avatar className="size-10 shrink-0">
-                      <AvatarImage src={user.photoURL} alt={user.name} />
+                      <AvatarImage src={user.photoURL ?? undefined} alt={user.name} />
                       <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
                         {user.name.slice(0, 1)}
                       </AvatarFallback>
@@ -372,7 +372,10 @@ const FollowingTab = () => {
                     className="flex items-center gap-3 bg-white rounded-lg p-3"
                   >
                     <Avatar className="size-10 shrink-0">
-                      <AvatarImage src={practice.ownerPhotoURL} alt={practice.ownerName} />
+                      <AvatarImage
+                        src={practice.ownerPhotoURL ?? undefined}
+                        alt={practice.ownerName}
+                      />
                       <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
                         {practice.ownerName.slice(0, 1)}
                       </AvatarFallback>
@@ -417,7 +420,7 @@ const FollowingTab = () => {
             {followers.map((user) => (
               <div key={user.id} className="flex items-center gap-3 bg-white rounded-lg p-3">
                 <Avatar className="size-10 shrink-0">
-                  <AvatarImage src={user.photoURL} alt={user.name} />
+                  <AvatarImage src={user.photoURL ?? undefined} alt={user.name} />
                   <AvatarFallback className="text-sm font-medium text-text-dark bg-[#E8FAF9]">
                     {user.name.slice(0, 1)}
                   </AvatarFallback>
