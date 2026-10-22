@@ -7,6 +7,7 @@ import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { Link2Icon, LockIcon, X } from "lucide-react";
 import * as React from "react";
+import { areResourceCardPropsEqual } from "./resource-card-props-equal";
 
 export interface ResourceCardData {
   id: string | number;
@@ -120,13 +121,4 @@ const ResourceCardComponent = ({
   );
 };
 
-export const ResourceCard = React.memo(ResourceCardComponent, (prevProps, nextProps) => {
-  // 只比較 resource 對象，忽略 onRemove 和 onClick 的變化
-  return (
-    prevProps.resource.id === nextProps.resource.id &&
-    prevProps.resource.name === nextProps.resource.name &&
-    prevProps.resource.url === nextProps.resource.url &&
-    prevProps.locked === nextProps.locked &&
-    prevProps.className === nextProps.className
-  );
-});
+export const ResourceCard = React.memo(ResourceCardComponent, areResourceCardPropsEqual);
