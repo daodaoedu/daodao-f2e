@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { join, relative, resolve, sep } from "node:path";
 import * as ts from "typescript";
 import { describe, expect, it } from "vitest";
 import enMessages from "../../../packages/i18n/src/locales/en";
@@ -17,6 +17,10 @@ import zhTWMessages from "../../../packages/i18n/src/locales/zh-TW";
  *   {placeholder} 都要由呼叫傳入
  * - 編輯頁（STRICT_FILES）：另檢查 `labelKey`／`descriptionKey` 這類動態 key，以及
  *   傳了參數但字串沒用到（例：傳 count 但字串只有「天」，數字就消失）
+ *
+ * 涵蓋不到：解構或轉手的翻譯函式（`const { t } = ...`、當 prop 傳進元件的 t）、
+ * 變數組出的 key（`t(\`${key}_title\`)`）、其他檔案定義的 labelKey 常數。
+ * 動態 key 的命名空間取同 scope 的 `t`，找不到時取檔案裡第一個 `t`（編輯頁的選項陣列宣告在模組層）。
  */
 
 type Messages = Record<string, unknown>;
@@ -177,7 +181,7 @@ const collectKeyUsages = (file: string, source: string): KeyUsage[] => {
 };
 
 const mobileUsages = listSourceFiles(MOBILE_ROOT).flatMap((path) =>
-  collectKeyUsages(relative(MOBILE_ROOT, path), readFileSync(path, "utf8"))
+  collectKeyUsages(relative(MOBILE_ROOT, path).split(sep).join("/"), readFileSync(path, "utf8"))
 );
 const isStrict = (usage: KeyUsage) => STRICT_FILES.includes(usage.file);
 const where = (usage: KeyUsage) => `${usage.file}:${usage.line} ${usage.key}`;
