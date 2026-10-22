@@ -5,6 +5,7 @@ import { useTranslations } from "@daodao/i18n";
 import { useParams, useRouter } from "@daodao/i18n/navigation";
 import {
   isPracticePrivacyLocked,
+  readPracticePrivacyStatus,
   withEditablePrivacy,
 } from "@daodao/shared/lib/practice-privacy-lock";
 import { Button } from "@daodao/ui/components/button";
@@ -98,7 +99,8 @@ export default function EditPracticePage() {
   const practiceId = params.id as string;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus>("private");
+  // 讀不到原本隱私時維持 undefined：不預設 private，存檔也不送，避免把公開實踐改回私人（daodao#358）
+  const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus | undefined>(undefined);
 
   const { data: practiceData, isLoading, error } = usePracticeById(practiceId);
 
@@ -221,9 +223,7 @@ export default function EditPracticePage() {
       form.reset(formValues);
     }
     if (practiceData?.data) {
-      const ps = (practiceData.data as Record<string, unknown>).privacyStatus as
-        | PrivacyStatus
-        | undefined;
+      const ps = readPracticePrivacyStatus(practiceData.data as { privacyStatus?: unknown });
       if (ps) setPrivacyStatus(ps);
     }
   }, [formValues, form, practiceData]);

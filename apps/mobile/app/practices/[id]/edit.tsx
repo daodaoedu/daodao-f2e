@@ -6,6 +6,7 @@ import {
 } from "@daodao/shared/lib/practice-edit-frequency";
 import {
   isPracticePrivacyLocked,
+  readPracticePrivacyStatus,
   withEditablePrivacy,
 } from "@daodao/shared/lib/practice-privacy-lock";
 import { Check, ChevronLeft, Eye, EyeOff, Lock } from "@tamagui/lucide-icons";
@@ -69,7 +70,8 @@ export default function PracticeEditScreen() {
   const [targetDays, setTargetDays] = useState(21);
   const [sessionDurationMinutes, setSessionDurationMinutes] = useState(30);
   const [frequency, setFrequency] = useState<EditFrequencyOption>("custom");
-  const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus>("private");
+  // 讀不到原本隱私時維持 undefined：不預設 private，存檔也不送，避免把公開實踐改回私人（daodao#358）
+  const [privacyStatus, setPrivacyStatus] = useState<PrivacyStatus | undefined>(undefined);
   const [tagsText, setTagsText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -103,7 +105,7 @@ export default function PracticeEditScreen() {
     setTargetDays(readNumber(record, "durationDays", readNumber(record, "targetDays", 21)));
     setSessionDurationMinutes(readNumber(record, "sessionDurationMinutes", 30));
     setFrequency(deriveEditFrequency(practice));
-    setPrivacyStatus(readString(record, "privacyStatus", "private") as PrivacyStatus);
+    setPrivacyStatus(readPracticePrivacyStatus(practice));
     setTagsText(tags.join(", "));
   }, [practice]);
 

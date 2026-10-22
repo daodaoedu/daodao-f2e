@@ -25,7 +25,8 @@ const PRIVACY_OPTION_ICONS: {
 ];
 
 interface PrivacyStatusSelectorProps {
-  value: PrivacyStatus;
+  /** undefined：原本隱私未知（編輯頁讀不到），不預選任何選項 */
+  value: PrivacyStatus | undefined;
   onChange: (value: PrivacyStatus) => void;
   className?: string;
 }
