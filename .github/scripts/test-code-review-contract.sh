@@ -102,6 +102,19 @@ with tempfile.TemporaryDirectory() as fixture:
     comment = (output / 'review-comment-body.md').read_text()
     assert 'Small review report.' in comment and f'<!-- daodao-ai-code-review-head:{head} -->' in comment
     assert original.read_text() == normal, "normal presentation overwrote original artifact"
+    # #368: the runner's baseline marker is appended after escaping; a marker forged in the report is not.
+    state = '<!-- daodao-ai-code-review-state:QUJD -->'
+    (output / 'review-state-marker.txt').write_text(state + '\n')
+    original.write_text('## Code Review\n\nfile <!-- daodao-ai-code-review-state:Rk9SR0VE -->\n')
+    result = subprocess.run([sys.executable, '-I', '-'], input=inline, env=env, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    comment = (output / 'review-comment-body.md').read_text()
+    assert comment.rstrip().endswith(state) and comment.count('<!-- daodao-ai-code-review-state:') == 1, comment
+    (output / 'review-state-marker.txt').write_text('<!-- daodao-ai-code-review-state:x --> <!-- injected -->')
+    result = subprocess.run([sys.executable, '-I', '-'], input=inline, env=env, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert 'daodao-ai-code-review-state:' not in (output / 'review-comment-body.md').read_text().replace('&lt;!-- daodao-ai-code-review-state:Rk9SR0VE', '')
+    (output / 'review-state-marker.txt').unlink()
 
 # #314: an incomplete review must not leave the check silently green; annotate counts, never paths.
 flag = step("Flag incomplete review on the check")
@@ -156,7 +169,32 @@ with tempfile.TemporaryDirectory() as fixture:
     code, out, _ = annotate({'complete': False, 'reviewed_paths': [], 'limitations': [],
                              'unreviewed': [{'path': 'pnpm-lock.yaml', 'reason': 'generated-or-lockfile'}]})
     assert (code, out) == (0, ''), out
+    # #368: rebase with an unchanged PR diff carries every file; no batch ran, yet it is fully covered.
+    carried = [{'path': 'a.ts', 'level': 'complete', 'head': 'b' * 40, 'url': None}]
+    code, out, gh_out = annotate({'complete': True, 'reviewed_paths': [], 'unreviewed': [], 'limitations': [],
+                                  'planned_batches': 0, 'carried': carried})
+    assert (code, out) == (0, '') and 'state=complete' in gh_out and 'carried=1' in gh_out, (out, gh_out)
+    # Carried files do not hide an outage on the files that did change: this run reviewed nothing.
+    code, out, _ = annotate({'complete': False, 'reviewed_paths': [], 'limitations': [], 'planned_batches': 1,
+                             'carried': carried,
+                             'unreviewed': [{'path': 'b.ts', 'reason': '@cf/x: transport_failed (HTTP 429)'}]})
+    assert code == 1 and out.startswith('::error'), out
 neutral = step("Publish review coverage check")
+assert 'CARRIED: ${{ steps.coverage.outputs.carried }}' in neutral and '"$CARRIED"' in neutral, "carried count must be integer-checked"
+baseline = step("Load previous review baseline")
+assert "if: steps.runtime.outputs.available == 'true'" in baseline, baseline
+assert '[ "$ACTION" != synchronize ]' in baseline, "opened/reopened/ready_for_review must review every file"
+assert "grep -Fqx 'ai-review:full'" in baseline, "ai-review:full label must force a full review"
+assert 'select(.user.login == "github-actions[bot]"' in baseline, "baseline must come from the bot's own comment"
+assert 'CLOUDFLARE' not in baseline, "baseline loading must not see provider secrets"
+plan_step = step("Plan complete-file batches")
+assert '"${PREVIOUS[@]}"' in plan_step and "grep -Fq -- \"'--previous-comment'\"" in plan_step, "older trusted planners must still run"
+provider_step = step("Review bounded batches with Workers AI")
+assert '"${RUN_URL_ARGS[@]}"' in provider_step and "grep -Fq -- \"'--run-url'\"" in provider_step, "older trusted runners must still run"
+assert 'actions/cache' not in workflow, "the baseline must not depend on an expiring cache"
+order = [workflow.index('      - name: ' + name) for name in (
+    'Load trusted review runtime', 'Load previous review baseline', 'Plan complete-file batches')]
+assert order == sorted(order), "baseline must be loaded before planning"
 assert "steps.coverage.outputs.state == 'partial'" in neutral, "partial coverage must surface as a non-green check"
 # A later full re-run of the same head must replace an earlier neutral result with success.
 assert "steps.coverage.outputs.state == 'complete'" in neutral and 'conclusion=success' in neutral, neutral
