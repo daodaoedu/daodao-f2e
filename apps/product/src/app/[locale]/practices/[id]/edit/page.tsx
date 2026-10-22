@@ -109,9 +109,11 @@ export default function EditPracticePage() {
   );
 
   // 使用 minStartDate 來創建 schema
+  // Step2 鎖住時（共同挑戰、已打卡）天數／頻率不必填：原值是 null 也要能改其他欄位（daodao#370）
+  const scheduleLocked = isPracticeStarted || isChallenge;
   const formSchema = useMemo(() => {
-    return createManualPracticeFormSchema({ minStartDate }, t);
-  }, [minStartDate, t]);
+    return createManualPracticeFormSchema({ minStartDate, scheduleLocked }, t);
+  }, [minStartDate, scheduleLocked, t]);
 
   // 將 API 資料轉換為表單值
   const formValues: ManualPracticeFormValues | null = useMemo(() => {
@@ -295,11 +297,7 @@ export default function EditPracticePage() {
               </p>
             )}
             <Step1 form={form} nameDisabled={isChallenge} />
-            <Step2
-              form={form}
-              disabled={isPracticeStarted || isChallenge}
-              minStartDate={minStartDate}
-            />
+            <Step2 form={form} disabled={scheduleLocked} minStartDate={minStartDate} />
             <Step3 form={form} />
             <Step4 form={form} />
 

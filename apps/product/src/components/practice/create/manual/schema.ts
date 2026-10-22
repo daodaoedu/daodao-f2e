@@ -60,6 +60,8 @@ export interface ManualPracticeSchemaOptions {
   // 編輯模式時可設為實踐的創建日期，允許保留原有的開始日期
   // 如果未提供，驗證時會動態使用當前日期
   minStartDate?: Date;
+  // 期間與頻率鎖住（共同挑戰、已打卡）時欄位無法填，原值是 null 也不能擋住其他欄位存檔（daodao#370）
+  scheduleLocked?: boolean;
 }
 
 // 建立開始日期驗證 schema
@@ -117,6 +119,7 @@ export const createManualPracticeFormSchema = (
 ) => {
   // 不提供預設值，讓 createStartDateSchema 在驗證時動態決定
   const minStartDate = options.minStartDate;
+  const scheduleMinLength = options.scheduleLocked ? 0 : 1;
 
   const msg = (key: string, params?: Record<string, string | number>) =>
     t(key as Parameters<TFunction>[0], params as never);
@@ -134,9 +137,9 @@ export const createManualPracticeFormSchema = (
     startDate: createStartDateSchema(minStartDate, t),
     // 新建立流程可存任意天數、每週頻率區間（daodao#141），編輯頁要能原值帶入（daodao#370）
     // 數字字串，例 "45"；輸入框已過濾非數字並夾限
-    durationDays: z.string().min(1, msg("validation_duration_required")),
+    durationDays: z.string().min(scheduleMinLength, msg("validation_duration_required")),
     // 正規化頻率，例 "1-3"、"7"
-    frequency: z.string().min(1, msg("validation_frequency_required")),
+    frequency: z.string().min(scheduleMinLength, msg("validation_frequency_required")),
 
     // Step 3
     // 每次時間在建立流程是選填，null 代表沒設定

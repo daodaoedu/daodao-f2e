@@ -27,6 +27,7 @@ interface Step3Props {
 }
 
 const MINUTE_PRESETS: readonly number[] = DURATION_MINUTES_OPTIONS.map((option) => option.value);
+const SLIDER_MIN = 15;
 
 const customMinutesText = (typing: string | null, value: number | null) =>
   typing ?? (value == null || MINUTE_PRESETS.includes(value) ? "" : String(value));
@@ -50,12 +51,13 @@ export const Step3 = ({ form }: Step3Props) => {
               <FormControl>
                 <div className="space-y-4">
                   <Slider
-                    value={field.value != null ? [field.value] : []}
+                    // 沒設定時仍給一個可拖的把手（顯示在 15），表單值維持 null，拖動後才有值
+                    value={[field.value ?? SLIDER_MIN]}
                     onValueChange={(value: number[]) => {
                       setMinutesTyping(null);
                       field.onChange(value[0]);
                     }}
-                    min={15}
+                    min={SLIDER_MIN}
                     max={60}
                     step={15}
                     className="w-full"
@@ -99,8 +101,10 @@ export const Step3 = ({ form }: Step3Props) => {
                 onChange={(event) => {
                   const next = sanitizeMinutesInput(event.target.value);
                   setMinutesTyping(next.text);
-                  // 清空自訂框 = 沒選；存檔時 null 不送，保留原本的分鐘數
-                  field.onChange(next.value);
+                  // 清空自訂框回到載入時的原值，畫面和存檔結果一致（不會看起來清空、存檔卻保留）
+                  field.onChange(
+                    next.value ?? form.formState.defaultValues?.durationMinutes ?? null
+                  );
                 }}
                 onBlur={() => {
                   setMinutesTyping(null);
