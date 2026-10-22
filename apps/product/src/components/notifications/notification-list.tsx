@@ -19,6 +19,7 @@ import {
 } from "@/hooks/use-notifications";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { formatRelativeTime } from "@/utils/format-time";
+import { buildNotificationDeepLink } from "@/utils/notification-link";
 import type { INotificationData } from "./notification-item";
 import { NotificationItem } from "./notification-item";
 
@@ -80,32 +81,6 @@ function apiItemToDisplay(item: NotificationApiItem, locale: string): INotificat
     time: formatRelativeTime(item.createdAt, locale),
     isRead: item.isRead,
   };
-}
-
-function buildDeepLink(item: NotificationApiItem): string | null {
-  const extId = item.entityId;
-
-  switch (item.entityType) {
-    case "comment":
-      if (extId && item.checkinId) return `/practices/${extId}/check-ins/${item.checkinId}`;
-      return extId ? `/practices/${extId}` : null;
-    case "practice":
-      if (extId && item.checkinId) return `/practices/${extId}/check-ins/${item.checkinId}`;
-      return extId ? `/practices/${extId}` : null;
-    case "checkin":
-      if (extId && item.checkinId) return `/practices/${extId}/check-ins/${item.checkinId}`;
-      return extId ? `/practices/${extId}` : null;
-    case "user":
-      return item.actor.id ? `/users/${item.actor.id}` : null;
-    case "connection":
-      return item.actor.id ? `/users/${item.actor.id}` : null;
-    case "buddy_request":
-      return extId ? `/practices/${extId}` : null;
-    case "persona_answer":
-      return item.url ?? null;
-    default:
-      return null;
-  }
 }
 
 // ============================================================================
@@ -249,7 +224,7 @@ export function NotificationList() {
     // navigate
     const apiItem = apiItems.find((n) => String(n.id) === notification.id);
     if (apiItem) {
-      const link = buildDeepLink(apiItem);
+      const link = buildNotificationDeepLink(apiItem);
       if (link) router.push(link);
     }
   };
