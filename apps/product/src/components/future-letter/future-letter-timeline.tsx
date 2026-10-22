@@ -15,6 +15,11 @@ import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { format, parseISO } from "date-fns";
 import { Mail, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  getLetterDetailScrollKey,
+  getLetterDetailView,
+  isFootprintTimelineSettled,
+} from "./future-letter-utils";
 import { LetterDetailCard } from "./letter-detail-card";
 import { buildFootprintTimeline } from "./timeline-model";
 import { VerticalTimeline } from "./vertical-timeline";
@@ -63,6 +68,31 @@ export function FutureLetterTimeline({
     pendingRouteTarget === undefined
       ? letters.find((letter) => letter.id === deepLinkedLetterId)
       : undefined;
+  const detailView = getLetterDetailView(selectedLetter);
+  const isLoading = timelineQuery.isLoading || lettersQuery.isLoading;
+  const hasError = Boolean(timelineQuery.error || lettersQuery.error);
+  const detailScrollKey = getLetterDetailScrollKey(
+    selectedLetter,
+    isFootprintTimelineSettled({
+      isLoading,
+      hasError,
+      timelineHasMore: Boolean(timelineQuery.data?.at(-1)?.pagination.hasMore),
+      lettersHasMore: Boolean(lettersQuery.data?.at(-1)?.pagination.hasNext),
+    })
+  );
+  const detailRef = useRef<HTMLDivElement>(null);
+
+  // The detail block renders after the whole timeline, so bring it into view whenever a
+  // different letter (or a different state of the same letter) is shown. Re-clicking the
+  // same card briefly clears the selection while the route updates, which re-triggers this.
+  useEffect(() => {
+    if (!detailScrollKey) return;
+    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    detailRef.current?.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  }, [detailScrollKey]);
 
   const refresh = useCallback(
     async () => Promise.all([lettersQuery.mutate(), timelineQuery.mutate()]),
@@ -141,9 +171,6 @@ export function FutureLetterTimeline({
     }
   };
 
-  const isLoading = timelineQuery.isLoading || lettersQuery.isLoading;
-  const hasError = Boolean(timelineQuery.error || lettersQuery.error);
-
   return (
     <section className="space-y-6">
       {isLoading && (
@@ -167,73 +194,77 @@ export function FutureLetterTimeline({
         />
       )}
 
-      {selectedLetter?.status === "scheduled" && (
-        <div className="mx-auto max-w-md rounded-2xl border border-dashed border-[#E4B84D] bg-[#FFFDF5] p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h3 className="font-bold text-text-dark">{t("sealed_title")}</h3>
-              <p className="mt-1 text-sm text-text-secondary">
-                {t("sealed_description", {
-                  date: selectedLetter.deliverAt
-                    ? format(parseISO(selectedLetter.deliverAt), "yyyy/MM/dd")
-                    : "",
-                })}
-              </p>
+      {selectedLetter && detailView && (
+        <div ref={detailRef} className="scroll-mt-24">
+          {detailView === "sealed" && (
+            <div className="mx-auto max-w-md rounded-2xl border border-dashed border-[#E4B84D] bg-[#FFFDF5] p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="font-bold text-text-dark">{t("sealed_title")}</h3>
+                  <p className="mt-1 text-sm text-text-secondary">
+                    {t("sealed_description", {
+                      date: selectedLetter.deliverAt
+                        ? format(parseISO(selectedLetter.deliverAt), "yyyy/MM/dd")
+                        : "",
+                    })}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t("letter_actions")}
+                  disabled={isMutating}
+                  onClick={() => handleDelete(selectedLetter)}
+                  className="text-red hover:text-red"
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label={t("letter_actions")}
-              disabled={isMutating}
-              onClick={() => handleDelete(selectedLetter)}
-              className="text-red hover:text-red"
-            >
-              <Trash2 className="size-4" />
-            </Button>
-          </div>
-        </div>
-      )}
+          )}
 
-      {selectedLetter?.status === "delivered" && !selectedLetter.openedAt && (
-        <div className="mx-auto max-w-md rounded-2xl border border-logo-cyan/30 bg-[#F4FBFA] p-6 text-center">
-          <Mail className="mx-auto size-8 text-logo-cyan" />
-          <h3 className="mt-3 font-bold text-text-dark">{t("unopened_title")}</h3>
-          <p className="mt-1 text-sm text-text-secondary">{t("unopened_description")}</p>
-          <div className="mt-5 flex justify-center gap-3">
-            <Button
-              disabled={isMutating}
-              onClick={handleOpen}
-              className="rounded-full bg-logo-cyan text-white hover:bg-logo-cyan/90"
-            >
-              {t("action_open_letter")}
-            </Button>
-            <Button
-              disabled={isMutating}
-              variant="outline"
-              onClick={() => handleDelete(selectedLetter)}
-              className="rounded-full text-red"
-            >
-              {t("action_delete")}
-            </Button>
-          </div>
-        </div>
-      )}
+          {detailView === "unopened" && (
+            <div className="mx-auto max-w-md rounded-2xl border border-logo-cyan/30 bg-[#F4FBFA] p-6 text-center">
+              <Mail className="mx-auto size-8 text-logo-cyan" />
+              <h3 className="mt-3 font-bold text-text-dark">{t("unopened_title")}</h3>
+              <p className="mt-1 text-sm text-text-secondary">{t("unopened_description")}</p>
+              <div className="mt-5 flex justify-center gap-3">
+                <Button
+                  disabled={isMutating}
+                  onClick={handleOpen}
+                  className="rounded-full bg-logo-cyan text-white hover:bg-logo-cyan/90"
+                >
+                  {t("action_open_letter")}
+                </Button>
+                <Button
+                  disabled={isMutating}
+                  variant="outline"
+                  onClick={() => handleDelete(selectedLetter)}
+                  className="rounded-full text-red"
+                >
+                  {t("action_delete")}
+                </Button>
+              </div>
+            </div>
+          )}
 
-      {selectedLetter?.status === "delivered" && selectedLetter.openedAt && (
-        <div className="mx-auto max-w-md space-y-3">
-          <LetterDetailCard letter={selectedLetter} />
-          <div className="flex justify-end">
-            <Button
-              disabled={isMutating}
-              variant="ghost"
-              onClick={() => handleDelete(selectedLetter)}
-              className="text-red hover:text-red"
-            >
-              <Trash2 className="size-4" />
-              {t("delete_permanently")}
-            </Button>
-          </div>
+          {detailView === "opened" && (
+            <div className="mx-auto max-w-md space-y-3">
+              <LetterDetailCard letter={selectedLetter} />
+              <div className="flex justify-end">
+                <Button
+                  disabled={isMutating}
+                  variant="ghost"
+                  onClick={() => handleDelete(selectedLetter)}
+                  className="text-red hover:text-red"
+                >
+                  <Trash2 className="size-4" />
+                  {t("delete_permanently")}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </section>
