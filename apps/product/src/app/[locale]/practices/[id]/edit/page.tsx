@@ -170,10 +170,8 @@ export default function EditPracticePage() {
       executionTiming.length > 0 ? executionTiming : [ExecutionTiming.morning];
 
     // 轉換 resources: API 格式 -> 表單格式
-    // isLocked（教練加入的資源）server 已回傳，前端型別待 gen:types 同步後再拿掉轉型
-    const resources = toEditFormResources(
-      (data.resources || []) as Parameters<typeof toEditFormResources>[0]
-    );
+    // isLocked（教練加入的資源）server 已回傳，前端型別待 gen:types 同步；toEditFormResources 以選填欄位讀取
+    const resources = toEditFormResources(data.resources || []);
 
     return {
       name: data.title || "",

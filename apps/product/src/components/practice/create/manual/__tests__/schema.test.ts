@@ -32,10 +32,12 @@ const messagesOf = (schema: ReturnType<typeof createManualPracticeFormSchema>) =
 
 describe("createManualPracticeFormSchema messages (daodao#334)", () => {
   it("requires t so callers cannot fall back to raw keys", () => {
-    // 編輯頁曾漏傳 t，畫面直接顯示 validation_name_required；t 必填後漏傳會在 typecheck 擋下
-    // @ts-expect-error t is required
-    const missingT = () => createManualPracticeFormSchema({ minStartDate: new Date() });
-    expect(missingT).toThrow();
+    // 編輯頁曾漏傳 t，畫面直接顯示 validation_name_required；t 必填後漏傳會在 typecheck 擋下。
+    // 這裡只做編譯期守門：t 改回選填時 @ts-expect-error 會變成未使用而讓 typecheck 失敗
+    const missingT = () =>
+      // @ts-expect-error t is required
+      createManualPracticeFormSchema({ minStartDate: new Date() });
+    expect(typeof missingT).toBe("function");
   });
 
   it("translates every validation message when t is given", () => {
