@@ -49,6 +49,7 @@ import {
   useArchivePracticeDialog,
 } from "@/hooks/use-archive-practice-dialog";
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
+import { runDeletePracticeFlow } from "@/lib/practice-delete/run-delete-practice-flow";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { resolvePracticeDurationDays } from "@/utils/practice-period";
 
@@ -149,7 +150,7 @@ export default function PracticeDetailPage() {
 
   const recordView = useRecordView();
   useRecordReadProgress(practiceId);
-  useRecordTimeSpent(practiceId);
+  const { stop: stopTimeSpent } = useRecordTimeSpent(practiceId);
 
   useEffect(() => {
     if (practiceId) {
@@ -293,16 +294,20 @@ export default function PracticeDetailPage() {
   };
 
   const handleDelete = async () => {
-    const result = await openDeleteDialog();
-    if (result === DeletePracticeResult.Deleted) {
-      try {
-        await deletePracticeById();
+    await runDeletePracticeFlow({
+      confirm: async () => (await openDeleteDialog()) === DeletePracticeResult.Confirmed,
+      deletePractice: deletePracticeById,
+      onDeleted: () => {
+        // 實踐已不存在，跳頁 unmount 時不要再回報停留時間（會 404）
+        stopTimeSpent();
+        toast.success(t("delete_success"));
         router.push("/");
-      } catch (deleteError) {
+      },
+      onError: (deleteError) => {
         console.error("Failed to delete practice:", deleteError);
         toast.error(serverErrorMessage(deleteError, t("delete_failed")));
-      }
-    }
+      },
+    });
   };
 
   const handleCommentSubmit = useCallback(

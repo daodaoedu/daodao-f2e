@@ -21,6 +21,8 @@ import {
   useArchivePracticeDialog,
 } from "@/hooks/use-archive-practice-dialog";
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
+import { runDeletePracticeFlow } from "@/lib/practice-delete/run-delete-practice-flow";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 
 interface PracticeActionMenuProps {
   practiceId: string;
@@ -36,6 +38,7 @@ export function PracticeActionMenu({
   const t = useTranslations("app_product");
   const practiceT = useTranslations("practice");
   const commonT = useTranslations("common");
+  const { errorMessage: serverErrorMessage } = useServerErrorMessage();
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -186,15 +189,17 @@ export function PracticeActionMenu({
             variant="ghost"
             onClick={async () => {
               setMenuOpen(false);
-              const result = await openDeleteDialog();
-              if (result === DeletePracticeResult.Deleted) {
-                try {
-                  await deletePractice();
+              await runDeletePracticeFlow({
+                confirm: async () => (await openDeleteDialog()) === DeletePracticeResult.Confirmed,
+                deletePractice,
+                onDeleted: () => {
+                  toast.success(practiceT("delete_success"));
                   router.refresh();
-                } catch {
-                  toast.error(practiceT("delete_failed"));
-                }
-              }
+                },
+                onError: (deleteError) => {
+                  toast.error(serverErrorMessage(deleteError, practiceT("delete_failed")));
+                },
+              });
             }}
             className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
           >
