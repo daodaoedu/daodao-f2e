@@ -65,7 +65,9 @@ export function FutureLetterTimeline({
       ? letters.find((letter) => letter.id === deepLinkedLetterId)
       : undefined;
   const detailView = getLetterDetailView(selectedLetter);
-  const detailScrollKey = getLetterDetailScrollKey(selectedLetter);
+  const isLoading = timelineQuery.isLoading || lettersQuery.isLoading;
+  const hasError = Boolean(timelineQuery.error || lettersQuery.error);
+  const detailScrollKey = getLetterDetailScrollKey(selectedLetter, !isLoading && !hasError);
   const detailRef = useRef<HTMLDivElement>(null);
 
   // The detail block renders after the whole timeline, so bring it into view whenever a
@@ -156,9 +158,6 @@ export function FutureLetterTimeline({
       setIsMutating(false);
     }
   };
-
-  const isLoading = timelineQuery.isLoading || lettersQuery.isLoading;
-  const hasError = Boolean(timelineQuery.error || lettersQuery.error);
 
   return (
     <section className="space-y-6">

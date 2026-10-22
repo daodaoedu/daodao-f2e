@@ -100,10 +100,13 @@ export function getLetterDetailView(
 /**
  * Changes whenever a different detail block is shown, so the page can bring it into view
  * (the block renders after the whole timeline, far below the clicked card).
+ * Stays null until the timeline has rendered: scrolling earlier (e.g. a deep link where the
+ * letters load before the timeline) lands on a short page and is lost once the timeline appears.
  */
 export function getLetterDetailScrollKey(
-  letter: LetterDetailSource | null | undefined
+  letter: LetterDetailSource | null | undefined,
+  isTimelineReady = true
 ): string | null {
   const view = getLetterDetailView(letter);
-  return letter && view ? `${letter.id}:${view}` : null;
+  return isTimelineReady && letter && view ? `${letter.id}:${view}` : null;
 }

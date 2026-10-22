@@ -37,6 +37,14 @@ describe("future letter detail scroll key", () => {
     expect(sent).not.toBe(read);
   });
 
+  it("waits for the timeline to render so a deep link still lands on the detail block", () => {
+    const letter = { id: "deep", status: "delivered", openedAt: "2026-10-16T00:00:00.000Z" };
+    const loading = getLetterDetailScrollKey(letter, false);
+    const ready = getLetterDetailScrollKey(letter, true);
+    expect(loading).toBeNull();
+    expect(ready).not.toBeNull();
+  });
+
   it("changes after an unopened letter is opened so the revealed content is brought into view", () => {
     const before = getLetterDetailScrollKey({ id: "a", status: "delivered", openedAt: null });
     const after = getLetterDetailScrollKey({
