@@ -64,11 +64,9 @@ export interface ManualPracticeSchemaOptions {
 
 // 建立開始日期驗證 schema
 // minDate 為可選參數，若未提供則在驗證時使用當前日期（確保跨午夜時仍正確）
-const createStartDateSchema = (minDate?: Date, t?: TFunction) => {
-  const msg = (key: string, params?: Record<string, string>) => {
-    if (t) return t(key as Parameters<TFunction>[0], params as never);
-    return key;
-  };
+const createStartDateSchema = (minDate: Date | undefined, t: TFunction) => {
+  const msg = (key: string, params?: Record<string, string>) =>
+    t(key as Parameters<TFunction>[0], params as never);
 
   return z
     .string()
@@ -112,17 +110,16 @@ const createStartDateSchema = (minDate?: Date, t?: TFunction) => {
 };
 
 // Form Schema 工廠函數
+// t 必填：錯誤訊息直接由 FormMessage 顯示，沒翻譯就會出現 validation_name_required 這種 key（daodao#334）
 export const createManualPracticeFormSchema = (
-  options?: ManualPracticeSchemaOptions,
-  t?: TFunction
+  options: ManualPracticeSchemaOptions,
+  t: TFunction
 ) => {
   // 不提供預設值，讓 createStartDateSchema 在驗證時動態決定
-  const minStartDate = options?.minStartDate;
+  const minStartDate = options.minStartDate;
 
-  const msg = (key: string, params?: Record<string, string | number>) => {
-    if (t) return t(key as Parameters<TFunction>[0], params as never);
-    return key;
-  };
+  const msg = (key: string, params?: Record<string, string | number>) =>
+    t(key as Parameters<TFunction>[0], params as never);
 
   return z
     .object({
@@ -171,6 +168,8 @@ export const createManualPracticeFormSchema = (
               .or(z.literal("")),
             // 教練加入的資源（燈塔本期草稿）：不可移除，server 也會擋
             isLocked: z.boolean().optional(),
+            // 第幾天使用；表單不提供編輯，但存檔要原樣送回，否則 server 重建關聯時會清成整段期間（daodao#332）
+            dayNumber: z.number().int().nullable().optional(),
           })
         )
         .optional(),
@@ -181,7 +180,4 @@ export const createManualPracticeFormSchema = (
     });
 };
 
-// 預設 schema（用於創建模式）
-export const manualPracticeFormSchema = createManualPracticeFormSchema();
-
-export type ManualPracticeFormValues = z.infer<typeof manualPracticeFormSchema>;
+export type ManualPracticeFormValues = z.infer<ReturnType<typeof createManualPracticeFormSchema>>;

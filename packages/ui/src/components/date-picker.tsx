@@ -137,6 +137,9 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             captionLayout="dropdown"
             month={month}
             onMonthChange={setMonth}
+            // 年份下拉沒給範圍時，react-day-picker 只能翻 today−100y 年初～今年底（daodao#337）
+            startMonth={minDate}
+            endMonth={maxDate}
             disabled={(date) =>
               (minDate && isBefore(date, startOfDay(minDate))) ||
               (maxDate && isAfter(date, startOfDay(maxDate))) ||
