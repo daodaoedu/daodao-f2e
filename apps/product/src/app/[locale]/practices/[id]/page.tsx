@@ -318,7 +318,11 @@ export default function PracticeDetailPage() {
 
       if (response.error) {
         console.error("Failed to create comment:", response.error);
-        toast.error(serverErrorMessage(response.error, t("comment_failed")));
+        toast.error(
+          serverErrorMessage(response.error, t("comment_failed"), {
+            status: response.response.status,
+          })
+        );
         return;
       }
 
@@ -342,7 +346,11 @@ export default function PracticeDetailPage() {
       });
       if (response.error) {
         console.error("Failed to update comment:", response.error);
-        toast.error(serverErrorMessage(response.error, t("update_comment_failed")));
+        toast.error(
+          serverErrorMessage(response.error, t("update_comment_failed"), {
+            status: response.response.status,
+          })
+        );
         return false;
       }
 
@@ -363,7 +371,11 @@ export default function PracticeDetailPage() {
       const response = await deleteComment(parsedCommentId);
       if (response.error) {
         console.error("Failed to delete comment:", response.error);
-        toast.error(serverErrorMessage(response.error, t("delete_comment_failed")));
+        toast.error(
+          serverErrorMessage(response.error, t("delete_comment_failed"), {
+            status: response.response.status,
+          })
+        );
         return false;
       }
 

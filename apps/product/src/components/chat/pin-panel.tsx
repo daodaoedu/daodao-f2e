@@ -1,12 +1,13 @@
 "use client";
 
 import type { ChatPinnedMessageType } from "@daodao/api";
-import { selectChatErrorMessage, selectChatPins, unpinChatMessage, useChatPins } from "@daodao/api";
+import { selectChatPins, unpinChatMessage, useChatPins } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { X } from "lucide-react";
 import { useCallback } from "react";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { chatShortDate } from "@/utils/chat-format";
 
 interface PinPanelProps {
@@ -28,15 +29,18 @@ function PinnedItem({
   onUnpin: () => void;
 }) {
   const t = useTranslations("messages");
+  const { errorMessage } = useServerErrorMessage();
 
   const handleUnpin = useCallback(async () => {
     const response = await unpinChatMessage(roomId, pin.id);
     if (response.error) {
-      toast.error(selectChatErrorMessage(response.error, t("send_failed")));
+      toast.error(
+        errorMessage(response.error, t("send_failed"), { status: response.response.status })
+      );
       return;
     }
     onUnpin();
-  }, [roomId, pin.id, onUnpin, t]);
+  }, [roomId, pin.id, onUnpin, t, errorMessage]);
 
   const authorName = pin.author?.nickname ?? t("deleted_user");
 

@@ -7,7 +7,6 @@ import {
   isOwnChatMessage,
   markChatRoomRead,
   selectChatDelta,
-  selectChatErrorMessage,
   selectChatHistory,
   selectChatPins,
   selectChatRoom,
@@ -32,10 +31,12 @@ import { PinBanner, usePinBannerState } from "@/components/chat/pin-banner";
 import { PinPanel } from "@/components/chat/pin-panel";
 import { SearchBar } from "@/components/chat/search-bar";
 import { useChatTimeline } from "@/hooks/use-chat-timeline";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { runOptimisticDelete } from "@/utils/chat-optimistic-delete";
 
 export default function ChatRoomPage() {
   const t = useTranslations("messages");
+  const { errorMessage } = useServerErrorMessage();
   const params = useParams<{ roomId: string }>();
   const roomId = Number(params.roomId);
 
@@ -122,10 +123,10 @@ export default function ChatRoomPage() {
         request: () => deleteChatMessage(message.roomId, message.id),
         // 刪掉的可能是置頂訊息：一併重抓置頂（banner、置頂面板、置頂數）
         onSuccess: handleMutate,
-        onError: (error) => toast.error(selectChatErrorMessage(error, t("delete_failed"))),
+        onError: (error) => toast.error(errorMessage(error, t("delete_failed"))),
       });
     },
-    [handleMutate, t]
+    [handleMutate, t, errorMessage]
   );
 
   // 刪除前先確認（FR-MSG-018、POC「刪除訊息／無法復原」）；確認後才跑樂觀刪除
