@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Plan bounded, whole-file review inputs; omitted coverage is explicit."""
 import argparse
+import base64
+import binascii
 import hashlib
 import json
 import re
 from pathlib import Path
 import subprocess
+import zlib
 
 
 def git(repo, *args):
@@ -81,6 +84,74 @@ def hunk_window_lines(diff_text, label, data, radius):
     return [(n, lines[n - 1]) for n in sorted(wanted)]
 
 
+def diff_fingerprint(diff_text):
+    """Identity of one file's PR diff that survives rebase / update-branch (#368).
+
+    Blob ids, similarity scores and hunk line numbers change when the base moves even though the
+    PR's own change is identical, so they are dropped. Paths, modes and every context/added/removed
+    line stay, whitespace included (unlike `git patch-id`, which ignores whitespace that matters in
+    YAML, Python and Markdown). A base change inside a hunk's context therefore still counts as a change.
+    """
+    kept = []
+    for line in diff_text.split('\n'):
+        if line.startswith(('index ', 'similarity index ', 'dissimilarity index ')):
+            continue
+        kept.append('@@' if HUNK_RE.match(line) else line)
+    return hashlib.sha256('\n'.join(kept).encode('utf-8', 'surrogateescape')).hexdigest()[:32]
+
+
+# Baseline of the last review, embedded by the workflow in the bot's review comment (#368).
+STATE_RE = re.compile(r'<!-- daodao-ai-code-review-state:([A-Za-z0-9+/=]{1,60000}) -->')
+RUN_URL_RE = re.compile(r'https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/actions/runs/\d+(?:/attempts/\d+)?')
+STATE_LEVELS = ('complete', 'before-hunks', 'head-only', 'hunks')
+MAX_STATE_JSON_BYTES = 512000
+
+
+def valid_state_path(value):
+    return (isinstance(value, str) and 0 < len(value) <= 1024 and not value.startswith('/')
+            and all(part not in ('', '.', '..') for part in value.split('/'))
+            and not any(c in value for c in '\\\t\r\n') and not any(ord(c) < 32 or 0xD800 <= ord(c) <= 0xDFFF for c in value))
+
+
+def parse_previous_state(text):
+    """Last review baseline found in a comment body, or None when absent or not well formed."""
+    found = STATE_RE.findall(text or '')
+    if not found:
+        return None
+    try:
+        decoder = zlib.decompressobj()
+        raw = decoder.decompress(base64.b64decode(found[-1], validate=True), MAX_STATE_JSON_BYTES)
+        if decoder.unconsumed_tail:
+            return None
+        state = json.loads(raw)
+    except (binascii.Error, zlib.error, ValueError):
+        return None
+    if not isinstance(state, dict) or set(state) != {'v', 'runs', 'files', 'findings'} or state['v'] != 1:
+        return None
+    runs, files, findings = state['runs'], state['files'], state['findings']
+    if not isinstance(runs, list) or not 0 < len(runs) <= 100:
+        return None
+    for run in runs:
+        if (not isinstance(run, dict) or set(run) != {'head', 'url'}
+                or not isinstance(run['head'], str) or not re.fullmatch('[0-9a-f]{40}', run['head'])
+                or not (run['url'] is None or (isinstance(run['url'], str) and RUN_URL_RE.fullmatch(run['url'])))):
+            return None
+    if not isinstance(files, dict) or len(files) > 5000:
+        return None
+    for path, entry in files.items():
+        if (not valid_state_path(path) or not isinstance(entry, dict) or set(entry) != {'fp', 'level', 'run'}
+                or not isinstance(entry['fp'], str) or not re.fullmatch('[0-9a-f]{32}', entry['fp'])
+                or entry['level'] not in STATE_LEVELS
+                or type(entry['run']) is not int or not 0 <= entry['run'] < len(runs)):
+            return None
+    # Findings are model output: kept only as data for files in the baseline; the runner re-validates them.
+    if not isinstance(findings, list) or len(findings) > 500:
+        return None
+    if any(not isinstance(f, dict) or f.get('path') not in files for f in findings):
+        return None
+    return state
+
+
 def describe(item, level, payload, unit_blobs):
     item['context_level'] = level
     item['required_bytes'] = len(payload)
@@ -115,13 +186,18 @@ def pack(pending, max_batch_bytes, max_batches, max_total_bytes):
 
 
 def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=24, max_total_bytes=800000,
-         max_source_bytes=None):
+         max_source_bytes=None, previous_state=None, previous_state_invalid=False):
     # Sources over one batch are reviewed from diff hunks; this cap only bounds Git's diff allocation.
     max_source_bytes = max_source_bytes or 50 * max_batch_bytes
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
+    # A file is carried only when the previous review covered it and its PR diff is byte-identical
+    # (modulo line numbers / blob ids); files that previous run left unreviewed are not in the baseline.
+    baseline = (previous_state or {}).get('files', {})
     manifest = {'schema_version': 1, 'base': None, 'head': None, 'merge_base': None,
-                'files': [], 'batches': [], 'errors': [],
+                'files': [], 'batches': [], 'errors': [], 'carried_findings': [],
+                'incremental': {'baseline': 'used' if previous_state else ('invalid' if previous_state_invalid else 'none'),
+                                'carried': 0},
                 'budgets': {'max_batch_bytes': max_batch_bytes, 'max_batches': max_batches,
                             'max_total_bytes': max_total_bytes, 'max_source_bytes': max_source_bytes}}
     try:
@@ -212,6 +288,14 @@ def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=24, max_total
                     diff_text = diff.decode('utf-8')
                 except UnicodeDecodeError:
                     item['reason'] = 'non-utf8-diff'; continue
+                item['fingerprint'] = diff_fingerprint(diff_text)
+                previous = baseline.get(path)
+                if previous and previous['fp'] == item['fingerprint']:
+                    run = previous_state['runs'][previous['run']]
+                    item.update(status='carried', file_complete=True, context_level=previous['level'],
+                                carried_from={'head': run['head'], 'url': run['url']})
+                    manifest['incremental']['carried'] += 1
+                    continue
                 def build_unit(unit_blobs, note=''):
                     prefix = (f'\nFILE {json.dumps(path, ensure_ascii=True)} STATUS {status}\n'
                               + note + 'COMPLETE DIFF\n').encode()
@@ -331,8 +415,10 @@ def plan(repo, base, head, out, max_batch_bytes=40000, max_batches=24, max_total
                                        'paths': paths, 'units': units})
     except (subprocess.CalledProcessError, ValueError, OSError) as exc:
         manifest['errors'].append(str(exc))
+    carried = {f['path'] for f in manifest['files'] if f['status'] == 'carried'}
+    manifest['carried_findings'] = [f for f in (previous_state or {}).get('findings', []) if f.get('path') in carried]
     manifest['coverage_complete'] = not manifest['errors'] and all(
-        f['status'] == 'planned' for f in manifest['files'])
+        f['status'] in ('planned', 'carried') for f in manifest['files'])
     (out / 'manifest.json').write_text(json.dumps(manifest, indent=2, ensure_ascii=True) + '\n')
     return manifest
 
@@ -344,9 +430,20 @@ def main():
     parser.add_argument('--max-batch-bytes', type=int, default=40000)
     parser.add_argument('--max-batches', type=int, default=24)
     parser.add_argument('--max-total-bytes', type=int, default=800000)
+    # Bot comment holding the last review's baseline (#368); omitted or unreadable means a full review.
+    parser.add_argument('--previous-comment')
     args = parser.parse_args()
+    previous, invalid = None, False
+    if args.previous_comment:
+        try:
+            text = Path(args.previous_comment).read_text(encoding='utf-8')
+        except (OSError, UnicodeError):
+            text = ''
+        previous = parse_previous_state(text)
+        invalid = previous is None and bool(text.strip())
     result = plan(args.repo, args.base, args.head, args.out, args.max_batch_bytes,
-                  args.max_batches, args.max_total_bytes)
+                  args.max_batches, args.max_total_bytes,
+                  previous_state=previous, previous_state_invalid=invalid)
     return 2 if result['errors'] else 0
 
 

@@ -81,28 +81,77 @@ jobs:
             node "$KNOWLEDGE_SCRIPT" prompt-block --db "$KNOWLEDGE_DB" > "$RUNNER_TEMP/known-fp.md" \
               || echo '::warning::Historical false-positive context unavailable'
           fi
+      # #368: on synchronize, files whose PR diff (vs merge-base) is unchanged since the last review
+      # reuse that review instead of calling the model again; a rebase / update-branch that leaves the
+      # PR's own diff untouched calls no model at all. The baseline is a hidden marker in the bot's
+      # own review comment (no expiring cache). Files the last run left unreviewed are not in it.
+      # opened / reopened / ready_for_review and the `ai-review:full` label always review everything.
+      - name: Load previous review baseline
+        if: steps.runtime.outputs.available == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          ACTION: ${{ github.event.action }}
+        run: |
+          BASELINE="$RUNNER_TEMP/previous-review-comment.md"
+          : > "$BASELINE"
+          if [ "$ACTION" != synchronize ]; then
+            echo "Full review: pull_request.$ACTION"
+            exit 0
+          fi
+          # Read live, so adding the label and re-running this job forces a full review.
+          if ! LABELS="$(gh api --paginate "repos/$REPOSITORY/issues/$PR_NUMBER/labels" --jq '.[].name')"; then
+            echo "::warning::PR labels unavailable; reviewing every file"
+            exit 0
+          fi
+          if printf '%s\n' "$LABELS" | grep -Fqx 'ai-review:full'; then
+            echo "Full review: label ai-review:full"
+            exit 0
+          fi
+          if ! COMMENTS="$(gh api --paginate --slurp "repos/$REPOSITORY/issues/$PR_NUMBER/comments")"; then
+            echo "::warning::Previous review unavailable; reviewing every file"
+            exit 0
+          fi
+          # Only the bot's own comments; the newest review that recorded a baseline wins.
+          printf '%s' "$COMMENTS" | jq -r '[add // [] | .[]
+            | select(.user.login == "github-actions[bot]" and (.body | contains("<!-- daodao-ai-code-review-state:")))]
+            | sort_by(.updated_at) | last | .body // empty' > "$BASELINE" || : > "$BASELINE"
       - name: Plan complete-file batches
         if: steps.runtime.outputs.available == 'true'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          BASELINE="$RUNNER_TEMP/previous-review-comment.md"
+          PREVIOUS=()
+          # A trusted base from before #368 has no incremental planner: it reviews every file.
+          if [ -s "$BASELINE" ] && grep -Fq -- "'--previous-comment'" "$RUNNER_TEMP/review-runtime/build-review-batches.py"; then
+            PREVIOUS=(--previous-comment "$BASELINE")
+          fi
           python3 -I "$RUNNER_TEMP/review-runtime/build-review-batches.py" \
             --repo "$GITHUB_WORKSPACE" --base "$BASE_SHA" --head "$HEAD_SHA" \
             --out "$RUNNER_TEMP/review-plan" \
-            --max-batch-bytes 40000 --max-batches 24 --max-total-bytes 800000
+            --max-batch-bytes 40000 --max-batches 24 --max-total-bytes 800000 \
+            "${PREVIOUS[@]}"
       - name: Review bounded batches with Workers AI
         if: steps.runtime.outputs.available == 'true'
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_WORKERS_AI_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_AI_API_TOKEN }}
+          REVIEW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
         run: |
+          RUN_URL_ARGS=()
+          if grep -Fq -- "'--run-url'" "$RUNNER_TEMP/review-runtime/run-review-batches.py"; then
+            RUN_URL_ARGS=(--run-url "$REVIEW_RUN_URL")
+          fi
           python3 -I "$RUNNER_TEMP/review-runtime/run-review-batches.py" \
             --manifest "$RUNNER_TEMP/review-plan/manifest.json" \
             --out "$RUNNER_TEMP/review-output" \
             --policy "$RUNNER_TEMP/review-policy.md" \
             --context "$RUNNER_TEMP/context-pack.md" \
-            --known-fp "$RUNNER_TEMP/known-fp.md"
+            --known-fp "$RUNNER_TEMP/known-fp.md" \
+            "${RUN_URL_ARGS[@]}"
       - name: Preserve review inputs and coverage
         if: always()
         uses: actions/upload-artifact@v4
@@ -137,6 +186,7 @@ jobs:
           python3 -I - <<'PY'
           import os
           import json
+          import re
           from pathlib import Path
           root = Path(os.environ['RUNNER_TEMP']) / 'review-output'
           root.mkdir(exist_ok=True)
@@ -144,7 +194,12 @@ jobs:
           body = body_path.read_text() if body_path.exists() else '## Code Review\n\n⚠️ Review 未完成：runtime 執行失敗。\n'
           # Prefix snapshot ownership ourselves; model cannot spoof comment markers.
           body = body.replace('<!--', '&lt;!--')
-          if len(body) > 50000:
+          # Baseline for the next synchronize (#368), appended after escaping; GitHub caps a comment at 65,536.
+          state_path = root / 'review-state-marker.txt'
+          state = state_path.read_text().strip() if state_path.exists() else ''
+          if len(state) > 16100 or not re.fullmatch(r'<!-- daodao-ai-code-review-state:[A-Za-z0-9+/=]+ -->', state):
+              state = ''
+          if len(body) > 45000:
               # Preserve the full report in the artifact; shorten only presentation.
               status_path = root / 'status.json'
               status = json.loads(status_path.read_text()) if status_path.exists() else {}
@@ -160,7 +215,8 @@ jobs:
                       + '此結果不代表測試、部署或產品驗收通過。\n')
           head = os.environ['HEAD_SHA']
           marker = '<!-- daodao-ai-code-review -->\n<!-- daodao-ai-code-review-head:' + head + ' -->'
-          (root / 'review-comment-body.md').write_text('## Code Review\n\n' + marker + '\n\n' + body.removeprefix('## Code Review').lstrip())
+          (root / 'review-comment-body.md').write_text('## Code Review\n\n' + marker + '\n\n' + body.removeprefix('## Code Review').lstrip()
+                                                       + ('\n' + state + '\n' if state else ''))
           PY
           BODY_FILE="$RUNNER_TEMP/review-output/review-comment-body.md"
           HEAD_MARKER="<!-- daodao-ai-code-review-head:$HEAD_SHA -->"
@@ -203,6 +259,10 @@ jobs:
           known = isinstance(unreviewed, list)
           sources = [x for x in unreviewed or [] if not str(x.get('reason', '') if isinstance(x, dict) else '').startswith('generated')]
           partial = [x for x in status.get('limitations') or [] if str(x).startswith('部分脈絡')]
+          # Files carried from an earlier review of the same PR diff (#368) are already out of
+          # `unreviewed`, so they count as covered. `reviewed` stays this run's model work only: when
+          # every batch sent this time fails, the new changes were not reviewed and the job still fails.
+          carried = status.get('carried') if isinstance(status.get('carried'), list) else []
           reviewed = status.get('reviewed_paths') or []
           bootstrap = status.get('reason') == 'trusted_runtime_missing'
           attempted = (status.get('planned_batches') or 0) > 0
@@ -216,7 +276,7 @@ jobs:
           else:
               state = 'complete'
           with open(os.environ.get('GITHUB_OUTPUT', os.devnull), 'a') as out:
-              out.write(f'state={state}\nunreviewed={len(sources)}\npartial={len(partial)}\n')
+              out.write(f'state={state}\nunreviewed={len(sources)}\npartial={len(partial)}\ncarried={len(carried)}\n')
           if state == 'none':
               print('::error title=AI review 未執行::'
                     f'0 個檔案被審查、{len(sources)} 個非產物檔案未審查（模型呼叫或 runtime 失敗）；稍後 re-run 此 job，詳見 review 留言')
@@ -236,16 +296,21 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           UNREVIEWED: ${{ steps.coverage.outputs.unreviewed }}
           PARTIAL: ${{ steps.coverage.outputs.partial }}
+          CARRIED: ${{ steps.coverage.outputs.carried }}
           REVIEW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           # Counts are integers written by the step above; no PR-controlled text reaches the check.
-          printf '%s\n' "$UNREVIEWED" "$PARTIAL" | grep -Eqx '[0-9]+' || exit 1
+          printf '%s\n' "$UNREVIEWED" "$PARTIAL" "$CARRIED" | grep -Eqx '[0-9]+' || exit 1
+          TITLE="全部非產物檔案已審查"
+          if [ "$CARRIED" -gt 0 ]; then
+            TITLE="$TITLE（$CARRIED 個檔案 diff 未變，沿用上次審查）"
+          fi
           # Always posted, so a later complete re-run of the same head replaces an earlier neutral result.
           if [ "$STATE" = complete ]; then
             gh api "repos/$REPOSITORY/check-runs" --method POST \
               -f name='AI review coverage' -f head_sha="$HEAD_SHA" \
               -f status=completed -f conclusion=success \
-              -f "output[title]=全部非產物檔案已審查" \
+              -f "output[title]=$TITLE" \
               -f "output[summary]=報告與 artifact：$REVIEW_RUN_URL" \
               > /dev/null
           else

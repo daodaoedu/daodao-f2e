@@ -438,5 +438,190 @@ class BatchCountCoverage(unittest.TestCase):
         self.assertTrue(status['complete'])
 
 
+RUN_1 = 'https://github.com/daodaoedu/daodao-f2e/actions/runs/1001'
+RUN_2 = 'https://github.com/daodaoedu/daodao-f2e/actions/runs/1002'
+RUN_3 = 'https://github.com/daodaoedu/daodao-f2e/actions/runs/1003'
+
+
+class IncrementalReview(unittest.TestCase):
+    """#368：synchronize 只審上次審查後 PR diff 有變的檔；rebase／update-branch 沒改到 PR diff 就不呼叫模型。"""
+
+    setUp = ReviewBatches.setUp
+    git = ReviewBatches.git
+    write = ReviewBatches.write
+    commit = ReviewBatches.commit
+
+    def far_file(self, marker):
+        return ''.join(f'far_{i:03d} = "{marker}"\n' for i in range(80))
+
+    def start_pr(self):
+        """main: a.py, b.py, far.py；PR branch 改 a.py、b.py。"""
+        self.write('lib/a.py', 'def a():\n    return 1\n')
+        self.write('lib/b.py', 'def b():\n    return 2\n')
+        self.write('far.py', self.far_file('v1'))
+        self.main = self.git('rev-parse', '--abbrev-ref', 'HEAD')
+        self.base = self.commit()
+        self.git('checkout', '-q', '-b', 'feature')
+        self.write('lib/a.py', 'def a():\n    return 10\n')
+        self.write('lib/b.py', 'def b():\n    return 20\n')
+        return self.commit()
+
+    def advance_main_and_rebase(self, path='far.py', text=None):
+        """main 改一個 PR 沒碰的檔，PR rebase 上去：PR 自身 diff 不變。"""
+        self.git('checkout', '-q', self.main)
+        self.write(path, text if text is not None else self.far_file('v2'))
+        self.base = self.commit()
+        self.git('checkout', '-q', 'feature')
+        self.git('rebase', '-q', self.main)
+        return self.git('rev-parse', 'HEAD')
+
+    def plan(self, head, name, previous=None):
+        out = self.root / name
+        return planner.plan(self.repo, self.base, head, out, previous_state=previous), out
+
+    def review(self, plan_dir, name, run_url, fail_paths=(), findings=None):
+        calls = []
+
+        def call(model, request):
+            batch = json.loads(json.loads(request)['messages'][1]['content'])['batch']
+            calls.append(sorted(batch['paths']))
+            if set(batch['paths']) & set(fail_paths):
+                return {'choices': [{'finish_reason': 'length', 'message': {'content': ''}}]}
+            body = {'batch_id': batch['batch_id'], 'reviewed_paths': batch['paths'],
+                    'findings': [f for f in (findings or []) if f['path'] in batch['paths']], 'limitations': []}
+            return {'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(body)}}]}
+        out = self.root / name
+        status = runner.run(plan_dir / 'manifest.json', out, policy='Trusted policy', context='Context pack',
+                            caller=call, run_url=run_url)
+        marker = (out / 'review-state-marker.txt').read_text()
+        return status, marker, calls, (out / 'review-body.md').read_text()
+
+    def baseline(self, marker):
+        # The workflow hands the planner the whole bot comment; the marker sits after the report.
+        return planner.parse_previous_state('## Code Review\n\n報告內容\n\n' + marker + '\n')
+
+    def statuses(self, manifest):
+        return {f['path']: f['status'] for f in manifest['files']}
+
+    def test_first_review_without_baseline_reviews_every_file(self):
+        head = self.start_pr()
+        manifest, _ = self.plan(head, 'plan-1')
+        self.assertEqual(self.statuses(manifest), {'lib/a.py': 'planned', 'lib/b.py': 'planned'})
+        self.assertEqual(manifest['incremental']['baseline'], 'none')
+
+    def test_rebase_with_unchanged_pr_diff_calls_no_model(self):
+        head = self.start_pr()
+        manifest, plan_dir = self.plan(head, 'plan-1')
+        status, marker, calls, _ = self.review(plan_dir, 'out-1', RUN_1)
+        self.assertTrue(status['complete'])
+        self.assertEqual(calls, [['lib/a.py', 'lib/b.py']])
+        rebased = self.advance_main_and_rebase()
+        self.assertNotEqual(rebased, head)
+        manifest, plan_dir = self.plan(rebased, 'plan-2', self.baseline(marker))
+        self.assertEqual(self.statuses(manifest), {'lib/a.py': 'carried', 'lib/b.py': 'carried'})
+        self.assertEqual(manifest['batches'], [])
+        self.assertEqual(manifest['incremental']['baseline'], 'used')
+        self.assertTrue(manifest['coverage_complete'])
+        status, marker2, calls, body = self.review(plan_dir, 'out-2', RUN_2)
+        self.assertEqual(calls, [])
+        self.assertTrue(status['complete'])
+        self.assertEqual(status['unreviewed'], [])
+        self.assertEqual(sorted(c['path'] for c in status['carried']), ['lib/a.py', 'lib/b.py'])
+        self.assertIn('diff 未變', body)
+        self.assertIn(RUN_1, body)
+        # The carried baseline still points at the run that actually reviewed the files.
+        again = self.baseline(marker2)
+        self.assertEqual({p: again['runs'][f['run']]['url'] for p, f in again['files'].items()},
+                         {'lib/a.py': RUN_1, 'lib/b.py': RUN_1})
+
+    def test_partial_push_only_reviews_changed_files(self):
+        head = self.start_pr()
+        _, plan_dir = self.plan(head, 'plan-1')
+        _, marker, _, _ = self.review(plan_dir, 'out-1', RUN_1)
+        self.write('lib/b.py', 'def b():\n    return 200\n')
+        head = self.commit()
+        manifest, plan_dir = self.plan(head, 'plan-2', self.baseline(marker))
+        self.assertEqual(self.statuses(manifest), {'lib/a.py': 'carried', 'lib/b.py': 'planned'})
+        status, marker2, calls, body = self.review(plan_dir, 'out-2', RUN_2)
+        self.assertEqual(calls, [['lib/b.py']])
+        self.assertTrue(status['complete'])
+        self.assertEqual(status['reviewed_paths'], ['lib/b.py'])
+        reviewed, carried = body.split('沿用上次審查', 1)
+        self.assertIn('lib/b.py', reviewed)
+        self.assertIn('lib/a.py', carried)
+        again = self.baseline(marker2)
+        self.assertEqual({p: again['runs'][f['run']]['url'] for p, f in again['files'].items()},
+                         {'lib/a.py': RUN_1, 'lib/b.py': RUN_2})
+
+    def test_file_left_unreviewed_last_time_is_reviewed_again_even_if_unchanged(self):
+        head = self.start_pr()
+        _, plan_dir = self.plan(head, 'plan-1')
+        # Two files fit one batch; force separate batches so only b.py fails.
+        manifest, plan_dir = planner.plan(self.repo, self.base, head, self.root / 'plan-1b', max_batch_bytes=400), self.root / 'plan-1b'
+        self.assertEqual(len(manifest['batches']), 2)
+        status, marker, _, _ = self.review(plan_dir, 'out-1', RUN_1, fail_paths=['lib/b.py'])
+        self.assertEqual([u['path'] for u in status['unreviewed']], ['lib/b.py'])
+        rebased = self.advance_main_and_rebase()
+        manifest, plan_dir = self.plan(rebased, 'plan-2', self.baseline(marker))
+        self.assertEqual(self.statuses(manifest), {'lib/a.py': 'carried', 'lib/b.py': 'planned'})
+        status, _, calls, _ = self.review(plan_dir, 'out-2', RUN_2)
+        self.assertEqual(calls, [['lib/b.py']])
+        self.assertTrue(status['complete'])
+
+    def test_base_change_inside_the_hunk_context_is_reviewed_again(self):
+        self.write('lib/a.py', 'import os\n\ndef a():\n    return 1\n')
+        self.main = self.git('rev-parse', '--abbrev-ref', 'HEAD')
+        self.base = self.commit()
+        self.git('checkout', '-q', '-b', 'feature')
+        self.write('lib/a.py', 'import os\n\ndef a():\n    return 10\n')
+        head = self.commit()
+        _, plan_dir = self.plan(head, 'plan-1')
+        _, marker, _, _ = self.review(plan_dir, 'out-1', RUN_1)
+        rebased = self.advance_main_and_rebase('lib/a.py', 'import sys\n\ndef a():\n    return 1\n')
+        manifest, _ = self.plan(rebased, 'plan-2', self.baseline(marker))
+        self.assertEqual(self.statuses(manifest), {'lib/a.py': 'planned'})
+
+    def test_findings_on_carried_files_stay_visible(self):
+        head = self.start_pr()
+        _, plan_dir = self.plan(head, 'plan-1')
+        finding = {'path': 'lib/a.py', 'side': 'HEAD', 'line': 2, 'severity': 'P2',
+                   'description': '回傳值改變', 'evidence': 'return 10'}
+        _, marker, _, _ = self.review(plan_dir, 'out-1', RUN_1, findings=[finding])
+        rebased = self.advance_main_and_rebase()
+        _, plan_dir = self.plan(rebased, 'plan-2', self.baseline(marker))
+        status, marker2, calls, body = self.review(plan_dir, 'out-2', RUN_2)
+        self.assertEqual(calls, [])
+        self.assertIn('回傳值改變', body)
+        self.assertEqual(len(self.baseline(marker2)['findings']), 1)
+
+    def test_partial_context_level_stays_a_limitation_when_carried(self):
+        head = self.start_pr()
+        _, plan_dir = self.plan(head, 'plan-1')
+        _, marker, _, _ = self.review(plan_dir, 'out-1', RUN_1)
+        state = self.baseline(marker)
+        state['files']['lib/a.py']['level'] = 'head-only'
+        rebased = self.advance_main_and_rebase()
+        _, plan_dir = self.plan(rebased, 'plan-2', state)
+        status, _, _, _ = self.review(plan_dir, 'out-2', RUN_2)
+        self.assertFalse(status['complete'])
+        self.assertTrue(any(x.startswith('部分脈絡') and 'lib/a.py' in x for x in status['limitations']))
+
+    def test_garbage_or_tampered_baseline_is_ignored(self):
+        prefix = '<!-- daodao-ai-code-review-state:'
+        self.assertIsNone(planner.parse_previous_state('no marker here'))
+        self.assertIsNone(planner.parse_previous_state(prefix + '!!!not-base64 -->'))
+        head = self.start_pr()
+        _, plan_dir = self.plan(head, 'plan-1')
+        _, marker, _, _ = self.review(plan_dir, 'out-1', RUN_1)
+        good = self.baseline(marker)
+        for broken in ({**good, 'v': 99},
+                       {**good, 'files': {'../etc/passwd': next(iter(good['files'].values()))}},
+                       {**good, 'files': {p: {**f, 'fp': 'not-hex'} for p, f in good['files'].items()}},
+                       {**good, 'runs': [{'head': 'x', 'url': 'javascript:alert(1)'}]}):
+            with self.subTest(broken=str(broken)[:60]):
+                self.assertIsNone(planner.parse_previous_state(runner.state_marker(broken)))
+        self.assertIsNotNone(planner.parse_previous_state(runner.state_marker(good)))
+
+
 if __name__ == '__main__':
     unittest.main()
