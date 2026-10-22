@@ -53,6 +53,16 @@ describe("buildEditFrequencyPayload", () => {
     ).toEqual({ frequencyMinDays: 3, frequencyMaxDays: 5 });
   });
 
+  it("原本沒有頻率、選自訂存檔 → 送畫面上顯示的預設 3/5", () => {
+    expect(buildEditFrequencyPayload("custom", {})).toEqual({
+      frequencyMinDays: 3,
+      frequencyMaxDays: 5,
+    });
+    expect(
+      buildEditFrequencyPayload("custom", { frequencyMinDays: null, frequencyMaxDays: null })
+    ).toEqual({ frequencyMinDays: 3, frequencyMaxDays: 5 });
+  });
+
   it("從 2/4 改選每天再改回自訂 → 回到原本 2/4，不送頻率", () => {
     const original = { frequencyMinDays: 2, frequencyMaxDays: 4 };
     expect(buildEditFrequencyPayload("custom", original)).toEqual({});

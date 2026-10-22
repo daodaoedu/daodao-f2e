@@ -31,12 +31,16 @@ export const resolveCustomFrequencyRange = (
   return { ...DEFAULT_CUSTOM_RANGE };
 };
 
-/** 存檔時的頻率欄位：選項沒變就不送（保留原值），改選才送所選頻率 */
+/**
+ * 存檔時的頻率欄位：選項沒變就不送（保留原值），改選才送所選頻率。
+ * 原本沒有頻率時，「自訂」送畫面上顯示的預設 3–5 天，不是空著。
+ */
 export const buildEditFrequencyPayload = (
   selected: EditFrequencyOption,
   original: PracticeFrequencyRange
 ): { frequencyMinDays?: number; frequencyMaxDays?: number } => {
-  if (selected === deriveEditFrequency(original)) return {};
+  const hasOriginalRange = original.frequencyMinDays != null && original.frequencyMaxDays != null;
+  if (selected === deriveEditFrequency(original) && hasOriginalRange) return {};
   if (selected === "daily") return { frequencyMinDays: 7, frequencyMaxDays: 7 };
   if (selected === "weekly") return { frequencyMinDays: 1, frequencyMaxDays: 1 };
   const { min, max } = resolveCustomFrequencyRange(original);
