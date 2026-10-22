@@ -423,7 +423,6 @@ export function PracticeDetailShell({
     ]
   );
   const { open: openSheet, close: closeSheet } = useSheetManager();
-  const { openWarningDialog } = useDialog();
 
   const taskStatus = practice.status ? mapPracticeStatusToTaskStatus(practice.status) : undefined;
   const statusInfo = taskStatus ? getStatusConfig(taskStatus) : undefined;
@@ -551,20 +550,10 @@ export function PracticeDetailShell({
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={async () => {
+                  onClick={() => {
                     setPracticeMenuOpen(false);
-                    const result = await openWarningDialog({
-                      title: t("delete_practice_title"),
-                      message: t("delete_practice_message"),
-                      textAlign: "left",
-                      buttons: [
-                        { label: t("delete_confirm"), value: "confirm", variant: "outline" },
-                        { label: t("cancel_action"), value: "cancel", variant: "orange" },
-                      ],
-                    });
-                    if (result.value === "confirm") {
-                      onDeletePractice();
-                    }
+                    // 確認框由 onDeletePractice（頁面的 useDeletePracticeDialog）負責，這裡不再自帶一層（daodao#369）
+                    onDeletePractice();
                   }}
                   className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
                 >

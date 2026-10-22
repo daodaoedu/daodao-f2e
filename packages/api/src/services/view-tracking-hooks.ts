@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { client } from "../client";
+import { createTimeSpentReporter, type TimeSpentReporter } from "./time-spent-reporter";
 
 export type ViewTrackingEntityType =
   | "practice"
@@ -112,30 +113,40 @@ export const useRecordReadProgress = (practiceId: string | number) => {
   }, [practiceId]);
 };
 
+/**
+ * 記錄實踐詳情頁停留時間；離開頁面或分頁隱藏時回報。
+ * 回傳 stop：實踐已刪除時呼叫，跳頁 unmount 就不會再送 time-spent（否則 404，daodao#369）。
+ */
 export const useRecordTimeSpent = (practiceId: string | number) => {
-  const startTime = useRef(Date.now());
+  const reporterRef = useRef<TimeSpentReporter | null>(null);
 
   useEffect(() => {
-    startTime.current = Date.now();
-
-    const send = () => {
-      const seconds = Math.round((Date.now() - startTime.current) / 1000);
-      if (seconds < 5) return;
-      (client as unknown as UntypedPostClient)
-        .POST(`/api/v1/practices/${practiceId}/time-spent`, {
-          body: { seconds },
-        })
-        .catch(() => {});
-    };
+    const reporter = createTimeSpentReporter({
+      now: () => Date.now(),
+      post: (seconds) => {
+        (client as unknown as UntypedPostClient)
+          .POST(`/api/v1/practices/${practiceId}/time-spent`, {
+            body: { seconds },
+          })
+          .catch(() => {});
+      },
+    });
+    reporterRef.current = reporter;
 
     const onVisibilityChange = () => {
-      if (document.visibilityState === "hidden") send();
+      if (document.visibilityState === "hidden") reporter.send();
     };
 
     document.addEventListener("visibilitychange", onVisibilityChange);
     return () => {
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      send();
+      reporter.send();
     };
   }, [practiceId]);
+
+  const stop = useCallback(() => {
+    reporterRef.current?.stop();
+  }, []);
+
+  return { stop };
 };
