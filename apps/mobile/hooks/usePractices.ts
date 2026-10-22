@@ -77,6 +77,9 @@ type ApiPracticeDetail = IApiPractice & {
   updatedAt?: string;
   // 後端有回傳擁有者，但先前型別未宣告（對齊 product 的 practice.user）
   user?: { id?: string | null } | null;
+  isChallenge?: boolean;
+  // 燈塔本期實踐：隱私由場次統一設定（server 詳情 API 才回傳）
+  isCohortPrivacyLocked?: boolean;
 };
 
 type ApiCheckIn = {
@@ -126,6 +129,8 @@ const mapPracticeDetail = (practice: ApiPracticeDetail | undefined): IPractice |
     progressPercentage: practice.progressPercentage,
     durationDays: practice.durationDays,
     user: practice.user ?? null,
+    isChallenge: practice.isChallenge === true,
+    isCohortPrivacyLocked: practice.isCohortPrivacyLocked === true,
     resources: (practice.resources ?? []).map((resource, index) => ({
       id: String(resource.id ?? resource.url ?? index),
       name: resource.name,
