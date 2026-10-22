@@ -323,5 +323,64 @@ class LargeFileTiers(unittest.TestCase):
         self.assertIn('pre-pr-gate.sh', head)
         self.assertNotIn('plugin/out/x/SKILL.md', head)
 
+
+class OversizedFileHunks(unittest.TestCase):
+    """#314 後續：單檔本身超過 max_batch_bytes（如 f2e en.json 452 KB）改一行，仍以 diff＋前後文審查。"""
+
+    setUp = ReviewBatches.setUp
+    git = ReviewBatches.git
+    write = ReviewBatches.write
+    commit = ReviewBatches.commit
+    run_plan = ReviewBatches.run_plan
+
+    def locale(self, changed=None):
+        # ~60 KB: 700 lines × ~85 bytes, over the 40 KB batch on its own
+        return ''.join(f'  "key_{i:03d}": "{changed if i == 350 and changed else "v1"} {"x" * 60}",\n'
+                       for i in range(700))
+
+    def test_one_line_change_to_file_over_batch_budget_is_reviewed_with_hunks(self):
+        self.write('en.json', self.locale())
+        self.base = self.commit()
+        self.write('en.json', self.locale('v2'))
+        result = self.run_plan()
+        item = result['files'][0]
+        self.assertEqual(item['status'], 'planned', item.get('reason'))
+        self.assertEqual(item['context_level'], 'hunks')
+        payload = (self.out / result['batches'][0]['payload']).read_text()
+        self.assertLessEqual(len(payload.encode()), 40000)
+        self.assertIn('HEAD HUNKS', payload)
+        self.assertIn('BEFORE HUNKS', payload)
+        self.assertIn('351:   "key_350": "v2', payload)   # changed line under its real HEAD number
+        self.assertIn('340:   "key_339"', payload)        # surrounding lines beyond the diff's own 3
+        self.assertNotIn('"key_010"', payload)            # far-away lines are not supplied
+        self.assertTrue(result['coverage_complete'])
+
+    def test_rewrite_of_file_over_batch_budget_is_explicit_when_diff_cannot_fit(self):
+        self.write('en.json', self.locale())
+        self.base = self.commit()
+        self.write('en.json', self.locale().replace('v1', 'v2'))
+        result = self.run_plan()
+        item = result['files'][0]
+        self.assertEqual(item['status'], 'unreviewed')
+        self.assertEqual(item['reason'], 'diff-exceeds-batch-budget')
+        self.assertFalse(result['coverage_complete'])
+
+    def test_runner_accepts_head_citation_inside_hunks_and_rejects_outside(self):
+        self.write('en.json', self.locale())
+        self.base = self.commit()
+        self.write('en.json', self.locale('v2'))
+        result = self.run_plan()
+        run = LargeFileTiers.run_runner
+        ok = {'path': 'en.json', 'side': 'HEAD', 'line': 351, 'severity': 'P2',
+              'description': '翻譯錯誤', 'evidence': '"key_350": "v2'}
+        status = run(self, result, ok)
+        self.assertEqual(status['successful_batches'], 1)
+        self.assertEqual(len(status['findings']), 1)
+        self.assertTrue(any('en.json' in x and 'hunks' in x for x in status['limitations']))
+        self.assertFalse(status['complete'])
+        outside = dict(ok, line=11, evidence='"key_010"')  # HEAD line 11 is not supplied
+        status = run(self, result, outside)
+        self.assertEqual(status['successful_batches'], 0)
+
 if __name__ == '__main__':
     unittest.main()

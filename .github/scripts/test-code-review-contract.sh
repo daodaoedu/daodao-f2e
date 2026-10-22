@@ -103,6 +103,31 @@ with tempfile.TemporaryDirectory() as fixture:
     assert 'Small review report.' in comment and f'<!-- daodao-ai-code-review-head:{head} -->' in comment
     assert original.read_text() == normal, "normal presentation overwrote original artifact"
 
+# #314: an incomplete review must not leave the check silently green; annotate counts, never paths.
+flag = step("Flag incomplete review on the check")
+assert 'if: always()' in flag, "incomplete-review annotation must run even after failures"
+match = re.search(r"python3 -I - <<'PY'\n(.*?)^          PY$", flag, re.M | re.S)
+assert match, "flag inline Python is missing"
+inline = '\n'.join(line[10:] if line.startswith('          ') else line for line in match.group(1).splitlines())
+with tempfile.TemporaryDirectory() as fixture:
+    root = Path(fixture)
+    output = root / 'review-output'
+    output.mkdir()
+    env = dict(os.environ, RUNNER_TEMP=str(root))
+    def annotate(status):
+        if status is not None:
+            (output / 'status.json').write_text(json.dumps(status))
+        result = subprocess.run([sys.executable, '-I', '-'], input=inline, env=env, capture_output=True, text=True)
+        assert result.returncode == 0, result.stderr
+        return result.stdout
+    assert annotate(None).startswith('::warning'), "missing status must be flagged"
+    out = annotate({'complete': False, 'limitations': ['部分脈絡（hunks）：en.json — x'],
+                    'unreviewed': [{'path': 'evil\n::error::x.json', 'reason': 'diff-exceeds-batch-budget'},
+                                   {'path': 'pnpm-lock.yaml', 'reason': 'generated-or-lockfile'}]})
+    assert out.startswith('::warning') and '1 個非產物檔案未審查' in out and '1 個檔案只審部分脈絡' in out, out
+    assert 'evil' not in out and out.count('\n') == 1, "untrusted paths must not reach workflow commands"
+    assert annotate({'complete': True}) == '', "complete review must not be flagged"
+
 PYCONTRACT
 # Historical examples remain prompt context; CI must not erase/downgrade
 # structured findings using the former textual Markdown row filter.

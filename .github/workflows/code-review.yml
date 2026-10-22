@@ -120,6 +120,26 @@ jobs:
           else
             printf '⚠️ Review 未完成：runtime 執行失敗，未產生 coverage report。\n' >> "$GITHUB_STEP_SUMMARY"
           fi
+      - name: Flag incomplete review on the check
+        if: always()
+        run: |
+          # Counts only: changed paths are untrusted and must not reach workflow commands.
+          python3 -I - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          path = Path(os.environ['RUNNER_TEMP']) / 'review-output' / 'status.json'
+          try:
+              status = json.loads(path.read_text())
+          except (OSError, ValueError):
+              status = {}
+          if status.get('complete') is not True:
+              unreviewed = status.get('unreviewed') or []
+              sources = [x for x in unreviewed if not str(x.get('reason', '') if isinstance(x, dict) else '').startswith('generated')]
+              partial = [x for x in status.get('limitations') or [] if str(x).startswith('部分脈絡')]
+              print('::warning title=AI review 未完成::'
+                    f'{len(sources)} 個非產物檔案未審查、{len(partial)} 個檔案只審部分脈絡；詳見 review 留言與 job summary')
+          PY
       - name: Post coverage-aware review snapshot
         if: always()
         env:
