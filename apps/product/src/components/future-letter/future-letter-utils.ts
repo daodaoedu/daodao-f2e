@@ -78,3 +78,49 @@ export function getDeliverAt(
 export function hasFutureLetterFormErrors(errors: IFutureLetterFormErrors): boolean {
   return Object.keys(errors).length > 0;
 }
+
+export type LetterDetailView = "sealed" | "unopened" | "opened";
+
+interface LetterDetailSource {
+  id: string;
+  status: string;
+  openedAt?: string | null;
+}
+
+/** Which detail block the footprints page shows for the selected letter. */
+export function getLetterDetailView(
+  letter: LetterDetailSource | null | undefined
+): LetterDetailView | null {
+  if (!letter) return null;
+  if (letter.status === "scheduled") return "sealed";
+  if (letter.status === "delivered") return letter.openedAt ? "opened" : "unopened";
+  return null;
+}
+
+interface FootprintTimelineLoadState {
+  isLoading: boolean;
+  hasError: boolean;
+  /** The timeline hook still has pages to auto-fetch. */
+  timelineHasMore: boolean;
+  /** The letters hook still has pages to auto-fetch. */
+  lettersHasMore: boolean;
+}
+
+/** True once every page of both lists has rendered, so the page height is final. */
+export function isFootprintTimelineSettled(state: FootprintTimelineLoadState): boolean {
+  return !state.isLoading && !state.hasError && !state.timelineHasMore && !state.lettersHasMore;
+}
+
+/**
+ * Changes whenever a different detail block is shown, so the page can bring it into view
+ * (the block renders after the whole timeline, far below the clicked card).
+ * Stays null until the timeline has rendered: scrolling earlier (e.g. a deep link where the
+ * letters load before the timeline) lands on a short page and is lost once the timeline appears.
+ */
+export function getLetterDetailScrollKey(
+  letter: LetterDetailSource | null | undefined,
+  isTimelineReady = true
+): string | null {
+  const view = getLetterDetailView(letter);
+  return isTimelineReady && letter && view ? `${letter.id}:${view}` : null;
+}
