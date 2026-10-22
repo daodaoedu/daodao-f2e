@@ -113,20 +113,60 @@ with tempfile.TemporaryDirectory() as fixture:
     root = Path(fixture)
     output = root / 'review-output'
     output.mkdir()
-    env = dict(os.environ, RUNNER_TEMP=str(root))
-    def annotate(status):
+    outputs = root / 'github-output'
+    def annotate(status, mode='warn'):
         if status is not None:
             (output / 'status.json').write_text(json.dumps(status))
+        outputs.write_text('')
+        env = dict(os.environ, RUNNER_TEMP=str(root), GITHUB_OUTPUT=str(outputs), MODE=mode)
         result = subprocess.run([sys.executable, '-I', '-'], input=inline, env=env, capture_output=True, text=True)
-        assert result.returncode == 0, result.stderr
-        return result.stdout
-    assert annotate(None).startswith('::warning'), "missing status must be flagged"
-    out = annotate({'complete': False, 'limitations': ['部分脈絡（hunks）：en.json — x'],
-                    'unreviewed': [{'path': 'evil\n::error::x.json', 'reason': 'diff-exceeds-batch-budget'},
-                                   {'path': 'pnpm-lock.yaml', 'reason': 'generated-or-lockfile'}]})
-    assert out.startswith('::warning') and '1 個非產物檔案未審查' in out and '1 個檔案只審部分脈絡' in out, out
+        assert result.returncode in (0, 1), result.stderr
+        return result.returncode, result.stdout, outputs.read_text()
+    # f2e#1091/#1092: models unreachable, 0 files reviewed, yet the check was green.
+    code, out, _ = annotate(None)
+    assert code == 1 and out.startswith('::error'), "missing status means nothing was reviewed: fail the check"
+    # A file that can never fit (budget) is not a model failure: re-running cannot fix it.
+    budget_only = {'complete': False, 'reviewed_paths': [], 'limitations': [], 'planned_batches': 0,
+                   'unreviewed': [{'path': 'big.sql', 'reason': 'diff-exceeds-batch-budget'}]}
+    code, out, gh_out = annotate(budget_only)
+    assert code == 0 and out.startswith('::warning') and 'state=partial' in gh_out, (out, gh_out)
+    code, out, gh_out = annotate({'complete': False, 'reason': 'trusted_runtime_missing'})
+    assert code == 0 and 'state=partial' in gh_out, (out, gh_out)
+    nothing = {'complete': False, 'reviewed_paths': [], 'limitations': [], 'planned_batches': 1,
+               'unreviewed': [{'path': 'a.ts', 'reason': '@cf/x: transport_failed (HTTP 429)'}]}
+    for mode in ('warn', 'block'):
+        code, out, _ = annotate(nothing, mode)
+        assert code == 1 and out.startswith('::error') and '0 個檔案被審查' in out, (mode, out)
+    partial = {'complete': False, 'reviewed_paths': ['ok.ts'], 'limitations': ['部分脈絡（hunks）：en.json — x'],
+               'unreviewed': [{'path': 'evil\n::error::x.json', 'reason': 'diff-exceeds-batch-budget'},
+                              {'path': 'pnpm-lock.yaml', 'reason': 'generated-or-lockfile'}]}
+    code, out, gh_out = annotate(partial)
+    assert code == 0 and out.startswith('::warning') and '1 個非產物檔案未審查' in out and '1 個檔案只審部分脈絡' in out, out
     assert 'evil' not in out and out.count('\n') == 1, "untrusted paths must not reach workflow commands"
-    assert annotate({'complete': True}) == '', "complete review must not be flagged"
+    assert 'state=partial' in gh_out and 'unreviewed=1' in gh_out and 'partial=1' in gh_out, gh_out
+    code, out, _ = annotate(partial, 'block')
+    assert code == 1, "block mode must fail a review that left source files unreviewed"
+    code, out, gh_out = annotate({'complete': True, 'reviewed_paths': ['a.ts'], 'unreviewed': [], 'limitations': []})
+    assert (code, out) == (0, '') and 'state=complete' in gh_out, "complete review must not be flagged"
+    # f2e repos have no REVIEW.md: a policy limitation alone is not a coverage gap.
+    code, out, _ = annotate({'complete': False, 'reviewed_paths': ['a.ts'], 'unreviewed': [],
+                             'limitations': ['Trusted review policy unavailable; policy conformance unverified']})
+    assert (code, out) == (0, ''), out
+    # Only lockfiles changed: nothing reviewable, nothing to flag.
+    code, out, _ = annotate({'complete': False, 'reviewed_paths': [], 'limitations': [],
+                             'unreviewed': [{'path': 'pnpm-lock.yaml', 'reason': 'generated-or-lockfile'}]})
+    assert (code, out) == (0, ''), out
+neutral = step("Publish review coverage check")
+assert "steps.coverage.outputs.state == 'partial'" in neutral, "partial coverage must surface as a non-green check"
+# A later full re-run of the same head must replace an earlier neutral result with success.
+assert "steps.coverage.outputs.state == 'complete'" in neutral and 'conclusion=success' in neutral, neutral
+assert 'conclusion=neutral' in neutral and 'check-runs' in neutral, neutral
+assert re.search(r'^      checks: write$', workflow, re.M), "creating the coverage check run needs checks: write"
+assert "vars.AI_REVIEW_COVERAGE_MODE || 'warn'" in flag, "coverage gate mode must default to warn"
+order = [workflow.index('      - name: ' + name) for name in (
+    'Post coverage-aware review snapshot', 'Flag incomplete review on the check',
+    'Publish review coverage check')]
+assert order == sorted(order), "the review comment must be posted before the coverage gate can fail the job"
 
 PYCONTRACT
 # Historical examples remain prompt context; CI must not erase/downgrade

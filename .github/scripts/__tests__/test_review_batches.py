@@ -382,5 +382,61 @@ class OversizedFileHunks(unittest.TestCase):
         status = run(self, result, outside)
         self.assertEqual(status['successful_batches'], 0)
 
+
+class BatchCountCoverage(unittest.TestCase):
+    """#314 後續：檔案多的 PR（f2e#1087 47 檔）不能因批次數用完就丟掉後面三分之二的檔案。"""
+
+    setUp = ReviewBatches.setUp
+    git = ReviewBatches.git
+    write = ReviewBatches.write
+    commit = ReviewBatches.commit
+    run_plan = ReviewBatches.run_plan
+
+    def mid_file(self, marker):
+        # ~14 KB: complete unit (BEFORE + HEAD) ≈ 30 KB, so only one fits a 40 KB batch;
+        # before-hunks ≈ 16 KB, so two fit.
+        return ''.join(f'line_{i:03d} = "{marker}" + "{"x" * 60}"\n' for i in range(160))
+
+    def test_many_mid_size_edits_downgrade_before_running_out_of_batches(self):
+        for i in range(10):
+            self.write(f'src/file_{i}.py', self.mid_file('v1'))
+        self.base = self.commit()
+        for i in range(10):
+            self.write(f'src/file_{i}.py', self.mid_file('v1') + 'added_line = True\n')
+        result = self.run_plan(max_batches=5)
+        unreviewed = [(f['path'], f.get('reason')) for f in result['files'] if f['status'] != 'planned']
+        self.assertEqual(unreviewed, [])
+        self.assertLessEqual(len(result['batches']), 5)
+        self.assertTrue(all(b['bytes'] <= 40000 for b in result['batches']))
+        self.assertIn('before-hunks', {f['context_level'] for f in result['files']})
+        self.assertTrue(result['coverage_complete'])
+
+    def test_batches_are_packed_by_size_not_diff_order(self):
+        # Diff order a,b,c,d with units ≈ 24/19/15/19 KB needs 3 sequential batches but fits 2.
+        for name, lines in (('a.txt', 187), ('b.txt', 148), ('c.txt', 117), ('d.txt', 148)):
+            self.write(name, ''.join(f'{name}-{i:04d}-{"x" * 50}\n' for i in range(lines)))
+        result = self.run_plan(max_batches=2)
+        self.assertEqual([f['status'] for f in result['files']], ['planned'] * 4,
+                         [(f['path'], f.get('reason'), f.get('required_bytes')) for f in result['files']])
+        self.assertEqual(len(result['batches']), 2)
+        self.assertEqual({f['context_level'] for f in result['files']}, {'complete'})
+        self.assertTrue(all(b['bytes'] <= 40000 for b in result['batches']))
+
+    def test_runner_accepts_reordered_packed_batches(self):
+        for name, lines in (('a.txt', 187), ('b.txt', 148), ('c.txt', 117), ('d.txt', 148)):
+            self.write(name, ''.join(f'{name}-{i:04d}-{"x" * 50}\n' for i in range(lines)))
+        result = self.run_plan(max_batches=2)
+        manifest = self.out / 'manifest.json'
+        spec = importlib.util.spec_from_file_location('runner_pack', Path(__file__).resolve().parents[1] / 'run-review-batches.py')
+        runner = importlib.util.module_from_spec(spec); spec.loader.exec_module(runner)
+        def call(model, request):
+            batch = json.loads(json.loads(request)['messages'][1]['content'])['batch']
+            return {'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(
+                {'batch_id': batch['batch_id'], 'reviewed_paths': batch['paths'], 'findings': [], 'limitations': []})}}]}
+        status = runner.run(manifest, self.root / 'review-out', policy='p', context='c', caller=call)
+        self.assertEqual(status['reviewed_paths'], ['a.txt', 'b.txt', 'c.txt', 'd.txt'])
+        self.assertTrue(status['complete'])
+
+
 if __name__ == '__main__':
     unittest.main()
