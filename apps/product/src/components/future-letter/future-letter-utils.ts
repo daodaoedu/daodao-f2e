@@ -97,6 +97,20 @@ export function getLetterDetailView(
   return null;
 }
 
+interface FootprintTimelineLoadState {
+  isLoading: boolean;
+  hasError: boolean;
+  /** The timeline hook still has pages to auto-fetch. */
+  timelineHasMore: boolean;
+  /** The letters hook still has pages to auto-fetch. */
+  lettersHasMore: boolean;
+}
+
+/** True once every page of both lists has rendered, so the page height is final. */
+export function isFootprintTimelineSettled(state: FootprintTimelineLoadState): boolean {
+  return !state.isLoading && !state.hasError && !state.timelineHasMore && !state.lettersHasMore;
+}
+
 /**
  * Changes whenever a different detail block is shown, so the page can bring it into view
  * (the block renders after the whole timeline, far below the clicked card).

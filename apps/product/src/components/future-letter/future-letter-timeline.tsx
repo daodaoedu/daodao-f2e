@@ -15,7 +15,11 @@ import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { format, parseISO } from "date-fns";
 import { Mail, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getLetterDetailScrollKey, getLetterDetailView } from "./future-letter-utils";
+import {
+  getLetterDetailScrollKey,
+  getLetterDetailView,
+  isFootprintTimelineSettled,
+} from "./future-letter-utils";
 import { LetterDetailCard } from "./letter-detail-card";
 import { buildFootprintTimeline } from "./timeline-model";
 import { VerticalTimeline } from "./vertical-timeline";
@@ -67,7 +71,15 @@ export function FutureLetterTimeline({
   const detailView = getLetterDetailView(selectedLetter);
   const isLoading = timelineQuery.isLoading || lettersQuery.isLoading;
   const hasError = Boolean(timelineQuery.error || lettersQuery.error);
-  const detailScrollKey = getLetterDetailScrollKey(selectedLetter, !isLoading && !hasError);
+  const detailScrollKey = getLetterDetailScrollKey(
+    selectedLetter,
+    isFootprintTimelineSettled({
+      isLoading,
+      hasError,
+      timelineHasMore: Boolean(timelineQuery.data?.at(-1)?.pagination.hasMore),
+      lettersHasMore: Boolean(lettersQuery.data?.at(-1)?.pagination.hasNext),
+    })
+  );
   const detailRef = useRef<HTMLDivElement>(null);
 
   // The detail block renders after the whole timeline, so bring it into view whenever a

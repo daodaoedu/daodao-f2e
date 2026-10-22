@@ -1,5 +1,31 @@
 import { describe, expect, it } from "vitest";
-import { getLetterDetailScrollKey, getLetterDetailView } from "../future-letter-utils";
+import {
+  getLetterDetailScrollKey,
+  getLetterDetailView,
+  isFootprintTimelineSettled,
+} from "../future-letter-utils";
+
+describe("footprint timeline settled", () => {
+  const settled = {
+    isLoading: false,
+    hasError: false,
+    timelineHasMore: false,
+    lettersHasMore: false,
+  };
+
+  it("is settled only after both lists finished loading every page", () => {
+    expect(isFootprintTimelineSettled(settled)).toBe(true);
+    expect(isFootprintTimelineSettled({ ...settled, isLoading: true })).toBe(false);
+    expect(isFootprintTimelineSettled({ ...settled, hasError: true })).toBe(false);
+  });
+
+  // More than 100 entries: later pages load automatically and push the detail block further
+  // down, so scrolling before they arrive leaves the detail outside the viewport.
+  it("is not settled while more timeline or letter pages are still being fetched", () => {
+    expect(isFootprintTimelineSettled({ ...settled, timelineHasMore: true })).toBe(false);
+    expect(isFootprintTimelineSettled({ ...settled, lettersHasMore: true })).toBe(false);
+  });
+});
 
 describe("future letter detail view", () => {
   it("returns no detail when nothing is selected or the letter is still a draft", () => {
