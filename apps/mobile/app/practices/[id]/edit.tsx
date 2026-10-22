@@ -47,6 +47,7 @@ const frequencyOptions: Array<{
 
 const durationOptions = [7, 14, 21, 30, 60, 90, 100, 365];
 const sessionDurationOptions = [15, 30, 45, 60];
+const MAX_EDIT_TAGS = 5;
 
 function readNumber(record: Record<string, unknown>, key: string, fallback: number) {
   const value = record[key];
@@ -153,7 +154,7 @@ export default function PracticeEditScreen() {
         .split(",")
         .map((tag) => tag.trim())
         .filter(Boolean)
-        .slice(0, 5);
+        .slice(0, MAX_EDIT_TAGS);
 
       await api.put(
         `/practices/${id}`,
@@ -372,7 +373,7 @@ export default function PracticeEditScreen() {
               gap="$3"
             >
               <Text fontSize={14} fontWeight="500" color="$color">
-                {t("mobile_tags_limit_label")}
+                {t("mobile_tags_limit_label", { max: MAX_EDIT_TAGS })}
               </Text>
               <Input
                 value={tagsText}
