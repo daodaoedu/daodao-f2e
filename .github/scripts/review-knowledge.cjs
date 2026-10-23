@@ -5,16 +5,23 @@
  * 單一來源：daodao monorepo 的 .github/review-knowledge/false-positives.jsonl
  * （sync-claude-config 會把本腳本與 jsonl 一起同步到各 sub-repo，供 CI 從 base ref 讀取）。
  * 兩個消費者共用同一份資料與同一套規則：
- *   - CI  code-review.yml  → prompt-block 進模型輸入、filter 在 strict validator 之前
- *   - 本機 code-review skill → prompt-block 進 review-input.md、filter 套在各引擎的表格輸出、record 寫回
+ *   - CI  code-review.yml  → prompt-block 進模型輸入；verify --findings 在 run-review-batches
+ *                            （含 strict 來源驗證）之後標註 absent-claim，不刪除 finding（#363 不再跑 filter）
+ *   - 本機 code-review skill → prompt-block 進 review-input.md、filter → verify 套在各引擎的表格輸出、record 寫回
  *
  * 子命令：
  *   prompt-block [--db FILE]                 依樣態彙整「已知誤判」段落（給模型看，短）
  *   filter [--db FILE] [--report FILE]       stdin=review body → stdout=過濾後 body；report 寫 JSON
+ *   verify --repo-root DIR [--rev REV] [--report FILE]
+ *                                            stdin=review body（filter 之後）→ 「找不到／缺少 X」而 X 在
+ *                                            head tree 查得到反證的列移出表格；report 記 verified-absent-claim
+ *   verify --repo-root DIR --rev SHA --findings status.json [--report FILE] [--note FILE]
+ *                                            CI structured findings：只標註不刪除，note 是附在 review body 的 Markdown
  *   record --pattern A-F --source ci|local --engine X --repo R --pr N --finding "…" --why "…" \
  *          [--file path:line] [--severity High|Medium|Low] [--evidence "…"] [--action drop|downgrade|context|repair|none] \
  *          [--sample "| 🔴 High | `p:1` | … | … |"] [--expected keep|drop|downgrade] [--db FILE|auto]
- *   test [--db FILE]                         每筆帶 sample+expected 的紀錄都當 fixture 跑一次 filter
+ *   test [--db FILE]                         每筆帶 sample+expected 的紀錄都當 fixture 跑一次 filter；
+ *                                            expected=verify-drop 另用紀錄的 verify_tree 建暫存 repo 跑 verify
  *
  * 樣態（pattern）：
  *   A absent-claim   對 diff 外的程式碼做否定斷言（找不到／缺少／未實作 X，而 X 在 head tree 存在）
@@ -135,6 +142,235 @@ function filterBody(body, db) {
   return { body: result, report };
 }
 
+// ---- verify（A 類 absent-claim 後置查證，daodao#169）----
+// finding 斷言「找不到／缺少／未實作 X」時，到 PR head tree 用 git grep 查 X；
+// 查到「足以反駁」的位置才算 verified-absent-claim。
+//   存在型斷言（找不到／未定義／not found）：只認 X 的定義處
+//   檢查型斷言（缺少驗證／沒有檢查／missing）：先判缺的是權限／身份驗證／輸入驗證哪一類（分不出就不查），
+//     route 檔要求同一個註冊敘述掛了「同一類」middleware；輸入驗證另認 validator／schema 程式檔的欄位定義
+// 敘述點名的識別字在 tree 裡完全不存在、沒查到、或識別字太短太泛，就原樣保留：寧可漏殺，不可把真的缺漏藏掉。
+const ABSENT_EXIST_RE = /找不到|找不着|未定義|未定义|未實作|未实现|未實現|不存在|沒有定義|没有定义|not found|not defined|is undefined|does not exist|doesn'?t exist|no such|not implemented|never defined/i;
+const ABSENT_CHECK_RE = /缺少|缺乏|欠缺|沒有檢查|没有检查|未檢查|未检查|沒有驗證|没有验证|未驗證|未验证|未做(?:驗證|检查|檢查)|missing|lacks?\b|without (?:any )?(?:check|validation|auth)|no (?:\w+ ){0,3}(?:check|validation|guard|middleware|auth\w*)|never (?:checks|validates)|does not (?:check|validate)|doesn'?t (?:check|validate)/i;
+const ROUTE_PATH_RE = /(route|router)/i;
+const ROUTE_START_RE = /[A-Za-z_$][\w$]*\.(?:get|post|put|patch|delete|all|use|route)\(/;
+const GENERIC_IDENTS = new Set([
+  "data", "error", "errors", "user", "users", "value", "values", "result", "results", "response", "request",
+  "string", "number", "boolean", "object", "array", "null", "undefined", "true", "false", "this", "self",
+  "req", "res", "next", "body", "query", "params", "item", "items", "list", "name", "type", "status", "message",
+  "config", "options", "props", "state", "event", "context", "input", "output", "file", "path", "line",
+  "Number", "String", "Boolean", "Object", "Array", "Promise", "Error", "JSON", "Math", "Date", "console",
+  "async", "await", "return", "const", "function", "class", "import", "export", "default",
+]);
+const GREP_EXCLUDES = [
+  ":(exclude,glob)**/node_modules/**", ":(exclude,glob)**/dist/**", ":(exclude,glob)**/generated/**",
+  ":(exclude,glob)**/__tests__/**", ":(exclude,glob)**/tests/**", ":(exclude,glob)**/*.test.*", ":(exclude,glob)**/*.spec.*",
+  ":(exclude,glob)**/*.lock", ":(exclude,glob)**/pnpm-lock.yaml", ":(exclude,glob)**/package-lock.json",
+  ":(exclude,glob)**/openapi.*", ":(exclude,glob)**/*.min.*", ":(exclude,glob)**/*.map",
+];
+const MAX_IDENTS = 6;
+
+function absentClaimKind(text) {
+  if (ABSENT_EXIST_RE.test(text)) return "exist";
+  if (ABSENT_CHECK_RE.test(text)) return "check";
+  return null;
+}
+
+// 從問題敘述抽出要查的識別字：反引號 token、member path（req.query.organizationId）、
+// camelCase／PascalCase（中間有大寫）、snake_case。member path 另外查最後一段。
+function extractIdentifiers(text) {
+  const found = [];
+  const add = (token) => {
+    const t = String(token || "").replace(/\(\)$/, "");
+    if (t.length < 4 || GENERIC_IDENTS.has(t) || found.includes(t)) return;
+    if (!/^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*$/.test(t)) return;
+    found.push(t);
+  };
+  const addPath = (p) => {
+    const parts = p.split(".");
+    // req.user／res.locals／this.x 到處都有，查到也證明不了什麼；只查最後一段（太泛的會再被濾掉）
+    if (parts.length === 1 || !/^(req|res|ctx|request|response|this|self|context)$/.test(parts[0])) add(p);
+    if (parts.length > 1) add(parts[parts.length - 1]);
+  };
+  for (const m of text.matchAll(/`([^`\n]{1,80})`/g)) {
+    const inner = m[1].trim();
+    if (/^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*(?:\(\))?$/.test(inner)) addPath(inner.replace(/\(\)$/, ""));
+  }
+  for (const m of text.matchAll(/\b[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)+\b/g)) {
+    if (/\.(?:ts|tsx|js|jsx|mjs|cjs|py|json|sql|md|yml|yaml)$/i.test(m[0])) continue; // 檔名不是識別字
+    addPath(m[0]);
+  }
+  for (const m of text.matchAll(/\b(?:[a-z][a-z0-9]*[A-Z]|[A-Z][a-z0-9]+[A-Z])[A-Za-z0-9]*\b/g)) add(m[0]);
+  for (const m of text.matchAll(/\b[a-z][a-z0-9]*_[a-z0-9_]+\b/g)) add(m[0]);
+  return found.slice(0, MAX_IDENTS);
+}
+
+function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+function makeGrep(repoRoot, rev) {
+  const { execFileSync } = require("child_process");
+  const fileCache = new Map();
+  const show = (p) => {
+    if (!fileCache.has(p)) {
+      let text = "";
+      try { text = execFileSync("git", ["-C", repoRoot, "show", `${rev}:${p}`], { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 }); } catch { text = ""; }
+      fileCache.set(p, text.split("\n"));
+    }
+    return fileCache.get(p);
+  };
+  const grep = (ident) => {
+    let out = "";
+    try {
+      out = execFileSync("git", ["-C", repoRoot, "grep", "-n", "-I", "-w", "-F", "-e", ident, rev, "--", ".", ...GREP_EXCLUDES],
+        { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 });
+    } catch (e) {
+      if (e.status === 1) return []; // 沒命中
+      throw new Error(`git grep 失敗（${repoRoot} @ ${rev}）：${String(e.stderr || e.message).trim()}`);
+    }
+    const prefix = `${rev}:`;
+    return out.split("\n").filter(Boolean).map((l) => {
+      const rest = l.startsWith(prefix) ? l.slice(prefix.length) : l;
+      const m = rest.match(/^(.*?):(\d+):(.*)$/);
+      return m ? { path: m[1], line: Number(m[2]), text: m[3] } : null;
+    }).filter(Boolean);
+  };
+  return { grep, show };
+}
+
+// 檢查型斷言說缺的是哪一類檢查；分不出來就不查（不能拿 authenticate 反駁「缺少擁有者檢查」）
+//   順序有意義：「身份驗證」含「驗證」，權限類要先判，因為 authenticate 證明不了擁有者／角色檢查
+const CHECK_CATEGORIES = [
+  ["permission", /權限|权限|擁有者|拥有者|所有者|owner|role|admin|permission|授權|授权|authoriz|越權|越权|IDOR/i,
+    /require[A-Z]\w*|authoriz\w*|permission\w*|guard\w*|checkRole|isAdmin|\w*Owner\w*/],
+  ["auth", /身份驗證|身分驗證|身份验证|登入|登录|未登入|authenticat|req\.user|login|token|session/i,
+    /authenticat\w*|requireAuth\w*|optionalAuth\w*/],
+  ["validation", /驗證|验证|校驗|校验|validat|NaN|格式|schema|sanitiz|型別|类型/i, /validate\w*/],
+];
+const DEF_KEYWORD_RE = (id) => new RegExp(`(?:function|class|interface|type|enum|const|let|var|def)\\s+${id}\\b|^\\s*(?:export\\s+)?(?:(?:public|private|protected|static|readonly|async)\\s+)*${id}\\s*(?:=|\\()`);
+const SCHEMA_FILE_RE = /(validat|schema)[^/]*\.(?:[cm]?[jt]sx?|py)$|\/(?:validators?|schemas?)\/[^/]+\.(?:[cm]?[jt]sx?|py)$/i;
+
+function checkCategory(text) {
+  for (const [name, re, token] of CHECK_CATEGORIES) if (re.test(text)) return { name, token };
+  return null;
+}
+
+// 該命中能不能反駁這個斷言
+function refutes(hit, ident, claim, show) {
+  const tail = escapeRe(ident.split(".").pop());
+  if (claim.kind === "exist") {
+    // 存在型：只認定義處；route／middleware 裡「用到」名字正是被質疑的那件事，不算反證
+    return DEF_KEYWORD_RE(tail).test(hit.text);
+  }
+  if (!claim.category) return false;
+  if (ROUTE_PATH_RE.test(hit.path) && /\.(?:[cm]?[jt]sx?|py)$/.test(hit.path)) {
+    // route 檔：同一個註冊敘述（命中那行往上找到 router.<method>( 為止）要掛了「同一類」middleware
+    const lines = show(hit.path);
+    let start = hit.line;
+    for (let i = hit.line; i >= Math.max(1, hit.line - 10); i--) {
+      if (ROUTE_START_RE.test(lines[i - 1] || "")) { start = i; break; }
+    }
+    const stmt = lines.slice(start - 1, hit.line).join("\n");
+    return claim.category.token.test(stmt);
+  }
+  // validator／schema 程式檔：只反駁「缺少驗證」，且命中行要是該欄位的 schema 定義（key: …）
+  if (claim.category.name === "validation" && SCHEMA_FILE_RE.test(hit.path)) {
+    return new RegExp(`(?:^|[\\s{,'"])${tail}['"]?\\??\\s*:`).test(hit.text);
+  }
+  return false;
+}
+
+function verifyText(text, verifier) {
+  const kind = absentClaimKind(text);
+  if (!kind) return null;
+  const claim = { kind, category: kind === "check" ? checkCategory(text) : null };
+  if (kind === "check" && !claim.category) return null;
+  const evidence = [];
+  for (const ident of extractIdentifiers(text)) {
+    const all = verifier.grep(ident);
+    // 敘述點名的識別字在 tree 裡完全不存在（例：缺少 `requireCohortOwner`）→ 斷言很可能為真，整列保留
+    if (!all.length) return null;
+    // validator／schema 的命中最直接，排在 route 與定義處前面
+    const rank = (h) => (SCHEMA_FILE_RE.test(h.path) ? 0 : ROUTE_PATH_RE.test(h.path) ? 1 : 2);
+    const hits = all.filter((h) => refutes(h, ident, claim, verifier.show))
+      .sort((a, b) => rank(a) - rank(b) || a.path.localeCompare(b.path) || a.line - b.line);
+    if (hits.length) evidence.push({ identifier: ident, hits: hits.slice(0, 3).map((h) => `${h.path}:${h.line}`) });
+  }
+  return evidence.length ? { kind, category: claim.category && claim.category.name, evidence } : null;
+}
+
+// 表格模式（本機 skill 步驟 6.5，接在 filter 之後）：查證成功的列移出表格，記進 report
+function verifyBody(body, verifier) {
+  const lines = body.split("\n");
+  const report = { rule: "verified-absent-claim", dropped: [], kept: 0, checked: 0 };
+  let inTable = false;
+  let mode = null;
+  const out = [];
+  for (const line of lines) {
+    if (ZH_HEADER_RE.test(line)) { inTable = true; mode = "zh"; out.push(line); continue; }
+    if (EN_HEADER_RE.test(line)) { inTable = true; mode = "en"; out.push(line); continue; }
+    if (inTable && !line.startsWith("|")) inTable = false;
+    const cells = inTable ? splitRow(line) : null;
+    if (!cells) { out.push(line); continue; }
+    const severity = cells[1].trim();
+    if (!SEVERITY_RE.test(severity)) { out.push(line); continue; }
+    const issue = cells[3];
+    const verdict = absentClaimKind(issue) ? verifyText(issue, verifier) : null;
+    if (absentClaimKind(issue)) report.checked++;
+    if (verdict) {
+      report.dropped.push({ pattern: "A", rule: "verified-absent-claim", file: cells[2].trim(), severity, issue: issue.trim().slice(0, 160), ...verdict });
+      continue;
+    }
+    report.kept++;
+    out.push(line);
+  }
+  // 全部被移除時不改寫成「沒有發現問題」：被移除的列是「查到反證」，不是「沒問題」的證據
+  if (report.dropped.length) {
+    const note = mode === "en"
+      ? `> ${report.dropped.length} finding(s) removed by review-knowledge verify (verified-absent-claim); see the verify report.`
+      : `> ${report.dropped.length} 列 finding 經 review-knowledge verify 在 head tree 查到反證（verified-absent-claim），已移出表格，明細見 verify report。`;
+    out.push("", note);
+  }
+  return { body: out.join("\n"), report };
+}
+
+// structured 模式（CI，run-review-batches 的 status.json）：只標註、不刪除——
+// #363 決定 CI 不得依文字樣態自動隱藏 finding（docs/automation/complete-ci-review.md）
+function verifyFindings(status, verifier) {
+  const report = { rule: "verified-absent-claim", mode: "annotate", annotated: [], checked: 0 };
+  const findings = [...(Array.isArray(status.findings) ? status.findings : []), ...(Array.isArray(status.carried_findings) ? status.carried_findings : [])];
+  for (const f of findings) {
+    const text = String(f && f.description || "");
+    if (!absentClaimKind(text)) continue;
+    report.checked++;
+    const verdict = verifyText(text, verifier);
+    if (verdict) report.annotated.push({ pattern: "A", rule: "verified-absent-claim", file: `${f.path}:${f.line}`, severity: f.severity, issue: text.slice(0, 160), ...verdict });
+  }
+  return report;
+}
+
+function plain(value, max = 120) {
+  // 只用於 Markdown code span 與 job log：去掉反引號、換行與 workflow command 標記
+  return String(value).replace(/[`\r\n]/g, " ").replace(/::/g, ": :").slice(0, max);
+}
+
+function verifyNote(report) {
+  if (!report.annotated.length) return "";
+  const lines = ["", "### 已在 head tree 查到反證的「缺少／找不到」finding（verify 標註，未刪除）", "",
+    "下列 finding 斷言缺少或找不到的識別字，在 PR head 的 route／middleware／schema 或定義處查得到。採納前先對照這些位置；這是 grep 證據，不代表 finding 一定錯。", ""];
+  for (const a of report.annotated) {
+    const ev = a.evidence.map((e) => `\`${plain(e.identifier, 60)}\` → ${e.hits.map((h) => `\`${plain(h)}\``).join("、")}`).join("；");
+    lines.push(`- \`${plain(a.file)}\`（${plain(a.severity, 8)}）：${ev}`);
+  }
+  return lines.join("\n") + "\n";
+}
+
+function logReport(items) {
+  for (const a of items) {
+    for (const e of a.evidence) {
+      process.stderr.write(`verified-absent-claim ${plain(a.file)} ${plain(e.identifier, 60)} -> ${e.hits.map((h) => plain(h)).join(", ")}\n`);
+    }
+  }
+}
+
 // ---- prompt-block ----
 function promptBlock(db) {
   if (!db.length) return "";
@@ -205,18 +441,83 @@ function runTests(db) {
     process.exit(1);
   }
   let n = 0;
+  let nVerify = 0;
+  const wrap = (sample) => {
+    const header = /^\|\s*(🔴|🟡|🟢)?\s*(High|Medium|Low)/.test(sample) ? "| 嚴重度 | 檔案 | 問題 | 建議 |\n|---|---|---|---|\n" : "";
+    return `## Code Review\n\n### 問題\n\n${header}${sample}\n\n### 總結\n\nx`;
+  };
   for (const r of db) {
     if (!r.sample || !r.expected) continue;
     n++;
-    const header = /^\|\s*(🔴|🟡|🟢)?\s*(High|Medium|Low)/.test(r.sample) ? "| 嚴重度 | 檔案 | 問題 | 建議 |\n|---|---|---|---|\n" : "";
-    const { body, report } = filterBody(`## Code Review\n\n### 問題\n\n${header}${r.sample}\n\n### 總結\n\nx`, db);
+    const { body, report } = filterBody(wrap(r.sample), db);
     const got = report.dropped.length ? "drop" : report.downgraded.length ? "downgrade" : "keep";
-    if (got !== r.expected) {
-      console.error(`❌ ${r.id} 期望 ${r.expected}，實際 ${got}\n${body}`);
+    // verify-drop：filter 不動它（keep），接著 verify 要在 verify_tree 查到反證而移除
+    const expectedFilter = r.expected === "verify-drop" ? "keep" : r.expected;
+    if (got !== expectedFilter) {
+      console.error(`❌ ${r.id} 期望 ${r.expected}，filter 實際 ${got}\n${body}`);
+      process.exit(1);
+    }
+    if (r.expected !== "verify-drop") continue;
+    nVerify++;
+    const dropped = runVerifyFixture(r.verify_tree, body);
+    if (!dropped) {
+      console.error(`❌ ${r.id} 期望 verify-drop，verify 沒有在 verify_tree 查到反證`);
       process.exit(1);
     }
   }
-  console.log(`✅ review-knowledge: ${n} 筆 fixture 通過（共 ${db.length} 筆紀錄）`);
+  // 反例：真正缺少的東西不得被 verify 移除（識別字在 tree 裡不存在／只出現在非 route、schema 的檔案）
+  for (const c of VERIFY_KEEP_FIXTURES) {
+    nVerify++;
+    if (runVerifyFixture(c.tree, wrap(c.sample))) {
+      console.error(`❌ verify 反例「${c.name}」被移除了：真正缺少的東西不能 drop`);
+      process.exit(1);
+    }
+  }
+  console.log(`✅ review-knowledge: ${n} 筆 fixture 通過（verify ${nVerify} 筆，共 ${db.length} 筆紀錄）`);
+}
+
+// verify 反例：兩筆都必須 keep
+const VERIFY_KEEP_FIXTURES = [
+  {
+    name: "缺少的 middleware 在 tree 裡不存在",
+    sample: "| 🔴 High | `src/controllers/cohort.controller.ts:10` | deleteCohort 缺少 `requireCohortOwner` 檢查，任何人都能刪 | 加上 requireCohortOwner |",
+    tree: {
+      "src/routes/cohort.routes.ts": "router.delete('/:id',\n  authenticate,\n  cohortController.removeMember as RequestHandler);\n",
+      "src/controllers/cohort.controller.ts": "export class CohortController {\n  deleteCohort = asyncHandler(async () => {});\n}\n",
+    },
+  },
+  {
+    name: "handler 的 route 沒掛任何 middleware",
+    sample: "| 🔴 High | `src/controllers/report.controller.ts:3` | exportReports 缺少身份驗證 | 加上 authenticate |",
+    tree: {
+      "src/routes/report.routes.ts": "router.get('/export',\n  reportController.exportReports as RequestHandler);\n",
+      "src/controllers/report.controller.ts": "export class ReportController {\n  exportReports = asyncHandler(async () => {});\n}\n",
+    },
+  },
+];
+
+// 把 {path: content} 建成暫存 git repo，對 body 跑 verify，回傳是否有列被移除
+function runVerifyFixture(tree, body) {
+  const os = require("os");
+  const { execFileSync } = require("child_process");
+  if (!tree || typeof tree !== "object") throw new Error("verify-drop 的紀錄需要 verify_tree（{path: content}）");
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "review-verify-"));
+  try {
+    for (const [p, content] of Object.entries(tree)) {
+      const target = path.join(dir, p);
+      if (!target.startsWith(dir + path.sep)) throw new Error(`verify_tree 路徑越界：${p}`);
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.writeFileSync(target, content);
+    }
+    const git = (...args) => execFileSync("git", ["-C", dir, ...args], { stdio: "pipe" });
+    git("init", "-q");
+    git("add", "-A");
+    git("-c", "user.name=fixture", "-c", "user.email=fixture@example.com", "commit", "-qm", "fixture");
+    const { report } = verifyBody(body, makeGrep(dir, "HEAD"));
+    return report.dropped.length > 0;
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 function main() {
@@ -234,10 +535,30 @@ function main() {
       process.stdout.write(filtered);
       return;
     }
+    case "verify": {
+      if (!opt["repo-root"] || opt["repo-root"] === true) throw new Error("verify 需要 --repo-root（PR head 的 git checkout）");
+      const verifier = makeGrep(opt["repo-root"], typeof opt.rev === "string" ? opt.rev : "HEAD");
+      if (opt.findings) {
+        // CI：讀 status.json，只標註不刪除；--note 寫要附在 review body 後面的 Markdown
+        const status = JSON.parse(fs.readFileSync(opt.findings, "utf8"));
+        const report = verifyFindings(status, verifier);
+        if (opt.report) fs.writeFileSync(opt.report, JSON.stringify(report, null, 2));
+        if (opt.note) fs.writeFileSync(opt.note, verifyNote(report));
+        logReport(report.annotated);
+        process.stdout.write(`verified-absent-claim: ${report.annotated.length} 筆（檢查 ${report.checked} 筆「缺少／找不到」finding，只標註不刪除）\n`);
+        return;
+      }
+      const body = fs.readFileSync(0, "utf8");
+      const { body: out, report } = verifyBody(body, verifier);
+      if (opt.report) fs.writeFileSync(opt.report, JSON.stringify(report, null, 2));
+      logReport(report.dropped);
+      process.stdout.write(out);
+      return;
+    }
     case "record": return record(opt);
     case "test": return runTests(loadDb(resolveDb(opt.db)));
     default:
-      console.error("usage: review-knowledge.cjs <prompt-block|filter|record|test> [--db FILE]");
+      console.error("usage: review-knowledge.cjs <prompt-block|filter|verify|record|test> [--db FILE]");
       process.exit(2);
   }
 }
@@ -245,4 +566,4 @@ function main() {
 if (require.main === module) {
   try { main(); } catch (e) { console.error(`review-knowledge: ${e.message}`); process.exit(1); }
 }
-module.exports = { filterBody, promptBlock, nextId, duplicateIds, PATTERNS };
+module.exports = { filterBody, promptBlock, nextId, duplicateIds, PATTERNS, verifyBody, verifyFindings, verifyNote, extractIdentifiers, absentClaimKind, makeGrep, runVerifyFixture };

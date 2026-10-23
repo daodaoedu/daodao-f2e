@@ -152,6 +152,30 @@ jobs:
             --context "$RUNNER_TEMP/context-pack.md" \
             --known-fp "$RUNNER_TEMP/known-fp.md" \
             "${RUN_URL_ARGS[@]}"
+      # #169: findings claiming something is missing / not found are grepped in the PR head tree
+      # (after run-review-batches' strict source validation). Report-only: per #363 CI never hides a
+      # structured finding by text pattern; matches are appended as a note and printed to the job log.
+      - name: Verify absent-claim findings against head tree
+        if: steps.runtime.outputs.available == 'true'
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          KNOWLEDGE_SCRIPT="$RUNNER_TEMP/review-knowledge.cjs"
+          STATUS="$RUNNER_TEMP/review-output/status.json"
+          NOTE="$RUNNER_TEMP/review-output/verify-note.md"
+          # A trusted base from before #169 has no verify subcommand.
+          if [ ! -f "$KNOWLEDGE_SCRIPT" ] || ! grep -Fq 'verifyFindings' "$KNOWLEDGE_SCRIPT" || [ ! -f "$STATUS" ]; then
+            echo "verify unavailable at trusted base or no review status; skipped"
+            exit 0
+          fi
+          echo "::group::verified-absent-claim report"
+          if node "$KNOWLEDGE_SCRIPT" verify --repo-root "$GITHUB_WORKSPACE" --rev "$HEAD_SHA" \
+            --findings "$STATUS" --report "$RUNNER_TEMP/review-output/verify-report.json" --note "$NOTE"; then
+            [ -s "$NOTE" ] && cat "$NOTE" >> "$RUNNER_TEMP/review-output/review-body.md"
+          else
+            echo "verify failed; review body left unchanged"
+          fi
+          echo "::endgroup::"
       - name: Preserve review inputs and coverage
         if: always()
         uses: actions/upload-artifact@v4

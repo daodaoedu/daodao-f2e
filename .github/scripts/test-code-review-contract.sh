@@ -205,6 +205,19 @@ order = [workflow.index('      - name: ' + name) for name in (
     'Post coverage-aware review snapshot', 'Flag incomplete review on the check',
     'Publish review coverage check')]
 assert order == sorted(order), "the review comment must be posted before the coverage gate can fail the job"
+# #169: absent-claim verify runs after run-review-batches (which owns the strict source/evidence
+# validator; #363 retired the Markdown filter) and before the comment is posted. It is report-only
+# with the trusted base script and never receives provider secrets.
+verify = step("Verify absent-claim findings against head tree")
+order = [workflow.index('      - name: ' + name) for name in (
+    'Review bounded batches with Workers AI', 'Verify absent-claim findings against head tree',
+    'Post coverage-aware review snapshot')]
+assert order == sorted(order), "verify must run after the strict-validated review and before the comment is posted"
+assert 'node "$KNOWLEDGE_SCRIPT" verify' in verify and 'KNOWLEDGE_SCRIPT="$RUNNER_TEMP/review-knowledge.cjs"' in verify, "verify must use the trusted base review-knowledge.cjs"
+assert '--findings "$STATUS"' in verify and '--rev "$HEAD_SHA"' in verify, "verify must check structured findings against the event head SHA"
+assert '>> "$RUNNER_TEMP/review-output/review-body.md"' in verify and 'status.json' in verify and '> "$STATUS"' not in verify, "verify may only append a note; structured findings stay untouched"
+assert 'secrets.' not in verify and 'CLOUDFLARE' not in verify, "verify must not see provider secrets"
+assert "if: steps.runtime.outputs.available == 'true'" in verify, "verify must require the trusted runtime"
 
 PYCONTRACT
 # Historical examples remain prompt context; CI must not erase/downgrade
@@ -228,6 +241,13 @@ python3 -m unittest discover -s "$SCRIPT_DIR/__tests__" -p 'test_review_*.py' -v
 
 if [ -f "$SKILL" ]; then
 grep -Fq 'review-knowledge.cjs' "$SKILL_ALL" || fail "manual skill lost the shared false-positive knowledge"
+# #169: 本機步驟 6.5 先 filter 再 verify，verify 讀 filter 的輸出、對 review snapshot 查證
+FILTER_LINE=$(grep -n 'node "$_KNOWLEDGE_SCRIPT" filter' "$SKILL_ALL" | head -1 | cut -d: -f1)
+VERIFY_LINE=$(grep -n 'node "$_KNOWLEDGE_SCRIPT" verify' "$SKILL_ALL" | head -1 | cut -d: -f1)
+[ -n "$FILTER_LINE" ] && [ -n "$VERIFY_LINE" ] && [ "$FILTER_LINE" -lt "$VERIFY_LINE" ] \
+  || fail "manual skill must run review-knowledge verify after filter"
+grep -Fq -- '--rev "$_REVIEW_HEAD"' "$SKILL_ALL" || fail "manual verify must grep the reviewed snapshot, not the working tree"
+grep -Fq '< "$_REVIEW_TMP_DIR/$engine.filtered.txt"' "$SKILL_ALL" || fail "manual verify must read the filter output"
 grep -Fq '## 步驟 0：建立可重現的 review input' "$SKILL_ALL" || fail "manual review skill has no Context Pack Step 0"
 grep -Fq 'git show "$_BASE_REF:.github/scripts/retrieve-context.sh"' "$SKILL_ALL" \
   || fail "manual review skill does not load the retriever from the trusted base"
