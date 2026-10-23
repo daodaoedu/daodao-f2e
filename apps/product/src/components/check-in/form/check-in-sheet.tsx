@@ -13,6 +13,7 @@ import { CheckInStatus } from "@/constants/check-in-status";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
 import { EarlyStartResult, useEarlyStartDialog } from "@/hooks/use-early-start-dialog";
 import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
+import { submitKeepingValuesOnError } from "./check-in-submit-flow";
 import { DescriptionField } from "./components/description-field";
 import { MediaUploadField } from "./components/media-upload-field";
 import { MoodSelector } from "./components/mood-selector";
@@ -65,15 +66,21 @@ export const CheckInSheetContent = ({
   const onSubmit = async (values: CheckInFormValuesType) => {
     setIsSubmitting(true);
     try {
-      await onComplete({
-        mood: values.mood,
-        tags: values.tags,
-        description: values.description,
-        media: values.media,
-        existingImageUrls:
-          keptExistingImages.length > 0 || existingImages?.length ? keptExistingImages : undefined,
-      });
-      form.reset();
+      // 失敗時不 reset，保留已填內容讓使用者重送（daodao#377）
+      await submitKeepingValuesOnError(
+        () =>
+          onComplete({
+            mood: values.mood,
+            tags: values.tags,
+            description: values.description,
+            media: values.media,
+            existingImageUrls:
+              keptExistingImages.length > 0 || existingImages?.length
+                ? keptExistingImages
+                : undefined,
+          }),
+        () => form.reset()
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -186,13 +193,8 @@ export const CheckInButton = ({
 
   const { openCheckInSheet } = useCheckInSheet({
     taskTitle,
-    onComplete: async (data) => {
-      try {
-        await submitCheckIn(data);
-      } catch {
-        // 錯誤已在 submitCheckIn 中處理
-      }
-    },
+    // 建立成功才關 sheet；失敗時錯誤（toast 已在 submitCheckIn 顯示）往上丟，sheet 與內容保留
+    onComplete: (data, { closeSheet }) => submitCheckIn(data, { onCreated: closeSheet }),
   });
 
   const { openEarlyStartDialog } = useEarlyStartDialog({
