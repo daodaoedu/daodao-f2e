@@ -22,6 +22,21 @@ export function createSheetCompleteHandler<T>(
 }
 
 /**
+ * useEditCheckInSheet 用（daodao#383）：更新成功才關 sheet。
+ * 錯誤不在這裡吞掉（toast 由 onComplete 顯示），要往上傳給表單，
+ * 否則 submitKeepingValuesOnError 會當成成功而把表單還原成編輯前的原值。
+ */
+export function createEditSheetCompleteHandler<T>(
+  onComplete: (data: T) => Promise<void> | void,
+  getClose: () => (() => void) | null | undefined
+) {
+  return async (data: T) => {
+    await onComplete(data);
+    getClose()?.();
+  };
+}
+
+/**
  * CheckInSheetContent 用：送出成功才清表單，失敗保留已填內容。
  * 錯誤提示已由送出端處理，這裡不再往上丟（避免 react-hook-form 的 handleSubmit 出現未處理的 rejection）。
  * @returns 是否送出成功

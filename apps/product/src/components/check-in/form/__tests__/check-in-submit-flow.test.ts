@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  createEditSheetCompleteHandler,
   createSheetCompleteHandler,
   runCheckInCreate,
   submitKeepingValuesOnError,
@@ -87,5 +88,71 @@ describe("打卡送出失敗保留 sheet 與內容（daodao#377）", () => {
     ).rejects.toThrow("dialog boom");
     expect(closeSheet).toHaveBeenCalledTimes(1);
     expect(onError).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * daodao#383 regression guard。
+ *
+ * 編輯打卡的 sheet（useEditCheckInSheet）原本把 onComplete 的錯誤 catch 掉，
+ * 表單以為送出成功而 reset() 回編輯前的原值。這裡把
+ * 編輯 sheet → 表單 → 頁面的更新打卡（失敗時 toast 後往上丟）串起來。
+ */
+function setupEdit(update: () => Promise<void>) {
+  const calls: string[] = [];
+  const closeSheet = vi.fn(() => calls.push("closeSheet"));
+  const reset = vi.fn(() => calls.push("reset"));
+
+  // 打卡詳情頁的 handleEditComplete：失敗時 toast.error 後 throw
+  const pageOnEditComplete = async () => {
+    try {
+      await update();
+      calls.push("toast.success");
+    } catch (error) {
+      calls.push("toast.error");
+      throw error;
+    }
+  };
+  const sheetOnComplete = createEditSheetCompleteHandler<string>(
+    pageOnEditComplete,
+    () => closeSheet
+  );
+  const submitForm = () => submitKeepingValuesOnError(() => sheetOnComplete("form-values"), reset);
+
+  return { calls, closeSheet, reset, submitForm };
+}
+
+describe("編輯打卡送出失敗保留 sheet 與修改內容（daodao#383）", () => {
+  it("更新打卡失敗（例如 404 已被刪除）：不關 sheet、不把表單還原、顯示錯誤", async () => {
+    const error = Object.assign(new Error("Not Found"), { status: 404 });
+    const { calls, closeSheet, reset, submitForm } = setupEdit(() => Promise.reject(error));
+
+    await expect(submitForm()).resolves.toBe(false);
+
+    expect(closeSheet).not.toHaveBeenCalled();
+    expect(reset).not.toHaveBeenCalled();
+    expect(calls).toEqual(["toast.error"]);
+  });
+
+  it("更新打卡成功：關 sheet", async () => {
+    const { calls, submitForm } = setupEdit(() => Promise.resolve());
+
+    await expect(submitForm()).resolves.toBe(true);
+
+    expect(calls).toEqual(["toast.success", "closeSheet", "reset"]);
+  });
+
+  it("失敗後重送成功：sheet 才關閉", async () => {
+    const update = vi
+      .fn<() => Promise<void>>()
+      .mockRejectedValueOnce(new Error("network"))
+      .mockResolvedValueOnce(undefined);
+    const { calls, closeSheet, submitForm } = setupEdit(update);
+
+    await expect(submitForm()).resolves.toBe(false);
+    expect(closeSheet).not.toHaveBeenCalled();
+
+    await expect(submitForm()).resolves.toBe(true);
+    expect(calls).toEqual(["toast.error", "toast.success", "closeSheet", "reset"]);
   });
 });
