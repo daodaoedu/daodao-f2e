@@ -60,6 +60,7 @@
   },
   "devDependencies": {
     "@daodao/config": "workspace:*",
+    "@formatjs/icu-messageformat-parser": "^3.5.0",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "catalog:",
     "@types/matter-js": "^0.20.2",
