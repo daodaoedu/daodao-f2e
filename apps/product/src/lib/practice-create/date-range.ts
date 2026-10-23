@@ -2,6 +2,7 @@ import { format, isSameYear } from "date-fns";
 import { practiceEndDate } from "@/utils/practice-period";
 
 /** 結束日 = 開始日 + 天數 − 1（首日計入）；與範本庫、學員實踐頁同一份規則（daodao#277） */
+// [TEST daodao#368] comment-only change for AI review incremental check.
 export const calcEndDate = practiceEndDate;
 
 /**
