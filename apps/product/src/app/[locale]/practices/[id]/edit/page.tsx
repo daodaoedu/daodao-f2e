@@ -37,7 +37,7 @@ import {
   toEditScheduleValues,
 } from "@/utils/practice-edit-schedule";
 import { minEditableStartDate } from "@/utils/practice-period";
-import { isPracticeScheduleLocked } from "@/utils/practice-schedule-lock";
+import { getEditScheduleLocks } from "@/utils/practice-schedule-lock";
 
 // API 錯誤響應類型
 interface ApiErrorResponse {
@@ -96,10 +96,11 @@ export default function EditPracticePage() {
       ?.isCohortPrivacyLocked === true;
   const isPrivacyLocked = isPracticePrivacyLocked({ isChallenge, isCohortPrivacyLocked });
 
-  // 已有打卡記錄才鎖期間與頻率（與 server stripLockedFields 一致）
-  const isPracticeStarted = useMemo(
-    () => isPracticeScheduleLocked(practiceData?.data),
-    [practiceData?.data]
+  // 已有打卡記錄才鎖期間與頻率（與 server stripLockedFields 一致）；
+  // 共同挑戰另鎖期間，但頻率仍可改（server CHALLENGE_LOCKED_UPDATE_FIELDS 不含頻率，daodao#385）
+  const { periodLocked, frequencyLocked } = useMemo(
+    () => getEditScheduleLocks({ ...practiceData?.data, isChallenge }),
+    [practiceData?.data, isChallenge]
   );
 
   // 取得日期驗證的最小日期
@@ -110,8 +111,8 @@ export default function EditPracticePage() {
   );
 
   // 使用 minStartDate 來創建 schema
-  // Step2 鎖住時（共同挑戰、已打卡）天數／頻率不必填：原值是 null 也要能改其他欄位（daodao#370）
-  const scheduleLocked = isPracticeStarted || isChallenge;
+  // 期間鎖住時（共同挑戰、已打卡）天數／頻率不必填：原值是 null 也要能改其他欄位（daodao#370）
+  const scheduleLocked = periodLocked;
   const formSchema = useMemo(() => {
     return createManualPracticeFormSchema({ minStartDate, scheduleLocked }, t);
   }, [minStartDate, scheduleLocked, t]);
@@ -292,7 +293,12 @@ export default function EditPracticePage() {
               </p>
             )}
             <Step1 form={form} nameDisabled={isChallenge} />
-            <Step2 form={form} disabled={scheduleLocked} minStartDate={minStartDate} />
+            <Step2
+              form={form}
+              disabled={periodLocked}
+              frequencyDisabled={frequencyLocked}
+              minStartDate={minStartDate}
+            />
             <Step3 form={form} />
             <Step4 form={form} />
 

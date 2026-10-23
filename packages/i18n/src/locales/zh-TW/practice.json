@@ -77,7 +77,7 @@
   "summary_public_toast_description": "已顯示在靈感廣場，讓更多人看見你的成長！",
   "summary_public_toast_dismiss": "不再顯示",
   "edit_title": "編輯實踐",
-  "edit_challenge_locked": "這是共同挑戰的實踐：名稱、期間與隱私由挑戰統一設定，這裡只能調整行動內容、頻率與資源。",
+  "edit_challenge_locked": "這是共同挑戰的實踐：名稱、期間與隱私由挑戰統一設定，無法在這裡修改。",
   "edit_cohort_privacy_locked": "這是本期的實踐，打卡隱私由教練統一設定。",
   "mobile_edit_challenge_locked": "這是共同挑戰的實踐：名稱、期間與隱私由挑戰統一設定，無法修改；其他欄位可以照常調整。",
   "edit_save_failed": "儲存失敗，請稍後再試",
