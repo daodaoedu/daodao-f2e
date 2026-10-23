@@ -3,10 +3,8 @@
 import {
   type LighthouseTemplate,
   useLighthouseOrganizationCohorts,
-  useLighthouseOrganizations,
   useLighthouseTemplates,
 } from "@daodao/api";
-
 import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
@@ -22,6 +20,10 @@ import { cn } from "@daodao/ui/lib/utils";
 import { BookOpenText, Plus, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { templateMatches } from "@/utils/template-library";
+import {
+  useLighthouseOrganization,
+  useLighthouseOrganizationGuard,
+} from "./lighthouse-organization-context";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 import { TemplateCard } from "./template-card";
 import { TemplateEditorDialog, type TemplateSaveKind } from "./template-editor-dialog";
@@ -35,12 +37,12 @@ type CompleteState = { template: LighthouseTemplate; kind: TemplateSaveKind } | 
  */
 export function TemplatesManager() {
   const t = useTranslations("lighthouse");
-  const { organizations } = useLighthouseOrganizations();
-  const organization = organizations?.[0];
+  const { organization } = useLighthouseOrganization();
   const templatesQuery = useLighthouseTemplates(organization?.id);
   const cohortsQuery = useLighthouseOrganizationCohorts(organization?.id);
   const [query, setQuery] = useState("");
   const [editor, setEditor] = useState<EditorState>({ open: false, template: null });
+  useLighthouseOrganizationGuard(editor.open);
   const [complete, setComplete] = useState<CompleteState>(null);
 
   const templates = templatesQuery.data?.data ?? [];

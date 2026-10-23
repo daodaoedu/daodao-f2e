@@ -33,6 +33,7 @@ import {
   lighthouseOutcomeResponseSchema,
   lighthouseParticipantCheckinsResponseSchema,
   lighthouseParticipantsResponseSchema,
+  lighthousePreferencesResponseSchema,
   lighthouseProgramListResponseSchema,
   lighthouseTemplatesResponseSchema,
   myCohortsResponseSchema,
@@ -311,4 +312,10 @@ export const useLighthouseActivities = (
       : null
   );
   return useValidatedResponse(result, lighthouseActivityResponseSchema);
+};
+
+/** Restore this account's saved Lighthouse organization. */
+export const useLighthousePreferences = () => {
+  const query = useQuery("/api/v1/lighthouse/preferences", EMPTY_QUERY_INIT);
+  return useValidatedResponse(query, lighthousePreferencesResponseSchema);
 };

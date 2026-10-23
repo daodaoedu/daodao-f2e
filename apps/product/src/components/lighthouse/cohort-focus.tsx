@@ -5,7 +5,6 @@ import {
   type LighthouseFocusEncouragementType,
   type LighthouseMessageCategory,
   useLighthouseFocus,
-  useLighthouseOrganizations,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import {
@@ -21,6 +20,7 @@ import { useState } from "react";
 import { CohortCheckinDrawer } from "./cohort-checkin-drawer";
 import { CohortErrorState } from "./cohort-error-state";
 import { CohortMessageComposeDialog, CohortMessageHistoryDialog } from "./cohort-message-dialogs";
+import { useLighthouseOrganization } from "./lighthouse-organization-context";
 
 interface CohortFocusProps {
   programId: number;
@@ -46,8 +46,8 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
     null
   );
   const query = useLighthouseFocus(programId, cohortId);
-  const { organizations } = useLighthouseOrganizations();
-  const organizationId = organizations?.[0]?.id;
+  const { organization } = useLighthouseOrganization();
+  const organizationId = organization?.id;
   const data = query.data?.data;
 
   if (query.isLoading) return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
@@ -131,7 +131,7 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
 
       {/* FR-TF-01 子頁籤 */}
       <div
-        className="mt-6 flex gap-2 rounded-full bg-[#E7FAF7] p-1.5"
+        className="mt-6 flex min-w-0 gap-2 rounded-full bg-[#E7FAF7] p-1.5"
         role="tablist"
         aria-label={t("cohort_nav_focus")}
       >
@@ -151,7 +151,7 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
               variant="ghost"
               onClick={() => setTab(key)}
               className={cn(
-                "h-10 flex-1 rounded-full text-sm font-semibold text-[#456B68] hover:bg-transparent hover:text-[#0D3036]",
+                "h-auto min-h-10 min-w-0 flex-1 whitespace-normal rounded-full px-2 py-2 text-xs font-semibold text-[#456B68] hover:bg-transparent hover:text-[#0D3036] sm:text-sm",
                 active && "bg-[#0D3036] text-white hover:bg-[#0D3036] hover:text-white"
               )}
             >

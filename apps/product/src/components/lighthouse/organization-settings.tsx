@@ -4,7 +4,6 @@ import {
   removeLighthouseOrganizationMember,
   updateLighthouseOrganization,
   useLighthouseOrganizationMembers,
-  useLighthouseOrganizations,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
@@ -15,6 +14,10 @@ import { cn } from "@daodao/ui/lib/utils";
 import { Building2, Plus, UserMinus, Users } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { ConfirmDialog } from "./confirm-dialog";
+import {
+  useLighthouseOrganization,
+  useLighthouseOrganizationGuard,
+} from "./lighthouse-organization-context";
 import { OrganizationAiKeyCard } from "./organization-ai-key-card";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
@@ -31,13 +34,14 @@ const ORGANIZATION_BIO_MAX = 2000;
 export function OrganizationSettings() {
   const t = useTranslations("lighthouse");
   const apiErrorMessage = useLighthouseErrorMessage();
-  const organizationsQuery = useLighthouseOrganizations();
-  const organization = organizationsQuery.organizations?.[0];
+  const { organization, organizationsQuery } = useLighthouseOrganization();
   const membersQuery = useLighthouseOrganizationMembers(organization?.id);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [removing, setRemoving] = useState<{ userId: number; name: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  useLighthouseOrganizationGuard(dirty, busy || saveState === "saving");
 
   // 用 onSubmit 而不是 React 19 的 form action：action 結束後 React 會重置 uncontrolled 欄位，
   // 驗證失敗／API 失敗時使用者剛打的內容會被清空（FR-ORG-01 要求失敗時不得清空輸入）
@@ -71,6 +75,7 @@ export function OrganizationSettings() {
       return;
     }
     await organizationsQuery.mutate();
+    setDirty(false);
     setSaveState("saved");
     toast.success(t("organization_saved"));
   }
@@ -105,7 +110,10 @@ export function OrganizationSettings() {
           <form
             onSubmit={(event) => void save(event)}
             className="rounded-3xl border border-[#CDEBE8] bg-white p-6"
-            onChange={() => saveState !== "saving" && setSaveState("idle")}
+            onChange={() => {
+              setDirty(true);
+              if (saveState !== "saving") setSaveState("idle");
+            }}
           >
             <div className="flex items-center gap-3">
               <span className="grid size-11 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
@@ -116,6 +124,7 @@ export function OrganizationSettings() {
             <label htmlFor="organization-name" className="mt-6 grid gap-2 text-sm font-medium">
               {t("organization_name")}
               <Input
+                disabled={saveState === "saving"}
                 id="organization-name"
                 name="name"
                 required
@@ -126,6 +135,7 @@ export function OrganizationSettings() {
             <label htmlFor="organization-bio" className="mt-4 grid gap-2 text-sm font-medium">
               {t("organization_bio")}
               <Textarea
+                disabled={saveState === "saving"}
                 id="organization-bio"
                 name="bio"
                 rows={4}
@@ -136,6 +146,7 @@ export function OrganizationSettings() {
             <label htmlFor="organization-link" className="mt-4 grid gap-2 text-sm font-medium">
               {t("organization_external_link")}
               <Input
+                disabled={saveState === "saving"}
                 id="organization-link"
                 name="externalLink"
                 type="url"

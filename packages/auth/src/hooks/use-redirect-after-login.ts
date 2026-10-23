@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { decodeOAuthState, verifyAndConsumeOAuthState } from "../lib/auth-client";
 import { DEFAULT_REDIRECT_URL, ONBOARDING_URL } from "../lib/auth-constants";
+import { getSafeLoginRedirect } from "../lib/safe-redirect";
 
 /**
  * 登入後跳轉的 Hook
@@ -84,7 +85,7 @@ export const useRedirectAfterLogin = () => {
     } else {
       // 舊用戶跳轉到原目標頁面
       // 過濾掉不適合作為登入後落地頁的路徑（設定頁、錯誤頁）
-      const redirectUrl = state.redirectUrl ?? DEFAULT_REDIRECT_URL;
+      const redirectUrl = getSafeLoginRedirect(state.redirectUrl);
       const isUnwantedLanding =
         redirectUrl.includes("/auth/error") || redirectUrl.includes("/settings");
       hardNavigate(isUnwantedLanding ? DEFAULT_REDIRECT_URL : redirectUrl);

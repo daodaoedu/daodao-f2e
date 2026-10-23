@@ -2,6 +2,7 @@ import { getEnv } from "@daodao/config";
 import createMiddleware from "@daodao/i18n/middleware";
 import { routing } from "@daodao/i18n/routing";
 import { type NextRequest, NextResponse } from "next/server";
+import { checkPrivateSession, isPrivateSpacePath } from "./lib/auth/private-access";
 
 /**
  * i18n middleware plus the Lighthouse organization-membership gate.
@@ -52,6 +53,22 @@ function localizedPath(pathname: string, path: string): string {
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  if (isPrivateSpacePath(pathname)) {
+    const apiBaseUrl =
+      getEnv("NEXT_PUBLIC_API_URL", "https://api.daodao.so") ?? "https://api.daodao.so";
+    const access = await checkPrivateSession(request.cookies.get("auth_token")?.value, apiBaseUrl);
+    if (access !== "allowed") {
+      const destination = request.nextUrl.clone();
+      destination.pathname = localizedPath(
+        pathname,
+        access === "unauthorized" ? "/auth/login" : "/auth/access-unavailable"
+      );
+      destination.search = `?redirect=${encodeURIComponent(`${pathname}${request.nextUrl.search}`)}`;
+      const response = NextResponse.redirect(destination);
+      response.headers.set("Cache-Control", "private, no-store");
+      return response;
+    }
+  }
   if (LIGHTHOUSE_PATH_RE.test(pathname) && !LIGHTHOUSE_ACCESS_REQUIRED_RE.test(pathname)) {
     const access = await hasLighthouseAccess(request);
     if (access !== "allowed") {
