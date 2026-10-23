@@ -103,6 +103,26 @@ describe("createManualPracticeFormSchema messages (daodao#334)", () => {
     expect(result.success).toBe(true);
   });
 
+  it("still requires frequency when only the period is locked (daodao#385)", () => {
+    // 共同挑戰還沒打卡：期間鎖住、頻率可改，頻率清空不能默默存成「沒改」
+    const result = createManualPracticeFormSchema(
+      { scheduleLocked: true, frequencyLocked: false },
+      t
+    ).safeParse({
+      ...invalidValues,
+      name: "每日閱讀",
+      actionDescription: "讀 10 頁",
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      durationDays: "",
+      frequency: "",
+      durationMinutes: null,
+      resources: [],
+    });
+    if (result.success) throw new Error("expected validation to fail");
+    const paths = result.error.issues.map((issue) => issue.path.join("."));
+    expect(paths).toEqual(["frequency"]);
+  });
+
   it("still requires days and frequency (daodao#370)", () => {
     const result = createManualPracticeFormSchema({}, t).safeParse({
       ...invalidValues,
