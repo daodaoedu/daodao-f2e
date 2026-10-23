@@ -5,12 +5,18 @@ import { useSheetManager } from "@daodao/ui/components/animate-ui/components/rad
 import { useCallback, useRef } from "react";
 import type { CheckInData } from "@/components/check-in";
 import { CheckInSheetContent } from "@/components/check-in";
+import {
+  createSheetCompleteHandler,
+  type ICheckInSheetHelpers,
+} from "@/components/check-in/form/check-in-submit-flow";
 
 interface IUseCheckInSheetOptions {
   /** 任務標題 */
   taskTitle: string;
-  /** 打卡完成回調 */
-  onComplete: (data: CheckInData) => Promise<void> | void;
+  /**
+   * 打卡送出回調。成功時呼叫 `closeSheet` 關閉 sheet；失敗時丟出錯誤，sheet 與已填內容會保留。
+   */
+  onComplete: (data: CheckInData, helpers: ICheckInSheetHelpers) => Promise<void> | void;
   /** 關閉時的回調 */
   onClose?: () => void;
 }
@@ -22,7 +28,11 @@ interface IUseCheckInSheetOptions {
  * ```tsx
  * const { openCheckInSheet } = useCheckInSheet({
  *   taskTitle: "我的實踐",
- *   onComplete: handleComplete,
+ *   // 送出成功後呼叫 closeSheet；失敗時丟出錯誤，sheet 與內容保留
+ *   onComplete: async (data, { closeSheet }) => {
+ *     await createCheckIn(data);
+ *     closeSheet();
+ *   },
  *   onClose: handleClose,
  * });
  *
@@ -42,12 +52,8 @@ export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInS
       content: (
         <CheckInSheetContent
           taskTitle={taskTitle}
-          onComplete={async (data) => {
-            // 先關閉 sheet
-            closeRef.current?.();
-            // 然後執行 onComplete（會顯示 loading 和成功對話框）
-            await onComplete(data);
-          }}
+          // 不先關 sheet：由 onComplete 在建立成功後呼叫 closeSheet，失敗時 sheet 與內容保留（daodao#377）
+          onComplete={createSheetCompleteHandler(onComplete, () => closeRef.current)}
         />
       ),
       dismissible: true,
