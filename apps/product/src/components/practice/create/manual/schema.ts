@@ -62,6 +62,8 @@ export interface ManualPracticeSchemaOptions {
   minStartDate?: Date;
   // 期間與頻率鎖住（共同挑戰、已打卡）時欄位無法填，原值是 null 也不能擋住其他欄位存檔（daodao#370）
   scheduleLocked?: boolean;
+  // 頻率是否鎖住；未指定時跟 scheduleLocked 相同。共同挑戰還沒打卡時只鎖期間、頻率仍必填（daodao#385）
+  frequencyLocked?: boolean;
 }
 
 // 建立開始日期驗證 schema
@@ -120,6 +122,7 @@ export const createManualPracticeFormSchema = (
   // 不提供預設值，讓 createStartDateSchema 在驗證時動態決定
   const minStartDate = options.minStartDate;
   const scheduleMinLength = options.scheduleLocked ? 0 : 1;
+  const frequencyMinLength = (options.frequencyLocked ?? options.scheduleLocked) ? 0 : 1;
 
   const msg = (key: string, params?: Record<string, string | number>) =>
     t(key as Parameters<TFunction>[0], params as never);
@@ -139,7 +142,7 @@ export const createManualPracticeFormSchema = (
     // 數字字串，例 "45"；輸入框已過濾非數字並夾限
     durationDays: z.string().min(scheduleMinLength, msg("validation_duration_required")),
     // 正規化頻率，例 "1-3"、"7"
-    frequency: z.string().min(scheduleMinLength, msg("validation_frequency_required")),
+    frequency: z.string().min(frequencyMinLength, msg("validation_frequency_required")),
 
     // Step 3
     // 每次時間在建立流程是選填，null 代表沒設定

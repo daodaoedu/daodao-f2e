@@ -22,7 +22,10 @@ import { DURATION_DAYS_OPTIONS, FREQUENCY_OPTIONS, type ManualPracticeFormValues
 
 interface Step2Props {
   form: UseFormReturn<ManualPracticeFormValues>;
+  // 開始日與天數是否停用
   disabled?: boolean;
+  // 頻率是否停用；預設跟 disabled 相同。共同挑戰只鎖期間、不鎖頻率（daodao#385）
+  frequencyDisabled?: boolean;
   minStartDate?: Date;
 }
 
@@ -36,7 +39,12 @@ const FREQUENCY_PRESETS: readonly string[] = FREQUENCY_OPTIONS.map((option) => o
 const customText = (typing: string | null, value: string, presets: readonly string[]) =>
   typing ?? (presets.includes(value) ? "" : value);
 
-export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
+export const Step2 = ({
+  form,
+  disabled = false,
+  frequencyDisabled = disabled,
+  minStartDate,
+}: Step2Props) => {
   const t = useTranslations("practice");
   const startDate = form.watch("startDate");
   const durationDays = form.watch("durationDays");
@@ -191,13 +199,13 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
                 <RadioGroup
                   value={selectedPreset}
                   onValueChange={(value) => {
-                    if (!disabled) {
+                    if (!frequencyDisabled) {
                       setFrequencyTyping(null);
                       field.onChange(value);
                     }
                   }}
                   onBlur={field.onBlur}
-                  disabled={disabled}
+                  disabled={frequencyDisabled}
                   className="grid grid-cols-3 gap-3"
                 >
                   {FREQUENCY_OPTIONS.map((option) => {
@@ -211,7 +219,7 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
                         htmlFor={inputId}
                         className={cn(
                           "flex flex-col gap-1 items-center justify-center p-2 rounded-lg border transition-colors bg-white text-text-dark",
-                          disabled
+                          frequencyDisabled
                             ? "cursor-not-allowed opacity-50"
                             : "cursor-pointer hover:border-bg-gray",
                           isSelected ? "border-logo-cyan text-logo-cyan" : "border-transparent"
@@ -222,7 +230,7 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
                           id={inputId}
                           className="sr-only"
                           aria-label={`${option.label} ${description}`}
-                          disabled={disabled}
+                          disabled={frequencyDisabled}
                         />
                         <span
                           className={cn(
@@ -249,13 +257,13 @@ export const Step2 = ({ form, disabled = false, minStartDate }: Step2Props) => {
               <Input
                 value={frequencyText}
                 maxLength={7}
-                disabled={disabled}
+                disabled={frequencyDisabled}
                 placeholder={t("wizard_frequency_custom_placeholder")}
                 aria-label={t("wizard_frequency_custom_placeholder")}
                 invalid={!!form.formState.errors.frequency}
                 className="mt-3 w-full"
                 onChange={(event) => {
-                  if (disabled) return;
+                  if (frequencyDisabled) return;
                   // 輸入中保留原文字（例「1~3」），表單值存正規化結果「1-3」
                   setFrequencyTyping(event.target.value);
                   field.onChange(normalizeFrequency(event.target.value));
