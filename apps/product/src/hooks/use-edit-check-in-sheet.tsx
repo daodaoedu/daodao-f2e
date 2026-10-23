@@ -5,6 +5,7 @@ import { useSheetManager } from "@daodao/ui/components/animate-ui/components/rad
 import { useCallback, useRef } from "react";
 import type { CheckInData } from "@/components/check-in";
 import { CheckInSheetContent } from "@/components/check-in";
+import { createEditSheetCompleteHandler } from "@/components/check-in/form/check-in-submit-flow";
 import type { MoodType } from "@/constants/mood";
 
 interface IEditCheckInData {
@@ -53,15 +54,9 @@ export function useEditCheckInSheet({
           }}
           existingImages={checkInData.images}
           submitButtonText={t("save_changes")}
-          onComplete={async (data) => {
-            try {
-              await onComplete(data);
-              closeRef.current?.(); // 僅在成功時關閉
-            } catch {
-              // 預期 onComplete 的實作會處理錯誤（例如顯示 toast）
-              // 保持 Sheet 開啟，讓使用者可以重試
-            }
-          }}
+          // 成功才關閉；失敗的錯誤（toast 由 onComplete 顯示）往上傳給表單，
+          // 表單據此保留使用者的修改（daodao#383）
+          onComplete={createEditSheetCompleteHandler(onComplete, () => closeRef.current)}
         />
       ),
       dismissible: true,
