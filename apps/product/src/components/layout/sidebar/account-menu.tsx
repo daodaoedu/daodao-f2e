@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth, useAuthContext } from "@daodao/auth";
+import { useAuthContext } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Popover, PopoverContent, PopoverTrigger } from "@daodao/ui/components/popover";
@@ -15,6 +15,7 @@ import {
   Settings,
 } from "lucide-react";
 import { useState } from "react";
+import { useLogoutAndRedirect } from "@/hooks/use-logout-redirect";
 import { LanguagePillToggle } from "./language-pill-toggle";
 
 interface AccountMenuProps {
@@ -24,7 +25,7 @@ interface AccountMenuProps {
 export function AccountMenu({ isCollapsed }: AccountMenuProps) {
   const t = useTranslations("app_product");
   const { user } = useAuthContext();
-  const { logout } = useAuth();
+  const logout = useLogoutAndRedirect();
   const [isOpen, setIsOpen] = useState(false);
 
   const displayName = user?.name || user?.email?.split("@")[0] || "";

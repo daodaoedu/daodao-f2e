@@ -9,6 +9,7 @@ import { Mail, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
+import { useLogoutAndRedirect } from "@/hooks/use-logout-redirect";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
@@ -19,7 +20,8 @@ const RESEND_COOLDOWN_SECONDS = 60;
 export default function VerifyEmailPendingPage() {
   const t = useTranslations("auth.verifyEmail.pending");
   const router = useRouter();
-  const { user, isAuthenticated, isEmailVerified, isLoading, logout, refreshAuth } = useAuth();
+  const { user, isAuthenticated, isEmailVerified, isLoading, refreshAuth } = useAuth();
+  const logoutAndRedirect = useLogoutAndRedirect();
   const [isResending, setIsResending] = useState(false);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
 
@@ -75,10 +77,10 @@ export default function VerifyEmailPendingPage() {
     }
   }, [user?.email, isResending, cooldownSeconds, t]);
 
+  // 「使用其他帳號登入」：登出後直接落在登入頁
   const handleLogout = useCallback(async () => {
-    await logout();
-    router.replace("/");
-  }, [logout, router]);
+    await logoutAndRedirect();
+  }, [logoutAndRedirect]);
 
   const description = user?.email
     ? t("description", { email: user.email })
