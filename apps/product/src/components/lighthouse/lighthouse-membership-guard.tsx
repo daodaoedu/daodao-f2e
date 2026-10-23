@@ -1,6 +1,7 @@
 import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { RadioTower } from "lucide-react";
+import { LIGHTHOUSE_APPLY_FORM_URL } from "./lighthouse-access";
 
 export function LighthouseAccessRequired() {
   const t = useTranslations("lighthouse");
@@ -14,7 +15,18 @@ export function LighthouseAccessRequired() {
           {t("membership_required_title")}
         </h1>
         <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[#5A7B79]">
-          {t("membership_required_description")}
+          {t.rich("membership_required_description", {
+            link: (chunks) => (
+              <a
+                href={LIGHTHOUSE_APPLY_FORM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-[#0D7773] underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan"
+              >
+                {chunks}
+              </a>
+            ),
+          })}
         </p>
         <CustomLink
           href="/"
