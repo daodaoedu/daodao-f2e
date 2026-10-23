@@ -9,17 +9,20 @@ import {
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { format, parseISO } from "date-fns";
-import { Mail, Trash2 } from "lucide-react";
+import { Mail, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  getLetterDetailScrollKey,
-  getLetterDetailView,
-  isFootprintTimelineSettled,
-} from "./future-letter-utils";
+import { getLetterDetailScrollKey, isFootprintTimelineSettled } from "./future-letter-utils";
 import { LetterDetailCard } from "./letter-detail-card";
 import { buildFootprintTimeline } from "./timeline-model";
 import { VerticalTimeline } from "./vertical-timeline";
@@ -49,6 +52,8 @@ export function FutureLetterTimeline({
     undefined
   );
   const [isMutating, setIsMutating] = useState(false);
+  const [openedLetter, setOpenedLetter] = useState<LifecycleLetter | null>(null);
+  const autoOpenAttemptedRef = useRef<string | null>(null);
   const lastRefreshTokenRef = useRef(0);
   const timelineQuery = useAllMyTimeline();
   const lettersQuery = useAllMyFutureLetters();
@@ -64,15 +69,15 @@ export function FutureLetterTimeline({
     () => buildFootprintTimeline(timelineEntries, letters, new Date()),
     [letters, timelineEntries]
   );
-  const selectedLetter =
-    pendingRouteTarget === undefined
-      ? letters.find((letter) => letter.id === deepLinkedLetterId)
-      : undefined;
-  const detailView = getLetterDetailView(selectedLetter);
+  const selectedLetterId =
+    pendingRouteTarget === undefined ? deepLinkedLetterId : pendingRouteTarget;
+  const selectedLetter = letters.find((letter) => letter.id === selectedLetterId);
+  const detailLetter = openedLetter?.id === selectedLetter?.id ? openedLetter : selectedLetter;
   const isLoading = timelineQuery.isLoading || lettersQuery.isLoading;
   const hasError = Boolean(timelineQuery.error || lettersQuery.error);
+  const scheduledLetter = selectedLetter?.status === "scheduled" ? selectedLetter : undefined;
   const detailScrollKey = getLetterDetailScrollKey(
-    selectedLetter,
+    scheduledLetter,
     isFootprintTimelineSettled({
       isLoading,
       hasError,
@@ -82,9 +87,6 @@ export function FutureLetterTimeline({
   );
   const detailRef = useRef<HTMLDivElement>(null);
 
-  // The detail block renders after the whole timeline, so bring it into view whenever a
-  // different letter (or a different state of the same letter) is shown. Re-clicking the
-  // same card briefly clears the selection while the route updates, which re-triggers this.
   useEffect(() => {
     if (!detailScrollKey) return;
     const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -118,22 +120,48 @@ export function FutureLetterTimeline({
     router.replace(`/me/footprints?${params.toString()}`, { scroll: false });
   };
 
-  const handleOpen = async () => {
-    if (!selectedLetter || isMutating) return;
-    setIsMutating(true);
-    try {
-      const response = await openFutureLetter(selectedLetter.id);
-      if (response.error) {
+  const handleOpen = useCallback(
+    async (letter: LifecycleLetter) => {
+      if (isMutating) return;
+      setIsMutating(true);
+      try {
+        const response = await openFutureLetter(letter.id);
+        if (response.error) {
+          toast.error(t("letter_open_failed"));
+          return;
+        }
+        if (response.data?.data) setOpenedLetter(response.data.data);
+        await refresh();
+      } catch (error) {
+        console.error("Failed to open future letter", error);
         toast.error(t("letter_open_failed"));
-        return;
+      } finally {
+        setIsMutating(false);
       }
-      await refresh();
-    } catch (error) {
-      console.error("Failed to open future letter", error);
-      toast.error(t("letter_open_failed"));
-    } finally {
-      setIsMutating(false);
+    },
+    [isMutating, refresh, t]
+  );
+
+  useEffect(() => {
+    if (
+      isMutating ||
+      selectedLetter?.status !== "delivered" ||
+      selectedLetter.openedAt ||
+      autoOpenAttemptedRef.current === selectedLetter.id
+    ) {
+      return;
     }
+    autoOpenAttemptedRef.current = selectedLetter.id;
+    void handleOpen(selectedLetter);
+  }, [selectedLetter, isMutating, handleOpen]);
+
+  const closeLetterDetail = () => {
+    autoOpenAttemptedRef.current = null;
+    setOpenedLetter(null);
+    setPendingRouteTarget(null);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("futureLetterId");
+    router.replace(`/me/footprints?${params.toString()}`, { scroll: false });
   };
 
   const handleDelete = async (letter: LifecycleLetter) => {
@@ -194,79 +222,76 @@ export function FutureLetterTimeline({
         />
       )}
 
-      {selectedLetter && detailView && (
-        <div ref={detailRef} className="scroll-mt-24">
-          {detailView === "sealed" && (
-            <div className="mx-auto max-w-md rounded-2xl border border-dashed border-[#E4B84D] bg-[#FFFDF5] p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="font-bold text-text-dark">{t("sealed_title")}</h3>
-                  <p className="mt-1 text-sm text-text-secondary">
-                    {t("sealed_description", {
-                      date: selectedLetter.deliverAt
-                        ? format(parseISO(selectedLetter.deliverAt), "yyyy/MM/dd")
-                        : "",
-                    })}
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  aria-label={t("letter_actions")}
-                  disabled={isMutating}
-                  onClick={() => handleDelete(selectedLetter)}
-                  className="text-red hover:text-red"
-                >
-                  <Trash2 className="size-4" />
-                </Button>
-              </div>
+      {selectedLetter?.status === "scheduled" && (
+        <div
+          ref={detailRef}
+          className="scroll-mt-24 mx-auto max-w-md rounded-2xl border border-dashed border-[#E4B84D] bg-[#FFFDF5] p-5"
+        >
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h3 className="font-bold text-text-dark">{t("sealed_title")}</h3>
+              <p className="mt-1 text-sm text-text-secondary">
+                {t("sealed_description", {
+                  date: selectedLetter.deliverAt
+                    ? format(parseISO(selectedLetter.deliverAt), "yyyy/MM/dd")
+                    : "",
+                })}
+              </p>
             </div>
-          )}
-
-          {detailView === "unopened" && (
-            <div className="mx-auto max-w-md rounded-2xl border border-logo-cyan/30 bg-[#F4FBFA] p-6 text-center">
-              <Mail className="mx-auto size-8 text-logo-cyan" />
-              <h3 className="mt-3 font-bold text-text-dark">{t("unopened_title")}</h3>
-              <p className="mt-1 text-sm text-text-secondary">{t("unopened_description")}</p>
-              <div className="mt-5 flex justify-center gap-3">
-                <Button
-                  disabled={isMutating}
-                  onClick={handleOpen}
-                  className="rounded-full bg-logo-cyan text-white hover:bg-logo-cyan/90"
-                >
-                  {t("action_open_letter")}
-                </Button>
-                <Button
-                  disabled={isMutating}
-                  variant="outline"
-                  onClick={() => handleDelete(selectedLetter)}
-                  className="rounded-full text-red"
-                >
-                  {t("action_delete")}
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {detailView === "opened" && (
-            <div className="mx-auto max-w-md space-y-3">
-              <LetterDetailCard letter={selectedLetter} />
-              <div className="flex justify-end">
-                <Button
-                  disabled={isMutating}
-                  variant="ghost"
-                  onClick={() => handleDelete(selectedLetter)}
-                  className="text-red hover:text-red"
-                >
-                  <Trash2 className="size-4" />
-                  {t("delete_permanently")}
-                </Button>
-              </div>
-            </div>
-          )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={t("letter_actions")}
+              disabled={isMutating}
+              onClick={() => handleDelete(selectedLetter)}
+              className="text-red hover:text-red"
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          </div>
         </div>
       )}
+
+      <Dialog
+        open={selectedLetter?.status === "delivered"}
+        onOpenChange={(open) => {
+          if (!open) closeLetterDetail();
+        }}
+      >
+        <DialogContent
+          showCloseButton={false}
+          overlayClassName="bg-[#0D303680]"
+          className="max-h-[calc(100dvh-32px)] w-[calc(100vw-32px)] max-w-[560px] overflow-hidden rounded-[24px] border border-[#E8D99E] bg-[#FFFDF2] p-0 shadow-[0_24px_70px_rgba(53,48,25,0.2)] sm:max-w-[560px]"
+        >
+          <DialogTitle className="sr-only">{t("detail_title")}</DialogTitle>
+          <DialogDescription className="sr-only">{t("unopened_description")}</DialogDescription>
+          <DialogClose
+            className="absolute right-6 top-6 z-10 rounded-full p-1 text-[#9D812C] transition-colors hover:bg-[#F3EBCF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9D812C]"
+            aria-label={t("detail_close")}
+          >
+            <X className="size-5" />
+          </DialogClose>
+          <div className="max-h-[calc(100dvh-32px)] overflow-y-auto px-8 pb-8 pt-8 sm:max-h-[min(78vh,660px)]">
+            {detailLetter?.openedAt ? (
+              <LetterDetailCard letter={detailLetter} />
+            ) : (
+              <div className="py-10 text-center">
+                <Mail className="mx-auto size-8 text-[#A47D29]" />
+                <h3 className="mt-3 font-medium text-[#493D22]">{t("unopened_title")}</h3>
+                <p className="mt-2 text-sm text-[#796B4F]">{t("unopened_description")}</p>
+                <Button
+                  disabled={isMutating || !selectedLetter}
+                  onClick={() => selectedLetter && void handleOpen(selectedLetter)}
+                  className="mt-5 rounded-full bg-[#F3EBCF] text-[#493D22] hover:bg-[#EDE0B6]"
+                >
+                  {isMutating ? t("detail_opening") : t("action_open_letter")}
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
