@@ -6,7 +6,6 @@ import {
   type LighthouseTemplate,
   updateLighthouseTemplate,
 } from "@daodao/api";
-
 import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
@@ -38,6 +37,7 @@ import {
   type TemplateTiming,
   TIMING_OPTIONS,
 } from "@/utils/template-library";
+import { useLighthouseOrganizationGuard } from "./lighthouse-organization-context";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 import { type TemplateResourceDraft, TemplateResourceEditor } from "./template-resource-editor";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
@@ -144,6 +144,7 @@ export function TemplateEditorDialog({
   const [editingName, setEditingName] = useState(false);
   const [tagInput, setTagInput] = useState("");
   const [busy, setBusy] = useState(false);
+  useLighthouseOrganizationGuard(open, busy);
 
   useEffect(() => {
     if (!open) return;

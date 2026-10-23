@@ -648,5 +648,11 @@
   "cohort_invite_message_placeholder": "Anything you'd like people who want to join to know",
   "cohort_invite_message_disabled_placeholder": "Check the option above to write a message",
   "cohort_signup_questions_coming_soon": "Custom signup questions are coming soon",
-  "cohort_signup_preview_coming_soon": "Signup page preview is coming soon"
+  "cohort_signup_preview_coming_soon": "Signup page preview is coming soon",
+  "organization_switch": "Organization",
+  "organization_suspended": "Suspended",
+  "organization_unavailable": "This organization is unavailable or you no longer have access. Choose another organization.",
+  "organization_unsaved_title": "Discard unsaved changes?",
+  "organization_unsaved_description": "Your changes have not been saved. Stay here to keep editing, or discard them to continue.",
+  "organization_discard": "Discard changes"
 }

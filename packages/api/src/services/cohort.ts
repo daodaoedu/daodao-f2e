@@ -84,6 +84,8 @@ const cohortSessionShape = {
 const lighthouseCohortShape = {
   id: z.number().int().positive(),
   programId: z.number().int().positive(),
+  organizationId: z.number().int().positive(),
+  organizationName: z.string(),
   slug: z.string(),
   displayName: z.string(),
   tagline: z.string().nullable(),
@@ -1125,3 +1127,12 @@ export const getLighthouseActivityDetail = async (
     "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/activities/{type}/{activityId}",
     { params: { path: { programId, cohortId, type, activityId } } }
   );
+
+/** Account-scoped Lighthouse preference, persisted by the authenticated backend. */
+export const lighthousePreferencesResponseSchema = apiSuccessSchema(
+  z.object({ organizationId: z.number().int().positive().nullable() })
+);
+
+/** Save the current account's organization; the backend validates membership and status. */
+export const updateLighthousePreferences = async (organizationId: number) =>
+  client.PATCH("/api/v1/lighthouse/preferences", { body: { organizationId } });

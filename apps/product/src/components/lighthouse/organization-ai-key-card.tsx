@@ -23,6 +23,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { KeyRound } from "lucide-react";
 import { useState } from "react";
 import { ConfirmDialog } from "./confirm-dialog";
+import { useLighthouseOrganizationGuard } from "./lighthouse-organization-context";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 interface OrganizationAiKeyCardProps {
@@ -43,6 +44,7 @@ export function OrganizationAiKeyCard({ organizationId }: OrganizationAiKeyCardP
   const [apiKey, setApiKey] = useState("");
   const [provider, setProvider] = useState<LighthouseAiProvider | null>(null);
   const [busy, setBusy] = useState(false);
+  useLighthouseOrganizationGuard(Boolean(apiKey), busy);
   const [testState, setTestState] = useState<TestState>("idle");
   const [testMessage, setTestMessage] = useState<string | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);

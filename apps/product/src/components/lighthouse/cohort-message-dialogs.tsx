@@ -8,7 +8,6 @@ import {
   useLighthouseMessageTemplates,
   useLighthouseParticipantMessages,
 } from "@daodao/api";
-
 import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
@@ -32,6 +31,7 @@ import { cn } from "@daodao/ui/lib/utils";
 import { format, parseISO } from "date-fns";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useLighthouseOrganizationGuard } from "./lighthouse-organization-context";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 
 type Person = {
@@ -124,6 +124,7 @@ export function CohortMessageComposeDialog({
   const [templateId, setTemplateId] = useState<string>(NO_TEMPLATE);
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
+  useLighthouseOrganizationGuard(Boolean(target && body), busy);
   const templatesQuery = useLighthouseMessageTemplates(organizationId, category);
   const templates = templatesQuery.templates ?? [];
   const name = target?.nickname || t("learner");
@@ -195,7 +196,7 @@ export function CohortMessageComposeDialog({
   }
 
   return (
-    <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={target !== null} onOpenChange={(open) => !busy && !open && onClose()}>
       <DialogContent
         className={cn("w-[min(480px,92vw)] rounded-[28px] border-0 bg-white p-6", LIGHTHOUSE_SCOPE)}
       >
@@ -282,6 +283,7 @@ export function CohortMessageComposeDialog({
           className="mt-3 min-h-[120px]"
           placeholder={t("message_placeholder")}
           aria-label={t("message_placeholder")}
+          disabled={busy}
           value={body}
           onChange={(event) => setBody(event.target.value)}
         />

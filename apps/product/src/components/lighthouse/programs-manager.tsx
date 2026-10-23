@@ -12,7 +12,6 @@ import {
   updateLighthouseCohort,
   updateLighthouseProgram,
   useLighthouseCohorts,
-  useLighthouseOrganizations,
   useLighthousePrograms,
   useLighthouseTemplates,
 } from "@daodao/api";
@@ -65,6 +64,10 @@ import {
 } from "@/utils/template-library";
 import { ConfirmDialog } from "./confirm-dialog";
 import { JoinCode } from "./join-code";
+import {
+  useLighthouseOrganization,
+  useLighthouseOrganizationGuard,
+} from "./lighthouse-organization-context";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 type SessionEntry = { id: string; sessionDate: string; startTime: string; endTime: string };
@@ -185,6 +188,7 @@ function CohortSetupPanel({
 }: CohortSetupPanelProps) {
   const t = useTranslations("lighthouse");
   const [activeTab, setActiveTab] = useState<SetupTab>("basic");
+  useLighthouseOrganizationGuard(true, busy);
   const panelRef = useRef<HTMLFormElement>(null);
   // 已開始的場次 server 會拒絕變更綁定（FR-TPL-05），直接鎖住勾選
   const templatesLocked = mode === "edit" && !!cohort && isCohortStarted(cohort.startDate);
@@ -975,6 +979,7 @@ function CohortCard({
   const searchParams = useSearchParams();
   const [editing, setEditing] = useState(searchParams.get("edit") === String(cohort.id));
   const [busy, setBusy] = useState(false);
+  useLighthouseOrganizationGuard(editing, busy);
 
   async function handlePublish() {
     if (!window.confirm(t("cohort_publish_confirm"))) {
@@ -1312,6 +1317,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
   const [editing, setEditing] = useState(false);
   const [creatingCohort, setCreatingCohort] = useState(false);
   const [busy, setBusy] = useState(false);
+  useLighthouseOrganizationGuard(editing || creatingCohort, busy);
 
   async function handleProgramUpdate(formData: FormData) {
     setBusy(true);
@@ -1583,11 +1589,11 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
 
 export function ProgramsManager() {
   const t = useTranslations("lighthouse");
-  const { organizations } = useLighthouseOrganizations();
-  const organization = organizations?.[0];
+  const { organization } = useLighthouseOrganization();
   const { programs, isLoading, mutate } = useLighthousePrograms(organization?.id);
   const [creating, setCreating] = useState(false);
   const [busy, setBusy] = useState(false);
+  useLighthouseOrganizationGuard(creating, busy);
 
   async function handleCreate(formData: FormData) {
     if (!organization) return;

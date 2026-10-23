@@ -12,6 +12,7 @@ import {
   lighthouseOrganizationListResponseSchema,
   lighthouseOrganizationMembersResponseSchema,
   lighthouseOutcomeResponseSchema,
+  lighthousePreferencesResponseSchema,
   lighthouseProgramListResponseSchema,
   lighthouseTemplatesResponseSchema,
 } from "../services/cohort";
@@ -157,6 +158,8 @@ describe("Lighthouse API runtime schemas", () => {
         {
           id: 20,
           programId: 10,
+          organizationId: 2,
+          organizationName: "組織二",
           slug: "summer-2026",
           displayName: "夏季同行",
           tagline: null,
@@ -533,5 +536,30 @@ describe("Lighthouse API runtime schemas", () => {
 
     expect(learners.data[0]).not.toHaveProperty("email");
     expect(organizationMembers.data[0]).not.toHaveProperty("email");
+  });
+});
+
+describe("Lighthouse account preference contract", () => {
+  it("accepts the account preference and an unset preference", () => {
+    for (const organizationId of [2, null]) {
+      expect(
+        lighthousePreferencesResponseSchema.safeParse({
+          success: true,
+          data: { organizationId },
+          timestamp: "2026-10-23T00:00:00.000Z",
+        }).success
+      ).toBe(true);
+    }
+  });
+  it("rejects invalid organization IDs rather than selecting a different organization", () => {
+    for (const organizationId of [0, -1, "2", 2.5]) {
+      expect(
+        lighthousePreferencesResponseSchema.safeParse({
+          success: true,
+          data: { organizationId },
+          timestamp: "2026-10-23T00:00:00.000Z",
+        }).success
+      ).toBe(false);
+    }
   });
 });

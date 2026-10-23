@@ -26,6 +26,7 @@ import {
 } from "@/utils/cohort-invitation";
 import { CohortErrorState } from "./cohort-error-state";
 import { JoinCode, useCopyJoinLink, useJoinUrl } from "./join-code";
+import { useLighthouseOrganizationGuard } from "./lighthouse-organization-context";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 interface CohortRosterProps {
@@ -74,6 +75,7 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
   const [preview, setPreview] = useState<PreviewItem[]>([]);
   const [summary, setSummary] = useState<InvitationPreviewSummary | null>(null);
   const [busy, setBusy] = useState(false);
+  useLighthouseOrganizationGuard(Boolean(csv), busy);
   const sendDisabledReason = summary ? getInvitationSendDisabledReason(summary) : null;
   const joinOpen = Boolean(cohort?.joinToken) && !cohort?.joinPaused;
 

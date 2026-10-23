@@ -648,5 +648,11 @@
   "cohort_templates_expand": "展開模板庫",
   "cohort_templates_start_label": "開始日",
   "cohort_templates_end_label": "結束日 {date}",
-  "cohort_templates_remove": "移除 {title}"
+  "cohort_templates_remove": "移除 {title}",
+  "organization_switch": "切換組織",
+  "organization_suspended": "已停權",
+  "organization_unavailable": "此組織目前無法管理，或你已沒有存取權限。請選擇其他組織。",
+  "organization_unsaved_title": "要放棄尚未儲存的變更嗎？",
+  "organization_unsaved_description": "變更尚未儲存。你可以留在此頁繼續編輯，或放棄變更後繼續。",
+  "organization_discard": "放棄變更"
 }
