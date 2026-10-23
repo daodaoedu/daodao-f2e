@@ -1,10 +1,9 @@
 "use client";
 
-import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { useCallback, useState } from "react";
-import { useSWRConfig } from "swr";
+import { useLogoutAndRedirect } from "./use-logout-redirect";
 
 export enum LogoutResult {
   /** 用戶已成功登出 */
@@ -31,8 +30,7 @@ export enum LogoutResult {
 export function useLogoutDialog() {
   const t = useTranslations("common");
   const { openWarningDialog } = useDialog();
-  const { logout } = useAuth();
-  const { cache } = useSWRConfig();
+  const logoutAndRedirect = useLogoutAndRedirect();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const openLogoutDialog = useCallback(async (): Promise<LogoutResult> => {
@@ -55,22 +53,14 @@ export function useLogoutDialog() {
     // 用戶確認登出
     setIsLoggingOut(true);
     try {
-      // 執行登出
-      await logout();
-
-      // 清除 SWR cache
-      if (cache instanceof Map) {
-        cache.clear();
-      }
-
-      // 重定向到登入頁（用 hard navigation 切斷 route protection 的競態 redirect）
-      window.location.href = "/auth/login";
+      // 執行登出、清除 SWR cache 並導向登入頁
+      await logoutAndRedirect();
 
       return LogoutResult.LoggedOut;
     } finally {
       setIsLoggingOut(false);
     }
-  }, [openWarningDialog, logout, cache, t]);
+  }, [openWarningDialog, logoutAndRedirect, t]);
 
   return { openLogoutDialog, isLoggingOut };
 }

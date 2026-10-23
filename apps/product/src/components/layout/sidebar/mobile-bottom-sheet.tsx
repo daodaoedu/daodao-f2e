@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth, useAuthContext } from "@daodao/auth";
+import { useAuthContext } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
@@ -14,6 +14,7 @@ import {
   Settings,
 } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
+import { useLogoutAndRedirect } from "@/hooks/use-logout-redirect";
 import { LanguagePillToggle } from "./language-pill-toggle";
 
 interface MobileBottomSheetProps {
@@ -24,7 +25,7 @@ interface MobileBottomSheetProps {
 export function MobileBottomSheet({ isOpen, onClose }: MobileBottomSheetProps) {
   const t = useTranslations("app_product");
   const { user } = useAuthContext();
-  const { logout } = useAuth();
+  const logout = useLogoutAndRedirect();
   const startY = useRef(0);
 
   useEffect(() => {

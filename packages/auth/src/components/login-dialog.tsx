@@ -3,8 +3,10 @@
 import { GoogleFilledSvg } from "@daodao/assets";
 import desktopLoginPng from "@daodao/assets/images/login/desktop-login.png";
 import mobileLoginPng from "@daodao/assets/images/login/mobile-login.png";
-import { useTranslations } from "@daodao/i18n";
+import { getEnv } from "@daodao/config";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { useIsMobile } from "@daodao/shared";
+import { getTermsUrl } from "@daodao/shared/lib/terms-url";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +23,6 @@ import {
 } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
-import { getEnv } from "@daodao/config";
 import { initiateOAuthLogin } from "../lib/auth-client";
 
 const websiteUrl = getEnv("NEXT_PUBLIC_WEBSITE_URL", "");
@@ -68,7 +69,10 @@ export const LoginDialog = ({
   dismissible = true,
 }: LoginDialogProps) => {
   const t = useTranslations("auth");
+  const locale = useLocale();
   const isMobile = useIsMobile();
+  const termsOfServiceUrl = getTermsUrl(websiteUrl, locale, "service");
+  const privacyPolicyUrl = getTermsUrl(websiteUrl, locale, "privacy-policy");
 
   const handleGoogleLogin = () => {
     if (onLogin) {
@@ -78,7 +82,6 @@ export const LoginDialog = ({
     const defaultSource = source || (window.location.hostname.includes("app.") ? "app" : "website");
     initiateOAuthLogin(redirectUrl, defaultSource);
   };
-
 
   // 處理關閉事件（如果不可關閉，則阻止關閉）
   const handleOpenChange = (newOpen: boolean) => {
@@ -148,7 +151,7 @@ export const LoginDialog = ({
               <span>{t("login_dialog_terms_prefix")}</span>
               <br />
               <a
-                href={`${websiteUrl}/terms/service`}
+                href={termsOfServiceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
@@ -157,7 +160,7 @@ export const LoginDialog = ({
               </a>
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
               <a
-                href={`${websiteUrl}/terms/privacy-policy`}
+                href={privacyPolicyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
@@ -220,7 +223,7 @@ export const LoginDialog = ({
               <span>{t("login_dialog_terms_prefix")}</span>
               <br />
               <a
-                href={`${websiteUrl}/terms/service`}
+                href={termsOfServiceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
@@ -229,7 +232,7 @@ export const LoginDialog = ({
               </a>
               <span className="mx-1">{t("login_dialog_terms_and")}</span>
               <a
-                href={`${websiteUrl}/terms/privacy-policy`}
+                href={privacyPolicyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-logo-cyan underline underline-offset-2 hover:text-logo-cyan/80"
