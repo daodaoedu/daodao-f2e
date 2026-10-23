@@ -28,7 +28,11 @@ interface IUseCheckInSheetOptions {
  * ```tsx
  * const { openCheckInSheet } = useCheckInSheet({
  *   taskTitle: "我的實踐",
- *   onComplete: handleComplete,
+ *   // 送出成功後呼叫 closeSheet；失敗時丟出錯誤，sheet 與內容保留
+ *   onComplete: async (data, { closeSheet }) => {
+ *     await createCheckIn(data);
+ *     closeSheet();
+ *   },
  *   onClose: handleClose,
  * });
  *
