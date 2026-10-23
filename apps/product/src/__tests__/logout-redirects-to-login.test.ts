@@ -14,7 +14,9 @@ import { describe, expect, it } from "vitest";
 const ALLOWED = new Set(["hooks/use-logout-redirect.ts"]);
 
 const SRC_DIR = path.resolve(__dirname, "..");
-const DESTRUCTURE_LOGOUT_FROM_USE_AUTH = /const\s*\{[^}]*\blogout\b[^}]*\}\s*=\s*useAuth\(\)/;
+// useAuth 是 useAuthContext 的別名；解構與直接呼叫（useAuth().logout()、auth.logout()）都算
+const DESTRUCTURE_LOGOUT_FROM_USE_AUTH =
+  /const\s*\{[^}]*\blogout\b[^}]*\}\s*=\s*useAuth(?:Context)?\(\)|useAuth(?:Context)?\(\)\.logout\b|\bauth\.logout\(/;
 
 const walk = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {
