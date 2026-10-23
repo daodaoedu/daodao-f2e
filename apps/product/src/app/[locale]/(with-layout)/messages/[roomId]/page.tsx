@@ -17,10 +17,12 @@ import {
   useMyChatRooms,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
+import { Button } from "@daodao/ui/components/button";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import { toast } from "@daodao/ui/components/sonner";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChatDeleteConfirmDialog } from "@/components/chat/chat-delete-confirm-dialog";
 import { ChatHeader } from "@/components/chat/chat-header";
 import { ChatInput } from "@/components/chat/chat-input";
@@ -36,11 +38,16 @@ import { runOptimisticDelete } from "@/utils/chat-optimistic-delete";
 
 export default function ChatRoomPage() {
   const t = useTranslations("messages");
-  const { errorMessage } = useServerErrorMessage();
+  const { errorMessage, locale } = useServerErrorMessage();
   const params = useParams<{ roomId: string }>();
   const roomId = Number(params.roomId);
 
-  const { data: roomData, isLoading: roomLoading } = useChatRoom(roomId || null);
+  const {
+    data: roomData,
+    isLoading: roomLoading,
+    error: roomError,
+    mutate: mutateRoom,
+  } = useChatRoom(roomId || null);
   const room = selectChatRoom(roomData);
   // 訊息 author.userId 是內部 users.id；/users/me 只給 UUID，所以用聊天室詳情的 viewerUserId 判斷本人訊息
   const viewerUserId = room?.viewerUserId ?? null;
@@ -154,8 +161,33 @@ export default function ChatRoomPage() {
           <Spinner className="size-6" />
         </div>
       ) : !room ? (
-        <div className="flex flex-1 items-center justify-center text-text-dark/50">
-          <p className="text-sm">{t("empty")}</p>
+        <div className="flex flex-1 items-center justify-center px-6 py-10">
+          <div className="flex max-w-sm flex-col items-center gap-4 text-center" role="alert">
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold text-text-dark">{t("room_unavailable")}</h2>
+              <p className="text-sm text-text-dark/70">
+                {errorMessage(roomError, t("room_load_failed"))}
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button asChild>
+                <CustomLink href="/messages" locale={locale}>
+                  {t("back_to_rooms")}
+                </CustomLink>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  void mutateRoom();
+                  void mutateHistory();
+                  void mutatePins();
+                  void mutateRooms();
+                }}
+              >
+                {t("retry_loading")}
+              </Button>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="relative flex flex-col flex-1 min-h-0">
