@@ -62,9 +62,9 @@ export const SpacePracticeSection = ({ tasks }: SpacePracticeSectionProps) => {
           {filterStatus === FilterStatus.inProgress ? t("empty_in_progress") : t("empty_list")}
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {filteredTasks.map((task) => (
-            <InProgressTaskCard key={task.id} {...task} />
+            <InProgressTaskCard key={task.id} {...task} presentation="personal-space" />
           ))}
         </div>
       )}
