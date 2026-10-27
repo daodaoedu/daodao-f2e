@@ -2,7 +2,6 @@
 
 import type { IShowcaseCheckIn } from "@daodao/api";
 import {
-  exitCohort,
   setCohortExportConsent,
   updatePractice,
   useCohortMemberHome,
@@ -10,20 +9,34 @@ import {
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { Button } from "@daodao/ui/components/button";
 import { Checkbox } from "@daodao/ui/components/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@daodao/ui/components/dropdown-menu";
 import { Empty, EmptyDescription } from "@daodao/ui/components/empty";
 import { Label } from "@daodao/ui/components/label";
 import { toast } from "@daodao/ui/components/sonner";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
-import { ArrowLeft, LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { InProgressTaskCard } from "@/components/dashboard";
 import { BackgroundAnimation, Banner } from "@/components/layout";
 import { CohortErrorState } from "@/components/lighthouse/cohort-error-state";
 import { CheckInShowcaseCard } from "@/components/showcase/CheckInShowcaseCard";
+import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 
 /** 與「我的」頁一致的預設卡片主題色 */
@@ -48,65 +61,55 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
   const home = homeQuery.data?.data;
   const feed = feedQuery.data?.data;
   const notMember = isNotMemberError(homeQuery.error);
-  const [tab, setTab] = useState<"practices" | "feed" | "settings">("practices");
+  const [tab, setTab] = useState<"practices" | "feed">("practices");
   const [pendingConsent, setPendingConsent] = useState<boolean | null>(null);
-  const { openWarningDialog } = useDialog();
+  const [privacySettingsOpen, setPrivacySettingsOpen] = useState(false);
+  const { openInfoDialog } = useDialog();
 
-  const consentValue = pendingConsent ?? home?.exportOptIn ?? false;
-  const consentDirty = pendingConsent !== null && pendingConsent !== (home?.exportOptIn ?? false);
+  const consentValue = pendingConsent ?? home?.exportOptIn ?? true;
+  const consentDirty = pendingConsent !== null && pendingConsent !== (home?.exportOptIn ?? true);
 
   useEffect(() => {
-    if (notMember) router.replace("/mine");
+    if (notMember) router.replace(HOME_TAB_PATHS.inspire);
   }, [notMember, router]);
 
-  async function activate(id: string) {
+  async function activate(id: string): Promise<boolean> {
     try {
       const response = await updatePractice(id, { status: "active", isDraft: false });
       if (response.error) {
         toast.error(t("activate_failed"));
-        return;
+        return false;
       }
       await homeQuery.mutate();
       toast.success(t("practice_activated"));
+      return true;
     } catch {
       toast.error(t("activate_failed"));
+      return false;
     }
   }
 
-  async function setConsent(consent: boolean) {
+  async function setConsent(consent: boolean): Promise<boolean> {
     try {
       const response = await setCohortExportConsent(cohortId, consent);
       if (response.error) {
         toast.error(t("save_failed"));
-        return;
+        return false;
       }
       await homeQuery.mutate();
+      return true;
     } catch {
       toast.error(t("save_failed"));
+      return false;
     }
   }
 
-  async function exit() {
-    const result = await openWarningDialog({
-      title: t("exit_confirm_title"),
-      message: t("exit_confirm"),
-      buttons: [
-        { label: t("exit_cancel"), value: "cancel", variant: "outline" },
-        { label: t("exit_confirm_action"), value: "confirm", variant: "orange" },
-      ],
+  function contactCourseAdmin() {
+    void openInfoDialog({
+      title: t("exit_program_activity"),
+      message: t("exit_contact_admin_message"),
+      buttons: [{ label: t("exit_contact_close"), value: "close" }],
     });
-    if (result.value !== "confirm") return;
-    try {
-      const response = await exitCohort(cohortId);
-      if (response.error) {
-        toast.error(t("exit_failed"));
-        return;
-      }
-      toast.success(t("exit_success"));
-      router.push("/mine");
-    } catch {
-      toast.error(t("exit_failed"));
-    }
   }
 
   if (homeQuery.isLoading || notMember)
@@ -131,20 +134,38 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
 
       <main className="relative z-[25] pb-[72px] bg-very-light-gray">
         <div className="max-w-[640px] px-4 mx-auto pt-4">
-          {/* Back + Cohort header */}
-          <button
-            type="button"
-            onClick={() => router.push("/mine")}
-            className="flex items-center gap-1 text-sm text-text-dark/60 hover:text-text-dark transition-colors mb-3 cursor-pointer"
-          >
-            <ArrowLeft className="size-4" />
-            {t("back_to_mine")}
-          </button>
-          <div className="mb-4">
-            <p className="text-xs font-medium text-logo-cyan">{home?.organization.name}</p>
-            <h1 className="mt-1 text-lg font-bold text-text-dark">
-              {home?.displayName ?? t("cohort_home")}
-            </h1>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-medium text-logo-cyan">{home?.organization.name}</p>
+              <h1 className="mt-1 text-lg font-bold text-text-dark">
+                {home?.displayName ?? t("cohort_home")}
+              </h1>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-9 shrink-0 text-text-dark/60"
+                  aria-label={t("settings")}
+                >
+                  <Settings className="size-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-48">
+                <DropdownMenuItem
+                  onClick={() => setPrivacySettingsOpen(true)}
+                  className="gap-2 text-text-dark"
+                >
+                  <Settings className="size-4" />
+                  {t("settings_privacy")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={contactCourseAdmin} className="gap-2 text-text-dark">
+                  <LogOut className="size-4" />
+                  {t("exit_program_activity")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Tab switcher */}
@@ -173,28 +194,16 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
             >
               {t("cohort_feed")}
             </button>
-            <button
-              type="button"
-              onClick={() => setTab("settings")}
-              className={cn(
-                "flex-1 py-2 text-sm font-medium transition-all",
-                tab === "settings"
-                  ? "text-text-dark border-b-2 border-logo-cyan -mb-px"
-                  : "text-text-dark/40"
-              )}
-            >
-              {t("settings")}
-            </button>
           </div>
 
           {/* Content */}
           {tab === "practices" && (
             <div className="flex flex-col gap-3">
-              {/* 匯出同意本來只藏在設定分頁，沒特別說沒人會去勾 */}
+              {/* 未同意匯出時顯示提示，提供直接管理入口 */}
               {!consentValue && (
                 <button
                   type="button"
-                  onClick={() => setTab("settings")}
+                  onClick={() => setPrivacySettingsOpen(true)}
                   className="rounded-xl bg-white p-4 text-left text-xs text-text-dark/60 shadow-sm transition-all hover:shadow-md"
                 >
                   {t("export_consent_nudge")}
@@ -223,11 +232,11 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
                     isUnreadMessages={false}
                     theme={practice.themeColor || DEFAULT_PRACTICE_THEME}
                     status={mapPracticeStatusToTaskStatus(practice.status)}
+                    cohortCard
                     lastCheckInDate={practice.lastCheckinAt ?? null}
                     startDate={practice.startDate ?? null}
                     endDate={practice.endDate ?? null}
-                    draftActionLabel={t("activate_practice")}
-                    onEdit={() => void activate(practice.id)}
+                    onBeforeCheckIn={() => activate(practice.id)}
                   />
                 ))}
               </div>
@@ -279,62 +288,65 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
               ))}
             </div>
           )}
-          {tab === "settings" && (
-            <div className="flex flex-col gap-4">
-              <div className="rounded-xl bg-white p-5 shadow-sm">
-                <h3 className="text-sm font-semibold text-text-dark">{t("settings_privacy")}</h3>
-                <p className="mt-1 text-xs text-text-dark/50 leading-relaxed">
-                  {t("settings_privacy_desc")}
-                </p>
-                <div className="mt-4 flex items-start gap-3">
-                  <Checkbox
-                    id="export-consent"
-                    checked={consentValue}
-                    onCheckedChange={(checked) => setPendingConsent(checked === true)}
-                    className="mt-0.5"
-                  />
-                  <Label
-                    htmlFor="export-consent"
-                    className="cursor-pointer text-sm text-text-dark leading-relaxed"
-                  >
-                    {t("export_consent")}
-                  </Label>
-                </div>
-                {consentDirty && (
-                  <div className="mt-4 flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        void setConsent(consentValue).then(() => setPendingConsent(null));
-                      }}
-                    >
-                      {t("save")}
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => setPendingConsent(null)}>
-                      {t("exit_cancel")}
-                    </Button>
-                  </div>
-                )}
-              </div>
-              <div className="rounded-xl bg-white p-5 shadow-sm">
-                <h3 className="text-sm font-semibold text-text-dark">{t("settings_membership")}</h3>
-                <p className="mt-1 text-xs text-text-dark/50 leading-relaxed">
-                  {t("settings_membership_desc")}
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-4 text-text-dark/60"
-                  onClick={exit}
-                >
-                  <LogOut className="size-4" />
-                  {t("exit_and_keep_personal")}
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
       </main>
+      <Dialog
+        open={privacySettingsOpen}
+        onOpenChange={(open) => {
+          setPrivacySettingsOpen(open);
+          if (!open) setPendingConsent(null);
+        }}
+      >
+        <DialogContent className="max-w-[420px] gap-4 rounded-[24px] p-6">
+          <DialogHeader className="items-start text-left">
+            <DialogTitle className="text-left text-lg font-semibold text-text-dark">
+              {t("settings_privacy")}
+            </DialogTitle>
+            <DialogDescription className="text-left text-sm leading-relaxed text-text-dark/60">
+              {t("settings_privacy_desc")}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="export-consent"
+              checked={consentValue}
+              onCheckedChange={(checked) => setPendingConsent(checked === true)}
+              className="mt-0.5"
+            />
+            <Label
+              htmlFor="export-consent"
+              className="cursor-pointer text-sm leading-relaxed text-text-dark"
+            >
+              {t("export_consent")}
+            </Label>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setPendingConsent(null);
+                setPrivacySettingsOpen(false);
+              }}
+            >
+              {t("exit_cancel")}
+            </Button>
+            <Button
+              size="sm"
+              disabled={!consentDirty}
+              onClick={() => {
+                void setConsent(consentValue).then((saved) => {
+                  if (!saved) return;
+                  setPendingConsent(null);
+                  setPrivacySettingsOpen(false);
+                });
+              }}
+            >
+              {t("save")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

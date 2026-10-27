@@ -6,7 +6,7 @@ export default async function WithLayout({ children, params }: LayoutProps<"/[lo
   setRequestLocale(locale);
   return (
     <>
-      <div className="md:pl-[132px]">
+      <div className="md:pl-[144px]">
         {children}
         <Footer />
       </div>

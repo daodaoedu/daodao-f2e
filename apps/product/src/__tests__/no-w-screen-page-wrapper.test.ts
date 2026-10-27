@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 /**
  * daodao#233 / #239 regression guard。
  *
- * `w-screen` 是 `100vw`：疊在有 padding 的父層（`(with-layout)` 的 `md:pl-[132px]`）上會讓整頁
+ * `w-screen` 是 `100vw`：疊在有 padding 的父層（`(with-layout)` 的 `md:pl-[144px]`）上會讓整頁
  * 右偏並出現橫向捲軸，有垂直捲軸時也會多出捲軸寬。頁面 wrapper 一律用 `w-full`。
  *
  * 真的需要 100vw 的（例如全螢幕遮罩）登記在 ALLOWED，並寫明**該檔預期的出現次數**——
@@ -24,7 +24,7 @@ const ALLOWED: Array<{ file: string; count: number; reason: string }> = [
   {
     file: "components/layout/page-shell.tsx",
     count: 1,
-    reason: "JSDoc 說明 w-screen 疊 md:pl-[132px] 的右偏問題（daodao#240），非 className",
+    reason: "JSDoc 說明 w-screen 疊 md:pl-[144px] 的右偏問題（daodao#240），非 className",
   },
   {
     file: "components/layout/__tests__/page-shell.styles.test.ts",
