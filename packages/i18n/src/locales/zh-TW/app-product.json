@@ -14,7 +14,7 @@
   "nav_home": "主頁",
   "nav_spaces": "空間",
   "nav_messages": "訊息",
-  "nav_manage": "管理",
+  "nav_manage": "燈塔",
   "nav_explore": "探索社群",
   "nav_growth_map": "成長地圖",
   "nav_notifications": "最新通知",
@@ -578,3 +578,4 @@
   "account_archived": "封存",
   "account_roadmap_suggestion": "Roadmap & 建議"
 }
+

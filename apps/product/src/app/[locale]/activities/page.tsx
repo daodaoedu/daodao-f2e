@@ -87,7 +87,7 @@ export default function ExploreActivitiesPage() {
     <div className={PAGE_BACKGROUND}>
       {isAuthenticated ? (
         <>
-          <div className="md:pl-[132px]">
+          <div className="md:pl-[144px]">
             <PageHeader
               leftAction="back"
               onLeftAction={() => router.push("/spaces")}
@@ -241,3 +241,4 @@ function BottomCta({
     </div>
   );
 }
+

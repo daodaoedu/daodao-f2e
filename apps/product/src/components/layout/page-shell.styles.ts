@@ -3,8 +3,8 @@ import { cn } from "@daodao/ui/lib/utils";
 /**
  * `(with-layout)` 頁面的外層 wrapper。
  *
- * `w-full` 而非 `w-screen`：外層 `(with-layout)/layout.tsx` 有 `md:pl-[132px]`，
- * `100vw` 會疊在 padding 上讓整頁右偏 132px（daodao#233）。
+ * `w-full` 而非 `w-screen`：外層 `(with-layout)/layout.tsx` 有 `md:pl-[144px]`，
+ * `100vw` 會疊在 padding 上讓整頁右偏 144px（daodao#233）。
  */
 export const PAGE_SHELL_WRAPPER_CLASS =
   "relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto";
@@ -16,3 +16,4 @@ export const pageShellWrapperClassName = (className?: string) =>
   cn(PAGE_SHELL_WRAPPER_CLASS, className);
 
 export const pageShellMainClassName = (className?: string) => cn(PAGE_SHELL_MAIN_CLASS, className);
+
