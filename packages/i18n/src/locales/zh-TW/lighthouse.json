@@ -598,6 +598,8 @@
   "cohort_location": "活動地點",
   "cohort_location_placeholder": "例：台北市某咖啡廳",
   "cohort_sessions_title": "聚會時段",
+  "cohort_timezone": "時區",
+  "cohort_timezone_hint": "所有聚會時段共用此時區。",
   "cohort_session_date": "日期",
   "cohort_session_start_time": "開始時間",
   "cohort_session_end_time": "結束時間",

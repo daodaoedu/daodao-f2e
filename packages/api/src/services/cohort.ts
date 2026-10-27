@@ -8,6 +8,9 @@ type ProgramListResponse =
   paths["/api/v1/lighthouse/programs"]["get"]["responses"][200]["content"]["application/json"];
 type CohortListResponse =
   paths["/api/v1/lighthouse/programs/{programId}/cohorts"]["get"]["responses"][200]["content"]["application/json"];
+type CohortListResponseWithTimezone = Omit<CohortListResponse, "data"> & {
+  data: Array<CohortListResponse["data"][number] & { timezone: string }>;
+};
 type CreateProgramBody = NonNullable<
   paths["/api/v1/lighthouse/programs"]["post"]["requestBody"]
 >["content"]["application/json"];
@@ -20,6 +23,8 @@ type CreateCohortBody = NonNullable<
 type UpdateCohortBody = NonNullable<
   paths["/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}"]["patch"]["requestBody"]
 >["content"]["application/json"];
+type CreateCohortBodyWithTimezone = CreateCohortBody & { timezone: string };
+type UpdateCohortBodyWithTimezone = UpdateCohortBody & { timezone?: string };
 type InviteCohortMembersBody = NonNullable<
   paths["/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/invitations"]["post"]["requestBody"]
 >["content"]["application/json"];
@@ -38,7 +43,7 @@ type AddOrganizationMemberBody = NonNullable<
 
 export type LighthouseOrganizationType = OrganizationListResponse["data"][number];
 export type LighthouseProgramType = ProgramListResponse["data"][number];
-export type LighthouseCohortType = CohortListResponse["data"][number];
+export type LighthouseCohortType = CohortListResponseWithTimezone["data"][number];
 
 const nullableDateTimeSchema = z.string().datetime().nullable();
 const responseMetaSchema = z.record(z.string(), z.unknown()).optional();
@@ -89,6 +94,7 @@ const lighthouseCohortShape = {
   tagline: z.string().nullable(),
   startDate: z.string(),
   endDate: z.string(),
+  timezone: z.string().default("Asia/Taipei"),
   joinToken: z.string().nullable(),
   joinPaused: z.boolean(),
   joinDeadline: z.string().nullable(),
@@ -123,7 +129,7 @@ export const lighthouseProgramListResponseSchema: z.ZodType<ProgramListResponse>
   z.array(lighthouseProgramSchema)
 );
 
-export const lighthouseCohortListResponseSchema: z.ZodType<CohortListResponse> = apiSuccessSchema(
+export const lighthouseCohortListResponseSchema: z.ZodType<CohortListResponseWithTimezone> = apiSuccessSchema(
   z.array(lighthouseCohortSchema)
 );
 
@@ -593,7 +599,10 @@ export const duplicateLighthouseProgram = async (programId: number) =>
     params: { path: { programId } },
   });
 
-export const createLighthouseCohort = async (programId: number, body: CreateCohortBody) =>
+export const createLighthouseCohort = async (
+  programId: number,
+  body: CreateCohortBodyWithTimezone
+) =>
   client.POST("/api/v1/lighthouse/programs/{programId}/cohorts", {
     params: { path: { programId } },
     body,
@@ -602,7 +611,7 @@ export const createLighthouseCohort = async (programId: number, body: CreateCoho
 export const updateLighthouseCohort = async (
   programId: number,
   cohortId: number,
-  body: UpdateCohortBody
+  body: UpdateCohortBodyWithTimezone
 ) =>
   client.PATCH("/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}", {
     params: { path: { programId, cohortId } },

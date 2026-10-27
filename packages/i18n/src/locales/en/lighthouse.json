@@ -576,6 +576,8 @@
   "cohort_location": "Location",
   "cohort_location_placeholder": "e.g. Online, a local cafe",
   "cohort_sessions_title": "Meeting sessions",
+  "cohort_timezone": "Time zone",
+  "cohort_timezone_hint": "All meeting sessions use this time zone.",
   "cohort_session_date": "Date",
   "cohort_session_start_time": "Start time",
   "cohort_session_end_time": "End time",

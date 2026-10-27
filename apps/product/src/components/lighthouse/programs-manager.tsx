@@ -16,7 +16,7 @@ import {
   useLighthousePrograms,
   useLighthouseTemplates,
 } from "@daodao/api";
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import {
@@ -30,6 +30,7 @@ import { Popover, PopoverAnchor, PopoverContent } from "@daodao/ui/components/po
 import { toast } from "@daodao/ui/components/sonner";
 import { Switch } from "@daodao/ui/components/switch";
 import { Textarea } from "@daodao/ui/components/textarea";
+import { addDays, differenceInCalendarDays, format, getDay, parseISO } from "date-fns";
 import {
   AlertTriangle,
   Archive,
@@ -63,11 +64,131 @@ import {
   templateBindingEndDate,
   templateStartDateOverride,
 } from "@/utils/template-library";
+import { DEFAULT_COHORT_TIMEZONE, TIME_ZONE_OPTIONS } from "@/utils/timezones";
 import { ConfirmDialog } from "./confirm-dialog";
 import { JoinCode } from "./join-code";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 type SessionEntry = { id: string; sessionDate: string; startTime: string; endTime: string };
+type SessionDisplayGroup = {
+  sessions: SessionEntry[];
+  repeatWeekdays: number[];
+  repeatWeeks: number;
+};
+type ExpandedRepeatGroup = { key: string; sessionIds: string[]; label: string };
+
+const RECURRENCE_WEEKDAYS = [
+  { day: 1, zh: "週一", en: "Mon" },
+  { day: 2, zh: "週二", en: "Tue" },
+  { day: 3, zh: "週三", en: "Wed" },
+  { day: 4, zh: "週四", en: "Thu" },
+  { day: 5, zh: "週五", en: "Fri" },
+  { day: 6, zh: "週六", en: "Sat" },
+  { day: 7, zh: "週日", en: "Sun" },
+] as const;
+
+function groupSessionsForDisplay(
+  sessions: SessionEntry[],
+  expandedSessionIds: Set<string>
+): SessionDisplayGroup[] {
+  const weeklyBuckets = new Map<string, SessionEntry[]>();
+  const singles: SessionDisplayGroup[] = [];
+
+  for (const session of sessions) {
+    if (!session.sessionDate || expandedSessionIds.has(session.id)) {
+      singles.push({ sessions: [session], repeatWeekdays: [], repeatWeeks: 0 });
+      continue;
+    }
+
+    const weekday = getDay(parseISO(session.sessionDate)) || 7;
+    const key = `${session.startTime}|${session.endTime}|${weekday}`;
+    const bucket = weeklyBuckets.get(key) ?? [];
+    bucket.push(session);
+    weeklyBuckets.set(key, bucket);
+  }
+
+  const weeklySequences: SessionEntry[][] = [];
+  for (const bucket of weeklyBuckets.values()) {
+    const ordered = bucket.slice().sort((a, b) => a.sessionDate.localeCompare(b.sessionDate));
+    let sequence: SessionEntry[] = [];
+
+    for (const session of ordered) {
+      const previous = sequence.at(-1);
+      if (
+        previous &&
+        differenceInCalendarDays(parseISO(session.sessionDate), parseISO(previous.sessionDate)) !==
+          7
+      ) {
+        if (sequence.length > 1) weeklySequences.push(sequence);
+        else singles.push({ sessions: sequence, repeatWeekdays: [], repeatWeeks: 0 });
+        sequence = [];
+      }
+      sequence.push(session);
+    }
+
+    if (sequence.length > 1) weeklySequences.push(sequence);
+    else if (sequence.length === 1)
+      singles.push({ sessions: sequence, repeatWeekdays: [], repeatWeeks: 0 });
+  }
+
+  const weeklyGroups: SessionDisplayGroup[][] = [];
+  for (const sequence of weeklySequences) {
+    const first = sequence[0];
+    const last = sequence.at(-1);
+    const weekday = getDay(parseISO(first.sessionDate)) || 7;
+    const matchingGroup = weeklyGroups.find((group) => {
+      const groupedSessions = group.flatMap((item) => item.sessions);
+      const groupedFirst = groupedSessions[0];
+      const groupedLast = groupedSessions.at(-1);
+      return (
+        groupedFirst.startTime === first.startTime &&
+        groupedFirst.endTime === first.endTime &&
+        group.every((item) => item.sessions.length === sequence.length) &&
+        Math.abs(
+          differenceInCalendarDays(parseISO(first.sessionDate), parseISO(groupedFirst.sessionDate))
+        ) <= 6 &&
+        Math.abs(
+          differenceInCalendarDays(parseISO(last.sessionDate), parseISO(groupedLast.sessionDate))
+        ) <= 6
+      );
+    });
+    const item = {
+      sessions: sequence,
+      repeatWeekdays: [weekday],
+      repeatWeeks: sequence.length,
+    };
+    if (matchingGroup) matchingGroup.push(item);
+    else weeklyGroups.push([item]);
+  }
+
+  const repeated = weeklyGroups.map((group) => ({
+    sessions: group
+      .flatMap((item) => item.sessions)
+      .sort((a, b) => a.sessionDate.localeCompare(b.sessionDate)),
+    repeatWeekdays: group.map((item) => item.repeatWeekdays[0]).sort((a, b) => a - b),
+    repeatWeeks: Math.max(...group.map((item) => item.repeatWeeks)),
+  }));
+
+  return [...singles, ...repeated].sort((a, b) => {
+    const aDate = a.sessions[0].sessionDate;
+    const bDate = b.sessions[0].sessionDate;
+    if (!aDate) return 1;
+    if (!bDate) return -1;
+    return aDate.localeCompare(bDate);
+  });
+}
+
+function recurringSessionLabel(group: SessionDisplayGroup, locale: string): string | null {
+  if (group.repeatWeekdays.length === 0) return null;
+
+  const weekdays = group.repeatWeekdays.map((weekday) => {
+    const match = RECURRENCE_WEEKDAYS.find((item) => item.day === weekday);
+    return locale === "en" ? match?.en : match?.zh.replace("週", "");
+  });
+  return locale === "en"
+    ? `Every ${weekdays.join(", ")} for ${group.repeatWeeks} weeks (${group.sessions.length} sessions)`
+    : `每週${weekdays.join("、")}，持續 ${group.repeatWeeks} 週（共 ${group.sessions.length} 場）`;
+}
 
 type CohortTemplateSummary = {
   id: number;
@@ -156,6 +277,7 @@ interface CohortSetupPanelProps {
     formData: FormData,
     extras: {
       interactionModes: string[];
+      timezone: string;
       sessions: SessionEntry[];
       feeType: "free" | "paid";
       signupMethod: "island_form" | "external";
@@ -184,6 +306,41 @@ function CohortSetupPanel({
   busy,
 }: CohortSetupPanelProps) {
   const t = useTranslations("lighthouse");
+  const locale = useLocale();
+  const recurrenceCopy =
+    locale === "en"
+      ? {
+          title: "Add recurring sessions",
+          startDate: "Start date",
+          weeks: "Number of weeks",
+          weekdays: "Repeat on",
+          weekdaysOnly: "Weekdays (Monday–Friday)",
+          startTime: "Start time for each session",
+          endTime: "End time for each session",
+          add: "Add recurring sessions",
+          regularOption: "Recurring sessions",
+          irregularOption: "One-off session",
+          irregularTitle: "One-off sessions",
+          editIndividual: "Edit individual sessions",
+          editingIndividual: "Editing individual sessions from",
+          collapseRepeat: "Collapse series",
+        }
+      : {
+          title: "規律新增聚會時段",
+          startDate: "從哪一天開始",
+          weeks: "持續週數",
+          weekdays: "重複星期",
+          weekdaysOnly: "平日（週一至週五）",
+          startTime: "每場開始時間",
+          endTime: "每場結束時間",
+          add: "新增規律時段",
+          regularOption: "規律時段",
+          irregularOption: "非規律時段",
+          irregularTitle: "非規律時段",
+          editIndividual: "逐場編輯",
+          editingIndividual: "正在逐場編輯",
+          collapseRepeat: "收合規律時段",
+        };
   const [activeTab, setActiveTab] = useState<SetupTab>("basic");
   const panelRef = useRef<HTMLFormElement>(null);
   // 已開始的場次 server 會拒絕變更綁定（FR-TPL-05），直接鎖住勾選
@@ -211,6 +368,7 @@ function CohortSetupPanel({
   const [templateDropOpen, setTemplateDropOpen] = useState(false);
   // 跟著基本資訊分頁正在編輯的場次開始日走，沒指定開始日的模板列才不會顯示舊日期
   const [cohortStartDate, setCohortStartDate] = useState(cohort?.startDate?.slice(0, 10) ?? "");
+  const [cohortEndDate, setCohortEndDate] = useState(cohort?.endDate?.slice(0, 10) ?? "");
   function savedTemplateStartDate(tpl: CohortTemplateSummary): string | null {
     const binding = cohort ? tpl.bindings.find((b) => b.cohortId === cohort.id) : undefined;
     return binding?.startDate?.slice(0, 10) ?? null;
@@ -232,6 +390,20 @@ function CohortSetupPanel({
       endTime: s.endTime ?? "",
     }))
   );
+  const [timezone, setTimezone] = useState(cohort?.timezone ?? DEFAULT_COHORT_TIMEZONE);
+  const [timezoneSearch, setTimezoneSearch] = useState("");
+  const [timezoneDropOpen, setTimezoneDropOpen] = useState(false);
+  const [recurrenceStartDateOverride, setRecurrenceStartDateOverride] = useState<string | null>(
+    null
+  );
+  const [recurrenceWeeks, setRecurrenceWeeks] = useState(4);
+  const [recurrenceWeekdays, setRecurrenceWeekdays] = useState<number[]>([]);
+  const [sessionAddMode, setSessionAddMode] = useState<"regular" | "irregular" | null>(null);
+  const [expandedRepeatGroups, setExpandedRepeatGroups] = useState<ExpandedRepeatGroup[]>([]);
+  const [recurrenceStartTime, setRecurrenceStartTime] = useState(
+    cohort?.sessions?.[0]?.startTime ?? ""
+  );
+  const [recurrenceEndTime, setRecurrenceEndTime] = useState(cohort?.sessions?.[0]?.endTime ?? "");
   const [interactionModes, setInteractionModes] = useState<string[]>(
     cohort?.interactionModes ?? []
   );
@@ -255,6 +427,12 @@ function CohortSetupPanel({
   const [showInviteOnSignup, setShowInviteOnSignup] = useState(
     cohort?.showInviteMessageOnSignup ?? false
   );
+  const recurrenceStartDate =
+    recurrenceStartDateOverride ??
+    cohort?.sessions?.find((session) => session.sessionDate)?.sessionDate?.slice(0, 10) ??
+    cohortStartDate;
+  const expandedSessionIds = new Set(expandedRepeatGroups.flatMap((group) => group.sessionIds));
+  const displayedSessions = groupSessionsForDisplay(sessions, expandedSessionIds);
 
   useEffect(() => {
     panelRef.current?.scrollIntoView({
@@ -278,11 +456,92 @@ function CohortSetupPanel({
     });
   }, []);
   const removeSession = useCallback((id: string) => {
-    setSessions((prev) => prev.filter((s) => s.id !== id));
+    setSessions((prev) => prev.filter((session) => session.id !== id));
+    setExpandedRepeatGroups((prev) =>
+      prev
+        .map((group) => ({
+          ...group,
+          sessionIds: group.sessionIds.filter((sessionId) => sessionId !== id),
+        }))
+        .filter((group) => group.sessionIds.length > 1)
+    );
   }, []);
-  const updateSession = useCallback((id: string, field: keyof SessionEntry, value: string) => {
-    setSessions((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
+  const addRecurringSessions = useCallback(() => {
+    if (!recurrenceStartDate || recurrenceWeekdays.length === 0) return;
+
+    const [year, month, day] = recurrenceStartDate.split("-").map(Number);
+    const firstDate = Date.UTC(year, month - 1, day);
+    if (!Number.isFinite(firstDate)) return;
+
+    const existingKeys = new Set(
+      sessions.map((session) => `${session.sessionDate}|${session.startTime}|${session.endTime}`)
+    );
+    const generated: SessionEntry[] = [];
+    const dayInMs = 24 * 60 * 60 * 1000;
+
+    for (let offset = 0; offset < recurrenceWeeks * 7; offset += 1) {
+      const date = new Date(firstDate + offset * dayInMs);
+      const weekday = date.getUTCDay() || 7;
+      if (!recurrenceWeekdays.includes(weekday)) continue;
+
+      const sessionDate = date.toISOString().slice(0, 10);
+      if (cohortEndDate && sessionDate > cohortEndDate) continue;
+
+      const session = {
+        id: crypto.randomUUID(),
+        sessionDate,
+        startTime: recurrenceStartTime,
+        endTime: recurrenceEndTime,
+      };
+      const key = `${session.sessionDate}|${session.startTime}|${session.endTime}`;
+      if (existingKeys.has(key)) continue;
+      existingKeys.add(key);
+      generated.push(session);
+    }
+
+    if (generated.length > 0) {
+      setSessions((prev) => [...prev, ...generated]);
+      setSessionAddMode(null);
+    }
+  }, [
+    cohortEndDate,
+    recurrenceEndTime,
+    recurrenceStartDate,
+    recurrenceStartTime,
+    recurrenceWeekdays,
+    recurrenceWeeks,
+    sessions,
+  ]);
+
+  const toggleRecurrenceWeekday = useCallback((weekday: number) => {
+    setRecurrenceWeekdays((prev) =>
+      prev.includes(weekday) ? prev.filter((day) => day !== weekday) : [...prev, weekday].sort()
+    );
   }, []);
+  const updateSessionGroup = useCallback(
+    (group: SessionDisplayGroup, field: "sessionDate" | "startTime" | "endTime", value: string) => {
+      const sessionIds = new Set(group.sessions.map((session) => session.id));
+      const firstSession = group.sessions[0];
+      const dayOffset =
+        field === "sessionDate" && value && firstSession.sessionDate
+          ? differenceInCalendarDays(parseISO(value), parseISO(firstSession.sessionDate))
+          : 0;
+
+      setSessions((prev) =>
+        prev.map((session) => {
+          if (!sessionIds.has(session.id)) return session;
+          if (field === "sessionDate" && value && dayOffset !== 0) {
+            return {
+              ...session,
+              sessionDate: format(addDays(parseISO(session.sessionDate), dayOffset), "yyyy-MM-dd"),
+            };
+          }
+          return { ...session, [field]: value };
+        })
+      );
+    },
+    []
+  );
   const toggleInteractionMode = useCallback((m: string) => {
     setInteractionModes((prev) => (prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]));
   }, []);
@@ -298,6 +557,9 @@ function CohortSetupPanel({
   const filteredTemplates =
     templates?.filter((tpl) => tpl.title.toLowerCase().includes(templateSearch.toLowerCase())) ??
     [];
+  const filteredTimezones = TIME_ZONE_OPTIONS.filter((timeZone) =>
+    timeZone.toLowerCase().includes(timezoneSearch.trim().toLowerCase())
+  );
 
   // 用 onSubmit 而不是 form action：React 19 的 action 完成後會 reset 表單，
   // 送出失敗（400/409）時使用者填的內容會全部消失，只能從頭再填一次（#188）
@@ -305,6 +567,7 @@ function CohortSetupPanel({
     event.preventDefault();
     await onSubmit(new FormData(event.currentTarget), {
       interactionModes,
+      timezone,
       sessions,
       feeType,
       signupMethod,
@@ -435,6 +698,7 @@ function CohortSetupPanel({
               type="date"
               required
               defaultValue={cohort?.endDate?.slice(0, 10) ?? ""}
+              onChange={(e) => setCohortEndDate(e.target.value)}
             />
           </label>
           <label htmlFor={`${prefix}-deadline`} className="grid gap-1.5 text-sm font-medium">
@@ -546,62 +810,382 @@ function CohortSetupPanel({
           {(interactionModes.includes("sync") || interactionModes.includes("physical")) && (
             <fieldset className="md:col-span-2">
               <legend className="text-sm font-medium">{t("cohort_sessions_title")}</legend>
-              <div className="mt-2 grid gap-2">
-                {sessions.map((session) => (
-                  <div key={session.id} className="flex flex-wrap items-end gap-2">
+              <label
+                htmlFor={`${prefix}-timezone`}
+                className="mt-2 grid max-w-sm gap-1.5 text-sm font-medium"
+              >
+                {t("cohort_timezone")}
+                <Popover
+                  open={timezoneDropOpen}
+                  onOpenChange={(open) => {
+                    setTimezoneDropOpen(open);
+                    if (!open) setTimezoneSearch("");
+                  }}
+                >
+                  <PopoverAnchor asChild>
+                    <div className="relative" data-timezone-search>
+                      <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#78928F]" />
+                      <Input
+                        id={`${prefix}-timezone`}
+                        role="combobox"
+                        aria-autocomplete="list"
+                        aria-expanded={timezoneDropOpen}
+                        aria-controls={`${prefix}-timezone-options`}
+                        autoComplete="off"
+                        placeholder={timezone}
+                        value={timezoneDropOpen ? timezoneSearch : timezone}
+                        onChange={(event) => {
+                          setTimezoneSearch(event.target.value);
+                          setTimezoneDropOpen(true);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key !== "Enter") return;
+                          event.preventDefault();
+                          const query = timezoneSearch.trim().toLowerCase();
+                          const exactMatch = filteredTimezones.find(
+                            (timeZone) => timeZone.toLowerCase() === query
+                          );
+                          const match =
+                            exactMatch ??
+                            (filteredTimezones.length === 1 ? filteredTimezones[0] : undefined);
+                          if (match) {
+                            setTimezone(match);
+                            setTimezoneSearch("");
+                            setTimezoneDropOpen(false);
+                          }
+                        }}
+                        onFocus={() => setTimezoneDropOpen(true)}
+                        className="h-10 rounded-lg border-[#CDEBE8] bg-white pl-9 focus-visible:pl-[35px]"
+                      />
+                    </div>
+                  </PopoverAnchor>
+                  <PopoverContent
+                    align="start"
+                    sideOffset={6}
+                    onOpenAutoFocus={(event) => event.preventDefault()}
+                    onInteractOutside={(event) => {
+                      if ((event.target as HTMLElement).closest?.("[data-timezone-search]")) {
+                        event.preventDefault();
+                      }
+                    }}
+                    className="grid max-h-[236px] w-[var(--radix-popover-trigger-width)] gap-0.5 overflow-auto rounded-[12px] border-[#DDEFED] p-1.5 shadow-[0_12px_28px_rgba(15,48,54,0.14)]"
+                  >
+                    {filteredTimezones.length > 0 ? (
+                      <div id={`${prefix}-timezone-options`} role="listbox">
+                        {filteredTimezones.map((timeZone) => (
+                          <button
+                            key={timeZone}
+                            type="button"
+                            role="option"
+                            aria-selected={timezone === timeZone}
+                            onClick={() => {
+                              setTimezone(timeZone);
+                              setTimezoneSearch("");
+                              setTimezoneDropOpen(false);
+                            }}
+                            className={`flex w-full items-center justify-between rounded-[8px] px-2.5 py-[9px] text-left text-sm text-[#0D3036] hover:bg-[#F1F8F7] ${
+                              timezone === timeZone ? "bg-[#F7FCFB]" : "bg-white"
+                            }`}
+                          >
+                            <span>{timeZone}</span>
+                            <Check
+                              className={`size-4 text-[#16A8A3] ${timezone === timeZone ? "opacity-100" : "opacity-0"}`}
+                              aria-hidden="true"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="p-2.5 text-[13px] text-[#78928F]">
+                        找不到符合的時區 / No matching time zones
+                      </p>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </label>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 w-fit gap-2 border-[#CDEBE8]"
+                  >
+                    <Plus className="size-4" />
+                    {t("cohort_session_add")}
+                    <ChevronDown className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="min-w-40 rounded-xl border-[#CDEBE8]">
+                  <DropdownMenuItem onClick={() => setSessionAddMode("regular")}>
+                    {recurrenceCopy.regularOption}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSessionAddMode("irregular");
+                      addSession();
+                    }}
+                  >
+                    {recurrenceCopy.irregularOption}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {sessionAddMode === "regular" && (
+                <div className="mt-3 grid gap-3 rounded-xl border border-[#DDEFED] bg-white p-3">
+                  <p className="text-sm font-medium text-[#0D3036]">{recurrenceCopy.title}</p>
+                  <div className="grid gap-3 sm:grid-cols-2">
                     {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
-                    <label className="grid gap-1 text-xs">
-                      {t("cohort_session_date")}
+                    <label className="grid gap-1.5 text-xs font-medium">
+                      {recurrenceCopy.startDate}
                       <Input
                         type="date"
-                        className="h-9 w-[140px] text-xs"
-                        value={session.sessionDate}
-                        onChange={(e) => updateSession(session.id, "sessionDate", e.target.value)}
+                        className="h-9 text-sm"
+                        value={recurrenceStartDate}
+                        onChange={(event) => setRecurrenceStartDateOverride(event.target.value)}
                       />
                     </label>
                     {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
-                    <label className="grid gap-1 text-xs">
-                      {t("cohort_session_start_time")}
+                    <label className="grid gap-1.5 text-xs font-medium">
+                      {recurrenceCopy.weeks}
                       <Input
-                        type="time"
-                        className="h-9 w-[110px] text-xs"
-                        value={session.startTime}
-                        onChange={(e) => updateSession(session.id, "startTime", e.target.value)}
+                        type="number"
+                        min={1}
+                        max={52}
+                        className="h-9 text-sm"
+                        value={recurrenceWeeks}
+                        onChange={(event) =>
+                          setRecurrenceWeeks(
+                            Math.min(52, Math.max(1, Number(event.target.value) || 1))
+                          )
+                        }
                       />
                     </label>
-                    {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
-                    <label className="grid gap-1 text-xs">
-                      {t("cohort_session_end_time")}
-                      <Input
-                        type="time"
-                        className="h-9 w-[110px] text-xs"
-                        value={session.endTime}
-                        onChange={(e) => updateSession(session.id, "endTime", e.target.value)}
-                      />
-                    </label>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="size-9 text-[#C03A3A]"
-                      onClick={() => removeSession(session.id)}
-                      aria-label={t("cohort_session_remove")}
-                    >
-                      <Minus className="size-4" />
-                    </Button>
                   </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-fit border-[#CDEBE8]"
-                  onClick={addSession}
+                  <div className="grid gap-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs font-medium">{recurrenceCopy.weekdays}</p>
+                      <button
+                        type="button"
+                        onClick={() => setRecurrenceWeekdays([1, 2, 3, 4, 5])}
+                        className="text-xs font-medium text-[#0D7773] hover:underline"
+                      >
+                        {recurrenceCopy.weekdaysOnly}
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {RECURRENCE_WEEKDAYS.map(({ day, zh, en }) => {
+                        const selected = recurrenceWeekdays.includes(day);
+                        return (
+                          <button
+                            key={day}
+                            type="button"
+                            aria-pressed={selected}
+                            onClick={() => toggleRecurrenceWeekday(day)}
+                            className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${
+                              selected
+                                ? "border-[#16B9B3] bg-[#E7FAF7] text-[#0D7773]"
+                                : "border-[#CDEBE8] bg-white text-[#5A7B79] hover:bg-[#F1F8F7]"
+                            }`}
+                          >
+                            {locale === "en" ? en : zh}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                    <label className="grid gap-1.5 text-xs font-medium">
+                      {recurrenceCopy.startTime}
+                      <Input
+                        type="time"
+                        className="h-9 text-sm"
+                        value={recurrenceStartTime}
+                        onChange={(event) => setRecurrenceStartTime(event.target.value)}
+                      />
+                    </label>
+                    {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                    <label className="grid gap-1.5 text-xs font-medium">
+                      {recurrenceCopy.endTime}
+                      <Input
+                        type="time"
+                        className="h-9 text-sm"
+                        value={recurrenceEndTime}
+                        onChange={(event) => setRecurrenceEndTime(event.target.value)}
+                      />
+                    </label>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-fit border-[#CDEBE8]"
+                    disabled={!recurrenceStartDate || recurrenceWeekdays.length === 0}
+                    onClick={addRecurringSessions}
+                  >
+                    <Plus className="size-4" />
+                    {recurrenceCopy.add}
+                  </Button>
+                </div>
+              )}
+              {sessions.length > 0 && (
+                <div
+                  className={`mt-3 grid gap-2 ${
+                    sessionAddMode === "irregular"
+                      ? "rounded-xl border border-[#DDEFED] bg-white p-3"
+                      : ""
+                  }`}
                 >
-                  <Plus className="size-4" />
-                  {t("cohort_session_add")}
-                </Button>
-              </div>
+                  {sessionAddMode === "irregular" && (
+                    <p className="text-sm font-medium text-[#0D3036]">
+                      {recurrenceCopy.irregularTitle}
+                    </p>
+                  )}
+                  {expandedRepeatGroups.map((group) => (
+                    <div
+                      key={group.key}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[#F1F8F7] px-3 py-2"
+                    >
+                      <p className="text-xs font-medium text-[#0D3036]">
+                        {recurrenceCopy.editingIndividual} · {group.label}
+                      </p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs text-[#0D7773]"
+                        onClick={() =>
+                          setExpandedRepeatGroups((prev) =>
+                            prev.filter((item) => item.key !== group.key)
+                          )
+                        }
+                      >
+                        {recurrenceCopy.collapseRepeat}
+                      </Button>
+                    </div>
+                  ))}
+                  {displayedSessions.map((group, index) => {
+                    const session = group.sessions[0];
+                    const isFirstSession = index === 0;
+                    const repeatLabel = recurringSessionLabel(group, locale);
+                    return (
+                      <div key={session.id} className="grid gap-1">
+                        <div className="flex flex-wrap items-end gap-2">
+                          {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                          <label className="grid gap-1 text-xs">
+                            {isFirstSession ? (
+                              t("cohort_session_date")
+                            ) : (
+                              <span aria-hidden="true" className="invisible">
+                                {t("cohort_session_date")}
+                              </span>
+                            )}
+                            <Input
+                              type="date"
+                              className="h-9 w-[140px] text-xs"
+                              aria-label={
+                                isFirstSession
+                                  ? undefined
+                                  : `${t("cohort_session_date")} ${index + 1}`
+                              }
+                              value={session.sessionDate}
+                              onChange={(e) =>
+                                updateSessionGroup(group, "sessionDate", e.target.value)
+                              }
+                            />
+                          </label>
+                          {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                          <label className="grid gap-1 text-xs">
+                            {isFirstSession ? (
+                              t("cohort_session_start_time")
+                            ) : (
+                              <span aria-hidden="true" className="invisible">
+                                {t("cohort_session_start_time")}
+                              </span>
+                            )}
+                            <Input
+                              type="time"
+                              className="h-9 w-[110px] text-xs"
+                              aria-label={
+                                isFirstSession
+                                  ? undefined
+                                  : `${t("cohort_session_start_time")} ${index + 1}`
+                              }
+                              value={session.startTime}
+                              onChange={(e) =>
+                                updateSessionGroup(group, "startTime", e.target.value)
+                              }
+                            />
+                          </label>
+                          {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
+                          <label className="grid gap-1 text-xs">
+                            {isFirstSession ? (
+                              t("cohort_session_end_time")
+                            ) : (
+                              <span aria-hidden="true" className="invisible">
+                                {t("cohort_session_end_time")}
+                              </span>
+                            )}
+                            <Input
+                              type="time"
+                              className="h-9 w-[110px] text-xs"
+                              aria-label={
+                                isFirstSession
+                                  ? undefined
+                                  : `${t("cohort_session_end_time")} ${index + 1}`
+                              }
+                              value={session.endTime}
+                              onChange={(e) => updateSessionGroup(group, "endTime", e.target.value)}
+                            />
+                          </label>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="size-9 text-[#C03A3A]"
+                            onClick={() => {
+                              group.sessions.forEach((item) => {
+                                removeSession(item.id);
+                              });
+                            }}
+                            aria-label={
+                              repeatLabel
+                                ? `${t("cohort_session_remove")} ${repeatLabel}`
+                                : t("cohort_session_remove")
+                            }
+                          >
+                            <Minus className="size-4" />
+                          </Button>
+                        </div>
+                        {repeatLabel && (
+                          <div className="flex items-center gap-1">
+                            <p className="text-xs font-medium text-[#5A7B79]">{repeatLabel}</p>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="size-6 shrink-0 text-[#0D7773]"
+                              title={recurrenceCopy.editIndividual}
+                              aria-label={recurrenceCopy.editIndividual}
+                              onClick={() => {
+                                const sessionIds = group.sessions.map((item) => item.id);
+                                const key = sessionIds.slice().sort().join("|");
+                                setExpandedRepeatGroups((prev) =>
+                                  prev.some((item) => item.key === key)
+                                    ? prev
+                                    : [...prev, { key, sessionIds, label: repeatLabel }]
+                                );
+                              }}
+                            >
+                              <Pencil className="size-3.5" aria-hidden="true" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </fieldset>
           )}
 
@@ -1081,6 +1665,7 @@ function CohortCard({
         tagline: String(formData.get("tagline") ?? "").trim() || null,
         startDate,
         endDate,
+        timezone: extras.timezone,
         joinDeadline: String(formData.get("joinDeadline") ?? "") || null,
         capacity: capacityValue ? Number(capacityValue) : null,
         inviteMessage: String(formData.get("inviteMessage") ?? "").trim() || null,
@@ -1393,6 +1978,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         tagline: String(formData.get("tagline") ?? "").trim() || undefined,
         startDate,
         endDate,
+        timezone: extras.timezone,
         joinDeadline: String(formData.get("joinDeadline") ?? "") || null,
         capacity: capacityValue ? Number(capacityValue) : null,
         inviteMessage: String(formData.get("inviteMessage") ?? "").trim() || null,
