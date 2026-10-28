@@ -315,7 +315,7 @@ def unreviewed_source_lines(status):
         return []
     return [f"**{len(sources)} 個非產物檔案未審查**：" + '、'.join(safe_markdown(p) for p in sources), '',
             '未審查檔案的處理：原因是 transport／provider-unavailable／time-budget-exhausted（模型服務暫時失敗）時，'
-            '稍後 re-run 此 job；原因是預算或檔案大小時，用本機 code-review skill 補審這些檔案，或拆小 PR。', '']
+            '稍後 re-run 此 job；原因是預算或檔案大小時，用本機 review-change skill 補審這些檔案，或拆小 PR。', '']
 
 
 def carried_lines(status):
