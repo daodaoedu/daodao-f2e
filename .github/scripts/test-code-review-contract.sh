@@ -4,10 +4,10 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WORKFLOW="$SCRIPT_DIR/../workflows/code-review.yml"
-SKILL="$SCRIPT_DIR/../../plugin/skills/code-review/SKILL.md"
+SKILL="$SCRIPT_DIR/../../plugin/skills/review-change/SKILL.md"
 # 引擎指令拆到 references/；字句檢查看 SKILL.md 加 references 的合併內容，步驟 0 仍從 SKILL.md 抽
 SKILL_ALL=$(mktemp)
-cat "$SKILL" "$SCRIPT_DIR/../../plugin/skills/code-review/references/"*.md > "$SKILL_ALL" 2>/dev/null
+cat "$SKILL" "$SCRIPT_DIR/../../plugin/skills/review-change/references/"*.md > "$SKILL_ALL" 2>/dev/null
 
 fail() {
   echo "❌ $1" >&2
