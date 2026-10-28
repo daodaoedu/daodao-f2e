@@ -38,6 +38,13 @@ jobs:
           gh api "repos/${GITHUB_REPOSITORY}/contents/.github/scripts/check-pr-evidence.sh?ref=${DEFAULT_BRANCH}" \
             -H "Accept: application/vnd.github.raw" > .github/scripts/check-pr-evidence.sh
           [ -s .github/scripts/check-pr-evidence.sh ] || { echo "::error::無法從 ${DEFAULT_BRANCH} 取得 check-pr-evidence.sh"; exit 1; }
+          helper_path=.github/scripts/check-read-access-evidence.py
+          if [ "${GITHUB_REPOSITORY##*/}" = daodao ]; then
+            helper_path=plugin/hooks/check-read-access-evidence.py
+          fi
+          gh api "repos/${GITHUB_REPOSITORY}/contents/${helper_path}?ref=${DEFAULT_BRANCH}" \
+            -H "Accept: application/vnd.github.raw" > .github/scripts/check-read-access-evidence.py
+          [ -s .github/scripts/check-read-access-evidence.py ] || { echo "::error::無法從 ${DEFAULT_BRANCH} 取得讀取權限驗證器"; exit 1; }
 
       - name: Check PR body evidence section
         env:

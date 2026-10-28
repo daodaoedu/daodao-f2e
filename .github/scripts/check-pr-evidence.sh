@@ -58,6 +58,25 @@ elif ! printf '%s\n' "$BODY" | grep -q '^## 驗證證據'; then
   problems+=("PR body 缺「## 驗證證據」區塊（驗證報告連結 + 核心旅程矩陣摘要，或「核心旅程不適用：<原因>」）")
 else
   section=$(printf '%s\n' "$BODY" | awk '/^## 驗證證據/{f=1; next} f && /^## /{exit} f')
+  # Canonical validator is packaged with hooks; synced sub-repos get an identical sibling copy.
+  script_dir="$(cd "$(dirname "$0")" && pwd)"
+  read_checker="$script_dir/check-read-access-evidence.py"
+  [ -f "$read_checker" ] || read_checker="$script_dir/../../plugin/hooks/check-read-access-evidence.py"
+  if [ ! -f "$read_checker" ]; then
+    problems+=("讀取權限驗證器缺失，不能核對證據")
+  elif read_problems=$(printf '%s\n' "$BODY" | python3 "$read_checker" --scope pr 2>&1); then
+    :
+  else
+    problems+=("$read_problems")
+  fi
+  if [ -f "$read_checker" ]; then
+    section=$(printf '%s\n' "$BODY" | python3 "$read_checker" --scope pr --emit-section)
+  fi
+  # The read-access role table is not a core-journey table.
+  journey_section=$(printf '%s\n' "$section" | awk '
+    /^### 讀取權限驗證[[:space:]]*$/ { read_section=1; next }
+    /^#{1,3} / { read_section=0 }
+    !read_section { print }')
   na_line=$(printf '%s\n' "$section" | grep -m1 -E '核心旅程不適用[：:]' || true)
   if [ -n "$na_line" ]; then
     reason=$(printf '%s' "$na_line" | sed -E 's/.*核心旅程不適用[：:][[:space:]]*//')
@@ -67,7 +86,7 @@ else
   else
     printf '%s\n' "$section" | grep -qE 'https?://' \
       || problems+=("「## 驗證證據」沒有驗證報告連結（https://…）")
-    rows=$(printf '%s\n' "$section" | sed -E 's/^[[:space:]]+//' | grep -E '^\|' | grep -vE '^\|[[:space:]]*(ID|-+)[[:space:]]*\|' | grep -vE '^\|[[:space:]-]*\|[[:space:]-]*\|' | LC_ALL=C grep -vE '<([^>|]*[^ -~][^>|]*|file:line)>' || true)
+    rows=$(printf '%s\n' "$journey_section" | sed -E 's/^[[:space:]]+//' | grep -E '^\|' | grep -vE '^\|[[:space:]]*(ID|-+)[[:space:]]*\|' | grep -vE '^\|[[:space:]-]*\|[[:space:]-]*\|' | LC_ALL=C grep -vE '<([^>|]*[^ -~][^>|]*|file:line)>' || true)
     if [ -z "$rows" ]; then
       problems+=("「## 驗證證據」沒有核心旅程矩陣列（| J-01 | 旅程 | 正常／錯誤路徑 | 輸入 | 預期 | 實際 |）")
     else
@@ -79,7 +98,7 @@ else
         { j=$3; t=$4; gsub(/^[ \t]+|[ \t]+$/, "", j); gsub(/^[ \t]+|[ \t]+$/, "", t)
           if (j == "") next
           seen[j]=1; if (t ~ /正常/) ok[j]=1; if (t ~ /錯誤路徑/) err[j]=1 }
-        END { for (j in seen) { if (!ok[j]) printf "旅程「%s」缺「正常」列；", j; if (!err[j]) printf "旅程「%s」缺「錯誤路徑」列（server 拒絕的輸入、訊息顯示、輸入保留）；", j } }')
+        END { for (j in seen) { if (!ok[j]) printf "旅程「%s」缺「正常」列；", j; if (!err[j]) printf "旅程「%s」缺「錯誤路徑」列（寫入驗拒絕輸入與保留；讀取驗拒絕存取且不含私人資料）；", j } }')
       [ -z "$pair_problems" ] || problems+=("$pair_problems")
     fi
   fi
