@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { addDays, format } from "date-fns";
+import { journeyDate } from "./contracts";
 import {
   api,
   cleanup,
@@ -38,8 +38,8 @@ test("admin creates and publishes challenge; learner joins and sees the resultin
     await staff.locator("#cohort-name").fill(name);
     await staff.locator("#cohort-template").click();
     await staff.getByRole("option").filter({ hasText: template.title }).click();
-    await staff.locator("#cohort-start").fill(format(addDays(new Date(), 1), "yyyy-MM-dd"));
-    await staff.locator("#cohort-deadline").fill(format(addDays(new Date(), 7), "yyyy-MM-dd"));
+    await staff.locator("#cohort-start").fill(journeyDate(1));
+    await staff.locator("#cohort-deadline").fill(journeyDate(7));
     const created = staff.waitForResponse(
       (response) =>
         response.request().method() === "POST" &&
@@ -93,7 +93,8 @@ for (const state of ["upcoming", "active", "full", "closed"] as const) {
     });
     const ownerToken = await login(context, "owner");
     const name = `journey-card-${state}-${randomUUID().slice(0, 8)}`;
-    const date = (offset: number) => format(addDays(new Date(), offset), "yyyy-MM-dd");
+    const now = new Date();
+    const date = (offset: number) => journeyDate(offset, now);
     const { program, template } = await createChallengeFixtures(request, ownerToken, name);
     const endpoint = `/api/v1/admin/challenges/programs/${program.id}/cohorts`;
     let deadlineOffset = 7;

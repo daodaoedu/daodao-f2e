@@ -25,8 +25,10 @@ Local runs need the #323 fixture owner to have admin authorization, the owner/co
 
 Outputs are under `artifacts/journeys`: HTML/JSON, failure trace and screenshot, and learner screenshots attached after each test. Use only the three named `*.spec.ts` entries in the journey registry.
 
-Local validation: all 24 real-browser cases passed with no skipped, flaky, or unexpected results. Helper tests (8), middleware tests (18), changed-file Biome checks, and the full product TypeScript check passed. Remote CI, required-check enforcement, and deployed nightly behavior remain unverified.
+Local validation: all 24 real-browser cases passed with no skipped, flaky, or unexpected results. Helper tests (15), middleware tests (18), changed-file Biome checks, and the full product TypeScript check passed. Remote CI, required-check enforcement, and deployed nightly behavior remain unverified.
 
 Upload condition: inspected practice wizard step-tags-resources/resource-item (URL resources and OG title only), admin GroupChallengesPage program/template/cohort forms, and staff Lighthouse CohortSetupPanel. None offers file/image upload, so upload-and-readback is not applicable to these creation routes. The personal-space downstream route loads useMyPractices and renders SpacePracticeSection; it does not depend on the AI recommendations service.
 
 Authentication is cached per API origin and fixture email in worker memory; concurrent requests share one login and rejected attempts are evicted. A passing suite normally needs at most three dev-logins per project worker, rather than one for every context. Cookies and admin token storage are installed independently in every context. Tokens are never written to a cache file.
+
+Journey DATE fixtures use the Asia/Taipei calendar explicitly, matching the server and browser regardless of the runner timezone. Regression tests cover the nightly UTC window, midnight, month/year rollover and leap day.

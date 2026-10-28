@@ -39,3 +39,17 @@ export function readApiData(status: number, body: string): unknown {
   if (status === 204) return undefined;
   return JSON.parse(body).data;
 }
+
+/** DATE fixtures follow the server's Asia/Taipei calendar, independent of the runner TZ. */
+export function journeyDate(offset = 0, now = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const part = (type: string) => Number(parts.find((entry) => entry.type === type)?.value);
+  const calendar = new Date(Date.UTC(part("year"), part("month") - 1, part("day")));
+  calendar.setUTCDate(calendar.getUTCDate() + offset);
+  return calendar.toISOString().slice(0, 10);
+}

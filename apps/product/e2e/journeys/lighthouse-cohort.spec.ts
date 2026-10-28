@@ -1,6 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { addDays, format } from "date-fns";
-import { fixtureProgram } from "./contracts";
+import { fixtureProgram, journeyDate } from "./contracts";
 import { api, cleanup, expect, login, manifest, serviceUrl, test, urls } from "./fixtures";
 
 test("staff creates Lighthouse cohort; learner consent gates joining and cohort remains visible", async ({
@@ -35,8 +34,8 @@ test("staff creates Lighthouse cohort; learner consent gates joining and cohort 
     await expect(form.locator('input[name="displayName"]:invalid')).toBeVisible();
     await form.locator('input[name="displayName"]').fill(name);
     await form.locator('input[name="slug"]').fill(name);
-    await form.locator('input[name="startDate"]').fill(format(new Date(), "yyyy-MM-dd"));
-    await form.locator('input[name="endDate"]').fill(format(addDays(new Date(), 14), "yyyy-MM-dd"));
+    await form.locator('input[name="startDate"]').fill(journeyDate());
+    await form.locator('input[name="endDate"]').fill(journeyDate(14));
     await form.getByText("選擇互動方式", { exact: true }).click();
     await staff.getByText("線上非同步", { exact: true }).click();
     await form.getByRole("button", { name: "線上非同步", exact: true }).click();
@@ -86,7 +85,8 @@ for (const state of ["upcoming", "active", "full", "closed", "closed-paused"] as
     const endpoint = `/api/v1/lighthouse/programs/${program.id}/cohorts`;
     const name = `journey-${state}-${randomUUID().slice(0, 8)}`;
     const closed = state.startsWith("closed");
-    const date = (offset: number) => format(addDays(new Date(), offset), "yyyy-MM-dd");
+    const now = new Date();
+    const date = (offset: number) => journeyDate(offset, now);
     let id: number | undefined;
     try {
       const cohort = await api(request, token, "POST", endpoint, {

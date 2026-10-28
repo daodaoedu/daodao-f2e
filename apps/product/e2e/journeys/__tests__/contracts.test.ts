@@ -4,6 +4,7 @@ import {
   type FixtureManifest,
   fixtureProgram,
   fixtureUser,
+  journeyDate,
   readApiData,
   serviceUrl,
 } from "../contracts";
@@ -66,5 +67,19 @@ describe("API response handling", () => {
   });
   it("does not hide unexpectedly empty JSON responses", () => {
     expect(() => readApiData(200, "")).toThrow();
+  });
+});
+
+describe("journey dates use the application calendar", () => {
+  it.each([
+    ["2026-10-28T19:20:00Z", 0, "2026-10-29"],
+    ["2026-10-28T19:20:00Z", 1, "2026-10-30"],
+    ["2026-10-31T19:20:00Z", -1, "2026-10-31"],
+    ["2026-12-31T19:20:00Z", 1, "2027-01-02"],
+    ["2028-02-28T19:20:00Z", 1, "2028-03-01"],
+    ["2026-10-28T15:59:59Z", 0, "2026-10-28"],
+    ["2026-10-28T16:00:00Z", 0, "2026-10-29"],
+  ])("maps %s plus %i days to %s in Taipei", (instant, offset, expected) => {
+    expect(journeyDate(offset, new Date(instant))).toBe(expected);
   });
 });
