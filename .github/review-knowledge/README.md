@@ -1,6 +1,6 @@
 # Review Knowledge — code review 誤判知識庫
 
-AI code review 有兩個來源：**CI**（`code-review.yml`，Workers AI）與**本機**（`code-review` skill，Codex／OMP／OpenCode／Haiku 四引擎）。兩邊的誤判都記在同一份 `false-positives.jsonl`，兩邊也都用同一支 `.github/scripts/review-knowledge.cjs` 消費它——記錄一次，兩處受益。
+AI code review 有兩個來源：**CI**（`code-review.yml`，Workers AI）與**本機**（`review-change` skill，Codex／OMP／OpenCode／Haiku 四引擎）。兩邊的誤判都記在同一份 `false-positives.jsonl`，兩邊也都用同一支 `.github/scripts/review-knowledge.cjs` 消費它——記錄一次，兩處受益。
 
 ```
 記錄（record）                          消費

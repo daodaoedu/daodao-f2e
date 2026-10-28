@@ -7,7 +7,7 @@
  * 兩個消費者共用同一份資料與同一套規則：
  *   - CI  code-review.yml  → prompt-block 進模型輸入；verify --findings 在 run-review-batches
  *                            （含 strict 來源驗證）之後標註 absent-claim，不刪除 finding（#363 不再跑 filter）
- *   - 本機 code-review skill → prompt-block 進 review-input.md、filter → verify 套在各引擎的表格輸出、record 寫回
+ *   - 本機 review-change skill → prompt-block 進 review-input.md、filter → verify 套在各引擎的表格輸出、record 寫回
  *
  * 子命令：
  *   prompt-block [--db FILE]                 依樣態彙整「已知誤判」段落（給模型看，短）
