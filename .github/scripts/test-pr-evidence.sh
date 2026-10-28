@@ -11,8 +11,12 @@ fail() { echo "❌ $1"; exit 1; }
 OUT_FILE=$(mktemp)
 trap 'rm -f "$OUT_FILE"' EXIT
 run() {  # $1=body $2=mode $3=head_ref $4=labels $5=author $6=repo → exit code；輸出存 $OUT_FILE（$(...) 子 shell 帶不出變數）
-  local code=0
-  BODY="$1" MODE="${2:-block}" HEAD_REF="${3:-feat/x}" LABELS="${4:-}" AUTHOR="${5:-someone}" REPO="${6:-daodaoedu/daodao-f2e}" bash "$CHECK" >"$OUT_FILE" 2>&1 || code=$?
+  local code=0 fixture_body="$1"
+  # Existing cases isolate earlier gates; provide this unrelated required declaration.
+  if [ "${6:-}" != raw ] && ! printf '%s\n' "$fixture_body" | grep -q '^讀取權限驗證[：:]'; then
+    fixture_body=$(printf '%s\n' "$fixture_body" | awk '/^## 驗證證據/ { print; print "讀取權限驗證：不適用：此案例只測既有寫入旅程，不改讀取權限"; next } { print }')
+  fi
+  BODY="$fixture_body" MODE="${2:-block}" HEAD_REF="${3:-feat/x}" LABELS="${4:-}" AUTHOR="${5:-someone}" REPO="${6:-daodaoedu/daodao-f2e}" bash "$CHECK" >"$OUT_FILE" 2>&1 || code=$?
   echo "$code"
 }
 out() { cat "$OUT_FILE"; }
@@ -44,6 +48,7 @@ x
 ## Test plan
 - [x] ok'
 
+code=$(run "$GOOD" block feat/x "" someone raw); expect_fail "缺讀取權限宣告不能當完整證據" "$code" "讀取權限驗證"
 code=$(run "$GOOD"); expect_pass "完整證據" "$code"
 
 code=$(run "$(printf '## Summary\nx\n\n## Test plan\n- [x] ok')"); expect_fail "缺區塊" "$code" "缺「## 驗證證據」"
@@ -163,4 +168,48 @@ $GOOD" warn); expect_pass "closing keyword warn 模式不阻擋" "$code"
 [[ "$(out)" == *"::warning::"*"closing keyword"* ]] || fail "warn 模式應印 closing keyword warning：$(out)"
 printf '✅ %s\n' "closing keyword warn 模式印 warning"
 
+READ_ACCESS='讀取權限驗證：適用
+### 讀取權限驗證
+- 入口與服務：首頁 AI feed → server 詳情 → 打卡
+- 固定資料：cohort57 owner2 peer3 outsider4 exited5
+- 資料庫驗證：✅ PostgreSQL；指令：pytest tests/read_acl.py；結果：12 passed；證據：evidence/db.log
+- 快取撤權：✅ 先讀後退出，回應不含舊資料；證據：evidence/cache.log
+- 期限邊界：✅ 第90天可讀，第91天拒絕；證據：evidence/expiry.log
+| 角色 | 預期 | 實際 | 資料斷言 | 結果 | 證據 |
+| 本人 | 200 可讀 | HTTP 200 | 包含自己的打卡 | ✅ | evidence/owner.json |
+| 同範圍成員 | 200 可讀 | HTTP 200 | 回應不含私人留言 | ✅ | evidence/peer.json |
+| 範圍外使用者 | 403 拒絕 | HTTP 403 | 回應不含私人資料 | ✅ | evidence/outsider.json |
+| 已退出或移除 | 403 拒絕 | HTTP 403 | 回應不含私人資料 | ✅ | evidence/exited.json |
+| 未登入 | 403 拒絕 | HTTP 403 | 回應不含私人資料 | ✅ | evidence/anonymous.json |'
+READ_BODY="## 驗證證據
+- 驗證報告：https://example.test/report
+### 核心旅程矩陣
+| ID | 旅程 | 類型 | 輸入 | 預期 | 實際 |
+|---|---|---|---|---|---|
+| J-01 | 讀取打卡 | 正常 | 同場學員 | 200 | ✅ 200 |
+| J-02 | 讀取打卡 | 錯誤路徑 | 場外使用者 | 403不含私人資料 | ✅ 403 |
+$READ_ACCESS"
+code=$(run "$READ_BODY" block feat/x "" someone raw); expect_pass "適用讀取角色表不誤當核心旅程列" "$code"
+MISSING_ROLE=$(printf '%s\n' "$READ_BODY" | grep -v '^| 未登入 |')
+code=$(run "$MISSING_ROLE" block feat/x "" someone raw); expect_fail "讀取角色不可漏未登入" "$code" "未登入"
+WRONG_CHECK=$(printf '%s\n' "$READ_BODY" | sed 's/包含自己的打卡 | ✅/包含自己的打卡 ✅ | 未填/')
+code=$(run "$WRONG_CHECK" block feat/x "" someone raw); expect_fail "讀取✅在資料欄不能冒充結果" "$code" "結果欄"
+READ_NA="## 驗證證據
+核心旅程不適用：沒有新增寫入
+$READ_ACCESS"
+code=$(run "$READ_NA" block feat/x "" someone raw); expect_fail "讀取權限不能用無寫入豁免" "$code" "不得用"
+OUTSIDE_NA="## Summary
+讀取權限驗證：不適用：純CSS樣式調整
+$GOOD"
+code=$(run "$OUTSIDE_NA" block feat/x "" someone raw); expect_fail "其他區塊NA不可豁免讀取驗證" "$code" "讀取權限驗證"
+NO_CACHE=$(printf '%s\n' "$READ_BODY" | grep -v '^- 快取撤權')
+code=$(run "$NO_CACHE" block feat/x "" someone raw); expect_fail "讀取缺快取撤權證據" "$code" "快取撤權"
+NO_TIME=$(printf '%s\n' "$READ_BODY" | grep -v '^- 期限邊界')
+code=$(run "$NO_TIME" block feat/x "" someone raw); expect_fail "讀取缺期限邊界證據" "$code" "期限邊界"
+
+FENCED_NA="$(printf '%s\n' "$READ_BODY" | sed 's/✅ 200/❌ 500/; s/✅ 403/⬜ 403/')
+\`\`\`
+核心旅程不適用：純 CSS 舊例子
+\`\`\`"
+code=$(run "$FENCED_NA" block feat/x "" someone raw); expect_fail "fenced核心NA不得放過失敗讀取journey" "$code" "⬜／❌"
 echo "✅ pr-evidence-gate regression tests passed"
