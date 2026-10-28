@@ -114,7 +114,7 @@ for p in "${problems[@]}"; do
   echo "::${level}::pr-evidence-gate: $p"
 done
 if [ "${#problems[@]}" -gt "$evidence_problems" ]; then
-  echo "格式見 daodaoedu/daodao plugin/skills/dev-task/references/journey-matrix.md；例外請加 label evidence-exempt 並在 PR 說明原因。"
+  echo "格式見 daodaoedu/daodao plugin/skills/develop/references/journey-matrix.md；例外請加 label evidence-exempt 並在 PR 說明原因。"
 fi
 if [ "$MODE" = "block" ]; then
   exit 1
