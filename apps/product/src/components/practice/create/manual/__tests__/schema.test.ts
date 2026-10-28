@@ -55,6 +55,22 @@ describe("createManualPracticeFormSchema messages (daodao#334)", () => {
     expect(issues.every((issue) => issue.message.startsWith("譯:"))).toBe(true);
   });
 
+  it("accepts HTTP cohort resources without relaxing personal resource validation", () => {
+    const base = {
+      ...invalidValues,
+      name: "每日閱讀",
+      actionDescription: "讀 10 頁",
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      executionTiming: ["morning"],
+    };
+    const schema = createManualPracticeFormSchema({}, t);
+    const locked = { id: "r1", name: "場次資源", url: "http://example.com/", isLocked: true };
+    expect(schema.safeParse({ ...base, resources: [locked] }).success).toBe(true);
+    expect(schema.safeParse({ ...base, resources: [{ ...locked, isLocked: false }] }).success).toBe(
+      false
+    );
+  });
+
   it("accepts dayNumber on resources so the edit form keeps it (daodao#332)", () => {
     const result = createManualPracticeFormSchema({}, t).safeParse({
       ...invalidValues,

@@ -208,7 +208,7 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
           const hasLockedResource = resources.some((r) => r.isLocked);
 
           return (
-            <FormItem>
+            <FormItem id="practice-resources" className="scroll-mt-24">
               <FormLabel className="block text-base font-normal text-text-dark mb-3">
                 {t("step4_resources_label")}
               </FormLabel>

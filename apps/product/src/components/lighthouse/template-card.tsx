@@ -25,9 +25,19 @@ import {
 } from "@daodao/ui/components/dropdown-menu";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
-import { Archive, ChevronDown, Copy, Link2, Lock, MoreVertical, Pencil } from "lucide-react";
+import {
+  Archive,
+  ChevronDown,
+  Copy,
+  FileCog,
+  Link2,
+  Lock,
+  MoreVertical,
+  Pencil,
+} from "lucide-react";
 import { useState } from "react";
 import { formatSlashDate, isCohortStarted, templateBindingEndDate } from "@/utils/template-library";
+import { CohortResourceDialog } from "./cohort-resource-dialog";
 import { ConfirmDialog } from "./confirm-dialog";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
@@ -68,6 +78,7 @@ export function TemplateCard({
   const [allOpen, setAllOpen] = useState(false);
   const [unbinding, setUnbinding] = useState<BoundRow | null>(null);
   const [confirmArchive, setConfirmArchive] = useState(false);
+  const [resourceCohort, setResourceCohort] = useState<BoundRow | null>(null);
 
   const boundRows: BoundRow[] = template.bindings
     .map((binding) => {
@@ -191,6 +202,17 @@ export function TemplateCard({
       <span className="min-w-0 flex-[1_1_140px] truncate text-xs font-semibold text-[#0D5B59]">
         {row.cohortName}
       </span>
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        className="size-6 shrink-0 rounded-full text-[#0D7773]"
+        aria-label={t("cohort_resources_edit")}
+        title={t("cohort_resources_edit")}
+        onClick={() => setResourceCohort(row)}
+      >
+        <FileCog className="size-2.5" aria-hidden="true" />
+      </Button>
       {row.locked && (
         <span
           className="grid size-6 place-items-center rounded-full bg-[#FFF4D6] text-[#A95D00]"
@@ -413,6 +435,15 @@ export function TemplateCard({
         </DialogContent>
       </Dialog>
 
+      {resourceCohort && (
+        <CohortResourceDialog
+          organizationId={organizationId}
+          templateId={template.id}
+          cohortId={resourceCohort.cohortId}
+          cohortName={resourceCohort.cohortName}
+          onClose={() => setResourceCohort(null)}
+        />
+      )}
       <ConfirmDialog
         open={unbinding !== null}
         title={t("template_unlink_confirm_title")}

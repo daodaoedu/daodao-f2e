@@ -4,7 +4,8 @@ import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Input } from "@daodao/ui/components/input";
 import { cn } from "@daodao/ui/lib/utils";
-import { useState } from "react";
+import { Pencil } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
   inferResourceName,
   normalizeResourceUrl,
@@ -18,11 +19,16 @@ export interface TemplateResourceDraft {
   url: string;
   /** 既有資源的指定天數；編輯器不改它，只在儲存時原樣帶回，避免被清掉 */
   dayNumber?: number | null;
+  relevantDate?: string | null;
 }
 
 interface TemplateResourceEditorProps {
   resources: TemplateResourceDraft[];
   onChange: (resources: TemplateResourceDraft[]) => void;
+  showRelevantDate?: boolean;
+  maxResources?: number;
+  onEditingChange?: (editing: boolean) => void;
+  onPendingInputChange?: (pending: boolean) => void;
 }
 
 const FETCH_DELAY_MS = 350;
@@ -31,7 +37,14 @@ const FETCH_DELAY_MS = 350;
  * Step 3 資源管理（FR-TPL-03）：貼 HTTPS 連結自動推論名稱、手動命名、去重、卡片編輯與移除。
  * 名稱推論在前端以網域對照表完成（原型同款），不打外部網站。
  */
-export function TemplateResourceEditor({ resources, onChange }: TemplateResourceEditorProps) {
+export function TemplateResourceEditor({
+  resources,
+  onChange,
+  showRelevantDate = false,
+  maxResources = TEMPLATE_RESOURCES_MAX,
+  onEditingChange,
+  onPendingInputChange,
+}: TemplateResourceEditorProps) {
   const t = useTranslations("lighthouse");
   const [link, setLink] = useState("");
   const [manualMode, setManualMode] = useState(false);
@@ -41,65 +54,95 @@ export function TemplateResourceEditor({ resources, onChange }: TemplateResource
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editUrl, setEditUrl] = useState("");
+  const [editDate, setEditDate] = useState<string | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
 
-  const full = resources.length >= TEMPLATE_RESOURCES_MAX;
+  const full = resources.length >= maxResources;
+  useEffect(() => {
+    onEditingChange?.(editingKey !== null);
+  }, [editingKey, onEditingChange]);
+  useEffect(() => {
+    onPendingInputChange?.(Boolean(link.trim() || manualName.trim()));
+  }, [link, manualName, onPendingInputChange]);
 
+  function prepareUrl(value: string): string {
+    const trimmed = value.trim();
+    if (!showRelevantDate || !trimmed || /^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed)) return trimmed;
+    return `https://${trimmed}`;
+  }
+  function checkUrl(value: string) {
+    if (!showRelevantDate) return validateResourceUrl(value);
+    try {
+      const parsed = new URL(prepareUrl(value));
+      return ["http:", "https:"].includes(parsed.protocol) && Boolean(parsed.hostname)
+        ? null
+        : "invalid";
+    } catch {
+      return "invalid";
+    }
+  }
   function duplicateUrl(url: string, exceptKey?: string): boolean {
     const key = normalizeResourceUrl(url);
     return resources.some(
       (item) => item.key !== exceptKey && item.url && normalizeResourceUrl(item.url) === key
     );
   }
-  function duplicateName(name: string, exceptKey?: string): boolean {
+  function duplicateName(name: string, exceptKey?: string, manualOnly = false): boolean {
     const key = name.trim().toLowerCase();
     return resources.some(
-      (item) => item.key !== exceptKey && item.name.trim().toLowerCase() === key
+      (item) =>
+        item.key !== exceptKey &&
+        (!manualOnly || !item.url) &&
+        item.name.trim().toLowerCase() === key
     );
   }
 
   async function addByLink() {
     if (full) {
-      setError(t("template_resource_err_full", { max: TEMPLATE_RESOURCES_MAX }));
+      setError(t("template_resource_err_full", { max: maxResources }));
       return;
     }
-    const problem = validateResourceUrl(link);
+    const problem = link.trim() ? checkUrl(link) : "empty";
     if (problem === "empty") return setError(t("template_resource_err_empty"));
     if (problem === "invalid") return setError(t("template_resource_err_invalid"));
     if (problem === "https") return setError(t("template_resource_err_https"));
-    if (duplicateUrl(link)) return setError(t("template_resource_err_dup_url"));
+    if (duplicateUrl(prepareUrl(link))) return setError(t("template_resource_err_dup_url"));
     setError(null);
     setFetching(true);
     await new Promise((resolve) => setTimeout(resolve, FETCH_DELAY_MS));
-    const name = inferResourceName(link.trim());
+    const name = inferResourceName(prepareUrl(link));
     setFetching(false);
     if (!name) {
       setManualMode(true);
       setError(t("template_resource_err_no_name"));
       return;
     }
-    if (duplicateName(name)) return setError(t("template_resource_err_dup_name"));
-    onChange([...resources, { key: `new-${Date.now()}`, name, url: link.trim() }]);
+    if (!showRelevantDate && duplicateName(name))
+      return setError(t("template_resource_err_dup_name"));
+    const resource = { key: `new-${Date.now()}`, name, url: prepareUrl(link) };
+    onChange(showRelevantDate ? [resource, ...resources] : [...resources, resource]);
     setLink("");
   }
 
   function addManual() {
     if (full) {
-      setError(t("template_resource_err_full", { max: TEMPLATE_RESOURCES_MAX }));
+      setError(t("template_resource_err_full", { max: maxResources }));
       return;
     }
     const name = manualName.trim();
     if (!name) return setError(t("template_resource_err_manual_empty"));
-    if (duplicateName(name)) return setError(t("template_resource_err_dup_name"));
-    const url = link.trim();
+    const url = prepareUrl(link);
+    if ((!showRelevantDate || !url) && duplicateName(name, undefined, showRelevantDate))
+      return setError(t("template_resource_err_dup_name"));
     if (url) {
-      const problem = validateResourceUrl(url);
+      const problem = checkUrl(url);
       if (problem === "invalid") return setError(t("template_resource_err_invalid"));
       if (problem === "https") return setError(t("template_resource_err_https"));
       if (duplicateUrl(url)) return setError(t("template_resource_err_dup_url"));
     }
     setError(null);
-    onChange([...resources, { key: `new-${Date.now()}`, name, url }]);
+    const resource = { key: `new-${Date.now()}`, name, url };
+    onChange(showRelevantDate ? [resource, ...resources] : [...resources, resource]);
     setManualName("");
     setLink("");
   }
@@ -108,6 +151,7 @@ export function TemplateResourceEditor({ resources, onChange }: TemplateResource
     setEditingKey(resource.key);
     setEditName(resource.name);
     setEditUrl(resource.url);
+    setEditDate(resource.relevantDate ?? null);
     setEditError(null);
   }
 
@@ -115,22 +159,31 @@ export function TemplateResourceEditor({ resources, onChange }: TemplateResource
     if (!editingKey) return;
     const name = editName.trim();
     if (!name) return setEditError(t("template_resource_err_manual_empty"));
-    if (duplicateName(name, editingKey)) return setEditError(t("template_resource_err_dup_name"));
-    const url = editUrl.trim();
+    const url = prepareUrl(editUrl);
+    if ((!showRelevantDate || !url) && duplicateName(name, editingKey, showRelevantDate))
+      return setEditError(t("template_resource_err_dup_name"));
     if (url) {
-      const problem = validateResourceUrl(url);
+      const problem = checkUrl(url);
       if (problem === "invalid") return setEditError(t("template_resource_err_invalid"));
       if (problem === "https") return setEditError(t("template_resource_err_https"));
       if (duplicateUrl(url, editingKey)) return setEditError(t("template_resource_err_dup_url"));
     }
-    onChange(resources.map((item) => (item.key === editingKey ? { ...item, name, url } : item)));
+    onChange(
+      resources.map((item) =>
+        item.key === editingKey
+          ? { ...item, name, url, ...(showRelevantDate ? { relevantDate: editDate } : {}) }
+          : item
+      )
+    );
     setEditingKey(null);
   }
 
   return (
     <div className="rounded-2xl bg-[#F7FCFB] p-4">
       <h4 className="text-sm font-semibold text-[#0D3036]">{t("template_resources_title")}</h4>
-      <p className="mt-1 text-xs text-[#78928F]">{t("template_resources_hint")}</p>
+      {!showRelevantDate && (
+        <p className="mt-1 text-xs text-[#78928F]">{t("template_resources_hint")}</p>
+      )}
       <div className="mt-3 flex flex-col gap-2 sm:flex-row">
         <Input
           placeholder={t("template_resource_link_placeholder")}
@@ -220,7 +273,11 @@ export function TemplateResourceEditor({ resources, onChange }: TemplateResource
                     aria-label={t("template_resource_name")}
                   />
                   <Input
-                    placeholder={t("template_resource_url_placeholder")}
+                    placeholder={t(
+                      showRelevantDate
+                        ? "cohort_resources_url"
+                        : "template_resource_url_placeholder"
+                    )}
                     value={editUrl}
                     onChange={(event) => setEditUrl(event.target.value)}
                     onKeyDown={(event) => {
@@ -230,8 +287,30 @@ export function TemplateResourceEditor({ resources, onChange }: TemplateResource
                       }
                       if (event.key === "Escape") setEditingKey(null);
                     }}
-                    aria-label={t("template_resource_url_placeholder")}
+                    aria-label={t(
+                      showRelevantDate
+                        ? "cohort_resources_url"
+                        : "template_resource_url_placeholder"
+                    )}
                   />
+                  {showRelevantDate && (
+                    <div>
+                      <label
+                        htmlFor={`cohort-resource-date-${resource.key}`}
+                        className="text-xs font-medium text-[#5A7B79]"
+                      >
+                        {t("cohort_resources_date")}
+                      </label>
+                      <Input
+                        id={`cohort-resource-date-${resource.key}`}
+                        type="date"
+                        value={editDate ?? ""}
+                        onInput={(event) => setEditDate(event.currentTarget.value || null)}
+                        onChange={(event) => setEditDate(event.target.value || null)}
+                        className="mt-1"
+                      />
+                    </div>
+                  )}
                   {editError && <p className="text-xs text-[#C03A3A]">{editError}</p>}
                   <div className="flex justify-end gap-2">
                     <Button
@@ -253,18 +332,33 @@ export function TemplateResourceEditor({ resources, onChange }: TemplateResource
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold">{resource.name}</p>
                     <p className="truncate text-xs text-[#78928F]">
-                      {resource.url || t("template_resource_manual_tag")}
+                      {resource.url ||
+                        t(
+                          showRelevantDate
+                            ? "cohort_resources_no_link"
+                            : "template_resource_manual_tag"
+                        )}
                     </p>
+                    {showRelevantDate && resource.relevantDate && (
+                      <p className="mt-1 text-xs text-[#78928F]">{resource.relevantDate}</p>
+                    )}
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
                     <Button
                       type="button"
                       variant="ghost"
-                      size="sm"
-                      className="rounded-full text-[#0D7773]"
+                      size={showRelevantDate ? "icon" : "sm"}
+                      className={cn("rounded-full text-[#0D7773]", showRelevantDate && "size-8")}
+                      aria-label={t("edit")}
+                      title={t("edit")}
+                      disabled={showRelevantDate && editingKey !== null}
                       onClick={() => startEdit(resource)}
                     >
-                      {t("edit")}
+                      {showRelevantDate ? (
+                        <Pencil className="size-4" aria-hidden="true" />
+                      ) : (
+                        t("edit")
+                      )}
                     </Button>
                     <Button
                       type="button"
@@ -272,6 +366,7 @@ export function TemplateResourceEditor({ resources, onChange }: TemplateResource
                       size="icon"
                       className="size-8 rounded-full text-[#78928F]"
                       aria-label={t("template_resource_remove")}
+                      disabled={showRelevantDate && editingKey !== null}
                       onClick={() =>
                         onChange(resources.filter((item) => item.key !== resource.key))
                       }

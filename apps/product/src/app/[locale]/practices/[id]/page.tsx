@@ -63,7 +63,14 @@ interface IPracticeDetailData {
   executionTiming: ExecutionTiming[];
   customTiming: string;
   tags: string[];
-  resources: { id: string; name: string; url?: string; dayNumber?: number | null }[];
+  resources: {
+    id: string;
+    name: string;
+    url?: string;
+    dayNumber?: number | null;
+    relevantDate?: string | null;
+    isLocked?: boolean;
+  }[];
   progress: number;
 }
 
@@ -197,11 +204,17 @@ export default function PracticeDetailPage() {
       tags: data.tags || [],
       resources: (data.resources || []).map((resource) => {
         const dayNumber = "dayNumber" in resource ? resource.dayNumber : null;
+        const isLocked = "isLocked" in resource && resource.isLocked === true;
         return {
           id: resource.id,
           name: resource.name,
           url: resource.url,
-          dayNumber: typeof dayNumber === "number" ? dayNumber : null,
+          dayNumber: !isLocked && typeof dayNumber === "number" ? dayNumber : null,
+          relevantDate:
+            "relevantDate" in resource && typeof resource.relevantDate === "string"
+              ? resource.relevantDate
+              : null,
+          isLocked,
         };
       }),
       progress: data.progressPercentage ?? 0,
@@ -454,6 +467,9 @@ export default function PracticeDetailPage() {
           id: practiceId,
           title: practice.title,
           isChallenge: practiceData?.data?.isChallenge === true,
+          isCohortPractice:
+            (practiceData?.data as { isCohortPrivacyLocked?: boolean } | undefined)
+              ?.isCohortPrivacyLocked === true,
           status: practiceData?.data?.status,
           actionDescription: practice.actionDescription,
           frequency: practice.frequency,

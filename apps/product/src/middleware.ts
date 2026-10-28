@@ -19,7 +19,8 @@ const LIGHTHOUSE_PATH_RE = /^\/(?:en\/)?lighthouse(?:\/|$)/;
 const LIGHTHOUSE_ACCESS_REQUIRED_RE = /^\/(?:en\/)?lighthouse\/access-required(?:\/|$)/;
 
 async function hasLighthouseAccess(
-  request: NextRequest
+  request: NextRequest,
+  allowCoachResources = false
 ): Promise<"allowed" | "unauthorized" | "denied" | "unavailable"> {
   const authToken = request.cookies.get("auth_token")?.value;
   if (!authToken) return "unauthorized";
@@ -33,6 +34,21 @@ async function hasLighthouseAccess(
       cache: "no-store",
     });
     if (response.status === 401) return "unauthorized";
+    if (response.status === 403 && allowCoachResources) {
+      const coachResponse = await fetch(
+        `${apiBaseUrl}/api/v1/lighthouse/my-cohort-resource-bindings`,
+        { headers: { Cookie: `auth_token=${authToken}` }, cache: "no-store" }
+      );
+      if (!coachResponse.ok) return coachResponse.status === 401 ? "unauthorized" : "unavailable";
+      const coachPayload: unknown = await coachResponse.json();
+      return coachPayload &&
+        typeof coachPayload === "object" &&
+        "data" in coachPayload &&
+        Array.isArray(coachPayload.data) &&
+        coachPayload.data.length
+        ? "allowed"
+        : "denied";
+    }
     if (response.status === 403) return "denied";
     if (!response.ok) return "unavailable";
 
@@ -53,7 +69,10 @@ function localizedPath(pathname: string, path: string): string {
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (LIGHTHOUSE_PATH_RE.test(pathname) && !LIGHTHOUSE_ACCESS_REQUIRED_RE.test(pathname)) {
-    const access = await hasLighthouseAccess(request);
+    const access = await hasLighthouseAccess(
+      request,
+      /^\/(?:en\/)?lighthouse\/templates\/?$/.test(pathname)
+    );
     if (access !== "allowed") {
       if (access === "unavailable") {
         const errorUrl = request.nextUrl.clone();

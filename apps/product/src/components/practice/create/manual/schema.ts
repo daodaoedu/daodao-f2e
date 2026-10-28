@@ -158,25 +158,36 @@ export const createManualPracticeFormSchema = (
       .optional(),
     resources: z
       .array(
-        z.object({
-          id: z.string(),
-          name: z
-            .string()
-            .min(1, msg("validation_resource_name_required"))
-            .max(100, msg("validation_resource_name_max")),
-          url: z
-            .string()
-            .url(msg("validation_resource_url_invalid"))
-            .refine((val) => !val || val.startsWith("https://"), {
-              message: msg("step4_url_https_required"),
-            })
-            .optional()
-            .or(z.literal("")),
-          // 教練加入的資源（燈塔本期草稿）：不可移除，server 也會擋
-          isLocked: z.boolean().optional(),
-          // 第幾天使用；表單不提供編輯，但存檔要原樣送回，否則 server 重建關聯時會清成整段期間（daodao#332）
-          dayNumber: z.number().int().nullable().optional(),
-        })
+        z
+          .object({
+            id: z.string(),
+            name: z
+              .string()
+              .min(1, msg("validation_resource_name_required"))
+              .max(100, msg("validation_resource_name_max")),
+            url: z
+              .string()
+              .url(msg("validation_resource_url_invalid"))
+              .optional()
+              .or(z.literal("")),
+            // 教練加入的資源（燈塔本期草稿）：不可移除，server 也會擋
+            isLocked: z.boolean().optional(),
+            // 第幾天使用；表單不提供編輯，但存檔要原樣送回，否則 server 重建關聯時會清成整段期間（daodao#332）
+            dayNumber: z.number().int().nullable().optional(),
+          })
+          .superRefine((resource, ctx) => {
+            if (
+              resource.url &&
+              !resource.url.toLowerCase().startsWith("https://") &&
+              !(resource.isLocked && resource.url.toLowerCase().startsWith("http://"))
+            ) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["url"],
+                message: msg("step4_url_https_required"),
+              });
+            }
+          })
       )
       .optional(),
   });

@@ -25,13 +25,13 @@ import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 import { toast } from "@daodao/ui/components/sonner";
-import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
 import {
   Archive,
   ChevronDown,
   ChevronUp,
   Copy,
+  LockIcon,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -70,6 +70,8 @@ interface IPracticeDetailResource {
   url?: string;
   /** 指定第幾天使用（1 = 開始日當天；null/undefined 代表整段期間皆可使用） */
   dayNumber?: number | null;
+  relevantDate?: string | null;
+  isLocked?: boolean;
 }
 
 interface IPracticeDetailCreator {
@@ -85,6 +87,7 @@ interface IPracticeDetailViewModel {
   title: string;
   /** 共同挑戰實踐：不可複製（FR-CC-09），加入挑戰是唯一途徑 */
   isChallenge?: boolean;
+  isCohortPractice?: boolean;
   status?: PracticeStatus;
   actionDescription: string;
   /** 每週頻率，例 "1-3"、"7"（daodao#370） */
@@ -148,61 +151,19 @@ const TABS: { id: TabType; labelKey: "tab_comments" | "tab_checkins" | "tab_reso
 
 interface IPracticeResourceListCardProps {
   resource: IPracticeDetailResource;
-  isOwner: boolean;
-  onEditPractice: () => void;
-  onDeleteResource?: (resourceId: string) => void;
 }
 
-function PracticeResourceListCard({
-  resource,
-  isOwner,
-  onEditPractice,
-  onDeleteResource,
-}: IPracticeResourceListCardProps) {
+function PracticeResourceListCard({ resource }: IPracticeResourceListCardProps) {
   const t = useTranslations("practice");
   const [imageError, setImageError] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const { data: ogImageData, isLoading } = useExtractOgImage(resource.url);
-  const { openWarningDialog } = useDialog();
   const ogImageUrl = ogImageData?.ogImageUrl ?? null;
   const shouldShowDefaultThumbnail = !ogImageUrl || imageError || isLoading || !resource.url;
-
-  useEffect(() => {
-    if (!menuOpen) {
-      return;
-    }
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [menuOpen]);
-
-  const handleDeleteResource = async () => {
-    setMenuOpen(false);
-    const result = await openWarningDialog({
-      title: t("delete_resource_title"),
-      message: t("delete_resource_message"),
-      textAlign: "left",
-      buttons: [
-        { label: t("delete_confirm"), value: "confirm", variant: "outline" },
-        { label: t("cancel_action"), value: "cancel", variant: "orange" },
-      ],
-    });
-    if (result.value === "confirm") {
-      onDeleteResource?.(resource.id);
-    }
-  };
 
   return (
     <div
       className={cn(
-        "relative flex items-stretch rounded-lg border border-[#E4EAE9] bg-white p-2 gap-3 w-full transition-colors",
+        "relative flex min-h-[66px] items-stretch rounded-lg border border-[#E4EAE9] bg-white p-2 gap-3 w-full transition-colors",
         resource.url ? "hover:bg-[#F0F9F8]" : "hover:bg-[#F7FAFA]"
       )}
     >
@@ -236,6 +197,16 @@ function PracticeResourceListCard({
             onError={() => setImageError(true)}
           />
         )}
+        {resource.isLocked && (
+          <span
+            className="absolute right-1 top-1 z-[2] rounded-full bg-white/90 p-1 text-[#0D7773]"
+            role="img"
+            aria-label={t("resource_locked_by_coach")}
+            title={t("resource_locked_by_coach")}
+          >
+            <LockIcon className="size-3" aria-hidden="true" />
+          </span>
+        )}
       </div>
 
       <div className="flex-1 min-w-0 py-1 overflow-hidden whitespace-normal">
@@ -252,44 +223,11 @@ function PracticeResourceListCard({
         )}
       </div>
 
-      <div ref={menuRef} className="relative shrink-0 self-start z-10">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => setMenuOpen((value) => !value)}
-          className="h-6 w-6 p-1 text-[#9FB5B8] hover:text-text-dark"
-        >
-          <MoreHorizontal className="size-4" />
-        </Button>
-
-        {menuOpen && (
-          <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[100px]">
-            {isOwner && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  onEditPractice();
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-              >
-                {t("edit_practice")}
-              </button>
-            )}
-            {isOwner && onDeleteResource && (
-              <button
-                type="button"
-                onClick={handleDeleteResource}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
-              >
-                <Trash2 className="size-[18px] shrink-0" />
-                <span>{t("action_delete")}</span>
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+      {resource.relevantDate && (
+        <span className="shrink-0 self-start pt-1 text-[11px] font-normal text-[#0D7773]">
+          {resource.relevantDate}
+        </span>
+      )}
     </div>
   );
 }
@@ -314,7 +252,6 @@ export function PracticeDetailShell({
   onPrevious,
   onNext,
   onDeletePractice,
-  onDeleteResource,
   onSubmitComment,
   onEditComment,
   onDeleteComment,
@@ -813,20 +750,38 @@ export function PracticeDetailShell({
             const label = t(labelKey);
             const displayLabel = count > 0 ? `${label}(${count})` : label;
             return (
-              <Button
+              <div
                 key={id}
-                type="button"
-                variant="ghost"
-                onClick={() => setActiveTab(id)}
                 className={cn(
-                  "flex-1 h-auto rounded-none py-3 text-sm font-medium transition-colors cursor-pointer",
-                  activeTab === id
-                    ? "text-logo-cyan border-b-2 border-logo-cyan -mb-px"
-                    : "text-[#9FB5B8] hover:text-text-dark/60"
+                  "flex flex-1 items-center justify-center",
+                  activeTab === id && "border-b-2 border-logo-cyan -mb-px"
                 )}
               >
-                {displayLabel}
-              </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setActiveTab(id)}
+                  className={cn(
+                    "h-auto rounded-none px-1 py-3 text-sm font-medium transition-colors cursor-pointer",
+                    activeTab === id ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-text-dark/60"
+                  )}
+                >
+                  {displayLabel}
+                </Button>
+                {id === "resources" && isOwner && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label={t("edit_resources")}
+                    title={t("edit_resources")}
+                    onClick={() => router.push(`/practices/${practiceId}/edit#practice-resources`)}
+                    className="shrink-0 size-6 text-logo-cyan"
+                  >
+                    <Pencil className="size-3" aria-hidden="true" />
+                  </Button>
+                )}
+              </div>
             );
           });
         })()}
@@ -873,20 +828,13 @@ export function PracticeDetailShell({
           {practice.resources.length > 0 ? (
             // 有指定使用日的資源依天數排前面，沒指定的（整段期間皆可用）排最後
             [...practice.resources]
-              .sort(
-                (a, b) =>
-                  (a.dayNumber ?? Number.MAX_SAFE_INTEGER) -
-                  (b.dayNumber ?? Number.MAX_SAFE_INTEGER)
+              .sort((a, b) =>
+                practice.isCohortPractice || practice.resources.some((item) => item.isLocked)
+                  ? 0
+                  : (a.dayNumber ?? Number.MAX_SAFE_INTEGER) -
+                    (b.dayNumber ?? Number.MAX_SAFE_INTEGER)
               )
-              .map((resource) => (
-                <PracticeResourceListCard
-                  key={resource.id}
-                  resource={resource}
-                  isOwner={isOwner}
-                  onEditPractice={onEditPractice}
-                  onDeleteResource={onDeleteResource}
-                />
-              ))
+              .map((resource) => <PracticeResourceListCard key={resource.id} resource={resource} />)
           ) : (
             <div className="text-sm text-[#9FB5B8] py-4">{t("no_resources")}</div>
           )}

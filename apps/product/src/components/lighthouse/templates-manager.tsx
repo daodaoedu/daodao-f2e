@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  type CoachResourceBinding,
+  getCoachResourceBindings,
   type LighthouseTemplate,
   useLighthouseOrganizationCohorts,
   useLighthouseOrganizations,
@@ -20,8 +22,9 @@ import { Button } from "@daodao/ui/components/button";
 import { Input } from "@daodao/ui/components/input";
 import { cn } from "@daodao/ui/lib/utils";
 import { BookOpenText, Plus, Search, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { templateMatches } from "@/utils/template-library";
+import { CohortResourceDialog } from "./cohort-resource-dialog";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 import { TemplateCard } from "./template-card";
 import { TemplateEditorDialog, type TemplateSaveKind } from "./template-editor-dialog";
@@ -42,6 +45,19 @@ export function TemplatesManager() {
   const [query, setQuery] = useState("");
   const [editor, setEditor] = useState<EditorState>({ open: false, template: null });
   const [complete, setComplete] = useState<CompleteState>(null);
+  const [coachBindings, setCoachBindings] = useState<CoachResourceBinding[]>([]);
+  const [coachResource, setCoachResource] = useState<CoachResourceBinding | null>(null);
+  useEffect(() => {
+    let active = true;
+    void getCoachResourceBindings()
+      .then((response) => {
+        if (active && response.data) setCoachBindings(response.data.data);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const templates = templatesQuery.data?.data ?? [];
   const draftLabel = t("template_draft_badge");
@@ -58,6 +74,34 @@ export function TemplatesManager() {
     void templatesQuery.mutate();
     setEditor({ open: false, template: null });
     setComplete({ template, kind });
+  }
+
+  if (!organization && coachBindings.length > 0) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-5 py-10 md:px-10">
+        <h1 className="text-2xl font-semibold">{t("templates_title")}</h1>
+        <p className="mt-3 text-[#5A7B79]">{t("coach_resources_scope")}</p>
+        <div className="mt-6 space-y-3">
+          {coachBindings.map((binding) => (
+            <div
+              key={`${binding.templateId}-${binding.cohortId}`}
+              className="flex items-center justify-between gap-3 rounded-xl border border-[#DDEFED] bg-white p-4"
+            >
+              <div>
+                <p className="font-semibold">{binding.templateName}</p>
+                <p className="text-sm text-[#5A7B79]">{binding.cohortName}</p>
+              </div>
+              <Button type="button" variant="outline" onClick={() => setCoachResource(binding)}>
+                {t("cohort_resources_edit")}
+              </Button>
+            </div>
+          ))}
+        </div>
+        {coachResource && (
+          <CohortResourceDialog {...coachResource} onClose={() => setCoachResource(null)} />
+        )}
+      </div>
+    );
   }
 
   return (
@@ -153,6 +197,32 @@ export function TemplatesManager() {
             />
           ))}
         </div>
+      )}
+
+      {organization &&
+        coachBindings.some((binding) => binding.organizationId !== organization.id) && (
+          <section className="mt-8 space-y-3">
+            <h2 className="font-semibold">{t("coach_resources_scope")}</h2>
+            {coachBindings
+              .filter((binding) => binding.organizationId !== organization.id)
+              .map((binding) => (
+                <div
+                  key={`${binding.templateId}-${binding.cohortId}`}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-[#DDEFED] bg-white p-4"
+                >
+                  <div>
+                    <p className="font-semibold">{binding.templateName}</p>
+                    <p className="text-sm text-[#5A7B79]">{binding.cohortName}</p>
+                  </div>
+                  <Button type="button" variant="outline" onClick={() => setCoachResource(binding)}>
+                    {t("cohort_resources_edit")}
+                  </Button>
+                </div>
+              ))}
+          </section>
+        )}
+      {coachResource && (
+        <CohortResourceDialog {...coachResource} onClose={() => setCoachResource(null)} />
       )}
 
       {organization && (

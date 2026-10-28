@@ -786,6 +786,62 @@ export const setLighthouseTemplateBinding = async (
       );
 };
 
+export type CohortTemplateResource = {
+  id: number;
+  name: string;
+  url: string;
+  relevantDate: string | null;
+};
+export type CohortTemplateResourceInput = Omit<CohortTemplateResource, "id">;
+type CohortResourcesResult = { data?: { data: CohortTemplateResource[] }; error?: unknown };
+type CohortResourcesClient = {
+  GET: (
+    path: string,
+    options: { params: { path: { organizationId: number; templateId: number; cohortId: number } } }
+  ) => Promise<CohortResourcesResult>;
+  PUT: (
+    path: string,
+    options: {
+      params: { path: { organizationId: number; templateId: number; cohortId: number } };
+      body: { resources: CohortTemplateResourceInput[] };
+    }
+  ) => Promise<CohortResourcesResult>;
+};
+const cohortResourcesClient = client as unknown as CohortResourcesClient;
+const cohortResourcesPath =
+  "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/cohorts/{cohortId}/resources";
+export type CoachResourceBinding = {
+  organizationId: number;
+  templateId: number;
+  cohortId: number;
+  cohortName: string;
+  templateName: string;
+};
+export const getCoachResourceBindings = () =>
+  (
+    client as unknown as {
+      GET: (path: string) => Promise<{ data?: { data: CoachResourceBinding[] }; error?: unknown }>;
+    }
+  ).GET("/api/v1/lighthouse/my-cohort-resource-bindings");
+export const getCohortTemplateResources = (
+  organizationId: number,
+  templateId: number,
+  cohortId: number
+) =>
+  cohortResourcesClient.GET(cohortResourcesPath, {
+    params: { path: { organizationId, templateId, cohortId } },
+  });
+export const saveCohortTemplateResources = (
+  organizationId: number,
+  templateId: number,
+  cohortId: number,
+  resources: CohortTemplateResourceInput[]
+) =>
+  cohortResourcesClient.PUT(cohortResourcesPath, {
+    params: { path: { organizationId, templateId, cohortId } },
+    body: { resources },
+  });
+
 export const addLighthouseOrganizationMember = async (
   organizationId: number,
   body: AddOrganizationMemberBody
