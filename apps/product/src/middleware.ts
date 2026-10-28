@@ -25,7 +25,11 @@ async function hasLighthouseAccess(
   if (!authToken) return "unauthorized";
 
   try {
-    const apiBaseUrl = getEnv("NEXT_PUBLIC_API_URL", "https://api.daodao.so")?.replace(/\/$/, "");
+    // Server-side membership checks may use a private service address while browsers
+    // continue using NEXT_PUBLIC_API_URL.
+    const apiBaseUrl = (
+      getEnv("API_INTERNAL_URL") || getEnv("NEXT_PUBLIC_API_URL", "https://api.daodao.so")
+    )?.replace(/\/$/, "");
     // Middleware runs on the Edge runtime; openapi-fetch currently uses a Node API,
     // so this boundary performs the same typed endpoint call with native fetch.
     const response = await fetch(`${apiBaseUrl}/api/v1/lighthouse/organizations`, {
