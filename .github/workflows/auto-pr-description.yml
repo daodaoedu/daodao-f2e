@@ -21,7 +21,7 @@ jobs:
           LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
           BODY: ${{ github.event.pull_request.body }}
         run: |
-          # 已由 dev-task 寫好驗證證據的 body 不能被覆寫（pr-evidence-gate 讀的就是這段）
+          # 已由 develop 寫好驗證證據的 body 不能被覆寫（pr-evidence-gate 讀的就是這段）
           if [[ "$HEAD" == auto/* ]] || [[ "$TITLE" == \[auto\]* ]] || echo "$LABELS" | grep -q '"code-review"' \
              || printf '%s\n' "$BODY" | grep -q '^## 驗證證據'; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
