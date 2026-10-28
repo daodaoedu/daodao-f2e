@@ -280,6 +280,7 @@ export function TemplateEditorDialog({
     <Dialog open={open} onOpenChange={(next) => !busy && onOpenChange(next)}>
       <DialogContent
         overlayClassName="bg-[#0F3036]/30"
+        showCloseButton={false}
         className={cn(
           "flex max-h-[calc(100vh-48px)] w-[min(680px,94vw)] sm:max-w-none flex-col gap-0 overflow-hidden rounded-3xl border-0 bg-white p-0",
           LIGHTHOUSE_SCOPE
@@ -287,14 +288,7 @@ export function TemplateEditorDialog({
         data-testid="template-editor"
       >
         <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-[#DDEFED] bg-[#F7FCFB] px-5 py-4">
-          <button
-            type="button"
-            className="justify-self-start text-sm text-[#5A7B79] hover:text-[#0D3036]"
-            onClick={() => onOpenChange(false)}
-            disabled={busy}
-          >
-            {t("cancel")}
-          </button>
+          <span aria-hidden="true" />
           <div className="text-center">
             <DialogTitle className="text-base font-semibold text-[#0D3036]">
               {step === 4

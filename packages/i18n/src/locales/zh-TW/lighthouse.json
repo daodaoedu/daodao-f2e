@@ -436,7 +436,7 @@
   "reaction_sent": "鼓勵反應已送出",
   "templates_eyebrow": "PRACTICE LIBRARY",
   "templates_title": "模板庫",
-  "templates_description": "把可重複使用的實踐設計留在組織內，綁定後會在參與者加入場次時產生草稿。",
+  "templates_description": "把可重複使用的實踐設計留在組織內，綁定後會加入參與者的場次。",
   "template_create": "建立模板",
   "templates_empty": "尚未建立組織私有模板。",
   "minimum": "最少天數",

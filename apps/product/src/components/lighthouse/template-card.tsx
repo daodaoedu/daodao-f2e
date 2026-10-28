@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { Button } from "@daodao/ui/components/button";
+import { DatePicker } from "@daodao/ui/components/date-picker";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +26,7 @@ import {
 } from "@daodao/ui/components/dropdown-menu";
 import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
+import { addYears, format, parseISO } from "date-fns";
 import { Archive, ChevronDown, Copy, Link2, Lock, MoreVertical, Pencil } from "lucide-react";
 import { useState } from "react";
 import { formatSlashDate, isCohortStarted, templateBindingEndDate } from "@/utils/template-library";
@@ -186,41 +188,46 @@ export function TemplateCard({
   const rowView = (row: BoundRow) => (
     <div
       key={row.cohortId}
-      className="flex flex-wrap items-center gap-2 rounded-[10px] border border-[#DDEFED] bg-[#F7FCFB] px-2.5 py-2"
+      className="flex items-center gap-2 rounded-[10px] border border-[#DDEFED] bg-[#F7FCFB] px-2.5 py-2"
     >
-      <span className="min-w-0 flex-[1_1_140px] truncate text-xs font-semibold text-[#0D5B59]">
+      <span className="min-w-0 flex-1 truncate text-xs font-semibold text-[#0D5B59]">
         {row.cohortName}
       </span>
-      {row.locked && (
-        <span
-          className="grid size-6 place-items-center rounded-full bg-[#FFF4D6] text-[#A95D00]"
-          title={t("template_cohort_started_hint")}
-          role="img"
-          aria-label={t("template_cohort_started_hint")}
-        >
-          <Lock className="size-3" aria-hidden="true" />
-        </span>
-      )}
-      <label className="flex items-center gap-1.5 text-xs text-[#5A7B79]">
-        {t("template_start_date")}
-        <input
-          type="date"
-          defaultValue={row.startDate}
-          disabled={row.locked || busy}
-          title={row.locked ? t("template_start_date_locked") : t("template_start_date_adjust")}
-          onBlur={(event) => {
-            const next = event.target.value;
-            if (!next || next === row.startDate) return;
-            void bind(row.cohortId, next);
-          }}
-          className="h-7 rounded-lg border border-[#CDEBE8] px-2 text-xs disabled:cursor-not-allowed disabled:bg-[#F6F9F8]"
-        />
-      </label>
-      {row.endDate && (
-        <span className="text-xs text-[#0D7773]">
-          {t("template_end_date", { date: formatSlashDate(row.endDate) })}
-        </span>
-      )}
+      <div className="flex shrink-0 items-center gap-2 whitespace-nowrap">
+        {row.locked && (
+          <span
+            className="grid size-6 place-items-center rounded-full bg-[#FFF4D6] text-[#A95D00]"
+            title={t("template_cohort_started_hint")}
+            role="img"
+            aria-label={t("template_cohort_started_hint")}
+          >
+            <Lock className="size-3" aria-hidden="true" />
+          </span>
+        )}
+        {/* biome-ignore lint/a11y/noLabelWithoutControl: DatePicker renders the input inside this label. */}
+        <label className="text-xs text-[#5A7B79]">
+          <span className="sr-only">{t("template_start_date")}</span>
+          <DatePicker
+            value={parseISO(row.startDate)}
+            maxDate={addYears(new Date(), 100)}
+            disabled={row.locked || busy}
+            onChange={(date) => {
+              if (!date) return;
+              const next = format(date, "yyyy-MM-dd");
+              if (next === row.startDate) return;
+              void bind(row.cohortId, next);
+            }}
+            className="h-7 w-36 rounded-lg border-[#CDEBE8] px-2 text-xs disabled:cursor-not-allowed disabled:bg-[#F6F9F8]"
+          />
+        </label>
+        {row.endDate && (
+          <span className="text-xs text-[#0D7773]">
+            <span aria-hidden="true">~ </span>
+            <span className="sr-only">{t("template_end_date", { date: "" })} </span>
+            {formatSlashDate(row.endDate)}
+          </span>
+        )}
+      </div>
     </div>
   );
 
