@@ -73,7 +73,7 @@
     "daodao": {
       "source": {
         "source": "url",
-        "url": "https://github.com/daodaoedu/daodao/releases/latest/download/marketplace.json"
+        "url": "https://daodaoedu.github.io/daodao/marketplace.json"
       },
       "autoUpdate": true
     }
