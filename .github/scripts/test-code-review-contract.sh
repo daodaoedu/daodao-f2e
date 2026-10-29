@@ -320,6 +320,8 @@ trap 'rm -rf "$FIXTURE" "$SKILL_ALL"' EXIT
   [ "$(git show-ref)" = "$BEFORE_REFS" ] || fail "Step 0 modified a git ref"
   grep -Fq '<context_pack>' "$_REVIEW_INPUT" || fail "shared input has no Context Pack"
   grep -Fq '<git_diff>' "$_REVIEW_INPUT" || fail "shared input has no diff"
+  grep -Fq '<intent>' "$_REVIEW_INPUT" || fail "shared input has no intent section"
+  grep -q '^- committed$' "$_INTENT" || fail "intent is missing the commit subjects"
 )
 
 fi
