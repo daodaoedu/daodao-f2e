@@ -7,7 +7,7 @@
  * 兩個消費者共用同一份資料與同一套規則：
  *   - CI  code-review.yml  → prompt-block 進模型輸入；verify --findings 在 run-review-batches
  *                            （含 strict 來源驗證）之後標註 absent-claim，不刪除 finding（#363 不再跑 filter）
- *   - 本機 review-change skill → prompt-block 進 review-input.md、filter → verify 套在各引擎的表格輸出、record 寫回
+ *   - 本機 review-change skill → prompt-block 進 review-input.md、filter → verify 套在各引擎的表格輸出（record 已於 2026-10-29 退役）
  *
  * 子命令：
  *   prompt-block [--db FILE]                 依樣態彙整「已知誤判」段落（給模型看，短）
@@ -17,10 +17,9 @@
  *                                            head tree 查得到反證的列移出表格；report 記 verified-absent-claim
  *   verify --repo-root DIR --rev SHA --findings status.json [--report FILE] [--note FILE]
  *                                            CI structured findings：只標註不刪除，note 是附在 review body 的 Markdown
- *   record --pattern A-G --source ci|local --engine X --repo R --pr N --finding "…" --why "…" \
- *          [--file path:line] [--severity High|Medium|Low] [--evidence "…"] [--action drop|downgrade|context|repair|none] \
- *          [--sample "| 🔴 High | `p:1` | … | … |"] [--expected keep|drop|downgrade] [--db FILE|auto]
- *   test [--db FILE]                         每筆帶 sample+expected 的紀錄都當 fixture 跑一次 filter；
+ *   record                                   已退役（2026-10-29），執行會報錯並說明改法
+ *   test [--db FILE]                         每筆帶 sample+expected 的紀錄都當 fixture 跑一次 filter；known_gap 失敗只列清單；
+ *                                            每筆都要是 fixture 或有 no_sample_reason；
  *                                            expected=verify-drop 另用紀錄的 verify_tree 建暫存 repo 跑 verify
  *
  * 樣態（pattern）：
@@ -51,7 +50,9 @@ const PATTERNS = {
 };
 
 // ---- 規則（確定性；每條規則都對應知識庫裡的樣態，改規則要同時加 fixture）----
-const UNVERIFIABLE_RE = /無法確認|无法确认|未能確認|無法判斷|无法判断|被截斷|被截断|不確定是否|不确定是否|無法得知|cannot (?:be )?(?:verif|confirm)|unable to (?:verify|confirm)|truncated in the diff|not visible in the diff|not shown in (?:the )?diff|diff (?:doesn'?t|does not) show|已顯示的(?:程式碼)?(?:段落|片段)|已显示的(?:代码)?(?:段落|片段)|在顯示的(?:段落|片段)|(?:visible|shown|displayed) (?:portion|snippet|section|segment)/i;
+// 「未確認…是否」只認審查者沒查完的說法：「是否涵蓋」，或句尾的「是否存在」「是否有測試覆蓋」。
+// 「未確認使用者是否已填」「未確認檔案是否存在就讀取」是程式漏檢查，必須保留（反例 FP-0184、FP-0185）
+const UNVERIFIABLE_RE = /無法確認|无法确认|未能確認|未被證明|未经证明|未經證實|未经证实|自承未|diff ?(?:中|裡|裏|內)?(?:未顯示|沒有?顯示|看不到|沒看到)|diff ?僅顯示|無法從 ?diff|未確認[^，。]{0,40}?是否(?:涵蓋|(?:存在|有測試覆蓋)(?=[／，。）)]|$))|無法判斷|无法判断|被截斷|被截断|不確定是否|不确定是否|無法得知|cannot (?:be )?(?:verif|confirm)|unable to (?:verify|confirm)|truncated in the diff|not visible in the diff|not shown in (?:the )?diff|diff (?:doesn'?t|does not) show|已顯示的(?:程式碼)?(?:段落|片段)|已显示的(?:代码)?(?:段落|片段)|在顯示的(?:段落|片段)|(?:visible|shown|displayed) (?:portion|snippet|section|segment)/i;
 const HYPOTHETICAL_RE = /若未來|如果未來|若將來|萬一|万一|未來若|未来若|假設|hypothetical|in the future|if a future|should a future|potential(?:ly)? (?:risk|issue|problem)/i;
 
 const REMINDER_RE = /請確認|請確保|請檢查.{0,24}是否|需確認|需確保|需要確認|需要確保|需同步|確認.{0,24}(?:同步|一致|更新)|是否.{0,24}一併|記得(?:更新|同步)|建議檢查.{0,24}是否|ensure .{0,40}(?:updated|in sync|consistent)|make sure|double[- ]check|please (?:check|verify|confirm)|verify that all/i;
@@ -451,26 +452,10 @@ function duplicateIds(db) {
 }
 
 // ---- record ----
-function record(opt) {
-  const required = ["pattern", "source", "engine", "repo", "pr", "finding", "why"];
-  for (const k of required) if (!opt[k]) throw new Error(`record 缺少 --${k}`);
-  if (!PATTERNS[opt.pattern]) throw new Error(`--pattern 必須是 ${Object.keys(PATTERNS).join("/")}`);
-  if (!["ci", "local"].includes(opt.source)) throw new Error("--source 必須是 ci 或 local");
-  if (opt.expected && !["keep", "drop", "downgrade"].includes(opt.expected)) throw new Error("--expected 必須是 keep/drop/downgrade");
-  const file = resolveDb(opt.db, { forWrite: true });
-  const db = loadDb(file);
-  const id = nextId(db);
-  const entry = {
-    id, date: new Date().toISOString().slice(0, 10),
-    source: opt.source, engine: opt.engine, repo: opt.repo, pr: Number(opt.pr),
-    pattern: opt.pattern, severity: opt.severity || null, file: opt.file || null,
-    finding: opt.finding, why: opt.why, evidence: opt.evidence || null,
-    action: opt.action || "none",
-  };
-  if (opt.sample) entry.sample = opt.sample;
-  if (opt.expected) entry.expected = opt.expected;
-  fs.appendFileSync(file, JSON.stringify(entry) + "\n");
-  process.stdout.write(`${id} → ${file}\n`);
+// 2026-10-29 起不再收集新誤判：既有紀錄已全部變成回歸測試（fixture）或寫明不測的原因，
+// filter 規則只靠這些 fixture 守住。要改規則時直接在 jsonl 加 pr 0 的 fixture 與反例，不用 record。
+function record() {
+  throw new Error("record 已退役（2026-10-29）：不再收集新的誤判紀錄。改 filter 規則時，直接在 false-positives.jsonl 加 pr 為 0、帶 sample＋expected 的 fixture 與反例，見 .github/review-knowledge/README.md");
 }
 
 // ---- test ----
@@ -480,12 +465,22 @@ function runTests(db) {
     console.error(`❌ 重複的 ID：${dup.join("、")}（每筆紀錄的 id 必須唯一）`);
     process.exit(1);
   }
+  // 每筆紀錄要嘛是 fixture（sample＋expected），要嘛寫明為什麼不測；不允許「默默沒被測」的紀錄
+  const untested = db.filter((r) => !(r.sample && r.expected) && !r.no_sample_reason).map((r) => r.id);
+  if (untested.length) {
+    console.error(`❌ 沒有 sample＋expected、也沒有 no_sample_reason 的紀錄：${untested.join("、")}`);
+    process.exit(1);
+  }
   let n = 0;
   let nVerify = 0;
   const wrap = (sample) => {
     const header = /^\|\s*(🔴|🟡|🟢)?\s*(High|Medium|Low)/.test(sample) ? "| 嚴重度 | 檔案 | 問題 | 建議 |\n|---|---|---|---|\n" : "";
     return `## Code Review\n\n### 問題\n\n${header}${sample}\n\n### 總結\n\nx`;
   };
+  // known_gap：紀錄寫了應該怎麼處理、但目前規則做不到。照樣跑，失敗列入漏網清單、不讓 test 失敗；
+  // 通過了就提示移除標記，清單只會越來越短。
+  const gaps = [];
+  const closed = [];
   for (const r of db) {
     if (!r.sample || !r.expected) continue;
     n++;
@@ -493,17 +488,17 @@ function runTests(db) {
     const got = report.dropped.length ? "drop" : report.downgraded.length ? "downgrade" : "keep";
     // verify-drop：filter 不動它（keep），接著 verify 要在 verify_tree 查到反證而移除
     const expectedFilter = r.expected === "verify-drop" ? "keep" : r.expected;
-    if (got !== expectedFilter) {
-      console.error(`❌ ${r.id} 期望 ${r.expected}，filter 實際 ${got}\n${body}`);
+    let failure = got !== expectedFilter ? `期望 ${r.expected}，filter 實際 ${got}` : null;
+    if (!failure && r.expected === "verify-drop") {
+      nVerify++;
+      if (!runVerifyFixture(r.verify_tree, body)) failure = "期望 verify-drop，verify 沒有在 verify_tree 查到反證";
+    }
+    if (failure && r.known_gap) { gaps.push(`${r.id} ${r.pattern}：${failure}`); continue; }
+    if (failure) {
+      console.error(`❌ ${r.id} ${failure}\n${body}`);
       process.exit(1);
     }
-    if (r.expected !== "verify-drop") continue;
-    nVerify++;
-    const dropped = runVerifyFixture(r.verify_tree, body);
-    if (!dropped) {
-      console.error(`❌ ${r.id} 期望 verify-drop，verify 沒有在 verify_tree 查到反證`);
-      process.exit(1);
-    }
+    if (r.known_gap) closed.push(r.id);
   }
   // 反例：真正缺少的東西不得被 verify 移除（識別字在 tree 裡不存在／只出現在非 route、schema 的檔案）
   for (const c of VERIFY_KEEP_FIXTURES) {
@@ -513,7 +508,9 @@ function runTests(db) {
       process.exit(1);
     }
   }
-  console.log(`✅ review-knowledge: ${n} 筆 fixture 通過（verify ${nVerify} 筆，共 ${db.length} 筆紀錄）`);
+  console.log(`✅ review-knowledge: ${n - gaps.length} 筆 fixture 通過（verify ${nVerify} 筆，共 ${db.length} 筆紀錄）`);
+  if (gaps.length) console.log(`⚠️ 已知漏網 ${gaps.length} 筆（known_gap，目前規則做不到，不算失敗）：\n  ${gaps.join("\n  ")}`);
+  if (closed.length) console.log(`🎉 known_gap 已通過，請移除標記：${closed.join("、")}`);
 }
 
 // verify 反例：兩筆都必須 keep
