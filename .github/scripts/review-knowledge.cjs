@@ -17,7 +17,7 @@
  *                                            head tree 查得到反證的列移出表格；report 記 verified-absent-claim
  *   verify --repo-root DIR --rev SHA --findings status.json [--report FILE] [--note FILE]
  *                                            CI structured findings：只標註不刪除，note 是附在 review body 的 Markdown
- *   record --pattern A-F --source ci|local --engine X --repo R --pr N --finding "…" --why "…" \
+ *   record --pattern A-G --source ci|local --engine X --repo R --pr N --finding "…" --why "…" \
  *          [--file path:line] [--severity High|Medium|Low] [--evidence "…"] [--action drop|downgrade|context|repair|none] \
  *          [--sample "| 🔴 High | `p:1` | … | … |"] [--expected keep|drop|downgrade] [--db FILE|auto]
  *   test [--db FILE]                         每筆帶 sample+expected 的紀錄都當 fixture 跑一次 filter；
@@ -30,6 +30,11 @@
  *   D hypothetical   假設性風險（若未來／萬一／可能會），無具體證據   → filter: High/Medium 降為 Low
  *   E format         schema 漂移（漏行號、括號說明、簡體）         → normalize 修復器處理，不在此
  *   F misattribution 引用的 path:line 指到別的函式／檔案
+ *   G reminder       「請確認／需同步／記得更新」的提醒，提醒以外沒有缺陷描述、也沒指出過時位置
+ *                    → filter: drop（High 只降為 Low，不 drop）
+ *
+ * 高風險類別（auth、權限、個資、migration／schema、金流、資料刪除、併發）一律保留原樣：
+ * C／D／G 規則都不套用，交人判斷（pstack bugbot-triage：不因歷史上類似 finding 被放過就自動略過）。
  */
 "use strict";
 const fs = require("fs");
@@ -42,12 +47,29 @@ const PATTERNS = {
   D: "hypothetical：「若未來／萬一／可能會」的假設性風險，沒有具體 path:line 證據",
   E: "format：檔案欄漏行號、夾說明文字、簡體——屬格式漂移，由修復器處理",
   F: "misattribution：引用的 path:line 指到別的函式或檔案",
+  G: "reminder：「請確認／需同步／記得更新」的提醒，沒有指出哪個位置還是舊的",
 };
 
 // ---- 規則（確定性；每條規則都對應知識庫裡的樣態，改規則要同時加 fixture）----
 const UNVERIFIABLE_RE = /無法確認|无法确认|未能確認|無法判斷|无法判断|被截斷|被截断|不確定是否|不确定是否|無法得知|cannot (?:be )?(?:verif|confirm)|unable to (?:verify|confirm)|truncated in the diff|not visible in the diff|not shown in (?:the )?diff|diff (?:doesn'?t|does not) show|已顯示的(?:程式碼)?(?:段落|片段)|已显示的(?:代码)?(?:段落|片段)|在顯示的(?:段落|片段)|(?:visible|shown|displayed) (?:portion|snippet|section|segment)/i;
 const HYPOTHETICAL_RE = /若未來|如果未來|若將來|萬一|万一|未來若|未来若|假設|hypothetical|in the future|if a future|should a future|potential(?:ly)? (?:risk|issue|problem)/i;
 
+const REMINDER_RE = /請確認|請確保|請檢查.{0,24}是否|需確認|需確保|需要確認|需要確保|需同步|確認.{0,24}(?:同步|一致|更新)|是否.{0,24}一併|記得(?:更新|同步)|建議檢查.{0,24}是否|ensure .{0,40}(?:updated|in sync|consistent)|make sure|double[- ]check|please (?:check|verify|confirm)|verify that all/i;
+// 提醒以外若還描述了具體缺陷（會跳過、仍繼續、但呼叫端…），就不是單純提醒，保留
+const DEFECT_RE = /會|導致|造成|但|仍|卻|錯誤|失敗|跳過|遺漏|漏掉|未處理|沒有處理|繞過|外洩|崩潰|break|skip|fail|wrong|incorrect|error|crash|leak|bypass|\bbut\b|\bstill\b|instead|never|regress/i;
+// 具體位置：帶目錄的 path:line，而且不是 finding 自己那格。有指出就不是單純提醒
+const LOCATION_RE = /[\w.-]+\/[\w./-]*\.[A-Za-z]\w*:\d+/g;
+// 只比對問題欄；用片語而不是單字，避免 design token、maxTokens、formSchema 這類一般用詞
+const HIGH_RISK_RE = /身份驗證|身分驗證|身份验证|authenticat|authoriz|權限|权限|授權|授权|越權|越权|未登入|登入狀態|access token|refresh token|jwt|csrf|api key|session (?:fixation|hijack)|個資|个资|隱私|隐私|\bPII\b|migration|遷移|迁移|資料庫 ?schema|db schema|schema (?:migration|變更)|transaction|交易|金流|付款|payment|billing|資料刪除|刪除資料|数据删除|删除数据|data loss|併發|并发|concurren|race condition/i;
+
+function isPureReminder(issueCell, suggestionCell, fileCell) {
+  if (!REMINDER_RE.test(issueCell)) return false;
+  const own = fileCell.replace(/`/g, "").trim();
+  const locations = `${issueCell} ${suggestionCell}`.match(LOCATION_RE) || [];
+  if (locations.some((l) => l !== own)) return false;
+  const rest = issueCell.split(/[；;。，,]/).filter((s) => !REMINDER_RE.test(s)).join(" ");
+  return !DEFECT_RE.test(rest);
+}
 const ZH_HEADER_RE = /^\|\s*(嚴重度|严重度)\s*\|\s*(檔案|文件)\s*\|\s*(問題|问题)\s*\|\s*(建議|建议)\s*\|\s*$/;
 const EN_HEADER_RE = /^\|\s*Severity\s*\|\s*File\s*\|\s*Issue\s*\|\s*Suggestion\s*\|\s*$/i;
 const SEVERITY_RE = /^(🔴|🟡|🟢)?\s*(High|Medium|Low)$/;
@@ -107,7 +129,7 @@ function splitRow(line) {
 // ---- filter ----
 function filterBody(body, db) {
   const lines = body.split("\n");
-  const report = { dropped: [], downgraded: [], kept: 0, mode: null };
+  const report = { dropped: [], downgraded: [], exempted: [], kept: 0, mode: null };
   let inTable = false;
   const out = [];
   for (const line of lines) {
@@ -121,8 +143,24 @@ function filterBody(body, db) {
     if (!SEVERITY_RE.test(severity)) { out.push(line); continue; }
     const issue = `${cells[3]} ${cells[4]}`;
     const file = cells[2].trim();
+    if (HIGH_RISK_RE.test(cells[3])) {
+      report.exempted.push({ file, severity, issue: cells[3].trim().slice(0, 160) });
+      report.kept++;
+      out.push(line);
+      continue;
+    }
     if (UNVERIFIABLE_RE.test(cells[3])) {
       report.dropped.push({ pattern: "C", file, severity, issue: cells[3].trim().slice(0, 160) });
+      continue;
+    }
+    if (isPureReminder(cells[3], cells[4], file)) {
+      if (/High/.test(severity)) {
+        cells[1] = " 🟢 Low ";
+        report.downgraded.push({ pattern: "G", file, from: severity, issue: cells[3].trim().slice(0, 160) });
+        out.push(cells.join("|"));
+        continue;
+      }
+      report.dropped.push({ pattern: "G", file, severity, issue: cells[3].trim().slice(0, 160) });
       continue;
     }
     if (HYPOTHETICAL_RE.test(issue) && /High|Medium/.test(severity)) {
@@ -376,10 +414,12 @@ function promptBlock(db) {
   if (!db.length) return "";
   const byPattern = new Map();
   for (const r of db) {
+    // 反例（expected keep）是「必須保留」，不是誤判；pr 為 0 的是人工造的 fixture，不當成給模型看的範例
+    if (r.expected === "keep" || !r.pr) continue;
     if (!byPattern.has(r.pattern)) byPattern.set(r.pattern, []);
     byPattern.get(r.pattern).push(r);
   }
-  const lines = ["已知誤判樣態（來自歷史 review 紀錄，這些不是問題，不得再報）："];
+  const lines = ["已知誤判樣態（來自歷史 review 紀錄；符合樣態才不報。auth、權限、個資、migration／schema、金流、資料刪除、併發相關的 finding 仍要照常回報）："];
   for (const [p, rs] of [...byPattern.entries()].sort()) {
     const ex = rs[rs.length - 1];
     const finding = (ex.finding || "").replace(/\s+/g, " ").slice(0, 90);
