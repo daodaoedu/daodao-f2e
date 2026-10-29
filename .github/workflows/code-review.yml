@@ -81,6 +81,19 @@ jobs:
             node "$KNOWLEDGE_SCRIPT" prompt-block --db "$KNOWLEDGE_DB" > "$RUNNER_TEMP/known-fp.md" \
               || echo '::warning::Historical false-positive context unavailable'
           fi
+          # CI 不跑 filter，知識庫只透過這段 prompt 影響模型；寫進 job summary 才看得出每次實際放了什麼
+          {
+            echo "### 已知誤判脈絡（review-knowledge prompt-block）"
+            echo
+            if [ -s "$RUNNER_TEMP/known-fp.md" ]; then
+              echo "放進模型提示的樣態：$(grep -c '^- ' "$RUNNER_TEMP/known-fp.md") 種"
+              echo
+              cat "$RUNNER_TEMP/known-fp.md"
+            else
+              echo "未載入（可信 base 沒有腳本或知識庫）"
+            fi
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
       # #368: on synchronize, files whose PR diff (vs merge-base) is unchanged since the last review
       # reuse that review instead of calling the model again; a rebase / update-branch that leaves the
       # PR's own diff untouched calls no model at all. The baseline is a hidden marker in the bot's
@@ -166,14 +179,19 @@ jobs:
           # A trusted base from before #169 has no verify subcommand.
           if [ ! -f "$KNOWLEDGE_SCRIPT" ] || ! grep -Fq 'verifyFindings' "$KNOWLEDGE_SCRIPT" || [ ! -f "$STATUS" ]; then
             echo "verify unavailable at trusted base or no review status; skipped"
+            { echo "### verified-absent-claim"; echo; echo "未執行（可信 base 沒有 verify，或沒有 review status）"; echo; } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           echo "::group::verified-absent-claim report"
           if node "$KNOWLEDGE_SCRIPT" verify --repo-root "$GITHUB_WORKSPACE" --rev "$HEAD_SHA" \
-            --findings "$STATUS" --report "$RUNNER_TEMP/review-output/verify-report.json" --note "$NOTE"; then
+            --findings "$STATUS" --report "$RUNNER_TEMP/review-output/verify-report.json" --note "$NOTE" \
+            > "$RUNNER_TEMP/verify-summary.txt"; then
+            cat "$RUNNER_TEMP/verify-summary.txt"
             [ -s "$NOTE" ] && cat "$NOTE" >> "$RUNNER_TEMP/review-output/review-body.md"
+            { echo "### verified-absent-claim"; echo; cat "$RUNNER_TEMP/verify-summary.txt"; echo; } >> "$GITHUB_STEP_SUMMARY"
           else
             echo "verify failed; review body left unchanged"
+            { echo "### verified-absent-claim"; echo; echo "verify 失敗，review body 未變更"; echo; } >> "$GITHUB_STEP_SUMMARY"
           fi
           echo "::endgroup::"
       - name: Preserve review inputs and coverage
