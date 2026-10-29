@@ -21,8 +21,11 @@ AI code review 有兩個來源：**CI**（`code-review.yml`，Workers AI）與**
 | D | hypothetical：「若未來／萬一／可能會」的假設風險，無具體證據 | **filter：High/Medium 降為 Low** |
 | E | format：漏行號、括號說明、簡體 | `code-review.yml` normalize 修復器 |
 | F | misattribution：path:line 指到別的函式 | 只記錄；回覆時指正 |
+| G | reminder：「請確認／需同步／記得更新」的提醒，沒指出哪個位置還是舊的 | **filter 直接 drop**；有指出另一個 `path:line` 就保留。CI prompt 也要求不報這類提醒 |
 
-規則寫在 `review-knowledge.cjs` 裡（`UNVERIFIABLE_RE`／`HYPOTHETICAL_RE`；verify 用 `ABSENT_EXIST_RE`／`ABSENT_CHECK_RE`）。**改規則必須同時加一筆帶 `sample` + `expected` 的紀錄**，`node .github/scripts/review-knowledge.cjs test` 會把每筆當 fixture 跑。`expected: "verify-drop"` 表示 filter 保留、verify 要移除，這種紀錄另外帶 `verify_tree`（`{路徑: 內容}`），test 會用它建暫存 git repo 跑 verify（例：FP-0001、FP-0010）；腳本內建的反例（真正缺少的東西）必須保留。
+**高風險類別不套用 C／D／G**：問題或建議欄提到 auth、權限、個資、migration／schema、金流、資料刪除、併發時，filter 一律保留原樣（記在 report 的 `exempted`），交人判斷。歷史上類似的 finding 被放過，不構成自動略過的理由。
+
+規則寫在 `review-knowledge.cjs` 裡（`UNVERIFIABLE_RE`／`HYPOTHETICAL_RE`／`REMINDER_RE`／`HIGH_RISK_RE`；verify 用 `ABSENT_EXIST_RE`／`ABSENT_CHECK_RE`）。**改規則必須同時加一筆帶 `sample` + `expected` 的紀錄**，`node .github/scripts/review-knowledge.cjs test` 會把每筆當 fixture 跑。`expected: "verify-drop"` 表示 filter 保留、verify 要移除，這種紀錄另外帶 `verify_tree`（`{路徑: 內容}`），test 會用它建暫存 git repo 跑 verify（例：FP-0001、FP-0010）；腳本內建的反例（真正缺少的東西）必須保留。
 
 ## 怎麼記一筆
 
@@ -45,7 +48,7 @@ node .github/scripts/review-knowledge.cjs record \
 
 ### CI 來源：PR 留言收割
 
-PR 作者回覆 bot 的 Code Review 留言時，用一行 `/fp <第幾條> <A-F> <一句為什麼>`，例如：
+PR 作者回覆 bot 的 Code Review 留言時，用一行 `/fp <第幾條> <A-G> <一句為什麼>`，例如：
 
 ```
 /fp 1 A route 已掛 authenticate，引用行號指到別的函式
