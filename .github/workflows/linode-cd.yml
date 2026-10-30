@@ -8,7 +8,7 @@ concurrency:
 # ===== 觸發條件設定 =====
 # 1. workflow_run：當 CI 完成後觸發（避免重複執行 CI）
 #    - 排除 pull_request 事件，PR 只需要 CI 檢查，不需要部署
-# 2. workflow_dispatch：手動觸發選項
+# 2. workflow_dispatch：手動觸發選項（feat/** 分支只走這條，選分支後勾 force_deploy）
 on:
   workflow_run:
     workflows: ["Linode CI"]
@@ -18,7 +18,6 @@ on:
       - main
       - dev
       - prod
-      - 'feat/**'
   workflow_dispatch:
     inputs:
       force_deploy:
@@ -828,7 +827,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [detect-changes, build-website, build-product, deploy, verify, update-deploy-ref]
-    if: always()
+    # PR 的 CI 完成也會觸發本 workflow，但 detect-changes 會被跳過；這時不需要通知，也不必多起一台 runner
+    if: ${{ always() && needs.detect-changes.result != 'skipped' }}
     steps:
       - name: Send Discord Notification
         run: |
