@@ -49,6 +49,7 @@ jobs:
   # ===== 檢測檔案變更 =====
   detect-changes:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: ${{ (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true }}
     outputs:
       build-website: ${{ steps.changes.outputs.website }}
@@ -139,6 +140,7 @@ jobs:
   # ===== Docker 映像構建階段 - Website =====
   build-website:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     needs: detect-changes
     # 只在 CI 成功或手動強制部署時執行，且 website 有變更
     if: ${{ ((github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true) && needs.detect-changes.outputs.build-website == 'true' }}
@@ -293,6 +295,7 @@ jobs:
   # ===== Docker 映像構建階段 - Product =====
   build-product:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     needs: detect-changes
     # 只在 CI 成功或手動強制部署時執行，且 product 有變更
     if: ${{ ((github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true) && needs.detect-changes.outputs.build-product == 'true' }}
@@ -777,6 +780,7 @@ jobs:
   # ===== 更新部署參照點（獨立 job，避免 race condition）=====
   update-deploy-ref:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [deploy, verify]
     # 僅在 deploy 成功且 verify 成功（或被跳過但非失敗）時更新；避免部分部署失敗卻前移 ref 導致下次增量檢測遺漏
     if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result != 'failure' && needs.verify.result != 'cancelled' }}
@@ -822,6 +826,7 @@ jobs:
   # ===== Discord 通知 =====
   notify:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: [detect-changes, build-website, build-product, deploy, verify, update-deploy-ref]
     if: always()
     steps:
