@@ -8,6 +8,7 @@ jobs:
   generate_description:
     name: Generate PR Description with Workers AI
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       pull-requests: write
       contents: read
@@ -24,6 +25,11 @@ jobs:
           # 已由 develop 寫好驗證證據的 body 不能被覆寫（pr-evidence-gate 讀的就是這段）
           if [[ "$HEAD" == auto/* ]] || [[ "$TITLE" == \[auto\]* ]] || echo "$LABELS" | grep -q '"code-review"' \
              || printf '%s\n' "$BODY" | grep -q '^## 驗證證據'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          # 作者已自行填寫描述就不覆寫：去掉 PR template 的 HTML 註解與兩個標題後仍有內容，即視為已填
+          elif printf '%s' "$BODY" | perl -0pe 's/<!--.*?-->//gs' \
+               | grep -vE '^[[:space:]]*## (Why is this necessary\?|How does it address\?)[[:space:]]*$' \
+               | grep -q '[^[:space:]]'; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"

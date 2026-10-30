@@ -15,6 +15,7 @@ jobs:
     # （pull_request_target + trusted script）跑同一套規則，不在 root 重複執行
     if: github.repository != 'daodaoedu/daodao'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Validate branch naming and base
         env:

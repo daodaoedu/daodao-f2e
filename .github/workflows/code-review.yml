@@ -1,8 +1,10 @@
 name: Code Review
 
+# 手動觸發以節省 Actions 額度：在 PR 貼 `ai-review` label 才跑（跑完自動移除，要再審就再貼一次），
+# 貼 `ai-review:full` 則強制全檔重審。不是 required check，不擋 merge。
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [labeled]
 
 concurrency:
   group: code-review-${{ github.event.pull_request.number }}
@@ -12,7 +14,7 @@ jobs:
   review:
     name: AI Code Review
     # Draft and already-reviewed shared-config sync PRs do not spend model calls.
-    if: ${{ !github.event.pull_request.draft && !startsWith(github.head_ref, 'chore/sync-claude-config-') }}
+    if: ${{ (github.event.label.name == 'ai-review' || github.event.label.name == 'ai-review:full') && !github.event.pull_request.draft && !startsWith(github.head_ref, 'chore/sync-claude-config-') }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -94,11 +96,11 @@ jobs:
             fi
             echo
           } >> "$GITHUB_STEP_SUMMARY"
-      # #368: on synchronize, files whose PR diff (vs merge-base) is unchanged since the last review
+      # #368: on synchronize / an `ai-review` label, files whose PR diff (vs merge-base) is unchanged since the last review
       # reuse that review instead of calling the model again; a rebase / update-branch that leaves the
       # PR's own diff untouched calls no model at all. The baseline is a hidden marker in the bot's
       # own review comment (no expiring cache). Files the last run left unreviewed are not in it.
-      # opened / reopened / ready_for_review and the `ai-review:full` label always review everything.
+      # The first review of a PR (no baseline comment yet) and the `ai-review:full` label review everything.
       - name: Load previous review baseline
         if: steps.runtime.outputs.available == 'true'
         env:
@@ -109,7 +111,7 @@ jobs:
         run: |
           BASELINE="$RUNNER_TEMP/previous-review-comment.md"
           : > "$BASELINE"
-          if [ "$ACTION" != synchronize ]; then
+          if [ "$ACTION" != synchronize ] && [ "$ACTION" != labeled ]; then
             echo "Full review: pull_request.$ACTION"
             exit 0
           fi
@@ -363,3 +365,14 @@ jobs:
               -f "output[summary]=AI review 沒有涵蓋全部檔案，綠燈不代表已審完。未審查檔案與原因見 PR 上的 review 留言；報告與 artifact：$REVIEW_RUN_URL" \
               > /dev/null
           fi
+      # 移除觸發用的 label，讓「再貼一次」就能再觸發；失敗只警告，不影響審查結果
+      - name: Remove trigger label
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          LABEL: ${{ github.event.label.name }}
+        run: |
+          gh api --method DELETE "repos/$REPOSITORY/issues/$PR_NUMBER/labels/$(jq -rn --arg l "$LABEL" '$l|@uri')" > /dev/null \
+            || echo "::warning::無法移除 label $LABEL，請手動移除後再貼一次以重新觸發"
