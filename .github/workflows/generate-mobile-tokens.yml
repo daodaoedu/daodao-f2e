@@ -21,6 +21,7 @@ jobs:
   generate:
     name: Generate Mobile Design Tokens
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout

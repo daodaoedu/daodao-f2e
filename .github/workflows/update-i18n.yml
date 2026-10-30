@@ -11,6 +11,7 @@ jobs:
   update_i18n:
     name: Update i18n Translations
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Git checkout

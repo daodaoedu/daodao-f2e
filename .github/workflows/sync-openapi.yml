@@ -15,6 +15,7 @@ jobs:
   sync_openapi:
     name: Sync OpenAPI from Backend
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
