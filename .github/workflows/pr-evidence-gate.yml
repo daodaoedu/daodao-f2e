@@ -25,6 +25,7 @@ jobs:
   evidence:
     name: PR evidence（驗證報告 + 核心旅程）
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       # 只為了用 API 讀取預設分支上的受信任腳本
       contents: read
