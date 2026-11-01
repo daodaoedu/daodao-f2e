@@ -142,7 +142,7 @@ async function main() {
           fs.readFileSync("packages/ui/src/components/animate-ui/primitives/radix/dialog.tsx")
         )
         .digest("hex"),
-      head: cp.execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+      head: cp.execFileSync("/usr/bin/git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
       results,
     };
     fs.writeFileSync(process.env.REPORT_PATH, JSON.stringify(report, null, 2));
