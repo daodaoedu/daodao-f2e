@@ -10,7 +10,7 @@ import {
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
-import { getStorage, StorageEnum } from "@daodao/shared";
+import { getStorage, StorageEnum, useIsMobile } from "@daodao/shared";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -111,7 +111,14 @@ export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("dashboard");
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const { user, isLoading: isAuthLoading, openLoginDialog } = useAuth();
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    if (!isAuthLoading && !user && isMobile) {
+      openLoginDialog({ source: "app", redirectUrl: HOME_TAB_PATHS.inspire });
+    }
+  }, [isAuthLoading, user, isMobile, openLoginDialog]);
 
   const [searchValue, setSearchValue] = useState(searchParams.get("keyword") ?? "");
   const [filters, _setFilters] = useState<ShowcaseFilterState>({
