@@ -35,7 +35,7 @@ export function LighthouseShell({ children }: LighthouseShellProps) {
   const t = useTranslations("lighthouse");
 
   return (
-    <div className="min-h-screen bg-[#F5FFFD] text-[#0D3036]">
+    <div className="min-h-screen bg-very-light-gray text-[#0D3036]">
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-[#CDEBE8] bg-white/95 px-5 py-7 md:flex md:flex-col">
         <div className="flex items-center gap-3 px-1">
           <CustomLink

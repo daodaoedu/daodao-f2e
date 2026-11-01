@@ -204,7 +204,7 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
       </div>
 
       <div
-        className="flex flex-wrap items-center gap-2.5 rounded-[20px] border border-[#CDEBE8] bg-white p-3.5 lg:flex-nowrap"
+        className="flex flex-wrap items-center gap-2.5 rounded-[20px] border border-[#CDEBE8] bg-white p-3.5"
         data-testid="activity-filters"
       >
         <div className="relative min-w-[200px] flex-1">
