@@ -7,8 +7,7 @@ export interface FixtureManifest {
 }
 export function fixtureUser(manifest: FixtureManifest, key: string) {
   const user = manifest.users.find((entry) => entry.key === key);
-  if (!user || !user.email || !Number.isInteger(user.id))
-    throw new Error(`Missing fixture user: ${key}`);
+  if (!user?.email || !Number.isInteger(user.id)) throw new Error(`Missing fixture user: ${key}`);
   return user;
 }
 export function fixtureProgram(manifest: FixtureManifest, kind: string) {
@@ -25,7 +24,7 @@ export function createAsyncCache<T>() {
   const entries = new Map<string, Promise<T>>();
   return (key: string, load: () => Promise<T>): Promise<T> => {
     const existing = entries.get(key);
-    if (existing) return existing;
+    if (existing !== undefined) return existing;
     const pending = load().catch((error) => {
       entries.delete(key);
       throw error;
