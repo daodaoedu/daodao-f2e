@@ -7,7 +7,8 @@ import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
 import { cn } from "@daodao/ui/lib/utils";
-import { Calendar, CalendarCheck, PenLine, Timer } from "lucide-react";
+import { isBefore, startOfDay } from "date-fns";
+import { Calendar, CalendarCheck, PenLine, Timer, Users } from "lucide-react";
 import { CheckInButton } from "@/components/check-in";
 import {
   getThemeNameFromColor,
@@ -16,6 +17,7 @@ import {
 } from "@/constants/practice-theme";
 import { getStatusConfig, TaskStatus } from "@/constants/task-status";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
+import { parseLocalDate } from "@/utils/practice-period";
 
 interface InProgressTaskCardProps {
   id: string;
@@ -34,7 +36,8 @@ interface InProgressTaskCardProps {
   /** 草稿按鈕文案；期程指派的草稿是「啟用」而非「繼續編輯」 */
   draftActionLabel?: string;
   /** Compact card actions and inset progress bar used on the Personal Space page. */
-  presentation?: "default" | "personal-space";
+  presentation?: "default" | "personal-space" | "cohort";
+  onBeforeCheckIn?: () => Promise<boolean>;
 }
 
 export const InProgressTaskCard = ({
@@ -53,24 +56,29 @@ export const InProgressTaskCard = ({
   onEdit,
   draftActionLabel,
   presentation = "default",
+  onBeforeCheckIn,
 }: InProgressTaskCardProps) => {
   const t = useTranslations("dashboard");
+  const tCheckIn = useTranslations("check_in");
   const themeName = getThemeNameFromColor(theme);
   const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
-  const statusInfo = getStatusConfig(status);
   const isDraft = status === TaskStatus.draft;
+  const isCohort = presentation === "cohort";
+  const displayStatus = isCohort && isDraft ? TaskStatus.notStarted : status;
+  const statusInfo = getStatusConfig(displayStatus);
+  const parsedStartDate = startDate ? parseLocalDate(startDate) : null;
+  const isBeforeStartDate =
+    isCohort && parsedStartDate !== null && isBefore(startOfDay(new Date()), parsedStartDate);
   const formattedStartDate = formatCardDate(startDate);
   const daysProgress = calculateDaysProgress(startDate, endDate);
-  const statusLabel =
-    status === TaskStatus.draft
-      ? t("filter_draft")
-      : status === TaskStatus.notStarted
-        ? t("filter_not_started")
-        : status === TaskStatus.inProgress
-          ? t("filter_in_progress")
-          : status === TaskStatus.completed
-            ? t("filter_completed")
-            : statusInfo?.label;
+  let statusLabel = statusInfo?.label;
+  if (displayStatus === TaskStatus.draft) statusLabel = t("filter_draft");
+  else if (displayStatus === TaskStatus.notStarted) statusLabel = t("filter_not_started");
+  else if (displayStatus === TaskStatus.inProgress) statusLabel = t("filter_in_progress");
+  else if (displayStatus === TaskStatus.completed) statusLabel = t("filter_completed");
+  let checkInSummary = t("checked_in_count_zero");
+  if (isCohort && isBeforeStartDate) checkInSummary = t("cohort_check_in_before_start");
+  else if (isCohort && checkInCount === 0) checkInSummary = t("cohort_check_in_first");
 
   return (
     <CustomLink
@@ -86,16 +94,24 @@ export const InProgressTaskCard = ({
       <div
         className={cn(
           "absolute inset-0 p-5 pb-4 z-10 flex flex-col",
-          presentation === "personal-space" && "pb-6"
+          presentation !== "default" && "pb-6"
         )}
       >
         <div className="flex-1 min-h-0 flex flex-col gap-3">
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5">
               {statusInfo && (
                 <Badge variant={statusInfo.variant} size="sm" className="w-fit">
                   {statusLabel}
                 </Badge>
+              )}
+              {isCohort && (
+                <span
+                  aria-hidden="true"
+                  className="inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-[#B9C8CC]"
+                >
+                  <Users className="size-4 text-text-dark" />
+                </span>
               )}
             </div>
 
@@ -138,7 +154,7 @@ export const InProgressTaskCard = ({
             <span className="flex items-center gap-1 text-xs text-text-dark">
               <CalendarCheck className="size-3.5 shrink-0" />
               {checkInCount === 0
-                ? t("checked_in_count_zero")
+                ? checkInSummary
                 : t.rich("checked_in_count", {
                     count: checkInCount,
                     bold: (chunks) => <span className="font-semibold">{chunks}</span>,
@@ -161,10 +177,7 @@ export const InProgressTaskCard = ({
         {/* Check-in Button — always visible at bottom, separated from content */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: 此處用於阻止事件冒泡到父元素 */}
         <span
-          className={cn(
-            "mt-3 shrink-0 block",
-            presentation === "personal-space" && "flex justify-end"
-          )}
+          className={cn("mt-3 shrink-0 block", presentation !== "default" && "flex justify-end")}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -173,12 +186,12 @@ export const InProgressTaskCard = ({
             e.stopPropagation();
           }}
         >
-          {isDraft ? (
+          {isDraft && !isCohort ? (
             <Button
               variant="secondary"
               onClick={onEdit}
               className={cn(
-                presentation === "personal-space" &&
+                presentation !== "default" &&
                   "h-7 w-fit gap-[5px] rounded-full px-3 py-0 text-[13px] [&>svg]:size-4"
               )}
             >
@@ -189,16 +202,19 @@ export const InProgressTaskCard = ({
             <CheckInButton
               variant="secondary"
               className={cn(
-                presentation === "personal-space"
+                presentation !== "default"
                   ? "h-7 w-fit max-w-none gap-[5px] rounded-full px-3 py-0 text-[13px] [&>svg]:size-4"
                   : "w-full sm:max-w-[288px]"
               )}
               practiceId={id}
-              practiceStatus={status}
+              practiceStatus={isCohort && isDraft ? TaskStatus.notStarted : status}
               lastCheckInDate={lastCheckInDate ?? null}
               startDate={startDate ?? null}
               endDate={endDate ?? null}
               taskTitle={title}
+              labelOverride={isCohort ? tCheckIn("button_check_in") : undefined}
+              beforeCheckIn={isCohort && isDraft ? onBeforeCheckIn : undefined}
+              disableBeforeStartDate={isCohort}
               showIcon
               progressPercentage={progress}
             />
@@ -210,13 +226,13 @@ export const InProgressTaskCard = ({
       <div
         className={cn(
           "absolute bottom-0 left-0 right-0 z-10 overflow-hidden",
-          presentation === "personal-space" && "bottom-1.5 left-5 right-5"
+          presentation !== "default" && "bottom-1.5 left-5 right-5"
         )}
       >
         <Progress
           value={progress}
           className={cn(
-            presentation === "personal-space" &&
+            presentation !== "default" &&
               "h-1.5 bg-white/75 [--active-color:oklch(0.711_0.12_190.6)] shadow-[inset_0_0_0_1px_rgba(15,48,54,0.08)]"
           )}
         />
