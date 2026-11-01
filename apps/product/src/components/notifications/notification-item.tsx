@@ -41,6 +41,10 @@ export interface INotificationData {
   practice?: INotificationPractice;
   /** 留言內容或打卡內容 */
   content?: string;
+  entityTitle?: string;
+  cohortName?: string;
+  message?: string;
+  hasDestination?: boolean;
   /** 反應 emoji */
   reaction?: string;
   /** 連結初衷（connect 類型專用） */
@@ -98,6 +102,22 @@ function NotificationText({ notification }: { notification: INotificationData })
       <span className="text-text-dark/60">{t("and_others", { count: count - 1 })}</span>
     ) : null;
   const practiceName = practice ? <span className="font-semibold">「{practice.name}」</span> : null;
+
+  if (type === NotificationType.cohortInvitation || type === NotificationType.cohortMemberRemoved) {
+    const isInvitation = type === NotificationType.cohortInvitation;
+    let text: string;
+    const cohortName = notification.cohortName?.trim();
+    const message = notification.message?.trim();
+    if (cohortName) {
+      text = t(isInvitation ? "cohort_invitation" : "cohort_removed", {
+        name: actor.name,
+        title: cohortName,
+      });
+    } else {
+      text = message || t(isInvitation ? "cohort_invitation_fallback" : "cohort_removed_fallback");
+    }
+    return <p className="text-sm leading-5 line-clamp-2">{text}</p>;
+  }
 
   if (type === NotificationType.reaction) {
     return (
@@ -264,6 +284,19 @@ function NotificationText({ notification }: { notification: INotificationData })
     );
   }
 
+  if (type === NotificationType.wishLinked || type === NotificationType.roadmapShipped) {
+    return (
+      <p className="text-sm leading-5 line-clamp-2">
+        {t(type === NotificationType.wishLinked ? "wish_linked" : "roadmap_shipped", {
+          title: notification.entityTitle?.trim() || t("related_roadmap_item"),
+        })}
+      </p>
+    );
+  }
+  if (notification.message?.trim()) {
+    return <p className="text-sm leading-5 line-clamp-2">{notification.message.trim()}</p>;
+  }
+
   // 未知類型的通用 fallback，避免通知卡片顯示空白
   return (
     <p className="text-sm leading-5 truncate">
@@ -329,6 +362,7 @@ function NotificationRightAction({
     );
   }
 
+  if (notification.hasDestination === false) return null;
   return <ArrowRightOutlineSvg className="shrink-0 size-6 text-text-dark" />;
 }
 
