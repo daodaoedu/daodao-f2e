@@ -1,4 +1,8 @@
 export const NotificationType = {
+  wishLinked: "wish-linked",
+  roadmapShipped: "roadmap-shipped",
+  cohortInvitation: "cohort-invitation",
+  cohortMemberRemoved: "cohort-member-removed",
   reaction: "reaction",
   comment: "comment",
   commentReply: "comment-reply",

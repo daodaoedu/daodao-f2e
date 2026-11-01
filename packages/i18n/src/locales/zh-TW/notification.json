@@ -25,5 +25,12 @@
   "agree_connect": "同意連結",
   "ignore": "忽略",
   "agreed": "已同意",
-  "ignored": "已忽略"
+  "ignored": "已忽略",
+  "cohort_invitation": "{name} 邀請你加入場次「{title}」",
+  "cohort_removed": "你已被移出場次「{title}」",
+  "cohort_invitation_fallback": "你收到一則場次邀請，相關場次資訊已無法取得",
+  "cohort_removed_fallback": "你已被移出一個場次，相關場次資訊已無法取得",
+  "wish_linked": "你的願望已連結到路線圖項目「{title}」",
+  "roadmap_shipped": "你支持的路線圖項目「{title}」已上線",
+  "related_roadmap_item": "相關項目"
 }

@@ -993,7 +993,14 @@
     "text_default": "{name} 發出了一則通知",
     "connect_accepted_toast": "你同意了 {name} 的連結請求！",
     "error_title": "錯誤",
-    "operation_failed": "操作失敗，請稍後再試"
+    "operation_failed": "操作失敗，請稍後再試",
+    "text_cohort_invitation": "{name} 邀請你加入場次「{title}」",
+    "text_cohort_removed": "你已被移出場次「{title}」",
+    "text_cohort_invitation_fallback": "你收到一則場次邀請，相關場次資訊已無法取得",
+    "text_cohort_removed_fallback": "你已被移出一個場次，相關場次資訊已無法取得",
+    "text_wish_linked": "你的願望已連結到路線圖項目「{title}」",
+    "text_roadmap_shipped": "你支持的路線圖項目「{title}」已上線",
+    "related_roadmap_item": "相關項目"
   },
   "createManual": {
     "create_success_title": "建立成功",

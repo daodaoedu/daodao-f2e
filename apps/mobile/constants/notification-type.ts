@@ -16,6 +16,8 @@ export const NotificationType = {
   buddyRequest: "buddy-request",
   buddyRequestFollower: "buddy-request-follower",
   buddyAccepted: "buddy-accepted",
+  cohortInvitation: "cohort-invitation",
+  cohortMemberRemoved: "cohort-member-removed",
 } as const;
 
 export type NotificationTypeType = (typeof NotificationType)[keyof typeof NotificationType];
