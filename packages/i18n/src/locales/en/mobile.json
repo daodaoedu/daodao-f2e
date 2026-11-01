@@ -993,7 +993,14 @@
     "text_default": "{name} sent a notification",
     "connect_accepted_toast": "You accepted {name}'s connection request!",
     "error_title": "Error",
-    "operation_failed": "Action failed. Please try again later."
+    "operation_failed": "Action failed. Please try again later.",
+    "text_cohort_invitation": "{name} invited you to join the cohort “{title}”",
+    "text_cohort_removed": "You were removed from the cohort “{title}”",
+    "text_cohort_invitation_fallback": "You received a cohort invitation. The cohort details are no longer available.",
+    "text_cohort_removed_fallback": "You were removed from a cohort. The cohort details are no longer available.",
+    "text_wish_linked": "Your wish was linked to the roadmap item “{title}”",
+    "text_roadmap_shipped": "The roadmap item you supported, “{title}”, has shipped",
+    "related_roadmap_item": "Related item"
   },
   "createManual": {
     "create_success_title": "Created",

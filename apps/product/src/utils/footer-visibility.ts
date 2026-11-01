@@ -2,5 +2,10 @@
 const FOOTERLESS_ROUTE = /^\/messages(\/|$)/;
 
 export function isFooterHidden(pathname: string): boolean {
-  return FOOTERLESS_ROUTE.test(pathname);
+  // 通知清單在視窗內捲動，頁外 footer 會重新撐高 document。
+  return (
+    pathname === "/notifications" ||
+    pathname === "/notifications/" ||
+    FOOTERLESS_ROUTE.test(pathname)
+  );
 }

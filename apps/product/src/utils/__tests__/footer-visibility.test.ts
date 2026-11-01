@@ -10,6 +10,16 @@ describe("isFooterHidden", () => {
     expect(isFooterHidden("/messages/")).toBe(true);
   });
 
+  it("hides the footer on the viewport-bound notification page", () => {
+    expect(isFooterHidden("/notifications")).toBe(true);
+    expect(isFooterHidden("/notifications/")).toBe(true);
+  });
+
+  it("does not hide unrelated notification settings or similarly named pages", () => {
+    expect(isFooterHidden("/settings/notifications")).toBe(false);
+    expect(isFooterHidden("/notifications-archive")).toBe(false);
+  });
+
   it("keeps the footer everywhere else", () => {
     expect(isFooterHidden("/")).toBe(false);
     expect(isFooterHidden("/spaces")).toBe(false);
