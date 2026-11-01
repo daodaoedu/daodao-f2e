@@ -5,13 +5,14 @@ import { useRouter } from "@daodao/i18n/navigation";
 import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { isBefore, parse, startOfDay } from "date-fns";
+import { isBefore, startOfDay } from "date-fns";
 import { CalendarCheck, Check, Eye } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { CheckInStatus } from "@/constants/check-in-status";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
 import { EarlyStartResult, useEarlyStartDialog } from "@/hooks/use-early-start-dialog";
+import { parseLocalDate } from "@/utils/practice-period";
 import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
 import { submitKeepingValuesOnError } from "./check-in-submit-flow";
 import { DescriptionField } from "./components/description-field";
@@ -144,6 +145,12 @@ interface ICheckInButtonProps
    * 是否顯示圖標
    */
   showIcon?: boolean;
+  /** 固定顯示指定的按鈕文字，不依打卡狀態變動 */
+  labelOverride?: string;
+  /** 開啟打卡表單前執行；回傳 false 時中止打卡 */
+  beforeCheckIn?: () => Promise<boolean>;
+  /** 開始日前停用打卡，且不提供提早開始 */
+  disableBeforeStartDate?: boolean;
   /**
    * 打卡前的進度百分比（用於顯示進度動畫）
    */
@@ -170,6 +177,10 @@ export const CheckInButton = ({
   isChallenge = false,
   taskTitle,
   onComplete,
+  labelOverride,
+  beforeCheckIn,
+  disableBeforeStartDate = false,
+  disabled: disabledProp,
   variant = "secondary",
   className,
   showIcon,
@@ -177,6 +188,8 @@ export const CheckInButton = ({
   ...props
 }: ICheckInButtonProps) => {
   const router = useRouter();
+  const preparingRef = useRef(false);
+  const [preparing, setPreparing] = useState(false);
   const t = useTranslations("check_in");
   const { status, canCheckIn, canClick, getButtonLabel } = useCheckInStatus({
     practiceStatus,
@@ -201,11 +214,11 @@ export const CheckInButton = ({
     startDate: startDate || "",
   });
 
-  // 共同挑戰：開始日前打卡鈕 Disable（不走提早開始流程）
-  const isChallengeNotStarted = useMemo(() => {
-    if (!isChallenge || !startDate) return false;
-    return isBefore(startOfDay(new Date()), startOfDay(parse(startDate, "yyyy-MM-dd", new Date())));
-  }, [isChallenge, startDate]);
+  // API 日期保留日曆日語意，避免 ISO 午夜在負時差地區提前一天。
+  const parsedStartDate = startDate ? parseLocalDate(startDate) : null;
+  const isBeforeStartDate =
+    parsedStartDate !== null && isBefore(startOfDay(new Date()), parsedStartDate);
+  const isChallengeNotStarted = isChallenge && isBeforeStartDate;
 
   const handleClick = async () => {
     // 如果是觀看總結狀態，導向總結頁面
@@ -214,13 +227,26 @@ export const CheckInButton = ({
       return;
     }
 
-    if (!canCheckIn || isChallengeNotStarted) return;
+    if (!canCheckIn || isChallengeNotStarted || (disableBeforeStartDate && isBeforeStartDate))
+      return;
+
+    if (preparingRef.current) return;
+    if (beforeCheckIn) {
+      preparingRef.current = true;
+      setPreparing(true);
+      try {
+        if (!(await beforeCheckIn())) return;
+      } finally {
+        preparingRef.current = false;
+        setPreparing(false);
+      }
+    }
 
     // 檢查今天是否早於開始日期
     if (startDate) {
       const today = startOfDay(new Date());
-      const practiceStartDate = startOfDay(parse(startDate, "yyyy-MM-dd", new Date()));
-      if (isBefore(today, practiceStartDate)) {
+      const parsedStartDate = parseLocalDate(startDate);
+      if (parsedStartDate !== null && isBefore(today, parsedStartDate)) {
         // 彈出確認對話框，讓用戶決定是否提早開始
         const result = await openEarlyStartDialog();
         if (result !== EarlyStartResult.Confirmed) {
@@ -244,16 +270,33 @@ export const CheckInButton = ({
     return <CalendarCheck className="size-4.5 text-logo-cyan" />;
   };
 
+  let buttonLabel: string;
+  if (status === CheckInStatus.viewSummary) {
+    buttonLabel = getButtonLabel();
+  } else if (labelOverride !== undefined && labelOverride !== null) {
+    buttonLabel = labelOverride;
+  } else if (isChallengeNotStarted) {
+    buttonLabel = t("challenge_not_started");
+  } else {
+    buttonLabel = getButtonLabel();
+  }
+
   return (
     <Button
       variant={variant}
       onClick={handleClick}
-      disabled={!canClick || isChallengeNotStarted}
+      disabled={
+        preparing ||
+        disabledProp ||
+        !canClick ||
+        isChallengeNotStarted ||
+        (disableBeforeStartDate && isBeforeStartDate)
+      }
       className={className}
       {...props}
     >
       {renderIcon()}
-      {isChallengeNotStarted ? t("challenge_not_started") : getButtonLabel()}
+      {buttonLabel}
     </Button>
   );
 };
