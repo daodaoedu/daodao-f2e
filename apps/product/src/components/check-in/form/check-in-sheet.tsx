@@ -270,6 +270,17 @@ export const CheckInButton = ({
     return <CalendarCheck className="size-4.5 text-logo-cyan" />;
   };
 
+  let buttonLabel: string;
+  if (status === CheckInStatus.viewSummary) {
+    buttonLabel = getButtonLabel();
+  } else if (labelOverride !== undefined && labelOverride !== null) {
+    buttonLabel = labelOverride;
+  } else if (isChallengeNotStarted) {
+    buttonLabel = t("challenge_not_started");
+  } else {
+    buttonLabel = getButtonLabel();
+  }
+
   return (
     <Button
       variant={variant}
@@ -285,10 +296,7 @@ export const CheckInButton = ({
       {...props}
     >
       {renderIcon()}
-      {status === CheckInStatus.viewSummary
-        ? getButtonLabel()
-        : (labelOverride ??
-          (isChallengeNotStarted ? t("challenge_not_started") : getButtonLabel()))}
+      {buttonLabel}
     </Button>
   );
 };
