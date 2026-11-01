@@ -18,6 +18,7 @@ const filterOptions = [
 
 interface SpacePracticeSectionProps {
   tasks: InProgressTask[];
+  presentation?: "default" | "personal-space";
 }
 
 /**
@@ -25,7 +26,10 @@ interface SpacePracticeSectionProps {
  * filters client-side (default 進行中) and keeps an empty container with
  * explanatory text instead of hiding the list.
  */
-export const SpacePracticeSection = ({ tasks }: SpacePracticeSectionProps) => {
+export const SpacePracticeSection = ({
+  tasks,
+  presentation = "default",
+}: SpacePracticeSectionProps) => {
   const t = useTranslations("space");
   const tDashboard = useTranslations("dashboard");
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.inProgress);
@@ -62,9 +66,15 @@ export const SpacePracticeSection = ({ tasks }: SpacePracticeSectionProps) => {
           {filterStatus === FilterStatus.inProgress ? t("empty_in_progress") : t("empty_list")}
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div
+          className={cn(
+            presentation === "personal-space"
+              ? "grid grid-cols-1 gap-4 md:grid-cols-2"
+              : "flex flex-col gap-3"
+          )}
+        >
           {filteredTasks.map((task) => (
-            <InProgressTaskCard key={task.id} {...task} />
+            <InProgressTaskCard key={task.id} {...task} presentation={presentation} />
           ))}
         </div>
       )}

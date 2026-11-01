@@ -40,7 +40,7 @@ export default function PersonalSpacePage() {
           <Spinner aria-label={t("loading")} />
         </div>
       ) : (
-        <SpacePracticeSection tasks={tasks} />
+        <SpacePracticeSection tasks={tasks} presentation="personal-space" />
       )}
     </div>
   );
