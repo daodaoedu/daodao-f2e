@@ -35,6 +35,10 @@ export interface INotificationApiItem {
   connectionRequestId?: number;
   buddyRequestId?: string;
   reactionType?: string;
+  cohortName?: string;
+  entityTitle?: string;
+  message?: string;
+  url?: string;
 }
 
 interface INotificationsResponse {
@@ -117,6 +121,10 @@ function toMobileNotification(item: ApiNotificationItem): INotificationApiItem {
       typeof item.connectionRequestId === "number" ? item.connectionRequestId : undefined,
     buddyRequestId: getOptionalString(item.buddyRequestId),
     reactionType: getOptionalString(item.reactionType),
+    cohortName: getOptionalString(item.cohortName),
+    entityTitle: getOptionalString(item.entityTitle),
+    message: getOptionalString(item.message),
+    url: getOptionalString(item.url),
   };
 }
 

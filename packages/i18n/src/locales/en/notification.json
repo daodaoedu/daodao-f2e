@@ -25,5 +25,12 @@
   "agree_connect": "Accept",
   "ignore": "Ignore",
   "agreed": "Accepted",
-  "ignored": "Ignored"
+  "ignored": "Ignored",
+  "cohort_invitation": "{name} invited you to join the cohort “{title}”",
+  "cohort_removed": "You were removed from the cohort “{title}”",
+  "cohort_invitation_fallback": "You received a cohort invitation. The cohort details are no longer available.",
+  "cohort_removed_fallback": "You were removed from a cohort. The cohort details are no longer available.",
+  "wish_linked": "Your wish was linked to the roadmap item “{title}”",
+  "roadmap_shipped": "The roadmap item you supported, “{title}”, has shipped",
+  "related_roadmap_item": "Related item"
 }

@@ -59,9 +59,11 @@ export function FeedSpaceFilter({ options, selected, onChange }: FeedSpaceFilter
       <PopoverContent
         aria-label={t("feed_space_filter_aria_label")}
         align="start"
+        side="bottom"
+        avoidCollisions={false}
         sideOffset={6}
         collisionPadding={16}
-        className="flex max-h-[var(--radix-popover-content-available-height)] w-auto min-w-[220px] max-w-[calc(100vw-32px)] flex-col gap-0.5 overflow-y-auto rounded-2xl border-[#E4EAE9] bg-white p-1.5 shadow-[0_8px_20px_rgba(15,48,54,0.12)]"
+        className="flex max-h-[var(--radix-popover-content-available-height)] w-auto min-w-[min(220px,var(--radix-popover-content-available-width))] max-w-[min(calc(100vw-32px),var(--radix-popover-content-available-width))] flex-col gap-0.5 overflow-y-auto rounded-2xl border-[#E4EAE9] bg-white p-1.5 shadow-[0_8px_20px_rgba(15,48,54,0.12)]"
       >
         <FilterRow
           label={t("feed_space_filter_all")}

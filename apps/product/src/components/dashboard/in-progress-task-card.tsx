@@ -6,6 +6,7 @@ import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
+import { cn } from "@daodao/ui/lib/utils";
 import { Calendar, CalendarCheck, PenLine, Timer } from "lucide-react";
 import { CheckInButton } from "@/components/check-in";
 import {
@@ -32,6 +33,8 @@ interface InProgressTaskCardProps {
   onEdit?: () => void;
   /** 草稿按鈕文案；期程指派的草稿是「啟用」而非「繼續編輯」 */
   draftActionLabel?: string;
+  /** Compact card actions and inset progress bar used on the Personal Space page. */
+  presentation?: "default" | "personal-space";
 }
 
 export const InProgressTaskCard = ({
@@ -49,6 +52,7 @@ export const InProgressTaskCard = ({
   endDate,
   onEdit,
   draftActionLabel,
+  presentation = "default",
 }: InProgressTaskCardProps) => {
   const t = useTranslations("dashboard");
   const themeName = getThemeNameFromColor(theme);
@@ -79,7 +83,12 @@ export const InProgressTaskCard = ({
       />
 
       {/* Main content — flex-1 absorbs available space, clips if overflow */}
-      <div className="absolute inset-0 p-5 pb-4 z-10 flex flex-col">
+      <div
+        className={cn(
+          "absolute inset-0 p-5 pb-4 z-10 flex flex-col",
+          presentation === "personal-space" && "pb-6"
+        )}
+      >
         <div className="flex-1 min-h-0 flex flex-col gap-3">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between gap-2">
@@ -152,7 +161,10 @@ export const InProgressTaskCard = ({
         {/* Check-in Button — always visible at bottom, separated from content */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: 此處用於阻止事件冒泡到父元素 */}
         <span
-          className="mt-3 shrink-0 block"
+          className={cn(
+            "mt-3 shrink-0 block",
+            presentation === "personal-space" && "flex justify-end"
+          )}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -162,14 +174,25 @@ export const InProgressTaskCard = ({
           }}
         >
           {isDraft ? (
-            <Button variant="secondary" onClick={onEdit}>
+            <Button
+              variant="secondary"
+              onClick={onEdit}
+              className={cn(
+                presentation === "personal-space" &&
+                  "h-7 w-fit gap-[5px] rounded-full px-3 py-0 text-[13px] [&>svg]:size-4"
+              )}
+            >
               <PenLine className="size-4.5 text-logo-cyan" />
               {draftActionLabel ?? t("continue_editing")}
             </Button>
           ) : (
             <CheckInButton
               variant="secondary"
-              className="w-full sm:max-w-[288px]"
+              className={cn(
+                presentation === "personal-space"
+                  ? "h-7 w-fit max-w-none gap-[5px] rounded-full px-3 py-0 text-[13px] [&>svg]:size-4"
+                  : "w-full sm:max-w-[288px]"
+              )}
               practiceId={id}
               practiceStatus={status}
               lastCheckInDate={lastCheckInDate ?? null}
@@ -184,8 +207,19 @@ export const InProgressTaskCard = ({
       </div>
 
       {/* Progress bar — always at card bottom */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 overflow-hidden">
-        <Progress value={progress} />
+      <div
+        className={cn(
+          "absolute bottom-0 left-0 right-0 z-10 overflow-hidden",
+          presentation === "personal-space" && "bottom-1.5 left-5 right-5"
+        )}
+      >
+        <Progress
+          value={progress}
+          className={cn(
+            presentation === "personal-space" &&
+              "h-1.5 bg-white/75 [--active-color:oklch(0.711_0.12_190.6)] shadow-[inset_0_0_0_1px_rgba(15,48,54,0.08)]"
+          )}
+        />
       </div>
     </CustomLink>
   );
