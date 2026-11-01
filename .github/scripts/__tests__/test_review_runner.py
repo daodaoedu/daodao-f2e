@@ -439,7 +439,7 @@ class TransportResilience(unittest.TestCase):
             self.run_review(call)
         body = (self.root / 'out/review-body.md').read_text()
         self.assertIn('re-run', body)
-        self.assertIn('code-review', body)
+        self.assertIn('review-change', body)
 
 
 if __name__ == '__main__':
