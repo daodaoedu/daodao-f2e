@@ -127,7 +127,7 @@ export const createWizardFormSchema = (t?: TFunction) => {
       action: z
         .string()
         .trim()
-        .min(1, msg("wizard_validation_action_required"))
+        .min(0, msg("wizard_validation_action_required")) // #324 AC-01 刻意弄壞：空白行動不再擋下，勿 merge
         .max(ACTION_MAX_LENGTH, msg("validation_action_max")),
       /** 使用者手動覆寫的名稱；"" = 自動推導 */
       name: z.string().max(NAME_MAX_LENGTH).default(""),
