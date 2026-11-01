@@ -1,8 +1,10 @@
 name: Code Review
 
+# 手動觸發以節省 Actions 額度：在 PR 貼 `ai-review` label 才跑（跑完自動移除，要再審就再貼一次），
+# 貼 `ai-review:full` 則強制全檔重審。不是 required check，不擋 merge。
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [labeled]
 
 concurrency:
   group: code-review-${{ github.event.pull_request.number }}
@@ -12,7 +14,7 @@ jobs:
   review:
     name: AI Code Review
     # Draft and already-reviewed shared-config sync PRs do not spend model calls.
-    if: ${{ !github.event.pull_request.draft && !startsWith(github.head_ref, 'chore/sync-claude-config-') }}
+    if: ${{ (github.event.label.name == 'ai-review' || github.event.label.name == 'ai-review:full') && !github.event.pull_request.draft && !startsWith(github.head_ref, 'chore/sync-claude-config-') }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -81,11 +83,24 @@ jobs:
             node "$KNOWLEDGE_SCRIPT" prompt-block --db "$KNOWLEDGE_DB" > "$RUNNER_TEMP/known-fp.md" \
               || echo '::warning::Historical false-positive context unavailable'
           fi
-      # #368: on synchronize, files whose PR diff (vs merge-base) is unchanged since the last review
+          # CI 不跑 filter，知識庫只透過這段 prompt 影響模型；寫進 job summary 才看得出每次實際放了什麼
+          {
+            echo "### 已知誤判脈絡（review-knowledge prompt-block）"
+            echo
+            if [ -s "$RUNNER_TEMP/known-fp.md" ]; then
+              echo "放進模型提示的樣態：$(grep -c '^- ' "$RUNNER_TEMP/known-fp.md") 種"
+              echo
+              cat "$RUNNER_TEMP/known-fp.md"
+            else
+              echo "未載入（可信 base 沒有腳本或知識庫）"
+            fi
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+      # #368: on synchronize / an `ai-review` label, files whose PR diff (vs merge-base) is unchanged since the last review
       # reuse that review instead of calling the model again; a rebase / update-branch that leaves the
       # PR's own diff untouched calls no model at all. The baseline is a hidden marker in the bot's
       # own review comment (no expiring cache). Files the last run left unreviewed are not in it.
-      # opened / reopened / ready_for_review and the `ai-review:full` label always review everything.
+      # The first review of a PR (no baseline comment yet) and the `ai-review:full` label review everything.
       - name: Load previous review baseline
         if: steps.runtime.outputs.available == 'true'
         env:
@@ -96,7 +111,7 @@ jobs:
         run: |
           BASELINE="$RUNNER_TEMP/previous-review-comment.md"
           : > "$BASELINE"
-          if [ "$ACTION" != synchronize ]; then
+          if [ "$ACTION" != synchronize ] && [ "$ACTION" != labeled ]; then
             echo "Full review: pull_request.$ACTION"
             exit 0
           fi
@@ -166,14 +181,19 @@ jobs:
           # A trusted base from before #169 has no verify subcommand.
           if [ ! -f "$KNOWLEDGE_SCRIPT" ] || ! grep -Fq 'verifyFindings' "$KNOWLEDGE_SCRIPT" || [ ! -f "$STATUS" ]; then
             echo "verify unavailable at trusted base or no review status; skipped"
+            { echo "### verified-absent-claim"; echo; echo "未執行（可信 base 沒有 verify，或沒有 review status）"; echo; } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           echo "::group::verified-absent-claim report"
           if node "$KNOWLEDGE_SCRIPT" verify --repo-root "$GITHUB_WORKSPACE" --rev "$HEAD_SHA" \
-            --findings "$STATUS" --report "$RUNNER_TEMP/review-output/verify-report.json" --note "$NOTE"; then
+            --findings "$STATUS" --report "$RUNNER_TEMP/review-output/verify-report.json" --note "$NOTE" \
+            > "$RUNNER_TEMP/verify-summary.txt"; then
+            cat "$RUNNER_TEMP/verify-summary.txt"
             [ -s "$NOTE" ] && cat "$NOTE" >> "$RUNNER_TEMP/review-output/review-body.md"
+            { echo "### verified-absent-claim"; echo; cat "$RUNNER_TEMP/verify-summary.txt"; echo; } >> "$GITHUB_STEP_SUMMARY"
           else
             echo "verify failed; review body left unchanged"
+            { echo "### verified-absent-claim"; echo; echo "verify 失敗，review body 未變更"; echo; } >> "$GITHUB_STEP_SUMMARY"
           fi
           echo "::endgroup::"
       - name: Preserve review inputs and coverage
@@ -345,3 +365,14 @@ jobs:
               -f "output[summary]=AI review 沒有涵蓋全部檔案，綠燈不代表已審完。未審查檔案與原因見 PR 上的 review 留言；報告與 artifact：$REVIEW_RUN_URL" \
               > /dev/null
           fi
+      # 移除觸發用的 label，讓「再貼一次」就能再觸發；失敗只警告，不影響審查結果
+      - name: Remove trigger label
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          LABEL: ${{ github.event.label.name }}
+        run: |
+          gh api --method DELETE "repos/$REPOSITORY/issues/$PR_NUMBER/labels/$(jq -rn --arg l "$LABEL" '$l|@uri')" > /dev/null \
+            || echo "::warning::無法移除 label $LABEL，請手動移除後再貼一次以重新觸發"
