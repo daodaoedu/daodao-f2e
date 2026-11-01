@@ -7,6 +7,11 @@ import type * as React from "react";
 import { useControlledState } from "../../../../hooks/use-controlled-state";
 import { getStrictContext } from "../../../../lib/get-strict-context";
 
+// Motion 12 WAAPI completion cancels the native animation before its final inline
+// style is rendered, exposing the initial opacity for one frame. An update observer
+// keeps these two modal surfaces on Motion's JS driver, including their exit animation.
+const keepDialogAnimationOnMainThread = () => undefined;
+
 type DialogContextType = {
   isOpen: boolean;
   setIsOpen: DialogProps["onOpenChange"];
@@ -62,6 +67,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay data-slot="dialog-overlay" asChild forceMount>
       <motion.div
         key="dialog-overlay"
+        onUpdate={keepDialogAnimationOnMainThread}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -104,6 +110,7 @@ function DialogContent({
     >
       <motion.div
         key="dialog-content"
+        onUpdate={keepDialogAnimationOnMainThread}
         data-slot="dialog-content"
         initial={{
           opacity: 0,
