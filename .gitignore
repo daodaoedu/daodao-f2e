@@ -9,6 +9,7 @@ coverage/
 playwright-report/
 test-results/
 artifacts/future-letter-playwright/
+artifacts/journeys/
 
 # Next.js
 .next/
