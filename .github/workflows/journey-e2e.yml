@@ -20,7 +20,7 @@
   "jobs": {
     "journeys": {
       "if": "github.event.pull_request.draft != true",
-      "uses": "daodaoedu/daodao-infra/.github/workflows/journeys-reusable.yml@c8d8d85992dbe64150107eb5775601a5d5478ca0",
+      "uses": "daodaoedu/daodao/.github/workflows/journeys-reusable.yml@9c4cc9e5ce89029a145f34f7146620db564b1500",
       "with": {
         "infra_ref": "c8d8d85992dbe64150107eb5775601a5d5478ca0",
         "caller_repository": "daodao-f2e",
