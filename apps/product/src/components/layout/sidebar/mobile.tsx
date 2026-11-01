@@ -1,6 +1,6 @@
 "use client";
 
-import { HomeOutlineSvg, HomeSolidSvg, UserOutlineSvg, UserSolidSvg } from "@daodao/assets";
+import { HomeOutlineSvg, HomeSolidSvg, MessagesOutlineSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { useAuthContext } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
@@ -13,6 +13,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import { ChatUnreadBadge } from "./chat-unread-badge";
 import { MobileBottomSheet } from "./mobile-bottom-sheet";
 import type { SidebarProps } from "./type";
 
@@ -57,8 +58,8 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
   }, [isHomePage]);
 
   const isHomeActive = pathname === "/";
+  const isMessagesActive = pathname.startsWith("/messages");
   const isNotificationsActive = pathname === "/notifications";
-  const isMyIslandActive = pathname.startsWith(`/users/${identifier}`);
 
   const handleAvatarClick = useCallback(() => {
     setIsSheetOpen(true);
@@ -69,7 +70,6 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
   }, []);
 
   const HomeIcon = isHomeActive ? HomeSolidSvg : HomeOutlineSvg;
-  const MyIslandIcon = isMyIslandActive ? UserSolidSvg : UserOutlineSvg;
 
   const navItemClass =
     "flex size-11 items-center justify-center rounded-xl transition-colors hover:bg-logo-cyan/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-logo-cyan";
@@ -104,15 +104,23 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
             </CustomLink>
           </li>
 
-          {/* Notifications */}
-          <li className="flex flex-1 justify-center">
+          {/* Messages */}
+          <li className="flex min-w-0 flex-1 justify-center">
             <CustomLink
-              href="/notifications"
+              href="/messages"
               className={navItemClass}
-              aria-label={t("nav_notifications")}
-              aria-current={isNotificationsActive ? "page" : undefined}
+              aria-label={t("nav_messages")}
+              aria-current={isMessagesActive ? "page" : undefined}
             >
-              <NotificationBell isActive={isNotificationsActive} className="[&_svg]:size-7" />
+              <span className="relative inline-flex">
+                <MessagesOutlineSvg
+                  className={cn(
+                    iconClass,
+                    isMessagesActive ? "text-logo-cyan opacity-100" : "text-light-gray opacity-45"
+                  )}
+                />
+                <ChatUnreadBadge />
+              </span>
             </CustomLink>
           </li>
 
@@ -127,20 +135,15 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
             </CustomLink>
           </li>
 
-          {/* My Island */}
+          {/* Notifications */}
           <li className="flex flex-1 justify-center">
             <CustomLink
-              href={`/users/${identifier}`}
+              href="/notifications"
               className={navItemClass}
-              aria-label={t("nav_my_island")}
-              aria-current={isMyIslandActive ? "page" : undefined}
+              aria-label={t("nav_notifications")}
+              aria-current={isNotificationsActive ? "page" : undefined}
             >
-              <MyIslandIcon
-                className={cn(
-                  iconClass,
-                  isMyIslandActive ? "text-logo-cyan opacity-100" : "text-light-gray opacity-45"
-                )}
-              />
+              <NotificationBell isActive={isNotificationsActive} className="[&_svg]:size-7" />
             </CustomLink>
           </li>
 
@@ -171,7 +174,7 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
         </ul>
       </nav>
 
-      <MobileBottomSheet isOpen={isSheetOpen} onClose={handleSheetClose} />
+      <MobileBottomSheet identifier={identifier} isOpen={isSheetOpen} onClose={handleSheetClose} />
     </>
   );
 };

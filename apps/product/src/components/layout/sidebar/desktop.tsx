@@ -29,7 +29,7 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
     <nav
       className={cn(
         "fixed left-0 top-0 flex flex-col h-screen bg-[#F9FEFF]/70 border-r-2 border-[#C1ECFF] backdrop-blur-[15px] rounded-r-3xl z-30 transition-all duration-300 ease-in-out overflow-hidden",
-        isCollapsed ? "w-[68px]" : "w-[132px]"
+        isCollapsed ? "w-[68px]" : "w-[144px]"
       )}
       style={{ paddingTop: 44, paddingBottom: 44 }}
     >
