@@ -1,0 +1,37 @@
+{
+  "name": "Core journey PR gate",
+  "on": {
+    "pull_request": {
+      "types": [
+        "opened",
+        "synchronize",
+        "reopened",
+        "ready_for_review"
+      ]
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "journeys-${{ github.workflow }}-${{ github.event.pull_request.number }}",
+    "cancel-in-progress": true
+  },
+  "jobs": {
+    "journeys": {
+      "if": "github.event.pull_request.draft != true",
+      "uses": "daodaoedu/daodao/.github/workflows/journeys-reusable.yml@317c88c3fe3eea4163f018d9954bd39c17662b5d",
+      "with": {
+        "infra_ref": "c8d8d85992dbe64150107eb5775601a5d5478ca0",
+        "caller_repository": "daodao-f2e",
+        "caller_sha": "${{ github.event.pull_request.head.sha }}",
+        "base_sha": "${{ github.event.pull_request.base.sha }}",
+        "mode": "local",
+        "revisions": "${{ vars.JOURNEY_REVISIONS || '{}' }}"
+      },
+      "secrets": {
+        "CROSS_REPO_TOKEN": "${{ secrets.JOURNEY_CROSS_REPO_TOKEN }}"
+      }
+    }
+  }
+}
