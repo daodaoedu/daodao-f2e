@@ -917,7 +917,7 @@ function CohortSetupPanel({
               endDate: String(formData.get("endDate") ?? ""),
             });
           }}
-          className="h-auto rounded-full border-[#CDEBE8] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#0D7773]"
+          className="h-auto rounded-full border-[#CDEBE8] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#0D7773] hover:bg-[#F0FBF9] hover:text-[#0D7773]"
         >
           <Eye className="size-[15px]" aria-hidden="true" />
           {t("cohort_signup_preview_join_page")}
@@ -970,7 +970,7 @@ function CohortSetupPanel({
             type="button"
             variant="outline"
             disabled
-            className="h-auto rounded-full border-dashed border-[#C6D8D6] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#9DB3B1]"
+            className="h-auto rounded-full border-dashed border-[#C6D8D6] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#9DB3B1] disabled:opacity-100"
           >
             <Plus className="size-[15px]" aria-hidden="true" />
             {t("cohort_signup_add_question")}
