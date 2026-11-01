@@ -227,12 +227,14 @@ export function TemplateCard({
 
   return (
     <article
-      className="rounded-3xl border border-[#CDEBE8] bg-white p-6"
+      className="min-w-0 rounded-3xl border border-[#CDEBE8] bg-white p-6"
       data-testid={`template-${template.id}`}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <h2 className="truncate text-xl font-semibold tracking-[-0.02em]">{template.title}</h2>
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+          <h2 className="min-w-0 max-w-full break-words text-xl font-semibold tracking-[-0.02em]">
+            {template.title}
+          </h2>
           {template.status === "draft" && (
             <span className="rounded-full bg-[#FFF4D6] px-2 py-0.5 text-xs font-semibold text-[#7A6120]">
               {t("template_draft_badge")}
