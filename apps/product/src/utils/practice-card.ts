@@ -1,4 +1,5 @@
 import { differenceInCalendarDays, format, isValid, parseISO } from "date-fns";
+import { parseLocalDate } from "./practice-period";
 
 export function calculateRemainingDays(endDate: string | null | undefined): number | null {
   if (!endDate) return null;
@@ -12,9 +13,9 @@ export function calculateDaysProgress(
   endDate: string | null | undefined
 ): { elapsed: number; total: number } | null {
   if (!startDate || !endDate) return null;
-  const start = parseISO(startDate);
-  const end = parseISO(endDate);
-  if (!isValid(start) || !isValid(end)) return null;
+  const start = parseLocalDate(startDate);
+  const end = parseLocalDate(endDate);
+  if (!start || !end) return null;
   const total = differenceInCalendarDays(end, start) + 1;
   if (total <= 0) return null;
   const elapsed = Math.min(total, Math.max(0, differenceInCalendarDays(new Date(), start) + 1));
@@ -23,7 +24,7 @@ export function calculateDaysProgress(
 
 export function formatCardDate(date: string | null | undefined): string | null {
   if (!date) return null;
-  const parsed = parseISO(date);
-  if (!isValid(parsed)) return null;
+  const parsed = parseLocalDate(date);
+  if (!parsed) return null;
   return format(parsed, "yyyy/MM/dd");
 }

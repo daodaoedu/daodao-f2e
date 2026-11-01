@@ -24,6 +24,8 @@
   "fab_team_badge": "島島團隊",
   "checked_in_count": "<bold>{count}</bold> 次",
   "checked_in_count_zero": "開始你的第一次打卡吧！",
+  "cohort_check_in_before_start": "開始日後即可進行打卡",
+  "cohort_check_in_first": "開始你的第一次打卡",
   "card_start_date": "{date}",
   "card_remaining_days": "剩 {count} 天",
   "card_days_progress": "{current}/{total} 天",

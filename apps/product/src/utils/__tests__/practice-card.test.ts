@@ -16,19 +16,19 @@ describe("calculateRemainingDays", () => {
 
   it("returns positive days when endDate is in the future", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-05-18T00:00:00Z"));
+    vi.setSystemTime(new Date(2026, 4, 18));
     expect(calculateRemainingDays("2026-05-25")).toBe(7);
   });
 
   it("returns 0 when endDate is today", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-05-18T00:00:00Z"));
+    vi.setSystemTime(new Date(2026, 4, 18));
     expect(calculateRemainingDays("2026-05-18")).toBe(0);
   });
 
   it("returns negative days when endDate is in the past", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-05-18T00:00:00Z"));
+    vi.setSystemTime(new Date(2026, 4, 18));
     expect(calculateRemainingDays("2026-05-10")).toBe(-8);
   });
 });
@@ -53,7 +53,7 @@ describe("calculateDaysProgress", () => {
   it("counts total days inclusively of both start and end date", () => {
     vi.useFakeTimers();
     // Local Date constructor (not a UTC ISO string) so the mocked "now"
-    // lines up with parseISO's local-timezone parsing of date-only strings,
+    // lines up with local calendar parsing of date-only strings,
     // regardless of the machine's timezone offset.
     vi.setSystemTime(new Date(2026, 4, 1));
     // startDate + (durationDays - 1) = endDate, so a 30-day practice starting
@@ -107,5 +107,22 @@ describe("formatCardDate", () => {
 
   it("formats single-digit month and day with leading zeros", () => {
     expect(formatCardDate("2026-03-07")).toBe("2026/03/07");
+  });
+});
+
+describe("API calendar dates", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("keeps the backend calendar date when formatted from a midnight ISO value", () => {
+    expect(formatCardDate("2026-11-02T00:00:00.000Z")).toBe("2026/11/02");
+  });
+
+  it("starts at day one for midnight ISO values on the local start date", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 10, 2, 12));
+    expect(calculateDaysProgress("2026-11-02T00:00:00.000Z", "2026-11-08T00:00:00.000Z")).toEqual({
+      elapsed: 1,
+      total: 7,
+    });
   });
 });
