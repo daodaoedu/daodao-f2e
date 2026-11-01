@@ -58,7 +58,8 @@ test("staff creates Lighthouse cohort; learner consent gates joining and cohort 
     await expect(page.getByRole("button", { name: "同意並加入", exact: true })).toBeDisabled();
     await page.getByRole("checkbox").check();
     await page.getByRole("button", { name: "同意並加入", exact: true }).click();
-    await expect(page).toHaveURL(new RegExp(`/cohorts/${id}$`));
+    // 私有程式庫的 CI runner 只有 2 核心（公開的是 4 核心），加入後跳轉常超過預設 20 秒；只放寬這一步。
+    await expect(page).toHaveURL(new RegExp(`/cohorts/${id}$`), { timeout: 60_000 });
     await expect(page.getByText(name, { exact: true }).first()).toBeVisible();
     await page.reload();
     await expect(page.getByText(name, { exact: true }).first()).toBeVisible();
