@@ -8,7 +8,7 @@ concurrency:
 # ===== 觸發條件設定 =====
 # 1. workflow_run：當 CI 完成後觸發（避免重複執行 CI）
 #    - 排除 pull_request 事件，PR 只需要 CI 檢查，不需要部署
-# 2. workflow_dispatch：手動觸發選項
+# 2. workflow_dispatch：手動觸發選項（feat/** 分支只走這條，選分支後勾 force_deploy）
 on:
   workflow_run:
     workflows: ["Linode CI"]
@@ -18,7 +18,6 @@ on:
       - main
       - dev
       - prod
-      - 'feat/**'
   workflow_dispatch:
     inputs:
       force_deploy:
@@ -49,6 +48,7 @@ jobs:
   # ===== 檢測檔案變更 =====
   detect-changes:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: ${{ (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true }}
     outputs:
       build-website: ${{ steps.changes.outputs.website }}
@@ -139,6 +139,7 @@ jobs:
   # ===== Docker 映像構建階段 - Website =====
   build-website:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     needs: detect-changes
     # 只在 CI 成功或手動強制部署時執行，且 website 有變更
     if: ${{ ((github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true) && needs.detect-changes.outputs.build-website == 'true' }}
@@ -293,6 +294,7 @@ jobs:
   # ===== Docker 映像構建階段 - Product =====
   build-product:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     needs: detect-changes
     # 只在 CI 成功或手動強制部署時執行，且 product 有變更
     if: ${{ ((github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true) && needs.detect-changes.outputs.build-product == 'true' }}
@@ -777,6 +779,7 @@ jobs:
   # ===== 更新部署參照點（獨立 job，避免 race condition）=====
   update-deploy-ref:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [deploy, verify]
     # 僅在 deploy 成功且 verify 成功（或被跳過但非失敗）時更新；避免部分部署失敗卻前移 ref 導致下次增量檢測遺漏
     if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result != 'failure' && needs.verify.result != 'cancelled' }}
@@ -822,8 +825,10 @@ jobs:
   # ===== Discord 通知 =====
   notify:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: [detect-changes, build-website, build-product, deploy, verify, update-deploy-ref]
-    if: always()
+    # PR 的 CI 完成也會觸發本 workflow，但 detect-changes 會被跳過；這時不需要通知，也不必多起一台 runner
+    if: ${{ always() && needs.detect-changes.result != 'skipped' }}
     steps:
       - name: Send Discord Notification
         run: |

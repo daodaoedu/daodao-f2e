@@ -23,7 +23,8 @@
     "test:e2e:future-letter": "playwright test --config=../../playwright.config.ts e2e/future-letter --project=chromium",
     "test:e2e:future-letter:record": "playwright test --config=../../playwright.config.ts e2e/future-letter --project=chromium",
     "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
-    "clean": "pnpm dlx rimraf .next out node_modules"
+    "clean": "pnpm dlx rimraf .next out node_modules",
+    "test:e2e:journeys": "playwright test --config=../../playwright.journeys.config.ts"
   },
   "dependencies": {
     "@daodao/analytics": "workspace:*",

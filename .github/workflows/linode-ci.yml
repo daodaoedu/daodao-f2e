@@ -10,7 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 # ===== 觸發條件設定 =====
-# 1. push：當推送到 main, dev, feat/** 分支時觸發
+# 1. push：當推送到 main, dev, prod 分支時觸發
+#    feat/** 不在 push 觸發：feat 分支的 PR 已由 pull_request 跑 CI，同時觸發會每次 push 跑兩份
+#    feat 環境改以 Linode CD 手動觸發（workflow_dispatch）部署
 # 2. pull_request：當向 main 或 dev 分支提交 PR 時觸發
 # 3. workflow_dispatch：手動觸發選項
 # =======================
@@ -20,7 +22,6 @@ on:
       - main
       - dev
       - prod
-      - 'feat/**'
   pull_request:
     branches:
       - main
@@ -36,6 +37,7 @@ env:
 jobs:
   workflow-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -50,6 +52,7 @@ jobs:
   test:
     needs: workflow-tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       # ===== 代碼檢出 =====
       - name: Checkout code
@@ -115,6 +118,7 @@ jobs:
   # ===== CI 成功通知 =====
   notify-success:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: test
     if: success()
     steps:
@@ -147,6 +151,7 @@ jobs:
   # ===== CI 失敗通知 =====
   notify-failure:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: test
     if: failure()
     steps:

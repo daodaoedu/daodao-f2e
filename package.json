@@ -28,7 +28,8 @@
     "docker:prod:down": "docker-compose -f docker/production/docker-compose.yml down",
     "docker:build": "pnpm build && docker-compose -f docker/production/docker-compose.yml up -d --build",
     "test": "turbo run test",
-    "clean": "turbo run clean && pnpm dlx rimraf node_modules"
+    "clean": "turbo run clean && pnpm dlx rimraf node_modules",
+    "test:journey-contracts": "vitest run --config apps/product/e2e/journeys/vitest.config.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",
