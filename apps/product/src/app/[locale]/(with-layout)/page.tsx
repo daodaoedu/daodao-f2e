@@ -10,7 +10,7 @@ import {
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter, useSearchParams } from "@daodao/i18n/navigation";
-import { getStorage, StorageEnum } from "@daodao/shared";
+import { getStorage, StorageEnum, useIsMobile } from "@daodao/shared";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -37,6 +37,7 @@ import {
   ShowcaseSearchBar,
 } from "@/components/showcase";
 import { HOME_TAB_PATHS } from "@/constants/home-navigation";
+import { getHomeGuestLoginRedirect } from "@/utils/home-guest-login";
 
 // Reorder feed items into the cycle: [打卡] → [互動] → [實踐] → repeat (1:1:1)
 // 規則：
@@ -111,7 +112,23 @@ export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("dashboard");
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const { user, isLoading: isAuthLoading, openLoginDialog } = useAuth();
+  const isMobile = useIsMobile();
+  const hasPromptedGuestLogin = useRef(false);
+
+  useEffect(() => {
+    const redirectUrl = getHomeGuestLoginRedirect({
+      isLoading: isAuthLoading,
+      isAuthenticated: !!user,
+      isMobile,
+      hasPrompted: hasPromptedGuestLogin.current,
+      searchParams,
+    });
+    if (redirectUrl === null) return;
+
+    hasPromptedGuestLogin.current = true;
+    openLoginDialog({ source: "app", redirectUrl });
+  }, [isAuthLoading, user, isMobile, openLoginDialog, searchParams]);
 
   const [searchValue, setSearchValue] = useState(searchParams.get("keyword") ?? "");
   const [filters, _setFilters] = useState<ShowcaseFilterState>({
