@@ -52,3 +52,8 @@ export function journeyDate(offset = 0, now = new Date()): string {
   calendar.setUTCDate(calendar.getUTCDate() + offset);
   return calendar.toISOString().slice(0, 10);
 }
+
+/** These fixtures test expired joining, not the exact day boundary; keep them past in UTC and Taipei. */
+export function journeyClosedDeadline(now = new Date()): string {
+  return journeyDate(-2, now);
+}
