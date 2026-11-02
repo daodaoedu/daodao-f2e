@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { fixtureProgram, journeyDate } from "./contracts";
+import { fixtureProgram, journeyClosedDeadline, journeyDate } from "./contracts";
 import { api, cleanup, expect, login, manifest, serviceUrl, test, urls } from "./fixtures";
 
 test("staff creates Lighthouse cohort; learner consent gates joining and cohort remains visible", async ({
@@ -95,7 +95,7 @@ for (const state of ["upcoming", "active", "full", "closed", "closed-paused"] as
         displayName: name,
         startDate: date(state === "upcoming" ? 7 : -7),
         endDate: date(21),
-        joinDeadline: date(closed ? -1 : 14),
+        joinDeadline: closed ? journeyClosedDeadline(now) : date(14),
         capacity: state === "full" ? 1 : null,
         status: "published",
         interactionModes: ["async"],
