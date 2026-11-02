@@ -17,6 +17,13 @@ import {
   useLighthouseTemplates,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import {
@@ -38,6 +45,7 @@ import {
   Check,
   ChevronDown,
   Copy,
+  Eye,
   Minus,
   MoreVertical,
   Pencil,
@@ -186,6 +194,12 @@ function CohortSetupPanel({
   const t = useTranslations("lighthouse");
   const [activeTab, setActiveTab] = useState<SetupTab>("basic");
   const panelRef = useRef<HTMLFormElement>(null);
+  const [signupPreview, setSignupPreview] = useState<{
+    name: string;
+    message: string;
+    startDate: string;
+    endDate: string;
+  } | null>(null);
   // 已開始的場次 server 會拒絕變更綁定（FR-TPL-05），直接鎖住勾選
   const templatesLocked = mode === "edit" && !!cohort && isCohortStarted(cohort.startDate);
   // 只記使用者動過的模板，其餘跟著最新的既有綁定走：templates 可能比面板晚載入，
@@ -890,6 +904,81 @@ function CohortSetupPanel({
 
       {/* Tab: signup */}
       <div className={activeTab !== "signup" ? "hidden" : ""} role="tabpanel">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            if (!panelRef.current) return;
+            const formData = new FormData(panelRef.current);
+            setSignupPreview({
+              name: String(formData.get("displayName") ?? ""),
+              message: showInviteOnSignup ? String(formData.get("inviteMessage") ?? "") : "",
+              startDate: String(formData.get("startDate") ?? ""),
+              endDate: String(formData.get("endDate") ?? ""),
+            });
+          }}
+          className="h-auto rounded-full border-[#CDEBE8] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#0D7773] hover:bg-[#F0FBF9] hover:text-[#0D7773]"
+        >
+          <Eye className="size-[15px]" aria-hidden="true" />
+          {t("cohort_signup_preview_join_page")}
+        </Button>
+        <Dialog
+          open={signupPreview !== null}
+          onOpenChange={(open) => !open && setSignupPreview(null)}
+        >
+          <DialogContent className="max-h-[85dvh] w-[92vw] gap-4 overflow-y-auto border-0 bg-white p-6 sm:max-w-xl">
+            <DialogHeader className="pt-0 pr-8 text-left">
+              <DialogTitle className="text-left">
+                {t("cohort_signup_preview_join_page")}
+              </DialogTitle>
+              <DialogDescription>{t("cohort_signup_preview_read_only")}</DialogDescription>
+            </DialogHeader>
+            <div className="rounded-3xl border border-[#CDEBE8] bg-white p-5 md:p-7">
+              <h2 className="break-words text-2xl font-semibold tracking-[-0.04em]">
+                {signupPreview?.name}
+              </h2>
+              {signupPreview?.message && (
+                <p className="mt-3 break-words whitespace-pre-line text-sm text-[#5A7B79]">
+                  {signupPreview.message}
+                </p>
+              )}
+              <p className="mt-2 text-xs text-[#78928F]">
+                {signupPreview?.startDate} — {signupPreview?.endDate}
+              </p>
+              <p className="mt-6 rounded-2xl bg-[#F7FCFB] p-4 text-sm leading-6 text-[#5A7B79]">
+                {t(
+                  signupMethod === "external"
+                    ? "cohort_signup_external_hint"
+                    : "cohort_signup_google_account_hint"
+                )}
+              </p>
+            </div>
+          </DialogContent>
+        </Dialog>
+        {signupMethod === "island_form" && (
+          <p className="mt-3 rounded-[14px] border border-[#DDEFED] bg-[#F7FCFB] px-3.5 py-3 text-xs leading-5 text-[#5A7B79]">
+            {t("cohort_signup_google_account_hint")}
+          </p>
+        )}
+        {signupMethod === "external" && (
+          <p className="mt-3 rounded-[14px] border border-[#F0DDB8] bg-[#FFF8EC] px-3.5 py-3 text-xs leading-5 text-[#72593C]">
+            {t("cohort_signup_external_hint")}
+          </p>
+        )}
+        <div className="my-6 flex flex-wrap items-center gap-2.5">
+          <Button
+            type="button"
+            variant="outline"
+            disabled
+            className="h-auto rounded-full border-dashed border-[#C6D8D6] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#9DB3B1] disabled:opacity-100"
+          >
+            <Plus className="size-[15px]" aria-hidden="true" />
+            {t("cohort_signup_add_question")}
+          </Button>
+          <span className="rounded-full bg-[#FFF4D6] px-2.5 py-1 text-[11px] font-semibold text-[#7A6120]">
+            {t("cohort_signup_custom_form_coming_soon")}
+          </span>
+        </div>
         <label className="mb-2 flex items-center gap-3 text-sm">
           <input
             name="showInviteMessageOnSignup"
@@ -915,12 +1004,6 @@ function CohortSetupPanel({
             defaultValue={cohort?.inviteMessage ?? ""}
           />
         </label>
-        <div className="mt-6 rounded-xl border border-dashed border-[#B9DCD8] p-5 text-center">
-          <p className="text-sm text-[#5A7B79]">{t("cohort_signup_questions_coming_soon")}</p>
-        </div>
-        <div className="mt-4 rounded-xl border border-dashed border-[#B9DCD8] p-5 text-center">
-          <p className="text-sm text-[#5A7B79]">{t("cohort_signup_preview_coming_soon")}</p>
-        </div>
       </div>
 
       {/* Bottom action bar */}

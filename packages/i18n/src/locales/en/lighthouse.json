@@ -648,5 +648,11 @@
   "cohort_invite_message_placeholder": "Anything you'd like people who want to join to know",
   "cohort_invite_message_disabled_placeholder": "Check the option above to write a message",
   "cohort_signup_questions_coming_soon": "Custom signup questions are coming soon",
-  "cohort_signup_preview_coming_soon": "Signup page preview is coming soon"
+  "cohort_signup_preview_coming_soon": "Signup page preview is coming soon",
+  "cohort_signup_preview_join_page": "Preview join page",
+  "cohort_signup_google_account_hint": "Participants sign in with Google. Their name and email come from their account, so you do not need to configure them here.",
+  "cohort_signup_external_hint": "This cohort uses an external signup link, so the built-in form is not enabled. After signup, share the cohort invitation link or invite participants by email to join.",
+  "cohort_signup_add_question": "Add question",
+  "cohort_signup_custom_form_coming_soon": "Custom signup forms & payments coming soon",
+  "cohort_signup_preview_read_only": "Read-only preview of the current cohort settings. This does not save changes or join the activity."
 }
