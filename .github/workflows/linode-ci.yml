@@ -11,8 +11,7 @@ concurrency:
 
 # ===== 觸發條件設定 =====
 # 1. push：當推送到 main, dev, prod 分支時觸發
-#    feat/** 不在 push 觸發：feat 分支的 PR 已由 pull_request 跑 CI，同時觸發會每次 push 跑兩份
-#    feat 環境改以 Linode CD 手動觸發（workflow_dispatch）部署
+#    feat/** 的 push 用來觸發 Linode CD 自動部署 feat 環境；f2e 是 public repo，重複跑不計費
 # 2. pull_request：當向 main 或 dev 分支提交 PR 時觸發
 # 3. workflow_dispatch：手動觸發選項
 # =======================
@@ -22,6 +21,7 @@ on:
       - main
       - dev
       - prod
+      - 'feat/**'
   pull_request:
     branches:
       - main
