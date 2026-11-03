@@ -24,7 +24,6 @@ test.describe("Future Letter FRD lifecycle", () => {
       `[data-testid="timeline-node"][data-node-id="letter-${draft.id}"][data-kind="delivered-unopened"]`
     );
     await expect(unopened).toBeVisible();
-    await unopened.click();
 
     const openResponsePromise = page.waitForResponse(
       (response) =>
@@ -32,7 +31,8 @@ test.describe("Future Letter FRD lifecycle", () => {
         response.request().method() === "POST" &&
         response.ok()
     );
-    await page.getByRole("button", { name: "打開這封信" }).click();
+    await unopened.focus();
+    await unopened.press("Enter");
     await openResponsePromise;
     await expect(page.getByTestId("letter-detail-card")).toContainText(message);
 
@@ -40,6 +40,19 @@ test.describe("Future Letter FRD lifecycle", () => {
     expect(firstOpenedAt).toBeTruthy();
     await ownerApi.open(draft.id);
     expect((await ownerApi.get(draft.id)).letter?.openedAt).toBe(firstOpenedAt);
+
+    const readCard = page.locator(
+      `[data-testid="timeline-node"][data-node-id="letter-${draft.id}"]`
+    );
+    await page.keyboard.press("Escape");
+    await expect(readCard).toBeFocused();
+    await readCard.press("Enter");
+    await expect(page.getByTestId("letter-detail-card")).toContainText(message);
+    await page.keyboard.press("Tab");
+    const close = page.getByRole("button", { name: "關閉信件", exact: true });
+    await expect(close).toBeFocused();
+    await close.press("Enter");
+    await expect(readCard).toBeFocused();
 
     await page.reload();
     await expect(page.locator('[data-testid="timeline-node"][data-kind="opened"]')).toBeVisible();
