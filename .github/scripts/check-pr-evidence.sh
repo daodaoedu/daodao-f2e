@@ -92,7 +92,7 @@ else
     else
       printf '%s\n' "$rows" | grep -qE '⬜|❌' && problems+=("核心旅程有 ⬜／❌ 列，未驗或未過")
       unverified=$(printf '%s\n' "$rows" | grep -v '✅' || true)
-      [ -z "$unverified" ] || problems+=("核心旅程有列缺 ✅（實際欄要有攔到的狀態碼）：$(printf '%s' "$unverified" | head -1)")
+      [ -z "$unverified" ] || problems+=("核心旅程有列缺 ✅（實際欄要有具體 HTTP／UI／job／SMTP 觀察值）：$(printf '%s' "$unverified" | head -1)")
       # 每條旅程（第 2 欄）都要同時有「正常」與「錯誤路徑」（第 3 欄）
       pair_problems=$(printf '%s\n' "$rows" | awk -F'|' '
         { j=$3; t=$4; gsub(/^[ \t]+|[ \t]+$/, "", j); gsub(/^[ \t]+|[ \t]+$/, "", t)
