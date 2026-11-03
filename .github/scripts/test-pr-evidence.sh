@@ -51,6 +51,25 @@ x
 code=$(run "$GOOD" block feat/x "" someone raw); expect_fail "缺讀取權限宣告不能當完整證據" "$code" "讀取權限驗證"
 code=$(run "$GOOD"); expect_pass "完整證據" "$code"
 
+
+GENERIC=$(printf '%s\n' "$GOOD" | sed 's/✅ 201/✅ PASS/')
+code=$(run "$GENERIC"); expect_fail "PASS字樣不是實際觀察值" "$code" "具體觀察結果"
+FAKE_WORKER=$(printf '%s\n' "$GOOD" | sed 's/✅ 201/✅ 未發請求（worker）；10\/10 PASS/')
+code=$(run "$FAKE_WORKER"); expect_fail "worker不得用未發請求充當結果" "$code" "具體觀察結果"
+UI_VALIDATION=$(printf '%s\n' "$GOOD" | sed 's/✅ 400/✅ 未發請求：slug 欄位顯示「只能使用小寫英文」/')
+code=$(run "$UI_VALIDATION"); expect_pass "真實前端驗證訊息不需要HTTP請求" "$code"
+WORKER='## 驗證證據
+- 報告：https://example.test/worker-report
+| ID | 旅程 | 類型 | 輸入 | 預期結果 | 實際 | 證據 |
+|---|---|---|---|---|---|---|
+| J-01 | 排程送達 | 正常 | 到期job | 完成送達 | ✅ job future-letter-1 delayed→completed | evidence/job.json |
+| J-02 | 排程送達 | 錯誤路徑 | 未到期job | 保留排程 | ✅ job future-letter-2 state=delayed，Email數量0 | evidence/job-2.json |'
+code=$(run "$WORKER"); expect_pass "真實job狀態不用捏HTTP狀態碼" "$code"
+SMTP=$(printf '%s\n' "$WORKER" | sed 's/✅ job future-letter-1 delayed→completed/✅ Mailpit收到1封，message-id=mail-7，To=learner@example.invalid/')
+code=$(run "$SMTP"); expect_pass "SMTP收件結果不用捏HTTP狀態碼" "$code"
+REPEAT_EXPECTED=$(printf '%s\n' "$WORKER" | sed 's/✅ job future-letter-1 delayed→completed/✅ 完成送達/')
+code=$(run "$REPEAT_EXPECTED"); expect_fail "重述預期不等於觀察結果" "$code" "具體觀察結果"
+
 code=$(run "$(printf '## Summary\nx\n\n## Test plan\n- [x] ok')"); expect_fail "缺區塊" "$code" "缺「## 驗證證據」"
 
 code=$(run "$(printf '## 驗證證據\n- 報告：沒連結\n| J-01 | a | 正常 | i | 201 | ✅ 201 |\n| J-02 | a | 錯誤路徑 | i | 400 | ✅ 400 |\n')")
