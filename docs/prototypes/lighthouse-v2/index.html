@@ -1,0 +1,654 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html lang="zh-TW"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>島島阿學 燈塔 v2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Anonymous+Pro:wght@400;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --primary-base:#16B9B3; --primary-darker:#0D7A77; --primary-lighter:#66D4CF; --primary-lightest:#B3E8E6; --primary-pale:#D9F3F5; --primary-palest:#E6F7F9;
+  --bg-dark:#0D3036; --text-dark:#2E6865; --text-muted:#5E7378; --light-gray:#9FB5B8; --bg-gray:#E4EAE9; --very-light-gray:#F4F6F6;
+  --page:#F7FDFB; --white:#FFFFFF; --mint-chip:#E7FAF7; --mint-chip-text:#0D5B59; --heat-empty:#EDF8F6;
+  --tips:#FFA10B; --tips-text:#A95D00;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"Anonymous Pro",ui-monospace,Menlo,monospace;
+  --s-1:.875rem; --s0:1rem; --s1:1.125rem; --s2:clamp(1.3rem,1.15rem + .6vw,1.5rem); --s3:clamp(1.75rem,1.4rem + 1.2vw,2.25rem); --s4:clamp(2rem,1.5rem + 2.2vw,3.1rem);
+  --wrap:1160px;
+}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--bg-dark);font-family:var(--f-body);font-size:var(--s0);line-height:1.75;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--white)}
+.wrap{max-width:var(--wrap);margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (min-width:720px){.wrap{padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:max(32px,env(safe-area-inset-right,0px))}}
+h1,h2,h3{margin:0;line-height:1.35;text-wrap:balance;font-weight:700}
+p{margin:0}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--primary-darker)}
+:focus-visible{outline:2px solid var(--primary-base);outline-offset:3px;border-radius:8px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:var(--s-1);font-weight:600;color:var(--primary-base);letter-spacing:.06em}
+.lede{color:var(--text-muted);font-size:var(--s1);max-width:34em}
+.h2{font-size:var(--s3);color:var(--primary-darker)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4em;min-height:48px;padding:0 1.6em;border-radius:999px;font:600 var(--s0)/1 var(--f-body);text-decoration:none;cursor:pointer;border:2px solid transparent;transition:background .2s,color .2s,box-shadow .2s}
+.btn-orange{background:var(--tips);border-color:var(--tips);color:var(--white);box-shadow:0 8px 10px 0 rgba(255,161,11,.2)}
+.btn-orange:hover{background:var(--white);color:var(--tips-text);box-shadow:0 12px 20px 0 rgba(255,161,11,.3)}
+.btn-outline{background:var(--white);border:1px solid var(--bg-gray);color:var(--text-dark)}
+.btn-outline:hover{border-color:var(--primary-base);color:var(--primary-darker)}
+.btn-sm{min-height:40px;padding:0 1.1em;font-size:var(--s-1)}
+.btn-huge{min-height:56px;padding:0 2.2em;font-size:var(--s1)}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--bg-gray)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px}
+.nav-logo img{width:150px}
+.nav-links{display:none;gap:28px;font-size:var(--s-1)}
+.nav-links a{color:var(--text-dark);text-decoration:none;font-weight:500}
+.nav-links a:hover,.nav-links a[aria-current="page"]{color:var(--primary-base)}
+.nav-links a[aria-current="page"]{font-weight:600}
+.nav-right{display:flex;align-items:center;gap:14px}
+@media (min-width:1100px){.nav-links{display:flex}}
+
+/* hero */
+.hero{position:relative;overflow:hidden;padding-block:clamp(48px,7vw,96px) clamp(56px,7vw,104px)}
+.hero .wrap{position:relative;display:grid;gap:48px;align-items:center}
+@media (min-width:980px){.hero .wrap{grid-template-columns:1fr 1.05fr}}
+.hero-copy{position:relative}
+.deco{position:absolute;pointer-events:none}
+.hero h1{font-size:var(--s4);color:var(--primary-darker);margin-block:16px 20px}
+.hero h1 span{color:var(--primary-base);display:block}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.cta-sub{margin-top:14px;font-size:var(--s-1);color:var(--text-muted)}
+
+/* product frame */
+.frame{background:var(--white);border:1px solid var(--bg-gray);border-radius:20px;box-shadow:0 30px 60px -30px rgba(13,48,54,.28);overflow:hidden;min-width:0}
+.frame-top{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--bg-gray)}
+.frame-top .back{font-size:.75rem;color:var(--text-muted)}
+.frame-top strong{font-size:var(--s-1);color:var(--bg-dark)}
+.tabs{display:flex;gap:6px;padding:12px 18px 0;flex-wrap:wrap}
+.tab{font-size:.78rem;padding:5px 12px;border-radius:999px;color:var(--text-muted);background:var(--very-light-gray)}
+.tab.on{background:var(--bg-dark);color:var(--white)}
+.focus-label{font-size:.72rem;font-weight:700;color:var(--text-muted);padding:0 14px;padding-bottom:6px}
+.focus-preview{display:grid;gap:8px;padding:14px 18px}
+.focus-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border:1px solid var(--bg-gray);border-radius:12px;background:var(--page);font-size:.8rem}
+.focus-row .name{font-weight:600;color:var(--bg-dark)}
+.focus-row .days{font-size:.72rem;color:var(--tips-text);font-weight:600}
+.focus-row .act{font-size:.72rem;padding:4px 10px;border-radius:999px;background:var(--primary-base);color:var(--white);font-weight:600}
+
+/* sections */
+section{padding-block:clamp(64px,8vw,112px)}
+.sec-head{display:grid;gap:12px;max-width:46em;margin-bottom:48px}
+.sec-head.center{margin-inline:auto;text-align:center;justify-items:center}
+.white-band{background:var(--white)}
+
+/* value pillars */
+.pillars{padding-block:clamp(48px,6vw,88px)}
+.pillar-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+.pillar{background:var(--white);border:1px solid var(--bg-gray);border-radius:24px;padding:28px 26px;display:grid;gap:12px;align-content:start;box-shadow:0 24px 50px -38px rgba(13,48,54,.3)}
+.pillar .ic{width:48px;height:48px;border-radius:14px;background:var(--primary-palest);display:grid;place-items:center;color:var(--primary-darker)}
+.pillar h3{font-size:var(--s2);color:var(--primary-darker)}
+.pillar p{color:var(--text-muted)}
+
+/* problem */
+.chat-grid{display:grid;gap:40px}
+@media (min-width:900px){.chat-grid{grid-template-columns:1fr 1fr;align-items:center}}
+.line-thread{background:#E9EEF1;border-radius:24px;padding:20px;display:grid;gap:10px;font-size:var(--s-1)}
+.bubble{background:var(--white);border-radius:16px 16px 16px 4px;padding:10px 14px;max-width:88%}
+.bubble small{display:block;color:var(--text-muted);font-size:.72rem}
+.bubble.me{justify-self:end;background:#C9F2D0;border-radius:16px 16px 4px 16px}
+.bubble.fade{opacity:.45}
+.pains{list-style:none;margin:0;padding:0;display:grid;gap:22px}
+.pains li{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start}
+.pains .ic{width:44px;height:44px;border-radius:14px;background:var(--primary-palest);display:grid;place-items:center;color:var(--primary-darker)}
+.pains h3{font-size:var(--s1);color:var(--bg-dark)}
+.pains p{color:var(--text-muted)}
+.quote{margin-top:30px;padding:20px 22px;border-radius:18px;background:var(--primary-palest);font-size:var(--s1);color:var(--primary-darker);font-weight:500}
+.quote cite{display:block;margin-top:8px;font:400 var(--s-1) var(--f-body);color:var(--text-muted)}
+.quote-note{display:block;margin-top:6px;font:400 .72rem/1.5 var(--f-body);color:var(--light-gray)}
+
+/* case */
+.case-band{background:var(--primary-palest)}
+.case-panel{display:grid;gap:32px;background:var(--white);border-radius:24px;padding:clamp(20px,4vw,44px);box-shadow:0 24px 50px -34px rgba(13,48,54,.3)}
+@media (min-width:940px){.case-panel{grid-template-columns:1.1fr 1fr;gap:56px}}
+.case-story{display:grid;gap:14px;align-content:start;min-width:0}
+.case-for{font-size:var(--s-1);color:var(--primary-darker);font-weight:600}
+.case-story h3{font-size:var(--s2);color:var(--primary-darker)}
+.case-story>p:not(.case-for){color:var(--text-muted)}
+.case-ex{display:grid;gap:4px;padding:16px 18px;border-radius:16px;border:1px dashed var(--primary-lighter);background:var(--page)}
+.case-ex-label{font-size:.72rem;font-weight:600;letter-spacing:.06em;color:var(--tips-text)}
+.case-ex strong{font-size:var(--s0);color:var(--bg-dark)}
+.case-ex small{font-size:.8rem;color:var(--text-dark)}
+.case-ex p{font-size:.85rem;color:var(--text-muted)}
+.ticks{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:8px}
+.ticks li{display:flex;gap:10px;align-items:baseline;color:var(--bg-dark)}
+.ticks li::before{content:"";flex:none;width:16px;height:16px;border-radius:50%;background:var(--primary-base) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.3 2.3 4.7-4.8' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;transform:translateY(3px)}
+.case-run{list-style:none;margin:0;padding:0;display:grid;min-width:0;position:relative}
+.case-run li{position:relative;display:grid;gap:6px;padding:0 0 26px 30px}
+.case-run li:last-child{padding-bottom:0}
+.case-run li::before{content:"";position:absolute;left:5px;top:8px;width:12px;height:12px;border-radius:50%;background:var(--white);border:3px solid var(--primary-base)}
+.case-run li:not(:last-child)::after{content:"";position:absolute;left:10px;top:24px;bottom:2px;width:2px;background:var(--primary-lightest)}
+.case-run .when{font-size:var(--s-1);font-weight:700;color:var(--primary-darker)}
+.case-run p{color:var(--bg-dark);font-size:.95rem}
+
+/* steps */
+.steps{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+.step{background:var(--white);border:1px solid var(--bg-gray);border-radius:20px;padding:24px;display:grid;gap:10px;align-content:start}
+.step .n{width:36px;height:36px;border-radius:50%;background:var(--primary-base);color:var(--white);display:grid;place-items:center;font:700 1rem var(--f-mono)}
+.step h3{font-size:var(--s1)}
+.step p{color:var(--text-muted);font-size:var(--s-1)}
+
+/* features */
+.features{display:grid;gap:clamp(72px,8vw,112px)}
+.feature{display:grid;gap:32px;align-items:center}
+@media (min-width:940px){.feature{grid-template-columns:1fr 1.1fr;gap:72px}.feature.flip .copy{order:2}}
+.feature .copy{display:grid;gap:14px;min-width:0}
+.feature h3{font-size:var(--s2);color:var(--primary-darker)}
+.feature .copy>p{color:var(--text-muted);max-width:32em}
+.q-tag{display:inline-block;width:fit-content;font-size:var(--s-1);padding:4px 14px;border-radius:999px;background:var(--mint-chip);color:var(--mint-chip-text);font-weight:600}
+.mock{background:var(--white);border:1px solid var(--bg-gray);border-radius:20px;padding:20px;min-width:0;box-shadow:0 24px 50px -34px rgba(13,48,54,.3)}
+
+/* dashboard mock */
+.mood{display:grid;gap:8px}
+.mood div{display:grid;grid-template-columns:4.5em 2em 1fr;gap:8px;align-items:center;font-size:.8rem}
+.mood span.bar{height:8px;border-radius:8px;background:var(--heat-empty);overflow:hidden}
+.mood span.bar i{display:block;height:100%;background:var(--primary-base);border-radius:8px}
+.hours{display:flex;align-items:flex-end;gap:8px;height:110px;padding-top:16px}
+.hours div{flex:1;display:grid;justify-items:center;gap:4px;font-size:.68rem;color:var(--text-muted)}
+.hours i{width:100%;max-width:28px;background:var(--primary-base);border-radius:6px 6px 2px 2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{font-size:.75rem;padding:3px 10px;border-radius:999px;background:var(--mint-chip);color:var(--mint-chip-text)}
+.split{display:grid;gap:14px}
+@media (min-width:520px){.split{grid-template-columns:1.25fr 1fr}}
+.card-lite{border:1px solid var(--bg-gray);border-radius:14px;padding:14px;min-width:0}
+.card-lite h4{margin:0 0 2px;font-size:.85rem}
+.card-lite small{display:block;font-size:.72rem;color:var(--text-muted);margin-bottom:10px}
+
+/* focus mock */
+.pill-tabs{display:inline-flex;padding:4px;border-radius:999px;background:var(--mint-chip);gap:4px}
+.pill-tabs button{min-height:36px;padding:0 18px;border:0;border-radius:999px;background:transparent;color:var(--mint-chip-text);font:600 var(--s-1) var(--f-body);cursor:pointer}
+.pill-tabs button[aria-selected="true"]{background:var(--bg-dark);color:var(--white)}
+.focus-hint{font-size:.8rem;color:var(--text-muted);margin:12px 0}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--bg-gray);border-radius:14px}
+.tbl{border-collapse:collapse;width:100%;min-width:520px;font-size:.8rem}
+.tbl th,.tbl td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--bg-gray);white-space:nowrap}
+.tbl tr:last-child td{border-bottom:0}
+.tbl th{font-weight:500;color:var(--text-muted);background:var(--very-light-gray)}
+.tbl .link{color:var(--primary-darker);text-decoration:underline;text-underline-offset:3px}
+.tbl .days{color:var(--tips-text);font-weight:600}
+.tbl .moment{white-space:normal;min-width:180px}
+.mini-btn{font:600 .72rem var(--f-body);padding:5px 12px;border-radius:999px;border:1px solid var(--primary-base);background:var(--white);color:var(--primary-darker)}
+.mini-btn.solid{background:var(--primary-base);color:var(--white)}
+.compose{margin-top:14px;border:1px solid var(--bg-gray);border-radius:14px;padding:14px;background:var(--page);display:grid;gap:8px}
+.compose .to{font-size:.82rem;font-weight:600}
+.compose .tpl{display:flex;gap:6px;flex-wrap:wrap;font-size:.72rem}
+.compose .tpl span{padding:3px 10px;border-radius:999px;border:1px solid var(--bg-gray);background:var(--white);color:var(--text-muted)}
+.compose .tpl span.on{border-color:var(--primary-base);color:var(--primary-darker)}
+.compose p{font-size:.82rem;background:var(--white);border:1px solid var(--bg-gray);border-radius:10px;padding:10px 12px}
+
+/* stance */
+.stance{background:var(--bg-dark);color:var(--white);border-radius:32px;padding:clamp(32px,5vw,64px);display:grid;gap:36px}
+@media (min-width:900px){.stance{grid-template-columns:1fr 1.1fr;align-items:center}}
+.stance .h2{color:var(--white)}
+.stance p{color:#C4D6D8}
+.stance .eyebrow{color:var(--primary-lighter)}
+.nots{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
+.nots div{border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:14px 16px;font-size:var(--s-1)}
+.nots s{color:#8FA8AB;text-decoration-thickness:1.5px}
+.nots b{display:block;color:var(--white);font-weight:600;margin-top:4px}
+
+/* pilot */
+.pilot{display:grid;gap:40px}
+@media (min-width:920px){.pilot{grid-template-columns:1fr 1fr;align-items:start}}
+.plist{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:18px}
+.plist li{display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:baseline}
+.plist .k{font-size:.8rem;font-weight:700;color:var(--primary-base)}
+form{background:var(--white);border:1px solid var(--bg-gray);border-radius:24px;padding:clamp(20px,3vw,32px);display:grid;gap:16px;box-shadow:0 24px 50px -34px rgba(13,48,54,.3)}
+label{display:grid;gap:6px;font-size:var(--s-1);font-weight:500;color:var(--bg-dark)}
+input,select,textarea{font:400 var(--s0) var(--f-body);color:var(--bg-dark);background:var(--white);border:1px solid var(--bg-gray);border-radius:12px;padding:10px 14px;min-height:48px;width:100%}
+textarea{min-height:96px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--primary-base);outline-offset:0;border-color:var(--primary-base)}
+.hint{font-weight:400;color:var(--text-muted);font-size:.78rem}
+.form-msg{font-size:var(--s-1);padding:12px 14px;border-radius:12px;background:var(--primary-palest);color:var(--primary-darker)}
+
+/* faq */
+.faq{display:grid;gap:10px;max-width:54em;margin-inline:auto}
+details{background:var(--white);border:1px solid var(--bg-gray);border-radius:16px;padding:0 22px}
+details[open]{border-color:var(--primary-lightest)}
+summary{cursor:pointer;list-style:none;padding:18px 0;font-weight:600;color:var(--bg-dark);display:flex;justify-content:space-between;gap:16px;align-items:center;min-height:52px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";flex:none;width:24px;height:24px;border-radius:50%;background:var(--primary-palest) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 10l4 4 4-4' stroke='%230D7A77' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center/18px no-repeat;transition:transform .2s}
+details[open] summary::after{transform:rotate(180deg)}
+details p{padding-bottom:20px;color:var(--text-muted)}
+
+/* closing */
+.closing{position:relative;overflow:hidden;background:linear-gradient(180deg,var(--page),#DDF3F6)}
+.closing .wrap{display:grid;gap:22px;justify-items:center;text-align:center}
+.closing h2{font-size:var(--s3);color:var(--primary-darker);max-width:18em}
+
+/* tutorial cta */
+.page-cta{background:var(--white);text-align:center}
+.page-cta .wrap{display:grid;gap:16px;justify-items:center;padding-block:clamp(56px,7vw,96px)}
+
+footer{background:var(--bg-dark);color:#B9CDD0;padding-block:36px;font-size:var(--s-1)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px}
+footer img{width:130px}
+.version-badge{position:fixed;bottom:max(16px,env(safe-area-inset-bottom,0px));right:16px;z-index:100;font:600 .72rem var(--f-mono);padding:4px 10px;border-radius:999px;background:var(--bg-dark);color:var(--primary-lighter);opacity:.75}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<span class="version-badge">v2 · 2026-11-04</span>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="wrap">
+    <a class="nav-logo" href="#home" aria-label="島島阿學 首頁"><img src="assets/logo.svg" alt="島島阿學" width="200" height="44"></a>
+    <nav class="nav-links" aria-label="頁面導覽">
+      <a href="#tutorial" data-page-link="tutorial">使用教學</a>
+    </nav>
+    <div class="nav-right">
+      <a class="btn btn-orange btn-sm" data-goto="home#pilot" href="#">申請免費試用</a>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════
+     首頁（含解決方案）
+     ═══════════════════════════════════════ -->
+<div data-page="home">
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <img class="deco" src="assets/deco-flower-orange.svg" alt="" width="44" height="39" style="left:-8px;top:-30px">
+        <p class="eyebrow">給每一位用心陪伴學員的導師</p>
+        <h1>讓每一次陪伴，<span>都成為成長的延續。</span></h1>
+        <p class="lede">從學員的實踐紀錄、回饋到參與進度，讓每一段成長都有跡可循，每一次引導都能接續前進。</p>
+        <div class="cta-row">
+          <a class="btn btn-outline btn-huge" href="#tutorial">探索陪跑新方式 →</a>
+        </div>
+      </div>
+
+      <div class="frame" role="img" aria-label="燈塔今日焦點示意">
+        <div class="frame-top"><span class="back">← 系列與場次</span><strong>信念改寫陪跑營 · 第 3 梯</strong></div>
+        <div class="tabs" aria-hidden="true"><span class="tab">儀表板</span><span class="tab">名單</span><span class="tab on">今日焦點</span><span class="tab">動態</span></div>
+        <span class="focus-label" aria-hidden="true">查看近期紀錄，決定是否主動關心</span>
+        <div class="focus-preview" aria-hidden="true">
+          <div class="focus-row">
+            <div><div class="name">晴</div><div style="font-size:.72rem;color:var(--text-muted)">每日覺察 21 天</div></div>
+            <div style="display:flex;align-items:center;gap:8px"><span class="days">4 天前打卡</span><span class="act">查看紀錄</span></div>
+          </div>
+          <div class="focus-row">
+            <div><div class="name">庭</div><div style="font-size:.72rem;color:var(--text-muted)">信念改寫練習</div></div>
+            <div style="display:flex;align-items:center;gap:8px"><span class="days">6 天前打卡</span><span class="act">查看紀錄</span></div>
+          </div>
+          <div class="focus-row" style="border-color:var(--primary-lightest);background:var(--primary-palest)">
+            <div><div class="name">小安</div><div style="font-size:.72rem;color:var(--text-muted)">信念改寫練習 · 今天打卡了</div></div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:.72rem;font-weight:600;color:var(--mint-chip-text)">值得慶祝</span>
+              <span class="act" style="background:var(--bg-dark)">送出訊息</span>
+            </div>
+          </div>
+        </div>
+        <div style="padding:0 18px 16px;font-size:.72rem;color:var(--light-gray)">使用情境示意</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUE PILLARS -->
+  <section class="pillars" aria-labelledby="v-title">
+    <div class="wrap">
+      <div class="sec-head center">
+        <p class="eyebrow">為每一段用心的陪跑，提供剛剛好的支持</p>
+        <h2 id="v-title" class="h2">從看見進展，到持續陪伴</h2>
+      </div>
+      <div class="pillar-grid">
+        <div class="pillar">
+          <span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="13" height="18" rx="2"/><path d="M4 7h3M4 12h3M4 17h3M10 8h5M10 12h5"/></svg></span>
+          <h3>找得到紀錄</h3><p>學員的每一次實踐，都留下清楚的足跡。</p>
+        </div>
+        <div class="pillar">
+          <span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h10v7H8l-4 3z"/><path d="M14 8h6v8l-3-2h-6v-3"/></svg></span>
+          <h3>接得上回饋</h3><p>延續上一次的對話，讓引導更有脈絡。</p>
+        </div>
+        <div class="pillar">
+          <span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 19v-4M12 19V10M18 19V5"/></svg></span>
+          <h3>看得見參與</h3><p>了解學員的投入情況，適時給予支持。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="white-band" aria-labelledby="p-title">
+    <div class="wrap chat-grid">
+      <div>
+        <div class="sec-head">
+          <p class="eyebrow">現在的陪跑日常</p>
+          <h2 id="p-title" class="h2">打卡其實有在寫，只是找不到</h2>
+        </div>
+        <div class="line-thread" aria-label="LINE 群組對話示意">
+          <div class="bubble fade"><small>小安 · 週一 22:41</small>Day 3 覺察：今天注意到我在會議裡又先道歉了…</div>
+          <div class="bubble fade"><small>宇 · 週一 23:02</small>（貼圖）</div>
+          <div class="bubble fade"><small>婷 · 週二 07:15</small>早安大家！今天也要加油</div>
+          <div class="bubble"><small>涵 · 週二 12:30</small>老師，我昨天的覺察有傳在上面，不知道你有沒有看到？</div>
+          <div class="bubble me"><small>你 · 週二 21:10</small>有！我往上滑找一下</div>
+        </div>
+      </div>
+      <div>
+        <ul class="pains">
+          <li><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"/></svg></span>
+            <div><h3>打卡紀錄難找</h3><p>對話一多，上週誰寫了什麼、你回了什麼，就只能往上滑。重要的打卡被聊天沖掉，回饋也難接續。</p></div></li>
+          <li><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <div><h3>回饋難接續</h3><p>每次對話前，你想了解參與者的近況，卻要在不同地方翻找：LINE 群、自己的筆記，有時直接問對方。</p></div></li>
+          <li><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span>
+            <div><h3>近況不易掌握</h3><p>好一陣子沒有動靜的參與者，你不確定他是怎麼了。打卡量看不出全貌，但也沒有其他依據。</p></div></li>
+        </ul>
+        <blockquote class="quote">「課程結束後大家都回 LINE 群了，我一直鼓勵他們分享，但我其實不知道誰還在練。」<cite>一位帶高敏內耗陪跑營的生命教練<span class="quote-note">情境示例</span></cite></blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- CASE -->
+  <section class="case-band" aria-labelledby="uc-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">使用案例</p>
+        <h2 id="uc-title" class="h2">下次會談前，先查看近期打卡脈絡</h2>
+        <p class="lede">燈塔把參與者的打卡、你的回饋與群組交流放在同一個地方。對話有了脈絡，陪伴不再靠記憶。</p>
+      </div>
+      <div class="case-panel">
+        <div class="case-story">
+          <p class="case-for">適合　生命教練、職涯諮詢師、帶主管或轉職者的導師與教練</p>
+          <h3>開營之後，你不用再靠 LINE 追每位參與者的進度</h3>
+          <p>一組參與者一起設定目標、定期小組會談，平日帶著行動任務在生活裡練習。燈塔每天幫你整理好近期紀錄，你打開就知道今天可以從哪裡接話。</p>
+          <div class="case-ex">
+            <span class="case-ex-label">情境示例</span>
+            <strong>8 週轉職陪跑營</strong>
+            <small><span class="mono">8</span> 週 · 每梯 <span class="mono">12</span> 人 · 每週一次線上小組會談</small>
+            <p>週二晚上的小組會談前，教練查看小安近期的打卡心得，接續上次討論到的職場界線。</p>
+          </div>
+          <ul class="ticks"><li>打卡紀錄留在每位參與者名下，回饋有脈絡</li><li>下次對話前，更容易知道從哪裡接話</li><li>下一梯沿用同一個系列，不用重新搭一次</li></ul>
+        </div>
+        <ol class="case-run" aria-label="一梯怎麼跑">
+          <li><span class="when">開營前</span><p>建立系列與場次，設定日期，加入這一梯要練的行動任務。島島團隊在試用期間協助設定。</p></li>
+          <li><span class="when">每週</span><p>小組會談的時間和題目置頂在群組聊天，參與者加入場次就自動在聊天室裡。</p></li>
+          <li><span class="when">平日</span><p>參與者在島島記錄心得。你打開今日焦點，查看近期紀錄，決定是否主動關心。</p></li>
+          <li><span class="when">會談前</span><p>打開燈塔，看這位參與者近期的打卡脈絡，帶著這些進入對話。</p></li>
+          <li><span class="when">結業</span><p>回顧整梯的打卡紀錄、常見標籤與心情，帶著這些去設計下一梯。</p></li>
+        </ol>
+      </div>
+      <p style="margin-top:22px;font-size:var(--s-1);color:var(--text-muted)">也可以這樣用　<span style="padding:4px 12px;border-radius:999px;background:var(--white);border:1px solid var(--primary-lightest);color:var(--text-dark)">小班實作課程</span>　<span style="padding:4px 12px;border-radius:999px;background:var(--white);border:1px solid var(--primary-lightest);color:var(--text-dark)">工作坊後續實踐</span>　<a data-goto="home#pilot" href="#" style="font-weight:600;text-decoration:none">聊聊你的情境 →</a></p>
+    </div>
+  </section>
+
+  <!-- STANCE -->
+  <section aria-labelledby="s-title">
+    <div class="wrap">
+      <div class="stance">
+        <div style="display:grid;gap:14px">
+          <p class="eyebrow">我們的堅持</p>
+          <h2 id="s-title" class="h2">見證，而不是比較</h2>
+          <p>陪跑談的是很私密的改變。我們刻意不把參與者變成分數，因為被比較的人，最先停下來的就是那些最需要被陪伴的人。燈塔只告訴你事實，怎麼陪，由你決定。</p>
+        </div>
+        <div class="nots">
+          <div><s>排行榜</s><b>每個人照自己的節奏走</b></div>
+          <div><s>連續天數</s><b>斷了不用重來</b></div>
+          <div><s>掉隊、風險標籤</s><b>只寫「距離上次打卡 4 天」</b></div>
+          <div><s>活躍度分數</s><b>只顯示人數，不顯示百分比</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PILOT -->
+  <section id="pilot" class="white-band" aria-labelledby="pi-title">
+    <div class="wrap pilot">
+      <div>
+        <div class="sec-head" style="margin-bottom:0">
+          <p class="eyebrow">免費試用方案</p>
+          <h2 id="pi-title" class="h2">免費試用一整梯，島島陪你一起帶</h2>
+          <p class="lede">適合正在籌備下一梯團體陪跑的導師與教練。本季名額有限，試用期間不收費；正式收費前會提前通知。</p>
+        </div>
+        <ul class="plist">
+          <li><span class="k">開始前</span><div>由島島團隊協助設定系列、場次與行動任務，你專心準備課程內容。</div></li>
+          <li><span class="k">陪跑中</span><div>整梯免費使用燈塔、群組聊天與今日焦點。遇到卡關，直接找島島團隊。</div></li>
+          <li><span class="k">結業後</span><div>一起回顧儀表板，聽你說哪裡要改。你的意見會直接影響島島接下來做什麼。</div></li>
+        </ul>
+        <p style="margin-top:20px;font-size:var(--s-1);color:var(--text-muted)">課程費用由你決定，標示在場次設定裡。燈塔目前不提供代收付款功能。</p>
+      </div>
+      <form id="pilot-form" novalidate>
+        <label for="f-name">你的名字或品牌<input id="f-name" name="name" autocomplete="name" required></label>
+        <label for="f-contact">Email 或 Threads / IG 帳號<input id="f-contact" name="contact" required></label>
+        <label for="f-type">你帶的是<select id="f-type" name="type">
+          <option>團體陪跑營 / 教練課程</option><option>心理或覺察工作坊</option><option>小班實作課程</option><option>其他</option>
+        </select></label>
+        <label for="f-when">下一梯預計什麼時候開始？<select id="f-when" name="when">
+          <option>一個月內</option><option>1–2 個月內</option><option>3 個月以後</option><option>還沒決定</option>
+        </select></label>
+        <label for="f-note">想先讓我們知道的事 <span class="hint">選填，例如每梯人數、天數、現在用的工具</span><textarea id="f-note" name="note"></textarea></label>
+        <button class="btn btn-orange btn-huge" type="submit">申請免費試用</button>
+        <p class="form-msg" id="form-msg" hidden role="status"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section aria-labelledby="q-title">
+    <div class="wrap">
+      <div class="sec-head center"><p class="eyebrow">常見問題</p><h2 id="q-title" class="h2">帶領人實際問過我們的</h2></div>
+      <div class="faq">
+        <details><summary>參與者的打卡，誰看得到？</summary><p>打卡只在這個場次裡流通，導師與教練、以及共同管理者可以在燈塔看到全部打卡紀錄。同梯參與者彼此可以在群組聊天裡互動，但打卡紀錄預設只有你看得到；若場次設定為公開，則以設定為準。場次要不要出現在探索活動課程頁面、要不要開放邀請連結，都由你在場次設定裡決定。</p></details>
+        <details><summary>島島會幫我替參與者打分數或排名嗎？</summary><p>不會。燈塔只顯示人數與事實，例如「本週有打卡的人數」「距離上次打卡 4 天」。我們刻意不做排行榜、連續天數和活躍度分數。</p></details>
+        <details><summary>他們還能繼續用 LINE 嗎？</summary><p>完全沒問題。很多導師與教練在開始時讓 LINE 群繼續放公告，打卡和回饋放進燈塔，慢慢熟悉之後再調整。你可以依自己的步調來。</p></details>
+        <details><summary>課程結束後，聊天室和紀錄會怎樣？</summary><p>群組聊天在課程結束後仍然可以繼續聊，參與者的打卡紀錄也會留著。下一梯是新的場次，會有自己的聊天室和名單。</p></details>
+        <details><summary>參與者需要另外註冊嗎？</summary><p>需要一個島島帳號。參與者收到你的邀請信或點邀請連結就能加入場次，加入後會自動進到這個場次的聊天室。</p></details>
+        <details><summary>可以跟其他帶領者一起管理嗎？</summary><p>可以。在組織設定中加入共同管理者，他們會擁有和你相同的操作權限，也能一起看名單和燈塔儀表板。</p></details>
+        <details><summary>怎麼收費？</summary><p>試用期間整梯免費，由島島團隊協助設定。正式方案我們正在跟第一批試用的導師與教練一起討論，確定後會在開始收費前先通知你。你向參與者收的課程費用，可以在場次設定裡標示，但燈塔目前不提供代收付款功能。</p></details>
+        <details><summary>共同挑戰是什麼？</summary><p>共同挑戰是由島島發起的集體實踐，島民可以自行加入，打卡紀錄為全公開，適合參與者在梯次之間繼續維持練習節奏。它和你帶領的場次是不同情境：你的場次是你發起、你帶的，參與者通過你的邀請加入；共同挑戰則由島島發起，任何島民都可以加入。</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="closing" aria-labelledby="end-title">
+    <div class="wrap">
+      <img src="assets/mascot-face.svg" alt="" width="90" height="70">
+      <h2 id="end-title">下一梯開始前，先點亮你的燈塔</h2>
+      <p class="lede">讓每次對話，都能接得上參與者留下的紀錄。</p>
+      <div class="cta-row" style="margin-top:4px;justify-content:center">
+        <a class="btn btn-orange btn-huge" data-goto="home#pilot" href="#">申請免費試用</a>
+        <a class="btn btn-outline btn-huge" href="#tutorial">看看使用方式</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+</div><!-- /home -->
+
+
+<!-- ═══════════════════════════════════════
+     使用教學
+     ═══════════════════════════════════════ -->
+<div data-page="tutorial" hidden>
+<main>
+
+  <!-- STEPS -->
+  <section aria-labelledby="h-title">
+    <div class="wrap">
+      <div class="sec-head center">
+        <p class="eyebrow">怎麼開始</p>
+        <h2 id="h-title" class="h2">三步驟，把下一梯搬進燈塔</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><h3>設定活動與行動任務</h3><p>建立系列與場次，設定日期和互動方式，加入這一梯要練的行動任務。島島團隊在試用期間協助設定。</p></div>
+        <div class="step"><span class="n">2</span><h3>邀請參與者加入</h3><p>貼上 Email 名單或上傳 CSV 寄出邀請，也可以提供邀請連結或 QR Code。參與者加入後自動進到群組聊天。</p></div>
+        <div class="step"><span class="n">3</span><h3>查看紀錄，接續回饋</h3><p>儀表板看整體，今日焦點看個人近期紀錄。對話前查看打卡脈絡，回饋有依據。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="white-band" aria-labelledby="f-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">燈塔管理</p>
+        <h2 id="f-title" class="h2">看見這一梯的參與情況</h2>
+        <p class="lede">燈塔是導師與教練的後台。它不是用來督促打卡的，而是讓你在對話前，有足夠的脈絡。</p>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <div class="copy">
+            <span class="q-tag">這一梯整體怎麼樣？</span>
+            <h3>儀表板：掌握這一梯的參與情況</h3>
+            <p>打卡量、節奏、參與者常寫的標籤和心情，都整理成看得懂的圖。可以看全部實踐，也可以只看其中一個。</p>
+            <ul class="ticks"><li>已加入、已開始、本週有打卡的人數</li><li>打卡熱度圖、近兩週走勢、偏好的打卡時段</li><li>打卡標籤與情緒分佈</li><li>參與者明細：打卡、留言、瀏覽、迴響</li></ul>
+          </div>
+          <div class="mock" aria-label="儀表板圖表示意">
+            <div class="split">
+              <div class="card-lite"><h4>情緒分佈</h4><small>打卡時情緒分佈</small>
+                <div class="mood">
+                  <div><span>平靜</span><span class="mono">24</span><span class="bar"><i style="width:80%"></i></span></div>
+                  <div><span>有點累</span><span class="mono">17</span><span class="bar"><i style="width:57%"></i></span></div>
+                  <div><span>開心</span><span class="mono">14</span><span class="bar"><i style="width:47%"></i></span></div>
+                  <div><span>焦慮</span><span class="mono">9</span><span class="bar"><i style="width:30%"></i></span></div>
+                </div>
+              </div>
+              <div class="card-lite"><h4>打卡標籤分佈</h4><small>打卡中最常出現的標籤</small>
+                <div class="tags"><span>界線</span><span>不敢拒絕</span><span>原生家庭</span><span>身體感受</span><span>職場</span><span>自我對話</span></div>
+              </div>
+            </div>
+            <div class="card-lite" style="margin-top:14px"><h4>打卡時段</h4><small>偏好在哪些時段打卡（24 小時制）</small>
+              <div class="hours" aria-hidden="true">
+                <div><span class="mono">6</span><i style="height:16px"></i>06–09</div>
+                <div><span class="mono">9</span><i style="height:24px"></i>09–12</div>
+                <div><span class="mono">7</span><i style="height:19px"></i>12–15</div>
+                <div><span class="mono">5</span><i style="height:13px"></i>15–18</div>
+                <div><span class="mono">14</span><i style="height:37px"></i>18–21</div>
+                <div><span class="mono">23</span><i style="height:60px"></i>21–24</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature flip">
+          <div class="copy">
+            <span class="q-tag">我現在可以關心誰？</span>
+            <h3>今日焦點：查看近期紀錄，決定是否主動關心</h3>
+            <p>好一陣子沒打卡的參與者，和近期有值得慶祝的時刻的參與者，會分別出現在兩個頁籤。點名字就能看他的打卡紀錄，再寫一段話給他。未打卡不代表沒有行動，由你來判斷怎麼陪。</p>
+            <ul class="ticks"><li>只呈現事實：例如距離上次打卡幾天</li><li>打卡紀錄、過去的往來訊息一鍵打開</li><li>常用的回饋話語可以存成範本</li></ul>
+          </div>
+          <div class="mock">
+            <div class="pill-tabs" role="tablist" aria-label="今日焦點">
+              <button type="button" role="tab" id="t-enc" aria-selected="true" aria-controls="p-enc">近期紀錄較少</button>
+              <button type="button" role="tab" id="t-cel" aria-selected="false" aria-controls="p-cel">值得慶祝</button>
+            </div>
+            <p class="focus-hint">查看近期紀錄，決定是否主動關心。</p>
+            <div id="p-enc" role="tabpanel" aria-labelledby="t-enc">
+              <div class="tbl-wrap"><table class="tbl">
+                <thead><tr><th>參與者</th><th>實踐</th><th>最後打卡日</th><th>距離上次打卡</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td>晴</td><td><span class="link">每日覺察 21 天</span></td><td class="mono">10/19</td><td class="days">4 天</td><td><span class="mini-btn solid">查看紀錄</span></td></tr>
+                  <tr><td>庭</td><td><span class="link">信念改寫練習</span></td><td class="mono">10/17</td><td class="days">6 天</td><td><span class="mini-btn solid">查看紀錄</span></td></tr>
+                  <tr><td>妤</td><td><span class="link">每日覺察 21 天</span></td><td class="mono">10/16</td><td class="days">7 天</td><td><span class="mini-btn solid">查看紀錄</span></td></tr>
+                </tbody>
+              </table></div>
+              <div class="compose" aria-label="訊息撰寫示意">
+                <span class="to">給 晴（查看了她的近期打卡後）</span>
+                <div class="tpl"><span class="on">鼓勵</span><span>慶祝</span><span>範本：好久不見</span></div>
+                <p>晴，這幾天還好嗎？不用急著補打卡，想到什麼就寫一句也很好，我都在。</p>
+              </div>
+            </div>
+            <div id="p-cel" role="tabpanel" aria-labelledby="t-cel" hidden>
+              <div class="tbl-wrap"><table class="tbl">
+                <thead><tr><th>參與者</th><th>實踐</th><th>首次打卡日</th><th>值得慶祝的時刻</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td>小安</td><td><span class="link">信念改寫練習</span></td><td class="mono">10/04</td><td class="moment">第一次在會議裡說出自己的意見</td><td><span class="mini-btn solid">送出訊息</span></td></tr>
+                  <tr><td>涵</td><td><span class="link">每日覺察 21 天</span></td><td class="mono">10/03</td><td class="moment">這個實踐的每一天都有留下紀錄</td><td><span class="mini-btn solid">送出訊息</span></td></tr>
+                </tbody>
+              </table></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE CTA -->
+  <section class="page-cta" aria-label="申請試用">
+    <div class="wrap">
+      <img src="assets/mascot-face.svg" alt="" width="72" height="56" style="margin-bottom:8px">
+      <h2 class="h2" style="margin-bottom:12px">準備好了嗎？</h2>
+      <p class="lede" style="margin-inline:auto;text-align:center">免費試用一整梯，由島島團隊協助設定。</p>
+      <div class="cta-row" style="justify-content:center;margin-top:28px">
+        <a class="btn btn-orange btn-huge" data-goto="home#pilot" href="#">申請免費試用</a>
+        <a class="btn btn-outline btn-huge" href="#home">回首頁了解更多</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+</div><!-- /tutorial -->
+
+<footer><div class="wrap"><img src="assets/logo-simple-white.svg" alt="島島阿學" width="130" height="30"><span>頁面中的參與者、課程與數字皆為使用情境示意</span></div></footer>
+
+<script>
+(()=>{
+  function showPage(page){
+    document.querySelectorAll('[data-page]').forEach(el=>{
+      el.hidden = el.dataset.page !== page;
+    });
+    document.querySelectorAll('.nav-links a[data-page-link]').forEach(a=>{
+      a.setAttribute('aria-current', a.dataset.pageLink===page ? 'page' : 'false');
+    });
+    window.scrollTo(0,0);
+  }
+  function getPage(){
+    const h=location.hash.slice(1);
+    return h==='tutorial' ? 'tutorial' : 'home';
+  }
+  window.addEventListener('hashchange',()=>showPage(getPage()));
+  showPage(getPage());
+
+  document.addEventListener('click',e=>{
+    const el=e.target.closest('[data-goto]');
+    if(!el) return;
+    e.preventDefault();
+    const [page,anchor]=el.dataset.goto.split('#');
+    location.hash=page;
+    showPage(page);
+    if(anchor) setTimeout(()=>document.getElementById(anchor)?.scrollIntoView({behavior:'smooth'}),60);
+  });
+
+  // today's focus tabs
+  const tabs=[document.getElementById('t-enc'),document.getElementById('t-cel')];
+  tabs.forEach(t=>t.addEventListener('click',()=>{
+    tabs.forEach(o=>{
+      const on=o===t;
+      o.setAttribute('aria-selected',String(on));
+      document.getElementById(o.getAttribute('aria-controls')).hidden=!on;
+    });
+  }));
+
+  // pilot form
+  const form=document.getElementById('pilot-form'),msg=document.getElementById('form-msg');
+  form.addEventListener('submit',e=>{
+    e.preventDefault();
+    const name=document.getElementById('f-name'),c=document.getElementById('f-contact');
+    if(!name.value.trim()||!c.value.trim()){
+      msg.textContent='請填寫名字和聯絡方式，我們才找得到你。';
+      msg.hidden=false;(name.value.trim()?c:name).focus();return;
+    }
+    msg.textContent='這是官網原型，表單還沒有串接，資料不會被送出。';
+    msg.hidden=false;
+  });
+})();
+</script>
+</body></html>
+
+</body></html>
