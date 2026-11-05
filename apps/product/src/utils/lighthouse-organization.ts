@@ -50,6 +50,21 @@ export function shouldSaveLighthouseOrganization(
   );
 }
 
+/** Preserve hidden drafts for transient failures; authorization denials must clear them. */
+export function isRecoverableLighthouseQueryError(error: unknown): boolean {
+  if (error instanceof TypeError) return true;
+  if (!error || typeof error !== "object") return false;
+  if ("status" in error && typeof error.status === "number") return error.status >= 500;
+  const detail = "error" in error ? error.error : error;
+  if (!detail || typeof detail !== "object" || !("code" in detail)) return false;
+  return [
+    "SERVICE_UNAVAILABLE",
+    "INTERNAL_SERVER_ERROR",
+    "TIMEOUT",
+    "RATE_LIMIT_EXCEEDED",
+  ].includes(String(detail.code));
+}
+
 /** Serialize account preference writes and coalesce rapid changes into the final choice. */
 export function createLighthousePreferenceWriter(
   save: (organizationId: number) => Promise<void>,

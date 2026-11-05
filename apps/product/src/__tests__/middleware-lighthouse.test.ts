@@ -95,6 +95,26 @@ describe("old Lighthouse entry URLs", () => {
       "https://product.example.test/en/lighthouse/o/4/programs?edit=8"
     );
   });
+  it("strips the internal listen port from a legacy redirect behind the public host", async () => {
+    const response = await middleware(
+      new NextRequest("https://product.example.test:3001/en/lighthouse/programs?edit=8", {
+        headers: { host: "product.example.test", cookie: "auth_token=fixture-session" },
+      })
+    );
+    expect(response.headers.get("location")).toBe(
+      "https://product.example.test/en/lighthouse/o/4/programs?edit=8"
+    );
+  });
+  it("retains the actual local listen port when no reverse proxy is involved", async () => {
+    const response = await middleware(
+      new NextRequest("http://localhost:3001/en/lighthouse/programs?edit=8", {
+        headers: { host: "localhost:3001", cookie: "auth_token=fixture-session" },
+      })
+    );
+    expect(response.headers.get("location")).toBe(
+      "http://localhost:3001/en/lighthouse/o/4/programs?edit=8"
+    );
+  });
   it("honors an authorized organization from old query links before the saved choice", async () => {
     const response = await middleware(
       request("fixture-session", "/lighthouse/templates?organizationId=2&sort=new")

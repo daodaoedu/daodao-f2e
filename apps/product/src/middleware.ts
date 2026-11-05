@@ -68,6 +68,39 @@ function localizedPath(pathname: string, path: string): string {
   return pathname.startsWith("/en/") || pathname === "/en" ? `/en${path}` : path;
 }
 
+function normalizeRedirectLocation(request: NextRequest, response: NextResponse): NextResponse {
+  const location = response.headers.get("location");
+  // Local dev runs on :3001 directly, so :3001 in Location is legitimate there.
+  // Only strip when the request host is not :3001 (i.e., behind a proxy in prod).
+  const isLocalDevPort = (request.headers.get("host") ?? "").endsWith(":3001");
+  if (location?.includes(":3001") && !isLocalDevPort) {
+    const cleaned = location.replace(INTERNAL_PORT_RE, "");
+    response.headers.set("location", cleaned);
+
+    console.warn("[middleware] stripped :3001 from redirect Location", {
+      method: request.method,
+      path: request.nextUrl.pathname + request.nextUrl.search,
+      original: location,
+      rewritten: cleaned,
+      hasCookie: request.headers.has("cookie"),
+      hasRsc: request.headers.has("rsc") || request.headers.has("next-router-state-tree"),
+      headers: {
+        host: request.headers.get("host"),
+        "x-forwarded-host": request.headers.get("x-forwarded-host"),
+        "x-forwarded-port": request.headers.get("x-forwarded-port"),
+        "x-forwarded-proto": request.headers.get("x-forwarded-proto"),
+        referer: request.headers.get("referer"),
+        "user-agent": request.headers.get("user-agent"),
+        "sec-fetch-site": request.headers.get("sec-fetch-site"),
+        "sec-fetch-mode": request.headers.get("sec-fetch-mode"),
+        "sec-fetch-dest": request.headers.get("sec-fetch-dest"),
+      },
+    });
+  }
+
+  return response;
+}
+
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (isPrivateSpacePath(pathname)) {
@@ -81,7 +114,7 @@ export default async function middleware(request: NextRequest) {
         access === "unauthorized" ? "/auth/login" : "/auth/access-unavailable"
       );
       destination.search = `?redirect=${encodeURIComponent(`${pathname}${request.nextUrl.search}`)}`;
-      const response = NextResponse.redirect(destination);
+      const response = normalizeRedirectLocation(request, NextResponse.redirect(destination));
       response.headers.set("Cache-Control", "private, no-store");
       return response;
     }
@@ -93,7 +126,7 @@ export default async function middleware(request: NextRequest) {
         const errorUrl = request.nextUrl.clone();
         errorUrl.pathname = localizedPath(pathname, "/lighthouse/access-required");
         errorUrl.search = "?reason=unavailable";
-        return NextResponse.redirect(errorUrl);
+        return normalizeRedirectLocation(request, NextResponse.redirect(errorUrl));
       }
       const redirectUrl = request.nextUrl.clone();
       if (access.status === "unauthorized") {
@@ -103,7 +136,7 @@ export default async function middleware(request: NextRequest) {
         redirectUrl.pathname = localizedPath(pathname, "/lighthouse/access-required");
         redirectUrl.search = "";
       }
-      return NextResponse.redirect(redirectUrl);
+      return normalizeRedirectLocation(request, NextResponse.redirect(redirectUrl));
     }
     const entry = pathname.match(
       /^(\/(?:en\/)?lighthouse)(\/(?:programs|templates|organization|archive))?\/?$/
@@ -114,7 +147,7 @@ export default async function middleware(request: NextRequest) {
         const destination = request.nextUrl.clone();
         destination.pathname = localizedPath(pathname, "/lighthouse/access-required");
         destination.search = "";
-        return NextResponse.redirect(destination);
+        return normalizeRedirectLocation(request, NextResponse.redirect(destination));
       }
       let savedId: number | null = null;
       if (requested === null) {
@@ -156,7 +189,7 @@ export default async function middleware(request: NextRequest) {
         const destination = request.nextUrl.clone();
         destination.pathname = `${entry[1]}/o/${encodeURIComponent(organizationId)}${entry[2] ?? ""}`;
         destination.searchParams.delete("organizationId");
-        const response = NextResponse.redirect(destination);
+        const response = normalizeRedirectLocation(request, NextResponse.redirect(destination));
         response.headers.set("Cache-Control", "private, no-store");
         return response;
       }
@@ -165,36 +198,7 @@ export default async function middleware(request: NextRequest) {
 
   const response = await i18nMiddleware(request);
 
-  const location = response.headers.get("location");
-  // Local dev runs on :3001 directly, so :3001 in Location is legitimate there.
-  // Only strip when the request host is not :3001 (i.e., behind a proxy in prod).
-  const isLocalDevPort = (request.headers.get("host") ?? "").endsWith(":3001");
-  if (location?.includes(":3001") && !isLocalDevPort) {
-    const cleaned = location.replace(INTERNAL_PORT_RE, "");
-    response.headers.set("location", cleaned);
-
-    console.warn("[middleware] stripped :3001 from redirect Location", {
-      method: request.method,
-      path: request.nextUrl.pathname + request.nextUrl.search,
-      original: location,
-      rewritten: cleaned,
-      hasCookie: request.headers.has("cookie"),
-      hasRsc: request.headers.has("rsc") || request.headers.has("next-router-state-tree"),
-      headers: {
-        host: request.headers.get("host"),
-        "x-forwarded-host": request.headers.get("x-forwarded-host"),
-        "x-forwarded-port": request.headers.get("x-forwarded-port"),
-        "x-forwarded-proto": request.headers.get("x-forwarded-proto"),
-        referer: request.headers.get("referer"),
-        "user-agent": request.headers.get("user-agent"),
-        "sec-fetch-site": request.headers.get("sec-fetch-site"),
-        "sec-fetch-mode": request.headers.get("sec-fetch-mode"),
-        "sec-fetch-dest": request.headers.get("sec-fetch-dest"),
-      },
-    });
-  }
-
-  return response;
+  return normalizeRedirectLocation(request, response);
 }
 
 export const config = {

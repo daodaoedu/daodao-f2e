@@ -249,3 +249,27 @@ describe("path organization and preference policy", () => {
     expect(shouldSaveLighthouseOrganization("/lighthouse/o/4/templates", undefined)).toBe(false);
   });
 });
+
+import { isRecoverableLighthouseQueryError } from "../lighthouse-organization";
+
+describe("temporary Lighthouse query failures", () => {
+  it.each([
+    new TypeError("Failed to fetch"),
+    { status: 503 },
+    { error: { code: "SERVICE_UNAVAILABLE" } },
+    { error: { code: "INTERNAL_SERVER_ERROR" } },
+    { error: { code: "TIMEOUT" } },
+  ])("allows retaining hidden drafts for a recoverable error", (error) => {
+    expect(isRecoverableLighthouseQueryError(error)).toBe(true);
+  });
+  it.each([
+    { status: 401 },
+    { status: 403 },
+    { error: { code: "UNAUTHORIZED" } },
+    { error: { code: "FORBIDDEN" } },
+    { error: { code: "NOT_FOUND" } },
+    null,
+  ])("does not retain drafts after an authorization or resource denial", (error) => {
+    expect(isRecoverableLighthouseQueryError(error)).toBe(false);
+  });
+});

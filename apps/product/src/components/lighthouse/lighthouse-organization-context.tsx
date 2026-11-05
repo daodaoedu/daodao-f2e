@@ -34,6 +34,7 @@ import {
 import {
   createLighthousePreferenceWriter,
   interceptLighthouseTraversal,
+  isRecoverableLighthouseQueryError,
   type LighthouseTraversalEventType,
   lighthouseOrganizationHref,
   lighthouseOrganizationPathId,
@@ -52,6 +53,7 @@ type OrganizationContextValue = {
   href: (href: string, organizationId?: number) => string;
   registerGuard: (key: symbol, guard?: Guard) => void;
   statusContent: ReactNode;
+  preserveDrafts: boolean;
 };
 const OrganizationContext = createContext<OrganizationContextValue | null>(null);
 
@@ -108,9 +110,18 @@ function OrganizationState({ children }: { children: ReactNode }) {
     preferences.data?.data.organizationId ?? null,
     resourceOrganizationId
   );
+  const preserveDrafts = Boolean(
+    resolution.status === "ready" &&
+      organizationsQuery.data &&
+      (organizationsQuery.error || (resourceMatch && cohort.error)) &&
+      (!organizationsQuery.error || isRecoverableLighthouseQueryError(organizationsQuery.error)) &&
+      (!resourceMatch || !cohort.error || isRecoverableLighthouseQueryError(cohort.error)) &&
+      !organizationsQuery.validationError &&
+      (!resourceMatch || !cohort.validationError)
+  );
   const ready =
     !organizationsQuery.isLoading &&
-    !organizationsQuery.error &&
+    (!organizationsQuery.error || preserveDrafts) &&
     !organizationsQuery.validationError &&
     Boolean(organizationsQuery.data) &&
     (resourceMatch ? Boolean(cohort.data) : requested !== null || Boolean(preferences.data));
@@ -387,8 +398,15 @@ function OrganizationState({ children }: { children: ReactNode }) {
     );
 
   const value = useMemo(
-    () => ({ organization, organizationsQuery, href, registerGuard, statusContent: content }),
-    [organization, organizationsQuery, href, registerGuard, content]
+    () => ({
+      organization,
+      organizationsQuery,
+      href,
+      registerGuard,
+      statusContent: content,
+      preserveDrafts,
+    }),
+    [organization, organizationsQuery, href, registerGuard, content, preserveDrafts]
   );
 
   return (
@@ -492,6 +510,13 @@ export function useLighthouseOrganizationGuard(dirty: boolean, busy = false) {
 
 /** Keep the navigation available while withholding stale or unauthorized page content. */
 export function LighthouseOrganizationContent({ children }: { children: ReactNode }) {
-  const { organization, statusContent } = useLighthouseOrganization();
-  return statusContent ?? <div key={organization?.id}>{children}</div>;
+  const { organization, statusContent, preserveDrafts } = useLighthouseOrganization();
+  return (
+    <>
+      {statusContent}
+      <div key={organization?.id} hidden={Boolean(statusContent)} inert={Boolean(statusContent)}>
+        {!statusContent || preserveDrafts ? children : null}
+      </div>
+    </>
+  );
 }
