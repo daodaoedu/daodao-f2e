@@ -25,6 +25,7 @@ import { BookOpenText, Plus, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { templateMatches } from "@/utils/template-library";
 import { CohortResourceDialog } from "./cohort-resource-dialog";
+import { getFallbackResourceBindings } from "./fallback-resource-bindings";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 import { TemplateCard } from "./template-card";
 import { TemplateEditorDialog, type TemplateSaveKind } from "./template-editor-dialog";
@@ -76,6 +77,7 @@ export function TemplatesManager() {
   }, [coachRetry]);
 
   const templates = templatesQuery.data?.data ?? [];
+  const fallbackBindings = getFallbackResourceBindings(coachBindings, organization?.id, templates);
   const draftLabel = t("template_draft_badge");
   const filtered = useMemo(
     () =>
@@ -243,28 +245,25 @@ export function TemplatesManager() {
           </Button>
         </div>
       )}
-      {organization &&
-        coachBindings.some((binding) => binding.organizationId !== organization.id) && (
-          <section className="mt-8 space-y-3">
-            <h2 className="font-semibold">{t("coach_resources_scope")}</h2>
-            {coachBindings
-              .filter((binding) => binding.organizationId !== organization.id)
-              .map((binding) => (
-                <div
-                  key={`${binding.templateId}-${binding.cohortId}`}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-[#DDEFED] bg-white p-4"
-                >
-                  <div>
-                    <p className="font-semibold">{binding.templateName}</p>
-                    <p className="text-sm text-[#5A7B79]">{binding.cohortName}</p>
-                  </div>
-                  <Button type="button" variant="outline" onClick={() => setCoachResource(binding)}>
-                    {t("cohort_resources_edit")}
-                  </Button>
-                </div>
-              ))}
-          </section>
-        )}
+      {organization && fallbackBindings.length > 0 && (
+        <section className="mt-8 space-y-3">
+          <h2 className="font-semibold">{t("coach_resources_scope")}</h2>
+          {fallbackBindings.map((binding) => (
+            <div
+              key={`${binding.templateId}-${binding.cohortId}`}
+              className="flex items-center justify-between gap-3 rounded-xl border border-[#DDEFED] bg-white p-4"
+            >
+              <div>
+                <p className="font-semibold">{binding.templateName}</p>
+                <p className="text-sm text-[#5A7B79]">{binding.cohortName}</p>
+              </div>
+              <Button type="button" variant="outline" onClick={() => setCoachResource(binding)}>
+                {t("cohort_resources_edit")}
+              </Button>
+            </div>
+          ))}
+        </section>
+      )}
       {coachResource && (
         <CohortResourceDialog {...coachResource} onClose={() => setCoachResource(null)} />
       )}
