@@ -28010,7 +28010,7 @@ export interface paths {
         };
         /**
          * 取得實踐模板列表
-         * @description 取得可用的實踐模板列表，支援分頁、分類過濾和搜尋。模板提供預設的實踐配置供用戶參考。
+         * @description 只列出未封存、未刪除的官方實踐模板，支援分頁、分類過濾和搜尋。組織私有模板請使用燈塔組織模板 API。
          */
         get: {
             parameters: {
@@ -28460,7 +28460,7 @@ export interface paths {
         };
         /**
          * 取得單一實踐模板
-         * @description 根據模板 ID 取得單一實踐模板的詳細資訊。
+         * @description 根據模板 ID 取得未封存、未刪除的官方模板。組織私有模板或不可用模板回傳 404。
          */
         get: {
             parameters: {
@@ -28803,7 +28803,7 @@ export interface paths {
         put?: never;
         /**
          * 拆段批次建立實踐模板
-         * @description 長天數模板拆成 2–3 段，一次 request 在同一交易內建立多筆模板；模板無開始日，不驗日期接續。
+         * @description 限島島管理員建立官方模板。長天數模板拆成 2–3 段，一次 request 在同一交易內建立多筆模板；模板無開始日，不驗日期接續。
          */
         post: {
             parameters: {
@@ -28895,6 +28895,7 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 500: components["responses"]["InternalServerError"];
             };
         };

@@ -1,6 +1,6 @@
 "use client";
 
-import type { MoodType, PracticeSummary, UpdatePracticeRequestType } from "@daodao/api";
+import type { MoodType, PracticeSummary } from "@daodao/api";
 import { updatePractice } from "@daodao/api";
 import {
   ArrowRightOutlineSvg,
@@ -30,11 +30,17 @@ import { motion } from "motion/react";
 import type { ComponentType } from "react";
 import { useState } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
+import {
+  getPracticeSummaryVisibility,
+  type SummaryPrivacyStatusType,
+} from "@/utils/practice-summary-visibility";
 import { usePracticeSummaryImage } from "./hooks";
 import { PracticeSummaryCard } from "./practice-summary-card";
 
 interface PracticeSummaryPageProps {
   summary: PracticeSummary;
+  privacyStatus: SummaryPrivacyStatusType;
 }
 
 /**
@@ -53,10 +59,12 @@ const MoodIconMap: Record<MoodType, ComponentType<{ className?: string }>> = {
  * 實踐完成總結頁面元件
  * @description 顯示實踐完成的慶祝頁面、摘要圖片和分享功能
  */
-export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
+export function PracticeSummaryPage({ summary, privacyStatus }: PracticeSummaryPageProps) {
   const t = useTranslations("practice");
   const router = useRouter();
-  const [isPublic, setIsPublic] = useState(false);
+  const { errorMessage } = useServerErrorMessage();
+  const [hasPublished, setHasPublished] = useState(false);
+  const isPublic = hasPublished || getPracticeSummaryVisibility(privacyStatus).isPublished;
   const [isPublishing, setIsPublishing] = useState(false);
 
   // 使用摘要圖片生成 hook
@@ -72,10 +80,19 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
     if (isPublic || isPublishing) return;
     setIsPublishing(true);
     try {
-      await updatePractice(summary.practiceId, {
-        privacy_status: "public",
-      } as UpdatePracticeRequestType);
-      setIsPublic(true);
+      const response = await updatePractice(summary.practiceId, {
+        privacyStatus: "public",
+      });
+      if (response.error) {
+        console.error("Failed to publish practice:", response.error);
+        toast.error(
+          errorMessage(response.error, t("summary_page_publish_failed"), {
+            status: response.response.status,
+          })
+        );
+        return;
+      }
+      setHasPublished(true);
     } catch {
       toast.error(t("summary_page_publish_failed"));
     } finally {
@@ -125,6 +142,10 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
     }
   };
 
+  let publishLabel = t("summary_page_publish");
+  if (isPublic) publishLabel = t("summary_page_published");
+  else if (isPublishing) publishLabel = t("summary_page_publishing");
+
   return (
     <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <PageHeader leftAction="back" leftLabel="" title="" rightActionTo="/" />
@@ -146,23 +167,22 @@ export function PracticeSummaryPage({ summary }: PracticeSummaryPageProps) {
               <p className="text-xs text-text-dark/50">{t("summary_page_publish_desc")}</p>
             </div>
           </div>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
+            animation="none"
             onClick={handlePublish}
             disabled={isPublic || isPublishing}
             className={cn(
               "px-4 py-1.5 rounded-full text-sm font-medium transition-colors",
               isPublic
                 ? "bg-[#E6FBF8] text-logo-cyan cursor-default"
-                : "bg-logo-cyan text-white hover:bg-logo-cyan/90"
+                : "bg-logo-cyan text-white hover:bg-logo-cyan/90 hover:text-white"
             )}
           >
-            {isPublic
-              ? t("summary_page_published")
-              : isPublishing
-                ? t("summary_page_publishing")
-                : t("summary_page_publish")}
-          </button>
+            {publishLabel}
+          </Button>
         </div>
 
         {/* 慶祝區塊 */}
