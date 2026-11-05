@@ -79,6 +79,19 @@ const cohortSessionShape = {
   sessionDate: z.string(),
   startTime: z.string().nullable(),
   endTime: z.string().nullable(),
+  recurrenceGroupId: z
+    .string()
+    .uuid()
+    .nullish()
+    .transform((value) => value ?? null),
+  recurrenceRule: z
+    .object({
+      startDate: z.string(),
+      weeks: z.number().int().min(1).max(52),
+      weekdays: z.array(z.number().int().min(1).max(7)),
+    })
+    .nullish()
+    .transform((value) => value ?? null),
 } satisfies z.ZodRawShape;
 
 const lighthouseCohortShape = {
@@ -89,6 +102,7 @@ const lighthouseCohortShape = {
   tagline: z.string().nullable(),
   startDate: z.string(),
   endDate: z.string(),
+  timezone: z.string().default("Asia/Taipei"),
   joinToken: z.string().nullable(),
   joinPaused: z.boolean(),
   joinDeadline: z.string().nullable(),
@@ -113,7 +127,7 @@ const lighthouseCohortShape = {
   createdAt: z.string().datetime(),
   updatedAt: nullableDateTimeSchema,
 } satisfies z.ZodRawShape;
-export const lighthouseCohortSchema: z.ZodType<LighthouseCohortType> =
+export const lighthouseCohortSchema: z.ZodType<LighthouseCohortType, z.ZodTypeDef, unknown> =
   z.object(lighthouseCohortShape);
 
 export const lighthouseOrganizationListResponseSchema: z.ZodType<OrganizationListResponse> =
@@ -123,9 +137,11 @@ export const lighthouseProgramListResponseSchema: z.ZodType<ProgramListResponse>
   z.array(lighthouseProgramSchema)
 );
 
-export const lighthouseCohortListResponseSchema: z.ZodType<CohortListResponse> = apiSuccessSchema(
-  z.array(lighthouseCohortSchema)
-);
+export const lighthouseCohortListResponseSchema: z.ZodType<
+  CohortListResponse,
+  z.ZodTypeDef,
+  unknown
+> = apiSuccessSchema(z.array(lighthouseCohortSchema));
 
 export const lighthouseCohortResponseSchema = apiSuccessSchema(lighthouseCohortSchema);
 /** 總覽用：組織底下所有系列的全部場次，附系列名稱、已加入人數與焦點摘要（FR-OV-02） */
@@ -470,6 +486,7 @@ export const cohortJoinInfoResponseSchema = apiSuccessSchema(
   z.object({
     cohortId: z.number().int().positive(),
     displayName: z.string(),
+    timezone: z.string().default("Asia/Taipei"),
     startDate: z.string().datetime(),
     endDate: z.string().datetime(),
     tagline: z.string().nullable(),
@@ -524,6 +541,7 @@ export const cohortMemberHomeResponseSchema = apiSuccessSchema(
   z.object({
     cohortId: z.number().int().positive(),
     displayName: z.string(),
+    timezone: z.string().default("Asia/Taipei"),
     startDate: z.string().datetime(),
     endDate: z.string().datetime(),
     tagline: z.string().nullable(),

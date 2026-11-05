@@ -73,6 +73,7 @@
   "summary_generating": "Generating summary...",
   "summary_load_failed": "Failed to load, please try again later",
   "summary_no_data": "Unable to load summary data",
+  "summary_delayed_toast": "Your practice will become public after completion",
   "summary_public_toast": "Your practice check-ins are now public",
   "summary_public_toast_description": "Shown in Inspiration Square for others to see your growth!",
   "summary_public_toast_dismiss": "Don't show again",
@@ -451,5 +452,7 @@
   "wizard_done_primary_template": "See my templates",
   "wizard_done_secondary_personal": "Create another practice",
   "wizard_done_secondary_template": "Create another template",
-  "wizard_create_failed": "Couldn't create, please try again"
+  "wizard_create_failed": "Couldn't create, please try again",
+  "template_access_denied": "Only DaoDao administrators can create official templates. You can create a personal practice instead.",
+  "template_access_create_personal": "Create a personal practice"
 }
