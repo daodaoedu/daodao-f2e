@@ -657,6 +657,43 @@
   "cohort_signup_add_question": "Add question",
   "cohort_signup_custom_form_coming_soon": "Custom signup forms & payments coming soon",
   "cohort_signup_preview_read_only": "Read-only preview of the current cohort settings. This does not save changes or join the activity.",
+  "organization_invitation": {
+    "eyebrow": "Lighthouse organization invitation",
+    "title": "Accept your organization invitation",
+    "description": "Accept this invitation to become an organization owner and manage it in Lighthouse.",
+    "email_hint": "Sign in with the email that received the invitation. If you use another email, Daodao must confirm your request before you can join.",
+    "login": "Sign in or register to continue",
+    "accept": "Accept invitation",
+    "accepting": "Processing…",
+    "loading": "Loading…",
+    "error": "Unable to accept the invitation. Please try again later.",
+    "open_lighthouse": "Open Lighthouse",
+    "home": "Go to home",
+    "accepted": {
+      "title": "You have joined the organization",
+      "description": "You are now an organization owner and can open Lighthouse."
+    },
+    "needs_confirmation": {
+      "title": "Daodao confirmation required",
+      "description": "Your sign-in email differs from the invited email. Your request has been submitted. Contact Daodao for help; you will join only after confirmation."
+    },
+    "expired": {
+      "title": "Invitation expired",
+      "description": "This invitation has expired. Ask a Daodao administrator to send a new invitation."
+    },
+    "revoked": {
+      "title": "Invitation no longer valid",
+      "description": "This invitation was revoked or replaced. Use the latest invitation email or contact a Daodao administrator."
+    },
+    "used": {
+      "title": "Invitation already used",
+      "description": "This link has already been used to join and cannot be used again. If you already joined, open Lighthouse from the home page."
+    },
+    "invalid": {
+      "title": "Invalid invitation link",
+      "description": "This invitation could not be found. Use the complete link in your invitation email or contact a Daodao administrator."
+    }
+  },
   "cohort_resources_edit": "Edit cohort resources",
   "cohort_resources_hint": "Add up to {max} resources for this cohort. Relevant dates are informational.",
   "cohort_resources_title": "Edit resources for {cohort}",
