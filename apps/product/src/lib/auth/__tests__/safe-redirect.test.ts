@@ -1,29 +1,41 @@
 import { getSafeLoginRedirect } from "@daodao/auth/lib/safe-redirect";
 import { describe, expect, it } from "vitest";
 
-describe("login returns only to safe private destinations", () => {
+describe("safe login redirect", () => {
   it.each([
+    "/",
     "/en/spaces/personal?tab=active",
     "/lighthouse/organization?organizationId=2",
-    "/spaces/共同學習",
     "/en/settings/account",
-  ])("preserves %s", (path) => {
+    "/lighthouse/programs?edit=1#details",
+    "/spaces/共同學習",
+    "/spaces/%E5%AD%B8%E7%BF%92?query=100%25&next=https%3A%2F%2Fexample.com",
+    "/search?q=%5Cexample.com",
+    "/progress/100%25",
+  ])("preserves the complete internal URL %j", (path) => {
     expect(getSafeLoginRedirect(path)).toBe(path);
   });
   it.each([
     undefined,
+    null,
     "",
-    "https://evil.example",
-    "//evil.example",
-    "/\\evil.example",
-    "/%2fevil.example",
-    "/%255cevil.example",
-    "/\nevil.example",
+    "relative/path",
+    "https://example.com",
+    "//example.com",
+    "/\\example.com",
+    "/%2fexample.com",
+    "/%255cexample.com",
+    "/%09/example.com",
+    "javascript:alert(1)",
     "/en/auth/login?redirect=/spaces",
     "/auth/callback",
     "/auth/error",
+    "/auth/access-unavailable",
+    "/zh-TW/auth/access-unavailable?redirect=/spaces",
     "/en/../auth/login",
-  ])("rejects unsafe or looping destination %s", (path) => {
+    "/en/%61uth/login",
+    "/en/auth/%256cogin",
+  ])("falls back to home for %j", (path) => {
     expect(getSafeLoginRedirect(path)).toBe("/");
   });
 });
