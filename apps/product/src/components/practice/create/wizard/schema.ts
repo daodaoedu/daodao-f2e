@@ -9,6 +9,7 @@ import { addDays, isAfter, isBefore, isValid, parse, startOfDay } from "date-fns
 import { z } from "zod";
 import { ExecutionTiming, MAX_PERSONAL_PRACTICE_RESOURCES } from "@/constants/practice-form";
 import { allocateSegmentDays } from "@/lib/practice-create";
+import { isResourceDayInRange } from "@/lib/resource-usage-date";
 
 type TFunction = ReturnType<typeof useTranslations<"practice">>;
 
@@ -91,6 +92,8 @@ export const createResourceSchema = (t?: TFunction) => {
       .string()
       .refine((val) => val === "" || isHttpsUrl(val), { message: msg("wizard_resource_url_https") })
       .default(""),
+    /** 相對於整體實踐開始日；null / undefined = 整段期間 */
+    dayNumber: z.number().int().min(DAYS_MIN).max(DAYS_MAX).nullish(),
     /** 指派的段落 index（0-based）；空陣列 = 全部實踐 */
     segmentIndexes: z.array(z.number().int().min(0)).default([]),
   });
@@ -190,6 +193,18 @@ export const createWizardFormSchema = (t?: TFunction) => {
           message: msg("validation_duration_required"),
         });
         return;
+      }
+
+      if (data.mode === WizardMode.personal) {
+        data.resources.forEach((resource, index) => {
+          if (!isResourceDayInRange(resource.dayNumber, data.durationDays ?? 0)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ["resources", index, "dayNumber"],
+              message: msg("resource_usage_out_of_range"),
+            });
+          }
+        });
       }
 
       if (!data.isSegmented) {

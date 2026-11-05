@@ -13,8 +13,8 @@ import { frequencyToRange } from "@/lib/practice-create";
 import {
   type EffectiveSegment,
   getEffectiveSegments,
+  getResourcesForSegment,
   isTimingPreset,
-  resourceAppliesToSegment,
 } from "./derive";
 import { CUSTOM_TIMING_SEPARATOR, type WizardFormValues, WizardMode } from "./schema";
 
@@ -82,9 +82,11 @@ const segmentToPracticeRequest = (
   if (otherContext) request.otherContext = otherContext;
 
   // 未拆段：指派列不顯示也不生效，所有資源都帶上
-  const resources = values.resources
-    .filter((r) => !values.isSegmented || resourceAppliesToSegment(r, segment.index))
-    .map((r) => ({ name: r.name, url: r.url || "" }));
+  const resources = getResourcesForSegment(values, segment).map((resource) => ({
+    name: resource.name,
+    url: resource.url || "",
+    ...(resource.dayNumber != null ? { dayNumber: resource.dayNumber } : {}),
+  }));
   if (resources.length > 0) request.resources = resources;
 
   if (opts.privacyStatus) request.privacyStatus = opts.privacyStatus;

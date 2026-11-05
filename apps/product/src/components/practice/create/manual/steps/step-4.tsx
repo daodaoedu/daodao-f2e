@@ -18,6 +18,7 @@ import { LockIcon } from "lucide-react";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { ResourceCard } from "@/components/practice/shared";
+import { ResourceDateSelector } from "@/components/practice/shared/resource-date-selector";
 import { MAX_PERSONAL_PRACTICE_RESOURCES } from "@/constants/practice-form";
 import { useTagEditSheet } from "@/hooks/use-tag-edit-sheet";
 import type { ManualPracticeFormValues } from "../schema";
@@ -33,6 +34,8 @@ export interface Step4Handle {
 
 export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
   const t = useTranslations("practice");
+  const startDate = form.watch("startDate");
+  const durationDays = Number(form.watch("durationDays"));
   const [resourceName, setResourceName] = useState("");
   const [resourceUrl, setResourceUrl] = useState("");
   const [isFetchingTitle, setIsFetchingTitle] = useState(false);
@@ -266,7 +269,7 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
                       </Button>
                     )}
                   </div>
-                  <FormMessage className="mb-3" />
+                  {form.formState.errors.resources?.message && <FormMessage className="mb-3" />}
                   <Button
                     type="button"
                     onClick={commitPendingResource}
@@ -283,14 +286,39 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
                     </p>
                   )}
                   {resources.length > 0 && (
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-4">
                       {resources.map((resource) => (
-                        <ResourceCard
+                        <div
                           key={resource.id}
-                          resource={resource}
-                          locked={resource.isLocked}
-                          onRemove={() => handleRemoveResource(resource.id)}
-                        />
+                          className="space-y-3 rounded-lg border border-bg-gray p-3"
+                        >
+                          <ResourceCard
+                            resource={resource}
+                            locked={resource.isLocked}
+                            onRemove={() => handleRemoveResource(resource.id)}
+                          />
+                          {resource.isLocked && resource.relevantDate && (
+                            <p className="text-sm text-text-dark">{resource.relevantDate}</p>
+                          )}
+                          {(!resource.isLocked ||
+                            (resource.dayNumber != null && !resource.relevantDate)) && (
+                            <ResourceDateSelector
+                              dayNumber={resource.dayNumber}
+                              startDate={startDate}
+                              durationDays={durationDays}
+                              disabled={resource.isLocked}
+                              onChange={(dayNumber) => {
+                                form.setValue(
+                                  "resources",
+                                  resources.map((item) =>
+                                    item.id === resource.id ? { ...item, dayNumber } : item
+                                  ),
+                                  { shouldDirty: true, shouldValidate: true }
+                                );
+                              }}
+                            />
+                          )}
+                        </div>
                       ))}
                     </div>
                   )}
