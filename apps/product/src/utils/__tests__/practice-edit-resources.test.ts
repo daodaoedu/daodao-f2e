@@ -41,7 +41,7 @@ describe("practice edit resources (daodao#332)", () => {
   it("round-trips untouched resources without dropping dayNumber", () => {
     expect(toUpdateResourcesPayload(toEditFormResources(apiResources))).toEqual([
       { id: "r1", name: "覆盤模板", url: "https://example.com/a", dayNumber: 2 },
-      { id: "r2", name: "整段可用", url: "https://example.com/b" },
+      { id: "r2", name: "整段可用", url: "https://example.com/b", dayNumber: null },
       { id: "r3", name: "純名稱", url: undefined, relevantDate: null },
     ]);
   });
@@ -53,7 +53,7 @@ describe("practice edit resources (daodao#332)", () => {
     expect(toUpdateResourcesPayload(formResources)).toEqual([
       { id: "r1", name: "覆盤模板", url: "https://example.com/a", dayNumber: 2 },
       { id: "r3", name: "純名稱", url: undefined, relevantDate: null },
-      { name: "新資源", url: "https://example.com/new" },
+      { name: "新資源", url: "https://example.com/new", dayNumber: null },
     ]);
   });
 });
@@ -84,7 +84,12 @@ describe("shared cohort resource round-trip (#401)", () => {
         url: "http://example.com/",
         relevantDate: "2027-01-01",
       },
-      { id: "personal-uuid", name: "個人筆記", url: "https://example.com/personal" },
+      {
+        id: "personal-uuid",
+        name: "個人筆記",
+        url: "https://example.com/personal",
+        dayNumber: null,
+      },
     ]);
   });
 });
@@ -100,8 +105,22 @@ it("preserves persisted personal IDs in API order while omitting client draft ID
       { id: "1793000123000", name: "Y", url: "https://example.com/y" },
     ])
   ).toEqual([
-    { id: "uuid-newer", name: "X", url: "https://example.com/x" },
-    { id: "uuid-older", name: "W", url: "https://example.com/w" },
-    { name: "Y", url: "https://example.com/y" },
+    { id: "uuid-newer", name: "X", url: "https://example.com/x", dayNumber: null },
+    { id: "uuid-older", name: "W", url: "https://example.com/w", dayNumber: null },
+    { name: "Y", url: "https://example.com/y", dayNumber: null },
+  ]);
+});
+
+it("explicitly clears a persisted personal date while preserving its identity (#376/#401)", () => {
+  const original = toEditFormResources([
+    { id: "personal-date", name: "日期資源", dayNumber: 7, isLocked: false },
+    { id: "shared-date", name: "共享資源", relevantDate: "2027-01-01", isLocked: true },
+  ]);
+  const changed = original.map((resource) =>
+    resource.id === "personal-date" ? { ...resource, dayNumber: null } : resource
+  );
+  expect(toUpdateResourcesPayload(changed)).toEqual([
+    { id: "personal-date", name: "日期資源", url: undefined, dayNumber: null },
+    { id: "shared-date", name: "共享資源", url: undefined, relevantDate: "2027-01-01" },
   ]);
 });

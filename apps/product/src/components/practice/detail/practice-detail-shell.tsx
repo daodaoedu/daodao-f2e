@@ -64,6 +64,8 @@ import {
 } from "@/constants/reaction-type";
 import { getStatusConfig, mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 
+import { getResourceDate } from "@/lib/resource-usage-date";
+
 interface IPracticeDetailResource {
   id: string;
   name: string;
@@ -150,10 +152,11 @@ const TABS: { id: TabType; labelKey: "tab_comments" | "tab_checkins" | "tab_reso
 ];
 
 interface IPracticeResourceListCardProps {
+  startDate?: string;
   resource: IPracticeDetailResource;
 }
 
-function PracticeResourceListCard({ resource }: IPracticeResourceListCardProps) {
+function PracticeResourceListCard({ startDate, resource }: IPracticeResourceListCardProps) {
   const t = useTranslations("practice");
   const [imageError, setImageError] = useState(false);
   const { data: ogImageData, isLoading } = useExtractOgImage(resource.url);
@@ -210,9 +213,16 @@ function PracticeResourceListCard({ resource }: IPracticeResourceListCardProps) 
       </div>
 
       <div className="flex-1 min-w-0 py-1 overflow-hidden whitespace-normal">
-        {resource.dayNumber != null && (
+        {(!resource.isLocked || resource.dayNumber != null) && (
           <span className="inline-block mb-1 rounded-full bg-[#E7FAF7] px-2 py-0.5 text-[11px] font-semibold text-[#0D7773]">
-            {t("resource_day_badge", { day: resource.dayNumber })}
+            {resource.dayNumber == null ? (
+              t("resource_usage_all")
+            ) : (
+              <>
+                {getResourceDate(startDate || "", resource.dayNumber)?.replaceAll("-", "/")} (
+                {t("resource_day_badge", { day: resource.dayNumber })})
+              </>
+            )}
           </span>
         )}
         <p className="text-sm font-semibold text-[#295E5C] leading-snug line-clamp-2">
@@ -834,7 +844,13 @@ export function PracticeDetailShell({
                   : (a.dayNumber ?? Number.MAX_SAFE_INTEGER) -
                     (b.dayNumber ?? Number.MAX_SAFE_INTEGER)
               )
-              .map((resource) => <PracticeResourceListCard key={resource.id} resource={resource} />)
+              .map((resource) => (
+                <PracticeResourceListCard
+                  key={resource.id}
+                  resource={resource}
+                  startDate={practice.startDate}
+                />
+              ))
           ) : (
             <div className="text-sm text-[#9FB5B8] py-4">{t("no_resources")}</div>
           )}

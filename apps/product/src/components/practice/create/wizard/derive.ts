@@ -9,7 +9,12 @@ import {
   deriveNameFromAction,
   segmentDateRanges,
 } from "@/lib/practice-create";
-import { type SegmentOverride, TIMING_PRESETS, type WizardFormValues } from "./schema";
+import {
+  type SegmentOverride,
+  TIMING_PRESETS,
+  type WizardFormValues,
+  type WizardResource,
+} from "./schema";
 
 export interface EffectiveSegment {
   index: number;
@@ -95,5 +100,24 @@ export const resourceAppliesToSegment = (
   resource: { segmentIndexes: number[] },
   index: number
 ): boolean => resource.segmentIndexes.length === 0 || resource.segmentIndexes.includes(index);
+
+/** 指定日期只屬於涵蓋該日的段落，並換算為該段內的相對天數。 */
+export const getResourcesForSegment = (
+  values: WizardFormValues,
+  segment: EffectiveSegment
+): WizardResource[] => {
+  const offsetDays = getEffectiveSegments(values, "")
+    .slice(0, segment.index)
+    .reduce((sum, previous) => sum + previous.days, 0);
+  return values.resources.flatMap((resource) => {
+    if (resource.dayNumber != null) {
+      const dayNumber = resource.dayNumber - offsetDays;
+      return dayNumber >= 1 && dayNumber <= segment.days ? [{ ...resource, dayNumber }] : [];
+    }
+    return !values.isSegmented || resourceAppliesToSegment(resource, segment.index)
+      ? [resource]
+      : [];
+  });
+};
 
 export { ExecutionTiming };

@@ -9,6 +9,8 @@ import {
   MAX_PRACTICE_TAGS,
 } from "@/constants/practice-form";
 
+import { isResourceDayInRange } from "@/lib/resource-usage-date";
+
 type TFunction = ReturnType<typeof useTranslations<"practice">>;
 
 // Form Options Constants (static keys for non-translated use)
@@ -128,78 +130,92 @@ export const createManualPracticeFormSchema = (
   const msg = (key: string, params?: Record<string, string | number>) =>
     t(key as Parameters<TFunction>[0], params as never);
 
-  return z.object({
-    // Step 1
-    name: z.string().min(1, msg("validation_name_required")),
-    actionDescription: z
-      .string()
-      .min(1, msg("validation_action_required"))
-      .max(50, msg("validation_action_max"))
-      .default(""),
+  return z
+    .object({
+      // Step 1
+      name: z.string().min(1, msg("validation_name_required")),
+      actionDescription: z
+        .string()
+        .min(1, msg("validation_action_required"))
+        .max(50, msg("validation_action_max"))
+        .default(""),
 
-    // Step 2
-    startDate: createStartDateSchema(minStartDate, t),
-    // 新建立流程可存任意天數、每週頻率區間（daodao#141），編輯頁要能原值帶入（daodao#370）
-    // 數字字串，例 "45"；輸入框已過濾非數字並夾限
-    durationDays: z.string().min(scheduleMinLength, msg("validation_duration_required")),
-    // 正規化頻率，例 "1-3"、"7"
-    frequency: z.string().min(frequencyMinLength, msg("validation_frequency_required")),
+      // Step 2
+      startDate: createStartDateSchema(minStartDate, t),
+      // 新建立流程可存任意天數、每週頻率區間（daodao#141），編輯頁要能原值帶入（daodao#370）
+      // 數字字串，例 "45"；輸入框已過濾非數字並夾限
+      durationDays: z.string().min(scheduleMinLength, msg("validation_duration_required")),
+      // 正規化頻率，例 "1-3"、"7"
+      frequency: z.string().min(frequencyMinLength, msg("validation_frequency_required")),
 
-    // Step 3
-    // 每次時間在建立流程是選填，null 代表沒設定
-    durationMinutes: z.number().nullable(),
-    // 執行時機在建立流程是選填（daodao#141），原本沒有時機的實踐也要能存檔（daodao#370）
-    executionTiming: z.array(z.nativeEnum(ExecutionTiming)),
-    customTiming: z.string(),
+      // Step 3
+      // 每次時間在建立流程是選填，null 代表沒設定
+      durationMinutes: z.number().nullable(),
+      // 執行時機在建立流程是選填（daodao#141），原本沒有時機的實踐也要能存檔（daodao#370）
+      executionTiming: z.array(z.nativeEnum(ExecutionTiming)),
+      customTiming: z.string(),
 
-    // Step 4
-    tags: z
-      .array(z.string())
-      .max(MAX_PRACTICE_TAGS, msg("validation_tags_max", { max: MAX_PRACTICE_TAGS }))
-      .optional(),
-    resources: z
-      .array(
-        z
-          .object({
-            id: z.string(),
-            persistedId: z.string().optional(),
-            name: z
-              .string()
-              .min(1, msg("validation_resource_name_required"))
-              .max(100, msg("validation_resource_name_max")),
-            url: z
-              .string()
-              .url(msg("validation_resource_url_invalid"))
-              .optional()
-              .or(z.literal("")),
-            // 教練加入的資源（燈塔本期草稿）：不可移除，server 也會擋
-            isLocked: z.boolean().optional(),
-            relevantDate: z.string().nullable().optional(),
-            // 第幾天使用；表單不提供編輯，但存檔要原樣送回，否則 server 重建關聯時會清成整段期間（daodao#332）
-            dayNumber: z.number().int().nullable().optional(),
-          })
-          .superRefine((resource, ctx) => {
-            if (
-              resource.url &&
-              !resource.url.toLowerCase().startsWith("https://") &&
-              !(resource.isLocked && resource.url.toLowerCase().startsWith("http://"))
-            ) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ["url"],
-                message: msg("step4_url_https_required"),
-              });
-            }
-          })
-      )
-      .refine(
-        (resources) =>
-          resources.filter((resource) => !resource.isLocked).length <=
-          MAX_PERSONAL_PRACTICE_RESOURCES,
-        { message: msg("wizard_resource_max", { max: MAX_PERSONAL_PRACTICE_RESOURCES }) }
-      )
-      .optional(),
-  });
+      // Step 4
+      tags: z
+        .array(z.string())
+        .max(MAX_PRACTICE_TAGS, msg("validation_tags_max", { max: MAX_PRACTICE_TAGS }))
+        .optional(),
+      resources: z
+        .array(
+          z
+            .object({
+              id: z.string(),
+              persistedId: z.string().optional(),
+              name: z
+                .string()
+                .min(1, msg("validation_resource_name_required"))
+                .max(100, msg("validation_resource_name_max")),
+              url: z
+                .string()
+                .url(msg("validation_resource_url_invalid"))
+                .optional()
+                .or(z.literal("")),
+              // 教練加入的資源（燈塔本期草稿）：不可移除，server 也會擋
+              isLocked: z.boolean().optional(),
+              relevantDate: z.string().nullable().optional(),
+              // 第幾天使用；開始日變更時，資源日期隨相對天數一起移動。
+              dayNumber: z.number().int().nullable().optional(),
+            })
+            .superRefine((resource, ctx) => {
+              if (
+                resource.url &&
+                !resource.url.toLowerCase().startsWith("https://") &&
+                !(resource.isLocked && resource.url.toLowerCase().startsWith("http://"))
+              ) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  path: ["url"],
+                  message: msg("step4_url_https_required"),
+                });
+              }
+            })
+        )
+        .refine(
+          (resources) =>
+            resources.filter((resource) => !resource.isLocked).length <=
+            MAX_PERSONAL_PRACTICE_RESOURCES,
+          { message: msg("wizard_resource_max", { max: MAX_PERSONAL_PRACTICE_RESOURCES }) }
+        )
+        .optional(),
+    })
+    .superRefine((values, ctx) => {
+      const duration = Number(values.durationDays);
+      if (!Number.isFinite(duration) || duration < 1) return;
+      values.resources?.forEach((resource, index) => {
+        if (!isResourceDayInRange(resource.dayNumber, duration)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["resources", index, "dayNumber"],
+            message: msg("resource_usage_out_of_range"),
+          });
+        }
+      });
+    });
 };
 
 export type ManualPracticeFormValues = z.infer<ReturnType<typeof createManualPracticeFormSchema>>;

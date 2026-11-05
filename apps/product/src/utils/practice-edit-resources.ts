@@ -27,8 +27,8 @@ export const toEditFormResources = (resources: ApiPracticeResource[]): FormResou
   }));
 
 /**
- * 編輯頁送出資源：有天數才帶 dayNumber。沒天數時不帶，server 對教練鎖定資源維持寬鬆比對
- * （見 daodao-server coach-resource-lock 的 lenient 模式）。
+ * 個人資源帶 persisted ID 後，省略日期代表沿用，因此整段期間必須明確送 null。
+ * 教練鎖定資源沿用省略日期的相容契約，使用 relevantDate 保留活動日期。
  */
 export const toUpdateResourcesPayload = (resources: FormResource[]) =>
   resources.map((resource) => ({
@@ -36,5 +36,7 @@ export const toUpdateResourcesPayload = (resources: FormResource[]) =>
     url: resource.url || undefined,
     ...(resource.persistedId ? { id: resource.persistedId } : {}),
     ...(resource.isLocked ? { id: resource.id, relevantDate: resource.relevantDate ?? null } : {}),
-    ...(resource.dayNumber != null ? { dayNumber: resource.dayNumber } : {}),
+    ...(!resource.isLocked || resource.dayNumber != null
+      ? { dayNumber: resource.dayNumber ?? null }
+      : {}),
   }));
