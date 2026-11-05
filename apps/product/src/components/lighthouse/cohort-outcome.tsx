@@ -1,11 +1,13 @@
 "use client";
 
 import { type LighthouseOutcome, useLighthouseOutcome } from "@daodao/api";
+import { getEnv } from "@daodao/config";
 import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { FileText } from "lucide-react";
 import { CohortErrorState } from "./cohort-error-state";
+import { CohortFeedback } from "./cohort-feedback";
 import { CohortOutcomeSummary } from "./cohort-outcome-summary";
 import { CohortOutcomeTables } from "./cohort-outcome-tables";
 
@@ -34,6 +36,7 @@ export function outcomeReportFilename(displayName: string, now = new Date()): st
 export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
   const t = useTranslations("lighthouse");
   const locale = useLocale();
+  const feedbackEnabled = getEnv("NEXT_PUBLIC_COHORT_FEEDBACK_ENABLED") === "true";
   const query = useLighthouseOutcome(programId, cohortId);
   const outcome = query.data?.data;
 
@@ -75,6 +78,14 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
 
       <CohortOutcomeTables outcome={outcome} />
 
+      {feedbackEnabled && (
+        <CohortFeedback
+          key={`${programId}-${cohortId}`}
+          programId={programId}
+          cohortId={cohortId}
+        />
+      )}
+
       <section
         className="rounded-3xl border border-[#CDEBE8] bg-white p-6"
         aria-labelledby="outcome-export-title"
@@ -107,6 +118,18 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
             <span className="font-semibold">{t("outcome_export_learners")}</span>
             <span className="text-xs font-normal">{t("coming_soon_badge")}</span>
           </Button>
+          {feedbackEnabled && (
+            <Button
+              type="button"
+              disabled
+              aria-disabled="true"
+              className="h-auto min-w-[220px] flex-col items-start gap-0.5 rounded-2xl bg-[#F6F9F8] px-5 py-3 text-left text-[#8AA09E] opacity-70"
+              data-testid="outcome-export-feedback"
+            >
+              <span className="font-semibold">{t("feedback_export")}</span>
+              <span className="text-xs font-normal">{t("coming_soon_badge")}</span>
+            </Button>
+          )}
         </div>
       </section>
     </div>

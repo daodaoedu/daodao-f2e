@@ -20,6 +20,8 @@ export * from "./chat";
 export * from "./chat-hooks";
 // Lighthouse Cohort Service
 export * from "./cohort";
+// Cohort feedback and authenticated public survey access
+export * from "./cohort-feedback";
 export * from "./cohort-hooks";
 // Comments Service
 export * from "./comments";
@@ -32,7 +34,6 @@ export * from "./email";
 export * from "./email-hooks";
 // Feed Service
 export * from "./feed-hooks";
-
 export * from "./feedback";
 // Follow Service
 export * from "./follow";

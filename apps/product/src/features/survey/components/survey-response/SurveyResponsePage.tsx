@@ -1,12 +1,15 @@
 "use client";
 
+import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { Loader2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { useSurveyResponse } from "../../hooks/use-survey-response";
 import { trackPartial, trackView } from "../../services/survey";
 import type { Answer } from "../../types";
+import { CohortFeedbackForm } from "./CohortFeedbackForm";
 import { QuestionRenderer } from "./QuestionRenderer";
 import { ThankYouPage } from "./ThankYouPage";
 
@@ -26,22 +29,24 @@ export function SurveyResponsePage() {
   const router = useRouter();
   const shareId = params?.shareId as string;
 
-  const { survey, loading, error, submitResponse } = useSurveyResponse(shareId);
+  const { survey, loading, error, submitResponse, retry } = useSurveyResponse(shareId);
+  const t = useTranslations("lighthouse");
+  const { errorMessage } = useServerErrorMessage();
   const startedAtRef = useRef<string | null>(null);
   const sessionKeyRef = useRef<string | null>(null);
   const lastTrackedPositionRef = useRef<number | null>(null);
 
   // Record start time + session key once survey is loaded
   useEffect(() => {
-    if (!survey || !shareId) return;
+    if (!survey || !shareId || survey.cohortFeedback) return;
     if (!startedAtRef.current) startedAtRef.current = new Date().toISOString();
     if (!sessionKeyRef.current) sessionKeyRef.current = getSessionKey(shareId);
   }, [survey, shareId]);
 
   // Track page view once survey is loaded
   useEffect(() => {
-    if (shareId) trackView(shareId);
-  }, [shareId]);
+    if (shareId && survey && !survey.cohortFeedback) void trackView(shareId);
+  }, [shareId, survey]);
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -53,18 +58,18 @@ export function SurveyResponsePage() {
 
   // Restore saved answers
   useEffect(() => {
-    if (!shareId) return;
+    if (!shareId || !survey || survey.cohortFeedback) return;
     try {
       const saved = localStorage.getItem(`survey-answers-${shareId}`);
       if (saved) setAnswers(JSON.parse(saved));
     } catch {
       /* ignore */
     }
-  }, [shareId]);
+  }, [shareId, survey]);
 
   // Auto-save answers (debounced)
   useEffect(() => {
-    if (Object.keys(answers).length === 0) return;
+    if (!survey || survey.cohortFeedback || Object.keys(answers).length === 0) return;
     const timer = setTimeout(() => {
       try {
         localStorage.setItem(`survey-answers-${shareId}`, JSON.stringify(answers));
@@ -73,7 +78,7 @@ export function SurveyResponsePage() {
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [answers, shareId]);
+  }, [answers, shareId, survey]);
 
   const handleAnswer = useCallback(
     (questionId: string, value: Answer["value"]) => {
@@ -177,7 +182,10 @@ export function SurveyResponsePage() {
   if (error)
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <p className="text-destructive">{error}</p>
+        <p className="text-destructive">{errorMessage(error, t("load_failed"))}</p>
+        <Button variant="outline" onClick={retry}>
+          {t("retry")}
+        </Button>
         <Button variant="outline" onClick={() => router.push("/")}>
           回到首頁
         </Button>
@@ -186,6 +194,11 @@ export function SurveyResponsePage() {
 
   if (submitted) return <ThankYouPage message={survey?.config?.successMessage} />;
   if (!survey) return null;
+
+  if (survey.cohortFeedback)
+    return (
+      <CohortFeedbackForm key={survey.shareId} survey={survey} submitResponse={submitResponse} />
+    );
 
   const isCohortFeedback = survey.tags?.includes("cohort-feedback") ?? false;
 
