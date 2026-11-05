@@ -451,5 +451,7 @@
   "wizard_done_primary_template": "See my templates",
   "wizard_done_secondary_personal": "Create another practice",
   "wizard_done_secondary_template": "Create another template",
-  "wizard_create_failed": "Couldn't create, please try again"
+  "wizard_create_failed": "Couldn't create, please try again",
+  "template_access_denied": "Only DaoDao administrators can create official templates. You can create a personal practice instead.",
+  "template_access_create_personal": "Create a personal practice"
 }
