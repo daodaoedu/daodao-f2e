@@ -157,6 +157,7 @@ describe("Lighthouse API runtime schemas", () => {
         {
           id: 20,
           programId: 10,
+          timezone: "Asia/Taipei",
           slug: "summer-2026",
           displayName: "夏季同行",
           tagline: null,
@@ -192,6 +193,9 @@ describe("Lighthouse API runtime schemas", () => {
 
     expect(programResult.success).toBe(true);
     expect(cohortResult.success).toBe(true);
+    if (cohortResult.success) {
+      expect(cohortResult.data.data[0]?.timezone).toBe("Asia/Taipei");
+    }
   });
 
   it("requires the real pending-response count in a cohort feed", () => {

@@ -82,6 +82,7 @@ const cohortSessionShape = {
 } satisfies z.ZodRawShape;
 
 const lighthouseCohortShape = {
+  timezone: z.string(),
   id: z.number().int().positive(),
   programId: z.number().int().positive(),
   slug: z.string(),
