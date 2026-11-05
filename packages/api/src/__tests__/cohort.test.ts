@@ -157,8 +157,8 @@ describe("Lighthouse API runtime schemas", () => {
         {
           id: 20,
           programId: 10,
-          timezone: "Asia/Taipei",
           slug: "summer-2026",
+          timezone: "Asia/Tokyo",
           displayName: "夏季同行",
           tagline: null,
           startDate: "2026-07-01",
@@ -172,7 +172,16 @@ describe("Lighthouse API runtime schemas", () => {
           interactionModes: ["async"],
           meetingUrl: null,
           location: null,
-          sessions: [{ id: 1, sessionDate: "2026-07-05", startTime: "19:00", endTime: null }],
+          sessions: [
+            {
+              id: 1,
+              sessionDate: "2026-07-05",
+              startTime: "19:00",
+              endTime: null,
+              recurrenceGroupId: "34700000-0000-4000-8000-000000000001",
+              recurrenceRule: { startDate: "2026-07-05", weeks: 4, weekdays: [7] },
+            },
+          ],
           feeType: "free",
           feeAmount: null,
           signupMethod: "island_form",
@@ -193,9 +202,16 @@ describe("Lighthouse API runtime schemas", () => {
 
     expect(programResult.success).toBe(true);
     expect(cohortResult.success).toBe(true);
-    if (cohortResult.success) {
-      expect(cohortResult.data.data[0]?.timezone).toBe("Asia/Taipei");
-    }
+    if (!cohortResult.success) throw cohortResult.error;
+    expect(cohortResult.data.data[0]).toMatchObject({
+      timezone: "Asia/Tokyo",
+      sessions: [
+        {
+          recurrenceGroupId: "34700000-0000-4000-8000-000000000001",
+          recurrenceRule: { startDate: "2026-07-05", weeks: 4, weekdays: [7] },
+        },
+      ],
+    });
   });
 
   it("requires the real pending-response count in a cohort feed", () => {

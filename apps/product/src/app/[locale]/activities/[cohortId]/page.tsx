@@ -8,7 +8,6 @@ import { Badge } from "@daodao/ui/components/badge";
 import { Button, buttonVariants } from "@daodao/ui/components/button";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { cn } from "@daodao/ui/lib/utils";
-import { format, isValid, parseISO } from "date-fns";
 import {
   ArrowLeft,
   Calendar,
@@ -19,6 +18,7 @@ import {
   Users,
 } from "lucide-react";
 import { useParams } from "next/navigation";
+import { CohortSessionSchedule } from "@/components/cohort/cohort-session-schedule";
 import { type ActivityDetailCta, resolveActivityDetailCta } from "@/constants/activity-detail-cta";
 
 /** 互動方式 i18n key 對照 */
@@ -26,22 +26,6 @@ const MODE_LABEL: Record<string, string> = {
   sync: "detail_mode_sync",
   async: "detail_mode_async",
   physical: "detail_mode_physical",
-};
-
-/** 格式化日期為 YYYY/MM/DD */
-const formatDate = (dateStr: string): string => {
-  const parsed = parseISO(dateStr);
-  return isValid(parsed) ? format(parsed, "yyyy/MM/dd") : dateStr;
-};
-
-/** 格式化時間為 HH:mm */
-const formatTime = (timeStr: string): string => {
-  // timeStr might be ISO or HH:mm:ss format
-  if (timeStr.includes("T")) {
-    const parsed = parseISO(timeStr);
-    return isValid(parsed) ? format(parsed, "HH:mm") : timeStr;
-  }
-  return timeStr.slice(0, 5);
 };
 
 /**
@@ -167,26 +151,7 @@ export default function ActivityDetailPage() {
           </DetailRow>
         )}
 
-        {/* 聚會時段 */}
-        {activity.sessions.length > 0 && (
-          <DetailRow icon={<Calendar className="size-4" />} label={t("detail_sessions_label")}>
-            <div className="flex flex-col gap-1.5">
-              {activity.sessions.map((session) => (
-                <div key={session.id} className="flex items-center gap-2 text-sm text-bg-dark">
-                  <span>{t("detail_session_date", { date: formatDate(session.sessionDate) })}</span>
-                  {session.startTime && session.endTime && (
-                    <span className="text-text-dark/60">
-                      {t("detail_session_time", {
-                        start: formatTime(session.startTime),
-                        end: formatTime(session.endTime),
-                      })}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </DetailRow>
-        )}
+        <CohortSessionSchedule sessions={activity.sessions} timezone={activity.timezone} />
 
         {/* 費用 */}
         <DetailRow icon={<Clock className="size-4" />} label={t("detail_fee_label")}>

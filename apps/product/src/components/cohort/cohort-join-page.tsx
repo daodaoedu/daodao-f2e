@@ -10,6 +10,7 @@ import { ArrowUpRight, Users } from "lucide-react";
 import { useState } from "react";
 import { resolveJoinConsentCopy } from "@/utils/cohort-join-consent";
 import { resolveJoinUnavailableCopy } from "@/utils/cohort-join-unavailable";
+import { CohortSessionSchedule } from "./cohort-session-schedule";
 
 export function CohortJoinPage({ joinToken }: { joinToken: string }) {
   const t = useTranslations("cohort");
@@ -97,6 +98,7 @@ export function CohortJoinPage({ joinToken }: { joinToken: string }) {
         <p className="mt-2 text-xs text-[#78928F]">
           {info.startDate.slice(0, 10)} — {info.endDate.slice(0, 10)}
         </p>
+        <CohortSessionSchedule sessions={info.sessions} timezone={info.timezone} />
         <label className="mt-8 flex items-start gap-3 rounded-2xl bg-[#FFF6E8] p-4 text-sm leading-6">
           <input
             type="checkbox"

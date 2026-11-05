@@ -69,5 +69,6 @@
   "settings_privacy": "隱私設定",
   "settings_privacy_desc": "決定你的實踐成果是否可以被教練匯出報告使用。",
   "save": "儲存",
-  "exit_cancel": "取消"
+  "exit_cancel": "取消",
+  "meeting_schedule": "聚會時段"
 }

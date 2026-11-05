@@ -210,3 +210,7 @@ packages/ui
 
 See [license](license) file for details.
 
+
+## 場次聚會時段規格
+
+現行規則見[場次聚會時段規則](docs/lighthouse/cohort-schedule.md)，引用 FRD v0.2 並記錄舊 FR-BS-03／TP-BS-07 的取代關係。
