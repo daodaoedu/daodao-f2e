@@ -64,6 +64,8 @@ import {
 } from "@/constants/reaction-type";
 import { getStatusConfig, mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 
+import { getResourceDate } from "@/lib/resource-usage-date";
+
 interface IPracticeDetailResource {
   id: string;
   name: string;
@@ -147,6 +149,7 @@ const TABS: { id: TabType; labelKey: "tab_comments" | "tab_checkins" | "tab_reso
 ];
 
 interface IPracticeResourceListCardProps {
+  startDate?: string;
   resource: IPracticeDetailResource;
   isOwner: boolean;
   onEditPractice: () => void;
@@ -154,6 +157,7 @@ interface IPracticeResourceListCardProps {
 }
 
 function PracticeResourceListCard({
+  startDate,
   resource,
   isOwner,
   onEditPractice,
@@ -239,11 +243,16 @@ function PracticeResourceListCard({
       </div>
 
       <div className="flex-1 min-w-0 py-1 overflow-hidden whitespace-normal">
-        {resource.dayNumber != null && (
-          <span className="inline-block mb-1 rounded-full bg-[#E7FAF7] px-2 py-0.5 text-[11px] font-semibold text-[#0D7773]">
-            {t("resource_day_badge", { day: resource.dayNumber })}
-          </span>
-        )}
+        <span className="inline-block mb-1 rounded-full bg-[#E7FAF7] px-2 py-0.5 text-[11px] font-semibold text-[#0D7773]">
+          {resource.dayNumber == null ? (
+            t("resource_usage_all")
+          ) : (
+            <>
+              {getResourceDate(startDate || "", resource.dayNumber)?.replaceAll("-", "/")} (
+              {t("resource_day_badge", { day: resource.dayNumber })})
+            </>
+          )}
+        </span>
         <p className="text-sm font-semibold text-[#295E5C] leading-snug line-clamp-2">
           {resource.name}
         </p>
@@ -882,6 +891,7 @@ export function PracticeDetailShell({
                 <PracticeResourceListCard
                   key={resource.id}
                   resource={resource}
+                  startDate={practice.startDate}
                   isOwner={isOwner}
                   onEditPractice={onEditPractice}
                   onDeleteResource={onDeleteResource}

@@ -134,3 +134,54 @@ describe("createManualPracticeFormSchema messages (daodao#334)", () => {
     expect(paths).toEqual(expect.arrayContaining(["durationDays", "frequency"]));
   });
 });
+
+describe("resource usage period validation (#376)", () => {
+  const values = () => ({
+    ...invalidValues,
+    name: "日期驗證",
+    actionDescription: "閱讀章節",
+    startDate: format(new Date(), "yyyy-MM-dd"),
+    resources: [{ id: "date-resource", name: "原文 BOOK", url: "", dayNumber: 14 }],
+  });
+
+  it("blocks shrinking past an assigned day and reports the affected resource", () => {
+    const input = values();
+    const result = createManualPracticeFormSchema({}, t).safeParse(input);
+    expect(result.success).toBe(false);
+    if (result.success) throw new Error("expected period error");
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ["resources", 0, "dayNumber"],
+        message: "譯:resource_usage_out_of_range",
+      })
+    );
+    expect(input.resources[0]?.dayNumber).toBe(14);
+  });
+
+  it("blocks saving when specific date was selected but no calendar day was chosen", () => {
+    const result = createManualPracticeFormSchema({}, t).safeParse({
+      ...values(),
+      resources: [{ ...values().resources[0], dayNumber: 0 }],
+    });
+    expect(result.success).toBe(false);
+    if (result.success) throw new Error("expected date selection error");
+    expect(
+      result.error.issues.some((issue) => issue.path.join(".") === "resources.0.dayNumber")
+    ).toBe(true);
+  });
+
+  it.each([1, 7, null])("accepts explicit recovery to day %s or the whole period", (dayNumber) => {
+    const input = { ...values(), resources: [{ ...values().resources[0], dayNumber }] };
+    const result = createManualPracticeFormSchema({}, t).safeParse(input);
+    expect(result.success).toBe(true);
+    expect(result.success && result.data.resources?.[0]?.dayNumber).toBe(dayNumber);
+  });
+
+  it("keeps assigned days when a legacy locked practice has no known duration", () => {
+    const result = createManualPracticeFormSchema({ scheduleLocked: true }, t).safeParse({
+      ...values(),
+      durationDays: "",
+    });
+    expect(result.success && result.data.resources?.[0]?.dayNumber).toBe(14);
+  });
+});

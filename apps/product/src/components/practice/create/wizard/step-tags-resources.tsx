@@ -90,6 +90,8 @@ export const StepTagsResources = forwardRef<StepTagsResourcesHandle, StepTagsRes
     const tags = form.watch("tags") ?? [];
     const resources = form.watch("resources") ?? [];
     const isSegmented = form.watch("isSegmented");
+    const startDate = form.watch("startDate");
+    const durationDays = form.watch("durationDays") ?? 0;
     const isPersonal = form.watch("mode") === WizardMode.personal;
     const segmentCount = isSegmented
       ? getEffectiveSegments(form.getValues(), t("wizard_name_fallback")).length
@@ -405,7 +407,7 @@ export const StepTagsResources = forwardRef<StepTagsResourcesHandle, StepTagsRes
                 </button>
               </div>
 
-              <FormMessage className="mt-2" />
+              {form.formState.errors.resources?.message && <FormMessage className="mt-2" />}
 
               {resources.length > 0 && (
                 <ul className="mt-3 space-y-2">
@@ -415,6 +417,21 @@ export const StepTagsResources = forwardRef<StepTagsResourcesHandle, StepTagsRes
                         resource={resource}
                         isEditing={editingId === resource.id}
                         segmentCount={segmentCount}
+                        startDate={isPersonal ? startDate : undefined}
+                        durationDays={durationDays}
+                        onDateChange={
+                          isPersonal
+                            ? (dayNumber) => {
+                                form.setValue(
+                                  "resources",
+                                  resources.map((item) =>
+                                    item.id === resource.id ? { ...item, dayNumber } : item
+                                  ),
+                                  { shouldDirty: true, shouldValidate: true }
+                                );
+                              }
+                            : undefined
+                        }
                         onStartEdit={() => setEditingId(resource.id)}
                         onCancelEdit={() => setEditingId(null)}
                         onSave={(draft) => handleSave(resource.id, draft)}
