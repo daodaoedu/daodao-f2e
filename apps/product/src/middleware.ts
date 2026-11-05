@@ -42,13 +42,53 @@ async function hasLighthouseAccess(
       cache: "no-store",
     });
     if (response.status === 401) return "unauthorized";
-    if (response.status === 403) return "denied";
-    if (!response.ok) return "unavailable";
-
-    const payload: unknown = await response.json();
-    if (!payload || typeof payload !== "object" || !("data" in payload)) return "unavailable";
-    if (!Array.isArray(payload.data)) return "unavailable";
-    return payload.data.length > 0 ? "allowed" : "denied";
+    if (response.status !== 403) {
+      if (!response.ok) return "unavailable";
+      const payload: unknown = await response.json();
+      if (!payload || typeof payload !== "object" || !("data" in payload)) return "unavailable";
+      if (!Array.isArray(payload.data)) return "unavailable";
+      if (payload.data.length > 0) return "allowed";
+    }
+    // Leaders without organization membership may only access their resources in templates.
+    if (!/^\/(?:en\/)?lighthouse\/templates(?:\/|$)/.test(request.nextUrl.pathname))
+      return "denied";
+    const bindingsResponse = await fetch(
+      `${apiBaseUrl}/api/v1/lighthouse/my-cohort-resource-bindings`,
+      {
+        headers: { Cookie: `auth_token=${authToken}` },
+        cache: "no-store",
+      }
+    );
+    if (bindingsResponse.status === 401) return "unauthorized";
+    if (bindingsResponse.status === 403) return "denied";
+    if (!bindingsResponse.ok) return "unavailable";
+    const bindings: unknown = await bindingsResponse.json();
+    if (
+      !bindings ||
+      typeof bindings !== "object" ||
+      !("data" in bindings) ||
+      !Array.isArray(bindings.data)
+    )
+      return "unavailable";
+    if (
+      !bindings.data.every(
+        (binding: unknown) =>
+          binding !== null &&
+          typeof binding === "object" &&
+          "organizationId" in binding &&
+          Number.isInteger(binding.organizationId) &&
+          "templateId" in binding &&
+          Number.isInteger(binding.templateId) &&
+          "cohortId" in binding &&
+          Number.isInteger(binding.cohortId) &&
+          "cohortName" in binding &&
+          typeof binding.cohortName === "string" &&
+          "templateName" in binding &&
+          typeof binding.templateName === "string"
+      )
+    )
+      return "unavailable";
+    return bindings.data.length > 0 ? "allowed" : "denied";
   } catch (error) {
     console.error("[middleware] Lighthouse membership check failed", error);
     return "unavailable";
