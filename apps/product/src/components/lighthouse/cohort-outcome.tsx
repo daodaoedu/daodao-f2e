@@ -6,6 +6,7 @@ import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { FileText } from "lucide-react";
 import { CohortErrorState } from "./cohort-error-state";
+import { CohortFeedbackPoc } from "./cohort-feedback-poc";
 import { CohortOutcomeSummary } from "./cohort-outcome-summary";
 import { CohortOutcomeTables } from "./cohort-outcome-tables";
 
@@ -75,6 +76,8 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
 
       <CohortOutcomeTables outcome={outcome} />
 
+      <CohortFeedbackPoc />
+
       <section
         className="rounded-3xl border border-[#CDEBE8] bg-white p-6"
         aria-labelledby="outcome-export-title"
@@ -106,6 +109,15 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
           >
             <span className="font-semibold">{t("outcome_export_learners")}</span>
             <span className="text-xs font-normal">{t("coming_soon_badge")}</span>
+          </Button>
+          <Button
+            type="button"
+            disabled
+            aria-disabled="true"
+            className="h-auto min-w-[220px] flex-col items-start gap-0.5 rounded-2xl bg-[#F6F9F8] px-5 py-3 text-left text-[#8AA09E] opacity-70"
+          >
+            <span className="font-semibold">匯出問卷結果</span>
+            <span className="text-xs font-normal">coming soon</span>
           </Button>
         </div>
       </section>
@@ -181,9 +193,7 @@ export function OutcomeOverview({ outcome }: { outcome: LighthouseOutcome }) {
           >
             {card.value}
           </p>
-          <p className={cn("mt-1 text-xs", card.amber ? "text-[#9A7B52]" : "text-[#78928F]")}>
-            {card.label}
-          </p>
+          <p className={cn("mt-1 text-xs", card.amber ? "text-[#9A7B52]" : "text-[#78928F]")}>{card.label}</p>
         </div>
       ))}
     </div>
