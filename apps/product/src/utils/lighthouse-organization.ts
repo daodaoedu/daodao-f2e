@@ -21,12 +21,33 @@ export function resolveLighthouseOrganization(
   return organization ? { status: "ready", organizationId: organization.id } : { status: "empty" };
 }
 
-/** Preserve the destination's existing query and hash when carrying organization context. */
+/** Read explicit path context; resource URLs intentionally have no organization segment. */
+export function lighthouseOrganizationPathId(pathname: string): string | null {
+  return pathname.match(/^\/(?:en\/|zh-TW\/)?lighthouse\/o\/([^/]+)(?:\/|$)/)?.[1] ?? null;
+}
+
+/** Build organization-page paths; cohort resources retain their globally unique URLs. */
 export function lighthouseOrganizationHref(href: string, organizationId?: number): string {
   if (!organizationId) return href;
   const url = new URL(href, "https://lighthouse.invalid");
-  url.searchParams.set("organizationId", String(organizationId));
+  const match = url.pathname.match(/^(\/(?:en\/|zh-TW\/)?lighthouse)(?=\/|$)(?:\/o\/[^/]+)?(.*)$/);
+  if (!match) return href;
+  url.searchParams.delete("organizationId");
+  const section = (match[2] ?? "").replace(/\/$/, "");
+  if (["", "/programs", "/templates", "/organization", "/archive"].includes(section)) {
+    url.pathname = `${match[1]}/o/${organizationId}${section}`;
+  }
   return `${url.pathname}${url.search}${url.hash}`;
+}
+
+/** Only ordinary organization pages update the account's saved default. */
+export function shouldSaveLighthouseOrganization(
+  pathname: string,
+  organizationId?: number
+): boolean {
+  return Boolean(
+    organizationId && lighthouseOrganizationPathId(pathname) === String(organizationId)
+  );
 }
 
 /** Serialize account preference writes and coalesce rapid changes into the final choice. */

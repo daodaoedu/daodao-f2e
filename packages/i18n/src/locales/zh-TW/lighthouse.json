@@ -458,7 +458,7 @@
   "organization_external_link": "外部連結",
   "organization_saved": "組織資訊已儲存",
   "organization_members": "組織成員",
-  "organization_role_owner": "共同管理者",
+  "organization_role_owner": "組織成員",
   "user_id": "使用者 ID",
   "add_member": "新增成員",
   "organization_member_remove_failed": "無法移除組織成員",
@@ -654,5 +654,12 @@
   "organization_unavailable": "此組織目前無法管理，或你已沒有存取權限。請選擇其他組織。",
   "organization_unsaved_title": "要放棄尚未儲存的變更嗎？",
   "organization_unsaved_description": "變更尚未儲存。你可以留在此頁繼續編輯，或放棄變更後繼續。",
-  "organization_discard": "放棄變更"
+  "organization_discard": "放棄變更",
+  "operation_destination": "組織：{organization} · 場次：{cohort}",
+  "message_send_confirm": "確認並送出",
+  "message_send_confirmation": "確定要以「{organization}」的「{cohort}」場次發訊息給{name}嗎？",
+  "invitation_destination_confirm": "確定要以「{organization}」的「{cohort}」場次寄出 {count} 封邀請嗎？",
+  "organization_all_suspended": "你所屬的組織目前皆已停權，請聯絡島島阿學恢復使用。",
+  "organization_not_enabled": "你的帳號尚未開通組織管理，請聯絡島島阿學。",
+  "invitation_resend_destination_confirm": "確定要以「{organization}」的「{cohort}」場次重寄邀請給 {email} 嗎？"
 }

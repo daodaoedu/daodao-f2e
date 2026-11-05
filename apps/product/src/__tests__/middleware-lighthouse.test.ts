@@ -10,8 +10,8 @@ vi.mock("@daodao/i18n/middleware", () => ({ default: () => () => NextResponse.ne
 
 import middleware from "../middleware";
 
-function request(token = "fixture-session") {
-  return new NextRequest("https://product.example.test/en/lighthouse/programs", {
+function request(token = "fixture-session", path = "/en/lighthouse/o/1/programs") {
+  return new NextRequest(`https://product.example.test${path}`, {
     headers: token ? { cookie: `auth_token=${token}` } : {},
   });
 }
@@ -23,7 +23,9 @@ describe("Lighthouse middleware backend routing", () => {
     environment.set("NEXT_PUBLIC_API_URL", "https://public-api.example.test/");
     fetchMock
       .mockReset()
-      .mockResolvedValue(new Response(JSON.stringify({ data: [{ id: 1 }] }), { status: 200 }));
+      .mockResolvedValue(
+        new Response(JSON.stringify({ data: [{ id: 1, status: "active" }] }), { status: 200 })
+      );
     vi.stubGlobal("fetch", fetchMock);
   });
   afterEach(() => vi.unstubAllGlobals());
@@ -61,5 +63,90 @@ describe("Lighthouse middleware backend routing", () => {
     fetchMock.mockResolvedValue(new Response(JSON.stringify(body), { status }));
     const response = await middleware(request());
     expect(response.headers.get("location")).toContain(destination);
+  });
+});
+
+describe("old Lighthouse entry URLs", () => {
+  const fetchMock = vi.fn();
+  beforeEach(() => {
+    environment.clear();
+    environment.set("NEXT_PUBLIC_API_URL", "https://public-api.example.test");
+    fetchMock.mockReset().mockImplementation(
+      async (url: string) =>
+        new Response(
+          JSON.stringify({
+            data: url.endsWith("/preferences")
+              ? { organizationId: 4 }
+              : [
+                  { id: 2, status: "active" },
+                  { id: 3, status: "suspended" },
+                  { id: 4, status: "active" },
+                ],
+          }),
+          { status: 200 }
+        )
+    );
+    vi.stubGlobal("fetch", fetchMock);
+  });
+  afterEach(() => vi.unstubAllGlobals());
+  it("redirects an old section to the account preference, preserving edit query", async () => {
+    const response = await middleware(request("fixture-session", "/en/lighthouse/programs?edit=8"));
+    expect(response.headers.get("location")).toBe(
+      "https://product.example.test/en/lighthouse/o/4/programs?edit=8"
+    );
+  });
+  it("honors an authorized organization from old query links before the saved choice", async () => {
+    const response = await middleware(
+      request("fixture-session", "/lighthouse/templates?organizationId=2&sort=new")
+    );
+    expect(response.headers.get("location")).toBe(
+      "https://product.example.test/lighthouse/o/2/templates?sort=new"
+    );
+  });
+  it("preserves explicitly forbidden or suspended old query choices for the unavailable screen", async () => {
+    const response = await middleware(
+      request("fixture-session", "/lighthouse/templates?organizationId=3")
+    );
+    expect(response.headers.get("location")).toBe(
+      "https://product.example.test/lighthouse/o/3/templates"
+    );
+  });
+  it("falls back to the first active organization if preferences cannot be read", async () => {
+    fetchMock.mockImplementation(async (url: string) =>
+      url.endsWith("/preferences")
+        ? new Response("unavailable", { status: 503 })
+        : new Response(
+            JSON.stringify({
+              data: [
+                { id: 3, status: "suspended" },
+                { id: 4, status: "active" },
+              ],
+            })
+          )
+    );
+    const response = await middleware(request("fixture-session", "/en/lighthouse"));
+    expect(response.headers.get("location")).toBe("https://product.example.test/en/lighthouse/o/4");
+  });
+  it("does not redirect resource links or fetch preferences for them", async () => {
+    const response = await middleware(
+      request("fixture-session", "/en/lighthouse/programs/2/cohorts/8/focus")
+    );
+    expect(response.headers.get("location")).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+  it("does not silently replace an explicitly empty organization query", async () => {
+    const response = await middleware(
+      request("fixture-session", "/lighthouse/templates?organizationId=")
+    );
+    expect(response.headers.get("location")).toBe(
+      "https://product.example.test/lighthouse/access-required"
+    );
+  });
+  it("does not redirect an all-suspended membership set into a loop", async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ data: [{ id: 3, status: "suspended" }] }))
+    );
+    const response = await middleware(request("fixture-session", "/lighthouse"));
+    expect(response.headers.get("location")).toBeNull();
   });
 });

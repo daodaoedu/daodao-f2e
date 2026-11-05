@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@daodao/ui/components/select";
-import { toast } from "@daodao/ui/components/sonner";
 import { useNavigationBlocker } from "@daodao/ui/hooks/navigation-blocker";
 import { useSearchParams } from "next/navigation";
 import {
@@ -37,9 +36,11 @@ import {
   interceptLighthouseTraversal,
   type LighthouseTraversalEventType,
   lighthouseOrganizationHref,
+  lighthouseOrganizationPathId,
   lighthouseRouterHref,
   lighthouseScopedHistoryRestore,
   resolveLighthouseOrganization,
+  shouldSaveLighthouseOrganization,
 } from "@/utils/lighthouse-organization";
 import { CohortErrorState } from "./cohort-error-state";
 import { ConfirmDialog } from "./confirm-dialog";
@@ -59,7 +60,13 @@ export function LighthouseOrganizationProvider({ children }: { children: ReactNo
   const { user, isAuthenticated, isLoading, authCheckUnavailable, refreshAuth } = useAuth();
   const t = useTranslations("lighthouse");
   const cacheConfig = useMemo(
-    () => ({ ...defaultSwrConfig, keepPreviousData: false, provider: () => new Map() }),
+    () => ({
+      ...defaultSwrConfig,
+      // Recheck access after returning to a tab; cached memberships can be revoked elsewhere.
+      revalidateOnFocus: true,
+      keepPreviousData: false,
+      provider: () => new Map(),
+    }),
     []
   );
   if (isLoading) return <p className="px-5 py-12 text-sm">{t("loading")}</p>;
@@ -93,7 +100,7 @@ function OrganizationState({ children }: { children: ReactNode }) {
     resourceMatch ? Number(resourceMatch[2]) : undefined
   );
   const resourceOrganizationId = resourceMatch ? cohort.data?.data.organizationId : undefined;
-  const requested = search.get("organizationId");
+  const requested = lighthouseOrganizationPathId(pathname);
   const organizations = organizationsQuery.organizations ?? [];
   const resolution = resolveLighthouseOrganization(
     organizations,
@@ -103,6 +110,8 @@ function OrganizationState({ children }: { children: ReactNode }) {
   );
   const ready =
     !organizationsQuery.isLoading &&
+    !organizationsQuery.error &&
+    !organizationsQuery.validationError &&
     Boolean(organizationsQuery.data) &&
     (resourceMatch ? Boolean(cohort.data) : requested !== null || Boolean(preferences.data));
   const organizationId =
@@ -119,20 +128,17 @@ function OrganizationState({ children }: { children: ReactNode }) {
   const writer = useRef<ReturnType<typeof createLighthousePreferenceWriter> | null>(null);
   useEffect(() => {
     mounted.current = true;
-    const accountWriter = createLighthousePreferenceWriter(
-      async (id) => {
-        const response = await updateLighthousePreferences(id);
-        if (response.error) throw response.error;
-        if (mounted.current) await preferenceMutation.current(response.data, { revalidate: false });
-      },
-      () => toast.error(t("save_failed"))
-    );
+    const accountWriter = createLighthousePreferenceWriter(async (id) => {
+      const response = await updateLighthousePreferences(id);
+      if (response.error) throw response.error;
+      if (mounted.current) await preferenceMutation.current(response.data, { revalidate: false });
+    });
     writer.current = accountWriter;
     return () => {
       mounted.current = false;
       accountWriter.dispose();
     };
-  }, [t]);
+  }, []);
   const historyIndex = useRef(0);
   const historySource = useRef<{ href: string; state: unknown } | null>(null);
   const pendingHistoryDelta = useRef<number | null>(null);
@@ -302,31 +308,44 @@ function OrganizationState({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!organizationId) return;
+    if (resourceMatch) {
+      if (search.has("organizationId")) {
+        router.replace(
+          href(`${pathname}?${search.toString()}${window.location.hash}`, organizationId)
+        );
+      }
+      return;
+    }
     if (requested !== String(organizationId)) {
       router.replace(
         href(`${pathname}?${search.toString()}${window.location.hash}`, organizationId)
       );
     }
-  }, [organizationId, requested, pathname, search, router, href]);
+  }, [organizationId, requested, pathname, search, router, href, resourceMatch]);
 
   useEffect(() => {
     if (
+      shouldSaveLighthouseOrganization(pathname, organizationId) &&
       organizationId &&
       preferences.data &&
       preferences.data.data.organizationId !== organizationId
     ) {
       writer.current?.request(organizationId);
     }
-  }, [organizationId, preferences.data]);
+  }, [organizationId, pathname, preferences.data]);
 
   useEffect(() => {
     const retry = () => {
-      if (organizationId && document.visibilityState === "visible")
+      if (
+        shouldSaveLighthouseOrganization(pathname, organizationId) &&
+        organizationId &&
+        document.visibilityState === "visible"
+      )
         writer.current?.request(organizationId);
     };
     window.addEventListener("focus", retry);
     return () => window.removeEventListener("focus", retry);
-  }, [organizationId]);
+  }, [organizationId, pathname]);
 
   const hasError =
     organizationsQuery.error ||
@@ -334,6 +353,11 @@ function OrganizationState({ children }: { children: ReactNode }) {
     (resourceMatch
       ? cohort.error || cohort.validationError
       : requested === null && (preferences.error || preferences.validationError));
+  let unavailableMessage = "organization_unavailable";
+  if (resolution.status === "empty") {
+    unavailableMessage =
+      organizations.length > 0 ? "organization_all_suspended" : "organization_not_enabled";
+  }
   let content: ReactNode = null;
   if (hasError)
     content = (
@@ -357,7 +381,7 @@ function OrganizationState({ children }: { children: ReactNode }) {
     content = (
       <div className="px-5 py-12">
         <p role="alert" className="text-sm text-[#5A7B79]">
-          {t("organization_unavailable")}
+          {t(unavailableMessage)}
         </p>
       </div>
     );

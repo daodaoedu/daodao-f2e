@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   lighthouseOrganizationHref,
+  lighthouseOrganizationPathId,
   resolveLighthouseOrganization,
+  shouldSaveLighthouseOrganization,
 } from "../lighthouse-organization";
 
 const organizations = [
@@ -44,7 +46,7 @@ describe("lighthouseOrganizationHref", () => {
   it("preserves existing query and fragment while replacing the organization", () => {
     expect(
       lighthouseOrganizationHref("/lighthouse/programs?edit=64&organizationId=2#cohort-64", 4)
-    ).toBe("/lighthouse/programs?edit=64&organizationId=4#cohort-64");
+    ).toBe("/lighthouse/o/4/programs?edit=64#cohort-64");
   });
   it("leaves the organization unspecified until the selection is ready", () => {
     expect(lighthouseOrganizationHref("/lighthouse", undefined)).toBe("/lighthouse");
@@ -209,5 +211,41 @@ describe("interceptLighthouseTraversal", () => {
       navigationType: "push",
     });
     expect(interceptLighthouseTraversal(push, { dirty: true, busy: false })).toBeNull();
+  });
+});
+
+describe("organization path navigation", () => {
+  it("replaces an existing organization while preserving section, locale, query and hash", () => {
+    expect(lighthouseOrganizationHref("/en/lighthouse/o/2/templates?sort=new#saved", 4)).toBe(
+      "/en/lighthouse/o/4/templates?sort=new#saved"
+    );
+  });
+  it("leaves cohort deep links unscoped and removes obsolete organization queries", () => {
+    expect(
+      lighthouseOrganizationHref(
+        "/lighthouse/programs/1/cohorts/8/focus?organizationId=2#learner",
+        4
+      )
+    ).toBe("/lighthouse/programs/1/cohorts/8/focus#learner");
+  });
+  it("does not rewrite destinations outside Lighthouse", () => {
+    expect(lighthouseOrganizationHref("/spaces?tab=private", 4)).toBe("/spaces?tab=private");
+  });
+});
+
+describe("path organization and preference policy", () => {
+  it("reads the explicit organization from localized and default-locale paths", () => {
+    expect(lighthouseOrganizationPathId("/lighthouse/o/4/templates")).toBe("4");
+    expect(lighthouseOrganizationPathId("/en/lighthouse/o/2")).toBe("2");
+    expect(lighthouseOrganizationPathId("/lighthouse/o/forbidden")).toBe("forbidden");
+    expect(lighthouseOrganizationPathId("/lighthouse/programs/1/cohorts/8/focus")).toBeNull();
+  });
+  it("never persists implicit resource ownership as a new account default", () => {
+    expect(shouldSaveLighthouseOrganization("/lighthouse/programs/1/cohorts/8/focus", 4)).toBe(
+      false
+    );
+    expect(shouldSaveLighthouseOrganization("/lighthouse/o/4/templates", 4)).toBe(true);
+    expect(shouldSaveLighthouseOrganization("/lighthouse/o/4/templates", 2)).toBe(false);
+    expect(shouldSaveLighthouseOrganization("/lighthouse/o/4/templates", undefined)).toBe(false);
   });
 });

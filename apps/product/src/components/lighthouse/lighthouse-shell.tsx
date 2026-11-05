@@ -71,7 +71,12 @@ function LighthouseShellContent({ children }: LighthouseShellProps) {
         <nav className="mt-8" aria-label={t("navigation_label")}>
           <ul className="space-y-1.5">
             {navigationItems.map((item) => {
-              const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+              const destination = href(item.href);
+              const isActive = item.exact
+                ? pathname === destination
+                : pathname.startsWith(destination) ||
+                  (item.href === "/lighthouse/programs" &&
+                    pathname.startsWith("/lighthouse/programs/"));
               const Icon = item.icon;
               return (
                 <li key={item.href}>
@@ -111,7 +116,12 @@ function LighthouseShellContent({ children }: LighthouseShellProps) {
         <nav className="mt-3 overflow-x-auto" aria-label={t("navigation_label")}>
           <ul className="flex min-w-max gap-2 pb-1">
             {navigationItems.map((item) => {
-              const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+              const destination = href(item.href);
+              const isActive = item.exact
+                ? pathname === destination
+                : pathname.startsWith(destination) ||
+                  (item.href === "/lighthouse/programs" &&
+                    pathname.startsWith("/lighthouse/programs/"));
               return (
                 <li key={item.href}>
                   <CustomLink

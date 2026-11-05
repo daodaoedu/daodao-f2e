@@ -1,5 +1,3 @@
-import { OrganizationSettings } from "@/components/lighthouse/organization-settings";
-
-export default function LighthouseOrganizationPage() {
-  return <OrganizationSettings />;
+export default function LighthouseLegacyEntryPage() {
+  return null;
 }

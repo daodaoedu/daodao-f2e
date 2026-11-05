@@ -3,6 +3,7 @@ import createMiddleware from "@daodao/i18n/middleware";
 import { routing } from "@daodao/i18n/routing";
 import { type NextRequest, NextResponse } from "next/server";
 import { checkPrivateSession, isPrivateSpacePath } from "./lib/auth/private-access";
+import { resolveLighthouseOrganization } from "./utils/lighthouse-organization";
 
 /**
  * i18n middleware plus the Lighthouse organization-membership gate.
@@ -19,11 +20,14 @@ const INTERNAL_PORT_RE = /:3001(?=\/|$|\?|#)/g;
 const LIGHTHOUSE_PATH_RE = /^\/(?:en\/)?lighthouse(?:\/|$)/;
 const LIGHTHOUSE_ACCESS_REQUIRED_RE = /^\/(?:en\/)?lighthouse\/access-required(?:\/|$)/;
 
-async function hasLighthouseAccess(
-  request: NextRequest
-): Promise<"allowed" | "unauthorized" | "denied" | "unavailable"> {
+type LighthouseAccess = {
+  status: "allowed" | "unauthorized" | "denied" | "unavailable";
+  organizations?: Array<{ id: number; status: string }>;
+};
+
+async function hasLighthouseAccess(request: NextRequest): Promise<LighthouseAccess> {
   const authToken = request.cookies.get("auth_token")?.value;
-  if (!authToken) return "unauthorized";
+  if (!authToken) return { status: "unauthorized" };
 
   try {
     // Server-side membership checks may use a private service address while browsers
@@ -37,17 +41,26 @@ async function hasLighthouseAccess(
       headers: { Cookie: `auth_token=${authToken}` },
       cache: "no-store",
     });
-    if (response.status === 401) return "unauthorized";
-    if (response.status === 403) return "denied";
-    if (!response.ok) return "unavailable";
+    if (response.status === 401) return { status: "unauthorized" };
+    if (response.status === 403) return { status: "denied" };
+    if (!response.ok) return { status: "unavailable" };
 
     const payload: unknown = await response.json();
-    if (!payload || typeof payload !== "object" || !("data" in payload)) return "unavailable";
-    if (!Array.isArray(payload.data)) return "unavailable";
-    return payload.data.length > 0 ? "allowed" : "denied";
+    if (!payload || typeof payload !== "object" || !("data" in payload))
+      return { status: "unavailable" };
+    if (!Array.isArray(payload.data)) return { status: "unavailable" };
+    const organizations = payload.data.filter(
+      (item): item is { id: number; status: string } =>
+        item !== null &&
+        typeof item === "object" &&
+        typeof item.id === "number" &&
+        typeof item.status === "string"
+    );
+    if (organizations.length !== payload.data.length) return { status: "unavailable" };
+    return organizations.length > 0 ? { status: "allowed", organizations } : { status: "denied" };
   } catch (error) {
     console.error("[middleware] Lighthouse membership check failed", error);
-    return "unavailable";
+    return { status: "unavailable" };
   }
 }
 
@@ -75,15 +88,15 @@ export default async function middleware(request: NextRequest) {
   }
   if (LIGHTHOUSE_PATH_RE.test(pathname) && !LIGHTHOUSE_ACCESS_REQUIRED_RE.test(pathname)) {
     const access = await hasLighthouseAccess(request);
-    if (access !== "allowed") {
-      if (access === "unavailable") {
+    if (access.status !== "allowed") {
+      if (access.status === "unavailable") {
         const errorUrl = request.nextUrl.clone();
         errorUrl.pathname = localizedPath(pathname, "/lighthouse/access-required");
         errorUrl.search = "?reason=unavailable";
         return NextResponse.redirect(errorUrl);
       }
       const redirectUrl = request.nextUrl.clone();
-      if (access === "unauthorized") {
+      if (access.status === "unauthorized") {
         redirectUrl.pathname = localizedPath(pathname, "/auth/login");
         redirectUrl.search = `?redirect=${encodeURIComponent(`${pathname}${request.nextUrl.search}`)}`;
       } else {
@@ -91,6 +104,62 @@ export default async function middleware(request: NextRequest) {
         redirectUrl.search = "";
       }
       return NextResponse.redirect(redirectUrl);
+    }
+    const entry = pathname.match(
+      /^(\/(?:en\/)?lighthouse)(\/(?:programs|templates|organization|archive))?\/?$/
+    );
+    if (entry) {
+      const requested = request.nextUrl.searchParams.get("organizationId");
+      if (requested === "") {
+        const destination = request.nextUrl.clone();
+        destination.pathname = localizedPath(pathname, "/lighthouse/access-required");
+        destination.search = "";
+        return NextResponse.redirect(destination);
+      }
+      let savedId: number | null = null;
+      if (requested === null) {
+        try {
+          const apiBaseUrl = (
+            getEnv("API_INTERNAL_URL") || getEnv("NEXT_PUBLIC_API_URL", "https://api.daodao.so")
+          )?.replace(/\/$/, "");
+          const preferenceResponse = await fetch(`${apiBaseUrl}/api/v1/lighthouse/preferences`, {
+            headers: { Cookie: `auth_token=${request.cookies.get("auth_token")?.value}` },
+            cache: "no-store",
+          });
+          if (preferenceResponse.ok) {
+            const payload: unknown = await preferenceResponse.json();
+            if (
+              payload &&
+              typeof payload === "object" &&
+              "data" in payload &&
+              payload.data &&
+              typeof payload.data === "object" &&
+              "organizationId" in payload.data &&
+              typeof payload.data.organizationId === "number"
+            )
+              savedId = payload.data.organizationId;
+          }
+        } catch {
+          // Preference outages must not block an otherwise authorized organization entry.
+        }
+      }
+      const resolution = resolveLighthouseOrganization(
+        access.organizations ?? [],
+        requested,
+        savedId
+      );
+      // Explicit old query choices stay explicit, including forbidden IDs; the scoped page
+      // displays unavailable instead of silently selecting a different organization.
+      const organizationId =
+        requested ?? (resolution.status === "ready" ? String(resolution.organizationId) : null);
+      if (organizationId !== null && organizationId !== "") {
+        const destination = request.nextUrl.clone();
+        destination.pathname = `${entry[1]}/o/${encodeURIComponent(organizationId)}${entry[2] ?? ""}`;
+        destination.searchParams.delete("organizationId");
+        const response = NextResponse.redirect(destination);
+        response.headers.set("Cache-Control", "private, no-store");
+        return response;
+      }
     }
   }
 

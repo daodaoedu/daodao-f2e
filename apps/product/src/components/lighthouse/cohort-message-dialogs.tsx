@@ -5,6 +5,7 @@ import {
   deleteLighthouseMessageTemplate,
   type LighthouseMessageCategory,
   sendLighthouseMessage,
+  useLighthouseCohort,
   useLighthouseMessageTemplates,
   useLighthouseParticipantMessages,
 } from "@daodao/api";
@@ -31,7 +32,10 @@ import { cn } from "@daodao/ui/lib/utils";
 import { format, parseISO } from "date-fns";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLighthouseOrganizationGuard } from "./lighthouse-organization-context";
+import {
+  useLighthouseOrganization,
+  useLighthouseOrganizationGuard,
+} from "./lighthouse-organization-context";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 
 type Person = {
@@ -120,6 +124,10 @@ export function CohortMessageComposeDialog({
   onSent,
 }: ComposeProps) {
   const t = useTranslations("lighthouse");
+  const { organization } = useLighthouseOrganization();
+  const cohort = useLighthouseCohort(programId, cohortId);
+  const cohortName = cohort.data?.data.displayName;
+  const [confirming, setConfirming] = useState(false);
   const [category, setCategory] = useState<LighthouseMessageCategory>("encourage");
   const [templateId, setTemplateId] = useState<string>(NO_TEMPLATE);
   const [body, setBody] = useState("");
@@ -132,6 +140,7 @@ export function CohortMessageComposeDialog({
   // 每次開啟依來源表格帶入類別，並清空上次內容
   useEffect(() => {
     if (target) {
+      setConfirming(false);
       setCategory(target.category);
       setTemplateId(NO_TEMPLATE);
       setBody("");
@@ -139,6 +148,7 @@ export function CohortMessageComposeDialog({
   }, [target]);
 
   function pickTemplate(value: string) {
+    setConfirming(false);
     setTemplateId(value);
     const template = templates.find((item) => String(item.id) === value);
     if (template) setBody(template.body);
@@ -177,7 +187,7 @@ export function CohortMessageComposeDialog({
   }
 
   async function send() {
-    if (!target || !body.trim()) return;
+    if (!target || !body.trim() || !organization || !cohortName || !confirming) return;
     setBusy(true);
     const response = await sendLighthouseMessage(programId, cohortId, target.userId, {
       category,
@@ -204,7 +214,12 @@ export function CohortMessageComposeDialog({
           <DialogTitle className="text-left text-xl font-semibold text-[#0D3036]">
             {t("message_compose_title", { name })}
           </DialogTitle>
-          <DialogDescription className="sr-only">{t("message_templates")}</DialogDescription>
+          <DialogDescription className="text-left text-sm text-[#5A7B79]">
+            {t("operation_destination", {
+              organization: organization?.name ?? "",
+              cohort: cohortName ?? "",
+            })}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -224,6 +239,7 @@ export function CohortMessageComposeDialog({
                 size="sm"
                 data-chip={category === key ? "true" : undefined}
                 onClick={() => {
+                  setConfirming(false);
                   setCategory(key);
                   setTemplateId(NO_TEMPLATE);
                 }}
@@ -279,13 +295,25 @@ export function CohortMessageComposeDialog({
             </Button>
           )}
         </div>
+        {confirming && (
+          <output className="mt-3 block text-sm text-[#0D3036]">
+            {t("message_send_confirmation", {
+              name,
+              organization: organization?.name ?? "",
+              cohort: cohortName ?? "",
+            })}
+          </output>
+        )}
         <Textarea
           className="mt-3 min-h-[120px]"
           placeholder={t("message_placeholder")}
           aria-label={t("message_placeholder")}
           disabled={busy}
           value={body}
-          onChange={(event) => setBody(event.target.value)}
+          onChange={(event) => {
+            setBody(event.target.value);
+            setConfirming(false);
+          }}
         />
         <DialogFooter className="mt-2">
           <Button
@@ -300,10 +328,10 @@ export function CohortMessageComposeDialog({
           <Button
             type="button"
             className="rounded-full bg-[#16B9B3] text-white hover:bg-[#12a39e]"
-            onClick={send}
-            disabled={busy || !body.trim()}
+            onClick={() => (confirming ? void send() : setConfirming(true))}
+            disabled={busy || !body.trim() || !organization || !cohortName}
           >
-            {t("message_send")}
+            {confirming ? t("message_send_confirm") : t("message_send")}
           </Button>
         </DialogFooter>
       </DialogContent>
