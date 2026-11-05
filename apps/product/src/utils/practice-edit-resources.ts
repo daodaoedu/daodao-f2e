@@ -8,6 +8,7 @@ interface ApiPracticeResource {
   url?: string | null;
   dayNumber?: number | null;
   isLocked?: boolean;
+  relevantDate?: string | null;
 }
 
 /**
@@ -17,10 +18,12 @@ interface ApiPracticeResource {
 export const toEditFormResources = (resources: ApiPracticeResource[]): FormResource[] =>
   resources.map((resource) => ({
     id: resource.id,
+    persistedId: resource.id,
     name: resource.name,
     url: resource.url || "",
     isLocked: resource.isLocked === true,
     dayNumber: resource.dayNumber ?? null,
+    ...(resource.isLocked ? { relevantDate: resource.relevantDate ?? null } : {}),
   }));
 
 /**
@@ -31,5 +34,7 @@ export const toUpdateResourcesPayload = (resources: FormResource[]) =>
   resources.map((resource) => ({
     name: resource.name,
     url: resource.url || undefined,
+    ...(resource.persistedId ? { id: resource.persistedId } : {}),
+    ...(resource.isLocked ? { id: resource.id, relevantDate: resource.relevantDate ?? null } : {}),
     ...(resource.dayNumber != null ? { dayNumber: resource.dayNumber } : {}),
   }));

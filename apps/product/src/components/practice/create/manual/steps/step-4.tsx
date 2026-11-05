@@ -18,6 +18,7 @@ import { LockIcon } from "lucide-react";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { ResourceCard } from "@/components/practice/shared";
+import { MAX_PERSONAL_PRACTICE_RESOURCES } from "@/constants/practice-form";
 import { useTagEditSheet } from "@/hooks/use-tag-edit-sheet";
 import type { ManualPracticeFormValues } from "../schema";
 
@@ -59,6 +60,15 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
     }
 
     const resources = form.getValues("resources") || [];
+    if (
+      resources.filter((resource) => !resource.isLocked).length >= MAX_PERSONAL_PRACTICE_RESOURCES
+    ) {
+      form.setError("resources", {
+        type: "manual",
+        message: t("wizard_resource_max", { max: MAX_PERSONAL_PRACTICE_RESOURCES }),
+      });
+      return false;
+    }
 
     // 如果有輸入 URL，驗證 URL 格式和 HTTPS
     if (trimmedUrl) {
@@ -208,7 +218,7 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
           const hasLockedResource = resources.some((r) => r.isLocked);
 
           return (
-            <FormItem>
+            <FormItem id="practice-resources" className="scroll-mt-24">
               <FormLabel className="block text-base font-normal text-text-dark mb-3">
                 {t("step4_resources_label")}
               </FormLabel>

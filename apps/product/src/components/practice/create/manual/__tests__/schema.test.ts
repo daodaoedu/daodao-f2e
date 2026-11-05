@@ -55,6 +55,22 @@ describe("createManualPracticeFormSchema messages (daodao#334)", () => {
     expect(issues.every((issue) => issue.message.startsWith("譯:"))).toBe(true);
   });
 
+  it("accepts HTTP cohort resources without relaxing personal resource validation", () => {
+    const base = {
+      ...invalidValues,
+      name: "每日閱讀",
+      actionDescription: "讀 10 頁",
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      executionTiming: ["morning"],
+    };
+    const schema = createManualPracticeFormSchema({}, t);
+    const locked = { id: "r1", name: "場次資源", url: "http://example.com/", isLocked: true };
+    expect(schema.safeParse({ ...base, resources: [locked] }).success).toBe(true);
+    expect(schema.safeParse({ ...base, resources: [{ ...locked, isLocked: false }] }).success).toBe(
+      false
+    );
+  });
+
   it("accepts dayNumber on resources so the edit form keeps it (daodao#332)", () => {
     const result = createManualPracticeFormSchema({}, t).safeParse({
       ...invalidValues,
@@ -132,5 +148,35 @@ describe("createManualPracticeFormSchema messages (daodao#334)", () => {
     if (result.success) throw new Error("expected validation to fail");
     const paths = result.error.issues.map((issue) => issue.path.join("."));
     expect(paths).toEqual(expect.arrayContaining(["durationDays", "frequency"]));
+  });
+});
+
+describe("personal resource limit with shared cohort resources (#401)", () => {
+  it("allows 50 shared plus a personal resource, and rejects eleven personal resources", () => {
+    const shared = Array.from({ length: 50 }, (_, index) => ({
+      id: `shared-${index}`,
+      name: `場次${index}`,
+      url: "http://example.com/",
+      isLocked: true,
+    }));
+    const personal = Array.from({ length: 11 }, (_, index) => ({
+      id: `personal-${index}`,
+      name: `個人${index}`,
+      url: `https://example.com/${index}`,
+    }));
+    const base = {
+      ...invalidValues,
+      name: "每日閱讀",
+      actionDescription: "讀10頁",
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      executionTiming: ["morning"],
+    };
+    const schema = createManualPracticeFormSchema({}, t);
+    expect(schema.safeParse({ ...base, resources: [...shared, personal[0]] }).success).toBe(true);
+    expect(
+      schema.safeParse({ ...base, resources: [...shared, ...personal.slice(0, 10)] }).success
+    ).toBe(true);
+    expect(schema.safeParse({ ...base, resources: personal }).success).toBe(false);
+    expect(schema.safeParse({ ...base, resources: [...shared, ...personal] }).success).toBe(false);
   });
 });
