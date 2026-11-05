@@ -37,6 +37,7 @@
     "@daodao/i18n": "workspace:*",
     "@daodao/shared": "workspace:*",
     "@daodao/ui": "workspace:*",
+    "@date-fns/tz": "1.4.1",
     "@hookform/resolvers": "catalog:",
     "@next/env": "catalog:",
     "@vercel/og": "^0.8.6",

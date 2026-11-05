@@ -26,6 +26,7 @@ import { CohortErrorState } from "@/components/lighthouse/cohort-error-state";
 import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
+import { CohortSessionSchedule } from "./cohort-session-schedule";
 
 /** 與「我的」頁一致的預設卡片主題色 */
 const DEFAULT_PRACTICE_THEME = "#FCDD84";
@@ -167,6 +168,8 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
               </PopoverContent>
             </Popover>
           </div>
+
+          {home && <CohortSessionSchedule sessions={home.sessions} timezone={home.timezone} />}
 
           <h2 className="mb-4 text-sm font-medium text-text-dark">{t("my_cohort_practices")}</h2>
           <div className="flex flex-col gap-3">
