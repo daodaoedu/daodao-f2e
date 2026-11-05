@@ -9,6 +9,10 @@ import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { PracticeSummaryPage } from "@/components/practice/summary";
 import { PracticeStatus } from "@/constants/practice-status";
 import { isPracticeEnded } from "@/utils/practice-period";
+import {
+  getPracticeSummaryPrivacyStatus,
+  getPracticeSummaryVisibility,
+} from "@/utils/practice-summary-visibility";
 
 const TOAST_DISMISSED_KEY = "showcase_public_toast_dismissed";
 
@@ -61,19 +65,19 @@ export default function PracticeSummaryPageRoute() {
     return isPracticeEnded(endDate, new Date());
   }, [practiceData]);
 
+  const privacyStatus = getPracticeSummaryPrivacyStatus(practiceData?.data);
+
   // task 10.1: 公開/延遲分享練習完成後顯示 toast
   const toastShownRef = useRef(false);
   useEffect(() => {
-    if (!practiceData?.data || toastShownRef.current) return;
-    const privacyStatus = (practiceData.data as Record<string, unknown>).privacyStatus as
-      | string
-      | undefined;
+    if (!practiceData?.data || !isOwner || !isExpired || toastShownRef.current) return;
+    const { notice } = getPracticeSummaryVisibility(privacyStatus, practiceData.data.status);
     const isDismissed =
       typeof window !== "undefined" && localStorage.getItem(TOAST_DISMISSED_KEY) === "1";
-    if (!isDismissed && (privacyStatus === "public" || privacyStatus === "delayed")) {
+    if (!isDismissed && notice) {
       toastShownRef.current = true;
-      toast(t("summary_public_toast"), {
-        description: t("summary_public_toast_description"),
+      toast(t(notice === "delayed" ? "summary_delayed_toast" : "summary_public_toast"), {
+        description: notice === "public" ? t("summary_public_toast_description") : undefined,
         action: {
           label: t("summary_public_toast_dismiss"),
           onClick: () => {
@@ -83,7 +87,7 @@ export default function PracticeSummaryPageRoute() {
         duration: 6000,
       });
     }
-  }, [practiceData]);
+  }, [practiceData, privacyStatus, isOwner, isExpired, t]);
 
   // 權限檢查：非擁有者或實踐未到期時，重定向到實踐詳情頁
   useEffect(() => {
@@ -123,5 +127,5 @@ export default function PracticeSummaryPageRoute() {
     return <PageShell message={summaryError ? t("summary_load_failed") : t("summary_no_data")} />;
   }
 
-  return <PracticeSummaryPage summary={summary} />;
+  return <PracticeSummaryPage summary={summary} privacyStatus={privacyStatus} />;
 }
