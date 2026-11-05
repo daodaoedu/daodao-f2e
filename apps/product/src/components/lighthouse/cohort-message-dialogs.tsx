@@ -175,15 +175,22 @@ export function CohortMessageComposeDialog({
   async function removeTemplate() {
     if (!organizationId || templateId === NO_TEMPLATE) return;
     setBusy(true);
-    const response = await deleteLighthouseMessageTemplate(organizationId, Number(templateId));
-    setBusy(false);
-    if (response.error) {
+    try {
+      const response = await deleteLighthouseMessageTemplate(organizationId, Number(templateId));
+      if (response.error) {
+        toast.error(t("save_failed"));
+        return;
+      }
+      // A deleted reference must not survive a failed or delayed refresh.
+      setTemplateId(NO_TEMPLATE);
+      await templatesQuery.mutate();
+      toast.success(t("message_template_deleted"));
+    } catch (error) {
+      console.error("Failed to delete cohort message template", error);
       toast.error(t("save_failed"));
-      return;
+    } finally {
+      setBusy(false);
     }
-    await templatesQuery.mutate();
-    setTemplateId(NO_TEMPLATE);
-    toast.success(t("message_template_deleted"));
   }
 
   async function send() {
@@ -254,7 +261,7 @@ export function CohortMessageComposeDialog({
           </div>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Select value={templateId} onValueChange={pickTemplate}>
+          <Select value={templateId} onValueChange={pickTemplate} disabled={busy}>
             <SelectTrigger
               className="h-9 min-w-[200px] flex-1 text-sm"
               aria-label={t("message_template_select")}

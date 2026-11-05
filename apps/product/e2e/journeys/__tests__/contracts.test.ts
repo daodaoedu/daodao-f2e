@@ -4,6 +4,7 @@ import {
   type FixtureManifest,
   fixtureProgram,
   fixtureUser,
+  journeyClosedDeadline,
   journeyDate,
   readApiData,
   serviceUrl,
@@ -81,5 +82,22 @@ describe("journey dates use the application calendar", () => {
     ["2026-10-28T16:00:00Z", 0, "2026-10-29"],
   ])("maps %s plus %i days to %s in Taipei", (instant, offset, expected) => {
     expect(journeyDate(offset, new Date(instant))).toBe(expected);
+  });
+});
+
+describe("closed cohort deadlines are expired in both calendars", () => {
+  it.each([
+    ["2026-10-28T15:59:59Z", "2026-10-26", "2026-10-28", "2026-10-28"],
+    ["2026-10-28T16:00:00Z", "2026-10-27", "2026-10-28", "2026-10-29"],
+    ["2026-10-31T16:00:00Z", "2026-10-30", "2026-10-31", "2026-11-01"],
+    ["2026-12-31T16:00:00Z", "2026-12-30", "2026-12-31", "2027-01-01"],
+    ["2028-02-28T16:00:00Z", "2028-02-27", "2028-02-28", "2028-02-29"],
+    ["2028-02-29T16:00:00Z", "2028-02-28", "2028-02-29", "2028-03-01"],
+    ["2027-02-28T16:00:00Z", "2027-02-27", "2027-02-28", "2027-03-01"],
+  ])("keeps %s expired for UTC and Taipei", (instant, expected, utcToday, taipeiToday) => {
+    const deadline = journeyClosedDeadline(new Date(instant));
+    expect.soft(deadline).toBe(expected);
+    expect.soft(deadline < utcToday).toBe(true);
+    expect.soft(deadline < taipeiToday).toBe(true);
   });
 });

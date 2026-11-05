@@ -70,6 +70,9 @@ export interface NotificationApiItem {
   entityType: string;
   entityId: string;
   // Optional fields spread from JSONB payload by backend
+  entityTitle?: string;
+  cohortName?: string;
+  message?: string;
   practiceTitle?: string;
   /** practice_checkin 通知時，entityId 為打卡 ID，practiceId 為所屬實踐 ID */
   practiceId?: string;

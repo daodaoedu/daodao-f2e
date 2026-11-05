@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { fixtureProgram, journeyDate } from "./contracts";
+import { fixtureProgram, journeyClosedDeadline, journeyDate } from "./contracts";
 import { api, cleanup, expect, login, manifest, serviceUrl, test, urls } from "./fixtures";
 
 test("staff creates Lighthouse cohort; learner consent gates joining and cohort remains visible", async ({
@@ -58,7 +58,8 @@ test("staff creates Lighthouse cohort; learner consent gates joining and cohort 
     await expect(page.getByRole("button", { name: "同意並加入", exact: true })).toBeDisabled();
     await page.getByRole("checkbox").check();
     await page.getByRole("button", { name: "同意並加入", exact: true }).click();
-    await expect(page).toHaveURL(new RegExp(`/cohorts/${id}$`));
+    // 私有程式庫的 CI runner 只有 2 核心（公開的是 4 核心），加入後跳轉常超過預設 20 秒；只放寬這一步。
+    await expect(page).toHaveURL(new RegExp(`/cohorts/${id}$`), { timeout: 60_000 });
     await expect(page.getByText(name, { exact: true }).first()).toBeVisible();
     await page.reload();
     await expect(page.getByText(name, { exact: true }).first()).toBeVisible();
@@ -94,7 +95,7 @@ for (const state of ["upcoming", "active", "full", "closed", "closed-paused"] as
         displayName: name,
         startDate: date(state === "upcoming" ? 7 : -7),
         endDate: date(21),
-        joinDeadline: date(closed ? -1 : 14),
+        joinDeadline: closed ? journeyClosedDeadline(now) : date(14),
         capacity: state === "full" ? 1 : null,
         status: "published",
         interactionModes: ["async"],

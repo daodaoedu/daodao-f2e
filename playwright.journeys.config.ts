@@ -8,7 +8,8 @@ export default defineConfig({
   maxFailures: 3,
   timeout: 120_000,
   expect: { timeout: 20_000 },
-  retries: 0,
+  // CI 重試一次：重試才通過會在 JSON 報告標成 flaky，由 infra 的 summarize_results.py 列進 job summary。
+  retries: getEnv("CI") ? 1 : 0,
   outputDir: "artifacts/journeys/test-results",
   reporter: [
     ["list"],

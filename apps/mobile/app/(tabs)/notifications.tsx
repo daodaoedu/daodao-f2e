@@ -1,10 +1,9 @@
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert, Pressable, RefreshControl } from "react-native";
+import { Alert, Linking, Pressable, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar, ScrollView, Spinner, Text, XStack, YStack } from "tamagui";
-import { NotificationType, type NotificationTypeType } from "@/constants/notification-type";
-import { REACTION_CONFIG, type ReactionTypeType } from "@/constants/reaction-type";
+import { NotificationType } from "@/constants/notification-type";
 import { colors } from "@/generated/design-tokens";
 import {
   type INotificationApiItem,
@@ -16,36 +15,15 @@ import {
 } from "@/hooks/useNotifications";
 import { useMobileTranslation } from "@/i18n";
 import { formatRelativeTime } from "@/utils/format-time";
+import {
+  getNotificationHref,
+  getNotificationText,
+  normalizeType,
+} from "@/utils/notification-display";
 
 // ============================================================================
 // Helpers
 // ============================================================================
-
-const BACKEND_TYPE_MAP: Record<string, NotificationTypeType> = {
-  Reaction: NotificationType.reaction,
-  Comment: NotificationType.comment,
-  CommentReply: NotificationType.commentReply,
-  Mention: NotificationType.mention,
-  UserFollowed: NotificationType.followUser,
-  PracticeFollowed: NotificationType.followPractice,
-  Connect: NotificationType.connect,
-  ConnectAccepted: NotificationType.agreeConnect,
-  ConnectAgreed: NotificationType.connectAgree,
-  ConnectRejected: NotificationType.connectRejected,
-  BuddyRequest: NotificationType.buddyRequest,
-  BuddyRequestFollower: NotificationType.buddyRequestFollower,
-  BuddyAccepted: NotificationType.buddyAccepted,
-  PracticeCreated: NotificationType.practiceCreated,
-  PracticeFinished: NotificationType.updatePracticeFinish,
-  PracticeCheckinActivity: NotificationType.updatePracticeCheckin,
-  PartnerCheckinActivity: NotificationType.updatePracticeCheckin,
-  PracticeUpdateActivity: NotificationType.updatePractice,
-  PartnerUpdateActivity: NotificationType.updatePractice,
-};
-
-function normalizeType(backendType: string): NotificationTypeType | string {
-  return BACKEND_TYPE_MAP[backendType] ?? backendType;
-}
 
 const AVATAR_COLORS = [
   "#FFD6C8",
@@ -61,90 +39,6 @@ const AVATAR_COLORS = [
 
 function getAvatarColor(name: string): string {
   return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length] ?? "#C8FFF2";
-}
-
-function getReactionEmoji(reactionType: string | undefined): string {
-  if (!reactionType) return "🙌";
-  return REACTION_CONFIG[reactionType as ReactionTypeType]?.emoji ?? "🙌";
-}
-
-function getNotificationText(
-  item: INotificationApiItem,
-  t: (key: string, values?: Record<string, string | number>) => string
-): string {
-  const type = normalizeType(item.type);
-  const name = item.actor.name;
-  const count = item.aggregationCount ?? 1;
-  const suffix = count > 1 ? t("and_others", { count: count - 1 }) : "";
-  const practiceTitle = item.practiceTitle ?? "";
-
-  switch (type) {
-    case NotificationType.reaction:
-      return t("text_reaction", {
-        name,
-        suffix,
-        title: practiceTitle,
-        reaction: getReactionEmoji(item.reactionType),
-      });
-    case NotificationType.comment:
-      return t("text_comment", { name, title: practiceTitle, content: item.content ?? "" });
-    case NotificationType.commentReply:
-      return t("text_comment_reply", { name, content: item.content ?? "" });
-    case NotificationType.mention:
-      return t("text_mention", { name, content: item.content ?? "" });
-    case NotificationType.followUser:
-      return t("text_follow_user", { name });
-    case NotificationType.followPractice:
-      return t("text_follow_practice", { name, title: practiceTitle });
-    case NotificationType.connect:
-      return t("text_connect", { name });
-    case NotificationType.agreeConnect:
-      return t("text_agree_connect", { name });
-    case NotificationType.connectAgree:
-      return t("text_connect_agree", { name });
-    case NotificationType.connectRejected:
-      return t("text_connect_rejected", { name });
-    case NotificationType.updatePracticeCheckin:
-      return t("text_check_in", {
-        name,
-        title: practiceTitle,
-        content: item.content ? t("content_suffix", { content: item.content }) : "",
-      });
-    case NotificationType.updatePracticeFinish:
-      return t("text_finish_practice", { name, title: practiceTitle });
-    case NotificationType.practiceCreated:
-      return t("text_practice_created", { name, title: practiceTitle });
-    case NotificationType.updatePractice:
-      return t("text_update_practice", { name, title: practiceTitle });
-    case NotificationType.buddyRequest:
-      return t("text_buddy_request", { name, title: practiceTitle });
-    case NotificationType.buddyRequestFollower:
-      return t("text_buddy_request_follower", { name, title: practiceTitle });
-    case NotificationType.buddyAccepted:
-      return t("text_buddy_accepted", { name });
-    default:
-      return t("text_default", { name });
-  }
-}
-
-function getNotificationHref(item: INotificationApiItem): string | null {
-  const practiceId = item.practiceId ?? (item.entityType === "checkin" ? undefined : item.entityId);
-
-  switch (item.entityType) {
-    case "practice":
-    case "comment":
-    case "checkin":
-    case "buddy_request":
-      if (practiceId && item.checkinId) {
-        return `/practices/${practiceId}/check-ins/${item.checkinId}`;
-      }
-      return practiceId ? `/practices/${practiceId}` : null;
-    case "user":
-    case "connection":
-      return item.actor.id ? `/users/${item.actor.id}` : null;
-    default:
-      return null;
-  }
 }
 
 // ============================================================================
@@ -296,10 +190,18 @@ export default function NotificationsScreen() {
 
       const href = getNotificationHref(item);
       if (href) {
-        router.push(href as never);
+        if (href.startsWith("https://")) {
+          try {
+            await Linking.openURL(href);
+          } catch {
+            Alert.alert(t("error_title"), t("operation_failed"));
+          }
+        } else {
+          router.push(href as never);
+        }
       }
     },
-    [router]
+    [router, t]
   );
 
   const handleAcceptConnect = useCallback(

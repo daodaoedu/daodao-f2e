@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check declared read-access evidence structure, never evidence truth or task applicability."""
+"""Check declared evidence structure, never execution truth or task applicability."""
 from __future__ import annotations
 
 import argparse
@@ -59,18 +59,72 @@ def evidence_reference(text: str) -> bool:
     return concrete(text) and bool(re.search(r'https?://\S+|(?:[\w.-]+/)+[^\s;；]+|[\w.-]+\.(?:json|log|txt|png|html|xml)\b', text))
 
 
+def observation_text(text: str) -> str:
+    value = re.sub(r'[✅✔☑\ufe0f`]', '', text).strip()
+    value = re.sub(r'\[[^\]]*\]\([^)]*\)|https?://\S+|(?:[A-Za-z_][\w.-]*/)+[^\s;；,，]+', '', value)
+    return value.strip()
+
+
+def journey_observations(lines: list[str]) -> list[str]:
+    """Reject empty success labels, without trying to infer whether prose is true."""
+    problems: list[str] = []
+    header: list[str] | None = None
+    for line in lines:
+        if not line.startswith('|'):
+            header = None
+            continue
+        cells = [cell.strip() for cell in line.strip('|').split('|')]
+        if cells[:3] == ['ID', '旅程', '類型']:
+            header = cells
+            continue
+        if cells and (cells[0] == '角色' or cells[0] in ROLES):
+            continue
+        if len(cells) < 4 or not re.search(r'正常|錯誤路徑', cells[2]):
+            continue
+        # Legacy rows may append evidence after the actual value. Prefer a marked
+        # observation, never a reference-only cell; retain the old compact shape.
+        fallback_index = 5 if len(cells) >= 6 else len(cells) - 1
+        if not header:
+            fallback_index = next((index for index in range(fallback_index, len(cells))
+                                   if any(mark in cells[index] for mark in ('✅', '⬜', '❌'))
+                                   and observation_text(cells[index]).strip(' ;；,，')), fallback_index)
+        actual_index = next((header.index(name) for name in ('實際', '實際結果') if header and name in header), fallback_index)
+        actual = cells[actual_index] if actual_index < len(cells) else ''
+        # The existing gates report missing or failed execution before checking a claimed success.
+        if any(mark in actual for mark in ('⬜', '❌')) or not any('✅' in cell for cell in cells):
+            continue
+        value = observation_text(actual)
+        value = re.sub(r'\b(?:all\s+)?\d+\s+checks?\s+pass(?:ed)?\b', '', value, flags=re.I)
+        # A test tally such as 100/100 PASS is not an HTTP status observation.
+        status_value = re.sub(r'\b\d+\s*/\s*\d+\s*(?=pass(?:ed)?\b)', '', value, flags=re.I)
+        residual = re.sub(r'\b(?:pass(?:ed)?|success(?:ful)?|verified|done|worker|background|queue|http|smtp|ui|api|all|checks?)\b', '', value, flags=re.I)
+        residual = re.sub(r'未發請求|符合預期|如預期|驗證通過|已驗證|通過|成功|正常|完成|前端驗證|背景工作|全部|驗證', '', residual)
+        residual = re.sub(r'\b\d+\s*/\s*\d+\b', '', residual)
+        residual = re.sub(r'[\W_]+', '', residual)
+        expected = ''
+        if header:
+            expected_index = next((header.index(name) for name in ('預期結果', '預期') if name in header), None)
+            if expected_index is not None and expected_index < len(cells):
+                expected = observation_text(cells[expected_index])
+        observed_value = bool(STATUS.search(status_value) or re.search(r'→|->|「[^」]+」|message[-_ ]?id\s*[:=]|\d+\s*(?:封|筆|rows|bytes)\b', value, re.I))
+        if (not residual and not STATUS.search(status_value)) or (expected and value == expected and not observed_value):
+            problems.append(f'核心旅程列「{cells[0]}」實際欄缺具體觀察結果；不能只填 PASS、未發請求或重述預期。請填實際 HTTP／UI 訊息／job 狀態或 SMTP 收件結果並附證據；格式通過不代表實跑。')
+    return problems
+
+
 def validate(text: str, scope: str) -> list[str]:
     lines = section(visible_lines(text), '驗證' if scope == 'task' else '驗證證據', 2)
+    observations = journey_observations(lines)
     declarations = [re.sub(r'^讀取權限驗證[：:]\s*', '', line) for line in lines if re.match(r'^讀取權限驗證[：:]', line)]
     if len(declarations) != 1:
-        return ['讀取權限驗證必須在驗證區塊內明確宣告一次「適用」或「不適用：具體原因」']
+        return observations + ['讀取權限驗證必須在驗證區塊內明確宣告一次「適用」或「不適用：具體原因」']
     declaration = declarations[0]
     reason = na_reason(declaration)
     if reason is not None:
-        return [] if concrete(reason) else ['讀取權限驗證不適用缺具體原因']
+        return observations if concrete(reason) else observations + ['讀取權限驗證不適用缺具體原因']
     if declaration != '適用':
-        return ['讀取權限驗證宣告只能是「適用」或「不適用：具體原因」']
-    problems: list[str] = []
+        return observations + ['讀取權限驗證宣告只能是「適用」或「不適用：具體原因」']
+    problems = observations
     if any(re.match(r'^核心旅程不適用[：:]', line) for line in lines):
         problems.append('讀取權限驗證適用時不得用「核心旅程不適用」豁免；需正常及拒絕存取旅程')
     journey_lines = section(lines, '核心旅程矩陣', 3)
