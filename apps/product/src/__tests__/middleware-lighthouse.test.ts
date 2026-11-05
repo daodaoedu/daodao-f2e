@@ -10,8 +10,8 @@ vi.mock("@daodao/i18n/middleware", () => ({ default: () => () => NextResponse.ne
 
 import middleware from "../middleware";
 
-function request(token = "fixture-session") {
-  return new NextRequest("https://product.example.test/en/lighthouse/programs", {
+function request(token = "fixture-session", path = "/en/lighthouse/programs") {
+  return new NextRequest(`https://product.example.test${path}`, {
     headers: token ? { cookie: `auth_token=${token}` } : {},
   });
 }
@@ -60,6 +60,45 @@ describe("Lighthouse middleware backend routing", () => {
     environment.set("API_INTERNAL_URL", "http://server:4000/");
     fetchMock.mockResolvedValue(new Response(JSON.stringify(body), { status }));
     const response = await middleware(request());
+    expect(response.headers.get("location")).toContain(destination);
+  });
+  it.each([
+    200, 403,
+  ])("allows a non-member leader into templates after organization HTTP %s", async (status) => {
+    fetchMock
+      .mockResolvedValueOnce(new Response(JSON.stringify({ data: [] }), { status }))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            data: [
+              {
+                organizationId: 1,
+                templateId: 2,
+                cohortId: 7,
+                cohortName: "場次",
+                templateName: "模板",
+              },
+            ],
+          }),
+          { status: 200 }
+        )
+      );
+    const response = await middleware(request("fixture-session", "/en/lighthouse/templates"));
+    expect(response.headers.get("location")).toBeNull();
+    expect(fetchMock.mock.calls[1]?.[0]).toContain("/my-cohort-resource-bindings");
+  });
+  it.each([
+    [200, { data: [] }, "/en/lighthouse/access-required"],
+    [401, {}, "/en/auth/login?"],
+    [403, {}, "/en/lighthouse/access-required"],
+    [500, {}, "/en/lighthouse/access-required?reason=unavailable"],
+    [200, { data: null }, "/en/lighthouse/access-required?reason=unavailable"],
+    [200, { data: [{}] }, "/en/lighthouse/access-required?reason=unavailable"],
+  ])("handles leader bindings HTTP %s without widening access", async (status, body, destination) => {
+    fetchMock
+      .mockResolvedValueOnce(new Response(JSON.stringify({ data: [] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(body), { status }));
+    const response = await middleware(request("fixture-session", "/en/lighthouse/templates"));
     expect(response.headers.get("location")).toContain(destination);
   });
 });

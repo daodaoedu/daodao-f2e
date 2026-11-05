@@ -1125,3 +1125,35 @@ export const getLighthouseActivityDetail = async (
     "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/activities/{type}/{activityId}",
     { params: { path: { programId, cohortId, type, activityId } } }
   );
+
+const cohortResourcesPath =
+  "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/cohorts/{cohortId}/resources";
+type CohortResourcesResponse =
+  paths[typeof cohortResourcesPath]["get"]["responses"][200]["content"]["application/json"];
+export type CohortTemplateResource = CohortResourcesResponse["data"][number];
+export type CohortTemplateResourceInput = NonNullable<
+  paths[typeof cohortResourcesPath]["put"]["requestBody"]
+>["content"]["application/json"]["resources"][number];
+export type CoachResourceBinding =
+  paths["/api/v1/lighthouse/my-cohort-resource-bindings"]["get"]["responses"][200]["content"]["application/json"]["data"][number];
+
+export const getCoachResourceBindings = () =>
+  client.GET("/api/v1/lighthouse/my-cohort-resource-bindings");
+
+export const getCohortTemplateResources = (
+  organizationId: number,
+  templateId: number,
+  cohortId: number
+) =>
+  client.GET(cohortResourcesPath, { params: { path: { organizationId, templateId, cohortId } } });
+
+export const saveCohortTemplateResources = (
+  organizationId: number,
+  templateId: number,
+  cohortId: number,
+  resources: CohortTemplateResourceInput[]
+) =>
+  client.PUT(cohortResourcesPath, {
+    params: { path: { organizationId, templateId, cohortId } },
+    body: { resources },
+  });
